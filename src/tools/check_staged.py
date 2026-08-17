@@ -152,11 +152,46 @@ def load_patterns():
     return pats
 
 
+#: A separator that turns a copy of a banned folder into a new name. Finder,
+#: rsync, the sanitiser's own quarantine and half the world's backup tools all
+#: reach for one of these.
+_NEIGHBOURS = (".", "-", "_", " ")
+
+
+def in_forbidden_dir(path: str) -> bool:
+    """Does this path lead into a personal-data directory at the repository root?
+
+    `startswith("profile/")` was the whole check, and it answers NO for
+    `profile._stale/labs.json`. That is not a hypothetical spelling: the
+    sanitiser itself renames a build it cannot delete to `<name>._stale`, Finder
+    writes `profile copy`, a hand backup becomes `profile.bak`, and a folder left
+    behind by the move became `genome-old`. Every one of those carries exactly
+    the same lab results as the folder the rule was written for, and every one of
+    them walked straight past it.
+
+    So the FIRST SEGMENT is compared, and it counts as banned when it equals the
+    name or continues it with a separator. Deeper down the same name stays
+    legitimate — `src/scholion/templates/profile/` holds the synthetic templates
+    without which the anonymised package does not build, and anchoring at the
+    root is what lets that stand. And `worksheets/`, `datasets/`, `rawhide/` are
+    left alone: a letter is not a separator, and a rule that blocks ordinary
+    words gets switched off by the first person it inconveniences.
+    """
+    head = path.replace("\\", "/").split("/", 1)[0]
+    for d in FORBIDDEN_DIRS:
+        name = d.rstrip("/")
+        if head == name:
+            return True
+        if head.startswith(name) and head[len(name):len(name) + 1] in _NEIGHBOURS:
+            return True
+    return False
+
+
 def check_paths(files):
     bad = []
     for f in files:
         low = f.lower()
-        if any(f.startswith(d) for d in FORBIDDEN_DIRS):
+        if in_forbidden_dir(f):
             bad.append((f, "personal-data directory", "block"))
         elif any(low.endswith(e) for e in FORBIDDEN_EXT if e):
             # …unless it is the declared, size-capped test fixture. The refusal

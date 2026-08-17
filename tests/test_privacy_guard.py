@@ -142,3 +142,52 @@ class TestHostList(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(check_staged is None, "check_staged.py is not part of this build")
+class TestARenamedPersonalFolderIsStillPersonal(unittest.TestCase):
+    """A copy of `profile/` under any nearby name carries the same lab results.
+
+    The rule was `path.startswith("profile/")`, and it answers NO for
+    `profile._stale/labs.json`. Every one of the spellings below is something a
+    real tool produces: the sanitiser renames an undeletable build to
+    `<name>._stale`, Finder writes `profile copy`, a hand backup becomes
+    `profile.bak`, and the move off iCloud left a `genome-old`. This was raised
+    for R2 and pulled forward the day the repository went public — a hole in the
+    personal-data guard stops being theoretical the moment there is somewhere for
+    the data to go.
+    """
+
+    BLOCKED = ["profile/labs.json", "profile._stale/labs.json", "profile.bak/genotypes.json",
+               "profile copy/labs.json", "genome-old/full.vcf.gz", "_backups.old/labs.json",
+               "raw-2/lab/form.pdf", "reports/summary.md"]
+
+    #: Ordinary names that merely begin with the same letters. A guard that
+    #: blocks these is a guard somebody switches off.
+    ALLOWED = ["worksheets/plan.md", "datasets/reference.csv", "rawhide/parser.py",
+               "src/scholion/templates/profile/labs.json", "src/core.py",
+               "tests/fixtures/profile/labs.json"]
+
+    def test_a_renamed_personal_directory_is_blocked(self):
+        missed = [p for p in self.BLOCKED if not check_staged.in_forbidden_dir(p)]
+        self.assertEqual(missed, [], "walked past the personal-data guard: " + ", ".join(missed))
+
+    def test_an_ordinary_directory_is_not_blocked(self):
+        caught = [p for p in self.ALLOWED if check_staged.in_forbidden_dir(p)]
+        self.assertEqual(caught, [], "blocked something legitimate: " + ", ".join(caught))
+
+    def test_the_nested_template_folder_still_works(self):
+        """Anchoring at the root is load-bearing, not a simplification.
+
+        `src/scholion/templates/profile/` holds the synthetic templates without
+        which the anonymised package does not build.
+        """
+        self.assertFalse(check_staged.in_forbidden_dir("src/scholion/templates/profile/labs.json"))
+
+    def test_the_push_gate_uses_the_same_predicate(self):
+        """Two gates, one rule. The last time they diverged, the fifth gate
+        blocked the synthetic fixture the other four admitted (v0.1.1)."""
+        src = (support.ROOT / "src" / "tools" / "check_push.py").read_text(encoding="utf-8")
+        self.assertIn("in_forbidden_dir", src)
+        self.assertNotIn("startswith(d) for d in FORBIDDEN_DIRS", src,
+                         "check_push.py kept its own copy of the prefix rule")

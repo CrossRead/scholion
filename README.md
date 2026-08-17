@@ -7,9 +7,9 @@ behind every statement.
 Three ways in, one core: a local web app, a skill for a language model, and a
 plugin for [Ouroboros](https://github.com/razzant/ouroboros).
 
-**Version 0.1.3 — the first public release.** Not a medical device and not a doctor. Everything the system
-produces is material for your own decisions and for a conversation with your
-physician.
+**Version 0.2.0** — first published as `0.1.0` on 16.08.2026. Not a medical
+device and not a doctor. Everything the system produces is material for your
+own decisions and for a conversation with your physician.
 
 ---
 
@@ -470,10 +470,10 @@ Semantic versions with the date in the entry heading. The rules for choosing a
 number, the release procedure and the two-repository model are described in
 `docs/`.
 
-**This is `0.1.0`, not the `2.24.0` the project had reached internally by
-publication day** — a version number is a promise to whoever already runs the
-previous one, and nobody outside had run any of those yet, so the count reset
-to where that promise begins.
+**Publication began at `0.1.0`, not the `2.24.0` the project had reached
+internally by then** — a version number is a promise to whoever already runs
+the previous one, and nobody outside had run any of those yet, so the count
+reset to where that promise begins.
 
 **Below `1.0.0` the public contract may break.** The project's own rule is that
 command names, the top-level fields of `--json` and the file names inside a

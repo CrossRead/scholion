@@ -6,8 +6,21 @@
     "assembly": "GRCh38",
     "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome).",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
-    "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). DPYD *13 (rs55886062) — a CPIC-actionable allele that src/ingest/extract_pgx_loci.sh used to carry a coordinate for while this catalogue did not; the script now reads the catalogue, so the locus is not scanned until its GRCh38 position is verified against a primary source. Named rather than guessed, 16.08.2026.",
+    "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
+    "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026."
+  },
+
+  "regions": {
+    "CYP2D6": {
+      "chrom": "22",
+      "start": 42126000,
+      "end": 42132000,
+      "why": {
+        "en": "structural variation: deletions, duplications and CYP2D6/CYP2D7 hybrids are not visible at a point",
+        "ru": "структурные варианты: делеции, дупликации и гибриды CYP2D6/CYP2D7 в точке не видны"
+      }
+    }
   },
   "loci": {
     "rs429358": {
@@ -125,6 +138,51 @@
       "star": "*10",
       "note": {"en": "see PyPGx", "ru": "см. PyPGx"}
     },
+    "rs115232898": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97699474,
+      "ref": "T",
+      "alt": "C",
+      "star": "c.557A>G",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
+    "rs146356975": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97595149,
+      "ref": "T",
+      "alt": "C",
+      "star": "c.868A>G",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
+    "rs75017182": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97579893,
+      "ref": "G",
+      "alt": "C",
+      "star": "HapB3 (c.1129-5923C>G)",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
+    "rs56038477": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97573863,
+      "ref": "C",
+      "alt": "T",
+      "star": "HapB3 (c.1236G>A)",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
+    "rs55886062": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97515787,
+      "ref": "A",
+      "alt": "C",
+      "star": "*13",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
     "rs3918290": {
       "gene": "DPYD",
       "chrom": "1",
@@ -132,6 +190,15 @@
       "ref": "C",
       "alt": "T",
       "star": "*2A",
+      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+    },
+    "rs112766203": {
+      "gene": "DPYD",
+      "chrom": "1",
+      "pos": 97305279,
+      "ref": "G",
+      "alt": "A",
+      "star": "c.2279C>T",
       "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
     },
     "rs67376798": {

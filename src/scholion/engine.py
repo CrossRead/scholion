@@ -159,6 +159,7 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
     func_counts: Dict[str, int] = {}
     found: List[Dict[str, Any]] = []
     unread: List[str] = []
+    hap_copies: Dict[str, int] = {}       # a multi-tag haplotype counts once, see below
     for m in gdef.get("markers", []):
         st = core.genotype_status(m["rsid"])
         if not st or not st.get("genotype"):
@@ -174,9 +175,27 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
             continue
         gt = st["genotype"]
         copies = gt.upper().count(m["variant_allele"].upper())
-        func_counts[m["function"]] = func_counts.get(m["function"], 0) + copies
+        # A haplotype defined by more than one tag is ONE allele, however many of
+        # its tags were read. DPYD HapB3 is tagged by rs75017182 and rs56038477,
+        # which travel together; adding both would make a single heterozygous
+        # carrier count as two decreased-function alleles — an activity score of
+        # 1.0 read as 0.0. Nothing in the phenotype rules says so today, which is
+        # exactly why it has to be right before one does.
+        #
+        # Among the tags of one haplotype the LARGEST copy number wins. They
+        # should agree; when they do not — imperfect linkage, a missed call, a
+        # phasing artefact — the cautious reading is the one that keeps the
+        # variant, not the one that drops it.
+        hap = m.get("haplotype")
+        if hap:
+            prev = hap_copies.get(hap, 0)
+            if copies > prev:
+                func_counts[m["function"]] = func_counts.get(m["function"], 0) + (copies - prev)
+                hap_copies[hap] = copies
+        else:
+            func_counts[m["function"]] = func_counts.get(m["function"], 0) + copies
         found.append({"rsid": m["rsid"], "star": m.get("star", ""), "genotype": gt,
-                      "copies": copies, "function": m["function"],
+                      "copies": copies, "function": m["function"], "haplotype": hap,
                       "confidence": st.get("confidence"), "depth": st.get("depth")})
 
     basis = _basis(gene, gdef, found)

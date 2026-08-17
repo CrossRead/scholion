@@ -125,6 +125,65 @@ class TestTheModelIsNotNarrowerThanTheCatalogue(unittest.TestCase):
             "catalogue: " + ", ".join(gaps)
             + " — model them, or record the decision in ACCEPTED with a reason")
 
+    #: The DPYD variants the 2024 joint consensus calls Tier 1 — "must be
+    #: included in a clinical DPYD genotyping panel". Written out here, from the
+    #: publication, because the invariant above compares the model against OUR
+    #: catalogue, and two files can narrow together without either noticing: on
+    #: 17.08.2026 both carried the same two variants of seven and the check was
+    #: green. A panel measured only against itself always looks complete.
+    #:
+    #: Source: DPYD Genotyping Recommendations: A Joint Consensus Recommendation
+    #: of AMP, ACMG, CPIC, CAP, DPWG, ESPT, PharmGKB and PharmVar.
+    #: J Mol Diagn 2024;26(10):851-863. https://pubmed.ncbi.nlm.nih.gov/39032821/
+    #: HapB3 is one allele carried by two tags, hence two rsIDs on one row.
+    DPYD_TIER_1 = {
+        "rs3918290":   "*2A / c.1905+1G>A",
+        "rs55886062":  "*13 / c.1679T>G",
+        "rs75017182":  "HapB3 / c.1129-5923C>G",
+        "rs56038477":  "HapB3 / c.1236G>A",
+        "rs115232898": "c.557A>G",
+        "rs146356975": "c.868A>G",
+        "rs112766203": "c.2279C>T",
+        "rs67376798":  "c.2846A>T",
+    }
+
+    def test_the_dpyd_panel_covers_tier_1(self):
+        """Measured against the outside world, not against ourselves.
+
+        A missing Tier 1 variant is not a smaller answer, it is a wrong one: with
+        the variant absent from the model a carrier is reported as having normal
+        DPD activity, and the drug in question kills people at full dose.
+        """
+        kb = _load("cpic_drug_gene.json")
+        modelled = {m["rsid"] for m in (kb["genes"].get("DPYD") or {}).get("markers", [])}
+        missing = sorted(set(self.DPYD_TIER_1) - modelled)
+        self.assertEqual(
+            missing, [],
+            "the DPYD model does not cover Tier 1 of the 2024 consensus: "
+            + ", ".join(f"{r} ({self.DPYD_TIER_1[r]})" for r in missing))
+
+    def test_every_tier_1_variant_has_coordinates(self):
+        """Modelled but unlocatable is the same gap one file further on."""
+        loci = _load("loci.json")["loci"]
+        missing = sorted(r for r in self.DPYD_TIER_1 if r not in loci)
+        self.assertEqual(missing, [], "Tier 1 variants absent from loci.json: " + ", ".join(missing))
+
+    def test_hapb3_is_one_allele_carried_by_two_tags(self):
+        """Both tags must declare the same haplotype, or the carrier counts twice.
+
+        rs75017182 and rs56038477 travel together. Counted separately, one
+        heterozygous carrier yields two decreased-function alleles — activity
+        score 1.0 read as 0.0. The phenotype rules do not yet distinguish the
+        two, which is the reason to fix it now rather than after they do.
+        """
+        kb = _load("cpic_drug_gene.json")
+        tags = {m["rsid"]: m.get("haplotype")
+                for m in kb["genes"]["DPYD"]["markers"]
+                if m["rsid"] in ("rs75017182", "rs56038477")}
+        self.assertEqual(len(tags), 2, "both HapB3 tags must be modelled")
+        self.assertEqual(set(tags.values()), {"HapB3"},
+                         f"the HapB3 tags do not share a haplotype: {tags}")
+
     def test_model_markers_exist_in_the_locus_catalogue(self):
         """The other direction: a model marker with no coordinates cannot be read from a VCF."""
         kb = _load("cpic_drug_gene.json")

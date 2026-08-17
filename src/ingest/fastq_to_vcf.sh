@@ -62,23 +62,57 @@ need bcftools "brew install bcftools"
 [ "$MISS" = 1 ] && { echo "Install what is missing and run again."; exit 1; }
 log "Aligner: $ALIGNER"
 
-# ---------- BED of the target regions (GRCh38, chr notation, ±50 bp) ---------
-cat > "$BED" <<'EOF'
-chr19	44908484	44908884	APOE_rs429358_rs7412
-chr10	94942090	94942490	CYP2C9_rs1799853_*2
-chr10	94981096	94981496	CYP2C9_rs1057910_*3
-chr12	21178415	21178815	SLCO1B1_rs4149056_*5
-chr22	42126000	42132000	CYP2D6_region
-chr1	97077000	97078000	DPYD_rs3918290_*2A
-chr1	97515639	97516039	DPYD_rs55886062_*13
-chr1	97981143	97981543	DPYD_rs67376798
-chr1	11794219	11796521	MTHFR_C677T_A1298C
-chr6	18130718	18144155	TPMT_region
-chr19	40991169	40991569	CYP2C19_rs4244285_*2
-chr19	40982433	40982833	CYP2C19_rs12248560_*17
-chr16	31096168	31096568	VKORC1_rs9923231
-chr12	21178415	21178815	SLCO1B1_dup
-EOF
+# ---------- BED of the target regions — GENERATED, not written by hand -------
+# The second table this script used to carry. Five markers of the interpretation
+# panel were missed by it, and none of the five looked like an error to anyone
+# downstream: `bcftools` finds no row outside the target and the marker comes out
+# `./. (ref/not covered)` — the same output a position the sequencing genuinely
+# missed produces. A person following the documented route was told nothing was
+# found where their genotype was.
+#
+#   rs4244285  CYP2C19 *2    written on chr19; the gene is on chr10
+#   rs12248560 CYP2C19 *17   the same
+#   rs3918290  DPYD *2A      interval 373 kb away from the locus
+#   rs67376798 DPYD          interval 899 kb away
+#   rs1142345  TPMT *3C      31 bp outside the left edge — the commonest
+#                            deficient allele in Europeans, off by a rounding
+#
+# `extract_pgx_loci.sh` was repaired the same way in v2.19.0 and this file kept
+# its table, so the class came back. The repair is not "correct the five": it is
+# that there is no second table left to drift.
+PGX_PAD="${PGX_PAD:-200}"
+CATALOGUE="${SCHOLION_LOCI_JSON:-$(cd "$(dirname "$0")/../.." && pwd)/src/scholion/knowledge/loci.json}"
+[ -s "$CATALOGUE" ] || { echo "❌ the locus catalogue was not found: $CATALOGUE"; exit 1; }
+python3 - "$CATALOGUE" "$PGX_PAD" > "$BED" <<'BED_PY'
+import json, sys
+from pathlib import Path
+
+cat = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+pad = int(sys.argv[2])
+rows = []
+
+# Point loci: the coordinate plus a margin on both sides. The margin is what the
+# TPMT case cost — an interval that starts exactly at the locus is one rounding
+# away from starting after it.
+for rs, e in (cat.get("loci") or {}).items():
+    pos, chrom, gene = e.get("pos"), e.get("chrom"), e.get("gene") or "?"
+    if pos is None or chrom is None:
+        continue
+    rows.append((str(chrom), max(0, int(pos) - pad), int(pos) + pad, f"{gene}_{rs}"))
+
+# Whole-gene windows, for the genes a point cannot answer.
+for gene, r in (cat.get("regions") or {}).items():
+    rows.append((str(r["chrom"]), int(r["start"]), int(r["end"]), f"{gene}_region"))
+
+def key(r):
+    c = r[0]
+    return (int(c) if c.isdigit() else 99, c, r[1])
+
+for chrom, s, e, name in sorted(rows, key=key):
+    print(f"chr{chrom}\t{s}\t{e}\t{name}")
+BED_PY
+[ -s "$BED" ] || { echo "❌ the target BED came out empty — check $CATALOGUE"; exit 1; }
+log "Target regions from the catalogue: $(wc -l < "$BED" | tr -d ' ') ($CATALOGUE, ±${PGX_PAD} bp)"
 
 # ---------- 1. Reference + indexes -------------------------------------------
 if [ ! -f "$REF_FASTA" ]; then

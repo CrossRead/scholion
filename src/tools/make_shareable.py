@@ -28,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import zipfile
+import pathlib
 from pathlib import Path
 from typing import Optional
 
@@ -876,7 +877,31 @@ def _write_zip(out: Path) -> Path:
     audit — and an archive of the folder sitting inside that same folder would
     be a stale copy the moment either one changes again.
     """
-    made = shutil.make_archive(str(out), "zip", root_dir=str(out.parent), base_dir=out.name)
+    # `.git` is skipped, and not for tidiness. The delivery folder BECOMES a git
+    # repository the first time `publish_share.sh` runs `git init` in it, and from
+    # then on `make_archive` sweeps the whole public history into the handover
+    # archive: 506 entries and 3.6 MB of 6.8 on 17.08.2026, plus a remote pointing
+    # at the owner's account, in a file meant to be «the package, as one file».
+    #
+    # The part that matters is not the weight. `audit()` walks this folder looking
+    # for strings, and a git object is zlib — of 315 files under `.git` exactly 26
+    # read back as text. Whatever a repository's history holds, the audit passes it
+    # without seeing it. A folder the audit cannot read has no business inside
+    # something the audit signs off.
+    made = shutil.make_archive(str(out), "zip", root_dir=str(out.parent), base_dir=out.name,
+                               logger=None)
+    kept = []
+    with zipfile.ZipFile(made) as src:
+        for info in src.infolist():
+            parts = pathlib.PurePosixPath(info.filename).parts
+            if ".git" in parts:
+                continue
+            kept.append((info, src.read(info.filename)))
+    tmp = Path(str(made) + ".tmp")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as dst:
+        for info, data in kept:
+            dst.writestr(info, data)          # the ZipInfo carries external_attr over
+    tmp.replace(made)
     return Path(made)
 
 

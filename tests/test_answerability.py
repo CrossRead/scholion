@@ -159,6 +159,80 @@ class TestTheCatalogueSilenceIsNotAnAnswer(_Base):
                             "a carrier and a person with no data are told the same thing")
 
 
+class TestAHaplotypeWithTwoTagsCountsOnce(_Base):
+    """DPYD HapB3 is ONE allele described by two variants that travel together.
+
+    Counted separately, one heterozygous carrier yields two decreased-function
+    alleles — CPIC activity score 1.0 read as 0.0, an intermediate metaboliser
+    reported as fully deficient.
+
+    Today the phenotype rules do not tell one decreased allele from two, so an
+    end-to-end assertion on the printed phenotype passes with the bug in place —
+    a test that cannot fail is not a test. So the counting is driven directly,
+    against a fabricated gene whose rules DO distinguish them. The production
+    rules are one edit away from distinguishing them too, and that edit must not
+    be the thing that discovers this.
+    """
+
+    #: A gene definition that exists only here: same two HapB3 tags, plus a rule
+    #: that separates one decreased allele from two.
+    FAKE = {
+        "type": "metabolizer",
+        "markers": [
+            {"rsid": "rs75017182", "star": "tag A", "variant_allele": "C",
+             "function": "decreased", "haplotype": "HapB3"},
+            {"rsid": "rs56038477", "star": "tag B", "variant_allele": "T",
+             "function": "decreased", "haplotype": "HapB3"},
+            {"rsid": "rs67376798", "star": "lone", "variant_allele": "A",
+             "function": "decreased"},
+        ],
+        "phenotype_rules": [
+            {"when": {"decreased": ">=2"}, "phenotype": "two", "label": ""},
+            {"when": {"decreased": ">=1"}, "phenotype": "one", "label": ""},
+            {"default": True, "phenotype": "none", "label": ""},
+        ],
+    }
+
+    def _phenotype(self, genotypes):
+        """Run compute_phenotype against FAKE with the given calls, in-process."""
+        import sys as _sys
+        if str(support.SRC) not in _sys.path:
+            _sys.path.insert(0, str(support.SRC))
+        from scholion import engine, core
+        kb = {"genes": {"FAKEGENE": self.FAKE}}
+        orig_kb, orig_st, orig_gaps = core.cpic_kb, core.genotype_status, core.genome_gaps
+        core.cpic_kb = lambda: kb
+        core.genotype_status = lambda rsid: (
+            {"genotype": genotypes[rsid], "confidence": "called"} if rsid in genotypes else None)
+        core.genome_gaps = lambda: set()
+        try:
+            return engine.compute_phenotype("FAKEGENE")["phenotype"]
+        finally:
+            core.cpic_kb, core.genotype_status, core.genome_gaps = orig_kb, orig_st, orig_gaps
+
+    def test_both_tags_of_one_haplotype_make_one_allele(self):
+        self.assertEqual(
+            self._phenotype({"rs75017182": "GC", "rs56038477": "CT"}), "one",
+            "reading the second tag of the same haplotype added a second allele")
+
+    def test_one_tag_alone_already_makes_the_allele(self):
+        """The opposite failure: grouping must not silence the haplotype."""
+        self.assertEqual(self._phenotype({"rs75017182": "GC"}), "one")
+
+    def test_a_homozygous_haplotype_is_two_alleles(self):
+        """Grouping is per haplotype, not per person: CC is two copies of it."""
+        self.assertEqual(self._phenotype({"rs75017182": "CC", "rs56038477": "TT"}), "two")
+
+    def test_a_marker_outside_a_haplotype_still_counts_per_copy(self):
+        """The grouping applies to tagged markers only."""
+        self.assertEqual(self._phenotype({"rs67376798": "AA"}), "two")
+
+    def test_the_haplotype_and_a_separate_allele_add_up(self):
+        self.assertEqual(
+            self._phenotype({"rs75017182": "GC", "rs56038477": "CT", "rs67376798": "TA"}),
+            "two", "a haplotype and an unrelated variant must still be two alleles")
+
+
 class TestTheTableBelongsToTheDrug(_Base):
     """A recommendation table is keyed by (drug, gene), never by the gene."""
 
@@ -643,3 +717,78 @@ class TestAPartlyReadListSaysWhichPartWasNotRead(_Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheOnlineRouteDoesNotBorrowATable(_Base):
+    """The same rule as TestTheTableBelongsToTheDrug, on the road it was raised about.
+
+    The finding was about the ONLINE lookup: a drug absent from the local
+    catalogue, resolved through RxNorm, taking the recommendation table of the
+    first catalogue record with a matching gene. The repair went into
+    `_check_drug_online`; the test that guards it went onto the LOCAL route,
+    because `esomeprazole` is in `cpic_drug_gene.json` and never reaches the
+    online branch at all. A guard on the neighbouring road.
+
+    Here the online branch is actually entered: an invented drug the catalogue
+    has never heard of, in a class that maps to CYP2C19 — whose first catalogue
+    record is clopidogrel — and a phenotype forced to IM, because with an
+    unknown phenotype both the right and the wrong lookup return the same
+    generic sentence and the test proves nothing.
+    """
+
+    INVENTED = "zzztestolol"
+
+    def _online(self, phenotype="IM"):
+        import sys as _sys
+        if str(support.SRC) not in _sys.path:
+            _sys.path.insert(0, str(support.SRC))
+        from scholion import engine, drugsource
+        orig_resolve, orig_phen = drugsource.resolve_drug, engine.compute_phenotype
+        drugsource.resolve_drug = lambda name, allow_network=True: {
+            "rxcui": "999999", "name": self.INVENTED, "atc": [],
+            "internal_class": "antiplatelet_p2y12", "url": "https://example.invalid"}
+        engine.compute_phenotype = lambda gene: {
+            "phenotype": phenotype, "label": phenotype, "found": [],
+            "certainty": "determined", "basis": {"missing": [], "read": ["x"]},
+            "basis_note": ""}
+        try:
+            return engine._check_drug_online(self.INVENTED)
+        finally:
+            drugsource.resolve_drug, engine.compute_phenotype = orig_resolve, orig_phen
+
+    def _clopidogrel_note(self, phenotype="IM"):
+        import json
+        kb = json.loads((support.ROOT / "src" / "scholion" / "knowledge"
+                         / "cpic_drug_gene.json").read_text(encoding="utf-8"))
+        rec = next(d for d in kb["drugs"]
+                   if d.get("gene") == "CYP2C19" and "clopidogrel" in d.get("names", []))
+        return (rec["guidance"][phenotype]["note"]["en"], rec["guidance"][phenotype]["level"])
+
+    def test_the_invented_drug_is_not_in_the_local_catalogue(self):
+        """Without this the test could pass by never entering the online branch."""
+        import json
+        kb = json.loads((support.ROOT / "src" / "scholion" / "knowledge"
+                         / "cpic_drug_gene.json").read_text(encoding="utf-8"))
+        names = {n for d in kb.get("drugs", []) for n in d.get("names", [])}
+        self.assertNotIn(self.INVENTED, names)
+
+    def test_the_online_branch_is_the_one_under_test(self):
+        r = self._online()
+        self.assertEqual(r.get("gene"), "CYP2C19")
+        self.assertEqual(r.get("resolved_by"), "rxnorm", "the online branch was not entered")
+
+    def test_it_does_not_receive_the_clopidogrel_recommendation(self):
+        note, level = self._clopidogrel_note("IM")
+        r = self._online("IM")
+        self.assertNotEqual(
+            r.get("recommendation"), note,
+            "a drug with no table of its own was answered out of the clopidogrel table")
+        self.assertNotEqual(
+            r.get("level"), level,
+            f"it also inherited clopidogrel's severity ({level}) for a drug it knows nothing about")
+
+    def test_a_gene_level_caution_is_still_given(self):
+        """The honest outcome is a general caution — not silence, not a borrowed table."""
+        r = self._online()
+        self.assertTrue(r.get("recommendation"), "the online branch returned no words at all")
+        self.assertIn(r.get("level"), ("low", "unknown"))

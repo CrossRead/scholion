@@ -702,3 +702,58 @@ class TestTheMainEntryPointRefusesToHandOverABrokenZip(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(ms is None, "make_shareable.py is not part of this build")
+class TestTheHandoverArchiveCarriesNoRepository(unittest.TestCase):
+    """The delivery folder becomes a git repository, and the archive noticed.
+
+    `publish_share.sh` runs `git init` in the delivery folder, so from the first
+    publication onwards the folder holds a `.git` — and `shutil.make_archive`
+    swept the whole public history into the handover file: 506 entries and 3.6 MB
+    of 6.8 on 17.08.2026, with a remote pointing at the owner's account, in
+    something described as «the package, as one file».
+
+    The weight is the smaller half. `audit()` reads this folder looking for
+    strings, and a git object is zlib: of 315 files under `.git`, 26 read back as
+    text. Whatever a history holds, the audit passes it without seeing it — so a
+    folder the audit cannot read may not travel inside something the audit signs.
+    """
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix="zip_git_"))
+        self.addCleanup(shutil.rmtree, self.root, ignore_errors=True)
+        self.out = self.root / "Pkg"
+        (self.out / ".git" / "objects" / "ab").mkdir(parents=True)
+        (self.out / ".git" / "config").write_text(
+            "[remote \"origin\"]\n\turl = git@github.com:someone/private.git\n", encoding="utf-8")
+        (self.out / ".git" / "objects" / "ab" / "cdef").write_bytes(b"\x78\x9c\x00binary")
+        (self.out / "README.md").write_text("# Pkg\n", encoding="utf-8")
+        run = self.out / "run_tests.sh"
+        run.write_text("#!/usr/bin/env bash\necho ok\n", encoding="utf-8")
+        run.chmod(0o755)
+
+    def test_the_repository_does_not_travel_in_the_archive(self):
+        z = ms._write_zip(self.out)
+        with zipfile.ZipFile(z) as arch:
+            names = arch.namelist()
+        stowaways = [n for n in names if ".git" in Path(n).parts]
+        self.assertEqual(stowaways, [], "the git repository shipped inside the handover archive")
+        self.assertTrue(any(n.endswith("README.md") for n in names),
+                        "the archive lost the package while dropping the repository")
+
+    def test_the_execute_bit_survives_the_rewrite(self):
+        """Dropping entries means writing the archive again, and the previous
+        lesson here was that a rewritten entry loses its mode."""
+        z = ms._write_zip(self.out)
+        with zipfile.ZipFile(z) as arch:
+            info = next(i for i in arch.infolist() if i.filename.endswith("run_tests.sh"))
+        self.assertTrue((info.external_attr >> 16) & 0o111,
+                        "run_tests.sh came out of the archive without the execute bit")
+
+    def test_the_remote_address_is_not_in_the_archive(self):
+        """Named separately: it is the part a reader would not think to look for."""
+        z = ms._write_zip(self.out)
+        with zipfile.ZipFile(z) as arch:
+            blob = b"".join(arch.read(n) for n in arch.namelist() if not n.endswith("/"))
+        self.assertNotIn(b"github.com:someone/private.git", blob)

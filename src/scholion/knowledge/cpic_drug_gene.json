@@ -382,6 +382,44 @@
           "star": "c.2846A>T",
           "variant_allele": "A",
           "function": "decreased"
+        },
+        {
+          "rsid": "rs55886062",
+          "star": "*13",
+          "variant_allele": "C",
+          "function": "none"
+        },
+        {
+          "rsid": "rs75017182",
+          "star": "HapB3 (c.1129-5923C>G)",
+          "variant_allele": "C",
+          "function": "decreased",
+          "haplotype": "HapB3"
+        },
+        {
+          "rsid": "rs56038477",
+          "star": "HapB3 (c.1236G>A)",
+          "variant_allele": "T",
+          "function": "decreased",
+          "haplotype": "HapB3"
+        },
+        {
+          "rsid": "rs115232898",
+          "star": "c.557A>G",
+          "variant_allele": "C",
+          "function": "decreased"
+        },
+        {
+          "rsid": "rs146356975",
+          "star": "c.868A>G",
+          "variant_allele": "C",
+          "function": "decreased"
+        },
+        {
+          "rsid": "rs112766203",
+          "star": "c.2279C>T",
+          "variant_allele": "A",
+          "function": "decreased"
         }
       ],
       "phenotype_rules": [

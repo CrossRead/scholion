@@ -31,6 +31,97 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.2.0 — 17.08.2026
+
+_Comparison base: v0.1.3 → HEAD. 13 files changed. **MINOR, not PATCH: this is a
+break in the series** — `src/scholion/knowledge/` changed and the same input now
+yields a different answer._
+
+### What this changes in the conclusions
+
+**The DPYD panel goes from two variants to seven.** The 2024 joint consensus of
+AMP, ACMG, CPIC, CAP, DPWG, ESPT, PharmGKB and PharmVar names seven Tier 1 DPYD
+alleles — the set a clinical panel is expected to carry. This one carried two:
+`*2A` and `c.2846A>T`. Now it carries all seven: `*13`, HapB3 (both of its tags),
+`c.557A>G`, `c.868A>G` and `c.2279C>T` are added, with their coordinates taken
+one at a time from dbSNP and Ensembl rather than from anybody's memory. The gene
+is on the minus strand, so the cDNA notation and the allele written in a VCF are
+opposites; each was converted and checked.
+
+A person who ran `drug capecitabine` before this release and was told the DPYD
+markers looked normal was told that on the strength of two positions out of
+seven. The same command now says «read 2 of 8 markers» and names the six it could
+not read. **Nothing about that person changed; what the answer admits did.**
+
+**A haplotype carried by two variants counted as two alleles.** DPYD HapB3 is one
+allele described by `rs75017182` and `rs56038477`, which travel together. The
+counter added copies per marker, so a single heterozygous carrier would have
+produced two decreased-function alleles — CPIC activity score 1.0 read as 0.0, an
+intermediate metaboliser reported as fully deficient. The direction is towards
+caution, which is why it could have sat there; it is still a wrong statement
+about a person. Markers may now declare a `haplotype`, and one is counted once.
+
+**Five markers were outside the extraction target and nobody could have seen it.**
+`fastq_to_vcf.sh` carried its own table of regions to align against. Two CYP2C19
+markers were written on chromosome 19 — the gene is on 10. Two DPYD intervals
+stood 373 kb and 899 kb from their loci. `rs1142345` — TPMT `*3C`, the commonest
+deficient allele in Europeans — was 31 bases outside the left edge. None of that
+surfaces as an error: `bcftools` finds no row outside the target and the marker
+comes out `./. (ref/not covered)`, exactly what a position the sequencing
+genuinely missed produces. Anyone following the documented route was told nothing
+was found where their genotype was. The table is gone: the target is generated
+from the catalogue at every run.
+
+### What is withdrawn
+
+**Any previous «DPYD looks normal» rests on two positions out of seven and does
+not exclude a deficiency.** It was never phrased as an exclusion, but it was read
+as one, and at full-dose fluoropyrimidine the difference is not academic.
+
+**Any previous genotype for CYP2C19 `*2`/`*17`, TPMT `*3C` or the two DPYD
+markers, obtained through `fastq_to_vcf.sh`, is not a result.** Those positions
+were never in the alignment target; `./.` there means «not looked at», not
+«reference».
+
+### What needs recomputing
+
+For anyone whose VCF came through `fastq_to_vcf.sh`: **re-run the extraction**,
+because the target now reaches five markers it did not before. Genotypes read
+from a full-genome VCF produced elsewhere are unaffected — only the targeted
+route was narrow.
+
+Nothing else needs recomputing. The wider DPYD panel does not change a stored
+value; it changes how much of the panel an answer admits to having read.
+
+### Changes by file
+
+**Knowledge — a break in the series**
+
+- `src/scholion/knowledge/cpic_drug_gene.json` — DPYD: 2 markers → 8, `haplotype` on the HapB3 pair
+- `src/scholion/knowledge/loci.json` — 6 DPYD loci added; new `regions` section for whole-gene windows
+
+**Engine and application**
+
+- `src/scholion/engine.py` — a multi-tag haplotype counts once
+
+**Data preparation**
+
+- `src/ingest/fastq_to_vcf.sh` — the target BED is generated from the catalogue
+- `src/ingest/update_check.sh` — the version of ClinVar is read by the name it is written under
+
+**Tools and build**
+
+- `src/tools/check_staged.py` — `in_forbidden_dir`: a personal-data folder under a neighbouring name
+- `src/tools/check_push.py` — uses that predicate instead of its own copy
+
+**Tests**
+
+- `tests/test_answerability.py` — haplotype counting; the online drug route
+- `tests/test_catalogue_integrity.py` — the DPYD panel against the external consensus
+- `tests/test_pgx_script_coordinates.py` — BED-shaped coordinate tables; the margin invariant; note vs catalogue
+- `tests/test_privacy_guard.py` — a renamed personal folder
+
+
 ## v0.1.3 — 17.08.2026
 
 _Comparison base: v0.1.2 → HEAD. Commits: 6. 21 files changed, 356 insertions(+), 19 deletions(-)._

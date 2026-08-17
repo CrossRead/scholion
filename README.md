@@ -470,13 +470,10 @@ Semantic versions with the date in the entry heading. The rules for choosing a
 number, the release procedure and the two-repository model are described in
 `docs/`.
 
-**This is `0.1.0`, and the number is deliberate.** The project was built over
-weeks under its own numbering and had reached `2.24.0` by the day it was
-published. That number measured how much had been built, which is not what a
-version number is for: it is supposed to promise that a person holding the
-previous version knows what moving to this one does to their data and their
-commands. Nobody outside had run any of those versions, so there was nothing to
-promise, and the number was reset at publication.
+**This is `0.1.0`, not the `2.24.0` the project had reached internally by
+publication day** — a version number is a promise to whoever already runs the
+previous one, and nobody outside had run any of those yet, so the count reset
+to where that promise begins.
 
 **Below `1.0.0` the public contract may break.** The project's own rule is that
 command names, the top-level fields of `--json` and the file names inside a

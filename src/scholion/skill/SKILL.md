@@ -697,6 +697,22 @@ and that is the whole point:
 5. `dose_context` — dose thresholds, effect size with a citation, the difference
    between forms and a comparison with the user's specific numbers. Present
    exactly those numbers.
+6. `safety_flags` — hand-curated entries in `profile/medications.json` →
+   `medications[].safety_flags[]`. A flag states a FACT ABOUT THIS USER that turns
+   the drug into a question rather than a routine: a documented diagnosis, a
+   documented event, a conflict with their own history. The engine never invents
+   one — it only surfaces it; a `severity: red_flag` lifts `overall` to `high`, and
+   the renderer prints the flag FIRST, above every computed block. Fields:
+   `factor`, `why_it_matters`, `what_is_known_in_favour`, `uncertainty`, `action`,
+   `source`. Phrase it as "factor X is present — discuss it with the physician": a
+   flag is neither a reason to stop the drug on one's own nor a reason to continue
+   it on one's own. When you add a flag, fill in `what_is_known_in_favour` and
+   `uncertainty` as well — a flag without that half is a scare, not decision
+   support. Raise one as soon as a report or discharge summary yields a diagnosis
+   or an event that changes how a current prescription reads; and run the check in
+   reverse too — when reading any new document, compare it against the current drug
+   list, because that is how such a conflict surfaces (a diagnosis from years ago
+   against a drug started this year).
 
 Begin with the bottom line (`overall`), then work through the blocks. `high` and
 `moderate` are presented as **questions for the physician**, not as instructions:

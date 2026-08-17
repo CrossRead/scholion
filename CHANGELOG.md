@@ -31,6 +31,98 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.1.3 — 17.08.2026
+
+_Comparison base: v0.1.2 → HEAD. Commits: 6. 21 files changed, 356 insertions(+), 19 deletions(-)._
+
+### What this changes in the conclusions
+
+One new layer: `prescription` can now surface a hand-curated fact from the
+patient's own record. `medications[].safety_flags[]` in `profile/medications.json`
+holds entries the engine never invents — it only reads one a person wrote down: a
+documented diagnosis, a documented event, a conflict with their own history. A
+flag marked `red_flag` lifts the overall verdict to `high`, anything else to
+`moderate`, and the renderer prints it first — above the genome, the labs and the
+interactions, because a flag read last is a flag not read. The web view carries
+the same block, and both skill editions now say when to raise one: as soon as a
+new document yields a diagnosis that changes how a current prescription reads,
+and in reverse — check any new document against the current drug list.
+
+Nobody who has not written a `safety_flags` entry into their own profile sees any
+difference in output; the layer is silent until a person fills it in.
+
+Everything else in this release is process and safety-net, not a change to any
+result: the shipped skill file is now checked against substitution at build time
+(the package ships two editions of `SKILL.md` and a build error used to be able to
+put the wrong one at a given path without anything noticing); the package's own
+test suite is now verified to pass from *inside* the package it built, not only
+inside the repository that builds it; a repository-hygiene test that mistakenly
+flagged the package's own shipped profile/genome templates as personal data is
+corrected; and a publication commit can now be signed with a real identity
+instead of the anonymous one the tooling used before.
+
+### What is withdrawn
+
+Nothing.
+
+### What needs recomputing
+
+Nothing computed from existing data changes. `safety_flags` is something a person
+adds by hand to their own `profile/medications.json`; it has no effect until they
+do.
+
+### Changes by file
+
+**Tools and build**
+
+- `src/tools/check_language.py` — changed
+- `src/tools/check_staged.py` — changed
+- `src/tools/install_hooks.sh` — changed
+- `src/tools/make_shareable.py` — changed
+- `src/tools/publish_share.sh` — changed
+
+**Skill**
+
+- `share/SKILL.shared.md` — changed
+- `src/skill/SKILL.md` — changed
+
+**Engine and application**
+
+- `src/scholion/engine.py` — changed
+- `src/scholion/format.py` — changed
+- `src/scholion/i18n/en.py` — changed
+- `src/scholion/i18n/ru.py` — changed
+- `src/scholion/skill/SKILL.md` — changed
+- `src/scholion/web/index.html` — changed
+
+**Guides and documentation**
+
+- `CLAUDE.md` — changed
+- `README.md` — changed
+- `docs/DATA-LAYOUT.md` — changed
+
+**Tests**
+
+- `tests/support.py` — changed
+- `tests/test_build_audit.py` — changed
+- `tests/test_licensing.py` — changed
+- `tests/test_repo_hygiene.py` — changed
+
+**Other**
+
+- `.gitignore` — changed
+
+<details><summary>Commits</summary>
+
+- a diagnosis of the patient's own can now outrank a computed verdict
+- the package's own template files no longer read as somebody's personal data
+- readme: trim the versioning explanation to one sentence
+- the publication commit can be signed by a person, and the setting that does it no longer kills the script
+- the suite stops being red inside the package it was built from
+- the shipped edition of the skill is checked, and the layout gains a slot for what was made to be read
+
+</details>
+
 ## v0.1.2 — 17.08.2026
 
 _Comparison base: v0.1.1 → the working tree (not committed yet). Commits: 0. 5 files changed, 79 insertions(+), 13 deletions(-)._

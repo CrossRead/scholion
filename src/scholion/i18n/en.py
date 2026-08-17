@@ -147,6 +147,15 @@ MESSAGES = {
     "prescription.gene_phenotype": "your phenotype **{phenotype}** — {label}",
     "prescription.variants": "variants: {list}",
     "prescription.labs_header": "Your labs:",
+    # ── red flags from the owner's own profile ───────────────────────────
+    "prescription.safety_h": "A red flag from your own profile:",
+    "prescription.safety_factor": "**Factor:** {text}",
+    "prescription.safety_why": "Why it matters: {text}",
+    "prescription.safety_pro": "What argues for a low risk: {text}",
+    "prescription.safety_unknown": "What is unknown: {text}",
+    "prescription.safety_action": "**Action:** {text}",
+    "prescription.safety_source": "Source: {text}",
+
     "prescription.no_lab_control": "No lab monitoring specific to this class is required.",
     "prescription.monitor": "Monitor: {text}",
     "prescription.already_abnormal": "You are already out of range on: **{names}** — "

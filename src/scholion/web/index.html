@@ -814,12 +814,31 @@ function rxCard(r){
       <div class="meta" style="margin-top:6px">${esc(t('web.rx.class',{name:r.class_display||'—'}))} · ${idLine}</div>
       ${(r.unresolved&&r.unresolved.length)?`<div class="meta" style="margin-top:10px"><b>${esc(t('prescription.unresolved_h'))}</b><ul style="margin:4px 0 0;padding-left:18px">${r.unresolved.map(u=>`<li>${esc(u.gene?t('prescription.unresolved_gene',{detail:u.detail||u.what,gene:u.gene}):(u.detail||u.what))}</li>`).join('')}</ul></div>`:''}
     </div>
+    ${flagsHTML(r.safety_flags)}
     <div class="so-h">🧬 ${esc(t('web.rx.h_genome'))}</div>${genomeHtml}
     <div class="so-h">🧪 ${esc(t('web.rx.h_labs'))}</div>${labsHtml}
     <div class="so-h">🔗 ${esc(t('web.rx.h_meds'))}</div>${interHtml}
     ${cvSection}
     ${doseHTML(r.dose_context)}
     <div class="meta" style="margin-top:12px">${esc(r.disclaimer||'')}</div>`;
+}
+function flagsHTML(flags){
+  if(!flags||!flags.length) return '';
+  const bold=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+  return flags.map(f=>{
+    const red=f.severity==='red_flag';
+    const rows=[['prescription.safety_factor',f.factor],
+                ['prescription.safety_why',f.why_it_matters],
+                ['prescription.safety_pro',f.what_is_known_in_favour],
+                ['prescription.safety_unknown',f.uncertainty],
+                ['prescription.safety_action',f.action],
+                ['prescription.safety_source',f.source]]
+      .filter(x=>x[1]).map(x=>`<li style="margin:3px 0">${bold(t(x[0],{text:x[1]}))}</li>`).join('');
+    return `<div class="card" style="margin-bottom:14px;border-left:4px solid var(--${red?'critical':'warning'})">
+      <div class="row"><b>${red?'🔴':'🟡'} ${esc(t('prescription.safety_h'))}</b>${f.medication?` <span class="muted">· ${esc(f.medication)}</span>`:''}</div>
+      <ul style="margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.5">${rows}</ul>
+    </div>`;
+  }).join('');
 }
 async function viewDrug(root){
   const sb = await sourceBar(['pgx','interactions','genome_vcf']);

@@ -7,7 +7,7 @@ behind every statement.
 Three ways in, one core: a local web app, a skill for a language model, and a
 plugin for [Ouroboros](https://github.com/razzant/ouroboros).
 
-**Version 0.1.2 — the first public release.** Not a medical device and not a doctor. Everything the system
+**Version 0.1.3 — the first public release.** Not a medical device and not a doctor. Everything the system
 produces is material for your own decisions and for a conversation with your
 physician.
 

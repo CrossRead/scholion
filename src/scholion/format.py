@@ -230,6 +230,23 @@ def prescription_check(r: Dict[str, Any]) -> str:
                                  if u.get("gene") else detail))
         lines.append("")
 
+    # 🔴 Red flags from the owner's own file — printed FIRST, above every computed
+    # section. A documented diagnosis of this patient outranks a rule inferred from a
+    # class, and a flag rendered at the bottom of a long answer is a flag not read.
+    for fl in (r.get("safety_flags") or []):
+        icon = "🔴" if fl.get("severity") == "red_flag" else "🟡"
+        lines.append(icon + " **" + _t("prescription.safety_h") + "**")
+        if fl.get("factor"):
+            lines.append("- " + _t("prescription.safety_factor", text=fl["factor"]))
+        for key, field in (("prescription.safety_why", "why_it_matters"),
+                           ("prescription.safety_pro", "what_is_known_in_favour"),
+                           ("prescription.safety_unknown", "uncertainty"),
+                           ("prescription.safety_action", "action"),
+                           ("prescription.safety_source", "source")):
+            if fl.get(field):
+                lines.append("- " + _t(key, text=fl[field]))
+        lines.append("")
+
     # 🧬 The patient's genome
     lines.append("**🧬 " + _t("prescription.genome_header") + "**")
     g = r.get("genome", {})

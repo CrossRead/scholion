@@ -1345,6 +1345,42 @@ def _dose_context(drug: str, info: Optional[Dict[str, Any]] = None) -> Dict[str,
             "note": hit.get("note")}
 
 
+def _own_safety_flags(drug: str, disp: Optional[str] = None) -> List[Dict[str, Any]]:
+    """Red flags recorded against THIS drug in the owner's own prescription file.
+
+    A flag lives in `medications.json` → `medications[].safety_flags[]` and states a
+    fact about this patient that makes the drug a question rather than a routine:
+    a documented diagnosis, a documented event, an interaction with their own history.
+    It is curated by hand — the engine never invents one — and it is deliberately
+    kept OUT of the shared knowledge base, because the fact is personal.
+
+    Why this exists at all: a flag written into the profile and rendered nowhere is
+    the defect this project keeps finding in itself — honest prose beside a green
+    machine-readable field. `check_new_prescription` therefore lifts `overall` to
+    `high` on a `red_flag`, and the renderer prints it before anything else.
+    """
+    try:
+        meds = (core.medications_json() or {}).get("medications") or []
+    except Exception:
+        return []
+    q = {core._norm_drug(x) for x in (drug, disp) if x}
+    qt = {t for s in q for t in s.split()}
+    out = []
+    for med in meds:
+        flags = med.get("safety_flags") or []
+        if not flags:
+            continue
+        nm = core._norm_drug(med.get("name", ""))
+        nt = set(nm.split())
+        # A match on any whole token: «атенолол» finds «Атенолол 50 мг», and a query
+        # written as the brand or with the dose still lands on the same entry.
+        if not (nt & qt):
+            continue
+        for f in flags:
+            out.append(dict(f, medication=med.get("name")))
+    return out
+
+
 def check_new_prescription(drug: str) -> Dict[str, Any]:
     """SECOND OPINION on a prescription — PERSONAL, relative to the patient's data:
     🧬 their genome (the genes important for the drug per CPIC + their genotypes),
@@ -1439,12 +1475,18 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
         concerns.append("moderate")
     if unresolved:
         concerns.append("moderate")     # not green; the reason travels in `unresolved`
+    # A hand-curated red flag from the owner's own file outranks everything computed
+    # here: it is a documented fact about this patient, not an inference from a rule.
+    own_flags = _own_safety_flags(drug, disp)
+    for f in own_flags:
+        concerns.append("high" if f.get("severity") == "red_flag" else "moderate")
     overall = "high" if "high" in concerns else ("moderate" if "moderate" in concerns else "low")
 
     return {
         "status": "ok",
         "drug": disp or drug,
         "overall": overall,
+        "safety_flags": own_flags,
         "unresolved": unresolved,
         "class_display": class_display,
         "classes": classes,

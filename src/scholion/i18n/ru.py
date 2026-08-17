@@ -125,6 +125,15 @@ MESSAGES = {
     "prescription.gene_phenotype": "твой фенотип **{phenotype}** — {label}",
     "prescription.variants": "варианты: {list}",
     "prescription.labs_header": "Твои анализы:",
+    # ── red flags from the owner's own profile ───────────────────────────
+    "prescription.safety_h": "Красный флаг из твоего профиля:",
+    "prescription.safety_factor": "**Фактор:** {text}",
+    "prescription.safety_why": "Почему это важно: {text}",
+    "prescription.safety_pro": "Что говорит в пользу низкого риска: {text}",
+    "prescription.safety_unknown": "Что неизвестно: {text}",
+    "prescription.safety_action": "**Действие:** {text}",
+    "prescription.safety_source": "Источник: {text}",
+
     "prescription.no_lab_control": "Специфического лабораторного контроля по классу не требуется.",
     "prescription.monitor": "Контролировать: {text}",
     "prescription.already_abnormal": "У тебя уже отклонены: **{names}** — "

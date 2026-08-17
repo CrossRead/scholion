@@ -1,0 +1,8 @@
+{
+  "_meta": {"purpose": "СИНТЕТИЧЕСКАЯ фикстура автотестов"},
+  "profile": {"sex": "m", "birth_date": "1980-06-15", "height_cm": 180},
+  "metrics": {
+    "weight": {"name": "Вес", "unit": "кг", "direction": "lower_worse",
+               "series": [{"date": "2026-06", "value": 84.0}, {"date": "2026-07", "value": 82.5}]}
+  }
+}

@@ -1,0 +1,201 @@
+{
+ "_meta": {
+  "synthetic": true,
+  "description": "SYNTHETIC baseline of Russian lab-form parsing, taken BEFORE the multilingual migration of lab_markers.json (project version 2.11.0, commit 057b56d). Invented forms, invented values, no real person.",
+  "taken_before": "the labels.{lang} migration (backlog task 27)",
+  "why": "The migration moves names and recognition rules under labels.ru. The only proof that seven-year series are not silently corrupted is a byte-identical comparison against a result recorded before the move. A baseline regenerated after the migration would prove nothing."
+ },
+ "reports": {
+  "01_biochem.txt": {
+   "date": "2024-03-14",
+   "found": {
+    "glucose": {
+     "value": 5.4,
+     "ref_low": 3.9,
+     "ref_high": 6.1
+    },
+    "cholesterol_total": {
+     "value": 6.1,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "ldl": {
+     "value": 4.05,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "hdl": {
+     "value": 1.12,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "triglycerides": {
+     "value": 2.31,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "alt": {
+     "value": 52.0,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "ast": {
+     "value": 31.0,
+     "ref_low": null,
+     "ref_high": null
+    },
+    "creatinine": {
+     "value": 88.0,
+     "ref_low": 62.0,
+     "ref_high": 106.0
+    },
+    "ferritin": {
+     "value": 41.2,
+     "ref_low": 30.0,
+     "ref_high": 400.0
+    }
+   }
+  },
+  "02_cbc.txt": {
+   "date": "2024-03-14",
+   "found": {
+    "hemoglobin": {
+     "value": 148.0,
+     "ref_low": 131.0,
+     "ref_high": 172.0
+    },
+    "wbc": {
+     "value": 6.2,
+     "ref_low": 4.4,
+     "ref_high": 11.3
+    },
+    "platelets": {
+     "value": 244.0,
+     "ref_low": 134.0,
+     "ref_high": 377.0
+    },
+    "neut_abs": {
+     "value": 3.62,
+     "ref_low": 1.8,
+     "ref_high": 7.7
+    },
+    "neut_pct": {
+     "value": 58.4,
+     "ref_low": 48.0,
+     "ref_high": 78.0
+    },
+    "rdw": {
+     "value": 12.5,
+     "ref_low": 11.5,
+     "ref_high": 14.5
+    }
+   }
+  },
+  "03_hormones.txt": {
+   "date": "2023-11-02",
+   "found": {
+    "tsh": {
+     "value": 2.84,
+     "ref_low": 0.27,
+     "ref_high": 4.2
+    },
+    "vitamin_d": {
+     "value": 25.0,
+     "ref_low": 30.0,
+     "ref_high": 100.0
+    },
+    "hba1c": {
+     "value": 5.3,
+     "ref_low": 4.0,
+     "ref_high": 6.0
+    }
+   }
+  },
+  "04_coprogram.txt": {
+   "date": "2024-06-21",
+   "found": {
+    "stool_mucus_macro": {
+     "value": 0.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_muscle_striated": {
+     "value": 1.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_starch_intracell": {
+     "value": 2.0,
+     "ref_low": null,
+     "ref_high": 2.0
+    },
+    "stool_mucus": {
+     "value": 1.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_leukocytes": {
+     "value": 0.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_erythrocytes": {
+     "value": 0.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_iodophilic_flora": {
+     "value": 4.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    },
+    "stool_starch": {
+     "value": 2.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    }
+   }
+  },
+  "05_dysbiosis.txt": {
+   "date": "2024-06-21",
+   "found": {
+    "dysb_bifidobacteria": {
+     "value": 8.0,
+     "ref_low": 9.0,
+     "ref_high": null
+    },
+    "dysb_lactobacilli": {
+     "value": 6.0,
+     "ref_low": 7.0,
+     "ref_high": 8.0
+    },
+    "dysb_ecoli_typical": {
+     "value": 7.0,
+     "ref_low": 7.0,
+     "ref_high": 8.0
+    },
+    "dysb_enterococci": {
+     "value": 5.0,
+     "ref_low": 5.0,
+     "ref_high": 8.0
+    },
+    "dysb_clostridia": {
+     "value": 4.0,
+     "ref_low": null,
+     "ref_high": 5.0,
+     "censored": "<"
+    },
+    "dysb_candida": {
+     "value": 4.0,
+     "ref_low": null,
+     "ref_high": 4.0
+    },
+    "dysb_staph_aureus": {
+     "value": 0.0,
+     "ref_low": null,
+     "ref_high": 0.0
+    }
+   }
+  }
+ }
+}

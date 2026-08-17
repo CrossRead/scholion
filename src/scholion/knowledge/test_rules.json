@@ -1,0 +1,220 @@
+{
+  "_meta": {
+    "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
+    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently."
+  },
+  "rules": [
+    {
+      "id": "rf_autoimmune",
+      "when": {
+        "marker": "rheumatoid_factor",
+        "op": ">",
+        "value": 14
+      },
+      "suggest": {
+        "en": "Anti-CCP, ANA, and if needed an X-ray of the hands",
+        "ru": "Анти-ЦЦП (АЦЦП), АНА, при необходимости рентген кистей"
+      },
+      "priority": "high",
+      "why": {
+        "en": "The rheumatoid factor is persistently raised and is not explained by the metabolic syndrome — rule out RA/an autoimmune condition. Genetically there is a risk of RA (PADI4).",
+        "ru": "Ревматоидный фактор стойко повышен и не объясняется метаболическим синдромом — исключить РА/аутоиммунное. Генетически есть риск РА (PADI4)."
+      },
+      "specialist": {
+        "en": "a rheumatologist",
+        "ru": "ревматолог"
+      },
+      "covers": [
+        "anti_ccp",
+        "ana_screen"
+      ],
+      "recheck_months": 12
+    },
+    {
+      "id": "trt_monitor",
+      "when": {
+        "med_class": "testosterone_replacement"
+      },
+      "suggest": {
+        "en": "Haematocrit/haemoglobin, PSA, oestradiol (E2) while on therapy",
+        "ru": "Гематокрит/гемоглобин, ПСА, эстрадиол (E2) на фоне терапии"
+      },
+      "priority": "high",
+      "why": {
+        "en": "On testosterone replacement therapy, monitoring of erythrocytosis (haematocrit), of the prostate (PSA) and of aromatisation (oestradiol) is mandatory.",
+        "ru": "На тестостерон-заместительной терапии обязателен контроль эритроцитоза (гематокрит), простаты (ПСА) и ароматизации (эстрадиол)."
+      },
+      "specialist": {
+        "en": "an endocrinologist/urologist",
+        "ru": "эндокринолог/уролог"
+      },
+      "covers": [
+        "hematocrit",
+        "psa_total",
+        "estradiol"
+      ],
+      "recheck_months": 6
+    },
+    {
+      "id": "slco1b1_statin",
+      "when": {
+        "all": [
+          {
+            "genome_gap": "SLCO1B1"
+          },
+          {
+            "marker": "ldl",
+            "op": ">",
+            "value": 3.34
+          }
+        ]
+      },
+      "suggest": {
+        "en": "The SLCO1B1 genotype (rs4149056) — through Track 2 (FASTQ→VCF)",
+        "ru": "Генотип SLCO1B1 (rs4149056) — через Трек 2 (FASTQ→VCF)"
+      },
+      "priority": "high",
+      "why": {
+        "en": "Dyslipidaemia → statin therapy is likely. SLCO1B1 determines the risk of statin myopathy; obtain it before statins are started.",
+        "ru": "Дислипидемия → вероятна статинотерапия. SLCO1B1 определяет риск статин-миопатии; получить до старта статинов."
+      },
+      "specialist": "—"
+    },
+    {
+      "id": "cyp2c9_warfarin_gap",
+      "when": {
+        "genome_gap": "CYP2C9"
+      },
+      "suggest": {
+        "en": "The CYP2C9 genotype (*2/*3) — through Track 2",
+        "ru": "Генотип CYP2C9 (*2/*3) — через Трек 2"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "Together with the already known VKORC1 it is needed for correct warfarin dosing in case of possible future anticoagulation.",
+        "ru": "Вместе с уже известным VKORC1 нужен для корректного дозирования варфарина при возможной будущей антикоагуляции."
+      },
+      "specialist": "—"
+    },
+    {
+      "id": "insulin_resistance_followup",
+      "when": {
+        "marker": "homa_ir",
+        "op": ">",
+        "value": 2.77
+      },
+      "suggest": {
+        "en": "Monitoring of HOMA-IR, lipids and uric acid ~3 months after a change of lifestyle",
+        "ru": "Контроль HOMA-IR, липидов, мочевой кислоты через ~3 мес после модификации образа жизни"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "Insulin resistance has been recorded — the effectiveness of the measures needs to be monitored over time.",
+        "ru": "Инсулинорезистентность зафиксирована — нужен динамический контроль эффективности мер."
+      },
+      "specialist": {
+        "en": "an endocrinologist",
+        "ru": "эндокринолог"
+      },
+      "covers": [
+        "homa_ir",
+        "ldl",
+        "uric_acid"
+      ],
+      "recheck_months": 3
+    },
+    {
+      "id": "liver_fat",
+      "when": {
+        "all": [
+          {
+            "marker": "alt",
+            "op": ">",
+            "value": 30
+          },
+          {
+            "marker": "triglycerides",
+            "op": ">",
+            "value": 1.7
+          }
+        ]
+      },
+      "suggest": {
+        "en": "An ultrasound of the liver / fibroscan, and if ALT rises — a liver panel",
+        "ru": "УЗИ печени / фиброскан, при росте АЛТ — печёночная панель"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "A rise in ALT/GGT against the background of the metabolic syndrome and hypertriglyceridaemia — non-alcoholic fatty liver disease is possible.",
+        "ru": "Рост АЛТ/ГГТ на фоне метаболического синдрома и гипертриглицеридемии — возможен неалкогольный жировой гепатоз."
+      },
+      "specialist": {
+        "en": "a gastroenterologist",
+        "ru": "гастроэнтеролог"
+      }
+    },
+    {
+      "id": "vit_d_low",
+      "when": {
+        "marker": "vitamin_d",
+        "op": "<",
+        "value": 30
+      },
+      "suggest": {
+        "en": "A repeat 25-OH vitamin D 8–12 weeks after the dose was adjusted",
+        "ru": "Повторный 25-OH витамин D через 8–12 нед после коррекции дозы"
+      },
+      "priority": "low",
+      "why": {
+        "en": "Below the sufficiency threshold of 30 ng/mL (Endocrine Society); check the effect of adjusting the D3 dose. The laboratory's lower bound of 50 is its own choice, not an action threshold — at 50 this rule fired on almost everyone and therefore said nothing.",
+        "ru": "Ниже порога достаточности 30 нг/мл (Endocrine Society); проверить эффект коррекции дозы D3. Нижняя граница 50 — выбор лаборатории, а не порог действия: на 50 правило срабатывало почти у всех и потому ничего не сообщало."
+      },
+      "specialist": "—",
+      "covers": [
+        "vitamin_d"
+      ],
+      "recheck_months": 3
+    },
+    {
+      "id": "dysbiosis_fungal",
+      "when": {
+        "marker": "oa_tartaric",
+        "op": ">",
+        "value": 8.58
+      },
+      "suggest": {
+        "en": "Monitoring of urinary organic acids (tartaric acid) after a course of caprylic acid/probiotics",
+        "ru": "Контроль органических кислот мочи (винная к-та) после курса каприловой кислоты/пробиотиков"
+      },
+      "priority": "low",
+      "why": {
+        "en": "The fungal marker is still raised — assess the effect of correcting the dysbiosis.",
+        "ru": "Грибковый маркёр всё ещё повышен — оценить эффект коррекции дисбиоза."
+      },
+      "specialist": {
+        "en": "a gastroenterologist",
+        "ru": "гастроэнтеролог"
+      },
+      "covers": [
+        "oa_tartaric"
+      ],
+      "recheck_months": 3
+    },
+    {
+      "id": "apoe_longevity",
+      "when": {
+        "genome_gap": "APOE"
+      },
+      "suggest": {
+        "en": "The APOE ε-status (rs429358/rs7412) — through Track 2",
+        "ru": "ε-статус APOE (rs429358/rs7412) — через Трек 2"
+      },
+      "priority": "low",
+      "why": {
+        "en": "For the assessment of longevity/cardiovascular/cognitive risks — a goal of the project.",
+        "ru": "Для оценки долголетия/ССЗ/когнитивных рисков — цель проекта."
+      },
+      "specialist": "—"
+    }
+  ]
+}

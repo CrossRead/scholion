@@ -1,0 +1,982 @@
+{
+  "_meta": {
+    "purpose": "PORTABLE curated panel of traits for polygenic risks (PGS Catalog through just-prs-mcp). Public names and search terms only — holds NO genotypes. EFO IDs are resolved at request time through search_traits.",
+    "design": "Two levels: this panel is precomputed (ready scores in the application), while ANY other trait is computed on request from merged.bam (genotyping the scoring positions on demand). The panel covers the main things; the tail is on request.",
+    "caveat": {
+      "en": "A polygenic score is a statistical proxy, not a diagnosis and not causality. The models are trained mainly on European samples (default superpopulation EUR); on another ancestry the accuracy falls. A percentile is a position in the population, NOT a probability of disease. Show it with the caveat; decisions are taken with a doctor.",
+      "ru": "Полигенный балл — статистический прокси, не диагноз и не каузальность. Модели обучены преимущественно на европейских выборках (superpopulation по умолчанию EUR); на другом происхождении точность падает. Перцентиль = позиция в популяции, НЕ вероятность болезни. Показывать с оговоркой; решения — с врачом."
+    },
+    "genotyping_note": "When genotyping scoring positions on demand, exclude genome-wide models (>~50k variants) so that the union of positions does not blow up; log what was dropped.",
+    "default_superpopulation": "EUR",
+    "profile_note": "The panel is built for a man of about 44 with metabolic syndrome; female-specific cancer traits are excluded.",
+    "evidence_tiers": {
+      "clinical": {
+        "label": {
+          "en": "clinically validated",
+          "ru": "клинически валидировано"
+        },
+        "rank": 1,
+        "meaning": {
+          "en": "there are prospective data or recognition in guidelines; may affect screening and prevention tactics — together with a doctor",
+          "ru": "есть проспективные данные или признание в рекомендациях; может влиять на тактику скрининга/профилактики — вместе с врачом"
+        }
+      },
+      "supportive": {
+        "label": {
+          "en": "supporting context",
+          "ru": "вспомогательный контекст"
+        },
+        "rank": 2,
+        "meaning": {
+          "en": "the association is reliable, but it rarely changes management, and only in combination with clinical factors",
+          "ru": "ассоциация надёжна, но тактику меняет редко и только в связке с клиническими факторами"
+        }
+      },
+      "research": {
+        "label": {
+          "en": "research grade",
+          "ru": "исследовательский уровень"
+        },
+        "rank": 3,
+        "meaning": {
+          "en": "the association is a population one; it must not influence the decisions of one person",
+          "ru": "ассоциация популяционная; на решения одного человека влиять не должна"
+        }
+      }
+    },
+    "evidence_note": {
+      "en": "The level of evidence is stated as of 2026-08. It refers to whether the score CHANGES clinical management, not to the quality of the score itself. Sources: ESC Clinical Consensus 2025 (Eur Heart J 46:1372), ACC/AHA 2026, BARCODE1 (NEJM 2025), WISDOM (2025), Kullo, Nat Rev Genet 2025. The general frame: a percentile is a position in the population, not a probability; the gain in C-statistic from a PRS on top of clinical models is usually +0.01…+0.03.",
+      "ru": "Уровень доказательности проставлен по состоянию на 2026-08. Он относится к тому, МЕНЯЕТ ЛИ шкала врачебную тактику, а не к качеству самой шкалы. Источники: ESC Clinical Consensus 2025 (Eur Heart J 46:1372), ACC/AHA 2026, BARCODE1 (NEJM 2025), WISDOM (2025), Kullo, Nat Rev Genet 2025. Общая рамка: перцентиль — позиция в популяции, а не вероятность; прирост C-статистики от PRS поверх клинических моделей обычно +0.01…+0.03."
+    }
+  },
+  "traits": [
+    {
+      "label": {
+        "en": "Coronary artery disease (CAD)",
+        "ru": "Ишемическая болезнь сердца (ИБС)"
+      },
+      "term": "coronary artery disease",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "clinical",
+      "evidence_note": {
+        "en": "MI-GENES (10 years, n=203, HR 0.20 for MACE — little, but prospective); ACC/AHA 2026 recognised the PRS as a risk-enhancing factor. ESC 2025: use it only at borderline risk and in the young with a family history",
+        "ru": "MI-GENES (10 лет, n=203, HR 0.20 на MACE — мало, но проспективно); ACC/AHA 2026 признали PRS фактором, усиливающим риск. ESC 2025: применять только в пограничном риске и у молодых с семейным анамнезом"
+      }
+    },
+    {
+      "label": {
+        "en": "Myocardial infarction",
+        "ru": "Инфаркт миокарда"
+      },
+      "term": "myocardial infarction",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Hypertension (high blood pressure)",
+        "ru": "Гипертония (высокое АД)"
+      },
+      "term": "hypertension",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Systolic blood pressure",
+        "ru": "Систолическое АД"
+      },
+      "term": "systolic blood pressure",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Atrial fibrillation",
+        "ru": "Фибрилляция предсердий"
+      },
+      "term": "atrial fibrillation",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Ischaemic stroke",
+        "ru": "Ишемический инсульт"
+      },
+      "term": "ischemic stroke",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Heart failure",
+        "ru": "Сердечная недостаточность"
+      },
+      "term": "heart failure",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Abdominal aortic aneurysm",
+        "ru": "Аневризма брюшной аорты"
+      },
+      "term": "abdominal aortic aneurysm",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Peripheral arterial disease",
+        "ru": "Заболевание периферических артерий"
+      },
+      "term": "peripheral arterial disease",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Venous thromboembolism",
+        "ru": "Венозная тромбоэмболия"
+      },
+      "term": "venous thromboembolism",
+      "category": {
+        "en": "Cardiovascular",
+        "ru": "Сердечно-сосудистые"
+      },
+      "evidence": "supportive",
+      "evidence_note": {
+        "en": "the standard here is the monogenic markers (F5 Leiden, F2 G20210A) — it was their technical standard that ACMG updated in 2025; the role of the PRS is a research one",
+        "ru": "стандарт здесь — моногенные маркёры (F5 Лейден, F2 G20210A), ACMG обновил именно их технический стандарт в 2025; роль PRS исследовательская"
+      }
+    },
+    {
+      "label": {
+        "en": "Type 2 diabetes",
+        "ru": "Диабет 2 типа"
+      },
+      "term": "type 2 diabetes",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "supportive",
+      "evidence_note": {
+        "en": "the effect of the PRS is context-dependent (age, BMI, sex): the OR per SD varies between 1.45 and 3.51 across cohorts (Nature Communications 2025). There is no RCT in which PRS-guided prevention lowered incidence",
+        "ru": "эффект PRS контекстно-зависим (возраст, ИМТ, пол): OR на SD варьирует 1.45–3.51 между когортами (Nature Communications 2025). Нет РКИ, где PRS-ориентированная профилактика снижала заболеваемость"
+      }
+    },
+    {
+      "label": {
+        "en": "Type 1 diabetes",
+        "ru": "Диабет 1 типа"
+      },
+      "term": "type 1 diabetes",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Body mass index (BMI)",
+        "ru": "Индекс массы тела (ИМТ)"
+      },
+      "term": "body mass index",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Obesity",
+        "ru": "Ожирение"
+      },
+      "term": "obesity",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Waist circumference",
+        "ru": "Окружность талии"
+      },
+      "term": "waist circumference",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Non-alcoholic fatty liver disease",
+        "ru": "Неалкогольная жировая болезнь печени"
+      },
+      "term": "non-alcoholic fatty liver disease",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Gout",
+        "ru": "Подагра"
+      },
+      "term": "gout",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Uric acid (urate)",
+        "ru": "Мочевая кислота (урат)"
+      },
+      "term": "urate measurement",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Fasting glucose",
+        "ru": "Глюкоза натощак"
+      },
+      "term": "fasting blood glucose",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "HbA1c (glycated haemoglobin)",
+        "ru": "HbA1c (гликир. гемоглобин)"
+      },
+      "term": "glycated hemoglobin HbA1c",
+      "category": {
+        "en": "Metabolism",
+        "ru": "Метаболизм"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "LDL cholesterol",
+        "ru": "Холестерин ЛПНП (LDL)"
+      },
+      "term": "LDL cholesterol",
+      "category": {
+        "en": "Lipids",
+        "ru": "Липиды"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "HDL cholesterol",
+        "ru": "Холестерин ЛПВП (HDL)"
+      },
+      "term": "HDL cholesterol",
+      "category": {
+        "en": "Lipids",
+        "ru": "Липиды"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Triglycerides",
+        "ru": "Триглицериды"
+      },
+      "term": "triglyceride measurement",
+      "category": {
+        "en": "Lipids",
+        "ru": "Липиды"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Total cholesterol",
+        "ru": "Общий холестерин"
+      },
+      "term": "total cholesterol",
+      "category": {
+        "en": "Lipids",
+        "ru": "Липиды"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Lipoprotein(a)",
+        "ru": "Липопротеин(а)"
+      },
+      "term": "lipoprotein A",
+      "category": {
+        "en": "Lipids",
+        "ru": "Липиды"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Prostate cancer",
+        "ru": "Рак предстательной железы"
+      },
+      "term": "prostate cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "clinical",
+      "evidence_note": {
+        "en": "BARCODE1 (NEJM 2025): in men in the top decile of the PRS, 71.8% more clinically significant tumours were found than along the standard PSA+MRI route. It changes the screening strategy; there are no mortality data yet",
+        "ru": "BARCODE1 (NEJM 2025): у мужчин верхней децили PRS выявлено на 71.8% больше клинически значимых опухолей, чем стандартным путём ПСА+МРТ. Меняет стратегию скрининга, данных по смертности пока нет"
+      }
+    },
+    {
+      "label": {
+        "en": "Colorectal cancer",
+        "ru": "Колоректальный рак"
+      },
+      "term": "colorectal cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Lung cancer",
+        "ru": "Рак лёгкого"
+      },
+      "term": "lung cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Melanoma",
+        "ru": "Меланома"
+      },
+      "term": "malignant melanoma",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Non-melanoma skin cancer",
+        "ru": "Немеланомный рак кожи"
+      },
+      "term": "basal cell carcinoma",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Bladder cancer",
+        "ru": "Рак мочевого пузыря"
+      },
+      "term": "bladder cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Renal cell carcinoma",
+        "ru": "Почечноклеточный рак"
+      },
+      "term": "renal cell carcinoma",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Gastric cancer",
+        "ru": "Рак желудка"
+      },
+      "term": "gastric cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Pancreatic cancer",
+        "ru": "Рак поджелудочной железы"
+      },
+      "term": "pancreatic cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Testicular cancer",
+        "ru": "Рак яичка"
+      },
+      "term": "testicular germ cell cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Thyroid cancer",
+        "ru": "Рак щитовидной железы"
+      },
+      "term": "thyroid cancer",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Non-Hodgkin lymphoma",
+        "ru": "Неходжкинская лимфома"
+      },
+      "term": "non-Hodgkin lymphoma",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Chronic lymphocytic leukaemia",
+        "ru": "Хронический лимфолейкоз"
+      },
+      "term": "chronic lymphocytic leukemia",
+      "category": {
+        "en": "Cancer screening",
+        "ru": "Онко-скрининг"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Alzheimer's disease",
+        "ru": "Болезнь Альцгеймера"
+      },
+      "term": "Alzheimer disease",
+      "category": {
+        "en": "Neurodegeneration",
+        "ru": "Нейродегенерация"
+      },
+      "evidence": "supportive",
+      "evidence_note": {
+        "en": "outside APOE the contribution of the PRS is small; there are no effective interventions at 40 — the value is prognostic, not tactical",
+        "ru": "вне APOE вклад PRS невелик; действенных вмешательств в 40 лет нет — ценность прогностическая, не тактическая"
+      }
+    },
+    {
+      "label": {
+        "en": "Parkinson's disease",
+        "ru": "Болезнь Паркинсона"
+      },
+      "term": "Parkinson disease",
+      "category": {
+        "en": "Neurodegeneration",
+        "ru": "Нейродегенерация"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Amyotrophic lateral sclerosis",
+        "ru": "Боковой амиотрофический склероз"
+      },
+      "term": "amyotrophic lateral sclerosis",
+      "category": {
+        "en": "Neurodegeneration",
+        "ru": "Нейродегенерация"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Migraine",
+        "ru": "Мигрень"
+      },
+      "term": "migraine",
+      "category": {
+        "en": "Neurodegeneration",
+        "ru": "Нейродегенерация"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Epilepsy",
+        "ru": "Эпилепсия"
+      },
+      "term": "epilepsy",
+      "category": {
+        "en": "Neurodegeneration",
+        "ru": "Нейродегенерация"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Rheumatoid arthritis",
+        "ru": "Ревматоидный артрит"
+      },
+      "term": "rheumatoid arthritis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Crohn's disease",
+        "ru": "Болезнь Крона"
+      },
+      "term": "Crohn disease",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Ulcerative colitis",
+        "ru": "Язвенный колит"
+      },
+      "term": "ulcerative colitis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Psoriasis",
+        "ru": "Псориаз"
+      },
+      "term": "psoriasis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Coeliac disease",
+        "ru": "Целиакия"
+      },
+      "term": "celiac disease",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "supportive",
+      "evidence_note": {
+        "en": "it is not the PRS that decides but HLA-DQ2/DQ8: a negative status all but excludes the diagnosis",
+        "ru": "решает не PRS, а HLA-DQ2/DQ8: отрицательный статус практически исключает диагноз"
+      }
+    },
+    {
+      "label": {
+        "en": "Systemic lupus erythematosus",
+        "ru": "Системная красная волчанка"
+      },
+      "term": "systemic lupus erythematosus",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Ankylosing spondylitis",
+        "ru": "Анкилозирующий спондилит"
+      },
+      "term": "ankylosing spondylitis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Multiple sclerosis",
+        "ru": "Рассеянный склероз"
+      },
+      "term": "multiple sclerosis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Atopic dermatitis",
+        "ru": "Атопический дерматит"
+      },
+      "term": "atopic dermatitis",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Hypothyroidism",
+        "ru": "Гипотиреоз"
+      },
+      "term": "hypothyroidism",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Graves' disease",
+        "ru": "Болезнь Грейвса"
+      },
+      "term": "Graves disease",
+      "category": {
+        "en": "Autoimmune",
+        "ru": "Аутоиммунные"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Asthma",
+        "ru": "Астма"
+      },
+      "term": "asthma",
+      "category": {
+        "en": "Respiratory",
+        "ru": "Дыхание"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "COPD",
+        "ru": "ХОБЛ"
+      },
+      "term": "chronic obstructive pulmonary disease",
+      "category": {
+        "en": "Respiratory",
+        "ru": "Дыхание"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Lung function (FEV1/FVC)",
+        "ru": "Функция лёгких (ОФВ1/ФЖЕЛ)"
+      },
+      "term": "FEV1",
+      "category": {
+        "en": "Respiratory",
+        "ru": "Дыхание"
+      },
+      "evidence": "research",
+      "evidence_note": {
+        "en": "the PGS000210 model predicts the FEV1/FVC ratio; the direction of the scale needs checking",
+        "ru": "модель PGS000210 предсказывает отношение ОФВ1/ФЖЕЛ; направление шкалы требует проверки"
+      }
+    },
+    {
+      "label": {
+        "en": "Bone mineral density",
+        "ru": "Плотность костной ткани"
+      },
+      "term": "bone mineral density",
+      "category": {
+        "en": "Bones and joints",
+        "ru": "Кости/суставы"
+      },
+      "evidence": "supportive"
+    },
+    {
+      "label": {
+        "en": "Osteoporosis (fracture)",
+        "ru": "Остеопороз (перелом)"
+      },
+      "term": "osteoporosis",
+      "category": {
+        "en": "Bones and joints",
+        "ru": "Кости/суставы"
+      },
+      "evidence": "supportive",
+      "evidence_note": {
+        "en": "Bayesian integration of PRS+FRAX improves fracture prediction (2025), but the standard of action is DXA+FRAX",
+        "ru": "байесовская интеграция PRS+FRAX улучшает предсказание переломов (2025), но стандарт действия — DXA+FRAX"
+      }
+    },
+    {
+      "label": {
+        "en": "Osteoarthritis",
+        "ru": "Остеоартрит"
+      },
+      "term": "osteoarthritis",
+      "category": {
+        "en": "Bones and joints",
+        "ru": "Кости/суставы"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Age-related macular degeneration",
+        "ru": "Возрастная макулодистрофия"
+      },
+      "term": "age-related macular degeneration",
+      "category": {
+        "en": "Vision and hearing",
+        "ru": "Зрение/слух"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Glaucoma",
+        "ru": "Глаукома"
+      },
+      "term": "glaucoma",
+      "category": {
+        "en": "Vision and hearing",
+        "ru": "Зрение/слух"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Cataract",
+        "ru": "Катаракта"
+      },
+      "term": "cataract",
+      "category": {
+        "en": "Vision and hearing",
+        "ru": "Зрение/слух"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Myopia",
+        "ru": "Близорукость"
+      },
+      "term": "myopia",
+      "category": {
+        "en": "Vision and hearing",
+        "ru": "Зрение/слух"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Age-related hearing loss",
+        "ru": "Возрастная потеря слуха"
+      },
+      "term": "age-related hearing impairment",
+      "category": {
+        "en": "Vision and hearing",
+        "ru": "Зрение/слух"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Chronic kidney disease",
+        "ru": "Хроническая болезнь почек"
+      },
+      "term": "chronic kidney disease",
+      "category": {
+        "en": "Kidney, liver, gut",
+        "ru": "Почки/печень/ЖКТ"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Gallstone disease",
+        "ru": "Желчнокаменная болезнь"
+      },
+      "term": "gallstones",
+      "category": {
+        "en": "Kidney, liver, gut",
+        "ru": "Почки/печень/ЖКТ"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Diverticular disease",
+        "ru": "Дивертикулярная болезнь"
+      },
+      "term": "diverticular disease",
+      "category": {
+        "en": "Kidney, liver, gut",
+        "ru": "Почки/печень/ЖКТ"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Longevity",
+        "ru": "Долголетие"
+      },
+      "term": "longevity",
+      "category": {
+        "en": "Longevity and ageing",
+        "ru": "Долголетие/старение"
+      },
+      "evidence": "research",
+      "evidence_note": {
+        "en": "genetics explains a negligible share; the heritability of ageing itself has been revised upwards (~50%, Science 2025), but that yields no individual prognosis",
+        "ru": "генетика объясняет мизерную долю; наследуемость собственно старения пересмотрена вверх (~50%, Science 2025), но индивидуального прогноза это не даёт"
+      }
+    },
+    {
+      "label": {
+        "en": "Parental lifespan",
+        "ru": "Продолжительность жизни родителей"
+      },
+      "term": "parental lifespan",
+      "category": {
+        "en": "Longevity and ageing",
+        "ru": "Долголетие/старение"
+      },
+      "evidence": "research",
+      "evidence_note": {
+        "en": "the same: a population quantity, not an individual prognosis",
+        "ru": "то же: популяционная величина, не индивидуальный прогноз"
+      }
+    },
+    {
+      "label": {
+        "en": "Frailty",
+        "ru": "Хрупкость (frailty)"
+      },
+      "term": "frailty index",
+      "category": {
+        "en": "Longevity and ageing",
+        "ru": "Долголетие/старение"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Depression",
+        "ru": "Депрессия"
+      },
+      "term": "major depressive disorder",
+      "category": {
+        "en": "Mind and behaviour",
+        "ru": "Психика/поведение"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Insomnia",
+        "ru": "Бессонница"
+      },
+      "term": "insomnia",
+      "category": {
+        "en": "Mind and behaviour",
+        "ru": "Психика/поведение"
+      },
+      "evidence": "research"
+    },
+    {
+      "label": {
+        "en": "Alcohol consumption",
+        "ru": "Употребление алкоголя"
+      },
+      "term": "alcohol consumption",
+      "category": {
+        "en": "Mind and behaviour",
+        "ru": "Психика/поведение"
+      },
+      "evidence": "research"
+    }
+  ]
+}

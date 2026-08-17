@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "purpose": "ШАБЛОН. Лабораторные анализы пользователя (временные ряды по маркёрам). ЛИЧНОЕ — заполняет каждый пользователь сам, НЕ передавать другим.",
+    "how_to_fill": "Проще всего — сложить PDF-отчёты лаборатории в папку и запустить `python3 -m scholion ingest-labs \"<папка>\"` (или вкладка «Анализы» в приложении). Можно и вручную: добавляйте точки в markers[key].series.",
+    "schema": "markers: { <ключ>: { name, unit, ref_low?, ref_high?, direction?('higher_better'|'lower_better'), genome_link?, series: [{date:'YYYY-MM'|'YYYY-MM-DD', value:number}] } }"
+  },
+  "markers": {
+    "triglycerides": {
+      "name": "Триглицериды", "unit": "ммоль/л", "ref_high": 1.7,
+      "series": [{"date": "2024-01", "value": 1.2}]
+    }
+  }
+}

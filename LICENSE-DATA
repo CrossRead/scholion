@@ -1,0 +1,55 @@
+DATA LICENSE — curated knowledge base
+=====================================
+
+Scope
+-----
+
+This license applies to the curated knowledge base of this repository:
+
+    src/scholion/knowledge/*.json
+
+and to any documentation file that reproduces its contents. It does NOT apply
+to the source code, which is licensed under the Apache License 2.0 (see
+LICENSE), and it does NOT apply to personal data, which is never part of this
+repository.
+
+License
+-------
+
+Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+    SPDX-License-Identifier: CC-BY-4.0
+    Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+    Summary:         https://creativecommons.org/licenses/by/4.0/
+
+You are free to share and adapt this material for any purpose, including
+commercially, provided you give appropriate credit, link to the license, and
+indicate whether changes were made.
+
+Version 4.0 is used deliberately rather than an earlier one: it is the first
+Creative Commons version that expressly licenses the European sui generis
+database right (Directive 96/9/EC) in addition to copyright. A curated
+compilation assembled from public biomedical databases is exactly the kind of
+subject matter that right covers.
+
+Attribution
+-----------
+
+    Knowledge base from Scholion (https://scholion.dev),
+    licensed under CC BY 4.0.
+
+Inherited obligations
+---------------------
+
+Some files in the knowledge base are derived from third-party sources that
+carry their own attribution requirements, and those requirements travel with
+the data regardless of this license. In particular, longevitymap.json is
+derived from the Human Ageing Genomic Resources under CC BY 3.0 and must be
+cited accordingly. See ATTRIBUTION.md for the per-file list.
+
+What this license is not
+------------------------
+
+This license grants rights in the compilation. It is not a warranty that any
+statement in it is clinically correct, current, or applicable to any person.
+See DISCLAIMER.md.

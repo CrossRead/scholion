@@ -1,0 +1,65 @@
+Scholion
+Copyright 2026 Andrey Belevtsev
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+--------------------------------------------------------------------------
+SCOPE OF LICENSES IN THIS REPOSITORY
+--------------------------------------------------------------------------
+
+Source code (src/, tests/, tools, scripts, plugin, skill):
+    Apache License 2.0 — see LICENSE
+
+Curated knowledge base (src/scholion/knowledge/*.json):
+    Creative Commons Attribution 4.0 International — see LICENSE-DATA
+
+--------------------------------------------------------------------------
+THIRD-PARTY DATA INCLUDED IN THIS REPOSITORY
+--------------------------------------------------------------------------
+
+This product includes data derived from the Human Ageing Genomic Resources
+(HAGR), specifically the LongevityMap database, licensed under Creative
+Commons Attribution 3.0 Unported (https://genomics.senescence.info/legal.html).
+See ATTRIBUTION.md for the required citations.
+
+--------------------------------------------------------------------------
+LOINC
+--------------------------------------------------------------------------
+
+This material contains content from LOINC (http://loinc.org). LOINC is
+copyright © Regenstrief Institute, Inc. and the Logical Observation Identifiers
+Names and Codes (LOINC) Committee and is available at no cost under the license
+at http://loinc.org/license. LOINC® is a registered United States trademark of
+Regenstrief Institute, Inc.
+
+LOINC codes appear in src/scholion/knowledge/lab_test_meta.json, each one
+next to the laboratory test it identifies and its LOINC long common name. Codes
+that could not be verified against the LOINC search service are marked and left
+empty rather than guessed.
+
+--------------------------------------------------------------------------
+THIRD-PARTY RESOURCES USED AT RUN TIME, NOT REDISTRIBUTED HERE
+--------------------------------------------------------------------------
+
+ClinVar (NCBI), PGS Catalog, dbSNP, Ensembl REST (including 1000 Genomes and
+gnomAD allele frequencies), RxNorm and RxClass (NLM), and the external tools
+PharmCAT, PyPGx, T1K, bcftools, samtools, Ensembl VEP, BWA and telomerecat are
+used by this software but are NOT distributed with it. Each is obtained by the
+user directly from its provider under that provider's own terms.
+
+Full details, licenses and required attributions: ATTRIBUTION.md
+
+--------------------------------------------------------------------------
+NOT A MEDICAL DEVICE
+--------------------------------------------------------------------------
+
+Scholion is a research and educational tool. It does not diagnose, treat, cure
+or prevent any disease, and it does not replace a clinician. See DISCLAIMER.md.

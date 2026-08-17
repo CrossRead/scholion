@@ -1,0 +1,1035 @@
+{
+  "_meta": {
+    "purpose": "SHARED PUBLIC LIST. The genes of the ACMG SF v3.3 secondary findings — the minimum where the medical community holds an incidental pathogenic variant in a healthy person to be a reason to act. Nobody's genotypes are kept here.",
+    "version": "ACMG SF v3.3",
+    "published": "2025-06-23, Genetics in Medicine (policy statement ACMG), DOI 10.1016/j.gim.2025.101454, PMID 40568962",
+    "gene_count": 84,
+    "new_in_v33": [
+      "ABCD1",
+      "CYP27A1",
+      "PLN"
+    ],
+    "removed_in_v33": [],
+    "considered_not_added": [
+      "GCK",
+      "RUNX1",
+      "SLC4A1",
+      "ADA2 (decision deferred)"
+    ],
+    "report_rules": {
+      "any": "report on a single pathogenic / likely pathogenic variant",
+      "biallelic": "report only on TWO P/LP variants (recessive inheritance). One variant = carriership, not disease",
+      "hfe_c282y_hom": "report only the p.C282Y homozygote. A heterozygote and H63D are not a secondary finding"
+    },
+    "provenance": "The full text of the paper in Genetics in Medicine is not directly available (403). The list was assembled by cross-checking several independent sources that reproduce the ACMG table: the official ACMG press release (acmg.net), the full v3.3 table from Ambry Genetics, Baylor Genetics, 3billion.io; inheritance modes and phenotypes for the 81 genes of v3.2 come from the official table on PMC/NIH (PMC10524344). The arithmetic adds up: 81 (v3.2) + 3 = 84.",
+    "caveats": "The inheritance mode of the three new genes (ABCD1 XL, CYP27A1 AR, PLN AD) is taken from accepted clinical genetics rather than verbatim from the v3.3 table — verify it once the primary source becomes accessible. The category of RPE65 is «metabolic» in some sources and «other» in others — the majority reading was taken. In the official table LDLR is marked semidominant (SD) rather than plain AD: homozygotes and compound heterozygotes are affected more severely.",
+    "how_to_use": "The list sets the FRAME of reporting, not a diagnosis. A finding in an SF gene is a reason to consult a geneticist and to check it clinically, not a conclusion that there is disease: see penetrance.json on why «pathogenic» != «will fall ill»."
+  },
+  "genes": {
+    "APC": {
+      "phenotype": {
+        "en": "familial adenomatous polyposis",
+        "ru": "семейный аденоматозный полипоз"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "BMPR1A": {
+      "phenotype": {
+        "en": "juvenile polyposis syndrome",
+        "ru": "ювенильный полипозный синдром"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "BRCA1": {
+      "phenotype": {
+        "en": "hereditary breast and ovarian cancer",
+        "ru": "наследственный рак молочной железы и яичников"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "BRCA2": {
+      "phenotype": {
+        "en": "hereditary breast and ovarian cancer",
+        "ru": "наследственный рак молочной железы и яичников"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MAX": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MEN1": {
+      "phenotype": {
+        "en": "multiple endocrine neoplasia type 1",
+        "ru": "множественная эндокринная неоплазия 1 типа"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MLH1": {
+      "phenotype": {
+        "en": "Lynch syndrome",
+        "ru": "синдром Линча"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MSH2": {
+      "phenotype": {
+        "en": "Lynch syndrome",
+        "ru": "синдром Линча"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MSH6": {
+      "phenotype": {
+        "en": "Lynch syndrome",
+        "ru": "синдром Линча"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MUTYH": {
+      "phenotype": {
+        "en": "MUTYH-associated polyposis",
+        "ru": "MUTYH-ассоциированный полипоз"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "NF2": {
+      "phenotype": {
+        "en": "NF2-related schwannomatosis",
+        "ru": "NF2-ассоциированный шванноматоз"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PALB2": {
+      "phenotype": {
+        "en": "hereditary breast cancer",
+        "ru": "наследственный рак молочной железы"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PMS2": {
+      "phenotype": {
+        "en": "Lynch syndrome",
+        "ru": "синдром Линча"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PTEN": {
+      "phenotype": {
+        "en": "PTEN hamartoma tumour syndrome",
+        "ru": "PTEN-гамартомный опухолевый синдром"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "RB1": {
+      "phenotype": {
+        "en": "retinoblastoma",
+        "ru": "ретинобластома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "RET": {
+      "phenotype": {
+        "en": "MEN type 2 / medullary thyroid carcinoma",
+        "ru": "МЭН 2 типа / медуллярный рак щитовидной железы"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SDHAF2": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SDHB": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SDHC": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SDHD": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SMAD4": {
+      "phenotype": {
+        "en": "juvenile polyposis / hereditary haemorrhagic telangiectasia",
+        "ru": "ювенильный полипоз / наследственная геморрагическая телеангиэктазия"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "STK11": {
+      "phenotype": {
+        "en": "Peutz-Jeghers syndrome",
+        "ru": "синдром Пейтца-Егерса"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TMEM127": {
+      "phenotype": {
+        "en": "paraganglioma-phaeochromocytoma",
+        "ru": "параганглиома-феохромоцитома"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TP53": {
+      "phenotype": {
+        "en": "Li-Fraumeni syndrome",
+        "ru": "синдром Ли-Фраумени"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TSC1": {
+      "phenotype": {
+        "en": "tuberous sclerosis",
+        "ru": "туберозный склероз"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TSC2": {
+      "phenotype": {
+        "en": "tuberous sclerosis",
+        "ru": "туберозный склероз"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "VHL": {
+      "phenotype": {
+        "en": "von Hippel-Lindau syndrome",
+        "ru": "синдром фон Хиппеля-Линдау"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "WT1": {
+      "phenotype": {
+        "en": "Wilms tumour",
+        "ru": "опухоль Вильмса"
+      },
+      "category": {
+        "en": "oncology",
+        "ru": "онкология"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "ACTA2": {
+      "phenotype": {
+        "en": "thoracic aortic aneurysm and dissection",
+        "ru": "аневризма и расслоение грудной аорты"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "ACTC1": {
+      "phenotype": {
+        "en": "hypertrophic / dilated cardiomyopathy",
+        "ru": "гипертрофическая/дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "APOB": {
+      "phenotype": {
+        "en": "familial hypercholesterolaemia",
+        "ru": "семейная гиперхолестеринемия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "BAG3": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "CALM1": {
+      "phenotype": {
+        "en": "long QT / CPVT",
+        "ru": "удлинённый QT / КПЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "CALM2": {
+      "phenotype": {
+        "en": "long QT / CPVT",
+        "ru": "удлинённый QT / КПЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "CALM3": {
+      "phenotype": {
+        "en": "long QT / CPVT",
+        "ru": "удлинённый QT / КПЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "CASQ2": {
+      "phenotype": {
+        "en": "catecholaminergic polymorphic ventricular tachycardia",
+        "ru": "катехоламинергическая полиморфная ЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "COL3A1": {
+      "phenotype": {
+        "en": "vascular Ehlers-Danlos syndrome",
+        "ru": "сосудистый тип синдрома Элерса-Данло"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "DES": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "DSC2": {
+      "phenotype": {
+        "en": "arrhythmogenic right ventricular cardiomyopathy",
+        "ru": "аритмогенная кардиомиопатия ПЖ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "DSG2": {
+      "phenotype": {
+        "en": "arrhythmogenic right ventricular cardiomyopathy",
+        "ru": "аритмогенная кардиомиопатия ПЖ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "DSP": {
+      "phenotype": {
+        "en": "arrhythmogenic right ventricular cardiomyopathy",
+        "ru": "аритмогенная кардиомиопатия ПЖ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "FBN1": {
+      "phenotype": {
+        "en": "Marfan syndrome",
+        "ru": "синдром Марфана"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "FLNC": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "KCNH2": {
+      "phenotype": {
+        "en": "long QT syndrome type 2",
+        "ru": "синдром удлинённого QT 2 типа"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "KCNQ1": {
+      "phenotype": {
+        "en": "long QT syndrome type 1",
+        "ru": "синдром удлинённого QT 1 типа"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "LDLR": {
+      "phenotype": {
+        "en": "familial hypercholesterolaemia",
+        "ru": "семейная гиперхолестеринемия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "SD",
+      "report_rule": "any"
+    },
+    "LMNA": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MYBPC3": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MYH11": {
+      "phenotype": {
+        "en": "thoracic aortic aneurysm and dissection",
+        "ru": "аневризма и расслоение грудной аорты"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MYH7": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MYL2": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "MYL3": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PCSK9": {
+      "phenotype": {
+        "en": "familial hypercholesterolaemia",
+        "ru": "семейная гиперхолестеринемия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PKP2": {
+      "phenotype": {
+        "en": "arrhythmogenic right ventricular cardiomyopathy",
+        "ru": "аритмогенная кардиомиопатия ПЖ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PLN": {
+      "phenotype": {
+        "en": "arrhythmogenic / dilated cardiomyopathy",
+        "ru": "аритмогенная/дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "PRKAG2": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "RBM20": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "RYR2": {
+      "phenotype": {
+        "en": "catecholaminergic polymorphic ventricular tachycardia",
+        "ru": "катехоламинергическая полиморфная ЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SCN5A": {
+      "phenotype": {
+        "en": "long QT type 3 / Brugada syndrome",
+        "ru": "удлинённый QT 3 типа / синдром Бругада"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "SMAD3": {
+      "phenotype": {
+        "en": "Loeys-Dietz syndrome",
+        "ru": "синдром Лойса-Дитца"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TGFBR1": {
+      "phenotype": {
+        "en": "Loeys-Dietz syndrome",
+        "ru": "синдром Лойса-Дитца"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TGFBR2": {
+      "phenotype": {
+        "en": "Loeys-Dietz syndrome",
+        "ru": "синдром Лойса-Дитца"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TMEM43": {
+      "phenotype": {
+        "en": "arrhythmogenic right ventricular cardiomyopathy",
+        "ru": "аритмогенная кардиомиопатия ПЖ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TNNC1": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TNNI3": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TNNT2": {
+      "phenotype": {
+        "en": "hypertrophic / dilated cardiomyopathy",
+        "ru": "гипертрофическая/дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TPM1": {
+      "phenotype": {
+        "en": "hypertrophic cardiomyopathy",
+        "ru": "гипертрофическая кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TRDN": {
+      "phenotype": {
+        "en": "catecholaminergic polymorphic ventricular tachycardia",
+        "ru": "катехоламинергическая полиморфная ЖТ"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "TTN": {
+      "phenotype": {
+        "en": "dilated cardiomyopathy",
+        "ru": "дилатационная кардиомиопатия"
+      },
+      "category": {
+        "en": "cardiac",
+        "ru": "кардио"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "ABCD1": {
+      "phenotype": {
+        "en": "X-linked adrenoleukodystrophy",
+        "ru": "X-сцепленная адренолейкодистрофия"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "XL",
+      "report_rule": "any"
+    },
+    "BTD": {
+      "phenotype": {
+        "en": "biotinidase deficiency",
+        "ru": "биотинидазная недостаточность"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "CYP27A1": {
+      "phenotype": {
+        "en": "cerebrotendinous xanthomatosis",
+        "ru": "церебротендинозный ксантоматоз"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "GAA": {
+      "phenotype": {
+        "en": "Pompe disease",
+        "ru": "болезнь Помпе"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "GLA": {
+      "phenotype": {
+        "en": "Fabry disease",
+        "ru": "болезнь Фабри"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "XL",
+      "report_rule": "any"
+    },
+    "OTC": {
+      "phenotype": {
+        "en": "ornithine transcarbamylase deficiency",
+        "ru": "дефицит орнитин-транскарбамилазы"
+      },
+      "category": {
+        "en": "metabolic",
+        "ru": "метаболические"
+      },
+      "inheritance": "XL",
+      "report_rule": "any"
+    },
+    "ACVRL1": {
+      "phenotype": {
+        "en": "hereditary haemorrhagic telangiectasia",
+        "ru": "наследственная геморрагическая телеангиэктазия"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "ATP7B": {
+      "phenotype": {
+        "en": "Wilson disease",
+        "ru": "болезнь Вильсона"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "CACNA1S": {
+      "phenotype": {
+        "en": "malignant hyperthermia",
+        "ru": "злокачественная гипертермия"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "ENG": {
+      "phenotype": {
+        "en": "hereditary haemorrhagic telangiectasia",
+        "ru": "наследственная геморрагическая телеангиэктазия"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "HFE": {
+      "phenotype": {
+        "en": "hereditary haemochromatosis",
+        "ru": "наследственный гемохроматоз"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AR",
+      "report_rule": "hfe_c282y_hom"
+    },
+    "HNF1A": {
+      "phenotype": "MODY3",
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "RPE65": {
+      "phenotype": {
+        "en": "RPE65-associated retinopathy",
+        "ru": "RPE65-ассоциированная ретинопатия"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AR",
+      "report_rule": "biallelic"
+    },
+    "RYR1": {
+      "phenotype": {
+        "en": "malignant hyperthermia",
+        "ru": "злокачественная гипертермия"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    },
+    "TTR": {
+      "phenotype": {
+        "en": "hereditary transthyretin amyloidosis",
+        "ru": "наследственный транстиретиновый амилоидоз"
+      },
+      "category": {
+        "en": "other",
+        "ru": "прочие"
+      },
+      "inheritance": "AD",
+      "report_rule": "any"
+    }
+  }
+}

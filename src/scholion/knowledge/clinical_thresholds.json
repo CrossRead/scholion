@@ -1,0 +1,193 @@
+{
+  "_meta": {
+    "purpose": "A PUBLIC map of CLINICAL ACTION THRESHOLDS. These are NOT reference intervals. A reference interval is the central 95 % of the values of a healthy population, that is, statistics; an action threshold is derived from outcomes and decisions, and it regularly lies INSIDE the reference corridor (prediabetes at HbA1c 5.7 with a laboratory norm up to 6.0) or far BEYOND it (haematocrit 54 % on testosterone therapy with a laboratory ceiling of 49). That is exactly why a position inside the corridor is almost uninterpretable, while a threshold is interpretable.",
+    "schema": "marker → a list of thresholds. value — the value in the units of labs.json; side — which side the threshold is on (high: value ≥ value; low: value ≤ value); label — what it means; source — where it comes from; action — what is done clinically; applies_when_class — the threshold applies only if the regimen contains a drug of that class (otherwise the threshold is a general one).",
+    "updated": "2026-08-13",
+    "disclaimer": "The thresholds are a reason for a question to the doctor, not a command. The assistant does not change therapy.",
+    "applies_to": "THE MECHANISM FOR LIMITING THRESHOLDS. The machine field is `applies_when_class`: the engine skips such a threshold if the user has no active drug of that class (this is how haematocrit 54 % is counted only on testosterone therapy). The `applies_to` field is a HUMAN-READABLE mark for the cases a drug class does not express; the engine does NOT execute it, and it must not be put in place of `applies_when_class`. If a limitation by sex is ever needed, an `applies_when_sex` field is added together with two lines in `_thresholds_for` next to the class check — otherwise the field is decoration rather than a rule. The absence of any of these fields means «the threshold applies to adults in general»: most of them are derived from outcomes and do not depend on sex or age."
+  },
+  "markers": {
+    "hba1c": [
+      {
+        "value": 5.7,
+        "side": "high",
+        "label": {"en": "prediabetes", "ru": "предиабет"},
+        "source": "ADA Standards of Care",
+        "action": {"en": "confirm with a repeat measurement; lifestyle, a discussion with the doctor", "ru": "подтвердить повторным измерением; образ жизни, обсуждение с врачом"}
+      },
+      {
+        "value": 6.5,
+        "side": "high",
+        "label": {"en": "diabetes (the diagnostic threshold)", "ru": "диабет (диагностический порог)"},
+        "source": "ADA Standards of Care",
+        "action": {"en": "confirmation and an in-person consultation", "ru": "подтверждение и очная консультация"}
+      }
+    ],
+    "glucose": [
+      {
+        "value": 5.6,
+        "side": "high",
+        "label": {"en": "impaired fasting glucose (ADA)", "ru": "нарушенная гликемия натощак (ADA)"},
+        "source": {"en": "ADA Standards of Care; the WHO uses a higher threshold, 6.1", "ru": "ADA Standards of Care; ВОЗ использует более высокий порог 6,1"},
+        "action": {"en": "confirm with a calm morning draw, compare with HbA1c and fructosamine", "ru": "подтвердить спокойным утренним забором, сопоставить с HbA1c и фруктозамином"}
+      },
+      {
+        "value": 7.0,
+        "side": "high",
+        "label": {"en": "diabetes (the diagnostic threshold)", "ru": "диабет (диагностический порог)"},
+        "source": {"en": "ADA / WHO", "ru": "ADA / ВОЗ"},
+        "action": {"en": "confirmation and an in-person consultation", "ru": "подтверждение и очная консультация"}
+      }
+    ],
+    "hematocrit": [
+      {
+        "value": 54.0,
+        "side": "high",
+        "label": {"en": "the intervention threshold on testosterone therapy", "ru": "порог вмешательства на терапии тестостероном"},
+        "source": {"en": "AUA Guideline on Testosterone Deficiency, recommendation 11: «a Hct 54% warrants intervention»", "ru": "AUA Guideline on Testosterone Deficiency, рекомендация 11: «a Hct 54% warrants intervention»"},
+        "action": {"en": "a dose reduction or a temporary withdrawal — the doctor's decision", "ru": "снижение дозы или временная отмена — решение врача"},
+        "applies_when_class": "testosterone_replacement"
+      },
+      {
+        "value": 50.0,
+        "side": "high",
+        "label": {"en": "the threshold for STARTING testosterone therapy", "ru": "порог для НАЧАЛА терапии тестостероном"},
+        "source": {"en": "AUA Guideline, recommendation 11: with Hct >50 % before the start — refrain", "ru": "AUA Guideline, рекомендация 11: при Hct >50 % до старта — воздержаться"},
+        "action": {"en": "this concerns the moment therapy is started, not the way it is run", "ru": "относится к моменту начала терапии, а не к её ведению"}
+      }
+    ],
+    "psa_total": [
+      {
+        "value": 4.0,
+        "side": "high",
+        "label": {"en": "the threshold for a urological consultation", "ru": "порог урологической консультации"},
+        "source": {"en": "Endocrine Society, Testosterone Therapy in Men With Hypogonadism (2018), rec. 3.2", "ru": "Endocrine Society, Testosterone Therapy in Men With Hypogonadism (2018), рек. 3.2"},
+        "action": {"en": "a confirmed PSA >4.0 — a consultation with a urologist", "ru": "подтверждённое ПСА >4,0 — консультация уролога"}
+      }
+    ],
+    "ldl": [
+      {
+        "value": 4.9,
+        "side": "high",
+        "label": {"en": "severe hypercholesterolaemia — assess for the familial form", "ru": "тяжёлая гиперхолестеринемия — оценка семейной формы"},
+        "source": {"en": "ACC/AHA: LDL ≥190 mg/dL (4.9 mmol/L) — a stand-alone reason for therapy outside the risk scores", "ru": "ACC/AHA: ЛПНП ≥190 мг/дл (4,9 ммоль/л) — самостоятельное основание для терапии вне шкал риска"},
+        "action": {"en": "discuss with the doctor an examination for familial hypercholesterolaemia and drug therapy", "ru": "обсудить с врачом обследование на СГХС и медикаментозную терапию"}
+      },
+      {
+        "value": 2.6,
+        "side": "high",
+        "label": {"en": "the target at raised risk", "ru": "цель при повышенном риске"},
+        "source": {"en": "a curated target of the profile (LDL ≤2.6; lower at high risk)", "ru": "курируемая цель профиля (ЛПНП ≤2,6; при высоком риске ниже)"},
+        "action": {"en": "a benchmark for the effectiveness of therapy", "ru": "ориентир эффективности терапии"}
+      }
+    ],
+    "apob": [
+      {
+        "value": 0.8,
+        "side": "high",
+        "label": {"en": "the cardiological optimum", "ru": "кардиологический оптимум"},
+        "source": {"en": "a curated target of the profile (ApoB <0.8 g/L)", "ru": "курируемая цель профиля (ApoB <0,8 г/л)"},
+        "action": {"en": "a benchmark of effectiveness", "ru": "ориентир эффективности"}
+      }
+    ],
+    "triglycerides": [
+      {
+        "value": 5.6,
+        "side": "high",
+        "label": {"en": "the risk of acute pancreatitis", "ru": "риск острого панкреатита"},
+        "source": {"en": "a threshold of ≈500 mg/dL", "ru": "порог ≈500 мг/дл"},
+        "action": {"en": "requires active lowering — a question for the doctor", "ru": "требует активного снижения — вопрос врачу"}
+      }
+    ],
+    "egfr_ckdepi": [
+      {
+        "value": 60.0,
+        "side": "low",
+        "label": {"en": "CKD stage 3 if it persists for ≥3 months", "ru": "ХБП стадии 3 при сохранении ≥3 мес"},
+        "source": "KDIGO",
+        "action": {"en": "confirm on a repeat test, a nephrologist", "ru": "подтвердить повторно, нефролог"}
+      }
+    ],
+    "uric_acid": [
+      {
+        "value": 360.0,
+        "side": "high",
+        "label": {"en": "the target level in gout", "ru": "целевой уровень при подагре"},
+        "source": {"en": "the target of urate-lowering therapy (<6 mg/dL)", "ru": "цель уратснижающей терапии (<6 мг/дл)"},
+        "action": {"en": "a benchmark; in the absence of gout it is not a diagnosis", "ru": "ориентир; в отсутствие подагры — не диагноз"},
+        "applies_to": {
+          "context": "the target of urate-lowering therapy",
+          "note": "this is a TARGET for the treatment of gout, not a threshold for a person who does not have it; there is no execution of it in the engine — read it with your eyes"
+        }
+      }
+    ],
+    "potassium": [
+      {
+        "value": 5.5,
+        "side": "high",
+        "label": {"en": "hyperkalaemia requiring action", "ru": "гиперкалиемия, требующая действия"},
+        "source": {"en": "the generally accepted threshold", "ru": "общепринятый порог"},
+        "action": {"en": "confirm, rule out haemolysis of the sample, a doctor", "ru": "подтвердить, исключить гемолиз пробы, врач"}
+      }
+    ],
+    "ck": [
+      {
+        "value": 570.0,
+        "side": "high",
+        "label": {"en": "3× the upper bound (190) on a statin — weekly monitoring", "ru": "3× верхней границы (190) на статине — еженедельный контроль"},
+        "source": {"en": "Medsafe NZ, statin myopathy: 3–10× ULN — monitoring of CK weekly and a specialist consultation", "ru": "Medsafe NZ, статиновая миопатия: 3–10× ВГН — контроль КФК еженедельно и консультация специалиста"},
+        "action": {"en": "do not stop it on your own; a question for the doctor", "ru": "не отменять самостоятельно; вопрос врачу"},
+        "applies_when_class": "statin"
+      },
+      {
+        "value": 1900.0,
+        "side": "high",
+        "label": {"en": "10× the upper bound — immediate withdrawal of the statin", "ru": "10× верхней границы — немедленная отмена статина"},
+        "source": "Medsafe NZ: «discontinue immediately if CK >10 x upper limit of normal»",
+        "action": {"en": "urgently to the doctor", "ru": "срочно к врачу"},
+        "applies_when_class": "statin"
+      }
+    ],
+    "alt": [
+      {
+        "value": 123.0,
+        "side": "high",
+        "label": {"en": "3× the upper bound (41) — a signal of drug-induced liver injury", "ru": "3× верхней границы (41) — сигнал лекарственного поражения печени"},
+        "source": {"en": "the generally accepted DILI threshold (3× ULN, especially together with bilirubin)", "ru": "общепринятый порог DILI (3× ВГН, особенно с билирубином)"},
+        "action": {"en": "a question for the doctor about the causative drug", "ru": "вопрос врачу о причинном препарате"}
+      }
+    ],
+    "vitamin_d": [
+      {
+        "value": 30.0,
+        "side": "low",
+        "label": {"en": "the sufficiency threshold", "ru": "порог достаточности"},
+        "source": {"en": "Endocrine Society: ≥30 ng/mL — sufficiency (the laboratory sets the lower bound at 50, that is its choice, not a threshold)", "ru": "Endocrine Society: ≥30 нг/мл — достаточность (лаборатория ставит нижнюю границу 50, это её выбор, а не порог)"},
+        "action": {"en": "below it — discuss the dose; above 30 there is no deficiency", "ru": "ниже — обсуждать дозу; выше 30 дефицита нет"}
+      },
+      {
+        "value": 100.0,
+        "side": "high",
+        "label": {"en": "the zone of potential toxicity", "ru": "зона потенциальной токсичности"},
+        "source": "Endocrine Society",
+        "action": {"en": "monitoring of calcium and PTH, a dose reduction — the doctor's decision", "ru": "контроль кальция и ПТГ, снижение дозы — решение врача"}
+      }
+    ],
+    "tsh": [
+      {
+        "value": 10.0,
+        "side": "high",
+        "label": {"en": "the threshold from which hypothyroidism is treated regardless of symptoms", "ru": "порог, с которого гипотиреоз лечат независимо от симптомов"},
+        "source": {"en": "common practice", "ru": "распространённая практика"},
+        "action": {"en": "a question for the endocrinologist", "ru": "вопрос эндокринологу"}
+      },
+      {
+        "value": 0.1,
+        "side": "low",
+        "label": {"en": "a suppressed TSH", "ru": "подавленный ТТГ"},
+        "source": {"en": "common practice", "ru": "распространённая практика"},
+        "action": {"en": "a question for the endocrinologist, assessment of T4/T3", "ru": "вопрос эндокринологу, оценка Т4/Т3"}
+      }
+    ]
+  }
+}

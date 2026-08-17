@@ -1,0 +1,37 @@
+# Citation File Format 1.2.0 — https://citation-file-format.github.io
+#
+# Checked by a test alongside the other legal files: the version number here is
+# obliged to match the VERSION file. There is one source of truth — VERSION; this
+# field is only a copy of it, and the test exists precisely so that the copy does
+# not drift.
+#
+# An ORCID goes here once there is one and it is meant for public use:
+#   orcid: "https://orcid.org/0000-0000-0000-0000"
+cff-version: 1.2.0
+message: "If you use Scholion in research, please cite it using this metadata."
+title: "Scholion"
+version: "0.1.2"
+date-released: "2026-08-17"
+type: software
+authors:
+  - family-names: "Belevtsev"
+    given-names: "Andrey"
+repository-code: "https://github.com/CrossRead/scholion"
+url: "https://github.com/CrossRead/scholion"
+license: "Apache-2.0"
+keywords:
+  - personal health data
+  - genomics
+  - pharmacogenomics
+  - polygenic scores
+  - laboratory results
+  - wearables
+  - n-of-1
+  - local-first
+  - provenance
+abstract: >-
+  A local-first personal evidence workspace that connects laboratory results,
+  medications, wearable data, clinical documents and personal genomics, keeping
+  the source, date, units, coverage and interpretation limits attached to every
+  statement it makes. Intended for personal research and for discussion with a
+  clinician. It is not a diagnostic device and does not prescribe treatment.

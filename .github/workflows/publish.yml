@@ -1,0 +1,74 @@
+# Publishing to PyPI on a tag — through Trusted Publishing.
+#
+# Why no token. A PyPI token in the repository secrets is a long-lived key to
+# somebody else's name in a shared registry: leak it once and anyone can push a
+# version under the project's name, and a published version cannot be rewritten.
+# Trusted Publishing issues an OIDC credential valid for one run: there is
+# nothing to steal.
+#
+# Conditions on the PyPI side (the pending publisher must match word for word):
+#   owner/repository — CrossRead/scholion
+#   workflow file    — publish.yml
+#   environment      — pypi
+#
+# What it does: builds the wheel and the sdist FROM THE TAG, runs the project's
+# own tests and `twine check`, and only then publishes. A tag whose tests are red
+# never reaches the registry — and in the registry there is nothing to roll back.
+name: publish
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:          # a manual run, to check the build without publishing
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: The version in the tag matches the VERSION file
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          file="$(tr -d '[:space:]' < VERSION)"
+          if [ "$tag" != "$file" ]; then
+            echo "The tag $GITHUB_REF_NAME does not match VERSION=$file."
+            echo "A published number cannot be rewritten — the build is stopped."
+            exit 1
+          fi
+
+      - name: The project's own tests
+        run: ./run_tests.sh
+
+      - name: Build
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build
+          python -m twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    # Only on a tag: a manual run reaches the build and stops there.
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write         # this is what the whole arrangement is for: OIDC instead of a token
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

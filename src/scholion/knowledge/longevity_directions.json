@@ -1,0 +1,316 @@
+{
+  "_meta": {
+    "purpose": "A PORTABLE curated catalogue of the directions of longevity alleles: which allele is «for longevity/health» according to the primary sources. It contains nobody's genotypes — it is applied to a personal VCF by rsID. It feeds the generator src/ingest/longevity_findings_build.py.",
+    "provenance": "Assembled on 2026-08-14 from the literature review «the direction of the alleles» (7 parallel reviews by PMID, 12.07.2026) + the KNOWN dictionary from longevity_report.py. The direction of an allele often depends on the population and on the linkage chain — where it cannot be resolved confidently, the variant sits in the unresolved section rather than here.",
+    "how_to_extend": "A new entry — only with a PMID and an explicit favorable allele according to the primary source. Aggregate gene-based associations (SKAT and the like) have no direction at the SNP level — their place is in unresolved.",
+    "schema": "directions[rsid] = {gene, favorable (an allele or null), label, confidence high/medium/low, zygosity_note?, population_caveat?, pmids[], action?, verdict_by_copies? {0:.., 1:.., 2:..}}"
+  },
+  "directions": {
+    "rs429358": {
+      "gene": "APOE",
+      "favorable": null,
+      "label": {"en": "a component of the ε-status: C = ε4 (a risk of Alzheimer's disease, a shorter life expectancy); T = not-ε4", "ru": "компонент ε-статуса: C = ε4 (риск Альцгеймера, меньшая продолжительность жизни); T = не-ε4"},
+      "confidence": "high",
+      "pmids": [
+        "8346443",
+        "31954858"
+      ],
+      "action": {"en": "part of the APOE block, do not interpret it separately", "ru": "входит в блок APOE, отдельно не интерпретировать"}
+    },
+    "rs7412": {
+      "gene": "APOE",
+      "favorable": "T",
+      "label": {"en": "a component of the ε-status: T = ε2 (favourable for longevity; but it raises TG/remnants)", "ru": "компонент ε-статуса: T = ε2 (благоприятен для долголетия; но повышает ТГ/ремнанты)"},
+      "confidence": "high",
+      "pmids": [
+        "8346443",
+        "31954858"
+      ],
+      "action": {"en": "part of the APOE block; with ε2 keep an eye on the triglycerides/remnants", "ru": "входит в блок APOE; при ε2 следить за триглицеридами/ремнантами"}
+    },
+    "rs2075650": {
+      "gene": "TOMM40",
+      "favorable": "A",
+      "label": {"en": "G is linked to the ε4 haplotype (risk); A/A = the risk allele is absent (neutral-to-good, not a plus in its own right)", "ru": "G сцеплен с ε4-гаплотипом (риск); A/A = риск-аллеля нет (нейтрально-хорошо, не самостоятельный плюс)"},
+      "confidence": "medium",
+      "population_caveat": {"en": "a proxy for ε4, it has almost no meaning of its own", "ru": "прокси ε4, самостоятельного смысла почти нет"},
+      "pmids": [
+        "19734902"
+      ],
+      "action": {"en": "read it together with APOE, not separately", "ru": "читать вместе с APOE, не отдельно"},
+      "verdict_by_copies": {
+        "0": "flag",
+        "1": "neutral",
+        "2": "neutral"
+      }
+    },
+    "rs2802292": {
+      "gene": "FOXO3",
+      "favorable": "G",
+      "label": {"en": "G — the most reproduced variant of human longevity (the Willcox model)", "ru": "G — самый воспроизведённый вариант долголетия человека (модель Willcox)"},
+      "confidence": "high",
+      "zygosity_note": {"en": "the effect is dose-dependent: GG is stronger than GT", "ru": "эффект дозозависим: GG сильнее, чем GT"},
+      "pmids": [
+        "18765803",
+        "19470488"
+      ],
+      "action": {"en": "the insulin/IGF axis: carriage of G is an argument that insulin-sensitising measures (weight loss, exercise) will fall on responsive genetics; monitoring by HOMA-IR", "ru": "инсулин/IGF-ось: носительство G — довод, что инсулин-сенсибилизирующие меры (похудение, нагрузка) лягут на отзывчивую генетику; контроль по HOMA-IR"},
+      "verdict_by_copies": {
+        "0": "neutral",
+        "1": "plus_partial",
+        "2": "plus"
+      }
+    },
+    "rs12206094": {
+      "gene": "FOXO3",
+      "favorable": "T",
+      "label": {"en": "a functional enhancer of FOXO3 — a causal variant (Grossi/Flachsbart, Nat Commun 2017), T raises expression", "ru": "функциональный энхансер FOXO3 — каузальный вариант (Grossi/Flachsbart, Nat Commun 2017), T повышает экспрессию"},
+      "confidence": "high",
+      "pmids": [
+        "29255262"
+      ],
+      "action": {"en": "it strengthens the reading of rs2802292: the carrier has not merely a tag but a causal allele", "ru": "усиливает чтение rs2802292: носитель — не просто tag, а причинный аллель"},
+      "verdict_by_copies": {
+        "0": "neutral",
+        "1": "plus_partial",
+        "2": "plus"
+      }
+    },
+    "rs2253310": {
+      "gene": "FOXO3",
+      "favorable": "C",
+      "label": {"en": "a perfect proxy for rs2802292 (r²=1.0)", "ru": "идеальный прокси rs2802292 (r²=1.0)"},
+      "confidence": "high",
+      "pmids": [
+        "18765803"
+      ],
+      "action": {"en": "duplicates rs2802292", "ru": "дублирует rs2802292"}
+    },
+    "rs4946935": {
+      "gene": "FOXO3",
+      "favorable": "A",
+      "label": {"en": "a distal functional variant of the FOXO3 haplotype", "ru": "дистальный функциональный вариант гаплотипа FOXO3"},
+      "confidence": "medium",
+      "pmids": [
+        "38459055"
+      ],
+      "action": {"en": "its absence when the proximal ones are carried = a recombinant (partial) haplotype", "ru": "отсутствие при носительстве проксимальных = рекомбинантный (частичный) гаплотип"}
+    },
+    "rs2764264": {
+      "gene": "FOXO3",
+      "favorable": "C",
+      "label": {"en": "a distal marker of the FOXO3 haplotype", "ru": "дистальный маркёр гаплотипа FOXO3"},
+      "confidence": "medium",
+      "pmids": [
+        "20849522"
+      ],
+      "action": {"en": "read it as part of the haplotype", "ru": "читать в составе гаплотипа"}
+    },
+    "rs13217795": {
+      "gene": "FOXO3",
+      "favorable": "C",
+      "label": {"en": "a distal marker of the FOXO3 haplotype", "ru": "дистальный маркёр гаплотипа FOXO3"},
+      "confidence": "medium",
+      "pmids": [
+        "20849522"
+      ],
+      "action": {"en": "read it as part of the haplotype", "ru": "читать в составе гаплотипа"}
+    },
+    "rs1042522": {
+      "gene": "TP53",
+      "favorable": "C",
+      "label": {"en": "Arg72Pro: carriage of Pro(C) = survival at 85+; Arg(G) = strong apoptosis/protection against cancer. The heterozygote is «the best of the two»", "ru": "Arg72Pro: Pro(C)-носительство = выживаемость 85+; Arg(G) = сильный апоптоз/защита от рака. Гетерозигота — «лучшее из двух»"},
+      "confidence": "high",
+      "pmids": [
+        "15732191"
+      ],
+      "action": {"en": "spare p53 the mutational load: UV protection, do not smoke, a minimum of alcohol", "ru": "беречь p53 от мутационной нагрузки: УФ-защита, не курить, минимум алкоголя"},
+      "verdict_by_copies": {
+        "0": "neutral",
+        "1": "plus",
+        "2": "lean_plus"
+      }
+    },
+    "rs1501299": {
+      "gene": "ADIPOQ",
+      "favorable": "T",
+      "label": {"en": "+276 G>T: T = higher adiponectin / insulin sensitivity", "ru": "+276 G>T: T = выше адипонектин / чувствительность к инсулину"},
+      "confidence": "medium",
+      "pmids": [
+        "12429876"
+      ],
+      "action": {"en": "a bridge to the metabolic axis: monitoring of HOMA-IR (and adiponectin if desired)", "ru": "мостик к метаболической оси: контроль HOMA-IR (при желании — адипонектин)"}
+    },
+    "rs5882": {
+      "gene": "CETP",
+      "favorable": "G",
+      "label": {"en": "Val405Ile: G=Val = low CETP activity, large HDL particles, longevity (Barzilai)", "ru": "Val405Ile: G=Val = низкая активность CETP, крупные ЛПВП, долголетие (Barzilai)"},
+      "confidence": "high",
+      "zygosity_note": {"en": "the protection is concentrated in VV homozygotes; a single copy is half the dose", "ru": "защита сконцентрирована у гомозигот VV; одна копия — половинная доза"},
+      "population_caveat": {"en": "the direction is valid for Europeans (in East Asians it is the opposite)", "ru": "направление валидно для европейцев (у восточноазиатов обратное)"},
+      "pmids": [
+        "14559957",
+        "20139178"
+      ],
+      "action": {"en": "a mild plus does not cancel the phenotype: run the lipid line by ApoB", "ru": "мягкий плюс не отменяет фенотип: липидную линию вести по ApoB"},
+      "verdict_by_copies": {
+        "0": "neutral",
+        "1": "lean_plus",
+        "2": "plus"
+      }
+    },
+    "rs2542052": {
+      "gene": "APOC3",
+      "favorable": "C",
+      "label": {"en": "C = higher HDL / lower TG, longevity (an Ashkenazi cohort)", "ru": "C = выше ЛПВП / ниже ТГ, долголетие (ашкеназская когорта)"},
+      "confidence": "medium",
+      "zygosity_note": {"en": "the full effect is in CC homozygotes", "ru": "полный эффект у CC"},
+      "pmids": [
+        "16602826"
+      ],
+      "action": {"en": "as with CETP: the plus is a mild one, run the lipids by the phenotype (ApoB)", "ru": "как и CETP: плюс мягкий, липиды вести по фенотипу (ApoB)"}
+    },
+    "rs2111699": {
+      "gene": "GSTZ1",
+      "favorable": "G",
+      "label": {"en": "carriage of G is associated with survival into deep old age (a detoxification enzyme)", "ru": "G-носительство ассоциировано с дожитием до глубокой старости (детокс-фермент)"},
+      "confidence": "medium",
+      "population_caveat": {"en": "a single cohort", "ru": "одна когорта"},
+      "pmids": [
+        "20563878"
+      ]
+    },
+    "rs1776180": {
+      "gene": "EXO1",
+      "favorable": "C",
+      "label": {"en": "C = higher expression of EXO1; an association with centenarians", "ru": "C = выше экспрессия EXO1; ассоциация с центенариями"},
+      "confidence": "medium",
+      "population_caveat": {"en": "the effect was shown in women", "ru": "эффект показан у женщин"},
+      "pmids": [
+        "19269274"
+      ]
+    },
+    "rs1050450": {
+      "gene": "GPX1",
+      "favorable": "G",
+      "label": {"en": "Pro198Leu: Pro(G) = full activity of glutathione peroxidase; Leu(A) — reduced", "ru": "Pro198Leu: Pro(G) = полная активность глутатионпероксидазы; Leu(A) — сниженная"},
+      "confidence": "high",
+      "pmids": [
+        "18448905"
+      ],
+      "action": {"en": "with a Leu copy the activity depends in part on selenium status (selenium is in the regimen)", "ru": "при Leu-копии активность частично зависит от статуса селена (селен в схеме есть)"}
+    },
+    "rs3781907": {
+      "gene": "UCP3",
+      "favorable": "A",
+      "label": {"en": "A is associated with longevity; G — with lower survival", "ru": "A ассоциирован с долголетием; G — с меньшей выживаемостью"},
+      "confidence": "medium",
+      "pmids": [
+        "19086053"
+      ]
+    },
+    "rs107251": {
+      "gene": "SIRT6",
+      "favorable": "T",
+      "label": {"en": "the major T is favourable; a minor copy — intermediate", "ru": "мажорный T благоприятен; минорная копия — промежуточно"},
+      "confidence": "medium",
+      "pmids": [
+        "28640802"
+      ]
+    },
+    "rs1805086": {
+      "gene": "MSTN",
+      "favorable": null,
+      "label": {"en": "K153R (myostatin): the direction is disputed in the literature — in some places a decrease in strength, in others an association with centenarians, the large studies on strength — null", "ru": "K153R (миостатин): направление в литературе спорно — где-то снижение силы, где-то ассоциация с центенариями, крупные работы по силе — null"},
+      "confidence": "low",
+      "pmids": [
+        "21617243"
+      ],
+      "action": {"en": "carriage of Arg153 is not a verdict but a reason to protect the muscles actively: strength training + protein ~1.6 g/kg + monitoring of body composition (relevant on tirzepatide)", "ru": "носительство Arg153 — не приговор, а повод активно защищать мышцы: силовые + белок ~1,6 г/кг + контроль состава тела (актуально на тирзепатиде)"},
+      "verdict_by_copies": {
+        "0": "neutral",
+        "1": "flag",
+        "2": "flag"
+      }
+    },
+    "rs1800795": {
+      "gene": "IL6",
+      "favorable": "C",
+      "label": {"en": "the promoter −174 G>C: C = lower IL-6 production (anti-inflammatory); G = higher", "ru": "−174 G>C промотора: C = ниже продукция ИЛ-6 (антивоспалительный); G = выше"},
+      "confidence": "medium",
+      "population_caveat": {"en": "the direction depends on the population", "ru": "направление зависит от популяции"},
+      "pmids": [
+        "9466968",
+        "19377912"
+      ],
+      "action": {"en": "the heterozygote = an «intermediate producer»: the genetics are NOT pro-inflammatory — look for chronic inflammation in the metabolic picture, not in the genes", "ru": "гетерозигота = «промежуточный продуцент»: генетика НЕ провоспалительная — хроническое воспаление искать в метаболике, не в генах"}
+    },
+    "rs1800797": {
+      "gene": "IL6",
+      "favorable": "A",
+      "label": {"en": "−597 G>A: linked to −174, read them together", "ru": "−597 G>A: сцеплен с −174, читать вместе"},
+      "confidence": "medium",
+      "pmids": [
+        "19377912"
+      ],
+      "action": {"en": "duplicates rs1800795", "ru": "дублирует rs1800795"}
+    },
+    "rs4646": {
+      "gene": "CYP19A1",
+      "favorable": "A",
+      "label": {"en": "aromatase: A = less aromatisation, an association with longevity; C/C = the «high-aromatase» genotype", "ru": "ароматаза: A = ниже ароматизация, ассоциация с долголетием; C/C = «высоко-ароматазный» генотип"},
+      "confidence": "medium",
+      "pmids": [
+        "20819792"
+      ],
+      "action": {"en": "practice matters more than a longevity marker: with C/C exogenous testosterone aromatises readily — monitor oestradiol after the titration of Androgel", "ru": "практика важнее долгожительского маркёра: при C/C экзогенный тестостерон охотно ароматизируется — контролировать эстрадиол после титрации Андрогеля"},
+      "verdict_by_copies": {
+        "0": "flag",
+        "1": "neutral",
+        "2": "plus"
+      }
+    },
+    "rs275653": {
+      "gene": "AGTR1",
+      "favorable": "minor",
+      "label": {"en": "longevity has been shown in homozygotes for the minor allele; the effect is recessive", "ru": "долголетие показано у гомозигот по минорному аллелю; эффект рецессивный"},
+      "confidence": "medium",
+      "zygosity_note": {"en": "the effect is recessive: the heterozygote is neutral", "ru": "эффект рецессивный: гетерозигота нейтральна"},
+      "pmids": [
+        "19941348"
+      ]
+    },
+    "rs422858": {
+      "gene": "AGTR1",
+      "favorable": "minor",
+      "label": {"en": "the same as rs275653 (a recessive effect)", "ru": "то же, что rs275653 (рецессивный эффект)"},
+      "confidence": "medium",
+      "zygosity_note": {"en": "the effect is recessive: the heterozygote is neutral", "ru": "эффект рецессивный: гетерозигота нейтральна"},
+      "pmids": [
+        "19941348"
+      ]
+    }
+  },
+  "unresolved": {
+    "note": {"en": "The direction at the SNP level has NOT been published (aggregate gene-based tests) or has not been reproduced — read these carriages as a navigator over PMIDs, not as «pluses/minuses».", "ru": "Направление на уровне SNP НЕ публиковалось (агрегатные gene-based тесты) или не воспроизведено — их носительства читать как навигатор по PMID, не как «плюсы/минусы»."},
+    "genes": [
+      "TXNRD1",
+      "NDUFS1",
+      "POLB",
+      "H2AFX",
+      "XRCC5",
+      "GHRHR",
+      "GHRL",
+      "GHSR",
+      "SIRT1",
+      "AKT1",
+      "NLRC5",
+      "ACE"
+    ],
+    "details": {
+      "ACE": "rs1799752 I/D — the results on longevity are inconsistent; no direction is assigned",
+      "SIRT1": "rs7896005/rs3758391 have not been replicated; note: rs3758391 was listed in the catalogue erroneously as ACE — it is the SIRT1 promoter",
+      "GHRHR/GHRL/GHSR": "a gene-based association (PMID 22406557), not replicated; the owner's low GH is not explained by these variants — verify by IGF-1"
+    }
+  }
+}

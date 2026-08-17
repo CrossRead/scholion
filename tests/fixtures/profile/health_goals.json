@@ -1,0 +1,8 @@
+{
+  "_meta": {"purpose": "СИНТЕТИЧЕСКАЯ фикстура автотестов", "updated": "2026-07-01"},
+  "title": "Тестовая цель",
+  "headline": "Проверить, что дашборд строится на живых данных",
+  "targets": [{"label": "ЛПНП", "source": "lab:ldl", "target": 2.6, "dir": "lower"},
+               {"label": "Вес", "source": "life:weight", "target": 78, "dir": "lower"}],
+  "charts": []
+}

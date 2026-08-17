@@ -1,0 +1,295 @@
+{
+  "_meta": {
+    "purpose": "External command-line tools the data-preparation scripts need, grouped by what stops working without them. Public reference data: no personal information here.",
+    "why": "Every ingest script checks its own tools and stops with a hint when one is missing. That is correct behaviour and terrible timing: on the genome path the gap surfaces an hour into an alignment. This file exists so the whole picture can be shown before anything starts.",
+    "names": "The binary and the package are often not the same name — bgzip and tabix both come from htslib, uvx comes from uv — and a list of binaries cannot be handed to a package manager. That mapping is the point of this file.",
+    "unverified": "Where a package name has not been verified against the tool's own documentation, it is absent deliberately. Printing an install command that turns out to be wrong costs more than printing none: the person runs it, it fails, and now they distrust the rest of the list.",
+    "sudo": "No entry here needs administrator rights, and that is a selection criterion rather than a coincidence. Homebrew and conda install into the user's own prefix. Anything that would need sudo is shown as text for the person to run themselves.",
+    "updated": "2026-08-16",
+    "sets": "A set names the tools it REQUIRES. Anything that merely makes the step faster or better is listed under `optional` and never counted as missing: a set that looks complete while a required tool is absent is worse than no list at all."
+  },
+  "sets": {
+    "base": {
+      "label": {
+        "en": "Reading and calling variants",
+        "ru": "Чтение и вызов вариантов"
+      },
+      "why": {
+        "en": "Without these the genome layer does not work at all: a VCF can be neither read, nor indexed, nor filtered.",
+        "ru": "Без них геномный слой не работает вовсе: VCF нельзя ни прочитать, ни проиндексировать, ни отфильтровать."
+      },
+      "tools": [
+        "samtools",
+        "bcftools",
+        "bgzip",
+        "tabix"
+      ],
+      "offer_at_init": true
+    },
+    "align": {
+      "label": {
+        "en": "Building a genome from raw reads",
+        "ru": "Сборка генома из сырых чтений"
+      },
+      "why": {
+        "en": "Needed only if you start from FASTQ. If a VCF already exists, this set can be skipped.",
+        "ru": "Нужен, только если вы начинаете с FASTQ. Если VCF уже есть, набор можно пропустить."
+      },
+      "tools": [
+        "bwa"
+      ],
+      "offer_at_init": false,
+      "optional": [
+        "bwa-mem2"
+      ]
+    },
+    "coverage": {
+      "label": {
+        "en": "Measuring callability",
+        "ru": "Измерение покрытия"
+      },
+      "why": {
+        "en": "Without a coverage measurement 'no findings' says nothing: a gene read at 70 % gives the same zero as a gene read in full. samtools alone can do it, more slowly.",
+        "ru": "Без измерения покрытия «находок нет» не означает ничего: ген, прочитанный на 70 %, даёт такой же ноль, как прочитанный целиком. samtools справится и один, только медленнее."
+      },
+      "tools": [
+        "mosdepth"
+      ],
+      "offer_at_init": false
+    },
+    "pgx": {
+      "label": {
+        "en": "Star alleles and pharmacogenomics",
+        "ru": "Звёздные аллели и фармакогенетика"
+      },
+      "why": {
+        "en": "PyPGx and PharmCAT resolve diplotypes — the level at which CYP2D6 copy number and phase can be read at all.",
+        "ru": "PyPGx и PharmCAT разбирают диплотипы — уровень, на котором вообще читаются число копий и фаза CYP2D6."
+      },
+      "tools": [
+        "java",
+        "pypgx"
+      ],
+      "offer_at_init": false
+    },
+    "wgs": {
+      "label": {
+        "en": "Full WGS calling via DeepVariant",
+        "ru": "Полный вызов WGS через DeepVariant"
+      },
+      "why": {
+        "en": "An optional path with higher accuracy on difficult regions. Heavy: a container runtime and hours of computation.",
+        "ru": "Необязательный путь с большей точностью на трудных участках. Тяжёлый: контейнеры и часы счёта."
+      },
+      "tools": [
+        "docker"
+      ],
+      "offer_at_init": false
+    },
+    "hla": {
+      "label": {
+        "en": "HLA typing",
+        "ru": "HLA-типирование"
+      },
+      "why": {
+        "en": "T1K is built from source, so the build tools are needed as well as the runtime ones.",
+        "ru": "T1K собирается из исходников, поэтому нужны инструменты сборки, а не только запуска."
+      },
+      "tools": [
+        "git",
+        "make",
+        "perl",
+        "samtools"
+      ],
+      "offer_at_init": false
+    },
+    "prs": {
+      "label": {
+        "en": "Polygenic scores",
+        "ru": "Полигенные баллы"
+      },
+      "why": {
+        "en": "The scoring server runs through uvx; the genome file stays local, only the public scoring files are fetched.",
+        "ru": "Сервер расчёта запускается через uvx; файл генома остаётся локальным, скачиваются только публичные scoring-файлы."
+      },
+      "tools": [
+        "uvx",
+        "curl"
+      ],
+      "offer_at_init": false
+    }
+  },
+  "tools": {
+    "samtools": {
+      "label": "samtools",
+      "why": {
+        "en": "reading and indexing alignments (BAM)",
+        "ru": "чтение и индексация выравниваний (BAM)"
+      },
+      "packages": {
+        "brew": "samtools",
+        "conda": "samtools"
+      }
+    },
+    "bcftools": {
+      "label": "bcftools",
+      "why": {
+        "en": "calling, filtering and annotating variants",
+        "ru": "вызов, фильтрация и аннотация вариантов"
+      },
+      "packages": {
+        "brew": "bcftools",
+        "conda": "bcftools"
+      }
+    },
+    "bgzip": {
+      "label": "bgzip",
+      "why": {
+        "en": "block compression a VCF index can seek into",
+        "ru": "блочное сжатие, по которому работает индекс VCF"
+      },
+      "packages": {
+        "brew": "htslib",
+        "conda": "htslib"
+      }
+    },
+    "tabix": {
+      "label": "tabix",
+      "why": {
+        "en": "indexing a compressed VCF for pinpoint queries",
+        "ru": "индекс сжатого VCF для точечных запросов"
+      },
+      "packages": {
+        "brew": "htslib",
+        "conda": "htslib"
+      }
+    },
+    "bwa": {
+      "label": "bwa",
+      "why": {
+        "en": "aligning reads to the reference genome",
+        "ru": "выравнивание чтений на референсный геном"
+      },
+      "packages": {
+        "brew": "brewsci/bio/bwa",
+        "conda": "bwa"
+      },
+      "note": {
+        "en": "Homebrew keeps it in the brewsci/bio tap; the fully qualified name taps it on the way in.",
+        "ru": "В Homebrew лежит в тапе brewsci/bio; полное имя формулы подключает тап само."
+      }
+    },
+    "bwa-mem2": {
+      "label": "bwa-mem2",
+      "why": {
+        "en": "the same alignment, several times faster; the scripts pick it up by themselves when it is there",
+        "ru": "то же выравнивание, в несколько раз быстрее; скрипты подхватывают его сами, если он есть"
+      },
+      "packages": {
+        "conda": "bwa-mem2"
+      },
+      "note": {
+        "en": "Homebrew has no formula for it — through conda, or one of the project's own aligners is enough: bwa alone closes the set.",
+        "ru": "В Homebrew формулы нет — через conda, либо достаточно одного bwa: набор он закрывает."
+      }
+    },
+    "mosdepth": {
+      "label": "mosdepth",
+      "why": {
+        "en": "fast per-gene coverage; samtools does the same more slowly",
+        "ru": "быстрое покрытие по генам; samtools делает то же медленнее"
+      },
+      "packages": {
+        "brew": "brewsci/bio/mosdepth",
+        "conda": "mosdepth"
+      },
+      "note": {
+        "en": "Homebrew keeps it in the brewsci/bio tap; the fully qualified name taps it on the way in.",
+        "ru": "В Homebrew лежит в тапе brewsci/bio; полное имя формулы подключает тап само."
+      }
+    },
+    "java": {
+      "label": "java",
+      "why": {
+        "en": "the runtime PharmCAT needs",
+        "ru": "среда выполнения, нужная PharmCAT"
+      },
+      "packages": {
+        "brew": "openjdk"
+      },
+      "note": {
+        "en": "Homebrew keeps openjdk keg-only: after installing it, brew prints the line that puts java on the PATH, and until that is done the command is still not found.",
+        "ru": "Homebrew держит openjdk keg-only: после установки brew печатает строку, которая кладёт java в PATH, и пока её не выполнить, команда по-прежнему не находится."
+      }
+    },
+    "pypgx": {
+      "label": "pypgx",
+      "why": {
+        "en": "star alleles and copy number from a BAM",
+        "ru": "звёздные аллели и число копий из BAM"
+      },
+      "packages": {
+        "conda": "pypgx",
+        "pip": "pypgx"
+      }
+    },
+    "docker": {
+      "label": "docker",
+      "why": {
+        "en": "the container DeepVariant runs in",
+        "ru": "контейнер, в котором работает DeepVariant"
+      },
+      "note": {
+        "en": "Installed by hand — Docker Desktop, colima or the distribution's own package. Not something to install on somebody's behalf: it puts a background service on the machine.",
+        "ru": "Ставится руками — Docker Desktop, colima или пакет дистрибутива. Не то, что стоит ставить за человека: это фоновая служба на машине."
+      }
+    },
+    "git": {
+      "label": "git",
+      "why": {
+        "en": "fetching the T1K sources",
+        "ru": "получение исходников T1K"
+      },
+      "system": true
+    },
+    "make": {
+      "label": "make",
+      "why": {
+        "en": "building T1K",
+        "ru": "сборка T1K"
+      },
+      "system": true
+    },
+    "perl": {
+      "label": "perl",
+      "why": {
+        "en": "the T1K helper scripts",
+        "ru": "вспомогательные скрипты T1K"
+      },
+      "system": true
+    },
+    "curl": {
+      "label": "curl",
+      "why": {
+        "en": "downloading public reference databases",
+        "ru": "загрузка публичных справочных баз"
+      },
+      "system": true
+    },
+    "uvx": {
+      "label": "uvx",
+      "why": {
+        "en": "running the polygenic-score server without installing it",
+        "ru": "запуск сервера полигенных баллов без установки"
+      },
+      "packages": {
+        "brew": "uv",
+        "pip": "uv"
+      },
+      "note": {
+        "en": "uvx arrives with uv — the package is called uv, the command is called uvx.",
+        "ru": "uvx приходит вместе с uv — пакет называется uv, команда называется uvx."
+      }
+    }
+  }
+}

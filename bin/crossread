@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# crossread — the entry point of Scholion.
+#
+# The command name deliberately differs from the project name. "Scholion" is a
+# scholium, a note in the margin of a manuscript saying where something was taken
+# from: that is the description of the product and it is also a defensible mark.
+# "crossread" is what the command does: it reads sources against each other. The
+# noun holds the brand, the verb explains itself without documentation; Homebrew
+# and `brew` are separated the same way.
+#
+# The wrapper installs nothing and requires nothing: it locates the project root
+# relative to itself, adds src/ to PYTHONPATH and passes everything on. So
+# `crossread labs` and `python3 -m scholion labs` are literally the same call,
+# and both will keep working.
+#
+#   ln -s "$PWD/bin/crossread" /usr/local/bin/crossread    # to call it from anywhere
+#   crossread overview
+#   crossread --help
+set -euo pipefail
+
+SELF="${BASH_SOURCE[0]}"
+while [ -L "$SELF" ]; do                      # the wrapper is usually installed as a symlink
+  DIR="$(cd -P "$(dirname "$SELF")" && pwd)"
+  SELF="$(readlink "$SELF")"
+  case "$SELF" in /*) ;; *) SELF="$DIR/$SELF" ;; esac
+done
+ROOT="$(cd -P "$(dirname "$SELF")/.." && pwd)"
+
+export SCHOLION_PROG="crossread"
+export PYTHONPATH="$ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m scholion "$@"

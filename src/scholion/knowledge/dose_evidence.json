@@ -1,0 +1,550 @@
+{
+  "_meta": {
+    "purpose": "The dose and critical layer: concrete dose thresholds, effect sizes, drug formulations, the link to the patient's markers and the sources. So that the conclusion is 'a comparison of numbers' rather than 'in the general direction'.",
+    "updated": "2026-07-13",
+    "schema": "entries[key] = {match[], nutritional_dose, pharmacologic_dose, critical[{claim, dose_dependent, effect_size, low_dose_note, compare_marker[], source}], forms, verdict_rule}"
+  },
+  "entries": {
+    "niacin": {
+      "match": [
+        "ниацин",
+        "niacin",
+        "nicotinic acid",
+        "никотиновая кислота",
+        "витамин b3",
+        "vitamin b3",
+        "b3"
+      ],
+      "nutritional_dose": {
+        "en": "≤500 mg/day (NAD support)",
+        "ru": "≤500 мг/сут (NAD-поддержка)"
+      },
+      "pharmacologic_dose": {
+        "en": "1500–2000 mg/day (the lipid dose)",
+        "ru": "1500–2000 мг/сут (липидная)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "raises glycaemia / insulin resistance",
+            "ru": "повышает гликемию / инсулинорезистентность"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "new-onset diabetes RR 1.34 (95% CI 1.21–1.49); a meta-analysis of 11 RCTs, 26,340 people",
+            "ru": "новый диабет RR 1,34 (95% ДИ 1,21–1,49); мета-анализ 11 РКИ, 26 340 чел."
+          },
+          "low_dose_note": {
+            "en": "the signal was obtained at 1500–2000 mg; at ≤500 mg the effect is many times weaker",
+            "ru": "сигнал получен на 1500–2000 мг; на ≤500 мг эффект многократно слабее"
+          },
+          "compare_marker": [
+            "homa_ir",
+            "glucose",
+            "hba1c"
+          ],
+          "source": "PMID 26370223; ACC AIM-HIGH/HPS2-THRIVE"
+        },
+        {
+          "claim": {
+            "en": "raises uric acid",
+            "ru": "повышает мочевую кислоту"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "lowers the renal excretion of urate (a class effect)",
+            "ru": "снижает почечную экскрецию уратов (класс-эффект)"
+          },
+          "low_dose_note": {
+            "en": "clinically significant mainly at the lipid doses",
+            "ru": "клинически значимо в основном на липидных дозах"
+          },
+          "compare_marker": [
+            "uric_acid"
+          ],
+          "source": "ACC review AIM-HIGH/HPS2-THRIVE"
+        }
+      ],
+      "forms": {
+        "en": "nicotinic acid (flush + metabolic effects) vs nicotinamide/NR (gentler on glucose and urate)",
+        "ru": "никотиновая кислота (флаш + метаболич. эффекты) vs никотинамид/NR (мягче по глюкозе/урату)"
+      },
+      "verdict_rule": {
+        "en": "At the nutraceutical dose the risk is small — not 'remove it', but compare it with the patient's markers (urate, HOMA-IR); if they are borderline — monitoring, withdrawal only if they rise.",
+        "ru": "На нутрицевтической дозе риск мал — не 'убрать', а сравнить с маркёрами пациента (урат, HOMA-IR); при пограничных — контроль, отмена только при росте."
+      }
+    },
+    "iodine": {
+      "match": [
+        "йод",
+        "iodine",
+        "iodomarin",
+        "йодомарин",
+        "калия йодид",
+        "potassium iodide"
+      ],
+      "nutritional_dose": {
+        "en": "150–300 µg/day (the WHO window)",
+        "ru": "150–300 мкг/сут (окно ВОЗ)"
+      },
+      "pharmacologic_dose": {
+        "en": ">1100 µg/day (above the UL)",
+        "ru": ">1100 мкг/сут (выше UL)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "a risk of autoimmune thyroiditis / ↑anti-TPO",
+            "ru": "риск аутоиммунного тиреоидита / ↑анти-ТПО"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "at the population level: anti-TPO 14.3%→23.8% after iodisation (Denmark); Hashimoto 3.5%→14.5% (Italy, 15 years)",
+            "ru": "популяционно: анти-ТПО 14,3%→23,8% после йодирования (Дания); Хашимото 3,5%→14,5% (Италия, 15 лет)"
+          },
+          "low_dose_note": {
+            "en": "this concerns an EXCESS and the already vulnerable; 150–300 µg is the norm, not an 'excess' (UL 1100 µg)",
+            "ru": "относится к ИЗБЫТКУ и уже-уязвимым; 150–300 мкг — норма, не 'избыток' (UL 1100 мкг)"
+          },
+          "compare_marker": [
+            "anti_tpo",
+            "tsh"
+          ],
+          "source": "PMC9816468 (2023); Endocrine Reviews 2024 (45/6/858)"
+        }
+      ],
+      "forms": {
+        "en": "physiological doses (µg) vs pharmacological ones (mg, Lugol's solution for example)",
+        "ru": "физиологичные дозы (мкг) vs фармакологические (мг, напр. Люголь)"
+      },
+      "verdict_rule": {
+        "en": "Compare the dose with the WHO window of 150–300 µg before raising a flag. The resolution is anti-TPO/TSH, not an a priori 'red'.",
+        "ru": "Сравни дозу с окном ВОЗ 150–300 мкг перед флагом. Резолюция — анти-ТПО/ТТГ, а не априорный 'красный'."
+      }
+    },
+    "metformin": {
+      "match": [
+        "метформин",
+        "metformin",
+        "глюкофаж",
+        "glucophage",
+        "сиофор"
+      ],
+      "nutritional_dose": null,
+      "pharmacologic_dose": {
+        "en": "500–2000 mg/day",
+        "ru": "500–2000 мг/сут"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "'raises insulin resistance' — WRONG by mechanism",
+            "ru": "'повышает инсулинорезистентность' — НЕВЕРНО по механизму"
+          },
+          "dose_dependent": false,
+          "effect_size": {
+            "en": "metformin is an insulin sensitiser (↓hepatic gluconeogenesis, AMPK); it lowers IR",
+            "ru": "метформин — инсулиновый сенситайзер (↓печёночный глюконеогенез, AMPK); ИР он снижает"
+          },
+          "low_dose_note": {
+            "en": "a widespread misconception; the direction of the effect is the opposite",
+            "ru": "распространённое заблуждение; направление эффекта обратное"
+          },
+          "compare_marker": [
+            "homa_ir"
+          ],
+          "source": "Diabetologia 2017 (10.1007/s00125-017-4342-z)"
+        },
+        {
+          "claim": {
+            "en": "lowers vitamin B12",
+            "ru": "снижает витамин B12"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "a proven class effect with long-term use",
+            "ru": "доказанный класс-эффект при длительном приёме"
+          },
+          "low_dose_note": {
+            "en": "monitor B12 periodically",
+            "ru": "контроль B12 периодически"
+          },
+          "compare_marker": [
+            "vitamin_b12"
+          ],
+          "source": "ADA Standards; Diabetologia 2017"
+        },
+        {
+          "claim": {
+            "en": "blunts the adaptation to exercise",
+            "ru": "притупляет адаптацию к физнагрузке"
+          },
+          "dose_dependent": false,
+          "effect_size": {
+            "en": "it dampens the mitochondrial response to aerobic training and hypertrophy in response to resistance training (in older people)",
+            "ru": "глушит митохондриальный ответ на аэробную и гипертрофию на силовую (у пожилых)"
+          },
+          "low_dose_note": {
+            "en": "an argument against it in people who train actively",
+            "ru": "довод против у активно тренирующихся"
+          },
+          "compare_marker": [],
+          "source": "Konopka Aging Cell 2019 (acel.12880); MASTERS acel.13039"
+        }
+      ],
+      "forms": {
+        "en": "IR vs XR (gastrointestinal tolerance)",
+        "ru": "IR vs XR (переносимость ЖКТ)"
+      },
+      "verdict_rule": {
+        "en": "Do not call it 'raises IR' — it is a sensitiser. Separately true: ↓B12 and the blunting of the training effect.",
+        "ru": "Не называть 'повышает ИР' — он сенситайзер. Отдельно верны: ↓B12 и притупление тренировочного эффекта."
+      }
+    },
+    "vitamin_d": {
+      "match": [
+        "витамин d",
+        "vitamin d",
+        "холекальциферол",
+        "cholecalciferol",
+        "d3"
+      ],
+      "nutritional_dose": {
+        "en": "1000–4000 IU/day (maintenance)",
+        "ru": "1000–4000 МЕ/сут (поддержка)"
+      },
+      "pharmacologic_dose": {
+        "en": ">10000 IU/day long-term (a risk of hypercalcaemia)",
+        "ru": ">10000 МЕ/сут длительно (риск гиперкальциемии)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "an overdose → hypercalcaemia",
+            "ru": "передозировка → гиперкальциемия"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "the risk arises with persistently high doses/a level >100 ng/ml",
+            "ru": "риск при стойко высоких дозах/уровне >100 нг/мл"
+          },
+          "low_dose_note": {
+            "en": "the target 25-OH-D is 50–100 ng/ml; monitor calcium",
+            "ru": "цель 25-OH-D 50–100 нг/мл; контроль кальция"
+          },
+          "compare_marker": [
+            "vitamin_d",
+            "calcium"
+          ],
+          "source": "Endocrine Society guideline"
+        }
+      ],
+      "forms": {
+        "en": "D3 is preferred over D2; K2 as a companion where calcification is a concern",
+        "ru": "D3 предпочтительнее D2; K2 как компаньон при кальцинозе"
+      },
+      "verdict_rule": {
+        "en": "Compare the current 25-OH-D with the target of 50–100 before assessing the dose.",
+        "ru": "Сравни текущий 25-OH-D с целью 50–100 перед оценкой дозы."
+      }
+    },
+    "selenium": {
+      "match": [
+        "селен",
+        "selenium"
+      ],
+      "nutritional_dose": {
+        "en": "55–200 µg/day",
+        "ru": "55–200 мкг/сут"
+      },
+      "pharmacologic_dose": {
+        "en": ">400 µg/day (the UL)",
+        "ru": ">400 мкг/сут (UL)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "selenosis with an excess",
+            "ru": "селеноз при избытке"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "UL 400 µg/day (food + supplements)",
+            "ru": "UL 400 мкг/сут (пища + добавки)"
+          },
+          "low_dose_note": {
+            "en": "100 µg is safe; it is protective for the thyroid",
+            "ru": "100 мкг безопасно; протективен для щитовидки"
+          },
+          "compare_marker": [],
+          "source": "NIH ODS"
+        }
+      ],
+      "forms": {
+        "en": "selenomethionine vs selenite",
+        "ru": "селенометионин vs селенит"
+      },
+      "verdict_rule": {
+        "en": "Add it to the dietary intake; raise a flag only when approaching 400 µg.",
+        "ru": "Складывать с пищевым; флаг только при приближении к 400 мкг."
+      }
+    },
+    "zinc": {
+      "match": [
+        "цинк",
+        "zinc",
+        "zn"
+      ],
+      "nutritional_dose": {
+        "en": "8–40 mg/day",
+        "ru": "8–40 мкг… мг/сут"
+      },
+      "pharmacologic_dose": {
+        "en": ">40 mg/day long-term (copper deficiency)",
+        "ru": ">40 мг/сут длительно (дефицит меди)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "copper depletion with long-term use",
+            "ru": "истощение меди при длительном приёме"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "UL 40 mg/day; beyond 3–4 months keep an eye on copper",
+            "ru": "UL 40 мг/сут; при >3–4 мес следить за медью"
+          },
+          "low_dose_note": {
+            "en": "25 mg for 3 months is usually safe",
+            "ru": "25 мг на 3 мес обычно безопасно"
+          },
+          "compare_marker": [],
+          "source": "NIH ODS"
+        }
+      ],
+      "forms": {
+        "en": "picolinate / citrate / gluconate",
+        "ru": "пиколинат/цитрат/глюконат"
+      },
+      "verdict_rule": {
+        "en": "Take the duration and the total dose into account; if it is extended — copper.",
+        "ru": "Учитывать длительность и суммарную дозу; при продлении — медь."
+      }
+    },
+    "omega3": {
+      "match": [
+        "омега",
+        "omega",
+        "рыбий жир",
+        "fish oil",
+        "epa",
+        "dha"
+      ],
+      "nutritional_dose": {
+        "en": "250–1000 mg EPA+DHA",
+        "ru": "250–1000 мг EPA+DHA"
+      },
+      "pharmacologic_dose": {
+        "en": "2–4 g EPA+DHA (hypertriglyceridaemia)",
+        "ru": "2–4 г EPA+DHA (гипертриглицеридемия)"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "the effect on TG is dose-dependent; a mild antiplatelet effect",
+            "ru": "эффект по ТГ дозозависим; лёгкий антиагрегантный эффект"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "lowering TG requires ≥2 g EPA+DHA; an omega-3 index >8% = saturation",
+            "ru": "для снижения ТГ нужно ≥2 г EPA+DHA; омега-3 индекс >8% = насыщение"
+          },
+          "low_dose_note": {
+            "en": "if the index is already >8%, adding more is pointless",
+            "ru": "если индекс уже >8% — добавлять больше бессмысленно"
+          },
+          "compare_marker": [
+            "omega3_index",
+            "triglycerides"
+          ],
+          "source": "AHA science advisory"
+        }
+      ],
+      "forms": {
+        "en": "the TG form is absorbed better than EE",
+        "ru": "TG-форма усваивается лучше EE"
+      },
+      "verdict_rule": {
+        "en": "Compare the omega-3 index with 8% and TG with the target before drawing a conclusion about the dose.",
+        "ru": "Сравни омега-3 индекс с 8% и ТГ с целью перед выводом о дозе."
+      }
+    },
+    "atenolol": {
+      "match": [
+        "атенолол",
+        "atenolol",
+        "тенормин",
+        "tenormin"
+      ],
+      "nutritional_dose": null,
+      "pharmacologic_dose": {
+        "en": "25–100 mg/day; a situational dose of 50 mg = ≈25 mg of the (S)-enantiomer",
+        "ru": "25–100 мг/сут; ситуативный приём 50 мг = ≈25 мг (S)-энантиомера"
+      },
+      "critical": [
+        {
+          "claim": {
+            "en": "suppresses the nocturnal secretion of melatonin",
+            "ru": "подавляет ночную секрецию мелатонина"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "(S)-atenolol 25 mg — nocturnal melatonin 4 µg versus 26 µg on placebo (−86 %, p<0.01); the (R)-enantiomer gives no effect (+7 %, ns). Randomised double-blind crossover, n=15 healthy subjects.",
+            "ru": "(S)-атенолол 25 мг — ночной мелатонин 4 мкг против 26 мкг на плацебо (−86 %, p<0,01); (R)-энантиомер эффекта не даёт (+7 %, нз). Рандомизированное двойное слепое перекрёстное, n=15 здоровых."
+          },
+          "low_dose_note": {
+            "en": "a racemic 50 mg tablet contains ≈25 mg of (S) — that is exactly the dose studied; one cannot go below a dose threshold, the effect begins where β1-blockade begins",
+            "ru": "рацемическая таблетка 50 мг содержит ≈25 мг (S) — это и есть изученная доза; ниже дозового порога уйти нельзя, эффект начинается там же, где β1-блокада"
+          },
+          "compare_marker": [
+            "DeepSleepMin",
+            "SleepScore"
+          ],
+          "source": "Stoschitzky K et al. Eur J Clin Pharmacol 1999;55:111–115 (PMID 10335905)"
+        },
+        {
+          "claim": {
+            "en": "additive hypotension with alcohol",
+            "ru": "аддитивная гипотензия с алкоголем"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "a class effect; clinically significant when taken together with alcohol",
+            "ru": "класс-эффект; клинически значим при приёме на фоне спиртного"
+          },
+          "low_dose_note": {
+            "en": "the risk is the higher the more was drunk and the earlier the tablet was taken",
+            "ru": "риск тем выше, чем больше выпито и чем раньше принята таблетка"
+          },
+          "compare_marker": [],
+          "source": {
+            "en": "a class effect of the beta blockers",
+            "ru": "класс-эффект бета-адреноблокаторов"
+          }
+        },
+        {
+          "claim": {
+            "en": "a «situational» dose means twenty-four hours of β1-blockade, not one evening",
+            "ru": "«ситуативный» приём — это сутки β1-блокады, а не один вечер"
+          },
+          "dose_dependent": true,
+          "effect_size": {
+            "en": "per the FDA label (Tenormin): the peak concentration is at 2–4 h, the half-life is 6–7 h, BUT the beta-blocking activity of a single 50–100 mg dose is traceable beyond 24 hours",
+            "ru": "по инструкции FDA (Tenormin): пик концентрации через 2–4 ч, период полувыведения 6–7 ч, НО β-блокирующая активность разовой дозы 50–100 мг прослеживается за пределами 24 часов"
+          },
+          "low_dose_note": {
+            "en": "the consequence: the nocturnal window of melatonin secretion (the peak is around 02:00–04:00) is covered entirely however it is taken — one cannot count on «for the evening only»",
+            "ru": "следствие: ночное окно секреции мелатонина (пик около 02:00–04:00) перекрыто целиком, как ни принимай — рассчитывать на «только на вечер» нельзя"
+          },
+          "compare_marker": [
+            "DeepSleepMin"
+          ],
+          "source": {
+            "en": "FDA label TENORMIN (atenolol), 2023 revision",
+            "ru": "FDA label TENORMIN (atenolol), редакция 2023"
+          }
+        }
+      ],
+      "forms": {
+        "en": "racemate (R+S). The beta-blocking activity lies entirely with the (S)-enantiomer; hydrophilic and crossing the blood-brain barrier poorly — but the pineal gland sits OUTSIDE that barrier, so being hydrophilic is no protection against melatonin suppression.",
+        "ru": "рацемат (R+S). β-блокирующая активность целиком у (S)-энантиомера; гидрофильный, плохо проникает через ГЭБ — но эпифиз лежит ВНЕ гематоэнцефалического барьера, поэтому гидрофильность от подавления мелатонина не защищает."
+      },
+      "verdict_rule": {
+        "en": "Not a reason to stop it. If the drug is taken for the sake of recovery after a stressful or alcoholic evening — name the conflict of goals and take it to the cardiologist; compare it with the options without β1-blockade.",
+        "ru": "Не повод к отмене. Если препарат принимается ради восстановления после стрессового или алкогольного вечера — назвать конфликт целей и вынести кардиологу; сравнить с вариантами без β1-блокады."
+      },
+      "alternatives": [
+        {
+          "name": {
+            "en": "carvedilol",
+            "ru": "карведилол"
+          },
+          "melatonin": {
+            "en": "25 mg — night-time melatonin 23 µg against 26 on placebo (−10 %, not significant); the class effect is not avoided",
+            "ru": "25 мг — ночной мелатонин 23 мкг против 26 на плацебо (−10 %, нз) в том же исследовании Stoschitzky 1999: единственный β-блокатор без подавления"
+          },
+          "metabolic": {
+            "en": "GEMINI (JAMA 2004, n=1235): HOMA-IR −9.1 % against −2.0 % on metoprolol",
+            "ru": "GEMINI (JAMA 2004, n=1235): HOMA-IR −9,1 % против −2,0 % на метопрололе (p=0,004); HbA1c 0,02 % против +0,15 % (p<0,001)"
+          },
+          "caveat": {
+            "en": "α1-blockade → orthostatic hypotension is HIGHER than with atenolol, and the drug is taken on alcoholic evenings. It lowers the pulse more weakly. A CYP2D6 substrate.",
+            "ru": "α1-блокада → ортостатическая гипотензия ВЫШЕ, чем у атенолола, а приём приходится на алкогольные вечера. Пульс снижает слабее. Субстрат CYP2D6."
+          }
+        },
+        {
+          "name": {
+            "en": "nebivolol",
+            "ru": "небиволол"
+          },
+          "melatonin": {
+            "en": "no direct measurements of melatonin exist. Nebivolol is the most lipophilic of the class, so the effect cannot be assumed to be absent",
+            "ru": "прямых измерений мелатонина НЕТ. При этом небиволол — самый β1-селективный препарат класса, а подавление мелатонина в Stoschitzky 1999 привязано именно к β1-блокаде: механизм предсказывает тот же эффект, что у атенолола, или сильнее"
+          },
+          "metabolic": {
+            "en": "PSQI improved against a worsening on metoprolol (Adv Ther 2007) — a subjective questionnaire, not a measurement",
+            "ru": "PSQI улучшился против ухудшения на метопрололе (Adv Ther 2008, рандомизированное открытое, n=39, 2,5 мг против 25 мг, 6 недель)"
+          },
+          "caveat": {
+            "en": "The only argument «for» is the PSQI questionnaire (subjective), an open design, n=39, six weeks of DAILY use in hypertensive patients. This result cannot be carried over to a single tablet. The pharmacokinetics argue against «situational» use: Tmax 1.5–4 h, T½ 12 h in CYP2D6 normal metabolisers (19–32 h in poor ones) — the night is covered entirely. Of the four options it is precisely nebivolol whose required property is supported WORST of all.",
+            "ru": "Единственный довод «за» — опросник PSQI (субъективный), открытый дизайн, n=39, шесть недель ЕЖЕДНЕВНОГО приёма у гипертоников. Перенести этот результат на разовую таблетку нельзя. Фармакокинетика против «ситуативности»: Tmax 1,5–4 ч, T½ 12 ч у нормальных метаболизаторов CYP2D6 (19–32 ч у медленных) — ночь перекрывается целиком. Из четырёх вариантов именно у небиволола нужное свойство обосновано ХУЖЕ всего."
+          },
+          "pk": {
+            "en": "Tmax 1.5–4 h; T½ 12 h in CYP2D6 normal metabolisers / 19–32 h in poor metabolisers; titrate in 2-week steps",
+            "ru": "Tmax 1,5–4 ч; T½ 12 ч (CYP2D6 EM) / 19–32 ч (PM); титрование с шагом 2 недели"
+          }
+        },
+        {
+          "name": {
+            "en": "verapamil",
+            "ru": "верапамил"
+          },
+          "melatonin": {
+            "en": "120 mg — melatonin 29 µg against 26 on placebo (+14 %, not significant) in the same Stoschitzky 1999 study: the mechanism is not adrenergic",
+            "ru": "120 мг — мелатонин 29 мкг против 26 на плацебо (+14 %, нз), Stoschitzky 1999: не адренергический механизм"
+          },
+          "metabolic": {
+            "en": "metabolically neutral",
+            "ru": "метаболически нейтрален"
+          },
+          "caveat": {
+            "en": "a negative inotrope, AV block, constipation; a CYP3A4 inhibitor — check the drug interactions; with alcohol the hypotension is additive as well",
+            "ru": "отрицательный инотроп, АВ-блокада, запоры; ингибитор CYP3A4 — проверять лекарственные взаимодействия; с алкоголем гипотензия тоже аддитивна"
+          }
+        },
+        {
+          "name": {
+            "en": "ivabradine",
+            "ru": "ивабрадин"
+          },
+          "melatonin": {
+            "en": "no data; the mechanism is blockade of the If current of the sinoatrial node, the adrenoceptors are not touched — there is no ground to expect melatonin suppression",
+            "ru": "данных нет; механизм If-канала синусового узла, адренорецепторы не затрагиваются — оснований подавлять мелатонин нет"
+          },
+          "metabolic": {
+            "en": "lowers the heart rate without lowering blood pressure",
+            "ru": "снижает ЧСС без падения АД"
+          },
+          "caveat": {
+            "en": "It does NOT work as a single dose: continuous use is needed. Phosphenes, a risk of atrial fibrillation. A CYP3A4 substrate (important with berberine and other inhibitors). In inappropriate sinus tachycardia — 5 mg ×2, resting heart rate 88→76, relief of symptoms in >70 % (JACC 2012, crossover, n=21); in many countries this use is off-label",
+            "ru": "НЕ работает разово: нужен постоянный приём. Фосфены, риск фибрилляции предсердий. Субстрат CYP3A4 (важно при берберине и др. ингибиторах). При неадекватной синусовой тахикардии — 5 мг ×2, ЧСС покоя 88→76, снятие симптомов >70 % (JACC 2012, перекрёстное, n=21), во многих странах это применение вне инструкции"
+          }
+        }
+      ],
+      "note": {
+        "en": "None of the options is «the same thing but without the harm to sleep». Taking melatonin on top of a beta blocker improves falling asleep and sleep efficiency (+36 min of total sleep, +7.6 % efficiency, −14 min of latency; Scheer FA et al. SLEEP 2012;35:1395, an RCT, n=16 on atenolol/metoprolol), but it does not increase the DEEP stage — the gain fell on stage 2, the other stages showed no significant changes.",
+        "ru": "Ни один из вариантов не является «тем же самым, но без вреда для сна». Совместный приём мелатонина на фоне бета-блокатора улучшает засыпание и эффективность сна (+36 мин общего сна, +7,6 % эффективности, −14 мин латентности; Scheer FA et al. SLEEP 2012;35:1395, РКИ, n=16 на атенололе/метопрололе), но ГЛУБОКУЮ фазу не увеличивает — прирост пришёлся на 2-ю стадию, прочие стадии без значимых изменений."
+      }
+    }
+  }
+}

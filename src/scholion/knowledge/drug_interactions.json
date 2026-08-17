@@ -1,0 +1,442 @@
+{
+  "_meta": {
+    "purpose": "A PUBLIC base of clinically important drug interactions by drug CLASSES. Portable, without patient data. A starting curated set — it keeps growing. The class pairs come from med_classes.json.",
+    "disclaimer": "Does not replace a check against the label/with the doctor. A guide for the «second opinion»: what to pay attention to with a new prescription.",
+    "severity_levels": [
+      "high",
+      "moderate",
+      "low"
+    ],
+    "note": "Symmetric: the pair (a,b) fires in either order. mechanism/effect/manage are used to word the recommendation.",
+    "note_nutraceutical_layer_20260813": "Pairs for the nutraceutical layer have been added. The principle is the same: severity is a reason for a QUESTION to the doctor, not an instruction. For berberine it is honestly noted that the inhibition of CYP3A4/P-gp has been shown mainly in vitro."
+  },
+  "interactions": [
+    {
+      "a": "anticoagulant_vka",
+      "b": "nsaid",
+      "severity": "high",
+      "effect": {
+        "en": "sharply ↑ the risk of gastrointestinal and other bleeding",
+        "ru": "резко ↑ риск желудочно-кишечного и другого кровотечения"
+      },
+      "mechanism": {
+        "en": "additive antihaemostatic action + the gastrotoxicity of NSAIDs",
+        "ru": "аддитивный антигемостаз + гастротоксичность НПВС"
+      },
+      "manage": {
+        "en": "avoid where possible; if needed — gastroprotection (a PPI), monitoring of the INR and of signs of bleeding",
+        "ru": "по возможности избегать; если нужно — гастропротекция (ИПП), контроль МНО и признаков кровотечения"
+      }
+    },
+    {
+      "a": "anticoagulant_vka",
+      "b": "azole_antifungal",
+      "severity": "high",
+      "effect": {
+        "en": "↑ the effect of warfarin, a risk of bleeding",
+        "ru": "↑ действие варфарина, риск кровотечения"
+      },
+      "mechanism": {
+        "en": "inhibition of CYP2C9 → ↓ the metabolism of warfarin",
+        "ru": "ингибирование CYP2C9 → ↓ метаболизм варфарина"
+      },
+      "manage": {
+        "en": "monitor the INR more often, the warfarin dose may need adjusting",
+        "ru": "чаще контролировать МНО, возможна коррекция дозы варфарина"
+      }
+    },
+    {
+      "a": "anticoagulant_vka",
+      "b": "ssri_snri",
+      "severity": "moderate",
+      "effect": {
+        "en": "↑ the risk of bleeding",
+        "ru": "↑ риск кровотечения"
+      },
+      "mechanism": {
+        "en": "SSRIs impair platelet aggregation",
+        "ru": "СИОЗС нарушают агрегацию тромбоцитов"
+      },
+      "manage": {
+        "en": "watch for bleeding; be careful about adding an NSAID",
+        "ru": "наблюдать за кровоточивостью; осторожно с добавлением НПВС"
+      }
+    },
+    {
+      "a": "anticoagulant_vka",
+      "b": "supplement_fish_oil",
+      "severity": "moderate",
+      "effect": {
+        "en": "a possible ↑ in bleeding (omega-3/nattokinase)",
+        "ru": "возможное ↑ кровоточивости (омега-3/наттокиназа)"
+      },
+      "mechanism": {
+        "en": "an antiplatelet/fibrinolytic effect",
+        "ru": "антиагрегантный/фибринолитический эффект"
+      },
+      "manage": {
+        "en": "take into account when selecting the dose, monitoring of the INR and of signs of bleeding",
+        "ru": "учитывать при подборе дозы, контроль МНО и признаков кровотечения"
+      }
+    },
+    {
+      "a": "anticoagulant_vka",
+      "b": "supplement_k2",
+      "severity": "moderate",
+      "effect": {
+        "en": "vitamin K can ↓ the effect of warfarin (a fall in the INR)",
+        "ru": "витамин K может ↓ эффект варфарина (снижение МНО)"
+      },
+      "mechanism": {
+        "en": "K is a cofactor of the clotting factors, antagonism with a VKA",
+        "ru": "K — кофактор факторов свёртывания, антагонизм с VKA"
+      },
+      "manage": {
+        "en": "a stable constant intake of K, monitoring of the INR when the vitamin dose changes",
+        "ru": "стабильное постоянное потребление K, контроль МНО при изменении дозы витамина"
+      }
+    },
+    {
+      "a": "antiplatelet_p2y12",
+      "b": "ppi",
+      "severity": "moderate",
+      "effect": {
+        "en": "omeprazole/esomeprazole can ↓ the activation of clopidogrel",
+        "ru": "омепразол/эзомепразол могут ↓ активацию клопидогрела"
+      },
+      "mechanism": {
+        "en": "inhibition of CYP2C19 (especially in CYP2C19 IM/PM)",
+        "ru": "ингибирование CYP2C19 (особенно у IM/PM по CYP2C19)"
+      },
+      "manage": {
+        "en": "prefer pantoprazole; take the CYP2C19 phenotype into account (see the Drugs tab)",
+        "ru": "предпочесть пантопразол; учесть фенотип CYP2C19 (см. вкладку Препараты)"
+      }
+    },
+    {
+      "a": "antiplatelet_p2y12",
+      "b": "nsaid",
+      "severity": "moderate",
+      "effect": {
+        "en": "↑ the risk of bleeding",
+        "ru": "↑ риск кровотечения"
+      },
+      "mechanism": {
+        "en": "an additive antiplatelet + gastrotoxic effect",
+        "ru": "аддитивный антиагрегантный + гастротоксический эффект"
+      },
+      "manage": {
+        "en": "minimise the NSAID, gastroprotection",
+        "ru": "минимизировать НПВС, гастропротекция"
+      }
+    },
+    {
+      "a": "statin",
+      "b": "fibrate",
+      "severity": "high",
+      "effect": {
+        "en": "↑ the risk of myopathy/rhabdomyolysis (especially gemfibrozil)",
+        "ru": "↑ риск миопатии/рабдомиолиза (особенно гемфиброзил)"
+      },
+      "mechanism": {
+        "en": "↑ the concentration of the statin + the fibrate's own myotoxicity",
+        "ru": "↑ концентрация статина + собственная миотоксичность фибрата"
+      },
+      "manage": {
+        "en": "avoid gemfibrozil+a statin; with fenofibrate — monitoring of CK and of muscle pain symptoms",
+        "ru": "избегать гемфиброзил+статин; при фенофибрате — контроль КФК, симптомов мышечной боли"
+      }
+    },
+    {
+      "a": "statin",
+      "b": "macrolide",
+      "severity": "high",
+      "effect": {
+        "en": "↑ the concentration of the statin, a risk of myopathy",
+        "ru": "↑ концентрация статина, риск миопатии"
+      },
+      "mechanism": {
+        "en": "inhibition of CYP3A4 (clarithro-/erythromycin)",
+        "ru": "ингибирование CYP3A4 (кларитро/эритромицин)"
+      },
+      "manage": {
+        "en": "for the duration of the macrolide course suspend simvastatin/atorvastatin or reduce the dose",
+        "ru": "на время курса макролида приостановить симвастатин/аторвастатин или снизить дозу"
+      }
+    },
+    {
+      "a": "statin",
+      "b": "azole_antifungal",
+      "severity": "high",
+      "effect": {
+        "en": "↑ the concentration of the statin, a risk of myopathy",
+        "ru": "↑ концентрация статина, риск миопатии"
+      },
+      "mechanism": {
+        "en": "inhibition of CYP3A4",
+        "ru": "ингибирование CYP3A4"
+      },
+      "manage": {
+        "en": "suspend the statin for the azole course or choose a statin outside CYP3A4",
+        "ru": "приостановить статин на курс азола или выбрать статин вне CYP3A4"
+      }
+    },
+    {
+      "a": "opioid_codeine",
+      "b": "ssri_snri",
+      "severity": "moderate",
+      "effect": {
+        "en": "a risk of serotonin syndrome; ↓ the analgesia of codeine",
+        "ru": "риск серотонинового синдрома; ↓ анальгезии кодеина"
+      },
+      "mechanism": {
+        "en": "serotonergic action + inhibition of CYP2D6 (paroxetine/fluoxetine)",
+        "ru": "серотонинергия + ингибирование CYP2D6 (пароксетин/флуоксетин)"
+      },
+      "manage": {
+        "en": "watch the symptoms; take into account that with CYP2D6 inhibited codeine is weaker",
+        "ru": "наблюдать симптомы; учесть, что при ингибировании CYP2D6 кодеин слабее"
+      }
+    },
+    {
+      "a": "thyroid_hormone",
+      "b": "ppi",
+      "severity": "low",
+      "effect": {
+        "en": "a possible ↓ in the absorption of levothyroxine",
+        "ru": "возможное ↓ всасывания левотироксина"
+      },
+      "mechanism": {
+        "en": "a fall in gastric acidity",
+        "ru": "снижение кислотности желудка"
+      },
+      "manage": {
+        "en": "separate the doses in time, monitoring of TSH",
+        "ru": "разнести приём по времени, контроль ТТГ"
+      }
+    },
+    {
+      "a": "testosterone_replacement",
+      "b": "anticoagulant_vka",
+      "severity": "moderate",
+      "effect": {
+        "en": "testosterone can enhance the effect of warfarin (↑ the INR)",
+        "ru": "тестостерон может усиливать действие варфарина (↑ МНО)"
+      },
+      "mechanism": {
+        "en": "an effect on the metabolism of the clotting factors",
+        "ru": "влияние на метаболизм факторов свёртывания"
+      },
+      "manage": {
+        "en": "monitor the INR when testosterone is started/stopped",
+        "ru": "при начале/отмене тестостерона контролировать МНО"
+      }
+    },
+    {
+      "a": "soluble_fiber",
+      "b": "ursodeoxycholic_acid",
+      "severity": "moderate",
+      "effect": {
+        "en": "↓ the absorption of ursodeoxycholic acid, the effect of the therapy may be lower than expected",
+        "ru": "↓ всасывание урсодезоксихолевой кислоты, эффект терапии может быть ниже ожидаемого"
+      },
+      "mechanism": {
+        "en": "psyllium forms a viscous gel and binds bile acids in the gut lumen",
+        "ru": "псиллиум образует вязкий гель и связывает жёлчные кислоты в просвете кишки"
+      },
+      "manage": {
+        "en": "separate the doses: fibre not at the same time as UDCA, an interval of at least 1–2 h",
+        "ru": "разносить приём: клетчатка не одновременно с УДХК, интервал не менее 1–2 ч"
+      }
+    },
+    {
+      "a": "soluble_fiber",
+      "b": "statin",
+      "severity": "low",
+      "effect": {
+        "en": "a possible ↓ in the absorption of the statin when taken at the same time (the lipid-lowering effect of the fibre itself adds to that of the statin)",
+        "ru": "возможное ↓ всасывания статина при одновременном приёме (гиполипидемический эффект самой клетчатки при этом складывается со статином)"
+      },
+      "mechanism": {
+        "en": "gel formation and binding in the gut lumen",
+        "ru": "гелеобразование и связывание в просвете кишки"
+      },
+      "manage": {
+        "en": "separate them in time; the target is LDL and ApoB, not the fact of taking it",
+        "ru": "разносить по времени; целевой показатель — ЛПНП и ApoB, а не факт приёма"
+      }
+    },
+    {
+      "a": "soluble_fiber",
+      "b": "thyroid_hormone",
+      "severity": "moderate",
+      "effect": {
+        "en": "↓ the absorption of levothyroxine, a risk of undertreated hypothyroidism",
+        "ru": "↓ всасывание левотироксина, риск недолеченного гипотиреоза"
+      },
+      "mechanism": {
+        "en": "binding in the gut lumen",
+        "ru": "связывание в просвете кишки"
+      },
+      "manage": {
+        "en": "levothyroxine on an empty stomach, fibre no earlier than 4 h later; when the regimen changes — monitoring of TSH",
+        "ru": "левотироксин натощак, клетчатка не ранее чем через 4 ч; при изменении режима — контроль ТТГ"
+      }
+    },
+    {
+      "a": "berberine",
+      "b": "statin",
+      "severity": "moderate",
+      "effect": {
+        "en": "a possible ↑ in the concentration of the statin and in the risk of myopathy",
+        "ru": "возможное ↑ концентрации статина и риска миопатии"
+      },
+      "mechanism": {
+        "en": "berberine is described as an inhibitor of CYP3A4 and P-gp (the data are mainly in vitro and limited clinical)",
+        "ru": "берберин описан как ингибитор CYP3A4 и P-gp (данные преимущественно in vitro и ограниченные клинические)"
+      },
+      "manage": {
+        "en": "not forbidden, but with muscle pain — CK; when taken together with an azole the contributions add up",
+        "ru": "не запрещено, но при мышечной боли — КФК; при совместном приёме с азолом вклад суммируется"
+      }
+    },
+    {
+      "a": "berberine",
+      "b": "azole_antifungal",
+      "severity": "moderate",
+      "effect": {
+        "en": "additive suppression of CYP3A4 — significant if the regimen contains a substrate (a statin, monacolin K)",
+        "ru": "аддитивное подавление CYP3A4 — значимо, если в схеме есть субстрат (статин, монаколин K)"
+      },
+      "mechanism": {
+        "en": "two inhibitors of one pathway at the same time",
+        "ru": "два ингибитора одного пути одновременно"
+      },
+      "manage": {
+        "en": "assess not the pair on its own but the triple with the substrate; for the duration of the azole course discuss pausing the substrate",
+        "ru": "оценивать не пару саму по себе, а тройку с субстратом; на время курса азола обсудить паузу субстрата"
+      }
+    },
+    {
+      "a": "berberine",
+      "b": "glp1",
+      "severity": "low",
+      "effect": {
+        "en": "an additive lowering of glycaemia",
+        "ru": "аддитивное снижение гликемии"
+      },
+      "mechanism": {
+        "en": "different mechanisms, an effect in the same direction",
+        "ru": "разные механизмы, однонаправленный эффект"
+      },
+      "manage": {
+        "en": "usually desirable; with symptoms of hypoglycaemia — discuss it with the doctor",
+        "ru": "обычно желаемо; при симптомах гипогликемии — обсудить с врачом"
+      }
+    },
+    {
+      "a": "probiotic_yeast",
+      "b": "azole_antifungal",
+      "severity": "low",
+      "effect": {
+        "en": "a two-way effect: the azole can suppress the yeast probiotic itself, while the caproic acid of S. boulardii increases the sensitivity of Candida to fluconazole (suppression of the Cdr1p efflux pump, Scientific Reports 2021)",
+        "ru": "двусторонний эффект: азол может подавлять сам дрожжевой пробиотик, при этом капроновая кислота S. boulardii повышает чувствительность Candida к флуконазолу (подавление эффлюксного насоса Cdr1p, Scientific Reports 2021)"
+      },
+      "mechanism": {
+        "en": "S. boulardii is a yeast, that is a target of the azole, and at the same time a factor that lowers the resistance of Candida",
+        "ru": "S. boulardii — дрожжи, то есть мишень азола, и одновременно фактор, снижающий устойчивость Candida"
+      },
+      "manage": {
+        "en": "there are no confirmed clinical cases of harm; the decision to take them together is the doctor's",
+        "ru": "подтверждённых клинических случаев вреда нет; решение о совместном приёме — за врачом"
+      }
+    },
+    {
+      "a": "niacin",
+      "b": "statin",
+      "severity": "moderate",
+      "effect": {
+        "en": "↑ the risk of myopathy at pharmacologic doses of niacin (1.5–2 g/day); at nutraceutical doses (≈250 mg) the signal is weak",
+        "ru": "↑ риск миопатии при фармакологических дозах ниацина (1,5–2 г/сут); на нутрицевтических дозах (≈250 мг) сигнал слабый"
+      },
+      "mechanism": {
+        "en": "additive myotoxicity",
+        "ru": "аддитивная миотоксичность"
+      },
+      "manage": {
+        "en": "clarify the niacin dose; with muscle pain — CK",
+        "ru": "уточнить дозу ниацина; при мышечной боли — КФК"
+      }
+    },
+    {
+      "a": "iodine",
+      "b": "thyroid_hormone",
+      "severity": "moderate",
+      "effect": {
+        "en": "an excess of iodine can change the requirement for levothyroxine and provoke thyroid dysfunction",
+        "ru": "избыток йода может менять потребность в левотироксине и провоцировать дисфункцию щитовидной железы"
+      },
+      "mechanism": {
+        "en": "the Wolff–Chaikoff effect and its escape; with autoimmune thyroiditis the risk is higher",
+        "ru": "эффект Вольфа–Чайкова и обратный ему; при аутоиммунном тиреоидите риск выше"
+      },
+      "manage": {
+        "en": "monitoring of TSH and free T4 6–8 weeks after a change of the iodine dose",
+        "ru": "контроль ТТГ и свободного Т4 через 6–8 нед после изменения дозы йода"
+      }
+    },
+    {
+      "a": "vitamin_d",
+      "b": "thiazide",
+      "severity": "moderate",
+      "effect": {
+        "en": "↑ the risk of hypercalcaemia",
+        "ru": "↑ риск гиперкальциемии"
+      },
+      "mechanism": {
+        "en": "the thiazide lowers calcium excretion, vitamin D increases absorption",
+        "ru": "тиазид снижает экскрецию кальция, витамин D повышает всасывание"
+      },
+      "manage": {
+        "en": "monitoring of blood calcium and of ionised calcium",
+        "ru": "контроль кальция крови и ионизированного кальция"
+      }
+    },
+    {
+      "a": "antiarrhythmic",
+      "b": "anticoagulant_vka",
+      "severity": "high",
+      "effect": {
+        "en": "↑ the effect of warfarin and the risk of bleeding; the INR can rise over weeks",
+        "ru": "↑ эффект варфарина и риск кровотечения; МНО может расти неделями"
+      },
+      "mechanism": {
+        "en": "amiodarone inhibits CYP2C9 and CYP3A4 and displaces warfarin; its own half-life is measured in weeks, so the effect builds up slowly and outlasts withdrawal",
+        "ru": "амиодарон ингибирует CYP2C9 и CYP3A4 и вытесняет варфарин; его собственный период полувыведения — недели, поэтому эффект нарастает медленно и переживает отмену"
+      },
+      "manage": {
+        "en": "the warfarin dose is usually reduced and the INR checked more often — the decision and the numbers belong to the doctor",
+        "ru": "дозу варфарина обычно снижают и чаще контролируют МНО — решение и цифры за врачом"
+      },
+      "source": "FDA label (amiodarone), DDI class effect"
+    },
+    {
+      "a": "antiarrhythmic",
+      "b": "statin",
+      "severity": "moderate",
+      "effect": {
+        "en": "↑ the statin concentration and the risk of myopathy and rhabdomyolysis",
+        "ru": "↑ концентрация статина и риск миопатии и рабдомиолиза"
+      },
+      "mechanism": {
+        "en": "amiodarone inhibits CYP3A4, by which simvastatin and lovastatin are metabolised",
+        "ru": "амиодарон ингибирует CYP3A4, которым метаболизируются симвастатин и ловастатин"
+      },
+      "manage": {
+        "en": "the FDA restricts simvastatin to 20 mg/day with amiodarone; a statin not metabolised by CYP3A4 is an alternative — to be discussed with the doctor",
+        "ru": "FDA ограничивает симвастатин 20 мг/сут при амиодароне; альтернатива — статин, не метаболизируемый CYP3A4; обсудить с врачом"
+      },
+      "source": "FDA label (simvastatin): dose limit with amiodarone"
+    }
+  ]
+}

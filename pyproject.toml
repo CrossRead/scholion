@@ -1,0 +1,141 @@
+# Packaging Scholion for PyPI.
+#
+# Two decisions worth explaining, because neither is obvious:
+#
+# 1. One dependency, and it is deliberate. Reading laboratory PDFs is not a
+#    side feature — for most people it is the first thing the tool does with
+#    their data, and `pdfplumber` is what does it. Declaring it means `pip
+#    install scholion` gives a working application.
+#
+#    It used to be an extra, and the ingest code compensated by running
+#    `pip install pdfplumber` on its own when a PDF turned up — including with
+#    `--break-system-packages`. A project that promises nothing happens without
+#    the user's command must not install packages into their interpreter behind
+#    their back. Declared beats silent.
+#
+#    `pysam` stays an extra: it needs compilation, it is platform-specific, and
+#    the genome path needs external tools (bcftools, samtools) anyway. Without
+#    it the built-in tabixlite works — slower, on the standard library.
+#
+# 2. The version is read from the VERSION file. That file is already the single
+#    source of truth for the changelog and for publication — there is no reason
+#    to keep a second one. `__version__` in `src/scholion/__init__.py` is not a
+#    constant: it comes from the metadata of the installed distribution, or, when
+#    running from the sources, from that same VERSION file.
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scholion"
+dynamic = ["version"]
+description = "Local analysis layer over your own medical data — genome, lab history, prescriptions, wearables"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# PEP 639: a licence expression plus the list of files. The code is Apache-2.0,
+# but the curated knowledge base inside the package is CC BY 4.0, and both files,
+# together with the required source notices, are obliged to travel in the
+# distribution.
+license = "Apache-2.0"
+license-files = ["LICENSE", "LICENSE-DATA", "NOTICE", "ATTRIBUTION.md"]
+
+authors = [{ name = "CrossRead" }]
+keywords = [
+    "genomics", "pharmacogenomics", "clinvar", "acmg", "cpic",
+    "polygenic-score", "laboratory", "wearables", "personal-health",
+    "second-opinion", "n-of-1",
+]
+
+# A `License ::` classifier is deliberately absent — PEP 639 prescribes the
+# `license` field instead.
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Natural Language :: Russian",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+# Empty by decision, not by oversight: see the comment at the top.
+dependencies = [
+    # Lab PDFs are the first data most people load. See the note at the top.
+    "pdfplumber>=0.11",
+]
+
+[project.optional-dependencies]
+# Kept so that `pip install "scholion[pdf]"` from older instructions still works;
+# pdfplumber is a plain dependency now, so this extra adds nothing.
+pdf = []
+# Fast VCF access. Without it the built-in tabixlite is used — slower, but on
+# the standard library alone.
+genome = ["pysam>=0.22"]
+all = ["scholion[pdf,genome]"]
+
+[project.scripts]
+scholion = "scholion.cli:main"
+# A second entry point over the same core: `crossread` — "read your sources
+# against each other". The CLI takes the program name from whatever it was called
+# as, so the help text reads correctly either way.
+crossread = "scholion.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/CrossRead/scholion"
+Repository = "https://github.com/CrossRead/scholion"
+Changelog = "https://github.com/CrossRead/scholion/blob/main/CHANGELOG.md"
+Issues = "https://github.com/CrossRead/scholion/issues"
+
+[tool.hatch.version]
+path = "VERSION"
+pattern = "(?P<version>[^\\s]+)"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/scholion"]
+
+# The sdist carries exactly what is needed for a reproducible build and for
+# understanding the legal position. The personal directories (profile/, genome/)
+# are not here and cannot be: they never reach git either.
+# The tests and the checking tools travel in the sdist deliberately. The release
+# gate requires running them INSIDE the unpacked artefact rather than in the
+# repository: a green run at the author's end with a red one at the recipient's
+# does not mean "verified", it means "the state of the artefact is unknown".
+# Without tests/ and run_tests.sh such a run is impossible in principle.
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/scholion",
+    "/src/tools",
+    # The data-preparation scripts: the genome build guide points at them, and
+    # part of the test suite leans on them too (the n-of-1 maths lives in
+    # src/ingest/nof1.py). Without them the sdist builds fine and the run inside
+    # it dies on an import — which is what the gate caught on its first run.
+    "/src/ingest",
+    "/tests",
+    "/run_tests.sh",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/CONTRIBUTING.md",
+    "/DISCLAIMER.md",
+    "/SECURITY.md",
+    "/THREAT_MODEL.md",
+    "/CITATION.cff",
+    "/ASSISTANT-RULES.md",
+    "/VERSION",
+]
+exclude = [
+    "**/__pycache__",
+    "**/*.pyc",
+    "**/.DS_Store",
+]

@@ -1,0 +1,23 @@
+marker,date,value,unit,ref_low,ref_high,note
+# A template for `scholion import-labs <file>`. Delete these comment lines before use.
+#
+# marker   — the name of the test in any language the dictionary knows, or its key.
+#            `scholion markers` lists what is already in your profile; an unknown
+#            name is refused with suggestions rather than creating a second series.
+# date     — YYYY-MM-DD or YYYY-MM.
+# value    — a number. A comma decimal mark is understood.
+# unit     — required for a test that is not yet in your profile. A non-canonical
+#            unit is converted (mg/dL → mmol/L and so on); an unrecognised one is
+#            refused with the list of accepted spellings.
+# ref_low  — the lower reference bound printed on your form. Optional, and it is
+# ref_high   converted along with the value.
+# note     — free text.
+#
+# The file is imported whole or not at all: one bad row and nothing is written.
+# Check first with `scholion import-labs <file> --dry-run`.
+Glucose,2026-08-01,5.4,mmol/L,3.9,6.1,fasting
+Haemoglobin,2026-08-01,148,g/L,131,172,
+LDL cholesterol,2026-08-01,3.1,mmol/L,,3.0,
+Ferritin,2026-08-01,41,ng/mL,30,400,
+Thyroid-stimulating hormone (TSH),2026-08-01,2.8,mIU/L,0.27,4.2,
+Vitamin D (25-OH),2026-08-01,62.5,nmol/L,75,250,

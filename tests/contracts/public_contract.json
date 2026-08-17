@@ -1,0 +1,222 @@
+{
+  "_note": "Эталон публичного контракта. Добавлять можно, убирать — только осознанно (--accept) и с записью в CHANGELOG как несовместимое.",
+  "entrypoints": [
+    "python3 -m scholion",
+    "bin/crossread"
+  ],
+  "env_vars": [
+    "SCHOLION_PROFILE_DIR",
+    "SCHOLION_REPO_DIR",
+    "SCHOLION_GENOME_DIR",
+    "SCHOLION_GENOME_VCF",
+    "SCHOLION_OFFLINE",
+    "SCHOLION_LABS_DIR"
+  ],
+  "commands": [
+    "acmg",
+    "add-lab",
+    "add-med",
+    "add-metric",
+    "assistant",
+    "brief",
+    "clinvar",
+    "drug",
+    "focus",
+    "focus-log",
+    "genome",
+    "genome-status",
+    "genome-updates",
+    "goal",
+    "ingest-garmin",
+    "ingest-labs",
+    "ingest-studies",
+    "labs",
+    "lifestyle",
+    "longevity",
+    "markers",
+    "medications",
+    "metrics",
+    "overview",
+    "phenoage",
+    "prescription",
+    "profile",
+    "provenance",
+    "prs",
+    "radar",
+    "reconcile",
+    "remove-med",
+    "second-opinion",
+    "selfcheck",
+    "serve",
+    "set-folder",
+    "suggest-tests"
+  ],
+  "json_fields": {
+    "overview": [
+      "abnormal_count",
+      "disclaimer",
+      "genome",
+      "genome_gaps",
+      "high_flags",
+      "high_suggestions",
+      "lifestyle",
+      "markers_total",
+      "medications_count",
+      "metrics",
+      "stale_abnormal_count",
+      "subject_id",
+      "suggestions_count",
+      "watch_flags"
+    ],
+    "labs": [
+      "abnormal_count",
+      "count",
+      "decision_crossed_count",
+      "disclaimer",
+      "markers",
+      "near_limit_count",
+      "status"
+    ],
+    "suggest-tests": [
+      "count",
+      "disclaimer",
+      "status",
+      "suggestions",
+      "total"
+    ],
+    "second-opinion": [
+      "disclaimer",
+      "drug_flags",
+      "red_labs",
+      "suggestions"
+    ],
+    "radar": [
+      "disclaimer",
+      "domains",
+      "overall",
+      "overall_delta",
+      "prev_date",
+      "prev_overall"
+    ],
+    "medications": [
+      "medications"
+    ],
+    "markers": [
+      "markers"
+    ],
+    "metrics": [
+      "age",
+      "bmi",
+      "disclaimer",
+      "metrics",
+      "profile",
+      "status"
+    ],
+    "goal": [
+      "as_of",
+      "available",
+      "charts",
+      "disclaimer",
+      "headline",
+      "peaks",
+      "targets",
+      "title"
+    ],
+    "genome-status": [
+      "engine",
+      "gaps",
+      "ready",
+      "vcf",
+      "vcf_present"
+    ],
+    "genome-updates": [
+      "available"
+    ],
+    "clinvar": [
+      "disclaimer",
+      "hits",
+      "message",
+      "penetrance",
+      "status",
+      "tiers"
+    ],
+    "acmg": [
+      "disclaimer",
+      "hits",
+      "message",
+      "penetrance",
+      "status",
+      "version"
+    ],
+    "prs": [
+      "available",
+      "disclaimer",
+      "message"
+    ],
+    "longevity": [
+      "available",
+      "disclaimer",
+      "message"
+    ],
+    "profile": [
+      "genome_gaps",
+      "labs_markers",
+      "pgx_genes",
+      "subject_id"
+    ],
+    "assistant": [
+      "assistant_adds",
+      "audit",
+      "curated",
+      "disclaimer",
+      "engine_does",
+      "entrypoints",
+      "planned",
+      "works_without_assistant"
+    ],
+    "drug": [
+      "clinvar",
+      "disclaimer",
+      "drug",
+      "drug_class",
+      "gene",
+      "level",
+      "markers_found",
+      "phenotype",
+      "phenotype_label",
+      "recommendation",
+      "status",
+      "why"
+    ],
+    "prescription": [
+      "class_display",
+      "classes",
+      "clinvar",
+      "disclaimer",
+      "dose_context",
+      "drug",
+      "genome",
+      "identified",
+      "interactions",
+      "labs",
+      "overall",
+      "pharmacogenetics",
+      "status"
+    ],
+    "phenoage": [
+      "complete",
+      "panels",
+      "rule"
+    ]
+  },
+  "profile_files": [
+    "labs.json",
+    "medications.json",
+    "metrics.json",
+    "health_goals.json",
+    "focus.json",
+    "lifestyle_brief.json",
+    "pharmacogenomics.json",
+    "experiments.json"
+  ]
+}

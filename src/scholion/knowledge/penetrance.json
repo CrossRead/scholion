@@ -1,0 +1,189 @@
+{
+  "_meta": {
+    "purpose": "A SHARED PUBLIC LAYER. How to read a pathogenic finding in a HEALTHY person honestly. No personal data. The engine mixes these caveats into the ClinVar/ACMG SF findings so that a «pathogenic variant» is not read as a «diagnosis».",
+    "updated": "2026-08-13",
+    "one_line": {
+      "en": "A variant's classification answers the question \"can this variant cause the disease at all\", NOT \"will this person fall ill\".",
+      "ru": "Классификация варианта отвечает на вопрос «вызывает ли этот вариант болезнь в принципе», а НЕ «заболеет ли этот человек»."
+    }
+  },
+  "principles": [
+    {
+      "id": "clinvar_is_not_penetrance",
+      "title": {
+        "en": "ClinVar does not measure penetrance",
+        "ru": "ClinVar не измеряет пенетрантность"
+      },
+      "text": {
+        "en": "The Pathogenic/Likely pathogenic label is a statement about the causality of the variant, not a percentage of risk. The database itself holds no data from which the probability that a carrier will fall ill could be derived.",
+        "ru": "Метка Pathogenic/Likely pathogenic — это утверждение о причинности варианта, а не процент риска. В самой базе нет данных, из которых можно вывести вероятность заболеть носителю."
+      },
+      "source": {
+        "en": "Nature Genetics, June 2025 — https://www.nature.com/articles/s41588-025-02212-3",
+        "ru": "Nature Genetics, июнь 2025 — https://www.nature.com/articles/s41588-025-02212-3"
+      }
+    },
+    {
+      "id": "outcome_defines_number",
+      "title": {
+        "en": "The penetrance figure depends on WHAT is counted as the outcome",
+        "ru": "Цифра пенетрантности зависит от того, ЧТО считать исходом"
+      },
+      "text": {
+        "en": "For one and the same variant in KCNH2 the penetrance came out at 1% by clinical diagnosis codes, 3% by intervention codes and 60% by a simple measurement of a prolonged QT on the ECG. A spread of tens of times is not a contradiction but different questions. That is why «a risk of N%» without stating the outcome is meaningless.",
+        "ru": "Для одного и того же варианта в KCNH2 пенетрантность составила 1% по кодам клинического диагноза, 3% по кодам вмешательств и 60% по простому измерению удлинённого QT на ЭКГ. Разброс в десятки раз — не противоречие, а разные вопросы. Поэтому «риск N%» без указания исхода бессмысленен."
+      },
+      "source": {
+        "en": "European Journal of Human Genetics, April 2026 — https://www.nature.com/articles/s41431-026-02101-1",
+        "ru": "European Journal of Human Genetics, апрель 2026 — https://www.nature.com/articles/s41431-026-02101-1"
+      }
+    },
+    {
+      "id": "ascertainment_bias",
+      "title": {
+        "en": "Estimates from clinical cohorts are systematically inflated",
+        "ru": "Оценки из клинических когорт систематически завышены"
+      },
+      "text": {
+        "en": "Phenotype-first studies (which recruited families that were already affected) overestimate penetrance. Genotype-first ones (population biobanks — UK Biobank, All of Us) give more realistic and usually markedly lower figures, but they can underestimate because of healthy volunteer bias. Always look at where an estimate comes from.",
+        "ru": "Phenotype-first исследования (набирали уже заболевшие семьи) завышают пенетрантность. Genotype-first (популяционные биобанки — UK Biobank, All of Us) дают более реалистичные и обычно заметно более низкие цифры, но могут занижать за счёт healthy volunteer bias. Всегда смотреть, откуда взята оценка."
+      },
+      "source": {
+        "en": "Nature Genetics, July 2024 — https://www.nature.com/articles/s41588-024-01842-3",
+        "ru": "Nature Genetics, июль 2024 — https://www.nature.com/articles/s41588-024-01842-3"
+      }
+    },
+    {
+      "id": "low_penetrance_band",
+      "title": {
+        "en": "There is a separate category, «low penetrance»",
+        "ru": "Есть отдельная категория «низкая пенетрантность»"
+      },
+      "text": {
+        "en": "The ClinGen working group counts variants with a risk of roughly 10–50% as low-penetrance. Below that it is already a «risk allele» rather than a «disease-causing variant». Many frequent «pathogenic» findings in healthy people fall precisely here.",
+        "ru": "Рабочая группа ClinGen считает низкопенетрантными варианты с риском примерно 10–50%. Ниже этого — это уже «аллель риска», а не «вариант, вызывающий заболевание». Многие частые «патогенные» находки у здоровых людей попадают именно сюда."
+      },
+      "source": {
+        "en": "ClinGen Low Penetrance / Risk Allele WG; the EJHG 2026 review",
+        "ru": "ClinGen Low Penetrance / Risk Allele WG; обзор EJHG 2026"
+      }
+    },
+    {
+      "id": "absence_is_not_negative",
+      "title": {
+        "en": "The absence of a finding is not a negative result",
+        "ru": "Отсутствие находки — не отрицательный результат"
+      },
+      "text": {
+        "en": "Short reads see structural variants, repeat expansions and regions with pseudogenes (CYP2D6, PMS2, SMN1, GBA, HLA) poorly. «Nothing was found» means «nothing was found by this method».",
+        "ru": "Короткие чтения плохо видят структурные варианты, экспансии повторов и регионы с псевдогенами (CYP2D6, PMS2, SMN1, GBA, HLA). «Ничего не найдено» означает «этим методом не найдено»."
+      },
+      "source": {
+        "en": "an internal rule of the project; see also the section on the missing layers of analysis",
+        "ru": "внутреннее правило проекта; см. также раздел про недостающие слои анализа"
+      }
+    },
+    {
+      "id": "not_a_diagnosis",
+      "title": {
+        "en": "This is a second opinion, not a diagnosis",
+        "ru": "Это второе мнение, а не диагноз"
+      },
+      "text": {
+        "en": "A finding in an ACMG SF gene is a reason for a consultation with a geneticist and for a clinical check (ECG, lipids, ultrasound, ferritin — depending on the gene), not for a conclusion that there is disease, and still less for a change of therapy on one's own.",
+        "ru": "Находка в гене ACMG SF — повод к консультации генетика и клинической проверке (ЭКГ, липиды, УЗИ, ферритин — смотря по гену), а не к выводу о заболевании и тем более не к самостоятельному изменению терапии."
+      }
+    }
+  ],
+  "confidence_modifiers": {
+    "review_status": {
+      "practice_guideline": {
+        "en": "the highest confidence in the classification (still not in the penetrance)",
+        "ru": "высшая уверенность в классификации (но всё ещё не в пенетрантности)"
+      },
+      "reviewed_by_expert_panel": {
+        "en": "high",
+        "ru": "высокая"
+      },
+      "criteria_provided,_multiple_submitters,_no_conflicts": {
+        "en": "several submitters with stated criteria and no disagreement",
+        "ru": "средняя"
+      },
+      "criteria_provided,_single_submitter": {
+        "en": "one submitter with stated criteria",
+        "ru": "низкая — один сабмиттер, требуется независимое подтверждение"
+      },
+      "criteria_provided,_conflicting_classifications": {
+        "en": "submitters disagree — the classification cannot be relied on as it stands",
+        "ru": "низкая — классификации расходятся, читать как неопределённость"
+      },
+      "no_assertion_criteria_provided": {
+        "en": "no criteria stated — the classification carries no weight of its own",
+        "ru": "минимальная — по сути неподтверждённое утверждение"
+      }
+    },
+    "zygosity_het_in_recessive_gene": {
+      "en": "carrier state, not disease: in a recessive gene a single P/LP variant is not clinically significant for the carrier himself (it is significant for family planning)",
+      "ru": "носительство, не заболевание: при рецессивном гене один P/LP вариант клинически не значим для самого носителя (значим для планирования семьи)"
+    },
+    "zygosity_hom_or_compound_in_recessive_gene": {
+      "en": "clinically significant, the phenotype has to be checked",
+      "ru": "клинически значимо, требует проверки фенотипа"
+    },
+    "zygosity_het_in_dominant_gene": {
+      "en": "potentially significant, but this is exactly where penetrance decides everything",
+      "ru": "потенциально значимо, но именно здесь пенетрантность решает всё"
+    },
+    "coverage_low_depth": {
+      "en": "fewer than 10 reads — the call is unreliable, confirm the finding separately",
+      "ru": "менее 10 чтений — вызов ненадёжен, находку подтвердить отдельно"
+    },
+    "coverage_assumed_ref": {
+      "en": "the position is absent from the variant VCF: that is reference OR absence of coverage, two different things",
+      "ru": "позиции нет в вариантном VCF: это референс ИЛИ отсутствие покрытия, две разные вещи"
+    }
+  },
+  "gene_notes": {
+    "HFE": {
+      "note": {
+        "en": "The penetrance of haemochromatosis is low even in C282Y homozygotes: most carriers do not develop iron overload. What decides is ferritin and transferrin saturation, not the genotype. A heterozygote is a weak modifier.",
+        "ru": "Пенетрантность гемохроматоза низкая даже у гомозигот C282Y: большинство носителей не развивают перегрузку железом. Решают ферритин и сатурация трансферрина, а не генотип. Гетерозигота — слабый модификатор."
+      },
+      "evidence": {
+        "en": "moderate",
+        "ru": "умеренная"
+      }
+    },
+    "HNF1A/GCK (MODY)": {
+      "note": {
+        "en": "A classic example of overestimated penetrance: in unselected biobanks, carriers of variants in the MODY genes fall ill markedly less often than followed from the clinical families.",
+        "ru": "Классический пример завышенной пенетрантности: в неотобранных биобанках носители вариантов MODY-генов заболевают заметно реже, чем следовало из клинических семей."
+      },
+      "evidence": {
+        "en": "moderate",
+        "ru": "умеренная"
+      },
+      "source": "Nature Genetics 2024"
+    },
+    "TTN": {
+      "note": {
+        "en": "Truncating variants of TTN are often found in healthy people too; they are clinically significant predominantly in the A-band. Without the domain stated, the finding is of little use.",
+        "ru": "Труncating-варианты TTN часто встречаются и у здоровых; клинически значимы преимущественно в A-band. Без указания домена находка малоинформативна."
+      },
+      "evidence": {
+        "en": "moderate",
+        "ru": "умеренная"
+      }
+    },
+    "MUTYH/ATP7B/BTD/GAA/RPE65/CASQ2/TRDN/CYP27A1": {
+      "note": {
+        "en": "The recessive genes of the ACMG SF list: a single variant is carriership. Significant for family planning, not for one's own risk.",
+        "ru": "Рецессивные гены списка ACMG SF: один вариант — носительство. Значимо для планирования семьи, не для собственного риска."
+      },
+      "evidence": {
+        "en": "strong",
+        "ru": "сильная"
+      }
+    }
+  }
+}

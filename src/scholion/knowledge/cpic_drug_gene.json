@@ -1,0 +1,946 @@
+{
+  "_meta": {
+    "purpose": "A SHARED (de-identified) gene↔drug reference base for pharmacogenetics. Does NOT contain the data of a particular patient — the genotype is taken from profile/pharmacogenomics.json at the moment of the request. Freely shareable.",
+    "source": "Compiled by hand from the published principles of the CPIC guidelines (CPIC content is CC0, public domain). The CPIC and PharmGKB tables were not copied. Requires periodic reconciliation with the current guidelines. Variant alleles are given in dbSNP notation (forward strand).",
+    "levels": {
+      "high": "a substantial genetic factor — must be discussed with the doctor before prescribing",
+      "moderate": "a noticeable factor — worth mentioning to the doctor",
+      "low": "no features by the available markers / the standard approach",
+      "unknown": "the gene required is not covered by the patient's data (an additional test is needed, e.g. WGS)"
+    }
+  },
+  "genes_of_interest": [
+    "CYP2C19",
+    "CYP2C9",
+    "VKORC1",
+    "TPMT",
+    "MTHFR",
+    "SLCO1B1",
+    "CYP2D6",
+    "DPYD",
+    "APOE"
+  ],
+  "track2_targets": {
+    "APOE": {
+      "needs_full_diplotype": false,
+      "note": {
+        "en": "ε-status rs429358/rs7412; from WGS. Longevity/CVD/cognition.",
+        "ru": "ε-статус rs429358/rs7412; из WGS. Долголетие/ССЗ/когнитив."
+      }
+    },
+    "CYP2C9": {
+      "needs_full_diplotype": false,
+      "note": {
+        "en": "rs1799853/*2, rs1057910/*3; from WGS. Warfarin, NSAIDs.",
+        "ru": "rs1799853/*2, rs1057910/*3; из WGS. Варфарин, НПВП."
+      }
+    },
+    "SLCO1B1": {
+      "needs_full_diplotype": false,
+      "note": {
+        "en": "rs4149056/*5; from WGS. Statin myopathy.",
+        "ru": "rs4149056/*5; из WGS. Миопатия на статинах."
+      }
+    },
+    "DPYD": {
+      "needs_full_diplotype": false,
+      "note": {
+        "en": "rs3918290/*2A and others; from WGS. Fluoropyrimidine toxicity.",
+        "ru": "rs3918290/*2A и др.; из WGS. Токсичность фторпиримидинов."
+      }
+    },
+    "CYP2D6": {
+      "needs_full_diplotype": true,
+      "note": {
+        "en": "The full diplotype (CNV+phasing, PyPGx). A single SNP is not enough.",
+        "ru": "Полный диплотип (CNV+фазировка, PyPGx). Один SNP недостаточен."
+      }
+    }
+  },
+  "genes": {
+    "CYP2C19": {
+      "type": "metabolizer",
+      "markers": [
+        {
+          "rsid": "rs4244285",
+          "star": "*2",
+          "variant_allele": "A",
+          "function": "none"
+        },
+        {
+          "rsid": "rs12248560",
+          "star": "*17",
+          "variant_allele": "T",
+          "function": "increased"
+        },
+        {
+          "rsid": "rs4986893",
+          "star": "*3",
+          "variant_allele": "A",
+          "function": "none"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "none": ">=2"
+          },
+          "phenotype": "PM",
+          "label": {
+            "en": "poor metaboliser",
+            "ru": "медленный метаболизатор"
+          }
+        },
+        {
+          "when": {
+            "none": ">=1",
+            "increased": ">=1"
+          },
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser (the presence of *17 partly compensates for the loss of function — the CPIC phenotype depends on the drug)",
+            "ru": "промежуточный метаболизатор (наличие *17 частично компенсирует потерю функции — фенотип по CPIC зависит от препарата)"
+          }
+        },
+        {
+          "when": {
+            "none": ">=1"
+          },
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser",
+            "ru": "промежуточный метаболизатор"
+          }
+        },
+        {
+          "when": {
+            "increased": ">=2"
+          },
+          "phenotype": "UM",
+          "label": {
+            "en": "ultrarapid metaboliser",
+            "ru": "ультрабыстрый метаболизатор"
+          }
+        },
+        {
+          "when": {
+            "increased": ">=1"
+          },
+          "phenotype": "RM",
+          "label": {
+            "en": "rapid metaboliser",
+            "ru": "быстрый метаболизатор"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "NM",
+          "label": {
+            "en": "normal metaboliser",
+            "ru": "нормальный метаболизатор"
+          }
+        }
+      ]
+    },
+    "VKORC1": {
+      "type": "sensitivity",
+      "markers": [
+        {
+          "rsid": "rs9923231",
+          "variant_allele": "T",
+          "function": "sensitizing"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "sensitizing": ">=2"
+          },
+          "phenotype": "high_sensitivity",
+          "label": {
+            "en": "high sensitivity to warfarin",
+            "ru": "высокая чувствительность к варфарину"
+          }
+        },
+        {
+          "when": {
+            "sensitizing": ">=1"
+          },
+          "phenotype": "intermediate_sensitivity",
+          "label": {
+            "en": "intermediate sensitivity to warfarin",
+            "ru": "промежуточная чувствительность к варфарину"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "normal_sensitivity",
+          "label": {
+            "en": "normal sensitivity",
+            "ru": "нормальная чувствительность"
+          }
+        }
+      ]
+    },
+    "TPMT": {
+      "type": "metabolizer",
+      "markers": [
+        {
+          "rsid": "rs1800462",
+          "star": "*2",
+          "variant_allele": "G",
+          "function": "none"
+        },
+        {
+          "rsid": "rs1142345",
+          "star": "*3C",
+          "variant_allele": "C",
+          "function": "none"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "none": ">=2"
+          },
+          "phenotype": "PM",
+          "label": {
+            "en": "low TPMT activity",
+            "ru": "низкая активность TPMT"
+          }
+        },
+        {
+          "when": {
+            "none": ">=1"
+          },
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate TPMT activity",
+            "ru": "промежуточная активность TPMT"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "NM",
+          "label": {
+            "en": "normal activity by *2 and *3C (*3A is a two-variant haplotype and is not resolved here)",
+            "ru": "нормальная активность по *2 и *3C (*3A — гаплотип из двух вариантов, здесь не разрешается)"
+          }
+        }
+      ]
+    },
+    "MTHFR": {
+      "type": "activity",
+      "markers": [
+        {
+          "rsid": "rs1801133",
+          "star": "677T",
+          "variant_allele": "A",
+          "function": "decreased"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "decreased": ">=2"
+          },
+          "phenotype": "low",
+          "label": {
+            "en": "decreased activity (677TT homozygote)",
+            "ru": "сниженная активность (гомозигота 677TT)"
+          }
+        },
+        {
+          "when": {
+            "decreased": ">=1"
+          },
+          "phenotype": "intermediate",
+          "label": {
+            "en": "moderately decreased activity (677CT heterozygote)",
+            "ru": "умеренно сниженная активность (гетерозигота 677CT)"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "normal",
+          "label": {
+            "en": "normal activity",
+            "ru": "нормальная активность"
+          }
+        }
+      ]
+    },
+    "CYP2C9": {
+      "type": "metabolizer",
+      "markers": [
+        {
+          "rsid": "rs1799853",
+          "star": "*2",
+          "variant_allele": "T",
+          "function": "decreased"
+        },
+        {
+          "rsid": "rs1057910",
+          "star": "*3",
+          "variant_allele": "C",
+          "function": "none"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "none": ">=2"
+          },
+          "phenotype": "PM",
+          "label": {
+            "en": "poor metaboliser",
+            "ru": "медленный метаболизатор"
+          }
+        },
+        {
+          "when": {
+            "none": ">=1"
+          },
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser",
+            "ru": "промежуточный метаболизатор"
+          }
+        },
+        {
+          "when": {
+            "decreased": ">=1"
+          },
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser",
+            "ru": "промежуточный метаболизатор"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "NM",
+          "label": {
+            "en": "normal metaboliser",
+            "ru": "нормальный метаболизатор"
+          }
+        }
+      ]
+    },
+    "SLCO1B1": {
+      "type": "transporter",
+      "markers": [
+        {
+          "rsid": "rs4149056",
+          "star": "*5",
+          "variant_allele": "C",
+          "function": "decreased"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "decreased": ">=2"
+          },
+          "phenotype": "low_function",
+          "label": {
+            "en": "low transporter function (a high risk of statin myopathy)",
+            "ru": "низкая функция транспортёра (высокий риск статин-миопатии)"
+          }
+        },
+        {
+          "when": {
+            "decreased": ">=1"
+          },
+          "phenotype": "intermediate_function",
+          "label": {
+            "en": "intermediate function",
+            "ru": "промежуточная функция"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "normal_function",
+          "label": {
+            "en": "normal function",
+            "ru": "нормальная функция"
+          }
+        }
+      ]
+    },
+    "DPYD": {
+      "type": "metabolizer",
+      "markers": [
+        {
+          "rsid": "rs3918290",
+          "star": "*2A",
+          "variant_allele": "T",
+          "function": "none"
+        },
+        {
+          "rsid": "rs67376798",
+          "star": "c.2846A>T",
+          "variant_allele": "A",
+          "function": "decreased"
+        }
+      ],
+      "phenotype_rules": [
+        {
+          "when": {
+            "none": ">=1"
+          },
+          "phenotype": "deficient",
+          "label": {
+            "en": "DPD deficiency (a high risk of fluoropyrimidine toxicity)",
+            "ru": "дефицит DPD (высокий риск токсичности фторпиримидинов)"
+          }
+        },
+        {
+          "when": {
+            "decreased": ">=1"
+          },
+          "phenotype": "intermediate",
+          "label": {
+            "en": "intermediate DPD activity",
+            "ru": "промежуточная активность DPD"
+          }
+        },
+        {
+          "default": true,
+          "phenotype": "normal",
+          "label": {
+            "en": "normal DPD activity",
+            "ru": "нормальная активность DPD"
+          }
+        }
+      ]
+    }
+  },
+  "drugs": [
+    {
+      "names": [
+        "клопидогрел",
+        "clopidogrel",
+        "плавикс",
+        "plavix",
+        "зилт"
+      ],
+      "gene": "CYP2C19",
+      "class": {
+        "en": "antiplatelet",
+        "ru": "антиагрегант"
+      },
+      "why": {
+        "en": "CYP2C19 activates clopidogrel into the active metabolite; decreased function → decreased activation.",
+        "ru": "CYP2C19 активирует клопидогрел в активный метаболит; сниженная функция → сниженная активация."
+      },
+      "guidance": {
+        "PM": {
+          "level": "high",
+          "note": {
+            "en": "A poor metaboliser → the active metabolite is formed poorly, the antiplatelet effect may be insufficient. Discuss an alternative with the doctor (prasugrel/ticagrelor).",
+            "ru": "Медленный метаболизатор → активный метаболит образуется плохо, антиагрегантный эффект может быть недостаточным. Обсудить с врачом альтернативу (прасугрел/тикагрелор)."
+          }
+        },
+        "IM": {
+          "level": "high",
+          "note": {
+            "en": "There is a loss-of-function allele → activation may be reduced, a risk of an insufficient effect. Discuss with the doctor an alternative or a platelet function test.",
+            "ru": "Есть аллель потери функции → активация может быть снижена, риск недостаточного эффекта. Обсудить с врачом альтернативу или тест функции тромбоцитов."
+          }
+        },
+        "RM": {
+          "level": "low",
+          "note": {
+            "en": "The standard approach for this gene.",
+            "ru": "Стандартный подход по этому гену."
+          }
+        },
+        "UM": {
+          "level": "low",
+          "note": {
+            "en": "The standard approach for this gene.",
+            "ru": "Стандартный подход по этому гену."
+          }
+        },
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "The standard approach for this gene.",
+            "ru": "Стандартный подход по этому гену."
+          }
+        },
+        "default": {
+          "level": "moderate",
+          "note": {
+            "en": "Clarify the CYP2C19 status; if the function is decreased, discuss it with the doctor.",
+            "ru": "Уточнить CYP2C19-статус; при снижении функции обсудить с врачом."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "омепразол",
+        "omeprazole",
+        "эзомепразол",
+        "esomeprazole",
+        "лансопразол",
+        "пантопразол",
+        "декслансопразол",
+        "рабепразол",
+        "ипп",
+        "ppi"
+      ],
+      "gene": "CYP2C19",
+      "class": {
+        "en": "proton-pump inhibitors",
+        "ru": "ИПП"
+      },
+      "why": {
+        "en": "CYP2C19 metabolises PPIs; the function of the gene affects exposure and efficacy.",
+        "ru": "CYP2C19 метаболизирует ИПП; функция гена влияет на экспозицию и эффективность."
+      },
+      "guidance": {
+        "UM": {
+          "level": "moderate",
+          "note": {
+            "en": "Accelerated metabolism → exposure and efficacy may be reduced; if the response is insufficient, discuss the dose/the choice with the doctor.",
+            "ru": "Ускоренный метаболизм → возможна сниженная экспозиция и эффективность; при недостаточном ответе обсудить с врачом дозу/выбор."
+          }
+        },
+        "RM": {
+          "level": "moderate",
+          "note": {
+            "en": "Exposure may be reduced; take this into account if the response is insufficient.",
+            "ru": "Возможна сниженная экспозиция; учитывать при недостаточном ответе."
+          }
+        },
+        "PM": {
+          "level": "moderate",
+          "note": {
+            "en": "Increased exposure — usually favourable for efficacy; in some cases a lower dose can be discussed.",
+            "ru": "Повышенная экспозиция — обычно благоприятно для эффективности; в ряде случаев можно обсудить меньшую дозу."
+          }
+        },
+        "IM": {
+          "level": "low",
+          "note": {
+            "en": "The standard approach.",
+            "ru": "Стандартный подход."
+          }
+        },
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "The standard approach.",
+            "ru": "Стандартный подход."
+          }
+        },
+        "default": {
+          "level": "low",
+          "note": {
+            "en": "No substantial features have been found by the markers.",
+            "ru": "Существенных особенностей по маркерам не выявлено."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "циталопрам",
+        "citalopram",
+        "эсциталопрам",
+        "escitalopram",
+        "сертралин",
+        "sertraline"
+      ],
+      "gene": "CYP2C19",
+      "class": {
+        "en": "SSRI antidepressant",
+        "ru": "СИОЗС"
+      },
+      "why": {
+        "en": "CYP2C19 metabolises citalopram/escitalopram/sertraline; it affects exposure.",
+        "ru": "CYP2C19 метаболизирует циталопрам/эсциталопрам/сертралин; влияет на экспозицию."
+      },
+      "guidance": {
+        "UM": {
+          "level": "moderate",
+          "note": {
+            "en": "Accelerated metabolism → the concentration may be reduced; if the response is insufficient, discuss the dose/an alternative.",
+            "ru": "Ускоренный метаболизм → возможна сниженная концентрация; при недостаточном ответе обсудить дозу/альтернативу."
+          }
+        },
+        "RM": {
+          "level": "moderate",
+          "note": {
+            "en": "The concentration may be reduced.",
+            "ru": "Возможна сниженная концентрация."
+          }
+        },
+        "PM": {
+          "level": "moderate",
+          "note": {
+            "en": "Increased concentration → CPIC recommends considering a reduced dose of citalopram/escitalopram.",
+            "ru": "Повышенная концентрация → CPIC рекомендует рассмотреть сниженную дозу циталопрама/эсциталопрама."
+          }
+        },
+        "default": {
+          "level": "low",
+          "note": {
+            "en": "No substantial features have been found by the markers.",
+            "ru": "Существенных особенностей по маркерам не выявлено."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "амитриптилин",
+        "amitriptyline",
+        "имипрамин",
+        "imipramine",
+        "кломипрамин"
+      ],
+      "gene": "CYP2C19",
+      "class": {
+        "en": "tricyclic antidepressant",
+        "ru": "ТЦА"
+      },
+      "why": {
+        "en": "CYP2C19 (and CYP2D6) metabolise tricyclics; they affect the drug/metabolite ratio.",
+        "ru": "CYP2C19 (и CYP2D6) метаболизируют трициклики; влияют на соотношение препарат/метаболит."
+      },
+      "guidance": {
+        "default": {
+          "level": "moderate",
+          "note": {
+            "en": "A full assessment of TCAs also requires CYP2D6 (the full diplotype, WGS). Discuss it with the doctor.",
+            "ru": "Для полной оценки ТЦА нужен также CYP2D6 (полный диплотип, WGS). Обсудить с врачом."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "вориконазол",
+        "voriconazole"
+      ],
+      "gene": "CYP2C19",
+      "class": {
+        "en": "antifungal",
+        "ru": "противогрибковое"
+      },
+      "why": {
+        "en": "CYP2C19 is the main metabolic pathway of voriconazole.",
+        "ru": "CYP2C19 — основной путь метаболизма вориконазола."
+      },
+      "guidance": {
+        "UM": {
+          "level": "moderate",
+          "note": {
+            "en": "Subtherapeutic concentrations are possible → discuss concentration monitoring (TDM).",
+            "ru": "Возможны субтерапевтические концентрации → обсудить контроль концентрации (TDM)."
+          }
+        },
+        "RM": {
+          "level": "moderate",
+          "note": {
+            "en": "Reduced concentrations are possible → consider TDM.",
+            "ru": "Возможны сниженные концентрации → рассмотреть TDM."
+          }
+        },
+        "PM": {
+          "level": "moderate",
+          "note": {
+            "en": "Increased concentrations → a risk of toxicity, discuss the dose/TDM.",
+            "ru": "Повышенные концентрации → риск токсичности, обсудить дозу/TDM."
+          }
+        },
+        "default": {
+          "level": "low",
+          "note": {
+            "en": "No features have been found by the markers.",
+            "ru": "Особенностей по маркерам не выявлено."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "варфарин",
+        "warfarin"
+      ],
+      "gene": "VKORC1",
+      "class": {
+        "en": "anticoagulant",
+        "ru": "антикоагулянт"
+      },
+      "why": {
+        "en": "VKORC1 is the target of warfarin; sensitivity affects the starting dose.",
+        "ru": "VKORC1 — мишень варфарина; чувствительность влияет на стартовую дозу."
+      },
+      "guidance": {
+        "high_sensitivity": {
+          "level": "high",
+          "note": {
+            "en": "High sensitivity → a lower starting dose is needed. The dosing algorithm also requires CYP2C9. Discuss it with the doctor + INR monitoring.",
+            "ru": "Высокая чувствительность → нужна меньшая стартовая доза. Для алгоритма дозирования нужен также CYP2C9. Обсудить с врачом + контроль МНО."
+          }
+        },
+        "intermediate_sensitivity": {
+          "level": "high",
+          "note": {
+            "en": "Intermediate sensitivity. Calculating the dose also requires CYP2C9 (WGS). Discuss algorithm-based dosing + INR monitoring.",
+            "ru": "Промежуточная чувствительность. Для расчёта дозы нужен также CYP2C9 (WGS). Обсудить дозирование по алгоритму + контроль МНО."
+          }
+        },
+        "default": {
+          "level": "moderate",
+          "note": {
+            "en": "Warfarin dosing also requires CYP2C9 and INR monitoring.",
+            "ru": "Дозирование варфарина требует также CYP2C9 и контроля МНО."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "азатиоприн",
+        "azathioprine",
+        "меркаптопурин",
+        "mercaptopurine",
+        "тиогуанин",
+        "тиопурин"
+      ],
+      "gene": "TPMT",
+      "class": {
+        "en": "thiopurine / immunosuppressant",
+        "ru": "тиопурин/иммунодепрессант"
+      },
+      "why": {
+        "en": "TPMT metabolises thiopurines; low activity → a risk of myelotoxicity.",
+        "ru": "TPMT метаболизирует тиопурины; низкая активность → риск миелотоксичности."
+      },
+      "guidance": {
+        "PM": {
+          "level": "high",
+          "note": {
+            "en": "Low TPMT activity → a high risk of myelotoxicity; discuss with the doctor a substantial dose reduction/an alternative.",
+            "ru": "Низкая активность TPMT → высокий риск миелотоксичности; обсудить с врачом существенное снижение дозы/альтернативу."
+          }
+        },
+        "IM": {
+          "level": "moderate",
+          "note": {
+            "en": "Intermediate activity → discuss with the doctor a reduction of the starting dose and monitoring of the complete blood count.",
+            "ru": "Промежуточная активность → обсудить с врачом снижение стартовой дозы и контроль ОАК."
+          }
+        },
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "Normal by this marker; for completeness it is desirable to assess *3A/*3C and/or the enzyme activity.",
+            "ru": "По маркеру норма; для полноты желательно оценить *3A/*3C и/или активность фермента."
+          }
+        },
+        "default": {
+          "level": "low",
+          "note": {
+            "en": "Assess the TPMT status before prescribing.",
+            "ru": "Оценить TPMT-статус перед назначением."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "метотрексат",
+        "methotrexate"
+      ],
+      "gene": "MTHFR",
+      "class": {
+        "en": "immunosuppressant / chemotherapy",
+        "ru": "иммунодепрессант/химио"
+      },
+      "why": {
+        "en": "MTHFR affects folate metabolism; it may modulate tolerability.",
+        "ru": "MTHFR влияет на фолатный обмен; может модулировать переносимость."
+      },
+      "guidance": {
+        "low": {
+          "level": "moderate",
+          "note": {
+            "en": "Decreased MTHFR activity → discuss with the doctor folate support and monitoring of tolerability.",
+            "ru": "Сниженная активность MTHFR → обсудить с врачом поддержку фолатами и контроль переносимости."
+          }
+        },
+        "intermediate": {
+          "level": "moderate",
+          "note": {
+            "en": "Moderately decreased activity → discuss adequate folate support.",
+            "ru": "Умеренно сниженная активность → обсудить адекватную поддержку фолатами."
+          }
+        },
+        "default": {
+          "level": "low",
+          "note": {
+            "en": "There are no substantial features.",
+            "ru": "Существенных особенностей нет."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "статин",
+        "статины",
+        "statin",
+        "statins",
+        "аторвастатин",
+        "atorvastatin",
+        "розувастатин",
+        "rosuvastatin",
+        "симвастатин",
+        "simvastatin",
+        "правастатин"
+      ],
+      "gene": "SLCO1B1",
+      "class": {
+        "en": "statin",
+        "ru": "статин"
+      },
+      "why": {
+        "en": "SLCO1B1 (rs4149056) affects statin transport; decreased function → a higher risk of myopathy (especially simvastatin).",
+        "ru": "SLCO1B1 (rs4149056) влияет на транспорт статинов; сниженная функция → выше риск миопатии (особенно симвастатин)."
+      },
+      "guidance": {
+        "low_function": {
+          "level": "high",
+          "note": {
+            "en": "Low SLCO1B1 function → a high risk of statin myopathy. Discuss with the doctor the choice of statin (not simvastatin at a high dose), a reduced dose and monitoring of CK/symptoms.",
+            "ru": "Низкая функция SLCO1B1 → высокий риск статин-миопатии. Обсудить с врачом выбор статина (не симвастатин в высокой дозе), сниженную дозу и контроль КФК/симптомов."
+          }
+        },
+        "intermediate_function": {
+          "level": "moderate",
+          "note": {
+            "en": "Intermediate SLCO1B1 function → a moderately increased risk of myopathy; take this into account when choosing the dose, especially of simvastatin.",
+            "ru": "Промежуточная функция SLCO1B1 → умеренно повышенный риск миопатии; учитывать при выборе дозы, особенно симвастатина."
+          }
+        },
+        "normal_function": {
+          "level": "low",
+          "note": {
+            "en": "There are no features by SLCO1B1; the standard approach.",
+            "ru": "По SLCO1B1 особенностей нет; стандартный подход."
+          }
+        },
+        "unknown": {
+          "level": "unknown",
+          "note": {
+            "en": "The SLCO1B1 genotype is unknown — an additional test is needed (WGS). With dyslipidaemia and likely statin therapy this marker is worth obtaining as a priority.",
+            "ru": "Генотип SLCO1B1 неизвестен — нужен доп. анализ (WGS). При дислипидемии и вероятной статинотерапии этот маркёр стоит получить в приоритете."
+          }
+        },
+        "default": {
+          "level": "unknown",
+          "note": {
+            "en": "The SLCO1B1 genotype (rs4149056) is needed.",
+            "ru": "Нужен генотип SLCO1B1 (rs4149056)."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "кодеин",
+        "codeine",
+        "трамадол",
+        "tramadol"
+      ],
+      "gene": "CYP2D6",
+      "class": {
+        "en": "opioid analgesic",
+        "ru": "опиоидный анальгетик"
+      },
+      "why": {
+        "en": "CYP2D6 activates codeine/tramadol into active metabolites; the phenotype determines efficacy and risk.",
+        "ru": "CYP2D6 активирует кодеин/трамадол в активные метаболиты; фенотип определяет эффективность и риск."
+      },
+      "guidance": {
+        "unknown": {
+          "level": "unknown",
+          "note": {
+            "en": "The full CYP2D6 diplotype is unknown (WGS + PyPGx are needed). Until then the assessment is incomplete.",
+            "ru": "Полный диплотип CYP2D6 неизвестен (нужен WGS + PyPGx). До этого оценка неполная."
+          }
+        },
+        "default": {
+          "level": "unknown",
+          "note": {
+            "en": "The full CYP2D6 diplotype is needed.",
+            "ru": "Нужен полный CYP2D6-диплотип."
+          }
+        }
+      }
+    },
+    {
+      "names": [
+        "фторурацил",
+        "5-фу",
+        "5-fu",
+        "капецитабин",
+        "capecitabine",
+        "фторпиримидин"
+      ],
+      "gene": "DPYD",
+      "class": {
+        "en": "fluoropyrimidine / chemotherapy",
+        "ru": "фторпиримидин/химио"
+      },
+      "why": {
+        "en": "DPYD breaks fluoropyrimidines down; a deficiency → severe toxicity.",
+        "ru": "DPYD расщепляет фторпиримидины; дефицит → тяжёлая токсичность."
+      },
+      "guidance": {
+        "deficient": {
+          "level": "high",
+          "note": {
+            "en": "A DPYD loss-of-function variant has been found → a high risk of severe fluoropyrimidine toxicity. Before prescribing, discuss with the oncologist a substantial dose reduction/an alternative.",
+            "ru": "Найден вариант потери функции DPYD → высокий риск тяжёлой токсичности фторпиримидинов. Перед назначением обсудить с онкологом существенное снижение дозы/альтернативу."
+          }
+        },
+        "intermediate": {
+          "level": "high",
+          "note": {
+            "en": "Intermediate DPD activity → an increased risk of toxicity; discuss with the oncologist a reduction of the starting dose.",
+            "ru": "Промежуточная активность DPD → повышенный риск токсичности; обсудить с онкологом снижение стартовой дозы."
+          }
+        },
+        "normal": {
+          "level": "low",
+          "note": {
+            "en": "Normal by the DPYD markers examined (this does not fully exclude a deficiency; rare variants are outside the panel).",
+            "ru": "По исследованным маркерам DPYD — норма (полностью дефицит не исключает; редкие варианты вне панели)."
+          }
+        },
+        "unknown": {
+          "level": "unknown",
+          "note": {
+            "en": "The DPYD status is unknown (WGS is needed). Before any fluoropyrimidine chemotherapy DPYD is mandatory — flag it for the oncologist.",
+            "ru": "DPYD-статус неизвестен (нужен WGS). Перед любой фторпиримидиновой химиотерапией DPYD обязателен — отметить для онколога."
+          }
+        },
+        "default": {
+          "level": "unknown",
+          "note": {
+            "en": "The DPYD genotype is needed.",
+            "ru": "Нужен генотип DPYD."
+          }
+        }
+      }
+    }
+  ]
+}

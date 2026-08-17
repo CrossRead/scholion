@@ -1,0 +1,24 @@
+# The user's personal data — do NOT commit.
+# profile/*.json and genome/* are deliberately outside git: once you fill them
+# in, the templates from the package become your own personal data. If you need
+# a pristine template, take it from the package archive, not from the history
+# of the repository.
+profile/*
+!profile/*.md
+genome/*
+!genome/README.md
+raw/
+work/
+archive/
+*._stale*/
+*.vcf*
+*.bam
+*.pdf
+# …except the synthetic test fixture: a few invented lines, checked by
+# content at commit time and at build time (src/tools/synthetic_fixture.py).
+!tests/fixtures/genome/*.vcf.gz
+!tests/fixtures/genome/*.vcf.gz.tbi
+__pycache__/
+*.pyc
+.cache/
+scholion-skill/

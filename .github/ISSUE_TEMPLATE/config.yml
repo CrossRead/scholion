@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: A question about your own results
+    url: https://github.com/
+    about: >-
+      Please do not. This project does not read anyone's data and cannot answer a
+      question about your health — and an issue is a public place. Everything it
+      computes runs on your own machine; take the output to your doctor, not to a
+      tracker.
+  - name: A security or privacy problem
+    url: https://github.com/
+    about: >-
+      Do NOT open an issue. See SECURITY.md — private vulnerability reporting is
+      enabled on this repository, and a leak reported in public is a leak twice.

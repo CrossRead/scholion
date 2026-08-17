@@ -1,0 +1,30 @@
+SYNTHETIC FIXTURE — an invented form with invented values.
+It belongs to nobody. It exists only to test parsing.
+
+Example Laboratory, Clinical Chemistry
+Patient: Test Patient
+Specimen: Serum
+Collection date: 2024-03-14
+
+Test                                Result      Reference range      Units
+
+Glucose                             5.4         3.9 - 6.1            mmol/L
+Total cholesterol                   6.1         < 5.2                mmol/L
+LDL cholesterol                     4.05        < 3.0                mmol/L
+HDL cholesterol                     1.12        > 1.0                mmol/L
+Triglycerides                       2.31        < 1.7                mmol/L
+Alanine aminotransferase (ALT)      52          < 41                 U/L
+Aspartate aminotransferase (AST)    31          < 40                 U/L
+Creatinine                          88          62 - 106             umol/L
+Ferritin                            41.2        30 - 400             ug/L
+Vitamin D (25-OH)                   62.5        75 - 250             nmol/L
+Thyroid-stimulating hormone (TSH)   2.84        0.27 - 4.20          uIU/mL
+
+Complete blood count
+
+Haemoglobin                         148         131 - 172            g/L
+White blood cells (WBC)             6.20        4.4 - 11.3           10^9/L
+Platelets (PLT)                     244         134 - 377            10^9/L
+Neutrophils                         %  58.4     48 - 78              Neutrophils  10^9/L  3.62   1.8 - 7.7
+
+Report generated automatically.

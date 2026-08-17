@@ -1,0 +1,640 @@
+{
+  "_meta": {
+    "purpose": "A PUBLIC dictionary: drug/brand → therapeutic class. Like a pharmacy classification. It is used by the monitoring rules by CLASS, not by the patient's particular drug. It holds no patient data, portable.",
+    "note": "Extensible. The patient's personal prescriptions live ONLY in profile/medications.json and profile/medications.md.",
+    "match": "It fires on the occurrence of any of the names in the text of the patient's prescriptions (case-insensitively).",
+    "note_nutraceutical_layer_20260813": "A nutraceutical layer has been added: classes for the items that were not in the cardio-diabetic frame (UDCA, soluble fibre, berberine, niacin, vitamin D, iodine, sources of B6, GH secretagogues, probiotics, inositol, lipoic acid). A CAVEAT ABOUT SUBSTRING MATCHING: 'niacin' is contained in 'niacinamide', and 'mk-7' (supplement_k2) is contained in 'mk-677' (ibutamoren) — when such items appear, write the name in medications.json explicitly, otherwise the class will be determined wrongly.",
+    "note_word_matching_20260813": "Name matching has become word-wise (core.classify_drug): the pattern has to match a whole word, and for Cyrillic patterns up to three letters of inflection are allowed. The consequence: variants with a digit at the end have to be listed explicitly — «vitamin d» no longer catches «Vitamin D3», so both forms have been entered into the list."
+  },
+  "classes": {
+    "testosterone_replacement": {
+      "label": {
+        "en": "testosterone replacement therapy",
+        "ru": "тестостерон-заместительная терапия"
+      },
+      "names": [
+        "тестостерон",
+        "testosterone",
+        "андрогель",
+        "androgel",
+        "testogel",
+        "тестогель",
+        "sustanon",
+        "сустанон",
+        "небидо",
+        "nebido",
+        "омнадрен",
+        "andriol",
+        "андриол"
+      ]
+    },
+    "anticoagulant_vka": {
+      "label": {
+        "en": "anticoagulant (a vitamin K antagonist)",
+        "ru": "антикоагулянт (антагонист витамина K)"
+      },
+      "names": [
+        "варфарин",
+        "warfarin",
+        "мареван",
+        "аценокумарол"
+      ]
+    },
+    "statin": {
+      "label": {
+        "en": "statin",
+        "ru": "статин"
+      },
+      "names": [
+        "статин",
+        "аторвастатин",
+        "atorvastatin",
+        "розувастатин",
+        "rosuvastatin",
+        "симвастатин",
+        "simvastatin",
+        "правастатин",
+        "ловастатин",
+        "флувастатин",
+        "питавастатин"
+      ]
+    },
+    "thiopurine": {
+      "label": {
+        "en": "thiopurine",
+        "ru": "тиопурин"
+      },
+      "names": [
+        "азатиоприн",
+        "azathioprine",
+        "меркаптопурин",
+        "mercaptopurine",
+        "тиогуанин"
+      ]
+    },
+    "nsaid": {
+      "label": {
+        "en": "NSAID",
+        "ru": "НПВС"
+      },
+      "names": [
+        "ибупрофен",
+        "ibuprofen",
+        "напроксен",
+        "naproxen",
+        "диклофенак",
+        "diclofenac",
+        "кеторолак",
+        "нимесулид",
+        "мелоксикам",
+        "аспирин",
+        "aspirin",
+        "ацетилсалицил",
+        "кетопрофен",
+        "целекоксиб"
+      ]
+    },
+    "ssri_snri": {
+      "label": {
+        "en": "antidepressant (SSRI/SNRI)",
+        "ru": "антидепрессант (СИОЗС/СИОЗСН)"
+      },
+      "names": [
+        "сертралин",
+        "sertraline",
+        "флуоксетин",
+        "fluoxetine",
+        "пароксетин",
+        "paroxetine",
+        "эсциталопрам",
+        "escitalopram",
+        "циталопрам",
+        "венлафаксин",
+        "venlafaxine",
+        "дулоксетин"
+      ]
+    },
+    "ppi": {
+      "label": {
+        "en": "proton pump inhibitor",
+        "ru": "ингибитор протонной помпы"
+      },
+      "names": [
+        "омепразол",
+        "omeprazole",
+        "эзомепразол",
+        "esomeprazole",
+        "пантопразол",
+        "лансопразол",
+        "рабепразол"
+      ]
+    },
+    "macrolide": {
+      "label": {
+        "en": "macrolide antibiotic",
+        "ru": "макролидный антибиотик"
+      },
+      "names": [
+        "кларитромицин",
+        "clarithromycin",
+        "эритромицин",
+        "erythromycin",
+        "азитромицин",
+        "azithromycin"
+      ]
+    },
+    "azole_antifungal": {
+      "label": {
+        "en": "azole antifungal",
+        "ru": "азольный противогрибковый"
+      },
+      "names": [
+        "флуконазол",
+        "fluconazole",
+        "итраконазол",
+        "кетоконазол",
+        "вориконазол",
+        "voriconazole",
+        "позаконазол"
+      ]
+    },
+    "fibrate": {
+      "label": {
+        "en": "fibrate",
+        "ru": "фибрат"
+      },
+      "names": [
+        "гемфиброзил",
+        "gemfibrozil",
+        "фенофибрат",
+        "fenofibrate",
+        "ципрофибрат"
+      ]
+    },
+    "antiplatelet_p2y12": {
+      "label": {
+        "en": "antiplatelet (P2Y12)",
+        "ru": "антиагрегант (P2Y12)"
+      },
+      "names": [
+        "клопидогрел",
+        "clopidogrel",
+        "плавикс",
+        "prasugrel",
+        "тикагрелор",
+        "ticagrelor"
+      ]
+    },
+    "doac": {
+      "label": {
+        "en": "direct oral anticoagulant",
+        "ru": "прямой оральный антикоагулянт"
+      },
+      "names": [
+        "ривароксабан",
+        "rivaroxaban",
+        "апиксабан",
+        "apixaban",
+        "дабигатран",
+        "dabigatran",
+        "эдоксабан"
+      ]
+    },
+    "opioid_codeine": {
+      "label": {
+        "en": "opioid (codeine/tramadol)",
+        "ru": "опиоид (кодеин/трамадол)"
+      },
+      "names": [
+        "кодеин",
+        "codeine",
+        "трамадол",
+        "tramadol"
+      ]
+    },
+    "thyroid_hormone": {
+      "label": {
+        "en": "thyroid hormone",
+        "ru": "гормон щитовидной железы"
+      },
+      "names": [
+        "левотироксин",
+        "levothyroxine",
+        "эутирокс",
+        "l-тироксин",
+        "l-thyroxine"
+      ]
+    },
+    "supplement_k2": {
+      "label": {
+        "en": "vitamin K2",
+        "ru": "витамин K2"
+      },
+      "names": [
+        "k2",
+        "mk-7",
+        "менахинон",
+        "menaquinone",
+        "витамин к"
+      ]
+    },
+    "supplement_fish_oil": {
+      "label": {
+        "en": "omega-3 / fish oil",
+        "ru": "омега-3 / рыбий жир"
+      },
+      "names": [
+        "omega",
+        "омега",
+        "рыбий жир",
+        "fish oil",
+        "epa",
+        "dha",
+        "nattokinase",
+        "наттокиназа"
+      ]
+    },
+    "biguanide": {
+      "label": {
+        "en": "biguanide (metformin)",
+        "ru": "бигуанид (метформин)"
+      },
+      "names": [
+        "метформин",
+        "metformin",
+        "глюкофаж",
+        "glucophage",
+        "сиофор",
+        "siofor",
+        "багомет",
+        "форметин"
+      ]
+    },
+    "sulfonylurea": {
+      "label": {
+        "en": "sulfonylurea",
+        "ru": "препарат сульфонилмочевины"
+      },
+      "names": [
+        "глибенкламид",
+        "гликлазид",
+        "глимепирид",
+        "glimepiride",
+        "gliclazide",
+        "диабетон",
+        "амарил"
+      ]
+    },
+    "sglt2": {
+      "label": {
+        "en": "SGLT2 inhibitor (gliflozin)",
+        "ru": "ингибитор SGLT2 (глифлозин)"
+      },
+      "names": [
+        "эмпаглифлозин",
+        "empagliflozin",
+        "дапаглифлозин",
+        "dapagliflozin",
+        "форсига",
+        "джардинс",
+        "канаглифлозин"
+      ]
+    },
+    "glp1": {
+      "label": {
+        "en": "incretin-based (a GLP-1 / GIP agonist)",
+        "ru": "инкретиновый (агонист ГПП-1 / ГИП)"
+      },
+      "names": [
+        "семаглутид",
+        "semaglutide",
+        "оземпик",
+        "ozempic",
+        "лираглутид",
+        "дулаглутид",
+        "виктоза",
+        "тирзепатид",
+        "tirzepatide",
+        "мунджаро",
+        "mounjaro",
+        "зепбаунд",
+        "zepbound"
+      ]
+    },
+    "dpp4": {
+      "label": {
+        "en": "DPP-4 inhibitor (gliptin)",
+        "ru": "ингибитор ДПП-4 (глиптин)"
+      },
+      "names": [
+        "ситаглиптин",
+        "sitagliptin",
+        "вилдаглиптин",
+        "галвус",
+        "янувия",
+        "линаглиптин"
+      ]
+    },
+    "ace_inhibitor": {
+      "label": {
+        "en": "ACE inhibitor",
+        "ru": "ингибитор АПФ"
+      },
+      "names": [
+        "эналаприл",
+        "enalapril",
+        "лизиноприл",
+        "периндоприл",
+        "рамиприл",
+        "престариум",
+        "каптоприл"
+      ]
+    },
+    "arb": {
+      "label": {
+        "en": "angiotensin receptor blocker (sartan)",
+        "ru": "блокатор рецепторов ангиотензина (сартан)"
+      },
+      "names": [
+        "лозартан",
+        "losartan",
+        "валсартан",
+        "телмисартан",
+        "кандесартан",
+        "ирбесартан"
+      ]
+    },
+    "beta_blocker": {
+      "label": {
+        "en": "beta blocker",
+        "ru": "бета-адреноблокатор"
+      },
+      "names": [
+        "бисопролол",
+        "bisoprolol",
+        "метопролол",
+        "небиволол",
+        "конкор",
+        "карведилол",
+        "атенолол"
+      ]
+    },
+    "ccb": {
+      "label": {
+        "en": "calcium channel blocker",
+        "ru": "блокатор кальциевых каналов"
+      },
+      "names": [
+        "амлодипин",
+        "amlodipine",
+        "нифедипин",
+        "верапамил",
+        "дилтиазем",
+        "фелодипин"
+      ]
+    },
+    "thiazide": {
+      "label": {
+        "en": "thiazide/thiazide-like diuretic",
+        "ru": "тиазидный/тиазидоподобный диуретик"
+      },
+      "names": [
+        "гидрохлортиазид",
+        "hydrochlorothiazide",
+        "индапамид",
+        "indapamide",
+        "арифон"
+      ]
+    },
+    "loop_diuretic": {
+      "label": {
+        "en": "loop diuretic",
+        "ru": "петлевой диуретик"
+      },
+      "names": [
+        "фуросемид",
+        "furosemide",
+        "торасемид",
+        "torasemide",
+        "лазикс",
+        "диувер"
+      ]
+    },
+    "h2_blocker": {
+      "label": {
+        "en": "H2 blocker",
+        "ru": "H2-блокатор"
+      },
+      "names": [
+        "фамотидин",
+        "famotidine",
+        "ранитидин",
+        "квамател"
+      ]
+    },
+    "ursodeoxycholic_acid": {
+      "label": {
+        "en": "ursodeoxycholic acid",
+        "ru": "урсодезоксихолевая кислота"
+      },
+      "names": [
+        "урсофальк",
+        "урсосан",
+        "урсодез",
+        "урсодезоксихол",
+        "ursodeoxycholic",
+        "ursodiol",
+        "удхк"
+      ]
+    },
+    "soluble_fiber": {
+      "label": {
+        "en": "soluble fibre (psyllium)",
+        "ru": "растворимая клетчатка (псиллиум)"
+      },
+      "names": [
+        "псиллиум",
+        "psyllium",
+        "мукофальк",
+        "mucofalk",
+        "подорожник",
+        "plantago ovata",
+        "ispaghula",
+        "испагол",
+        "фитомуцил"
+      ]
+    },
+    "berberine": {
+      "label": {
+        "en": "berberine",
+        "ru": "берберин"
+      },
+      "names": [
+        "берберин",
+        "berberine"
+      ]
+    },
+    "niacin": {
+      "label": {
+        "en": "nicotinic acid (niacin)",
+        "ru": "никотиновая кислота (ниацин)"
+      },
+      "names": [
+        "ниацин",
+        "niacin",
+        "никотиновая кислота",
+        "nicotinic acid"
+      ]
+    },
+    "vitamin_d": {
+      "label": {
+        "en": "vitamin D",
+        "ru": "витамин D"
+      },
+      "names": [
+        "vitamin d",
+        "витамин d",
+        "витамин д",
+        "холекальциферол",
+        "cholecalciferol",
+        "аквадетрим",
+        "вигантол",
+        "vitamin d3",
+        "витамин d3",
+        "витамин д3",
+        "vitamin d2",
+        "d3 холекальциферол"
+      ]
+    },
+    "iodine": {
+      "label": {
+        "en": "iodine",
+        "ru": "йод"
+      },
+      "names": [
+        "йодомарин",
+        "sea-iodine",
+        "iodine",
+        "йодид калия",
+        "калия йодид",
+        "potassium iodide",
+        "йодбаланс"
+      ]
+    },
+    "vitamin_b6_source": {
+      "label": {
+        "en": "a source of vitamin B6",
+        "ru": "источник витамина B6"
+      },
+      "names": [
+        "b complex",
+        "b-complex",
+        "в-комплекс",
+        "пиридоксин",
+        "pyridoxine",
+        "vitamin b6",
+        "витамин b6",
+        "магне в6",
+        "магний в6",
+        "magne b6"
+      ]
+    },
+    "gh_secretagogue": {
+      "label": {
+        "en": "growth hormone secretagogue",
+        "ru": "секретагог гормона роста"
+      },
+      "names": [
+        "ипаморелин",
+        "ipamorelin",
+        "серморелин",
+        "sermorelin",
+        "тесаморелин",
+        "tesamorelin",
+        "ghrp-",
+        "cjc-1295",
+        "ibutamoren",
+        "ибутаморен"
+      ]
+    },
+    "probiotic": {
+      "label": {
+        "en": "probiotic",
+        "ru": "пробиотик"
+      },
+      "names": [
+        "пробиотик",
+        "probiotic",
+        "lactobacillus",
+        "лактобактер",
+        "bifidobacterium",
+        "бифидобактер",
+        "dophilus",
+        "lactoflorene",
+        "лактофлорене",
+        "boulardii",
+        "saccharomyces",
+        "линекс",
+        "бифиформ",
+        "энтерол"
+      ]
+    },
+    "probiotic_yeast": {
+      "label": {
+        "en": "yeast probiotic",
+        "ru": "дрожжевой пробиотик"
+      },
+      "names": [
+        "boulardii",
+        "буларди",
+        "saccharomyces",
+        "энтерол"
+      ]
+    },
+    "inositol": {
+      "label": {
+        "en": "inositol",
+        "ru": "инозитол"
+      },
+      "names": [
+        "инозитол",
+        "inositol",
+        "мио-инозитол",
+        "myo-inositol",
+        "d-chiro"
+      ]
+    },
+    "alpha_lipoic_acid": {
+      "label": {
+        "en": "alpha-lipoic (thioctic) acid",
+        "ru": "альфа-липоевая (тиоктовая) кислота"
+      },
+      "names": [
+        "липоевая",
+        "lipoic",
+        "тиоктовая",
+        "thioctic",
+        "берлитион",
+        "октолипен"
+      ]
+    },
+    "antiarrhythmic": {
+      "label": {
+        "en": "antiarrhythmic (class III)",
+        "ru": "антиаритмик (III класс)"
+      },
+      "names": [
+        "амиодарон",
+        "amiodarone",
+        "кордарон",
+        "cordarone",
+        "соталол",
+        "sotalol",
+        "дронедарон",
+        "dronedarone",
+        "мультак",
+        "multaq"
+      ]
+    }
+  }
+}

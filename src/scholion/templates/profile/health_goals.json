@@ -1,0 +1,24 @@
+{
+  "_meta": {
+    "purpose": "ШАБЛОН ЦЕЛИ. Курируемая цель пользователя по показателям. ЛИЧНОЕ. ТЕКУЩИЕ значения и ряды НЕ хранятся здесь — берутся живыми из labs.json + wearable_trends.json.",
+    "how_to_fill": "Отредактируйте headline/peaks/targets/charts под свою цель. source-ссылки: 'lab:<ключ маркёра из labs.json>' или 'wear:<метрика из wearable_trends.json>' (Weight/BMI/BodyFat/MuscleMass/VO2Max/RestingHeartRate/StepsDaily/...). Композитная строка — через '|': 'lab:insulin|lab:homa_ir'.",
+    "updated": "2024-01-01"
+  },
+  "title": "Цель — пример (замените на свою)",
+  "headline": "Опишите одной фразой, к какому состоянию вы стремитесь и почему это достижимо.",
+  "peaks": [
+    {"title": "Опорная точка A", "year": "год", "text": "чем была хороша эта точка (пример лучшего состояния)"}
+  ],
+  "targets": [
+    {"label": "Вес, кг", "source": "wear:Weight", "best": "напр. 80 (2021)", "target": "≤80"},
+    {"label": "Жир, %", "source": "wear:BodyFat", "best": "напр. 18", "target": "≤18"},
+    {"label": "Триглицериды", "source": "lab:triglycerides", "best": "напр. 1,0", "target": "≤1,5"}
+  ],
+  "charts": {
+    "weight": {"title": "Вес, кг", "cap": "целевая линия", "source": "wear:Weight",
+               "targets": [{"value": 80, "label": "цель 80", "color": "#ffd166"}], "min": 70, "max": 100},
+    "minis": [
+      {"id": "tg", "source": "lab:triglycerides", "title": "Триглицериды", "cap": "цель ≤1,5", "color": "#ff9a6b", "tgt": 1.5, "tlabel": "1,5", "min": 0, "max": 5}
+    ]
+  }
+}

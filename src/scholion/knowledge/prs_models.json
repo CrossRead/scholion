@@ -1,0 +1,508 @@
+{
+  "_meta": {
+    "purpose": "A SHARED PUBLIC REGISTRY of pinned PGS models: trait → PGS identifier. There are nobody's genotypes here — only the public IDs of PGS Catalog models.",
+    "why": "A percentile has meaning only inside a specific model: each has its own set of variants, training sample and reference distribution. The just-prs server ranking changes over time, and without pinning one and the same genome receives different percentiles from run to run (up to ±68 percentiles was observed on traits with a weak genetic architecture). That is why the model of a trait is pinned here and is changed only deliberately.",
+    "policy": "The life cycle of a model: (1) percentiles are computed only with the pinned model; (2) a run where the server preferred another one does NOT change the values — the model that did not match is recorded as a candidate with a dossier (when it was noticed, how many runs in a row, quality, coverage, whether there is a reference percentile; personal percentiles are not written into the registry); (3) prs_model_review.py gives recommendations once a quarter: REJECT without a reference percentile or with coverage <0.95; MAY BE ACCEPTED when the quality is above that of the pinned one or when it is stable over ≥2 runs with quality not lower; otherwise WAIT; (4) acceptance is pointwise, prs_results_build.py --accept-model <trait>: the old model goes into history, a mark about the break of the series stays in the profile — percentiles before and after the change are not comparable. A shift of the percentile is never a ground on its own.",
+    "created": "2026-08-14",
+    "reference_population": {
+      "superpopulation": "EUR",
+      "validated": "2026-08-14",
+      "method": "ancestry_check.py: the log-likelihood of 317 genotypes from the BAM under the 1000G phase 3 frequencies (Ensembl)",
+      "evidence": "the EUR posterior ≈ 1.0; ΔLL to the nearest one (AMR, itself half European by origin) = 22.2 ≈ a likelihood ratio of 4×10⁹",
+      "sensitivity": "the sensitivity of the percentiles to the choice of reference has been measured (profile/prs_ancestry_sensitivity.json): the median spread between populations is 26.7 pp, in 29/69 models it is ≥30 pp — the choice of reference matters, and it has been confirmed",
+      "policy": "compute the percentiles against EUR; pgsc_calc --run_ancestry is not required until the ancestry is called into question (e.g. another user of the package — run ancestry_check.py again)"
+    }
+  },
+  "models": {
+    "abdominal aortic aneurysm": {
+      "pgs_id": "PGS000753",
+      "label": {"en": "Abdominal aortic aneurysm", "ru": "Аневризма брюшной аорты"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "systolic blood pressure": {
+      "pgs_id": "PGS000901",
+      "label": {"en": "Systolic blood pressure", "ru": "Систолическое АД"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "venous thromboembolism": {
+      "pgs_id": "PGS002235",
+      "label": {"en": "Venous thromboembolism", "ru": "Венозная тромбоэмболия"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "hypertension": {
+      "pgs_id": "PGS004456",
+      "label": {"en": "Hypertension (high blood pressure)", "ru": "Гипертония (высокое АД)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "ischemic stroke": {
+      "pgs_id": "PGS000665",
+      "label": {"en": "Ischaemic stroke", "ru": "Ишемический инсульт"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "atrial fibrillation": {
+      "pgs_id": "PGS000035",
+      "label": {"en": "Atrial fibrillation", "ru": "Фибрилляция предсердий"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "peripheral arterial disease": {
+      "pgs_id": "PGS005158",
+      "label": {"en": "Peripheral arterial disease", "ru": "Заболевание периферических артерий"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "heart failure": {
+      "pgs_id": "PGS001842",
+      "label": {"en": "Heart failure", "ru": "Сердечная недостаточность"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "coronary artery disease": {
+      "pgs_id": "PGS000010",
+      "label": {"en": "Coronary artery disease (CAD)", "ru": "Ишемическая болезнь сердца (ИБС)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "myocardial infarction": {
+      "pgs_id": "PGS004458",
+      "label": {"en": "Myocardial infarction", "ru": "Инфаркт миокарда"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "waist circumference": {
+      "pgs_id": "PGS000827",
+      "label": {"en": "Waist circumference", "ru": "Окружность талии"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "non-alcoholic fatty liver disease": {
+      "pgs_id": "PGS000655",
+      "label": {"en": "Non-alcoholic fatty liver disease", "ru": "Неалкогольная жировая болезнь печени"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "urate measurement": {
+      "pgs_id": "PGS002010",
+      "label": {"en": "Uric acid (urate)", "ru": "Мочевая кислота (урат)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "fasting blood glucose": {
+      "pgs_id": "PGS000306",
+      "label": {"en": "Fasting blood glucose", "ru": "Глюкоза натощак"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "obesity": {
+      "pgs_id": "PGS001825",
+      "label": {"en": "Obesity", "ru": "Ожирение"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "body mass index": {
+      "pgs_id": "PGS000034",
+      "label": {"en": "Body mass index (BMI)", "ru": "Индекс массы тела (ИМТ)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "gout": {
+      "pgs_id": "PGS001248",
+      "label": {"en": "Gout", "ru": "Подагра"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "type 1 diabetes": {
+      "pgs_id": "PGS000023",
+      "label": {"en": "Type 1 diabetes", "ru": "Диабет 1 типа"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "glycated hemoglobin HbA1c": {
+      "pgs_id": "PGS000128",
+      "label": {"en": "HbA1c (glycated haemoglobin)", "ru": "HbA1c (гликир. гемоглобин)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "type 2 diabetes": {
+      "pgs_id": "PGS000031",
+      "label": {"en": "Type 2 diabetes", "ru": "Диабет 2 типа"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "total cholesterol": {
+      "pgs_id": "PGS000936",
+      "label": {"en": "Total cholesterol", "ru": "Общий холестерин"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "LDL cholesterol": {
+      "pgs_id": "PGS000061",
+      "label": {"en": "LDL cholesterol", "ru": "Холестерин ЛПНП (LDL)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "lipoprotein A": {
+      "pgs_id": "PGS002101",
+      "label": {"en": "Lipoprotein(a)", "ru": "Липопротеин(а)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "HDL cholesterol": {
+      "pgs_id": "PGS002782",
+      "label": {"en": "HDL cholesterol", "ru": "Холестерин ЛПВП (HDL)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "triglyceride measurement": {
+      "pgs_id": "PGS000063",
+      "label": {"en": "Triglycerides", "ru": "Триглицериды"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "chronic lymphocytic leukemia": {
+      "pgs_id": "PGS000646",
+      "label": {"en": "Chronic lymphocytic leukaemia", "ru": "Хронический лимфолейкоз"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "basal cell carcinoma": {
+      "pgs_id": "PGS000445",
+      "label": {"en": "Non-melanoma skin cancer", "ru": "Немеланомный рак кожи"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "prostate cancer": {
+      "pgs_id": "PGS001292",
+      "label": {"en": "Prostate cancer", "ru": "Рак предстательной железы"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "lung cancer": {
+      "pgs_id": "PGS001392",
+      "label": {"en": "Lung cancer", "ru": "Рак лёгкого"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "testicular germ cell cancer": {
+      "pgs_id": "PGS001806",
+      "label": {"en": "Testicular cancer", "ru": "Рак яичка"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "colorectal cancer": {
+      "pgs_id": "PGS000376",
+      "label": {"en": "Colorectal cancer", "ru": "Колоректальный рак"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "pancreatic cancer": {
+      "pgs_id": "PGS000159",
+      "label": {"en": "Pancreatic cancer", "ru": "Рак поджелудочной железы"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "malignant melanoma": {
+      "pgs_id": "PGS003382",
+      "label": {"en": "Melanoma", "ru": "Меланома"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "gastric cancer": {
+      "pgs_id": "PGS002299",
+      "label": {"en": "Gastric cancer", "ru": "Рак желудка"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "bladder cancer": {
+      "pgs_id": "PGS003736",
+      "label": {"en": "Bladder cancer", "ru": "Рак мочевого пузыря"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "renal cell carcinoma": {
+      "pgs_id": "PGS000787",
+      "label": {"en": "Renal cell carcinoma", "ru": "Почечноклеточный рак"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "non-Hodgkin lymphoma": {
+      "pgs_id": "PGS003448",
+      "label": {"en": "Non-Hodgkin lymphoma", "ru": "Неходжкинская лимфома"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "thyroid cancer": {
+      "pgs_id": "PGS018581",
+      "label": {"en": "Thyroid cancer", "ru": "Рак щитовидной железы"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "Parkinson disease": {
+      "pgs_id": "PGS000123",
+      "label": {"en": "Parkinson disease", "ru": "Болезнь Паркинсона"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "migraine": {
+      "pgs_id": "PGS004797",
+      "label": {"en": "Migraine", "ru": "Мигрень"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "epilepsy": {
+      "pgs_id": "PGS002760",
+      "label": {"en": "Epilepsy", "ru": "Эпилепсия"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "Alzheimer disease": {
+      "pgs_id": "PGS000025",
+      "label": {"en": "Alzheimer disease", "ru": "Болезнь Альцгеймера"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "systemic lupus erythematosus": {
+      "pgs_id": "PGS000328",
+      "label": {"en": "Systemic lupus erythematosus", "ru": "Системная красная волчанка"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "celiac disease": {
+      "pgs_id": "PGS000040",
+      "label": {"en": "Coeliac disease", "ru": "Целиакия"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "atopic dermatitis": {
+      "pgs_id": "PGS001773",
+      "label": {"en": "Atopic dermatitis", "ru": "Атопический дерматит"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "psoriasis": {
+      "pgs_id": "PGS001871",
+      "label": {"en": "Psoriasis", "ru": "Псориаз"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "Graves disease": {
+      "pgs_id": "PGS005264",
+      "label": {"en": "Graves disease", "ru": "Болезнь Грейвса"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "ulcerative colitis": {
+      "pgs_id": "PGS001855",
+      "label": {"en": "Ulcerative colitis", "ru": "Язвенный колит"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "hypothyroidism": {
+      "pgs_id": "PGS005270",
+      "label": {"en": "Hypothyroidism", "ru": "Гипотиреоз"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "ankylosing spondylitis": {
+      "pgs_id": "PGS001876",
+      "label": {"en": "Ankylosing spondylitis", "ru": "Анкилозирующий спондилит"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "Crohn disease": {
+      "pgs_id": "PGS004254",
+      "label": {"en": "Crohn disease", "ru": "Болезнь Крона"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "multiple sclerosis": {
+      "pgs_id": "PGS000809",
+      "label": {"en": "Multiple sclerosis", "ru": "Рассеянный склероз"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "rheumatoid arthritis": {
+      "pgs_id": "PGS000195",
+      "label": {"en": "Rheumatoid arthritis", "ru": "Ревматоидный артрит"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "FEV1": {
+      "pgs_id": "PGS000210",
+      "label": {"en": "Lung function (FEV1)", "ru": "Функция лёгких (ОФВ1)"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "chronic obstructive pulmonary disease": {
+      "pgs_id": "PGS001334",
+      "label": {"en": "COPD", "ru": "ХОБЛ"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "asthma": {
+      "pgs_id": "PGS000799",
+      "label": {"en": "Asthma", "ru": "Астма"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "osteoarthritis": {
+      "pgs_id": "PGS001882",
+      "label": {"en": "Osteoarthritis", "ru": "Остеоартрит"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "osteoporosis": {
+      "pgs_id": "PGS001273",
+      "label": {"en": "Osteoporosis (fracture)", "ru": "Остеопороз (перелом)"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "bone mineral density": {
+      "pgs_id": "PGS001038",
+      "label": {"en": "Bone mineral density", "ru": "Плотность костной ткани"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "age-related macular degeneration": {
+      "pgs_id": "PGS002269",
+      "label": {"en": "Age-related macular degeneration", "ru": "Возрастная макулодистрофия"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "cataract": {
+      "pgs_id": "PGS001837",
+      "label": {"en": "Cataract", "ru": "Катаракта"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "age-related hearing impairment": {
+      "pgs_id": "PGS000763",
+      "label": {"en": "Age-related hearing loss", "ru": "Возрастная потеря слуха"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "myopia": {
+      "pgs_id": "PGS003564",
+      "label": {"en": "Myopia", "ru": "Близорукость"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "glaucoma": {
+      "pgs_id": "PGS001322",
+      "label": {"en": "Glaucoma", "ru": "Глаукома"},
+      "quality_label": "High",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "chronic kidney disease": {
+      "pgs_id": "PGS000859",
+      "label": {"en": "Chronic kidney disease", "ru": "Хроническая болезнь почек"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "diverticular disease": {
+      "pgs_id": "PGS000996",
+      "label": {"en": "Diverticular disease", "ru": "Дивертикулярная болезнь"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "gallstones": {
+      "pgs_id": "PGS001861",
+      "label": {"en": "Gallstone disease", "ru": "Желчнокаменная болезнь"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "major depressive disorder": {
+      "pgs_id": "PGS000139",
+      "label": {"en": "Major depressive disorder", "ru": "Депрессия"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "insomnia": {
+      "pgs_id": "PGS001932",
+      "label": {"en": "Insomnia", "ru": "Бессонница"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    },
+    "alcohol consumption": {
+      "pgs_id": "PGS000203",
+      "label": {"en": "Alcohol consumption", "ru": "Употребление алкоголя"},
+      "quality_label": "Moderate",
+      "pinned": "2026-08-14",
+      "reason": {"en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)", "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"}
+    }
+  }
+}

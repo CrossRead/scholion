@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "purpose": "СИНТЕТИЧЕСКАЯ фикстура для автотестов. Все значения выдуманы и не принадлежат никому.",
+    "warning": "Не использовать как профиль: числа подобраны так, чтобы срабатывали проверки, а не так, как бывает у людей."
+  },
+  "markers": {
+    "ldl": {
+      "name": "ЛПНП", "unit": "ммоль/л", "ref_high": 3.34, "direction": "higher_worse",
+      "series": [{"date": "2026-01", "value": 4.2}, {"date": "2026-07", "value": 4.9}]
+    },
+    "hdl": {
+      "name": "ЛПВП", "unit": "ммоль/л", "ref_low": 1.45, "direction": "lower_worse",
+      "series": [{"date": "2026-07", "value": 1.2}]
+    },
+    "glucose": {
+      "name": "Глюкоза", "unit": "ммоль/л", "ref_low": 4.1, "ref_high": 6.05,
+      "series": [{"date": "2026-07", "value": 5.2}]
+    },
+    "ferritin_no_ref": {
+      "name": "Ферритин (без коридора в бланке)", "unit": "нг/мл",
+      "series": [{"date": "2026-07", "value": 320}]
+    },
+    "albumin":    {"name": "Альбумин", "unit": "г/л", "ref_low": 35, "ref_high": 52, "series": [{"date": "2026-07", "value": 45}]},
+    "creatinine": {"name": "Креатинин", "unit": "мкмоль/л", "ref_low": 62, "ref_high": 106, "series": [{"date": "2026-07", "value": 88}]},
+    "crp_hs":     {"name": "СРБ высокочувствительный", "unit": "мг/л", "ref_high": 3, "series": [{"date": "2026-07", "value": 1.1}]},
+    "lymph_pct":  {"name": "Лимфоциты, %", "unit": "%", "ref_low": 19, "ref_high": 37, "series": [{"date": "2026-07", "value": 32}]},
+    "mcv":        {"name": "MCV", "unit": "fL", "ref_low": 80, "ref_high": 100, "series": [{"date": "2026-07", "value": 89}]},
+    "rdw":        {"name": "RDW", "unit": "%", "ref_low": 11.5, "ref_high": 14.5, "series": [{"date": "2026-07", "value": 12.8}]},
+    "alp":        {"name": "Щелочная фосфатаза", "unit": "Ед/л", "ref_low": 40, "ref_high": 130, "series": [{"date": "2026-07", "value": 70}]},
+    "wbc":        {"name": "Лейкоциты", "unit": "10⁹/л", "ref_low": 4, "ref_high": 9, "series": [{"date": "2026-07", "value": 5.6}]}
+  }
+}

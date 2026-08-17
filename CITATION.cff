@@ -10,7 +10,7 @@
 cff-version: 1.2.0
 message: "If you use Scholion in research, please cite it using this metadata."
 title: "Scholion"
-version: "0.2.0"
+version: "0.2.1"
 date-released: "2026-08-17"
 type: software
 authors:

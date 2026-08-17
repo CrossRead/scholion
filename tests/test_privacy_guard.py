@@ -184,9 +184,19 @@ class TestARenamedPersonalFolderIsStillPersonal(unittest.TestCase):
         """
         self.assertFalse(check_staged.in_forbidden_dir("src/scholion/templates/profile/labs.json"))
 
+    @unittest.skipUnless(support.IN_SOURCE_REPO,
+                         "this tree is a package, not the repository it was built from")
     def test_the_push_gate_uses_the_same_predicate(self):
         """Two gates, one rule. The last time they diverged, the fifth gate
-        blocked the synthetic fixture the other four admitted (v0.1.1)."""
+        blocked the synthetic fixture the other four admitted (v0.1.1).
+
+        Guarded, because `check_push.py` is the PRIVATE repository's pre-push
+        hook and does not ship: it guards a history the recipient does not have.
+        Reading it unguarded made the public CI red on v0.2.0 and no version
+        reached PyPI — the third time in three days that a test asked the
+        artefact for something only the repository has, and the first time the
+        predicate for asking already existed and simply was not used.
+        """
         src = (support.ROOT / "src" / "tools" / "check_push.py").read_text(encoding="utf-8")
         self.assertIn("in_forbidden_dir", src)
         self.assertNotIn("startswith(d) for d in FORBIDDEN_DIRS", src,

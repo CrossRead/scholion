@@ -31,6 +31,64 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.2.1 — 17.08.2026
+
+_PATCH: nothing that ships behaves differently. `v0.2.0` could not be published —
+its own test suite failed on a public runner, and the workflow runs that suite
+before it publishes._
+
+### What this changes in the conclusions
+
+Nothing. This release exists because `v0.2.0` never reached anybody.
+
+A test read `src/tools/check_push.py` — the private repository's pre-push hook,
+which guards a history a recipient does not have and therefore does not ship.
+Inside the package the file is absent, the test raised `FileNotFoundError`, the
+suite went red and no version was published.
+
+That is the third time in three days for the same shape: `.personal_patterns` in
+v2.23.0, `share/` in v0.1.3, this one now. The first two were repaired by
+guarding the one test that had failed — which is how a class survives being
+fixed. The third is the one worth naming: `support.IN_SOURCE_REPO` already
+existed, written for the second, and simply was not used.
+
+So the repair is on the publication rather than on the test. `publish_share.sh`
+now **runs the package's own suite inside the package**, before anything is
+committed or pushed, and a red run stops the publication instead of announcing
+it. `pyproject.toml` has stated that rule in prose since the sdist was defined —
+«a green run at the author's end with a red one at the recipient's does not mean
+verified, it means the state of the artefact is unknown» — and nothing enforced
+it. The run leaves `__pycache__`, which the audit calls build junk, so the last
+word belongs to a clean rebuild and a second audit.
+
+A textual rule was tried first and abandoned, which is worth recording so nobody
+tries it again: «a test module reading a repository-only path must name
+IN_SOURCE_REPO» flagged `test_redact.py`, which correctly writes its own
+`.personal_patterns` into a temporary directory, then missed the real defect, and
+tightening it would have failed three modules that guard themselves differently
+and correctly. A check wrong in both directions is worse than no check.
+
+### What is withdrawn
+
+Nothing. `v0.2.0` was tagged and pushed but never published — anyone who has it
+has it from the repository, not from an index.
+
+### What needs recomputing
+
+Nothing.
+
+### Changes by file
+
+**Tools and build**
+
+- `src/tools/publish_share.sh` — the artefact's own suite runs before the commit; a clean rebuild after it
+
+**Tests**
+
+- `tests/test_privacy_guard.py` — the push-gate test asks whether it is in the repository
+- `tests/test_build_audit.py` — the publication is checked for running the suite it declares
+
+
 ## v0.2.0 — 17.08.2026
 
 _Comparison base: v0.1.3 → HEAD. 13 files changed. **MINOR, not PATCH: this is a

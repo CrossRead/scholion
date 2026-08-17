@@ -757,3 +757,63 @@ class TestTheHandoverArchiveCarriesNoRepository(unittest.TestCase):
         with zipfile.ZipFile(z) as arch:
             blob = b"".join(arch.read(n) for n in arch.namelist() if not n.endswith("/"))
         self.assertNotIn(b"github.com:someone/private.git", blob)
+
+
+class TestThePublicationRunsTheArtefactsOwnTests(unittest.TestCase):
+    """The gate that catches this class, instead of a rule about writing tests.
+
+    Three times in three days a test reached for something only the source
+    repository has — `.personal_patterns` (v2.23.0), `share/` (v0.1.3),
+    `src/tools/check_push.py` (v0.2.0). Green here, red on the public runner,
+    and `publish.yml` runs the suite before it publishes, so nothing reached
+    PyPI. Each repair guarded the one test that had failed, which is how a class
+    survives being fixed.
+
+    A textual rule was tried first and abandoned: «a module reading a
+    repository-only path must name IN_SOURCE_REPO» flagged `test_redact.py`,
+    which correctly writes its OWN `.personal_patterns` into a temp directory,
+    and then missed the real defect, and tightening it would have failed three
+    modules that guard themselves differently and correctly. A check wrong in
+    both directions is worse than no check.
+
+    What separates a working artefact from a broken one is not how its tests are
+    written, it is whether they pass where the recipient runs them. So the demand
+    is on the publication: run the suite INSIDE the built package, before
+    anything is committed or pushed. `pyproject.toml` has stated that rule in
+    prose since the sdist was defined; nothing enforced it.
+    """
+
+    SCRIPT = support.ROOT / "src" / "tools" / "publish_share.sh"
+
+    def setUp(self):
+        if not self.SCRIPT.exists():
+            self.skipTest("the publication script is not part of this build")
+        self.text = self.SCRIPT.read_text(encoding="utf-8")
+
+    def test_the_suite_runs_inside_the_package(self):
+        self.assertIn("run_tests.sh", self.text,
+                      "the publication never runs the package's own tests")
+
+    def test_a_red_run_stops_the_publication(self):
+        """Running them and publishing anyway would be worse than not running them:
+        it would put the word «verified» on a failure somebody watched go past."""
+        i = self.text.find("run_tests.sh")
+        tail = self.text[i:]
+        self.assertRegex(tail[:900], r"exit\s+[1-9]",
+                         "the test run does not stop the publication when it fails")
+
+    def test_it_happens_before_anything_is_committed(self):
+        """After the commit it is a report; before it, it is a gate."""
+        run = self.text.find("run_tests.sh")
+        commit = self.text.find("git commit")
+        self.assertGreater(commit, 0, "the script no longer commits")
+        self.assertLess(run, commit,
+                        "the package is committed before its own tests are run")
+
+    def test_what_the_recipient_gets_is_rebuilt_after_the_run(self):
+        """A test run leaves __pycache__, which the audit calls build junk."""
+        run = self.text.find("run_tests.sh")
+        rebuild = self.text.find("make_shareable.py", run)
+        commit = self.text.find("git commit")
+        self.assertTrue(0 < rebuild < commit,
+                        "the package is handed over carrying the leavings of its own test run")

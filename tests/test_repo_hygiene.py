@@ -73,6 +73,18 @@ def _synthetic_fixture_ok(path) -> bool:
     return mod.allowed(path)
 
 
+def _package_template_ok(path: Path) -> bool:
+    """Is this one of the two files the built package ships inside an otherwise
+    personal directory? `make_shareable.py` writes the package's `.gitignore` with
+    an explicit carve-out — `profile/*.md` and `genome/README.md` — so a fresh
+    checkout has a template to fill in instead of an empty folder. Mirrored here
+    rather than hand-listed a second time, so the two rules cannot drift apart."""
+    parts = path.parts
+    if len(parts) == 2 and parts[0] == "profile" and path.suffix.lower() == ".md":
+        return True
+    return parts == ("genome", "README.md")
+
+
 class TestDataBoundary(unittest.TestCase):
 
     def setUp(self):
@@ -84,8 +96,11 @@ class TestDataBoundary(unittest.TestCase):
         # We compare only the TOP level. The nested `templates/profile/` and
         # `tests/fixtures/profile/` are synthetic templates and a fixture, they
         # are obliged to be under version control: without them the package does
-        # not build and the tests do not run.
-        offenders = [str(f) for f in self.files if f.parts[0] in DATA_DIRECTORIES]
+        # not build and the tests do not run. `profile/index.md` and
+        # `genome/README.md` are a second, narrower exception — the package's own
+        # shipped templates, see `_package_template_ok`.
+        offenders = [str(f) for f in self.files
+                     if f.parts[0] in DATA_DIRECTORIES and not _package_template_ok(f)]
         self.assertEqual(offenders, [], "user data ended up under version control: "
                                         + ", ".join(offenders[:10]))
 

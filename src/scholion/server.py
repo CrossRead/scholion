@@ -22,7 +22,12 @@ from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 
 from . import engine, store, core, i18n
+from . import __version__ as VERSION
 from .i18n import t as _t
+
+# VERSION is imported, not written here. A hand-kept build string said
+# «2026-07-30 · radar dynamics + tab freshness» while the package was 0.2.2 —
+# a changelog line frozen in the header of a medical application, and wrong.
 
 # The request body limit. Everything the application accepts over POST is a lab point,
 # a drug or a path to a folder: kilobytes. Without a limit, `rfile.read(n)` will allocate
@@ -48,7 +53,6 @@ def _host_is_local(raw: str) -> bool:
 
 _WEB = Path(__file__).resolve().parent / "web"
 _INGEST = Path(__file__).resolve().parent.parent / "ingest"
-VERSION = "2026-07-30 · radar dynamics + tab freshness"
 
 # The state of the background check for database updates (ClinVar × genome).
 # `hint` holds a catalogue KEY, not a phrase: the check is started by one browser
@@ -232,7 +236,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"error": deny}, 403)
         try:
             if p == "/api/ping":
-                return self._json({"app": "Scholion", "ok": True, "version": VERSION})
+                # `synthetic` travels with the ping because the answer has to be true on
+                # EVERY tab, not only where /api/overview happens to be fetched. A demo
+                # that does not announce itself is a demo somebody mistakes for themselves.
+                return self._json({"app": "Scholion", "ok": True, "version": VERSION,
+                                   "synthetic": core.profile_is_synthetic()})
             if p == "/api/i18n":
                 # The whole catalogue in one reply: the page renders its own labels
                 # from the same source the reports are rendered from, so a phrase
@@ -261,6 +269,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.overview())
             if p == "/api/goal":
                 return self._json(engine.goal_dashboard())
+            if p == "/api/goal-suggest":
+                return self._json(engine.suggest_goal_targets())
             if p == "/api/labs":
                 return self._json(engine.analyze_labs())
             if p == "/api/drug":
@@ -297,6 +307,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.clinvar_findings())
             if p == "/api/prs":
                 return self._json(engine.prs_findings())
+            if p == "/api/lipid-genetics":
+                return self._json(engine.lipid_genetics())
             if p == "/api/longevity":
                 return self._json(engine.longevity_findings())
             if p == "/api/genome-updates":
@@ -332,6 +344,15 @@ class Handler(BaseHTTPRequestHandler):
                     name=body.get("name"), unit=body.get("unit"),
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
                     direction=body.get("direction")))
+            if u.path == "/api/goal":
+                # The keys the reader ticked, not the whole proposal set: the
+                # choice of which targets to adopt is theirs, and a POST that
+                # wrote all of them would have made the tick boxes decoration.
+                want = set(body.get("keys") or [])
+                sug = engine.suggest_goal_targets()
+                picked = [p for p in sug["proposals"] if p["key"] in want] if want \
+                    else sug["proposals"]
+                return self._json(store.write_goal_targets(picked))
             if u.path == "/api/medications":
                 return self._json(store.add_medication(
                     body.get("name", ""), body.get("dose", ""), body.get("note", "")))

@@ -4,8 +4,8 @@
     ".gitignore": 1,
     "CHANGELOG.pre-0.1.0.md": 3,
     "share/PREPARING-THE-GENOME.md": 2,
-    "share/skill/INSTRUCTION.md": 2,
     "share/presentation.html": 1,
+    "share/skill/INSTRUCTION.md": 2,
     "src/ingest/README_track2.md": 1,
     "src/ingest/fastq_to_vcf.sh": 1,
     "src/ingest/first_run_check.py": 2,
@@ -49,6 +49,7 @@
     "tests/test_output_language.py": 1,
     "tests/test_owner_split.py": 1,
     "tests/test_privacy_guard.py": 4,
+    "tests/test_safety_rules.py": 2,
     "tests/test_server_guard.py": 2,
     "tests/test_skill_editions.py": 7,
     "tests/test_unit_gate.py": 1

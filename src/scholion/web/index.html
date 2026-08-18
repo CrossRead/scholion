@@ -135,6 +135,16 @@
   .pbar{position:relative;height:8px;background:var(--surface-2);border-radius:999px;overflow:visible}
   .pbar-fill{height:100%;border-radius:999px}
   .pbar-mark{position:absolute;top:-2px;width:2px;height:12px;background:var(--ink-2);transform:translateX(-1px)}
+  /* A summary block that belongs to another tab carries the way there. Without it
+     the same list lives in two places and neither says which one owns it. */
+  /* A demo that does not announce itself is a demo somebody mistakes for themselves.
+     On the first pass the only sign was «DEMO-0001» in the header — which reads like a
+     laboratory accession number, not like «none of this is about you». */
+  #demobanner{background:#3a2a12;border-bottom:1px solid #6b4c19;color:#f3d9a4;
+              padding:9px 18px;font-size:13.5px;font-weight:600}
+  .tablink{font-size:12.5px;font-weight:400;text-transform:none;letter-spacing:0;
+           color:var(--accent);text-decoration:none;white-space:nowrap;margin-left:8px}
+  .tablink:hover{text-decoration:underline}
   .subnav{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 16px}
   .subnav a{font-size:13px;color:var(--ink-2);text-decoration:none;padding:4px 11px;border:1px solid var(--border);border-radius:999px}
   .subnav a:hover{background:var(--surface-2);color:var(--ink)}
@@ -232,6 +242,34 @@
   .goalboard .glegend span{display:inline-flex;align-items:center;gap:5px}
   .goalboard .gdot{width:10px;height:3px;border-radius:2px;display:inline-block}
   @media(max-width:800px){.goalboard .peaks,.goalboard .g2,.goalboard .g4{grid-template-columns:minmax(0,1fr)}}
+
+  /* ---- what gets carried into a consultation ------------------------------
+     A general practitioner reading this printout cold said the first grounds to
+     hand it back was that nothing on it identifies a patient, and the second was
+     the build strings, file paths and shell commands: the moment those appear the
+     sheet reads as software output the patient has not understood. On paper the
+     navigation, the source chips, the language switch and the cross-tab links are
+     all dead ink as well — none of them can be clicked.
+     So print strips the application and leaves the document, with a line at the
+     top for the two facts the page never had: who this is and when it was made. */
+  .printonly{display:none}
+  @media print{
+    :root{--ink:#000;--ink-2:#333;--muted:#666;--bg:#fff;--surface:#fff;--surface-2:#fff;
+          --border:#bbb;--grid:#ddd}
+    html,body{background:#fff;color:#000}
+    header,nav,#langswitch,#localbadge,#ver,#demobanner,.subnav,.tablink,
+    button,.act,.ghost,.srcbar,.sources{display:none !important}
+    .printonly{display:block}
+    #view{padding:0}
+    .card,.list-item,.chartbox{break-inside:avoid;border-color:#bbb}
+    a[href]:after{content:""}
+    .printhead{border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:14px}
+    .printhead h1{font-size:19px;margin:0 0 6px}
+    .printhead .fields{display:flex;gap:26px;font-size:13px;color:#333}
+    .printhead .fields span{border-bottom:1px solid #999;min-width:190px;padding-bottom:2px}
+    .printfoot{margin-top:18px;padding-top:8px;border-top:1px solid #999;
+               font-size:11.5px;color:#333}
+  }
 </style>
 <script src="/chart.min.js"></script>
 </head>
@@ -244,6 +282,7 @@
   <span class="sub" id="ver" style="margin-left:12px;font-size:12px;opacity:.7"></span>
   <span class="sub" id="langswitch" style="margin-left:12px;display:inline-flex;gap:4px"></span>
 </header>
+<div id="demobanner" hidden></div>
 <div class="disclaimer" id="disclaimer"></div>
 <nav id="nav"></nav>
 <main id="view"></main>
@@ -431,8 +470,88 @@ const gbase=(extra={})=>({responsive:true,maintainAspectRatio:false,interaction:
 const gline=(v,c,fill=false)=>({data:v,borderColor:c,backgroundColor:fill?c+"22":c,
   borderWidth:2.2,tension:.3,pointRadius:2.2,pointHoverRadius:5,pointBackgroundColor:c,fill,spanGaps:true});
 function destroyGoalCharts(){ _goalCharts.forEach(c=>{try{c.destroy()}catch(e){}}); _goalCharts=[]; }
+// A chart box is emitted only when there is a series to draw in it. The boxes used
+// to be printed unconditionally and `drawGoalCharts` then skipped the empty ones, so
+// three framed rectangles with headings and nothing inside sat on the first screen.
+// Two readers with no context read them the same way: not «no data» but «broken».
+function gdrawn(c){ return !!(c && c.l && c.l.length); }
+function gbox(c, size, fallbackTitle, canvasId){
+  if(!gdrawn(c)) return '';
+  return `<div class="chartbox ${size}"><h4>${esc(c.title||fallbackTitle)}</h4>`
+       + `<p class="cap">${esc(c.cap||'')}</p><div class="cv"><canvas id="${canvasId}"></canvas></div></div>`;
+}
+function gsection(heading, grid, boxes){
+  const drawn = boxes.filter(Boolean);
+  return `<h3 class="gh">${esc(heading)}</h3>`
+       + (drawn.length ? `<div class="cgrid ${grid}">${drawn.join('')}</div>`
+                       : `<div class="muted" style="font-size:12.5px">${esc(t('web.goal.chart_nodata'))}</div>`);
+}
+// ---- the goal the application proposes, instead of the one it used to ship ----
+// A goal arrived with the product until 0.3.0: one person's targets, in the file
+// every new profile was created from. What replaces it is a proposal the reader
+// accepts, edits or ignores — and every line of it says where its number came
+// from, because «what a cardiology society publishes» and «your own best in 2023»
+// are different kinds of claim and must not look alike.
+const GSRC={guideline:'goalgen.src.guideline',personal_best:'goalgen.src.personal_best',
+            reference:'goalgen.src.reference'};
+function gsProposal(p){
+  const tg=p.target||{}, now=p.now||{};
+  const cand=(p.candidates||[]).find(c=>c.source===p.proposed)||{};
+  const cit=cand.citation||null;
+  return `<div class="list-item">
+    <div class="row"><label style="display:flex;gap:8px;align-items:baseline;cursor:pointer">
+      <input type="checkbox" data-gskey="${esc(p.key)}" checked>
+      <b>${esc(p.name)}</b></label>
+      <span class="muted">${esc(t('web.goalgen.now'))} ${esc(String(now.value??'—'))} ${esc(p.unit||'')}</span>
+      → <b>${esc(tg.comparator||'')}${esc(String(tg.value??''))}</b>
+      ${badge(p.proposed==='guideline'?'b-good':(p.proposed==='personal_best'?'b-near':'b-unknown'),
+              t(GSRC[p.proposed]||'goalgen.src.reference'))}
+      ${p.reached_before?`<span class="muted" style="font-size:12px">· ${esc(t('web.goalgen.reached'))}</span>`:''}
+    </div>
+    ${cand.why?`<div class="why">${esc(cand.why)}</div>`:''}
+    ${cit?`<div class="meta">${esc([cit.body,cit.document,cit.year].filter(Boolean).join(', '))}${
+        cit.url?` · <a href="${esc(cit.url)}" target="_blank" rel="noreferrer noopener">${esc(cit.url)}</a>`:''}</div>`:''}
+    ${cand.assumed&&cand.assumed.note?`<div class="why" style="color:var(--warning)">⚠ ${esc(cand.assumed.note)}</div>`:''}
+    ${p.caveat?`<div class="why" style="color:var(--warning)">⚠ ${esc(p.caveat)}</div>`:''}
+  </div>`;
+}
+async function renderGoalProposal(box){
+  box.innerHTML=`<div class="muted">${esc(t('web.common.loading'))}</div>`;
+  const d=await api('/api/goal-suggest');
+  const list=(d.proposals||[]).map(gsProposal).join('');
+  const skipped=(d.skipped||[]).map(x=>`<div class="list-item" style="opacity:.65"><div class="row">
+      <b>${esc(x.name)}</b> <span class="muted">${esc(t('goalgen.skip.'+x.reason))}</span></div></div>`).join('');
+  const met=(d.already_met||[]).map(x=>`<div class="list-item" style="opacity:.65"><div class="row">
+      <b>${esc(x.name)}</b> <span class="muted">${esc(String((x.now||{}).value??''))} ${esc(x.unit||'')} · ${
+      esc((x.met||[]).map(m=>m.comparator+m.value).join(', '))}</span></div></div>`).join('');
+  box.innerHTML=`<div class="meta" style="margin-bottom:10px">${esc(d.how_to_read||'')}</div>
+    ${list||`<div class="muted">${esc(t('goalgen.none'))}</div>`}
+    ${list?`<div class="row" style="margin-top:12px"><button class="act" id="gs-save">💾 ${esc(t('web.goalgen.save'))}</button></div>`:''}
+    ${met?`<div class="so-h" style="margin-top:18px">${esc(t('web.goalgen.reached'))}</div>${met}`:''}
+    ${skipped?`<div class="so-h" style="margin-top:18px">${esc(t('goalgen.skipped_h'))}</div>${skipped}`:''}`;
+  const save=$('#gs-save',box);
+  if(save) save.onclick=async()=>{
+    const keys=[...box.querySelectorAll('[data-gskey]')].filter(c=>c.checked)
+                 .map(c=>c.getAttribute('data-gskey'));
+    if(!keys.length) return;
+    const r=await post('/api/goal',{keys});
+    if(r.error){toast(r.error);return;}
+    toast(t('web.goalgen.saved',{n:(r.added||[]).length}));
+    mount(TABS.findIndex(x=>x[0]==='web.tab.overview'));
+  };
+}
 function renderGoal(root, g){
-  if(!g||!g.available){ root.innerHTML=`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`; return; }
+  if(!g||!g.available){
+    root.innerHTML=`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>
+      <div class="card" style="margin-top:12px">
+        <div class="row"><b>${esc(t('web.goalgen.h'))}</b></div>
+        <div class="meta" style="margin:6px 0 10px">${esc(t('web.goalgen.intro'))}</div>
+        <button class="act" id="gs-go">🎯 ${esc(t('web.goalgen.btn'))}</button>
+        <div id="gs-box" style="margin-top:14px"></div>
+      </div>`;
+    $('#gs-go',root).onclick=()=>renderGoalProposal($('#gs-box',root));
+    return;
+  }
   const rows=(g.targets||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${esc(r.now)}</td><td class="best">${esc(r.best)}</td><td class="tgt">${esc(r.target)}</td></tr>`).join('');
   const peaks=(g.peaks||[]).map(p=>`<div class="peak"><h4>${esc(p.title)} <span class="yr">· ${esc(p.year)}</span></h4><p>${esc(p.text)}</p></div>`).join('');
   const C=g.charts||{};
@@ -447,22 +566,19 @@ function renderGoal(root, g){
       <span><i class="gdot" style="background:var(--warning)"></i>${esc(t('web.goal.lg_target'))}</span>
       <span><i class="gdot" style="background:rgba(84,214,166,.55)"></i>${esc(t('web.goal.lg_window'))}</span>
     </div>
-    <h3 class="gh">${esc(t('web.goal.body_h'))}</h3>
-    <div class="cgrid g2">
-      <div class="chartbox big"><h4>${esc((C.weight&&C.weight.title)||t('web.goal.weight'))}</h4><p class="cap">${esc((C.weight&&C.weight.cap)||'')}</p><div class="cv"><canvas id="gcW"></canvas></div></div>
-      <div class="chartbox big"><h4>${esc((C.bodycomp&&C.bodycomp.title)||t('web.goal.bodycomp'))}</h4><p class="cap">${esc((C.bodycomp&&C.bodycomp.cap)||'')}</p><div class="cv"><canvas id="gcBC"></canvas></div></div>
-    </div>
+    ${gsection(t('web.goal.body_h'),'g2',[
+      gbox(C.weight,'big',t('web.goal.weight'),'gcW'),
+      gbox(C.bodycomp,'big',t('web.goal.bodycomp'),'gcBC')])}
     <h3 class="gh">${esc(t('web.goal.metabolism_h'))}</h3>
-    <div class="cgrid g4" id="gminis"></div>
-    <h3 class="gh">${esc(t('web.goal.fitness_h'))}</h3>
-    <div class="cgrid g2">
-      <div class="chartbox med"><h4>${esc((C.fit&&C.fit.title)||t('web.goal.aerobic'))}</h4><p class="cap">${esc((C.fit&&C.fit.cap)||'')}</p><div class="cv"><canvas id="gcFIT"></canvas></div></div>
-      <div class="chartbox med"><h4>${esc((C.la&&C.la.title)||t('web.goal.ldl_alt'))}</h4><p class="cap">${esc((C.la&&C.la.cap)||'')}</p><div class="cv"><canvas id="gcLA"></canvas></div></div>
-    </div>
+    ${(C.minis||[]).some(gdrawn)?'<div class="cgrid g4" id="gminis"></div>'
+      :`<div class="muted" style="font-size:12.5px">${esc(t('web.goal.chart_nodata'))}</div><div id="gminis"></div>`}
+    ${gsection(t('web.goal.fitness_h'),'g2',[
+      gbox(C.fit,'med',t('web.goal.aerobic'),'gcFIT'),
+      gbox(C.la,'med',t('web.goal.ldl_alt'),'gcLA')])}
     <div class="muted" style="font-size:12px;margin-top:14px">${t('web.goal.note',{key_metric:'<b>'+esc(t('web.goal.note_key'))+'</b>'})}</div>
   </div>`;
   const gm=$('#gminis',root);
-  (C.minis||[]).forEach(m=>gm.appendChild(el(`<div class="chartbox mini"><h4>${esc(m.title)}</h4><p class="cap">${esc(m.cap)}</p><div class="cv"><canvas id="gc_${esc(m.id)}"></canvas></div></div>`)));
+  (C.minis||[]).filter(gdrawn).forEach(m=>gm.appendChild(el(`<div class="chartbox mini"><h4>${esc(m.title)}</h4><p class="cap">${esc(m.cap)}</p><div class="cv"><canvas id="gc_${esc(m.id)}"></canvas></div></div>`)));
   drawGoalCharts(C, root);
 }
 function drawGoalCharts(C, root){
@@ -582,9 +698,26 @@ function renderFocus(root,f){
 }
 
 // ---------------- Overview ----------------
+// ---- going to the tab that owns a block ------------------------------------
+// `Overview` and `Second opinion` are compilations by design: they show pieces
+// that another tab owns. The rule this encodes is that a compiled block never
+// pretends to be the original — it names its owner and goes there on a click.
+function goTab(key){const i=TABS.findIndex(x=>x[0]===key);if(i>=0)mount(i);}
+function tabLink(key){return `<a href="#" class="tablink" data-goto="${esc(key)}">${esc(t(key))} \u2192</a>`;}
+function bindTabLinks(root){root.querySelectorAll('[data-goto]').forEach(a=>a.onclick=e=>{
+  e.preventDefault();goTab(a.getAttribute('data-goto'));});}
+
 async function viewOverview(root){
   const [g,o,sb,f] = await Promise.all([api('/api/goal'), api('/api/overview'), overviewSourceBar(), api('/api/focus')]);
-  $('#subhead').textContent = t('web.overview.subhead',{subject:o.subject_id,meds:o.medications_count,gaps:o.genome_gaps.length});
+  // Built from parts rather than one format string. The old one always printed all
+  // three, so a profile with no subject id came out as «subject ?», an empty profile
+  // claimed «1 prescriptions», and «5 genome gaps» — a constant, the same for everyone
+  // who has not connected a genome — read as a finding about the reader's DNA.
+  const parts=[];
+  if(o.subject_id) parts.push(t('web.header.subject',{subject:o.subject_id}));
+  parts.push(plural(o.medications_count,'count.prescriptions'));
+  if(o.genome_gaps.length) parts.push(t('web.header.genome_gaps',{n:o.genome_gaps.length}));
+  $('#subhead').textContent = parts.join(' · ');
   root.innerHTML = `
     ${sb}
     ${f&&f.available?`<h2 class="section">📌 ${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus" style="margin-bottom:26px"></div>`:''}
@@ -592,24 +725,43 @@ async function viewOverview(root){
     <div id="ov-goal"></div>
     <h2 class="section" style="margin-top:30px">📌 ${esc(t('web.overview.watched_h'))}</h2>
     <div class="stat">
-      <div class="s"><b style="color:var(--critical)">${o.high_flags.length}</b><span>${esc(t('web.overview.stat_red'))}</span></div>
-      <div class="s"><b style="color:var(--warning)">${o.watch_flags.length}</b><span>${esc(t('web.overview.stat_watch'))}</span></div>
-      <div class="s"><b>${o.abnormal_count}/${o.markers_total}</b><span>${esc(t('web.overview.stat_abnormal'))}</span></div>
+      <div class="s"><b style="color:${o.abnormal_count?'var(--critical)':'var(--ink)'}">${o.abnormal_count}/${o.markers_total}</b><span>${esc(t('web.overview.stat_abnormal'))}</span></div>
+      <div class="s"><b>${o.high_flags.length}</b><span>${esc(t('web.overview.stat_above'))}</span></div>
+      <div class="s"><b>${o.watch_flags.length}</b><span>${esc(t('web.overview.stat_below'))}</span></div>
       <div class="s"><b>${o.suggestions_count}</b><span>${esc(t('web.overview.stat_suggested'))}</span></div>
     </div>
-    <h2 class="section" style="margin-top:20px">🔴 ${esc(t('web.overview.red_h'))} <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.overview.red_window'))}</span></h2>
+    <div class="muted" style="font-size:12.5px;margin-top:6px">${esc(t('web.overview.stat_note'))}</div>
+    <h2 class="section" style="margin-top:20px">🔴 ${esc(t('web.overview.red_h'))} <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.overview.red_window'))}</span>${tabLink('web.tab.labs')}</h2>
     ${o.stale_abnormal_count?`<div class="muted" style="font-size:12.5px;margin-bottom:8px">${esc(t('web.overview.stale_hidden',{count:plural(o.stale_abnormal_count,'count.abnormal')}))}</div>`:''}
     <div class="grid" id="ov-red"></div>
-    <h2 class="section" style="margin-top:24px">${esc(t('web.overview.priority_tests_h'))}</h2>
+    <h2 class="section" style="margin-top:24px">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.tests')}</h2>
     <div id="ov-tests"></div>`;
   if(f&&f.available) renderFocus($('#ov-focus',root), f);
   renderGoal($('#ov-goal',root), g);
   const red = $('#ov-red',root);
-  if(!o.high_flags.length) red.innerHTML = `<div class="muted">${esc(t('web.overview.no_red'))}</div>`;
-  o.high_flags.forEach(m=>red.appendChild(markerCard(m)));
+  // Nothing flagged has two causes and they are not alike: nothing is out of
+  // range, or nothing has been measured. The old line gave the reassuring one to
+  // both, which on an empty profile is a statement about a person made from the
+  // absence of data — the class this project exists to refuse.
+  //
+  // The list is `flagged`, not `high_flags`: a value below its floor belongs on the
+  // first screen exactly as much as one above its ceiling. Sorted so that the ones
+  // furthest outside their corridor lead.
+  const flagged = (o.flagged||o.high_flags||[]);
+  if(!flagged.length) red.innerHTML = `<div class="muted">${esc(o.markers_total
+    ? t('web.overview.no_red',{n:o.markers_total})
+    : t('web.overview.no_red_nodata'))}</div>`;
+  flagged.forEach(m=>red.appendChild(markerCard(m)));
   const box = $('#ov-tests',root);
-  o.high_suggestions.forEach(s=>box.appendChild(testItem(s)));
-  if(!o.high_suggestions.length) box.innerHTML=`<div class="muted">${esc(t('web.overview.no_priority_tests'))}</div>`;
+  // The same list the tile counts. Ordered by priority rather than filtered by it:
+  // the tile used to count every pending suggestion while this block printed only
+  // the `high` ones, so «2 tests suggested» stood above «nothing rises to priority».
+  const PRI={high:0,moderate:1,low:2};
+  const pending = (o.pending_suggestions||o.high_suggestions||[])
+    .slice().sort((a,b)=>(PRI[a.priority]??3)-(PRI[b.priority]??3));
+  pending.forEach(s=>box.appendChild(testItem(s)));
+  if(!pending.length) box.innerHTML=`<div class="muted">${esc(t('web.overview.no_priority_tests'))}</div>`;
+  bindTabLinks(root);
 }
 
 // The flag, taking the "at the edge" level into account (within range, but in the last
@@ -635,10 +787,20 @@ function refText(m){
 }
 
 // ---------------- Labs ----------------
+// Where a marker is going, in one span. It used to live inside `markerCard`, which
+// meant the same marker said less about itself on «Second opinion» than on
+// «Overview» — the movement that made it worth flagging was visible on one tab and
+// not the other. A shared helper is the only way the two densities stay two
+// densities rather than two answers.
+function trendNote(m){
+  if(m&&m.trend){const a={up:'↑',down:'↓',flat:'→'}[m.trend.direction];
+    const pct=m.trend.pct!=null?` ${m.trend.pct>0?'+':''}${m.trend.pct}%`:'';
+    return `<span class="trend">${a}${pct} (${m.trend.from_date}→${m.trend.to_date})</span>`;}
+  return nearNote(m);
+}
 function markerCard(m){
   const f = flagOf(m);
-  let tr=nearNote(m);
-  if(m.trend){const a={up:'↑',down:'↓',flat:'→'}[m.trend.direction];const pct=m.trend.pct!=null?` ${m.trend.pct>0?'+':''}${m.trend.pct}%`:'';tr=`<span class="trend">${a}${pct} (${m.trend.from_date}→${m.trend.to_date})</span>`;}
+  const tr=trendNote(m);
   return el(`<div class="card">
     <div class="label">${esc(m.name)}</div>
     <div class="value">${m.value} <small>${esc(m.unit)}</small></div>
@@ -1006,8 +1168,12 @@ async function viewSecond(root){
   const radar=await api('/api/radar');
   const d=await api('/api/second-opinion');
   const flagged=radar.domains.filter(x=>x.status==='warning'||x.status==='critical');
+  // The compact form of the same marker: a row instead of a card because a body
+  // system holds several and this page is printed. It carries what the card carries
+  // — flag, value, corridor, date, movement — so that which tab you are on changes
+  // the density and not the facts.
   const abItem=m=>{const f=flagOf(m);
-      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span></div>${m.genome_link?`<div class="why">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;};
+      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span>${trendNote(m)}</div>${m.genome_link?`<div class="why">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;};
   const expl=flagged.map(dom=>{
     const col=dom.status==='critical'?'b-critical':'b-warning';
     const recent=dom.abnormal.filter(m=>!m.stale), stale=dom.abnormal.filter(m=>m.stale);
@@ -1017,16 +1183,51 @@ async function viewSecond(root){
     const dyn=dom.prev_score!=null?` <span class="muted" style="font-weight:400">· <span style="color:${a.col}">${a.txt||'='}</span> ${esc(t('web.second.vs_prev',{date:dom.prev_date||'',score:dom.prev_score}))}</span>`:'';
     return `<div class="so-h">${badge(col,dom.label+' — '+dom.score+'/100')}${dyn}</div>${items||`<div class="muted">${esc(t('web.second.no_current'))}</div>`}${staleBlock}`;
   }).join('');
-  const drugs=d.drug_flags.map(x=>{const lv=LEVEL[x.level]||LEVEL.unknown;return `<div class="list-item"><div class="row">${badge(lv.cls,t(lv.key))}<b>${esc(x.drug)}</b> → ${esc(x.gene)} (${esc(x.phenotype)})</div><div class="why">${esc(x.recommendation)}</div></div>`;}).join('');
-  const tests=d.suggestions.map(s=>testItem(s).outerHTML).join('');
-  root.innerHTML=`<h2 class="section">${esc(t('web.second.title'))}</h2>${sb}
+  // `phenotype` is the machine code — «UM», «normal_sensitivity» — and it was being
+  // printed straight onto the page a patient carries to an appointment. The engine
+  // already sends `phenotype_label`, which is both the human form AND the one that
+  // carries the qualifier: «ultrarapid metaboliser — ASSUMED, not every marker was
+  // read». Printing the code lost the qualifier as well as the sense.
+  const drugs=d.drug_flags.map(x=>{const lv=LEVEL[x.level]||LEVEL.unknown;
+    const ph=x.phenotype_label||String(x.phenotype||'').replace(/_/g,' ');
+    return `<div class="list-item"><div class="row">${badge(lv.cls,t(lv.key))}<b>${esc(x.drug)}</b> → ${esc(x.gene)}</div><div class="why"><b>${esc(ph)}</b></div><div class="why">${esc(x.recommendation)}</div></div>`;}).join('');
+  // «What to test» owns this list. Repeating it whole put the routine-control block
+  // — already taken, watched by interval — on two tabs word for word. The second
+  // opinion is a document to carry to an appointment, so it keeps what is still to
+  // be ordered and hands the rest back to the tab that owns it.
+  const tPending=d.suggestions.filter(s=>!s.done_recently);
+  const tDone=d.suggestions.filter(s=>s.done_recently);
+  const tests=tPending.map(s=>testItem(s).outerHTML).join('');
+  const testsEmpty=`<div class="muted">${esc(t('web.tests.none_pending'))}</div>`;
+  const testsRoutine=tDone.length?`<div class="meta" style="margin-top:8px">${esc(t('web.second.routine_elsewhere',{n:tDone.length}))} ${tabLink('web.tab.tests')}</div>`:'';
+  // Nothing flagged among the drugs is not the same statement as nothing checkable.
+  const drugsEmpty=`<div class="muted">${esc(d.drugs_answerable
+    ? t('web.second.no_drug_flags',{n:d.drugs_answerable})
+    : t('web.second.no_drug_data',{n:d.drugs_checked||0}))}</div>`;
+  // The section opens with its own basis. Seven drug names under a heading read as
+  // seven findings; most of them are the general rule printed because the genotype
+  // was missing, and each row says so only after the reader is already inside it.
+  const drugsBasis=d.drugs_checked?`<div class="meta" style="margin:2px 0 8px">${esc(d.drugs_answerable
+    ? t('web.second.pgx_basis',{k:d.drugs_answerable,n:d.drugs_checked})
+    : t('web.second.pgx_basis_none',{n:d.drugs_checked}))}</div>`:'';
+  root.innerHTML=`<div class="printonly printhead">
+      <h1>${esc(t('web.second.print_title'))}</h1>
+      <div class="fields"><b>${esc(t('web.second.print_name'))}</b> <span></span>
+        <b>${esc(t('web.second.print_dob'))}</b> <span></span>
+        <b>${esc(t('web.second.print_date'))}</b> <span></span></div>
+    </div>
+    <h2 class="section">${esc(t('web.second.title'))}</h2>${sb}
     <div class="row" style="margin-bottom:10px"><button class="ghost" onclick="window.print()">🖨 ${esc(t('web.second.print'))}</button>${radar.overall!=null?`<span class="muted">${esc(t('web.second.overall'))} <b style="color:${radar.overall>=80?'var(--good)':radar.overall>=50?'var(--warning)':'var(--critical)'}">${radar.overall}</b>/100${radar.prev_overall!=null?` <span style="color:${dArrow(radar.overall_delta).col}">${dArrow(radar.overall_delta).txt||'='}</span> <span style="opacity:.8">${esc(t('web.second.was',{score:radar.prev_overall,date:radar.prev_date||''}))}</span>`:''}</span>`:''}</div>
     <div class="card" style="display:flex;justify-content:center;padding:10px">${radarSVG(radar.domains)}</div>
-    <div class="so-h" style="margin-top:22px">${esc(t('web.second.factors_h'))}</div>
-    ${expl||`<div class="muted">${esc(t('web.second.no_domain_issues'))}</div>`}
-    <div class="so-h">${esc(t('web.second.pgx_h'))}</div>${drugs||'<div class="muted">—</div>'}
-    <div class="so-h">${esc(t('web.second.tests_h'))}</div>${tests||'<div class="muted">—</div>'}
-    <div class="meta" style="margin-top:14px">${esc(d.disclaimer)}</div>`;
+    <div class="so-h" style="margin-top:22px">${esc(t('web.second.factors_h'))}${tabLink('web.tab.labs')}</div>
+    ${expl||`<div class="muted">${esc((radar.domains||[]).some(x=>x.status!=='nodata')
+      ? t('web.second.no_domain_issues',{n:(radar.domains||[]).filter(x=>x.status!=='nodata').length})
+      : t('web.second.no_domain_data'))}</div>`}
+    <div class="so-h">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.drugs')}</div>${drugsBasis}${drugs||drugsEmpty}
+    <div class="so-h">${esc(t('web.second.tests_h'))}${tabLink('web.tab.tests')}</div>${tests||testsEmpty}${testsRoutine}
+    <div class="meta" style="margin-top:14px">${esc(d.disclaimer)}</div>
+    <div class="printonly printfoot">${esc(t('web.second.print_foot'))}</div>`;
+  bindTabLinks(root);
 }
 
 // ---------------- Prescriptions ----------------
@@ -1388,6 +1589,8 @@ function genomeCard(r){
   return `<div class="card">
     <div class="row">🧬 <b style="font-size:17px">${esc(r.rsid)}</b>${r.star?' <span class="muted">'+esc(r.star)+'</span>':''} → ${esc(t('web.drug.gene'))} <b>${esc(r.gene)}</b> <span class="muted">${esc(r.chrom)}:${esc(r.pos)}</span></div>
     <div class="value" style="margin:10px 0">${esc(res.genotype||'?')} <small>${esc(conf)}${esc(dp)}</small></div>
+    ${res.conflict?`<div class="meta" style="color:var(--critical)">⚠️ ${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</div>`:''}
+    ${res.confirmed_by==='profile'?`<div class="meta" style="color:var(--good)">${esc(t('genome.confirmed_by_report'))}</div>`:''}
     ${res.note?`<div class="meta">⚠️ ${esc(res.note)}</div>`:''}
     ${r.note?`<div class="meta">${esc(r.note)}</div>`:''}
   </div>`;
@@ -1450,8 +1653,52 @@ function renderLongevity(d){
     <div class="muted" style="font-size:12.5px;margin-bottom:6px">${esc(t('web.longevity.by_gene_note'))}</div>
     <div class="drugchips">${genes||'—'}</div>`;
 }
+// The inherited half of a lipid profile, in one card: PCSK9 carriage and Lp(a).
+// They live here rather than one per tab because each is misread alone — a low
+// LDL-C with a loss-of-function variant behind it is a different fact from the
+// same number on a statin, and Lp(a) is invisible to the rest of a lipid panel.
+// Every branch has to say something: a card that renders nothing when the genome
+// is absent lets the reader conclude there was nothing to find.
+function renderLipidGenetics(d){
+  if(!d||d.status!=='ok') return '';
+  const rows=(d.pcsk9||[]).map(x=>{
+    const badgeFor = x.status==='read'
+      ? (x.carrier?badge('b-good',t('lipidgen.carrier')):badge('b-unknown',t('lipidgen.not_carrier')))
+      : badge('b-unknown',t('lipidgen.unread'));
+    return `<div class="list-item"><div class="row">${badgeFor}<b>${esc(x.gene)}</b>
+        <code>${esc(x.rsid)}</code>
+        ${x.genotype?`<span class="muted">${esc(t('web.genome.genotype'))} <b>${esc(x.genotype)}</b></span>`:''}</div>
+      ${x.label?`<div class="why">${esc(x.label)}</div>`:''}
+      ${x.verdict?`<div class="why">${esc(x.verdict)}</div>`:''}
+      ${x.population_note?`<div class="why" style="color:var(--warning)">⚠ ${esc(x.population_note)}</div>`:''}
+      ${x.action?`<div class="why muted">${esc(x.action)}</div>`:''}
+      ${(x.pmids||[]).length?`<div class="meta">PMID: ${(x.pmids||[]).map(pm=>
+        `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(pm)}/" target="_blank" rel="noreferrer noopener">${esc(pm)}</a>`).join(', ')}</div>`:''}
+    </div>`;}).join('');
+  const waiting=(d.pcsk9_waiting||[]).map(w=>`<div class="list-item" style="opacity:.7">
+      <div class="row"><code>${esc(w.rsid)}</code> <b>${esc(w.gene)}</b></div>
+      <div class="why">${esc(w.why||'')}</div></div>`).join('');
+  const l=d.lpa||{}; const m=l.measured;
+  const lpa = m
+    ? `<div class="list-item"><div class="row">${m.above?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):badge('b-good',t('web.flag.ok'))}
+         <b>${esc(String(m.value))} ${esc(m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
+    : `<div class="card muted">${esc(l.what_to_do||'')}</div>`;
+  const est = l.estimate
+    ? `<div class="list-item"><div class="row"><b>${esc(l.estimate.label||'')}</b>
+         <span class="muted">${esc(String(l.estimate.percentile))} · ${esc(l.estimate.pgs_id||'')} · ${esc(l.estimate.quality||'')}</span></div>
+       <div class="why" style="color:var(--warning)">⚠ ${esc(l.estimate_is_not_a_measurement||'')}</div></div>`
+    : '';
+  return `<div class="card" style="margin-bottom:10px"><b>${esc(d.headline||'')}</b>
+      <div class="meta" style="margin-top:6px">${esc(d.how_to_read||'')}</div></div>
+    ${rows}
+    ${waiting?`<div class="so-h" style="margin-top:14px">${esc(t('lipidgen.waiting_h'))}</div>${waiting}`:''}
+    <div class="so-h" style="margin-top:16px">${esc(t('lipidgen.lpa.h'))}</div>${lpa}${est}`;
+}
 function renderClinvar(cv){
-  if(!cv||cv.status==='not_run')return `<div class="card muted">${esc((cv&&cv.message)||t('web.clinvar.not_run'))} ${t('web.clinvar.run_hint',{script:'<code>src/ingest/annotate_clinvar.sh</code>'})}</div>`;
+  // The message from the engine already says what has not been run and where the
+  // route is written down. The old second sentence repeated it and named a script
+  // that does not exist in an installed package.
+  if(!cv||cv.status==='not_run')return `<div class="card muted">${esc((cv&&cv.message)||t('web.clinvar.not_run'))}</div>`;
   if(cv.status!=='ok'||!cv.count)return `<div class="card muted">${esc(t('web.clinvar.nothing'))}${cv.message?': '+esc(cv.message):''}.</div>`;
   const TCLS={pathogenic:'b-critical',drug:'b-warning',risk:'b-warning',protective:'b-good',association:'b-unknown',uncertain:'b-unknown'};
   const byTier={};(cv.hits||[]).forEach(h=>{(byTier[h.tier]=byTier[h.tier]||[]).push(h);});
@@ -1497,12 +1744,14 @@ async function pollUpdate(root){
   }
 }
 async function viewGenome(root){
-  const [st,cv,prs,lng,upd]=await Promise.all([
-    api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),api('/api/genome-updates')]);
+  const [st,cv,prs,lng,upd,lip]=await Promise.all([
+    api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
+    api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null)]);
   const sb=await sourceBar(['genome_vcf','catalog','ensembl','clinvar']);
   const stBadge=st.ready?badge('b-good',t('web.genome.db_connected')):badge('b-unknown',t('web.genome.db_not_connected'));
   const nav=[['sum','web.genome.nav_summary'],['upd','web.genome.nav_updates'],['risks','web.genome.nav_risks'],
-             ['long','web.genome.nav_longevity'],['clinvar','web.genome.nav_clinvar'],['locus','web.genome.nav_locus']];
+             ['lipids','web.genome.nav_lipids'],['long','web.genome.nav_longevity'],
+             ['clinvar','web.genome.nav_clinvar'],['locus','web.genome.nav_locus']];
   root.innerHTML=`<h2 class="section">${esc(t('web.genome.title'))}</h2>${sb}
     <div class="subnav">${nav.map(([id,key])=>`<a href="#gs-${id}">${esc(t(key))}</a>`).join('')}</div>
 
@@ -1516,6 +1765,9 @@ async function viewGenome(root){
 
     <h2 class="section" id="gs-risks" style="margin-top:24px">${esc(t('web.genome.prs_h'))}</h2>
     <div id="risks-box">${renderPRS(prs)}</div>
+
+    <h2 class="section" id="gs-lipids" style="margin-top:24px">${esc(t('web.genome.lipidgen_h'))}</h2>
+    <div id="lipids-box">${renderLipidGenetics(lip)}</div>
 
     <h2 class="section" id="gs-long" style="margin-top:24px">${esc(t('web.genome.longevity_h'))}</h2>
     <div id="long-box">${renderLongevity(lng)}</div>
@@ -1558,7 +1810,7 @@ async function viewAssistant(root){
       <div class="row">${badge(col[e.state]||'b-unknown',mark[e.state]?t(mark[e.state]):e.state)}<b>${esc(e.title)}</b>
         <span class="muted">${esc(e.detail)}</span></div>
       <div class="why">${esc(e.what)}</div>
-      <div class="why"><code>${esc(e.how)}</code></div>
+      ${e.how?`<div class="why"><code>${esc(e.how)}</code></div>`:''}
       ${e.id==='any'?`<div class="row" style="margin-top:8px"><button class="ghost" id="ctxbtn">📋 ${esc(t('web.assistant.collect_btn'))}</button><span class="muted" id="ctxinfo"></span></div>
         <div class="why">${esc(t('web.assistant.context_warning'))}</div>`:''}
     </div>`).join('');
@@ -1660,10 +1912,15 @@ async function viewGuide(root){
 }
 
 // ---------------- Navigation ----------------
+// «Guide» sits second, not last. It is the map of this interface — what the colours
+// mean, what each tab is for, what a percentile and an rsID are — and every reader
+// without context reached for it only after being lost, because it was the tenth of
+// ten. A map handed over at the end of the journey is a different object.
 const TABS=[
-  ['web.tab.overview',viewOverview],['web.tab.labs',viewLabs],['web.tab.drugs',viewDrug],['web.tab.genome',viewGenome],
-  ['web.tab.lifestyle',viewLifestyle],['web.tab.tests',viewTests],['web.tab.second_opinion',viewSecond],['web.tab.prescriptions',viewMeds],
-  ['web.tab.assistant',viewAssistant],['web.tab.guide',viewGuide],
+  ['web.tab.overview',viewOverview],['web.tab.guide',viewGuide],
+  ['web.tab.labs',viewLabs],['web.tab.drugs',viewDrug],['web.tab.genome',viewGenome],
+  ['web.tab.lifestyle',viewLifestyle],['web.tab.tests',viewTests],['web.tab.second_opinion',viewSecond],
+  ['web.tab.prescriptions',viewMeds],['web.tab.assistant',viewAssistant],
 ];
 let current=0;
 function buildNav(){
@@ -1680,7 +1937,14 @@ function mount(i){
 // The parts of the page that live outside the tabs. Redrawn on a language switch, so
 // that switching does not require a reload and does not lose the tab one is reading.
 let _version=null;
+let _synthetic=false;
+function renderDemoBanner(){
+  const b=$('#demobanner'); if(!b) return;
+  b.hidden=!_synthetic;
+  b.textContent=_synthetic?t('web.header.demo_banner'):'';
+}
 function renderChrome(){
+  renderDemoBanner();
   $('#subhead').textContent=t('web.header.subtitle');
   const lb=$('#localbadge');
   lb.textContent='🔒 '+t('web.header.local_badge');
@@ -1730,7 +1994,11 @@ document.addEventListener('click',async e=>{
   buildNav();
   {const lb=$('#localbadge');if(lb)lb.onclick=()=>mount(TABS.findIndex(x=>x[0]==='web.tab.assistant'));}
   mount(0);
-  api('/api/ping').then(p=>{if(p&&p.version){_version=p.version;$('#ver').textContent=t('web.header.build',{version:_version});}}).catch(()=>{});
+  api('/api/ping').then(p=>{
+    if(!p)return;
+    if(p.version){_version=p.version;$('#ver').textContent=t('web.header.build',{version:_version});}
+    _synthetic=!!p.synthetic; renderDemoBanner();
+  }).catch(()=>{});
 })();
 </script>
 </body>

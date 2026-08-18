@@ -1,10 +1,10 @@
 {
   "_meta": {
     "schema": 1,
-    "purpose": "ШАБЛОН. n-of-1 эксперименты пользователя: предрегистрация протокола, отметки соблюдения и результаты. ЛИЧНОЕ — НЕ передавать.",
-    "how_to_fill": "Не редактировать руками. Заводить командой: python3 src/ingest/nof1.py register --id <имя> --hypothesis \"...\" --metric sleep.deep_min --blocks 6 --phase-days 10 --washout 2 --start ГГГГ-ММ-ДД. Ход отмечать: nof1.py log <id> --ok | --violated --note \"...\". Готовые протоколы — knowledge/experiment_templates.json.",
-    "rule": "Протокол после старта не правится: смена метрики или длительности — это новый эксперимент, старый закрывается как есть. День без отметки соблюдения считается НЕИЗВЕСТНЫМ, а не соблюдённым.",
-    "shape": "experiments: [{ id, registered, status, hypothesis, primary_metric, direction, secondary_metrics[], phase_days, blocks, washout_days, alpha, randomization_seed, schedule[{n,label,start,end}], min_achievable_p, feasible, compliance_log{ГГГГ-ММ-ДД: {ok, note}} }]"
+    "purpose": "TEMPLATE. Your n-of-1 experiments: the pre-registered protocol, compliance marks and results. PERSONAL — do not pass it on.",
+    "how_to_fill": "Not meant to be edited by hand. The registration and logging tools live in the project's source tree (src/ingest/nof1.py) and are not part of the installed package; ready-made protocols are in knowledge/experiment_templates.json.",
+    "rule": "A protocol is not amended after it starts: changing the metric or the length makes a NEW experiment, and the old one is closed as it stands. A day with no compliance mark counts as UNKNOWN, not as complied.",
+    "shape": "experiments: [{ id, registered, status, hypothesis, primary_metric, direction, secondary_metrics[], phase_days, blocks, washout_days, alpha, randomization_seed, schedule[{n,label,start,end}], min_achievable_p, feasible, compliance_log{YYYY-MM-DD: {ok, note}} }]"
   },
   "experiments": []
 }

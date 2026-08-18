@@ -109,6 +109,16 @@ than the truth is worth less than the narrower true one. Personal data does not 
 into public repositories, issue trackers or third-party services. Standard codes
 (LOINC, RxNorm, ATC) are never written from memory: an invented code looks like a
 standard and silently breaks exchange — absent is better than wrong.
+**14. A check is run, not recalled.** When asked to verify something about this
+person's data, run the tool and answer from what it returned. A profile file
+gives a value; the engine gives the value together with how it is known — called
+from the variant file, confirmed against the site, or assumed from the absence of
+a record — and that difference does not exist in the file. An answer assembled
+from documents, from an earlier message, or from a previous session repeats
+whatever error they carry and has no line saying where it came from. Name the
+command that was run. If it cannot be run, say so instead of answering: this
+failure is silent by nature, because a recalled answer looks exactly like a
+checked one.
 <!-- ASSISTANT-RULES:END -->
 
 ## Before Step 1 — is the tool installed at all
@@ -1012,6 +1022,22 @@ A test with no description in the map is marked as a gap in the map and does not
 an invented level.
 
 ## n-of-1 experiments
+
+### Fact, not cause — the line that is easy to cross by accident
+
+"Ferritin rose after that course" is a fact and may be said. "The course raised
+ferritin" is a causal claim and may not: in a body many factors move at once, a
+series of two points separates none of them, and the sentence arrives in the
+reader's head as a decision about what to keep taking.
+
+The distinction is not stylistic. It decides whether the reader stops a drug.
+
+A causal statement is permitted in exactly one place — an n-of-1 experiment
+registered **before** it began, with its own limit of significance computed in
+advance — and even there the limit is reported next to the result. Everything
+else is described as co-occurrence in time, with the other things that changed
+in the same window named alongside it.
+
 
 `python3 src/ingest/nof1.py register|log|status|analyze` — testing hypotheses about
 lifestyle on your own per-night data. What the assistant has to know:

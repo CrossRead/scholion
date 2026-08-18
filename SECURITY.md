@@ -41,6 +41,12 @@ in the repository settings. Open a normal issue saying exactly that — *"privat
 vulnerability reporting appears to be disabled"* — and nothing else. Do not
 describe the vulnerability in it.
 
+**If you would rather not use GitHub at all**, write to scholion.dev@proton.me.
+The button is the better route — it keeps the report, the fix and the advisory in
+one place — but a report that reaches us by any means beats one that was not sent
+because the route felt wrong. Encrypt if you like: say so in the first line and a
+key will come back.
+
 **Response times.** This project is maintained by one person. We will not
 pretend to an SLA we cannot keep: expect an acknowledgement within a few days
 and an initial assessment once the report has been reproduced. If a report goes

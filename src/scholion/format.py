@@ -159,6 +159,15 @@ def genome_report(r: Dict[str, Any]) -> str:
     line = (f"🧬 **{r.get('rsid')}**{star} — "
             + _t("genome.gene_at", gene=gene, chrom=r.get("chrom"), pos=r.get("pos"))
             + ": " + _t("genome.genotype", genotype=gt) + f" ({conf}{dp})")
+    # Two sources for one position, and what became of them. A flag computed in
+    # the data layer and printed nowhere is the failure this project keeps
+    # finding in itself; this is the last mile for the one task 64 added.
+    if res.get("conflict"):
+        c = res["conflict"]
+        line += "\n⚠️ " + _t("genome.conflict", reported=c.get("reported"),
+                             called=c.get("called"))
+    elif res.get("confirmed_by") == "profile":
+        line += "\n" + _t("genome.confirmed_by_report")
     cs = r.get("clinical_significance")
     if cs:
         line += "\n" + _t("genome.significance", values=", ".join(cs))
@@ -1024,6 +1033,18 @@ def limits_report(r: Dict[str, Any]) -> str:
     command exists is that the reader can act on it.
     """
     L = [_t("limits.title"), ""]
+    # The cell first, the list second: what may be claimed at all depends on the
+    # class of the input and on the architecture of the trait, and a reader who
+    # does not know the cell mis-reads every line that follows.
+    sc = r.get("scope") or {}
+    if sc.get("input_note"):
+        L.append(_t("limits.scope.title"))
+        L.append(sc["input_note"])
+        for row in sc.get("rows") or []:
+            L.append(f"  · {row['note']}")
+        if sc.get("heritability_note"):
+            L.append(f"  · {sc['heritability_note']}")
+        L.append("")
     cov = r.get("coverage") or {}
     if cov.get("known"):
         L.append(_t("limits.coverage_line", genes=cov.get("genes"),
@@ -1097,3 +1118,92 @@ def write_result(r: Dict[str, Any]) -> str:
         return f"⚠️ {r.get('error') or _t('write.failed')}"
     bits = [f"{k}: {v}" for k, v in r.items() if k not in ("ok",) and not isinstance(v, (dict, list))]
     return "✓ " + _t("write.saved") + (" · " + "; ".join(bits) if bits else "") + "."
+
+
+def goal_suggest_report(r: Dict[str, Any]) -> str:
+    """The proposals, each with the source of its number on the same line.
+
+    The three lists are printed, not just the first: what was proposed, what is
+    already met, and what nothing could be proposed for and why. A page of five
+    suggestions with no account of the forty markers passed over reads as «these
+    five are what matter», which is a different and false claim.
+    """
+    L = [f"**{_t('goalgen.title')}**", "", r.get("how_to_read", ""), ""]
+    SRC = {"guideline": "goalgen.src.guideline", "personal_best": "goalgen.src.personal_best",
+           "reference": "goalgen.src.reference"}
+    if not r.get("proposals"):
+        L.append(_t("goalgen.none"))
+    for p in r.get("proposals", []):
+        t = p.get("target") or {}
+        now = p.get("now") or {}
+        src = _t(SRC.get(p.get("proposed"), "goalgen.src.reference"))
+        L.append(f"- **{p['name']}** {now.get('value', '—')} {p.get('unit','')} "
+                 f"→ **{t.get('comparator','')}{t.get('value','')}**  _[{src}]_")
+        cand = next((c for c in (p.get("candidates") or [])
+                     if c.get("source") == p.get("proposed")), {})
+        if cand.get("why"):
+            L.append(f"  {cand['why']}")
+        if cand.get("citation"):
+            c = cand["citation"]
+            L.append(f"  — {c.get('body','')}, {c.get('document','')} ({c.get('year','')})"
+                     + (f" {c['url']}" if c.get("url") else ""))
+        if cand.get("assumed"):
+            L.append(f"  ⚠ {cand['assumed'].get('note','')}")
+        if p.get("caveat"):
+            L.append(f"  ⚠ {p['caveat']}")
+    if r.get("already_met"):
+        L += ["", f"**{_t('goalgen.title')} — {_t('web.goalgen.reached')}**"]
+        for a in r["already_met"]:
+            met = ", ".join(f"{m['comparator']}{m['value']}" for m in a.get("met", []))
+            L.append(f"- {a['name']} {(a.get('now') or {}).get('value','—')} "
+                     f"{a.get('unit','')} — {met}")
+    if r.get("skipped"):
+        L += ["", f"**{_t('goalgen.skipped_h')}**"]
+        for skp in r["skipped"]:
+            L.append(f"- {skp['name']} — {_t('goalgen.skip.' + skp['reason'])}")
+    if r.get("written"):
+        w = r["written"]
+        L += ["", _t("web.goalgen.saved", n=len(w.get("added") or [])), f"  {w.get('path','')}"]
+    L += ["", f"_{r.get('disclaimer','')}_"]
+    return "\n".join(L) + "\n"
+
+
+def lipid_genetics_report(r: Dict[str, Any]) -> str:
+    """PCSK9 and Lp(a) in one block, each line carrying what it is worth."""
+    L = [f"**{_t('lipidgen.title')}**", "", r.get("headline", ""), "",
+         r.get("how_to_read", ""), ""]
+    for x in r.get("pcsk9", []):
+        if x["status"] == "unread":
+            L.append(f"- `{x['rsid']}` {x['gene']} — **{_t('lipidgen.unread')}**")
+        elif x["status"] == "no_data":
+            L.append(f"- `{x['rsid']}` {x['gene']} — {_t('lipidgen.unread')}")
+        else:
+            mark = _t("lipidgen.carrier") if x["carrier"] else _t("lipidgen.not_carrier")
+            L.append(f"- `{x['rsid']}` {x['gene']} {x['genotype']} — **{mark}**")
+            if x.get("verdict"):
+                L.append(f"  {x['verdict']}")
+        if x.get("population_note"):
+            L.append(f"  ⚠ {x['population_note']}")
+        if x.get("pmids"):
+            L.append("  PMID: " + ", ".join(x["pmids"]))
+    if r.get("pcsk9_waiting"):
+        L += ["", f"**{_t('lipidgen.waiting_h')}**"]
+        for w in r["pcsk9_waiting"]:
+            L.append(f"- `{w['rsid']}` {w['gene']} — {w.get('why','')}")
+    lpa = r.get("lpa") or {}
+    L += ["", f"**{_t('lipidgen.lpa.h')}**"]
+    m = lpa.get("measured")
+    if m:
+        L.append("- " + _t("lipidgen.lpa.measured", value=m["value"], unit=m["unit"],
+                           date=m["date"]))
+        if m.get("above"):
+            L.append("  ⚠ " + _t("lipidgen.lpa.above", ref=m.get("ref_high")))
+    else:
+        L.append("- " + (lpa.get("what_to_do") or ""))
+    if lpa.get("estimate"):
+        e = lpa["estimate"]
+        L.append(f"- {e.get('label','')}: {e.get('percentile')} ({e.get('pgs_id')}, "
+                 f"{e.get('quality')})")
+        L.append(f"  ⚠ {lpa.get('estimate_is_not_a_measurement','')}")
+    L += ["", f"_{r.get('disclaimer','')}_"]
+    return "\n".join(L) + "\n"

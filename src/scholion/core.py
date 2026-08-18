@@ -352,6 +352,32 @@ def _profile_meta(data: Dict[str, Any]) -> Dict[str, Any]:
     return {}
 
 
+def profile_meta(data: Dict[str, Any]) -> Dict[str, Any]:
+    """The metadata block of a profile file, under either spelling.
+
+    Public because callers outside this module need it and were reaching for
+    `data["meta"]` directly — which is the older spelling, so a file written with
+    `_meta` came back empty and a missing subject id was printed as «subject ?».
+    """
+    return _profile_meta(data)
+
+
+def profile_is_synthetic() -> bool:
+    """Is the profile now loaded a fictional person rather than somebody's own data?
+
+    `scholion init --demo` writes `synthetic: true` into every file it lays down.
+    Asking any one of them is enough, and pharmacogenomics.json is the file the
+    subject id lives in. The answer travels to the interface so that the demo says
+    so on every screen: on the first pass the only sign of it was the string
+    «DEMO-0001» in the header, which reads like a laboratory accession number, and
+    a reader who takes it for their own is exactly who this project must not fail.
+    """
+    try:
+        return bool(_profile_meta(pharmacogenomics()).get("synthetic"))
+    except Exception:                                        # noqa: BLE001
+        return False
+
+
 def profile_schema_of(data: Dict[str, Any]) -> int:
     """The version a profile file declares. An undeclared file is version 1.
 
@@ -583,6 +609,31 @@ def med_classes() -> Dict[str, Any]:
 def drug_interactions() -> Dict[str, Any]:
     """Public database of drug interactions by class. Not personal."""
     return _read_knowledge("drug_interactions.json")
+
+
+def goal_targets() -> Dict[str, Any]:
+    """Targets a clinical association has published, with the citation attached.
+
+    Separate from `lab_markers.json` on purpose: that file holds reference
+    INTERVALS, which say where most of a population sits. A target says where a
+    body of physicians has argued a value should be brought, for a named
+    population and a stated reason. The two disagree often — LDL-C sits inside
+    the laboratory range at values every cardiology guideline calls too high —
+    and a file that mixed them would make the difference impossible to show.
+    """
+    return _read_knowledge("goal_targets.json")
+
+
+def longevity_directions() -> Dict[str, Any]:
+    """Curated directions of longevity alleles — which allele the primary source
+    calls favourable. Public reference data; it contains nobody's genotypes."""
+    return _read_knowledge("longevity_directions.json")
+
+
+def loci() -> Dict[str, Any]:
+    """rsID → GRCh38 coordinate. The one place in this project where a position
+    may be asserted; everything else asks here."""
+    return _read_knowledge("loci.json")
 
 
 def lab_markers() -> Dict[str, Any]:
@@ -1189,13 +1240,73 @@ def genotype_status(rsid: str) -> Optional[Dict[str, Any]]:
 
     `source` is `profile` for a genotype typed in from a laboratory report,
     `vcf` for one resolved from the person's own file.
+
+    WHICH SOURCE WINS, and why it is not the one that used to (task 64). This
+    function returned the profile entry the moment it found one and never reached
+    the VCF. So `rs4988235`, `rs1801133` and `rs429358` came back as
+    `reported/profile/depth=None` — copied off a laboratory's summary sheet —
+    while the person's own aligned reads sat unread in a file on the same disk.
+    `scholion genome rs4988235` meanwhile read the VCF and answered «reference
+    confirmed by a call (0/0), coverage 32». Two routes to one fact, disagreeing.
+
+    A read outranks a report: it carries a depth, it can be re-examined, and it
+    is the thing the report was made from. But only a GENUINE read does. A
+    missing row in a -mv VCF comes back as `assumed_ref`, which does not mean
+    reference — it means «either the reference, or nothing was looked at there» —
+    and letting that overrule a laboratory's positive finding would be the
+    project's oldest defect wearing new clothes: more data producing a less
+    cautious answer.
+
+    A disagreement is never resolved silently. Both values travel in `conflict`,
+    so the layer above can say that the report and the reads do not agree rather
+    than quietly print one of them.
+
+    Why this was not caught by the seventeen known disagreements between the
+    Evogen report and the reads: `genotype_status` answered `None` for all of
+    them — those rsIDs are not in the catalogue, so the priority was never
+    exercised where it is dangerous. The absence of an error there proved nothing,
+    and the test below builds the collision by hand rather than waiting for one.
     """
+    reported = None
     for g in pharmacogenomics().get("genotypes", []):
         if g.get("rsid", "").lower() == rsid.lower():
-            return {"genotype": g.get("genotype", ""), "confidence": "reported",
-                    "source": "profile"}
+            reported = {"genotype": g.get("genotype", ""), "confidence": "reported",
+                        "source": "profile"}
+            break
+
     from . import genome  # lazy import
-    return genome.genotype_from_vcf(rsid)
+    try:
+        called = genome.genotype_from_vcf(rsid)
+    except Exception:                                        # noqa: BLE001
+        called = None
+
+    if reported is None:
+        return called
+    # A row that was never read cannot overrule a laboratory that did read it.
+    if not called or not called.get("genotype") or called.get("confidence") != "called":
+        return reported
+
+    if _same_genotype(called.get("genotype"), reported.get("genotype")):
+        # Agreement is worth saying: two independent routes to the same call is a
+        # stronger statement than either of them alone.
+        return {**called, "confirmed_by": "profile",
+                "also_reported": reported.get("genotype")}
+    return {**called, "conflict": {"reported": reported.get("genotype"),
+                                   "called": called.get("genotype"),
+                                   "resolved_to": "called"}}
+
+
+def _same_genotype(a: Optional[str], b: Optional[str]) -> bool:
+    """Two genotype strings for the same call, phase and separators aside.
+
+    «A/G», «AG» and «GA» are one genotype written three ways; a comparison that
+    treated them as three would report a disagreement on every second marker and
+    train the reader to ignore the flag.
+    """
+    def norm(x):
+        x = (x or "").replace("|", "").replace("/", "").strip().upper()
+        return "".join(sorted(x))
+    return bool(norm(a)) and norm(a) == norm(b)
 
 
 def genotype_at(rsid: str) -> Optional[str]:

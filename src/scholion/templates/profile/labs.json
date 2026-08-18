@@ -1,14 +1,11 @@
 {
   "_meta": {
     "schema": 1,
-    "purpose": "ШАБЛОН. Лабораторные анализы пользователя (временные ряды по маркёрам). ЛИЧНОЕ — заполняет каждый пользователь сам, НЕ передавать другим.",
-    "how_to_fill": "Проще всего — сложить PDF-отчёты лаборатории в папку и запустить `python3 -m scholion ingest-labs \"<папка>\"` (или вкладка «Анализы» в приложении). Можно и вручную: добавляйте точки в markers[key].series.",
-    "shape": "markers: { <ключ>: { name, unit, ref_low?, ref_high?, direction?('higher_better'|'lower_better'), genome_link?, series: [{date:'YYYY-MM'|'YYYY-MM-DD', value:number}] } }"
+    "purpose": "TEMPLATE. Your laboratory results as a time series per marker. PERSONAL — you fill it in yourself; do not pass it to anyone.",
+    "how_to_fill": "Easiest: put the lab's PDF reports in one folder and run `scholion ingest-labs \"<folder>\"` (or use the «Labs» tab in the application). By hand: add points to markers[key].series.",
+    "shape": "markers: { <key>: { name, unit, ref_low?, ref_high?, direction?('higher_better'|'lower_better'), genome_link?, series: [{date:'YYYY-MM'|'YYYY-MM-DD', value:number}] } }",
+    "example": "\"triglycerides\": { \"name\": \"Triglycerides\", \"unit\": \"mmol/L\", \"ref_high\": 1.7, \"series\": [{\"date\": \"2024-01\", \"value\": 1.2}] }",
+    "why_empty": "This file ships EMPTY on purpose. A sample measurement left in here would be counted, flagged and shown as if it were yours — a statement about a person made from a template. The example above is a string, so nothing reads it as data."
   },
-  "markers": {
-    "triglycerides": {
-      "name": "Триглицериды", "unit": "ммоль/л", "ref_high": 1.7,
-      "series": [{"date": "2024-01", "value": 1.2}]
-    }
-  }
+  "markers": {}
 }

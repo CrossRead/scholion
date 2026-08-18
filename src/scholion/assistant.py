@@ -252,26 +252,46 @@ def _entrypoints() -> List[Dict[str, Any]]:
     eps: List[Dict[str, Any]] = []
 
     # 1. the skill for Claude
-    skill_src = REPO / "src" / "skill" / "INSTRUCTION.owner.md"
+    #
+    # WHERE IT ACTUALLY IS. `REPO` is `PKG.parents[1]`, which is the repository root
+    # only when the code runs from the source tree; after `pip install` it is the
+    # parent of site-packages, and a path built from it names nothing on disk. The
+    # file the old code looked for made that worse: `INSTRUCTION.owner.md` is the
+    # owner's clinical key and NEVER ships, so for every user but one the state read
+    # «missing» and the command printed underneath it pointed into empty space —
+    # the flagship way into the product, broken for everybody who installed it.
+    #
+    # The skill that does ship is the copy inside the package, which is also what
+    # `scholion skill --path` prints. Ask that first and fall back to the source tree.
+    skill_dir = PKG / "skill"
+    if not (skill_dir / "SKILL.md").exists() and (REPO / "src" / "skill" / "SKILL.md").exists():
+        skill_dir = REPO / "src" / "skill"
+    skill_ok = (skill_dir / "SKILL.md").exists()
     installed = [p for p in (home / ".claude" / "skills").glob("*/SKILL.md")
                  if "scholion" in p.parent.name.lower()] if (home / ".claude" / "skills").is_dir() else []
     eps.append({
         "id": "skill", "title": _t("assistant.ep.skill.title"),
-        "state": "ok" if installed else ("ready" if skill_src.exists() else "missing"),
+        "state": "ok" if installed else ("ready" if skill_ok else "missing"),
         "detail": (_t("assistant.ep.skill.installed", path=installed[0].parent) if installed
-                   else (_t("assistant.ep.skill.ready") if skill_src.exists()
+                   else (_t("assistant.ep.skill.ready") if skill_ok
                          else _t("assistant.ep.skill.missing"))),
-        "how": ("mkdir -p ~/.claude/skills && ln -s "
-                f"'{skill_src.parent}' ~/.claude/skills/scholion"),
+        # Printed only when there is something to point at. A command that cannot work
+        # is worse than no command: it spends the reader's attempt and their trust.
+        "how": (f"mkdir -p ~/.claude/skills && ln -s '{skill_dir}' ~/.claude/skills/scholion"
+                if skill_ok else None),
         "what": _t("assistant.ep.skill.what"),
     })
 
-    # 2. the Ouroboros plugin
-    plug = REPO / "ouroboros_plugin" / "scholion_tools.py"
+    # 2. the Ouroboros plugin — the same shape of mistake, the same fix. The installed
+    # package carries the tools as an importable module; the standalone plugin file
+    # exists only in the source tree.
+    plug = PKG / "ouroboros_tools.py"
+    if not plug.exists():
+        plug = REPO / "ouroboros_plugin" / "scholion_tools.py"
     eps.append({
         "id": "ouroboros", "title": _t("assistant.ep.ouroboros.title"),
         "state": "ready" if plug.exists() else "missing",
-        "detail": (_t("assistant.ep.ouroboros.ready", path=plug.relative_to(REPO))
+        "detail": (_t("assistant.ep.ouroboros.ready", path=plug)
                    if plug.exists() else _t("assistant.ep.ouroboros.missing")),
         "how": _t("assistant.ep.ouroboros.how"),
         "what": _t("assistant.ep.ouroboros.what"),

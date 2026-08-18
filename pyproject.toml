@@ -41,7 +41,11 @@ requires-python = ">=3.10"
 license = "Apache-2.0"
 license-files = ["LICENSE", "LICENSE-DATA", "NOTICE", "ATTRIBUTION.md"]
 
-authors = [{ name = "CrossRead" }]
+# The e-mail belongs HERE, in the field the metadata standard has for it, and not
+# in `[project.urls]`. PyPI rejects a `mailto:` there — «is not a valid url» — and
+# it rejects it at UPLOAD, after the build, after `twine check` has passed, which
+# is why two releases reached GitHub and neither reached PyPI.
+authors = [{ name = "CrossRead", email = "scholion.dev@proton.me" }]
 keywords = [
     "genomics", "pharmacogenomics", "clinvar", "acmg", "cpic",
     "polygenic-score", "laboratory", "wearables", "personal-health",
@@ -97,6 +101,11 @@ Homepage = "https://github.com/CrossRead/scholion"
 Repository = "https://github.com/CrossRead/scholion"
 Changelog = "https://github.com/CrossRead/scholion/blob/main/CHANGELOG.md"
 Issues = "https://github.com/CrossRead/scholion/issues"
+# Every value under [project.urls] must be a URL, and PyPI means it. The address
+# itself now travels in `authors`, where it is metadata rather than a link; this
+# points at the section of the README that explains what to write about and, more
+# importantly, what NOT to send.
+Contact = "https://github.com/CrossRead/scholion#contact"
 
 [tool.hatch.version]
 path = "VERSION"

@@ -94,6 +94,16 @@ than the truth is worth less than the narrower true one. Personal data does not 
 into public repositories, issue trackers or third-party services. Standard codes
 (LOINC, RxNorm, ATC) are never written from memory: an invented code looks like a
 standard and silently breaks exchange — absent is better than wrong.
+**14. A check is run, not recalled.** When asked to verify something about this
+person's data, run the tool and answer from what it returned. A profile file
+gives a value; the engine gives the value together with how it is known — called
+from the variant file, confirmed against the site, or assumed from the absence of
+a record — and that difference does not exist in the file. An answer assembled
+from documents, from an earlier message, or from a previous session repeats
+whatever error they carry and has no line saying where it came from. Name the
+command that was run. If it cannot be run, say so instead of answering: this
+failure is silent by nature, because a recalled answer looks exactly like a
+checked one.
 <!-- CORE:END -->
 
 ---

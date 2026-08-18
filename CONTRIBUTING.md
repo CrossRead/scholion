@@ -83,6 +83,18 @@ By doing so you certify the Developer Certificate of Origin 1.1
 * You have not added a dependency. The engine is standard library only, and
   that is a feature, not an oversight.
 
+## Where to write
+
+Issues and pull requests are the main way in. **scholion.dev@proton.me** is for
+what does not fit a public tracker: an offer of a de-identified case for
+validation, a co-authorship, a security matter, or anything you would rather not
+say in the open.
+
+One request that holds regardless of the channel: **no personal health data**,
+not in an issue, not in an e-mail, not in an attachment. Describe the shape of
+the problem, not your results — `scholion redact` strips the structural parts of
+a file, and what it cannot decide for you it says so about.
+
 ## Scope
 
 Scholion is a research and educational tool, not a medical device — see

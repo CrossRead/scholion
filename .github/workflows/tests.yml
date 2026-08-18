@@ -112,12 +112,36 @@ jobs:
         with:
           python-version: "3.12"
 
+      # CAN THIS CHECKOUT BUILD A PACKAGE, OR IS IT ONE?
+      #
+      # This job exists to catch a check that asks the artefact for something
+      # only the repository has — and it was one. `make_shareable.py` builds the
+      # package FROM `share/`, and `share/` does not ship, so on the public
+      # repository the very first step answered «Run this from the ORIGINAL
+      # repository» and the build went red on every push. Written in the source
+      # tree, where it passes; shipped to the tree where it cannot.
+      #
+      # The predicate is the same one `tests/support.py` calls `IN_SOURCE_REPO`.
+      # Two spellings of one question is how they drift apart, so if this ever
+      # grows a second condition, change both.
+      - name: Can this checkout build a package
+        id: source
+        run: |
+          if [ -d share ]; then
+            echo "yes=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "yes=" >> "$GITHUB_OUTPUT"
+            echo "::notice::No share/ in this checkout — it IS the package rather than the tree that builds one. The build-and-run-inside steps are skipped here on purpose; the matrix job above has already run this package's own suite on the files a recipient gets."
+          fi
+
       - name: Build the anonymised package
+        if: steps.source.outputs.yes
         # `--no-personal-patterns` because a clean runner has no
         # `.personal_patterns` by design, and the builder fails closed without it.
         run: python3 src/tools/make_shareable.py /tmp/pkg --no-personal-patterns
 
       - name: Its tests, where the recipient runs them
+        if: steps.source.outputs.yes
         # The class this catches has cost three releases: a test that asks the
         # artefact for something only the repository has passes here and fails
         # there. `publish_share.sh` runs this too, before it publishes; this job

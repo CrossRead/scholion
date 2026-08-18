@@ -267,6 +267,44 @@ def _input_limits() -> List[Dict[str, str]]:
     return out
 
 
+def scope() -> Dict[str, Any]:
+    """Which cell of the matrix an answer from this profile sits in.
+
+    Input class (whole genome / exome / consumer array) × trait architecture
+    (monogenic / oligogenic / polygenic). The pipeline is genuinely different in
+    each cell, and so is what may be claimed: a monogenic call wants orthogonal
+    confirmation, an array wants a frequency floor because most of what it seems
+    to find is false, a polygenic score wants ancestry calibration and a note on
+    how much of the variance genetics explains at all.
+
+    Naming the cell is not decoration. A percentile with no architecture beside
+    it reads as a verdict, and «no pathogenic variant found» in a gene the file
+    never covered reads as reassurance. The whole reason this module exists is
+    that the reader should not have to know which of those they are looking at.
+    """
+    from . import genome
+    has_vcf = bool(genome.available().get("ready"))
+    traits = (core.prs_results() or {}).get("traits") or {}
+    rows = []
+    if has_vcf:
+        rows.append({"architecture": "monogenic", "state": "supported",
+                     "note": _t("limits.scope.monogenic")})
+        rows.append({"architecture": "oligogenic", "state": "partial",
+                     "note": _t("limits.scope.oligogenic")})
+        rows.append({"architecture": "polygenic", "state": "supported",
+                     "note": _t("limits.scope.polygenic")})
+    return {
+        "input": "wgs" if has_vcf else "none",
+        "input_note": _t("limits.scope.input_wgs") if has_vcf
+                      else _t("limits.scope.input_none"),
+        "rows": rows,
+        # Shown whenever a polygenic number is on screen at all: without it a
+        # percentile is read as the whole of the risk rather than as the part of
+        # it that inheritance accounts for.
+        "heritability_note": _t("limits.scope.heritability") if traits else "",
+    }
+
+
 def _disclaimer() -> str:
     from . import engine
     return engine.DISCLAIMER()
@@ -278,6 +316,7 @@ def report() -> Dict[str, Any]:
     cov = coverage_summary()
     closable = [i for i in items if i["closes"]]
     return {
+        "scope": scope(),
         "coverage": cov,
         "items": items,
         "count": len(items),

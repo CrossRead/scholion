@@ -453,3 +453,54 @@ def _ensure_layout(force: bool = False):
         _write_private(dst, _layout_readme(rel))
         written.append(f"{rel}/README.md")
     return written, skipped
+
+
+def write_goal_targets(proposals: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Write proposed targets into `profile/health_goals.json`, keeping what is there.
+
+    Three things this deliberately does NOT do.
+
+    It does not overwrite a goal somebody has already written. A target the person
+    set by hand is the strongest source there is — stronger than any guideline,
+    because it is theirs — and a command that silently replaced it would be the
+    same defect this whole feature exists to remove, only pointed the other way.
+    Existing keys survive; only new ones are added, and the result says which.
+
+    It does not invent a headline. The goal's wording is the person's to write,
+    and a generated sentence in the first person («my goal is…») put into their
+    file without asking is a small forgery.
+
+    It records where each number came from, in the file. Six months later the
+    reader has to be able to tell «my own best from 2023» from «what a cardiology
+    society publishes», and a bare number cannot say which it is.
+    """
+    path = core.profile_dir() / "health_goals.json"
+    data = core.read_profile_json(path) if path.exists() else {}
+    existing = {t.get("label") or t.get("key"): t for t in (data.get("targets") or [])}
+
+    added, kept = [], []
+    for p in proposals or []:
+        label = p.get("name") or p.get("key")
+        if label in existing:
+            kept.append(label)
+            continue
+        tgt = p.get("target") or {}
+        cand = next((c for c in (p.get("candidates") or [])
+                     if c.get("source") == p.get("proposed")), {})
+        entry = {
+            "label": label,
+            "source": f"lab:{p['key']}",
+            "target": f"{tgt.get('comparator', '')}{tgt.get('value', '')}",
+            "best": (str(cand.get("observed", {}).get("date", "")) if cand.get("observed") else ""),
+            # The provenance of the target, kept beside it rather than in a log.
+            "_from": {"source": p.get("proposed"), "why": cand.get("why"),
+                      "citation": cand.get("citation"), "caveat": p.get("caveat")},
+        }
+        (data.setdefault("targets", [])).append(entry)
+        added.append(label)
+
+    meta = data.setdefault("_meta", {})
+    meta.setdefault("schema", core.PROFILE_SCHEMA)
+    meta["written_by"] = "scholion goal-suggest"
+    _write_private(path, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+    return {"path": str(path), "added": added, "kept": kept}

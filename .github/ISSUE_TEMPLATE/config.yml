@@ -8,7 +8,8 @@ contact_links:
       computes runs on your own machine; take the output to your doctor, not to a
       tracker.
   - name: A security or privacy problem
-    url: https://github.com/
+    url: mailto:scholion.dev@proton.me
     about: >-
-      Do NOT open an issue. See SECURITY.md — private vulnerability reporting is
-      enabled on this repository, and a leak reported in public is a leak twice.
+      Do NOT open an issue. Write to scholion.dev@proton.me or, once the repository is public,
+      use private vulnerability reporting. See SECURITY.md. A leak reported in
+      public is a leak twice.

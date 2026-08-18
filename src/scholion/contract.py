@@ -31,6 +31,7 @@ PARITY: Dict[str, str] = {
     # reading
     "GET /api/overview": "overview",
     "GET /api/goal": "goal",
+    "GET /api/goal-suggest": "goal-suggest",
     "GET /api/labs": "labs",
     "GET /api/drug": "drug",
     "GET /api/suggest-tests": "suggest-tests",
@@ -50,10 +51,14 @@ PARITY: Dict[str, str] = {
     "GET /api/clinvar": "clinvar",
     "GET /api/prs": "prs",
     "GET /api/longevity": "longevity",
+    "GET /api/lipid-genetics": "lipid-genetics",
     "GET /api/sources": "provenance",
     "GET /api/assistant": "assistant",
     # writing
     "POST /api/labs": "add-lab",
+    # The same command; `--write` is its flag. The map names commands, not
+    # invocations — a route whose CLI twin needs an argument is still covered.
+    "POST /api/goal": "goal-suggest",
     "POST /api/medications": "add-med",
     "POST /api/medications/remove": "remove-med",
     "POST /api/metrics": "add-metric",

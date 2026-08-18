@@ -7,7 +7,7 @@ behind every statement.
 Three ways in, one core: a local web app, a skill for a language model, and a
 plugin for [Ouroboros](https://github.com/razzant/ouroboros).
 
-**Version 0.2.2** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.3.0** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -523,6 +523,19 @@ knowledge catalogues that alters the result on unchanged input. Values from
 before and after such a change cannot go on the same chart without a note.
 
 ---
+
+## Contact
+
+**scholion.dev@proton.me**
+
+For anything that fits a tracker — a defect, a text that is wrong, a laboratory
+whose forms are not read — open an issue. The address is for what does not: an
+offer of de-identified data for validation, co-authorship, a private word.
+
+**Please send no personal health data** — not in an issue, not in an e-mail, not
+in an attachment. Describe the shape of the problem, not your results;
+`scholion redact` strips the structural parts of a file and says plainly what it
+could not decide for you.
 
 ## Safety
 

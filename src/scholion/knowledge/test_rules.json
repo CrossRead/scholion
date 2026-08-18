@@ -70,8 +70,8 @@
         ]
       },
       "suggest": {
-        "en": "The SLCO1B1 genotype (rs4149056) — through Track 2 (FASTQ→VCF)",
-        "ru": "Генотип SLCO1B1 (rs4149056) — через Трек 2 (FASTQ→VCF)"
+        "en": "The SLCO1B1 genotype (rs4149056) — a pharmacogenetic test, or a full genome",
+        "ru": "Генотип SLCO1B1 (rs4149056) — фармакогенетический тест или полный геном"
       },
       "priority": "high",
       "why": {
@@ -86,13 +86,13 @@
         "genome_gap": "CYP2C9"
       },
       "suggest": {
-        "en": "The CYP2C9 genotype (*2/*3) — through Track 2",
-        "ru": "Генотип CYP2C9 (*2/*3) — через Трек 2"
+        "en": "The CYP2C9 genotype (*2, *3) — a pharmacogenetic test, or a full genome",
+        "ru": "Генотип CYP2C9 (*2, *3) — фармакогенетический тест или полный геном"
       },
       "priority": "moderate",
       "why": {
-        "en": "Together with the already known VKORC1 it is needed for correct warfarin dosing in case of possible future anticoagulation.",
-        "ru": "Вместе с уже известным VKORC1 нужен для корректного дозирования варфарина при возможной будущей антикоагуляции."
+        "en": "Warfarin dosing is read from CYP2C9 and VKORC1 together; without CYP2C9 the pair cannot be read. Worth having before anticoagulation is ever needed, not during it.",
+        "ru": "Дозирование варфарина читается по CYP2C9 и VKORC1 вместе; без CYP2C9 пару прочитать нельзя. Нужен заранее, а не в момент, когда антикоагуляция понадобилась."
       },
       "specialist": "—"
     },
@@ -206,13 +206,13 @@
         "genome_gap": "APOE"
       },
       "suggest": {
-        "en": "The APOE ε-status (rs429358/rs7412) — through Track 2",
-        "ru": "ε-статус APOE (rs429358/rs7412) — через Трек 2"
+        "en": "The APOE ε-status (rs429358, rs7412) — a pharmacogenetic test, or a full genome",
+        "ru": "ε-статус APOE (rs429358, rs7412) — фармакогенетический тест или полный геном"
       },
       "priority": "low",
       "why": {
-        "en": "For the assessment of longevity/cardiovascular/cognitive risks — a goal of the project.",
-        "ru": "Для оценки долголетия/ССЗ/когнитивных рисков — цель проекта."
+        "en": "The ε-status shifts the cardiovascular and cognitive risk estimates, and it is read once and never changes.",
+        "ru": "ε-статус сдвигает оценки сердечно-сосудистого и когнитивного риска, читается один раз и больше не меняется."
       },
       "specialist": "—"
     }

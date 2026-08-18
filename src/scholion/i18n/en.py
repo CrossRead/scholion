@@ -120,9 +120,9 @@ MESSAGES = {
     "drug.no_guidance_for_phenotype": "The catalogue records no recommendation for the phenotype {phenotype} of {gene} for this drug. This is a gap in the reference data, not a finding about you — take the question to the doctor.",
     "basis.read": "Read {read} of {total} markers of the model.",
     "basis.missing": "Not read: {names}.",
-    "basis.obtainable": "Their coordinates are in the locus catalogue — a full VCF closes this (see PREPARING-THE-GENOME.md), after which `scholion drug` answers with certainty.",
+    "basis.obtainable": "These positions are in the locus catalogue: a full genome (VCF) built from your own reads, or a targeted pharmacogenetic test that covers them, would close this gap and turn the general rule into a statement about this person.",
     "basis.not_in_catalogue": "They are not in the locus catalogue either — a laboratory test is needed.",
-    "basis.not_called": "The VCF is connected, but {names} have no row in it — that is either the reference or no coverage, and the file cannot tell them apart. Genotype those positions from the BAM (src/ingest/loci_sites_bed.py + prs_genotype_sites.sh); until then they count as unread.",
+    "basis.not_called": "The VCF is connected, but {names} have no row in it — that is either the reference or no coverage, and the file cannot tell them apart. Building another VCF changes nothing; those positions have to be genotyped from the aligned reads, and until they are they count as unread.",
     "basis.not_modelled": "The project's catalogue knows {names} for this gene and the interpretation model does not use that yet — so even a full VCF leaves this part unanswered.",
     "phenotype.assumed": "{label} — ASSUMED, not every marker was read",
     "prescription.title": "**Second opinion: {drug}** — verdict: **{overall}**",
@@ -246,7 +246,9 @@ MESSAGES = {
     "tests.done": "{name} — measured {date}, repeat in ~{months} months.",
 
     # ── goal ─────────────────────────────────────────────────────────────
-    "goal.not_set": "No goal has been set yet (there is no profile/health_goals.json).",
+    "goal.not_set": "No goal has been set yet. profile/health_goals.json carries a "
+                    "worked example under `_meta._example` — copy it to the top level "
+                    "and rewrite it for your own goal.",
     "goal.title_default": "Goal",
     "goal.as_of": "data as of {date}",
     "goal.headline": "In one sentence: {text}",
@@ -257,8 +259,10 @@ MESSAGES = {
     "goal.progress_rule": "Progress = fat down while muscle holds.",
 
     # ── ClinVar findings ─────────────────────────────────────────────────
-    "clinvar.how_to_run": "Run `src/ingest/annotate_clinvar.sh` — it links your VCF "
-                          "to a fresh ClinVar.",
+    "clinvar.how_to_run": "The ClinVar annotation is part of preparing the genome, which "
+                          "runs from the project's source tree rather than the installed "
+                          "package. `scholion doc preparing-the-genome` describes the whole "
+                          "route.",
     "clinvar.empty": "No significant ClinVar variants were extracted from your VCF.",
     "clinvar.header": "**Clinically significant findings (ClinVar): {n}**",
     "clinvar.shown": "(first {n} shown)",
@@ -375,7 +379,7 @@ MESSAGES = {
     "genome_status.build_index": "Build the index: tabix -p vcf <file>",
     "genome_status.no_vcf": "**The full VCF is not connected** — the genome side answers "
                             "«the database is not connected».",
-    "genome_status.how_to_get": "How to obtain it is described in genome/README.md.",
+    "genome_status.how_to_get": "How to obtain one: `scholion doc preparing-the-genome`.",
     "genome_status.gaps": "Gaps (target genes with no data): {genes}",
 
     # ── genome updates (a fresh ClinVar against the personal VCF) ────────
@@ -401,8 +405,14 @@ MESSAGES = {
     "init.skipped": "  already there, left alone: {files} — to overwrite: --force",
     "init.demo_notice": "  This is a FICTIONAL person, not anybody's real data.",
     "init.demo_next": "  Have a look:  scholion overview   ·   scholion serve",
-    "init.next_steps": "  Next: put your own data into this directory, or look at the demo —\n"
-                       "          scholion demo",
+    "init.next_steps": "  Next — whichever you have:\n"
+                       "     lab PDFs in a folder   scholion ingest-labs \"<folder>\"\n"
+                       "     a prescription list    scholion add-med \"<name>\" --dose \"...\"\n"
+                       "     nothing yet            scholion demo   (a fictional person, to look around)\n"
+                       "  Then:  scholion serve   opens the whole thing in a browser.",
+    "tools.only_for_genome": "\nThe rest of this message is about the GENOME track only — building a VCF "
+                             "from raw reads.\nLab results, prescriptions and a consumer-array file need "
+                             "none of it; the application already works.",
     "skill.file_missing": "✗ the instruction file was not found: {path}\n  The package looks "
                           "incompletely built — reinstall it.",
     "assistant.context_saved": "Context saved: {path} ({chars} characters).",
@@ -645,12 +655,13 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                        "presented as a fact. refresh=true re-reads every PDF "
                                        "from scratch (slow).",
     "tool.sch_provenance.param.refresh": "re-read every form instead of taking labs_coverage.json",
-    "tool.sch_goal.description": "The owner's goal for their metrics («get the 2021–2022 shape "
-                                 "back», profile/health_goals.json): the now→goal table and "
-                                 "the reference points. The CURRENT values are LIVE, from the "
-                                 "single model (labs.json + wearable_trends.json). Use it to "
-                                 "judge how close the owner is to the goal and what is holding "
-                                 "them back. Progress = fat down with muscle holding.",
+    "tool.sch_goal.description": "The goal set in this profile (profile/health_goals.json): "
+                                 "the now→goal table and the reference points. The CURRENT "
+                                 "values are LIVE, from the single model (labs.json + "
+                                 "wearable_trends.json). Use it to judge how close the profile "
+                                 "is to its own goal and what is holding it back. The goal and "
+                                 "the measure of progress are whatever that file says they are; "
+                                 "if it is absent, no goal has been set.",
 
     # ── the Ouroboros tools: what a call reports back ─────────────────
     "tool.ingest_labs.done": "Files processed: {files}, points added: {points}, skipped: "
@@ -845,7 +856,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "limits.coverage_what": "No negative genomic conclusion can be relied on.",
     "limits.no_genome_what": "Nothing can be said about the genome at all.",
     "limits.no_genome_why": "No VCF is connected: every genomic answer would be about the absence of a file rather than about you.",
-    "limits.no_genome_closes": "See PREPARING-THE-GENOME.md — a VCF built from your own reads, or an export from a laboratory.",
+    "limits.no_genome_closes": "What closes it: a VCF built from your own reads, or an export from a laboratory. The route is described in `scholion doc preparing-the-genome`.",
     "limits.weak_gene_what": "A negative result in {gene} is not a statement.",
     "limits.weak_gene_why": "Only {pct} % of the gene's bases were read deeply enough to decide a heterozygote (>=10x); the rest was not read, and an unread base yields the same «no findings» as a clean one.",
     "limits.weak_gene_closes": "Deeper sequencing, or a targeted test of {gene} — the under-covered regions can be exported as a BED for it.",
@@ -868,6 +879,13 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "limits.no_wearables_why": "No wearable export has been loaded.",
     "limits.no_wearables_closes": "`ingest-garmin <export folder>`; Apple Health goes through the same layer.",
     "limits.title": "**What cannot be said from this data**",
+    "limits.scope.title": "**What class of question this data can answer**",
+    "limits.scope.input_wgs": "Input: a whole genome — every base the sequencing reached, so both single variants and polygenic scores are computable.",
+    "limits.scope.input_none": "Input: no genomic file. Nothing below applies to the genome — only to labs, prescriptions and wearables.",
+    "limits.scope.monogenic": "Monogenic traits (one variant decides): ClinVar and the ACMG secondary-findings layer. A positive finding is a reason for a clinical test, not a substitute for one; large deletions are not called by short reads at all.",
+    "limits.scope.oligogenic": "Oligogenic traits (a handful of variants carry most of the effect): partially — the catalogued loci are read, the interaction between them is not modelled.",
+    "limits.scope.polygenic": "Polygenic traits (many variants, each weak): a score plus what is actually measured in your labs. Where a direct measurement exists it outweighs the score, and the score is withdrawn from trust rather than argued with.",
+    "limits.scope.heritability": "A percentile is not a probability, and inheritance explains only part of the variance of any of these traits — the rest is environment, behaviour and chance. The share differs by trait and is rarely the larger half.",
     "limits.none": "Every layer the system knows about is present and readable. That is not a promise that the answers are complete — it is a statement that nothing is missing that this check knows how to look for.",
     "limits.coverage_line": "Coverage: {genes} genes measured, on average {mean} % of bases at >=10x; ACMG SF panel {acmg_genes} genes at {acmg_pct} %.",
     "limits.coverage_weak_line": "Below 90 %: {n} genes.",
@@ -1075,10 +1093,18 @@ will go through them later.
     "genome.coordinate_only": "The coordinate was found, but the full genome database is not "
                               "connected yet (genome/*.vcf.gz + .tbi are needed).",
     "genome.need_rsid_or_gene": "an rsid or a gene is required",
-    "genome.clinvar_not_run": "Run src/ingest/annotate_clinvar.sh — it annotates your VCF "
-                              "against a fresh ClinVar.",
-    "genome.acmg_not_run": "Run src/ingest/acmg_sf_scan.py — it checks your VCF against the "
-                           "ACMG SF list.",
+    "genome.clinvar_not_run": "Your VCF has not been annotated against ClinVar yet. The "
+                              "annotation is part of preparing the genome — "
+                              "`scholion doc preparing-the-genome`.",
+    "genome.conflict": "The laboratory report and your own reads disagree here: the report says "
+                       "{reported}, the reads say {called}. Shown above is what the reads say — "
+                       "they carry a depth and can be re-examined, and the report was made from "
+                       "them. A disagreement of this kind is worth taking to whoever issued the "
+                       "report.",
+    "genome.confirmed_by_report": "Your own reads and a laboratory report agree at this position.",
+    "genome.acmg_not_run": "Your VCF has not been checked against the ACMG SF list yet. The "
+                           "scan is part of preparing the genome — "
+                           "`scholion doc preparing-the-genome`.",
     "genome.apoe_note": "the ε status is approximate without phasing; confirm it for clinical use.",
     "clinvar.tier.pathogenic": "Pathogenic / likely pathogenic",
     "clinvar.tier.pathogenic.hint": "worth knowing: a link to a disease, or carrier status",
@@ -1213,8 +1239,9 @@ will go through them later.
     "web.decision.not_reached": "action threshold {value} ({label}) — not reached",
 
     # ── web: the goal dashboard ──────────────────────────────────────────
-    "web.goal.not_set": "The goal has not been set yet.",
-    "web.goal.title": "Goal — get back in shape",
+    "web.goal.not_set": "No goal has been set yet. The shape of one, filled in, is in "
+                        "profile/health_goals.json under `_meta._example`.",
+    "web.goal.title": "Your goal for the indicators",
     "web.goal.as_of": "data as of {date}",
     "web.goal.in_one_phrase": "In one phrase:",
     "web.goal.targets_h": "Target values",
@@ -1225,7 +1252,7 @@ will go through them later.
     "web.goal.lg_now": "now",
     "web.goal.lg_best": "historical best",
     "web.goal.lg_target": "goal",
-    "web.goal.lg_window": "the optimum window 2021–2022",
+    "web.goal.lg_window": "your reference window",
     "web.goal.body_h": "Weight and body composition",
     "web.goal.weight": "Weight",
     "web.goal.bodycomp": "Body composition",
@@ -1235,32 +1262,51 @@ will go through them later.
     "web.goal.ldl_alt": "LDL/ALT",
     "web.goal.ds_fat": "Fat %",
     "web.goal.ds_muscle": "Muscle",
-    "web.goal.note": "The data is live, from the project's single model (labs + Garmin / smart "
-                     "scales). After a new lab panel and a weigh-in the points appear on their "
-                     "own; check them against the yellow target lines and the green optimum window "
-                     "of 2021–2022. The key metric of progress is {key_metric}, not the number on "
-                     "the scales alone.",
+    "web.goal.note": "The data is live, from the same model the rest of the application reads "
+                     "(labs + wearable + scales). After a new lab panel or a weigh-in the points "
+                     "appear on their own; read them against the yellow target lines and the green "
+                     "reference window, both of which come from the goal you set in "
+                     "health_goals.json. Where body composition is the goal, the key metric is "
+                     "{key_metric}, not the number on the scales alone.",
     "web.goal.note_key": "fat down with muscle held",
+    "web.goal.chart_nodata": "No series here yet — the chart appears once there are "
+                             "measurements to draw.",
     "web.goal.charts_unavailable": "Charts are unavailable (chart.min.js did not load). Restart "
                                    "the application and refresh the page.",
 
     # ── web: overview ────────────────────────────────────────────────────
-    "web.overview.subhead": "subject {subject} · {meds} prescriptions · {gaps} genome gaps",
+    "web.header.subject": "subject {subject}",
+    "web.header.genome_gaps": "{n} target genes not read from a genome",
+    "web.header.demo_banner": "DEMO — a fictional person. Nothing on these screens is about "
+                              "you: the numbers, the prescriptions and the genotypes are "
+                              "generated. Run «scholion init» for your own profile.",
+    "count.prescriptions.one": "{n} prescription",
+    "count.prescriptions.few": "{n} prescriptions",
+    "count.prescriptions.many": "{n} prescriptions",
     "web.overview.focus_h": "Focus of attention",
     "web.overview.watched_h": "Markers under control",
-    "web.overview.stat_red": "red flags",
-    "web.overview.stat_watch": "under observation",
-    "web.overview.stat_abnormal": "out of range in the labs",
-    "web.overview.stat_suggested": "tests suggested",
-    "web.overview.red_h": "Red flags",
+    "web.overview.stat_above": "of them above the ceiling",
+    "web.overview.stat_below": "of them below the floor",
+    "web.overview.stat_abnormal": "out of range, of markers measured",
+    "web.overview.stat_suggested": "tests to take",
+    "web.overview.stat_note": "The second and third numbers split the first by direction — "
+                              "below a floor is not milder than above a ceiling. The fourth "
+                              "is the list on the «What to test» tab.",
+    "web.overview.red_h": "Out of range now",
     "web.overview.red_window": "over the last 12 months",
     "web.overview.stale_hidden": "Another {count} older than 12 months is hidden — see the «Labs» "
                                  "tab.",
-    "web.overview.priority_tests_h": "Priority tests to take",
-    "web.overview.no_red": "There are no red flags.",
-    "web.overview.no_priority_tests": "There is nothing to order on priority — everything "
-                                      "prescribed has been taken. Routine control and repeat "
-                                      "intervals are on the «What to test» tab.",
+    "web.overview.tests_h": "What to take",
+    # Two different facts, and the old sentence covered both with the reassuring
+    # one: nothing is flagged because nothing is out of range, or because nothing
+    # has been measured. The count is what tells them apart.
+    "web.overview.no_red": "Nothing outside its range among the {n} markers measured.",
+    "web.overview.no_red_nodata": "Nothing has been measured yet, so there is nothing to "
+                                  "flag. Load lab results and this line will mean something.",
+    # Same defect as `web.tests.none_pending`, and on the FIRST screen.
+    "web.overview.no_priority_tests": "No new order comes out of what is in the profile right "
+                                      "now. Routine control and repeat intervals are on the "
+                                      "«What to test» tab.",
 
     # ── web: focus of attention ──────────────────────────────────────────
     "web.focus.track_tip": "baseline {base} · now {now} · target {target}",
@@ -1333,9 +1379,11 @@ will go through them later.
     "web.drug.placeholder": "drug name, e.g. metformin or aspirin",
     "web.drug.full_check": "Full check",
     "web.drug.pgx_only": "Pharmacogenetics only",
-    "web.drug.names_note": "Local names are resolved automatically: the local database first, then "
-                           "international RxNorm (translation / active substance). The internet is "
-                           "needed.",
+    "web.drug.names_note": "Local names are resolved automatically: the local database first, "
+                           "then the international RxNorm (translation / active substance). Only "
+                           "that second step goes to the network, and the only thing sent is the "
+                           "drug name you typed — never your profile, your labs or your genome. "
+                           "Without a connection the local database answers alone.",
     "web.drug.checking_full": "checking (including the international database)…",
     "web.drug.checking": "checking…",
     "web.drug.found_online": "found online",
@@ -1415,8 +1463,13 @@ will go through them later.
                           "in roughly ~{months} months.",
     "web.tests.specialist": "who to see: {name}",
     "web.tests.why": "what for: {text}",
-    "web.tests.none_pending": "There is nothing to order right now — what was ordered has been "
-                              "taken; we are only waiting for results that are not ready yet.",
+    # An empty list of suggestions means the rules produced nothing from what is in
+    # the profile. It does NOT mean anything about what was ordered or taken —
+    # a profile with no labs at all yields exactly the same empty list, and the
+    # previous wording told that person their results were on the way.
+    "web.tests.none_pending": "No new order comes out of what is in the profile right now. "
+                              "That is a statement about these rules and this data — not "
+                              "about what you have or have not had taken.",
     "web.tests.routine_h": "Routine control — already taken, watched by interval",
 
     # ── web: the health radar and the second look ────────────────────────
@@ -1442,9 +1495,125 @@ will go through them later.
     "web.second.vs_prev": "against the previous measurement ({date}: {score}/100)",
     "web.second.no_current": "there are no current abnormalities",
     "web.second.factors_h": "The important factors — what to discuss with the doctor",
-    "web.second.no_domain_issues": "No clear abnormalities by body system.",
+    "web.second.no_domain_issues": "No clear abnormalities among the {n} body systems "
+                                   "there was enough data to judge.",
+    "web.second.no_domain_data": "No body system has enough measured to be judged yet. "
+                                 "The radar shows the shape; the verdicts wait for data.",
+    "web.second.print_title": "Scholion — material for a conversation, prepared at home",
+    "web.second.print_name": "Name",
+    "web.second.print_dob": "Date of birth",
+    "web.second.print_date": "Date",
+    "web.second.print_foot": "This sheet is generated on the patient's own computer from files "
+                             "the patient maintains. It is not a laboratory report and carries no "
+                             "accession number: every value on it should be checked against the "
+                             "original before it is acted on. It is not a diagnosis, not a "
+                             "prescription, and asks for nothing except that the questions on it "
+                             "be considered.",
     "web.second.pgx_h": "Pharmacogenetics — for the future",
+    "web.second.no_drug_flags": "None of the {n} watch-list drugs there was a genotype for "
+                                "raised a flag.",
+    "web.second.pgx_basis": "{k} of {n} could be judged from the genotypes on file. The rest "
+                            "print the general rule for the drug — not a statement about you.",
+    "web.second.pgx_basis_none": "None of the {n} could be judged from the genotypes on file: "
+                                 "what follows is the general rule for each drug, not a "
+                                 "statement about you.",
+    "web.second.no_drug_data": "None of the {n} watch-list drugs could be judged — the profile "
+                               "carries no genotype for the genes they depend on. This is a "
+                               "statement about the data, not about the drugs.",
     "web.second.tests_h": "What is worth taking",
+    "web.second.routine_elsewhere": "Another {n} are routine control — already taken, watched "
+                                    "by interval. They are on the tab",
+
+    # ── proposing a goal ─────────────────────────────────────────────────
+    # Three sources, and the wording of each says what kind of claim it is. The
+    # personal best is deliberately «where you have been», not «where you should
+    # be»: nobody recommended that number, the person's own body produced it.
+    "goalgen.why.guideline": "{body} publishes this target ({year}).",
+    "goalgen.why.guideline_conditional": "{body} publishes this target ({year}) for people "
+                                         "with {condition}. Whether that is you is not "
+                                         "something this profile can confirm.",
+    "goalgen.why.no_target": "{body} looked at this marker and declined to set a target. "
+                             "That is the finding, not a gap — no number is proposed here.",
+    "goalgen.why.personal_best": "The best you have reached — {date}, out of {n} readings "
+                                 "over {months} months. Nobody recommended it; your own "
+                                 "measurements did.",
+    "goalgen.why.reference": "The wall of the laboratory corridor. Weaker than the other two: "
+                             "«inside the range» is where most people already are, and is "
+                             "not an aim.",
+    "goalgen.how_to_read": "A proposal, not a prescription. Where a clinical association has "
+                           "published a target it is quoted with its source; otherwise the "
+                           "proposal is your own best result, which is a fact about you and "
+                           "not advice. Change any of them, and take the ones that matter to "
+                           "your doctor.",
+    "goalgen.skip.no_series": "nothing measured",
+    "goalgen.skip.no_direction": "the catalogue does not record which direction is better "
+                                 "for this marker, so no goal is proposed rather than one "
+                                 "pointing the wrong way",
+    "goalgen.skip.too_few_points": "fewer than three readings — that is not a trend",
+    "goalgen.skip.too_short_a_window": "every reading falls inside six months",
+    "goalgen.skip.already_there": "your best is where you are now",
+    "goalgen.skip.society_withdrew_the_target": "the society that set the target withdrew it",
+    "goalgen.skip.nothing_to_go_on": "no published target, no usable series, no corridor",
+    "goalgen.title": "Proposed goals",
+    "goalgen.none": "Nothing here can carry a goal yet. Load more lab results and this "
+                    "answers differently.",
+    "goalgen.skipped_h": "Not proposed for, and why",
+    "goalgen.src.guideline": "clinical guideline",
+    "goalgen.src.personal_best": "your own best",
+    "goalgen.src.reference": "laboratory corridor",
+    "web.goalgen.h": "Let the application propose a goal",
+    "web.goalgen.intro": "It reads what you have measured and what the clinical associations "
+                         "publish, and proposes a target for each marker there is enough to "
+                         "propose one for. Every line says where its number came from. "
+                         "Nothing is written until you press «Save».",
+    "web.goalgen.btn": "Propose a goal",
+    "web.goalgen.save": "Save the ones ticked",
+    "web.goalgen.saved": "Saved to profile/health_goals.json — {n} target(s).",
+    "web.goalgen.now": "now",
+    "web.goalgen.reached": "you have been here before",
+    "web.goalgen.pick": "source",
+
+    # ── the genetic side of the lipid profile (PCSK9 + Lp(a)) ────────────
+    "lipidgen.title": "The genetic side of the lipid profile",
+    "lipidgen.headline.carrier": "A protective loss-of-function variant of PCSK9 is carried. "
+                                 "Part of the LDL-C picture is inheritance rather than habit — "
+                                 "which explains a low value, and does not replace measuring one.",
+    "lipidgen.headline.not_carrier": "No protective PCSK9 variant among those read. That is the "
+                                     "common answer, not a finding: it means the LDL-C measurement "
+                                     "stands on its own.",
+    "lipidgen.headline.unread": "The PCSK9 positions have not been read, so nothing can be said "
+                                "about them yet — which is different from saying there is nothing "
+                                "there.",
+    "lipidgen.how_to_read": "Two facts that are misread apart. Carrying a PCSK9 loss-of-function "
+                            "variant says how much of the LDL-C picture is fixed at birth. Lp(a) "
+                            "is invisible to the rest of a lipid panel — it is set at birth too, "
+                            "it does not move with the things LDL-C moves with, and a normal panel "
+                            "with a high Lp(a) is a normal panel that has missed the finding. "
+                            "Neither is a risk calculation and neither is a reason to start or "
+                            "stop a therapy.",
+    "lipidgen.copies.0": "not a carrier — no buffer from this variant; the LDL-C measurement stands on its own",
+    "lipidgen.copies.1": "one copy — lower LDL-C through life, and a materially lower risk of coronary heart disease",
+    "lipidgen.copies.2": "two copies — the same effect, stronger; very rare, and worth confirming by another method",
+    "lipidgen.lpa.h": "Lipoprotein(a)",
+    "lipidgen.lpa.order_it": "Not measured. Lp(a) is worth measuring ONCE in a lifetime — the "
+                             "level is largely fixed at birth and barely moves afterwards — and "
+                             "the moment for it is BEFORE a decision about lipid therapy, not "
+                             "after. Ask for it in nmol/L: the mg/dL conversion is not exact, "
+                             "because the apo(a) isoform differs in size from person to person.",
+    "lipidgen.lpa.estimate_limit": "A polygenic score for Lp(a) is a genetic ESTIMATE and cannot "
+                                   "stand in for the measurement. The level is driven mostly by "
+                                   "the number of KIV-2 repeats inside LPA — a copy-number "
+                                   "variant that short-read sequencing and SNP arrays see poorly. "
+                                   "The catalogue's own «Moderate» mark on this model is that "
+                                   "limit, not a gap in the catalogue.",
+    "lipidgen.lpa.measured": "measured {value} {unit} · {date}",
+    "lipidgen.lpa.above": "above the reference bound of {ref}",
+    "lipidgen.waiting_h": "Read, but not interpreted here",
+    "lipidgen.unread": "not read",
+    "lipidgen.carrier": "carrier",
+    "lipidgen.not_carrier": "not a carrier",
+    "web.genome.lipidgen_h": "Lipids — the part that is inherited",
+    "web.genome.nav_lipids": "Lipids",
 
     # ── web: prescriptions ───────────────────────────────────────────────
     "web.meds.title": "Prescriptions (editable)",
@@ -1492,7 +1661,7 @@ will go through them later.
     "web.bullet.none": "no data",
     "web.bullet.no_target": "no goal",
     "web.bullet.target": "goal {value}",
-    "web.bullet.src_goal": "a goal from your shape of 2021–2022",
+    "web.bullet.src_goal": "the goal you set",
     "web.bullet.src_ref": "the wall of the laboratory corridor",
     "web.bullet.src_norm": "general advice",
     "web.bullet.src_own": "derived from your own data",
@@ -1587,7 +1756,8 @@ will go through them later.
     "web.genome.nav_locus": "Locus lookup",
     "web.genome.db_connected": "database connected",
     "web.genome.db_not_connected": "database not connected",
-    "web.genome.db_after_script": "the database appears after call_full_vcf.sh",
+    "web.genome.db_after_script": "the genome side answers once a full VCF is connected — "
+                                 "`scholion doc preparing-the-genome` describes how",
     "web.genome.intro": "Everything about your genome in one place: the advantages as well as the "
                         "risks. Below: what is new in the databases, polygenic risks, longevity, "
                         "clinically significant ClinVar findings and a lookup for any locus. "
@@ -1641,7 +1811,6 @@ will go through them later.
 
     # ── web: ClinVar findings ────────────────────────────────────────────
     "web.clinvar.not_run": "The ClinVar annotation has not been run yet.",
-    "web.clinvar.run_hint": "Run {script}.",
     "web.clinvar.nothing": "No significant findings were extracted",
     "web.clinvar.experts": "experts",
     "web.clinvar.several_labs": "several laboratories",

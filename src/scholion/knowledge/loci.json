@@ -8,9 +8,9 @@
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool.",
-    "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026."
+    "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
+    "updated": "2026-08-18"
   },
-
   "regions": {
     "CYP2D6": {
       "chrom": "22",
@@ -29,7 +29,10 @@
       "pos": 44908684,
       "ref": "T",
       "alt": "C",
-      "note": {"en": "the ε-status (with rs7412)", "ru": "ε-статус (с rs7412)"}
+      "note": {
+        "en": "the ε-status (with rs7412)",
+        "ru": "ε-статус (с rs7412)"
+      }
     },
     "rs7412": {
       "gene": "APOE",
@@ -37,7 +40,10 @@
       "pos": 44908822,
       "ref": "C",
       "alt": "T",
-      "note": {"en": "the ε-status (with rs429358)", "ru": "ε-статус (с rs429358)"}
+      "note": {
+        "en": "the ε-status (with rs429358)",
+        "ru": "ε-статус (с rs429358)"
+      }
     },
     "rs1799853": {
       "gene": "CYP2C9",
@@ -62,7 +68,10 @@
       "ref": "T",
       "alt": "C",
       "star": "*5",
-      "note": {"en": "myopathy on statins", "ru": "миопатия на статинах"}
+      "note": {
+        "en": "myopathy on statins",
+        "ru": "миопатия на статинах"
+      }
     },
     "rs4244285": {
       "gene": "CYP2C19",
@@ -86,7 +95,10 @@
       "pos": 31096368,
       "ref": "C",
       "alt": "T",
-      "note": {"en": "-1639; T = increased sensitivity to warfarin", "ru": "-1639; T = повышенная чувствительность к варфарину"}
+      "note": {
+        "en": "-1639; T = increased sensitivity to warfarin",
+        "ru": "-1639; T = повышенная чувствительность к варфарину"
+      }
     },
     "rs1801133": {
       "gene": "MTHFR",
@@ -127,7 +139,10 @@
       "ref": "C",
       "alt": "T",
       "star": "*4",
-      "note": {"en": "CYP2D6 is more reliably called with PyPGx (CNV/phasing)", "ru": "CYP2D6 надёжнее считать PyPGx (CNV/фазировка)"}
+      "note": {
+        "en": "CYP2D6 is more reliably called with PyPGx (CNV/phasing)",
+        "ru": "CYP2D6 надёжнее считать PyPGx (CNV/фазировка)"
+      }
     },
     "rs1065852": {
       "gene": "CYP2D6",
@@ -136,7 +151,10 @@
       "ref": "G",
       "alt": "A",
       "star": "*10",
-      "note": {"en": "see PyPGx", "ru": "см. PyPGx"}
+      "note": {
+        "en": "see PyPGx",
+        "ru": "см. PyPGx"
+      }
     },
     "rs115232898": {
       "gene": "DPYD",
@@ -145,7 +163,10 @@
       "ref": "T",
       "alt": "C",
       "star": "c.557A>G",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs146356975": {
       "gene": "DPYD",
@@ -154,7 +175,10 @@
       "ref": "T",
       "alt": "C",
       "star": "c.868A>G",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs75017182": {
       "gene": "DPYD",
@@ -163,7 +187,10 @@
       "ref": "G",
       "alt": "C",
       "star": "HapB3 (c.1129-5923C>G)",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs56038477": {
       "gene": "DPYD",
@@ -172,7 +199,10 @@
       "ref": "C",
       "alt": "T",
       "star": "HapB3 (c.1236G>A)",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs55886062": {
       "gene": "DPYD",
@@ -181,7 +211,10 @@
       "ref": "A",
       "alt": "C",
       "star": "*13",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs3918290": {
       "gene": "DPYD",
@@ -190,7 +223,10 @@
       "ref": "C",
       "alt": "T",
       "star": "*2A",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs112766203": {
       "gene": "DPYD",
@@ -199,7 +235,10 @@
       "ref": "G",
       "alt": "A",
       "star": "c.2279C>T",
-      "note": {"en": "fluoropyrimidine toxicity", "ru": "токсичность фторпиримидинов"}
+      "note": {
+        "en": "fluoropyrimidine toxicity",
+        "ru": "токсичность фторпиримидинов"
+      }
     },
     "rs67376798": {
       "gene": "DPYD",
@@ -215,7 +254,10 @@
       "pos": 108575012,
       "ref": "A",
       "alt": "G",
-      "note": {"en": "longevity; G — the favourable allele", "ru": "долголетие; G — благоприятный аллель"}
+      "note": {
+        "en": "longevity; G — the favourable allele",
+        "ru": "долголетие; G — благоприятный аллель"
+      }
     },
     "rs6025": {
       "gene": "F5",
@@ -224,7 +266,10 @@
       "ref": "C",
       "alt": "T",
       "star": "Leiden (R506Q)",
-      "note": {"en": "factor V Leiden. The gene is on the minus strand: the genetic 1691G>A = the genomic C>T. A heterozygote raises the risk of VTE; it is not a contraindication to TRT, but it is a reason for more frequent monitoring of the haematocrit; a homozygote/a combination with F2 — a consultation with a haematologist", "ru": "фактор V Лейден. Ген на минус-цепи: генетический 1691G>A = геномный C>T. Гетерозигота повышает риск ВТЭ, не противопоказание к ТРТ, но повод к более частому контролю гематокрита; гомозигота/сочетание с F2 — консультация гематолога"}
+      "note": {
+        "en": "factor V Leiden. The gene is on the minus strand: the genetic 1691G>A = the genomic C>T. A heterozygote raises the risk of VTE; it is not a contraindication to TRT, but it is a reason for more frequent monitoring of the haematocrit; a homozygote/a combination with F2 — a consultation with a haematologist",
+        "ru": "фактор V Лейден. Ген на минус-цепи: генетический 1691G>A = геномный C>T. Гетерозигота повышает риск ВТЭ, не противопоказание к ТРТ, но повод к более частому контролю гематокрита; гомозигота/сочетание с F2 — консультация гематолога"
+      }
     },
     "rs1799963": {
       "gene": "F2",
@@ -233,7 +278,10 @@
       "ref": "G",
       "alt": "A",
       "star": "G20210A",
-      "note": {"en": "prothrombin G20210A. The same context as F5: a risk of VTE, a matter of monitoring tactics, not a ban on therapy", "ru": "протромбин G20210A. Тот же контекст, что F5: риск ВТЭ, тактика мониторинга, не запрет терапии"}
+      "note": {
+        "en": "prothrombin G20210A. The same context as F5: a risk of VTE, a matter of monitoring tactics, not a ban on therapy",
+        "ru": "протромбин G20210A. Тот же контекст, что F5: риск ВТЭ, тактика мониторинга, не запрет терапии"
+      }
     },
     "rs1800562": {
       "gene": "HFE",
@@ -242,7 +290,10 @@
       "ref": "G",
       "alt": "A",
       "star": "C282Y",
-      "note": {"en": "hereditary haemochromatosis. The penetrance is LOW — what decides is not the genotype but ferritin and transferrin saturation; a C282Y homozygote = a reason for regular monitoring of iron", "ru": "наследственный гемохроматоз. Пенетрантность НИЗКАЯ — решает не генотип, а ферритин и сатурация трансферрина; гомозигота C282Y = повод к регулярному контролю железа"}
+      "note": {
+        "en": "hereditary haemochromatosis. The penetrance is LOW — what decides is not the genotype but ferritin and transferrin saturation; a C282Y homozygote = a reason for regular monitoring of iron",
+        "ru": "наследственный гемохроматоз. Пенетрантность НИЗКАЯ — решает не генотип, а ферритин и сатурация трансферрина; гомозигота C282Y = повод к регулярному контролю железа"
+      }
     },
     "rs1799945": {
       "gene": "HFE",
@@ -251,7 +302,10 @@
       "ref": "C",
       "alt": "G",
       "star": "H63D",
-      "note": {"en": "a weak allele; clinically significant mainly as a compound heterozygote with C282Y, in isolation it almost always has no consequences", "ru": "слабый аллель; клинически значим в основном как компаунд-гетерозигота с C282Y, изолированно почти всегда без последствий"}
+      "note": {
+        "en": "a weak allele; clinically significant mainly as a compound heterozygote with C282Y, in isolation it almost always has no consequences",
+        "ru": "слабый аллель; клинически значим в основном как компаунд-гетерозигота с C282Y, изолированно почти всегда без последствий"
+      }
     },
     "rs28929474": {
       "gene": "SERPINA1",
@@ -260,7 +314,10 @@
       "ref": "C",
       "alt": "T",
       "star": "Pi*Z (E366K)",
-      "note": {"en": "alpha-1 antitrypsin deficiency. A Pi*ZZ homozygote — a risk of emphysema and liver disease; a Pi*MZ heterozygote — a moderate modifier in the presence of smoking and of other liver damage. Look at it together with the liver markers and elastography", "ru": "дефицит альфа-1-антитрипсина. Гомозигота Pi*ZZ — риск эмфиземы и болезни печени; гетерозигота Pi*MZ — умеренный модификатор при курении и других поражениях печени. Смотреть вместе с печёночными маркёрами и эластографией"}
+      "note": {
+        "en": "alpha-1 antitrypsin deficiency. A Pi*ZZ homozygote — a risk of emphysema and liver disease; a Pi*MZ heterozygote — a moderate modifier in the presence of smoking and of other liver damage. Look at it together with the liver markers and elastography",
+        "ru": "дефицит альфа-1-антитрипсина. Гомозигота Pi*ZZ — риск эмфиземы и болезни печени; гетерозигота Pi*MZ — умеренный модификатор при курении и других поражениях печени. Смотреть вместе с печёночными маркёрами и эластографией"
+      }
     },
     "rs17580": {
       "gene": "SERPINA1",
@@ -269,7 +326,10 @@
       "ref": "T",
       "alt": "A",
       "star": "Pi*S",
-      "note": {"en": "a milder deficiency allele; significant in combination with Pi*Z", "ru": "более мягкий дефицитный аллель; значим в сочетании с Pi*Z"}
+      "note": {
+        "en": "a milder deficiency allele; significant in combination with Pi*Z",
+        "ru": "более мягкий дефицитный аллель; значим в сочетании с Pi*Z"
+      }
     },
     "rs4148323": {
       "gene": "UGT1A1",
@@ -278,7 +338,10 @@
       "ref": "G",
       "alt": "A",
       "star": "*6",
-      "note": {"en": "reduced activity of UGT1A1 (predominantly in East Asians). The main European variant is *28 (a TA repeat in the promoter), it is NOT a SNP and is reliably determined only by PyPGx/a targeted indel call", "ru": "снижение активности UGT1A1 (преимущественно у восточноазиатов). Основной европейский вариант — *28 (TA-повтор промотора), он НЕ SNP и надёжно определяется только PyPGx/адресным индел-вызовом"}
+      "note": {
+        "en": "reduced activity of UGT1A1 (predominantly in East Asians). The main European variant is *28 (a TA repeat in the promoter), it is NOT a SNP and is reliably determined only by PyPGx/a targeted indel call",
+        "ru": "снижение активности UGT1A1 (преимущественно у восточноазиатов). Основной европейский вариант — *28 (TA-повтор промотора), он НЕ SNP и надёжно определяется только PyPGx/адресным индел-вызовом"
+      }
     },
     "rs2231142": {
       "gene": "ABCG2",
@@ -287,7 +350,10 @@
       "ref": "G",
       "alt": "T",
       "star": "Q141K",
-      "note": {"en": "CPIC: together with SLCO1B1 it determines the tactics for rosuvastatin; also associated with urate", "ru": "CPIC: вместе с SLCO1B1 определяет тактику по розувастатину; также ассоциирован с уратом"}
+      "note": {
+        "en": "CPIC: together with SLCO1B1 it determines the tactics for rosuvastatin; also associated with urate",
+        "ru": "CPIC: вместе с SLCO1B1 определяет тактику по розувастатину; также ассоциирован с уратом"
+      }
     },
     "rs116855232": {
       "gene": "NUDT15",
@@ -296,7 +362,10 @@
       "ref": "C",
       "alt": "T",
       "star": "*3 (R139C)",
-      "note": {"en": "CPIC level A: myelotoxicity of the thiopurines (azathioprine, mercaptopurine)", "ru": "CPIC уровень A: миелотоксичность тиопуринов (азатиоприн, меркаптопурин)"}
+      "note": {
+        "en": "CPIC level A: myelotoxicity of the thiopurines (azathioprine, mercaptopurine)",
+        "ru": "CPIC уровень A: миелотоксичность тиопуринов (азатиоприн, меркаптопурин)"
+      }
     },
     "rs776746": {
       "gene": "CYP3A5",
@@ -305,7 +374,10 @@
       "ref": "T",
       "alt": "C",
       "star": "*3",
-      "note": {"en": "CPIC: the dose of tacrolimus. In Europeans *3/*3 (non-functional) is the norm, an expressor is a rarity", "ru": "CPIC: доза такролимуса. У европейцев *3/*3 (нефункциональный) — норма, экспрессор — редкость"}
+      "note": {
+        "en": "CPIC: the dose of tacrolimus. In Europeans *3/*3 (non-functional) is the norm, an expressor is a rarity",
+        "ru": "CPIC: доза такролимуса. У европейцев *3/*3 (нефункциональный) — норма, экспрессор — редкость"
+      }
     },
     "rs4986893": {
       "gene": "CYP2C19",
@@ -314,7 +386,10 @@
       "ref": "G",
       "alt": "A",
       "star": "*3",
-      "note": {"en": "a non-functional allele, it complements *2/*17 when the phenotype is determined", "ru": "нефункциональный аллель, дополняет *2/*17 при определении фенотипа"}
+      "note": {
+        "en": "a non-functional allele, it complements *2/*17 when the phenotype is determined",
+        "ru": "нефункциональный аллель, дополняет *2/*17 при определении фенотипа"
+      }
     },
     "rs2108622": {
       "gene": "CYP4F2",
@@ -323,7 +398,10 @@
       "ref": "C",
       "alt": "T",
       "star": "V433M",
-      "note": {"en": "the warfarin dose together with VKORC1 and CYP2C9", "ru": "доза варфарина вместе с VKORC1 и CYP2C9"}
+      "note": {
+        "en": "the warfarin dose together with VKORC1 and CYP2C9",
+        "ru": "доза варфарина вместе с VKORC1 и CYP2C9"
+      }
     },
     "rs1050828": {
       "gene": "G6PD",
@@ -332,7 +410,10 @@
       "ref": "C",
       "alt": "T",
       "star": "A- (V68M)",
-      "note": {"en": "G6PD deficiency. The X chromosome: in men there is hemizygosity, and the interpretation is unambiguous. In case of deficiency — avoid oxidants (primaquine, rasburicase, a number of sulfonamides, high doses of intravenous vitamin C)", "ru": "дефицит Г6ФД. X-хромосома: у мужчин гемизиготность, интерпретация однозначна. При дефиците — избегать окислителей (примахин, расбуриказа, ряд сульфаниламидов, высокие дозы витамина C в/в)"}
+      "note": {
+        "en": "G6PD deficiency. The X chromosome: in men there is hemizygosity, and the interpretation is unambiguous. In case of deficiency — avoid oxidants (primaquine, rasburicase, a number of sulfonamides, high doses of intravenous vitamin C)",
+        "ru": "дефицит Г6ФД. X-хромосома: у мужчин гемизиготность, интерпретация однозначна. При дефиците — избегать окислителей (примахин, расбуриказа, ряд сульфаниламидов, высокие дозы витамина C в/в)"
+      }
     },
     "rs5030868": {
       "gene": "G6PD",
@@ -341,7 +422,10 @@
       "ref": "G",
       "alt": "A",
       "star": "Mediterranean (S188F)",
-      "note": {"en": "the Mediterranean variant, a more severe deficiency; the same list of restrictions", "ru": "средиземноморский вариант, более тяжёлый дефицит; тот же список ограничений"}
+      "note": {
+        "en": "the Mediterranean variant, a more severe deficiency; the same list of restrictions",
+        "ru": "средиземноморский вариант, более тяжёлый дефицит; тот же список ограничений"
+      }
     },
     "rs12979860": {
       "gene": "IFNL4",
@@ -349,7 +433,10 @@
       "pos": 39248147,
       "ref": "C",
       "alt": "T",
-      "note": {"en": "the response to interferon therapy for hepatitis C; in the era of DAAs its significance is historical", "ru": "ответ на интерферон-терапию гепатита C; в эпоху ПППД значение историческое"}
+      "note": {
+        "en": "the response to interferon therapy for hepatitis C; in the era of DAAs its significance is historical",
+        "ru": "ответ на интерферон-терапию гепатита C; в эпоху ПППД значение историческое"
+      }
     },
     "rs4988235": {
       "gene": "MCM6",
@@ -357,7 +444,10 @@
       "pos": 135851076,
       "ref": "G",
       "alt": "A",
-      "note": {"en": "lactase persistence (the LCT enhancer). GG — probable adult hypolactasia, A — persistence", "ru": "лактазная персистентность (энхансер LCT). GG — вероятная гиполактазия взрослых, A — персистентность"}
+      "note": {
+        "en": "lactase persistence (the LCT enhancer). GG — probable adult hypolactasia, A — persistence",
+        "ru": "лактазная персистентность (энхансер LCT). GG — вероятная гиполактазия взрослых, A — персистентность"
+      }
     },
     "rs671": {
       "gene": "ALDH2",
@@ -366,7 +456,10 @@
       "ref": "G",
       "alt": "A",
       "star": "*2",
-      "note": {"en": "aldehyde dehydrogenase deficiency (the flush reaction). In carriers, regular alcohol reliably raises the risk of oesophageal cancer. In Europeans the variant is rare", "ru": "дефицит альдегиддегидрогеназы (flush-реакция). У носителей регулярный алкоголь достоверно повышает риск рака пищевода. У европейцев вариант редок"}
+      "note": {
+        "en": "aldehyde dehydrogenase deficiency (the flush reaction). In carriers, regular alcohol reliably raises the risk of oesophageal cancer. In Europeans the variant is rare",
+        "ru": "дефицит альдегиддегидрогеназы (flush-реакция). У носителей регулярный алкоголь достоверно повышает риск рака пищевода. У европейцев вариант редок"
+      }
     },
     "rs601338": {
       "gene": "FUT2",
@@ -375,7 +468,10 @@
       "ref": "G",
       "alt": "A",
       "star": "W154X",
-      "note": {"en": "a non-secretor when AA: the composition of the microbiota, resistance to norovirus, ambiguous data on B12. Change the dose of supplements only on a laboratory deficiency, not on the genotype", "ru": "non-secretor при AA: состав микробиоты, устойчивость к норовирусу, неоднозначные данные по B12. Дозу добавок менять только по лабораторному дефициту, не по генотипу"}
+      "note": {
+        "en": "a non-secretor when AA: the composition of the microbiota, resistance to norovirus, ambiguous data on B12. Change the dose of supplements only on a laboratory deficiency, not on the genotype",
+        "ru": "non-secretor при AA: состав микробиоты, устойчивость к норовирусу, неоднозначные данные по B12. Дозу добавок менять только по лабораторному дефициту, не по генотипу"
+      }
     },
     "rs762551": {
       "gene": "CYP1A2",
@@ -384,7 +480,10 @@
       "ref": "C",
       "alt": "A",
       "star": "*1F",
-      "note": {"en": "the rate of caffeine metabolism. The data on clinical outcomes are weak — an argument for moderation rather than a medical recommendation", "ru": "скорость метаболизма кофеина. Данные по клиническим исходам слабые — довод к умеренности, а не медицинская рекомендация"}
+      "note": {
+        "en": "the rate of caffeine metabolism. The data on clinical outcomes are weak — an argument for moderation rather than a medical recommendation",
+        "ru": "скорость метаболизма кофеина. Данные по клиническим исходам слабые — довод к умеренности, а не медицинская рекомендация"
+      }
     },
     "rs12934922": {
       "gene": "BCO1",
@@ -392,7 +491,10 @@
       "pos": 81268089,
       "ref": "A",
       "alt": "T",
-      "note": {"en": "the conversion of beta-carotene into retinol; carriers of the «slow» variant get vitamin A from plant sources less well", "ru": "конверсия бета-каротина в ретинол; носители «медленного» варианта хуже получают витамин A из растительных источников"}
+      "note": {
+        "en": "the conversion of beta-carotene into retinol; carriers of the «slow» variant get vitamin A from plant sources less well",
+        "ru": "конверсия бета-каротина в ретинол; носители «медленного» варианта хуже получают витамин A из растительных источников"
+      }
     },
     "rs7501331": {
       "gene": "BCO1",
@@ -400,7 +502,10 @@
       "pos": 81280891,
       "ref": "C",
       "alt": "T",
-      "note": {"en": "the second BCO1 conversion variant, assessed together with rs12934922", "ru": "второй вариант конверсии BCO1, оценивается вместе с rs12934922"}
+      "note": {
+        "en": "the second BCO1 conversion variant, assessed together with rs12934922",
+        "ru": "второй вариант конверсии BCO1, оценивается вместе с rs12934922"
+      }
     },
     "rs2187668": {
       "gene": "HLA-DQA1",
@@ -408,7 +513,10 @@
       "pos": 32638107,
       "ref": "C",
       "alt": "T",
-      "note": {"en": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. IMPORTANT: it does not detect DQ2.5 in the trans configuration", "ru": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. ВАЖНО: не выявляет DQ2.5 в транс-конфигурации"}
+      "note": {
+        "en": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. IMPORTANT: it does not detect DQ2.5 in the trans configuration",
+        "ru": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. ВАЖНО: не выявляет DQ2.5 в транс-конфигурации"
+      }
     },
     "rs7775228": {
       "gene": "HLA-DQB1",
@@ -416,7 +524,10 @@
       "pos": 32690302,
       "ref": "T",
       "alt": "C",
-      "note": {"en": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; paired with rs2395182 and rs4713586 (the exclusion of DQ4)", "ru": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; в паре с rs2395182 и rs4713586 (исключение DQ4)"}
+      "note": {
+        "en": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; paired with rs2395182 and rs4713586 (the exclusion of DQ4)",
+        "ru": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; в паре с rs2395182 и rs4713586 (исключение DQ4)"
+      }
     },
     "rs2395182": {
       "gene": "HLA-DRA",
@@ -424,7 +535,10 @@
       "pos": 32445540,
       "ref": "G",
       "alt": "T",
-      "note": {"en": "tag DQ2.2 (the second marker), risk allele T; Monsuur 2008", "ru": "tag DQ2.2 (второй маркёр), risk allele T; Monsuur 2008"}
+      "note": {
+        "en": "tag DQ2.2 (the second marker), risk allele T; Monsuur 2008",
+        "ru": "tag DQ2.2 (второй маркёр), risk allele T; Monsuur 2008"
+      }
     },
     "rs7454108": {
       "gene": "HLA-DQB1",
@@ -440,7 +554,10 @@
       "pos": 32634437,
       "ref": "G",
       "alt": "A",
-      "note": {"en": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); needed TOGETHER with DQ2.2 to recognise DQ2.5 in trans (the DR5/DR7 genotype). The orientation of the tag allele needs confirmation against Monsuur 2008 Table 3", "ru": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); нужен ВМЕСТЕ с DQ2.2 для распознавания DQ2.5 в транс (генотип DR5/DR7). Ориентация аллеля-метки требует подтверждения по Monsuur 2008 Table 3"}
+      "note": {
+        "en": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); needed TOGETHER with DQ2.2 to recognise DQ2.5 in trans (the DR5/DR7 genotype). The orientation of the tag allele needs confirmation against Monsuur 2008 Table 3",
+        "ru": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); нужен ВМЕСТЕ с DQ2.2 для распознавания DQ2.5 в транс (генотип DR5/DR7). Ориентация аллеля-метки требует подтверждения по Monsuur 2008 Table 3"
+      }
     },
     "rs4713586": {
       "gene": "HLA-DQB1",
@@ -448,7 +565,54 @@
       "pos": 32691805,
       "ref": "A",
       "alt": "G",
-      "note": {"en": "the DQ4 exclusion marker when calling DQ2.2 (Monsuur 2008); the GRCh38 coordinate from Ensembl", "ru": "маркёр исключения DQ4 при вызове DQ2.2 (Monsuur 2008); координата GRCh38 по Ensembl"}
+      "note": {
+        "en": "the DQ4 exclusion marker when calling DQ2.2 (Monsuur 2008); the GRCh38 coordinate from Ensembl",
+        "ru": "маркёр исключения DQ4 при вызове DQ2.2 (Monsuur 2008); координата GRCh38 по Ensembl"
+      }
+    },
+    "rs11591147": {
+      "gene": "PCSK9",
+      "chrom": "1",
+      "pos": 55039974,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "R46L — a loss-of-function variant; the T allele lowers LDL-C",
+        "ru": "R46L — вариант потери функции; аллель T снижает ЛПНП"
+      }
+    },
+    "rs28362286": {
+      "gene": "PCSK9",
+      "chrom": "1",
+      "pos": 55063542,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "C679X — a nonsense variant; the A allele truncates the protein",
+        "ru": "C679X — нонсенс-вариант; аллель A обрывает белок"
+      }
+    },
+    "rs28362263": {
+      "gene": "PCSK9",
+      "chrom": "1",
+      "pos": 55058182,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "A443T — a weak effect on LDL-C; direction not yet resolved here",
+        "ru": "A443T — слабый эффект на ЛПНП; направление здесь пока не разрешено"
+      }
+    },
+    "rs72646508": {
+      "gene": "PCSK9",
+      "chrom": "1",
+      "pos": 55052749,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "L253F — rare, loss of function reported; direction not yet resolved here",
+        "ru": "L253F — редкий, сообщается о потере функции; направление здесь пока не разрешено"
+      }
     }
   }
 }

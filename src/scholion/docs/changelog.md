@@ -31,6 +31,313 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.3.0 — 18.08.2026
+
+_Tagged three times before it left the building. `v0.3.0` and `v0.3.1` were pushed
+to GitHub and rejected by PyPI — see «the metadata line» below — so neither was
+ever installable, and both tags were withdrawn rather than left standing as
+versions nobody could get. What follows is everything those three tags contained,
+under the number the release was always meant to carry. If you have a checkout
+pinned to `v0.3.1`, it is gone; `v0.3.0` is the same code and more._
+
+_MINOR, and a **series break** in two places. `test_rules.json` rewrote three
+rules, so a suggestion list printed before this version and one printed after it
+are not the same document even from an unchanged profile. `loci.json` and
+`longevity_directions.json` gained PCSK9, so a genome that resolved nothing there
+now resolves four positions. Separately, a profile carrying BOTH a laboratory
+report and a VCF can answer differently at a position where the two disagree: the
+reads win now, and the disagreement is printed._
+
+_Written from a run of the product as a stranger: the package built by
+`make_shareable.py`, installed with `pip install` into a clean machine, opened in
+a browser as two people — one with the demo, one an hour after installing with
+nothing loaded — and read by three reviewers with no knowledge of the project. The
+findings are theirs; what follows is what was done about them._
+
+### What this changes in the conclusions
+
+**A new profile no longer says anything about the person who created it.** Every
+file `scholion init` laid down carried data: one triglyceride measurement dated
+2024-01, one prescription, a sex, a year of birth and a height. A minute after
+installing — before loading anything — the first screen counted «0 red flags over
+the last 12 months», the labs tab showed a value flagged «within range» with a
+date on it, and the header counted a prescription. Both readers who met that state
+said they would have repeated those numbers to a doctor. The templates now ship
+empty, and each one says in `_meta.why_empty` that the emptiness is a decision.
+`metrics.json` no longer assigns a sex, a birth year or a height: the panels that
+need them refuse until they are filled in, which is the correct answer.
+
+**The suggestion rules stopped asserting facts about the reader.** The CYP2C9
+rule fires for anyone whose CYP2C9 is unread — that is, for everyone new — and its
+reason read «Together with the **already known VKORC1**…». True of exactly one
+profile, the one it was written on. The APOE rule justified a test with «a goal of
+the project». Both rewritten. «Track 2», the project's internal name for the
+FASTQ→VCF pipeline, left the three rules it appeared in: every reviewer stopped on
+it, and a clinician read «The CYP2C9 genotype (\*2/\*3) — through Track 2» as the
+patient's genotype rather than as a test being suggested.
+
+**Direction stopped being read as severity.** The first screen split current
+abnormalities into «red flags» (above a ceiling) and «under observation» (below a
+floor), which made a ferritin of 13 against a floor of 20 the milder of the two —
+while the same screen's focus card was about that ferritin. The block now shows
+every current abnormality in one list; the two counts remain, labelled as the
+directions they are, with a line saying how the four numbers relate.
+
+**The pharmacogenetic section says how much of it is about you.** With no
+genotypes on file the section is not empty — every watch-list drug comes back with
+the general rule printed in place of a statement about the person — so it now
+opens with «K of N could be judged from the genotypes on file», and each row shows
+the phenotype LABEL (`ultrarapid metaboliser — ASSUMED, not every marker was
+read`) instead of the machine code (`UM`, `normal_sensitivity`).
+
+### What is retracted
+
+**The command for installing the skill never worked for anybody but the owner, and
+would have leaked his key if it had.** The «Assistant» tab built the path as
+`REPO/src/skill/INSTRUCTION.owner.md`. `REPO` is the repository root only in a
+source checkout — after `pip install` it is the parent of site-packages, naming
+nothing — and `INSTRUCTION.owner.md` never ships, so every installed copy showed
+«not found» and then printed a symlink command into empty space. In a checkout the
+path did resolve, and it pointed at `src/skill/`, which holds the owner's 117 KB
+clinical key: following it would have symlinked that key into `~/.claude/skills`
+for a model to read. The entry now names the packaged skill directory, prints no
+command when there is nothing to point at, and a test asserts that whatever
+directory it names carries no `*.owner.*` file — the assertion that fails on the
+owner's own machine, which the path-exists version did not.
+
+**Four places sent the reader to scripts that are not in the package.**
+`call_full_vcf.sh`, `annotate_clinvar.sh`, `acmg_sf_scan.py`,
+`loci_sites_bed.py` — all of `src/ingest/`, none of it shipped. They now point at
+`scholion doc preparing-the-genome`, which travels with the package.
+
+**The version in the header was a changelog line frozen in 2026-07.** `server.py`
+kept `VERSION = "2026-07-30 · radar dynamics + tab freshness"` by hand while the
+package was 0.2.2. It reads the package version now, and a test ties the two
+together.
+
+### What needs recomputing
+
+Nothing stored changes value. Suggestion lists and second-opinion sheets printed
+before this version carry the retracted wording and should be reprinted if they
+are still in circulation.
+
+### Also
+
+- The demo announces itself on every screen — an amber band saying it is a
+  fictional person. Before, the only sign was «DEMO-0001» in the header, which
+  reads like a laboratory accession number.
+- «Guide» moved from tenth tab to second. It answers most of what a newcomer asks
+  and was being handed over at the end of the journey.
+- A print stylesheet: the navigation, the source chips, the language switch and
+  the cross-tab links are stripped, and the sheet gains a header with fields for a
+  name, a date of birth and a date — the first thing a general practitioner said
+  was missing — and a footer saying where the numbers came from.
+- Empty chart frames replaced by a line saying no series exists yet. Three framed
+  rectangles with headings and nothing in them read as broken, not as empty.
+- `scholion init` names the first useful command for whatever the person actually
+  has, and says out loud that the four external programs listed after it are for
+  the genome track alone.
+- The owner's own goal left the product's vocabulary: the CLI help, the tool
+  description, the chart legend («the optimum window 2021–2022») and the default
+  heading («Goal — get back in shape») were one person's aim shown to everyone.
+- `_goal_num` used a decimal comma regardless of language, so the English page
+  showed «TSH 6,4» in the goal table above a card reading «6.42».
+- «The internet is needed» on the drugs tab, three centimetres under a padlock
+  reading «runs locally», now says what actually leaves: the drug name typed, and
+  nothing else.
+- Three new test files — `test_fresh_profile_is_empty.py`,
+  `test_entrypoints_are_reachable.py`, `test_empty_state_honesty.py` — named after
+  the failures rather than the functions.
+
+### From the other branch, in the same release
+
+**There is now an address.** `scholion.dev@proton.me`, in `README.md`,
+`SECURITY.md`, `CITATION.cff`, `pyproject.toml` and the issue-template config —
+with the instruction, in every one of them, to send no personal health data, and
+a pointer to `scholion redact` for anyone who wants to send a file anyway. This
+closes the last item of R1.1: until now a reader who found a defect, or wanted to
+offer de-identified data for validation, had nowhere to write.
+
+**A page for clinicians.** `docs/FOR-CLINICIANS.md` — what the program takes in,
+what it will and will not claim, and where it refuses. It ships inside the
+package like the other documents (`scholion doc for-clinicians`).
+
+**`scholion limits` names the cell it is answering from.** Input class (whole
+genome / exome / consumer array) × trait architecture (monogenic / oligogenic /
+polygenic): the pipeline differs in each, and so does what may be claimed. A
+percentile with no architecture beside it reads as a verdict; «no pathogenic
+variant found» in a gene the file never covered reads as reassurance. Where a
+polygenic number is on screen, a note on heritability goes with it.
+
+**Fact, not cause.** Raised by a clinical geneticist reviewing the project on
+17.08.2026 and the sharpest technical point in that review: «ferritin rose after
+the course» is a fact, «the course raised ferritin» is a causal claim that a
+series of two points cannot support. Rule 7 of the skill entry now says so to the
+model, and `test_safety_rules.py` holds the message catalogue to it — the
+catalogue is where a causal habit would start, because the model imitates the
+wording it is given.
+
+### Two capabilities, in the same release
+
+**The goal is proposed now, not shipped.** Removing one person's targets from
+`health_goals.json` left a hole where a goal used to be, and «write your own»
+is not an answer for somebody who has just installed a program. `scholion
+goal-suggest` reads what the person has actually measured and what the clinical
+associations publish, and proposes a target for each marker there is enough to
+propose one for. Three sources, and the whole design is in keeping them apart:
+
+- **a guideline**, quoted with its citation — the strongest and the rarest;
+- **the person's own best**, with the date and the number of readings behind it.
+  Not a recommendation from anybody: a fact about them;
+- **the wall of the laboratory corridor**, offered last, because «inside the
+  range» is where most people already are and is not an aim.
+
+A target already met is not offered as something to reach — it goes to a list of
+its own, which is a different and true statement. A target written for people
+with a condition (ADA's «under 7 %» is for somebody who HAS diabetes) is never
+adopted on a condition nobody confirmed. And what was passed over is listed with
+the reason, because five proposals with no account of the forty markers skipped
+read as «these five are what matter».
+
+`goal_targets.json` is new, and its hardest entries are the empty ones. The
+Endocrine Society looked at 25(OH)D in 2024 and withdrew the target it had once
+set; that refusal is recorded, quoted, and travels with anything else proposed
+for that marker — otherwise the laboratory corridor quietly supplies the number
+the society declined to write.
+
+Nothing is written to the profile without `--write` or a press of «Save», and a
+target the person set by hand is never replaced: it is the strongest source
+there is, because it is theirs.
+
+**The inherited side of the lipid profile (task 63).** PCSK9 carriage and Lp(a)
+in one card on «Genome», because each is misread alone. A low LDL-C with a
+loss-of-function variant behind it is a different fact from the same number
+reached on a statin; and Lp(a) is invisible to the rest of a lipid panel — set
+at birth, unmoved by what moves LDL-C, so a normal panel with a high Lp(a) is a
+normal panel that has missed the finding.
+
+Four PCSK9 positions entered `loci.json`, each coordinate read from the Ensembl
+REST API rather than from memory — the one lost variant in this project's
+history was lost to a coordinate written from memory. Two of them entered
+`longevity_directions.json` with primary PMIDs (Cohen 2005, Cohen 2006); the
+other two did not, and sit in `unresolved` saying why. The catalogue's own rule
+asks for a primary source naming the favourable allele, and review-level sourcing
+is not that.
+
+Two limits are printed rather than implied. «Not a carrier» of C679X says almost
+nothing outside populations of African descent, where the variant is close to
+absent — so the caveat travels with the answer. And a polygenic score for Lp(a)
+is an ESTIMATE: the level is driven mostly by the number of KIV-2 repeats inside
+LPA, a copy-number variant short reads see poorly, which is what the catalogue's
+«Moderate» mark on `PGS002101` has been saying in a place nobody looks. Where
+Lp(a) has not been measured the card says so and asks for the test — once in a
+lifetime, in nmol/L, and before a decision about therapy rather than after it.
+
+One correction to the analysis this was built from: `rs28362286` is **C679X**,
+not «near Y142X». Y142X is a different variant (`rs67608943`). The position
+Ensembl returns, 1:55063542, is at the 3′ end of the gene and fits residue 679,
+not 142.
+
+
+**A laboratory's summary sheet no longer overrules your own reads (task 64).**
+`core.genotype_status` returned the profile entry the moment it found one and
+never reached the VCF. So `rs4988235`, `rs1801133` and `rs429358` came back as
+`reported / profile / depth=None` — copied off an Evogen summary — while the
+person's own aligned reads sat unread in a file on the same disk. `scholion
+genome rs4988235` meanwhile DID read the VCF and answered «reference confirmed
+by a call (0/0), coverage 32». Two routes to one fact, disagreeing, and nothing
+in either saying so.
+
+A genuine read now wins: it carries a depth, it can be re-examined, and it is
+what the report was made from. But only a genuine one — `assumed_ref` means «the
+reference, OR nothing was looked at there», and letting that overrule a
+laboratory's positive finding would be this project's oldest defect wearing new
+clothes. A disagreement is never resolved silently: both values travel in
+`conflict`, and the CLI and the interface both print it, with the suggestion to
+take it back to whoever issued the report. Agreement is printed too — two
+independent routes to the same call is a stronger statement than either alone.
+
+Why the seventeen known disagreements between that report and the reads never
+tripped this: `genotype_status` answered `None` for every one of them, because
+those rsIDs are not in the coordinate catalogue. The priority was never exercised
+where it is dangerous, so the absence of an error there proved nothing — and the
+tests build the collision by hand rather than waiting for one.
+
+
+### What is retracted — the CI job that could not run where it was sent
+
+**The job written to catch «a check that asks the artefact for something only the
+repository has» was one.** `tests.yml` has a `package` job whose first step runs
+`make_shareable.py` — the sanitiser, which builds the package FROM `share/`. But
+`share/` does not ship: it is the folder the package is built out of, not part of
+what is built. So on the public repository that step answered «Run this from the
+ORIGINAL repository (there is no share/ folder with the templates)» and the build
+went red on the first push after publication, six seconds in.
+
+The author never saw it, because the author is in the source tree, where it
+passes. That is the whole of the class: a check agreeing with the single
+environment it was written in. It has now cost this project four times, and this
+is the first time it cost a red badge on a public repository — the first thing a
+stranger sees.
+
+The two steps are conditional now, on the same predicate `tests/support.py`
+already uses and calls `IN_SOURCE_REPO`: does `share/` exist. Where they are
+skipped the job says so with a `::notice::`, because a green tick for having run
+nothing is worse than a red one, and the matrix job above has in any case already
+run the package's own suite on exactly the files a recipient gets.
+
+#### Also
+
+`tests/test_ci_runs_where_it_can.py` — a workflow step that runs a tool needing
+the source tree must be conditional, and the condition must be the same question
+Python asks. The check is textual, so it is narrow on purpose; its first version
+read the workflow's own explanation of the guard as an unguarded call, which is
+the failure mode of every textual check and is why it now drops comment lines
+before looking. Verified by removing the guard and watching it go red.
+
+### What is retracted — the metadata line that kept this release off PyPI
+
+**Two releases reached GitHub and neither reached PyPI.** `v0.3.0` and `v0.3.1`
+both died on the same line, added when the project got an address to write to:
+
+    Contact = "mailto:scholion.dev@proton.me"
+
+Every value under `[project.urls]` has to be a URL, and PyPI means it:
+`400 'mailto:scholion.dev@proton.me' is not a valid url`. The index published
+`0.2.2` and has been publishing it ever since; the tags on GitHub say otherwise.
+Anyone who ran `pip install scholion` after 0.3.0 was tagged got 0.2.2 and had no
+way to know.
+
+**When it failed is the part worth keeping.** The build succeeded. `twine check`
+printed PASSED on both artefacts — it validates the long description, not the URL
+schemes. The signing, the attestations and the transparency-log entries all
+completed. The refusal came from the index, in the last step of the last job,
+after everything that could have caught it had said yes.
+
+The address now lives in `authors`, which is the field the core-metadata
+specification has for an e-mail and which PyPI accepts; the built wheel carries it
+as `Author-email: CrossRead <scholion.dev@proton.me>`. `Contact` points at the
+README's own contact section — the place that says what to write about and, more
+importantly, what not to send.
+
+#### Also
+
+`tests/test_packaging_metadata.py` asks the questions the index asks, when the
+suite runs rather than when the artefact is in flight: every `[project.urls]`
+value begins with `http`, an address to write to still exists and is not a
+`mailto:` in disguise, and the version still comes from the one file. Verified by
+putting the `mailto:` back and watching it go red, and by dropping the address and
+watching it go red for the other reason — the fix must not become «we removed the
+contact», which is the task the address was added for.
+
+It parses the file by hand instead of with `tomllib`. That library arrived in
+Python 3.11; this project supports 3.10, and 3.10 is the interpreter the mistake
+was authored on — so a test that skipped without a TOML reader would have skipped
+on the one machine where it mattered and reported OK for checking nothing. This
+project has been bitten by that shape four times.
+
+---
+
 ## v0.2.2 — 17.08.2026
 
 _PATCH, by the owner's judgement and against the first reading of this project's

@@ -118,11 +118,18 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("brief", parents=[common],
                    help="the lifestyle brief: live numbers + curated wordings")
     sub.add_parser("lifestyle", parents=[common], help="lifestyle (wearables): monthly trends + body composition")
-    sub.add_parser("goal", parents=[common], help="the goal for the metrics (get the 2021–2022 shape back) on live data")
+    sub.add_parser("goal", parents=[common], help="your goal for the metrics, on live data")
+    _gs = sub.add_parser("goal-suggest", parents=[common],
+                         help="propose a goal from your own series and the published guidelines")
+    _gs.add_argument("--write", action="store_true",
+                     help="write the proposals into profile/health_goals.json (nothing is "
+                          "written without this)")
     sub.add_parser("clinvar", parents=[common], help="clinically significant findings (ClinVar × VCF)")
     sub.add_parser("acmg", parents=[common], help="ACMG SF v3.3 secondary findings (the actionable minimum)")
     sub.add_parser("prs", parents=[common], help="polygenic risks (PGS): percentiles by trait")
     sub.add_parser("longevity", parents=[common], help="the longevity layer (LongevityMap): APOE ε + markers")
+    sub.add_parser("lipid-genetics", parents=[common],
+                   help="the inherited side of the lipid profile: PCSK9 carriage + Lp(a)")
 
     ig = sub.add_parser("ingest-labs", parents=[common], help="extract markers from the PDFs in a folder → labs.json")
     ig.add_argument("folder", help="the folder with the laboratory PDFs")
@@ -356,6 +363,11 @@ def _main(argv=None) -> int:
         if r.get("mode") == "demo":
             print(_t("tools.see_later"))
         else:
+            # One line before the four crosses. Without it the list reads as «this
+            # is not installed yet», which is false for everything most people
+            # arrive with — lab PDFs, a prescription list, a consumer-array file.
+            # These four are the genome track alone.
+            print(_t("tools.only_for_genome"))
             _tools.offer_after_init(assume_yes=args.yes, skip=args.no_tools)
         return 0
 
@@ -555,6 +567,12 @@ def _main(argv=None) -> int:
         res, render = engine.lifestyle(), fmt.lifestyle_report
     elif args.cmd == "goal":
         res, render = engine.goal_dashboard(), fmt.goal_report
+    elif args.cmd == "goal-suggest":
+        res = engine.suggest_goal_targets()
+        if args.write:
+            from . import store as _st
+            res = {**res, "written": _st.write_goal_targets(res["proposals"])}
+        render = fmt.goal_suggest_report
     elif args.cmd == "clinvar":
         res, render = engine.clinvar_findings(), fmt.clinvar_report
     elif args.cmd == "acmg":
@@ -563,6 +581,8 @@ def _main(argv=None) -> int:
         res, render = engine.prs_findings(), fmt.prs_report
     elif args.cmd == "longevity":
         res, render = engine.longevity_findings(), fmt.longevity_report
+    elif args.cmd == "lipid-genetics":
+        res, render = engine.lipid_genetics(), fmt.lipid_genetics_report
     elif args.cmd == "ingest-labs":
         from . import ingest_labs
         res = ingest_labs.ingest(args.folder, force=args.force)

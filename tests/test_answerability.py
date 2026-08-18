@@ -327,8 +327,18 @@ class TestUnknownIsAnInstructionNotAVerdict(_Base):
                         "the answer does not know these are obtainable from the person's own data")
 
     def test_it_says_what_would_close_the_gap(self):
+        """The answer names a remedy, and the test asks the catalogue what it is.
+
+        This used to assert the substring «VCF». That passed for the right reason
+        and would have kept passing for a wrong one — any sentence containing the
+        three letters satisfies it — and it broke the day the sentence was
+        rewritten to stop reading like a shell instruction. Comparing against the
+        catalogue entry checks the thing the test is actually about: that the
+        remedy sentence was CHOSEN and emitted, not that a word survived an edit.
+        """
+        from scholion.i18n import t as _t
         r = support.run_json(["drug", "clopidogrel"], profile_dir=self.profile())
-        self.assertIn("VCF", r.get("recommendation") or "",
+        self.assertIn(_t("basis.obtainable"), r.get("recommendation") or "",
                       "nothing tells the reader how to obtain what is missing")
 
     def test_it_admits_what_even_a_full_vcf_would_not_close(self):
@@ -529,10 +539,15 @@ class TestConnectingAGenomeCannotMakeTheAnswerLessCautious(_Base):
         have to be genotyped from the BAM, and telling the reader to make a VCF
         would be advice that cannot work.
         """
+        from scholion.i18n import t as _t
         without, with_ = self._check(False), self._check(True)
-        self.assertIn("full VCF closes this", without["recommendation"])
+        # Which SENTENCE was chosen, asked of the catalogue. A literal fragment
+        # would tie this guard to today's wording; the wording is allowed to
+        # change, the choice between the two remedies is not.
+        obtainable = _t("basis.obtainable")
+        self.assertIn(obtainable, without["recommendation"])
         self.assertIn("no row in it", with_["recommendation"])
-        self.assertNotIn("full VCF closes this", with_["recommendation"])
+        self.assertNotIn(obtainable, with_["recommendation"])
 
     def test_a_called_variant_is_still_read_normally(self):
         """The reverse: a position that WAS called must behave like a reading.

@@ -15,6 +15,7 @@ mode, so here they are pinned down by machine:
 import json
 import shutil
 import tempfile
+import re
 import unittest
 from pathlib import Path
 
@@ -134,3 +135,50 @@ class TestBiologicalAge(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# ──────────────────────────────────────────────────────────────────────────
+# Fact, not cause
+# ──────────────────────────────────────────────────────────────────────────
+class TestFactNotCause(unittest.TestCase):
+    """No line the product prints may say that an intervention changed a marker.
+
+    Raised by a clinical geneticist reviewing the project on 17.08.2026, and it
+    is the sharpest technical point in that review: «ferritin rose after the
+    course» is a fact, «the course raised ferritin» is a causal claim. In a body
+    many factors move at once and a series of two points separates none of them.
+    The difference is not stylistic — the second sentence arrives in the reader's
+    head as a decision about what to keep taking.
+
+    The engine already speaks in facts; this test is here so that it keeps doing
+    so when somebody writes the next hundred strings. It cannot police the
+    language model — that is what rule 7 of the skill entry is for — but the
+    catalogue is where a causal habit would start, because the model imitates the
+    wording it is given.
+
+    The pattern is deliberately narrow: an intervention word immediately followed
+    by a verb of change. A wide net here would flag «a raised risk of Alzheimer's
+    disease», which is an association and perfectly allowed.
+    """
+
+    INTERVENTION = r"(drug|dose|dosage|course|supplement|medication|therapy|intake|" \
+                   r"препарат\w*|доз\w*|курс\w*|добавк\w*|приём|прием|терапи\w*)"
+    CHANGE = r"(raised|lowered|increased|decreased|improved|worsened|caused|" \
+             r"повысил\w*|снизил\w*|улучшил\w*|ухудшил\w*|вызвал\w*|привёл|привел)"
+
+    def test_no_catalogue_string_attributes_a_change_to_an_intervention(self):
+        pat = re.compile(self.INTERVENTION + r"\s+\w{0,6}\s?" + self.CHANGE,
+                         re.IGNORECASE | re.UNICODE)
+        offenders = []
+        for lang in ("en", "ru"):
+            f = support.ROOT / "src" / "scholion" / "i18n" / f"{lang}.py"
+            if not f.exists():
+                continue
+            for i, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+                m = pat.search(line)
+                if m:
+                    offenders.append(f"{lang}.py:{i}: …{m.group(0)}…")
+        self.assertEqual(
+            offenders, [],
+            "a printed line attributes a change to an intervention — say what "
+            "happened and when, and name the other things that moved in the same "
+            "window:\n  " + "\n  ".join(offenders))

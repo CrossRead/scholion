@@ -9,9 +9,12 @@
 #   orcid: "https://orcid.org/0000-0000-0000-0000"
 cff-version: 1.2.0
 message: "If you use Scholion in research, please cite it using this metadata."
+contact:
+  - email: "scholion.dev@proton.me"
+    name: "Scholion project"
 title: "Scholion"
-version: "0.2.2"
-date-released: "2026-08-17"
+version: "0.3.0"
+date-released: "2026-08-18"
 type: software
 authors:
   - family-names: "Belevtsev"

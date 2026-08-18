@@ -1,12 +1,12 @@
 {
   "_meta": {
     "schema": 1,
-    "purpose": "ШАБЛОН. Личные показатели: статический профиль (пол/год/рост) + ручные метрики (напр. талия). ЛИЧНОЕ.",
-    "how_to_fill": "profile: пол/год рождения/рост — вкладка «Образ жизни» → профиль. Метрики (талия) — поле «Талия, см». ИМТ считается из роста и последнего веса.",
-    "shape": "profile: { sex('male'|'female'), birth_year:int, height_cm:number }; metrics: { <ключ>: { name, unit, direction?, series:[{date, value}] } }"
+    "purpose": "TEMPLATE. Personal indicators: the static profile (sex / year of birth / height) plus manual metrics such as waist. PERSONAL.",
+    "how_to_fill": "profile: sex, year of birth, height — the «Lifestyle» tab → profile. Manual metrics (waist) — the «Waist, cm» field. BMI is computed from the height and the latest weight.",
+    "shape": "profile: { sex('male'|'female'), birth_year:int, height_cm:number }; metrics: { <key>: { name, unit, direction?, series:[{date, value}] } }",
+    "example": "\"profile\": { \"sex\": \"female\", \"birth_year\": 1985, \"height_cm\": 168 }",
+    "why_empty": "`profile` ships EMPTY on purpose. Sex, age and height enter the biological-age panels and the BMI; a default sex and year of birth would put someone else's body into your results without saying so. Anything that needs them refuses to answer until you fill them in — which is the correct answer, not a defect."
   },
-  "profile": {"sex": "male", "birth_year": 1985, "height_cm": 178},
-  "metrics": {
-    "waist": {"name": "Талия", "unit": "см", "direction": "lower_better", "series": []}
-  }
+  "profile": {},
+  "metrics": {}
 }

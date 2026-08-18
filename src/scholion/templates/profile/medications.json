@@ -1,11 +1,11 @@
 {
   "_meta": {
     "schema": 1,
-    "purpose": "ШАБЛОН. Текущие назначения пользователя. ЛИЧНОЕ — заполняет каждый сам. Единая точка правды для проверки взаимодействий и классов.",
-    "how_to_fill": "Через приложение (вкладка «Назначения») или вручную. Повторное добавление препарата с тем же именем обновляет запись, дубли не плодятся.",
-    "shape": "medications: [{ name, dose, note }]"
+    "purpose": "TEMPLATE. The medications you currently take. PERSONAL — you fill it in yourself. The single point of truth for interaction and drug-class checks.",
+    "how_to_fill": "Through the application («Prescriptions» tab) or by hand. Adding a drug with a name already present updates that record rather than creating a duplicate.",
+    "shape": "medications: [{ name, dose, note }]",
+    "example": "{ \"name\": \"atorvastatin\", \"dose\": \"10 mg\", \"note\": \"since 2024-03, for the lipids\" }",
+    "why_empty": "This file ships EMPTY on purpose: a sample prescription left in here would be counted in the header and checked for interactions as though you were taking it."
   },
-  "medications": [
-    {"name": "пример: аторвастатин", "dose": "10 мг", "note": "удалите эту строку и внесите свои назначения"}
-  ]
+  "medications": []
 }

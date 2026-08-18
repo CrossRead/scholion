@@ -21,4 +21,4 @@ archive/
 __pycache__/
 *.pyc
 .cache/
-scholion-skill/
+claude-skill/

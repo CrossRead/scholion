@@ -42,6 +42,11 @@ python3 src/tools/check_compat.py
 # These steps run only if the tool is present in this build: the anonymised
 # package does not carry every internal tool, and a run at the recipient's end
 # must not fail over the absence of something they were never given.
+if [ -f src/tools/sync_docs.py ]; then
+  echo "▶ the documents inside the package match their sources"
+  python3 src/tools/sync_docs.py || exit 1
+fi
+
 if [ -f src/tools/sync_rules.py ]; then
   echo "▶ the assistant rules are in sync with ASSISTANT-RULES.md"
   python3 src/tools/sync_rules.py

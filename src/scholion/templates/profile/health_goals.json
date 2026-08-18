@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "schema": 1,
     "purpose": "ШАБЛОН ЦЕЛИ. Курируемая цель пользователя по показателям. ЛИЧНОЕ. ТЕКУЩИЕ значения и ряды НЕ хранятся здесь — берутся живыми из labs.json + wearable_trends.json.",
     "how_to_fill": "Отредактируйте headline/peaks/targets/charts под свою цель. source-ссылки: 'lab:<ключ маркёра из labs.json>' или 'wear:<метрика из wearable_trends.json>' (Weight/BMI/BodyFat/MuscleMass/VO2Max/RestingHeartRate/StepsDaily/...). Композитная строка — через '|': 'lab:insulin|lab:homa_ir'.",
     "updated": "2024-01-01"

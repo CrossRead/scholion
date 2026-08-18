@@ -279,3 +279,133 @@ class TestCitationAndSecurity(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheSupportedVersionsAreActuallyTested(unittest.TestCase):
+    """`requires-python` is a promise, and until 17.08.2026 nothing checked it.
+
+    `pyproject.toml` says `>=3.10`. That sentence tells anyone who runs
+    `pip install` that the package works on 3.10, 3.11, 3.12 and 3.13, and the
+    only evidence behind it was that it worked on the author's laptop. CI had
+    `publish.yml` and nothing else: one OS, one Python, and only on a tag —
+    a release gate, not a test matrix.
+
+    The cost was measured before this was written. Three failures of
+    `test_lab_dir_boundary` lived three days because they appeared only on macOS,
+    where `/var` is a symlink to `/private/var` and a path compared before
+    `.resolve()` came out unequal. There was no macOS runner to catch them.
+
+    So the promise and the matrix are compared to each other. Widening
+    `requires-python` without widening the matrix now fails here rather than in
+    somebody's install.
+    """
+
+    WORKFLOW = support.ROOT / ".github" / "workflows" / "tests.yml"
+
+    def setUp(self):
+        if not self.WORKFLOW.exists():
+            self.skipTest("the workflow directory is not part of this build")
+        self.text = self.WORKFLOW.read_text(encoding="utf-8")
+
+    def _declared_minimum(self):
+        toml = (support.ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        m = re.search(r'requires-python\s*=\s*"[><=~^]*\s*(\d+)\.(\d+)"', toml)
+        self.assertIsNotNone(m, "pyproject.toml no longer declares requires-python")
+        return int(m.group(1)), int(m.group(2))
+
+    def test_every_python_the_project_promises_is_in_the_matrix(self):
+        major, minor = self._declared_minimum()
+        tested = {tuple(int(x) for x in v.split("."))
+                  for v in re.findall(r'"(\d+\.\d+)"', self.text)}
+        missing = [f"{major}.{n}" for n in range(minor, 14)
+                   if (major, n) not in tested]
+        self.assertEqual(
+            missing, [],
+            f"pyproject promises Python >={major}.{minor} and the matrix does not "
+            f"test: {', '.join(missing)} — either test them or stop promising them")
+
+    def test_both_operating_systems_are_in_the_matrix(self):
+        """One of them is where the three-day defect lived."""
+        for os_name in ("ubuntu-latest", "macos-latest"):
+            self.assertIn(os_name, self.text, f"{os_name} is not in the matrix")
+
+    def test_one_red_cell_does_not_hide_the_others(self):
+        """`fail-fast` on a matrix turns eight answers into one."""
+        self.assertRegex(self.text, r"fail-fast:\s*false",
+                         "a single failing cell cancels the rest of the matrix, and "
+                         "'something went red first' is not a diagnosis")
+
+    def test_the_symlinked_tmpdir_case_is_covered(self):
+        """The macOS shape, reproduced where a runner is cheap."""
+        self.assertIn("TMPDIR", self.text,
+                      "the class that cost three days is not reproduced anywhere in CI")
+
+    def test_the_package_is_tested_as_the_recipient_gets_it(self):
+        """Three releases were lost to a test that only passes in the repository."""
+        self.assertIn("make_shareable.py", self.text,
+                      "CI never builds the package")
+        i = self.text.find("make_shareable.py")
+        self.assertIn("run_tests.sh", self.text[i:],
+                      "CI builds the package and never runs its tests")
+
+
+class TestBundledThirdPartyCodeIsRecorded(unittest.TestCase):
+    """Code that ships inside the package carries its licence to every recipient.
+
+    The distinction this guards is between a tool the user installs — already
+    covered by «External tools invoked, not bundled» — and a file that travels in
+    the delivery. Pico CSS arrived as the second kind and was recorded nowhere:
+    eighty kilobytes of somebody else's MIT-licensed work inside a package whose
+    legal layer is otherwise meticulous, including a verbatim Regenstrief notice
+    for LOINC.
+
+    MIT is satisfied by the banner the minified file already carries. This check
+    is about the other requirement, the project's own: that a person can learn
+    what they just installed without opening a minified asset.
+    """
+
+    WEB = ROOT / "src" / "scholion" / "web"
+
+    #: A file authored here has no copyright line naming somebody else. That is
+    #: a coarse signal and deliberately so — it costs a line to satisfy honestly
+    #: and it fires on the next vendored asset, which is the point.
+    FOREIGN = re.compile(r"(?i)copyright\s+(?:\(c\)\s*)?\d{4}")
+
+    def setUp(self):
+        if not self.WEB.is_dir():
+            self.skipTest("the web interface is not part of this build")
+        self.attribution = (ROOT / "ATTRIBUTION.md").read_text(encoding="utf-8")
+
+    def _vendored(self):
+        out = []
+        for f in sorted(self.WEB.rglob("*")):
+            if f.suffix.lower() not in (".css", ".js") or not f.is_file():
+                continue
+            head = f.read_text(encoding="utf-8", errors="replace")[:2000]
+            if self.FOREIGN.search(head):
+                out.append(f)
+        return out
+
+    def test_every_bundled_asset_is_named_in_the_attribution(self):
+        missing = [f.name for f in self._vendored() if f.name not in self.attribution]
+        self.assertEqual(
+            missing, [],
+            "third-party code ships inside the package and is recorded nowhere: "
+            + ", ".join(missing)
+            + " — add it to «Code bundled in this repository» in ATTRIBUTION.md")
+
+    def test_its_licence_is_named_too(self):
+        """A filename without a licence answers half the question."""
+        for f in self._vendored():
+            with self.subTest(asset=f.name):
+                i = self.attribution.find(f.name)
+                self.assertGreater(i, -1)
+                row = self.attribution[i:i + 400]
+                self.assertRegex(row, r"(MIT|Apache|BSD|MPL|GPL|CC[ -]BY|ISC|Unlicense)",
+                                 f"{f.name} is listed with no licence")
+
+    def test_the_check_reaches_something(self):
+        """A pattern that matched nothing would pass in silence for ever."""
+        self.assertTrue(self._vendored(),
+                        "no bundled asset carries a copyright line — either none is "
+                        "vendored, or the signal this check relies on has changed")

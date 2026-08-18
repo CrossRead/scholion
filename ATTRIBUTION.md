@@ -102,6 +102,28 @@ provider's terms. This project only calls them.
 | SNOMED CT | SNOMED International | **Not used.** Requires an Affiliate licence; incompatible with open redistribution. |
 | LOINC | Regenstrief Institute | **Used and redistributed** — see the dedicated section below. |
 
+## Code bundled in this repository
+
+Third-party code that ships inside the package, as opposed to tools the user
+installs. It travels to every recipient, so its licence travels with it.
+
+| What | Where | Author | Licence |
+|---|---|---|---|
+| Pico CSS v2.1.1 | `src/scholion/web/pico.min.css` | Pico CSS contributors, 2019–2025 | MIT |
+
+The minified file keeps its own banner comment — `/*! Pico CSS ✨ v2.1.1 …
+Licensed under MIT */` — and that comment is what satisfies the licence's
+requirement that the notice travel with the copy. It is recorded here as well
+because a person should be able to learn what is bundled without opening eighty
+kilobytes of minified CSS, and because this table is where the question «what did
+I just install» gets answered.
+
+Vendored rather than loaded from a CDN deliberately: the web interface binds to
+`127.0.0.1` and the product's claim is that using it sends nothing anywhere. A
+stylesheet fetched from someone else's server on every page load would make that
+claim false — silently, and in the one component whose whole promise is that it
+is local.
+
 ## External tools invoked, not bundled
 
 Installed by the user; this project executes them and reads their output.

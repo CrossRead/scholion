@@ -103,29 +103,59 @@ class TestEveryCommandPromisedExists(unittest.TestCase):
 
 
 class TestTheFirstScreenActuallyRuns(unittest.TestCase):
-    """Not «the command exists» — «the command works, on a profile anyone can make»."""
+    """The four lines a stranger copies, run in the order and the state they are in.
 
-    #: argv after `python3 -m scholion`. The fourth line is the refusal the first
-    #: screen promises: «watch the system refuse to compute a biological age».
-    #: `limits` names the refusal, `phenoage --panels` shows which panel is short of
-    #: what — the promise was in the prose with no command beside it.
-    FIRST_SCREEN = (("demo",), ("overview",), ("limits",), ("phenoage", "--panels"))
+    The previous version of this class handed every command an environment with
+    `SCHOLION_PROFILE_DIR` already pointing at the repository's own demo profile,
+    and skipped the first line altogether. So it proved that the commands work
+    when somebody has already arranged for them to work — which is the exact
+    shape of check this project has caught itself making three times, and it
+    missed a defect that met every new user:
+
+        scholion demo        writes into <data>/demo/profile
+        scholion overview    reads   <data>/profile
+
+    The first two commands of the README produced an empty profile. Reported from
+    a clean-machine run of `pip install scholion`; the test was green throughout,
+    because a command that prints «profile is empty» exits 0 and prints something.
+
+    Two things changed. The run starts from an empty data directory and sets no
+    profile path, so the commands have to arrange the state themselves. And the
+    output is read: exit 0 and non-empty is what an honest refusal looks like too.
+    """
+
+    #: argv after `python3 -m scholion`, in the order the README prints them.
+    #: The first line has to be the one that puts the demo where the rest read
+    #: from — `demo` builds it in a directory of its own on purpose, which is
+    #: right, and is why it cannot be the opening line of the first screen.
+    FIRST_SCREEN = (("init", "--demo"), ("overview",), ("limits",), ("phenoage", "--panels"))
+
+    #: What the demo profile must be seen to contain. Not a phrase from the
+    #: report's own wording — a fact about the fictional person, so that a
+    #: rewrite of the prose does not silently turn this into a check of nothing.
+    EVIDENCE = {"overview": re.compile(r"markers:\s*([1-9]\d*)")}
 
     def setUp(self):
-        if not (support.ROOT / "demo" / "profile").is_dir():
-            self.skipTest("the demo profile is not part of this build")
         self.dir = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.dir, ignore_errors=True)
+        self.env = {**os.environ,
+                    "PYTHONPATH": str(support.ROOT / "src"),
+                    "SCHOLION_OFFLINE": "1",
+                    "SCHOLION_LANG": "en",
+                    # An empty data root and NO profile path: exactly what a person
+                    # has after `pip install` and nothing else.
+                    "SCHOLION_REPO_DIR": str(self.dir),
+                    "SCHOLION_GENOME_VCF": str(self.dir / "no-such-file.vcf.gz"),
+                    "SCHOLION_GENOME_DIR": str(self.dir / "no-genome")}
+        self.env.pop("SCHOLION_PROFILE_DIR", None)
 
-    def tearDown(self):
-        shutil.rmtree(self.dir, ignore_errors=True)
+    def _run(self, argv):
+        return subprocess.run([sys.executable, "-m", "scholion", *argv],
+                              cwd=support.ROOT, env=self.env,
+                              capture_output=True, text=True, timeout=120)
 
     def test_the_readme_prints_the_same_first_screen_this_test_runs(self):
-        """Otherwise the two drift and each of them looks right on its own.
-
-        The list above is what gets executed; the code block in the README is what
-        a person copies. A command added to one and not the other is either an
-        untested promise or a tested secret.
-        """
+        """Otherwise the two drift and each of them looks right on its own."""
         if not README.exists():
             self.skipTest("README.md is not part of this build")
         text = README.read_text(encoding="utf-8")
@@ -136,25 +166,44 @@ class TestTheFirstScreenActuallyRuns(unittest.TestCase):
                 self.assertIn("scholion " + " ".join(argv), block,
                               "the first screen this test runs is not the one the README shows")
 
-    def test_each_command_of_the_first_screen_exits_cleanly(self):
-        env = {**os.environ,
-               "PYTHONPATH": str(support.ROOT / "src"),
-               "SCHOLION_OFFLINE": "1",
-               "SCHOLION_LANG": "en",
-               "SCHOLION_PROFILE_DIR": str(support.ROOT / "demo" / "profile"),
-               "SCHOLION_GENOME_VCF": str(self.dir / "no-such-file.vcf.gz"),
-               "SCHOLION_GENOME_DIR": str(self.dir / "no-genome")}
+    def test_the_four_lines_work_one_after_another_from_nothing(self):
         for argv in self.FIRST_SCREEN:
             cmd = " ".join(argv)
-            if argv[0] == "demo":
-                continue          # it writes a profile; covered in test_demo_profile
             with self.subTest(command=cmd):
-                p = subprocess.run([sys.executable, "-m", "scholion", *argv],
-                                   cwd=support.ROOT, env=env,
-                                   capture_output=True, text=True, timeout=120)
+                p = self._run(argv)
                 self.assertEqual(p.returncode, 0,
-                                 f"the first screen's `scholion {cmd}` fails:\n{p.stderr[-600:]}")
+                                 f"`scholion {cmd}` fails:\n{p.stderr[-600:]}")
                 self.assertTrue(p.stdout.strip(), f"`scholion {cmd}` printed nothing")
+
+    def test_the_screen_shows_the_demo_rather_than_an_empty_profile(self):
+        """The assertion the old one was missing.
+
+        «profile is empty» is a correct, well-behaved, zero-exit answer. It is
+        also the answer that made the first screen useless, and no check that
+        looks at the exit code can tell the two apart.
+        """
+        for argv in self.FIRST_SCREEN:
+            self._run(argv)
+        out = self._run(("overview",)).stdout
+        self.assertNotIn("profile is empty", out,
+                         "the first screen ends on an empty profile — the demo was written "
+                         "somewhere the rest of the commands do not read from")
+        m = self.EVIDENCE["overview"].search(out)
+        self.assertIsNotNone(m, f"`overview` does not report a marker count at all:\n{out[:400]}")
+        self.assertGreater(int(m.group(1)), 0, "the demo profile came out with no markers")
+
+    def test_the_separate_demo_directory_says_how_to_look_at_it(self):
+        """`scholion demo` is not the defect and is not being removed.
+
+        Building the profile away from a real one is the right default — a demo
+        that overwrites somebody's medical history would be far worse than an
+        awkward second step. What it owes the reader is the command, and it
+        prints it.
+        """
+        p = self._run(("demo",))
+        self.assertEqual(p.returncode, 0, p.stderr[-400:])
+        self.assertIn("SCHOLION_PROFILE_DIR", p.stdout,
+                      "`demo` writes to a directory of its own and does not say how to read it")
 
 
 class TestEveryClaimIsDemonstrable(unittest.TestCase):
@@ -231,3 +280,69 @@ class TestTheDocumentsDoNotContradictEachOther(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheDocumentsTheOutputNamesCanBeOpened(unittest.TestCase):
+    """Advice to open a file the reader cannot open is worse than no advice.
+
+    A `pip install` gets `src/scholion` and nothing else — that is what the wheel
+    declares. Meanwhile `limits` sends the reader to PREPARING-THE-GENOME, the
+    skill to README, the data layer to DATA-LAYOUT. Reported from a clean-machine
+    run: the advice arrives, the file is not there, and with the repository still
+    private there is no second place to look. To the person it reads as a broken
+    installation rather than as a closed door.
+
+    So the documents travel inside the package and `scholion doc <name>` prints
+    one — the same shape as `scholion skill`, which has carried the instruction
+    inside the package from the beginning for the same reason.
+    """
+
+    #: Documents the product's own output names. Checked by what the code says,
+    #: not by a list somebody remembered to update.
+    def _referenced(self):
+        names = set()
+        src = support.ROOT / "src" / "scholion"
+        for f in list(src.glob("*.py")) + list((src / "i18n").glob("*.py")):
+            for m in re.finditer(r"\b([A-Z][A-Z0-9-]{3,})\.md\b", f.read_text(encoding="utf-8")):
+                names.add(m.group(1).lower())
+        return names
+
+    def test_every_document_the_output_names_is_carried_or_is_the_skill(self):
+        from scholion import docs as _docs
+        carried = {k for k, _ in _docs.available()}
+        # The skill files have their own command and their own place inside the
+        # package: `scholion skill` prints the entry, `--full` the instruction,
+        # `--rules` the canon. Carrying them through `doc` as well would give the
+        # same text two names, which is the thing the rename was for.
+        own = {"skill", "instruction", "assistant-rules"}
+        missing = sorted(n for n in self._referenced() if n not in carried and n not in own)
+        self.assertEqual(
+            missing, [],
+            "the output names documents a pip user has no way to open: " + ", ".join(missing)
+            + " — add them to src/tools/sync_docs.py, or stop naming them")
+
+    def test_the_check_reaches_something(self):
+        """A regex that matched nothing would pass for ever in silence."""
+        self.assertTrue(self._referenced(), "no document is named anywhere in the output code")
+
+    def test_the_copies_equal_their_sources(self):
+        """A copy is a synchronisation problem, and this is where it surfaces."""
+        tool = support.ROOT / "src" / "tools" / "sync_docs.py"
+        if not tool.exists():
+            self.skipTest("the synchroniser is not part of this build")
+        p = subprocess.run([sys.executable, str(tool)], cwd=support.ROOT,
+                           capture_output=True, text=True, timeout=60)
+        self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
+
+    def test_the_command_prints_a_document_and_refuses_an_unknown_one(self):
+        env = {**os.environ, "PYTHONPATH": str(support.ROOT / "src"),
+               "SCHOLION_OFFLINE": "1", "SCHOLION_LANG": "en"}
+        ok = subprocess.run([sys.executable, "-m", "scholion", "doc", "data-layout"],
+                            cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60)
+        self.assertEqual(ok.returncode, 0, ok.stderr[-300:])
+        self.assertGreater(len(ok.stdout), 1000, "the document came out empty or truncated")
+
+        bad = subprocess.run([sys.executable, "-m", "scholion", "doc", "no-such-thing"],
+                             cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60)
+        self.assertEqual(bad.returncode, 1, "an unknown name is answered as if it existed")
+        self.assertIn("data-layout", bad.stderr, "the refusal does not say what there is")

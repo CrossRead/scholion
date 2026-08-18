@@ -1,19 +1,5 @@
----
-name: scholion
-description: >-
-  Personal assistant for the genome, lab results, prescriptions and lifestyle.
-  Works with the user's profile in `profile/` and `genome/`: no data is baked
-  into the skill, everyone supplies their own. Use it when you need to: check a
-  physician's prescription as a second opinion (pharmacogenetics + interactions
-  with the current regimen + monitoring labs), check a drug against
-  pharmacogenetics, review lab results (flags, trends, links to the genome),
-  find a locus or clinically significant ClinVar findings in the full VCF, look
-  at metrics and lifestyle, judge movement toward a goal, suggest which tests
-  to take, prepare a "second opinion" summary before a visit. Triggers: "I was
-  prescribed a drug", "check this prescription", "review my labs", "what should
-  I get tested for", "my metrics", "what does my genome say about gene X",
-  "how close am I to my goal", "prepare me for a visit to the physician".
----
+<!-- This is the long instruction, not the entry. The entry is SKILL.md and it is
+     the only file that carries skill frontmatter: one name, one role. -->
 
 # Scholion — assistant for the genome, lab results, prescriptions and lifestyle
 
@@ -124,6 +110,55 @@ into public repositories, issue trackers or third-party services. Standard codes
 (LOINC, RxNorm, ATC) are never written from memory: an invented code looks like a
 standard and silently breaks exchange — absent is better than wrong.
 <!-- ASSISTANT-RULES:END -->
+
+## Before Step 1 — is the tool installed at all
+
+An instruction is useless if the thing it instructs is not there. Before the
+first answer, check that the command replies:
+
+```bash
+scholion --version
+```
+
+If it does not, install it. It is an ordinary Python package: no account, no
+key, and the analysis itself needs no network.
+
+```bash
+pip install scholion
+```
+
+Then show the person the product **on somebody who does not exist**, before
+asking them for a single file of their own:
+
+```bash
+scholion init --demo      # a fictional person — not anybody's real data
+scholion overview         # flags, gaps, counters
+scholion limits           # what CANNOT be said from this data, and what would close it
+```
+
+Three things that save a conversation at this point:
+
+- **Use `init --demo`, not `demo`.** They are different commands: `demo` builds
+  the fictional profile in a directory of its own and leaves the working profile
+  untouched, so the next `overview` reports an empty profile and the person
+  concludes the tool is broken. `init --demo` puts it where every other command
+  looks.
+- **The report about missing external programs is not an error.** On the first
+  run the tool lists what it cannot find — samtools, bcftools, bgzip. None of
+  them are needed for the demo, for lab results, for prescriptions or for
+  wearables. They matter only when the person brings raw genomic data. Do not
+  send anyone to install them at the start; it reads as "half-installed" and
+  costs you the first five minutes.
+- **Nothing has been sent anywhere.** Say this out loud once, early. The profile
+  is a folder of files on that person's machine, and the analysis is local. Two
+  lookups can go out later — a drug name and an rsID — and only when asked for
+  by name.
+
+When the person wants their own data instead of the fiction, `scholion init`
+lays out empty templates, and the entry ladder in the project's README says what
+can be loaded and by which command. The shortest real path is usually
+`scholion add-lab` for a handful of values or `scholion import-labs panel.csv`
+for a whole panel.
 
 ## Step 1 — self-check at the start of a session
 
@@ -620,10 +655,15 @@ said before, not after.
 
 ## First run and compatibility
 
-`python3 src/ingest/first_run_check.py` shows what is already in the profile and
-**what can be trusted**: demographics, the share of markers that have a reference
-range, readiness of the genome, whether a biological age series is possible at
-all.
+`scholion profile` shows what is loaded, and `scholion limits` shows **what can
+be trusted**: which layers are connected, which markers have a reference range,
+whether the genome is readable, whether a biological age series is possible at
+all — and what would close each gap. Both work in every installation.
+
+In a source checkout there is additionally `python3 src/ingest/first_run_check.py`,
+which reports the same in one pass. **It does not exist in a `pip install`** — the
+`src/ingest/` scripts are data-preparation tools and do not travel in the package,
+so do not send a person there without knowing how they installed the tool.
 
 A rule the assistant has to observe with a new user: **ranges are taken from that
 user's printed forms, not from code**. No form, no range — the marker is shown

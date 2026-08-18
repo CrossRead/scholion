@@ -4,11 +4,11 @@
 Builds TWO packages in the output folder:
   <out>/                   — the full runnable project (code+application+knowledge+
                                    skill+plugin), with an EMPTY profile/ (templates) and genome/README.
-  <out>/scholion-skill/    — the standalone Claude skill (SKILL.md + guide).
+  <out>/claude-skill/    — the standalone Claude skill (SKILL.md + guide).
 
 What it does:
   1) copies ONLY what is portable (whitelist), excluding personal material (profile/, genome/, PDF, VCF, BAM…);
-  2) swaps the owner's SKILL.md for the generalised one (share/SKILL.shared.md);
+  2) swaps the owner's SKILL.md for the generalised one (share/skill/INSTRUCTION.md);
   3) replaces personal identifiers (sample ID, home paths) with neutral ones;
   4) AUDITS the result: looks for signs of personal data (strings, files, templates,
      and also UNapproved embedded screenshots) — on a finding it FAILS (non-zero code).
@@ -404,7 +404,7 @@ def build(repo: Path, out: Path) -> Path:
     # raise the question of which one is true, and a `pip install` from GitHub
     # wants pyproject.toml at the root, not one level down.
     shared = out
-    skillpkg = out / "scholion-skill"      # delivered in the archive, excluded from git
+    skillpkg = out / "claude-skill"        # delivered in the archive, excluded from git
     _clear_build_root(out)
     _clear_or_quarantine(skillpkg, quarantine_root(out))
 
@@ -532,7 +532,7 @@ def build(repo: Path, out: Path) -> Path:
 
     # ── 2) the generalised skill instead of the owner's one ───────────────
     (shared / "src" / "skill").mkdir(parents=True, exist_ok=True)
-    shutil.copy2(share / "SKILL.shared.md", shared / "src" / "skill" / "SKILL.md")
+    shutil.copy2(share / "skill" / "INSTRUCTION.md", shared / "src" / "skill" / "INSTRUCTION.md")
 
     # ── 3) an empty profile (templates) + genome README + docs ────────────
     # The templates moved inside the package (src/scholion/templates): otherwise they
@@ -686,11 +686,12 @@ def build(repo: Path, out: Path) -> Path:
         # repository: its SKILL.md is byte for byte the one inside the package
         # (src/scholion/skill/), and a second copy under version control is a
         # question of which one to edit.
-        "scholion-skill/\n", encoding="utf-8")
+        "claude-skill/\n", encoding="utf-8")
 
     # ── 4) the standalone skill package ───────────────────────────────────
     skillpkg.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(share / "SKILL.shared.md", skillpkg / "SKILL.md")
+    shutil.copy2(share / "skill" / "SKILL.md", skillpkg / "SKILL.md")
+    shutil.copy2(share / "skill" / "INSTRUCTION.md", skillpkg / "INSTRUCTION.md")
     shutil.copy2(share / "LOADING-DATA.md",
                  skillpkg / "LOADING-DATA.md")
     shutil.copy2(share / "PREPARING-THE-GENOME.md",
@@ -756,7 +757,7 @@ def _check_root_fresh(repo: Path, out: Path, shared: Path) -> None:
     # cannot be deleted, so a file that used to be put at the root and is now put
     # elsewhere stays lying there and travels to the recipient. That is how the
     # delivery root acquired a `pyproject.toml` from which an empty wheel is built.
-    expected = {".git", ".gitignore", ".DS_Store", ".github", "scholion-skill",
+    expected = {".git", ".gitignore", ".DS_Store", ".github", "claude-skill",
                 "README.md", "ASSISTANT-RULES.md", "CLAUDE.md",
                 "SHORTCUTS-macOS.md", "LOADING-DATA.md", "PREPARING-THE-GENOME.md",
                 "pyproject.toml", "run_tests.sh",
@@ -1145,8 +1146,8 @@ def audit(root: Path) -> int:
         violations += 1
 
     # e) the edition of the skill that actually shipped.
-    #    Step 2 of the build puts share/SKILL.shared.md over the owner's
-    #    src/skill/SKILL.md. Nothing else stood behind that one line: the owner's
+    #    Step 2 of the build puts share/skill/INSTRUCTION.md over the owner's
+    #    src/skill/INSTRUCTION.owner.md. Nothing else stood behind that one line: the owner's
     #    edition is NOT on the private list (the package needs a file at that
     #    path, so omitting it is not an option), and the identifier audit above
     #    cannot see it either — those 116 KB hold diplotypes, phenotypes and
@@ -1156,10 +1157,15 @@ def audit(root: Path) -> int:
     #    than on the person: the personal block, written by sync_rules.py under a
     #    heading of its own. Two assertions, both from inside the package:
     #    the copies are one edition, and that edition is not the owner's.
-    skills = sorted(q for q in root.rglob("SKILL.md") if not _quarantined(q))
-    if skills:
+    #    Since the split of names, two groups are checked instead of one, and the
+    #    check got stronger rather than weaker: `SKILL.md` is everywhere the short
+    #    entry, `INSTRUCTION.md` everywhere the long text, and within each group the
+    #    copies must be one edition. A file named `*.owner.*` must not be in the
+    #    package at all — that is now a property of the name, not of the content.
+    for name in ("SKILL.md", "INSTRUCTION.md"):
+        group = sorted(q for q in root.rglob(name) if not _quarantined(q))
         digests = {}
-        for q in skills:
+        for q in group:
             try:
                 blob = q.read_bytes()
             except (OSError, PermissionError):
@@ -1168,16 +1174,23 @@ def audit(root: Path) -> int:
             if OWNER_BLOCK_MARK.encode("utf-8") in blob:
                 print(f"  ✗ the OWNER's edition of the skill shipped: "
                       f"{q.relative_to(root)} carries \"{OWNER_BLOCK_MARK}\". "
-                      f"The generalised edition (share/SKILL.shared.md) was not "
+                      f"The generalised edition (share/skill/INSTRUCTION.md) was not "
                       f"put over it — check step 2 of build().")
                 violations += 1
         if len(digests) > 1:
             print(f"  ✗ the package carries {len(digests)} different editions of "
-                  f"SKILL.md where it must carry one:")
+                  f"{name} where it must carry one:")
             for h, qs in sorted(digests.items()):
                 print(f"      {h[:16]}…  " +
                       ", ".join(str(q.relative_to(root)) for q in sorted(qs)))
             violations += 1
+
+    owned = sorted(q for q in root.rglob("*.owner.*") if not _quarantined(q))
+    if owned:
+        print("  ✗ a file whose name says it belongs to the owner shipped:")
+        for q in owned:
+            print(f"      {q.relative_to(root)}")
+        violations += 1
     return violations
 
 

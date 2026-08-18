@@ -899,6 +899,8 @@
    "convert_note": "Cortisol M = 362.46 g/mol; 1 µg/dL = 10000/362.46 = 27.59 nmol/L."
   },
   "t4_free": {
+   "convert": {"ng/dL": 12.87, "нг/дл": 12.87},
+   "convert_note": "Free thyroxine M = 776.87 g/mol; 1 ng/dL = 10/776.87 = 12.87 pmol/L. The US form is the commoner one on an American report, and free T4 arrives in it from every large reference lab.",
    "unit": "pmol/L",
    "ref_low": 12.0,
    "ref_high": 22.0,
@@ -923,6 +925,8 @@
    }
   },
   "t3_free": {
+   "convert": {"pg/mL": 1.5362, "пг/мл": 1.5362},
+   "convert_note": "Free triiodothyronine M = 650.98 g/mol; 1 pg/mL = 1 ng/L = 1.5362 pmol/L. Note that pg/mL belongs to free T3 and ng/dL to total T3 — the same number under the wrong one is off by a factor of ten, so the two markers keep separate tables.",
    "unit": "pmol/L",
    "ref_low": 3.1,
    "ref_high": 6.8,
@@ -948,6 +952,8 @@
    }
   },
   "dht": {
+   "convert": {"ng/dL": 0.0344, "нг/дл": 0.0344},
+   "convert_note": "Dihydrotestosterone M = 290.44 g/mol; 1 ng/dL = 10/290.44 = 0.0344 nmol/L.",
    "unit": "nmol/L",
    "ref_low": 0.4,
    "ref_high": 2.65,
@@ -1753,6 +1759,8 @@
    "convert_note": "Monovalent: mEq/L = mmol/L."
   },
   "zinc": {
+   "convert": {"ug/dL": 10.0, "\u00b5g/dL": 10.0, "мкг/дл": 10.0},
+   "convert_note": "A decimal prefix, not a molar conversion: 1 µg/dL = 10 µg/L exactly, because a decilitre is a tenth of a litre. Nothing here depends on a molar mass, and the factor cannot drift.",
    "unit": "ug/L",
    "ref_low": 600,
    "ref_high": 1200,
@@ -3428,6 +3436,8 @@
    }
   },
   "tibc": {
+   "convert": {"ug/dL": 0.1791, "\u00b5g/dL": 0.1791, "мкг/дл": 0.1791},
+   "convert_note": "TIBC is expressed as the iron it can bind, so it converts on iron's molar mass, M = 55.845 g/mol: 1 µg/dL = 10/55.845 = 0.1791 µmol/L. Both spellings of micro are accepted because a report may carry either.",
    "unit": "umol/L",
    "ref_low": 45.0,
    "ref_high": 76.0,

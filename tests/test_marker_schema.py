@@ -172,3 +172,79 @@ class TestKeysAreFrozen(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheUnitsAnAmericanReportArrivesIn(unittest.TestCase):
+    """The eight-row US panel, in the units a US lab actually prints.
+
+    This is the last of the sixteen forms task 36 counted, and the one place in
+    the whole product where an American user meets it on the first screen: the
+    gateway refuses a unit it does not know, the lab import is transactional, and
+    a single unknown form drops the whole panel rather than one row.
+
+    Every factor is written down with the molar mass it comes from, so that a
+    wrong one can be checked by arithmetic instead of by trusting the person who
+    typed it. Sources: Quest Diagnostics SI unit conversion table (free T4, free
+    T3, DHT) and iron's molar mass for TIBC. Zinc is a decimal prefix and depends
+    on nothing.
+    """
+
+    CASES = [
+        # marker,     value,   incoming unit, expected in the profile's unit
+        ("t4_free",   1.3,     "ng/dL",       16.731),    # ×12.87,  M = 776.87
+        ("t3_free",   3.2,     "pg/mL",       4.9158),    # ×1.5362, M = 650.98
+        ("tibc",      310.0,   "ug/dL",       55.521),    # ×0.1791, M = 55.845 (iron)
+        ("zinc",      85.0,    "ug/dL",       850.0),     # ×10, dL → L
+        ("dht",       45.0,    "ng/dL",       1.548),     # ×0.0344, M = 290.44
+    ]
+
+    def setUp(self):
+        self.markers = json.loads(
+            (support.ROOT / "src" / "scholion" / "knowledge" / "lab_markers.json")
+            .read_text(encoding="utf-8"))
+        self.markers = self.markers.get("markers", self.markers)
+
+    def test_each_us_form_is_accepted_and_converts(self):
+        for key, value, unit, expected in self.CASES:
+            with self.subTest(marker=key):
+                conv = (self.markers[key].get("convert") or {})
+                self.assertIn(unit, conv, f"{key} does not accept {unit}")
+                got = value * conv[unit]
+                self.assertAlmostEqual(
+                    got, expected, delta=abs(expected) * 0.005,
+                    msg=f"{key}: {value} {unit} → {got}, expected about {expected}")
+
+    def test_every_factor_carries_the_arithmetic_that_produced_it(self):
+        """A bare number in a conversion table cannot be checked by reading."""
+        for key, _, _, _ in self.CASES:
+            with self.subTest(marker=key):
+                note = self.markers[key].get("convert_note") or ""
+                self.assertTrue(note, f"{key} has a factor and no note saying where it came from")
+                self.assertRegex(
+                    note, r"(M = [\d.]+|decimal prefix|molar mass)",
+                    f"{key}'s note does not say what the factor is derived from")
+
+    def test_free_and_total_hormones_do_not_share_a_form(self):
+        """pg/mL belongs to free T3 and ng/dL to total T3.
+
+        The same number under the wrong one is out by a factor of ten, and both
+        land inside a plausible range, so nothing downstream would notice.
+        """
+        free = (self.markers["t3_free"].get("convert") or {})
+        self.assertIn("pg/mL", free)
+        self.assertNotIn("ng/dL", free,
+                         "free T3 accepts the form that belongs to total T3")
+
+    def test_the_two_refusals_stay_refusals(self):
+        """`hba1c` and `lpa` are not oversights — they are decisions.
+
+        HbA1c relates to the IFCC scale by an affine formula, not a multiplier;
+        Lp(a) mass to molar depends on the person's apo(a) isoform. Giving either
+        a factor would be the one thing this layer exists to prevent.
+        """
+        for key, form in (("hba1c", "mmol/mol"), ("lpa", "mg/dL")):
+            with self.subTest(marker=key):
+                self.assertIn(form, self.markers[key].get("convert_refused") or {},
+                              f"{key} lost its recorded refusal of {form}")
+                self.assertNotIn(form, self.markers[key].get("convert") or {},
+                                 f"{key} was given a multiplier for {form}, which has none")

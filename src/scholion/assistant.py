@@ -252,7 +252,7 @@ def _entrypoints() -> List[Dict[str, Any]]:
     eps: List[Dict[str, Any]] = []
 
     # 1. the skill for Claude
-    skill_src = REPO / "src" / "skill" / "SKILL.md"
+    skill_src = REPO / "src" / "skill" / "INSTRUCTION.owner.md"
     installed = [p for p in (home / ".claude" / "skills").glob("*/SKILL.md")
                  if "scholion" in p.parent.name.lower()] if (home / ".claude" / "skills").is_dir() else []
     eps.append({

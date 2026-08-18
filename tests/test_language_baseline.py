@@ -51,7 +51,7 @@ class TestTheRemainderDoesNotGrow(unittest.TestCase):
                         "a bare table of numbers gives the next reader no way to tell "
                         "an accepted decision from an unpaid debt")
 
-    @unittest.skipUnless((support.ROOT / "share" / "SKILL.shared.md").exists(),
+    @unittest.skipUnless((support.ROOT / "share" / "skill" / "INSTRUCTION.md").exists(),
                          "only the source repository holds every file the baseline names")
     def test_the_baseline_does_not_name_files_that_are_gone(self):
         """A stale entry is a hole in the gate.

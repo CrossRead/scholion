@@ -480,7 +480,7 @@ class TestTheEditionOfTheSkillThatShipped(unittest.TestCase):
     until 17.08.2026 nothing checked its work.
 
     The owner's edition cannot simply be put on the private list: the package
-    needs a file at `src/skill/SKILL.md`, so omitting it is not a possible
+    needs a file at `src/skill/INSTRUCTION.owner.md`, so omitting it is not a possible
     outcome — substitution is. And the identifier audit is blind to it on
     purpose: those 116 KB hold diplotypes, phenotypes and per-drug caveats, and
     not one name, e-mail or sample number. Every guard the builder had looks for
@@ -495,7 +495,7 @@ class TestTheEditionOfTheSkillThatShipped(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp(prefix="audit_skill_"))
         self.addCleanup(shutil.rmtree, self.root, ignore_errors=True)
         self.paths = []
-        for rel in ("src/skill", "src/scholion/skill", "scholion-skill"):
+        for rel in ("src/skill", "src/scholion/skill", "claude-skill"):
             (self.root / rel).mkdir(parents=True, exist_ok=True)
             self.paths.append(self.root / rel / "SKILL.md")
 

@@ -1713,6 +1713,122 @@ will go through them later.
                                      "conversation with the model",
     "web.assistant.toast_file": "The context has been saved to a file",
 
+    # ── web: the guide tab ─────────────────────────────────────────────
+    "web.tab.guide": "Guide",
+    "web.guide.title": "Guide",
+    "web.guide.intro": "What every screen in this application shows, in one place — so none "
+                       "of it has to stay unexplained just because the source is not at hand. "
+                       "Everything below describes the interface itself: colours, labels, "
+                       "terms. What your own numbers mean is explained on the screen that "
+                       "shows them, next to the number.",
+
+    "web.guide.sources_h": "Where a number comes from",
+    "web.guide.sources_body": "Most tabs open with a row of small chips above the content. "
+                              "A chip marks where that tab's data was read from: your own "
+                              "files on this machine, or a public reference database consulted "
+                              "over the network (ClinVar, RxClass, Ensembl). Nothing is asserted "
+                              "without one of these two origins, and the two are never rendered "
+                              "the same colour. Whether the Assistant tab has a language model "
+                              "connected or not, this distinction does not change: the "
+                              "underlying numbers are always computed by code on your machine.",
+
+    "web.guide.status_h": "Colours and badges",
+    "web.guide.status_intro": "The same five badges recur on almost every tab. Colour is never "
+                              "the only signal — a number and a caption always sit next to it, "
+                              "so the badge stays readable even where colour is not.",
+    "web.guide.status_good_label": "good",
+    "web.guide.status_good_why": "The goal is reached, or there is no goal and the value sits "
+                                 "inside the reference range.",
+    "web.guide.status_warning_label": "warning",
+    "web.guide.status_warning_why": "Inside the reference range, but a personal goal is not yet "
+                                    "reached — or a pharmacogenetic effect worth a moment's "
+                                    "attention, not a red flag.",
+    "web.guide.status_critical_label": "critical",
+    "web.guide.status_critical_why": "Outside the laboratory reference range, or a safety flag "
+                                     "raised from your own profile.",
+    "web.guide.status_near_label": "at the edge",
+    "web.guide.status_near_why": "Formally inside the range, but pressed against its wall. "
+                                 "Rendered in blue rather than amber on purpose — so a "
+                                 "colour-blind reader sees a difference from «warning» in the "
+                                 "tone itself, not only in the caption.",
+    "web.guide.status_unknown_label": "no data",
+    "web.guide.status_unknown_why": "Nothing to judge yet — not measured, or not present in "
+                                    "your files.",
+    "web.guide.status_three_note": "Judgement itself uses three levels, not five: good, warning, "
+                                   "critical. A fourth, near-identical level was tried and "
+                                   "dropped — at normal contrast it was indistinguishable from "
+                                   "«warning» to normal vision. «At the edge» and «no data» are "
+                                   "not severity levels; they mark a different kind of thing — "
+                                   "a value's position, or its absence.",
+
+    "web.guide.tour_h": "What each tab is for",
+    "web.guide.tour_overview": "The first screen: one focus-of-attention card — what is most "
+                               "worth looking at right now, and why — above the goal dashboard, "
+                               "if you have set a shape target.",
+    "web.guide.tour_labs": "Every lab marker on file, flagged against its reference range, with "
+                           "a trend line where enough measurements exist.",
+    "web.guide.tour_drugs": "Check a medication by name before you take it: a quick "
+                            "pharmacogenetics-only pass, or the full check — genome, current "
+                            "labs, interactions with what you already take, and ClinVar.",
+    "web.guide.tour_genome": "Polygenic scores as population percentiles, longevity-linked "
+                             "variants, ClinVar findings in your genome, a check for what "
+                             "changed since ClinVar was last read, and a lookup by gene or "
+                             "rsID.",
+    "web.guide.tour_lifestyle": "Wearable-derived metrics against a personal goal, a bullet bar "
+                                "per metric, and workout history.",
+    "web.guide.tour_tests": "What is worth measuring next, and what was measured recently enough "
+                            "to skip.",
+    "web.guide.tour_second_opinion": "One page combining the domain radar, pharmacogenetic "
+                                     "flags on current prescriptions and suggested tests — built "
+                                     "to be printed and taken to an appointment.",
+    "web.guide.tour_prescriptions": "The medications you take. Adding one runs the same "
+                                    "interaction check as the drug-check tab, against the rest "
+                                    "of the list.",
+    "web.guide.tour_assistant": "Whether a language model is connected, what it is and is not "
+                                "allowed to see, and how to connect one if you want richer "
+                                "wording on top of the same numbers.",
+
+    "web.guide.terms_h": "Terms",
+    "web.guide.term_prs_label": "PRS, percentile",
+    "web.guide.term_prs_body": "A polygenic score turned into a position in a reference "
+                               "population, 0 to 100. Not a diagnosis and not a probability of "
+                               "disease — a percentile says where you sit in a distribution, "
+                               "nothing more. Built mostly from European-ancestry cohorts; "
+                               "outside that ancestry the percentile is less exact.",
+    "web.guide.term_pgx_label": "Pharmacogenetics (PGx)",
+    "web.guide.term_pgx_body": "How your own genotype at a handful of well-studied genes "
+                               "(CYP2C9, CYP2C19, SLCO1B1 and others) changes how a specific "
+                               "drug is likely to be processed — faster, slower, or with a "
+                               "raised chance of a side effect. A pharmacogenetic flag is a "
+                               "reason to ask a prescriber a specific question, not an "
+                               "instruction to change a dose yourself.",
+    "web.guide.term_clinvar_label": "ClinVar tiers",
+    "web.guide.term_clinvar_body": "Findings in your genome are grouped by what ClinVar says "
+                                   "about them: pathogenic (disease-causing), drug response, "
+                                   "risk factor, or protective are shown first; association and "
+                                   "uncertain significance — the weakest, least actionable tiers "
+                                   "— sit behind a «show more» so they do not crowd out the "
+                                   "rest.",
+    "web.guide.term_confidence_label": "Genome read confidence",
+    "web.guide.term_confidence_body": "A genotype can be called directly from the sequencing "
+                                      "data, or — at a site with no variant on record — "
+                                      "confirmed as reference by an explicit 0/0 call, which is "
+                                      "not the same as a site simply missing from the file. Low "
+                                      "read depth at a called site is flagged in place, next to "
+                                      "the number it affects.",
+    "web.guide.term_sources_label": "Local vs public",
+    "web.guide.term_sources_body": "«Local» is a file already on this machine: your labs, your "
+                                   "genome, your prescriptions. «Public» is a reference database "
+                                   "read over the network to interpret them — ClinVar for "
+                                   "variant significance, RxClass for drug classes, Ensembl for "
+                                   "coordinates. The engine never sends your file contents to a "
+                                   "public source — only the query, such as a drug name or an "
+                                   "rsID.",
+
+    "web.guide.footer": "Every screen carries its own note on what it can and cannot tell you. "
+                        "This page is the map to the interface, not a substitute for those "
+                        "notes, and not medical advice.",
+
     # ── web: workout types (the key is the identifier Garmin sends) ──────
     "web.workout.Running": "Running",
     "web.workout.Tennis": "Tennis",
@@ -1789,6 +1905,22 @@ will go through them later.
     "tools.no_route": "✗ {tool}: no verified install command — this one is installed by hand.",
     "tools.later": "`scholion tools` shows this picture again, `scholion tools --install` "
                    "installs the base set.",
+    # Printed instead of the four ✗ after `init --demo`. The demo needs no external
+    # program at all, and a list of what is missing, directly under «Have a look»,
+    # reads as «installed halfway» to somebody thirty seconds into the product.
+    "doc.list_header": "Documents carried inside the package:",
+    "doc.list_hint": "  scholion doc <name>          print one\n"
+                     "  scholion doc <name> --path   where it is on disk",
+    "doc.unknown": "There is no document «{name}» in this build. There are: {known}",
+    "tools.see_later": "Nothing else to install for the demo. When you bring a real genome, "
+                       "`scholion tools` says which external programs it needs.",
+    # A bare `scholion` used to answer with a usage dump of forty-four commands and
+    # «error: the following arguments are required: cmd». It is the first thing a
+    # curious person types, and it was answered with an error.
+    "cli.bare_hint": "Scholion — your medical data, read against itself, on your own machine.\n\n"
+                     "  scholion init --demo   lay out a synthetic profile and look around\n"
+                     "  scholion overview      the main screen, once you have a profile\n"
+                     "  scholion --help        all commands",
     "tools.not_confirmed": "Installation was not confirmed — nothing was run.",
     "tools.offline": "SCHOLION_OFFLINE is set: installing needs the network, so nothing was run.",
     "tools.running": "→ {command}",

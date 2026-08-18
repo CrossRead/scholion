@@ -1,8 +1,8 @@
 """Two editions of the skill: the personal one and the shared one — and they must not mix.
 
-The personal one (`src/skill/SKILL.md`) accumulates around the owner's particular
+The personal one (`src/skill/INSTRUCTION.owner.md`) accumulates around the owner's particular
 investigation: his laboratories, his devices, the measured coverage of his genes.
-The shared one (`share/SKILL.shared.md`), which travels into the anonymised
+The shared one (`share/skill/INSTRUCTION.md`), which travels into the anonymised
 package, is obliged to contain only what is true for ANY user.
 
 Mixing them is more dangerous than it seems. This is not a leak of personal data
@@ -24,8 +24,8 @@ import support
 
 OWNER_BEGIN, OWNER_END = "<!-- OWNER:BEGIN -->", "<!-- OWNER:END -->"
 
-OWNER_EDITION = support.ROOT / "src" / "skill" / "SKILL.md"
-SHARED_EDITION = support.ROOT / "share" / "SKILL.shared.md"
+OWNER_EDITION = support.ROOT / "src" / "skill" / "INSTRUCTION.owner.md"
+SHARED_EDITION = support.ROOT / "share" / "skill" / "INSTRUCTION.md"
 
 # Entities of a single investigation: the names of laboratories and devices, the
 # concrete measurements of one genome. They have no place in the shared edition.
@@ -91,9 +91,9 @@ class TestSharedEdition(unittest.TestCase):
 
 
 # In the SOURCE repository there are two editions and they lie at different
-# paths. In the built package the path `src/skill/SKILL.md` is occupied by the
+# paths. In the built package the path `src/skill/INSTRUCTION.owner.md` is occupied by the
 # SHARED edition — the builder puts it there under the same name. So the personal
-# edition can be checked by path only where `share/SKILL.shared.md` lies next to
+# edition can be checked by path only where `share/skill/INSTRUCTION.md` lies next to
 # it: that is the only reliable sign of "we are in the source repository, not in
 # the package".
 IN_SOURCE_REPO = SHARED_EDITION.exists() and OWNER_EDITION.exists()
@@ -131,15 +131,15 @@ class TestCopyInsideThePackage(unittest.TestCase):
 
     def setUp(self):
         self.root = support.ROOT
-        self.shared = self.root / "share" / "SKILL.shared.md"
+        self.shared = self.root / "share" / "skill" / "INSTRUCTION.md"
         if not self.shared.exists():
             self.skipTest("a built package: the source edition is not next to it")
 
     def test_the_copy_of_the_skill_matches_byte_for_byte(self):
-        inside = self.root / "src" / "scholion" / "skill" / "SKILL.md"
+        inside = self.root / "src" / "scholion" / "skill" / "INSTRUCTION.md"
         self.assertTrue(inside.exists(), "the package has no skill/SKILL.md — the wheel would ship without the instruction")
         self.assertEqual(inside.read_bytes(), self.shared.read_bytes(),
-                         "the copy in the package has diverged from share/SKILL.shared.md: "
+                         "the copy in the package has diverged from share/skill/INSTRUCTION.md: "
                          "fix it with `python3 src/tools/sync_rules.py --write`")
 
     def test_the_copy_of_the_rules_is_the_canon_without_the_personal_block(self):
@@ -288,3 +288,53 @@ class TestTheSharedSkillOnlyNamesFilesThatShip(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# ──────────────────────────────────────────────────────────────────────────
+# One name, one role
+# ──────────────────────────────────────────────────────────────────────────
+_SKIP_PARTS = {"_to_delete", "_backups", "archive", "dist", "node_modules", ".git"}
+
+
+def _live(p) -> bool:
+    return not (set(p.parts) & _SKIP_PARTS) and "._stale" not in str(p)
+
+
+class TestOneNameMeansOneThing(unittest.TestCase):
+    """`SKILL.md` is the entry. The long text is `INSTRUCTION.md`. Never the reverse.
+
+    Until 16.08.2026 both roles were called `SKILL.md`, and the four files under
+    that name ranged from 5 KB to 115 KB. Nothing failed: a wrong copy, a test
+    comparing the wrong pair and a model loading seventy kilobytes where it
+    expected five all produce a quietly wrong result instead of an error. That is
+    the same class as `profile/` against `profile._stale/` and as a check that
+    compares behaviour with itself.
+
+    The size limit is not a style rule. It is what tells the two roles apart from
+    the outside, without reading them.
+    """
+
+    ENTRY_CEILING = 12_000
+
+    def test_every_skill_md_is_an_entry(self):
+        for p in sorted(support.ROOT.rglob("SKILL.md")):
+            if not _live(p):
+                continue
+            text = p.read_text(encoding="utf-8")
+            rel = p.relative_to(support.ROOT)
+            self.assertTrue(text.startswith("---"),
+                            f"{rel}: an entry has to carry frontmatter — "
+                            f"without it the runtime will not pick the skill up")
+            self.assertLess(len(text), self.ENTRY_CEILING,
+                            f"{rel}: {len(text)} bytes under the name SKILL.md — "
+                            f"this is the instruction, not the entry. "
+                            f"The long text is called INSTRUCTION.md")
+
+    def test_no_instruction_pretends_to_be_an_entry(self):
+        """The mirror rule: frontmatter in a long text makes it loadable by accident."""
+        for p in sorted(support.ROOT.rglob("INSTRUCTION*.md")):
+            if not _live(p):
+                continue
+            text = p.read_text(encoding="utf-8")
+            self.assertFalse(text.startswith("---"),
+                             f"{p.relative_to(support.ROOT)}: an instruction must not "
+                             f"carry frontmatter — only the entry may")

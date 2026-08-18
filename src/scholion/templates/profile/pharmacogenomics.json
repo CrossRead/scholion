@@ -1,9 +1,10 @@
 {
-  "meta": {
+  "_meta": {
+    "schema": 1,
     "purpose": "ШАБЛОН. Фармакогенетические генотипы пользователя (из отчёта лаборатории и/или полного VCF). ЛИЧНОЕ — НЕ передавать.",
     "subject_id": "SAMPLE1",
     "how_to_fill": "Если есть полный VCF — большинство локусов резолвится автоматически (genome/). Точечные генотипы из PDF-отчёта можно внести в genotypes[]. Пустой список допустим.",
-    "schema": "genotypes: [{ gene, rsid, genotype, interpretation?, drug? }]"
+    "shape": "genotypes: [{ gene, rsid, genotype, interpretation?, drug? }]"
   },
   "genotypes": []
 }

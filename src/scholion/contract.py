@@ -86,6 +86,9 @@ NO_CLI: Dict[str, str] = {
 # CLI commands that have no route and should not have one: this is not a gap in the web.
 CLI_ONLY: Dict[str, str] = {
     "serve": "the command that starts the server itself",
+    "doc": "a document the output refers to, printed from inside the package: after "
+           "`pip install` README, PREPARING-THE-GENOME and DATA-LAYOUT are not on disk, "
+           "and advice to open a file somebody cannot open reads as a broken install",
     "skill": "the instruction for an external model: after `pip install` the file lies inside "
              "site-packages and its path cannot be named to a person. Not needed in the web — "
              "no model works there",

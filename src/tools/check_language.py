@@ -63,9 +63,22 @@ CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 PERSONAL_DIRS = {"profile", "genome", "raw", "work", "archive", "reports", "_backups",
                  "_to_delete", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
                  "dist", "node_modules"}
+#: Not personal — COPIES. `src/scholion/docs/` holds the documents the output
+#: names, carried inside the package so a `pip install` user can open them. Every
+#: file there is byte-identical to a source that this gate already measures, and
+#: `src/tools/sync_docs.py` fails the suite if it stops being. Counting both
+#: would inflate the remainder by exactly the size of the duplication and make
+#: the baseline describe a problem twice.
+#:
+#: This is an exclusion, so it is worth saying what would make it a hiding place:
+#: a file appearing here WITHOUT a source. That cannot happen quietly — the
+#: synchroniser derives the directory's contents from its own list of sources and
+#: reports a copy with no source as an error.
+COPIED_DIRS = ("src/scholion/docs",)
+
 PERSONAL_FILES = {
     "CHANGELOG.private.md",          # the owner's personal log
-    "src/skill/SKILL.md",            # personal edition of the skill, with the clinical key
+    "src/skill/INSTRUCTION.owner.md",            # personal edition of the skill, with the clinical key
     ".personal_patterns",
     "_commit_msg.txt",               # a draft the assistant hands to the owner; gitignored
 }
@@ -110,7 +123,7 @@ LAYERS = (
     ("tools",            ("src/tools",)),
     ("tests",            ("tests",)),
     ("plugin",           ("ouroboros_plugin",)),
-    ("skill and rules",  ("share/SKILL.shared.md", "ASSISTANT-RULES.md")),
+    ("skill and rules",  ("share/skill/INSTRUCTION.md", "ASSISTANT-RULES.md")),
     ("documentation",    ("docs", "README.md", "share/README.md", "DISCLAIMER.md")),
     ("changelog",        ("CHANGELOG.md",)),
 )
@@ -244,6 +257,9 @@ def remainder() -> dict:
     """File → how many places hold Russian. An empty dict = the public tree is in English."""
     found = {}
     for p in sorted(ROOT.rglob("*")):
+        _rel = p.relative_to(ROOT).as_posix()
+        if any(_rel.startswith(d + "/") for d in COPIED_DIRS):
+            continue
         if not p.is_file():
             continue
         rel = p.relative_to(ROOT)
@@ -303,7 +319,19 @@ def _regressions(data: dict):
     names: dict = {}
     for k, v in accepted.items():
         names.setdefault(Path(k).name, []).append(v)
-    by_name = {n: v[0] for n, v in names.items() if len(v) == 1}
+    # One entry, or several that AGREE. The original rule was «exactly one», and
+    # a rename disabled it without touching a line of it: when the shared skill
+    # became `INSTRUCTION.md`, the baseline held that bare name twice —
+    # `share/skill/` and `src/scholion/skill/` — the fallback refused to guess,
+    # and the package's own test run went red on text nobody had edited. It
+    # stopped the publication, which is what it is for; but the alarm was about
+    # the shape of the baseline, not about the tree.
+    #
+    # Ambiguity is only a danger when the candidates disagree. Two entries that
+    # both say 2 leave nothing to guess: whichever the file is, the accepted
+    # count is the same. Entries that differ still refuse, because there an
+    # arbitrary forgiveness is worse than a false alarm.
+    by_name = {n: v[0] for n, v in names.items() if len(set(v)) == 1}
 
     grew, appeared = [], []
     for k, v in sorted(data.items()):

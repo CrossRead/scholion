@@ -1,8 +1,9 @@
 {
   "_meta": {
+    "schema": 1,
     "purpose": "ШАБЛОН. Личные показатели: статический профиль (пол/год/рост) + ручные метрики (напр. талия). ЛИЧНОЕ.",
     "how_to_fill": "profile: пол/год рождения/рост — вкладка «Образ жизни» → профиль. Метрики (талия) — поле «Талия, см». ИМТ считается из роста и последнего веса.",
-    "schema": "profile: { sex('male'|'female'), birth_year:int, height_cm:number }; metrics: { <ключ>: { name, unit, direction?, series:[{date, value}] } }"
+    "shape": "profile: { sex('male'|'female'), birth_year:int, height_cm:number }; metrics: { <ключ>: { name, unit, direction?, series:[{date, value}] } }"
   },
   "profile": {"sex": "male", "birth_year": 1985, "height_cm": 178},
   "metrics": {

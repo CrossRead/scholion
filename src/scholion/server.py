@@ -251,6 +251,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(_WEB / "dna.svg", "image/svg+xml")
             if p == "/chart.min.js":
                 return self._file(_WEB / "chart.min.js", "application/javascript; charset=utf-8")
+            if p == "/pico.min.css":
+                return self._file(_WEB / "pico.min.css", "text/css; charset=utf-8")
             if p == "/favicon.ico":
                 return self._file(_WEB / "favicon.ico", "image/x-icon")
             if p in ("/favicon.png", "/favicon-32.png", "/favicon-16.png", "/apple-touch-icon.png"):

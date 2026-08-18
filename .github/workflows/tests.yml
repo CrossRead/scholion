@@ -1,0 +1,125 @@
+# The test suite, on every OS and Python the project claims to support.
+#
+# WHY THIS FILE EXISTS. `publish.yml` runs the suite too, but only on a tag and
+# only on ubuntu-latest with one Python. That is a release gate, not a test
+# matrix: it tells you a tag is broken after you have made the tag, on the single
+# combination it happens to use.
+#
+# The cost of not having this was measured. Three failures of
+# `test_lab_dir_boundary` lived for three days because they appeared only on
+# macOS -- on Linux `/var` is a real directory, on macOS it is a symlink to
+# `/private/var`, and a path compared before `.resolve()` came out unequal.
+# Nobody was running macOS in CI, so there was nothing to catch it. The same week
+# produced three more of a different shape: a test that reached for something
+# only the source repository has, red on a public runner and green everywhere the
+# author looked.
+#
+# WHAT THE MATRIX IS FOR, precisely. `pyproject.toml` says
+# `requires-python = ">=3.10"`. That sentence is a promise to anyone who installs
+# the package, and until this file existed nothing checked it on 3.10, 3.11 or
+# 3.13 at all -- the project was tested on whatever the author's laptop had.
+#
+# THE SYMLINK JOB is not decoration either. The macOS class above reproduces on
+# Linux when `TMPDIR` points at a symlink, which is far cheaper than keeping a
+# macOS runner busy for it. It stays as its own job so that a failure names the
+# cause instead of leaving somebody to guess why one OS disagrees.
+name: tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A second push to the same branch cancels the first: the answer about an
+  # older commit is not worth a runner once a newer one exists.
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matrix:
+    name: ${{ matrix.os }} - Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # One red cell must not cancel the others. Knowing that 3.10 fails on both
+      # systems and 3.13 passes on neither is a different diagnosis from knowing
+      # that something, somewhere, went red first.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: What is actually running
+        # Printed because a matrix cell that lies about its Python is a whole
+        # afternoon, and this is two lines.
+        run: |
+          python -VV
+          python -c "import sys, platform; print(sys.executable, platform.platform())"
+
+      - name: The suite
+        # No dependencies are installed on purpose. The project promises to run
+        # on the standard library alone, and installing anything here would test
+        # a configuration no user has.
+        run: ./run_tests.sh
+
+  symlinked-tmpdir:
+    name: Linux - TMPDIR through a symlink
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: A temporary directory reached through a symlink
+        # This is the macOS `/var` -> `/private/var` shape, reproduced where it
+        # is cheap. A path compared before `.resolve()` comes out unequal here
+        # and equal on an ordinary Linux runner.
+        run: |
+          mkdir -p /tmp/real-tmp
+          ln -sfn /tmp/real-tmp /tmp/link-tmp
+          echo "TMPDIR=/tmp/link-tmp" >> "$GITHUB_ENV"
+
+      - name: The symlink is genuinely a symlink
+        # Without this the job can pass by testing nothing, which is the failure
+        # mode of every environment-dependent test in this repository.
+        run: |
+          test -L /tmp/link-tmp || { echo "TMPDIR is not a symlink - this job would prove nothing"; exit 1; }
+          python -c "import tempfile, os; d = tempfile.gettempdir(); print(d, '->', os.path.realpath(d)); raise SystemExit(0 if d != os.path.realpath(d) else 1)"
+
+      - name: The suite
+        run: ./run_tests.sh
+
+  package:
+    name: The package's own suite, inside the package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the anonymised package
+        # `--no-personal-patterns` because a clean runner has no
+        # `.personal_patterns` by design, and the builder fails closed without it.
+        run: python3 src/tools/make_shareable.py /tmp/pkg --no-personal-patterns
+
+      - name: Its tests, where the recipient runs them
+        # The class this catches has cost three releases: a test that asks the
+        # artefact for something only the repository has passes here and fails
+        # there. `publish_share.sh` runs this too, before it publishes; this job
+        # answers on every push instead of at the moment of release.
+        run: cd /tmp/pkg && ./run_tests.sh

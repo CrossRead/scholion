@@ -245,6 +245,25 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
     and failing because an ADDITIONAL guarantee is impossible is not acceptable.
     """
     path = Path(path)
+    # Everything written INTO the profile carries the version of the shape it was
+    # written in. Stamped here rather than at each of the dozen call sites: a
+    # number applied by half the writers is worse than none, because then its
+    # absence means «old» in one file and «whoever wrote this forgot» in the next.
+    # Caches and knowledge files are not the profile and are left alone.
+    try:
+        # `.resolve()` on both sides, and it is not tidiness. `profile_dir()`
+        # resolves; a path handed in by a caller does not have to. On macOS
+        # `/var` and `/tmp` are symlinks to `/private/...`, so a profile
+        # directory reached the ordinary way compares UNEQUAL to itself, the
+        # stamp is skipped, and the file is written with no version at all —
+        # silently, which defeats the entire point of having one. Caught by the
+        # package's own test run on the owner's machine while the same code was
+        # green on Linux, which is the third time this project has paid for that
+        # difference.
+        if isinstance(data, dict) and path.parent.resolve() == profile_dir():
+            data = stamp_profile_schema(data)
+    except Exception:                                             # noqa: BLE001
+        pass          # a stamp is never a reason to fail a write of somebody's data
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
     # A new file is created closed (0600). A plain `open()` would give 0644, that
@@ -301,6 +320,104 @@ def _read_json(path: Path) -> Dict[str, Any]:
     with path.open(encoding="utf-8") as f:
         data = json.load(f)
     _JSON_CACHE[key] = (mt, data)
+    return data
+
+
+# ---- the version of the profile format -----------------------------------
+#: The version the code in this build writes and understands.
+#:
+#: Raised only when a file's SHAPE changes in a way an older build would read
+#: wrongly — a renamed field, a changed nesting, a unit that now means something
+#: else. Adding a field nobody reads yet is not a new version.
+PROFILE_SCHEMA = 1
+
+#: Where the number lives. The prose describing a file's layout used to live
+#: under the same key, and the two are not the same thing: one is for a person
+#: reading the file, the other is for code deciding whether it may read it at
+#: all. The prose moved to `_meta.shape`.
+_SCHEMA_FIELD = "schema"
+
+
+def _profile_meta(data: Dict[str, Any]) -> Dict[str, Any]:
+    """The metadata block, under either spelling.
+
+    `pharmacogenomics.json` shipped with `meta` while every other profile file
+    used `_meta`. Both are accepted on read — a file already on somebody's disk
+    is not going to rename itself — and `_meta` is what gets written.
+    """
+    for key in ("_meta", "meta"):
+        v = data.get(key)
+        if isinstance(v, dict):
+            return v
+    return {}
+
+
+def profile_schema_of(data: Dict[str, Any]) -> int:
+    """The version a profile file declares. An undeclared file is version 1.
+
+    Silence means «written before the number existed», which is exactly version
+    1 — every file this project has ever written. Treating it as unknown and
+    refusing would lock every existing user out of their own data on upgrade.
+    """
+    v = _profile_meta(data).get(_SCHEMA_FIELD)
+    if isinstance(v, bool):          # a stray `true` is not a version
+        return 1
+    if isinstance(v, int) and v > 0:
+        return v
+    if isinstance(v, str) and v.strip().isdigit():
+        return int(v.strip())
+    return 1                          # prose, absent, or nonsense — the original shape
+
+
+class ProfileFromTheFuture(RuntimeError):
+    """A profile file written by a newer build than this one.
+
+    Raised rather than shrugged off. The alternative is reading a shape the code
+    does not know with rules that no longer apply — silently, on somebody's
+    medical history, with no symptom until a number comes out wrong. Refusing
+    names the file and the two versions; the person can update or keep a copy.
+    """
+
+
+def read_profile_json(path: Path) -> Dict[str, Any]:
+    """Read one file of the profile, checking that this build may read it.
+
+    Migration forward has nothing to do yet: version 1 is the only shape that
+    has ever existed. The point of the check is the other direction — a file
+    from a newer build must not be read by an older one. That direction cannot
+    be added retroactively: by the time there is a version 2, the builds that
+    would need to refuse it are already installed.
+    """
+    data = _read_json(path)
+    if not data:
+        return data
+    found = profile_schema_of(data)
+    if found > PROFILE_SCHEMA:
+        raise ProfileFromTheFuture(
+            f"{path.name} declares profile schema {found}; this build understands "
+            f"{PROFILE_SCHEMA}. It was written by a newer version of Scholion. "
+            f"Update, or keep this file aside — reading it here would apply rules "
+            f"that no longer describe it.")
+    return data
+
+
+def stamp_profile_schema(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Put the current version into a structure about to be written to the profile.
+
+    In place and idempotent. Called by the writers rather than left to each of
+    them to remember, because a stamp applied by half the writers is worse than
+    none: it makes the absence of a number meaningful in one file and accidental
+    in the next.
+    """
+    if not isinstance(data, dict):
+        return data
+    meta = data.get("_meta")
+    if not isinstance(meta, dict):
+        legacy = data.get("meta")
+        meta = dict(legacy) if isinstance(legacy, dict) else {}
+        data["_meta"] = meta
+        data.pop("meta", None)
+    meta[_SCHEMA_FIELD] = PROFILE_SCHEMA
     return data
 
 
@@ -661,14 +778,14 @@ def wearable_trends() -> Dict[str, Any]:
     """PERSONAL historical lifestyle data (wearable devices): wearable_trends.json.
     Yearly trends: metric → {year: value}. Personal, only on the owner's machine."""
     p = profile_dir() / "wearable_trends.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def lifestyle_brief_src() -> Dict[str, Any]:
     """PERSONAL curated lifestyle brief (profile/lifestyle_brief.json).
     The wording is written by the assistant, the numbers are substituted by the engine from tokens. Personal."""
     p = profile_dir() / "lifestyle_brief.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def studies() -> Dict[str, Any]:
@@ -678,47 +795,47 @@ def studies() -> Dict[str, Any]:
     engine did not see them, and a study that had been done was twice called not done.
     """
     p = profile_dir() / "studies.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def focus_src() -> Dict[str, Any]:
     """PERSONAL focus of attention (profile/focus.json): the one task the owner is
     concentrated on right now. Curated wording and levers; the numbers the engine takes live."""
     p = profile_dir() / "focus.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def focus_log() -> Dict[str, Any]:
     """PERSONAL journal of episodes for the focus (profile/focus_log.json): alcohol, drugs, dinner.
     Needed in order to separate factors that are superimposed on one another in passive data."""
     p = profile_dir() / "focus_log.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def sleep_nightly() -> Dict[str, Any]:
     """PERSONAL per-night sleep data (profile/sleep_nightly.json): phases, falling asleep,
     awakenings. The granularity is one night, for n-of-1 analyses."""
     p = profile_dir() / "sleep_nightly.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def prs_results() -> Dict[str, Any]:
     """PERSONAL aggregated polygenic scores (profile/prs_results.json). Personal."""
     p = profile_dir() / "prs_results.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def longevity_data() -> Dict[str, Any]:
     """PERSONAL longevity findings (profile/longevity_findings.json). Personal."""
     p = profile_dir() / "longevity_findings.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def health_goals() -> Dict[str, Any]:
     """PERSONAL goal for the metrics (profile/health_goals.json): the wording, the anchor points,
     the reference values and the chart parameters. Current values/series are taken live from labs+wearable."""
     p = profile_dir() / "health_goals.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 def genome_dir() -> Path:
@@ -763,7 +880,7 @@ def whats_new() -> Dict[str, Any]:
     """Result of the last check for database updates (genome/whats_new.json).
     NOT cached — it is updated after every check."""
     p = genome_dir() / "whats_new.json"
-    return _read_json(p) if p.exists() else {}
+    return read_profile_json(p) if p.exists() else {}
 
 
 _CYR = "\u0430-\u044f"          # Russian lower case (after the yo→ye normalisation)
@@ -871,12 +988,12 @@ def active_med_classes() -> List[str]:
 
 # ---- profile -------------------------------------------------------------
 def pharmacogenomics() -> Dict[str, Any]:
-    return _read_json(profile_dir() / "pharmacogenomics.json")
+    return read_profile_json(profile_dir() / "pharmacogenomics.json")
 
 
 def labs() -> Dict[str, Any]:
     p = source_path("labs")
-    return _read_json(p) if p.exists() else {"markers": {}}
+    return read_profile_json(p) if p.exists() else {"markers": {}}
 
 
 def marker_catalog() -> List[Dict[str, Any]]:
@@ -976,14 +1093,14 @@ def resolve_marker(query: str) -> Dict[str, Any]:
 def medications_json() -> Dict[str, Any]:
     """Editable list of prescriptions (medications.json). Added to through the UI."""
     p = source_path("medications")
-    return _read_json(p) if p.exists() else {"medications": []}
+    return read_profile_json(p) if p.exists() else {"medications": []}
 
 
 def metrics_json() -> Dict[str, Any]:
     """Personal health metrics (metrics.json): sleep, weight, height, mobility and so on.
     Added to through the UI. Personal. The structure is time series, as in labs.json."""
     p = source_path("metrics")
-    return _read_json(p) if p.exists() else {"profile": {}, "metrics": {}}
+    return read_profile_json(p) if p.exists() else {"profile": {}, "metrics": {}}
 
 
 def medications_text() -> str:

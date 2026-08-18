@@ -14,6 +14,7 @@ import json
 import sys
 from pathlib import Path
 
+from . import core as _core
 from . import core, engine, format as fmt
 from . import i18n as _i18n
 from .i18n import t as _t
@@ -42,7 +43,12 @@ def build_parser() -> argparse.ArgumentParser:
                                 description="Assistant: genome + labs + prescriptions (put --json after the subcommand)")
     from . import __version__ as _ver
     p.add_argument("--version", action="version", version=f"scholion {_ver}")
-    sub = p.add_subparsers(dest="cmd", required=True)
+    # NOT required. With `required=True` a bare `scholion` answers with a usage
+    # dump of all forty-four commands and the line «error: the following arguments
+    # are required: cmd» — to somebody who has just installed it and typed the
+    # name to see what happens, that is an error message and a wall of names.
+    # It is the first thing a curious person types.
+    sub = p.add_subparsers(dest="cmd")
 
     # The initial set-up. It stands first for a reason: it is the only command needed
     # by a person who does not yet have a single file of their own.
@@ -72,10 +78,22 @@ def build_parser() -> argparse.ArgumentParser:
     # `pip install` the file lies inside site-packages: naming that path to a person is
     # impossible, while the model needs it in full.
     sk = sub.add_parser("skill", parents=[common],
-                        help="the instruction for an external model (SKILL.md) — the text or the path")
+                        help="the instruction for an external model — the short entry by default, --full for all of it")
     sk.add_argument("--path", action="store_true", help="print only the path to the file")
+    sk.add_argument("--full", action="store_true",
+                    help="the FULL instruction (INSTRUCTION.md) instead of the short entry")
     sk.add_argument("--rules", action="store_true",
                     help="the canon of the assistant's rules instead of the instruction (ASSISTANT-RULES.md)")
+
+    # The same reason `skill` exists. A `pip install` gets `src/scholion` and
+    # nothing else, while the output sends the reader to README nine times, to
+    # PREPARING-THE-GENOME four and to DATA-LAYOUT twice — files that are not on
+    # a PyPI user's disk, in a repository that is not open yet. `limits` was
+    # advising people to read something they had no way to reach.
+    dc = sub.add_parser("doc", parents=[common],
+                        help="print a document the output refers to (no argument — the list)")
+    dc.add_argument("name", nargs="?", help="which document; omit to list them")
+    dc.add_argument("--path", action="store_true", help="print only the path to the file")
 
     d = sub.add_parser("drug", parents=[common], help="check a drug against the pharmacogenetics")
     d.add_argument("name", help="the name of the drug (Russian/English)")
@@ -265,6 +283,23 @@ def _hint_if_empty(cmd) -> None:
 
 
 def main(argv=None) -> int:
+    """The command line, with one class of failure caught before it reaches a person.
+
+    A profile file written by a newer build cannot be read by this one, and the
+    refusal is deliberate (`core.ProfileFromTheFuture`). What must not happen is
+    that the refusal arrives as a Python traceback: the first thing somebody sees
+    about their own medical history should not look like a crash. The message
+    already says which file, which two versions, and what to do — it only needed
+    somewhere to be printed instead of raised.
+    """
+    try:
+        return _main(argv)
+    except _core.ProfileFromTheFuture as e:
+        print(f"⚠️  {e}", file=sys.stderr)
+        return 3
+
+
+def _main(argv=None) -> int:
     # `scholion skill | head` is a natural command, and its output runs to nearly a hundred
     # kilobytes. Without this, head closes the pipe and the person gets a BrokenPipeError
     # traceback instead of text: it looks like a breakage even though everything worked.
@@ -277,6 +312,12 @@ def main(argv=None) -> int:
 
     p = build_parser()
     args = p.parse_args(argv)
+    if not getattr(args, "cmd", None):
+        # Three lines and a way in, not a catalogue. `--help` is one keystroke
+        # away and lists everything; what a bare `scholion` owes the reader is a
+        # first move.
+        print(_t("cli.bare_hint"))
+        return 0
     # An explicit flag beats the environment, the environment beats the default.
     if getattr(args, "lang", None):
         _i18n.set_lang(args.lang)
@@ -306,7 +347,16 @@ def main(argv=None) -> int:
         # created and the person has already been told what to do next: a failed
         # installation must not be able to make a successful init look failed.
         from . import tools as _tools
-        _tools.offer_after_init(assume_yes=args.yes, skip=args.no_tools)
+        # Not after a demo. The demo needs none of these — it is synthetic data
+        # already on disk — and four ✗ printed directly under «Have a look» read
+        # as «installed halfway», which is the wrong thing to tell somebody in
+        # the first thirty seconds. For a real profile the offer stays: there the
+        # genome layer does not work without them, and the moment to say so is
+        # before the person goes looking for a VCF.
+        if r.get("mode") == "demo":
+            print(_t("tools.see_later"))
+        else:
+            _tools.offer_after_init(assume_yes=args.yes, skip=args.no_tools)
         return 0
 
     if args.cmd == "tools":
@@ -368,8 +418,41 @@ def main(argv=None) -> int:
                              ensure_ascii=False, indent=2))
         return code
 
+    if args.cmd == "doc":
+        from . import docs as _docs
+        if not args.name:
+            avail = _docs.available()
+            if args.json:
+                print(json.dumps({"documents": [{"name": k, "bytes": b} for k, b in avail]},
+                                 ensure_ascii=False, indent=2))
+                return 0
+            print(_t("doc.list_header"))
+            for k, b in avail:
+                print(f"  {k:24} {b // 1024} KB")
+            print()
+            print(_t("doc.list_hint"))
+            return 0
+        path = _docs.path_of(args.name)
+        if path is None:
+            print(_t("doc.unknown", name=args.name,
+                     known=", ".join(k for k, _ in _docs.available())), file=sys.stderr)
+            return 1
+        text = path.read_text(encoding="utf-8")
+        if args.json:
+            print(json.dumps({"name": args.name, "path": str(path),
+                              "bytes": len(text.encode()),
+                              "text": None if args.path else text},
+                             ensure_ascii=False, indent=2))
+            return 0
+        print(str(path) if args.path else text, end="" if not args.path else "\n")
+        return 0
+
     if args.cmd == "skill":
-        name = "ASSISTANT-RULES.md" if args.rules else "SKILL.md"
+        # SKILL.md is the entry a model loads first; INSTRUCTION.md is the long text.
+        # Printing seventy kilobytes at somebody who typed `scholion skill` to see what
+        # this is was the old behaviour, and it was the wrong default.
+        name = ("ASSISTANT-RULES.md" if args.rules
+                else "INSTRUCTION.md" if args.full else "SKILL.md")
         path = Path(__file__).resolve().parent / "skill" / name
         if not path.exists():
             # The build is incomplete. Staying silent is not an option: a command that

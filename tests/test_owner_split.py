@@ -34,7 +34,7 @@ SPLIT_FILES = {
 class TestSplitByMarkers(unittest.TestCase):
 
     def setUp(self):
-        self.in_repository = (support.ROOT / "share" / "SKILL.shared.md").exists()
+        self.in_repository = (support.ROOT / "share" / "skill" / "INSTRUCTION.md").exists()
         if not self.in_repository:
             self.skipTest("a built package: the source is not next to it")
 

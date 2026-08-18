@@ -5,8 +5,8 @@ The rules live in one file and the skills receive a copy mechanically — which 
 why the edition inside a skill cannot fall behind the canon unnoticed.
 
 **There are two editions, and they DIFFER in composition.** The personal one
-(`src/skill/SKILL.md`) gets "Core" + "Owner's personal refinements"; the shared one
-(`share/SKILL.shared.md`), which travels in the depersonalised package, gets only
+(`src/skill/INSTRUCTION.owner.md`) gets "Core" + "Owner's personal refinements"; the shared one
+(`share/skill/INSTRUCTION.md`), which travels in the depersonalised package, gets only
 "Core".
 
 Why the split. A rule and a special case of it are different things. An "orange
@@ -34,7 +34,7 @@ SOURCE = ROOT / "ASSISTANT-RULES.md"
 # without this line the sync check inside the built artefact failed with "not a
 # single skill file", although the file is there. Exactly the case for whose sake
 # the run is moved onto the artefact.
-# `src/scholion/skill/SKILL.md` is deliberately NOT in this list, although that
+# `src/scholion/skill/INSTRUCTION.md` is deliberately NOT in this list, although that
 # file also holds the rules block. It is not an edition of its own but a byte-for-
 # byte copy of the shared one (see MIRROR below): a copy is by definition in sync
 # with its original, and a second check of the same thing adds no guarantee — only
@@ -45,11 +45,12 @@ SOURCE = ROOT / "ASSISTANT-RULES.md"
 # copy remains the only skill file — so the list of targets below is extended with
 # it dynamically.
 TARGETS = tuple(t for t in (
-    ROOT / "src" / "skill" / "SKILL.md",
-    ROOT / "share" / "SKILL.shared.md",
-    ROOT / "src" / "scholion" / "skill" / "SKILL.md",
-) if not ((ROOT / "share" / "SKILL.shared.md").exists()
-          and t == ROOT / "src" / "scholion" / "skill" / "SKILL.md"))
+    ROOT / "src" / "skill" / "INSTRUCTION.owner.md",   # source repo: the owner's edition
+    ROOT / "src" / "skill" / "INSTRUCTION.md",         # built package: the shared edition lands here
+    ROOT / "share" / "skill" / "INSTRUCTION.md",
+    ROOT / "src" / "scholion" / "skill" / "INSTRUCTION.md",
+) if not ((ROOT / "share" / "skill" / "INSTRUCTION.md").exists()
+          and t == ROOT / "src" / "scholion" / "skill" / "INSTRUCTION.md"))
 
 SRC_BEGIN, SRC_END = "<!-- CORE:BEGIN -->", "<!-- CORE:END -->"
 OWNER_BEGIN, OWNER_END = "<!-- OWNER:BEGIN -->", "<!-- OWNER:END -->"
@@ -58,13 +59,13 @@ DST_BEGIN, DST_END = "<!-- ASSISTANT-RULES:BEGIN -->", "<!-- ASSISTANT-RULES:END
 # Which edition gets what. The key is the target path relative to the root.
 #
 # The subtlety this used to break on: in a BUILT PACKAGE the path
-# `src/skill/SKILL.md` holds the SHARED edition — the builder puts it there under
-# the same name. Determining the edition by path alone is impossible there: the
+# `src/skill/INSTRUCTION.md` holds the SHARED edition. The name now says which is
+# which — `.owner.` never leaves the source repository — but the check still has to
 # check would demand the personal block from the shared edition and fail for the
-# package recipient. The sign of the source repository is `share/SKILL.shared.md`
+# package recipient. The sign of the source repository is `share/skill/INSTRUCTION.md`
 # lying next to it.
-OWNER_EDITION = "src/skill/SKILL.md"
-IN_SOURCE_REPO = (ROOT / "share" / "SKILL.shared.md").exists()
+OWNER_EDITION = "src/skill/INSTRUCTION.owner.md"
+IN_SOURCE_REPO = (ROOT / "share" / "skill" / "INSTRUCTION.md").exists()
 
 # Copies inside the package. The reason is separate from block synchronisation:
 # only what lies INSIDE `src/scholion` gets into the wheel (`pip install scholion`).
@@ -73,7 +74,13 @@ IN_SOURCE_REPO = (ROOT / "share" / "SKILL.shared.md").exists()
 # the package description promises them the skill. Hence the shared edition and the
 # canon of rules are mirrored into the package byte for byte; the source stays one.
 MIRROR = (
-    (ROOT / "share" / "SKILL.shared.md", ROOT / "src" / "scholion" / "skill" / "SKILL.md"),
+    (ROOT / "share" / "skill" / "INSTRUCTION.md", ROOT / "src" / "scholion" / "skill" / "INSTRUCTION.md"),
+    # The entry carries no rules block of its own — it is copied verbatim, not synchronised.
+    (ROOT / "share" / "skill" / "SKILL.md", ROOT / "src" / "scholion" / "skill" / "SKILL.md"),
+    # The owner keeps ~/.claude/skills/scholion pointed at src/skill/, and the
+    # runtime looks for SKILL.md there — so the entry is mirrored into the
+    # owner's directory as well. Nothing personal is in it.
+    (ROOT / "share" / "skill" / "SKILL.md", ROOT / "src" / "skill" / "SKILL.md"),
     (SOURCE, ROOT / "src" / "scholion" / "skill" / "ASSISTANT-RULES.md"),
 )
 HEADER = (
@@ -114,8 +121,8 @@ def main(argv: list[str]) -> int:
     if not rules.strip():
         raise SystemExit("✗ the \"Core\" block in ASSISTANT-RULES.md is empty")
     stale = []
-    # A depersonalised package holds only one skill edition: `share/SKILL.shared.md`
-    # arrives at the recipient as `src/skill/SKILL.md`, and they have no source file.
+    # A depersonalised package holds only one skill edition: `share/skill/INSTRUCTION.md`
+    # arrives at the recipient as `src/skill/INSTRUCTION.owner.md`, and they have no source file.
     # A missing target is not an error; the absence of ALL targets is an error.
     present = [t for t in TARGETS if t.exists()]
     if not present:

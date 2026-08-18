@@ -130,6 +130,13 @@ audit rejects it.
   risk estimate.
 - Chromosome sorting: `order.get(c, int(c))` breaks on `X` — use explicit
   branches.
+- **One name, one role, in the skill files.** `SKILL.md` is always the short
+  entry a model loads first — frontmatter, under 12 KB. The long text is always
+  `INSTRUCTION.md`, and it carries no frontmatter. `*.owner.*` never leaves the
+  source repository. Until 16.08.2026 both roles were called `SKILL.md` and the
+  files under that name ranged from 5 KB to 115 KB; nothing failed, which is
+  exactly why it had to be split — a wrong copy produces a quietly wrong result,
+  not an error. Two tests hold the rule (`tests/test_skill_editions.py`).
 - Shell scripts that ship must run on the bash macOS provides — **3.2, from
   2007**. No `mapfile`, no associative arrays, no `${arr[@]}` on an empty array
   under `set -u`. A tool that has to be installed before it can run is useless
@@ -141,3 +148,11 @@ audit rejects it.
   passes on Linux and fails on macOS. Resolve the temporary root in `setUp`.
   A macOS-only failure of this shape reproduces on Linux: point `TMPDIR` at a
   symlink and run again.
+- **pico.css is the base style layer for every HTML surface.** Vendored
+  locally — `web/pico.min.css`, no CDN, no build step, served by `server.py`
+  the same way as `chart.min.js` — so the interface keeps working with no
+  network reachable at all. It fills in sane defaults for elements not
+  already hand-styled; every existing custom class keeps exactly the rule it
+  had, because a class selector always outranks Pico's element-level default.
+  Adopted 18.08.2026 when `web/index.html` moved onto it; the next HTML
+  surface starts there directly instead of re-deciding.

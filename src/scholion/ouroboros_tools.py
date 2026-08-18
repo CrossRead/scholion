@@ -111,6 +111,62 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
             + (f"\n{files}" if files else ""))
 
 
+# --- the reports a model asks for ABOUT THE PERSON --------------------------
+# These nine were missing until v0.3.1, and the reason is worth naming because it
+# is the project's own recurring one. `contract.py` was written after «Second
+# opinion» lived only in the web tabs for half a year, and it enforces parity
+# between the web and the CLI — while its own opening paragraph calls the plugin
+# the THIRD face of one core. The map never covered it, so the plugin drifted
+# exactly the way the web had, and a model connected through Ouroboros could not
+# ask for the summary, the second opinion, or — worst of the three — the limits.
+#
+# `limits` is the one that mattered most. It is the answer to «what can this data
+# NOT tell you», the capability the whole project is built around, and the model
+# that most needed it was the one that could not call it.
+def _h_overview(ctx: "ToolContext") -> str:
+    return fmt.overview_report(engine.overview())
+
+
+def _h_second_opinion(ctx: "ToolContext") -> str:
+    return fmt.second_opinion_report(engine.second_opinion())
+
+
+def _h_limits(ctx: "ToolContext") -> str:
+    from scholion import limits as _lim  # noqa: E402
+    return fmt.limits_report(_lim.report())
+
+
+def _h_radar(ctx: "ToolContext") -> str:
+    return fmt.radar_report(engine.health_radar())
+
+
+def _h_focus(ctx: "ToolContext") -> str:
+    return fmt.render_focus(engine.focus_dashboard())
+
+
+def _h_brief(ctx: "ToolContext") -> str:
+    return fmt.render_brief(engine.lifestyle_brief())
+
+
+def _h_acmg(ctx: "ToolContext") -> str:
+    return fmt.acmg_report(engine.acmg_findings())
+
+
+def _h_goal_suggest(ctx: "ToolContext") -> str:
+    """Proposes targets; it does NOT write them.
+
+    The write path stays behind `--write` on the command line and behind a button
+    in the interface. A model that could set somebody's health goals by calling a
+    tool is a model changing the profile, and the canon it is handed says it does
+    not do that.
+    """
+    return fmt.goal_suggest_report(engine.suggest_goal_targets())
+
+
+def _h_lipid_genetics(ctx: "ToolContext") -> str:
+    return fmt.lipid_genetics_report(engine.lipid_genetics())
+
+
 # --- schemas (OpenAI function-calling) -------------------------------------
 # A description is the only thing the model reads before deciding to call a tool, so it
 # is text like any other and lives in the catalogue. It is built at CALL time rather than
@@ -130,6 +186,15 @@ _TOOLS = (
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
     ("sch_ingest_labs", ("folder",), ["folder"], _h_ingest_labs),
+    ("sch_overview", (), [], _h_overview),
+    ("sch_second_opinion", (), [], _h_second_opinion),
+    ("sch_limits", (), [], _h_limits),
+    ("sch_radar", (), [], _h_radar),
+    ("sch_focus", (), [], _h_focus),
+    ("sch_brief", (), [], _h_brief),
+    ("sch_acmg", (), [], _h_acmg),
+    ("sch_goal_suggest", (), [], _h_goal_suggest),
+    ("sch_lipid_genetics", (), [], _h_lipid_genetics),
 )
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the

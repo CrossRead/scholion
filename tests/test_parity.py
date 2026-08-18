@@ -40,3 +40,60 @@ class TestParity(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTheThirdFaceKeepsUp(unittest.TestCase):
+    """One core, three faces — and the map covered two of them.
+
+    The docstring at the top of `contract.py` names the web, the CLI and the
+    Ouroboros plugin, and describes the defect the map was written after:
+    «Second opinion», the summary and the health index lived only in the web tabs
+    for half a year, because a capability added «quickly» to one face stays there.
+
+    The plugin then did exactly that for the next six months, unwatched. Nine
+    capabilities had a route and a command and no tool — among them `limits`, the
+    answer to «what can this data NOT tell you». The reader who needs that answer
+    most is a language model about to make a negative statement, and it was the
+    one face that could not ask for it.
+
+    A missing tool is worse than a missing route for a reason worth stating: a
+    person looking at a web page can see that a tab is absent. A model cannot see
+    a capability it was never shown — it answers from what it has instead of
+    saying it cannot.
+    """
+
+    def test_every_command_has_a_tool_or_a_written_reason(self):
+        self.assertEqual(contract.check_plugin_parity(), [])
+
+    def test_the_map_does_not_promise_tools_that_are_not_registered(self):
+        tools = set(contract.plugin_tools())
+        missing = sorted(t for t in contract.PLUGIN.values() if t not in tools)
+        self.assertEqual(missing, [], "the map is ahead of the plugin")
+
+    def test_no_tool_writes_to_the_profile(self):
+        """The canon says a model does not change therapy or the profile.
+
+        The absence of a write tool is what makes that more than a promise. Every
+        write command is listed in NO_PLUGIN as «a write», and this checks the
+        list has not quietly lost one.
+        """
+        writes = {"add-lab", "add-med", "remove-med", "add-metric", "focus-log",
+                  "set-folder", "import-labs", "ingest-studies", "ingest-garmin"}
+        for cmd in sorted(writes & set(contract.cli_commands())):
+            with self.subTest(command=cmd):
+                self.assertNotIn(cmd, contract.PLUGIN,
+                                 f"«{cmd}» writes to the profile and is exposed as a tool")
+                self.assertIn(cmd, contract.NO_PLUGIN)
+
+    def test_the_tools_a_model_needs_before_a_negative_statement_are_there(self):
+        """Named one by one, because these are the ones whose absence is silent.
+
+        `limits` says what the data cannot answer; `provenance` says which points
+        are confirmed by nothing. A model without them does not know it is
+        guessing.
+        """
+        tools = set(contract.plugin_tools())
+        for name in ("sch_limits", "sch_provenance", "sch_overview", "sch_second_opinion"):
+            with self.subTest(tool=name):
+                self.assertIn(name, tools)
+

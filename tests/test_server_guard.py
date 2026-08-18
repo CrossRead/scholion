@@ -7,6 +7,8 @@ will go through. So four things are checked: a foreign name in Host, a cross-sit
 Origin, the size of the body, and the fact that the details of an internal error
 do not leave in the response.
 """
+import contextlib
+import io
 import json
 import os
 import shutil
@@ -116,11 +118,23 @@ class TestRequestGuard(unittest.TestCase):
         def boom(*a, **k):
             raise FileNotFoundError(2, "No such file", "/Users/кто-то/profile/labs.json")
 
+        # The server prints the traceback to the owner's console on purpose — that
+        # is the behaviour under test, one half of it. But this test PROVOKES the
+        # failure, so the traceback lands in the middle of a release log looking
+        # exactly like a crash, and it has now been read as one three times.
+        # Swallowed here, in the test that causes it, and nowhere else: silencing
+        # it in the server would remove the half of the design that says the
+        # details belong to the person who started it.
         _store.add_medication = boom
+        buf = io.StringIO()
         try:
-            code, txt = self._call("/api/medications", {"name": "x", "dose": "1"})
+            with contextlib.redirect_stderr(buf):
+                code, txt = self._call("/api/medications", {"name": "x", "dose": "1"})
         finally:
             _store.add_medication = original
+        self.assertIn("FileNotFoundError", buf.getvalue(),
+                      "the traceback no longer reaches the owner's console, which is "
+                      "the other half of this guard: the details have to go somewhere")
         self.assertEqual(code, 500)
         self.assertNotIn("/Users/", txt, "the path leaked into the HTTP response")
         self.assertNotIn("кто-то", txt)

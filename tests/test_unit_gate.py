@@ -122,16 +122,36 @@ class TestNothingIsWrittenOnRefusal(_Profile):
         self.assertTrue(r.get("ok"), r)
         self.assertEqual(len(self.series("ldl")), 2)
 
-    def test_hba1c_in_ifcc_units_is_refused_with_its_reason(self):
-        """The conversion is affine, and a multiplier would read 6.5 % as 4.4 %.
+    def test_hba1c_in_ifcc_units_is_converted_by_its_formula(self):
+        """Affine, and it used to be refused for being affine.
 
-        Refused rather than approximated, and the reason is in the message: a
-        person told only «unknown unit» about a unit that plainly exists goes
-        looking for a typo, finds none, and enters the number bare.
+        A multiplier would read 48 mmol/mol as about 4.4 %, so refusing was the
+        right answer while a factor was the only tool. It was also a refusal of
+        the commonest unit on a European report, and the person met «unknown
+        unit» about a unit that plainly exists — went looking for a typo, found
+        none, and entered the number bare, which is the outcome the refusal was
+        meant to avoid.
+
+        The gateway carries a second law now. 48 mmol/mol is 6.5 %, and the test
+        checks the published value rather than the arithmetic, so a mistyped
+        constant fails here rather than in somebody's diabetic reading.
         """
         r = store.add_lab_point("hba1c", "2026-08-01", 48, unit="mmol/mol")
+        self.assertTrue(r.get("ok"), r)
+        pts = self.series("hba1c")
+        self.assertEqual(len(pts), 1)
+        self.assertAlmostEqual(pts[0]["value"], 6.5, places=1)
+
+    def test_a_unit_with_no_law_at_all_is_still_refused_and_writes_nothing(self):
+        """The second law must not become a licence to convert anything.
+
+        Lp(a) in mg/dL depends on the size of the person's apo(a) isoform: no
+        factor, no formula. This is the case that keeps the refusal path alive
+        now that HbA1c has left it.
+        """
+        r = store.add_lab_point("lpa", "2026-08-01", 60, unit="mg/dL")
         self.assertFalse(r.get("ok"))
-        self.assertEqual(self.series("hba1c"), [])
+        self.assertEqual(self.series("lpa"), [])
 
 
 class TestTheConstantsThemselves(unittest.TestCase):
@@ -298,15 +318,33 @@ class TestTheUnitsAnAmericanPanelIsPrintedIn(unittest.TestCase):
                                      "for another")
         self.assertEqual(r["factor"], 1.0)
 
-    def test_the_two_deliberate_refusals_say_why_in_their_own_words(self):
-        for key, unit, word in (("hba1c", "mmol/mol", "affine"),
-                                ("lpa", "mg/dL", "isoform")):
-            with self.subTest(marker=key):
-                r = self._resolve(key, unit)
-                self.assertFalse(r.get("ok"), f"{key} now converts {unit} by a multiplier")
-                self.assertIn(word, (r.get("reason") or ""),
-                              "the refusal is generic, so it reads as «we have not got round to "
-                              "this unit» rather than «this conversion does not exist»")
+    def test_a_deliberate_refusal_says_why_in_its_own_words(self):
+        """One of the two is left. That is the point of checking the wording.
+
+        A generic «unknown unit» reads as «we have not got round to this one» and
+        sends the reader looking for a typo. Lp(a) in mg/dL has no conversion at
+        all — not a factor, not a formula — because the size of the apo(a) isoform
+        differs between people, and the message has to say that much.
+        """
+        r = self._resolve("lpa", "mg/dL")
+        self.assertFalse(r.get("ok"), "lpa now converts mg/dL, which nothing can")
+        self.assertIn("isoform", (r.get("reason") or ""),
+                      "the refusal is generic, so it reads as «we have not got round to "
+                      "this unit» rather than «this conversion does not exist»")
+
+    def test_the_unit_that_stopped_being_a_refusal_converts_by_a_formula(self):
+        """HbA1c in mmol/mol used to live in the list above.
+
+        It moved because the law existed all along — the NGSP master equation —
+        and only the gateway lacked a shape for it. What must not happen is a
+        quiet return to a multiplier: `factor` alone would put 48 mmol/mol at
+        about 4.4 %.
+        """
+        r = self._resolve("hba1c", "mmol/mol")
+        self.assertTrue(r.get("ok"), "the commonest unit on a European report is refused")
+        self.assertTrue(r.get("affine"))
+        self.assertNotEqual(r.get("offset"), 0,
+                            "converted with no offset, which is the wrong law")
 
     def test_a_unit_that_belongs_to_another_marker_is_still_refused(self):
         """Widening must not turn the gate off."""

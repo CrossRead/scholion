@@ -724,24 +724,71 @@ def resolve_unit(spec: Dict[str, Any], given: str) -> Dict[str, Any]:
             return {"ok": False, "canonical": canonical, "accepted": _accepted_units(spec),
                     "reason": why}
 
+    # A unit that converts by a FORMULA rather than by a factor. HbA1c is the
+    # case: the IFCC scale (mmol/mol) and the NGSP scale (%) are related by
+    # `% = 0.09148 × mmol/mol + 2.152`, the NGSP master equation — affine, not
+    # proportional. Multiplying 48 mmol/mol by anything gives the wrong number;
+    # the right one is 6.5 %.
+    #
+    # It carries an `offset`, and every caller has to apply it. That «has to» is
+    # the dangerous part: a caller reading only `factor` would store 48 as 48 %,
+    # which is not a refusal but a silently wrong diabetic reading. So nothing
+    # calls this and does the arithmetic itself any more — `convert_to_canonical`
+    # below is the one place the law lives, and both entry points go through it.
+    for surface, rule in (spec.get("convert_affine") or {}).items():
+        if _norm_unit(surface) == g:
+            return {"ok": True, "factor": float(rule["k"]), "offset": float(rule["b"]),
+                    "affine": True, "canonical": canonical,
+                    "note": rule.get("source")}
+
     # `convert` first, then `units`: the conversion table is written for typed
     # input and carries the full constants, while `units` exists for the parser
     # and rounds where a form's own precision makes rounding harmless.
     for source in (spec.get("convert") or {}, units):
         for surface, factor in source.items():
             if _norm_unit(surface) == g:
-                return {"ok": True, "factor": float(factor), "canonical": canonical}
+                return {"ok": True, "factor": float(factor), "offset": 0.0,
+                        "canonical": canonical}
 
     if canonical and g == _norm_unit(canonical):
-        return {"ok": True, "factor": 1.0, "canonical": canonical}
+        return {"ok": True, "factor": 1.0, "offset": 0.0, "canonical": canonical}
     entry = (_read_knowledge_raw("units.json").get("units", {}).get(canonical) or {})
     labels = entry.get("label") or {}
     if isinstance(labels, dict) and any(_norm_unit(v) == g for v in labels.values()
                                         if isinstance(v, str)):
-        return {"ok": True, "factor": 1.0, "canonical": canonical}
+        return {"ok": True, "factor": 1.0, "offset": 0.0, "canonical": canonical}
 
     return {"ok": False, "canonical": canonical, "accepted": _accepted_units(spec),
             "reason": "unit not recognised"}
+
+
+def convert_to_canonical(spec: Dict[str, Any], given: str, value: float) -> Dict[str, Any]:
+    """A value in whatever unit it arrived in → the marker's canonical unit.
+
+    THE ONE PLACE THE ARITHMETIC LIVES, and it exists because there are now two
+    laws instead of one. Almost every unit converts by a factor; HbA1c in mmol/mol
+    converts by `% = 0.09148 × mmol/mol + 2.152`, which is affine. A caller that
+    knew only about factors and met the second law would multiply 48 by 1.0 and
+    store 48 %, and nothing would error — the person would simply be told they
+    have a catastrophic HbA1c. That is not a hypothetical failure mode; it is the
+    same shape as the mg/dL glucose defect this gateway was built after.
+
+    So the callers no longer multiply. They ask here, for the value and for each
+    end of the reference range separately — a corridor printed on a form is in the
+    same unit as the result, and converting one without the other reproduces the
+    original defect one level down.
+
+    Rounded to four decimals, as elsewhere: below every unit's reporting precision
+    and above every threshold in the knowledge base, so it neither invents digits
+    nor loses a comparison.
+    """
+    res = resolve_unit(spec, given)
+    if not res.get("ok"):
+        return res
+    k, b = float(res.get("factor", 1.0)), float(res.get("offset", 0.0))
+    if k == 1.0 and b == 0.0:
+        return {**res, "value": value}
+    return {**res, "value": round(value * k + b, 4)}
 
 
 def _accepted_units(spec: Dict[str, Any]) -> List[str]:
@@ -754,7 +801,8 @@ def _accepted_units(spec: Dict[str, Any]) -> List[str]:
                   .get("label") or {})
         if isinstance(labels, dict):
             out.extend(v for v in labels.values() if isinstance(v, str) and v not in out)
-    for source in (spec.get("convert") or {}, spec.get("units") or {}):
+    for source in (spec.get("convert") or {}, spec.get("units") or {},
+                   spec.get("convert_affine") or {}):
         for surface in source:
             if surface not in out:
                 out.append(surface)

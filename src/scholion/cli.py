@@ -168,6 +168,9 @@ def build_parser() -> argparse.ArgumentParser:
     pv.add_argument("--marker", help="check a single marker only")
     pv.add_argument("--lab-dir", help="the folder with the forms (for --refresh)")
 
+    sub.add_parser("capabilities", parents=[common],
+                   help="what this build can do — every command, what it does, "
+                        "whether it writes, and which entry points carry it")
     asi = sub.add_parser("assistant", parents=[common],
                          help="what the application does by itself, what the assistant adds and how to connect it")
     asi.add_argument("--context", action="store_true",
@@ -581,6 +584,9 @@ def _main(argv=None) -> int:
         res, render = engine.prs_findings(), fmt.prs_report
     elif args.cmd == "longevity":
         res, render = engine.longevity_findings(), fmt.longevity_report
+    elif args.cmd == "capabilities":
+        from . import contract as _c
+        res, render = _c.capabilities(), fmt.capabilities_report
     elif args.cmd == "lipid-genetics":
         res, render = engine.lipid_genetics(), fmt.lipid_genetics_report
     elif args.cmd == "ingest-labs":

@@ -31,6 +31,248 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.3.1 — 18.08.2026
+
+_MINOR by the letter of `docs/VERSIONING.md`: `lab_markers.json` changes what a
+value means on unchanged input — an HbA1c that used to be refused is now stored.
+Nothing already stored moves; a refusal has no stored value to move._
+
+_Backlog 36 and 41, and the answer to both was mostly «check before you build»._
+
+### What this changes in the conclusions
+
+**HbA1c in mmol/mol is read now instead of refused.** The IFCC scale and the
+NGSP scale are related by the master equation `% = 0.09148 × mmol/mol + 2.152` —
+affine, not proportional — and the gateway had one law: a multiplier per spelling.
+Refusing was the honest answer while that was the only tool, and it was also a
+refusal of the commonest unit on a European report. A person met «unknown unit»
+about a unit that plainly exists, went looking for a typo, found none, and typed
+the number bare — the outcome the refusal existed to prevent.
+
+The gateway carries a second law: `convert_affine`, with the constants and the
+NGSP citation beside them. 48 mmol/mol comes out as 6.5 %, which is what the
+published table says, and the test checks the table rather than the arithmetic.
+
+**The corridor travels with the value, by the same law.** A range printed in
+mmol/mol beside a value converted to % is the mg/dL-glucose defect one level
+down, and with an affine law a bound multiplied instead of transformed lands
+somewhere else entirely. Both ends now go through the conversion, and a test
+adds a value inside its own corridor and checks it is not flagged.
+
+**Nothing converts on its own any more.** The arithmetic used to live in the
+caller. That was safe with one law and dangerous with two: a caller reading only
+`factor` would apply 1.0 to 48 mmol/mol and store 48 % — not an error, a
+catastrophic diabetic reading, silently. `core.convert_to_canonical` is the one
+place the law lives, both entry points go through it, and a test refuses any
+module that multiplies by the gateway's factor itself. Verified by putting the
+multiplication back and watching two tests go red.
+
+**Lp(a) in mg/dL stays refused,** and that is what keeps the refusal path
+honest. Mass and molar concentration there depend on the size of the person's
+apo(a) isoform: no factor, no formula, and a second law is not a licence to
+convert everything.
+
+### What was already done, and is now closed by checking rather than by memory
+
+**Task 41 — the test matrix — was already in the tree.** `tests.yml` runs
+ubuntu × macOS against Python 3.10, 3.11, 3.12 and 3.13 with `fail-fast: false`,
+plus a Linux job with `TMPDIR` behind a symlink (the macOS `/var` →
+`/private/var` shape, reproduced where it is cheap), plus the package job. The
+backlog line said «not started» as of 16.08 and was two days stale. It is closed
+with what proves it: the file, the cells it declares, and a green run on GitHub.
+
+**Task 36 was five-sevenths done and the entry knew it.** The five factor
+conversions — free T4, free T3, TIBC, zinc, DHT — shipped earlier, each with its
+molar mass written next to the constant. What remained were the two the entry
+itself called hard, and they turned out to be one piece of work and one correct
+refusal, which is the paragraph above.
+
+### The frame: one capability, four faces, one tick
+
+`contract.py` opens by naming three faces of one core and describes the defect it
+was written after — «Second opinion», the summary and the health index living in
+the web tabs alone for half a year, because a capability added quickly to one
+face stays there. It closed the first two faces against each other and left the
+others open, and both drifted.
+
+There are four doors, not two, and they are not equal:
+
+| | who walks through it | who notices it is shut |
+|---|---|---|
+| web interface | a person clicking | the person — a missing tab is visible |
+| command line | a MODEL with a shell, first; a person typing, second | the person — the model works from what it was told exists |
+| plugin tool list | a model deciding what it can call | **nobody** |
+| the model's instruction | a model deciding what exists at all | **nobody** |
+
+A person can see that something is absent and go looking. A model cannot see a
+capability it was never shown: it answers from what it has instead of saying it
+cannot, and that answer looks exactly like a good one. So the two model-facing
+doors now carry the higher bar — an omission must be written down with a reason,
+and the reason must be about the capability rather than about the week.
+
+**Measured before the guard was written**, which is the only reason to trust that
+it was needed: the plugin lacked nine capabilities (see above), and the shared
+instruction named 40 commands of 47. Three of the seven absent were real —
+`acmg`, `goal-suggest`, `lipid-genetics` — and two of the three had been added
+that same week. Each of those two drifts had been found by somebody noticing
+months later, not by a test.
+
+`check_all_faces()` answers for all four at once, and `tests/test_all_faces_move_
+together.py` prints them in one message. That is deliberate: the question an
+author has after adding something is «what did I forget», and four separate red
+runs answer it a quarter at a time — a run per face, a fix per run, and the
+fourth found an hour later.
+
+The fourth face is CHECKED and not generated. The command block in the
+instruction carries curated invocations — `genome rs0000000`, `phenoage
+--panels`, `tools --set NAME` — worth more to a reader than a line per bare
+command, and a generator would flatten them. What must not happen is silent
+absence, and that is what is now impossible.
+
+A fifth check went in beside them, of a different kind: every phrase the
+interface reaches for exists in **both** catalogues. A missing key does not
+crash — the page prints `⟦web.some.key⟧` where a sentence should be, in front of
+the reader and nowhere else, in only the language that lacks it, so it is
+invisible to whoever wrote the other one.
+
+**The guard's first catch was its author.** `init` was excused as «not named in
+the instruction» and is named there; the excuse was wrong and the check said so
+on the first run. Its second was a stale sentence in both instruction editions
+telling a model that HbA1c in mmol/mol is refused — true until earlier the same
+day, and exactly the sort of statement that outlives the thing it describes.
+
+**The command line was misnamed in the first draft of this table.** It said «a
+person typing, every script» — and the owner corrected it: the CLI's
+completeness is noticed not only by a person but by the AI agent that works
+with Scholion as a tool, and the CLI is for that agent first. A person can
+browse `--help`; a model with a shell runs what its instruction names and
+nothing else — the instruction is the discovery mechanism of the main surface.
+That correction forced two things that were not in the plan.
+
+The first is a second route to the truth: `scholion capabilities` (also
+`--json`) — a manifest GENERATED from the command parser and the entry-point
+map, listing every command, what it does, whether it writes, and which faces
+carry it. The instruction now ends its command list with the rule «if this
+list and the build disagree, believe the build». A curated instruction can go
+stale — this release found it stale twice — so the model gets one door that
+cannot: the build describing itself.
+
+The second the new gate class found on its own first run
+(`TestTheManifestCannotFallBehindTheBuild`): the claim «no tool handed to a
+model writes», printed in the writes heading and asserted from a hand-written
+list, had been false from the beginning — `sch_ingest_labs` is a tool and
+writes `labs.json`. The earlier test happened not to contain the one command
+that broke its premise: a check agreeing with its author, the same class that
+has cost this project four times. The fix is a distinction, not a deletion:
+WRITES splits into AUTHORS (creates values from nobody's document — `add-lab`,
+`add-med`, `demo`… — never a model's tool) and TRANSCRIBES (moves the person's
+own documents into the profile — `ingest-labs`, `ingest-garmin`… — a model may
+hold these, because they invent nothing). The manifest marks every write with
+its kind, the gate holds AUTHORS out of the tool list by name, and every
+transcriber must be recorded as admitted or refused — silence is the one state
+the contract no longer allows.
+
+**And the manifest's own reader carried the disease it was built against.**
+`instruction_text()` read the instruction at its source-repository address
+alone, passed every test in the repository it was written in, and failed inside
+the built package on the owner's publish run — the package does not carry
+`share/`, it carries the identical copy beside the module. A check agreeing
+with the single environment its author sat in: the same class, caught by the
+publish gate doing exactly what it is for — nothing was committed or pushed to
+the public repository. The function now knows both homes and says so when it
+finds neither.
+
+### The third face of the core had fallen behind, and nothing was watching it
+
+`contract.py` opens by naming three faces of one core — the web interface, the
+CLI and the Ouroboros plugin — and by describing the defect it was written after:
+«Second opinion», the summary and the health index by body system lived only in
+the web tabs for half a year, because a capability added quickly to one face
+stays there. The map it enforces covered two faces of the three.
+
+So the plugin drifted exactly the way the web had. Nine capabilities had a route
+and a command and no tool: the overview, the second opinion, the radar, the
+focus, the lifestyle brief, the ACMG scan, the two added this week — and
+`limits`, which is the answer to «what can this data NOT tell you».
+
+`limits` is the one that matters. The reader who needs it most is a language
+model about to make a negative statement, and it was the one face that could not
+ask for it. A missing tool is worse than a missing tab for a reason worth
+stating: a person looking at a page can see that something is absent. A model
+cannot see a capability it was never shown — it answers from what it has instead
+of saying it cannot.
+
+Fourteen tools became twenty-three, each checked by calling it. `PLUGIN` maps
+command → tool and `NO_PLUGIN` records a reason for every command that has none,
+and the bar there is deliberately higher than for the web. Every write command is
+in that list marked «a write», with a test that keeps it so: the canon handed to
+a model says it does not change the profile, and the absence of a write tool is
+what makes that more than a promise.
+
+### The seven small things the stranger's run left behind
+
+None of them changes an answer; all seven were things a reader had to work
+around.
+
+**Labs listed twenty-seven markers alphabetically under a heading that said
+«8 out of range of 27».** The eight the sentence was about were scattered among
+the nineteen it was not, and counting them by eye was work the page could have
+done. Out of range first, furthest outside its corridor leading, then a divider
+and the rest in the order they had.
+
+**Overview came to 11 400 px on a 390 px screen** — the goal board is most of
+that, and the four numbers a reader opens the page for sat underneath it. The
+board folds on a narrow screen and stays open on a wide one: 5 200 px now, one
+tap instead of a minute of scrolling. Built with `<details>` rather than a
+script, so it survives a half-loaded page and a screen reader already knows how
+to announce it.
+
+**Polygenic scores sat a centimetre below «Full genome (VCF): no data».** Both
+true — a score is a stored result, computed once from a file that need not still
+be attached — and read as a contradiction with no way to tell which half to
+believe. The block now says when it was computed and that the file is not
+attached now.
+
+**The disclaimer was printed four times on one screen** and after the fourth it
+reads as legal cover rather than as care. It was repeated for a real reason:
+Overview is thousands of pixels tall and the header scrolled away. The header is
+pinned now, which answers the reason instead of arguing with it, and the copy
+inside the focus card is gone.
+
+**«P94», a phenotype code and a confidence mark carried no explanation** where a
+reader first meets them; the Guide has all three, a tab away. They now carry the
+Guide's own wording as a tooltip — the Guide's, not a second text written beside
+them, because two texts for one term drift and the one on the badge is the one
+nobody maintains.
+
+**A traceback in the middle of the release log.** `test_server_guard.py` provokes
+a failure to prove the server does not leak a filesystem path into an HTTP
+response; the server prints the details to the owner's console, which is the
+other half of that design. Read as a crash three times in one day. Swallowed in
+the test that causes it — and the test now also asserts the traceback still
+reaches the console, because silencing it in the server would delete half the
+guard.
+
+**One tool description still described the owner's shelf** («from Garmin
+wearables and smart scales») in text written for every profile.
+
+### Also
+
+`LICENSE-DATA` attributed the knowledge base to `https://scholion.dev`, which
+does not exist. It points at the repository now. The edit arrived in the built
+package rather than the source tree, where the next publication would have wiped
+it without a word — the hazard the two-repository model carries, and worth
+recording next to the fix.
+
+
+#### Also, on the unit gateway
+
+`tests/test_unit_gate_second_law.py`. Among its assertions: that the published
+pairs do NOT share a ratio — which is the reason the second law has to exist at
+all, stated as something that fails if it ever stops being true.
+
+---
+
 ## v0.3.0 — 18.08.2026
 
 _Tagged three times before it left the building. `v0.3.0` and `v0.3.1` were pushed

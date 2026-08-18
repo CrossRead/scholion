@@ -235,16 +235,40 @@ class TestTheUnitsAnAmericanReportArrivesIn(unittest.TestCase):
         self.assertNotIn("ng/dL", free,
                          "free T3 accepts the form that belongs to total T3")
 
-    def test_the_two_refusals_stay_refusals(self):
+    def test_neither_of_the_two_hard_cases_is_given_a_multiplier(self):
         """`hba1c` and `lpa` are not oversights — they are decisions.
 
-        HbA1c relates to the IFCC scale by an affine formula, not a multiplier;
-        Lp(a) mass to molar depends on the person's apo(a) isoform. Giving either
-        a factor would be the one thing this layer exists to prevent.
+        Both were refusals until v0.3.1, and one of them stopped being one. HbA1c
+        relates to the IFCC scale by the NGSP master equation — affine, not
+        proportional — so it now converts under `convert_affine`, which is a second
+        law rather than a fudged factor. Lp(a) mass to molar still depends on the
+        size of the person's apo(a) isoform, so no constant of any shape relates
+        the two, and it stays refused.
+
+        What must not change for either is the thing this layer exists to prevent:
+        a plain multiplier where none exists.
         """
         for key, form in (("hba1c", "mmol/mol"), ("lpa", "mg/dL")):
             with self.subTest(marker=key):
-                self.assertIn(form, self.markers[key].get("convert_refused") or {},
-                              f"{key} lost its recorded refusal of {form}")
-                self.assertNotIn(form, self.markers[key].get("convert") or {},
+                spec = self.markers[key]
+                self.assertNotIn(form, spec.get("convert") or {},
                                  f"{key} was given a multiplier for {form}, which has none")
+                self.assertNotIn(form, spec.get("units") or {},
+                                 f"{key} was given a multiplier for {form} by the back door")
+                recorded = ((form in (spec.get("convert_refused") or {}))
+                            or (form in (spec.get("convert_affine") or {})))
+                self.assertTrue(recorded,
+                                f"{key} no longer records any decision about {form}: it is "
+                                f"neither refused nor converted, so the form simply falls "
+                                f"through as an unrecognised unit")
+
+    def test_the_affine_rule_is_a_formula_and_says_where_it_came_from(self):
+        rule = (self.markers["hba1c"].get("convert_affine") or {}).get("mmol/mol")
+        self.assertIsNotNone(rule, "HbA1c cannot read the commonest unit on a "
+                                   "European report")
+        self.assertIn("k", rule)
+        self.assertIn("b", rule)
+        self.assertNotEqual(rule["b"], 0,
+                            "an offset of zero is a multiplier wearing the other law's "
+                            "clothes — if that is right, `convert` is the place for it")
+        self.assertTrue(rule.get("source"), "a conversion constant with no citation")

@@ -836,6 +836,16 @@ def prs_findings() -> Dict[str, Any]:
     if not traits:
         return {"available": False, "disclaimer": PRS_DISCLAIMER(),
                 "message": _t("prs.not_computed")}
+    # WHERE THESE NUMBERS CAME FROM, and when. A polygenic score is a stored
+    # RESULT: it was computed once from a VCF and lives in the profile afterwards.
+    # So the screen could show twelve percentiles a centimetre below a chip
+    # reading «Full genome (VCF): no data», both true and reading as a
+    # contradiction — a reader has no way to tell which of the two to believe.
+    # The answer is neither: the file was there when this was computed and is not
+    # attached now, and saying so is shorter than either half.
+    _pm = core.profile_meta(data)
+    _computed = _pm.get("generated") or _pm.get("updated")
+    _connected = bool(genome_status().get("ready"))
     for tr in traits:                      # a guard layer: double counting of the input shows at once
         _mr = tr.get("match_rate")
         if isinstance(_mr, (int, float)) and _mr > 1.0001:
@@ -858,6 +868,11 @@ def prs_findings() -> Dict[str, Any]:
     return {
         "available": True,
         "categories": [{"category": c, "traits": cats[c]} for c in order],
+        "provenance": {
+            "computed": _computed, "genome_connected": _connected,
+            "note": (None if _connected
+                     else _t("prs.from_a_genome_not_attached", date=_computed or "—")),
+        },
         "high": high,
         "stats": {"total": len(traits), "reliable": len(reliable),
                   "high": len(high), "superpopulation": (data.get("_meta") or {}).get("superpopulation", "EUR"),

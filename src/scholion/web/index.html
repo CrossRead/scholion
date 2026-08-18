@@ -63,7 +63,14 @@
   header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
   header h1{font-size:22px;margin:0;font-weight:700;letter-spacing:.2px}
   header .sub{color:var(--muted);font-size:14.5px}
-  .disclaimer{color:var(--muted);font-size:13.5px;padding:9px 24px;background:var(--surface);border-bottom:1px solid var(--border)}
+  /* Sticky, and that is what makes the repeats removable. The line was printed
+     four times on one screen — header, focus card, second-opinion footer, demo
+     banner — and after the fourth it reads as legal cover rather than as care.
+     It was repeated for a real reason, though: Overview is three thousand pixels
+     tall and the header scrolled away long before the reader reached the bottom.
+     Pinning it answers that reason instead of arguing with it. */
+  .disclaimer{color:var(--muted);font-size:13.5px;padding:9px 24px;background:var(--surface);
+              border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
   nav{display:flex;gap:4px;padding:12px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;position:sticky;top:0;background:var(--plane);z-index:5}
   nav button{background:transparent;border:1px solid transparent;color:var(--ink-2);padding:9px 16px;border-radius:999px;cursor:pointer;font-size:15.5px}
   nav button:hover{background:var(--surface-2)}
@@ -241,6 +248,16 @@
   .goalboard .glegend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin:8px 0 4px}
   .goalboard .glegend span{display:inline-flex;align-items:center;gap:5px}
   .goalboard .gdot{width:10px;height:3px;border-radius:2px;display:inline-block}
+  /* The goal board is most of Overview's height: on a 390 px screen the page came
+     to 11 400 px, and the four numbers the reader came for sat at the bottom of
+     it. Folded on a narrow screen and open on a wide one — the same content, and
+     on a phone it is one tap instead of a minute of scrolling. `<details>` was
+     chosen over a script for it: it survives with JavaScript half-loaded, and it
+     is what a screen reader already knows how to announce. */
+  .goalsum{cursor:pointer;list-style:none}
+  .goalsum::-webkit-details-marker{display:none}
+  .goalsum::before{content:"▸ ";color:var(--muted)}
+  details[open] > .goalsum::before{content:"▾ "}
   @media(max-width:800px){.goalboard .peaks,.goalboard .g2,.goalboard .g4{grid-template-columns:minmax(0,1fr)}}
 
   /* ---- what gets carried into a consultation ------------------------------
@@ -402,7 +419,10 @@ const LEVEL = {
 };
 const PRIO = {high:'b-critical', moderate:'b-warning', low:'b-good'};
 
-function badge(cls,txt){return `<span class="badge ${cls}"><span class="dot" style="background:currentColor"></span>${esc(txt)}</span>`;}
+// `hint` is optional and, where it is given, carries the Guide's own wording
+// rather than a second explanation written beside the badge. Two texts for one
+// term drift, and the one on the badge is the one nobody maintains.
+function badge(cls,txt,hint){return `<span class="badge ${cls}"${hint?` title="${esc(hint)}" style="cursor:help"`:''}><span class="dot" style="background:currentColor"></span>${esc(txt)}</span>`;}
 
 // the chart window: the last ~3 years, but never fewer than the last 3 points
 function windowSeries(series){
@@ -682,7 +702,6 @@ function renderFocus(root,f){
     <details class="lsec" style="margin-top:10px"><summary>${esc(t('web.focus.questions_h'))}</summary>
       <div class="blk"><ul class="fcq">${(f.questions||[]).map(q=>`<li><b>${esc(q.to||'')}:</b> ${esc(q.text||'')}</li>`).join('')}</ul></div>
     </details>
-    <div class="muted" style="font-size:12.5px;margin-top:12px">${esc(f.disclaimer||'')}</div>
   </div>`;
   const btn=$('#fc-save',root);
   if(btn) btn.onclick=async()=>{
@@ -721,8 +740,10 @@ async function viewOverview(root){
   root.innerHTML = `
     ${sb}
     ${f&&f.available?`<h2 class="section">📌 ${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus" style="margin-bottom:26px"></div>`:''}
-    <h2 class="section">🎯 ${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.goal.as_of',{date:g.as_of}))}</span>`:''}</h2>
-    <div id="ov-goal"></div>
+    <details id="ov-goal-wrap"${g&&g.available?'':' open'}>
+      <summary class="section goalsum">🎯 ${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.goal.as_of',{date:g.as_of}))}</span>`:''}</summary>
+      <div id="ov-goal"></div>
+    </details>
     <h2 class="section" style="margin-top:30px">📌 ${esc(t('web.overview.watched_h'))}</h2>
     <div class="stat">
       <div class="s"><b style="color:${o.abnormal_count?'var(--critical)':'var(--ink)'}">${o.abnormal_count}/${o.markers_total}</b><span>${esc(t('web.overview.stat_abnormal'))}</span></div>
@@ -738,6 +759,10 @@ async function viewOverview(root){
     <div id="ov-tests"></div>`;
   if(f&&f.available) renderFocus($('#ov-focus',root), f);
   renderGoal($('#ov-goal',root), g);
+  // Wide screens keep what they had; the fold is for the narrow ones. Measured,
+  // not guessed at a breakpoint in CSS, because the decision is about how far the
+  // reader has to scroll rather than about layout.
+  {const w=$('#ov-goal-wrap',root); if(w&&g&&g.available) w.open = window.innerWidth > 800;}
   const red = $('#ov-red',root);
   // Nothing flagged has two causes and they are not alike: nothing is out of
   // range, or nothing has been measured. The old line gave the reassuring one to
@@ -828,7 +853,28 @@ async function viewLabs(root){
     <div id="add-lab" class="hidden"></div>
     <div class="grid" id="labgrid"></div>`;
   const g = $('#labgrid',root);
-  d.markers.forEach(m=>g.appendChild(markerCard(m)));
+  // The heading says «8 out of range of 27» and the grid then listed all
+  // twenty-seven alphabetically, so the eight the sentence is about were
+  // scattered among the nineteen it is not. A reader counting them by eye is
+  // doing work the page could have done. Out of range first, furthest outside
+  // its corridor leading; everything inside keeps the alphabetical order it had.
+  const OUT={high:0,low:0};
+  const dist=m=>{
+    const v=Number(m.value);
+    if(!isFinite(v)) return 0;
+    if(m.flag==='high'&&m.ref_high!=null&&Number(m.ref_high)!==0)
+      return (v-Number(m.ref_high))/Math.abs(Number(m.ref_high));
+    if(m.flag==='low'&&m.ref_low!=null&&Number(m.ref_low)!==0)
+      return (Number(m.ref_low)-v)/Math.abs(Number(m.ref_low));
+    return 0;
+  };
+  const flagged=d.markers.filter(m=>m.flag in OUT).sort((a,b)=>dist(b)-dist(a));
+  const rest=d.markers.filter(m=>!(m.flag in OUT));
+  flagged.forEach(m=>g.appendChild(markerCard(m)));
+  if(flagged.length&&rest.length)
+    g.appendChild(el(`<div class="so-h" style="grid-column:1/-1;margin-top:6px">${
+      esc(t('web.labs.within_h',{n:rest.length}))}</div>`));
+  rest.forEach(m=>g.appendChild(markerCard(m)));
   // the add form
   $('#toggle-add',root).onclick=()=>$('#add-lab',root).classList.toggle('hidden');
   renderAddLab($('#add-lab',root), cat);
@@ -1190,7 +1236,7 @@ async function viewSecond(root){
   // read». Printing the code lost the qualifier as well as the sense.
   const drugs=d.drug_flags.map(x=>{const lv=LEVEL[x.level]||LEVEL.unknown;
     const ph=x.phenotype_label||String(x.phenotype||'').replace(/_/g,' ');
-    return `<div class="list-item"><div class="row">${badge(lv.cls,t(lv.key))}<b>${esc(x.drug)}</b> → ${esc(x.gene)}</div><div class="why"><b>${esc(ph)}</b></div><div class="why">${esc(x.recommendation)}</div></div>`;}).join('');
+    return `<div class="list-item"><div class="row">${badge(lv.cls,t(lv.key))}<b>${esc(x.drug)}</b> → ${esc(x.gene)}</div><div class="why" title="${esc(t('web.guide.term_pgx_body'))}"><b>${esc(ph)}</b></div><div class="why">${esc(x.recommendation)}</div></div>`;}).join('');
   // «What to test» owns this list. Repeating it whole put the routine-control block
   // — already taken, watched by interval — on two tabs word for word. The second
   // opinion is a document to carry to an appointment, so it keeps what is still to
@@ -1588,7 +1634,7 @@ function genomeCard(r){
   const dp=res.depth!=null?', '+t('web.genome.coverage',{value:res.depth}):'';
   return `<div class="card">
     <div class="row">🧬 <b style="font-size:17px">${esc(r.rsid)}</b>${r.star?' <span class="muted">'+esc(r.star)+'</span>':''} → ${esc(t('web.drug.gene'))} <b>${esc(r.gene)}</b> <span class="muted">${esc(r.chrom)}:${esc(r.pos)}</span></div>
-    <div class="value" style="margin:10px 0">${esc(res.genotype||'?')} <small>${esc(conf)}${esc(dp)}</small></div>
+    <div class="value" style="margin:10px 0">${esc(res.genotype||'?')} <small title="${esc(t('web.guide.term_confidence_body'))}">${esc(conf)}${esc(dp)}</small></div>
     ${res.conflict?`<div class="meta" style="color:var(--critical)">⚠️ ${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</div>`:''}
     ${res.confirmed_by==='profile'?`<div class="meta" style="color:var(--good)">${esc(t('genome.confirmed_by_report'))}</div>`:''}
     ${res.note?`<div class="meta">⚠️ ${esc(res.note)}</div>`:''}
@@ -1605,17 +1651,27 @@ function pctBar(p,reliable){
 function renderPRS(d){
   if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.prs.not_ready'))}</div>`;
   const s=d.stats;
-  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning','P'+Math.round(tr.percentile))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div></div>`).join('');
+  // Twelve percentiles a centimetre below «Full genome (VCF): no data» read as a
+  // contradiction. Both are true — a polygenic score is a stored result, computed
+  // once from a file that need not still be attached — and the reader has no way
+  // to tell which to believe unless the block says so itself.
+  const prov=(d.provenance&&d.provenance.note)
+    ?`<div class="card muted" style="margin-bottom:10px">⚠ ${esc(d.provenance.note)}</div>`:'';
+  // «P94» is the Guide's material, and the Guide is a tab away. A reader meeting
+  // the badge for the first time has to leave the page to learn that it is a
+  // position in a population and not a probability — so the badge says it where
+  // it stands. The wording is the Guide's own, not a second one written here.
+  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning','P'+Math.round(tr.percentile),t('web.guide.term_prs_body'))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div></div>`).join('');
   let cats='';
   d.categories.forEach(c=>{
     const rows=c.traits.map(tr=>{
       const rel=tr.reliable;const pv=(tr.percentile!=null)?Math.round(tr.percentile):null;
       const warn=(!rel&&tr.percentile!=null)?` <span class="muted" title="${esc(t('web.prs.low_coverage'))}">⚠</span>`:'';
-      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}</div><div class="prs-bar">${pctBar(tr.percentile,rel)}</div><div class="prs-num">${pv!=null?('P'+pv):'—'}</div></div>`;
+      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}</div><div class="prs-bar">${pctBar(tr.percentile,rel)}</div><div class="prs-num" title="${esc(t('web.guide.term_prs_body'))}">${pv!=null?('P'+pv):'—'}</div></div>`;
     }).join('');
     cats+=`<div class="prs-cat"><div class="prs-cat-h">${esc(c.category)}</div>${rows}</div>`;
   });
-  return `<div class="stat">
+  return `${prov}<div class="stat">
       <div class="s"><b>${s.total}</b><span>${esc(t('web.prs.stat_traits'))}</span></div>
       <div class="s"><b>${s.reliable}</b><span>${esc(t('web.prs.stat_reliable'))}</span></div>
       <div class="s"><b>${s.high}</b><span>${esc(t('web.prs.stat_high'))}</span></div>

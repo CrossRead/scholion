@@ -263,6 +263,20 @@ MESSAGES = {
                           "runs from the project's source tree rather than the installed "
                           "package. `scholion doc preparing-the-genome` describes the whole "
                           "route.",
+    "capabilities.title": "**What this build can do** — Scholion {version}, {n} commands",
+    "capabilities.how_to_read": "Generated from the command parser and the entry-point map, so "
+                                "it cannot fall behind them. If the instruction you were given "
+                                "and this list disagree, this list is the build in front of you. "
+                                "Every command takes `--json`.",
+    "capabilities.reads_h": "Reads only — {n} commands. Safe to call to answer a question.",
+    "capabilities.writes_h": "CHANGES something — {n} commands. Not to be called to answer a "
+                             "question. Two kinds, marked on each line: one AUTHORS values into "
+                             "the profile and is never handed to a model as a tool; the other "
+                             "TRANSCRIBES the person's own documents into the profile and "
+                             "invents nothing — that one a model may hold.",
+    "capabilities.kind.authors": "authors values — never a model's tool",
+    "capabilities.kind.transcribes": "transcribes the person's own documents",
+    "capabilities.face.web": "in the web interface",
     "clinvar.empty": "No significant ClinVar variants were extracted from your VCF.",
     "clinvar.header": "**Clinically significant findings (ClinVar): {n}**",
     "clinvar.shown": "(first {n} shown)",
@@ -603,8 +617,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                            "(profile/metrics.json): age, BMI, sleep, weight, "
                                            "steps, activity and trends. For the «lifestyle» "
                                            "context.",
-    "tool.sch_lifestyle.description": "The owner's historical lifestyle data from Garmin "
-                                      "wearables and smart scales "
+    "tool.sch_lifestyle.description": "This profile's historical lifestyle data, from "
+                                      "whichever wearable and scales fed it "
                                       "(profile/wearable_trends.json): MONTHLY trends (3-month "
                                       "smoothing) of weight, BMI, body fat share, muscle mass, "
                                       "VO2max, resting heart rate, HRV, stress, Body Battery, "
@@ -655,6 +669,52 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                        "presented as a fact. refresh=true re-reads every PDF "
                                        "from scratch (slow).",
     "tool.sch_provenance.param.refresh": "re-read every form instead of taking labs_coverage.json",
+    "tool.sch_overview.description": "The main screen of this profile: how many markers are "
+                                    "measured, how many are outside their range and in which "
+                                    "direction, what tests are pending, what the genome layer "
+                                    "knows. Start here when the question is broad — it names "
+                                    "the parts worth asking about next.",
+    "tool.sch_second_opinion.description": "One page for a conversation with a doctor: the "
+                                          "health index by body system, the current lab "
+                                          "abnormalities grouped by the system they belong to, "
+                                          "the pharmacogenetic watch list against the "
+                                          "prescriptions on file, and the tests still worth "
+                                          "taking. Says of each drug whether the genotype was "
+                                          "read or the general rule is being printed.",
+    "tool.sch_limits.description": "WHAT THIS DATA CANNOT ANSWER, and what would close each "
+                                  "gap. Read it before making any negative statement: «nothing "
+                                  "found» is only meaningful next to what was looked at. Names "
+                                  "the cell of the input × trait-architecture matrix the answer "
+                                  "sits in, the measured coverage, and every claim the profile "
+                                  "does not support.",
+    "tool.sch_radar.description": "The health index by body system, 0–100 each, with the change "
+                                 "since the previous measurement and the markers that moved. "
+                                 "The denominator is the panel declared for the system, not the "
+                                 "part of it that happens to be measured — a system with two "
+                                 "values out of nine says so.",
+    "tool.sch_focus.description": "The one task this profile is concentrating on right now: the "
+                                 "live metric, the path baseline → now → target, the levers "
+                                 "drawn from the person's own data, and the episode log. Empty "
+                                 "when nothing is set, which is a legitimate answer.",
+    "tool.sch_brief.description": "The lifestyle brief: live numbers from the wearable and the "
+                                 "scales together with the curated wordings from the profile, "
+                                 "each marked as fresh or stale against its own watch interval.",
+    "tool.sch_acmg.description": "ACMG SF v3.3 secondary findings — the actionable minimum "
+                                "across 84 genes, with the reporting rules applied (recessive "
+                                "genes only when biallelic, and so on). Says plainly when the "
+                                "scan has not been run, which is not the same as a clean result.",
+    "tool.sch_goal_suggest.description": "Proposes a target for each marker there is enough "
+                                        "evidence to propose one for, and says where each number "
+                                        "came from: a clinical association with its citation, "
+                                        "the person's own best with the date and the count behind "
+                                        "it, or the laboratory corridor. Lists what it declined "
+                                        "to propose for, and why. READ-ONLY — it writes nothing.",
+    "tool.sch_lipid_genetics.description": "The inherited side of the lipid profile: carriage of "
+                                          "a PCSK9 loss-of-function variant and the Lp(a) value, "
+                                          "in one answer because each is misread alone. Carries "
+                                          "the population caveat where carriage means little, and "
+                                          "the reason a polygenic estimate of Lp(a) cannot stand "
+                                          "in for measuring it.",
     "tool.sch_goal.description": "The goal set in this profile (profile/health_goals.json): "
                                  "the now→goal table and the reference points. The CURRENT "
                                  "values are LIVE, from the single model (labs.json + "
@@ -713,6 +773,11 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "bmi.normal": "normal",
     "bmi.over": "overweight",
     "bmi.obese": "obesity",
+    "prs.from_a_genome_not_attached": "Computed on {date} from a genome file that is not "
+                                      "attached right now. The numbers are stored results, not "
+                                      "a live reading — which is why they can sit beside a "
+                                      "«no data» mark for the VCF without either being wrong. "
+                                      "Reconnect the file to recompute them.",
     "prs.not_computed": "The polygenic scores have not been computed yet (there is no "
                         "profile/prs_results.json).",
     "prs.integrity_double": "coverage >1 — positions in the target VCF were counted twice (a "
@@ -1334,6 +1399,7 @@ will go through them later.
     "web.focus.save_failed": "Could not log it",
 
     # ── web: labs ────────────────────────────────────────────────────────
+    "web.labs.within_h": "Inside their range ({n})",
     "web.labs.title": "Labs: {abnormal} out of range of {total}",
     "web.labs.pick_docs": "Folder of studies (PDF)",
     "web.labs.reingest": "Refresh from the folder",

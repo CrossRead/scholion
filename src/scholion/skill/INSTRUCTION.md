@@ -558,6 +558,8 @@ python3 -m scholion limits                   # what cannot be said from this dat
 python3 -m scholion genome-updates           # what the last reconciliation with a fresh ClinVar produced
 python3 -m scholion prs                      # polygenic scores: percentiles by trait
 python3 -m scholion longevity                # longevity layer: APOE ε and LongevityMap markers
+python3 -m scholion acmg                     # ACMG SF v3.3 secondary findings, with the reporting rules applied
+python3 -m scholion lipid-genetics           # the inherited side of the lipid profile: PCSK9 carriage + Lp(a)
 
 # Metrics, lifestyle, goal
 python3 -m scholion metrics                  # personal metrics, BMI, trends
@@ -565,6 +567,7 @@ python3 -m scholion lifestyle                # lifestyle: monthly trends, body c
 python3 -m scholion brief                    # the lifestyle brief
 python3 -m scholion focus                    # focus of attention: task, levers, journal
 python3 -m scholion goal                     # goal by marker (now → target) on live data
+python3 -m scholion goal-suggest             # PROPOSES a goal per marker and says where each number came from
 python3 -m scholion phenoage --panels        # which panels are complete and what is missing from them
 python3 -m scholion phenoage latest          # biological age from the latest complete panel
 python3 -m scholion phenoage YYYY-MM         # computation for a specific panel
@@ -597,12 +600,23 @@ python3 -m scholion tools                    # external programs (bcftools, htsl
 python3 -m scholion tools --install          # installs the base set. ONLY on the user's explicit say-so — this changes their machine
 python3 -m scholion tools --set NAME         # one set: base | align | coverage | pgx | wgs | hla | prs
 
+# What this build can do
+python3 -m scholion capabilities             # every command, what it does, whether it writes
+python3 -m scholion capabilities --json      # the same, machine-readable
+
 # Entry points
 python3 -m scholion serve                    # local web application
 python3 -m scholion assistant                # what the code computes, what you add, how to connect
 python3 -m scholion assistant --context      # context for any model (CONTAINS PERSONAL DATA)
 python3 -m scholion assistant --context --out FILE
 ```
+
+**If this list and the build disagree, believe the build.** `scholion capabilities`
+is generated from the command parser and the entry-point map, so it cannot fall
+behind them; this document is written by hand and can. The command line is your
+main surface — you learn what to run from here rather than by exploring — which
+makes a stale line in this file a capability that, for you, does not exist. Run
+the manifest when an answer seems to need something you cannot find named above.
 
 **Two rules govern manual entry, and both refuse rather than assume.**
 
@@ -619,8 +633,12 @@ with the reference range from the same form. An unrecognised unit is refused wit
 the list of accepted spellings and NOTHING is written. This matters because action
 thresholds are stored in the canonical unit and do not name it: a value in mg/dL
 written down as given is compared against arithmetic that belongs to someone else.
-Two units are refused on purpose — HbA1c in mmol/mol (the relation to % is affine,
-not a multiplier) and urea reported as BUN under a bare «mg/dL».
+One unit is refused on purpose: Lp(a) in mg/dL, because its ratio to nmol/L depends
+on the size of the person's apo(a) isoform — no factor and no formula relate them.
+Urea reported as BUN under a bare «mg/dL» is refused for a different reason: the
+label is ambiguous, not the arithmetic. HbA1c in mmol/mol used to be refused too
+and is now CONVERTED, by the NGSP master equation rather than by a multiplier —
+the gateway carries an affine law for the one marker that needs it.
 
 The set of factors for `focus-log` is defined by the user in `profile/focus.json`.
 The journal is needed where two factors always coincide in time and passive data

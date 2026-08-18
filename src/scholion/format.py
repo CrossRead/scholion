@@ -1207,3 +1207,35 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         L.append(f"  ⚠ {lpa.get('estimate_is_not_a_measurement','')}")
     L += ["", f"_{r.get('disclaimer','')}_"]
     return "\n".join(L) + "\n"
+
+
+def capabilities_report(r: Dict[str, Any]) -> str:
+    """The manifest, for a reader who will act on it.
+
+    Grouped by whether a command CHANGES anything, because that is the only
+    distinction a caller must not get wrong. The rest it can discover by running
+    the thing; this one it has to know before it runs anything.
+    """
+    L = [_t("capabilities.title", version=r.get("version", "?"), n=r.get("count", 0)), "",
+         _t("capabilities.how_to_read"), ""]
+    for group, key in (("reads_only", "capabilities.reads_h"),
+                       ("writes", "capabilities.writes_h")):
+        names = set(r.get(group) or [])
+        if not names:
+            continue
+        L += [f"**{_t(key, n=len(names))}**", ""]
+        for c in r.get("commands", []):
+            if c["command"] not in names:
+                continue
+            faces = c.get("faces") or {}
+            marks = []
+            if c.get("kind") in ("authors", "transcribes"):
+                marks.append(_t("capabilities.kind." + c["kind"]))
+            if faces.get("web"):
+                marks.append(_t("capabilities.face.web"))
+            if faces.get("plugin"):
+                marks.append(faces["plugin"])
+            L.append(f"- `scholion {c['command']}` — {c['does']}"
+                     + (f"  _[{', '.join(marks)}]_" if marks else ""))
+        L.append("")
+    return "\n".join(L) + "\n"

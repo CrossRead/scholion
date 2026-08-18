@@ -149,7 +149,8 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     spec = core.lab_markers().get("markers", {}).get(marker) or {}
     known = bool(spec.get("unit"))
     if unit:
-        res = core.resolve_unit(spec, unit) if known else {"ok": True, "factor": 1.0}
+        res = (core.convert_to_canonical(spec, unit, value) if known
+               else {"ok": True, "value": value})
         if not res.get("ok"):
             # The refusal names what would be accepted. Without the list the next
             # attempt is a guess at spelling, and a guess that happens to match a
@@ -157,23 +158,28 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             return {"ok": False, "error": _t("store.unit_not_accepted", marker=marker,
                                              unit=unit,
                                              accepted=", ".join(res.get("accepted") or []))}
-        factor = float(res.get("factor", 1.0))
-        if factor != 1.0:
-            # Rounded, because 95 × 0.05551 is 5.2734499999999995 in binary and no
-            # laboratory ever measured that. Four decimals sits below every unit's
-            # reporting precision and above every threshold in the knowledge base,
-            # so it neither invents digits nor loses a comparison.
-            value = round(value * factor, 4)
-            # …and the corridor with it. The reference range is printed on the form
-            # in the SAME unit as the result, so converting one and not the other
-            # reproduces the original defect one level down: the value would be
-            # 5.27 mmol/L against a corridor of 70–99, and every point would read
-            # as far below normal. Found by running the CSV import on a real
-            # American panel layout, not by reading this function.
-            if ref_low is not None:
-                ref_low = round(float(ref_low) * factor, 4)
-            if ref_high is not None:
-                ref_high = round(float(ref_high) * factor, 4)
+        value = res["value"]
+        # The corridor converts with the value, by the same law. The reference
+        # range is printed on the form in the SAME unit as the result, so
+        # converting one and not the other reproduces the defect this gateway was
+        # built after, one level down: 5.27 mmol/L against a corridor of 70–99,
+        # every point reading as far below normal. Found by running the CSV import
+        # on a real American panel layout, not by reading this function.
+        #
+        # Each end goes through `convert_to_canonical` rather than through a
+        # multiplier kept here. With HbA1c that difference is the whole answer:
+        # the mmol/mol scale converts by a formula, and a bound multiplied instead
+        # of transformed lands somewhere else entirely.
+        if known:
+            for name, bound in (("ref_low", ref_low), ("ref_high", ref_high)):
+                if bound is None:
+                    continue
+                r = core.convert_to_canonical(spec, unit, float(bound))
+                if r.get("ok"):
+                    if name == "ref_low":
+                        ref_low = r["value"]
+                    else:
+                        ref_high = r["value"]
         unit = res.get("canonical") or unit
     elif m is None and known:
         # A new series with no unit: there is nothing to interpret the number

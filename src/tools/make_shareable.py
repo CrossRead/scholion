@@ -54,23 +54,42 @@ RASTER_MAX_B64 = 30_000  # base64 characters (~22 KB) — above the threshold it
 # image fails the audit: a text audit cannot look inside a JPEG, and a new screenshot
 # may hold real lab results and genotypes. Add a hash here only after viewing the image.
 APPROVED_RASTER_SHA256 = {
-    # Presentation shots, retaken on 16.08.2026 after the migration to English: the
+    # Presentation shots, retaken on 19.08.2026 for the 0.3.2 refresh: the
     # application on the SYNTHETIC demo profile (an invented person, subject
-    # DEMO-0001, generator make_demo_profile.py), interface language en. The audit
-    # does not see what is drawn inside an image — so the list is approved by eye,
-    # and the hash pins exactly what was looked at. The previous set showed the
-    # Russian interface and was replaced wholesale rather than extended: an English
-    # page whose screenshots are in another language reads as carelessness, and
-    # keeping the old hashes would have let either version pass.
-    "46edea120d293c414321f0af301d6caac29a15d9c5d5073167a59f3642d89087": "presentation \u00b7 Overview: focus of attention and levers",
-    "49296d178cfbf884f1fb92062b027e64a4e3519d5db437b69e87e5c1e9ea32ce": "presentation \u00b7 Labs: flags and trends",
-    "247b898268e0896e4c0e428c17930839e8cb87c1bf79ae4ba57c7de6d88e3ba5": "presentation \u00b7 Drugs: the check for one drug",
-    "f35b7aa00917987cec4a8b43c54696e5ac6e06f89eeb14c758e2d90884a07c70": "presentation \u00b7 Genome: findings, PGS, longevity",
-    "855c53894dc2bfb733e58d8e2e20bae2a8660e6c4b7c06b1ca189afb68e12dd8": "presentation \u00b7 Lifestyle: trends",
-    "1350d4f12116a6acb991459f3c3f3c86d442ff138168048d336ae38bb90d925d": "presentation \u00b7 What to test: steps and preparation",
-    "2d7528b16c6b71d1d10289bb4dd840bc04311b7fe4f5286c8879491e0bd00651": "presentation \u00b7 Second opinion: the summary for a visit",
-    "0451ff0efc219cb8224a657089da225dc4216aad61e5fc1c3cc9b9733de286c8": "presentation \u00b7 Prescriptions: the current regimen",
-    "eb4d4be2e16b92676cc94645b5d4033b89395332c595a73d3a5f15083e7543c0": "presentation \u00b7 Assistant: the core's self-check",
+    # DEMO-0001, `scholion init --demo`), captured via a real headless run of
+    # `scholion serve`, one full set per language \u2014 English and Russian now each
+    # carry their OWN screenshots, ten tabs each (the Guide tab is new; it did not
+    # exist in the previous set). The audit does not see what is drawn inside an
+    # image \u2014 so the list is approved by eye, and the hash pins exactly what was
+    # looked at. The previous set (nine hashes, English only, Russian reusing the
+    # English images) was replaced wholesale rather than extended, for the same
+    # reason it was replaced wholesale the time before: a page whose screenshots
+    # are stale or in the wrong language reads as carelessness, and keeping old
+    # hashes around would let a stale edition pass right alongside the current one.
+    #
+    # English (docs/presentation.html):
+    "fa479e1a2e31e262e9dde323fb14a5673bb98aa3764dad8d7714922c21c3ec40": "presentation (en) \u00b7 Overview: the current task, the live marker and the levers",
+    "af63f7f88ee42aaa5784548f56838f8d654b3c06a5e8067d4a60a0c6e3fd0062": "presentation (en) \u00b7 Guide: what every colour, badge and label means",
+    "bc401752cdc67fcd2132eeb936a42a388d6489a97b72b193c3164ac36dee885d": "presentation (en) \u00b7 Labs: flags, sparklines and movement for every marker",
+    "473f81ff9c25a3a6609ab205868c2b84558c9b60f5986b0c2111f3df981173e5": "presentation (en) \u00b7 Drugs: one drug checked against genome x labs x interactions x ClinVar",
+    "84e7d341003e994b7c1072748c0c67005b50883f9f3d35ec0df976bf2598031a": "presentation (en) \u00b7 Genome: findings by tier, polygenic risks and the longevity layer",
+    "6d18749e21aef38fd2b3306819cb8f012ac007f503b45039b3f54feb28aeb6d8": "presentation (en) \u00b7 Lifestyle: anthropometry, activity and recovery with their trends",
+    "f686265dcd280245a44ee03fb8188ee42a4c029e43b0eb0f3387b4d1a2a391c5": "presentation (en) \u00b7 What to test: entries in steps, tube, preparation, age of last value",
+    "1ff87e7c82727636b11ff217890f7ca4704679e628d3e7458f0fc44cf702b719": "presentation (en) \u00b7 Second opinion: summary for the appointment",
+    "9f8844744abdddf13af044831e987acf0c316130c0a3c5111ddce91259cbd165": "presentation (en) \u00b7 Prescriptions: the current regimen as single point of truth",
+    "5bfb54f7683962813ee8fe219148d54855c9ba875141533d6f6f014f0390b563": "presentation (en) \u00b7 Assistant: the core's self-check",
+    # Russian (docs/presentation.ru.html) \u2014 genuinely Russian-interface screenshots,
+    # not the English set reused:
+    "4f1b92d0d168a2876099b4cf8b43b4c74d7da5eb775fb3469381f5b9b9229953": "presentation (ru) \u00b7 Overview: the current task, the live marker and the levers",
+    "d26a0302ae9e689f4bb52384a3296b757a3577681ae5a722ae3e6ad76e23b298": "presentation (ru) \u00b7 Guide: what every colour, badge and label means",
+    "f4c2369e14ac950bc2b54471505c25aba7c4200f9c9a9d4d4f94f5f32a24262d": "presentation (ru) \u00b7 Labs: flags, sparklines and movement for every marker",
+    "0d2371af0287b6acbcdec4d2784bd6b37681f64b73ca8f6a687dbf553bc24d9d": "presentation (ru) \u00b7 Drugs: one drug checked against genome x labs x interactions x ClinVar",
+    "882c05ad3dc8a0387def0a891341a4b96868f555db125b967b6290b87fb8a37e": "presentation (ru) \u00b7 Genome: findings by tier, polygenic risks and the longevity layer",
+    "e91cf2b65e5c8c1764fe54c5e877555cf0f37a84395899a751f5f2691b697c3d": "presentation (ru) \u00b7 Lifestyle: anthropometry, activity and recovery with their trends",
+    "c2d6ba9f5da21a143ab7843a1052a1ae563056b346803048b9f707d1c2cbb139": "presentation (ru) \u00b7 What to test: entries in steps, tube, preparation, age of last value",
+    "e6e87fbf540ee69d73ca7644db6d0e2a86a1ba7124246a987ebe4a3b065ef950": "presentation (ru) \u00b7 Second opinion: summary for the appointment",
+    "6c59a8abf98c4a65997fa65eda33255839c15d1efee628ba190fabfc4b795a02": "presentation (ru) \u00b7 Prescriptions: the current regimen as single point of truth",
+    "3b0e71142ab3ad3c0bab01c56c178151bc88e57b3979b0e815b7f71e46a94f88": "presentation (ru) \u00b7 Assistant: the core's self-check",
 }
 
 
@@ -430,11 +449,16 @@ def build(repo: Path, out: Path) -> Path:
     _qlog = repo / "src" / "tools" / "nof1_quick_log.sh"
     if _qlog.exists():
         shutil.copy2(_qlog, shared / "src" / "tools" / "nof1_quick_log.sh")
-    # the runbook of checks: the skill links to it, and without the file the link is broken
-    _doc = repo / "docs" / "TESTS-AND-COMPATIBILITY.md"
-    if _doc.exists():
-        (shared / "docs").mkdir(parents=True, exist_ok=True)
-        shutil.copy2(_doc, shared / "docs" / "TESTS-AND-COMPATIBILITY.md")
+    # the documents a recipient needs to CONTRIBUTE, not only to run: the runbook
+    # of checks (the skill links to it), the development conventions (written for
+    # an outside contributor — shipping everywhere except to that contributor
+    # would be the four-face defect again), and the versioning rules the
+    # conventions point at.
+    for _name in ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md"):
+        _doc = repo / "docs" / _name
+        if _doc.exists():
+            (shared / "docs").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(_doc, shared / "docs" / _name)
 
     # the compatibility check is part of the public package: the recipient must be
     # able to confirm that their build has not narrowed the contract, without access
@@ -730,6 +754,15 @@ def build(repo: Path, out: Path) -> Path:
     if has_pres != has_pres_ru:
         print("  \u26a0 only one edition of the presentation is present — the language "
               "switcher on the page that shipped points at a file that did not")
+    # GitHub Pages, serving straight off docs/ on the main branch: a bare visit to
+    # the Pages root has nothing to render without an index.html (a 404, not the
+    # presentation), and .nojekyll tells Pages not to run the tree through Jekyll
+    # first \u2014 neither file has any other purpose, so both are optional the same way
+    # the presentation itself is: added only if present in share/.
+    for extra_name in ("index.html", ".nojekyll"):
+        extra_src = share / extra_name
+        if extra_src.exists():
+            shutil.copy2(extra_src, shared / "docs" / extra_name)
     # The guide README that used to live at the container level is gone with the
     # level itself: the root now holds the project README, and that is the page
     # GitHub renders and PyPI links to.

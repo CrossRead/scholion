@@ -31,6 +31,57 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.3.3 — 19.08.2026
+
+The release where the project explains itself twice over: to a visitor, and
+to a contributor. No knowledge changes, no series break; the analysis answers
+exactly what v0.3.2 answered.
+
+### The presentation catches up with the product, and gets a front door
+
+`share/presentation.html` and `share/presentation.ru.html` are rebuilt
+against the living 0.3.2 — checked by running the product, not by memory:
+553 tests, 48 commands, the Assistant tab's self-audit at 39 files / 18,194
+lines (read from `_audit_core()` directly, not off a screenshot), six
+outbound hosts by name. All screenshots are fresh, a tenth was added (the
+Guide tab), and the Russian edition carries REAL Russian screenshots for the
+first time — the apologetic note about English ones is gone. An Installation
+section now mirrors the README's four ways in, and says plainly that the
+genome-preparation workshop lives in the source tree only. Two wordings were
+corrected on the way: «not one external dependency» (pdfplumber is required)
+and the locality card now names the translation services next to the
+reference APIs, because the application's own self-report does.
+
+The pages get an entry point: `share/index.html` redirects to the
+presentation (with a manual fallback naming both languages) and
+`share/.nojekyll` keeps GitHub Pages from mangling the folder. The publish
+gate carries both into the built package's `docs/`, so
+`crossread.github.io/scholion` starts answering at the root instead of 404.
+The screenshot allowlist in `make_shareable.py` was replaced wholesale —
+twenty hashes, ten per language — following the file's own precedent. One
+accepted line joins the language baseline: the «Russian» link label on the
+entry page is a language switch, which is the one place a language's own
+name belongs.
+
+### The conventions get a file, and the split gets a gate
+
+`docs/DEVELOPMENT.md` — the architecture and the development rules, written
+for an outside contributor to assemble a structured commit without reading
+the tests first: the layer map, the engine-package rules, the four-face
+tick, language and i18n discipline, the gate order, what a commit message
+carries, and short checklists for the common additions. An early audit cited
+a DEVELOPMENT.md that did not exist; the citation is now true.
+
+`tests/test_engine_stays_split.py` holds the refactoring's shape the way the
+four faces are held — as a red test, not a memory: the facade defines
+nothing; domain imports stay acyclic at the top level (the one sanctioned
+back edge is lazy inside a function, which is exactly what makes it
+sanctioned); every module has a size budget recorded in the test, and
+exceeding it is a same-commit decision — split, or raise the budget with a
+reason about the capability; the facade may not shrink below the hundred
+names the flat file exposed. Seven mutations were tried against the gate;
+seven came back red.
+
 ## v0.3.2 — 18.08.2026
 
 A refactoring release: not one answer changes on unchanged input. The full

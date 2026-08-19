@@ -182,3 +182,60 @@ class TestFactNotCause(unittest.TestCase):
             "a printed line attributes a change to an intervention — say what "
             "happened and when, and name the other things that moved in the same "
             "window:\n  " + "\n  ".join(offenders))
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# The build of the input file
+# ──────────────────────────────────────────────────────────────────────────
+class TestTheBuildIsCheckedBeforeAnswering(unittest.TestCase):
+    """A file called against another assembly must switch the genomic layer off.
+
+    The catalogue of loci is written in one build. A file called against another
+    puts every position half a million bases out: APOE rs429358 is 19:44,908,684
+    in GRCh38 and 19:45,411,941 in GRCh37. The query then lands in a different
+    gene and comes back either empty — a real finding lost — or full, and
+    somebody else's variant is reported as APOE. Neither looks like an error,
+    which is what makes this the most dangerous case in the whole reader.
+
+    Told apart by contig length, because that is a fact about the reference and
+    not a claim in a header that somebody may have edited.
+    """
+
+    import_gzip = staticmethod(lambda: __import__("gzip"))
+
+    LENGTHS = {"GRCh37": 249250621, "GRCh38": 248956422, "T2T-CHM13v2.0": 248387328}
+
+    def _vcf(self, length=None, reference=None):
+        import gzip, tempfile
+        d = tempfile.mkdtemp(prefix="asm_")
+        head = "##fileformat=VCFv4.2\n"
+        if length:
+            head += f"##contig=<ID=chr1,length={length}>\n"
+        if reference:
+            head += f"##reference={reference}\n"
+        head += "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tS1\n"
+        path = Path(d) / "x.vcf.gz"
+        path.write_bytes(gzip.compress(head.encode()))
+        return str(path)
+
+    def test_each_build_is_recognised_by_its_contig_length(self):
+        from scholion import genome
+        for name, length in self.LENGTHS.items():
+            genome.assembly_of.cache_clear()
+            self.assertEqual(genome.assembly_of(self._vcf(length=length)), name)
+
+    def test_a_reference_line_is_used_only_when_there_are_no_contigs(self):
+        from scholion import genome
+        genome.assembly_of.cache_clear()
+        self.assertEqual(genome.assembly_of(self._vcf(reference="/ref/hg19.fa")), "GRCh37")
+
+    def test_a_header_that_says_nothing_gives_no_answer(self):
+        """None is a real answer. Refusing on «cannot tell» is the same mistake
+        as answering on it, in the other direction."""
+        from scholion import genome
+        genome.assembly_of.cache_clear()
+        self.assertIsNone(genome.assembly_of(self._vcf()))
+
+    def test_the_catalogue_declares_its_own_build(self):
+        from scholion import genome
+        self.assertIn(genome.catalogue_assembly(), self.LENGTHS)

@@ -954,16 +954,54 @@ def medications_report(r: Dict[str, Any]) -> str:
 
 
 def genome_status_report(r: Dict[str, Any]) -> str:
+    # The build comes first, before «connected» and before «no index». A file in
+    # the wrong assembly is neither broken nor missing: it is fine, and it is the
+    # wrong coordinate system for our catalogue. Reported as «no index» it would
+    # send the reader to run tabix and arrive back at the same wall.
+    if r.get("assembly_mismatch"):
+        out = [_t("genome_status.assembly_mismatch",
+                  found=r.get("assembly"), want=r.get("assembly_expected")),
+               _t("genome_status.file", path=r.get("vcf")),
+               _t("genome_status.assembly_fix", want=r.get("assembly_expected"))]
+        if r.get("gaps"):
+            out.append(_t("genome_status.gaps", genes=", ".join(r["gaps"])))
+        return "\n".join(out)
     if r.get("ready"):
         out = [_t("genome_status.connected") + " " + _t("genome_status.file", path=r.get("vcf", "?"))]
         if r.get("reader"):
             out.append(_t("genome_status.reader", reader=r["reader"]))
+        if r.get("assembly"):
+            out.append(_t("genome_status.assembly_ok", found=r.get("assembly")))
+        elif r.get("assembly_unknown"):
+            # Not a refusal: refusing on «we could not tell» is the same mistake
+            # as answering on it. Named, so the reader knows what the answers rest on.
+            out.append(_t("genome_status.assembly_unknown", want=r.get("assembly_expected")))
+            # The actions, not just the diagnosis. This output is read by an
+            # assistant as often as by a person, and «could not be determined»
+            # gives neither of them anything to do next.
+            out.append(_t("genome_status.assembly_unknown_actions", path=r.get("vcf", "<file>")))
     elif r.get("vcf"):
-        out = [_t("genome_status.not_ready", reason=r.get("reason") or _t("genome_status.no_index")),
-               _t("genome_status.file", path=r.get("vcf")),
-               _t("genome_status.build_index")]
+        # «No index» is the right answer only when an index is genuinely all that
+        # is missing. A gzip-not-bgzip archive lands here too, and telling that
+        # person to run tabix sends them into an error about the format that
+        # explains nothing — the file has to be recompressed first.
+        un = r.get("unusable") or {}
+        if un.get("reason") == "gzip_not_bgzip":
+            out = [_t("genome_status.unusable_gzip_not_bgzip", path=un["path"]),
+                   _t("genome_status.unusable_fix", cmd=un["fix"])]
+        else:
+            out = [_t("genome_status.not_ready", reason=r.get("reason") or _t("genome_status.no_index")),
+                   _t("genome_status.file", path=r.get("vcf")),
+                   _t("genome_status.build_index")]
     else:
-        out = [_t("genome_status.no_vcf"), _t("genome_status.how_to_get")]
+        # A file that is there and unreadable is a different message from no file
+        # at all: one needs a command, the other needs a sequencing run.
+        un = r.get("unusable") or {}
+        if un:
+            out = [_t("genome_status.unusable_" + un["reason"], path=un["path"]),
+                   _t("genome_status.unusable_fix", cmd=un["fix"])]
+        else:
+            out = [_t("genome_status.no_vcf"), _t("genome_status.how_to_get")]
     if r.get("gaps"):
         out.append(_t("genome_status.gaps", genes=", ".join(r["gaps"])))
     return "\n".join(out)

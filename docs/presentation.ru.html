@@ -63,6 +63,11 @@
  table.cmp tr:last-child td{border-bottom:none}
  pre.cmd{background:#0a0d12;border:1px solid var(--line);border-radius:10px;padding:16px 18px;overflow-x:auto;margin:0}
  pre.cmd code{background:none;border:none;padding:0;color:#cfe0fb;font-size:14px;line-height:1.7}
+ .cta{margin:26px 0 0;padding:18px 20px;border:1px solid rgba(78,161,255,.35);border-radius:14px;background:rgba(78,161,255,.08)}
+ .cta .t{font-weight:700;margin-bottom:10px;font-size:17px}
+ .cta-btn{display:inline-block;padding:10px 18px;border-radius:10px;background:#4ea1ff;color:#0c0f14;font-weight:700;text-decoration:none}
+ .cta p{margin:8px 0 0}
+ .cta .s{color:#9fb0c3;font-size:14px;margin-top:10px}
  @media(max-width:820px){.g3,.g2,.two{grid-template-columns:1fr} h1{font-size:34px} h2{font-size:25px}}
 </style></head>
 <body>
@@ -78,6 +83,15 @@
     <span class="pill">🧪 Анализы и тренды</span><span class="pill">💊 Назначения и взаимодействия</span>
     <span class="pill">⌚ Носимые устройства</span><span class="pill">🤖 Ассистент — по желанию</span>
     <span class="pill">📦 Открытый код, Apache-2.0</span><span class="pill">🔗 <a href="https://github.com/CrossRead/scholion" style="color:inherit">Исходный код на GitHub</a></span>
+  </div>
+  <div class="cta">
+    <div class="t">🧩 Самый быстрый вход — терминал не нужен</div>
+    <p><a class="cta-btn" href="scholion-skill.md" download>Скачать файл скилла</a></p>
+    <p>Приложите его к диалогу с <b>Claude или ChatGPT</b> и скажите <b>«настрой мне это»</b> — модель
+    прочитает и поведёт дальше сама, по одному маленькому шагу, объясняя каждый до того, как он случится.
+    Данные остаются на вашей машине; правила безопасности старше любой другой инструкции, данной модели.</p>
+    <p class="s">Нужна полная картина? <a href="scholion.skill" download>полный комплект</a> со справочными
+    текстами &nbsp;·&nbsp; <a href="#install">все способы установки</a> — для тех, кому терминал дом родной</p>
   </div>
   <div class="disc">⚠️ Исследовательский и образовательный инструмент. <b>Не медицинское изделие</b>: не ставит диагнозов, не назначает и не отменяет терапию, не подбирает дозу и не заменяет врача. Всё, что он выдаёт, — материал для собственного изучения и разговора с лечащим врачом.</div>
 </div></header>
@@ -297,7 +311,7 @@ scholion serve</code></pre>
 
   <div class="grid g3" style="margin-top:22px">
     <div class="card"><div class="ic">📁</div><h3>Без установки — папка, которую вы распаковываете</h3><p>Python 3.10+ — единственное требование, весь анализ работает на стандартной библиотеке. (Исключение — чтение PDF-бланков анализов: для этого нужен <code>pdfplumber</code>, а его в этой поставке нет.) Для начала — <code>./bin/crossread --help</code>. Здесь же лежит инструментарий подготовки генома — FASTQ → VCF, PharmCAT/PyPGx — для тех, кто строит VCF из сырых прочтений; <code>scholion tools</code> показывает, каких внешних программ (bcftools, samtools) не хватает и как их поставить.</p></div>
-    <div class="card"><div class="ic">🧩</div><h3>Скилл для языковой модели</h3><p>Нет терминала, нет Python: <code>python3 src/tools/make_skill_package.py</code> пишет один файл, <code>dist/scholion.skill</code>, — отдайте его модели, и она сама поставит пакет и продолжит. Пакет уже установлен? <code>scholion skill --full</code> печатает ту же инструкцию. Модель не получает доступа к машине: она просит выполнить команду и разбирает вывод, а правила безопасности имеют приоритет над любой другой её инструкцией.</p></div>
+    <div class="card"><div class="ic">🧩</div><h3>Скилл для языковой модели</h3><p>Самый простой вход — без навыков работы с терминалом: <a href="scholion-skill.md" download>скачайте файл скилла</a> и приложите его к диалогу с Claude или ChatGPT со словами «настрой мне это». Модель прочитает и поведёт дальше сама — по одному маленькому шагу, объясняя каждый до того, как он случится. Есть и <a href="scholion.skill" download>полный комплект</a> со справочными текстами и правилами безопасности, а если пакет уже установлен — <code>scholion skill --full</code> печатает ту же инструкцию. Модель не получает доступа к машине, профиль её не покидает, а правила безопасности имеют приоритет над любой другой её инструкцией.</p></div>
     <div class="card"><div class="ic">🔌</div><h3>Плагин для <a href="https://github.com/razzant/ouroboros" style="color:inherit">Ouroboros</a></h3><p><code>scholion/ouroboros_tools.py</code> регистрирует 23 инструмента <code>sch_*</code> — второе мнение по препарату, разбор анализов, поиск по локусу, полигенные баллы, долголетие, цели и другое. Ouroboros находит модули инструментов, сканируя свой пакет tools, поэтому файл туда копируется один раз: <code>pip install scholion</code>, затем скопируйте <code>ouroboros_tools.py</code> в <code>&lt;ouroboros&gt;/ouroboros/tools/</code> и задайте <code>SCHOLION_REPO_DIR</code>. <code>python3 -m scholion.ouroboros_tools</code> печатает список инструментов и отдельно от Ouroboros.</p></div>
   </div>
   <p class="sub" style="margin-top:22px">Все четыре входа запускают один и тот же анализ. Единственная разница, которую стоит знать заранее: pip-пакет и распакованная папка одинаково дают полное приложение, а инструментарий подготовки генома — превращение сырых прочтений секвенатора в VCF — есть только в исходном дереве, вместе с внешними биоинформатическими инструментами, которые он использует. Если VCF у вас уже есть, pip-пакета достаточно для всего, что показано на этой странице.</p>

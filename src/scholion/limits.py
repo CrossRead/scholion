@@ -105,11 +105,28 @@ def _item(what: str, why: str, closes: str, kind: str, subject: str = "",
 def _genome_limits() -> List[Dict[str, str]]:
     from . import genome
     out: List[Dict[str, str]] = []
-    ready = bool(genome.available().get("ready"))
+    av = genome.available()
+    ready = bool(av.get("ready"))
     if not ready:
-        out.append(_item(_t("limits.no_genome_what"), _t("limits.no_genome_why"),
-                         _t("limits.no_genome_closes"), kind="genome"))
+        # «There is no genome» and «the genome is in another coordinate system»
+        # are different facts, and the remedy differs. Printing the first for the
+        # second would be this layer telling the reader something untrue about
+        # itself, which is the one thing it may not do.
+        if av.get("assembly_mismatch"):
+            out.append(_item(
+                _t("limits.assembly_what", found=av.get("assembly")),
+                _t("limits.assembly_why", found=av.get("assembly"),
+                   want=av.get("assembly_expected")),
+                _t("limits.assembly_closes", want=av.get("assembly_expected")),
+                kind="genome"))
+        else:
+            out.append(_item(_t("limits.no_genome_what"), _t("limits.no_genome_why"),
+                             _t("limits.no_genome_closes"), kind="genome"))
         return out
+    if av.get("assembly_unknown"):
+        out.append(_item(_t("limits.assembly_unknown_what"),
+                         _t("limits.assembly_unknown_why", want=av.get("assembly_expected")),
+                         _t("limits.assembly_unknown_closes"), kind="genome"))
 
     cov = coverage_summary()
     if not cov["known"]:
@@ -283,7 +300,8 @@ def scope() -> Dict[str, Any]:
     that the reader should not have to know which of those they are looking at.
     """
     from . import genome
-    has_vcf = bool(genome.available().get("ready"))
+    av = genome.available()
+    has_vcf = bool(av.get("ready"))
     traits = (core.prs_results() or {}).get("traits") or {}
     rows = []
     if has_vcf:
@@ -295,8 +313,12 @@ def scope() -> Dict[str, Any]:
                      "note": _t("limits.scope.polygenic")})
     return {
         "input": "wgs" if has_vcf else "none",
-        "input_note": _t("limits.scope.input_wgs") if has_vcf
-                      else _t("limits.scope.input_none"),
+        # A file in the wrong build is not «no file»: saying so here would
+        # contradict the item three lines below, which names it precisely.
+        "input_note": (_t("limits.scope.input_wgs") if has_vcf
+                       else _t("limits.scope.input_wrong_build", found=av.get("assembly"))
+                       if av.get("assembly_mismatch")
+                       else _t("limits.scope.input_none")),
         "rows": rows,
         # Shown whenever a polygenic number is on screen at all: without it a
         # percentile is read as the whole of the risk rather than as the part of

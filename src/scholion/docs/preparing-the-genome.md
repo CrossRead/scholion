@@ -8,6 +8,105 @@ The document is written so that **a person can carry it out by hand in a termina
 
 ---
 
+## 0a. If you already have a VCF: the two things that decide whether it can be read
+
+Most people arriving here do not need the whole guide. They were handed a file
+by a laboratory and want to know whether it works. Two properties decide that,
+and one command reports both:
+
+```bash
+scholion genome-status
+```
+
+### The build — this one is not negotiable
+
+The catalogue of positions this project queries is written in **GRCh38**. A file
+called against another build is not slightly off; it is off by whole genes. APOE
+`rs429358` sits at `19:44,908,684` in GRCh38 and at `19:45,411,941` in GRCh37 —
+half a million bases apart. Asking the first coordinate of the second file lands
+somewhere else entirely, and the answer comes back either empty, so a real
+finding is lost, or full, so somebody else's variant is reported as APOE.
+Neither looks like an error. That is why the genomic layer switches itself off
+on a mismatch instead of answering.
+
+GRCh37 is not an edge case: consumer arrays are hg19, several sequencing
+providers shipped hg19 for years, and most WGS more than a few years old is
+hg19.
+
+**The build is detected by contig length, not by the `##reference` line** — a
+length is a property of the reference, a reference line is a claim, and people
+routinely leave a path to a file they no longer have.
+
+| chr1 length in the header | build |
+|---|---|
+| 249 250 621 | GRCh37 / hg19 |
+| 248 956 422 | GRCh38 / hg38 |
+| 248 387 328 | T2T-CHM13v2.0 |
+
+**If the header says nothing**, the data are asked instead: a variant past the
+end of chromosome 1 in GRCh38 cannot exist in GRCh38, so finding one settles it.
+Finding none settles nothing, and that is reported as "not established" rather
+than assumed away.
+
+**Three ways to settle it yourself**, cheapest first:
+
+```bash
+# 1. You know the build from the sequencing report — say so, and that is the whole fix
+SCHOLION_GENOME_ASSEMBLY=GRCh37 scholion genome-status
+
+# 2. Read it off the header
+bcftools view -h <file.vcf.gz> | grep -E '##(contig|reference)'
+
+# 3. Write the contigs in once, so the file answers for itself from now on
+bcftools reheader -f <reference>.fai <file.vcf.gz>
+```
+
+**If your file is in GRCh37 and you want it read**, lift it over — `CrossMap` or
+`bcftools +liftover` with the appropriate chain file — or re-call the variants
+from the alignment against GRCh38. Coordinates are deliberately not converted on
+the fly here: a silent conversion would add exactly the class of error this
+project exists to remove.
+
+### The shape of the file
+
+The readers seek into the file by position, so it has to be block-compressed and
+indexed. Everything below is reported by name rather than as "no genome found",
+because a file that is present and unreadable needs a command, while an absent
+file needs a sequencing run.
+
+| What you have | What to do |
+|---|---|
+| `file.vcf` — plain, uncompressed | `bgzip -c file.vcf > file.vcf.gz && tabix -p vcf file.vcf.gz` |
+| `file.vcf.gz` compressed with ordinary **gzip** | It looks right and `tabix` will refuse it. `gunzip -c file.vcf.gz \| bgzip -c > f.bgz && mv f.bgz file.vcf.gz && tabix -p vcf file.vcf.gz` |
+| `file.vcf.gz` with no index | `tabix -p vcf file.vcf.gz` |
+| A `.zip` or `.tar.gz` from the provider | Unpack it into `genome/` first — Dante Labs and Nebula ship archives |
+| A BAM or CRAM and no VCF | Start at §5 of this guide: the VCF is built from the alignment |
+| A 23andMe / Ancestry `.txt` | Not read yet — that is a consumer array, not a VCF, and it needs its own frequency rules to be safe |
+
+### Two things worth knowing before you trust an answer
+
+**One sample per file.** A joint or family VCF — a trio, two spouses — is read
+from its first sample column, so genotypes from the wrong person would be
+reported under yours. If the file was called jointly, extract yourself first:
+`bcftools view -s <YOUR-SAMPLE> -Oz -o mine.vcf.gz joint.vcf.gz`.
+
+**One VCF in the folder.** If several are present the first by name is taken. A
+per-chromosome set (`chr1.vcf.gz` … `chr22.vcf.gz`) would therefore be read as
+if `chr1` were the whole genome. Concatenate them first: `bcftools concat -Oz -o
+all.vcf.gz chr*.vcf.gz && tabix -p vcf all.vcf.gz`.
+
+### A note for an assistant reading this with a person
+
+`genome-status` prints the next action, not just the diagnosis. When the build
+is not established, the useful question to a person is **who did the sequencing
+and what does their report say the reference was** — that answer converts the
+whole problem into one environment variable. Do not guess the build, and do not
+suggest lifting coordinates over inside the tool: neither the person nor the
+tool would be able to tell afterwards whether the answer was about the right
+position.
+
+---
+
 ## 0. Where we are heading: what the finished result looks like
 
 The application and the skill read the genome from the `genome/` folder in the project root. The minimum sufficient set is two files:

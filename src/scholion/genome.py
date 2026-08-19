@@ -119,6 +119,160 @@ def vcf_path() -> Optional[Path]:
     return None
 
 
+#: Assemblies are told apart by the length of a chromosome, which is a fact about
+#: the reference rather than a claim in a header somebody may have edited. chr1 is
+#: enough on its own; chr2 and chrX are here for files whose header lists only a
+#: few contigs. The numbers are the lengths in the primary assembly of each build.
+_LENGTH_TO_ASSEMBLY = {
+    249250621: "GRCh37", 248956422: "GRCh38", 248387328: "T2T-CHM13v2.0",   # chr1
+    243199373: "GRCh37", 242193529: "GRCh38", 242696752: "T2T-CHM13v2.0",   # chr2
+    155270560: "GRCh37", 156040895: "GRCh38", 154259566: "T2T-CHM13v2.0",   # chrX
+}
+
+#: Only as a fallback: a `##reference=` line says what somebody wrote there, and
+#: people write the path to a file they no longer have. A contig length cannot lie.
+_REFERENCE_HINTS = (
+    ("grch38", "GRCh38"), ("hg38", "GRCh38"),
+    ("grch37", "GRCh37"), ("hg19", "GRCh37"), ("b37", "GRCh37"), ("hs37", "GRCh37"),
+    ("chm13", "T2T-CHM13v2.0"), ("t2t", "T2T-CHM13v2.0"),
+)
+
+
+def _header_text(vcf: str, limit: int = 4000) -> str:
+    """The header of a VCF, however it is compressed. Stdlib only, on purpose.
+
+    `gzip` reads BGZF because BGZF *is* gzip — a conforming reader does not care
+    that the stream is made of blocks. So the header is available with no index,
+    no bcftools and no pysam, which matters here: the check has to work in the
+    installation where the least is present, not in the one where the most is.
+    """
+    try:
+        import gzip
+        opener = gzip.open if str(vcf).endswith((".gz", ".bgz")) else open
+        out = []
+        with opener(vcf, "rt", encoding="utf-8", errors="replace") as fh:   # type: ignore[operator]
+            for i, line in enumerate(fh):
+                if not line.startswith("#") or i > limit:
+                    break
+                out.append(line)
+        return "".join(out)
+    except (OSError, EOFError, UnicodeError):
+        return ""
+
+
+#: The last stretch of chr1 that exists in GRCh37 and does not exist in GRCh38.
+#: A variant there is proof the file is not GRCh38 — the coordinate is past the
+#: end of that chromosome. The test only ever adds information: rows found means
+#: GRCh37, rows not found means nothing at all, and it is reported that way.
+_BEYOND_GRCH38_CHR1 = (248956422, 249250621)
+
+
+def _probe_assembly(vcf: str) -> Optional[str]:
+    """Ask the data when the header will not say.
+
+    A header can be silent — `bcftools view -G`, a hand-assembled file, a
+    provider that strips contig lines. The variants themselves cannot be: a row
+    on chr1 past 248,956,422 cannot exist in GRCh38, because the chromosome ends
+    there. One indexed query settles it in one direction, which is more than the
+    header gave us.
+    """
+    lo, hi = _BEYOND_GRCH38_CHR1
+    try:
+        rows = _query_region_range(vcf, "1", lo + 1, hi)
+    except Exception:                                        # noqa: BLE001
+        return None
+    return "GRCh37" if rows else None
+
+
+def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List[str]]:
+    pref = _chr_prefix(vcf)
+    name = f"{pref}{chrom}" if not str(chrom).startswith("chr") else str(chrom)
+    if _have_bcftools():
+        out = subprocess.run(["bcftools", "view", "-H", "-r", f"{name}:{start}-{end}", vcf],
+                             capture_output=True, text=True, timeout=60).stdout
+        return [ln.split("\t") for ln in out.splitlines() if ln]
+    from . import tabixlite
+    return tabixlite.query(vcf, name, start, window=end - start)
+
+
+@lru_cache(maxsize=8)
+def assembly_of(vcf: str) -> Optional[str]:
+    """Which reference build this file was called against, or None if it cannot be told.
+
+    None is a real answer and must not be turned into a guess. A file whose header
+    carries no contig lengths and no reference line tells us nothing, and refusing
+    on nothing is the same mistake as answering on nothing.
+    """
+    # Declared by the person beats anything we can infer. Someone who knows which
+    # build their file is in should be able to say so in one variable rather than
+    # be told to rewrite the header of a fifty-gigabyte file.
+    declared = os.environ.get("SCHOLION_GENOME_ASSEMBLY")
+    if declared:
+        return declared.strip()
+    head = _header_text(vcf)
+    if not head:
+        return _probe_assembly(vcf)
+    for line in head.splitlines():
+        if line.startswith("##contig=") and "length=" in line:
+            try:
+                length = int(line.split("length=", 1)[1].split(",")[0].split(">")[0])
+            except (ValueError, IndexError):
+                continue
+            hit = _LENGTH_TO_ASSEMBLY.get(length)
+            if hit:
+                return hit
+    for line in head.splitlines():
+        if line.startswith("##reference="):
+            low = line.lower()
+            for needle, name in _REFERENCE_HINTS:
+                if needle in low:
+                    return name
+    return _probe_assembly(vcf)
+
+
+@lru_cache(maxsize=1)
+def catalogue_assembly() -> str:
+    """The build the coordinate catalogue is written in. One source: loci.json."""
+    try:
+        import json
+        meta = json.loads((Path(__file__).resolve().parent / "knowledge" / "loci.json")
+                          .read_text(encoding="utf-8")).get("_meta") or {}
+        return str(meta.get("assembly") or "GRCh38")
+    except (OSError, ValueError):
+        return "GRCh38"
+
+
+def unusable_nearby() -> Optional[Dict[str, str]]:
+    """A genome file that IS there and cannot be read — named instead of ignored.
+
+    `vcf_path` looks for `*.vcf.gz`, because that is the only shape the readers
+    can seek into. Everything else is invisible to it, and "not connected" is
+    then printed at a person whose genome is lying in that very folder. For the
+    audience this project is for — people who have their own file — that is the
+    first thing half of them will meet, and it reads as "your file is not
+    supported" rather than "your file needs one command".
+
+    Two shapes get here. A plain `.vcf`, which providers hand out routinely. And
+    a `.vcf.gz` compressed with ordinary gzip rather than bgzip: it looks right,
+    it is not, and `tabix` on it fails with a message about the format that
+    explains nothing to someone who did not know there were two gzips.
+    """
+    for base in list(core.genome_bases()):
+        for plain in sorted(glob.glob(str(base / "*.vcf"))):
+            return {"path": plain, "reason": "plain", "fix": f"bgzip -c {plain} > {plain}.gz && tabix -p vcf {plain}.gz"}
+        for gz in sorted(glob.glob(str(base / "*.vcf.gz"))):
+            try:
+                with open(gz, "rb") as fh:
+                    head = fh.read(4)
+            except OSError:
+                continue
+            # BGZF is a gzip member carrying an extra field; byte 3 (FLG) has FEXTRA set.
+            if head[:2] == b"\x1f\x8b" and not (head[3] & 0x04):   # gzip without FEXTRA → not BGZF
+                return {"path": gz, "reason": "gzip_not_bgzip",
+                        "fix": f"gunzip -c {gz} | bgzip -c > {gz}.bgz && mv {gz}.bgz {gz} && tabix -p vcf {gz}"}
+    return None
+
+
 def _have_bcftools() -> bool:
     return shutil.which("bcftools") is not None
 
@@ -133,11 +287,31 @@ def available() -> Dict[str, Any]:
         engine = "pysam"
     elif vp is not None and Path(str(vp) + ".tbi").exists():
         engine = "tabixlite"
+    # Also when the file WAS found: a gzip-not-bgzip archive is found by the glob,
+    # reports «no index», and then tabix refuses it for a reason the message never
+    # mentions. Say it here instead of letting the person meet it in tabix.
+    near = unusable_nearby() if (vp is None or engine is None) else None
+    # The build decides whether the genomic layer may answer at all. Our catalogue
+    # is in one assembly; a file called against another puts every locus half a
+    # million bases off — APOE rs429358 sits at 19:44,908,684 in GRCh38 and at
+    # 19:45,411,941 in GRCh37. The query then lands in a different gene, and the
+    # answer comes back either empty (a real finding lost) or full (somebody
+    # else's variant reported as APOE). Both are silent. So: refuse, and do not
+    # lift coordinates over on the fly — that would add a source of error to the
+    # layer that exists to remove them.
+    asm = assembly_of(str(vp)) if vp is not None else None
+    want = catalogue_assembly()
+    asm_mismatch = bool(asm and asm != want)
     return {
+        "unusable": near,
+        "assembly": asm,
+        "assembly_expected": want,
+        "assembly_mismatch": asm_mismatch,
+        "assembly_unknown": vp is not None and asm is None,
         "vcf_present": vp is not None,
         "vcf": str(vp) if vp else None,
         "engine": engine,
-        "ready": vp is not None and engine is not None,
+        "ready": vp is not None and engine is not None and not asm_mismatch,
     }
 
 

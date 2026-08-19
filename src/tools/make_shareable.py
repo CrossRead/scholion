@@ -460,6 +460,22 @@ def build(repo: Path, out: Path) -> Path:
             (shared / "docs").mkdir(parents=True, exist_ok=True)
             shutil.copy2(_doc, shared / "docs" / _name)
 
+    # The skill, downloadable from the published page. A person whose only tool
+    # is a chat model should not need `python3 src/tools/...` to obtain the one
+    # file that removes the terminal from their path. Both artefacts are
+    # GENERATED here, from the same sources every other build step uses, so the
+    # page can never serve a stale skill: `scholion-skill.md` is the entry file
+    # a person drops into a chat, `scholion.skill` is the full bundle with the
+    # reference texts and the safety rules.
+    _skill_entry = repo / "share" / "skill" / "SKILL.md"
+    if _skill_entry.exists():
+        (shared / "docs").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(_skill_entry, shared / "docs" / "scholion-skill.md")
+        _r = subprocess.run([sys.executable, str(repo / "src" / "tools" / "make_skill_package.py"),
+                      "--out", str(shared / "docs")], capture_output=True, text=True)
+        if _r.returncode != 0:
+            sys.exit("✗ the skill bundle did not build for the page:\n" + _r.stdout + _r.stderr)
+
     # the compatibility check is part of the public package: the recipient must be
     # able to confirm that their build has not narrowed the contract, without access
     # to our repository.

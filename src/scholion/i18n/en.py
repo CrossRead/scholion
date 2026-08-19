@@ -786,15 +786,6 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "prs.category_other": "Other",
     "longevity.not_built": "The longevity layer has not been built yet (there is no "
                            "profile/longevity_findings.json).",
-    "monitor.statin": "at baseline and after about 8 weeks: lipids, ALT/AST; on muscle pain — CK.",
-    "monitor.anticoagulant_vka": "INR regularly; agree the target range with the doctor.",
-    "monitor.doac": "kidney function (eGFR) at baseline and over time.",
-    "monitor.thiopurine": "before starting — TPMT/NUDT15 activity (see Drugs); full blood "
-                          "count regularly.",
-    "monitor.testosterone_replacement": "testosterone, haematocrit, PSA, lipids over time.",
-    "monitor.thyroid_hormone": "TSH 6–8 weeks after starting or changing the dose.",
-    "monitor.ppi": "on long-term use — B12, magnesium, fracture risk.",
-    "monitor.antiplatelet_p2y12": "signs of bleeding; the CYP2C19 phenotype for clopidogrel.",
     "sources.chosen_folder": "chosen folder · {path}",
     "sources.local_folder": "local folder · {path}",
     "sources.labs": "Laboratory studies",

@@ -31,6 +31,74 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.3.2 — 18.08.2026
+
+A refactoring release: not one answer changes on unchanged input. The full
+suite, the compatibility snapshots, both language catalogues and every command
+are byte-for-byte the same claims as v0.3.1 — that sameness IS the release
+gate, recorded here as the thing that was checked rather than assumed.
+
+### engine.py becomes a package of eight domain modules
+
+The 2800-line flat file — five domains that had grown into one another for a
+year — is now `engine/`: `_helpers`, `labs`, `pgx`, `genomics`, `goals`,
+`lifestyle`, `sources`, `profile_view`, with `__init__.py` as a facade that
+re-exports EVERY name, private ones included, at the address the tree has
+always used. Six consumers (`__init__`, `cli`, `server`, `ouroboros_tools`,
+`assistant`, `limits`) and the tests needed zero edits: five of the six always
+called `engine.<name>(...)`, and the sixth's explicit imports resolve through
+the facade identically. Two module names differ from the auditor's proposal
+for a reason recorded in the plan: `genomics` (a `genome.py` already exists —
+the VCF backend) and `sources` (a `provenance.py` already exists and means the
+reverse check; `engine.provenance()` keeps its public name, only its file
+changed).
+
+The mechanical work was governed by a call-graph analysis the original audit
+did not do, and the graph had teeth: two cycles (labs↔pgx and lifestyle↔pgx).
+They were broken by MOVING two leaves into `_helpers` — `_active_names_by_class`
+and `_brief_num` invoke nothing and belong to everyone — and by ONE deliberate
+lazy import: `pgx._dose_context` reaches for `lifestyle._brief_life` inside
+the function body, the same pattern the file already used for `drugsource`.
+Everything else imports one way, top-level, two dots up for the package
+neighbours exactly as the plan required.
+
+The extraction tool refused to write a module with an unresolved name, and
+that refusal caught three edges no analysis had listed: `DISCLAIMER` is called
+by `goals` and `genomics` (the call-graph pass had skipped the two constant-
+like functions), and `_OPS` — the comparison-operator table — is shared by
+`_helpers._match_count` and `labs._eval_condition`. All three now live in
+`_helpers`, imported by name where used. The audit's other prediction was
+confirmed the hard way: `_WATCHLIST` sits in `profile_view`'s line range and
+belongs to `lifestyle.second_opinion` — cutting by line ranges would have
+shipped a NameError that only fires when somebody asks for a second opinion.
+
+One collision existed and is now tested: `lifestyle` is both a submodule and a
+function. The facade binds the function last, and a test-adjacent check
+confirms `engine.lifestyle` stays callable even after a direct submodule
+import.
+
+### Removed: the monitoring list nobody calls
+
+`_monitoring_for` returned monitoring hints for eight drug classes hard-coded
+in the source, through sixteen `monitor.*` keys in both catalogues. The only
+place needing such hints — `check_new_prescription` — has long read them from
+`knowledge/drug_lab_monitoring.json` via `core.drug_lab_monitoring()`. The
+code list lost that argument and stayed anyway; found by the refactoring
+audit, deleted with its keys (catalogues stay identical: 1334 = 1334).
+
+### What was checked, where
+
+`run_tests.sh` end to end in the repository: 553 tests, 48 commands, 20
+snapshots, docs and rules in sync, the language remainder unchanged at 352
+(the seven accepted places that lived in `engine.py` moved to their new
+addresses; the baseline records the move, not growth). And — because a check
+that agrees only with the repository it was written in has now cost this
+project five times — the artefact itself: a wheel built from this tree,
+installed into a clean environment, imports the facade, resolves the private
+names the tests use, and answers `scholion capabilities` and
+`scholion second-opinion` from the installed package. All nine `engine/`
+files travel in the wheel.
+
 ## v0.3.1 — 18.08.2026
 
 _MINOR by the letter of `docs/VERSIONING.md`: `lab_markers.json` changes what a

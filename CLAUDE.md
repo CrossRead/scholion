@@ -123,6 +123,14 @@ showing anyone's medical record, and so screenshots have something to show. Ever
 file declares itself synthetic in `_meta` — without that declaration the build
 audit rejects it.
 
+## A published version is frozen
+
+`VERSION` must be bumped for any change that reaches the package — and
+`CHANGELOG.md` reaches it, while `ouroboros_plugin/` does not. Do not answer that
+from memory: `python3 src/tools/check_published.py --check` reads what travels out
+of `pyproject.toml`, asks the registry, and compares. `publish_share.sh` runs it
+before building and records the result after publishing.
+
 ## Adding a surface
 
 Any new way in — a protocol server, a plugin for another host, an API — is not

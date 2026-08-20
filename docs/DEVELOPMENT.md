@@ -228,6 +228,36 @@ product makes about the data not travelling has to be re-argued if it moves. Doe
 it need a credential — the answer is no, it has always been no, and if it ever
 becomes yes then `access()['auth']` is a lie and a test says so.
 
+## A published version is frozen
+
+Once a number is in the registry it cannot be rewritten, and the workflow no
+longer says so out loud: `skip-existing: true` was added so that a tag moving
+after a correction to the release notes would not leave a red mark where nothing
+was wrong. That setting has a cost, and it is silence — the same skip happens when
+somebody forgot to bump `VERSION`, after which the registry keeps the old artefact
+and the tag points at code nobody can install.
+
+`src/tools/check_published.py` pays for that silence. Before anything is built it
+asks the registry whether this version exists, and compares a fingerprint of
+**what actually travels** — read out of `pyproject.toml`, not listed a second
+time — against what was recorded at the last successful publication. Four
+verdicts, and the fourth is the point: with no record of what went out, the
+honest answer is «I cannot tell», which is what `--allow-unverified` is for and
+why it has to be typed.
+
+**Two consequences worth knowing before you need them.**
+
+The journal is inside the package. `CHANGELOG.md` is in the sdist, so a
+correction to the release notes after publication is not a free re-publish: the
+artefact genuinely differs and the registry cannot take it. Correct the notes
+BEFORE publishing; after publishing, a correction belongs in the repository and
+on the release page, and the tag stays where it is.
+
+The Hub manifest is not inside the package. `ouroboros_plugin/` travels in a pull
+request and never reaches the registry, so changing it needs no new number. The
+check knows the difference because it reads the build configuration; do not
+answer this question from memory.
+
 ## Release notes
 
 The entry in `CHANGELOG.md` is the only thing somebody who has never seen this

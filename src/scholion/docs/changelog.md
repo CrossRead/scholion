@@ -40,6 +40,33 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.2 — 20.08.2026
+
+The safety rules now travel with the tools, not only with the skill.
+
+### What you can do now
+
+**`sch_rules` — the rules this product is operated under, as a tool.** A model
+that arrives through the skill is handed the instruction and the rules with it. A
+model that arrives through the tool interface was handed a list of tools and
+nothing else: it knew what it could call and nothing about what it must not say.
+Every answer already ends in the one-line disclaimer, and a disclaimer is a
+boundary, not an instruction. The rules are now a tool any host can call — 29
+tools in total — and the Model Context Protocol handshake carries a digest of
+them in the protocol's own `instructions` field, for the hosts that pass it on.
+They are the same rules `scholion skill --rules` prints, through a second door.
+
+**A version that is already published cannot be re-published changed.** The build
+refuses instead of letting the registry skip the upload in silence: it reads what
+actually travels out of the build configuration, compares it against what went
+out last time, and stops with «bump the version» when the two differ. Where it
+cannot reach the registry to ask, it says so and refuses rather than guessing —
+the alternative is a tag pointing at code nobody can install.
+
+### What needs recomputing
+
+Nothing. No stored value changes and no answer changes.
+
 ## v0.4.1 — 20.08.2026
 
 An assistant can now ask Scholion how to reach it, and what it must not say — and
@@ -68,15 +95,6 @@ end of the pipe but the program that started it. That was always true and was
 written nowhere a program could read, so a program asked for a credential
 instead. It is now the first thing the build answers, and the claim is checked
 against the code rather than repeated.
-
-**`sch_rules` — the safety canon as a tool.** A model that arrives through the
-skill is handed the instruction and the rules with it. A model that arrives
-through the tool interface used to be handed a list of tools and nothing else: it
-knew what it could call and nothing about what it must not say. Every answer
-already ends in the one-line disclaimer, and a disclaimer is a boundary, not an
-instruction. The rules are now a tool any host can call, and the MCP handshake
-carries a digest of them in the protocol's own `instructions` field for the hosts
-that pass it on.
 
 ### What was wrong
 

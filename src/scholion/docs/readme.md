@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.1** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.2** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 

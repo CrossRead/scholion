@@ -610,6 +610,10 @@ def build(repo: Path, out: Path) -> Path:
     # The sync check travels together with the canon: the copy of the rules in the
     # skill asks "edit the canon, not the copy", and the recipient must have something
     # to check that with.
+    _pub = repo / "src" / "tools" / "check_published.py"
+    if _pub.exists():
+        shutil.copy2(_pub, shared / "src" / "tools" / "check_published.py")
+
     _manifest = repo / "src" / "tools" / "sync_manifest.py"
     if _manifest.exists():
         shutil.copy2(_manifest, shared / "src" / "tools" / "sync_manifest.py")

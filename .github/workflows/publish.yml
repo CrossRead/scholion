@@ -72,3 +72,11 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # A tag can move after publication — a correction to the release notes
+          # is the ordinary reason, and the tag should point at the final text.
+          # The version is then already in the registry, and a published version
+          # cannot be rewritten: without this the run fails with «file already
+          # exists» and leaves a red mark that means nothing was wrong. Skipping
+          # is the honest answer, because the artefact really is already there.
+          skip-existing: true

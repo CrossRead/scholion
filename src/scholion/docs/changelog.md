@@ -23,6 +23,15 @@ a change to `src/scholion/knowledge/` that alters the result on unchanged input.
 Values from before and after such a change cannot go on the same chart without a
 note.
 
+**Who it is for.** Somebody who has never seen this repository and wants to know
+what this version does. That decides what an entry contains: **new capabilities,
+fixed defects, and what either of those means for data already stored.** It also
+decides what an entry does NOT contain — the path a change took, which attempt
+came first, what was learned along the way, whose machine anything ran on, and
+who wrote it. Those are worth recording and belong elsewhere; in a release entry
+they crowd out the two questions a reader actually has: what can I do now that I
+could not, and what was wrong that is now right.
+
 **What is not here.** Personal data and one person's findings: no genotypes, no
 lab values, no dates of anyone's tests. This journal records what changed in the
 **system**, not what was found in somebody.
@@ -33,19 +42,15 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 ## v0.4.0 — 19.08.2026
 
-Until this release, Scholion had been built and tested against one person's data:
-the author's genome, his own laboratory forms, his own prescriptions. That is
-enough to make a tool work for one person and not enough to make it work for
-anybody else. This release was written against data that is not the author's —
-27 real genomic files from eleven providers in the Personal Genome Project, a
-synthetic FHIR bundle, and an outside review of the code — and most of what
-follows is what those turned up.
+This release is about the files people actually have. A consumer DNA test, a
+genome in the older GRCh37 build, a hospital portal export, laboratory results as
+a spreadsheet — all of them are now read, where most of them used to be answered
+with «no genome found» or «nothing importable here».
 
-Two things changed as a result. **Far more kinds of file now work**: a consumer
-DNA test, an older genome, a spreadsheet of lab results, a hospital portal
-export. And **the answers say more about themselves** — how much of the gene was
-actually read, which sample in the file was used, why a question is being
-refused.
+The second half is what the answers say about themselves: how much of a gene was
+actually read before «no findings» was printed, which sample in a multi-sample
+file was used, and — where an answer cannot honestly be given — which of several
+different reasons is the one that applies.
 
 ### What you can bring it now
 
@@ -63,7 +68,7 @@ screening, secondary findings, polygenic scores — are refused with the reason.
 
 **A genome in the older GRCh37 build.** Most files people actually hold are
 GRCh37: consumer chips, several sequencing providers, and most whole genomes more
-than a few years old. Seven of the eight real genomes we tested against are.
+than a few years old.
 Scholion used to switch its genomic layer off on every one of them. All 54
 catalogue positions now carry coordinates in both builds — each one taken from
 two independent public sources that agreed — so a GRCh37 file is read at GRCh37
@@ -118,8 +123,8 @@ on everybody is not information.
 
 ### What it now refuses to do
 
-Refusing well is most of what this product is for, and four situations used to
-produce a confident answer instead.
+Four situations used to produce a confident answer where no answer was
+available. Each is now a refusal that names the file and the reason.
 
 **A file it cannot actually open is no longer «Genome connected».** A `.vcf.gz`
 compressed with ordinary gzip rather than bgzip looks correct from the outside
@@ -153,11 +158,16 @@ formats used to print at people whose file was lying right there.
 
 * **`scholion mcp`** — Scholion as a Model Context Protocol server over standard
   input and output, so any MCP-capable assistant can call the same tools the
-  Ouroboros plugin exposes. The tool list is derived from the plugin's rather
-  than maintained twice.
-* **Author settings, declared.** Four numeric thresholds that nobody published,
-  and that Scholion had simply chosen, are now written down with what would
-  replace them and — the field that matters — what they do not license.
+  Ouroboros plugin exposes.
+* **`SCHOLION_GENOME_VCF` and `SCHOLION_GENOME_SAMPLE`** — which file, and which
+  sample inside it, is yours. `scholion genome-status --json` reports the sample
+  name, how many samples the file holds, how many genome files were found, and
+  the reason it is refusing when it refuses.
+* **The numbers behind the flags are written down.** Four thresholds that no
+  published guideline fixes — how large a change counts as movement, how close to
+  a reference limit counts as near it, and two more — are now stated in the
+  knowledge base with what would replace them and, more usefully, what they do
+  not license anyone to conclude.
 
 ### A series break
 
@@ -205,9 +215,8 @@ chart without a note.
 
 ### Measured
 
-Twenty-eight input shapes — the zoo real providers hand out — run through the
-previous release and this one on the same harness (`src/tools/format_matrix.py`;
-synthetic files, no personal data):
+Twenty-eight input shapes — the zoo of formats real providers hand out — run
+through the previous release and this one:
 
 | | v0.3.4 | this release |
 |---|---|---|
@@ -218,31 +227,28 @@ synthetic files, no personal data):
 
 The remaining one is a genome whose reference build cannot be determined from the
 file: the first line still says «Genome connected» before it says the build is
-unknown, though every position in it now refuses. It is counted here rather than
-left out.
+unknown, though every position in it now refuses.
 
 And on real files rather than invented ones — 31 sets of genomic and medical
-records from the Personal Genome Project, run through the previous release and
-this one. Nobody's data, findings or identifiers appear here or anywhere else in
-this repository; these are counts of what the software did.
+records from the Personal Genome Project, whose participants publish their data
+under open consent. No participant's data, findings or identifiers appear here or
+anywhere else in this repository; these are counts of what the software did.
 
-| | before | this release |
+| | v0.3.4 | this release |
 |---|---|---|
 | **Confidently wrong answers** | 1 | **0** |
 | Consumer arrays read | 3 | **9** |
 | Genomes turned away over their reference build | 7 | **0** |
 | False «no genome found» | 11 | 7 |
-| **Laboratory results imported** | **0** | **61** |
+| **Laboratory results imported** | 0 | **61** |
 
-The last row is the one that changed what the product is. Before this release the
-laboratory side had never once filled up from somebody else's records — every
-medical file in the corpus came back empty, so the thing the whole tool exists
-for, reading the genome and the lab history together, had only ever happened for
-its author. It now happens for strangers: on one set, a lipid panel showed
-dyslipidaemia, the tool concluded that statin therapy was likely, and named the
-one gene worth testing **before** it starts. On another, a single raised
-rheumatoid factor produced two suggested tests and a sentence saying why one
-result is not a diagnosis.
+The last row is the one that matters most: the laboratory side now fills up from
+records it has never seen before, which is the precondition for everything this
+tool does across layers. On one of those sets a lipid panel showed dyslipidaemia,
+the tool concluded that statin therapy was likely, and named the one gene worth
+testing **before** it starts. On another, a single raised rheumatoid factor
+produced two suggested tests and a sentence saying why one result is not a
+diagnosis.
 
 ### Thanks
 

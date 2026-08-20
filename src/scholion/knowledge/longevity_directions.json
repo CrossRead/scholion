@@ -4,7 +4,8 @@
     "provenance": "Assembled on 2026-08-14 from the literature review «the direction of the alleles» (7 parallel reviews by PMID, 12.07.2026) + the KNOWN dictionary from longevity_report.py. The direction of an allele often depends on the population and on the linkage chain — where it cannot be resolved confidently, the variant sits in the unresolved section rather than here.",
     "how_to_extend": "A new entry — only with a PMID and an explicit favorable allele according to the primary source. Aggregate gene-based associations (SKAT and the like) have no direction at the SNP level — their place is in unresolved.",
     "schema": "directions[rsid] = {gene, favorable (an allele or null), label, confidence high/medium/low, zygosity_note?, population_caveat?, pmids[], action?, verdict_by_copies? {0:.., 1:.., 2:..}}",
-    "updated": "2026-08-18"
+    "updated": "2026-08-18",
+    "source_tier": "primary_literature"
   },
   "directions": {
     "rs429358": {

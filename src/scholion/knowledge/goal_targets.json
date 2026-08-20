@@ -6,9 +6,9 @@
     "the_hardest_entries_are_the_empty_ones": "Where a society has looked and declined to set a target, that is recorded here as `no_target` with the quote. It is the most useful thing this file can carry: it stops the application from inventing a goal in the one place where the honest answer is that nobody has earned one.",
     "applies_to": "Every entry names the population it was written for. An entry whose population cannot be checked from the profile is PROPOSED WITH THAT ASSUMPTION STATED, never silently.",
     "updated": "2026-08-18",
-    "how_to_extend": "One entry per marker key from lab_markers.json. Required: unit, source{body, document, year, url}, and either `targets` or `no_target`. A target without a citation does not belong here."
+    "how_to_extend": "One entry per marker key from lab_markers.json. Required: unit, source{body, document, year, url}, and either `targets` or `no_target`. A target without a citation does not belong here.",
+    "source_tier": "guideline_compiled"
   },
-
   "targets": {
     "ldl": {
       "unit": "mmol/L",
@@ -23,17 +23,48 @@
       "depends_on": "cardiovascular_risk",
       "cannot_be_decided_here": "Which of these four applies is a clinical judgement — it turns on established disease, diabetes, kidney function, familial hypercholesterolaemia and a calculated risk score (SCORE2). The application does not compute it and must not guess it.",
       "by_category": [
-        {"category": "low",       "comparator": "<", "value": 3.0, "alt": {"unit": "mg/dL", "value": 116}},
-        {"category": "moderate",  "comparator": "<", "value": 2.6, "alt": {"unit": "mg/dL", "value": 100}},
-        {"category": "high",      "comparator": "<", "value": 1.8, "alt": {"unit": "mg/dL", "value": 70},
-         "and_also": "a reduction of at least 50 % from the untreated value"},
-        {"category": "very_high", "comparator": "<", "value": 1.4, "alt": {"unit": "mg/dL", "value": 55},
-         "and_also": "a reduction of at least 50 % from the untreated value"}
+        {
+          "category": "low",
+          "comparator": "<",
+          "value": 3.0,
+          "alt": {
+            "unit": "mg/dL",
+            "value": 116
+          }
+        },
+        {
+          "category": "moderate",
+          "comparator": "<",
+          "value": 2.6,
+          "alt": {
+            "unit": "mg/dL",
+            "value": 100
+          }
+        },
+        {
+          "category": "high",
+          "comparator": "<",
+          "value": 1.8,
+          "alt": {
+            "unit": "mg/dL",
+            "value": 70
+          },
+          "and_also": "a reduction of at least 50 % from the untreated value"
+        },
+        {
+          "category": "very_high",
+          "comparator": "<",
+          "value": 1.4,
+          "alt": {
+            "unit": "mg/dL",
+            "value": 55
+          },
+          "and_also": "a reduction of at least 50 % from the untreated value"
+        }
       ],
       "default_category": "moderate",
       "default_note": "Offered at the MODERATE-risk goal, which is an assumption, not a finding. Someone with established cardiovascular disease, diabetes or familial hypercholesterolaemia is in a stricter category and should take the choice to their doctor."
     },
-
     "hba1c": {
       "unit": "%",
       "direction": "lower_better",
@@ -48,9 +79,10 @@
       "comparator": "<",
       "value": 7.0,
       "note": "This is a goal for someone who HAS diabetes. For a person without it, the same guideline's 5.7 % is a diagnostic boundary, not something to aim at, and driving a normal HbA1c lower has no evidence behind it. Less stringent goals are appropriate where life expectancy is limited or the harms of treatment outweigh the benefits.",
-      "applies_when": {"has_condition": "diabetes"}
+      "applies_when": {
+        "has_condition": "diabetes"
+      }
     },
-
     "triglycerides": {
       "unit": "mmol/L",
       "direction": "lower_better",
@@ -62,10 +94,12 @@
       },
       "comparator": "<",
       "value": 1.7,
-      "alt": {"unit": "mg/dL", "value": 150},
+      "alt": {
+        "unit": "mg/dL",
+        "value": 150
+      },
       "note": "A cut-point above which triglycerides are treated as raised, not a target to be driven towards zero. It is the same number as the upper reference bound, which is why it is the one entry here that adds little beyond the laboratory range."
     },
-
     "vitamin_d": {
       "unit": "ng/mL",
       "no_target": true,

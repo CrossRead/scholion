@@ -25,12 +25,54 @@ def genome_status() -> Dict[str, Any]:
     return genome.available()
 
 
+def _array_only_input() -> Optional[Dict[str, Any]]:
+    """A refusal when the input is a genotyping array, for the three paths that
+    must not run on one.
+
+    ClinVar screening, ACMG secondary findings and polygenic scores are closed on
+    an array not because the code cannot execute them but because the RESULT
+    would not mean what it says. A chip's positive predictive value for rare
+    pathogenic variants is 4.2 % for BRCA1/2 (Weedon, BMJ 2021 — 889 positives,
+    37 confirmed) and 40 % of variants sent for confirmation from raw consumer
+    data were false (Moscarello 2019). And a chip carries no depth, so «nothing
+    found» in a gene says only that its handful of probes were negative.
+
+    These three stay shut until the frequency floor (task 2) and the input
+    quality label (task 8) exist. Until then the honest behaviour is to refuse
+    with the reason — never to answer with a value that reads like a finding.
+    The locus catalogue is a different matter and stays open: it is made of
+    common pharmacogenetic and trait variants, which is the register where a chip
+    works as designed.
+    """
+    from .. import genome
+    st = genome.available()
+    if st.get("input_class") != "array":
+        return None
+    arr = st.get("array") or {}
+    return {"status": "input_is_an_array", "available": False,
+            "vendor": arr.get("vendor"),
+            "message": _t("array.path_closed"),
+            "open_instead": _t("array.open_instead")}
+
+
 def clinvar_findings(limit: int = 200) -> Dict[str, Any]:
     """The patient's clinically significant findings (ClinVar × the personal VCF)."""
+    closed = _array_only_input()
+    if closed:
+        return closed
     from .. import genome
     r = genome.clinvar_hits(limit=limit)
     r["disclaimer"] = DISCLAIMER()
     r["penetrance"] = _penetrance_block()
+    # Whether an indel in this list could have been matched at all. Attached
+    # always, because it qualifies the SILENCE as much as the hits: without
+    # left-alignment a pathogenic indel spelled differently from ClinVar's copy
+    # simply does not appear, and nothing on screen distinguishes that from a
+    # genome that does not carry one.
+    norm = genome.clinvar_normalisation()
+    r["normalisation"] = norm
+    if not norm.get("left_aligned"):
+        r["indel_caveat"] = _t("genome.indels_not_left_aligned")
     return r
 
 
@@ -43,12 +85,50 @@ def _penetrance_block() -> Dict[str, Any]:
                            for p in pn.get("principles", [])]}
 
 
+def _unread_genes(genes) -> List[Dict[str, Any]]:
+    """Genes among `genes` whose bases were not read deeply enough to decide.
+
+    «No pathogenic variant found» in a gene that was never read is the same
+    sentence as «no pathogenic variant found» in a gene read end to end, and a
+    reader cannot tell them apart. The coverage has been computed all along —
+    `limits.callability()` reads it — and the findings report never consulted it.
+    Two facts held, neither compared with the other.
+    """
+    from .. import limits
+    cov = limits.callability() or {}
+    out = []
+    for g in genes:
+        row = cov.get(g)
+        if not row:
+            continue
+        pct = row.get("pct_10x")
+        if pct is None:
+            continue
+        try:
+            pct = float(pct)
+        except (TypeError, ValueError):
+            continue
+        if pct < 90.0:
+            out.append({"gene": g, "pct": round(pct, 1)})
+    return sorted(out, key=lambda x: x["pct"])
+
+
 def acmg_findings() -> Dict[str, Any]:
     """ACMG SF secondary findings + the layer of honesty about interpretation."""
+    closed = _array_only_input()
+    if closed:
+        return closed
     from .. import genome
     r = genome.acmg_sf_findings()
     r["disclaimer"] = DISCLAIMER()
     r["penetrance"] = _penetrance_block()
+    # An empty result is a claim about the panel, so it has to carry what of the
+    # panel was actually readable. Attached whether or not anything was found:
+    # a gene read at 72 % qualifies a finding as much as it qualifies a silence.
+    from .. import genome as _g
+    genes = list((_g.acmg_catalogue().get("genes") or {})) if hasattr(_g, "acmg_catalogue") \
+        else list((core._read_knowledge("acmg_sf.json").get("genes") or {}))
+    r["unread_genes"] = _unread_genes(genes)
     return r
 
 
@@ -60,6 +140,39 @@ def apoe() -> Dict[str, Any]:
 # ==========================================================================
 # Polygenic risks (PGS) and the longevity layer (LongevityMap)
 # ==========================================================================
+def prs_method_caveats() -> List[Dict[str, str]]:
+    """What the polygenic computation does NOT do, said once and carried.
+
+    The scoring itself happens in a separate process (`just-prs-mcp`), so these
+    are not defects this codebase can repair — which is exactly why they have to
+    be printed rather than left implicit. A percentile that arrives without them
+    reads as a measurement; with them it reads as what it is.
+
+    Three of the four are structural to how the score is summed, and the fourth
+    is about provenance:
+
+    · STRAND-AMBIGUOUS VARIANTS. A locus whose alleles are their own complement
+      (A/T, C/G) matches whichever strand it is reported on, so a strand flip is
+      indistinguishable from a correct call. This build identifies those loci on
+      the array path (`array_genome.strand_ambiguous_loci`, computed from the
+      catalogue) and cannot do so inside a score it does not sum.
+    · MISSING VARIANTS. A variant absent from the file is simply not added,
+      which is arithmetically the same as imputing a zero dose and biases the sum
+      downward. This one IS measured here — `weight_mass_coverage` says how much
+      of the model's weight was actually present, and the percentile is withdrawn
+      from trust below the threshold rather than printed with a footnote.
+    · HARD GENOTYPES ONLY. No dosage; an uncertain call counts as a certain one.
+    · THE REFERENCE PANEL. The percentile is a position within a reference
+      sample. The scoring package is pinned by version, not by hash, and the
+      1000 Genomes cache it downloads on first use is not pinned at all — so two
+      machines can, in principle, produce percentiles from different reference
+      data for the same genome.
+    """
+    return [{"key": k, "note": _t(f"prs.caveat.{k}")}
+            for k in ("strand_ambiguous", "missing_as_zero", "hard_genotypes",
+                      "reference_panel")]
+
+
 def PRS_DISCLAIMER() -> str:
     """The caveat specific to polygenic scores — see the note on DISCLAIMER()."""
     return _t("disclaimer.prs")
@@ -93,12 +206,57 @@ def _annotate_prs_evidence(traits: List[Dict[str, Any]]) -> None:
             t["evidence_note"] = src["evidence_note"]
 
 
+#: The same 0.90 the variant-count gate uses, applied to the WEIGHT the model
+#: actually places on what was found. Kept equal deliberately: two thresholds
+#: with different numbers would be two policies, and nobody could say which one
+#: a withdrawn percentile failed.
+_PRS_MIN_WEIGHT_MASS = 0.90
+
+
+def _withheld_by_sex(traits):
+    """(kept, withheld). A trait the catalogue marks for one sex only.
+
+    Symmetric, and it also withholds when the sex is NOT RECORDED: choosing a
+    side there would be the same failure pointing the other way. The catalogue is
+    the authority — a stored result carries no such mark, and matching is by the
+    trait term the catalogue uses.
+    """
+    marked = {}
+    for t in (core._read_knowledge("prs_traits.json").get("traits") or []):
+        if t.get("applies_to_sex"):
+            marked[(t.get("term") or "").strip().lower()] = t["applies_to_sex"]
+    if not marked:
+        return traits, []
+    sex = core.profile_sex()
+    kept, withheld = [], []
+    for t in traits:
+        need = marked.get((t.get("term") or t.get("trait") or "").strip().lower())
+        if need and need != sex:
+            withheld.append({"label": t.get("label") or t.get("term"),
+                             "applies_to_sex": need,
+                             "reason": "sex_not_recorded" if not sex else "other_sex",
+                             "note": _t("prs.withheld_by_sex" if sex
+                                        else "prs.withheld_sex_unknown", sex=need)})
+            continue
+        kept.append(t)
+    return kept, withheld
+
+
 def prs_findings() -> Dict[str, Any]:
     """Aggregated polygenic scores (profile/prs_results.json), grouped by category.
+
+    Closed on an array input for now: a score computed from a chip needs
+    imputation and an ancestry-matched reference before its percentile means
+    anything, and neither the frequency floor (task 2) nor the input quality
+    label (task 8) exists yet. Refusing with the reason is the only honest state
+    in between.
 
     Returns {categories:[{category, traits:[...]}], high[], stats, disclaimer}.
     high — the reliable traits with a percentile ≥80 (what to look at when screening).
     """
+    closed = _array_only_input()
+    if closed:
+        return closed
     data = core.prs_results()
     traits = data.get("traits", []) if isinstance(data, dict) else []
     if not traits:
@@ -119,6 +277,26 @@ def prs_findings() -> Dict[str, Any]:
         if isinstance(_mr, (int, float)) and _mr > 1.0001:
             tr["reliable"] = False
             tr["integrity_note"] = _t("prs.integrity_double")
+        # A FLAT threshold on the COUNT of matched variants is weight-blind, and
+        # a polygenic score is not a vote — its variants carry wildly different
+        # weights. Ninety per cent of the variants can be sixty per cent of the
+        # weight, and the percentile computed from what is left is a number about
+        # a different model. The engine already returns `weight_mass_coverage`;
+        # nothing consulted it. The gate now takes the WEAKER of the two and says
+        # which one withdrew trust.
+        _wm = tr.get("weight_mass_coverage")
+        if isinstance(_wm, (int, float)) and _wm < _PRS_MIN_WEIGHT_MASS:
+            tr["reliable"] = False
+            tr["weight_mass_note"] = _t("prs.weight_mass_low",
+                                        pct=round(float(_wm) * 100, 1))
+    # THE SEX GUARD, applied where the report is built and not only where the
+    # score is computed. `prs_results.json` is a stored result: it may have been
+    # computed before the person recorded their sex, or on another machine
+    # entirely, and a percentile for an organ the reader does not have would then
+    # sail through as an ordinary line. Withheld traits are NAMED — a trait that
+    # disappears from a panel in silence is indistinguishable from one that was
+    # never in it.
+    traits, withheld_by_sex = _withheld_by_sex(traits)
     _annotate_prs_evidence(traits)
     cats: Dict[str, List[Dict[str, Any]]] = {}
     order: List[str] = []
@@ -142,8 +320,17 @@ def prs_findings() -> Dict[str, Any]:
                      else _t("prs.from_a_genome_not_attached", date=_computed or "—")),
         },
         "high": high,
+        "withheld_by_sex": withheld_by_sex,
+        # Said on every report rather than remembered by whoever reads it: the
+        # sum happens in another process, and what that process does not do is
+        # part of what this number means.
+        "method_caveats": prs_method_caveats(),
         "stats": {"total": len(traits), "reliable": len(reliable),
                   "high": len(high), "superpopulation": (data.get("_meta") or {}).get("superpopulation", "EUR"),
+                  # Whether the population was STATED by the person or merely
+                  # defaulted to. The number is the same; what may be claimed
+                  # about it is not.
+                  "ancestry_stated": bool(core.profile_ancestry()),
                   "updated": (data.get("_meta") or {}).get("updated")},
         "disclaimer": PRS_DISCLAIMER(),
     }

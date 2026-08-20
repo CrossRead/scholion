@@ -1,232 +1,233 @@
 {
- "_meta": {
-  "purpose": "Labels for units of measurement, keyed by UCUM code. The marker dictionary stores the code; what a person reads is chosen here, by output language.",
-  "why": "A unit is at once input and output: it is read off a form in the language the form was printed in, and it is printed back in the language the reader asked for. Storing one string for both made the dictionary Russian by construction — «ммоль/л» was not a translatable field, it was the value the code compared. Splitting the two ends that: the code is the identity, this file is the rendering.",
-  "ucum": "https://ucum.org — the same unit language LOINC speaks, which is why it was chosen over inventing one.",
-  "annotations": "A code in braces is an annotation rather than a unit: {score} is an ordinal scale (the coprogram's «умеренно» → 3), {index} a computed index, {titer} a dilution, {log10_CFU}/g the decimal exponent of a culture count. Nothing converts these — an ordinal 3 is not three of anything — and `convertible: false` says so to code rather than to a reader.",
-  "source_of_labels": "Written out rather than composed from prefixes: «мкМЕ/мл» is not «мк» + «МЕ/мл» in any useful sense, and a composer would have to be trusted on strings it has never seen.",
-  "shape": "Each entry is an ordinary object with a `label` — a per-language map read by the same resolver as every other curated field — and, where it applies, `convertible: false`. The flag sits OUTSIDE the label rather than beside `en`/`ru`: a map with a non-language key stops being recognisable as a language map, and the audit that looks for unresolved maps would either miss it or trip over it."
- },
- "units": {
-  "mmol/L": {
-   "label": {
-    "en": "mmol/L",
-    "ru": "ммоль/л"
-   }
+  "_meta": {
+    "purpose": "Labels for units of measurement, keyed by UCUM code. The marker dictionary stores the code; what a person reads is chosen here, by output language.",
+    "why": "A unit is at once input and output: it is read off a form in the language the form was printed in, and it is printed back in the language the reader asked for. Storing one string for both made the dictionary Russian by construction — «ммоль/л» was not a translatable field, it was the value the code compared. Splitting the two ends that: the code is the identity, this file is the rendering.",
+    "ucum": "https://ucum.org — the same unit language LOINC speaks, which is why it was chosen over inventing one.",
+    "annotations": "A code in braces is an annotation rather than a unit: {score} is an ordinal scale (the coprogram's «умеренно» → 3), {index} a computed index, {titer} a dilution, {log10_CFU}/g the decimal exponent of a culture count. Nothing converts these — an ordinal 3 is not three of anything — and `convertible: false` says so to code rather than to a reader.",
+    "source_of_labels": "Written out rather than composed from prefixes: «мкМЕ/мл» is not «мк» + «МЕ/мл» in any useful sense, and a composer would have to be trusted on strings it has never seen.",
+    "shape": "Each entry is an ordinary object with a `label` — a per-language map read by the same resolver as every other curated field — and, where it applies, `convertible: false`. The flag sits OUTSIDE the label rather than beside `en`/`ru`: a map with a non-language key stops being recognisable as a language map, and the audit that looks for unresolved maps would either miss it or trip over it.",
+    "source_tier": "curated_reference"
   },
-  "umol/L": {
-   "label": {
-    "en": "µmol/L",
-    "ru": "мкмоль/л"
-   }
-  },
-  "nmol/L": {
-   "label": {
-    "en": "nmol/L",
-    "ru": "нмоль/л"
-   }
-  },
-  "pmol/L": {
-   "label": {
-    "en": "pmol/L",
-    "ru": "пмоль/л"
-   }
-  },
-  "g/L": {
-   "label": {
-    "en": "g/L",
-    "ru": "г/л"
-   }
-  },
-  "mg/L": {
-   "label": {
-    "en": "mg/L",
-    "ru": "мг/л"
-   }
-  },
-  "ug/L": {
-   "label": {
-    "en": "µg/L",
-    "ru": "мкг/л"
-   }
-  },
-  "mg/dL": {
-   "label": {
-    "en": "mg/dL",
-    "ru": "мг/дл"
-   }
-  },
-  "g/dL": {
-   "label": {
-    "en": "g/dL",
-    "ru": "г/дл"
-   }
-  },
-  "ng/mL": {
-   "label": {
-    "en": "ng/mL",
-    "ru": "нг/мл"
-   }
-  },
-  "pg/mL": {
-   "label": {
-    "en": "pg/mL",
-    "ru": "пг/мл"
-   }
-  },
-  "ng/dL": {
-   "label": {
-    "en": "ng/dL",
-    "ru": "нг/дл"
-   }
-  },
-  "ug/dL": {
-   "label": {
-    "en": "µg/dL",
-    "ru": "мкг/дл"
-   }
-  },
-  "pg": {
-   "label": {
-    "en": "pg",
-    "ru": "пг"
-   }
-  },
-  "U/L": {
-   "label": {
-    "en": "U/L",
-    "ru": "Ед/л"
-   }
-  },
-  "U/mL": {
-   "label": {
-    "en": "U/mL",
-    "ru": "Ед/мл"
-   }
-  },
-  "U": {
-   "label": {
-    "en": "U",
-    "ru": "Ед"
-   }
-  },
-  "[IU]/mL": {
-   "label": {
-    "en": "IU/mL",
-    "ru": "МЕ/мл"
-   }
-  },
-  "[IU]/L": {
-   "label": {
-    "en": "IU/L",
-    "ru": "МЕ/л"
-   }
-  },
-  "m[IU]/mL": {
-   "label": {
-    "en": "mIU/mL",
-    "ru": "мМЕ/мл"
-   }
-  },
-  "m[IU]/L": {
-   "label": {
-    "en": "mIU/L",
-    "ru": "мМЕ/л"
-   }
-  },
-  "u[IU]/mL": {
-   "label": {
-    "en": "µIU/mL",
-    "ru": "мкМЕ/мл"
-   }
-  },
-  "10*9/L": {
-   "label": {
-    "en": "10⁹/L",
-    "ru": "10⁹/л"
-   }
-  },
-  "10*12/L": {
-   "label": {
-    "en": "10¹²/L",
-    "ru": "10¹²/л"
-   }
-  },
-  "%": {
-   "label": {
-    "en": "%",
-    "ru": "%"
-   }
-  },
-  "fL": {
-   "label": {
-    "en": "fL",
-    "ru": "фл"
-   }
-  },
-  "mm/h": {
-   "label": {
-    "en": "mm/h",
-    "ru": "мм/ч"
-   }
-  },
-  "s": {
-   "label": {
-    "en": "s",
-    "ru": "сек"
-   }
-  },
-  "[pH]": {
-   "label": {
-    "en": "pH",
-    "ru": "pH"
-   }
-  },
-  "mL/min/{1.73_m2}": {
-   "label": {
-    "en": "mL/min/1.73 m²",
-    "ru": "мл/мин/1,73 м²"
-   }
-  },
-  "mmol/mol{creat}": {
-   "label": {
-    "en": "mmol/mol creat.",
-    "ru": "ммоль/моль креат."
-   }
-  },
-  "nmol/mmol{creat}": {
-   "label": {
-    "en": "nmol/mmol creat.",
-    "ru": "нмоль/ммоль креат."
-   }
-  },
-  "{log10_CFU}/g": {
-   "label": {
-    "en": "log₁₀ CFU/g",
-    "ru": "log₁₀ КОЕ/г"
-   },
-   "convertible": false
-  },
-  "{score}": {
-   "label": {
-    "en": "score",
-    "ru": "балл"
-   },
-   "convertible": false
-  },
-  "{index}": {
-   "label": {
-    "en": "index",
-    "ru": "индекс"
-   },
-   "convertible": false
-  },
-  "{titer}": {
-   "label": {
-    "en": "titre",
-    "ru": "титр"
-   },
-   "convertible": false
+  "units": {
+    "mmol/L": {
+      "label": {
+        "en": "mmol/L",
+        "ru": "ммоль/л"
+      }
+    },
+    "umol/L": {
+      "label": {
+        "en": "µmol/L",
+        "ru": "мкмоль/л"
+      }
+    },
+    "nmol/L": {
+      "label": {
+        "en": "nmol/L",
+        "ru": "нмоль/л"
+      }
+    },
+    "pmol/L": {
+      "label": {
+        "en": "pmol/L",
+        "ru": "пмоль/л"
+      }
+    },
+    "g/L": {
+      "label": {
+        "en": "g/L",
+        "ru": "г/л"
+      }
+    },
+    "mg/L": {
+      "label": {
+        "en": "mg/L",
+        "ru": "мг/л"
+      }
+    },
+    "ug/L": {
+      "label": {
+        "en": "µg/L",
+        "ru": "мкг/л"
+      }
+    },
+    "mg/dL": {
+      "label": {
+        "en": "mg/dL",
+        "ru": "мг/дл"
+      }
+    },
+    "g/dL": {
+      "label": {
+        "en": "g/dL",
+        "ru": "г/дл"
+      }
+    },
+    "ng/mL": {
+      "label": {
+        "en": "ng/mL",
+        "ru": "нг/мл"
+      }
+    },
+    "pg/mL": {
+      "label": {
+        "en": "pg/mL",
+        "ru": "пг/мл"
+      }
+    },
+    "ng/dL": {
+      "label": {
+        "en": "ng/dL",
+        "ru": "нг/дл"
+      }
+    },
+    "ug/dL": {
+      "label": {
+        "en": "µg/dL",
+        "ru": "мкг/дл"
+      }
+    },
+    "pg": {
+      "label": {
+        "en": "pg",
+        "ru": "пг"
+      }
+    },
+    "U/L": {
+      "label": {
+        "en": "U/L",
+        "ru": "Ед/л"
+      }
+    },
+    "U/mL": {
+      "label": {
+        "en": "U/mL",
+        "ru": "Ед/мл"
+      }
+    },
+    "U": {
+      "label": {
+        "en": "U",
+        "ru": "Ед"
+      }
+    },
+    "[IU]/mL": {
+      "label": {
+        "en": "IU/mL",
+        "ru": "МЕ/мл"
+      }
+    },
+    "[IU]/L": {
+      "label": {
+        "en": "IU/L",
+        "ru": "МЕ/л"
+      }
+    },
+    "m[IU]/mL": {
+      "label": {
+        "en": "mIU/mL",
+        "ru": "мМЕ/мл"
+      }
+    },
+    "m[IU]/L": {
+      "label": {
+        "en": "mIU/L",
+        "ru": "мМЕ/л"
+      }
+    },
+    "u[IU]/mL": {
+      "label": {
+        "en": "µIU/mL",
+        "ru": "мкМЕ/мл"
+      }
+    },
+    "10*9/L": {
+      "label": {
+        "en": "10⁹/L",
+        "ru": "10⁹/л"
+      }
+    },
+    "10*12/L": {
+      "label": {
+        "en": "10¹²/L",
+        "ru": "10¹²/л"
+      }
+    },
+    "%": {
+      "label": {
+        "en": "%",
+        "ru": "%"
+      }
+    },
+    "fL": {
+      "label": {
+        "en": "fL",
+        "ru": "фл"
+      }
+    },
+    "mm/h": {
+      "label": {
+        "en": "mm/h",
+        "ru": "мм/ч"
+      }
+    },
+    "s": {
+      "label": {
+        "en": "s",
+        "ru": "сек"
+      }
+    },
+    "[pH]": {
+      "label": {
+        "en": "pH",
+        "ru": "pH"
+      }
+    },
+    "mL/min/{1.73_m2}": {
+      "label": {
+        "en": "mL/min/1.73 m²",
+        "ru": "мл/мин/1,73 м²"
+      }
+    },
+    "mmol/mol{creat}": {
+      "label": {
+        "en": "mmol/mol creat.",
+        "ru": "ммоль/моль креат."
+      }
+    },
+    "nmol/mmol{creat}": {
+      "label": {
+        "en": "nmol/mmol creat.",
+        "ru": "нмоль/ммоль креат."
+      }
+    },
+    "{log10_CFU}/g": {
+      "label": {
+        "en": "log₁₀ CFU/g",
+        "ru": "log₁₀ КОЕ/г"
+      },
+      "convertible": false
+    },
+    "{score}": {
+      "label": {
+        "en": "score",
+        "ru": "балл"
+      },
+      "convertible": false
+    },
+    "{index}": {
+      "label": {
+        "en": "index",
+        "ru": "индекс"
+      },
+      "convertible": false
+    },
+    "{titer}": {
+      "label": {
+        "en": "titre",
+        "ru": "титр"
+      },
+      "convertible": false
+    }
   }
- }
 }

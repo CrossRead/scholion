@@ -1,24 +1,27 @@
 {
   "_meta": {
     "purpose": "A SHARED (de-identified) gene↔drug reference base for pharmacogenetics. Does NOT contain the data of a particular patient — the genotype is taken from profile/pharmacogenomics.json at the moment of the request. Freely shareable.",
-    "source": "Compiled by hand from the published principles of the CPIC guidelines (CPIC content is CC0, public domain). The CPIC and PharmGKB tables were not copied. Requires periodic reconciliation with the current guidelines. Variant alleles are given in dbSNP notation (forward strand).",
+    "source": "Derived from CPIC (api.cpicpgx.org, CC0), fetched 2026-08-19. Three layers, each labelled: (1) the PHENOTYPE models — allele functional status, activity-score→phenotype bands, NUDT15 function combinations — are verbatim from the CPIC tables; (2) each guidance entry that carries a `cpic` block quotes CPIC's OWN recommendation and implication wording verbatim, with its strength of recommendation; (3) the `note` beside it is this project's plain-language line for the patient, in their language — a paraphrase, and never presented as the guideline's words. Pairs without a `cpic` block have no verbatim text yet (warfarin needs the dosing algorithm, amitriptyline the joint CYP2D6+CYP2C19 table); their level and note remain project-compiled. `scholion sources --refresh --only cpic` re-checks all of this against the live source. Genotypes are never here; they come from profile/pharmacogenomics.json at request time.",
     "levels": {
       "high": "a substantial genetic factor — must be discussed with the doctor before prescribing",
       "moderate": "a noticeable factor — worth mentioning to the doctor",
       "low": "no features by the available markers / the standard approach",
       "unknown": "the gene required is not covered by the patient's data (an additional test is needed, e.g. WGS)"
-    }
+    },
+    "source_tier": "guideline_mixed",
+    "source_tier_note": "The phenotype models and the quoted recommendations are verbatim; the patient-facing notes, the severity levels, and the pairs still without a quote are compiled. One tier word would be a claim about the whole file that is false of part of it.",
+    "emits_contract": "Every gene declares `emits`: the phenotype vocabulary its model can produce. A drug's guidance table must be keyed in the vocabulary of ITS gene — a gate enforces the correspondence. Without it, changing a model's vocabulary (DPYD moved from deficient/intermediate/normal to NM/IM/PM when it became activity-score) silently orphans every row of the table keyed in the old one, and the answer falls through to the gap branch while nothing fails."
   },
   "genes_of_interest": [
     "CYP2C19",
     "CYP2C9",
     "VKORC1",
     "TPMT",
-    "MTHFR",
     "SLCO1B1",
     "CYP2D6",
     "DPYD",
-    "APOE"
+    "APOE",
+    "NUDT15"
   ],
   "track2_targets": {
     "APOE": {
@@ -140,6 +143,13 @@
             "ru": "нормальный метаболизатор"
           }
         }
+      ],
+      "emits": [
+        "UM",
+        "RM",
+        "NM",
+        "IM",
+        "PM"
       ]
     },
     "VKORC1": {
@@ -180,6 +190,11 @@
             "ru": "нормальная чувствительность"
           }
         }
+      ],
+      "emits": [
+        "high_sensitivity",
+        "intermediate_sensitivity",
+        "normal_sensitivity"
       ]
     },
     "TPMT": {
@@ -227,6 +242,11 @@
             "ru": "нормальная активность по *2 и *3C (*3A — гаплотип из двух вариантов, здесь не разрешается)"
           }
         }
+      ],
+      "emits": [
+        "NM",
+        "IM",
+        "PM"
       ]
     },
     "MTHFR": {
@@ -268,6 +288,13 @@
             "ru": "нормальная активность"
           }
         }
+      ],
+      "not_a_cpic_drug_pair": {
+        "en": "CPIC publishes no methotrexate/MTHFR (or any MTHFR drug) guideline, and ACMG recommends AGAINST clinical testing of MTHFR C677T/A1298C. MTHFR is kept for folate/longevity context only, not as a pharmacogenetic dosing signal.",
+        "ru": "У CPIC нет гайдлайна метотрексат/MTHFR (как и любого лекарственного по MTHFR), а ACMG рекомендует ПРОТИВ клинического тестирования MTHFR C677T/A1298C. MTHFR оставлен только для контекста фолатов/долголетия, не как фармакогенетический сигнал дозирования."
+      },
+      "emits": [
+        "reported"
       ]
     },
     "CYP2C9": {
@@ -286,45 +313,44 @@
           "function": "none"
         }
       ],
-      "phenotype_rules": [
+      "model": "activity_score",
+      "activity_bands": [
         {
-          "when": {
-            "none": ">=2"
-          },
-          "phenotype": "PM",
-          "label": {
-            "en": "poor metaboliser",
-            "ru": "медленный метаболизатор"
-          }
-        },
-        {
-          "when": {
-            "none": ">=1"
-          },
-          "phenotype": "IM",
-          "label": {
-            "en": "intermediate metaboliser",
-            "ru": "промежуточный метаболизатор"
-          }
-        },
-        {
-          "when": {
-            "decreased": ">=1"
-          },
-          "phenotype": "IM",
-          "label": {
-            "en": "intermediate metaboliser",
-            "ru": "промежуточный метаболизатор"
-          }
-        },
-        {
-          "default": true,
+          "min": 2.0,
+          "max": 2.0,
           "phenotype": "NM",
           "label": {
-            "en": "normal metaboliser",
-            "ru": "нормальный метаболизатор"
+            "en": "normal metaboliser (activity score 2.0)",
+            "ru": "нормальный метаболизатор (activity score 2.0)"
+          }
+        },
+        {
+          "min": 1.0,
+          "max": 1.5,
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser (activity score 1.0–1.5)",
+            "ru": "промежуточный метаболизатор (activity score 1.0–1.5)"
+          }
+        },
+        {
+          "min": 0.0,
+          "max": 0.5,
+          "phenotype": "PM",
+          "label": {
+            "en": "poor metaboliser (activity score 0.0–0.5)",
+            "ru": "медленный метаболизатор (activity score 0.0–0.5)"
           }
         }
+      ],
+      "activity_source": "Allele activity values and score→phenotype bands taken verbatim from CPIC (api.cpicpgx.org/v1/allele and /v1/diplotype, fetched 2026-08-19; CPIC content is CC0). Replaces the earlier count-by-function rules, which read CYP2C9 *2/*3 as intermediate; the activity score 0.5 is a poor metaboliser.",
+      "_phenotype_rules_retired": "superseded by the activity_score model above; kept out of the computation. The count model could not express an activity score.",
+      "emits": [
+        "UM",
+        "RM",
+        "NM",
+        "IM",
+        "PM"
       ]
     },
     "SLCO1B1": {
@@ -366,6 +392,11 @@
             "ru": "нормальная функция"
           }
         }
+      ],
+      "emits": [
+        "normal_function",
+        "intermediate_function",
+        "low_function"
       ]
     },
     "DPYD": {
@@ -422,35 +453,89 @@
           "function": "decreased"
         }
       ],
+      "model": "activity_score",
+      "activity_bands": [
+        {
+          "min": 2.0,
+          "max": 2.0,
+          "phenotype": "NM",
+          "label": {
+            "en": "normal metaboliser (activity score 2.0)",
+            "ru": "нормальный метаболизатор (activity score 2.0)"
+          }
+        },
+        {
+          "min": 1.0,
+          "max": 1.5,
+          "phenotype": "IM",
+          "label": {
+            "en": "intermediate metaboliser (activity score 1.0–1.5)",
+            "ru": "промежуточный метаболизатор (activity score 1.0–1.5)"
+          }
+        },
+        {
+          "min": 0.0,
+          "max": 0.5,
+          "phenotype": "PM",
+          "label": {
+            "en": "poor metaboliser (activity score 0.0–0.5)",
+            "ru": "медленный метаболизатор (activity score 0.0–0.5)"
+          }
+        }
+      ],
+      "activity_source": "Allele activity values and score→phenotype bands taken verbatim from CPIC (api.cpicpgx.org/v1/allele and /v1/diplotype, fetched 2026-08-19; CPIC content is CC0). Replaces the earlier count-by-function rules, which read CYP2C9 *2/*3 as intermediate; the activity score 0.5 is a poor metaboliser.",
+      "_phenotype_rules_retired": "superseded by the activity_score model above; kept out of the computation. The count model could not express an activity score.",
+      "emits": [
+        "NM",
+        "IM",
+        "PM"
+      ]
+    },
+    "NUDT15": {
+      "type": "metabolizer",
+      "source": "CPIC NUDT15 allele functionality (api.cpicpgx.org, CC0, 2026-08-19): *3 (rs116855232, c.415C>T) no function. Function-combination phenotype, not activity score.",
+      "markers": [
+        {
+          "rsid": "rs116855232",
+          "star": "*3",
+          "variant_allele": "T",
+          "function": "none"
+        }
+      ],
       "phenotype_rules": [
+        {
+          "when": {
+            "none": ">=2"
+          },
+          "phenotype": "PM",
+          "label": {
+            "en": "NUDT15 poor metaboliser",
+            "ru": "NUDT15 медленный метаболизатор"
+          }
+        },
         {
           "when": {
             "none": ">=1"
           },
-          "phenotype": "deficient",
+          "phenotype": "IM",
           "label": {
-            "en": "DPD deficiency (a high risk of fluoropyrimidine toxicity)",
-            "ru": "дефицит DPD (высокий риск токсичности фторпиримидинов)"
-          }
-        },
-        {
-          "when": {
-            "decreased": ">=1"
-          },
-          "phenotype": "intermediate",
-          "label": {
-            "en": "intermediate DPD activity",
-            "ru": "промежуточная активность DPD"
+            "en": "NUDT15 intermediate metaboliser",
+            "ru": "NUDT15 промежуточный метаболизатор"
           }
         },
         {
           "default": true,
-          "phenotype": "normal",
+          "phenotype": "NM",
           "label": {
-            "en": "normal DPD activity",
-            "ru": "нормальная активность DPD"
+            "en": "NUDT15 normal metaboliser",
+            "ru": "NUDT15 нормальный метаболизатор"
           }
         }
+      ],
+      "emits": [
+        "NM",
+        "IM",
+        "PM"
       ]
     }
   },
@@ -478,6 +563,12 @@
           "note": {
             "en": "A poor metaboliser → the active metabolite is formed poorly, the antiplatelet effect may be insufficient. Discuss an alternative with the doctor (prasugrel/ticagrelor).",
             "ru": "Медленный метаболизатор → активный метаболит образуется плохо, антиагрегантный эффект может быть недостаточным. Обсудить с врачом альтернативу (прасугрел/тикагрелор)."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Avoid clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+            "implication": "Significantly reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events",
+            "classification": "Strong"
           }
         },
         "IM": {
@@ -485,6 +576,12 @@
           "note": {
             "en": "There is a loss-of-function allele → activation may be reduced, a risk of an insufficient effect. Discuss with the doctor an alternative or a platelet function test.",
             "ru": "Есть аллель потери функции → активация может быть снижена, риск недостаточного эффекта. Обсудить с врачом альтернативу или тест функции тромбоцитов."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Avoid standard dose (75 mg) clopidogrel if possible. Use prasugrel or ticagrelor at standard dose if no contraindication.",
+            "implication": "Reduced clopidogrel active metabolite formation; increased on-treatment platelet reactivity; increased risk for adverse cardiac and cerebrovascular events",
+            "classification": "Strong"
           }
         },
         "RM": {
@@ -492,6 +589,12 @@
           "note": {
             "en": "The standard approach for this gene.",
             "ru": "Стандартный подход по этому гену."
+          },
+          "cpic": {
+            "phenotype": "Rapid Metabolizer",
+            "recommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+            "implication": "Normal or increased clopidogrel active metabolite formation; normal or lower on-treatment platelet reactivity; no association with higher bleeding risk",
+            "classification": "Strong"
           }
         },
         "UM": {
@@ -499,6 +602,12 @@
           "note": {
             "en": "The standard approach for this gene.",
             "ru": "Стандартный подход по этому гену."
+          },
+          "cpic": {
+            "phenotype": "Ultrarapid Metabolizer",
+            "recommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+            "implication": "Increased clopidogrel active metabolite formation; lower on-treatment platelet reactivity; no association with higher bleeding risk",
+            "classification": "Strong"
           }
         },
         "NM": {
@@ -506,6 +615,12 @@
           "note": {
             "en": "The standard approach for this gene.",
             "ru": "Стандартный подход по этому гену."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "If considering clopidogrel, use at standard dose (75 mg/day)",
+            "implication": "Normal clopidogrel active metabolite formation; normal on-treatment platelet reactivity",
+            "classification": "Strong"
           }
         },
         "default": {
@@ -515,7 +630,8 @@
             "ru": "Уточнить CYP2C19-статус; при снижении функции обсудить с врачом."
           }
         }
-      }
+      },
+      "cpic_drug": "clopidogrel"
     },
     {
       "names": [
@@ -545,6 +661,12 @@
           "note": {
             "en": "Accelerated metabolism → exposure and efficacy may be reduced; if the response is insufficient, discuss the dose/the choice with the doctor.",
             "ru": "Ускоренный метаболизм → возможна сниженная экспозиция и эффективность; при недостаточном ответе обсудить с врачом дозу/выбор."
+          },
+          "cpic": {
+            "phenotype": "Ultrarapid Metabolizer",
+            "recommendation": "Increase starting daily dose by 100%. Daily dose may be given in divided doses. Monitor for efficacy.",
+            "implication": "Decreased plasma concentrations of PPIs compared to CYP2C19 NMs; increased risk of therapeutic failure",
+            "classification": "Optional"
           }
         },
         "RM": {
@@ -552,6 +674,12 @@
           "note": {
             "en": "Exposure may be reduced; take this into account if the response is insufficient.",
             "ru": "Возможна сниженная экспозиция; учитывать при недостаточном ответе."
+          },
+          "cpic": {
+            "phenotype": "Rapid Metabolizer",
+            "recommendation": "Initiate standard starting daily dose. Consider increasing dose by 50-100% for the treatment of H. pylori infection and erosive esophagitis. Daily dose may be given in divided doses.\nMonitor for efficacy.",
+            "implication": "Decreased plasma concentrations of PPIs compared to CYP2C19 NMs; increased risk of therapeutic failure",
+            "classification": "Moderate"
           }
         },
         "PM": {
@@ -559,6 +687,12 @@
           "note": {
             "en": "Increased exposure — usually favourable for efficacy; in some cases a lower dose can be discussed.",
             "ru": "Повышенная экспозиция — обычно благоприятно для эффективности; в ряде случаев можно обсудить меньшую дозу."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+            "implication": "Increased plasma concentration of PPI compared to CYP2C19 NMs; increased chance of efficacy and potentially toxicity",
+            "classification": "Moderate"
           }
         },
         "IM": {
@@ -566,6 +700,12 @@
           "note": {
             "en": "The standard approach.",
             "ru": "Стандартный подход."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Initiate standard starting daily dose. For chronic therapy (>12 weeks) and efficacy achieved, consider 50% reduction in daily dose and monitor for continued efficacy.",
+            "implication": "Increased plasma concentration of PPI compared to CYP2C19 NMs; increased chance of efficacy and potentially toxicity",
+            "classification": "Optional"
           }
         },
         "NM": {
@@ -573,6 +713,12 @@
           "note": {
             "en": "The standard approach.",
             "ru": "Стандартный подход."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Initiate standard starting daily dose. Consider increasing dose by 50-100% for the treatment of H. pylori infection and erosive esophagitis. Daily dose may be given in divided doses.\nMonitor for efficacy.",
+            "implication": "Normal PPI metabolism; may be at increased risk of therapeutic failure compared to CYP2C19 IMs and PMs",
+            "classification": "Moderate"
           }
         },
         "default": {
@@ -582,7 +728,8 @@
             "ru": "Существенных особенностей по маркерам не выявлено."
           }
         }
-      }
+      },
+      "cpic_drug": "omeprazole"
     },
     {
       "names": [
@@ -603,11 +750,43 @@
         "ru": "CYP2C19 метаболизирует циталопрам/эсциталопрам/сертралин; влияет на экспозицию."
       },
       "guidance": {
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "Normal CYP2C19 metabolism — the recommended starting dose applies.",
+            "ru": "Нормальный метаболизм CYP2C19 — действует рекомендованная стартовая доза."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Initiate therapy with recommended starting dose",
+            "implication": "Normal metabolism",
+            "classification": "Strong"
+          }
+        },
+        "IM": {
+          "level": "moderate",
+          "note": {
+            "en": "Reduced metabolism — the concentration is higher, so side effects are likelier; the starting dose is unchanged but titration should be slower. Discuss with the doctor.",
+            "ru": "Сниженный метаболизм — концентрация выше, побочные вероятнее; стартовая доза та же, но наращивать медленнее. Обсудите с врачом."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Initiate therapy with recommended starting dose. Consider a slower titration schedule and lower maintenance dose than normal metabolizers.",
+            "implication": "Reduced metabolism when compared to CYP2C19 normal metabolizers. Higher plasma concentrations may increase the probability of side effects.",
+            "classification": "Moderate"
+          }
+        },
         "UM": {
           "level": "moderate",
           "note": {
             "en": "Accelerated metabolism → the concentration may be reduced; if the response is insufficient, discuss the dose/an alternative.",
             "ru": "Ускоренный метаболизм → возможна сниженная концентрация; при недостаточном ответе обсудить дозу/альтернативу."
+          },
+          "cpic": {
+            "phenotype": "Ultrarapid Metabolizer",
+            "recommendation": "Consider a clinically appropriate alternative antidepressant not predominantly metabolized by CYP2C19. If citalopram or escitalopram are clinically appropriate, and adequate efficacy is not achieved at standard maintenance dosing, consider titrating to a higher maintenance dose.",
+            "implication": "Increased metabolism of citalopram and escitalopram to less active compounds when compared to CYP2C19 rapid and normal metabolizers. Lower plasma concentrations decrease the probability of clinical benefit.",
+            "classification": "Strong"
           }
         },
         "RM": {
@@ -615,6 +794,12 @@
           "note": {
             "en": "The concentration may be reduced.",
             "ru": "Возможна сниженная концентрация."
+          },
+          "cpic": {
+            "phenotype": "Rapid Metabolizer",
+            "recommendation": "Initiate therapy with recommended starting dose. If patient does not adequately respond to recommended maintenance dosing, consider titrating to a higher maintenance dose or switching to a clinically appropriate alternative antidepressant not predominantly metabolized by CYP2C19.",
+            "implication": "Increase in metabolism of citalopram and escitalopram to less active compounds when compared to CYP2C19 normal metabolizers. Lower plasma concentrations decrease the probability of clinical benefit.",
+            "classification": "Optional"
           }
         },
         "PM": {
@@ -622,6 +807,12 @@
           "note": {
             "en": "Increased concentration → CPIC recommends considering a reduced dose of citalopram/escitalopram.",
             "ru": "Повышенная концентрация → CPIC рекомендует рассмотреть сниженную дозу циталопрама/эсциталопрама."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Consider a clinically appropriate antidepressant not predominantly metabolized by CYP2C19. If citalopram or escitalopram are clinically appropriate, consider a lower starting dose, slower titration schedule and 50% reduction of the standard maintenance dose as compared to normal metabolizers.",
+            "implication": "Reduced metabolism of citalopram and escitalopram to less active compounds when compared to CYP2C19 normal and intermediate metabolizers. Higher plasma concentrations may increase the probability of side effects.",
+            "classification": "Strong"
           }
         },
         "default": {
@@ -631,7 +822,8 @@
             "ru": "Существенных особенностей по маркерам не выявлено."
           }
         }
-      }
+      },
+      "cpic_drug": "citalopram"
     },
     {
       "names": [
@@ -651,6 +843,48 @@
         "ru": "CYP2C19 (и CYP2D6) метаболизируют трициклики; влияют на соотношение препарат/метаболит."
       },
       "guidance": {
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "Normal CYP2C19 metabolism — the usual starting dose applies. A full assessment also needs CYP2D6.",
+            "ru": "Нормальный метаболизм CYP2C19 — действует обычная стартовая доза. Для полной оценки нужен также CYP2D6."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Initiate therapy with recommended starting dose.",
+            "implication": "Normal metabolism of tertiary amines",
+            "classification": "Strong",
+            "assumes": "CPIC's amitriptyline table is keyed on CYP2D6 AND CYP2C19 together. The quote below is the row for a NORMAL CYP2D6; if CYP2D6 is not normal the row differs, which is why CYP2D6 is named as a co-gene and why an unresolved CYP2D6 is said so rather than assumed away."
+          }
+        },
+        "IM": {
+          "level": "low",
+          "note": {
+            "en": "Intermediate CYP2C19 metabolism — with a normal CYP2D6 the starting dose is unchanged. A full assessment also needs CYP2D6.",
+            "ru": "Промежуточный метаболизм CYP2C19 — при нормальном CYP2D6 стартовая доза не меняется. Для полной оценки нужен также CYP2D6."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Initiate therapy with recommended starting dose.",
+            "implication": "Reduced metabolism of tertiary amines compared to normal metabolizers",
+            "classification": "Strong",
+            "assumes": "CPIC's amitriptyline table is keyed on CYP2D6 AND CYP2C19 together. The quote below is the row for a NORMAL CYP2D6; if CYP2D6 is not normal the row differs, which is why CYP2D6 is named as a co-gene and why an unresolved CYP2D6 is said so rather than assumed away."
+          }
+        },
+        "PM": {
+          "level": "high",
+          "note": {
+            "en": "Poor CYP2C19 metabolism — concentrations rise and CPIC advises avoiding amitriptyline; if it is used, a halved starting dose and drug-level monitoring. Discuss with the doctor.",
+            "ru": "Медленный метаболизм CYP2C19 — концентрация растёт, CPIC советует избегать амитриптилина; если он назначен — половинная стартовая доза и контроль концентрации. Обсудите с врачом."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Avoid amitriptyline use. If amitripyline is warranted, consider a 50% reduction of recommended starting dose. Utilize therapeutic drug monitoring to guide dose adjustments.",
+            "implication": "Greatly reduced metabolism of tertiary amines compared to normal metabolizers; Decreased conversion of tertiary amines to secondary amines may affect response or side effects",
+            "classification": "Moderate",
+            "assumes": "CPIC's amitriptyline table is keyed on CYP2D6 AND CYP2C19 together. The quote below is the row for a NORMAL CYP2D6; if CYP2D6 is not normal the row differs, which is why CYP2D6 is named as a co-gene and why an unresolved CYP2D6 is said so rather than assumed away."
+          }
+        },
         "default": {
           "level": "moderate",
           "note": {
@@ -658,7 +892,25 @@
             "ru": "Для полной оценки ТЦА нужен также CYP2D6 (полный диплотип, WGS). Обсудить с врачом."
           }
         }
-      }
+      },
+      "also_genes": [
+        "CYP2D6"
+      ],
+      "guidance_gaps": {
+        "RM": {
+          "guidance_gap_reason": {
+            "en": "CPIC's row for a CYP2C19 rapid metaboliser has not been imported verbatim yet — writing one from memory is what this work exists to stop.",
+            "ru": "Строка CPIC для быстрого метаболизатора CYP2C19 ещё не импортирована дословно — писать её по памяти как раз то, что эта работа призвана прекратить."
+          }
+        },
+        "UM": {
+          "guidance_gap_reason": {
+            "en": "CPIC's row for a CYP2C19 ultrarapid metaboliser has not been imported verbatim yet.",
+            "ru": "Строка CPIC для сверхбыстрого метаболизатора CYP2C19 ещё не импортирована дословно."
+          }
+        }
+      },
+      "cpic_drug": "amitriptyline"
     },
     {
       "names": [
@@ -675,11 +927,43 @@
         "ru": "CYP2C19 — основной путь метаболизма вориконазола."
       },
       "guidance": {
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "Normal voriconazole metabolism — standard of care dosing applies.",
+            "ru": "Нормальный метаболизм вориконазола — действует стандартное дозирование."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Initiate therapy with recommended standard of care dosing",
+            "implication": "Normal voriconazole metabolism",
+            "classification": "Strong"
+          }
+        },
+        "IM": {
+          "level": "moderate",
+          "note": {
+            "en": "Higher trough concentrations than a normal metaboliser — standard dosing still applies, and drug-level monitoring is worth discussing.",
+            "ru": "Более высокие остаточные концентрации, чем у нормального метаболизатора — стандартное дозирование сохраняется, контроль концентрации стоит обсудить."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Initiate therapy with recommended standard of care dosing",
+            "implication": "Higher dose-adjusted trough concentrations of voriconazole compared with normal metabolizers",
+            "classification": "Moderate"
+          }
+        },
         "UM": {
           "level": "moderate",
           "note": {
             "en": "Subtherapeutic concentrations are possible → discuss concentration monitoring (TDM).",
             "ru": "Возможны субтерапевтические концентрации → обсудить контроль концентрации (TDM)."
+          },
+          "cpic": {
+            "phenotype": "Ultrarapid Metabolizer",
+            "recommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include liposomal amphotericin B and posaconazole.",
+            "implication": "In patients for whom an ultrarapid metabolizer genotype (*17/*17) is identified, the probability of attainment of therapeutic concentrations is small",
+            "classification": "Moderate"
           }
         },
         "RM": {
@@ -687,6 +971,12 @@
           "note": {
             "en": "Reduced concentrations are possible → consider TDM.",
             "ru": "Возможны сниженные концентрации → рассмотреть TDM."
+          },
+          "cpic": {
+            "phenotype": "Rapid Metabolizer",
+            "recommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include isavuconazole, liposomal amphotericin B, and posaconazole.",
+            "implication": "In patients for whom a rapid metabolizer genotype (*1/*17) is identified, the probability of attainment of therapeutic concentrations is modest with standard dosing",
+            "classification": "Moderate"
           }
         },
         "PM": {
@@ -694,6 +984,12 @@
           "note": {
             "en": "Increased concentrations → a risk of toxicity, discuss the dose/TDM.",
             "ru": "Повышенные концентрации → риск токсичности, обсудить дозу/TDM."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Choose an alternative agent that is not dependent on CYP2C19 metabolism as primary therapy in lieu of voriconazole. Such agents include liposomal amphotericin B and posaconazole. In the event that voriconazole is considered to be the most appropriate agent, based on clinical advice, for a patient with poor metabolizer genotype, voriconazole should be administered at a preferably lower than standard dosage with careful therapeutic drug monitoring.",
+            "implication": "Higher dose-adjusted trough concentrations of voriconazole and may increase probability of adverse events",
+            "classification": "Moderate"
           }
         },
         "default": {
@@ -703,7 +999,8 @@
             "ru": "Особенностей по маркерам не выявлено."
           }
         }
-      }
+      },
+      "cpic_drug": "voriconazole"
     },
     {
       "names": [
@@ -720,6 +1017,13 @@
         "ru": "VKORC1 — мишень варфарина; чувствительность влияет на стартовую дозу."
       },
       "guidance": {
+        "normal_sensitivity": {
+          "level": "low",
+          "note": {
+            "en": "Normal VKORC1 sensitivity — no genetic reason to shift the starting dose. The dose itself comes from a validated algorithm that also needs CYP2C9, and from INR monitoring.",
+            "ru": "Нормальная чувствительность VKORC1 — генетических причин смещать стартовую дозу нет. Сама доза считается по валидированному алгоритму, которому нужен ещё CYP2C9, и по контролю МНО."
+          }
+        },
         "high_sensitivity": {
           "level": "high",
           "note": {
@@ -741,6 +1045,14 @@
             "ru": "Дозирование варфарина требует также CYP2C9 и контроля МНО."
           }
         }
+      },
+      "guidance_gaps": {
+        "__all__": {
+          "guidance_gap_reason": {
+            "en": "CPIC publishes warfarin dosing as an algorithm over CYP2C9, VKORC1 and CYP4F2 plus clinical factors, not as a sentence per phenotype, so no row here carries a verbatim quote.",
+            "ru": "CPIC публикует дозирование варфарина как алгоритм по CYP2C9, VKORC1 и CYP4F2 плюс клинические факторы, а не как фразу на каждый фенотип, поэтому ни одна строка здесь не несёт дословной цитаты."
+          }
+        }
       }
     },
     {
@@ -758,8 +1070,8 @@
         "ru": "тиопурин/иммунодепрессант"
       },
       "why": {
-        "en": "TPMT metabolises thiopurines; low activity → a risk of myelotoxicity.",
-        "ru": "TPMT метаболизирует тиопурины; низкая активность → риск миелотоксичности."
+        "en": "TPMT and NUDT15 both metabolise thiopurines; low activity in EITHER raises the risk of myelotoxicity. CPIC dosing follows the more severe of the two.",
+        "ru": "TPMT и NUDT15 оба метаболизируют тиопурины; низкая активность ЛЮБОГО повышает риск миелотоксичности. Доза по CPIC — по более тяжёлому из двух."
       },
       "guidance": {
         "PM": {
@@ -767,6 +1079,12 @@
           "note": {
             "en": "Low TPMT activity → a high risk of myelotoxicity; discuss with the doctor a substantial dose reduction/an alternative.",
             "ru": "Низкая активность TPMT → высокий риск миелотоксичности; обсудить с врачом существенное снижение дозы/альтернативу."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Consider alternative nonthiopurine immunosuppressant therapy.",
+            "implication": "TPMT PMs have extremely high erythrocyte concentrations of TGN metabolites and no MeMPN compared to TPMT NMs.",
+            "classification": "Strong"
           }
         },
         "IM": {
@@ -774,6 +1092,12 @@
           "note": {
             "en": "Intermediate activity → discuss with the doctor a reduction of the starting dose and monitoring of the complete blood count.",
             "ru": "Промежуточная активность → обсудить с врачом снижение стартовой дозы и контроль ОАК."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Initiate therapy with reduced starting doses (30-80% of standard starting dose) if standard starting dose is ≥2 mg/kg/day. If starting dose is already below standard starting dose, dose reduction might not be necessary. During therapy, adjust the doses of azathioprine based on the degree of myelosuppression and disease-specific guidelines. It usually takes at least 2-4 weeks of stable dosing to reach steady state after each dose adjustment.",
+            "implication": "TPMT IMs have moderate to high erythrocyte concentrations of TGN metabolites and low concentrations of MeMPNs compared to TPMT NMs.",
+            "classification": "Strong"
           }
         },
         "NM": {
@@ -781,6 +1105,12 @@
           "note": {
             "en": "Normal by this marker; for completeness it is desirable to assess *3A/*3C and/or the enzyme activity.",
             "ru": "По маркеру норма; для полноты желательно оценить *3A/*3C и/или активность фермента."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Initiate therapy with standard starting dose (e.g., 2 mg/kg/day for autoimmune diseases). During therapy, adjust doses of azathioprine based on disease-specific guidelines. It usually takes at least 2 weeks to reach steady state after each dose adjustment.",
+            "implication": "TPMT NMs have lower erythrocyte concentrations of TGN metabolites and higher concentrations of MeMPNs compared to TPMT IMs and TPMT PMs. This is the 'normal' pattern.",
+            "classification": "Strong"
           }
         },
         "default": {
@@ -790,45 +1120,11 @@
             "ru": "Оценить TPMT-статус перед назначением."
           }
         }
-      }
-    },
-    {
-      "names": [
-        "метотрексат",
-        "methotrexate"
+      },
+      "also_genes": [
+        "NUDT15"
       ],
-      "gene": "MTHFR",
-      "class": {
-        "en": "immunosuppressant / chemotherapy",
-        "ru": "иммунодепрессант/химио"
-      },
-      "why": {
-        "en": "MTHFR affects folate metabolism; it may modulate tolerability.",
-        "ru": "MTHFR влияет на фолатный обмен; может модулировать переносимость."
-      },
-      "guidance": {
-        "low": {
-          "level": "moderate",
-          "note": {
-            "en": "Decreased MTHFR activity → discuss with the doctor folate support and monitoring of tolerability.",
-            "ru": "Сниженная активность MTHFR → обсудить с врачом поддержку фолатами и контроль переносимости."
-          }
-        },
-        "intermediate": {
-          "level": "moderate",
-          "note": {
-            "en": "Moderately decreased activity → discuss adequate folate support.",
-            "ru": "Умеренно сниженная активность → обсудить адекватную поддержку фолатами."
-          }
-        },
-        "default": {
-          "level": "low",
-          "note": {
-            "en": "There are no substantial features.",
-            "ru": "Существенных особенностей нет."
-          }
-        }
-      }
+      "cpic_drug": "azathioprine"
     },
     {
       "names": [
@@ -859,6 +1155,12 @@
           "note": {
             "en": "Low SLCO1B1 function → a high risk of statin myopathy. Discuss with the doctor the choice of statin (not simvastatin at a high dose), a reduced dose and monitoring of CK/symptoms.",
             "ru": "Низкая функция SLCO1B1 → высокий риск статин-миопатии. Обсудить с врачом выбор статина (не симвастатин в высокой дозе), сниженную дозу и контроль КФК/симптомов."
+          },
+          "cpic": {
+            "phenotype": "Poor Function",
+            "recommendation": "Prescribe an alternative statin depending on the desired potency (see Figure 1 of PMID: 35152405 for recommendations for alternative statins).",
+            "implication": "Increased simvastatin acid exposure compared to normal and decreased function; highly increased myopathy risk",
+            "classification": "Strong"
           }
         },
         "intermediate_function": {
@@ -866,6 +1168,12 @@
           "note": {
             "en": "Intermediate SLCO1B1 function → a moderately increased risk of myopathy; take this into account when choosing the dose, especially of simvastatin.",
             "ru": "Промежуточная функция SLCO1B1 → умеренно повышенный риск миопатии; учитывать при выборе дозы, особенно симвастатина."
+          },
+          "cpic": {
+            "phenotype": "Decreased Function",
+            "recommendation": "Prescribe an alternative statin depending on the desired potency (see Figure 1 of PMID: 35152405 for recommendations for alternative statins). If simvastatin therapy is warranted, limit dose to <20mg/day.",
+            "implication": "Increased simvastatin acid exposure as compared to normal function; increased risk of myopathy",
+            "classification": "Strong"
           }
         },
         "normal_function": {
@@ -873,13 +1181,19 @@
           "note": {
             "en": "There are no features by SLCO1B1; the standard approach.",
             "ru": "По SLCO1B1 особенностей нет; стандартный подход."
+          },
+          "cpic": {
+            "phenotype": "Normal Function",
+            "recommendation": "Prescribe desired starting dose and adjust doses based on disease-specific guidelines.",
+            "implication": "Typical myopathy risk and statin exposure",
+            "classification": "Strong"
           }
         },
         "unknown": {
           "level": "unknown",
           "note": {
-            "en": "The SLCO1B1 genotype is unknown — an additional test is needed (WGS). With dyslipidaemia and likely statin therapy this marker is worth obtaining as a priority.",
-            "ru": "Генотип SLCO1B1 неизвестен — нужен доп. анализ (WGS). При дислипидемии и вероятной статинотерапии этот маркёр стоит получить в приоритете."
+            "en": "The SLCO1B1 genotype is unknown — an additional test is needed (WGS). Where dyslipidaemia and statin therapy apply, this marker is a priority to obtain.",
+            "ru": "Генотип SLCO1B1 неизвестен — нужен доп. анализ (WGS). Если применимы дислипидемия и статинотерапия, этот маркёр — в приоритете."
           }
         },
         "default": {
@@ -889,7 +1203,8 @@
             "ru": "Нужен генотип SLCO1B1 (rs4149056)."
           }
         }
-      }
+      },
+      "cpic_drug": "simvastatin"
     },
     {
       "names": [
@@ -908,6 +1223,52 @@
         "ru": "CYP2D6 активирует кодеин/трамадол в активные метаболиты; фенотип определяет эффективность и риск."
       },
       "guidance": {
+        "UM": {
+          "level": "high",
+          "note": {
+            "en": "An ultrarapid metaboliser turns codeine into morphine faster — a risk of serious toxicity even at an ordinary dose. Discuss another pain medicine with the doctor.",
+            "ru": "Сверхбыстрый метаболизатор превращает кодеин в морфин быстрее — риск серьёзной токсичности даже на обычной дозе. Обсудите с врачом другое обезболивающее."
+          },
+          "cpic": {
+            "phenotype": "Ultrarapid Metabolizer",
+            "recommendation": "Avoid codeine use because of potential for serious toxicity. If opioid use is warranted, consider a non-tramadol opioid.",
+            "implication": "Increased formation of morphine leading to higher risk of toxicity",
+            "classification": "Strong"
+          }
+        },
+        "PM": {
+          "level": "high",
+          "note": {
+            "en": "A poor metaboliser forms almost no morphine from codeine — the pain relief may simply not arrive. Discuss another pain medicine with the doctor.",
+            "ru": "Медленный метаболизатор почти не образует морфин из кодеина — обезболивания может просто не быть. Обсудите с врачом другое обезболивающее."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Avoid codeine use because of possibility of diminished analgesia. If opioid use is warranted, consider a non-tramadol opioid.",
+            "implication": "Greatly reduced morphine formation leading to diminished analgesia.",
+            "classification": "Strong"
+          }
+        },
+        "IM": {
+          "level": "moderate",
+          "note": {
+            "en": "An intermediate metaboliser forms less morphine; the label dose is the starting point, and if it does not work the choice is worth discussing.",
+            "ru": "Промежуточный метаболизатор образует меньше морфина; доза по инструкции — отправная точка, и если она не работает, выбор стоит обсудить."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Use codeine label recommended age- or weight-specific dosing. If no response and opioid use is warranted, consider a non-tramadol opioid.",
+            "implication": "Reduced morphine formation",
+            "classification": "Moderate"
+          }
+        },
+        "NM": {
+          "level": "low",
+          "note": {
+            "en": "A normal metaboliser — codeine is converted as expected; the usual dosing applies.",
+            "ru": "Нормальный метаболизатор — кодеин превращается как ожидается; действует обычное дозирование."
+          }
+        },
         "unknown": {
           "level": "unknown",
           "note": {
@@ -922,7 +1283,8 @@
             "ru": "Нужен полный CYP2D6-диплотип."
           }
         }
-      }
+      },
+      "cpic_drug": "codeine"
     },
     {
       "names": [
@@ -943,25 +1305,43 @@
         "ru": "DPYD расщепляет фторпиримидины; дефицит → тяжёлая токсичность."
       },
       "guidance": {
-        "deficient": {
+        "PM": {
           "level": "high",
           "note": {
             "en": "A DPYD loss-of-function variant has been found → a high risk of severe fluoropyrimidine toxicity. Before prescribing, discuss with the oncologist a substantial dose reduction/an alternative.",
             "ru": "Найден вариант потери функции DPYD → высокий риск тяжёлой токсичности фторпиримидинов. Перед назначением обсудить с онкологом существенное снижение дозы/альтернативу."
+          },
+          "cpic": {
+            "phenotype": "Poor Metabolizer",
+            "recommendation": "Avoid use of 5-fluorouracil or 5-fluorouracil prodrug-based regimens. In the event, based on clinical advice, alternative agents are not considered a suitable therapeutic option, 5-fluorouracil should be administered at a strongly reduced dose with early therapeutic drug monitoring.",
+            "implication": "Complete DPD deficiency and increased risk for severe or even fatal drug toxicity when treated with fluoropyrimidine drugs.",
+            "classification": "Strong"
           }
         },
-        "intermediate": {
+        "IM": {
           "level": "high",
           "note": {
             "en": "Intermediate DPD activity → an increased risk of toxicity; discuss with the oncologist a reduction of the starting dose.",
             "ru": "Промежуточная активность DPD → повышенный риск токсичности; обсудить с онкологом снижение стартовой дозы."
+          },
+          "cpic": {
+            "phenotype": "Intermediate Metabolizer",
+            "recommendation": "Reduce starting dose by 50% followed by titration of dose based on toxicity or therapeutic drug monitoring (if available).",
+            "implication": "Decreased DPD activity (leukocyte DPD activity at 30% to 70% that of the normal population) and increased risk for severe or even fatal drug toxicity when treated with fluoropyrimidine drugs",
+            "classification": "Moderate"
           }
         },
-        "normal": {
+        "NM": {
           "level": "low",
           "note": {
             "en": "Normal by the DPYD markers examined (this does not fully exclude a deficiency; rare variants are outside the panel).",
             "ru": "По исследованным маркерам DPYD — норма (полностью дефицит не исключает; редкие варианты вне панели)."
+          },
+          "cpic": {
+            "phenotype": "Normal Metabolizer",
+            "recommendation": "Based on genotype, there is no indication to change dose or therapy. Use label-recommended dosage and administration.",
+            "implication": "Normal DPD activity and \"normal\" risk for fluoropyrimidine toxicity",
+            "classification": "Strong"
           }
         },
         "unknown": {
@@ -978,6 +1358,25 @@
             "ru": "Нужен генотип DPYD."
           }
         }
+      },
+      "cpic_drug": "fluorouracil"
+    },
+    {
+      "names": [
+        "метотрексат",
+        "methotrexate",
+        "методжект",
+        "metoject"
+      ],
+      "gene": null,
+      "no_pgx": true,
+      "class": {
+        "en": "immunosuppressant / chemotherapy",
+        "ru": "иммунодепрессант / химиотерапия"
+      },
+      "note": {
+        "en": "CPIC publishes no methotrexate pharmacogenetic guideline, and ACMG recommends AGAINST clinical testing of MTHFR C677T/A1298C for drug dosing. There is no pharmacogenetic dosing signal to report for this drug; MTHFR is folate-context only.",
+        "ru": "У CPIC нет фармакогенетического гайдлайна по метотрексату, а ACMG рекомендует ПРОТИВ клинического тестирования MTHFR C677T/A1298C для дозирования. Фармакогенетического сигнала для дозирования этого препарата нет; MTHFR — только контекст фолатов."
       }
     }
   ]

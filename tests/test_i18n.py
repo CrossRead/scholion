@@ -63,6 +63,32 @@ class TestCatalogues(unittest.TestCase):
             empty = sorted(k for k, v in catalogue.items() if not v.strip())
             self.assertEqual(empty, [], f"«{code}» has empty phrases: " + ", ".join(empty[:10]))
 
+    def test_no_key_is_defined_twice(self):
+        """A key written twice is invisible to every other test here.
+
+        The catalogues are dict literals: a repeated key does not raise, it
+        silently wins over the earlier one, and by the time the tests see a
+        catalogue it is already a dict with the duplicate collapsed. So the
+        comparison of key sets — the check written to keep the catalogues
+        honest — cannot see this class at all, and the audit found six such
+        keys (`count.nights.*` in both languages) that no gate had reported.
+        This one reads the source text instead of the loaded object, because
+        that is the only place where the duplicate still exists.
+        """
+        import collections
+        from pathlib import Path
+        here = Path(i18n.__file__).resolve().parent
+        for code in sorted(i18n.CATALOGUES):
+            path = here / f"{code}.py"
+            if not path.exists():
+                continue
+            with self.subTest(language=code):
+                keys = re.findall(r'^\s*"([^"]+)"\s*:', path.read_text(encoding="utf-8"), re.M)
+                twice = sorted(k for k, n in collections.Counter(keys).items() if n > 1)
+                self.assertEqual(twice, [], f"«{code}» defines a key more than once "
+                                            f"(the second definition wins silently): "
+                                            + ", ".join(twice[:10]))
+
     def test_plural_forms_are_complete(self):
         """A key with forms must have all the forms of its own language.
 

@@ -146,3 +146,39 @@ Installed by the user; this project executes them and reads their output.
 If you believe something here is misattributed or should not be redistributed,
 open an issue titled `licensing:` or write to the maintainer. Data whose status
 is unclear is removed first and discussed second.
+
+## Synthea — the FHIR test bundle
+
+* File: `tests/fixtures/fhir/synthea_patient_clinical.json`
+* Source: **synthetichealth/synthea** — the bundle published in that repository as
+  the flexporter sample patient
+  (https://github.com/synthetichealth/synthea)
+* Licence: **Apache-2.0** — the same licence as this project's code, so the file
+  travels with the tests without any further condition beyond this notice.
+* Modification: the administrative resources (Claim, ExplanationOfBenefit,
+  Encounter, DocumentReference) were removed and the clinical core kept, so that
+  the fixture is about the thing under test and not about billing.
+* **The data are synthetic.** This is a generated patient, not a person. That is
+  the reason this file may live in the repository at all, unlike the PGP corpus:
+  no one's consent is involved, because no one is involved. It is used to test
+  the FHIR import against a bundle that a real system produced, rather than
+  against one written by the same person who wrote the parser — which is the
+  usual way a parser comes to pass its own tests and fail on the world.
+
+## Genomi — input format detection (vendored)
+
+`src/scholion/vendor/genomi/` carries `detection.py`, `text_io.py` and two
+helpers extracted from `alignment.py`, together with their own test suite, taken
+from **Genomi** (https://github.com/exon-research/genomi) at commit `07a255e`.
+Copyright Exon Research, licensed under the **Apache License 2.0** — the same
+licence as this project, so the two combine directly.
+
+They decide what a genomic file is by its CONTENT rather than by its name: BAM,
+CRAM, VCF, gVCF told apart from VCF, paired FASTQ, and the consumer array
+exports of 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA;
+gzip/bzip2/xz/zip/tar wrappers are peeled by magic bytes.
+
+The files carry attribution headers, every modification is marked in place, and
+`src/scholion/vendor/genomi/UPSTREAM.md` records what was taken, what changed and
+how to update. `python3 src/tools/check_vendor.py` compares our copy with
+upstream and reports drift in either direction.

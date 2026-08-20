@@ -61,7 +61,7 @@ CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 
 # ── what we do not look at at all ────────────────────────────────────────
 PERSONAL_DIRS = {"profile", "genome", "raw", "work", "archive", "reports", "_backups",
-                 "_to_delete", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
+                 "_to_delete", "_research", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
                  "dist", "node_modules"}
 #: Not personal — COPIES. `src/scholion/docs/` holds the documents the output
 #: names, carried inside the package so a `pip install` user can open them. Every

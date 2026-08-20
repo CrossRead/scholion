@@ -4,12 +4,22 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome).",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-    "updated": "2026-08-18"
+    "updated": "2026-08-19",
+    "source_tier": "primary_literature",
+    "assembly_secondary": "GRCh37",
+    "assembly_secondary_note": {
+      "en": "`pos` is GRCh38 and always was. `pos_grch37` is the same locus's position in GRCh37, and all 54 loci now carry one. Three independent sources were used: real GRCh37 files that carry rsIDs (public Genes for Good exports in the PGP corpus, accepted only where REF/ALT also matched this catalogue — 30 of 30 did); NCBI dbSNP esummary, field `chrpos_prev_assm`; and the Ensembl GRCh37 REST endpoint. A value was written ONLY where every source that answered gave the same number: 30 loci carry corpus+NCBI+Ensembl and 24 carry NCBI+Ensembl, none carries fewer than two, and no source disagreed with another anywhere in the table. `src/tools/fill_grch37.py` is the script that asked; it names disagreements instead of writing them, and it must be run from a machine with a network. It is NEVER computed from `pos`: the offset between builds is not constant even inside one chromosome (405 kb of spread on chr1 across the measured pairs), so arithmetic would give a plausible position pointing at the wrong base.",
+      "ru": "`pos` — это GRCh38, и так было всегда. `pos_grch37` — позиция того же локуса в GRCh37, и теперь она есть у всех 54 локусов. Использованы три независимых источника: настоящие файлы GRCh37 с rsID (публичные выгрузки Genes for Good в корпусе PGP, принятые только там, где REF/ALT совпали с этим каталогом — совпали 30 из 30); NCBI dbSNP esummary, поле `chrpos_prev_assm`; и Ensembl GRCh37 REST. Значение записано ТОЛЬКО там, где все ответившие источники дали одно и то же число: у 30 локусов это корпус+NCBI+Ensembl, у 24 — NCBI+Ensembl, меньше двух нет ни у одного, и нигде источники не разошлись. Спрашивает скрипт `src/tools/fill_grch37.py`: расхождения он называет, а не записывает, и запускать его нужно с машины с сетью. Из `pos` координата НИКОГДА не вычисляется: смещение между сборками непостоянно даже внутри одной хромосомы (разброс 405 тыс. оснований на chr1 по измеренным парам), и арифметика дала бы правдоподобную позицию, указывающую не на то основание."
+    },
+    "assembly_secondary_open": {
+      "en": "The position question is closed — every locus answers in both builds. Two things are not. (1) Allele orientation: rs6025, rs1065852 and rs762551 appear in a corpus GRCh37 file with REF/ALT the reverse of this catalogue's (file T>C vs catalogue C>T; G>A vs A>G; C>A vs A>C). Their GRCh37 positions here come from NCBI and Ensembl, not from that file, so the coordinates are unaffected; what is unresolved is which strand that exporter reports on, and it is left open rather than settled from one caller's output. (2) The same run also compared every GRCh38 position in this catalogue against dbSNP. It reported to the console and the console was not kept, so that comparison is not on record here — the script now writes a report file beside its output, and the next run will leave one.",
+      "ru": "Вопрос о позициях закрыт — каждый локус отвечает в обеих сборках. Незакрытых два. (1) Ориентация аллелей: rs6025, rs1065852 и rs762551 встречаются в файле GRCh37 из корпуса с REF/ALT, обратными нашим (в файле T>C против C>T в каталоге; G>A против A>G; C>A против A>C). Координаты GRCh37 у них взяты из NCBI и Ensembl, а не из этого файла, так что на позиции это не влияет; неразрешено то, с какой цепи отчитывается этот экспортёр, и вопрос оставлен открытым, а не решён по выводу одного вызывателя. (2) Тот же прогон сверил и все координаты GRCh38 этого каталога с dbSNP. Он отчитался в консоль, консоль не сохранена — значит, этой сверки здесь нет на бумаге. Теперь скрипт пишет отчёт рядом с выходным файлом, и следующий прогон его оставит."
+    }
   },
   "regions": {
     "CYP2D6": {
@@ -32,7 +42,8 @@
       "note": {
         "en": "the ε-status (with rs7412)",
         "ru": "ε-статус (с rs7412)"
-      }
+      },
+      "pos_grch37": 45411941
     },
     "rs7412": {
       "gene": "APOE",
@@ -43,7 +54,8 @@
       "note": {
         "en": "the ε-status (with rs429358)",
         "ru": "ε-статус (с rs429358)"
-      }
+      },
+      "pos_grch37": 45412079
     },
     "rs1799853": {
       "gene": "CYP2C9",
@@ -51,7 +63,8 @@
       "pos": 94942290,
       "ref": "C",
       "alt": "T",
-      "star": "*2"
+      "star": "*2",
+      "pos_grch37": 96702047
     },
     "rs1057910": {
       "gene": "CYP2C9",
@@ -59,7 +72,8 @@
       "pos": 94981296,
       "ref": "A",
       "alt": "C",
-      "star": "*3"
+      "star": "*3",
+      "pos_grch37": 96741053
     },
     "rs4149056": {
       "gene": "SLCO1B1",
@@ -71,7 +85,8 @@
       "note": {
         "en": "myopathy on statins",
         "ru": "миопатия на статинах"
-      }
+      },
+      "pos_grch37": 21331549
     },
     "rs4244285": {
       "gene": "CYP2C19",
@@ -79,7 +94,8 @@
       "pos": 94781859,
       "ref": "G",
       "alt": "A",
-      "star": "*2"
+      "star": "*2",
+      "pos_grch37": 96541616
     },
     "rs12248560": {
       "gene": "CYP2C19",
@@ -87,7 +103,8 @@
       "pos": 94761900,
       "ref": "C",
       "alt": "T",
-      "star": "*17"
+      "star": "*17",
+      "pos_grch37": 96521657
     },
     "rs9923231": {
       "gene": "VKORC1",
@@ -98,7 +115,8 @@
       "note": {
         "en": "-1639; T = increased sensitivity to warfarin",
         "ru": "-1639; T = повышенная чувствительность к варфарину"
-      }
+      },
+      "pos_grch37": 31107689
     },
     "rs1801133": {
       "gene": "MTHFR",
@@ -106,7 +124,8 @@
       "pos": 11796321,
       "ref": "G",
       "alt": "A",
-      "star": "677T"
+      "star": "677T",
+      "pos_grch37": 11856378
     },
     "rs1801131": {
       "gene": "MTHFR",
@@ -114,7 +133,8 @@
       "pos": 11794419,
       "ref": "T",
       "alt": "G",
-      "star": "1298C"
+      "star": "1298C",
+      "pos_grch37": 11854476
     },
     "rs1800462": {
       "gene": "TPMT",
@@ -122,7 +142,8 @@
       "pos": 18143724,
       "ref": "C",
       "alt": "G",
-      "star": "*2"
+      "star": "*2",
+      "pos_grch37": 18143955
     },
     "rs1142345": {
       "gene": "TPMT",
@@ -130,7 +151,8 @@
       "pos": 18130687,
       "ref": "T",
       "alt": "C",
-      "star": "*3C"
+      "star": "*3C",
+      "pos_grch37": 18130918
     },
     "rs3892097": {
       "gene": "CYP2D6",
@@ -142,7 +164,8 @@
       "note": {
         "en": "CYP2D6 is more reliably called with PyPGx (CNV/phasing)",
         "ru": "CYP2D6 надёжнее считать PyPGx (CNV/фазировка)"
-      }
+      },
+      "pos_grch37": 42524947
     },
     "rs1065852": {
       "gene": "CYP2D6",
@@ -154,7 +177,8 @@
       "note": {
         "en": "see PyPGx",
         "ru": "см. PyPGx"
-      }
+      },
+      "pos_grch37": 42526694
     },
     "rs115232898": {
       "gene": "DPYD",
@@ -166,7 +190,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 98165030
     },
     "rs146356975": {
       "gene": "DPYD",
@@ -178,7 +203,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 98060705
     },
     "rs75017182": {
       "gene": "DPYD",
@@ -190,7 +216,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 98045449
     },
     "rs56038477": {
       "gene": "DPYD",
@@ -202,7 +229,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 98039419
     },
     "rs55886062": {
       "gene": "DPYD",
@@ -214,7 +242,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 97981343
     },
     "rs3918290": {
       "gene": "DPYD",
@@ -226,7 +255,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 97915614
     },
     "rs112766203": {
       "gene": "DPYD",
@@ -238,7 +268,8 @@
       "note": {
         "en": "fluoropyrimidine toxicity",
         "ru": "токсичность фторпиримидинов"
-      }
+      },
+      "pos_grch37": 97770835
     },
     "rs67376798": {
       "gene": "DPYD",
@@ -246,7 +277,8 @@
       "pos": 97082391,
       "ref": "T",
       "alt": "A",
-      "star": "c.2846A>T"
+      "star": "c.2846A>T",
+      "pos_grch37": 97547947
     },
     "rs2802288": {
       "gene": "FOXO3",
@@ -257,7 +289,8 @@
       "note": {
         "en": "longevity; G — the favourable allele",
         "ru": "долголетие; G — благоприятный аллель"
-      }
+      },
+      "pos_grch37": 108896215
     },
     "rs6025": {
       "gene": "F5",
@@ -269,7 +302,8 @@
       "note": {
         "en": "factor V Leiden. The gene is on the minus strand: the genetic 1691G>A = the genomic C>T. A heterozygote raises the risk of VTE; it is not a contraindication to TRT, but it is a reason for more frequent monitoring of the haematocrit; a homozygote/a combination with F2 — a consultation with a haematologist",
         "ru": "фактор V Лейден. Ген на минус-цепи: генетический 1691G>A = геномный C>T. Гетерозигота повышает риск ВТЭ, не противопоказание к ТРТ, но повод к более частому контролю гематокрита; гомозигота/сочетание с F2 — консультация гематолога"
-      }
+      },
+      "pos_grch37": 169519049
     },
     "rs1799963": {
       "gene": "F2",
@@ -281,7 +315,8 @@
       "note": {
         "en": "prothrombin G20210A. The same context as F5: a risk of VTE, a matter of monitoring tactics, not a ban on therapy",
         "ru": "протромбин G20210A. Тот же контекст, что F5: риск ВТЭ, тактика мониторинга, не запрет терапии"
-      }
+      },
+      "pos_grch37": 46761055
     },
     "rs1800562": {
       "gene": "HFE",
@@ -293,7 +328,8 @@
       "note": {
         "en": "hereditary haemochromatosis. The penetrance is LOW — what decides is not the genotype but ferritin and transferrin saturation; a C282Y homozygote = a reason for regular monitoring of iron",
         "ru": "наследственный гемохроматоз. Пенетрантность НИЗКАЯ — решает не генотип, а ферритин и сатурация трансферрина; гомозигота C282Y = повод к регулярному контролю железа"
-      }
+      },
+      "pos_grch37": 26093141
     },
     "rs1799945": {
       "gene": "HFE",
@@ -305,7 +341,8 @@
       "note": {
         "en": "a weak allele; clinically significant mainly as a compound heterozygote with C282Y, in isolation it almost always has no consequences",
         "ru": "слабый аллель; клинически значим в основном как компаунд-гетерозигота с C282Y, изолированно почти всегда без последствий"
-      }
+      },
+      "pos_grch37": 26091179
     },
     "rs28929474": {
       "gene": "SERPINA1",
@@ -317,7 +354,8 @@
       "note": {
         "en": "alpha-1 antitrypsin deficiency. A Pi*ZZ homozygote — a risk of emphysema and liver disease; a Pi*MZ heterozygote — a moderate modifier in the presence of smoking and of other liver damage. Look at it together with the liver markers and elastography",
         "ru": "дефицит альфа-1-антитрипсина. Гомозигота Pi*ZZ — риск эмфиземы и болезни печени; гетерозигота Pi*MZ — умеренный модификатор при курении и других поражениях печени. Смотреть вместе с печёночными маркёрами и эластографией"
-      }
+      },
+      "pos_grch37": 94844947
     },
     "rs17580": {
       "gene": "SERPINA1",
@@ -329,7 +367,8 @@
       "note": {
         "en": "a milder deficiency allele; significant in combination with Pi*Z",
         "ru": "более мягкий дефицитный аллель; значим в сочетании с Pi*Z"
-      }
+      },
+      "pos_grch37": 94847262
     },
     "rs4148323": {
       "gene": "UGT1A1",
@@ -341,7 +380,8 @@
       "note": {
         "en": "reduced activity of UGT1A1 (predominantly in East Asians). The main European variant is *28 (a TA repeat in the promoter), it is NOT a SNP and is reliably determined only by PyPGx/a targeted indel call",
         "ru": "снижение активности UGT1A1 (преимущественно у восточноазиатов). Основной европейский вариант — *28 (TA-повтор промотора), он НЕ SNP и надёжно определяется только PyPGx/адресным индел-вызовом"
-      }
+      },
+      "pos_grch37": 234669144
     },
     "rs2231142": {
       "gene": "ABCG2",
@@ -353,7 +393,8 @@
       "note": {
         "en": "CPIC: together with SLCO1B1 it determines the tactics for rosuvastatin; also associated with urate",
         "ru": "CPIC: вместе с SLCO1B1 определяет тактику по розувастатину; также ассоциирован с уратом"
-      }
+      },
+      "pos_grch37": 89052323
     },
     "rs116855232": {
       "gene": "NUDT15",
@@ -365,7 +406,8 @@
       "note": {
         "en": "CPIC level A: myelotoxicity of the thiopurines (azathioprine, mercaptopurine)",
         "ru": "CPIC уровень A: миелотоксичность тиопуринов (азатиоприн, меркаптопурин)"
-      }
+      },
+      "pos_grch37": 48619855
     },
     "rs776746": {
       "gene": "CYP3A5",
@@ -377,7 +419,8 @@
       "note": {
         "en": "CPIC: the dose of tacrolimus. In Europeans *3/*3 (non-functional) is the norm, an expressor is a rarity",
         "ru": "CPIC: доза такролимуса. У европейцев *3/*3 (нефункциональный) — норма, экспрессор — редкость"
-      }
+      },
+      "pos_grch37": 99270539
     },
     "rs4986893": {
       "gene": "CYP2C19",
@@ -389,7 +432,8 @@
       "note": {
         "en": "a non-functional allele, it complements *2/*17 when the phenotype is determined",
         "ru": "нефункциональный аллель, дополняет *2/*17 при определении фенотипа"
-      }
+      },
+      "pos_grch37": 96540410
     },
     "rs2108622": {
       "gene": "CYP4F2",
@@ -401,7 +445,8 @@
       "note": {
         "en": "the warfarin dose together with VKORC1 and CYP2C9",
         "ru": "доза варфарина вместе с VKORC1 и CYP2C9"
-      }
+      },
+      "pos_grch37": 15990431
     },
     "rs1050828": {
       "gene": "G6PD",
@@ -413,7 +458,8 @@
       "note": {
         "en": "G6PD deficiency. The X chromosome: in men there is hemizygosity, and the interpretation is unambiguous. In case of deficiency — avoid oxidants (primaquine, rasburicase, a number of sulfonamides, high doses of intravenous vitamin C)",
         "ru": "дефицит Г6ФД. X-хромосома: у мужчин гемизиготность, интерпретация однозначна. При дефиците — избегать окислителей (примахин, расбуриказа, ряд сульфаниламидов, высокие дозы витамина C в/в)"
-      }
+      },
+      "pos_grch37": 153764217
     },
     "rs5030868": {
       "gene": "G6PD",
@@ -425,7 +471,8 @@
       "note": {
         "en": "the Mediterranean variant, a more severe deficiency; the same list of restrictions",
         "ru": "средиземноморский вариант, более тяжёлый дефицит; тот же список ограничений"
-      }
+      },
+      "pos_grch37": 153762634
     },
     "rs12979860": {
       "gene": "IFNL4",
@@ -436,7 +483,8 @@
       "note": {
         "en": "the response to interferon therapy for hepatitis C; in the era of DAAs its significance is historical",
         "ru": "ответ на интерферон-терапию гепатита C; в эпоху ПППД значение историческое"
-      }
+      },
+      "pos_grch37": 39738787
     },
     "rs4988235": {
       "gene": "MCM6",
@@ -447,7 +495,8 @@
       "note": {
         "en": "lactase persistence (the LCT enhancer). GG — probable adult hypolactasia, A — persistence",
         "ru": "лактазная персистентность (энхансер LCT). GG — вероятная гиполактазия взрослых, A — персистентность"
-      }
+      },
+      "pos_grch37": 136608646
     },
     "rs671": {
       "gene": "ALDH2",
@@ -459,7 +508,8 @@
       "note": {
         "en": "aldehyde dehydrogenase deficiency (the flush reaction). In carriers, regular alcohol reliably raises the risk of oesophageal cancer. In Europeans the variant is rare",
         "ru": "дефицит альдегиддегидрогеназы (flush-реакция). У носителей регулярный алкоголь достоверно повышает риск рака пищевода. У европейцев вариант редок"
-      }
+      },
+      "pos_grch37": 112241766
     },
     "rs601338": {
       "gene": "FUT2",
@@ -471,7 +521,8 @@
       "note": {
         "en": "a non-secretor when AA: the composition of the microbiota, resistance to norovirus, ambiguous data on B12. Change the dose of supplements only on a laboratory deficiency, not on the genotype",
         "ru": "non-secretor при AA: состав микробиоты, устойчивость к норовирусу, неоднозначные данные по B12. Дозу добавок менять только по лабораторному дефициту, не по генотипу"
-      }
+      },
+      "pos_grch37": 49206674
     },
     "rs762551": {
       "gene": "CYP1A2",
@@ -483,7 +534,8 @@
       "note": {
         "en": "the rate of caffeine metabolism. The data on clinical outcomes are weak — an argument for moderation rather than a medical recommendation",
         "ru": "скорость метаболизма кофеина. Данные по клиническим исходам слабые — довод к умеренности, а не медицинская рекомендация"
-      }
+      },
+      "pos_grch37": 75041917
     },
     "rs12934922": {
       "gene": "BCO1",
@@ -494,7 +546,8 @@
       "note": {
         "en": "the conversion of beta-carotene into retinol; carriers of the «slow» variant get vitamin A from plant sources less well",
         "ru": "конверсия бета-каротина в ретинол; носители «медленного» варианта хуже получают витамин A из растительных источников"
-      }
+      },
+      "pos_grch37": 81301694
     },
     "rs7501331": {
       "gene": "BCO1",
@@ -505,7 +558,8 @@
       "note": {
         "en": "the second BCO1 conversion variant, assessed together with rs12934922",
         "ru": "второй вариант конверсии BCO1, оценивается вместе с rs12934922"
-      }
+      },
+      "pos_grch37": 81314496
     },
     "rs2187668": {
       "gene": "HLA-DQA1",
@@ -516,7 +570,8 @@
       "note": {
         "en": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. IMPORTANT: it does not detect DQ2.5 in the trans configuration",
         "ru": "tag DQ2.5 (DQA1*05:01–DQB1*02:01), risk allele T; Monsuur 2008 PLoS ONE, sens 1.000/spec 0.999. ВАЖНО: не выявляет DQ2.5 в транс-конфигурации"
-      }
+      },
+      "pos_grch37": 32605884
     },
     "rs7775228": {
       "gene": "HLA-DQB1",
@@ -527,7 +582,8 @@
       "note": {
         "en": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; paired with rs2395182 and rs4713586 (the exclusion of DQ4)",
         "ru": "tag DQ2.2 (DQA1*02:01–DQB1*02:02), risk allele C; в паре с rs2395182 и rs4713586 (исключение DQ4)"
-      }
+      },
+      "pos_grch37": 32658079
     },
     "rs2395182": {
       "gene": "HLA-DRA",
@@ -538,7 +594,8 @@
       "note": {
         "en": "tag DQ2.2 (the second marker), risk allele T; Monsuur 2008",
         "ru": "tag DQ2.2 (второй маркёр), risk allele T; Monsuur 2008"
-      }
+      },
+      "pos_grch37": 32413317
     },
     "rs7454108": {
       "gene": "HLA-DQB1",
@@ -546,7 +603,8 @@
       "pos": 32713706,
       "ref": "T",
       "alt": "C",
-      "note": "tag DQ8 (DQA1*03–DQB1*03:02), risk allele C; Monsuur 2008"
+      "note": "tag DQ8 (DQA1*03–DQB1*03:02), risk allele C; Monsuur 2008",
+      "pos_grch37": 32681483
     },
     "rs4639334": {
       "gene": "HLA-DQB1",
@@ -557,7 +615,8 @@
       "note": {
         "en": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); needed TOGETHER with DQ2.2 to recognise DQ2.5 in trans (the DR5/DR7 genotype). The orientation of the tag allele needs confirmation against Monsuur 2008 Table 3",
         "ru": "tag DQ7.5 (DQA1*05:05–DQB1*03:01); нужен ВМЕСТЕ с DQ2.2 для распознавания DQ2.5 в транс (генотип DR5/DR7). Ориентация аллеля-метки требует подтверждения по Monsuur 2008 Table 3"
-      }
+      },
+      "pos_grch37": 32602214
     },
     "rs4713586": {
       "gene": "HLA-DQB1",
@@ -568,7 +627,8 @@
       "note": {
         "en": "the DQ4 exclusion marker when calling DQ2.2 (Monsuur 2008); the GRCh38 coordinate from Ensembl",
         "ru": "маркёр исключения DQ4 при вызове DQ2.2 (Monsuur 2008); координата GRCh38 по Ensembl"
-      }
+      },
+      "pos_grch37": 32659582
     },
     "rs11591147": {
       "gene": "PCSK9",
@@ -579,7 +639,8 @@
       "note": {
         "en": "R46L — a loss-of-function variant; the T allele lowers LDL-C",
         "ru": "R46L — вариант потери функции; аллель T снижает ЛПНП"
-      }
+      },
+      "pos_grch37": 55505647
     },
     "rs28362286": {
       "gene": "PCSK9",
@@ -590,7 +651,8 @@
       "note": {
         "en": "C679X — a nonsense variant; the A allele truncates the protein",
         "ru": "C679X — нонсенс-вариант; аллель A обрывает белок"
-      }
+      },
+      "pos_grch37": 55529215
     },
     "rs28362263": {
       "gene": "PCSK9",
@@ -601,7 +663,8 @@
       "note": {
         "en": "A443T — a weak effect on LDL-C; direction not yet resolved here",
         "ru": "A443T — слабый эффект на ЛПНП; направление здесь пока не разрешено"
-      }
+      },
+      "pos_grch37": 55523855
     },
     "rs72646508": {
       "gene": "PCSK9",
@@ -612,7 +675,8 @@
       "note": {
         "en": "L253F — rare, loss of function reported; direction not yet resolved here",
         "ru": "L253F — редкий, сообщается о потере функции; направление здесь пока не разрешено"
-      }
+      },
+      "pos_grch37": 55518422
     }
   }
 }

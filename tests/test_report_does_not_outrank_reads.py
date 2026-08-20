@@ -67,7 +67,7 @@ class TestWhichSourceWins(unittest.TestCase):
             % (str(support.SRC), vcf_answer, rsid)
         )
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=self.env, timeout=60)
+                           text=True, env=self.env, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr)
         return json.loads(p.stdout.strip().splitlines()[-1])
 

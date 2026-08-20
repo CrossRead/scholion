@@ -1,7 +1,8 @@
 {
   "_meta": {
     "purpose": "A PUBLIC reference for interpreting the metrics of wearable devices and smart scales (Garmin): label/units/direction/target/group/why. Not personal. Used by the «Lifestyle» tab.",
-    "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone)."
+    "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone).",
+    "source_tier": "curated_reference"
   },
   "order": [
     "Weight",
@@ -39,8 +40,8 @@
       "direction": "lower_better",
       "group": "anthro",
       "why": {
-        "en": "losing weight is the key goal in the metabolic syndrome",
-        "ru": "снижение веса — ключевая цель при метаболическом синдроме"
+        "en": "in metabolic syndrome, weight reduction is a common goal",
+        "ru": "при метаболическом синдроме снижение веса — частая цель"
       }
     },
     "BMI": {
@@ -96,8 +97,8 @@
       "direction": null,
       "group": "anthro",
       "why": {
-        "en": "hydration/composition; the norm for men is ~55–60%",
-        "ru": "гидратация/состав; норма муж. ~55–60%"
+        "en": "hydration/composition; typical range differs by sex (men ~55–60%)",
+        "ru": "гидратация/состав; типичный диапазон зависит от пола (муж. ~55–60%)"
       }
     },
     "VO2Max": {

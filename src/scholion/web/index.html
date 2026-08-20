@@ -309,7 +309,7 @@
 const API = "";
 const $ = (s,el=document)=>el.querySelector(s);
 const el = (h)=>{const tpl=document.createElement('template');tpl.innerHTML=h.trim();return tpl.content.firstChild;};
-const esc = (s)=>String(s??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc = (s)=>String(s??'').replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
 
 // ---------------- Language ----------------
 // The language is a display preference of THIS browser tab and of nothing else. It is
@@ -820,7 +820,7 @@ function refText(m){
 function trendNote(m){
   if(m&&m.trend){const a={up:'↑',down:'↓',flat:'→'}[m.trend.direction];
     const pct=m.trend.pct!=null?` ${m.trend.pct>0?'+':''}${m.trend.pct}%`:'';
-    return `<span class="trend">${a}${pct} (${m.trend.from_date}→${m.trend.to_date})</span>`;}
+    return `<span class="trend">${a}${pct} (${esc(m.trend.from_date)}→${esc(m.trend.to_date)})</span>`;}
   return nearNote(m);
 }
 function markerCard(m){
@@ -1356,7 +1356,7 @@ async function viewMetrics(root){
   const pf=$('#mprof',root);
   pf.innerHTML=`<div class="form"><div class="fr">
     <label>${esc(t('web.metrics.sex_label'))}<select id="mp-sex"><option value="">—</option><option value="male"${p.sex==='male'?' selected':''}>${esc(t('web.metrics.male'))}</option><option value="female"${p.sex==='female'?' selected':''}>${esc(t('web.metrics.female'))}</option></select></label>
-    <label>${esc(t('web.metrics.birth_year'))}<input id="mp-year" value="${p.birth_year??''}" size="6" placeholder="1985"></label>
+    <label>${esc(t('web.metrics.birth_year'))}<input id="mp-year" value="${esc(p.birth_year??'')}" size="6" placeholder="1985"></label>
     <label>${esc(t('web.metrics.height_label'))}<input id="mp-height" value="${p.height_cm??''}" size="5" placeholder="178"></label>
     <button class="act" id="mp-save">${esc(t('web.form.save'))}</button>
   </div><div class="muted" style="font-size:13.5px">${esc(t('web.metrics.profile_note'))}</div></div>`;

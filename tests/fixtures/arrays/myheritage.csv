@@ -1,0 +1,6 @@
+# MyHeritage DNA raw data.
+# For more information visit: https://www.myheritage.com/dna
+RSID,CHROMOSOME,POSITION,RESULT
+"rs4149056","12","21331549","TC"
+"rs1801133","1","11856378","AA"
+"rs4244285","10","96541616","--"

@@ -152,7 +152,7 @@ class TestTheFirstScreenActuallyRuns(unittest.TestCase):
     def _run(self, argv):
         return subprocess.run([sys.executable, "-m", "scholion", *argv],
                               cwd=support.ROOT, env=self.env,
-                              capture_output=True, text=True, timeout=120)
+                              capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
 
     def test_the_readme_prints_the_same_first_screen_this_test_runs(self):
         """Otherwise the two drift and each of them looks right on its own."""
@@ -255,11 +255,20 @@ class TestTheDocumentsDoNotContradictEachOther(unittest.TestCase):
         return self.readme[i:i + 700].lower()
 
     def test_the_array_bullet_names_the_route_that_does_work(self):
+        """Rewritten 19.08.2026, because the answer changed.
+
+        It used to require the word «convert»: an array was not read, and a
+        README that said so without naming the conversion route left a reader to
+        discover in `genome/README.md` that the first screen had been wrong. In
+        0.4.0 the array IS read, so the test now requires the command that reads
+        it. The shape of the check is the same — the page must name a road that
+        exists — only the road has moved.
+        """
         claim = self._array_claim()
-        self.assertIn("convert", claim,
-                      "the README says an array is not read and does not say that a converted "
-                      "VCF is — the route is documented in genome/README.md, and a reader who "
-                      "finds it there learns that the first screen was wrong")
+        self.assertTrue("scholion array" in claim or "read directly" in claim,
+                        "an array is read now, and the page that mentions arrays has to say "
+                        "how — a capability nobody can find is indistinguishable from one "
+                        "that is not there")
 
     def test_the_route_it_points_at_exists(self):
         guide = support.ROOT / "genome" / "README.md"
@@ -272,10 +281,12 @@ class TestTheDocumentsDoNotContradictEachOther(unittest.TestCase):
     def test_the_dangerous_half_is_stated_where_the_capability_is(self):
         """«It works» and «a missing variant is not reference» belong on one page."""
         claim = self._array_claim()
-        self.assertTrue("unread" in claim or "not equal reference" in claim
-                        or "does not equal reference" in claim,
+        self.assertTrue("never interrogated" in claim or "unread" in claim
+                        or "not on this chip" in claim
+                        or "not equal reference" in claim,
                         "the array route is offered without the caveat that makes it safe to "
-                        "take: on a chip the absence of a variant is not the reference")
+                        "take: on a chip the absence of a variant is not the reference — the "
+                        "position was never looked at")
 
 
 if __name__ == "__main__":
@@ -331,18 +342,18 @@ class TestTheDocumentsTheOutputNamesCanBeOpened(unittest.TestCase):
         if not tool.exists():
             self.skipTest("the synchroniser is not part of this build")
         p = subprocess.run([sys.executable, str(tool)], cwd=support.ROOT,
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
 
     def test_the_command_prints_a_document_and_refuses_an_unknown_one(self):
         env = {**os.environ, "PYTHONPATH": str(support.ROOT / "src"),
                "SCHOLION_OFFLINE": "1", "SCHOLION_LANG": "en"}
         ok = subprocess.run([sys.executable, "-m", "scholion", "doc", "data-layout"],
-                            cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60)
+                            cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(ok.returncode, 0, ok.stderr[-300:])
         self.assertGreater(len(ok.stdout), 1000, "the document came out empty or truncated")
 
         bad = subprocess.run([sys.executable, "-m", "scholion", "doc", "no-such-thing"],
-                             cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60)
+                             cwd=support.ROOT, env=env, capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(bad.returncode, 1, "an unknown name is answered as if it existed")
         self.assertIn("data-layout", bad.stderr, "the refusal does not say what there is")

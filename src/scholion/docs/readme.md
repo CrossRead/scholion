@@ -4,10 +4,11 @@ A local analysis layer over your own medical data: genome, years of lab results,
 prescriptions, wearables. Read them against each other, with the source shown
 behind every statement.
 
-Three ways in, one core: a local web app, a skill for a language model, and a
-plugin for [Ouroboros](https://github.com/razzant/ouroboros).
+Four ways in, one core: a local web app, a skill for a language model, a plugin
+for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
+model that speaks the protocol can call the same tools.
 
-**Version 0.3.4** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.0** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -77,11 +78,36 @@ from aligned reads. Plus measured **callability**: for every clinical gene you
 know what fraction of bases was read deeply enough — without it, "no findings"
 means nothing.
 
+**A consumer array is a different class of input, not a weaker genome.** 23andMe,
+AncestryDNA, MyHeritage, FamilyTreeDNA and Living DNA exports are read directly —
+including inside the `.zip` or `.bz2` a provider hands you — and every locus
+answers one of three ways: called, no-call, or *not on this chip at all*. The
+third is the one that matters: on a chip an absent position was never
+interrogated, so treating it as a reference call would turn «this instrument
+cannot see that locus» into «you do not have that variant». Measured on a real
+23andMe v5 export: 46 of the 54 catalogue loci present, none of them no-call, and
+the eight absent ones named. The paths that a chip cannot support — ClinVar
+screening, ACMG SF, polygenic scores — refuse with the reason instead of
+answering.
+
+**Both reference builds.** A file called against GRCh37 is read at GRCh37
+coordinates, because most of the files people actually hold are GRCh37 and
+nobody is going to re-sequence for us. All 54 catalogue loci now carry both
+coordinates, each written only where at least two independent primary sources
+agreed — NCBI dbSNP, the Ensembl GRCh37 endpoint, and real GRCh37 files for 30
+of them. Nothing is converted between builds: the offset is not constant even
+within one chromosome, so arithmetic would return a plausible position pointing
+at the wrong base. A locus the catalogue carries in one build only says so
+rather than falling through to a reference assumption.
+
 **Diplotype-level pharmacogenomics.** PyPGx across 18 genes from BAM — copy
-number, phasing, star alleles — and PharmCAT with ready CPIC/DPWG/FDA
-recommendations. This is a level above single SNPs: `CYP2C19 *2/*17` reads as an
-intermediate metabolizer only because the phase is known, and `CYP2D6` copy
-number cannot be determined from individual polymorphisms at all.
+number, phasing, star alleles — run through PharmCAT, which maps diplotypes to
+CPIC recommendations locally. This is a level above single SNPs: `CYP2C19 *2/*17`
+reads as an intermediate metabolizer only because the phase is known, and
+`CYP2D6` copy number cannot be determined from individual polymorphisms at all.
+The DPWG and FDA guideline tables that some pipelines add come from PharmGKB,
+whose licence (CC BY-SA, no commercial redistribution) is incompatible with this
+project's, so they are not bundled — CPIC (CC0) is what travels here.
 
 **Polygenic scores.** Traits from the PGS Catalog, each carrying an evidence
 level and a validity note. Scoring positions are re-genotyped from BAM: an
@@ -92,8 +118,13 @@ a swapped model.
 **Longevity.** LongevityMap with allele direction resolved against primary
 sources: "carrier of a variant in gene X" instead of a false "risk".
 
-**Labs.** Automatic ingest from PDF forms — **Russian ones today**; any language
-goes in through a CSV panel or one command per value. Hundreds of recognised
+**Labs.** Automatic ingest from PDF forms — **Russian ones today**, with American
+date formats read as well; delimited exports (CSV, TSV, TXT) go in through a reader
+of their own, because a table dates its rows rather than its header and a person's
+export is usually years of them. A **FHIR R4 bundle** — a portal export, Apple
+Health clinical records, an EHR download — is imported by LOINC code through
+`scholion import-fhir`. Any language also goes in through a CSV panel or one
+command per value. Hundreds of recognised
 markers, timelines and trends, reference ranges verified against the printed
 line of the form. Three
 levels of assessment instead of two: outside the interval, *near the boundary*
@@ -199,7 +230,8 @@ own, and each one makes the ones above it sharper:
 | A wearable export | `scholion ingest-garmin "<folder>"` | Sleep phases, load, body composition as trends rather than as a daily number |
 | Prescriptions | `scholion add-med "name" --dose "…"` | Interactions, monitoring tests per class, a second opinion on anything new |
 | A VCF or a BAM | see `PREPARING-THE-GENOME.md` | Pharmacogenetics, ClinVar findings, ACMG SF, polygenic scores, longevity |
-| A consumer array | convert it to a GRCh38 VCF yourself (`genome/README.md`) | The same as a VCF, minus polygenic scores; positions the chip does not carry count as unread |
+| A consumer array | `scholion array` — drop the export in the genome folder, `.zip` and all | The locus catalogue read straight off the chip, each position called, no-call or *not on this chip*; ClinVar, ACMG SF and polygenic scores refuse with the reason |
+| A FHIR bundle | `scholion import-fhir bundle.json` | Results matched by LOINC code, units converted or refused; what the bundle claims about its patient is reported, not applied |
 
 Whatever you skip, `scholion limits` says what that costs you and what would close
 it. Nothing here silently degrades: a layer that is missing is named as missing.
@@ -480,6 +512,28 @@ src/tools/                package sanitizer, hooks, release notes, publication
 ouroboros_plugin/         tool registration for Ouroboros
 tests/                    the whole test suite; runs on the standard library alone
 ```
+
+---
+
+## Thanks
+
+**Personal Genome Project (Harvard)** and its participants. Their open-consent
+data is what made it possible to test this on 27 real files from eleven
+providers without a single user — and almost every defect fixed in 0.4.0 was
+invisible on the author's own machine. Nothing of theirs is redistributed here:
+no genotypes, no findings, no identifiers, no medical records, in any form. What
+travels out of that work is the behaviour of the engine and aggregate numbers.
+
+**Synthea** ([synthetichealth/synthea](https://github.com/synthetichealth/synthea),
+Apache-2.0) for the synthetic FHIR bundle the import is tested against. A parser
+tested only on input written by whoever wrote the parser passes its own tests and
+fails on the world.
+
+**Genomi** ([exon-research/genomi](https://github.com/exon-research/genomi),
+Apache-2.0) for the input-format detector, vendored with a way to update it and
+with our one change marked in place.
+
+Full provenance for every third-party file: `ATTRIBUTION.md`.
 
 ---
 

@@ -6,7 +6,8 @@
     "unverified": "Where a package name has not been verified against the tool's own documentation, it is absent deliberately. Printing an install command that turns out to be wrong costs more than printing none: the person runs it, it fails, and now they distrust the rest of the list.",
     "sudo": "No entry here needs administrator rights, and that is a selection criterion rather than a coincidence. Homebrew and conda install into the user's own prefix. Anything that would need sudo is shown as text for the person to run themselves.",
     "updated": "2026-08-16",
-    "sets": "A set names the tools it REQUIRES. Anything that merely makes the step faster or better is listed under `optional` and never counted as missing: a set that looks complete while a required tool is absent is worse than no list at all."
+    "sets": "A set names the tools it REQUIRES. Anything that merely makes the step faster or better is listed under `optional` and never counted as missing: a set that looks complete while a required tool is absent is worse than no list at all.",
+    "source_tier": "curated_reference"
   },
   "sets": {
     "base": {
@@ -289,6 +290,22 @@
       "note": {
         "en": "uvx arrives with uv — the package is called uv, the command is called uvx.",
         "ru": "uvx приходит вместе с uv — пакет называется uv, команда называется uvx."
+      }
+    }
+  },
+  "considered": {
+    "ursapgx": {
+      "label": "ursaPGx",
+      "license": "MIT",
+      "url": "https://github.com/coriell-research/ursaPGx",
+      "status": "named, not integrated",
+      "would_close": {
+        "en": "CYP2D6 star alleles from a VCF. This build resolves CYP2D6 only from a called diplotype produced elsewhere (PyPGx from a BAM); from a plain provider VCF, and from every consumer array, CYP2D6 has no phenotype at all — both of its tag SNPs are absent from the 23andMe v5 chip, measured. That gap decides codeine, tramadol, tamoxifen and the tricyclics.",
+        "ru": "Звёздные аллели CYP2D6 из VCF. Сейчас CYP2D6 разрешается только по вызванному диплотипу, полученному снаружи (PyPGx из BAM); по обычному VCF провайдера и по любому потребительскому чипу фенотипа у CYP2D6 нет вовсе — оба его тег-SNP отсутствуют на чипе 23andMe v5, измерено. Этот пробел решает кодеин, трамадол, тамоксифен и трициклики."
+      },
+      "why_named_not_taken": {
+        "en": "Licence-compatible (MIT) and the right tool, unlike Aldy and Cyrius whose licences forbid it. Integrating a caller is a pipeline change with its own install, not a data edit, so it is named here rather than half-done: a tool listed as available and not actually reachable is the failure this file exists to prevent.",
+        "ru": "Совместим по лицензии (MIT) и подходит по существу, в отличие от Aldy и Cyrius, чьи лицензии это запрещают. Подключение вызывателя — изменение конвейера со своей установкой, а не правка данных, поэтому он здесь назван, а не сделан наполовину: инструмент, объявленный доступным и недостижимый на деле, — ровно тот дефект, против которого этот файл и существует."
       }
     }
   }

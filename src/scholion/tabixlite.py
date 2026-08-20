@@ -74,6 +74,43 @@ def contigs(vcf: str) -> List[str]:
         return []
 
 
+def _scan(lines, chrom: str, pos: int, window: int, seen: bool):
+    """Rows of `chrom` inside [pos, pos+window] from one batch of raw lines.
+
+    Returns (rows, seen, stop). This lives outside `query()` because what was
+    wrong here was the stopping rule, not the I/O, and the rule is testable only
+    if it can be run without a bgzf file and an index.
+
+    The rule. A VCF is sorted by contig, so a row of another contig means one of
+    two different things depending on where we are. Before the first row of our
+    own contig it is the tail of the previous one — the index lands us at the
+    start of a block, not at our first row — and we skip it. After our contig has
+    been seen, it means our contig is over: there is nothing further to find, and
+    the scan stops. It used to `continue` in both cases, so a query for a position
+    past the end of a contig decompressed the file to EOF — on a 200 MB personal
+    VCF a single call of minutes, and inside the PGS re-genotyping loop a hang.
+    """
+    out = []
+    for ln in lines:
+        if not ln or ln.startswith(b"#"):
+            continue
+        fields = ln.decode("utf-8", "replace").split("\t")
+        if fields[0] != chrom:
+            if seen:
+                return out, seen, True
+            continue
+        seen = True
+        try:
+            p = int(fields[1])
+        except ValueError:
+            continue
+        if pos <= p <= pos + window:
+            out.append(fields)
+        elif p > pos + window:
+            return out, seen, True
+    return out, seen, False
+
+
 def query(vcf: str, chrom: str, pos: int, window: int = 0) -> List[List[str]]:
     """VCF rows in [pos, pos+window]. Empty = the site is not in the file.
 
@@ -101,26 +138,14 @@ def query(vcf: str, chrom: str, pos: int, window: int = 0) -> List[List[str]]:
                 need -= len(chunk)
             tail = b""
             stop = False
+            seen = False
             while not stop:
                 chunk = gz.read(1 << 20)
                 if not chunk:
                     break
                 *lines, tail = (tail + chunk).split(b"\n")
-                for ln in lines:
-                    if not ln or ln.startswith(b"#"):
-                        continue
-                    fields = ln.decode("utf-8", "replace").split("\t")
-                    if fields[0] != chrom:
-                        continue
-                    try:
-                        p = int(fields[1])
-                    except ValueError:
-                        continue
-                    if pos <= p <= pos + window:
-                        out.append(fields)
-                    elif p > pos + window:
-                        stop = True
-                        break
+                rows, seen, stop = _scan(lines, chrom, pos, window, seen)
+                out.extend(rows)
             gz.close()
     except Exception:
         return out

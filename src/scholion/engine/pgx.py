@@ -13,6 +13,84 @@ from ._helpers import (_active_names_by_class, _basis, _basis_note,
 from .labs import analyze_labs
 
 
+# CPIC's activity-score model, for the genes it scores that way (CYP2C9, DPYD,
+# and CYP2D6 once diplotypes are read). A star allele carries an activity value
+# — normal 1.0, decreased 0.5, no-function 0.0 — and the two alleles' scores sum
+# to a total that maps to a phenotype by a published table. The count-by-function
+# model this replaces got CYP2C9 *2/*3 wrong: it read «one no-function allele →
+# intermediate», but *2 (0.5) + *3 (0.0) = 0.5, which CPIC calls a POOR
+# metaboliser. The activity values are derived from the function label the
+# markers already carry (verbatim from the CPIC allele table: no-function 0.0,
+# decreased 0.5, normal 1.0); the score→phenotype bands are carried per gene,
+# also verbatim (api.cpicpgx.org/v1/diplotype).
+_FUNCTION_ACTIVITY = {"normal": 1.0, "increased": 1.0, "decreased": 0.5, "none": 0.0}
+
+
+def _activity_phenotype(gdef, found):
+    """(phenotype, label, score) from an activity score, or None if no band matches.
+
+    Score = 2.0 (two normal alleles) minus the deficit of each detected variant
+    copy; a haplotype counts once (found already reflects the per-marker copies,
+    so the caller passes the de-duplicated deficit in). Bands are matched min<=s<=max.
+    """
+    score = 2.0
+    seen_hap = {}
+    for f in found:
+        act = _FUNCTION_ACTIVITY.get(f.get("function"), 1.0)
+        deficit_per_copy = 1.0 - act
+        hap = f.get("haplotype")
+        if hap:
+            # one allele however many of its tags were read: the largest copy wins
+            prev = seen_hap.get(hap, 0)
+            copies = max(f.get("copies", 0), prev)
+            score -= (copies - prev) * deficit_per_copy
+            seen_hap[hap] = copies
+        else:
+            score -= f.get("copies", 0) * deficit_per_copy
+    score = max(0.0, min(2.0, round(score * 2) / 2))
+    for band in gdef.get("activity_bands", []):
+        if band["min"] <= score <= band["max"]:
+            return band["phenotype"], band.get("label", ""), score
+    return None
+
+
+# A CPIC phenotype string (as PyPGx / PharmCAT print it) to the short code the
+# rest of the engine speaks. A called diplotype is the most authoritative reading
+# there is — it used copy number and phase, which tag SNPs cannot — so it is
+# preferred over the tag-SNP model whenever the profile carries one. Until now
+# these calls were written into the profile and never read (the audit's finding
+# 35); CYP2D6, which tag SNPs cannot resolve at all, had no phenotype without them.
+_PHENO_CODE = {
+    "normal metabolizer": "NM", "normal metaboliser": "NM",
+    "intermediate metabolizer": "IM", "intermediate metaboliser": "IM",
+    "poor metabolizer": "PM", "poor metaboliser": "PM",
+    "rapid metabolizer": "RM", "rapid metaboliser": "RM",
+    "ultrarapid metabolizer": "UM", "ultrarapid metaboliser": "UM",
+    "likely intermediate metabolizer": "IM", "possible intermediate metabolizer": "IM",
+    "likely poor metabolizer": "PM",
+}
+
+
+def _called_diplotype(gene: str):
+    """The PyPGx/PharmCAT star-allele call for a gene, if the profile has one.
+
+    TWO SHAPES, and the second is why this had never fired on real data. The
+    profile writes `star_alleles: {method: {...}, genes: {CYP2D6: {...}}}` — the
+    calls live under `genes`, beside a block describing how they were made — and
+    this function looked only at the top level, where it found `method` and
+    `genes` and no gene it recognised. Twenty called diplotypes, produced from a
+    BAM with a CNV model and 1KGP phasing, sat in the profile while the engine
+    answered from tag SNPs. It is the same finding as the unread TSV, one level
+    further in: the fact was computed, written, and the reader looked in the
+    wrong place — which is indistinguishable, from outside, from not looking.
+    """
+    sa = core.pharmacogenomics().get("star_alleles") or {}
+    for candidate in ((sa.get("genes") or {}).get(gene), sa.get(gene)):
+        if isinstance(candidate, dict) and candidate.get("diplotype") and candidate.get("phenotype"):
+            return candidate
+    return None
+
+
 def compute_phenotype(gene: str) -> Dict[str, Any]:
     """The patient's phenotype for a gene, WITH the basis it rests on.
 
@@ -27,6 +105,22 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
     """
     kb = core.cpic_kb()
     gdef = (kb.get("genes", {}) or {}).get(gene)
+
+    # A real star-allele diplotype (from PyPGx / PharmCAT) outranks the tag-SNP
+    # model: it resolved copy number and phase. If one is on file, use it.
+    called = _called_diplotype(gene)
+    if called:
+        code = _PHENO_CODE.get(str(called["phenotype"]).strip().lower())
+        label = called["phenotype"] if code else called["phenotype"]
+        return {"phenotype": code or "reported", "label": label,
+                "found": [{"diplotype": called["diplotype"], "source": called.get("source"),
+                           "phenotype_text": called["phenotype"]}],
+                "certainty": "called", "diplotype": called["diplotype"],
+                "basis": {"model": [], "found": [], "missing": [],
+                          "source": called.get("source"), "called": True},
+                "basis_note": _t("phenotype.from_called_diplotype",
+                                 diplotype=called["diplotype"])}
+
     if gene in core.genome_gaps():
         basis = _basis(gene, gdef, [])
         # Which of them are unread because the file has no row there, as opposed
@@ -98,16 +192,27 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
                 "certainty": "unknown", "basis": basis, "basis_note": note}
 
     certainty = "determined" if not basis["missing"] else "assumed"
-    phen, label = "NM", _t("phenotype.normal_default")
-    for rule in gdef.get("phenotype_rules", []):
-        if rule.get("default") or all(_match_count(func_counts.get(fn, 0), expr)
-                                      for fn, expr in rule["when"].items()):
-            phen, label = rule["phenotype"], rule.get("label", "")
-            break
+    score = None
+    if gdef.get("model") == "activity_score":
+        ap = _activity_phenotype(gdef, found)
+        if ap is not None:
+            phen, label, score = ap
+        else:
+            phen, label = "NM", _t("phenotype.normal_default")
+    else:
+        phen, label = "NM", _t("phenotype.normal_default")
+        for rule in gdef.get("phenotype_rules", []):
+            if rule.get("default") or all(_match_count(func_counts.get(fn, 0), expr)
+                                          for fn, expr in rule["when"].items()):
+                phen, label = rule["phenotype"], rule.get("label", "")
+                break
     if certainty == "assumed":
         label = _t("phenotype.assumed", label=label)
-    return {"phenotype": phen, "label": label, "found": found,
-            "certainty": certainty, "basis": basis, "basis_note": note}
+    result = {"phenotype": phen, "label": label, "found": found,
+              "certainty": certainty, "basis": basis, "basis_note": note}
+    if score is not None:
+        result["activity_score"] = score
+    return result
 
 
 def check_drug_gene(drug: str) -> Dict[str, Any]:
@@ -128,10 +233,41 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     if not match:
         return _check_drug_online(drug)
 
+    if match.get("no_pgx"):
+        # A drug people ask about but with no pharmacogenetic guideline. Saying so
+        # plainly is the honest answer — better than a generic online lookup and
+        # far better than the MTHFR «recommendation» this used to fabricate
+        # (CPIC has no MTHFR drug guideline; ACMG advises against testing it).
+        return {"status": "ok", "drug": (match.get("names") or [drug])[0],
+                "gene": None, "no_pgx": True, "phenotype": "not_applicable",
+                "class": match.get("class"), "recommendation": match.get("note"),
+                "note": match.get("note"), "disclaimer": DISCLAIMER()}
     gene = match["gene"]
     ph = compute_phenotype(gene)
     phenotype = ph["phenotype"]
     guidance = match.get("guidance", {})
+
+    # Some drugs are metabolised by more than one gene, and the dose follows the
+    # more severe of them. Thiopurines are the case CPIC is explicit about: TPMT
+    # AND NUDT15 — a person normal on TPMT but a NUDT15 poor metaboliser is still
+    # at high risk, and reporting TPMT alone (as this did) misses it entirely.
+    # The clinical ACTION for a given severity is the same whichever gene caused
+    # it (reduce / avoid), so the single guidance table is applied to the worst
+    # phenotype across the genes, and every gene is reported.
+    _SEVERITY = {"PM": 3, "IM": 2, "RM": 2, "UM": 2, "NM": 1}
+    co_genes = []
+    worst_gene, worst_ph, worst_rank = gene, phenotype, _SEVERITY.get(phenotype, 0)
+    for g2 in match.get("also_genes", []):
+        ph2 = compute_phenotype(g2)
+        co_genes.append({"gene": g2, "phenotype": ph2["phenotype"],
+                         "phenotype_label": ph2.get("label", ""),
+                         "certainty": ph2.get("certainty")})
+        r2 = _SEVERITY.get(ph2["phenotype"], 0)
+        if r2 > worst_rank:
+            worst_gene, worst_ph, worst_rank = g2, ph2["phenotype"], r2
+    # The guidance is looked up on the WORST phenotype; note which gene drove it.
+    driving_gene = worst_gene
+    guidance_phenotype = worst_ph
 
     # A determined phenotype with no entry of its own must not be answered out of
     # `default`. Voriconazole's table has keys for UM, RM, PM and default — but
@@ -144,18 +280,18 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # but only where the phenotype was never determined. Where it WAS determined
     # and the catalogue has nothing to say, that is what the answer says, and the
     # gap is machine-readable in `guidance_gap` rather than only in the prose.
-    explicit = guidance.get(phenotype)
+    explicit = guidance.get(guidance_phenotype)
     gap = False
     if explicit:
         flag = explicit
-    elif phenotype in ("unknown", "reported") or not guidance:
+    elif guidance_phenotype in ("unknown", "reported") or not guidance:
         flag = guidance.get("default") or {
             "level": "unknown" if phenotype == "unknown" else "low",
             "note": _t("drug.nothing_notable")}
     else:
         gap = True
         flag = {"level": "unknown",
-                "note": _t("drug.no_guidance_for_phenotype", phenotype=phenotype, gene=gene)}
+                "note": _t("drug.no_guidance_for_phenotype", phenotype=guidance_phenotype, gene=driving_gene)}
 
     # An undetermined phenotype cannot yield a reassuring level, whatever the
     # catalogue's `default` says. Five drugs had `default.level = "low"`, so a
@@ -197,6 +333,14 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         "basis": ph.get("basis"),
         "level": flag["level"],
         "guidance_gap": gap,
+        "co_genes": co_genes,
+        "driving_gene": driving_gene if co_genes else None,
+        # CPIC's OWN wording for this phenotype, when the catalogue carries it.
+        # Kept separate from `recommendation` on purpose: that one is this
+        # project's plain-language line for the patient, in their language, and
+        # presenting a paraphrase as the guideline's words is the exact defect
+        # the audit found. Both are shown, each labelled as what it is.
+        "cpic": (explicit or {}).get("cpic") if isinstance(explicit, dict) else None,
         "recommendation": flag["note"],
         "markers_found": ph.get("found") or core.markers_for_gene(gene),
         "clinvar": clinvar_for_drug(drug, {"genes": [{"gene": gene}]}),

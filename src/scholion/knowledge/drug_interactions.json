@@ -8,7 +8,8 @@
       "low"
     ],
     "note": "Symmetric: the pair (a,b) fires in either order. mechanism/effect/manage are used to word the recommendation.",
-    "note_nutraceutical_layer_20260813": "Pairs for the nutraceutical layer have been added. The principle is the same: severity is a reason for a QUESTION to the doctor, not an instruction. For berberine it is honestly noted that the inhibition of CYP3A4/P-gp has been shown mainly in vitro."
+    "note_nutraceutical_layer_20260813": "Pairs for the nutraceutical layer have been added. The principle is the same: severity is a reason for a QUESTION to the doctor, not an instruction. For berberine it is honestly noted that the inhibition of CYP3A4/P-gp has been shown mainly in vitro.",
+    "source_tier": "guideline_compiled"
   },
   "interactions": [
     {

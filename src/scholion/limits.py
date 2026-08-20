@@ -35,12 +35,46 @@ from .i18n import t as _t
 #: Below this fraction of bases at ≥10× a gene cannot be called negative. 10× is
 #: the depth at which a heterozygote is decided at all — see qc_callability.sh,
 #: which uses the same threshold; the number is not repeated here by coincidence.
+#: AN AUTHOR SETTING — see AUTHOR_SETTINGS below.
 WEAK_10X = 90.0
 
 #: A polygenic score whose model is called below this is a number without a
 #: population behind it. The same threshold the PGS layer uses to withdraw a
-#: percentile from trust.
+#: percentile from trust. AN AUTHOR SETTING — see AUTHOR_SETTINGS below.
 PRS_MIN_MATCH = 0.90
+
+#: EVERY NUMBER IN THIS PROJECT THAT NOBODY PUBLISHED.
+#:
+#: The reviewers' strongest single correction: three of the four numeric
+#: thresholds in the lab and genome layers were described in our own notes as
+#: «considered engineering decisions», and they are nothing of the kind. They are
+#: an author's preferences. That is allowed — a product has to draw a line
+#: somewhere — but the line has to say whose it is, because a threshold with no
+#: document behind it, printed in the same voice as a guideline, borrows an
+#: authority it does not have.
+#:
+#: An entry here says: what the number is, what it would take to replace it with
+#: something external, and what it does NOT license. `test_author_settings.py`
+#: enumerates the module-level numeric constants of these modules and fails on
+#: one that is not registered — so a new magic number cannot join quietly.
+AUTHOR_SETTINGS = {
+    "WEAK_10X": {
+        "module": "scholion.limits", "value": WEAK_10X, "unit": "% of bases at ≥10×",
+        "basis": "author's setting — no published document sets this figure",
+        "closes": "a coverage threshold from the laboratory's own report, the panel "
+                  "protocol, or a pipeline validation document, attached by the user",
+        "does_not_license": "a NEGATIVE conclusion. Without such a document the honest "
+                            "answer over a weakly covered gene is «not enough data», not "
+                            "«nothing found»",
+    },
+    "PRS_MIN_MATCH": {
+        "module": "scholion.limits", "value": PRS_MIN_MATCH, "unit": "fraction of the model",
+        "basis": "author's setting",
+        "closes": "binding it to a PGS Catalog identifier, a computation version and the "
+                  "result file, so the number belongs to a model rather than to a habit",
+        "does_not_license": "presenting a percentile as clinically actionable",
+    },
+}
 
 
 def callability() -> Dict[str, Any]:
@@ -75,6 +109,39 @@ def callability() -> Dict[str, Any]:
     return out
 
 
+#: What a coverage percentage is computed OVER, when the pipeline did not say.
+#: Our own `build_clinical_bed.py` uses gene loci with a 10 kb margin and now
+#: records that beside the BED; a file from anywhere else says nothing, and
+#: «unknown» is then the honest answer rather than an assumption in our favour.
+INTERVAL_BASIS_DEFAULT = "unknown"
+
+
+def interval_basis() -> Dict[str, Any]:
+    """On what intervals the callability percentages were measured.
+
+    This matters more than it looks. Over a gene LOCUS with a margin, a 200 bp
+    dropout in a 300 kb gene moves `pct_10x` by about 0.07 % — while a dropout
+    inside the coding sequence is the single thing the number is consulted about.
+    So a high percentage over loci is not the same statement as a high percentage
+    over CDS, and printing them in the same words would be the quiet substitution
+    this layer exists to prevent.
+    """
+    p = core.profile_dir() / "callability_meta.json"
+    try:
+        if p.is_file():
+            import json as _json
+            d = _json.loads(p.read_text(encoding="utf-8"))
+            return {"basis": d.get("interval_basis") or INTERVAL_BASIS_DEFAULT,
+                    "pad": d.get("pad_locus"), "stated": True,
+                    "note": _t("limits.interval_basis_locus")
+                    if (d.get("interval_basis") or "").startswith("gene_locus")
+                    else None}
+    except (OSError, ValueError):
+        pass
+    return {"basis": INTERVAL_BASIS_DEFAULT, "stated": False,
+            "note": _t("limits.interval_basis_unknown")}
+
+
 def coverage_summary() -> Dict[str, Any]:
     """The one paragraph a report owes its reader about how much was read."""
     rows = callability()
@@ -88,6 +155,7 @@ def coverage_summary() -> Dict[str, Any]:
     def _mean(sel, field):
         return round(sum(r[field] for r in sel) / len(sel), 1) if sel else None
     return {"known": True, "genes": len(rows),
+            "interval_basis": interval_basis(),
             "mean_pct_10x": _mean(list(rows.values()), "pct_10x"),
             "acmg_genes": len(acmg), "acmg_pct_10x": _mean(acmg, "pct_10x"),
             "weak": [{"gene": g, "pct_10x": rows[g]["pct_10x"],
@@ -301,9 +369,25 @@ def scope() -> Dict[str, Any]:
     """
     from . import genome
     av = genome.available()
-    has_vcf = bool(av.get("ready"))
+    # `ready` is now true for an array too, so the cell is chosen by the CLASS of
+    # input, not by whether anything answered. An array in the «whole genome» row
+    # would be the exact confusion this table exists to prevent.
+    has_vcf = av.get("input_class") == "sequenced"
+    is_array = av.get("input_class") == "array"
     traits = (core.prs_results() or {}).get("traits") or {}
     rows = []
+    if is_array:
+        # Monogenic on a chip is the dangerous cell, and it is the one people
+        # arrive expecting to use. The chip's positive predictive value for rare
+        # pathogenic variants is low enough that a hit is a reason to test, not a
+        # finding: BMJ 2021 measured 4.2 % PPV for BRCA1/2 on consumer arrays, and
+        # Moscarello 2019 found 40 % of variants sent for confirmation were false.
+        rows.append({"architecture": "monogenic", "state": "not_supported",
+                     "note": _t("limits.scope.array_monogenic")})
+        rows.append({"architecture": "oligogenic", "state": "partial",
+                     "note": _t("limits.scope.array_oligogenic")})
+        rows.append({"architecture": "polygenic", "state": "partial",
+                     "note": _t("limits.scope.array_polygenic")})
     if has_vcf:
         rows.append({"architecture": "monogenic", "state": "supported",
                      "note": _t("limits.scope.monogenic")})
@@ -312,10 +396,15 @@ def scope() -> Dict[str, Any]:
         rows.append({"architecture": "polygenic", "state": "supported",
                      "note": _t("limits.scope.polygenic")})
     return {
-        "input": "wgs" if has_vcf else "none",
+        "input": "wgs" if has_vcf else ("array" if is_array else "none"),
+        "array": av.get("array"),
         # A file in the wrong build is not «no file»: saying so here would
         # contradict the item three lines below, which names it precisely.
         "input_note": (_t("limits.scope.input_wgs") if has_vcf
+                       else _t("limits.scope.input_array",
+                               vendor=(av.get("array") or {}).get("vendor", ""),
+                               markers=(av.get("array") or {}).get("markers", 0))
+                       if is_array
                        else _t("limits.scope.input_wrong_build", found=av.get("assembly"))
                        if av.get("assembly_mismatch")
                        else _t("limits.scope.input_none")),

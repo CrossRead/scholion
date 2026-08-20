@@ -104,6 +104,18 @@ whatever error they carry and has no line saying where it came from. Name the
 command that was run. If it cannot be run, say so instead of answering: this
 failure is silent by nature, because a recalled answer looks exactly like a
 checked one.
+
+**15. An unrecognised row may be extended into, never guessed into.** When a line
+on a lab form matches no marker, the assistant may draft a DICTIONARY ENTRY for
+it — a canonical key, the printed names that recognise it, the unit as printed —
+and only when the person asks for that specific row by name, exactly as rule 13
+requires for the two network lookups. It never supplies the VALUE: the number
+comes from deterministic code applying the new rule, which is what makes it
+reproducible a year later and checkable by somebody else. It never supplies a
+reference range either — a corridor is a clinical claim, and `CONTRIBUTING.md` is
+explicit that a language model is not a source for one. The entry is written as
+`proposed`, and while it is proposed the marker is shown with its value and
+without any statement about the norm; a person confirms it, not the assistant.
 <!-- CORE:END -->
 
 ---

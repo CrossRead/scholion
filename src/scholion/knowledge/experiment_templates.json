@@ -10,64 +10,114 @@
       "a rigid ABAB — vulnerable to trend and season; the order of the blocks is randomised",
       "no washout — carry-over of the effect of the previous phase (caffeine: days; drugs: weeks)",
       "a comparison across the boundary of a change of device or of measurement method"
-    ]
+    ],
+    "source_tier": "curated_reference"
   },
   "templates": [
     {
       "id": "caffeine_timing",
-      "title": {"en": "Moving caffeine to the first half of the day", "ru": "Перенос кофеина на первую половину дня"},
-      "hypothesis": {"en": "giving up caffeine after 12:00 increases deep sleep", "ru": "отказ от кофеина после 12:00 увеличивает глубокий сон"},
+      "title": {
+        "en": "Moving caffeine to the first half of the day",
+        "ru": "Перенос кофеина на первую половину дня"
+      },
+      "hypothesis": {
+        "en": "giving up caffeine after 12:00 increases deep sleep",
+        "ru": "отказ от кофеина после 12:00 увеличивает глубокий сон"
+      },
       "primary_metric": "sleep.deep_min",
       "direction": "increase",
-      "secondary_metrics": ["sleep.sleep_stress", "sleep.score", "sleep.awake_count"],
+      "secondary_metrics": [
+        "sleep.sleep_stress",
+        "sleep.score",
+        "sleep.awake_count"
+      ],
       "phase_days": 10,
       "blocks": 6,
       "washout_days": 3,
       "min_achievable_p": 0.05,
       "total_days": 60,
-      "note": {"en": "The half-life of caffeine is 4–6 h, longer in slow metabolisers — 3 days of washout cover the carry-over. Genetics (CYP1A2) sets the plausibility of the hypothesis but does not replace the measurement.", "ru": "Период полувыведения кофеина 4–6 ч, у медленных метаболизаторов дольше — 3 дня washout закрывают перенос. Генетика (CYP1A2) задаёт правдоподобие гипотезы, но не заменяет измерение."}
+      "note": {
+        "en": "The half-life of caffeine is 4–6 h, longer in slow metabolisers — 3 days of washout cover the carry-over. Genetics (CYP1A2) sets the plausibility of the hypothesis but does not replace the measurement.",
+        "ru": "Период полувыведения кофеина 4–6 ч, у медленных метаболизаторов дольше — 3 дня washout закрывают перенос. Генетика (CYP1A2) задаёт правдоподобие гипотезы, но не заменяет измерение."
+      }
     },
     {
       "id": "bedtime_shift",
-      "title": {"en": "An earlier bedtime", "ru": "Более раннее время отхода ко сну"},
-      "hypothesis": {"en": "going to bed 45 minutes earlier than usual increases deep sleep", "ru": "отбой на 45 минут раньше обычного увеличивает глубокий сон"},
+      "title": {
+        "en": "An earlier bedtime",
+        "ru": "Более раннее время отхода ко сну"
+      },
+      "hypothesis": {
+        "en": "going to bed 45 minutes earlier than usual increases deep sleep",
+        "ru": "отбой на 45 минут раньше обычного увеличивает глубокий сон"
+      },
       "primary_metric": "sleep.deep_min",
       "direction": "increase",
-      "secondary_metrics": ["sleep.total_min", "sleep.score"],
+      "secondary_metrics": [
+        "sleep.total_min",
+        "sleep.score"
+      ],
       "phase_days": 10,
       "blocks": 6,
       "washout_days": 1,
       "min_achievable_p": 0.05,
       "total_days": 60,
-      "note": {"en": "The only lever that worked monotonically in the project's retrospective; a prospective test is needed precisely because a retrospective does not confirm the hypothesis but only proposes it.", "ru": "Единственный рычаг, монотонно работавший в ретроспективе проекта; проспективная проверка нужна именно потому, что ретроспектива гипотезу не подтверждает, а только предлагает."}
+      "note": {
+        "en": "The only lever that worked monotonically in the project's retrospective; a prospective test is needed precisely because a retrospective does not confirm the hypothesis but only proposes it.",
+        "ru": "Единственный рычаг, монотонно работавший в ретроспективе проекта; проспективная проверка нужна именно потому, что ретроспектива гипотезу не подтверждает, а только предлагает."
+      }
     },
     {
       "id": "evening_carbs",
-      "title": {"en": "The carbohydrate composition of dinner", "ru": "Углеводный состав ужина"},
-      "hypothesis": {"en": "a dinner with a low share of fast carbohydrates lowers night-time stress", "ru": "ужин с низкой долей быстрых углеводов снижает ночной стресс"},
+      "title": {
+        "en": "The carbohydrate composition of dinner",
+        "ru": "Углеводный состав ужина"
+      },
+      "hypothesis": {
+        "en": "a dinner with a low share of fast carbohydrates lowers night-time stress",
+        "ru": "ужин с низкой долей быстрых углеводов снижает ночной стресс"
+      },
       "primary_metric": "sleep.sleep_stress",
       "direction": "decrease",
-      "secondary_metrics": ["sleep.deep_min", "sleep.awake_count"],
+      "secondary_metrics": [
+        "sleep.deep_min",
+        "sleep.awake_count"
+      ],
       "phase_days": 7,
       "blocks": 8,
       "washout_days": 1,
       "min_achievable_p": 0.014,
       "total_days": 56,
-      "note": {"en": "Short phases are admissible: the effect of dinner shows up the same night. More blocks at the same duration — a stricter test.", "ru": "Короткие фазы допустимы: эффект ужина проявляется в ту же ночь. Больше блоков при той же длительности — строже тест."}
+      "note": {
+        "en": "Short phases are admissible: the effect of dinner shows up the same night. More blocks at the same duration — a stricter test.",
+        "ru": "Короткие фазы допустимы: эффект ужина проявляется в ту же ночь. Больше блоков при той же длительности — строже тест."
+      }
     },
     {
       "id": "alcohol_free",
-      "title": {"en": "Weekend evenings without alcohol", "ru": "Вечера выходных без алкоголя"},
-      "hypothesis": {"en": "giving up alcohol at the weekend removes the dip in deep sleep", "ru": "отказ от алкоголя в выходные убирает провал глубокого сна"},
+      "title": {
+        "en": "Weekend evenings without alcohol",
+        "ru": "Вечера выходных без алкоголя"
+      },
+      "hypothesis": {
+        "en": "giving up alcohol at the weekend removes the dip in deep sleep",
+        "ru": "отказ от алкоголя в выходные убирает провал глубокого сна"
+      },
       "primary_metric": "sleep.deep_min",
       "direction": "increase",
-      "secondary_metrics": ["sleep.sleep_stress", "sleep.awake_count"],
+      "secondary_metrics": [
+        "sleep.sleep_stress",
+        "sleep.awake_count"
+      ],
       "phase_days": 14,
       "blocks": 6,
       "washout_days": 2,
       "min_achievable_p": 0.05,
       "total_days": 84,
-      "note": {"en": "The phase is a multiple of a week deliberately: the effect is tied to the day of the week, and with a non-multiple length the blocks would contain different numbers of weekend days and there would be nothing to compare.", "ru": "Фаза кратна неделе намеренно: эффект привязан к дню недели, при некратной длительности блоки будут содержать разное число выходных и сравнивать будет нечего."}
+      "note": {
+        "en": "The phase is a multiple of a week deliberately: the effect is tied to the day of the week, and with a non-multiple length the blocks would contain different numbers of weekend days and there would be nothing to compare.",
+        "ru": "Фаза кратна неделе намеренно: эффект привязан к дню недели, при некратной длительности блоки будут содержать разное число выходных и сравнивать будет нечего."
+      }
     }
   ]
 }

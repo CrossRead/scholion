@@ -90,6 +90,27 @@ NO_CLI: Dict[str, str] = {
 
 # CLI commands that have no route and should not have one: this is not a gap in the web.
 CLI_ONLY: Dict[str, str] = {
+    "flag-rate": "how often each flag fires. The web shows the flags themselves; the share "
+                 "they fire on is a question about the RULES rather than about this person, "
+                 "which is a maintainer's screen and belongs where the other manifests live.",
+    "array": "the coverage of a consumer genotyping array against the locus catalogue. The "
+             "web already answers the question a reader has — every locus it shows carries its "
+             "own three-valued status — and a second, aggregate screen would be a place to "
+             "read a percentage without the ceiling that has to travel with it.",
+    "marker": "the local marker dictionary — listing, proposing and confirming entries. "
+              "Confirming an entry is the act that turns a value into a claim, and the web "
+              "interface reads the profile rather than authoring it; the proposal itself is "
+              "offered to a model as a tool, which is where an unrecognised row is actually "
+              "met.",
+    "lab-draw": "recording why a day holds two draws and what stood between them. The web "
+                "interface is a reader of the profile, not an author of it: every command that "
+                "writes lives on the command line, and this one writes a sentence the person "
+                "composes about their own care. It belongs where the ingest that produced the "
+                "pair already lives.",
+    "sources": "the register of external reference sources and the import that refreshes "
+               "them. A refresh reaches the network and rewrites reference data, so it stays "
+               "a typed command rather than a button a click can trigger by accident; the "
+               "Assistant tab already shows the outbound inventory a reader needs.",
     "capabilities": "the manifest of this build. In the web the tab bar IS the manifest — a "
                     "person sees what exists by looking at it — so a page listing commands "
                     "nobody types would answer a question the interface has already answered",
@@ -110,6 +131,13 @@ CLI_ONLY: Dict[str, str] = {
               "deliberately no route: a web form that accepts a pasted medical log would "
               "create one more place for that log to exist, and the whole point of the "
               "command is that the text stops existing in fewer places, not more",
+    "mcp": "not a report and not a page: it is a PROTOCOL spoken over stdin/stdout for the "
+           "length of a session. A web route would mean a second server with its own lifetime "
+           "inside the one this command replaces, and a model that wants these answers in a "
+           "browser already has the web interface itself",
+    "import-fhir": "a FHIR bundle imported from a path on disk. No web route for the same reason "
+                   "as `import-labs`: a page reachable from a browser must not be able to read an "
+                   "arbitrary file by name",
     "import-labs": "a CSV/TSV panel imported from a path on disk. The web has no route because "
                    "a page reachable from a browser must not be able to read an arbitrary file "
                    "by name — that is a file picker's job, and the picker is the next step, not "
@@ -196,6 +224,11 @@ PLUGIN: Dict[str, str] = {
     "overview": "sch_overview",
     "second-opinion": "sch_second_opinion",
     "limits": "sch_limits",
+    "sources": "sch_sources",
+    "lab-draw": "sch_lab_draw",
+    "marker": "sch_marker_propose",
+    "array": "sch_array",
+    "flag-rate": "sch_flag_rate",
     "radar": "sch_radar",
     "focus": "sch_focus",
     "brief": "sch_brief",
@@ -237,6 +270,9 @@ NO_PLUGIN: Dict[str, str] = {
     "add-lab": "a write", "add-med": "a write", "remove-med": "a write",
     "add-metric": "a write", "focus-log": "a write", "set-folder": "a write",
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
+    "import-fhir": "a write",
+    "mcp": "it IS the tool surface — a tool that starts the tool server would be a loop, and the "
+           "model calling it is already talking to the thing this command would start",
 }
 
 
@@ -392,7 +428,7 @@ def check_i18n_keys() -> List[str]:
 # second is the one the canon forbids.
 WRITES = {
     "init", "demo", "add-lab", "add-med", "remove-med", "add-metric", "focus-log",
-    "set-folder", "import-labs", "ingest-labs", "ingest-studies", "ingest-garmin",
+    "set-folder", "import-labs", "import-fhir", "ingest-labs", "ingest-studies", "ingest-garmin",
     "redact",
 }
 
@@ -407,7 +443,8 @@ AUTHORS = {
 # purpose and recorded here rather than by omission: a model that has just been
 # handed a folder of new results should be able to load them, and the values it
 # writes are the laboratory's, read off the form.
-TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "import-labs", "redact"}
+TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "import-labs", "import-fhir",
+               "redact"}
 
 
 def capabilities() -> Dict[str, Any]:

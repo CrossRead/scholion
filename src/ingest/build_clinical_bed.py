@@ -94,6 +94,28 @@ def main(argv):
     with out.open("w", encoding="utf-8") as fh:
         for c, lo, hi, name in merged:
             fh.write(f"chr{c}\t{lo}\t{hi}\t{name[:200]}\n")
+    # WHAT THE PERCENTAGE WILL MEAN. Written beside the BED so that whatever
+    # reads the coverage later can say what it was computed over, instead of
+    # letting the reader assume it was the coding sequence. It was not: these
+    # are gene LOCI with a 10 kb margin, so a 200 bp dropout inside a large gene
+    # moves the number by a rounding error — in TTN, about 0.07 % — while being
+    # exactly the thing the number is consulted about. Moving onto MANE Select
+    # CDS plus splice sites is a pipeline change (`scholion sources` carries
+    # MANE and the reason it is not a background refresh).
+    meta = out.with_name("callability_meta.json")
+    try:
+        meta.write_text(json.dumps({
+            "interval_basis": "gene_locus_plus_10kb",
+            "pad_locus": PAD_LOCUS,
+            "bounds_from": "ClinVar GENEINFO min/max per gene (local VCF)",
+            "intervals": len(merged), "bases": total,
+            "known_limitation": "a percentage over a whole locus is insensitive to a small "
+                                "dropout inside the coding sequence, which is the case it is "
+                                "usually consulted about",
+        }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"✓ {meta}: what the coverage percentage is computed over")
+    except OSError as e:
+        print(f"! could not write {meta}: {e}")
     print(f"✓ {out}: intervals {len(merged)}, {total/1e6:.1f} Mb in total "
           f"({100*total/3.1e9:.2f}% of the genome)")
     return 0

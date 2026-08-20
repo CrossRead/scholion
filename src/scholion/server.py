@@ -80,7 +80,12 @@ def _run_update_bg():
             return
         try:
             env = dict(os.environ)
-            env["PATH"] = "/opt/homebrew/bin:/usr/local/bin:" + env.get("PATH", "")
+            # APPEND the common brew locations, do not prepend: prepending puts
+            # user-writable directories ahead of the system ones, so anyone who can
+            # write to /opt/homebrew/bin could shadow a system binary the shell then
+            # runs. Appended, they are still found when nothing earlier provides the
+            # tool, and system binaries keep precedence.
+            env["PATH"] = env.get("PATH", "") + ":/opt/homebrew/bin:/usr/local/bin"
             env["PROJECT_DIR"] = str(_INGEST.parent.parent)
             p = subprocess.Popen(["bash", str(script)], stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT, env=env, text=True, bufsize=1)
@@ -445,6 +450,16 @@ def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, 
     import errno
     import threading
     import webbrowser
+
+    # The bind address is a security boundary, not a convenience. The README says
+    # the data does not leave the machine, and that promise is only kept while the
+    # socket listens on loopback. A non-loopback host (0.0.0.0, a LAN address)
+    # exposes the whole profile to the network — and the Host-header check is not a
+    # substitute, because Host is set by the client. So a non-loopback bind is
+    # refused unless the person says out loud, in the environment, that they mean
+    # it — the same shape as SCHOLION_TLS_INSECURE elsewhere.
+    if host not in _LOCAL_HOSTS and os.environ.get("SCHOLION_ALLOW_REMOTE", "").strip() not in ("1", "true", "yes"):
+        raise SystemExit(_t("server.remote_bind_refused", host=host))
 
     # The lab integrity self-check at start-up (in the background, it does not block the server)
     def _selfcheck():

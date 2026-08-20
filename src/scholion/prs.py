@@ -17,11 +17,31 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import re
 from pathlib import Path
 
 from .i18n import t as _t
 
-PKG = os.environ.get("PRS_MCP_PKG", "just-prs-mcp@0.1.3")
+_DEFAULT_PKG = "just-prs-mcp@0.1.3"
+
+
+def _prs_pkg() -> str:
+    """The uvx package spec, pinned by default and validated if overridden.
+
+    PRS_MCP_PKG existed as an undocumented override, and uvx runs whatever spec
+    it is given — so an attacker who can set one environment variable could point
+    it at an arbitrary package and gain code execution. The override stays (it is
+    useful for testing a local build) but only a bare `name` or `name@version`
+    of the ordinary character set is accepted; anything else falls back to the
+    pinned default rather than being run.
+    """
+    raw = os.environ.get("PRS_MCP_PKG", "").strip()
+    if raw and re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]*(@[A-Za-z0-9][A-Za-z0-9._+-]*)?$", raw):
+        return raw
+    return _DEFAULT_PKG
+
+
+PKG = _prs_pkg()
 _TRAITS = Path(__file__).resolve().parent / "knowledge" / "prs_traits.json"
 
 
@@ -34,6 +54,12 @@ class _MCP:
 
     def __init__(self, mode: str = "essentials", timeout: float = 600.0):
         self.timeout = timeout
+        from . import net as _net
+        if _net.offline():
+            # SCHOLION_OFFLINE=1 must be a single, honest switch: uvx would reach
+            # PyPI to fetch/refresh the package, so «offline» has to stop it here
+            # too, not only the direct urllib calls.
+            raise PrsUnavailable(_t("prs.offline"))
         env = dict(os.environ)
         env.setdefault("PRS_MCP_MODE", mode)
         try:
@@ -214,6 +240,35 @@ def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lam
             "score_meta": meta, "result": pr}, None
 
 
+def _sex_filtered(traits):
+    """Traits for organs the person does not have are not scored at all.
+
+    This module did not contain the word `sex` anywhere, so a woman with a VCF
+    was handed a prostate-cancer percentile as an ordinary line of the report —
+    a number about an organ she does not have, printed with the same confidence
+    as the rest. The guard is symmetric, and it also withholds on an UNRECORDED
+    sex: guessing which way to resolve it is the same failure in a different
+    direction, and this is the third place in the project where the answer to
+    «we do not know» has had to be «then we do not say» rather than a default.
+
+    Returns (kept, withheld) — withheld is carried into the result, because a
+    trait that silently vanishes from a panel is indistinguishable from a trait
+    that was never in it.
+    """
+    from . import core
+    sex = core.profile_sex()
+    kept, withheld = [], []
+    for t in traits:
+        need = t.get("applies_to_sex")
+        if need and need != sex:
+            withheld.append({"label": t.get("label"), "term": t.get("term"),
+                             "applies_to_sex": need,
+                             "reason": "sex_not_recorded" if not sex else "other_sex"})
+            continue
+        kept.append(t)
+    return kept, withheld
+
+
 def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
            only=None, normalize: bool = True, models_per_trait: int = 3,
            profile: str = "curated", include_children: bool = False,
@@ -229,6 +284,7 @@ def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
     fallback — when a model is missing or poorly covered, look for one via search_scores.
     """
     traits = traits or _load_traits()
+    traits, withheld = _sex_filtered(traits)
     if only:
         only = [o.lower() for o in only]
         traits = [t for t in traits
@@ -316,7 +372,10 @@ def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
             out.append(row)
         return {"ok": True, "vcf": vcf_path, "genotypes_path": geno,
                 "superpopulation": superpopulation, "pick": pick,
-                "profile": profile, "traits": out}
+                "profile": profile, "traits": out,
+                # Named, not dropped: a trait that vanishes from the panel in
+                # silence looks exactly like a trait that was never in it.
+                "withheld_by_sex": withheld}
     finally:
         m.close()
 

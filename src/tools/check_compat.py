@@ -35,6 +35,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -56,8 +57,36 @@ SNAPSHOT_CMDS = [
 
 ENTRYPOINTS = ["python3 -m scholion", "bin/crossread"]
 
-ENV_VARS = ["SCHOLION_PROFILE_DIR", "SCHOLION_REPO_DIR", "SCHOLION_GENOME_DIR",
-            "SCHOLION_GENOME_VCF", "SCHOLION_OFFLINE", "SCHOLION_LABS_DIR"]
+# Read from the tree, not typed here. The list used to be six names while the code
+# read twenty-one; the fifteen it did not name could be renamed in silence, because
+# the check compared a frozen list against the same frozen list. That is the shape
+# of gate this project has now been bitten by twice (the APOE table, the emitted
+# vocabularies): a derivable table typed by hand goes stale without a sound.
+#
+# Only our own names and the ones we promise to honour are the contract. PATH, HOME
+# and TMPDIR are read too, but they belong to the operating system: we do not get to
+# promise anything about them, so they are not in the contract.
+_ENV_READ = re.compile(r"""(?:environ\.get|getenv)\(\s*["']([A-Z][A-Z0-9_]*)["']"""
+                       r"""|environ\[\s*["']([A-Z][A-Z0-9_]*)["']""")
+FOREIGN_ENV = {
+    # Not ours by name, but the product reads it and its behaviour depends on it.
+    "PRS_MCP_PKG",
+}
+
+
+def env_vars() -> list:
+    names = set()
+    for p in sorted(SRC.rglob("*.py")):
+        if "__pycache__" in p.parts:
+            continue
+        for a, b in _ENV_READ.findall(p.read_text(encoding="utf-8", errors="ignore")):
+            n = a or b
+            if n.startswith("SCHOLION_") or n in FOREIGN_ENV:
+                names.add(n)
+    return sorted(names)
+
+
+ENV_VARS = None      # filled in collect(); see env_vars() above
 
 PROFILE_FILES = [
     "labs.json", "medications.json", "metrics.json", "health_goals.json",
@@ -99,7 +128,7 @@ def collect() -> dict:
     return {"_note": "The baseline of the public contract. Adding is allowed; removing "
                      "only deliberately (--accept) and with an entry in the CHANGELOG "
                      "as an incompatible change.",
-            "entrypoints": ENTRYPOINTS, "env_vars": ENV_VARS,
+            "entrypoints": ENTRYPOINTS, "env_vars": env_vars(),
             "commands": commands, "json_fields": fields, "profile_files": PROFILE_FILES}
 
 

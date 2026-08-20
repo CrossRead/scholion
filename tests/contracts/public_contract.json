@@ -1,39 +1,68 @@
 {
-  "_note": "Эталон публичного контракта. Добавлять можно, убирать — только осознанно (--accept) и с записью в CHANGELOG как несовместимое.",
+  "_note": "The baseline of the public contract. Adding is allowed; removing only deliberately (--accept) and with an entry in the CHANGELOG as an incompatible change.",
   "entrypoints": [
     "python3 -m scholion",
     "bin/crossread"
   ],
   "env_vars": [
-    "SCHOLION_PROFILE_DIR",
-    "SCHOLION_REPO_DIR",
+    "PRS_MCP_PKG",
+    "SCHOLION_ALLOW_REMOTE",
+    "SCHOLION_ARRAY_FILE",
+    "SCHOLION_CACHE_DIR",
+    "SCHOLION_CLINVAR_VCF",
+    "SCHOLION_GENOME_ASSEMBLY",
     "SCHOLION_GENOME_DIR",
     "SCHOLION_GENOME_VCF",
+    "SCHOLION_LABS_DIR",
+    "SCHOLION_LANG",
+    "SCHOLION_LONGEVITYMAP",
+    "SCHOLION_LONGEVITY_DIR",
+    "SCHOLION_LONGEVITY_OUT",
+    "SCHOLION_LONGEVITY_RSMAP",
+    "SCHOLION_LONGEVITY_VCF",
     "SCHOLION_OFFLINE",
-    "SCHOLION_LABS_DIR"
+    "SCHOLION_PROFILE_DIR",
+    "SCHOLION_PROG",
+    "SCHOLION_PRS_CACHE",
+    "SCHOLION_REPO_DIR",
+    "SCHOLION_TLS_INSECURE"
   ],
   "commands": [
     "acmg",
     "add-lab",
     "add-med",
     "add-metric",
+    "array",
     "assistant",
     "brief",
+    "capabilities",
     "clinvar",
+    "demo",
+    "doc",
     "drug",
+    "flag-rate",
     "focus",
     "focus-log",
     "genome",
     "genome-status",
     "genome-updates",
     "goal",
+    "goal-suggest",
+    "import-fhir",
+    "import-labs",
     "ingest-garmin",
     "ingest-labs",
     "ingest-studies",
+    "init",
+    "lab-draw",
     "labs",
     "lifestyle",
+    "limits",
+    "lipid-genetics",
     "longevity",
+    "marker",
     "markers",
+    "mcp",
     "medications",
     "metrics",
     "overview",
@@ -44,17 +73,22 @@
     "prs",
     "radar",
     "reconcile",
+    "redact",
     "remove-med",
     "second-opinion",
     "selfcheck",
     "serve",
     "set-folder",
-    "suggest-tests"
+    "skill",
+    "sources",
+    "suggest-tests",
+    "tools"
   ],
   "json_fields": {
     "overview": [
       "abnormal_count",
       "disclaimer",
+      "flagged",
       "genome",
       "genome_gaps",
       "high_flags",
@@ -63,9 +97,11 @@
       "markers_total",
       "medications_count",
       "metrics",
+      "pending_suggestions",
       "stale_abnormal_count",
       "subject_id",
       "suggestions_count",
+      "synthetic",
       "watch_flags"
     ],
     "labs": [
@@ -87,8 +123,11 @@
     "second-opinion": [
       "disclaimer",
       "drug_flags",
+      "drugs_answerable",
+      "drugs_checked",
       "red_labs",
-      "suggestions"
+      "suggestions",
+      "suggestions_pending"
     ],
     "radar": [
       "disclaimer",
@@ -123,9 +162,20 @@
       "title"
     ],
     "genome-status": [
+      "array",
+      "array_unreadable",
+      "assembly",
+      "assembly_expected",
+      "assembly_mismatch",
+      "assembly_served",
+      "assembly_unknown",
+      "catalogue_by_assembly",
+      "coordinates",
       "engine",
       "gaps",
+      "input_class",
       "ready",
+      "unusable",
       "vcf",
       "vcf_present"
     ],
@@ -135,7 +185,9 @@
     "clinvar": [
       "disclaimer",
       "hits",
+      "indel_caveat",
       "message",
+      "normalisation",
       "penetrance",
       "status",
       "tiers"
@@ -146,6 +198,7 @@
       "message",
       "penetrance",
       "status",
+      "unread_genes",
       "version"
     ],
     "prs": [
@@ -168,6 +221,7 @@
       "assistant_adds",
       "audit",
       "curated",
+      "data_layout",
       "disclaimer",
       "engine_does",
       "entrypoints",
@@ -175,11 +229,17 @@
       "works_without_assistant"
     ],
     "drug": [
+      "basis",
+      "certainty",
       "clinvar",
+      "co_genes",
+      "cpic",
       "disclaimer",
+      "driving_gene",
       "drug",
       "drug_class",
       "gene",
+      "guidance_gap",
       "level",
       "markers_found",
       "phenotype",
@@ -201,7 +261,9 @@
       "labs",
       "overall",
       "pharmacogenetics",
-      "status"
+      "safety_flags",
+      "status",
+      "unresolved"
     ],
     "phenoage": [
       "complete",

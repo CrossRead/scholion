@@ -74,7 +74,7 @@ class TestUnknownIsNotGreen(_Base):
         """
         p = self.profile()
         for drug in ("azathioprine", "voriconazole", "omeprazole",
-                     "citalopram", "methotrexate", "capecitabine"):
+                     "citalopram", "capecitabine"):
             with self.subTest(drug=drug):
                 r = support.run_json(["drug", drug], profile_dir=p)
                 self.assertEqual(r.get("phenotype"), "unknown",
@@ -134,16 +134,20 @@ class TestTheCatalogueSilenceIsNotAnAnswer(_Base):
     """A phenotype the catalogue says nothing about is reported as such."""
 
     def test_a_phenotype_without_its_own_entry_is_named_a_gap(self):
-        """Voriconazole has UM, RM, PM and `default` — and no IM, NM or unknown.
+        """The catalogue's silence about a phenotype must not be printed as a
+        statement about the patient.
 
-        So a carrier of a loss-of-function allele, a normal metaboliser and a
-        person with no data received one and the same sentence. The catalogue's
-        silence about a phenotype was printed as a statement about the patient.
+        This once used voriconazole, which had UM/RM/PM and nothing for IM or NM,
+        so a carrier of a loss-of-function allele, a normal metaboliser and a
+        person with no data all received one sentence. Those rows have since been
+        imported from CPIC verbatim, so the example moved to a gap that is
+        DECLARED: amitriptyline's rapid-metaboliser row has not been imported
+        yet, and the catalogue says so out loud rather than answering anyway.
         """
-        p = self.profile(genotypes=[{"gene": "CYP2C19", "rsid": "rs4244285",
-                                     "genotype": "GA"}])
-        r = support.run_json(["drug", "voriconazole"], profile_dir=p)
-        self.assertEqual(r.get("phenotype"), "IM")
+        p = self.profile(genotypes=[{"gene": "CYP2C19", "rsid": "rs12248560",
+                                     "genotype": "CT"}])
+        r = support.run_json(["drug", "amitriptyline"], profile_dir=p)
+        self.assertEqual(r.get("phenotype"), "RM")
         self.assertTrue(r.get("guidance_gap"),
                         "the missing entry is not reported as a gap in the reference data")
         self.assertNotEqual(r.get("level"), "low")
@@ -353,8 +357,13 @@ class TestUnknownIsAnInstructionNotAVerdict(_Base):
         basis = engine.compute_phenotype("MTHFR").get("basis") or {}
         self.assertIn("rs1801131", basis.get("not_modelled") or [],
                       "an allele the catalogue knows and the model ignores is not reported")
+        # methotrexate is no longer presented as an MTHFR pharmacogenetic pair
+        # (CPIC has no such guideline; ACMG advises against testing MTHFR): the
+        # honest answer says there is no pharmacogenetic signal, rather than
+        # fabricating an MTHFR «recommendation».
         r = support.run_json(["drug", "methotrexate"], profile_dir=self.profile())
-        self.assertIn("rs1801131", r.get("recommendation") or "")
+        self.assertTrue(r.get("no_pgx"))
+        self.assertEqual(r.get("phenotype"), "not_applicable")
 
     def test_a_partial_panel_answers_and_marks_the_answer(self):
         p = self.profile(genotypes=[{"gene": "CYP2C19", "rsid": "rs4244285",
@@ -416,8 +425,18 @@ class TestConnectingAGenomeCannotMakeTheAnswerLessCautious(_Base):
 
     def _env(self, with_genome):
         if with_genome:
+            # The build is declared because this fixture cannot settle it by
+            # itself: two rows, no `##contig` block, and no variant past the end
+            # of chromosome 1 to probe with. Since 0.4.1 a file whose build is
+            # unestablished does not report «no row here» — «no row» and «the
+            # wrong coordinate system» produce the same silence, and telling them
+            # apart is the point. That third case is asserted in
+            # `test_one_file_one_person.py`; the case THIS test is about is a
+            # readable file in a known build whose rows do not cover the
+            # positions, and declaring the build is what makes it that case.
             return {"SCHOLION_GENOME_VCF": str(GENOME_FIXTURE),
-                    "SCHOLION_GENOME_DIR": str(GENOME_FIXTURE.parent)}
+                    "SCHOLION_GENOME_DIR": str(GENOME_FIXTURE.parent),
+                    "SCHOLION_GENOME_ASSEMBLY": "GRCh38"}
         return {"SCHOLION_GENOME_VCF": str(support.ROOT / "tests/fixtures/no-such-file.vcf.gz"),
                 "SCHOLION_GENOME_DIR": str(support.ROOT / "tests/fixtures/no-genome")}
 
@@ -433,7 +452,7 @@ class TestConnectingAGenomeCannotMakeTheAnswerLessCautious(_Base):
                 "r['_gaps'] = core.genome_gaps();"
                 "print(json.dumps(r, default=str))" % (str(support.SRC), drug))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=120)
+                           text=True, env=env, timeout=120, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr)
         return _json.loads(p.stdout.strip().splitlines()[-1])
 
@@ -564,7 +583,7 @@ class TestConnectingAGenomeCannotMakeTheAnswerLessCautious(_Base):
                 "print(json.dumps(core.genotype_status('rs1800462'), default=str))"
                 % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=60)
+                           text=True, env=env, timeout=60, stdin=subprocess.DEVNULL)
         st = _json.loads(p.stdout.strip().splitlines()[-1] or "null")
         self.assertTrue(st, "the one variant actually present in the fixture was not found")
         self.assertEqual(st["confidence"], "called")
@@ -600,7 +619,7 @@ class TestASourceNeverReachedCannotMakeANegativeStatement(_Base):
                 "print(json.dumps({'r': r, 'text': fmt.prescription_check(r)}, default=str))"
                 % (str(support.SRC), drug))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=120)
+                           text=True, env=env, timeout=120, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-800:])
         return _json.loads(p.stdout.strip().splitlines()[-1])
 
@@ -648,7 +667,7 @@ class TestASourceNeverReachedCannotMakeANegativeStatement(_Base):
                 "from scholion import drugsource;"
                 "print(json.dumps(drugsource.cpic_lookup('6809')))" % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=60)
+                           text=True, env=env, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-600:])
         got = _json.loads(p.stdout.strip().splitlines()[-1])
         self.assertTrue(got["asked"], "a cached CPIC answer was reported as never asked")
@@ -695,7 +714,7 @@ class TestAPartlyReadListSaysWhichPartWasNotRead(_Base):
                 "print(json.dumps({'r': r, 'text': fmt.prescription_check(r)}, default=str))"
                 % (str(support.SRC), drug))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=120)
+                           text=True, env=env, timeout=120, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-800:])
         return _json.loads(p.stdout.strip().splitlines()[-1])
 

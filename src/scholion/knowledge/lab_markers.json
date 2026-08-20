@@ -10,7 +10,8 @@
       "ru",
       "en"
     ],
-    "key_rule": "the marker key is the primary key of a person's series and never changes: a rename would split a series in two. A key that has to be replaced gets an `aliases` entry instead."
+    "key_rule": "the marker key is the primary key of a person's series and never changes: a rename would split a series in two. A key that has to be replaced gets an `aliases` entry instead.",
+    "source_tier": "curated_reference"
   },
   "markers": {
     "cholesterol_total": {
@@ -261,13 +262,12 @@
         "mmol/mol": {
           "k": 0.09148,
           "b": 2.152,
-          "source": "NGSP-IFCC master equation, NGSP (ngsp.org/ifccngsp.asp): NGSP % = 0.09148 × IFCC mmol/mol + 2.152. Revised in 2007 when the IFCC moved from % to mmol HbA1c/mol Hb; the constant 2.152 was kept and the multiplier scaled by ten.",
-          "why_not_a_factor": "Affine, not proportional: the line does not pass through the origin. 48 mmol/mol is 6.5 %, and any single multiplier applied to 48 gives something else. This is the one marker in the file that needs the second law, and it is the commonest unit on a European report — refusing it, as this entry did until v0.3.1, rejected an ordinary form."
+          "source": "NGSP master equation: NGSP % = 0.09148 × IFCC mmol/mol + 2.152"
         },
         "ммоль/моль": {
           "k": 0.09148,
           "b": 2.152,
-          "source": "the same master equation; the Cyrillic spelling appears on Russian forms"
+          "source": "NGSP master equation: NGSP % = 0.09148 × IFCC mmol/mol + 2.152"
         }
       }
     },
@@ -297,7 +297,18 @@
         "mg/dL": 59.48,
         "мг/дл": 59.48
       },
-      "convert_note": "Uric acid M = 168.11 g/mol; 1 mg/dL = 10000/168.11 = 59.48 µmol/L."
+      "convert_note": "Uric acid M = 168.11 g/mol; 1 mg/dL = 10000/168.11 = 59.48 µmol/L.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 202,
+          "ref_high": 420
+        },
+        "female": {
+          "ref_low": 143.0,
+          "ref_high": 340.0
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "rheumatoid_factor": {
       "unit": "[IU]/mL",
@@ -306,6 +317,11 @@
         "ru": {
           "names": [
             "ревматоидный фактор"
+          ]
+        },
+        "en": {
+          "names": [
+            "rheumatoid factor"
           ]
         }
       }
@@ -382,7 +398,18 @@
         "ng/mL": 3.467,
         "нг/мл": 3.467
       },
-      "convert_note": "Testosterone M = 288.42 g/mol; 1 ng/dL = 10/288.42 = 0.03467 nmol/L, 1 ng/mL = 3.467 nmol/L. The two spellings differ by a factor of 100."
+      "convert_note": "Testosterone M = 288.42 g/mol; 1 ng/dL = 10/288.42 = 0.03467 nmol/L, 1 ng/mL = 3.467 nmol/L. The two spellings differ by a factor of 100.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 12.1,
+          "ref_high": 34.4
+        },
+        "female": {
+          "ref_low": 0.3,
+          "ref_high": 2.4
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "igf1": {
       "unit": "ng/mL",
@@ -507,6 +534,18 @@
             "sgpt"
           ]
         }
+      },
+      "ref_by_sex": {
+        "male": {
+          "ref_high": 41
+        },
+        "female": {
+          "ref_high": 33
+        }
+      },
+      "units_note": {
+        "en": "IFCC method at 37 °C. The reference limit is published as a pair — the number kept at the top level is the male one, which is why a woman's 3×ULN thresholds were being computed from a man's bound.",
+        "ru": "Метод IFCC при 37 °C. Референсный предел публикуется парой — наверху лежит мужское число, из-за чего пороги 3×ВГН для женщины считались от мужской границы."
       }
     },
     "ast": {
@@ -592,7 +631,18 @@
         "mg/dL": 88.4,
         "мг/дл": 88.4
       },
-      "convert_note": "Creatinine M = 113.12 g/mol; 1 mg/dL = 10000/113.12 = 88.4 µmol/L."
+      "convert_note": "Creatinine M = 113.12 g/mol; 1 mg/dL = 10000/113.12 = 88.4 µmol/L.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 62,
+          "ref_high": 106
+        },
+        "female": {
+          "ref_low": 44.0,
+          "ref_high": 80.0
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "ferritin": {
       "unit": "ug/L",
@@ -615,7 +665,18 @@
         "ng/mL": 1.0,
         "нг/мл": 1.0
       },
-      "convert_note": "1 ng/mL = 1 µg/L exactly — the same quantity under two names, and worth listing so that the commoner spelling is not refused."
+      "convert_note": "1 ng/mL = 1 µg/L exactly — the same quantity under two names, and worth listing so that the commoner spelling is not refused.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 30,
+          "ref_high": 400
+        },
+        "female": {
+          "ref_low": 13.0,
+          "ref_high": 150.0
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "tsh": {
       "unit": "u[IU]/mL",
@@ -935,7 +996,14 @@
             "total"
           ]
         }
-      }
+      },
+      "units": {
+        "pmol/L": 1.0,
+        "пмоль/л": 1.0,
+        "ng/dL": 12.872,
+        "нг/дл": 12.872
+      },
+      "units_note": "ng/dL → pmol/L: T4 is C15H11I4NO4, M = 776.87 g/mol; 1 ng/dL = 10 ng/L = 10e-9/776.87 mol/L = 12.872 pmol/L"
     },
     "t3_free": {
       "convert": {
@@ -965,7 +1033,14 @@
             "reverse"
           ]
         }
-      }
+      },
+      "units": {
+        "pmol/L": 1.0,
+        "пмоль/л": 1.0,
+        "pg/mL": 1.536,
+        "пг/мл": 1.536
+      },
+      "units_note": "pg/mL → pmol/L: T3 is C15H12I3NO4, M = 650.98 g/mol; 1 pg/mL = 1 ng/L = 1e-9/650.98 mol/L = 1.536 pmol/L"
     },
     "dht": {
       "convert": {
@@ -982,7 +1057,9 @@
         "нг/мл": 3.4435261707988984,
         "nmol/L": 1.0,
         "pg/mL": 0.003443526170798898,
-        "ng/mL": 3.4435261707988984
+        "ng/mL": 3.4435261707988984,
+        "ng/dL": 0.03443,
+        "нг/дл": 0.03443
       },
       "labels": {
         "ru": {
@@ -1000,7 +1077,8 @@
             "dht"
           ]
         }
-      }
+      },
+      "units_note": "ng/dL → nmol/L: DHT is C19H30O2, M = 290.45 g/mol; 1 ng/dL = 10 ng/L = 10e-9/290.45 mol/L = 0.03443 nmol/L"
     },
     "androstendion": {
       "unit": "nmol/L",
@@ -1357,7 +1435,18 @@
         "L/L": 100.0,
         "л/л": 100.0
       },
-      "convert_note": "A volume fraction and a percentage of the same quantity: 0.45 L/L is 45 %. US analysers print either."
+      "convert_note": "A volume fraction and a percentage of the same quantity: 0.45 L/L is 45 %. US analysers print either.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 39.0,
+          "ref_high": 49.0
+        },
+        "female": {
+          "ref_low": 35.0,
+          "ref_high": 45.0
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "hemoglobin": {
       "unit": "g/L",
@@ -1397,7 +1486,18 @@
         "g/dL": 10.0,
         "г/дл": 10.0
       },
-      "convert_note": "1 g/dL = 10 g/L."
+      "convert_note": "1 g/dL = 10 g/L.",
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 131.0,
+          "ref_high": 172.0
+        },
+        "female": {
+          "ref_low": 117.0,
+          "ref_high": 155.0
+        }
+      },
+      "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range."
     },
     "rbc": {
       "unit": "10*12/L",
@@ -1793,7 +1893,10 @@
         "ug/L": 1.0,
         "µg/L": 1.0,
         "umol/L": 65.38,
-        "µmol/L": 65.38
+        "µmol/L": 65.38,
+        "ug/dL": 10.0,
+        "µg/dL": 10.0,
+        "мкг/дл": 10.0
       },
       "labels": {
         "ru": {
@@ -1821,7 +1924,8 @@
             "urinary"
           ]
         }
-      }
+      },
+      "units_note": "ug/dL → ug/L: a power of ten, 1 dL = 0.1 L"
     },
     "urea": {
       "unit": "mmol/L",
@@ -3434,8 +3538,14 @@
         }
       },
       "convert_refused": {
-        "mg/dL": "mass and molar concentration of Lp(a) do not relate by a constant: the apo(a) isoform varies in size between people (kringle IV type-2 repeats), so mg/dL → nmol/L needs a factor that depends on the person's isoform. Published approximations range from about 2.0 to 2.5 and are explicitly not for clinical conversion. Enter the nmol/L figure the laboratory reported, or keep the mg/dL series separately.",
-        "мг/дл": "see mg/dL: mass and molar concentration of Lp(a) do not relate by a constant — the size of the apo(a) isoform differs between people."
+        "mg/dL": {
+          "en": "Lp(a) in mg/dL cannot be converted to nmol/L by a factor: the mass-to-particle ratio depends on the apo(a) isoform (the number of kringle IV repeats), which differs between people and has no consensus conversion. Enter the value in nmol/L, or record the mg/dL result as its own series.",
+          "ru": "Лп(а) в мг/дл нельзя перевести в нмоль/л коэффициентом: отношение массы к числу частиц зависит от изоформы апо(а) (числа повторов kringle IV), различается между людьми и общепринятого пересчёта не имеет. Введите значение в нмоль/л или ведите результат в мг/дл отдельным рядом."
+        },
+        "мг/дл": {
+          "en": "see mg/dL",
+          "ru": "см. mg/dL"
+        }
       }
     },
     "transferrin_sat": {
@@ -3484,7 +3594,16 @@
             "tibc"
           ]
         }
-      }
+      },
+      "units": {
+        "umol/L": 1.0,
+        "µmol/L": 1.0,
+        "мкмоль/л": 1.0,
+        "ug/dL": 0.17907,
+        "µg/dL": 0.17907,
+        "мкг/дл": 0.17907
+      },
+      "units_note": "ug/dL → umol/L: TIBC is expressed as iron, M(Fe) = 55.845 g/mol; 1 µg/dL = 10 µg/L = 10e-6/55.845 mol/L = 0.17907 µmol/L"
     },
     "aldosterone": {
       "unit": "nmol/L",
@@ -8713,6 +8832,20 @@
         "en": {
           "display": "Creatine kinase"
         }
+      },
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 0,
+          "ref_high": 190
+        },
+        "female": {
+          "ref_low": 0,
+          "ref_high": 170
+        }
+      },
+      "units_note": {
+        "en": "IFCC method at 37 °C. The reference limit is published as a pair — the number kept at the top level is the male one, which is why a woman's 3×ULN thresholds were being computed from a man's bound.",
+        "ru": "Метод IFCC при 37 °C. Референсный предел публикуется парой — наверху лежит мужское число, из-за чего пороги 3×ВГН для женщины считались от мужской границы."
       }
     },
     "thyroid_ippk": {

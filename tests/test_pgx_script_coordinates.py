@@ -127,7 +127,7 @@ class TestTheScriptTakesItsLociFromTheCatalogue(unittest.TestCase):
         self.assertEqual(len(body), 2, "the selection step is no longer a LOCI_PY block")
         code = body[1].split("LOCI_PY", 1)[0]
         p = subprocess.run([sys.executable, "-c", code, str(CATALOGUE), *self._genes()],
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-600:])
         rows = [l.split("\t") for l in p.stdout.splitlines() if l.strip()]
         self.assertTrue(rows, "the selection step emitted nothing")
@@ -265,7 +265,7 @@ class TestTheExtractionTargetReachesEveryMarker(unittest.TestCase):
         self.assertGreater(i, 0, "the script no longer generates its target regions")
         code = src[i + len("BED_PY'\n"):j]
         p = subprocess.run([sys.executable, "-c", code, str(CATALOGUE), "200"],
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr)
         out = []
         for line in p.stdout.splitlines():

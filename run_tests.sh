@@ -36,7 +36,9 @@ for a in "$@"; do
 done
 
 echo "▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not depend on whether some external reference answers today)"
-python3 -m unittest discover -s tests -t . "$@"
+# `< /dev/null`: no test may read the terminal. One that does passes on CI,
+# where stdin is closed, and hangs for whoever runs the suite by hand.
+python3 -m unittest discover -s tests -t . "$@" < /dev/null
 echo "▶ backward compatibility of the public contract"
 python3 src/tools/check_compat.py
 # These steps run only if the tool is present in this build: the anonymised

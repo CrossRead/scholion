@@ -19,7 +19,7 @@ command -v samtools >/dev/null || { echo "❌ samtools is missing (brew install 
 
 log "1/3 Cleaning up the stuck temp files and the empty markdup stub…"
 rm -f "$WORKDIR"/samtools.*.tmp.*.bam
-if [ -f "$WORKDIR/$SAMPLE.markdup.bam" ] && [ "$(stat -f%z "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || echo 0)" -lt 1048576 ]; then
+if [ -f "$WORKDIR/$SAMPLE.markdup.bam" ] && [ "$(stat -f%z "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || stat -c%s "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || echo 0)" -lt 1048576 ]; then
   rm -f "$WORKDIR/$SAMPLE.markdup.bam"
 fi
 df -h "$WORKDIR" | tail -1

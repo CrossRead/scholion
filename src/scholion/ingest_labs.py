@@ -11,6 +11,7 @@ Text extraction: pdfplumber → pdftotext (poppler) → pdfminer; if none is ava
 to install pdfplumber via pip. Scanned PDFs (no text layer) are not supported without OCR.
 """
 from __future__ import annotations
+import csv
 import json
 import os
 import re
@@ -44,9 +45,32 @@ _TAIL3 = re.compile(r"\d{3}(?:[.,]\d+)?$")
 # a female range (17-OH-progesterone took «Новорожденные», 17-OH-pregnenolone — «Женщины»).
 _ROW_LABEL = re.compile(r"^\s*(?:взрослые|мужчин|женщин|новорожд|дети|детск|девочк|мальчик|"
                         r"подростк|беремен|терапевтическ|шкала|до\s+полудня|после\s+полудня|"
-                        r"при\s+ходьбе|в\s+покое)", re.IGNORECASE)
+                        r"при\s+ходьбе|в\s+покое|по\s+умолчанию|остальные|прочие|"
+                        r"таннер|стадия|\d+\s*-?\s*й?\s*триместр|"
+                        # A bare Roman numeral opening the row, when a number follows
+                        # it: «I    0,10 - 0,98» is a pubertal stage on a form that
+                        # dropped the word «Таннер». Requiring the number keeps a
+                        # stray capital I from swallowing an ordinary row.
+                        r"[IVX]{1,4}(?=[\s:.\-–—(]*\d))",
+                        re.IGNORECASE)
+# A row that belongs to SOMEBODY ELSE. Three additions, each from a real form:
+#
+# «таннер» without the word «шкала» before it — Gemotest prints «Таннер I», and the
+# old pattern required «шкала таннер», so a man of 41 was measured against stage I
+# and 18.5 nmol/L of testosterone read as nineteen times the upper bound (task 65).
+#
+# A bare Roman numeral opening the row — the same block on other forms drops the
+# word «Таннер» entirely and prints «II 0,10 - 1,20».
+#
+# «триместр» — a trimester row sits UNDER a «Женщины» heading and does not repeat
+# the word «беременн», so it passed the filter as an ordinary adult row. The
+# profile has no pregnancy status at all, so no trimester row is ever applicable
+# (task 66c).
 _ROW_ALIEN = re.compile(r"новорожд|девочк|мальчик|детск|дети|подростк|беремен|пуповин|"
-                        r"терапевтическ|шкала\s+таннер", re.IGNORECASE)
+                        r"терапевтическ|таннер|триместр|"
+                        r"^\s*(?:стадия\s*)?[IVX]{1,4}(?=[\s:.\-–—(]*\d)",
+                        re.IGNORECASE | re.MULTILINE)
+_BLOCK_HEAD = re.compile(r"^\s*(?:референс|норм[аы]|reference|значени)", re.IGNORECASE)
 _ROW_FEM = re.compile(r"женщин|девушк", re.IGNORECASE)
 _ROW_BAND = re.compile(r"(\d{1,2})\s*[-–—]\s*(\d{1,2})\s*(?:лет\b|год\w*|г\s*[):])", re.IGNORECASE)
 _ROW_OVER = re.compile(r"старше\s*(\d{1,2})|>\s*(\d{1,2})\s*(?:лет|год\w*)", re.IGNORECASE)
@@ -57,6 +81,30 @@ _ROW_LOWER = re.compile(r"(?:>|\bболее\b)\s*(" + _NUM_ANY + r")", re.IGNORE
 # (Invitro/Medgorod), «Взятие биоматериала: DD.MM.YYYY HH:MM» (DNKOM/Gemotest).
 # If it goes unrecognised, the form silently drops out of both ingest and reconcile.
 _DATE = re.compile(r"(?:Дата\s+взятия|Взятие\s+биоматериала|Дата\s+забора|Забор\s+биоматериала)[^\d]*(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
+# The CLOCK TIME of the draw, when the form prints one right after the date.
+#
+# Until now a point was stored at month granularity, so two draws on one day
+# collapsed into a single value and the second one was reported as a discrepancy
+# with the first. That is a real and ordinary situation — blood taken before a
+# procedure or a dose and again after it — and calling it a conflict tells the
+# person their data disagrees with itself when in fact it is doing exactly what
+# it should. The time is what tells the two apart, so it is read when the form
+# prints it and the point keeps it.
+_TIME_AFTER = re.compile(r"^[^\d\n]{0,12}(\d{1,2})[:.](\d{2})")
+
+# A delimited export has no «Дата взятия» line: it has a date COLUMN, and the
+# date sits at the start of every data row. Only ISO order is accepted here for
+# the same reason as below — «03/04/2024» is two different days depending on who
+# printed it — and only at the start of a row followed by a separator, so that a
+# birth date inside a sentence cannot be mistaken for a draw date.
+_DATE_ROW = re.compile(r'^\s*"?(\d{4})-(\d{2})-(\d{2})"?\s*[,;\t]', re.MULTILINE)
+
+
+def table_dates(text: str) -> list:
+    """Distinct ISO dates that begin a row. Sorted, deduplicated, never guessed at."""
+    return sorted({f"{a}-{b}-{c}" for a, b, c in _DATE_ROW.findall(text)})
+
+
 _DATE_FALLBACK = re.compile(r"Регистрация\s+биоматериала[^\d]*(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
 # The same date on an English form — and ONLY in ISO order, deliberately.
 # «03/04/2024» is the fourth of March in the United States and the third of April
@@ -66,9 +114,88 @@ _DATE_FALLBACK = re.compile(r"Регистрация\s+биоматериала[
 # joins a series and moves a trend. So an unambiguous date is read and an
 # ambiguous one is left for the person to enter, with the file skipped as «not a
 # report» exactly as before.
-_DATE_EN = re.compile(r"(?:collected|collection\s+date|date\s+of\s+collection|specimen\s+collected|"
-                      r"drawn|draw\s+date|sample\s+date|date\s+drawn)[^\d]{0,20}"
-                      r"(\d{4})-(\d{2})-(\d{2})", re.IGNORECASE)
+_EN_LABEL = (r"(?:collected|collection\s+date|date\s+of\s+collection|specimen\s+collected|"
+             r"drawn|draw\s+date|sample\s+date|date\s+drawn|report\s+date|date\s+reported)")
+
+_DATE_EN = re.compile(_EN_LABEL + r"[^\d]{0,20}(\d{4})-(\d{2})-(\d{2})", re.IGNORECASE)
+
+#: `July 27, 2015` and `27 July 2015` — the form American laboratories print most
+#: often after the slashed one. Unambiguous by construction: the month is spelt,
+#: so there is nothing to guess.
+_MONTHS = {m: i for i, m in enumerate(
+    ["january", "february", "march", "april", "may", "june", "july",
+     "august", "september", "october", "november", "december"], start=1)}
+_DATE_EN_MONTH = re.compile(
+    _EN_LABEL + r"[^A-Za-z\d]{0,20}([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})", re.IGNORECASE)
+_DATE_EN_MONTH_FIRST_DAY = re.compile(
+    _EN_LABEL + r"[^A-Za-z\d]{0,20}(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})", re.IGNORECASE)
+
+#: `07/27/2015`. READ ONLY WHEN THE ORDER IS DECIDABLE — that is, when one of the
+#: two numbers is greater than twelve and can therefore only be the day. On
+#: `07/12/2015` both readings are possible: the twelfth of July in the United
+#: States, the seventh of December almost everywhere else. Nothing on the page
+#: says which laboratory printed it, so a parser that picks one is right about
+#: half the time and silent about the other half — and a point filed under the
+#: wrong month is worse than a point not filed, because it joins a series and
+#: moves a trend. The ambiguous case is NAMED, not guessed: same rule as the
+#: sex-specific interval that is left empty rather than borrowed.
+_DATE_EN_SLASH = re.compile(_EN_LABEL + r"[^\d]{0,20}(\d{1,2})/(\d{1,2})/(\d{4})", re.IGNORECASE)
+
+
+def english_date(text: str):
+    """(date, ambiguity) for an English form. Either may be None.
+
+    `ambiguity` is a dict describing a date that WAS found and cannot be read —
+    it exists so the caller can say «this form has a date I refuse to guess at»
+    instead of the untrue «no date on this form».
+    """
+    m = _DATE_EN.search(text)
+    if m:
+        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}", None
+    for pattern, order in ((_DATE_EN_MONTH, "mdy"), (_DATE_EN_MONTH_FIRST_DAY, "dmy")):
+        m = pattern.search(text)
+        if not m:
+            continue
+        name, day = (m.group(1), m.group(2)) if order == "mdy" else (m.group(2), m.group(1))
+        month = _MONTHS.get(name.lower()) or _MONTHS.get(
+            next((full for full in _MONTHS if full.startswith(name.lower()[:3])), ""), None)
+        if month and 1 <= int(day) <= 31:
+            return f"{m.group(3)}-{month:02d}-{int(day):02d}", None
+    m = _DATE_EN_SLASH.search(text)
+    if m:
+        a, b, year = int(m.group(1)), int(m.group(2)), m.group(3)
+        if a > 12 and b <= 12:                     # only D/M/Y reads
+            return f"{year}-{b:02d}-{a:02d}", None
+        if b > 12 and a <= 12:                     # only M/D/Y reads
+            return f"{year}-{a:02d}-{b:02d}", None
+        if a == b:
+            # «04/04/2017» reads the same in both orders. Refusing it printed
+            # «which is either 2017-04-04 or 2017-04-04» and threw away a form
+            # about which there was nothing to be unsure of. A refusal costs a
+            # real measurement; it has to be spent only where there is a real
+            # choice to be wrong about.
+            return f"{year}-{a:02d}-{b:02d}", None
+        if a <= 12 and b <= 12:
+            return None, {"raw": m.group(0).strip(), "both": [f"{year}-{a:02d}-{b:02d}",
+                                                              f"{year}-{b:02d}-{a:02d}"]}
+    return None, None
+
+
+#: A date in the FILE NAME. Usable, and marked as what it is: the name of a file
+#: is not the form, it is what somebody called the form — and people rename files
+#: to the day they downloaded them. So it is read only when the page itself
+#: carries no date, and the report says the date did not come off the page.
+_DATE_IN_NAME = re.compile(r"(?<!\d)(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})(?!\d)")
+
+
+def date_from_filename(name: str):
+    m = _DATE_IN_NAME.search(name or "")
+    if not m:
+        return None
+    y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+    if 1 <= mo <= 12 and 1 <= d <= 31:
+        return f"{y:04d}-{mo:02d}-{d:02d}"
+    return None
 # Paediatric/female references that land on the same row as the name:
 # «Фолликулостимулирующий гормон   Девочки (12-13лет): 1,29 - 8,74» — numbers from here must
 # not be taken. The segment carries only PAEDIATRIC/female references, not a result.
@@ -242,7 +369,7 @@ def _row_fits(t: str, sex: str, age: float) -> bool:
 
     A row without a group label counts as fitting — that is an ordinary single-line reference.
     """
-    if _ROW_ALIEN.search(t):
+    if _ROW_ALIEN.search(t) or _local_row_rule(t, "alien"):
         return False
     if sex == "male" and _ROW_FEM.search(t):
         return False
@@ -279,12 +406,33 @@ _OWNER_CACHE: Dict[str, Any] = {}
 
 def _owner():
     """(sex, age) of the owner from profile/metrics.json — used to pick the right row of a
-    multi-line reference. No profile / no birth date → (None, None), the logic is off."""
-    if _OWNER_CACHE:
+    multi-line reference. No profile / no birth date → (None, None), the logic is off.
+
+    Keyed by the profile file and its mtime, like every other reader in the
+    project. It used to be a plain `if _OWNER_CACHE: return …`, and the first
+    read won for the life of the process — including the read that happened
+    BEFORE the person filled in their sex. Two ways that bites: the server holds
+    one process across a whole session, so a profile edited in the web interface
+    kept being ingested against `(None, None)`; and the value cached first is the
+    one that turns the row filter OFF, so the failure is towards silence in a
+    place where silence looks like a working filter.
+    """
+    mfile = core.profile_dir() / "metrics.json"
+    try:
+        st = mfile.stat()
+        # mtime AND size: a profile edited twice inside one filesystem tick has
+        # the same mtime, and «the timestamp did not move» would then mean «the
+        # file did not change» — which is how a stale cache survives the test
+        # written to catch it.
+        key = (str(mfile), st.st_mtime_ns, st.st_size)
+    except OSError:
+        key = (str(mfile), None, None)
+    if _OWNER_CACHE.get("_key") == key:
         return _OWNER_CACHE.get("sex"), _OWNER_CACHE.get("age")
+    _OWNER_CACHE.clear()
     sex = age = None
     try:
-        d = json.loads((core.profile_dir() / "metrics.json").read_text(encoding="utf-8"))
+        d = json.loads(mfile.read_text(encoding="utf-8"))
         pr = d.get("profile") or {}
         sex = pr.get("sex")
         bd = pr.get("birth_date") or (str(pr["birth_year"]) + "-01-01" if pr.get("birth_year") else None)
@@ -294,7 +442,7 @@ def _owner():
             age = today.year - y - ((today.month, today.day) < (m, dd))
     except Exception:
         pass
-    _OWNER_CACHE.update({"sex": sex, "age": age})
+    _OWNER_CACHE.update({"sex": sex, "age": age, "_key": key})
     return sex, age
 
 
@@ -545,7 +693,57 @@ def _parse_dysb(text: str, markers: Dict[str, Any]) -> Dict[str, Any]:
     return found
 
 
-def parse_report(text: str, markers: Dict[str, Any], source: str = "") -> Tuple[Optional[str], Dict[str, Any]]:
+def _local_row_rule(row: str, kind: str) -> bool:
+    """Does a CONFIRMED local row rule match this line?
+
+    Proposed rules are not consulted: a row rule decides WHICH corridor is taken
+    from a multi-line block, so an unconfirmed one would pick a corridor — and
+    the whole discipline here is that ambiguity is answered with silence rather
+    than with a plausible pick.
+    """
+    try:
+        from . import markers_local as _ml
+        pats = _ml.confirmed_row_rules(kind)
+    except Exception:
+        return False
+    for p in pats:
+        try:
+            if re.search(p, row, re.IGNORECASE):
+                return True
+        except re.error:
+            continue
+    return False
+
+
+def _fitting_rows(lines, i, o_sex, o_age):
+    """Every row of the reference block below line `i` that applies to this person.
+
+    Returns a list of (low, high). The caller uses it only when the list holds
+    exactly one entry: ambiguity is answered with silence, not with the first
+    candidate.
+    """
+    out = []
+    for j in range(i + 1, min(i + 10, len(lines))):
+        row = lines[j]
+        if not row.strip():
+            continue
+        if not _ROW_LABEL.match(row) and not _local_row_rule(row, "label"):
+            # A heading such as «Референсные значения:» does not end the block —
+            # it introduces it. Only a row that is neither a heading nor a
+            # labelled row means the block is over.
+            if _BLOCK_HEAD.match(row):
+                continue
+            break
+        if not _row_fits(row, o_sex, o_age):
+            continue
+        a, b = _row_limits(_AGERANGE.sub(lambda mm: " " * (mm.end() - mm.start()), row))
+        if a is not None or b is not None:
+            out.append((a, b))
+    return out
+
+
+def parse_report(text: str, markers: Dict[str, Any], source: str = "",
+                 date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
 
     Accounts for line wrapping in tables: when a marker name is broken
@@ -554,12 +752,29 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "") -> Tuple[
     """
     date = None
     m = _DATE.search(text) or _DATE_FALLBACK.search(text)
+    if not m and date_hint:
+        # The caller established the date another way — a table whose rows all
+        # carry one and the same date. It is passed in rather than guessed here,
+        # and it is used ONLY when the form itself printed no draw date: a date
+        # the form states always wins over one a caller inferred.
+        date = date_hint
     if m:
         date = f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
     else:
-        m = _DATE_EN.search(text)
-        if m:
-            date = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"   # already ISO
+        found, _ambiguous = english_date(text)
+        if found:
+            date = found
+            m = None            # no anchor to read a clock time from
+    if date and m:
+        # Only a time printed IMMEDIATELY after the date is taken. A clock time
+        # found anywhere else on the form may belong to the report, the printing
+        # or the laboratory's opening hours, and a wrong time is worse than none:
+        # it would order two draws the wrong way round.
+        tm = _TIME_AFTER.match(text[m.end():m.end() + 24])
+        if tm:
+            hh, mm = int(tm.group(1)), int(tm.group(2))
+            if 0 <= hh <= 23 and 0 <= mm <= 59:
+                date = f"{date}T{hh:02d}:{mm:02d}"
     if _DERIVED.search(text[:4000]):
         return None, {}      # a derived report, not a form — it is not a source of data
     if text.count("Генотип") >= 3 and "Единицы" not in text:
@@ -789,19 +1004,24 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "") -> Tuple[
             # the block below is taken. Example: «17-ОН-прогестерон <value> Новорожденные
             # (до 7 дней): 1,20 - 7,80» → descend to «Мужчины (старше 18): < 4,20».
             o_sex, o_age = _owner()
-            if rl is not None and o_age is not None and not _row_fits(tail[nm.end():], o_sex, o_age):
+            row_fits = _row_fits(tail[nm.end():], o_sex, o_age)
+            # Descend into the block below when the row's own range belongs to
+            # somebody else, AND ALSO when the row printed no range at all — many
+            # forms put the value on one line and the whole reference block under
+            # it, and that case used to end with no corridor at any cost.
+            if o_age is not None and (rl is None or not row_fits):
                 rl = rh = None
-                for j in range(i + 1, min(i + 8, len(lines))):
-                    row = lines[j]
-                    if not _ROW_LABEL.match(row):
-                        break
-                    if not _row_fits(row, o_sex, o_age):
-                        continue
-                    a, b = _row_limits(_AGERANGE.sub(lambda mm: " " * (mm.end() - mm.start()), row))
-                    if a is not None or b is not None:
-                        rl = a * fac if a is not None else None
-                        rh = b * fac if b is not None else None
-                    break
+                fits = _fitting_rows(lines, i, o_sex, o_age)
+                # «The only applicable row», not «the first row that passed».
+                # Taking the first is how a woman who is not pregnant was measured
+                # against the second-trimester interval: several rows passed a flat
+                # filter and the earliest won. When more than one row fits, the
+                # form is ambiguous to us and the point keeps no range — the
+                # project's own rule, and the one the report quoted back at us.
+                if len(fits) == 1:
+                    rl, rh = fits[0]
+                    rl = rl * fac if rl is not None else None
+                    rh = rh * fac if rh is not None else None
             val = _to_float(nm.group(1)) * fac
             if fac != 1.0:
                 val = round(val, 2 if abs(val) >= 1 else 4)
@@ -826,20 +1046,251 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "") -> Tuple[
     return date, found
 
 
+_LABEL_ROW = re.compile(r"^\s*([А-ЯЁA-Z][^\d]{3,60}?)\s{2,}"
+                        r"(?:[<>]?\s*)?\d[\d.,]*\s*([А-Яа-яA-Za-z%/^*]+[^\s]*)?")
+
+
+def _unrecognised_labels(text: str, limit: int = 12):
+    """The printed LABELS of rows that look like results and matched no marker.
+
+    Labels and units only. Not the values — a proposal for the dictionary is
+    about what a row is called, and the patient's numbers have no business
+    leaving the machine or entering a draft. This is the raw material task 80
+    turns into a proposed dictionary entry, and on its own it already replaces
+    «19 files went past in silence» with a list a person can read.
+    """
+    markers = core.lab_markers().get("markers", {})
+    known = []
+    for spec in markers.values():
+        known.extend(x.lower() for x in core.marker_rules(spec, "names"))
+    out = []
+    for ln in text.splitlines():
+        m = _LABEL_ROW.match(ln)
+        if not m:
+            continue
+        label = " ".join(m.group(1).split())
+        low = label.lower()
+        if any(k in low for k in known):
+            continue
+        if any(low.startswith(x) for x in ("дата", "пациент", "врач", "заказ", "адрес")):
+            continue
+        item = {"label": label, "unit": (m.group(2) or "").strip()}
+        if item not in out:
+            out.append(item)
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _sex_specific_and_sex_unknown(spec) -> bool:
+    """True when this marker's default range is sex-specific and the sex is unknown."""
+    if not spec.get("ref_by_sex"):
+        return False
+    return core.profile_sex() not in ("male", "female")
+
+
+#: What a folder of results actually holds. The walk used to be `rglob("*.pdf")`,
+#: and that is a claim about the world rather than about this folder: a lab hands
+#: out PDFs, but an export hands out CSV, a portal hands out TSV, and the PGP
+#: corpus keeps a participant's measured values in
+#: `hu…_phenotypes_2018.csv` — read as nothing at all, so the person's lab layer
+#: stayed empty while their genome was read fine. Text files go to the same
+#: parser: what makes a row a lab result is the row, not the container.
+_TEXT_SUFFIXES = (".csv", ".tsv", ".txt", ".tab", ".md")
+
+#: A text file bigger than this is not a lab form. The cap keeps a stray genome
+#: export in the same folder from being read into memory as prose.
+_TEXT_MAX_BYTES = 8 * 1024 * 1024
+
+
+def _read_any(path: Path) -> Optional[str]:
+    """The text of a result file, whatever kind it is. None = we cannot read it."""
+    if path.suffix.lower() == ".pdf":
+        return _read_pdf(path)
+    try:
+        if path.stat().st_size > _TEXT_MAX_BYTES:
+            return None
+        return path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+
+
+#: A DELIMITED EXPORT IS A DIFFERENT KIND OF INPUT, and this is the whole reason
+#: it gets its own reader instead of a wider date regex.
+#:
+#: A paper form is one draw: one date at the top, a column of analytes under it.
+#: That shape is baked into `parse_report`, correctly, because that is how a form
+#: is printed. A table is the other shape — every ROW is a measurement, with its
+#: own date — and a person's export usually holds years of them. Reading it as a
+#: form means either taking one date for all of it (a history flattened into a
+#: day) or refusing the file (a history thrown away). Neither is acceptable, and
+#: neither is a parser bug: they are the answers a form-shaped reader has.
+#:
+#: So: same dictionary, same unit gate, same rule that a corridor comes from the
+#: document — a different arrangement of the page.
+_TABLE_COLUMNS = {
+    "date": ("date", "timestamp", "collected", "collection date", "draw date", "datetime",
+             "date collected", "observation date", "дата", "дата забора"),
+    "label": ("test", "analyte", "marker", "name", "test name", "component", "observation",
+              "phenotype", "measurement", "item", "показатель", "тест", "анализ"),
+    "value": ("result", "value", "result value", "numeric result", "результат", "значение"),
+    "unit": ("unit", "units", "uom", "единица", "единицы", "ед. изм."),
+    "range": ("reference range", "reference", "ref range", "normal range", "range",
+              "референс", "референсные значения", "норма"),
+}
+
+_RANGE_TEXT = re.compile(r"(-?\d+(?:[.,]\d+)?)\s*(?:-|–|—|to|\.\.)\s*(-?\d+(?:[.,]\d+)?)")
+
+#: `Rheumatoid factor - IU / mL` — a real export writes the unit INTO the label,
+#: because a table with one value column has nowhere else to put it. Split off,
+#: but only when the tail is a unit this project already knows: a dash is a
+#: perfectly ordinary character in an analyte's name («HbA1c - IFCC», «anti-CCP»),
+#: and guessing that the last words after a dash are a unit would rename markers.
+#: The unit table is the authority; nothing here decides what looks like one.
+_LABEL_UNIT = re.compile(r"^(?P<name>.+?)\s+[-–—]\s+(?P<unit>[^-–—]{1,24})$")
+
+
+def split_label_unit(label: str):
+    """(key, label, unit) for a row label that may carry its unit inside it.
+
+    THE DICTIONARY DECIDES, not the shape of the string. A dash is an ordinary
+    character in an analyte's name — «anti-CCP», «HbA1c - IFCC», «Complete Blood
+    Count - Hematocrit» — so a rule like «everything after the last dash is a
+    unit» would rename markers. Instead: the whole label is offered to the
+    dictionary first; only if that fails is the tail cut off and the head offered
+    again. The tail is called a unit exactly when doing so is what made the
+    marker resolvable, which is the only evidence available and the only one
+    needed.
+    """
+    raw = (label or "").strip()
+    hit = core.resolve_marker(raw)
+    if hit.get("key"):
+        return hit["key"], raw, None
+    m = _LABEL_UNIT.match(raw)
+    if m:
+        head = m.group("name").strip()
+        hit = core.resolve_marker(head)
+        if hit.get("key"):
+            return hit["key"], head, m.group("unit").strip()
+    return None, raw, None
+
+
+def _column_map(header: list) -> dict:
+    """Header cell → what it is. Unrecognised columns are simply not used."""
+    out = {}
+    for i, cell in enumerate(header):
+        name = (cell or "").strip().strip('"').casefold()
+        for role, spellings in _TABLE_COLUMNS.items():
+            if role in out:
+                continue
+            if name in spellings or any(name.startswith(sp) for sp in spellings):
+                out[role] = i
+                break
+    return out
+
+
+def _number(raw: str):
+    try:
+        return float(str(raw).strip().replace(",", ".").replace("<", "").replace(">", ""))
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_table(text: str, markers: dict, source: str = "") -> dict:
+    """Rows of a delimited export → points, each with the date of its own row.
+
+    Returns {ok, rows, points, unrecognised, reason}. `unrecognised` holds the
+    labels no dictionary entry matched — the same material a dictionary proposal
+    is built from, and never a guess: a row whose analyte cannot be named is not
+    stored under an approximate name.
+    """
+    lines = [ln for ln in text.splitlines() if ln.strip() and not ln.strip().startswith("#")]
+    if len(lines) < 2:
+        return {"ok": False, "reason": "not_a_table"}
+    delimiter = "," if lines[0].count(",") > lines[0].count("\t") else "\t"
+    reader = list(csv.reader(lines, delimiter=delimiter))
+    if not reader:
+        return {"ok": False, "reason": "not_a_table"}
+    cols = _column_map(reader[0])
+    if not all(k in cols for k in ("date", "label", "value")):
+        return {"ok": False, "reason": "not_a_table", "columns": cols}
+    points, unrecognised = [], []
+    for row in reader[1:]:
+        if len(row) <= max(cols.values()):
+            continue
+        raw_date = (row[cols["date"]] or "").strip().strip('"')
+        label = (row[cols["label"]] or "").strip().strip('"')
+        value = _number(row[cols["value"]])
+        if not raw_date or not label or value is None:
+            continue
+        stamp = raw_date[:10] if _DATE_ROW.match(raw_date + ",") else None
+        if not stamp:
+            iso, _amb = english_date("collected " + raw_date)
+            stamp = iso
+        if not stamp:
+            continue
+        if len(raw_date) >= 16 and raw_date[10] in "T ":
+            stamp = f"{stamp}T{raw_date[11:16]}"
+        key, label, label_unit = split_label_unit(label)
+        if not key or key not in markers:
+            # The SAME shape the PDF path produces — `{label, unit}`. It used to
+            # be a bare string here, and `format.ingest_report` reads `row["label"]`,
+            # so a table with one unknown row crashed the whole report with
+            # `'str' object has no attribute 'get'` — after the recognised rows
+            # had already been stored. Seven points went in and the person saw a
+            # traceback instead of them. One name, two shapes, and the renderer
+            # could only be right about one of them; the shape is settled at the
+            # source rather than defended against downstream.
+            unrecognised.append({"label": label, "unit": label_unit or None})
+            continue
+        low = high = None
+        if "range" in cols and len(row) > cols["range"]:
+            m = _RANGE_TEXT.search(row[cols["range"]] or "")
+            if m:
+                low, high = _number(m.group(1)), _number(m.group(2))
+        unit = (row[cols["unit"]].strip().strip('"') if "unit" in cols and len(row) > cols["unit"]
+                else None) or label_unit
+        points.append({"key": key, "label": label, "date": stamp, "value": value,
+                       "unit": unit or None, "ref_low": low, "ref_high": high})
+    seen, unique = set(), []
+    for row in unrecognised:
+        mark = (row["label"], row["unit"])
+        if mark not in seen:
+            seen.add(mark)
+            unique.append(row)
+    return {"ok": True, "rows": len(reader) - 1, "points": points,
+            "unrecognised": sorted(unique, key=lambda r: r["label"]), "source": source}
+
+
 def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
-    """Walk the folder of PDFs and update labs.json with new markers. Incremental."""
+    """Walk the folder of results and update labs.json with new markers. Incremental."""
     ex = _ensure_extractor()
-    if not ex:
-        return {"ok": False, "error": _t("ingest_labs.no_pdf_reader")}
     root = Path(folder).expanduser()
     if not root.exists() or not root.is_dir():
         return {"ok": False, "error": _t("ingest_labs.folder_not_found", path=root)}
     markers = core.lab_markers().get("markers", {})
     existing = {k: m.get("name") for k, m in core.labs().get("markers", {}).items()}
     manifest = _load_manifest()
-    files = sorted(root.rglob("*.pdf"))
+    files = sorted(f for f in root.rglob("*")
+                   if f.is_file()
+                   and (f.suffix.lower() == ".pdf" or f.suffix.lower() in _TEXT_SUFFIXES))
+    if not files:
+        return {"ok": False, "error": _t("ingest_labs.folder_empty", path=root)}
+    if not ex and all(f.suffix.lower() == ".pdf" for f in files):
+        # Only PDFs here and nothing to read them with: that is a refusal, and it
+        # names the command. But it is no longer a refusal for the whole folder —
+        # a CSV next to those PDFs is readable with no extractor at all.
+        return {"ok": False, "error": _t("ingest_labs.no_pdf_reader")}
     out = {"ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
-           "points_added": 0, "skipped": 0, "per_file": [], "conflicts": []}
+           "points_added": 0, "skipped": 0, "per_file": [], "conflicts": [],
+           "repeats": [], "draw_times": {},
+           # Every file that produced nothing says WHY, by name. «19 of 47 went
+           # past both counters in silence» was the first real user's report, and
+           # the cause was that `skipped` counted only «unchanged since last run»
+           # while three other paths returned without touching any counter at all.
+           # A file dropped silently is indistinguishable from a file that was
+           # never there — the project's own rule 9, which the code broke.
+           "not_ingested": []}
     # (key, month) -> (value, file). One and the same marker for one date occurs in several
     # forms (different orders from one draw, duplicates in subfolders). The last processed
     # file used to win — silently and non-deterministically. Now the FIRST one in sort order
@@ -854,18 +1305,114 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         if not force and manifest.get(rk) == mt:
             out["skipped"] += 1
             continue
-        text = _read_pdf(f) or ""
-        if not (_DATE.search(text) or _DATE_FALLBACK.search(text)
-                or _DATE_EN.search(text)):   # not a lab report (or a scan without text)
+        if f.suffix.lower() == ".pdf" and not ex:
+            out["not_ingested"].append({"file": f.name, "reason": "no_pdf_reader",
+                                        "detail": _t("ingest_labs.no_pdf_reader")})
+            continue
+        text = _read_any(f) or ""
+        hint = None
+        # THE ROW-WISE READER GOES FIRST for anything that is not a PDF. If the
+        # file is a table with a date column, every row is a measurement with its
+        # own date and the form-shaped reader below must not see it — that reader
+        # can only file a whole file under one day, which for a history is either
+        # destruction or refusal.
+        if f.suffix.lower() != ".pdf" and text.strip():
+            table = parse_table(text, markers, source=str(f))
+            if table.get("ok") and table["points"]:
+                added_here = []
+                for pt in table["points"]:
+                    spec = markers[pt["key"]]
+                    r = store.add_lab_point(pt["key"], pt["date"], pt["value"],
+                                            name=existing.get(pt["key"])
+                                            or core.marker_display(spec, i18n.lang()) or pt["label"],
+                                            unit=pt["unit"] or spec.get("unit"),
+                                            ref_low=pt["ref_low"], ref_high=pt["ref_high"],
+                                            direction=spec.get("direction"))
+                    if r.get("ok"):
+                        added_here.append(pt["key"])
+                manifest[rk] = mt
+                if added_here:
+                    out["files_processed"] += 1
+                    out["points_added"] += len(added_here)
+                    out["per_file"].append({"file": f.name, "kind": "table",
+                                            "rows": table["rows"],
+                                            "dates": sorted({p["date"][:10] for p in table["points"]})[:1]
+                                            + (["…"] if len({p["date"][:10] for p in table["points"]}) > 1 else []),
+                                            "markers": sorted(set(added_here))})
+                if table["unrecognised"]:
+                    out["not_ingested"].append(
+                        {"file": f.name, "reason": "table_labels_unknown",
+                         "detail": _t("ingest_labs.reason_table_labels", n=len(table["unrecognised"])),
+                         "unrecognised": table["unrecognised"][:40]})
+                continue
+        if f.suffix.lower() != ".pdf" and text.strip():
+            # Not a table this reader can use — no date column, or none of its
+            # rows resolved. A delimited file still dates its rows rather than
+            # its header, so one date across the whole of it is a draw date and
+            # several are a history this reader could not place. The second case
+            # is named rather than resolved by taking the first: picking one of
+            # several dates for somebody's results is a guess, and a silent one.
+            dates = table_dates(text)
+            if len(dates) == 1:
+                hint = dates[0]
+            elif len(dates) > 1:
+                out["not_ingested"].append(
+                    {"file": f.name, "reason": "several_draw_dates",
+                     "detail": _t("ingest_labs.reason_several_dates", n=len(dates),
+                                  first=dates[0], last=dates[-1])})
+                manifest[rk] = mt
+                continue
+        en_date, ambiguous = english_date(text)
+        if ambiguous:
+            # A date IS on the page and cannot be read. Saying «no date on this
+            # form» here would be untrue, and «no date» is the sentence that
+            # makes a person go looking for one.
+            out["not_ingested"].append(
+                {"file": f.name, "reason": "ambiguous_date",
+                 "detail": _t("ingest_labs.reason_ambiguous_date", raw=ambiguous["raw"],
+                              first=ambiguous["both"][0], second=ambiguous["both"][1])})
             manifest[rk] = mt
             continue
-        date, found = parse_report(text, markers, source=str(f))
+        if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+            # Before giving up: the FILE NAME. It is a weaker witness than the
+            # page — people rename files to the day they downloaded them — so it
+            # is used only here, at the end, and the report says the date did not
+            # come off the form.
+            hint = date_from_filename(f.name)
+            if hint:
+                out.setdefault("date_from_filename", []).append(
+                    {"file": f.name, "date": hint,
+                     "note": _t("ingest_labs.date_from_filename", date=hint)})
+        if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+            out["not_ingested"].append(
+                {"file": f.name,
+                 "reason": "no_draw_date" if text.strip() else "no_text",
+                 "detail": _t("ingest_labs.reason_no_date") if text.strip()
+                           else _t("ingest_labs.reason_no_text")})
+            manifest[rk] = mt
+            continue
+        date, found = parse_report(text, markers, source=str(f), date_hint=hint)
         ftl = text.lower()
         if not date or not found:
+            # Name the lines that were not recognised, not just the file. This is
+            # what a dictionary proposal (task 80) will be built from: the labels
+            # and units of the rows nobody could place, and nothing else — never
+            # the patient's numbers.
+            out["not_ingested"].append(
+                {"file": f.name,
+                 "reason": "no_date" if not date else "no_known_marker",
+                 "detail": _t("ingest_labs.reason_no_date") if not date
+                           else _t("ingest_labs.reason_no_marker"),
+                 "unrecognised": [] if not date else _unrecognised_labels(text)})
             manifest[rk] = mt
             continue
         added = []
-        ym = date[:7]   # the profile stores points at month granularity (as reconcile does)
+        # The point keeps the FULL stamp the form printed — day, and the clock time
+        # when there was one. Truncating to the month was what made two draws in a
+        # single day indistinguishable, so the second one could only be recorded as
+        # a discrepancy with the first.
+        stamp = date
+        day = date[:10]
         for key, v in found.items():
             spec = markers[key]
             if spec.get("ref_locked"):
@@ -876,27 +1423,50 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
                 # ref_locked=true: the reference comes only from the dictionary, form ignored.
                 rl, rh = spec.get("ref_low"), spec.get("ref_high")
             else:
-                rl = v["ref_low"] if v["ref_low"] is not None else spec.get("ref_low")
-                rh = v["ref_high"] if v["ref_high"] is not None else spec.get("ref_high")
+                rl, rh = v["ref_low"], v["ref_high"]
+                if rl is None and rh is None and _sex_specific_and_sex_unknown(spec):
+                    # The dictionary default for these six markers IS the male
+                    # range — uric acid, testosterone, creatinine, ferritin,
+                    # haematocrit, haemoglobin. Substituting it for a person whose
+                    # sex nobody asked for is how a woman's normal testosterone
+                    # was flagged against 12.1–34.4. The project's own rule says a
+                    # marker with no range from the form gets no range at all; it
+                    # applies here, and the point is stored without one rather
+                    # than with a plausible wrong one.
+                    pass
+                else:
+                    rl = rl if rl is not None else spec.get("ref_low")
+                    rh = rh if rh is not None else spec.get("ref_high")
             # display_name — the printed name of the marker, used when names[] holds only
             # lower-case search substrings (e.g. the dysbacteriosis panel).
             name = (existing.get(key) or core.marker_display(spec, i18n.lang())
                     or (core.marker_rules(spec, "names") or [key])[0].capitalize())
             prio = 2 if any(x.lower() in ftl for x in core.marker_rules(spec, "prefer_form")) else 1
-            prev = seen_pt.get((key, ym))
+            # A REPEAT is not a conflict. Two stamps on one day are two measurements —
+            # blood drawn before a procedure or a dose and again after it — and both
+            # belong in the series. A conflict is two readings claiming to be THE SAME
+            # measurement: the same stamp, a different number.
+            same_day = seen_pt.get((key, day))
+            if same_day is not None and same_day[3] != stamp:
+                out.setdefault("repeats", []).append(
+                    {"marker": key, "day": day,
+                     "first": {"at": same_day[3], "value": same_day[0], "from": same_day[1]},
+                     "second": {"at": stamp, "value": v["value"], "from": f.name}})
+            prev = seen_pt.get((key, stamp))
             if prev is not None:
                 if prev[0] == v["value"]:
                     continue
                 if prio <= prev[2]:           # an equal or higher-priority method is recorded
-                    out["conflicts"].append({"marker": key, "date": ym,
+                    out["conflicts"].append({"marker": key, "date": stamp,
                                              "kept": prev[0], "kept_from": prev[1],
                                              "other": v["value"], "other_from": f.name})
                     continue
-                out["conflicts"].append({"marker": key, "date": ym,      # new method prevails
+                out["conflicts"].append({"marker": key, "date": stamp,   # new method prevails
                                          "kept": v["value"], "kept_from": f.name,
                                          "other": prev[0], "other_from": prev[1]})
-            seen_pt[(key, ym)] = (v["value"], f.name, prio)
-            r = store.add_lab_point(key, ym, v["value"], name=name, unit=spec.get("unit"),
+            seen_pt[(key, stamp)] = (v["value"], f.name, prio, stamp)
+            seen_pt.setdefault((key, day), (v["value"], f.name, prio, stamp))
+            r = store.add_lab_point(key, stamp, v["value"], name=name, unit=spec.get("unit"),
                                     ref_low=rl, ref_high=rh, direction=spec.get("direction"),
                                     censored=v.get("censored"))
             if r.get("ok"):
@@ -905,7 +1475,14 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         if added:
             out["files_processed"] += 1
             out["points_added"] += len(added)
-            out["per_file"].append({"file": f.name, "date": ym, "draw_date": date, "markers": added})
+            # `date` stays the month for the readers that already parse it; the
+            # full stamp is `draw_date`. `ym` was the month variable, and when the
+            # point started keeping its full stamp the assignment went and this
+            # reference stayed: every ingest that actually added a point raised
+            # NameError, and no test noticed because none of them ran a successful
+            # ingest end to end. `test_ingest_reads_a_table.py` now does.
+            out["per_file"].append({"file": f.name, "date": day[:7],
+                                    "draw_date": date, "markers": added})
     _save_manifest(manifest)
     core.reset_cache()
     return out

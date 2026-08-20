@@ -31,6 +31,231 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.0 — 19.08.2026
+
+Until this release, Scholion had been built and tested against one person's data:
+the author's genome, his own laboratory forms, his own prescriptions. That is
+enough to make a tool work for one person and not enough to make it work for
+anybody else. This release was written against data that is not the author's —
+27 real genomic files from eleven providers in the Personal Genome Project, a
+synthetic FHIR bundle, and an outside review of the code — and most of what
+follows is what those turned up.
+
+Two things changed as a result. **Far more kinds of file now work**: a consumer
+DNA test, an older genome, a spreadsheet of lab results, a hospital portal
+export. And **the answers say more about themselves** — how much of the gene was
+actually read, which sample in the file was used, why a question is being
+refused.
+
+### What you can bring it now
+
+**A consumer DNA test — 23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living
+DNA.** This is the most common genetic file in the world and Scholion used to
+answer «no genome» to all of it. It is now a first-class input, including when it
+is still inside the `.zip` or `.gz` the provider sent. On a 23andMe v5 export, 46
+of the 54 catalogue positions are present — APOE ε-status included, so the
+headline genomic answers work without a sequenced genome. Every position answers
+one of three things: read, attempted and not called, or not on this chip at all —
+because «not on the chip» and «you do not carry it» are different sentences.
+Six positions whose two strands are ambiguous are named separately instead of
+being handed over with the rest, and the things a chip cannot support — ClinVar
+screening, secondary findings, polygenic scores — are refused with the reason.
+
+**A genome in the older GRCh37 build.** Most files people actually hold are
+GRCh37: consumer chips, several sequencing providers, and most whole genomes more
+than a few years old. Seven of the eight real genomes we tested against are.
+Scholion used to switch its genomic layer off on every one of them. All 54
+catalogue positions now carry coordinates in both builds — each one taken from
+two independent public sources that agreed — so a GRCh37 file is read at GRCh37
+coordinates. Nothing is converted between builds: the offset is not constant even
+inside one chromosome, so arithmetic would return a plausible position pointing at
+the wrong base.
+
+**Laboratory results from a health portal or an app.** `scholion import-fhir`
+reads a FHIR R4 bundle — a patient-portal download, Apple Health clinical
+records, an EHR export. Analytes are matched by their LOINC code rather than by
+the name a hospital happened to print, and units go through the same gate as
+everything else. The bundle names a patient; Scholion reports who it says and
+does not act on it.
+
+**Lab results as a spreadsheet.** CSV, TSV and plain text exports are read, not
+just PDFs. In a table each row carries its own date, which is how these files
+actually work — and which is why they used to import as one date for the whole
+sheet, or not at all.
+
+**American forms.** Dates written `03/14/2015` or `March 14, 2015` are read. When
+a date is genuinely ambiguous — `07/12/2015` is either July 12th or December 7th
+— it is refused by name rather than guessed at, because a mis-dated point silently
+reorders a seven-year trend.
+
+### What the answers tell you that they did not before
+
+**«No secondary findings» now says how much was read.** The ACMG list of 84
+actionable genes is only as good as the coverage underneath it, and that number
+had been computed and printed elsewhere for months without reaching this
+sentence. A negative over a gene read at 62 % is now qualified as one.
+
+**Sex-specific thresholds.** «Three times the upper limit of normal» is published
+as a pair of numbers, one for each sex. Scholion had stored only the product,
+computed from the male bound — so a woman on a statin with ALT 110 or CK 520 got
+nothing, in both cases in the dangerous direction. The rule is stored now and the
+number computed from it. Where sex is not recorded, the more cautious bound is
+used and said so.
+
+**Star-allele diplotypes are used where they exist.** If a proper pharmacogenetic
+call is in your profile — from PyPGx over a BAM, with copy number and phasing —
+it now decides the phenotype, instead of the answer being reconstructed from
+individual tag SNPs. `CYP2C19 *2/*17` means something a pair of SNPs cannot.
+
+**Polygenic scores say what they cannot do**, and a percentile about an organ you
+do not have is withheld and named rather than quietly printed. A low-confidence
+ClinVar hit now carries how strongly it is reviewed — a single-submitter
+«Pathogenic» and an expert-panel one are not the same claim.
+
+**`scholion flag-rate`** answers a question the documentation had been describing
+for a while: how often does this tool raise this flag at all? A rule that fires
+on everybody is not information.
+
+### What it now refuses to do
+
+Refusing well is most of what this product is for, and four situations used to
+produce a confident answer instead.
+
+**A file it cannot actually open is no longer «Genome connected».** A `.vcf.gz`
+compressed with ordinary gzip rather than bgzip looks correct from the outside
+and cannot be read at all. Every position in it came back «reference» — including
+a heterozygous APOE ε4 carrier, reported as a non-carrier. The same applies to a
+missing, truncated, or previously unsupported `.csi` index. Scholion now names
+the file, prints the one command that fixes it, and answers nothing until it is.
+
+**A folder holding several genomes.** It used to read whichever filename sorted
+first. A genome split across `chr1.vcf.gz` … `chr22.vcf.gz` therefore answered
+APOE — which is on chromosome 19 — out of chromosome 1, as «reference», while the
+right file sat unopened beside it. A folder holding two people answered about
+whoever came earlier in the alphabet. Both now list the files and ask
+(`SCHOLION_GENOME_VCF`).
+
+**A file holding several samples.** A trio or a family file puts several people
+side by side, and the first column belongs to whoever the laboratory listed
+first — possibly a relative. `SCHOLION_GENOME_SAMPLE` says which one is yours,
+and until it does, nothing is read.
+
+**A file whose reference build cannot be established.** A position looked up in
+the wrong coordinate system comes back empty for exactly the same reason a
+position with no variant does. That silence is no longer reported as «reference».
+
+And when the folder holds a BAM, a CRAM, a FASTQ pair, a BCF, a gVCF or a
+provider archive, each is named by what it is with the next step for that kind of
+file — instead of the same «the full VCF is not connected» that eleven different
+formats used to print at people whose file was lying right there.
+
+### Also new
+
+* **`scholion mcp`** — Scholion as a Model Context Protocol server over standard
+  input and output, so any MCP-capable assistant can call the same tools the
+  Ouroboros plugin exposes. The tool list is derived from the plugin's rather
+  than maintained twice.
+* **Author settings, declared.** Four numeric thresholds that nobody published,
+  and that Scholion had simply chosen, are now written down with what would
+  replace them and — the field that matters — what they do not license.
+
+### A series break
+
+Values computed before and after this version can differ on unchanged input, in
+six places: sex-specific decision thresholds (ALT and CK on a statin),
+star-allele diplotypes that were on disk and unread, the ClinVar
+review-confidence note, polygenic traits withheld for sex, lab points imported
+from tables and FHIR bundles that were previously skipped, and every genomic
+answer from a GRCh37 file. Do not put values from either side of this line on one
+chart without a note.
+
+### What is retracted
+
+* **Any earlier «no reportable findings» read as unqualified.** It never was: it
+  was a statement about what had been read, and now it says so.
+* **Any lab flag on ALT or CK for a woman, or for a person whose sex was not
+  recorded.** The thresholds were male.
+* **«This position is not on the array»** for a consumer export that had been
+  opened and re-saved in a spreadsheet. The file parsed to zero rows, and our
+  failure to read it was reported as a fact about the chip.
+* **Any report that claimed a folder held nothing importable** when it held CSV,
+  TSV or TXT: the search looked only for PDFs.
+* **Any genomic answer out of a `.vcf.gz` that was not block-compressed**, or
+  whose index was missing, truncated or `.csi`. It was not reference; it was
+  unread.
+* **Any genomic answer from a folder holding several genomes**, or from a
+  multi-sample file where the sample was never named. Which person it was about
+  was decided by sort order.
+* **Any «reference» from a file whose build was never established.**
+
+### What needs recomputing
+
+* `scholion labs` and `scholion overview` — the sex-dependent thresholds.
+* `scholion drug <name>` for CYP2D6, CYP2C19, CYP2C9, DPYD, TPMT, NUDT15,
+  SLCO1B1 and the rest of the eighteen, if a star-allele table or a called
+  diplotype is in the profile.
+* `scholion acmg` — the report now carries coverage.
+* `scholion prs` — sex-specific traits are withheld and the method caveats are
+  printed.
+* `scholion ingest-labs` on any folder holding non-PDF files, and on any American
+  form.
+* `scholion genome` and everything downstream of it, on a GRCh37 file, on a
+  consumer array, on a multi-sample file, on a folder with several genomes, or on
+  a file that was never actually readable.
+
+### Measured
+
+Twenty-eight input shapes — the zoo real providers hand out — run through the
+previous release and this one on the same harness (`src/tools/format_matrix.py`;
+synthetic files, no personal data):
+
+| | v0.3.4 | this release |
+|---|---|---|
+| **Confidently wrong answers** | **8** | **0** |
+| False «no genome found» | 14 | 0 |
+| Correct | 6 | 27 |
+| Answers nothing, but still says «connected» | 0 | 1 |
+
+The remaining one is a genome whose reference build cannot be determined from the
+file: the first line still says «Genome connected» before it says the build is
+unknown, though every position in it now refuses. It is counted here rather than
+left out.
+
+And on real files rather than invented ones — 31 sets of genomic and medical
+records from the Personal Genome Project, run through the previous release and
+this one. Nobody's data, findings or identifiers appear here or anywhere else in
+this repository; these are counts of what the software did.
+
+| | before | this release |
+|---|---|---|
+| **Confidently wrong answers** | 1 | **0** |
+| Consumer arrays read | 3 | **9** |
+| Genomes turned away over their reference build | 7 | **0** |
+| False «no genome found» | 11 | 7 |
+| **Laboratory results imported** | **0** | **61** |
+
+The last row is the one that changed what the product is. Before this release the
+laboratory side had never once filled up from somebody else's records — every
+medical file in the corpus came back empty, so the thing the whole tool exists
+for, reading the genome and the lab history together, had only ever happened for
+its author. It now happens for strangers: on one set, a lipid panel showed
+dyslipidaemia, the tool concluded that statin therapy was likely, and named the
+one gene worth testing **before** it starts. On another, a single raised
+rheumatoid factor produced two suggested tests and a sentence saying why one
+result is not a diagnosis.
+
+### Thanks
+
+* **Personal Genome Project (Harvard)** and its participants, whose open-consent
+  data made it possible to test this on 27 real files from eleven providers
+  without a single user. Almost everything in this release was found there. No
+  participant's data, findings or identifiers are redistributed here in any form.
+* **Synthea** (synthetichealth/synthea, Apache-2.0) for the synthetic FHIR bundle
+  the import is tested against — a parser tested only on input written by whoever
+  wrote the parser passes its own tests and fails on the world.
+* **Genomi** (exon-research/genomi, Apache-2.0) for the input-format detector,
+  vendored with a way to update it.
+
 ## v0.3.4 — 19.08.2026
 
 The release for the person we are about to invite: someone with their own

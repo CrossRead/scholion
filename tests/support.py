@@ -51,12 +51,54 @@ def env(profile_dir: Path | None = None, lang: str | None = None) -> dict:
     return e
 
 
+# ── The suite has no standard input, and that is enforced here rather than asked
+# for. `run_tests.sh` redirects `< /dev/null`, which is right and is not enough:
+# anyone running `python3 -m unittest` directly, or an IDE's test runner, gets a
+# terminal on file descriptor 0 — and a child process inherits the DESCRIPTOR,
+# not `sys.stdin`. `scholion init` then finds `isatty()` true, asks two questions,
+# and waits. That is what turned one publication run into thirteen minutes of
+# 120-second timeouts, and it is invisible on CI, where stdin is closed already.
+#
+# So the descriptor itself is replaced, once, when the first test module imports
+# this file. Every child of this process inherits the replacement, including ones
+# spawned by tests written after this comment.
+#
+# The escape hatch is deliberate and narrow: `SCHOLION_TESTS_KEEP_STDIN=1` for
+# somebody who wants `pdb` inside a test. Without it a debugger has no console —
+# a real cost, and a smaller one than a suite that hangs on whoever runs it.
+def _close_stdin() -> None:
+    if os.environ.get("SCHOLION_TESTS_KEEP_STDIN"):
+        return
+    try:
+        devnull = os.open(os.devnull, os.O_RDONLY)
+        os.dup2(devnull, 0)
+        if devnull != 0:
+            os.close(devnull)
+    except OSError:
+        # A platform or harness that will not allow it. The explicit
+        # `stdin=subprocess.DEVNULL` on every spawn below still holds, and
+        # `test_no_test_can_ask_a_question` keeps that true.
+        pass
+
+
+_close_stdin()
+
 def run(args, profile_dir: Path | None = None, timeout: int = 120,
         lang: str | None = None):
-    """Run a CLI command. Returns (return code, stdout, stderr)."""
+    """Run a CLI command. Returns (return code, stdout, stderr).
+
+    `stdin` is closed, and that is not a detail. `capture_output=True` redirects
+    the two OUTPUT streams and leaves stdin inherited, so a command spawned here
+    reads the developer's keyboard when the suite is run from a terminal.
+    `scholion init` asks two questions behind an `isatty()` guard — a correct
+    guard, which was simply true — and seven tests sat waiting for somebody to
+    type, then timed out after 120 seconds each. On CI, where stdin is already
+    closed, the same suite passed. A test that behaves differently depending on
+    whether a human is watching measures the human.
+    """
     p = subprocess.run([sys.executable, "-m", "scholion", *args],
                        cwd=str(ROOT), env=env(profile_dir, lang), capture_output=True,
-                       text=True, timeout=timeout)
+                       text=True, timeout=timeout, stdin=subprocess.DEVNULL)
     return p.returncode, p.stdout, p.stderr
 
 
@@ -74,6 +116,15 @@ def run_json(args, profile_dir: Path | None = None, lang: str | None = None):
 # knowingly harmless ones. An absence of data is a legitimate answer, a crash is not.
 ARGS_FOR = {
     "drug": ["atorvastatin"],
+    # Writes into the profile, and only for a day that already holds two draws.
+    # A smoke sweep must not author profile content; covered in full by
+    # tests/test_same_day_draws.py on a temporary profile.
+    "lab-draw": None,
+    # Writes into the local dictionary. A smoke sweep must not author knowledge;
+    # covered in full by tests/test_marker_proposals.py on a temporary data dir.
+    # Reading it (no flags) is what the sweep exercises, so the entry is [] not None.
+    "marker": [],
+    "flag-rate": [],
     "prescription": ["atorvastatin"],
     "genome": ["rs4149056"],
     "labs": [],
@@ -82,6 +133,13 @@ ARGS_FOR = {
     # sweep, and passing a real file would make the sweep write into a profile.
     # Covered in full by tests/test_marker_resolution.py, on a temporary profile.
     "import-labs": None,
+    # Same reason, and one more: this one is covered on a REAL bundle produced by
+    # a system that implements the standard (tests/test_fhir_import.py), which is
+    # worth more than anything a smoke sweep could pass it.
+    "import-fhir": None,
+    # A protocol dialogue that owns stdout until stdin closes; a smoke sweep that
+    # ran it would hang. Covered in full by tests/test_mcp_server.py.
+    "mcp": None,
     "redact": None,               # reads stdin; covered by tests/test_redact.py
     "ingest-studies": None,
     "ingest-garmin": None,

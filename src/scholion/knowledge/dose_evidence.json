@@ -2,7 +2,8 @@
   "_meta": {
     "purpose": "The dose and critical layer: concrete dose thresholds, effect sizes, drug formulations, the link to the patient's markers and the sources. So that the conclusion is 'a comparison of numbers' rather than 'in the general direction'.",
     "updated": "2026-07-13",
-    "schema": "entries[key] = {match[], nutritional_dose, pharmacologic_dose, critical[{claim, dose_dependent, effect_size, low_dose_note, compare_marker[], source}], forms, verdict_rule}"
+    "schema": "entries[key] = {match[], nutritional_dose, pharmacologic_dose, critical[{claim, dose_dependent, effect_size, low_dose_note, compare_marker[], source}], forms, verdict_rule}",
+    "source_tier": "guideline_compiled"
   },
   "entries": {
     "niacin": {

@@ -225,7 +225,7 @@ class TestGitDoesNotIgnoreTheFixture(unittest.TestCase):
         for name in ("tiny.vcf.gz", "tiny.vcf.gz.tbi"):
             rel = f"tests/fixtures/genome/{name}"
             r = subprocess.run(["git", "check-ignore", "-q", rel],
-                               cwd=ROOT, env=env, capture_output=True)
+                               cwd=ROOT, env=env, capture_output=True, stdin=subprocess.DEVNULL)
             self.assertNotEqual(r.returncode, 0,
                                 f"{rel} is ignored by git — it would never be committed, "
                                 f"and the test that needs it would ship without it")

@@ -16,6 +16,20 @@ from .i18n import t as _t
 _NAME_DOMAIN = {"labs.json": "labs", "medications.json": "medications", "metrics.json": "metrics"}
 
 
+import functools as _functools
+
+
+def _serialized(fn):
+    """Every profile mutator holds the profile write-lock for its whole
+    read-modify-write, so concurrent writes from the server's threads or a
+    parallel CLI cannot lose each other's changes (core.profile_write_lock)."""
+    @_functools.wraps(fn)
+    def _w(*a, **k):
+        with core.profile_write_lock():
+            return fn(*a, **k)
+    return _w
+
+
 def _path(name: str) -> Path:
     """The path to write to: if a folder is chosen for the domain we write there, otherwise
     into the profile. Reading and writing use the same folder (consistency)."""
@@ -43,6 +57,7 @@ _KNOWN_SOURCE_DOMAINS = ("labs", "medications", "metrics", "genome",
                         "labs_docs", "med_docs", "garmin", "apple_health")
 
 
+@_serialized
 def set_source_folder(domain: str, folder: str) -> Dict[str, Any]:
     """Bind a data domain to a chosen folder on disk.
 
@@ -81,6 +96,7 @@ def set_source_folder(domain: str, folder: str) -> Dict[str, Any]:
     return {"ok": True, "domain": domain, "folder": str(fp), "section": section}
 
 
+@_serialized
 def clear_source_folder(domain: str) -> Dict[str, Any]:
     """Return the domain to the default profile folder (whichever section it was set under)."""
     cfgp = core.profile_dir() / "sources.json"
@@ -95,6 +111,42 @@ def clear_source_folder(domain: str) -> Dict[str, Any]:
 
 def _write_json(path: Path, data: Dict[str, Any]) -> None:
     core.write_json(path, data, indent=2)
+
+
+@_serialized
+def set_draw_context(day: str, reason: str = "", between: str = "",
+                     marker: Optional[str] = None) -> Dict[str, Any]:
+    """Record why a day holds two draws and what stood between them.
+
+    Attached to the LATER point of the day, because that is the measurement the
+    context explains — the first one is the baseline it is being compared against.
+    Applied to every marker measured twice that day unless one is named: the
+    procedure or the dose happened once, not once per analyte, and making the
+    person repeat themselves for each line of a panel is how a useful field ends
+    up empty.
+    """
+    if not day or not (reason or between):
+        return {"ok": False, "error": _t("store.need_day_and_context")}
+    p = _path("labs.json")
+    if not p.exists():
+        return {"ok": False, "error": _t("store.no_labs")}
+    data = json.loads(p.read_text(encoding="utf-8"))
+    ctx = " · ".join(x for x in (reason.strip(), between.strip()) if x)
+    touched = []
+    for key, m in (data.get("markers") or {}).items():
+        if marker and key != marker:
+            continue
+        pts = [pt for pt in (m.get("series") or [])
+               if str(pt.get("date", "")).startswith(day) and len(str(pt.get("date", ""))) > 10]
+        if len(pts) < 2:
+            continue
+        latest = sorted(pts, key=lambda x: str(x["date"]))[-1]
+        latest["draw_context"] = ctx
+        touched.append(key)
+    if not touched:
+        return {"ok": False, "error": _t("store.no_repeat_that_day", day=day)}
+    _write_json(p, data)
+    return {"ok": True, "day": day, "markers": sorted(touched), "context": ctx}
 
 
 def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] = None,
@@ -171,12 +223,18 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
         # the mmol/mol scale converts by a formula, and a bound multiplied instead
         # of transformed lands somewhere else entirely.
         if known:
-            for name, bound in (("ref_low", ref_low), ("ref_high", ref_high)):
+            # `bound_name`, not `name`: a `for` target is not scoped to the loop,
+            # so calling it `name` left the function's own `name` parameter — the
+            # marker's printed label — equal to "ref_high" for every point that
+            # arrived with a unit. Every marker in a real ingest was renamed to
+            # "ref_high" on screen. The loop runs before the None check, so even
+            # an empty range did it.
+            for bound_name, bound in (("ref_low", ref_low), ("ref_high", ref_high)):
                 if bound is None:
                     continue
                 r = core.convert_to_canonical(spec, unit, float(bound))
                 if r.get("ok"):
-                    if name == "ref_low":
+                    if bound_name == "ref_low":
                         ref_low = r["value"]
                     else:
                         ref_high = r["value"]
@@ -215,6 +273,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     return {"ok": True, "marker": marker, "points": len(series)}
 
 
+@_serialized
 def add_medication(name: str, dose: str = "", note: str = "") -> Dict[str, Any]:
     """Add a prescription to medications.json (an editable list)."""
     if not name:
@@ -238,6 +297,7 @@ def add_medication(name: str, dose: str = "", note: str = "") -> Dict[str, Any]:
     return {"ok": True, "count": len(meds), "updated": replaced}
 
 
+@_serialized
 def remove_medication(name: str) -> Dict[str, Any]:
     """Remove a prescription by name (from medications.json; medications.md is untouched)."""
     p = _path("medications.json")
@@ -256,6 +316,7 @@ def list_medications() -> List[Dict[str, str]]:
 
 
 # ---- personal health metrics (metrics.json) ------------------------------
+@_serialized
 def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str] = None,
                      unit: Optional[str] = None, ref_low: Optional[float] = None,
                      ref_high: Optional[float] = None, direction: Optional[str] = None) -> Dict[str, Any]:
@@ -288,12 +349,20 @@ def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str
     return {"ok": True, "metric": metric, "points": len(series)}
 
 
+@_serialized
 def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
-    """Update the static fields of the health profile (sex, year of birth, height)."""
+    """Update the static fields of the health profile.
+
+    `ancestry` joins sex and year of birth because it is the same kind of fact:
+    a precondition the engine cannot derive and must not invent. Without it a
+    polygenic percentile is computed against a default reference population and
+    printed as an ordinary number — the same silent substitution that gave a
+    woman a male reference interval.
+    """
     p = _path("metrics.json")
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"profile": {}, "metrics": {}}
     prof = data.setdefault("profile", {})
-    for k in ("sex", "birth_year", "height_cm"):
+    for k in ("sex", "birth_year", "height_cm", "ancestry"):
         if k in fields and fields[k] not in (None, ""):
             prof[k] = fields[k]
     _write_json(p, data)
@@ -301,6 +370,7 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
     return {"ok": True, "profile": prof}
 
 
+@_serialized
 def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
                     late_meal: bool = False, note: str = "") -> Dict[str, Any]:
     """Add/replace an entry in the episode log (profile/focus_log.json).
@@ -461,6 +531,7 @@ def _ensure_layout(force: bool = False):
     return written, skipped
 
 
+@_serialized
 def write_goal_targets(proposals: List[Dict[str, Any]]) -> Dict[str, Any]:
     """Write proposed targets into `profile/health_goals.json`, keeping what is there.
 

@@ -30,6 +30,13 @@ The forms are invented — five layouts covering the paths that differ:
 If this file fails after a change to the dictionary or to `ingest_labs`, the
 answer is not to refresh the baseline. It is to find which marker stopped being
 recognised.
+ONE deliberate refresh has happened since (19.08.2026): the `date` field of all
+five forms gained the clock time the form prints, because a point stored at month
+granularity made two draws in a single day indistinguishable and the second was
+reported as a discrepancy with the first. Only the date changed — every marker
+and every parsed record stayed identical, which is what made the refresh safe to
+accept rather than a symptom to investigate.
+
 """
 from __future__ import annotations
 

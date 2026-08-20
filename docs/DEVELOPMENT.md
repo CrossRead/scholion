@@ -138,8 +138,34 @@ convert (factor, or `convert_affine` with its citation) — never a bare
 spelling. If the reference interval logic changes, that is a series break.
 
 **A knowledge catalogue:** data in `knowledge/`, access through `core`,
-provenance fields inside the file. Licence goes to `ATTRIBUTION.md`; data
-whose licence forbids bundling is fetched at runtime instead.
+provenance fields inside the file (`source_tier` is required and gated). Licence
+goes to `ATTRIBUTION.md`; data whose licence forbids bundling is fetched at
+runtime instead.
+
+**A gap.** Coverage is never claimed, it is stated as a fraction with the
+missing part enumerated. Three enumerators run in CI (`src/tools/check_coverage.py`):
+facts the pipeline writes that nothing reads, phenotypes a model can emit with no
+guidance row, and pairs the authority calls actionable that this build does not
+carry. Known gaps live in `coverage_baseline.json` and are listed out loud; a NEW
+gap fails the build until it is fixed or accepted deliberately. A row that is
+absent on purpose says so in `guidance_gaps`, with a reason — silence is
+indistinguishable from an oversight.
+
+**A phenotype vocabulary.** Each gene declares `emits`. A drug's guidance table
+must be keyed in the vocabulary of its own gene, and a gate enforces it: changing
+a model's output without renaming the tables written in its old words orphans
+every row silently, and the answer falls through to «no recommendation» while
+nothing fails. That is not hypothetical — it shipped, in DPYD.
+
+**An external source.** If the data mirrors something that changes upstream, it
+needs an entry in `sources.SOURCES` — address, licence, cadence, and either an
+importer or a written reason it cannot have one. A mirror without an import path
+drifts silently: it keeps answering while the answer stops matching the source it
+claims. An importer VERIFIES before it writes (report the differences, then
+apply), and writes to `<data>/knowledge/` — never into the package, which is
+read-only after `pip install` and replaced by the next upgrade. `scholion
+sources` is the register; a refresh is a typed command and honours
+`SCHOLION_OFFLINE`.
 
 **A language:** a new catalogue in `i18n/` key-identical to `en`, and the
 parity test will hold it there.

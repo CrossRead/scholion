@@ -1,7 +1,8 @@
 {
   "_meta": {
     "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
-    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently."
+    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently.",
+    "source_tier": "guideline_compiled"
   },
   "rules": [
     {
@@ -17,8 +18,8 @@
       },
       "priority": "high",
       "why": {
-        "en": "The rheumatoid factor is persistently raised and is not explained by the metabolic syndrome — rule out RA/an autoimmune condition. Genetically there is a risk of RA (PADI4).",
-        "ru": "Ревматоидный фактор стойко повышен и не объясняется метаболическим синдромом — исключить РА/аутоиммунное. Генетически есть риск РА (PADI4)."
+        "en": "The rheumatoid factor is above the reference interval — worth ruling out RA or another autoimmune condition. A single raised result is not a diagnosis: it also rises in chronic infection and in some healthy people, which is why the suggestion is a test and not a conclusion.",
+        "ru": "Ревматоидный фактор выше референсного интервала — стоит исключить РА или другое аутоиммунное. Одно повышение — не диагноз: он растёт и при хронической инфекции, и у части здоровых людей, поэтому предлагается анализ, а не вывод."
       },
       "specialist": {
         "en": "a rheumatologist",
@@ -28,7 +29,8 @@
         "anti_ccp",
         "ana_screen"
       ],
-      "recheck_months": 12
+      "recheck_months": 12,
+      "why_note": "The genetic sentence was removed: it asserted a finding about THIS person whether or not a genome was attached, while every other genome-dependent rule gates that through `genome_gap` in its own trigger. The recommendation stands on the persistently raised rheumatoid factor alone. Rewritten 19.08.2026: «persistently raised and is not explained by the metabolic syndrome» asserted two things about the reader — a history of repeated results and a diagnosis — from a single value above a bound. Seen firing verbatim on a stranger's data from the PGP corpus, which is exactly how the audit described this class: clinical notes about one patient shipped as a rule."
     },
     {
       "id": "trt_monitor",
@@ -188,8 +190,8 @@
       },
       "priority": "low",
       "why": {
-        "en": "The fungal marker is still raised — assess the effect of correcting the dysbiosis.",
-        "ru": "Грибковый маркёр всё ещё повышен — оценить эффект коррекции дисбиоза."
+        "en": "The fungal marker is raised — assess the effect of correcting the dysbiosis.",
+        "ru": "Грибковый маркёр повышен — оценить эффект коррекции дисбиоза."
       },
       "specialist": {
         "en": "a gastroenterologist",

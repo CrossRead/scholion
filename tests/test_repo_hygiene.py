@@ -55,7 +55,7 @@ LATER_DIRECTORIES = {"inbox", "_to_delete", "tmp", "temp", "old", "trash"}
 def _under_git() -> list:
     out = subprocess.run(["git", "ls-files"], cwd=str(support.ROOT),
                          capture_output=True, text=True,
-                         env={"GIT_OPTIONAL_LOCKS": "0", "PATH": "/usr/bin:/bin:/usr/local/bin"})
+                         env={"GIT_OPTIONAL_LOCKS": "0", "PATH": "/usr/bin:/bin:/usr/local/bin"}, stdin=subprocess.DEVNULL)
     if out.returncode != 0:
         return []
     return [Path(p) for p in out.stdout.splitlines() if p.strip()]
@@ -164,7 +164,7 @@ class TestPathsLeadIntoTheDataDirectory(unittest.TestCase):
                 env.pop(k, None)
             p = subprocess.run([sys.executable, "-c", self.PROBE_PROGRAM],
                                cwd=str(support.ROOT), env=env,
-                               capture_output=True, text=True, timeout=60)
+                               capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
             self.assertEqual(p.returncode, 0, p.stderr[-800:])
             paths = json.loads(p.stdout)
 
@@ -199,7 +199,7 @@ class TestLayout(unittest.TestCase):
         for k in ("SCHOLION_PROFILE_DIR", "SCHOLION_GENOME_DIR", "SCHOLION_CACHE_DIR"):
             env.pop(k, None)
         p = subprocess.run([sys.executable, "-m", "scholion", "init"],
-                           cwd=str(support.ROOT), env=env,
+                           cwd=str(support.ROOT), env=env, stdin=subprocess.DEVNULL,
                            capture_output=True, text=True, timeout=60)
         self.assertEqual(p.returncode, 0, p.stderr[-800:])
 
@@ -260,7 +260,7 @@ class TestLayout(unittest.TestCase):
             for k in ("SCHOLION_PROFILE_DIR", "SCHOLION_GENOME_DIR", "SCHOLION_CACHE_DIR"):
                 env.pop(k, None)
             p = subprocess.run([sys.executable, "-m", "scholion", "init"],
-                               cwd=str(support.ROOT), env=env,
+                               cwd=str(support.ROOT), env=env, stdin=subprocess.DEVNULL,
                                capture_output=True, text=True, timeout=60)
             self.assertEqual(p.returncode, 0, p.stderr[-800:])
             self.assertFalse(external.exists(),
@@ -302,7 +302,7 @@ class TestTheNumberingBeforePublicationStaysInItsOwnNamespace(unittest.TestCase)
 
     def _git(self, *args):
         out = subprocess.run(["git", *args], cwd=str(support.ROOT),
-                             capture_output=True, text=True, env=self.env)
+                             capture_output=True, text=True, env=self.env, stdin=subprocess.DEVNULL)
         return out.stdout.strip() if out.returncode == 0 else ""
 
     def test_no_plain_version_tag_points_before_the_first_public_release(self):
@@ -317,7 +317,7 @@ class TestTheNumberingBeforePublicationStaysInItsOwnNamespace(unittest.TestCase)
                 continue
             ok = subprocess.run(
                 ["git", "merge-base", "--is-ancestor", self.ROOT_TAG, tag + "^{commit}"],
-                cwd=str(support.ROOT), capture_output=True, text=True, env=self.env)
+                cwd=str(support.ROOT), capture_output=True, text=True, env=self.env, stdin=subprocess.DEVNULL)
             if ok.returncode != 0:
                 stray.append(tag)
         self.assertEqual(stray, [], "a version tag points at a commit from before the first "

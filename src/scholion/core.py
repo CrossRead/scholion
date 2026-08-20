@@ -228,6 +228,70 @@ def mkdir_private(path: Path) -> Path:
     return path
 
 
+import contextlib as _contextlib
+import threading as _threading
+
+try:
+    import fcntl as _fcntl
+except ImportError:                                   # non-POSIX; the owner runs POSIX
+    _fcntl = None
+
+_WRITE_TLOCK = _threading.RLock()
+_WRITE_DEPTH = _threading.local()
+
+
+@_contextlib.contextmanager
+def profile_write_lock():
+    """Serialize a read-modify-write of the profile across threads AND processes.
+
+    The web server is a ThreadingHTTPServer: two requests that each read a file,
+    change one field and write it back run concurrently, and the later writer
+    silently drops the earlier one's change — a lost update, reproduced as five
+    failures out of eight parallel writes. The same race exists between a CLI
+    write and the running server. `write_json` makes a SINGLE write atomic; it
+    cannot make a read-and-then-write atomic, which is what this does.
+
+    A process-local RLock covers the server's own threads (and makes the lock
+    reentrant, so a mutator that calls another mutator does not deadlock). An
+    flock on a lockfile in the profile directory covers a separate CLI process.
+    flock is advisory and per-open-description, so a second os.open in the same
+    process would contend — the depth counter skips re-locking on reentry.
+    """
+    depth = getattr(_WRITE_DEPTH, "n", 0)
+    with _WRITE_TLOCK:
+        if depth or _fcntl is None:
+            _WRITE_DEPTH.n = depth + 1
+            try:
+                yield
+            finally:
+                _WRITE_DEPTH.n = depth
+            return
+        try:
+            lockpath = profile_dir() / ".write.lock"
+            lockpath.parent.mkdir(parents=True, exist_ok=True)
+            fd = os.open(str(lockpath), os.O_CREAT | os.O_RDWR, 0o600)
+        except OSError:
+            # If the lockfile cannot be made, the RLock still serializes this
+            # process's own threads — better than nothing, and never a reason to
+            # refuse to write somebody's data.
+            _WRITE_DEPTH.n = depth + 1
+            try:
+                yield
+            finally:
+                _WRITE_DEPTH.n = depth
+            return
+        _WRITE_DEPTH.n = depth + 1
+        try:
+            _fcntl.flock(fd, _fcntl.LOCK_EX)
+            yield
+        finally:
+            _WRITE_DEPTH.n = depth
+            try:
+                _fcntl.flock(fd, _fcntl.LOCK_UN)
+            finally:
+                os.close(fd)
+
+
 def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
     """Write JSON so that the file is never left half written.
 
@@ -485,6 +549,9 @@ LOCALIZABLE_FIELDS = {
     "interpretation", "recommendation", "evidence_note", "validity_note",
     "meaning", "effect", "mechanism", "manage", "claim", "effect_size",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
+    "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",
+    "would_close", "why_named_not_taken",
+    "assembly_secondary_note", "assembly_secondary_open", "applies_to_sex_note",
     "zygosity_note", "loinc_note", "common_pitfalls", "hypothesis", "evidence",
     "text", "rule", "summary", "description",
     # names and headings shown on screen
@@ -533,7 +600,12 @@ def _localized(value: Any, lang: str) -> Any:
 # datum. So the container is named instead, and every value inside it is
 # resolved. Without this the text renders raw, and the failure is silent for
 # whoever added a new alternative.
-LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status"}
+# `convert_refused` joins them: its keys are the unit surfaces a form may print
+# (data — «mg/dL», «мг/дл») and its values are the sentence explaining why that
+# unit cannot be converted. A field-name rule cannot reach inside a map keyed by
+# data, which is what this set is for.
+LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status",
+                          "convert_refused"}
 
 # A language map whose values are STRUCTURE, not prose: `labels` in the marker
 # dictionary holds, per language, a marker's display name together with the
@@ -547,7 +619,12 @@ LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status
 # It is named here so that the audit of stray language maps can tell «resolved by
 # a dedicated accessor» from «forgotten, and will print raw into a report». Being
 # on this list is a claim that something reads the field deliberately.
-STRUCTURAL_LANGUAGE_MAPS = {"labels"}
+# A phenotype code is two letters (RM, UM, PM) and so is a language code (en, ru):
+# by shape alone they are indistinguishable, and `guidance_gaps`, keyed by
+# phenotype, reads to the language audit as a map of translations. It is declared
+# structural here — its values are objects, and the audit walks INTO them, so the
+# prose inside still has to sit in a curated field.
+STRUCTURAL_LANGUAGE_MAPS = {"labels", "guidance_gaps"}
 
 
 def _localize_tree(node: Any, lang: str) -> Any:
@@ -566,6 +643,53 @@ def _localize_tree(node: Any, lang: str) -> Any:
     return node
 
 
+def knowledge_dir_local() -> Path:
+    """Where a REFRESHED copy of a knowledge file lives, on this machine.
+
+    The bundled `knowledge/` travels inside the package and is, after a
+    `pip install`, usually read-only (site-packages) and replaced wholesale by
+    the next upgrade. A catalogue refreshed from its upstream must therefore land
+    beside the person's own data, not inside the wheel — otherwise «update the
+    reference base» would mean «reinstall the program», and an upgrade would
+    silently discard the refresh.
+    """
+    return repo_dir() / "knowledge"
+
+
+def knowledge_path(name: str) -> Path:
+    """The file that WINS for a knowledge name: a local refresh over the bundle.
+
+    Both are the same shape; the local one is newer by construction, because the
+    only thing that writes it is an import from the upstream source. `sources`
+    prints which of the two answered, so the precedence is visible rather than
+    inferred.
+    """
+    local = knowledge_dir_local() / name
+    try:
+        if local.is_file():
+            return local
+    except OSError:
+        pass
+    return _KNOWLEDGE_DIR / name
+
+
+def knowledge_is_local(name: str) -> bool:
+    return knowledge_path(name) != _KNOWLEDGE_DIR / name
+
+
+def write_knowledge_local(name: str, data: Any) -> Path:
+    """Write a refreshed knowledge file to the LOCAL copy, next to the profile.
+
+    Never into the package: see `knowledge_dir_local`. The write goes through
+    `write_json`, so it is atomic — a knowledge file half-written by an
+    interrupted import would be a reference base that fails to parse.
+    """
+    p = knowledge_dir_local() / name
+    write_json(p, data)
+    _KB_CACHE.clear()
+    return p
+
+
 _KB_CACHE: Dict[str, Any] = {}
 
 
@@ -577,7 +701,7 @@ def _read_knowledge(name: str) -> Dict[str, Any]:
     that forgot would print a raw `{'en': …, 'ru': …}` into a report.
     """
     from .i18n import lang as _lang
-    path = _KNOWLEDGE_DIR / name
+    path = knowledge_path(name)
     code = _lang()
     try:
         mt = path.stat().st_mtime
@@ -636,9 +760,109 @@ def loci() -> Dict[str, Any]:
     return _read_knowledge("loci.json")
 
 
+def loinc_index() -> Dict[str, str]:
+    """LOINC code → marker key, built from what the base actually carries.
+
+    Task 60/21. A FHIR `Observation` names its analyte by LOINC code, so the
+    reverse direction is what an import needs — and it did not exist. Built here
+    rather than stored, because a second copy of a mapping drifts from the first.
+
+    It is deliberately small: 33 of 408 markers carry a code today. That is the
+    honest denominator, and `scholion sources` prints it as a fraction rather
+    than letting the presence of an index imply completeness. A code arrives per
+    marker with medical verification, or through the local overlay as a proposal
+    somebody confirms — never from a guess, because a wrong code silently binds
+    an incoming value to the wrong analyte.
+    """
+    out: Dict[str, str] = {}
+    for key, meta in (lab_test_meta().get("tests") or {}).items():
+        code = (meta or {}).get("loinc")
+        if code:
+            out[str(code)] = key
+    try:
+        from . import markers_local as _ml
+        for k, spec in (_ml.confirmed_markers() or {}).items():
+            if spec.get("loinc"):
+                out.setdefault(str(spec["loinc"]), k)
+    except Exception:
+        pass
+    return out
+
+
+def loinc_coverage() -> Dict[str, Any]:
+    """How much of the dictionary is reachable by LOINC code, as a fraction."""
+    markers = lab_markers().get("markers") or {}
+    idx = loinc_index()
+    return {"coded": len(idx), "markers": len(markers),
+            "pct": round(100.0 * len(idx) / len(markers), 1) if markers else 0.0}
+
+
+def lab_test_meta() -> Dict[str, Any]:
+    """Per-test metadata: biomaterial, tier, whether the test is taken fasting, LOINC.
+
+    Read by the laboratory engine to know what a threshold PRESUMES about the
+    draw. The base recorded «fasting: true» for years while the engine applied
+    fasting thresholds to any measurement whatever the hour — the fact was held
+    and never compared.
+    """
+    return _read_knowledge("lab_test_meta.json")
+
+
+def markers_overlay_path() -> Path:
+    """Where locally added marker entries live: <data>/knowledge/lab_markers.local.json.
+
+    A separate file, never the shipped one. The overlay is how the dictionary
+    grows from the person in front of it without the build lying about what it
+    ships: an entry here is theirs until somebody reviews it, and an upgrade
+    cannot silently overwrite or silently keep it.
+    """
+    return knowledge_dir_local() / "lab_markers.local.json"
+
+
 def lab_markers() -> Dict[str, Any]:
-    """Public dictionary for recognising lab markers in PDFs (for the auto-ingest)."""
-    return _read_knowledge("lab_markers.json")
+    """Public dictionary for recognising lab markers, plus locally added entries.
+
+    The overlay is MERGED, not substituted: a local file replacing the shipped
+    dictionary would quietly drop four hundred markers to add one. Each merged
+    entry keeps its `status` — `proposed` or `confirmed` — and every consumer that
+    makes a claim about a value has to look at it.
+
+    `proposed` exists because of what it prevents. When a row on a form matches no
+    marker, the honest repair is a new dictionary entry; but an entry drafted from
+    a single form, by a model or by a person in a hurry, is a guess about what the
+    row means and what corridor belongs to it. Until a person confirms it the
+    value is READ, STORED and SHOWN — it is not lost, which was the defect — and
+    no statement of «above normal» is made on it. The same shape as
+    `ref_sex_unknown`: keep the number, withhold the claim.
+    """
+    base = _read_knowledge("lab_markers.json")
+    p = markers_overlay_path()
+    try:
+        if not p.is_file():
+            return base
+        extra = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return base
+    from .i18n import lang as _lang
+    merged = dict(base)
+    markers = dict(base.get("markers") or {})
+    for key, spec in (extra.get("markers") or {}).items():
+        if key in markers:
+            # A local entry never overwrites a shipped one. The shipped
+            # dictionary is reviewed; silently shadowing it from a file nobody
+            # reviewed is how a curated base stops being curated.
+            continue
+        spec = _localize_tree(spec, _lang())
+        spec.setdefault("status", "proposed")
+        markers[key] = spec
+    merged["markers"] = markers
+    return merged
+
+
+def proposed_markers() -> Dict[str, Any]:
+    """Locally added entries that no person has confirmed yet."""
+    return {k: v for k, v in (lab_markers().get("markers") or {}).items()
+            if isinstance(v, dict) and v.get("status") == "proposed"}
 
 
 def marker_rules(spec: Dict[str, Any], field: str) -> List[str]:
@@ -710,7 +934,16 @@ def resolve_unit(spec: Dict[str, Any], given: str) -> Dict[str, Any]:
     that goes to their doctor.
     """
     canonical = spec.get("unit") or ""
-    units = spec.get("units") or {}
+    units = dict(spec.get("units") or {})
+    # A CONFIRMED local unit form joins the gate; a proposed one deliberately
+    # does not. A wrong marker entry costs a wrong corridor; a wrong factor costs
+    # a wrong NUMBER, so nothing multiplies a value until a person has vouched
+    # for the multiplier. The proposal travels in the refusal instead.
+    try:
+        from . import markers_local as _ml
+        units.update(_ml.confirmed_units(spec.get("key") or spec.get("_key") or ""))
+    except Exception:
+        pass
     g = _norm_unit(given or "")
     if not g:
         return {"ok": False, "canonical": canonical, "accepted": _accepted_units(spec),
@@ -817,7 +1050,7 @@ def _read_knowledge_raw(name: str) -> Dict[str, Any]:
     user must be recognised while the output language is English, and vice versa.
     Recognition reads all languages; rendering reads one.
     """
-    path = _KNOWLEDGE_DIR / name
+    path = knowledge_path(name)
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -1086,8 +1319,59 @@ def active_med_classes() -> List[str]:
 
 
 # ---- profile -------------------------------------------------------------
+def star_alleles_tsv() -> Dict[str, Any]:
+    """`profile/pgx_star_alleles.tsv` → {gene: {diplotype, phenotype, cnv}}.
+
+    This file is written by `src/ingest/pgx_star_alleles.sh` (PyPGx over a BAM:
+    pileup, CNV model, 1KGP phasing) and, until now, was read by nothing. Star
+    alleles for eighteen genes were computed and sat on disk while the engine
+    answered from tag SNPs, because the only path into the engine was a hand
+    edit of `pharmacogenomics.json` that nothing told the person to make.
+
+    A row whose diplotype is `ERROR` or empty is skipped rather than carried: the
+    pipeline writes that when a gene failed, and a failure is not a call.
+    """
+    p = profile_dir() / "pgx_star_alleles.tsv"
+    if not p.is_file():
+        return {}
+    out: Dict[str, Any] = {}
+    try:
+        import csv as _csv
+        with p.open(encoding="utf-8") as fh:
+            for row in _csv.DictReader(fh, delimiter="\t"):
+                gene = (row.get("gene") or "").strip().upper()
+                dip = (row.get("diplotype") or "").strip()
+                if not gene or not dip or dip.upper() == "ERROR":
+                    continue
+                out[gene] = {"diplotype": dip,
+                             "phenotype": (row.get("phenotype") or "").strip(),
+                             "cnv": (row.get("cnv") or "").strip() or None,
+                             "source": "pgx_star_alleles.tsv"}
+    except (OSError, ValueError):
+        return {}
+    return out
+
+
 def pharmacogenomics() -> Dict[str, Any]:
-    return read_profile_json(profile_dir() / "pharmacogenomics.json")
+    """The pharmacogenomic profile, with the star-allele TSV merged in.
+
+    `pharmacogenomics.json` wins wherever it has a gene: it is what a person or
+    another tool wrote deliberately. The TSV fills the rest, so an artefact the
+    ingest layer produced reaches the reasoning layer without anyone having to
+    know it exists. The two were connected by the filesystem and by convention,
+    and the convention was checked nowhere — which is the single architectural
+    cause the audit found behind four separate defects.
+    """
+    data = read_profile_json(profile_dir() / "pharmacogenomics.json")
+    from_tsv = star_alleles_tsv()
+    if not from_tsv:
+        return data
+    merged = dict(data or {})
+    known = dict(merged.get("star_alleles") or {})
+    for gene, call in from_tsv.items():
+        known.setdefault(gene, call)
+    merged["star_alleles"] = known
+    return merged
 
 
 def labs() -> Dict[str, Any]:
@@ -1195,6 +1479,34 @@ def medications_json() -> Dict[str, Any]:
     return read_profile_json(p) if p.exists() else {"medications": []}
 
 
+def profile_ancestry() -> Optional[str]:
+    """The reference superpopulation the person stated, or None.
+
+    None is the important value: it means a percentile printed for them was
+    computed against a default, and the report has to say so rather than let the
+    number stand as if the question had been asked.
+    """
+    v = (metrics_json().get("profile") or {}).get("ancestry")
+    return v if v in ("EUR", "AFR", "EAS", "SAS", "AMR") else None
+
+
+def profile_sex() -> Optional[str]:
+    """The person's sex as 'male'/'female', or None if not set or unrecognised.
+
+    Lives in metrics.json → profile.sex. Read here, once, because the reference
+    intervals for a dozen markers differ by sex (haemoglobin, ferritin, creatinine,
+    testosterone…) and applying the male range to a woman prints false anaemia and
+    false-normal testosterone. An unrecognised value is None, not a guess: a
+    silent default to one sex is exactly the failure this exists to prevent.
+    """
+    raw = str((metrics_json().get("profile") or {}).get("sex") or "").strip().lower()
+    if raw in ("m", "male", "man", "муж", "мужской", "м"):
+        return "male"
+    if raw in ("f", "female", "woman", "жен", "женский", "ж"):
+        return "female"
+    return None
+
+
 def metrics_json() -> Dict[str, Any]:
     """Personal health metrics (metrics.json): sleep, weight, height, mobility and so on.
     Added to through the UI. Personal. The structure is time series, as in labs.json."""
@@ -1229,6 +1541,24 @@ def _any_locus_called(rsids: List[str]) -> bool:
     return False
 
 
+def _genotyped_for(gene: str) -> bool:
+    """Does the profile carry a genotype at any of this gene's model positions?
+
+    The mapping rsID → gene lives in the pharmacogenetic catalogue, so a writer
+    does not have to repeat it: requiring the gene name beside every genotype is
+    a second source of truth for something the base already knows.
+    """
+    model = {m.get("rsid") for m in
+             (((cpic_kb().get("genes") or {}).get(gene) or {}).get("markers") or [])
+             if m.get("rsid")}
+    if not model:
+        return False
+    for g in pharmacogenomics().get("genotypes", []) or []:
+        if g.get("rsid") in model and g.get("genotype"):
+            return True
+    return False
+
+
 def genome_gaps() -> List[str]:
     """Target genes not yet covered by the patient's data.
 
@@ -1247,8 +1577,17 @@ def genome_gaps() -> List[str]:
     for gene, meta in targets.items():
         if meta.get("needs_full_diplotype"):
             gaps.append(gene)                       # e.g. CYP2D6 — PyPGx is needed even with a VCF
-        elif markers_for_gene(gene):
-            continue                                # already in the Evogen report
+        elif markers_for_gene(gene) or _genotyped_for(gene):
+            # «Already in the report» OR «the profile carries a genotype at one of
+            # this gene's model positions». The second half was missing, and it
+            # cost a whole class of test its independence: an entry in
+            # `genotypes` that does not repeat the gene NAME was invisible here,
+            # even though the catalogue already knows which gene each rsID
+            # belongs to. On the author's machine the gene was covered by his own
+            # VCF, so the omission never showed; with the genome pointed at an
+            # empty fixture — that is, on anybody else's machine — a gene with
+            # explicit genotypes in the profile came back «not covered».
+            continue
         elif vcf_ready and _any_locus_called(gene_loci.get(gene.upper()) or []):
             continue                                # closed by an actual reading at its positions
         else:

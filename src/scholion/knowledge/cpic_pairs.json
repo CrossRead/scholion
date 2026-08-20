@@ -1,0 +1,396 @@
+{
+  "_meta": {
+    "purpose": "The list of gene↔drug pairs CPIC classifies at level A — prescribing guidance exists and is actionable. Carried NOT to answer with, but to be COMPARED against what this build models: a pair CPIC calls actionable and we do not carry is a gap, and a gap nobody enumerates is one a person has to find by being harmed by it. This is the file the NUDT15 omission would have been caught by.",
+    "source": "CPIC (api.cpicpgx.org/v1/pair, cpiclevel=A, removed=false), CC0, fetched 2026-08-19.",
+    "source_tier": "guideline_verbatim",
+    "level": "A",
+    "count": 96,
+    "not_a_todo_list": "Level A is not a list of things this build must implement. It is the denominator: coverage is stated as a fraction of it, and the pairs that matter for a particular person are the ones intersecting their own prescriptions."
+  },
+  "pairs": [
+    {
+      "gene": "ABCG2",
+      "drug": "rosuvastatin"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "isoflurane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "sevoflurane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "methoxyflurane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "halothane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "desflurane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "enflurane"
+    },
+    {
+      "gene": "CACNA1S",
+      "drug": "succinylcholine"
+    },
+    {
+      "gene": "CFTR",
+      "drug": "ivacaftor"
+    },
+    {
+      "gene": "CYP2B6",
+      "drug": "efavirenz"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "citalopram"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "sertraline"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "clopidogrel"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "voriconazole"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "lansoprazole"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "escitalopram"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "amitriptyline"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "omeprazole"
+    },
+    {
+      "gene": "CYP2C19",
+      "drug": "pantoprazole"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "siponimod"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "ibuprofen"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "fosphenytoin"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "flurbiprofen"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "fluvastatin"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "celecoxib"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "warfarin"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "lornoxicam"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "meloxicam"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "tenoxicam"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "piroxicam"
+    },
+    {
+      "gene": "CYP2C9",
+      "drug": "phenytoin"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "tamoxifen"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "vortioxetine"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "tropisetron"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "nortriptyline"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "codeine"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "atomoxetine"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "ondansetron"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "pitolisant"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "paroxetine"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "tramadol"
+    },
+    {
+      "gene": "CYP2D6",
+      "drug": "amitriptyline"
+    },
+    {
+      "gene": "CYP3A5",
+      "drug": "tacrolimus"
+    },
+    {
+      "gene": "CYP4F2",
+      "drug": "warfarin"
+    },
+    {
+      "gene": "DPYD",
+      "drug": "capecitabine"
+    },
+    {
+      "gene": "DPYD",
+      "drug": "fluorouracil"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "dapsone"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "methylene blue"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "toluidine blue"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "primaquine"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "nitrofurantoin"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "tafenoquine"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "rasburicase"
+    },
+    {
+      "gene": "G6PD",
+      "drug": "pegloticase"
+    },
+    {
+      "gene": "HLA-A",
+      "drug": "carbamazepine"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "allopurinol"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "carbamazepine"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "oxcarbazepine"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "phenytoin"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "fosphenytoin"
+    },
+    {
+      "gene": "HLA-B",
+      "drug": "abacavir"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "streptomycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "plazomicin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "neomycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "tobramycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "kanamycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "dibekacin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "gentamicin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "ribostamycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "paromomycin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "netilmicin"
+    },
+    {
+      "gene": "MT-RNR1",
+      "drug": "amikacin"
+    },
+    {
+      "gene": "NAT2",
+      "drug": "hydralazine"
+    },
+    {
+      "gene": "NUDT15",
+      "drug": "azathioprine"
+    },
+    {
+      "gene": "NUDT15",
+      "drug": "thioguanine"
+    },
+    {
+      "gene": "NUDT15",
+      "drug": "mercaptopurine"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "desflurane"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "halothane"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "succinylcholine"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "sevoflurane"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "methoxyflurane"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "isoflurane"
+    },
+    {
+      "gene": "RYR1",
+      "drug": "enflurane"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "pitavastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "pravastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "lovastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "atorvastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "fluvastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "rosuvastatin"
+    },
+    {
+      "gene": "SLCO1B1",
+      "drug": "simvastatin"
+    },
+    {
+      "gene": "TPMT",
+      "drug": "mercaptopurine"
+    },
+    {
+      "gene": "TPMT",
+      "drug": "thioguanine"
+    },
+    {
+      "gene": "TPMT",
+      "drug": "azathioprine"
+    },
+    {
+      "gene": "UGT1A1",
+      "drug": "atazanavir"
+    },
+    {
+      "gene": "UGT1A1",
+      "drug": "irinotecan"
+    },
+    {
+      "gene": "VKORC1",
+      "drug": "warfarin"
+    }
+  ]
+}

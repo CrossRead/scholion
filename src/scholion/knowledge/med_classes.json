@@ -4,7 +4,8 @@
     "note": "Extensible. The patient's personal prescriptions live ONLY in profile/medications.json and profile/medications.md.",
     "match": "It fires on the occurrence of any of the names in the text of the patient's prescriptions (case-insensitively).",
     "note_nutraceutical_layer_20260813": "A nutraceutical layer has been added: classes for the items that were not in the cardio-diabetic frame (UDCA, soluble fibre, berberine, niacin, vitamin D, iodine, sources of B6, GH secretagogues, probiotics, inositol, lipoic acid). A CAVEAT ABOUT SUBSTRING MATCHING: 'niacin' is contained in 'niacinamide', and 'mk-7' (supplement_k2) is contained in 'mk-677' (ibutamoren) — when such items appear, write the name in medications.json explicitly, otherwise the class will be determined wrongly.",
-    "note_word_matching_20260813": "Name matching has become word-wise (core.classify_drug): the pattern has to match a whole word, and for Cyrillic patterns up to three letters of inflection are allowed. The consequence: variants with a digit at the end have to be listed explicitly — «vitamin d» no longer catches «Vitamin D3», so both forms have been entered into the list."
+    "note_word_matching_20260813": "Name matching has become word-wise (core.classify_drug): the pattern has to match a whole word, and for Cyrillic patterns up to three letters of inflection are allowed. The consequence: variants with a digit at the end have to be listed explicitly — «vitamin d» no longer catches «Vitamin D3», so both forms have been entered into the list.",
+    "source_tier": "curated_reference"
   },
   "classes": {
     "testosterone_replacement": {

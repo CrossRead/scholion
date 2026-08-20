@@ -119,6 +119,18 @@ whatever error they carry and has no line saying where it came from. Name the
 command that was run. If it cannot be run, say so instead of answering: this
 failure is silent by nature, because a recalled answer looks exactly like a
 checked one.
+
+**15. An unrecognised row may be extended into, never guessed into.** When a line
+on a lab form matches no marker, the assistant may draft a DICTIONARY ENTRY for
+it — a canonical key, the printed names that recognise it, the unit as printed —
+and only when the person asks for that specific row by name, exactly as rule 13
+requires for the two network lookups. It never supplies the VALUE: the number
+comes from deterministic code applying the new rule, which is what makes it
+reproducible a year later and checkable by somebody else. It never supplies a
+reference range either — a corridor is a clinical claim, and `CONTRIBUTING.md` is
+explicit that a language model is not a source for one. The entry is written as
+`proposed`, and while it is proposed the marker is shown with its value and
+without any statement about the norm; a person confirms it, not the assistant.
 <!-- ASSISTANT-RULES:END -->
 
 ## Before Step 1 — is the tool installed at all
@@ -589,6 +601,8 @@ python3 -m scholion set-folder labs_docs "<path>"  # where the forms and conclus
 
 # Manual entry
 python3 -m scholion import-labs panel.csv [--dry-run]   # a whole panel from CSV/TSV; all rows or none
+python3 -m scholion import-fhir bundle.json [--dry-run]  # a FHIR R4 Bundle: a portal export, Apple Health clinical records
+python3 -m scholion mcp                                 # speak MCP over stdin/stdout: the same tools, called by a model directly
 python3 -m scholion add-lab NAME YYYY-MM VALUE --unit UNIT [--ref-low --ref-high --new]
 python3 -m scholion add-metric KEY DATE VALUE
 python3 -m scholion add-med "drug" --dose "…"
@@ -601,6 +615,11 @@ python3 -m scholion tools --install          # installs the base set. ONLY on th
 python3 -m scholion tools --set NAME         # one set: base | align | coverage | pgx | wgs | hla | prs
 
 # What this build can do
+python3 -m scholion flag-rate                # on what share of objects each flag fired — run this before repeating a flag back to somebody
+python3 -m scholion array                    # a consumer genotyping array: catalogue loci called / failed / not on the chip, and what it may not be asked
+python3 -m scholion marker                   # locally added marker entries; --propose KEY --names "…" adds one, --confirm KEY vouches for it
+python3 -m scholion lab-draw --day YYYY-MM-DD --reason "…" --between "…"   # WRITES: why a day holds two draws and what stood between them
+python3 -m scholion sources                  # the external reference sources this build mirrors, with the date each was last imported
 python3 -m scholion capabilities             # every command, what it does, whether it writes
 python3 -m scholion capabilities --json      # the same, machine-readable
 

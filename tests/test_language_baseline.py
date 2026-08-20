@@ -37,7 +37,7 @@ class TestTheRemainderDoesNotGrow(unittest.TestCase):
 
     def test_strict_passes(self):
         p = subprocess.run([sys.executable, str(TOOL), "--strict"],
-                           cwd=str(support.ROOT), capture_output=True, text=True, timeout=180)
+                           cwd=str(support.ROOT), capture_output=True, text=True, timeout=180, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0,
                          "Russian was added to a file that ships:\n" + p.stdout + p.stderr)
 

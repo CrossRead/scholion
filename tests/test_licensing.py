@@ -164,7 +164,7 @@ class TestExecutableFiles(unittest.TestCase):
         self.assertTrue(wrapper.stat().st_mode & 0o111, "bin/crossread has no execute bit")
         import subprocess
         p = subprocess.run([str(wrapper), "--help"], capture_output=True, text=True,
-                           cwd=str(ROOT), timeout=60)
+                           cwd=str(ROOT), timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-400:])
         self.assertIn("crossread", p.stdout, "the help names the wrong command")
 

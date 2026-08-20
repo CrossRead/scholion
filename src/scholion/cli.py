@@ -11,6 +11,7 @@ Examples:
 from __future__ import annotations
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -59,6 +60,9 @@ def build_parser() -> argparse.ArgumentParser:
     ini.add_argument("--force", action="store_true",
                      help="overwrite files that already exist")
     ini.add_argument("--dir", help="profile directory (the user's one by default)")
+    ini.add_argument("--sex", choices=["male", "female"], default=None,
+                     help="record the sex now: six reference intervals depend on it")
+    ini.add_argument("--birth-year", type=int, default=None, help="record the year of birth now")
     # The external tools are asked about at the end of `init` and nowhere else.
     # There is no post-install hook in a wheel — pip runs no code of ours after
     # unpacking — so «ask at install time» has to mean «ask at first run», and
@@ -102,7 +106,18 @@ def build_parser() -> argparse.ArgumentParser:
     l.add_argument("markers", nargs="*", help="marker keys (all of them by default)")
 
     sub.add_parser("suggest-tests", parents=[common], help="which tests it makes sense to take")
-    sub.add_parser("profile", parents=[common], help="a snapshot of the profile (what is loaded)")
+    prf = sub.add_parser("profile", parents=[common],
+                         help="a snapshot of the profile (what is loaded); also sets sex "
+                              "and year of birth, which several reference intervals need")
+    prf.add_argument("--sex", choices=["male", "female"], default=None,
+                     help="six markers keep a sex-specific interval; without this the "
+                          "corridor is not shown rather than guessed")
+    prf.add_argument("--birth-year", type=int, default=None,
+                     help="year of birth — age-banded rows on a lab form need it")
+    prf.add_argument("--ancestry", choices=["EUR", "AFR", "EAS", "SAS", "AMR"], default=None,
+                     help="the reference superpopulation for polygenic scores; without it a "
+                          "percentile is printed with the caveat that it was computed against "
+                          "a population that may not be yours")
 
     g = sub.add_parser("genome", parents=[common], help="look a locus up in the full VCF (rsID or --gene)")
     g.add_argument("rsid", nargs="?", help="rsID (e.g. rs4149056)")
@@ -171,6 +186,53 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("capabilities", parents=[common],
                    help="what this build can do — every command, what it does, "
                         "whether it writes, and which entry points carry it")
+    sub.add_parser("flag-rate", parents=[common],
+                   help="on what share of objects each flag fired — the cheap check this "
+                        "project asks for before any interpretation")
+    sub.add_parser("array", parents=[common],
+                   help="a consumer genotyping array: which catalogue loci it carries, "
+                        "which failed to call, and which it does not carry at all")
+    mkp = sub.add_parser("marker", parents=[common],
+                         help="locally added marker entries: list, propose, confirm, drop. "
+                              "A proposal describes what a row is CALLED — never a value")
+    mkp.add_argument("--propose", metavar="KEY", default="",
+                     help="canonical key for a new entry")
+    mkp.add_argument("--names", default="",
+                     help="printed names that recognise the row, separated by «;»")
+    mkp.add_argument("--names-en", default="", help="the same in English, if the form is English")
+    mkp.add_argument("--unit", default="", help="the unit as printed on the form")
+    mkp.add_argument("--direction", default="", choices=["", "higher_better", "lower_better"])
+    mkp.add_argument("--loinc", default="", help="LOINC code, if one is known")
+    mkp.add_argument("--confirm", metavar="KEY", default="",
+                     help="vouch for an entry — from here it may flag")
+    mkp.add_argument("--drop", metavar="KEY", default="", help="remove a local entry")
+    mkp.add_argument("--propose-unit", nargs=2, metavar=("MARKER", "UNIT"), default=None,
+                     help="propose that a printed unit form belongs to a marker; add "
+                          "--factor or --refuse-reason")
+    mkp.add_argument("--factor", type=float, default=None,
+                     help="conversion factor to the canonical unit — NOT applied until confirmed")
+    mkp.add_argument("--refuse-reason", default="",
+                     help="propose instead that this form cannot be converted at all")
+    mkp.add_argument("--propose-row-rule", metavar="PATTERN", default="",
+                     help="propose a rule for a multi-line reference block")
+    mkp.add_argument("--rule-kind", choices=["alien", "label"], default="alien")
+    mkp.add_argument("--example", default="",
+                     help="the SHAPE of the row that produced the pattern (required)")
+    ldp = sub.add_parser("lab-draw", parents=[common],
+                         help="explain a day that holds two draws: why the repeat, and what "
+                              "happened between them")
+    ldp.add_argument("--day", required=True, help="the day, YYYY-MM-DD")
+    ldp.add_argument("--reason", default="", help="why the test was repeated that day")
+    ldp.add_argument("--between", default="", help="what happened between the two draws — "
+                                                   "a procedure, a dose, a load")
+    ldp.add_argument("--marker", default="", help="apply to one marker only (default: all "
+                                                  "markers measured twice that day)")
+    srcp = sub.add_parser("sources", parents=[common],
+                          help="the external reference sources this build mirrors, "
+                               "when each was last imported, and what has to be done by hand")
+    srcp.add_argument("--refresh", action="store_true",
+                      help="import the sources that can be automated (reaches the network)")
+    srcp.add_argument("--only", default="", help="refresh one source by id (e.g. cpic)")
     asi = sub.add_parser("assistant", parents=[common],
                          help="what the application does by itself, what the assistant adds and how to connect it")
     asi.add_argument("--context", action="store_true",
@@ -227,6 +289,17 @@ def build_parser() -> argparse.ArgumentParser:
                                   "A filled-in example ships as templates/panel-template.csv")
     imp.add_argument("--dry-run", action="store_true",
                      help="check and report, write nothing")
+
+    sub.add_parser("mcp", parents=[common],
+                   help="speak the Model Context Protocol over stdin/stdout, so a model can "
+                        "call the same tools the plugin registers")
+
+    fhi = sub.add_parser("import-fhir", parents=[common],
+                         help="import laboratory results from a FHIR R4 Bundle (a portal export, "
+                              "Apple Health clinical records, an EHR download)")
+    fhi.add_argument("path", help="the bundle: a .json file whose resourceType is Bundle")
+    fhi.add_argument("--dry-run", action="store_true",
+                     help="say what it would take and write nothing")
 
     amt = sub.add_parser("add-metric", parents=[common],
                          help="add a point of a personal metric (weight, sleep, blood pressure…)")
@@ -292,6 +365,26 @@ def _hint_if_empty(cmd) -> None:
           _t("init.empty_hint_demo"), sep="\n", file=sys.stderr)
 
 
+def _can_ask() -> bool:
+    """Whether there is somebody who can answer, not merely a terminal.
+
+    `isatty()` answers the wrong question for automation. A Makefile, a
+    provisioning script, a CI job with a pseudo-terminal allocated — all of them
+    have a terminal and none of them has a person, and a command that stops to
+    ask in one of those hangs a pipeline with no output to explain why. Both
+    signals are the conventional ones: `CI` is set by every hosted runner, and
+    `SCHOLION_NONINTERACTIVE` is for everyone else. The answers can still be
+    given outright with `--sex` and `--birth-year`, which is what a script should
+    do when it knows them.
+    """
+    if os.environ.get("SCHOLION_NONINTERACTIVE") or os.environ.get("CI"):
+        return False
+    try:
+        return bool(sys.stdin) and sys.stdin.isatty()
+    except (ValueError, AttributeError):     # a closed or replaced stream
+        return False
+
+
 def main(argv=None) -> int:
     """The command line, with one class of failure caught before it reaches a person.
 
@@ -353,6 +446,50 @@ def _main(argv=None) -> int:
             print(_t("init.demo_next"))
         else:
             print(_t("init.next_steps"))
+        # Setting the tool up includes knowing what reference data it carries and
+        # how that data is refreshed. Printed for both modes and before the tool
+        # check, because it is true of every install: the catalogues are mirrors
+        # of sources that move, and a mirror without a named import path is the
+        # defect this line exists to prevent. Nothing is fetched here — the line
+        # names the command, the person runs it.
+        # Sex and year of birth, at the one moment the person is already setting
+        # the tool up. Task 72: without them six reference intervals fall back to
+        # the male range and every age-banded row on a lab form is unreachable —
+        # one unasked question is the precondition for a whole family of wrong
+        # flags. Asked only for a real profile (the demo has its own person), only
+        # when there is a terminal to answer from, and never blocking: a person
+        # who presses Enter twice gets the same honest «not recorded» as before,
+        # now with the command that fixes it.
+        if r.get("mode") != "demo":
+            from . import store as _st
+            fields = {}
+            if args.sex:
+                fields["sex"] = args.sex
+            if args.birth_year:
+                fields["birth_year"] = args.birth_year
+            if not fields and _can_ask():
+                print()
+                print(_t("init.why_sex_asked"))
+                try:
+                    a = input(_t("init.ask_sex")).strip().lower()
+                    if a in ("m", "male", "м", "мужской"):
+                        fields["sex"] = "male"
+                    elif a in ("f", "female", "ж", "женский"):
+                        fields["sex"] = "female"
+                    b = input(_t("init.ask_birth_year")).strip()
+                    if b.isdigit() and 1900 < int(b) <= 2026:
+                        fields["birth_year"] = int(b)
+                except (EOFError, KeyboardInterrupt):
+                    fields = {}
+            if fields:
+                _st.update_metric_profile(fields)
+                print(_t("profile.recorded",
+                         fields=", ".join(f"{k} = {v}" for k, v in sorted(fields.items()))))
+            else:
+                print()
+                print(_t("init.sex_not_recorded"))
+        print()
+        print(_t("sources.init_hint"))
         # Last, deliberately. Whatever happens with brew, the profile is already
         # created and the person has already been told what to do next: a failed
         # installation must not be able to make a successful init look failed.
@@ -531,6 +668,14 @@ def _main(argv=None) -> int:
     elif args.cmd == "import-labs":
         from . import import_csv as _imp
         res, render = _imp.run(args.path, dry_run=args.dry_run), fmt.import_report
+    elif args.cmd == "mcp":
+        # A protocol dialogue, not a report: it owns stdout for its whole run, so
+        # it returns straight from here rather than going through the renderer.
+        from . import mcp_server as _mcp
+        raise SystemExit(_mcp.serve())
+    elif args.cmd == "import-fhir":
+        from . import ingest_fhir as _fhir
+        res, render = _fhir.ingest(args.path, dry_run=args.dry_run), fmt.fhir_report
     elif args.cmd == "add-metric":
         from . import store as _st
         res = _st.add_metric_point(args.metric, args.date, args.value,
@@ -587,14 +732,58 @@ def _main(argv=None) -> int:
     elif args.cmd == "capabilities":
         from . import contract as _c
         res, render = _c.capabilities(), fmt.capabilities_report
+    elif args.cmd == "flag-rate":
+        from . import prevalence as _pv
+        res, render = _pv.report(), fmt.prevalence_report
+    elif args.cmd == "array":
+        from . import array_genome as _arr
+        res, render = _arr.catalogue_coverage(), fmt.array_report
+    elif args.cmd == "marker":
+        from . import markers_local as _ml
+        if args.propose_unit:
+            res = _ml.propose_unit(args.propose_unit[0], args.propose_unit[1],
+                                   factor=args.factor, refuse_reason=args.refuse_reason,
+                                   by="person")
+        elif args.propose_row_rule:
+            res = _ml.propose_row_rule(args.propose_row_rule, kind=args.rule_kind,
+                                       example=args.example, by="person")
+        elif args.propose:
+            res = _ml.propose(args.propose, unit=args.unit,
+                              names_ru=[x for x in args.names.split(";") if x.strip()],
+                              names_en=[x for x in args.names_en.split(";") if x.strip()],
+                              direction=args.direction, loinc=args.loinc, by="person")
+        elif args.confirm:
+            res = _ml.confirm(args.confirm)
+        elif args.drop:
+            res = _ml.drop(args.drop)
+        else:
+            res = _ml.listing()
+        render = fmt.markers_local_report
+    elif args.cmd == "lab-draw":
+        from . import store as _st
+        res = _st.set_draw_context(args.day, args.reason, args.between,
+                                   marker=args.marker or None)
+        render = fmt.draw_context_report
+    elif args.cmd == "sources":
+        from . import sources as _src
+        results = []
+        if getattr(args, "refresh", False):
+            try:
+                ids = [args.only] if getattr(args, "only", "") else list(_src.SOURCES)
+                results = [_src.refresh(i) for i in ids]
+            except _src.SourceUnavailable as e:
+                results = [{"source": args.only or "all", "skipped": True, "reason": str(e)}]
+            except KeyError:
+                results = [{"source": args.only, "skipped": True,
+                            "reason": f"no such source: {args.only}"}]
+        res = {"sources": _src.state(), "results": results}
+        render = fmt.sources_report
     elif args.cmd == "lipid-genetics":
         res, render = engine.lipid_genetics(), fmt.lipid_genetics_report
     elif args.cmd == "ingest-labs":
         from . import ingest_labs
         res = ingest_labs.ingest(args.folder, force=args.force)
-        render = lambda r: (_t("ingest.labs_done", files=r.get('files_processed', 0),
-                               points=r.get('points_added', 0), skipped=r.get('skipped', 0))
-                            if r.get("ok") else f"⚠️ {r.get('error')}")
+        render = fmt.ingest_labs_report
     elif args.cmd == "ingest-studies":
         from . import ingest_studies
         folder = args.folder or core.source_config().get("labs_docs")
@@ -632,6 +821,19 @@ def _main(argv=None) -> int:
         from . import provenance as _pv
         res = _pv.audit(refresh=args.refresh, lab_dir=args.lab_dir, marker=args.marker)
         render = _pv.format_report
+    elif args.cmd == "profile" and (getattr(args, "sex", None)
+                                    or getattr(args, "birth_year", None)
+                                    or getattr(args, "ancestry", None)):
+        from . import store as _st
+        fields = {}
+        if args.sex:
+            fields["sex"] = args.sex
+        if args.birth_year:
+            fields["birth_year"] = args.birth_year
+        if getattr(args, "ancestry", None):
+            fields["ancestry"] = args.ancestry
+        res = _st.update_metric_profile(fields)
+        render = fmt.profile_set_report
     elif args.cmd == "profile":
         res, render = engine.load_profile(), lambda r: json.dumps(r, ensure_ascii=False, indent=2)
     else:

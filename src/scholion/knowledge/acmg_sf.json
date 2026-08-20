@@ -16,14 +16,11 @@
       "SLC4A1",
       "ADA2 (decision deferred)"
     ],
-    "report_rules": {
-      "any": "report on a single pathogenic / likely pathogenic variant",
-      "biallelic": "report only on TWO P/LP variants (recessive inheritance). One variant = carriership, not disease",
-      "hfe_c282y_hom": "report only the p.C282Y homozygote. A heterozygote and H63D are not a secondary finding"
-    },
+    "report_rules": "`any` — any P/LP is reportable. `biallelic` — only with two hits. `hfe_c282y_hom` — only C282Y homozygous. `truncating_only` and `mh_associated_only` — the variant CLASS decides, and when the scan cannot establish it the hit is returned as needing review rather than as a secondary finding: reporting a gene on the wrong variant class is how a healthy person is told they carry a cardiomyopathy.",
     "provenance": "The full text of the paper in Genetics in Medicine is not directly available (403). The list was assembled by cross-checking several independent sources that reproduce the ACMG table: the official ACMG press release (acmg.net), the full v3.3 table from Ambry Genetics, Baylor Genetics, 3billion.io; inheritance modes and phenotypes for the 81 genes of v3.2 come from the official table on PMC/NIH (PMC10524344). The arithmetic adds up: 81 (v3.2) + 3 = 84.",
     "caveats": "The inheritance mode of the three new genes (ABCD1 XL, CYP27A1 AR, PLN AD) is taken from accepted clinical genetics rather than verbatim from the v3.3 table — verify it once the primary source becomes accessible. The category of RPE65 is «metabolic» in some sources and «other» in others — the majority reading was taken. In the official table LDLR is marked semidominant (SD) rather than plain AD: homozygotes and compound heterozygotes are affected more severely.",
-    "how_to_use": "The list sets the FRAME of reporting, not a diagnosis. A finding in an SF gene is a reason to consult a geneticist and to check it clinically, not a conclusion that there is disease: see penetrance.json on why «pathogenic» != «will fall ill»."
+    "how_to_use": "The list sets the FRAME of reporting, not a diagnosis. A finding in an SF gene is a reason to consult a geneticist and to check it clinically, not a conclusion that there is disease: see penetrance.json on why «pathogenic» != «will fall ill».",
+    "source_tier": "guideline_verbatim"
   },
   "genes": {
     "APC": {
@@ -852,7 +849,11 @@
         "ru": "кардио"
       },
       "inheritance": "AD",
-      "report_rule": "any"
+      "report_rule": "truncating_only",
+      "report_rule_note": {
+        "en": "ACMG SF reports TTN only for TRUNCATING variants in constitutively expressed exons, in the context of dilated cardiomyopathy. TTN is one of the largest genes in the genome and carries rare missense variation in almost everybody; reporting any P/LP here would return a finding to a large share of healthy people.",
+        "ru": "ACMG SF репортит TTN только для УСЕКАЮЩИХ вариантов в конститутивно экспрессируемых экзонах, в контексте дилатационной кардиомиопатии. TTN — один из крупнейших генов, редкие миссенс-варианты есть почти у каждого; репортить здесь любой P/LP значит выдать находку большой доле здоровых людей."
+      }
     },
     "ABCD1": {
       "phenotype": {
@@ -960,7 +961,11 @@
         "ru": "прочие"
       },
       "inheritance": "AD",
-      "report_rule": "any"
+      "report_rule": "mh_associated_only",
+      "report_rule_note": {
+        "en": "As RYR1: only variants established for malignant hyperthermia susceptibility.",
+        "ru": "Как RYR1: только варианты, установленные для предрасположенности к злокачественной гипертермии."
+      }
     },
     "ENG": {
       "phenotype": {
@@ -1017,7 +1022,11 @@
         "ru": "прочие"
       },
       "inheritance": "AD",
-      "report_rule": "any"
+      "report_rule": "mh_associated_only",
+      "report_rule_note": {
+        "en": "ACMG SF reports RYR1 only for variants established as causing malignant hyperthermia susceptibility — a curated list, not any pathogenic variant in the gene. RYR1 also causes myopathies whose variants are pathogenic for a different disease entirely.",
+        "ru": "ACMG SF репортит RYR1 только для вариантов, установленных как вызывающие предрасположенность к злокачественной гипертермии — это курируемый список, а не любой патогенный вариант гена. RYR1 вызывает также миопатии, чьи варианты патогенны совсем для другого заболевания."
+      }
     },
     "TTR": {
       "phenotype": {

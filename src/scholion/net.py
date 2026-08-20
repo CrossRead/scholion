@@ -13,12 +13,38 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
+import urllib.parse
 from typing import Any, Dict, Optional
 
 from .i18n import t as _t
 
 _UNVERIFIED: Optional[ssl.SSLContext] = None
 _UA = {"User-Agent": "scholion", "Accept": "application/json"}
+
+# The only hosts this tool ever contacts, and therefore the only hosts the
+# connectivity check may probe. /api/diag?url= used to pass ANY url straight
+# into a fetch with a fallback to an UNVERIFIED TLS context — which turned the
+# loopback server into a blind SSRF proxy and a file oracle (file:///etc/passwd
+# returned ok:true) reachable from any page in the origin. A diagnostic has no
+# business reaching an address the product itself never reaches; the allowlist
+# is that business rule, enforced before any socket is opened.
+_DIAG_HOSTS = frozenset({
+    "rxnav.nlm.nih.gov", "mor.nlm.nih.gov", "api.mymemory.translated.net",
+    "translate.googleapis.com", "rest.ensembl.org", "api.cpicpgx.org",
+})
+
+
+def _diag_url_ok(url: str) -> bool:
+    """A diagnostic target must be https to one of the product's own hosts.
+
+    Rejects file://, ftp://, http:// downgrade, and every host the tool does not
+    itself use — before a request is made, so a rejected url is never fetched.
+    """
+    try:
+        u = urllib.parse.urlsplit(url)
+    except ValueError:
+        return False
+    return u.scheme == "https" and u.hostname in _DIAG_HOSTS
 
 
 def offline() -> bool:
@@ -123,7 +149,15 @@ def get_text(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = No
 
 
 def diagnose(url: str = "https://rxnav.nlm.nih.gov/REST/version.json") -> Dict[str, Any]:
-    """Check internet access from this Python. Returns the mode (verified/unverified) and the error."""
+    """Check internet access from this Python. Returns the mode (verified/unverified) and the error.
+
+    Only the product's own hosts over https may be probed (see _DIAG_HOSTS): the
+    caller does not get to choose an arbitrary address, because this function runs
+    behind a loopback HTTP route reachable from any page.
+    """
+    if not _diag_url_ok(url):
+        return {"ok": False, "url": url, "error": _t("net.diag_host_refused"),
+                "refused": True}
     if offline():
         return {"ok": False, "offline": True, "url": url,
                 "error": _t("net.offline_deliberate"),

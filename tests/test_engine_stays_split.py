@@ -43,9 +43,38 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 LINE_BUDGETS = {
     "__init__": 220,     # imports only -- claim 1 keeps it honest anyway
     "_helpers": 250,
-    "labs": 450,
+    # 450 → 480 on 19.08.2026. Three capabilities took the room, all of them in
+    # the same place because they are all about what a single measurement means:
+    # a draw's clock time and the same-day pair it forms (a repeat is not a
+    # discrepancy), a reference interval borrowed from the catalogue when the form
+    # printed none, and the guard that refuses to borrow a sex-specific interval
+    # for a person whose sex was never recorded. Splitting them out would put the
+    # question «may this number be compared with that corridor» in two files.
+    # 480 → 530 on 19.08.2026. One capability, and it belongs beside the others
+    # above because it is the same question: a decision threshold stated as «3×
+    # the upper limit of normal» is a RULE, and the upper limit of normal is a
+    # sex pair. Storing the product instead of the rule is what gave a woman on a
+    # statin no signal at ALT 110 and none at CK 520. The computation has to sit
+    # next to the corridor logic — moving it out would split «which bound applies
+    # to this person» across two files, which is exactly the split that produced
+    # the defect.
+    # 530 → 560 on 19.08.2026: AUTHOR_SETTINGS — the three numbers in this module
+    # that nobody published, each with what would replace it and what it does not
+    # license. It lives beside them rather than in a registry elsewhere, because a
+    # declaration a reader has to go and find is one they will not find.
+    "labs": 560,
     "goals": 550,
-    "genomics": 460,
+    # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
+    # the report is BUILT, not only where the score is computed, because
+    # `prs_results.json` is a stored result that may predate the moment the
+    # person recorded their sex.
+    # 490 → 530 on 19.08.2026: what the polygenic computation does NOT do —
+    # strand-ambiguous variants, missing variants summed as a zero dose, hard
+    # genotypes, an unpinned reference panel — is printed on every report instead
+    # of being remembered by whoever reads it. The sum happens in another
+    # process, so these are not repairable here; that is precisely why they have
+    # to be said rather than left implicit.
+    "genomics": 530,
     "sources": 180,
     "pgx": 900,
     "lifestyle": 980,

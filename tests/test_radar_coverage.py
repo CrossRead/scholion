@@ -85,7 +85,7 @@ class _Base(unittest.TestCase):
                 "print(json.dumps({'r': r, 'text': fmt.radar_report(r)}, default=str))"
                 % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], capture_output=True,
-                           text=True, env=env, timeout=120)
+                           text=True, env=env, timeout=120, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr[-800:])
         got = json.loads(p.stdout.strip().splitlines()[-1])
         got["by_key"] = {d_["key"]: d_ for d_ in got["r"]["domains"]}

@@ -167,7 +167,7 @@ class TestTheTwoScreensBeforeAnybodyHasData(unittest.TestCase):
         env.pop("SCHOLION_PROFILE_DIR", None)
         return subprocess.run([sys.executable, "-m", "scholion", *argv],
                               cwd=support.ROOT, env=env,
-                              capture_output=True, text=True, timeout=120)
+                              capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
 
     def setUp(self):
         self.root = Path(tempfile.mkdtemp())

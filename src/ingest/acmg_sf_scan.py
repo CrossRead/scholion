@@ -166,12 +166,35 @@ def main(argv) -> int:
     for g, rs in per_gene.items():
         rule = rs[0]["report_rule"]
         if rule == "biallelic":
-            biallelic = any(r["zygosity"] == "hom" for r in rs) or len(rs) >= 2
-            for r in rs:
-                r["reportable"] = "yes" if biallelic else "carrier_only"
+            # A HOMOZYGOTE is unambiguous: both copies carry it, whatever the
+            # phase. TWO HETEROZYGOTES are not — they are biallelic only if they
+            # sit on DIFFERENT chromosomes (in trans). In cis, both on one copy,
+            # the person is a carrier with a normal second copy and has the
+            # disease no more than any other carrier.
+            #
+            # A VCF without phase cannot tell those apart, and calling two hets
+            # «biallelic» turns a carrier into a patient. Short-read data usually
+            # cannot phase variants far enough apart to settle it; a parent's
+            # genotype or long reads can.
+            hom = any(r["zygosity"] == "hom" for r in rs)
+            if hom:
+                for r in rs:
+                    r["reportable"] = "yes"
+            elif len(rs) >= 2:
+                for r in rs:
+                    r["reportable"] = "needs_phase"
+            else:
+                for r in rs:
+                    r["reportable"] = "carrier_only"
         elif rule == "hfe_c282y_hom":
             for r in rs:
                 r["reportable"] = "yes" if (r["rsid"] == "rs1800562" and r["zygosity"] == "hom") else "carrier_only"
+        elif rule in ("truncating_only", "mh_associated_only"):
+            # The class of the variant decides, and this scan reads ClinVar's
+            # significance, not its molecular consequence. So it does not decide:
+            # it hands the hit over marked as needing that class established.
+            for r in rs:
+                r["reportable"] = "needs_variant_class"
         else:
             for r in rs:
                 r["reportable"] = "yes"

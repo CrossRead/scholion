@@ -31,9 +31,9 @@ STABLE=0
 while true; do
   RUN="$(pgrep -x bwa 2>/dev/null; pgrep -x bwa-mem2 2>/dev/null; pgrep -x samtools 2>/dev/null)"
   if [ -z "$RUN" ] && [ -f "$MARKED" ]; then
-    S1=$(stat -f%z "$MARKED" 2>/dev/null || echo 0)
+    S1=$(stat -f%z "$MARKED" 2>/dev/null || stat -c%s "$MARKED" 2>/dev/null || echo 0)
     sleep 90
-    S2=$(stat -f%z "$MARKED" 2>/dev/null || echo 0)
+    S2=$(stat -f%z "$MARKED" 2>/dev/null || stat -c%s "$MARKED" 2>/dev/null || echo 0)
     if [ "$S1" = "$S2" ] && [ "${S1:-0}" -gt 1000000 ]; then
       STABLE=$((STABLE + 1))
       say "markdup.bam is stable (~$((S1 / 1024 / 1024)) MB), confirmation $STABLE/2…"

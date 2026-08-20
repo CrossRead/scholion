@@ -184,7 +184,7 @@ class TestAQuarantinedBuildIsIgnoredByGitToo(unittest.TestCase):
         env = {"GIT_OPTIONAL_LOCKS": "0", "PATH": "/usr/bin:/bin:/usr/local/bin",
                "HOME": str(d), "GIT_CONFIG_GLOBAL": str(d / "nonexistent")}
         if subprocess.run(["git", "init", "-q", str(d)], capture_output=True,
-                          env=env).returncode != 0:
+                          env=env, stdin=subprocess.DEVNULL).returncode != 0:
             self.skipTest("git is not available")
         (d / ".gitignore").write_text(ignore_text, encoding="utf-8")
         out = set()
@@ -192,7 +192,7 @@ class TestAQuarantinedBuildIsIgnoredByGitToo(unittest.TestCase):
             (d / p).parent.mkdir(parents=True, exist_ok=True)
             (d / p).write_text("x", encoding="utf-8")
             r = subprocess.run(["git", "check-ignore", "-q", p], cwd=str(d),
-                               capture_output=True, env=env)
+                               capture_output=True, env=env, stdin=subprocess.DEVNULL)
             if r.returncode == 0:
                 out.add(p)
         return out

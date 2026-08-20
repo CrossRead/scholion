@@ -127,7 +127,7 @@ class TestACustomDomainIsAcceptedAsExternal(unittest.TestCase):
                 "print(core.source_config().get('evogen_genome_app', ''))" % str(support.SRC))
         env = support.env(profile_dir=self.p.profile)
         proc = subprocess.run([sys.executable, "-c", code], env=env,
-                              cwd=str(support.ROOT), capture_output=True, text=True, timeout=60)
+                              cwd=str(support.ROOT), capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertEqual(proc.stdout.strip(), str(self.p.source))
 

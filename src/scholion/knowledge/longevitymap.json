@@ -6,7 +6,8 @@
     "note": "The associations from the literature are of varying strength; many have not been reproduced and depend on the population. Use it as a research layer with caveats, not as a diagnosis.",
     "variant_count": 2859,
     "gene_count": 162,
-    "association_records": 214
+    "association_records": 214,
+    "source_tier": "primary_literature"
   },
   "variants": {
     "rs1000290": {

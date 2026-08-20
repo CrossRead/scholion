@@ -40,6 +40,34 @@ def unit(key: str) -> str:
     return _t(f"phenoage.unit.{key}")
 
 
+# Canonical-unit plausibility bands for the nine inputs. A value outside means the
+# stored number is almost certainly in a different unit than the formula expects —
+# refuse rather than compute a confidently wrong age (finding 31: albumin in g/dL
+# read as g/L moved PhenoAge by 8.3 years and printed a hypoalbuminaemia
+# incompatible with life). Bounds are deliberately wide; they catch unit errors,
+# not borderline results.
+_PLAUSIBLE = {
+    "albumin": (20.0, 60.0),      # g/L
+    "creatinine": (20.0, 1500.0), # umol/L
+    "glucose": (1.5, 40.0),       # mmol/L
+    "crp": (0.0, 500.0),          # mg/L
+    "lymph": (1.0, 90.0),         # %
+    "mcv": (50.0, 130.0),         # fL
+    "rdw": (8.0, 30.0),           # %
+    "alp": (10.0, 1500.0),        # U/L
+    "wbc": (0.5, 100.0),          # 10^9/L
+}
+
+
+def _implausible(vals: Dict[str, float]) -> List[str]:
+    out = []
+    for k, (lo, hi) in _PLAUSIBLE.items():
+        v = vals.get(k)
+        if v is not None and not (lo <= v <= hi):
+            out.append(k)
+    return out
+
+
 def formula(v: Dict[str, float]) -> Tuple[float, float]:
     """(PhenoAge, modelled 10-year mortality risk). Units are as in UNITS."""
     crp = max(v["crp"] / 10.0, 0.01)   # mg/L -> mg/dL, then the natural logarithm
@@ -134,12 +162,23 @@ def compute_panel(panel: str = "latest", track: bool = False,
                 "missing": missing, "missing_ru": [marker_name(m) for m in missing],
                 "request_next_panel": [f"{marker_name(m)} ({unit(m)})" for m in missing],
                 "message": _t("phenoage.incomplete", panel=panel, n=len(missing))}
+    bad = _implausible(vals)
+    if bad:
+        return {"ok": False, "error": "implausible_units", "panel": panel,
+                "markers": bad, "markers_ru": [marker_name(m) for m in bad],
+                "message": _t("phenoage.implausible", markers=", ".join(marker_name(m) for m in bad))}
     a = age if age is not None else age_at(panel)
     if a is None:
         return {"ok": False, "error": "no_age", "panel": panel,
                 "message": _t("phenoage.no_age")}
     vals["age"] = a
-    pa, M = formula(vals)
+    try:
+        pa, M = formula(vals)
+    except (ValueError, OverflowError):
+        # The math domain can be left only by an input the plausibility gate should
+        # have caught; refusing is the contract, a traceback is not (finding 32).
+        return {"ok": False, "error": "compute_failed", "panel": panel,
+                "message": _t("phenoage.compute_failed")}
     res = {"ok": True, "panel": panel, "age": round(a, 1), "phenoage": round(pa, 1),
            "delta": round(pa - a, 1), "mortality_10y_pct": round(M * 100, 1),
            "values": {m: vals[m] for m in REQ}, "labs_keys": used, "tracked": False}

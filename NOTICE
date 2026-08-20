@@ -63,3 +63,9 @@ NOT A MEDICAL DEVICE
 
 Scholion is a research and educational tool. It does not diagnose, treat, cure
 or prevent any disease, and it does not replace a clinician. See DISCLAIMER.md.
+
+This product includes software developed by Exon Research as part of Genomi
+(https://github.com/exon-research/genomi), licensed under the Apache License,
+Version 2.0. The vendored files live in src/scholion/vendor/genomi/, carry their
+own attribution headers, and have been modified; the modifications are listed in
+src/scholion/vendor/genomi/UPSTREAM.md.

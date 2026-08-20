@@ -87,10 +87,51 @@ if [[ "$PREF" == "chr" ]]; then
 fi
 
 # --- 3. annotate your VCF with the ClinVar fields -----------------------------
+# --- 3a. normalise before matching -------------------------------------------
+#
+# `bcftools annotate` matches on CHROM+POS+REF+ALT. An indel has many equally
+# valid spellings — a deletion can be written with different padding and at
+# different anchor positions — so the same variant in your file and in ClinVar
+# can fail to meet. The miss is SILENT: the annotation simply finds nothing, and
+# a pathogenic indel comes out looking like a locus with no finding.
+#
+# Two steps fix it, and they need different things:
+#   -m -any        splits multiallelic sites, so a site where only one ALT is
+#                  pathogenic still matches. Needs no reference.
+#   -f REFERENCE   left-aligns and trims, which is what actually makes two
+#                  spellings of one indel identical. Needs the reference FASTA.
+#
+# When the reference is not on this machine the first step still runs and the
+# second cannot. That is recorded rather than glossed over: `genome/
+# clinvar_norm.json` says whether indels were left-aligned, and the engine
+# qualifies indel findings when they were not. An unreliable match presented as a
+# clean one is the failure this whole layer exists to prevent.
+REF_FASTA="${SCHOLION_REFERENCE_FASTA:-}"
+if [ -z "$REF_FASTA" ]; then
+  for cand in "$GEN"/*.fa "$GEN"/*.fasta "$GEN"/*.fa.gz "$GEN"/*.fasta.gz; do
+    [ -f "$cand" ] && { REF_FASTA="$cand"; break; }
+  done
+fi
+NORM_VCF="$GEN/.normalised.vcf.gz"
+if [ -n "$REF_FASTA" ] && [ -f "$REF_FASTA" ]; then
+  echo "→ Normalising (split multiallelics, left-align indels) against $(basename "$REF_FASTA")…"
+  bcftools norm -m -any -f "$REF_FASTA" "$VCF" -Oz -o "$NORM_VCF"
+  LEFT_ALIGNED=true
+else
+  echo "⚠ No reference FASTA found — splitting multiallelics only. Indels will NOT be"
+  echo "  left-aligned, so an indel spelled differently from ClinVar's copy may be missed."
+  echo "  Set SCHOLION_REFERENCE_FASTA to the FASTA to close this."
+  bcftools norm -m -any "$VCF" -Oz -o "$NORM_VCF"
+  LEFT_ALIGNED=false
+fi
+tabix -f -p vcf "$NORM_VCF"
+printf '{"left_aligned": %s, "reference": "%s", "normalised": true}\n' \
+  "$LEFT_ALIGNED" "${REF_FASTA:-}" > "$GEN/clinvar_norm.json"
+
 echo "→ Annotating your VCF with the ClinVar fields (CLNSIG, CLNDN, CLNREVSTAT, RS)…"
 bcftools annotate -a "$ANNOT" \
   -c INFO/CLNSIG,INFO/CLNDN,INFO/CLNREVSTAT,INFO/RS \
-  "$VCF" -Oz -o "$OUT_VCF"
+  "$NORM_VCF" -Oz -o "$OUT_VCF"
 tabix -f -p vcf "$OUT_VCF"
 
 # --- 4. extract the clinically SIGNIFICANT findings ---------------------------

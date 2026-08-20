@@ -8,7 +8,7 @@
     },
     "genotyping_note": "When genotyping scoring positions on demand, exclude genome-wide models (>~50k variants) so that the union of positions does not blow up; log what was dropped.",
     "default_superpopulation": "EUR",
-    "profile_note": "The panel is built for a man of about 44 with metabolic syndrome; female-specific cancer traits are excluded.",
+    "profile_note": "This trait panel is not personalised and reflects its origin: female-specific cancer traits (e.g. breast, BCAC 313) are not yet included — a known gap, not a per-person choice.",
     "evidence_tiers": {
       "clinical": {
         "label": {
@@ -47,6 +47,11 @@
     "evidence_note": {
       "en": "The level of evidence is stated as of 2026-08. It refers to whether the score CHANGES clinical management, not to the quality of the score itself. Sources: ESC Clinical Consensus 2025 (Eur Heart J 46:1372), ACC/AHA 2026, BARCODE1 (NEJM 2025), WISDOM (2025), Kullo, Nat Rev Genet 2025. The general frame: a percentile is a position in the population, not a probability; the gain in C-statistic from a PRS on top of clinical models is usually +0.01…+0.03.",
       "ru": "Уровень доказательности проставлен по состоянию на 2026-08. Он относится к тому, МЕНЯЕТ ЛИ шкала врачебную тактику, а не к качеству самой шкалы. Источники: ESC Clinical Consensus 2025 (Eur Heart J 46:1372), ACC/AHA 2026, BARCODE1 (NEJM 2025), WISDOM (2025), Kullo, Nat Rev Genet 2025. Общая рамка: перцентиль — позиция в популяции, а не вероятность; прирост C-статистики от PRS поверх клинических моделей обычно +0.01…+0.03."
+    },
+    "source_tier": "curated_reference",
+    "applies_to_sex_note": {
+      "en": "A trait that only exists for one sex carries `applies_to_sex`, and the engine will not print a percentile for it to a person of the other sex, nor to a person whose sex is not recorded. A prostate-cancer percentile handed to a woman as an ordinary line of the report is not a small cosmetic error: it is a number about an organ she does not have, presented with the same confidence as the rest.",
+      "ru": "Признак, существующий только у одного пола, несёт `applies_to_sex`, и движок не печатает по нему перцентиль ни человеку другого пола, ни человеку с неуказанным полом. Перцентиль по раку простаты, выданный женщине обычной строкой отчёта, — не косметическая мелочь: это число про орган, которого у неё нет, поданное с той же уверенностью, что и остальные."
     }
   },
   "traits": [
@@ -376,7 +381,8 @@
       "evidence_note": {
         "en": "BARCODE1 (NEJM 2025): in men in the top decile of the PRS, 71.8% more clinically significant tumours were found than along the standard PSA+MRI route. It changes the screening strategy; there are no mortality data yet",
         "ru": "BARCODE1 (NEJM 2025): у мужчин верхней децили PRS выявлено на 71.8% больше клинически значимых опухолей, чем стандартным путём ПСА+МРТ. Меняет стратегию скрининга, данных по смертности пока нет"
-      }
+      },
+      "applies_to_sex": "male"
     },
     {
       "label": {
@@ -484,7 +490,8 @@
         "en": "Cancer screening",
         "ru": "Онко-скрининг"
       },
-      "evidence": "research"
+      "evidence": "research",
+      "applies_to_sex": "male"
     },
     {
       "label": {

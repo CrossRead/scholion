@@ -2,7 +2,8 @@
   "_meta": {
     "purpose": "A PUBLIC map: therapeutic class → which laboratory values to monitor while taking it. For a personal assessment: the application checks this against the patient's LAB RESULTS and highlights the deviations that are already there. Portable, without patient data.",
     "note": "labs — keys from labs.json (what we actually track). why — why it is monitored on this class.",
-    "note_nutraceutical_layer_20260813": "Monitoring tests have been added for the nutraceutical classes; statin (+CK), testosterone_replacement (+haematocrit, testosterone, DHT) and azole_antifungal (+CK) have been strengthened."
+    "note_nutraceutical_layer_20260813": "Monitoring tests have been added for the nutraceutical classes; statin (+CK), testosterone_replacement (+haematocrit, testosterone, DHT) and azole_antifungal (+CK) have been strengthened.",
+    "source_tier": "guideline_compiled"
   },
   "classes": {
     "statin": {
@@ -12,7 +13,10 @@
         "creatinine",
         "ck"
       ],
-      "why": {"en": "liver enzymes at baseline and after ~8 weeks; CK at baseline as a reference point and with any muscle pain", "ru": "печёночные ферменты исходно и через ~8 недель; КФК исходно как базис и при любой мышечной боли"}
+      "why": {
+        "en": "liver enzymes at baseline and after ~8 weeks; CK at baseline as a reference point and with any muscle pain",
+        "ru": "печёночные ферменты исходно и через ~8 недель; КФК исходно как базис и при любой мышечной боли"
+      }
     },
     "fibrate": {
       "labs": [
@@ -20,100 +24,145 @@
         "ast",
         "creatinine"
       ],
-      "why": {"en": "the liver, kidney function; a risk of myopathy together with a statin", "ru": "печень, функция почек; риск миопатии со статином"}
+      "why": {
+        "en": "the liver, kidney function; a risk of myopathy together with a statin",
+        "ru": "печень, функция почек; риск миопатии со статином"
+      }
     },
     "biguanide": {
       "labs": [
         "creatinine",
         "vitamin_b12"
       ],
-      "why": {"en": "kidney function (eGFR); with long-term use a risk of B12 deficiency", "ru": "функция почек (СКФ); при длительном приёме риск дефицита B12"}
+      "why": {
+        "en": "kidney function (eGFR); with long-term use a risk of B12 deficiency",
+        "ru": "функция почек (СКФ); при длительном приёме риск дефицита B12"
+      }
     },
     "sulfonylurea": {
       "labs": [
         "glucose",
         "hba1c"
       ],
-      "why": {"en": "monitoring of glycaemia and the risk of hypoglycaemia", "ru": "контроль гликемии и риск гипогликемии"}
+      "why": {
+        "en": "monitoring of glycaemia and the risk of hypoglycaemia",
+        "ru": "контроль гликемии и риск гипогликемии"
+      }
     },
     "sglt2": {
       "labs": [
         "creatinine",
         "glucose"
       ],
-      "why": {"en": "kidney function; ketones on decompensation", "ru": "функция почек; кетоны при декомпенсации"}
+      "why": {
+        "en": "kidney function; ketones on decompensation",
+        "ru": "функция почек; кетоны при декомпенсации"
+      }
     },
     "glp1": {
       "labs": [
         "glucose",
         "hba1c"
       ],
-      "why": {"en": "glycaemia; pancreatic enzymes if there are symptoms", "ru": "гликемия; ферменты поджелудочной при симптомах"}
+      "why": {
+        "en": "glycaemia; pancreatic enzymes if there are symptoms",
+        "ru": "гликемия; ферменты поджелудочной при симптомах"
+      }
     },
     "dpp4": {
       "labs": [
         "glucose",
         "hba1c"
       ],
-      "why": {"en": "glycaemia", "ru": "гликемия"}
+      "why": {
+        "en": "glycaemia",
+        "ru": "гликемия"
+      }
     },
     "nsaid": {
       "labs": [
         "creatinine",
         "uric_acid"
       ],
-      "why": {"en": "kidney function, fluid retention, gastrointestinal risk", "ru": "функция почек, задержка жидкости, ЖКТ-риск"}
+      "why": {
+        "en": "kidney function, fluid retention, gastrointestinal risk",
+        "ru": "функция почек, задержка жидкости, ЖКТ-риск"
+      }
     },
     "ace_inhibitor": {
       "labs": [
         "creatinine"
       ],
-      "why": {"en": "creatinine and potassium 1–2 weeks after the start", "ru": "креатинин и калий через 1–2 недели после старта"}
+      "why": {
+        "en": "creatinine and potassium 1–2 weeks after the start",
+        "ru": "креатинин и калий через 1–2 недели после старта"
+      }
     },
     "arb": {
       "labs": [
         "creatinine"
       ],
-      "why": {"en": "creatinine and potassium", "ru": "креатинин и калий"}
+      "why": {
+        "en": "creatinine and potassium",
+        "ru": "креатинин и калий"
+      }
     },
     "loop_diuretic": {
       "labs": [
         "creatinine",
         "uric_acid"
       ],
-      "why": {"en": "electrolytes (potassium, sodium), uric acid", "ru": "электролиты (калий, натрий), мочевая кислота"}
+      "why": {
+        "en": "electrolytes (potassium, sodium), uric acid",
+        "ru": "электролиты (калий, натрий), мочевая кислота"
+      }
     },
     "thiazide": {
       "labs": [
         "glucose",
         "uric_acid"
       ],
-      "why": {"en": "glucose, uric acid, electrolytes", "ru": "глюкоза, мочевая кислота, электролиты"}
+      "why": {
+        "en": "glucose, uric acid, electrolytes",
+        "ru": "глюкоза, мочевая кислота, электролиты"
+      }
     },
     "beta_blocker": {
       "labs": [
         "glucose"
       ],
-      "why": {"en": "it can mask hypoglycaemia; monitoring of pulse/blood pressure", "ru": "может маскировать гипогликемию; контроль пульса/АД"}
+      "why": {
+        "en": "it can mask hypoglycaemia; monitoring of pulse/blood pressure",
+        "ru": "может маскировать гипогликемию; контроль пульса/АД"
+      }
     },
     "ppi": {
       "labs": [
         "vitamin_b12",
         "ferritin"
       ],
-      "why": {"en": "with long-term use — B12, magnesium, iron", "ru": "при длительном приёме — B12, магний, железо"}
+      "why": {
+        "en": "with long-term use — B12, magnesium, iron",
+        "ru": "при длительном приёме — B12, магний, железо"
+      }
     },
     "h2_blocker": {
       "labs": [
         "vitamin_b12"
       ],
-      "why": {"en": "with long-term use — B12", "ru": "при длительном приёме — B12"}
+      "why": {
+        "en": "with long-term use — B12",
+        "ru": "при длительном приёме — B12"
+      }
     },
     "thyroid_hormone": {
       "labs": [
         "tsh"
       ],
-      "why": {"en": "TSH 6–8 weeks after the start/a change of dose", "ru": "ТТГ через 6–8 недель после старта/смены дозы"}
+      "why": {
+        "en": "TSH 6–8 weeks after the start/a change of dose",
+        "ru": "ТТГ через 6–8 недель после старта/смены дозы"
+      }
     },
     "testosterone_replacement": {
       "labs": [
@@ -124,26 +173,38 @@
         "alt",
         "ggt"
       ],
-      "why": {"en": "PSA and haematocrit — the mandatory safety minimum; total testosterone and DHT — dose control (the free fraction and DHT leave the corridor before the total does)", "ru": "ПСА и гематокрит — обязательный минимум безопасности; общий тестостерон и ДГТ — контроль дозы (свободная фракция и ДГТ выходят за коридор раньше общего)"}
+      "why": {
+        "en": "PSA and haematocrit — the mandatory safety minimum; total testosterone and DHT — dose control (the free fraction and DHT leave the corridor before the total does)",
+        "ru": "ПСА и гематокрит — обязательный минимум безопасности; общий тестостерон и ДГТ — контроль дозы (свободная фракция и ДГТ выходят за коридор раньше общего)"
+      }
     },
     "thiopurine": {
       "labs": [
         "alt",
         "ast"
       ],
-      "why": {"en": "a full blood count and liver enzymes regularly (plus TPMT/NUDT15 before the start)", "ru": "ОАК и печёночные ферменты регулярно (плюс TPMT/NUDT15 до старта)"}
+      "why": {
+        "en": "a full blood count and liver enzymes regularly (plus TPMT/NUDT15 before the start)",
+        "ru": "ОАК и печёночные ферменты регулярно (плюс TPMT/NUDT15 до старта)"
+      }
     },
     "anticoagulant_vka": {
       "labs": [
         "alt"
       ],
-      "why": {"en": "the INR regularly (outside the panel); the liver", "ru": "МНО регулярно (вне панели); печень"}
+      "why": {
+        "en": "the INR regularly (outside the panel); the liver",
+        "ru": "МНО регулярно (вне панели); печень"
+      }
     },
     "doac": {
       "labs": [
         "creatinine"
       ],
-      "why": {"en": "kidney function at baseline and over time", "ru": "функция почек исходно и в динамике"}
+      "why": {
+        "en": "kidney function at baseline and over time",
+        "ru": "функция почек исходно и в динамике"
+      }
     },
     "azole_antifungal": {
       "labs": [
@@ -152,14 +213,20 @@
         "ggt",
         "ck"
       ],
-      "why": {"en": "liver values during the course; CK — if the regimen contains a statin or monacolin K", "ru": "печёночные при курсе; КФК — если в схеме есть статин или монаколин K"}
+      "why": {
+        "en": "liver values during the course; CK — if the regimen contains a statin or monacolin K",
+        "ru": "печёночные при курсе; КФК — если в схеме есть статин или монаколин K"
+      }
     },
     "macrolide": {
       "labs": [
         "alt",
         "ast"
       ],
-      "why": {"en": "the liver; interactions through CYP3A4", "ru": "печень; взаимодействия через CYP3A4"}
+      "why": {
+        "en": "the liver; interactions through CYP3A4",
+        "ru": "печень; взаимодействия через CYP3A4"
+      }
     },
     "vitamin_d": {
       "labs": [
@@ -168,7 +235,10 @@
         "calcium_ionized",
         "pth"
       ],
-      "why": {"en": "at doses above the tolerable upper intake level (IOM 4000 IU/day) — blood calcium, ionised calcium and PTH, not 25-OH D alone", "ru": "на дозах выше верхнего допустимого уровня (IOM 4000 МЕ/сут) — кальций крови, ионизированный кальций и ПТГ, а не только сам 25-OH D"}
+      "why": {
+        "en": "at doses above the tolerable upper intake level (IOM 4000 IU/day) — blood calcium, ionised calcium and PTH, not 25-OH D alone",
+        "ru": "на дозах выше верхнего допустимого уровня (IOM 4000 МЕ/сут) — кальций крови, ионизированный кальций и ПТГ, а не только сам 25-OH D"
+      }
     },
     "iodine": {
       "labs": [
@@ -176,13 +246,19 @@
         "t4_free",
         "anti_tpo"
       ],
-      "why": {"en": "TSH, free T4 and anti-TPO antibodies 6–8 weeks after a change in the iodine dose; the tolerable upper level is 1100 µg/day (US) and 600 µg/day (EFSA)", "ru": "ТТГ, свободный Т4 и антитела к ТПО через 6–8 нед после изменения дозы йода; верхний допустимый уровень 1100 мкг/сут (US) и 600 мкг/сут (EFSA)"}
+      "why": {
+        "en": "TSH, free T4 and anti-TPO antibodies 6–8 weeks after a change in the iodine dose; the tolerable upper level is 1100 µg/day (US) and 600 µg/day (EFSA)",
+        "ru": "ТТГ, свободный Т4 и антитела к ТПО через 6–8 нед после изменения дозы йода; верхний допустимый уровень 1100 мкг/сут (US) и 600 мкг/сут (EFSA)"
+      }
     },
     "vitamin_b6_source": {
       "labs": [
         "vitamin_b6"
       ],
-      "why": {"en": "pyridoxal phosphate with long-term use; EFSA lowered the tolerable upper level from 25 to 12 mg/day (2023) — the toxicity is a sensory neuropathy", "ru": "пиридоксальфосфат при длительном приёме; EFSA снизила верхний допустимый уровень с 25 до 12 мг/сут (2023) — токсичность сенсорная нейропатия"}
+      "why": {
+        "en": "pyridoxal phosphate with long-term use; EFSA lowered the tolerable upper level from 25 to 12 mg/day (2023) — the toxicity is a sensory neuropathy",
+        "ru": "пиридоксальфосфат при длительном приёме; EFSA снизила верхний допустимый уровень с 25 до 12 мг/сут (2023) — токсичность сенсорная нейропатия"
+      }
     },
     "niacin": {
       "labs": [
@@ -191,7 +267,10 @@
         "uric_acid",
         "alt"
       ],
-      "why": {"en": "glycaemia, insulin resistance and urate — the effect is dose-dependent (the diabetes signal RR 1.34 refers to 1500–2000 mg, not to nutraceutical doses); liver values with long-term use", "ru": "гликемия, инсулинорезистентность и урат — эффект дозозависим (сигнал по диабету RR 1,34 относится к 1500–2000 мг, не к нутрицевтическим дозам); печёночные при длительном приёме"}
+      "why": {
+        "en": "glycaemia, insulin resistance and urate — the effect is dose-dependent (the diabetes signal RR 1.34 refers to 1500–2000 mg, not to nutraceutical doses); liver values with long-term use",
+        "ru": "гликемия, инсулинорезистентность и урат — эффект дозозависим (сигнал по диабету RR 1,34 относится к 1500–2000 мг, не к нутрицевтическим дозам); печёночные при длительном приёме"
+      }
     },
     "berberine": {
       "labs": [
@@ -200,7 +279,10 @@
         "insulin",
         "alt"
       ],
-      "why": {"en": "the target measures of the effect and liver values; when taken together with a statin — see the interactions", "ru": "целевые показатели эффекта и печёночные; при совместном приёме со статином — см. взаимодействия"}
+      "why": {
+        "en": "the target measures of the effect and liver values; when taken together with a statin — see the interactions",
+        "ru": "целевые показатели эффекта и печёночные; при совместном приёме со статином — см. взаимодействия"
+      }
     },
     "ursodeoxycholic_acid": {
       "labs": [
@@ -209,14 +291,20 @@
         "ggt",
         "bilirubin_total"
       ],
-      "why": {"en": "liver enzymes and bilirubin as measures of the response to therapy", "ru": "печёночные ферменты и билирубин как показатели ответа на терапию"}
+      "why": {
+        "en": "liver enzymes and bilirubin as measures of the response to therapy",
+        "ru": "печёночные ферменты и билирубин как показатели ответа на терапию"
+      }
     },
     "soluble_fiber": {
       "labs": [
         "ldl",
         "apob"
       ],
-      "why": {"en": "the target measures of the effect; a clinically meaningful effect on lipids begins at 10–15 g of soluble fibre per day", "ru": "целевые показатели эффекта; клинически значимое влияние на липиды начинается с 10–15 г растворимой клетчатки в сутки"}
+      "why": {
+        "en": "the target measures of the effect; a clinically meaningful effect on lipids begins at 10–15 g of soluble fibre per day",
+        "ru": "целевые показатели эффекта; клинически значимое влияние на липиды начинается с 10–15 г растворимой клетчатки в сутки"
+      }
     },
     "gh_secretagogue": {
       "labs": [
@@ -224,7 +312,10 @@
         "glucose",
         "hba1c"
       ],
-      "why": {"en": "IGF-1 as a measure of the systemic effect, glycaemia — GH secretagogues can reduce insulin sensitivity", "ru": "ИФР-1 как показатель системного эффекта, гликемия — секретагоги ГР могут снижать чувствительность к инсулину"}
+      "why": {
+        "en": "IGF-1 as a measure of the systemic effect, glycaemia — GH secretagogues can reduce insulin sensitivity",
+        "ru": "ИФР-1 как показатель системного эффекта, гликемия — секретагоги ГР могут снижать чувствительность к инсулину"
+      }
     },
     "inositol": {
       "labs": [
@@ -232,14 +323,20 @@
         "homa_ir",
         "insulin"
       ],
-      "why": {"en": "the target measures of the effect", "ru": "целевые показатели эффекта"}
+      "why": {
+        "en": "the target measures of the effect",
+        "ru": "целевые показатели эффекта"
+      }
     },
     "alpha_lipoic_acid": {
       "labs": [
         "glucose",
         "homa_ir"
       ],
-      "why": {"en": "the target measures of the effect; an additive lowering of glycaemia is possible", "ru": "целевые показатели эффекта; возможно аддитивное снижение гликемии"}
+      "why": {
+        "en": "the target measures of the effect; an additive lowering of glycaemia is possible",
+        "ru": "целевые показатели эффекта; возможно аддитивное снижение гликемии"
+      }
     }
   }
 }

@@ -20,7 +20,8 @@
       "source": "NLM Clinical Table Search Service (clinicaltables.nlm.nih.gov, LOINC items v3) — every code was checked by a query on the code itself and reconciled with the full name",
       "coverage": "34 codes reconciled, 13 marked as not reconciled",
       "rule": "A LOINC code is NEVER written from memory: an invented code looks like a standard and silently breaks the exchange. No confirmation — the field stays null with the status «not verified»."
-    }
+    },
+    "source_tier": "curated_reference"
   },
   "tests": {
     "glucose": {
@@ -34,7 +35,10 @@
       "tier": 2,
       "biomaterial": "serum",
       "fasting": true,
-      "note": {"en": "strictly fasting and at rest: it reacts to exercise and to stress the day before", "ru": "строго натощак и в покое: реагирует на нагрузку и стресс накануне"},
+      "note": {
+        "en": "strictly fasting and at rest: it reacts to exercise and to stress the day before",
+        "ru": "строго натощак и в покое: реагирует на нагрузку и стресс накануне"
+      },
       "loinc": "20448-7",
       "loinc_name": "Insulin [Units/volume] in Serum or Plasma"
     },
@@ -45,19 +49,28 @@
         "glucose",
         "insulin"
       ],
-      "note": {"en": "an index, not an assay: computed as glucose × insulin / 22.5", "ru": "индекс, а не анализ: считается как глюкоза × инсулин / 22,5"}
+      "note": {
+        "en": "an index, not an assay: computed as glucose × insulin / 22.5",
+        "ru": "индекс, а не анализ: считается как глюкоза × инсулин / 22,5"
+      }
     },
     "hba1c": {
       "tier": 2,
       "biomaterial": "edta_whole_blood",
-      "note": {"en": "a window of ~3 months; does not require fasting", "ru": "окно ~3 месяца; не требует натощак"},
+      "note": {
+        "en": "a window of ~3 months; does not require fasting",
+        "ru": "окно ~3 месяца; не требует натощак"
+      },
       "loinc": "4548-4",
       "loinc_name": "Hemoglobin A1c/Hemoglobin.total in Blood"
     },
     "fructosamine": {
       "tier": 3,
       "biomaterial": "serum",
-      "note": {"en": "a window of 2–3 weeks; taken when HbA1c and a single glucose disagree", "ru": "окно 2–3 недели; берут, когда HbA1c и разовая глюкоза расходятся"},
+      "note": {
+        "en": "a window of 2–3 weeks; taken when HbA1c and a single glucose disagree",
+        "ru": "окно 2–3 недели; берут, когда HbA1c и разовая глюкоза расходятся"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
@@ -72,10 +85,16 @@
       "tier": 1,
       "biomaterial": "serum",
       "fasting": true,
-      "note": {"en": "the Friedewald calculation is underestimated when TG are high — cross-check against non-HDL and apoB", "ru": "расчёт по Фридвальду занижается при высоких ТГ — сверять с не-ЛПВП и апоВ"},
+      "note": {
+        "en": "the Friedewald calculation is underestimated when TG are high — cross-check against non-HDL and apoB",
+        "ru": "расчёт по Фридвальду занижается при высоких ТГ — сверять с не-ЛПВП и апоВ"
+      },
       "loinc": "13457-7",
       "loinc_name": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by calculation",
-      "loinc_note": {"en": "the code is specifically for CALCULATED LDL (by calculation) — it matches the Friedewald formula on our lab forms; direct measurement has a different code (18262-6), and if the method changes the code has to change too", "ru": "код именно для РАСЧЁТНОГО ЛПНП (by calculation) — совпадает с формулой Фридвальда в наших бланках; у прямого измерения код другой (18262-6), при смене метода менять и код"}
+      "loinc_note": {
+        "en": "the code is specifically for CALCULATED LDL (by calculation) — it matches the Friedewald formula on our lab forms; direct measurement has a different code (18262-6), and if the method changes the code has to change too",
+        "ru": "код именно для РАСЧЁТНОГО ЛПНП (by calculation) — совпадает с формулой Фридвальда в наших бланках; у прямого измерения код другой (18262-6), при смене метода менять и код"
+      }
     },
     "hdl": {
       "tier": 1,
@@ -94,7 +113,10 @@
     "lpa": {
       "tier": 3,
       "biomaterial": "serum",
-      "note": {"en": "genetically determined, measured once in a lifetime — no point in repeating it", "ru": "генетически задан, измеряется один раз в жизни — повторять незачем"},
+      "note": {
+        "en": "genetically determined, measured once in a lifetime — no point in repeating it",
+        "ru": "генетически задан, измеряется один раз в жизни — повторять незачем"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
@@ -137,7 +159,10 @@
     "creatinine": {
       "tier": 1,
       "biomaterial": "serum",
-      "note": {"en": "it rises with muscle mass; check the renal meaning with cystatin C", "ru": "растёт с мышечной массой; почечный смысл проверять цистатином C"},
+      "note": {
+        "en": "it rises with muscle mass; check the renal meaning with cystatin C",
+        "ru": "растёт с мышечной массой; почечный смысл проверять цистатином C"
+      },
       "loinc": "2160-0",
       "loinc_name": "Creatinine [Mass/volume] in Serum or Plasma"
     },
@@ -147,7 +172,10 @@
       "requires": [
         "creatinine"
       ],
-      "note": {"en": "it separates the muscular from the renal cause of a rise in creatinine", "ru": "разводит мышечную и почечную причину роста креатинина"},
+      "note": {
+        "en": "it separates the muscular from the renal cause of a rise in creatinine",
+        "ru": "разводит мышечную и почечную причину роста креатинина"
+      },
       "loinc": "33863-2",
       "loinc_name": "Cystatin C [Mass/volume] in Serum or Plasma"
     },
@@ -160,14 +188,20 @@
     "ck": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "give it without exercise for 48 h, otherwise the value reflects the workout", "ru": "сдавать без нагрузки за 48 ч, иначе значение отражает тренировку"},
+      "note": {
+        "en": "give it without exercise for 48 h, otherwise the value reflects the workout",
+        "ru": "сдавать без нагрузки за 48 ч, иначе значение отражает тренировку"
+      },
       "loinc": "2157-6",
       "loinc_name": "Creatine kinase [Enzymatic activity/volume] in Serum or Plasma"
     },
     "crp_hs": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "the high-sensitivity one specifically; an ordinary CRP will not do for this task", "ru": "именно высокочувствительный; обычный СРБ для этой задачи не годится"},
+      "note": {
+        "en": "the high-sensitivity one specifically; an ordinary CRP will not do for this task",
+        "ru": "именно высокочувствительный; обычный СРБ для этой задачи не годится"
+      },
       "loinc": "30522-7",
       "loinc_name": "C reactive protein [Mass/volume] in Serum or Plasma by High sensitivity method"
     },
@@ -182,7 +216,10 @@
       "biomaterial": "edta_whole_blood",
       "loinc": "736-9",
       "loinc_name": "Lymphocytes/Leukocytes in Blood by Automated count",
-      "loinc_note": {"en": "the fraction of lymphocytes among leukocytes (per cent), not the absolute count", "ru": "доля лимфоцитов от лейкоцитов (проценты), не абсолютное число"}
+      "loinc_note": {
+        "en": "the fraction of lymphocytes among leukocytes (per cent), not the absolute count",
+        "ru": "доля лимфоцитов от лейкоцитов (проценты), не абсолютное число"
+      }
     },
     "mcv": {
       "tier": 1,
@@ -199,7 +236,10 @@
     "ferritin": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "an acute-phase protein: raised during inflammation, read it together with CRP", "ru": "белок острой фазы: при воспалении завышен, читать вместе с СРБ"},
+      "note": {
+        "en": "an acute-phase protein: raised during inflammation, read it together with CRP",
+        "ru": "белок острой фазы: при воспалении завышен, читать вместе с СРБ"
+      },
       "loinc": "2276-4",
       "loinc_name": "Ferritin [Mass/volume] in Serum or Plasma"
     },
@@ -230,14 +270,20 @@
     "anti_tpo": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "a qualitative question, «is there autoimmunity or not», it is not needed over time", "ru": "качественный вопрос «есть/нет аутоиммунность», в динамике не нужен"},
+      "note": {
+        "en": "a qualitative question, «is there autoimmunity or not», it is not needed over time",
+        "ru": "качественный вопрос «есть/нет аутоиммунность», в динамике не нужен"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
     "testosterone": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "morning, 7:00–11:00: the circadian rhythm gives a spread larger than the effect of therapy", "ru": "утро, 7:00–11:00: суточный ритм даёт разброс больше, чем эффект терапии"},
+      "note": {
+        "en": "morning, 7:00–11:00: the circadian rhythm gives a spread larger than the effect of therapy",
+        "ru": "утро, 7:00–11:00: суточный ритм даёт разброс больше, чем эффект терапии"
+      },
       "loinc": "2986-8",
       "loinc_name": "Testosterone [Mass/volume] in Serum or Plasma"
     },
@@ -247,7 +293,10 @@
       "requires": [
         "testosterone"
       ],
-      "note": {"en": "the method matters: equilibrium dialysis/LC-MS is more reliable than the calculated one", "ru": "метод важен: равновесный диализ/ЖХ-МС надёжнее расчётного"},
+      "note": {
+        "en": "the method matters: equilibrium dialysis/LC-MS is more reliable than the calculated one",
+        "ru": "метод важен: равновесный диализ/ЖХ-МС надёжнее расчётного"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
@@ -263,14 +312,20 @@
     "estradiol": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "in men — LC-MS/MS: immunoassay is inaccurate at low concentrations", "ru": "у мужчин — ЖХ-МС/МС: иммуноанализ на низких концентрациях неточен"},
+      "note": {
+        "en": "in men — LC-MS/MS: immunoassay is inaccurate at low concentrations",
+        "ru": "у мужчин — ЖХ-МС/МС: иммуноанализ на низких концентрациях неточен"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
     "igf1": {
       "tier": 3,
       "biomaterial": "serum",
-      "note": {"en": "an integral marker of the GH axis, more stable than a single GH measurement", "ru": "интегральный маркёр СТГ-оси, стабильнее разового СТГ"},
+      "note": {
+        "en": "an integral marker of the GH axis, more stable than a single GH measurement",
+        "ru": "интегральный маркёр СТГ-оси, стабильнее разового СТГ"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
@@ -279,7 +334,10 @@
       "biomaterial": "serum",
       "loinc": "62292-8",
       "loinc_name": "25-Hydroxyvitamin D3+25-Hydroxyvitamin D2 [Mass/volume] in Serum or Plasma",
-      "loinc_note": {"en": "total 25-OH (D3+D2) — what laboratories print as «vitamin D»", "ru": "суммарный 25-OH (D3+D2) — то, что печатают лаборатории как «витамин D»"}
+      "loinc_note": {
+        "en": "total 25-OH (D3+D2) — what laboratories print as «vitamin D»",
+        "ru": "суммарный 25-OH (D3+D2) — то, что печатают лаборатории как «витамин D»"
+      }
     },
     "pth": {
       "tier": 2,
@@ -288,33 +346,51 @@
         "calcium_blood",
         "vitamin_d"
       ],
-      "note": {"en": "without calcium and vitamin D it cannot be interpreted", "ru": "без кальция и витамина D не интерпретируется"},
+      "note": {
+        "en": "without calcium and vitamin D it cannot be interpreted",
+        "ru": "без кальция и витамина D не интерпретируется"
+      },
       "loinc": "2731-8",
       "loinc_name": "Parathyrin.intact [Mass/volume] in Serum or Plasma",
-      "loinc_note": {"en": "intact PTH — the standard method", "ru": "интактный ПТГ — стандартный метод"}
+      "loinc_note": {
+        "en": "intact PTH — the standard method",
+        "ru": "интактный ПТГ — стандартный метод"
+      }
     },
     "omega3_index": {
       "tier": 3,
       "biomaterial": "edta_whole_blood",
-      "note": {"en": "erythrocyte membranes, a window of ~4 months", "ru": "мембраны эритроцитов, окно ~4 месяца"},
+      "note": {
+        "en": "erythrocyte membranes, a window of ~4 months",
+        "ru": "мембраны эритроцитов, окно ~4 месяца"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
     "homocysteine": {
       "tier": 2,
       "biomaterial": "serum_special",
-      "note": {"en": "separate the plasma quickly, otherwise the value is overestimated", "ru": "плазму отделять быстро, иначе значение завышается"},
+      "note": {
+        "en": "separate the plasma quickly, otherwise the value is overestimated",
+        "ru": "плазму отделять быстро, иначе значение завышается"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
     "calcium_ionized": {
       "tier": 2,
       "biomaterial": "serum_special",
-      "note": {"en": "sensitive to the conditions of collection and storage — check the laboratory's rules", "ru": "чувствителен к условиям взятия и хранения — уточнять правила лаборатории"},
+      "note": {
+        "en": "sensitive to the conditions of collection and storage — check the laboratory's rules",
+        "ru": "чувствителен к условиям взятия и хранения — уточнять правила лаборатории"
+      },
       "requires": [],
       "loinc": "1994-3",
       "loinc_name": "Calcium.ionized [Moles/volume] in Blood",
-      "loinc_note": {"en": "in moles per volume: it matches the mmol/L of Russian lab forms", "ru": "в молях на объём: совпадает с ммоль/л российских бланков"}
+      "loinc_note": {
+        "en": "in moles per volume: it matches the mmol/L of Russian lab forms",
+        "ru": "в молях на объём: совпадает с ммоль/л российских бланков"
+      }
     },
     "calcium_blood": {
       "tier": 1,
@@ -322,14 +398,20 @@
       "requires": [
         "albumin"
       ],
-      "note": {"en": "it is read only together with albumin", "ru": "читается только вместе с альбумином"},
+      "note": {
+        "en": "it is read only together with albumin",
+        "ru": "читается только вместе с альбумином"
+      },
       "loinc": "17861-6",
       "loinc_name": "Calcium [Mass/volume] in Serum or Plasma"
     },
     "apob": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "a direct measurement of the atherogenic particles; it does not depend on the Friedewald formula", "ru": "прямое измерение атерогенных частиц; не зависит от формулы Фридвальда"},
+      "note": {
+        "en": "a direct measurement of the atherogenic particles; it does not depend on the Friedewald formula",
+        "ru": "прямое измерение атерогенных частиц; не зависит от формулы Фридвальда"
+      },
       "loinc": "1884-6",
       "loinc_name": "Apolipoprotein B [Mass/volume] in Serum or Plasma"
     },
@@ -348,21 +430,30 @@
     "psa_total": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "48 h without cycling, sex or a prostate massage", "ru": "48 ч без езды на велосипеде, секса и массажа простаты"},
+      "note": {
+        "en": "48 h without cycling, sex or a prostate massage",
+        "ru": "48 ч без езды на велосипеде, секса и массажа простаты"
+      },
       "loinc": "2857-1",
       "loinc_name": "Prostate specific Ag [Mass/volume] in Serum or Plasma"
     },
     "vitamin_b12": {
       "tier": 2,
       "biomaterial": "serum",
-      "note": {"en": "the upper bound of the corridor is printed differently by different laboratories — check it against the form", "ru": "верхняя граница коридора у лабораторий печатается по-разному — сверять по бланку"},
+      "note": {
+        "en": "the upper bound of the corridor is printed differently by different laboratories — check it against the form",
+        "ru": "верхняя граница коридора у лабораторий печатается по-разному — сверять по бланку"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     },
     "vitamin_b6": {
       "tier": 3,
       "biomaterial": "serum_special",
-      "note": {"en": "light-sensitive; while taking complexes it reflects the supplement rather than the store", "ru": "светочувствителен; при приёме комплексов отражает добавку, а не запас"},
+      "note": {
+        "en": "light-sensitive; while taking complexes it reflects the supplement rather than the store",
+        "ru": "светочувствителен; при приёме комплексов отражает добавку, а не запас"
+      },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     }

@@ -69,7 +69,7 @@ class TestAgainstARealBadCertificate(unittest.TestCase):
         subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048",
                         "-keyout", key, "-out", cert, "-days", "1", "-nodes",
                         "-subj", "/CN=localhost"],
-                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(cert, key)
         cls.srv = HTTPServer(("127.0.0.1", 0), _Handler)

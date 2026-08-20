@@ -131,6 +131,86 @@ def _h_second_opinion(ctx: "ToolContext") -> str:
     return fmt.second_opinion_report(engine.second_opinion())
 
 
+def _h_flag_rate(ctx: "ToolContext") -> str:
+    """READ-ONLY: on what share of objects each flag fired.
+
+    The cheap check this project asks for before any interpretation, and the one
+    a model should run before repeating a flag back to a person: a threshold that
+    marks nearly every object carries no information, however plausible it looks.
+    """
+    from scholion import prevalence as _pv  # noqa: E402
+    return fmt.prevalence_report(_pv.report())
+
+
+def _h_array(ctx: "ToolContext") -> str:
+    """READ-ONLY: what a genotyping array carries, and what it cannot answer.
+
+    The number a model most needs before it says anything about this person's
+    genome: whether the input is a chip at all, which catalogue loci it carries,
+    and which it never interrogated — so that «no variant found» is never
+    repeated back as reassurance about a locus nobody looked at.
+    """
+    from scholion import array_genome as _arr  # noqa: E402
+    return fmt.array_report(_arr.catalogue_coverage())
+
+
+def _h_marker_propose(ctx: "ToolContext") -> str:
+    """WRITES a dictionary RULE — never a value, and never a confirmation.
+
+    The model may say «a row printed as X in unit Y is probably this marker».
+    It may not say what the row's number was, and it may not confirm its own
+    proposal: an entry stays `proposed` until a person vouches for it, and while
+    it is proposed the marker is shown without any statement about the norm.
+
+    That division is the whole design. A value read by a model would be a
+    probabilistic number among reproducible ones; a RULE proposed by a model is a
+    line of JSON that a person can check by eye, that reads the number with the
+    same deterministic code as everything else, and that keeps working for
+    everyone after the conversation is over.
+
+    A reference range is deliberately not accepted here — it is a clinical claim,
+    and the project's own contribution rules say a language model is not a source
+    for one.
+    """
+    from scholion import markers_local as _ml  # noqa: E402
+    names = [x for x in (ctx.args.get("names") or "").split(";") if x.strip()]
+    return fmt.markers_local_report(_ml.propose(
+        (ctx.args.get("key") or "").strip(),
+        unit=(ctx.args.get("unit") or "").strip(),
+        names_ru=names, names_en=[x for x in (ctx.args.get("names_en") or "").split(";") if x.strip()],
+        by="model"))
+
+
+def _h_lab_draw(ctx: "ToolContext") -> str:
+    """WRITES: record why a day holds two draws and what stood between them.
+
+    The one write the model is given here, and it is given deliberately: the
+    engine can see that two measurements share a day but only a person knows that
+    an infusion, a dose or a stress test stood between them, and the answer
+    usually arrives in conversation rather than at a prompt. The model records
+    what the person SAID; it does not infer the event, and it never touches a
+    value — the same boundary as everywhere else, where numbers come from the
+    form and the model may only add what it was told.
+    """
+    from scholion import store as _st  # noqa: E402
+    day = (ctx.args.get("day") or "").strip()
+    reason = (ctx.args.get("reason") or "").strip()
+    between = (ctx.args.get("between") or "").strip()
+    return fmt.draw_context_report(_st.set_draw_context(day, reason, between))
+
+
+def _h_sources(ctx: "ToolContext") -> str:
+    """READ-ONLY: the register of external sources and when each was imported.
+
+    The listing only. Refreshing reaches the network and rewrites reference data
+    on the person's machine; that is the owner's command to type, not a tool a
+    model may fire. A model that can SEE the dates can say «your pharmacogenetic
+    table was imported eight months ago» — which is the useful half.
+    """
+    from scholion import sources as _src  # noqa: E402
+    return fmt.sources_report({"sources": _src.state(), "results": []})
+
+
 def _h_limits(ctx: "ToolContext") -> str:
     from scholion import limits as _lim  # noqa: E402
     return fmt.limits_report(_lim.report())
@@ -189,6 +269,12 @@ _TOOLS = (
     ("sch_overview", (), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", (), [], _h_limits),
+    ("sch_sources", (), [], _h_sources),
+    ("sch_lab_draw", ("day", "reason", "between"), ["day"], _h_lab_draw),
+    ("sch_marker_propose", ("key", "names", "unit", "names_en"), ["key", "names"],
+     _h_marker_propose),
+    ("sch_array", (), [], _h_array),
+    ("sch_flag_rate", (), [], _h_flag_rate),
     ("sch_radar", (), [], _h_radar),
     ("sch_focus", (), [], _h_focus),
     ("sch_brief", (), [], _h_brief),

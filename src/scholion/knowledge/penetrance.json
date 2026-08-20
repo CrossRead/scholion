@@ -5,7 +5,8 @@
     "one_line": {
       "en": "A variant's classification answers the question \"can this variant cause the disease at all\", NOT \"will this person fall ill\".",
       "ru": "Классификация варианта отвечает на вопрос «вызывает ли этот вариант болезнь в принципе», а НЕ «заболеет ли этот человек»."
-    }
+    },
+    "source_tier": "primary_literature"
   },
   "principles": [
     {

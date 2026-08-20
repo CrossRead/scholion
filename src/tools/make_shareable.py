@@ -499,6 +499,20 @@ def build(repo: Path, out: Path) -> Path:
     if _compat.exists():
         shutil.copy2(_compat, shared / "src" / "tools" / "check_compat.py")
 
+    # `check_vendor.py` is NAMED IN ATTRIBUTION.md as the mechanism that keeps the
+    # vendored copy of genomi honest — a public file promising a tool that was not
+    # in the package. `check_coverage.py` and its baseline are what
+    # `tests/test_coverage_gate.py` imports, and that test IS shipped: without the
+    # tool the package's own suite failed on an import rather than skipping a
+    # check it does not carry. Both are the class named beside
+    # `synthetic_fixture.py` above — a dependency of something shipped is shipped —
+    # and both were found by the package's own tests, thirteen minutes into a
+    # publication run. `_shipped_tools_resolve()` below now finds them in a second.
+    for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json"):
+        _src = repo / "src" / "tools" / _name
+        if _src.exists():
+            shutil.copy2(_src, shared / "src" / "tools" / _name)
+
     # The language gate, for the same reason as the two above: it is what keeps the
     # project English, and a contributor cannot honour a rule they have no way to
     # check. Without the baseline beside it the tool reports every file as new, so
@@ -784,7 +798,50 @@ def build(repo: Path, out: Path) -> Path:
     # GitHub renders and PyPI links to.
 
     _check_root_fresh(repo, out, shared)
+    _shipped_tests_can_import(repo, shared)
     return out
+
+
+def _shipped_tests_can_import(repo: Path, shared: Path) -> None:
+    """Every `src/tools` module a SHIPPED test imports must be shipped with it.
+
+    The failure this prevents is not a missing feature — it is a test file that
+    travels into the package and cannot even be imported there, which unittest
+    reports as an error rather than a skip. The recipient sees a broken suite and
+    has no way to tell whether the product is broken too.
+
+    It is written as an enumeration rather than a list of known cases on purpose:
+    the list was already right twice and wrong the third time. `check_coverage`
+    went missing while `check_compat`, `check_language` and `check_staged` were
+    all remembered.
+    """
+    import ast as _ast
+    available = {f.stem for f in (repo / "src" / "tools").glob("*.py")}
+    shipped = {f.stem for f in (shared / "src" / "tools").glob("*.py")}
+    missing: dict = {}
+    for test in sorted((shared / "tests").glob("*.py")):
+        try:
+            tree = _ast.parse(test.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError):
+            continue
+        for node in _ast.walk(tree):
+            names = []
+            if isinstance(node, _ast.Import):
+                names = [a.name.split(".")[0] for a in node.names]
+            elif isinstance(node, _ast.ImportFrom) and node.level == 0 and node.module:
+                names = [node.module.split(".")[0]]
+            for n in names:
+                if n in available and n not in shipped:
+                    missing.setdefault(n, []).append(test.name)
+    if missing:
+        lines = "\n".join(f"     {n}.py — imported by {', '.join(sorted(set(v)))}"
+                           for n, v in sorted(missing.items()))
+        raise SystemExit(
+            "\n❌ the package ships tests that import tools it does not ship:\n"
+            f"{lines}\n"
+            "   Either copy the tool in `build()` beside the other checks, or stop\n"
+            "   shipping the test. A test that cannot import is not a skipped check;\n"
+            "   it is a broken suite in somebody else's hands.")
 
 
 # Files at the build root that have a same-named source in the repository.

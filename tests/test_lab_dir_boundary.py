@@ -79,7 +79,7 @@ class _Layout:
                 "d = reconcile._default_lab_dir();"
                 "print(d if d else '')" % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=self.env(),
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         assert p.returncode == 0, p.stderr
         return p.stdout.strip()
 
@@ -112,7 +112,7 @@ class TestAFreshPackageDoesNotReachOutside(unittest.TestCase):
         code = ("import sys; sys.path.insert(0, %r);"
                 "from scholion import reconcile; reconcile.reconcile()" % str(support.SRC))
         subprocess.run([sys.executable, "-c", code], env=self.L.env(),
-                       capture_output=True, text=True, timeout=120)
+                       capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
         stray = [str(p.relative_to(self.L.root))
                  for p in self.L.root.rglob("labs_coverage.json")
                  if p.parent != self.L.data / "profile"]
@@ -147,7 +147,7 @@ class TestAFilledProfileDoesNotEarnTheRightEither(unittest.TestCase):
                 "from scholion import reconcile;"
                 "print(json.dumps(reconcile.reconcile()))" % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=self.L.env(),
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr)
         res = json.loads(p.stdout.strip().splitlines()[-1])
         self.assertFalse(res.get("ok"))
@@ -195,7 +195,7 @@ class TestAnExplicitAnswerIsStillHonoured(unittest.TestCase):
                 "from scholion import reconcile; print(reconcile._default_lab_dir())"
                 % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=env,
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.stdout.strip(), str(other), p.stderr)
 
 
@@ -226,7 +226,7 @@ class TestTheProfileVariableGovernsTheWrite(unittest.TestCase):
         code = ("import sys; sys.path.insert(0, %r);"
                 "from scholion import reconcile; reconcile.reconcile()" % str(support.SRC))
         subprocess.run([sys.executable, "-c", code], env=env,
-                       capture_output=True, text=True, timeout=120)
+                       capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
         self.assertFalse((self.L.data / "profile" / "labs_coverage.json").exists(),
                          "the provenance was written next to the code, not next to the profile")
 
@@ -261,7 +261,7 @@ class TestTheSameRuleCoversTheWearableExport(unittest.TestCase):
                 "from scholion import garmin;"
                 "d = garmin.find_export(); print(d if d else '')" % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=self.L.env(),
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         assert p.returncode == 0, p.stderr
         return p.stdout.strip()
 
@@ -281,7 +281,7 @@ class TestTheSameRuleCoversTheWearableExport(unittest.TestCase):
                 "from scholion import garmin; print(json.dumps(garmin.reingest()))"
                 % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=self.L.env(),
-                           capture_output=True, text=True, timeout=60)
+                           capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         self.assertEqual(p.returncode, 0, p.stderr)
         res = json.loads(p.stdout.strip().splitlines()[-1])
         self.assertFalse(res.get("ok"))

@@ -18,20 +18,32 @@ and one command reports both:
 scholion genome-status
 ```
 
-### The build — this one is not negotiable
+### The build — both are read, and neither is converted
 
-The catalogue of positions this project queries is written in **GRCh38**. A file
-called against another build is not slightly off; it is off by whole genes. APOE
-`rs429358` sits at `19:44,908,684` in GRCh38 and at `19:45,411,941` in GRCh37 —
-half a million bases apart. Asking the first coordinate of the second file lands
-somewhere else entirely, and the answer comes back either empty, so a real
-finding is lost, or full, so somebody else's variant is reported as APOE.
-Neither looks like an error. That is why the genomic layer switches itself off
-on a mismatch instead of answering.
+A file called against another build is not slightly off; it is off by whole
+genes. APOE `rs429358` sits at `19:44,908,684` in GRCh38 and at `19:45,411,941`
+in GRCh37 — half a million bases apart. Asking the first coordinate of the
+second file lands somewhere else entirely, and the answer comes back either
+empty, so a real finding is lost, or full, so somebody else's variant is
+reported as APOE. Neither looks like an error.
 
 GRCh37 is not an edge case: consumer arrays are hg19, several sequencing
 providers shipped hg19 for years, and most WGS more than a few years old is
-hg19.
+hg19. Seven of the eight real genomes in the public corpus this project is
+tested against are GRCh37.
+
+So the catalogue carries **both** coordinates. All 54 loci have a GRCh38
+position and a GRCh37 position, each taken from a primary source and written
+only where at least two independent sources agreed — NCBI dbSNP, the Ensembl
+GRCh37 endpoint, and, for 30 of them, real GRCh37 files that carry rsIDs.
+A GRCh37 file is queried at GRCh37 coordinates; you do not have to do anything.
+
+**Nothing is converted between builds.** The offset is not constant even inside
+one chromosome — 405 kb of spread on chromosome 1 across the pairs measured on
+the corpus — so arithmetic would hand back a plausible position pointing at the
+wrong base, which is worse than a refusal and far harder to notice. A locus that
+the catalogue happens to carry in one build only is not read out of the other
+file at all, and says which build it is missing.
 
 **The build is detected by contig length, not by the `##reference` line** — a
 length is a property of the reference, a reference line is a claim, and people
@@ -61,11 +73,15 @@ bcftools view -h <file.vcf.gz> | grep -E '##(contig|reference)'
 bcftools reheader -f <reference>.fai <file.vcf.gz>
 ```
 
-**If your file is in GRCh37 and you want it read**, lift it over — `CrossMap` or
-`bcftools +liftover` with the appropriate chain file — or re-call the variants
-from the alignment against GRCh38. Coordinates are deliberately not converted on
-the fly here: a silent conversion would add exactly the class of error this
-project exists to remove.
+**If your file is in GRCh37** it is read as it is — say so with
+`SCHOLION_GENOME_ASSEMBLY=GRCh37` if the header does not, and the catalogue
+answers at GRCh37 coordinates. Lifting the file over to GRCh38 is still worth
+doing if you intend to use tools outside this project that expect GRCh38, but it
+is no longer a precondition for being read here.
+
+**If your file is on T2T-CHM13**, it is not read: the catalogue carries no third
+coordinate, and a silent conversion would add exactly the class of error this
+project exists to remove. That is reported by name rather than as "no genome".
 
 ### The shape of the file
 
@@ -119,9 +135,12 @@ genome/
 
 The rules by which the code finds this database (`src/scholion/genome.py`):
 
-- the alphabetically first `genome/*.vcf.gz` is taken, **except** the derived `*.clinvar.vcf.gz`; the path can be set explicitly through the environment variable `SCHOLION_GENOME_VCF`;
+- **exactly one** `genome/*.vcf.gz` is read, and the derived companions — `*.clinvar.vcf.gz`, `loci_sites.vcf.gz` and the other files our own pipeline writes beside it — do not count. If the folder holds more than one genome, nothing is read and all of them are listed: `SCHOLION_GENOME_VCF=/path/to/yours` settles it in one variable. This matters more than it sounds. A per-chromosome set (`chr1.vcf.gz` … `chr22.vcf.gz`) used to answer APOE — which is on chromosome 19 — out of `chr1.vcf.gz`, as "reference", while `chr19.vcf.gz` sat unopened in the same folder;
+- **one sample inside that file.** A trio, a family file or a joint call carries several, and the tenth column is not a person's name. When there is more than one, nothing is read until `SCHOLION_GENOME_SAMPLE=<name>` says which one is yours; `scholion genome-status` lists the names the file carries;
 - a `.tbi` next to it is mandatory — otherwise lookup by position is impossible;
-- reading requires `bcftools` on the `PATH` (the best option), or the python package `pysam`, or — as a bare fallback — the built-in reader `tabixlite`, for which the `.tbi` is enough.
+- reading requires `bcftools` on the `PATH` (the best option), or the python package `pysam`, or — as a bare fallback — the built-in reader `tabixlite`, for which the `.tbi` is enough;
+- **a file that cannot be read is never reported as connected.** A `.vcf.gz` compressed with ordinary gzip rather than bgzip looks correct from the outside and cannot be seeked into; it is named, with the one command that fixes it, instead of being read as a genome full of reference calls. A gVCF is refused for the same reason in the other direction: it carries reference *blocks*, so a position inside a block has no row of its own and would come back as "reference" whether or not it was ever covered;
+- **other genomic data in the folder is named by its own class.** A BAM or CRAM, a FASTQ pair, a BCF, a provider archive — each needs a different next step, and "no genome found" is false in front of a person whose file is right there.
 
 The complete set you end up with after all of the optional steps looks like this:
 

@@ -20,7 +20,7 @@ REF_FASTA="${REF_FASTA:-$HOME/genomic_work/reference/GRCh38_no_alt.fa}"
 # BAM: markdup is taken by default; if it is missing/empty — the merged merged.bam
 # (a pipeline without markdup — justified for DNBSEQ, where duplication is low).
 if [ -z "${BAM:-}" ]; then
-  if [ -s "$WORKDIR/$SAMPLE.markdup.bam" ] && [ "$(stat -f%z "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || echo 0)" -gt 1048576 ]; then
+  if [ -s "$WORKDIR/$SAMPLE.markdup.bam" ] && [ "$(stat -f%z "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || stat -c%s "$WORKDIR/$SAMPLE.markdup.bam" 2>/dev/null || echo 0)" -gt 1048576 ]; then
     BAM="$WORKDIR/$SAMPLE.markdup.bam"
   elif [ -f "$WORKDIR/$SAMPLE.merged.bam" ]; then
     BAM="$WORKDIR/$SAMPLE.merged.bam"

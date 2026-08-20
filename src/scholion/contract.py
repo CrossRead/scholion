@@ -207,6 +207,13 @@ def cli_commands() -> List[str]:
 # The map below is CLI command → tool name. Everything a CLI read command
 # produces is expected to have a tool unless a reason is written down.
 PLUGIN: Dict[str, str] = {
+    # `skill --rules` and `sch_rules` are one capability with two doors. It was
+    # excused from the plugin face on the reasoning that a model calling for its
+    # own instruction reads itself — true while the only door carried the
+    # instruction with it. The tool interface does not: a model arriving there is
+    # handed a list of tools and nothing about what it must not say, so asking for
+    # the canon is not a loop, it is the only way to get it.
+    "skill": "sch_rules",
     "drug": "sch_check_drug_gene",
     "labs": "sch_analyze_labs",
     "suggest-tests": "sch_suggest_tests",
@@ -247,8 +254,6 @@ NO_PLUGIN: Dict[str, str] = {
             "confuse it with the person's own",
     "doc": "prints a document that ships with the package; the model is handed the "
            "instruction directly and does not read the product's manuals",
-    "skill": "prints the model's own instruction to a person; calling it from inside the "
-             "model is a loop",
     "assistant": "describes how to connect a model — addressed to the person doing the "
                  "connecting",
     "profile": "a snapshot for the skill's own context, assembled before the tools run",
@@ -326,8 +331,12 @@ INSTRUCTION_DOC = "share/skill/INSTRUCTION.md"
 NO_INSTRUCTION: Dict[str, str] = {
     "demo": "lays out a fictional profile — offering it to a model invites the one confusion "
             "this project cannot afford, between the demo and the person",
-    "doc": "prints a document that ships with the package; the model is handed the "
-           "instruction directly and has no use for the product's manuals",
+    # `doc` was excused here on the reasoning that a model is handed its
+    # instruction directly and has no use for the manuals. One of them turned out
+    # to be addressed to the model itself: `connecting-an-agent` is how an
+    # assistant reaches this product at all, and an assistant that cannot find it
+    # invents what it needs instead. The excuse is removed rather than amended —
+    # the instruction names the command now, and the four faces agree again.
     "skill": "prints this very instruction to a person. A model calling it reads itself",
     "redact": "strips identifiers out of text a person is about to publish. Addressed to the "
               "person, and its whole purpose is that the text reaches fewer places",
@@ -495,8 +504,88 @@ def capabilities() -> Dict[str, Any]:
         })
     from . import __version__
     return {"version": __version__, "count": len(out), "commands": out,
+            "access": access(),
             "reads_only": sorted(c["command"] for c in out if not c["writes"]),
             "writes": sorted(c["command"] for c in out if c["writes"])}
+
+
+#: Environment variables whose NAME would suggest a secret. There are none, and
+#: this is how that is said to a machine rather than promised in prose: the list
+#: below is matched against the variables the tree actually reads, so the claim
+#: cannot outlive the code.
+_SECRET_LOOKING = ("TOKEN", "KEY", "SECRET", "PASSWORD", "CREDENTIAL", "AUTH")
+
+
+def access() -> Dict[str, Any]:
+    """How to reach this build, and what it needs in order to answer — for a machine.
+
+    Written because of what happened without it. An assistant was asked to send
+    something to Scholion, had no Scholion tool in front of it, and — finding no
+    way to say «I cannot reach it from here» — asked its user for a «Scholion
+    credential», a thing that does not exist and never has. It admitted in the
+    same breath that it did not know the name of what it was asking for.
+
+    A product that cannot be asked what it needs will have the answer invented
+    for it. So it answers: these are the doors, this is what each one costs, and
+    there is no key to any of them. Everything here is derived — the tool count
+    from the tool list, the protocol version from the server, the commands from
+    the parser — so the answer cannot drift from the build.
+    """
+    import os as _os
+    from . import mcp_server as _mcp
+    from . import ouroboros_tools as _ot
+
+    tools = [e.name for e in _ot.get_tools()]
+    # What the build CAN read, scanned out of its own source — not what happens
+    # to be set in this process. The difference matters here more than usual: the
+    # question this answers is «what does it want from me», and a list that
+    # depends on the asker's shell answers a different one.
+    import re as _re2
+    from pathlib import Path as _Path
+    pkg = _Path(__file__).resolve().parent
+    env: set = set()
+    for f in sorted(pkg.rglob("*.py")):
+        try:
+            env |= set(_re2.findall(r"SCHOLION_[A-Z0-9_]+", f.read_text(encoding="utf-8")))
+        except OSError:
+            continue
+    env_read = sorted(env)
+    return {
+        # The first field, because it is the one that gets invented.
+        "auth": {
+            "required": False,
+            "kinds_accepted": [],
+            "note": "Scholion has no account, key, token or credential of any "
+                    "kind, and no service to authenticate against: the analysis "
+                    "runs on the machine that holds the data. Anything asking "
+                    "for a Scholion credential is not Scholion — most often it "
+                    "is a host that assumes every tool server is remote.",
+        },
+        "runs": "locally, on the machine that holds the data",
+        "doors": {
+            "cli": {"how": "scholion <command>", "commands": len(cli_commands())},
+            "mcp": {"how": "scholion mcp", "transport": "stdio",
+                    "protocol": _mcp.PROTOCOL_VERSION, "tools": len(tools),
+                    "note": "a local process spoken to over stdin and stdout; "
+                            "no port is opened and no host is contacted"},
+            "ouroboros_tools": {"how": "import scholion.ouroboros_tools",
+                                "entry": "get_tools() -> list[ToolEntry]",
+                                "tools": len(tools)},
+            "ouroboros_hub": {"how": "the `scholion` skill", "entry": "plugin.py",
+                              "installs": "pip package `scholion`"},
+            # Named and marked, rather than left out. An agent that finds a
+            # local page and no note beside it will try to drive it; a door that
+            # is not for you is a fact worth stating, like any other refusal.
+            "web": {"how": "scholion serve", "binds": "127.0.0.1",
+                    "for": "a person", "agent_surface": False},
+        },
+        "environment": {
+            "reads": env_read,
+            "secret_looking": [v for v in env_read
+                               if any(w in v.upper() for w in _SECRET_LOOKING)],
+            "offline_switch": "SCHOLION_OFFLINE=1",
+        },
+    }
 
 
 def check_all_faces() -> Dict[str, List[str]]:

@@ -64,11 +64,16 @@ class TestNoTestCanAskAQuestion(unittest.TestCase):
             except SyntaxError:                      # pragma: no cover
                 continue
             for call in _spawns(tree):
-                if not any(k.arg == "stdin" for k in call.keywords):
+                # `input=` counts: it makes subprocess open a pipe and feed it, so
+                # the child's stdin is stated as plainly as by `stdin=`. What is
+                # forbidden is saying NOTHING, because then the child gets
+                # whatever the runner had — which on a developer's machine is a
+                # terminal.
+                if not any(k.arg in ("stdin", "input") for k in call.keywords):
                     offenders.append(f"{f.name}:{call.lineno}")
         self.assertEqual(offenders, [], "these spawn a process with the runner's "
-                                        "stdin inherited — pass stdin=subprocess.DEVNULL "
-                                        "(or an explicit pipe if the test feeds input)")
+                                        "stdin inherited — pass stdin=subprocess.DEVNULL, "
+                                        "or input=... if the test feeds the child")
 
     def test_the_harness_really_did_close_it(self):
         """The guard above is about source; this is about the running process."""

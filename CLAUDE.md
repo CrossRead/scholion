@@ -123,6 +123,32 @@ showing anyone's medical record, and so screenshots have something to show. Ever
 file declares itself synthetic in `_meta` — without that declaration the build
 audit rejects it.
 
+## Adding a surface
+
+Any new way in — a protocol server, a plugin for another host, an API — is not
+finished until four things are true: `contract.access()` describes it, derived
+from the build; `docs/CONNECTING-AN-AGENT.md` names it; it says who it is for
+(`agent_surface: False` for a human door, not omission); and the safety canon
+reaches whoever speaks through it — `sch_rules` is a tool for exactly that
+reason, because the tool interface carries no instruction with it.
+`tests/test_an_agent_can_ask_how_to_connect.py` enumerates the doors out of
+`access()`, so a fifth one fails the build the day it is added. Reasoning in
+`docs/DEVELOPMENT.md`.
+
+## Release notes
+
+Written for somebody who has never seen this repository. **New capabilities,
+fixed defects, and what either means for data already stored** — nothing about
+who wrote it, which attempt came first, what it taught anybody, internal task
+numbers, commit hashes, paths in this tree, or whose machine anything ran on.
+Those belong in `CHANGELOG.private.md` and in commit messages, and a reader who
+wants them knows where to look. A defect is described by the wrong answer
+somebody could have received, not by its cause in the code.
+
+Enforced by `tests/test_release_notes_exist.py` and checked by
+`publish_share.sh` before it builds. The full convention, with the reasoning and
+the list of markers, is in `docs/DEVELOPMENT.md`.
+
 ## Conventions
 
 - PGS and longevity statements always carry their caveats: mostly European

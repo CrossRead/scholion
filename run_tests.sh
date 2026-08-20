@@ -49,6 +49,11 @@ if [ -f src/tools/sync_docs.py ]; then
   python3 src/tools/sync_docs.py || exit 1
 fi
 
+if [ -f src/tools/sync_manifest.py ]; then
+  echo "▶ the host manifest matches the build"
+  python3 src/tools/sync_manifest.py || exit 1
+fi
+
 if [ -f src/tools/sync_rules.py ]; then
   echo "▶ the assistant rules are in sync with ASSISTANT-RULES.md"
   python3 src/tools/sync_rules.py

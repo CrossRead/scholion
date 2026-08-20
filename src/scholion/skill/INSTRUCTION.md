@@ -603,6 +603,7 @@ python3 -m scholion set-folder labs_docs "<path>"  # where the forms and conclus
 python3 -m scholion import-labs panel.csv [--dry-run]   # a whole panel from CSV/TSV; all rows or none
 python3 -m scholion import-fhir bundle.json [--dry-run]  # a FHIR R4 Bundle: a portal export, Apple Health clinical records
 python3 -m scholion mcp                                 # speak MCP over stdin/stdout: the same tools, called by a model directly
+python3 -m scholion doc connecting-an-agent             # every way in, the MCP configuration a host expects, and why there is no key
 python3 -m scholion add-lab NAME YYYY-MM VALUE --unit UNIT [--ref-low --ref-high --new]
 python3 -m scholion add-metric KEY DATE VALUE
 python3 -m scholion add-med "drug" --dose "…"

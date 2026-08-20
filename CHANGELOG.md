@@ -40,6 +40,67 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.1 — 20.08.2026
+
+An assistant can now ask Scholion how to reach it, and what it must not say — and
+gets an answer instead of inventing one.
+
+### What you can do now
+
+**`scholion doc connecting-an-agent`** — how to wire an assistant to this, for
+every way in: the command line, the Model Context Protocol server, the Ouroboros
+tools module and the Ouroboros Hub skill. It carries the configuration block an
+MCP host expects, what to do when the executable is not on the host's `PATH`, how
+to point the server at a profile or genome elsewhere on disk, and a two-line
+exchange that tests the server by hand with no host at all.
+
+**`scholion capabilities --json` carries an `access` block.** Every way in, the
+protocol the server speaks, the number of tools behind it, and the environment
+variables this build reads — scanned from its own source, so the list cannot
+outlive the code that reads it. The first field is authentication, and it says
+there is none.
+
+**There is no account, key, token or credential for any surface of this
+product**, and nothing to authenticate against: the analysis runs on the machine
+that holds the data, and the Model Context Protocol server is a local process
+spoken to over standard input and output — no port, no host, nothing on the other
+end of the pipe but the program that started it. That was always true and was
+written nowhere a program could read, so a program asked for a credential
+instead. It is now the first thing the build answers, and the claim is checked
+against the code rather than repeated.
+
+**`sch_rules` — the safety canon as a tool.** A model that arrives through the
+skill is handed the instruction and the rules with it. A model that arrives
+through the tool interface used to be handed a list of tools and nothing else: it
+knew what it could call and nothing about what it must not say. Every answer
+already ends in the one-line disclaimer, and a disclaimer is a boundary, not an
+instruction. The rules are now a tool any host can call, and the MCP handshake
+carries a digest of them in the protocol's own `instructions` field for the hosts
+that pass it on.
+
+### What was wrong
+
+**The Ouroboros Hub skill described a build that no longer existed.** It declared
+version 0.3.2 against 0.4, 23 tools against 28, and did not mention the Model
+Context Protocol server at all — so a host that read only that file saw a
+Scholion without it, and an assistant working from that description had no way to
+reach a surface that was sitting there. The version and the tool count are now
+written from the build rather than typed beside it, the same way the shipped
+documents and the assistant rules already are.
+
+**The model's instruction named the protocol and not the way to speak it.** It
+listed `scholion mcp` and stopped. It now points at the connection guide.
+
+**The local web page was not marked as being for a person.** `scholion serve`
+opens a page on `127.0.0.1` for someone to read. It is listed among the ways in
+and listed as human: an agent that finds an undescribed local page will try to
+drive it, and a door that is not for you is a fact worth stating, like any other
+refusal.
+
+### What needs recomputing
+
+Nothing. No stored value changes and no answer changes.
+
 ## v0.4.0 — 19.08.2026
 
 This release is about the files people actually have. A consumer DNA test, a

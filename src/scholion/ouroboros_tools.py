@@ -211,6 +211,30 @@ def _h_sources(ctx: "ToolContext") -> str:
     return fmt.sources_report({"sources": _src.state(), "results": []})
 
 
+def _h_rules(ctx: "ToolContext") -> str:
+    """The safety canon, handed to whoever is about to speak for this product.
+
+    A model that arrives through the skill is given 73 KB of instruction and this
+    canon with it. A model that arrives through the tool interface is given a list
+    of tools and nothing else — it knows what it may call and not what it must not
+    say. Every answer already carries the one-line disclaimer, and a disclaimer is
+    a boundary, not an instruction.
+
+    So the canon is a tool. It is the only way that works on every host: a field
+    in the handshake is ignored by clients that do not read it, and a document on
+    disk is not reachable from a sandbox, but a tool the model can see it can
+    call.
+    """
+    from pathlib import Path as _P
+    path = _P(__file__).resolve().parent / "skill" / "ASSISTANT-RULES.md"
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        # An incomplete build. Saying nothing here would read as «this product has
+        # no rules», which is the worst of the available untruths.
+        return _t("skill.file_missing", path=str(path))
+
+
 def _h_limits(ctx: "ToolContext") -> str:
     from scholion import limits as _lim  # noqa: E402
     return fmt.limits_report(_lim.report())
@@ -269,6 +293,7 @@ _TOOLS = (
     ("sch_overview", (), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", (), [], _h_limits),
+    ("sch_rules", (), [], _h_rules),
     ("sch_sources", (), [], _h_sources),
     ("sch_lab_draw", ("day", "reason", "between"), ["day"], _h_lab_draw),
     ("sch_marker_propose", ("key", "names", "unit", "names_en"), ["key", "names"],

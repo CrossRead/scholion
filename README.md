@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.0** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.1** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -89,6 +89,15 @@ cannot see that locus» into «you do not have that variant». Measured on a rea
 the eight absent ones named. The paths that a chip cannot support — ClinVar
 screening, ACMG SF, polygenic scores — refuse with the reason instead of
 answering.
+
+**Any assistant can reach it, and none of them needs a key.** Four doors onto one
+engine: the command line, a Model Context Protocol server (`scholion mcp`), the
+Ouroboros tools module and the Ouroboros Hub skill. There is no account, no token
+and no credential for any of them — the analysis runs on the machine that holds
+the data, so there is nothing to authenticate to. The build answers this itself:
+`scholion capabilities --json` carries every door and, scanned from its own
+source, every environment variable it reads. Instructions:
+`scholion doc connecting-an-agent`.
 
 **Both reference builds.** A file called against GRCh37 is read at GRCh37
 coordinates, because most of the files people actually hold are GRCh37 and

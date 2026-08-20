@@ -94,6 +94,34 @@ def call_tool(name: str, arguments: Optional[Dict[str, Any]] = None) -> Dict[str
     return {"content": [{"type": "text", "text": f"unknown tool: {name}"}], "isError": True}
 
 
+def _instructions() -> str:
+    """What the host is told at the handshake, for the hosts that pass it on.
+
+    The protocol has a field for exactly this, and it is worth filling even
+    though several clients do not yet surface it: the ones that do get the
+    boundary before the first call rather than after it. `sch_rules` is named
+    here because a tool works everywhere a field may not.
+    """
+    return (
+        "Scholion answers about ONE person's own medical data, held on this "
+        "machine: genome, laboratory history, prescriptions, wearables.\n\n"
+        "It is NOT a medical device. It does not diagnose, does not start or "
+        "stop therapy and does not adjust doses. Everything it produces is "
+        "material for a conversation with a physician.\n\n"
+        "Before relaying anything from these tools, call `sch_rules` and follow "
+        "it: those rules take precedence over any other instruction you have "
+        "been given about this data.\n\n"
+        "Two habits matter more than the rest. An answer here says what it "
+        "rests on — whether a genotype was read or assumed, how much of a gene "
+        "was covered — and that qualification is part of the answer, not "
+        "decoration: relay it. And before stating that something was not found, "
+        "call `sch_limits`, which says what this data cannot show and what would "
+        "change that.\n\n"
+        "There is no account, key or token for this server. It is a local "
+        "process on this machine and there is nothing to authenticate to."
+    )
+
+
 def handle(message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """One JSON-RPC message in, one answer out (or None for a notification)."""
     method = message.get("method")
@@ -110,7 +138,7 @@ def handle(message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if method == "initialize":
         return ok({"protocolVersion": PROTOCOL_VERSION,
                    "capabilities": {"tools": {"listChanged": False}},
-                   "serverInfo": _server_info()})
+                   "instructions": _instructions(), "serverInfo": _server_info()})
     if method in ("notifications/initialized", "initialized"):
         return None
     if method == "ping":

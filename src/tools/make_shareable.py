@@ -454,7 +454,13 @@ def build(repo: Path, out: Path) -> Path:
     # an outside contributor — shipping everywhere except to that contributor
     # would be the four-face defect again), and the versioning rules the
     # conventions point at.
-    for _name in ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md"):
+    # `CONNECTING-AN-AGENT.md` is here for a different reader again: whoever is
+    # wiring an assistant to this and has landed on the repository rather than
+    # on a command line. It also travels inside the package, where
+    # `scholion doc connecting-an-agent` prints it — both, because the two
+    # readers arrive by different roads and neither knows about the other.
+    for _name in ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md",
+                  "CONNECTING-AN-AGENT.md"):
         _doc = repo / "docs" / _name
         if _doc.exists():
             (shared / "docs").mkdir(parents=True, exist_ok=True)
@@ -604,6 +610,10 @@ def build(repo: Path, out: Path) -> Path:
     # The sync check travels together with the canon: the copy of the rules in the
     # skill asks "edit the canon, not the copy", and the recipient must have something
     # to check that with.
+    _manifest = repo / "src" / "tools" / "sync_manifest.py"
+    if _manifest.exists():
+        shutil.copy2(_manifest, shared / "src" / "tools" / "sync_manifest.py")
+
     _sync = repo / "src" / "tools" / "sync_rules.py"
     if _sync.exists():
         shutil.copy2(_sync, shared / "src" / "tools" / "sync_rules.py")

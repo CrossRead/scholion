@@ -180,3 +180,108 @@ Not a style guide (the code shows the style), not a roadmap (the backlog
 holds that), and not a substitute for reading `contract.py` — that file's
 opening comment is the architecture argued from its defects, and it is
 better than any summary of it.
+
+## Adding a surface
+
+A surface is any way something outside this project reaches the engine: the
+command line, the Model Context Protocol server, the Ouroboros tools module, the
+Hub skill, the local web page. There are five, there will be more, and each one
+arrived the same way — as an obvious good idea, described nowhere, discovered by
+somebody who then had to guess what it needed.
+
+The Hub skill spent a release describing 23 tools when there were 28, and a
+version the build had not been for two releases. The MCP server spent a release
+existing and being mentioned in no description at all — so an assistant asked to
+use it invented a credential rather than find it. Neither was a mistake anyone
+made twice; both were things nobody was required to remember.
+
+**A surface is not finished until four things are true, and each is checked.**
+
+1. **The build describes it.** `contract.access()` lists every door with what it
+   costs to use. Derived — the tool count from the tool list, the protocol from
+   the server, the commands from the parser — because a description typed beside
+   the thing it describes outlives it.
+2. **The connection guide names it.** `docs/CONNECTING-AN-AGENT.md`, which ships
+   both inside the package and in the repository, because the person wiring it up
+   and the model using it arrive by different roads.
+3. **It says who it is for.** A door meant for a person is marked
+   `agent_surface: False`, not left out. An agent that finds an undescribed
+   surface will try to drive it; a door that is not for you is a fact, like any
+   other refusal.
+4. **The safety canon reaches whoever speaks through it.** This is the one that
+   is easy to lose. The skill carries the instruction and the rules with it; the
+   tool interface carries neither, and a model arriving that way knows what it
+   may call and not what it must not say. Every answer already ends in the
+   one-line disclaimer — that is a boundary, not an instruction. So the rules are
+   themselves a tool (`sch_rules`), and the MCP handshake carries a digest in the
+   protocol's `instructions` field for the hosts that pass it on. A new agent
+   surface must have an answer to «how does the model get the rules», and
+   «through the skill» is not one unless the skill is what it uses.
+
+`tests/test_an_agent_can_ask_how_to_connect.py` holds all four. It enumerates the
+doors out of `access()` rather than listing them, so a fifth door fails the build
+on the day it is added and not on the day somebody notices.
+
+**And the two questions that are not about the code.** Does the surface move the
+trust boundary off this machine — a network transport does, and every promise the
+product makes about the data not travelling has to be re-argued if it moves. Does
+it need a credential — the answer is no, it has always been no, and if it ever
+becomes yes then `access()['auth']` is a lie and a test says so.
+
+## Release notes
+
+The entry in `CHANGELOG.md` is the only thing somebody who has never seen this
+repository reads about a version. A tag carries a commit and a wheel carries
+code; neither says anything. So the entry is written for that reader, and the
+rest of this section is what that implies.
+
+**Three things go in.**
+
+1. **What a person can do now that they could not.** Written from what they
+   bring and what they get — «a 23andMe export, including inside the `.zip` the
+   provider sent», not «the array reader gained a search pattern».
+2. **What was wrong and now is not.** A defect is described by the WRONG ANSWER
+   somebody could have received, not by its cause in the code. «A `.vcf.gz`
+   compressed with ordinary gzip was reported as connected, and every position in
+   it came back as reference» — a reader can tell whether that happened to them.
+   «The unreadable-file check ran under the wrong condition» — they cannot.
+3. **What either means for data already stored.** This project's own sections:
+   a **series break** when the same input now produces a different value, what is
+   **retracted**, and what **needs recomputing**, by command.
+
+**Add measurement where it exists.** A number a reader could check is worth more
+than any adjective, and it also disciplines the claim. Say what it was measured
+on. Aggregates only — never a person's data, findings or identifier, even from a
+public research corpus.
+
+**Attribute outside data and code.** Whoever made the release possible is named,
+with the licence.
+
+**What stays out, and why it is not pedantry.** Each of these was in a draft:
+
+* **Who wrote it.** The author, the owner, «his own data». A release note is
+  about the software.
+* **The path the work took.** Which attempt came first, what was refactored on
+  the way, what it taught anybody. That is worth recording — in
+  `CHANGELOG.private.md`, in a design note, in the commit message, which is
+  exactly where a reader who wants it will look.
+* **Internal identifiers.** Task and issue numbers, commit hashes, paths inside
+  this repository, module and function names, names of internal tools.
+* **The development environment.** Whose machine, which branch, the test harness,
+  CI mechanics.
+
+The test is simple: strike every sentence that only means something with this
+repository open. What survives is the entry.
+
+**How it is enforced.** `tests/test_release_notes_exist.py` reads the entry for
+the current `VERSION` and requires that it exists, is longer than a note to
+oneself, carries the date in its heading, names at least one command a person
+could run, and contains none of five markers of an entry written for whoever was
+in the room. `src/tools/publish_share.sh` checks the same thing BEFORE it builds
+anything, and creates the release page from that section afterwards.
+
+**Two more things about the mechanics.** The version number is a promise to
+somebody holding the previous one — while nothing has been published, work
+belongs inside the current entry rather than in a new number. And a tag may
+legitimately move, most often because the notes were corrected; when it does, the
+version is already in the registry, and republishing it is not a failure.

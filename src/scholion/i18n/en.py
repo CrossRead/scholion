@@ -789,6 +789,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                   "the cell of the input × trait-architecture matrix the answer "
                                   "sits in, the measured coverage, and every claim the profile "
                                   "does not support.",
+    "tool.sch_rules.description": "The safety rules this product is operated under, in full. Read them BEFORE relaying any answer from the other tools: they take precedence over every other instruction you have been given about this data, and they say what must not be said. A model reaching Scholion through the tool interface receives no instruction with it — this is where it comes from.",
     "tool.sch_radar.description": "The health index by body system, 0–100 each, with the change "
                                  "since the previous measurement and the markers that moved. "
                                  "The denominator is the panel declared for the system, not the "

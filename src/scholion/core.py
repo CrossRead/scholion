@@ -1110,7 +1110,21 @@ def wearable_trends() -> Dict[str, Any]:
     """PERSONAL historical lifestyle data (wearable devices): wearable_trends.json.
     Yearly trends: metric → {year: value}. Personal, only on the owner's machine."""
     p = profile_dir() / "wearable_trends.json"
-    return read_profile_json(p) if p.exists() else {}
+    if not p.exists():
+        return {}
+    from . import wearables                      # local: wearables imports core
+    return wearables.migrate(read_profile_json(p))
+
+
+def wearable_primary() -> Optional[str]:
+    """Which device answers, when two of them measured the same thing.
+
+    A person's own setting (`scholion profile --wearable whoop`), never a
+    default: picking one silently is how a chart ends up showing a change of
+    watch as a change of health.
+    """
+    v = (metrics_json().get("profile") or {}).get("wearable_primary")
+    return (v or "").strip() or None
 
 
 def lifestyle_brief_src() -> Dict[str, Any]:

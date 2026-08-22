@@ -190,3 +190,15 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   had, because a class selector always outranks Pico's element-level default.
   Adopted 18.08.2026 when `web/index.html` moved onto it; the next HTML
   surface starts there directly instead of re-deciding.
+- **A working copy reached through a mount that forbids `unlink` needs
+  `git --no-optional-locks` for every read.** A plain `git status` creates
+  `.git/index.lock` and then cannot remove it, so the NEXT git command dies on
+  `Unable to create '.git/index.lock': File exists` — and the failure surfaces
+  one command later than its cause, which is why it looked twice like `commit`
+  being impossible. It is not: `git commit` itself works there. Read state with
+  `git --no-optional-locks status|log|diff`, and before and after anything that
+  writes, move what is left — `index.lock`, `HEAD.lock`,
+  `objects/maintenance.lock`, `objects/*/tmp_obj_*` — out of `.git` with `mv`,
+  not `rm`: such a mount forbids deleting a file and allows renaming one.
+  Learned 22.08.2026, after two sessions concluded the wrong thing from the
+  same message.

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 from .. import core
+from .. import subject as _subject
 from ..i18n import t as _t
 from ._helpers import _recent, DISCLAIMER
 from .labs import _latest, _trend, _flag_value, analyze_labs, suggest_tests
@@ -43,6 +44,13 @@ def overview() -> Dict[str, Any]:
         # as the seriousness. `flagged` is the whole current set, in one list, and the
         # two counts stay only as counts of a direction each.
         "synthetic": core.profile_is_synthetic(),
+        # Who the data belong to, asked of the data rather than of the file
+        # metadata: `synthetic` is a property of a file somebody wrote, `whose`
+        # is a property of what is in it. They agree in a demonstration and in a
+        # real profile; the case they disagreed in — a real measurement added to
+        # a demonstration — is the one this field exists for, and is now refused
+        # upstream rather than described here.
+        "whose": _subject.profile_subject(),
         "flagged": red,
         "high_flags": [m for m in red if m["flag"] == "high"],
         "watch_flags": [m for m in red if m["flag"] == "low"],

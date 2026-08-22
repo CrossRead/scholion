@@ -6,6 +6,14 @@ to 127.0.0.1: it will not read the response (CORS forbids that), but the write
 will go through. So four things are checked: a foreign name in Host, a cross-site
 Origin, the size of the body, and the fact that the details of an internal error
 do not leave in the response.
+
+Two things added after CodeQL flagged `/api/diag` (py/full-ssrf, critical) and
+four folder-ingest routes (py/path-injection): the Origin check is not only for
+POST — a GET that makes its own outbound request costs something even if it
+changes no file, and `/api/diag` is the one route on this server where that is
+true — and the guard being CORRECT in general is not the same claim as the guard
+being WIRED to every route that touches a path or the network, which is why the
+routes get named explicitly below rather than trusted by association.
 """
 import contextlib
 import io
@@ -93,6 +101,45 @@ class TestRequestGuard(unittest.TestCase):
         code, _ = self._call("/api/medications", {"name": "fly-agaric jam", "dose": "1"},
                              {"Origin": "https://evil.example.com"})
         self.assertEqual(code, 403, "a cross-site POST was accepted")
+
+    def test_a_cross_site_origin_cannot_reach_any_folder_ingest_route(self):
+        """`garmin.reingest`, `ingest_labs.ingest`, `ingest_studies.ingest`,
+        `wearables.reingest` and `store.set_source_folder` all build a
+        filesystem path straight from the POST body — CodeQL flagged four of
+        these five as py/path-injection. None of them validate the path
+        themselves, by design: the same function also serves the CLI, where
+        the path is whatever the operator running the tool typed, and that is
+        not something to second-guess. This guard is the ONLY thing standing
+        between a foreign page and an arbitrary local folder on the HTTP side,
+        so each route gets checked by name rather than trusted by
+        association with the general mechanism above."""
+        routes = ("/api/ingest-garmin", "/api/ingest-labs", "/api/ingest-studies",
+                 "/api/ingest-wearable", "/api/pick-folder")
+        for route in routes:
+            with self.subTest(route=route):
+                code, _ = self._call(route, {"path": "/etc", "domain": "labs"},
+                                     {"Origin": "https://evil.example.com"})
+                self.assertEqual(code, 403, f"{route} accepted a cross-site path")
+
+    def test_a_cross_site_origin_cannot_reach_diag(self):
+        """/api/diag is a GET, so the general request guard above used to skip
+        the Origin check for it entirely — the same class of gap that once let
+        this exact route become «a blind SSRF proxy and a file oracle» (see the
+        comment in net.py). It makes a real outbound request on the caller's
+        behalf even though it writes nothing to the profile, and a foreign page
+        must not be able to trigger that any more than it can trigger a POST."""
+        code, _ = self._call("/api/diag?url=https://rest.ensembl.org/",
+                             headers={"Origin": "https://evil.example.com"})
+        self.assertEqual(code, 403, "a cross-site GET reached the network-issuing route")
+
+    def test_a_same_origin_diag_request_is_not_blocked_by_the_guard(self):
+        """The new check on /api/diag must not break legitimate callers: the
+        page's own same-origin fetch, and curl/the CLI, which send no Origin
+        at all (see test_a_request_without_origin_works below)."""
+        code, _ = self._call("/api/diag", headers={"Origin": self.base})
+        self.assertNotEqual(code, 403, "the page's own request to its own API was blocked")
+        code, _ = self._call("/api/diag")
+        self.assertNotEqual(code, 403, "a request with no Origin at all was blocked")
 
     def test_a_request_without_origin_works(self):
         """curl and the CLI do not send an Origin — there is nothing and no reason to break them."""

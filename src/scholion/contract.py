@@ -64,6 +64,8 @@ PARITY: Dict[str, str] = {
     "POST /api/metrics": "add-metric",
     "POST /api/focus/log": "focus-log",
     "POST /api/pick-folder": "set-folder",
+    "POST /api/wearable-primary": "profile",
+    "POST /api/ingest-wearable": "ingest-wearable",
     "POST /api/ingest-garmin": "ingest-garmin",
     "POST /api/ingest-studies": "ingest-studies",
     "POST /api/ingest-labs": "ingest-labs",
@@ -275,6 +277,7 @@ NO_PLUGIN: Dict[str, str] = {
     "add-lab": "a write", "add-med": "a write", "remove-med": "a write",
     "add-metric": "a write", "focus-log": "a write", "set-folder": "a write",
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
+    "ingest-wearable": "a write",
     "import-fhir": "a write",
     "mcp": "it IS the tool surface — a tool that starts the tool server would be a loop, and the "
            "model calling it is already talking to the thing this command would start",
@@ -438,6 +441,7 @@ def check_i18n_keys() -> List[str]:
 WRITES = {
     "init", "demo", "add-lab", "add-med", "remove-med", "add-metric", "focus-log",
     "set-folder", "import-labs", "import-fhir", "ingest-labs", "ingest-studies", "ingest-garmin",
+    "ingest-wearable",
     "redact",
 }
 
@@ -452,7 +456,8 @@ AUTHORS = {
 # purpose and recorded here rather than by omission: a model that has just been
 # handed a folder of new results should be able to load them, and the values it
 # writes are the laboratory's, read off the form.
-TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "import-labs", "import-fhir",
+TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearable",
+               "import-labs", "import-fhir",
                "redact"}
 
 

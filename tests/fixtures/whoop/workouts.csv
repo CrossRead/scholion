@@ -1,0 +1,4 @@
+Cycle start time,Cycle end time,Cycle timezone,Workout start time,Workout end time,Duration (min),Activity name,Activity Strain,Energy burned (cal),Max HR (bpm),Average HR (bpm),HR Zone 1 %,HR Zone 2 %,HR Zone 3 %,HR Zone 4 %,HR Zone 5 %,GPS enabled,Distance (meters),Altitude gain (meters),Altitude change (meters)
+2026-01-04 06:12:00,2026-01-05 06:00:00,UTC+03:00,2026-01-04 09:00:00,2026-01-04 09:52:00,52,Weightlifting,9.1,410,158,121,40,35,20,5,0,false,0,0,0
+2026-01-05 06:20:00,2026-01-06 06:05:00,UTC+03:00,2026-01-05 18:10:00,2026-01-05 18:48:00,38,Running,11.4,470,171,148,10,25,40,20,5,true,7100,42.5,0.2
+2026-02-02 06:30:00,,UTC+03:00,2026-02-02 08:00:00,2026-02-02 08:45:00,45,Weightlifting,8.6,380,151,118,45,33,18,4,0,false,0,0,0

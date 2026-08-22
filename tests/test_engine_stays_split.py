@@ -62,7 +62,11 @@ LINE_BUDGETS = {
     # that nobody published, each with what would replace it and what it does not
     # license. It lives beside them rather than in a registry elsewhere, because a
     # declaration a reader has to go and find is one they will not find.
-    "labs": 560,
+    # 560 → 580 on 21.08.2026: task 100. A point now carries where its DATE came
+    # from, and a claim about a shift has to say when one of the two days was not
+    # printed on any form. Both are readers of a field that would otherwise be
+    # written and never looked at.
+    "labs": 580,
     "goals": 550,
     # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
     # the report is BUILT, not only where the score is computed, because
@@ -74,7 +78,12 @@ LINE_BUDGETS = {
     # of being remembered by whoever reads it. The sum happens in another
     # process, so these are not repairable here; that is precisely why they have
     # to be said rather than left implicit.
-    "genomics": 530,
+    # 530 → 580 on 21.08.2026: task 99. The three closed paths used to key on the
+    # CARRIER — «is this an array» — and a chip does not stop being a chip by
+    # arriving as a VCF. The room went to NARROW_INPUTS, the enumeration of the
+    # measured classes that may not answer, and to one branch per class so that
+    # each refusal names its own number instead of a shared sentence.
+    "genomics": 580,
     "sources": 180,
     "pgx": 900,
     "lifestyle": 980,

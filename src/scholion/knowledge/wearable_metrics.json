@@ -1,356 +1,675 @@
 {
-  "_meta": {
-    "purpose": "A PUBLIC reference for interpreting the metrics of wearable devices and smart scales (Garmin): label/units/direction/target/group/why. Not personal. Used by the «Lifestyle» tab.",
-    "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone).",
-    "source_tier": "curated_reference"
+ "_meta": {
+  "purpose": "A PUBLIC reference for interpreting the metrics of wearable devices and smart scales: label/units/direction/target/group/why, plus how each supported export names its columns. Not personal. Used by the «Lifestyle» tab.",
+  "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone).",
+  "source_tier": "curated_reference",
+  "sources": "A metric is stored together with the device that measured it. Two devices do not measure the same thing the same way — window, algorithm and place on the body all differ — so a single series carrying both would be an artefact of whichever export was loaded last rather than a fact about the person."
+ },
+ "order": [
+  "Weight",
+  "BMI",
+  "BodyFat",
+  "MuscleMass",
+  "BodyWater",
+  "VO2Max",
+  "StepsDaily",
+  "IntensityMinutesDaily",
+  "CaloriesDaily",
+  "RestingHeartRate",
+  "HRV",
+  "SleepHours",
+  "DeepSleepMin",
+  "RemSleepMin",
+  "SleepScore",
+  "SleepStress",
+  "Bedtime",
+  "Stress",
+  "BodyBatteryHigh",
+  "BodyBatteryLow",
+  "Respiration",
+  "Recovery",
+  "DayStrain",
+  "SleepPerformance",
+  "SleepEfficiency",
+  "SleepDebt",
+  "SleepConsistency",
+  "LightSleepMin",
+  "AwakeMin",
+  "TimeInBedMin",
+  "SleepNeedMin",
+  "BloodOxygen",
+  "SkinTemp"
+ ],
+ "metrics": {
+  "Weight": {
+   "label": {
+    "en": "Weight",
+    "ru": "Вес"
+   },
+   "unit": {
+    "en": "kg",
+    "ru": "кг"
+   },
+   "direction": "lower_better",
+   "group": "anthro",
+   "why": {
+    "en": "in metabolic syndrome, weight reduction is a common goal",
+    "ru": "при метаболическом синдроме снижение веса — частая цель"
+   }
   },
-  "order": [
-    "Weight",
-    "BMI",
-    "BodyFat",
-    "MuscleMass",
-    "BodyWater",
-    "VO2Max",
-    "StepsDaily",
-    "IntensityMinutesDaily",
-    "CaloriesDaily",
-    "RestingHeartRate",
-    "HRV",
-    "SleepHours",
-    "DeepSleepMin",
-    "RemSleepMin",
-    "SleepScore",
-    "SleepStress",
-    "Bedtime",
-    "Stress",
-    "BodyBatteryHigh",
-    "BodyBatteryLow",
-    "Respiration"
-  ],
-  "metrics": {
-    "Weight": {
-      "label": {
-        "en": "Weight",
-        "ru": "Вес"
-      },
-      "unit": {
-        "en": "kg",
-        "ru": "кг"
-      },
-      "direction": "lower_better",
-      "group": "anthro",
-      "why": {
-        "en": "in metabolic syndrome, weight reduction is a common goal",
-        "ru": "при метаболическом синдроме снижение веса — частая цель"
-      }
-    },
-    "BMI": {
-      "label": {
-        "en": "BMI",
-        "ru": "ИМТ"
-      },
-      "unit": "",
-      "direction": "lower_better",
-      "target_high": 25,
-      "group": "anthro",
-      "why": {
-        "en": "excess body mass strengthens insulin resistance",
-        "ru": "избыточная масса усиливает инсулинорезистентность"
-      }
-    },
-    "BodyFat": {
-      "label": {
-        "en": "Body fat",
-        "ru": "Жир"
-      },
-      "unit": "%",
-      "direction": "lower_better",
-      "target_high": 20,
-      "group": "anthro",
-      "why": {
-        "en": "visceral fat → ↓testosterone, ↑inflammation, insulin resistance",
-        "ru": "висцеральный жир → ↓тестостерон, ↑воспаление, инсулинорезистентность"
-      }
-    },
-    "MuscleMass": {
-      "label": {
-        "en": "Muscle mass",
-        "ru": "Мышечная масса"
-      },
-      "unit": {
-        "en": "kg",
-        "ru": "кг"
-      },
-      "direction": "higher_better",
-      "group": "anthro",
-      "why": {
-        "en": "keeping/building muscle while losing weight is metabolically protective",
-        "ru": "сохранять/растить мышцы при похудении — метаболически защищает"
-      }
-    },
-    "BodyWater": {
-      "label": {
-        "en": "Body water",
-        "ru": "Вода в организме"
-      },
-      "unit": "%",
-      "direction": null,
-      "group": "anthro",
-      "why": {
-        "en": "hydration/composition; typical range differs by sex (men ~55–60%)",
-        "ru": "гидратация/состав; типичный диапазон зависит от пола (муж. ~55–60%)"
-      }
-    },
-    "VO2Max": {
-      "label": {
-        "en": "VO₂max",
-        "ru": "МПК (VO₂max)"
-      },
-      "unit": {
-        "en": "mL/kg/min",
-        "ru": "мл/кг/мин"
-      },
-      "direction": "higher_better",
-      "target_low": 40,
-      "group": "activity",
-      "why": {
-        "en": "cardiorespiratory fitness — one of the strongest predictors of longevity",
-        "ru": "кардиореспираторная выносливость — один из сильнейших предикторов долголетия"
-      }
-    },
-    "StepsDaily": {
-      "label": {
-        "en": "Steps per day",
-        "ru": "Шаги в день"
-      },
-      "unit": {
-        "en": "steps",
-        "ru": "шаг"
-      },
-      "direction": "higher_better",
-      "target_low": 8000,
-      "group": "activity",
-      "why": {
-        "en": "baseline activity — prevention of insulin resistance; the target is 8–10k",
-        "ru": "базовая активность — профилактика инсулинорезистентности; цель 8–10к"
-      }
-    },
-    "IntensityMinutesDaily": {
-      "label": {
-        "en": "Intensity minutes",
-        "ru": "Интенсивные минуты"
-      },
-      "unit": {
-        "en": "min/day",
-        "ru": "мин/день"
-      },
-      "direction": "higher_better",
-      "target_low": 21,
-      "group": "activity",
-      "why": {
-        "en": "structured exercise (WHO: ≥150 min/week of moderate ≈ 21/day)",
-        "ru": "структурная нагрузка (ВОЗ: ≥150 мин/нед умеренной ≈ 21/день)"
-      }
-    },
-    "CaloriesDaily": {
-      "label": {
-        "en": "Calories burned",
-        "ru": "Расход калорий"
-      },
-      "unit": {
-        "en": "kcal/day",
-        "ru": "ккал/день"
-      },
-      "direction": null,
-      "group": "activity",
-      "why": {
-        "en": "total daily energy expenditure — depends on activity and body mass",
-        "ru": "суммарный дневной расход энергии — зависит от активности и массы"
-      }
-    },
-    "RestingHeartRate": {
-      "label": {
-        "en": "Resting heart rate",
-        "ru": "Пульс покоя"
-      },
-      "unit": {
-        "en": "bpm",
-        "ru": "уд/мин"
-      },
-      "direction": "lower_better",
-      "target_high": 60,
-      "group": "recovery",
-      "why": {
-        "en": "lower is better fitness and autonomic balance",
-        "ru": "ниже — лучше тренированность и вегетативный баланс"
-      }
-    },
-    "HRV": {
-      "label": {
-        "en": "HRV (rMSSD)",
-        "ru": "ВСР (rMSSD)"
-      },
-      "unit": {
-        "en": "ms",
-        "ru": "мс"
-      },
-      "direction": "higher_better",
-      "target_low": 40,
-      "group": "recovery",
-      "why": {
-        "en": "higher is better recovery, stress resilience and autonomic balance",
-        "ru": "выше — лучше восстановление, стрессоустойчивость, вегетативный баланс"
-      }
-    },
-    "SleepHours": {
-      "label": {
-        "en": "Sleep",
-        "ru": "Сон"
-      },
-      "unit": {
-        "en": "h/night",
-        "ru": "ч/ночь"
-      },
-      "direction": "higher_better",
-      "target_low": 7,
-      "group": "recovery",
-      "why": {
-        "en": "short sleep worsens insulin resistance, hormones and recovery",
-        "ru": "недосып ухудшает инсулинорезистентность, гормоны, восстановление"
-      }
-    },
-    "Stress": {
-      "label": {
-        "en": "Stress (Garmin)",
-        "ru": "Стресс (Garmin)"
-      },
-      "unit": "0–100",
-      "direction": "lower_better",
-      "target_high": 40,
-      "group": "recovery",
-      "why": {
-        "en": "integral autonomic stress from HRV; lower is better recovery",
-        "ru": "интегральный вегетативный стресс по ВСР; ниже — лучше восстановление"
-      }
-    },
-    "BodyBatteryHigh": {
-      "label": {
-        "en": "Body Battery (peak)",
-        "ru": "Body Battery (пик)"
-      },
-      "unit": "0–100",
-      "direction": "higher_better",
-      "target_low": 70,
-      "group": "recovery",
-      "why": {
-        "en": "the daytime maximum of the energy reserve — higher when recovery is good",
-        "ru": "дневной максимум запаса энергии — выше при хорошем восстановлении"
-      }
-    },
-    "BodyBatteryLow": {
-      "label": {
-        "en": "Body Battery (minimum)",
-        "ru": "Body Battery (минимум)"
-      },
-      "unit": "0–100",
-      "direction": "higher_better",
-      "target_low": 20,
-      "group": "recovery",
-      "why": {
-        "en": "the daytime minimum — it should not fall too low (exhaustion)",
-        "ru": "дневной минимум — не должен падать слишком низко (истощение)"
-      }
-    },
-    "Respiration": {
-      "label": {
-        "en": "Resting respiration",
-        "ru": "Дыхание в покое"
-      },
-      "unit": {
-        "en": "breaths/min",
-        "ru": "вдох/мин"
-      },
-      "direction": "lower_better",
-      "target_high": 16,
-      "group": "recovery",
-      "why": {
-        "en": "the resting respiratory rate; lower usually = calmer autonomic tone",
-        "ru": "частота дыхания покоя; ниже обычно = спокойнее вегетатика"
-      }
-    },
-    "DeepSleepMin": {
-      "label": {
-        "en": "Deep sleep",
-        "ru": "Глубокий сон"
-      },
-      "unit": {
-        "en": "min/night",
-        "ru": "мин/ночь"
-      },
-      "direction": "higher_better",
-      "group": "recovery",
-      "why": {
-        "en": "the restorative stage: growth hormone, memory consolidation, immunity; it is the first to fall with age",
-        "ru": "восстановительная фаза: гормон роста, консолидация памяти, иммунитет; с возрастом снижается первой"
-      }
-    },
-    "RemSleepMin": {
-      "label": {
-        "en": "REM sleep",
-        "ru": "REM-сон"
-      },
-      "unit": {
-        "en": "min/night",
-        "ru": "мин/ночь"
-      },
-      "direction": "higher_better",
-      "group": "recovery",
-      "why": {
-        "en": "emotional regulation and memory",
-        "ru": "эмоциональная регуляция и память"
-      }
-    },
-    "SleepStress": {
-      "label": {
-        "en": "Sleep stress",
-        "ru": "Стресс во сне"
-      },
-      "unit": "0–100",
-      "direction": "lower_better",
-      "group": "recovery",
-      "why": {
-        "en": "autonomic activation at night; most strongly linked to the share of deep sleep",
-        "ru": "вегетативная активация ночью; сильнее всего связана с долей глубокого сна"
-      }
-    },
-    "SleepScore": {
-      "label": {
-        "en": "Sleep score (Garmin)",
-        "ru": "Оценка сна (Garmin)"
-      },
-      "unit": "0–100",
-      "direction": "higher_better",
-      "group": "recovery",
-      "why": {
-        "en": "the device's summary score: duration, stages, awakenings",
-        "ru": "сводная оценка прибора: длительность, фазы, пробуждения"
-      }
-    },
-    "Bedtime": {
-      "label": {
-        "en": "Bedtime",
-        "ru": "Время засыпания"
-      },
-      "unit": {
-        "en": "min after 20:00",
-        "ru": "мин от 20:00"
-      },
-      "direction": "lower_better",
-      "group": "recovery",
-      "why": {
-        "en": "by the owner's own data — the most reproducible lever on deep sleep",
-        "ru": "по собственным данным — самый воспроизводимый рычаг глубокого сна"
-      }
-    }
+  "BMI": {
+   "label": {
+    "en": "BMI",
+    "ru": "ИМТ"
+   },
+   "unit": "",
+   "direction": "lower_better",
+   "target_high": 25,
+   "group": "anthro",
+   "why": {
+    "en": "excess body mass strengthens insulin resistance",
+    "ru": "избыточная масса усиливает инсулинорезистентность"
+   }
+  },
+  "BodyFat": {
+   "label": {
+    "en": "Body fat",
+    "ru": "Жир"
+   },
+   "unit": "%",
+   "direction": "lower_better",
+   "target_high": 20,
+   "group": "anthro",
+   "why": {
+    "en": "visceral fat → ↓testosterone, ↑inflammation, insulin resistance",
+    "ru": "висцеральный жир → ↓тестостерон, ↑воспаление, инсулинорезистентность"
+   }
+  },
+  "MuscleMass": {
+   "label": {
+    "en": "Muscle mass",
+    "ru": "Мышечная масса"
+   },
+   "unit": {
+    "en": "kg",
+    "ru": "кг"
+   },
+   "direction": "higher_better",
+   "group": "anthro",
+   "why": {
+    "en": "keeping/building muscle while losing weight is metabolically protective",
+    "ru": "сохранять/растить мышцы при похудении — метаболически защищает"
+   }
+  },
+  "BodyWater": {
+   "label": {
+    "en": "Body water",
+    "ru": "Вода в организме"
+   },
+   "unit": "%",
+   "direction": null,
+   "group": "anthro",
+   "why": {
+    "en": "hydration/composition; typical range differs by sex (men ~55–60%)",
+    "ru": "гидратация/состав; типичный диапазон зависит от пола (муж. ~55–60%)"
+   }
+  },
+  "VO2Max": {
+   "label": {
+    "en": "VO₂max",
+    "ru": "МПК (VO₂max)"
+   },
+   "unit": {
+    "en": "mL/kg/min",
+    "ru": "мл/кг/мин"
+   },
+   "direction": "higher_better",
+   "target_low": 40,
+   "group": "activity",
+   "why": {
+    "en": "cardiorespiratory fitness — one of the strongest predictors of longevity",
+    "ru": "кардиореспираторная выносливость — один из сильнейших предикторов долголетия"
+   }
+  },
+  "StepsDaily": {
+   "label": {
+    "en": "Steps per day",
+    "ru": "Шаги в день"
+   },
+   "unit": {
+    "en": "steps",
+    "ru": "шаг"
+   },
+   "direction": "higher_better",
+   "target_low": 8000,
+   "group": "activity",
+   "why": {
+    "en": "baseline activity — prevention of insulin resistance; the target is 8–10k",
+    "ru": "базовая активность — профилактика инсулинорезистентности; цель 8–10к"
+   }
+  },
+  "IntensityMinutesDaily": {
+   "label": {
+    "en": "Intensity minutes",
+    "ru": "Интенсивные минуты"
+   },
+   "unit": {
+    "en": "min/day",
+    "ru": "мин/день"
+   },
+   "direction": "higher_better",
+   "target_low": 21,
+   "group": "activity",
+   "why": {
+    "en": "structured exercise (WHO: ≥150 min/week of moderate ≈ 21/day)",
+    "ru": "структурная нагрузка (ВОЗ: ≥150 мин/нед умеренной ≈ 21/день)"
+   }
+  },
+  "CaloriesDaily": {
+   "label": {
+    "en": "Calories burned",
+    "ru": "Расход калорий"
+   },
+   "unit": {
+    "en": "kcal/day",
+    "ru": "ккал/день"
+   },
+   "direction": null,
+   "group": "activity",
+   "why": {
+    "en": "total daily energy expenditure — depends on activity and body mass",
+    "ru": "суммарный дневной расход энергии — зависит от активности и массы"
+   }
+  },
+  "RestingHeartRate": {
+   "label": {
+    "en": "Resting heart rate",
+    "ru": "Пульс покоя"
+   },
+   "unit": {
+    "en": "bpm",
+    "ru": "уд/мин"
+   },
+   "direction": "lower_better",
+   "target_high": 60,
+   "group": "recovery",
+   "why": {
+    "en": "lower is better fitness and autonomic balance",
+    "ru": "ниже — лучше тренированность и вегетативный баланс"
+   }
+  },
+  "HRV": {
+   "label": {
+    "en": "HRV (rMSSD)",
+    "ru": "ВСР (rMSSD)"
+   },
+   "unit": {
+    "en": "ms",
+    "ru": "мс"
+   },
+   "direction": "higher_better",
+   "target_low": 40,
+   "group": "recovery",
+   "why": {
+    "en": "higher is better recovery, stress resilience and autonomic balance",
+    "ru": "выше — лучше восстановление, стрессоустойчивость, вегетативный баланс"
+   }
+  },
+  "SleepHours": {
+   "label": {
+    "en": "Sleep",
+    "ru": "Сон"
+   },
+   "unit": {
+    "en": "h/night",
+    "ru": "ч/ночь"
+   },
+   "direction": "higher_better",
+   "target_low": 7,
+   "group": "recovery",
+   "why": {
+    "en": "short sleep worsens insulin resistance, hormones and recovery",
+    "ru": "недосып ухудшает инсулинорезистентность, гормоны, восстановление"
+   }
+  },
+  "Stress": {
+   "label": {
+    "en": "Stress (Garmin)",
+    "ru": "Стресс (Garmin)"
+   },
+   "unit": "0–100",
+   "direction": "lower_better",
+   "target_high": 40,
+   "group": "recovery",
+   "why": {
+    "en": "integral autonomic stress from HRV; lower is better recovery",
+    "ru": "интегральный вегетативный стресс по ВСР; ниже — лучше восстановление"
+   }
+  },
+  "BodyBatteryHigh": {
+   "label": {
+    "en": "Body Battery (peak)",
+    "ru": "Body Battery (пик)"
+   },
+   "unit": "0–100",
+   "direction": "higher_better",
+   "target_low": 70,
+   "group": "recovery",
+   "why": {
+    "en": "the daytime maximum of the energy reserve — higher when recovery is good",
+    "ru": "дневной максимум запаса энергии — выше при хорошем восстановлении"
+   }
+  },
+  "BodyBatteryLow": {
+   "label": {
+    "en": "Body Battery (minimum)",
+    "ru": "Body Battery (минимум)"
+   },
+   "unit": "0–100",
+   "direction": "higher_better",
+   "target_low": 20,
+   "group": "recovery",
+   "why": {
+    "en": "the daytime minimum — it should not fall too low (exhaustion)",
+    "ru": "дневной минимум — не должен падать слишком низко (истощение)"
+   }
+  },
+  "Respiration": {
+   "label": {
+    "en": "Resting respiration",
+    "ru": "Дыхание в покое"
+   },
+   "unit": {
+    "en": "breaths/min",
+    "ru": "вдох/мин"
+   },
+   "direction": "lower_better",
+   "target_high": 16,
+   "group": "recovery",
+   "why": {
+    "en": "the resting respiratory rate; lower usually = calmer autonomic tone",
+    "ru": "частота дыхания покоя; ниже обычно = спокойнее вегетатика"
+   }
+  },
+  "DeepSleepMin": {
+   "label": {
+    "en": "Deep sleep",
+    "ru": "Глубокий сон"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": "higher_better",
+   "group": "recovery",
+   "why": {
+    "en": "the restorative stage: growth hormone, memory consolidation, immunity; it is the first to fall with age",
+    "ru": "восстановительная фаза: гормон роста, консолидация памяти, иммунитет; с возрастом снижается первой"
+   }
+  },
+  "RemSleepMin": {
+   "label": {
+    "en": "REM sleep",
+    "ru": "REM-сон"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": "higher_better",
+   "group": "recovery",
+   "why": {
+    "en": "emotional regulation and memory",
+    "ru": "эмоциональная регуляция и память"
+   }
+  },
+  "SleepStress": {
+   "label": {
+    "en": "Sleep stress",
+    "ru": "Стресс во сне"
+   },
+   "unit": "0–100",
+   "direction": "lower_better",
+   "group": "recovery",
+   "why": {
+    "en": "autonomic activation at night; most strongly linked to the share of deep sleep",
+    "ru": "вегетативная активация ночью; сильнее всего связана с долей глубокого сна"
+   }
+  },
+  "SleepScore": {
+   "label": {
+    "en": "Sleep score (Garmin)",
+    "ru": "Оценка сна (Garmin)"
+   },
+   "unit": "0–100",
+   "direction": "higher_better",
+   "group": "recovery",
+   "why": {
+    "en": "the device's summary score: duration, stages, awakenings",
+    "ru": "сводная оценка прибора: длительность, фазы, пробуждения"
+   }
+  },
+  "Bedtime": {
+   "label": {
+    "en": "Bedtime",
+    "ru": "Время засыпания"
+   },
+   "unit": {
+    "en": "min after 20:00",
+    "ru": "мин от 20:00"
+   },
+   "direction": "lower_better",
+   "group": "recovery",
+   "why": {
+    "en": "by the owner's own data — the most reproducible lever on deep sleep",
+    "ru": "по собственным данным — самый воспроизводимый рычаг глубокого сна"
+   }
+  },
+  "Recovery": {
+   "label": {
+    "en": "Recovery (WHOOP)",
+    "ru": "Восстановление (WHOOP)"
+   },
+   "unit": "0–100 %",
+   "direction": "higher_better",
+   "target_low": 67,
+   "group": "recovery",
+   "why": {
+    "en": "the device's own daily readiness score, built mainly from HRV and resting heart rate; a scale of one manufacturer and not comparable with another's",
+    "ru": "суточная готовность по версии самого прибора, считается в основном из ВСР и пульса покоя; шкала одного производителя и с чужой не сравнивается"
+   }
+  },
+  "DayStrain": {
+   "label": {
+    "en": "Day strain (WHOOP)",
+    "ru": "Нагрузка за день (WHOOP)"
+   },
+   "unit": "0–21",
+   "direction": null,
+   "group": "activity",
+   "why": {
+    "en": "cardiovascular load over the day on the manufacturer's own logarithmic scale; neither high nor low is good by itself — it is read against recovery",
+    "ru": "сердечно-сосудистая нагрузка за сутки по логарифмической шкале производителя; сама по себе ни высокая, ни низкая не «хорошая» — читается вместе с восстановлением"
+   }
+  },
+  "SleepPerformance": {
+   "label": {
+    "en": "Sleep performance (WHOOP)",
+    "ru": "Выполнение сна (WHOOP)"
+   },
+   "unit": "%",
+   "direction": "higher_better",
+   "target_low": 85,
+   "group": "recovery",
+   "why": {
+    "en": "how much of the sleep the device calculated as needed was actually slept",
+    "ru": "какая доля рассчитанной прибором потребности во сне действительно проспана"
+   }
+  },
+  "SleepEfficiency": {
+   "label": {
+    "en": "Sleep efficiency",
+    "ru": "Эффективность сна"
+   },
+   "unit": "%",
+   "direction": "higher_better",
+   "target_low": 85,
+   "group": "recovery",
+   "why": {
+    "en": "time asleep as a share of time in bed; a low value with enough time in bed points at fragmentation",
+    "ru": "доля сна от времени в постели; низкое значение при достаточном времени в постели указывает на фрагментацию"
+   }
+  },
+  "SleepDebt": {
+   "label": {
+    "en": "Sleep debt",
+    "ru": "Дефицит сна"
+   },
+   "unit": {
+    "en": "min",
+    "ru": "мин"
+   },
+   "direction": "lower_better",
+   "target_high": 60,
+   "group": "recovery",
+   "why": {
+    "en": "accumulated shortfall against the need the device calculated",
+    "ru": "накопленная недостача против рассчитанной прибором потребности"
+   }
+  },
+  "SleepConsistency": {
+   "label": {
+    "en": "Sleep consistency",
+    "ru": "Постоянство сна"
+   },
+   "unit": "%",
+   "direction": "higher_better",
+   "target_low": 70,
+   "group": "recovery",
+   "why": {
+    "en": "how close bedtime and wake time stay from night to night; the strongest single lever on the rest of this group",
+    "ru": "насколько совпадают время отхода ко сну и подъёма от ночи к ночи; самый сильный одиночный рычаг для всей этой группы"
+   }
+  },
+  "LightSleepMin": {
+   "label": {
+    "en": "Light sleep",
+    "ru": "Лёгкий сон"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": null,
+   "group": "recovery",
+   "why": {
+    "en": "the remainder of the night once deep and REM are counted; read as a share rather than as a target of its own",
+    "ru": "остаток ночи после глубокого и REM; читается долей, а не собственной целью"
+   }
+  },
+  "AwakeMin": {
+   "label": {
+    "en": "Awake after falling asleep",
+    "ru": "Бодрствование после засыпания"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": "lower_better",
+   "target_high": 40,
+   "group": "recovery",
+   "why": {
+    "en": "fragmentation: time awake between falling asleep and rising, which a total duration hides completely",
+    "ru": "фрагментация: время бодрствования между засыпанием и подъёмом, которое общая длительность скрывает полностью"
+   }
+  },
+  "TimeInBedMin": {
+   "label": {
+    "en": "Time in bed",
+    "ru": "Время в постели"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": null,
+   "group": "recovery",
+   "why": {
+    "en": "the denominator of sleep efficiency; long time in bed with short sleep is a different problem from short time in bed",
+    "ru": "знаменатель эффективности сна; много времени в постели при коротком сне — это другая проблема, чем мало времени в постели"
+   }
+  },
+  "SleepNeedMin": {
+   "label": {
+    "en": "Sleep need (WHOOP)",
+    "ru": "Потребность во сне (WHOOP)"
+   },
+   "unit": {
+    "en": "min/night",
+    "ru": "мин/ночь"
+   },
+   "direction": null,
+   "group": "recovery",
+   "why": {
+    "en": "what the device calculated as needed that night, from baseline plus debt plus the day's load; a manufacturer's model, not a physiological constant",
+    "ru": "сколько прибор рассчитал нужным в эту ночь из базиса, дефицита и дневной нагрузки; модель производителя, а не физиологическая константа"
+   }
+  },
+  "BloodOxygen": {
+   "label": {
+    "en": "Blood oxygen (at night)",
+    "ru": "Кислород крови (ночью)"
+   },
+   "unit": "%",
+   "direction": "higher_better",
+   "target_low": 95,
+   "group": "recovery",
+   "why": {
+    "en": "a wrist estimate rather than an oximeter reading; a persistently low night-time value is a reason for a proper measurement, not a conclusion",
+    "ru": "оценка с запястья, а не показание оксиметра; стойко низкие ночные значения — повод для нормального измерения, а не вывод"
+   }
+  },
+  "SkinTemp": {
+   "label": {
+    "en": "Skin temperature",
+    "ru": "Температура кожи"
+   },
+   "unit": "°C",
+   "direction": null,
+   "group": "recovery",
+   "why": {
+    "en": "skin, not core: useful as a deviation from one's own baseline and meaningless as an absolute number",
+    "ru": "кожи, а не тела: полезна как отклонение от собственного базиса и бессмысленна как абсолютное число"
+   }
   }
+ },
+ "sources": {
+  "whoop": {
+   "_note": "Column headers of the WHOOP data export, as observed in exports. WHOOP does not publish this schema, so it is kept as data rather than as code: a header that is not listed here is reported by name and nothing is read from it, and a person whose export differs can add a line locally instead of waiting for a release. `read` names the conversion: number — as printed; minutes_to_hours; clock_to_minutes_after_2000 — a local clock time as minutes from 20:00. Checked against a real export published by a member: every header below was present in it, and the headers it had that are not measurements are listed under `structural`.",
+   "files": [
+    "physiological_cycles",
+    "sleeps",
+    "workouts"
+   ],
+   "not_read": {
+    "journal_entries": "free-text behaviour log written by the person, not a measurement — it is left alone rather than averaged"
+   },
+   "structural": [
+    "Cycle start time",
+    "Cycle end time",
+    "Cycle timezone",
+    "Wake onset",
+    "Nap",
+    "Workout start time",
+    "Workout end time",
+    "Duration (min)",
+    "Activity name",
+    "Activity Strain",
+    "Max HR (bpm)",
+    "Average HR (bpm)",
+    "HR Zone 1 %",
+    "HR Zone 2 %",
+    "HR Zone 3 %",
+    "HR Zone 4 %",
+    "HR Zone 5 %",
+    "GPS enabled",
+    "Distance (meters)",
+    "Altitude gain (meters)",
+    "Altitude change (meters)",
+    "Question text",
+    "Answered yes",
+    "Notes"
+   ],
+   "_structural_note": "Headers that are known and deliberately are NOT metrics: they carry the date a row belongs to, describe a workout, or answer a journal question. Naming them here is what keeps the report's list of unknown columns short enough to be worth reading — a list that cries about every timestamp is a list nobody looks at twice.",
+   "columns": {
+    "Recovery score %": {
+     "metric": "Recovery",
+     "read": "number"
+    },
+    "Resting heart rate (bpm)": {
+     "metric": "RestingHeartRate",
+     "read": "number"
+    },
+    "Heart rate variability (ms)": {
+     "metric": "HRV",
+     "read": "number"
+    },
+    "Skin temp (celsius)": {
+     "metric": "SkinTemp",
+     "read": "number"
+    },
+    "Blood oxygen %": {
+     "metric": "BloodOxygen",
+     "read": "number"
+    },
+    "Day Strain": {
+     "metric": "DayStrain",
+     "read": "number"
+    },
+    "Energy burned (cal)": {
+     "metric": "CaloriesDaily",
+     "read": "number"
+    },
+    "Respiratory rate (rpm)": {
+     "metric": "Respiration",
+     "read": "number"
+    },
+    "Asleep duration (min)": {
+     "metric": "SleepHours",
+     "read": "minutes_to_hours"
+    },
+    "Deep (SWS) duration (min)": {
+     "metric": "DeepSleepMin",
+     "read": "number"
+    },
+    "REM duration (min)": {
+     "metric": "RemSleepMin",
+     "read": "number"
+    },
+    "Sleep performance %": {
+     "metric": "SleepPerformance",
+     "read": "number"
+    },
+    "Sleep efficiency %": {
+     "metric": "SleepEfficiency",
+     "read": "number"
+    },
+    "Sleep debt (min)": {
+     "metric": "SleepDebt",
+     "read": "number"
+    },
+    "Sleep consistency %": {
+     "metric": "SleepConsistency",
+     "read": "number"
+    },
+    "Light sleep duration (min)": {
+     "metric": "LightSleepMin",
+     "read": "number"
+    },
+    "Awake duration (min)": {
+     "metric": "AwakeMin",
+     "read": "number"
+    },
+    "In bed duration (min)": {
+     "metric": "TimeInBedMin",
+     "read": "number"
+    },
+    "Sleep need (min)": {
+     "metric": "SleepNeedMin",
+     "read": "number"
+    },
+    "Sleep onset": {
+     "metric": "Bedtime",
+     "read": "clock_to_minutes_after_2000"
+    }
+   }
+  },
+  "garmin": {
+   "_note": "Garmin Connect GDPR export. Its parser reads the vendor's own JSON structure rather than a header row, so there is no column table here.",
+   "files": [
+    "DI_CONNECT"
+   ]
+  }
+ }
 }

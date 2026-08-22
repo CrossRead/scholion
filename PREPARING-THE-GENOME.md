@@ -55,10 +55,33 @@ routinely leave a path to a file they no longer have.
 | 248 956 422 | GRCh38 / hg38 |
 | 248 387 328 | T2T-CHM13v2.0 |
 
-**If the header says nothing**, the data are asked instead: a variant past the
+**If the header carries no lengths**, two weaker witnesses are tried in turn,
+and both say so when they answer. First, the signature the producing pipeline
+stamps into the header: a few providers name themselves and build against one
+reference only, and where the pipeline serves both builds — DRAGEN does — the
+signature counts only together with the reference path in the same header, since
+the provider's name alone settles nothing. Second, the `##reference=` line
+itself. `scholion genome-status` prints which of the four established the build,
+so an inferred one never looks like a measured one.
+
+**If nothing in the header answers**, the data are asked: a variant past the
 end of chromosome 1 in GRCh38 cannot exist in GRCh38, so finding one settles it.
 Finding none settles nothing, and that is reported as "not established" rather
 than assumed away.
+
+**Which reader is used can be pinned.** By default the strongest one present is
+chosen — `bcftools`, else `pysam`, else the reader that ships with the project.
+That makes the answer depend on what happens to be installed, which matters
+whenever two runs are being compared:
+
+```bash
+SCHOLION_GENOME_ENGINE=tabixlite scholion genome-status   # the path with nothing installed
+SCHOLION_GENOME_ENGINE=bcftools  scholion genome-status   # and the one with everything
+```
+
+A reader that is named and not installed, or a name that is not one of the
+three, is a refusal rather than a quiet fall back to another one: silently
+answering through a different reader is exactly what pinning exists to prevent.
 
 **Three ways to settle it yourself**, cheapest first:
 

@@ -74,8 +74,13 @@ def lifestyle() -> Dict[str, Any]:
     data = core.wearable_trends()
     meta = core.wearable_metrics()
     mm = meta.get("metrics", {})
-    # Garmin schema: the metrics are in data["metrics"]; the old Apple schema — flat in data.
-    msrc = data.get("metrics") if isinstance(data.get("metrics"), dict) else data
+    # One block per device. A file written before there was more than one is
+    # brought to this shape on read, and the device it is filed under is taken
+    # from what that file says about itself — never assumed.
+    from .. import wearables
+    blocks = wearables.series(data)
+    shared = wearables.shared_metrics(data)
+    primary = core.wearable_primary()
     def _life_metric(key, info, sd, since=None):
         """A metric from a monthly series {YYYY-MM: value}: 3-month smoothing, trend, status.
 
@@ -127,9 +132,21 @@ def lifestyle() -> Dict[str, Any]:
     cmp_from = (data.get("_meta") or {}).get("comparable_from") or {}
     out = []
     for key in meta.get("order", list(mm.keys())):
-        sd = msrc.get(key)
-        if isinstance(sd, dict) and sd:
-            out.append(_life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key)))
+        for src, block in blocks:
+            sd = (block.get("metrics") or {}).get(key)
+            if not (isinstance(sd, dict) and sd):
+                continue
+            m = _life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key))
+            m["source"] = src
+            others = [s for s in shared.get(key, []) if s != src]
+            m["also_measured_by"] = others
+            # Where two devices measured the same thing, one of them does not get
+            # to speak for both. Averaging them would invent a number nobody
+            # measured; picking silently would make the answer depend on which
+            # export was loaded last. So the series are both shown, and the
+            # CONCLUSION is drawn only from the device the person named.
+            m["counts_toward_conclusions"] = (not others) or (primary == src)
+            out.append(m)
     # manual markers from metrics.json that are NOT in Garmin (e.g. waist/measurements) — also with a trend
     _SKIP = {"weight", "steps", "resting_hr", "sleep_hours", "activity_min"}   # covered by Garmin
     for mk, marker in (core.metrics_json().get("metrics", {}) or {}).items():
@@ -148,12 +165,25 @@ def lifestyle() -> Dict[str, Any]:
         info = {"label": marker.get("name", mk), "unit": marker.get("unit", ""),
                 "direction": direction, "group": "anthro", "why": marker.get("note", ""),
                 "target_high": marker.get("ref_high"), "target_low": marker.get("ref_low")}
-        out.append(_life_metric(mk, info, monthly))
+        man = _life_metric(mk, info, monthly)
+        man["source"] = None                      # written down by hand, not by a device
+        man["also_measured_by"] = []
+        man["counts_toward_conclusions"] = True
+        out.append(man)
     # workouts: totals by type + the last active year
     workouts = []
-    wnew = data.get("workouts")
+    # Sessions are counted per device on purpose: two straps worn on the same
+    # day are two records of one workout, and adding them would report a
+    # training volume nobody did.
+    wnew = {}
+    for _src, _block in blocks:
+        for _yr, _types in (_block.get("workouts") or {}).items():
+            if isinstance(_types, dict):
+                wnew.setdefault(_yr, {}).update({f"{_t2}": _v for _t2, _v in _types.items()}
+                                                if len(blocks) == 1 else
+                                                {f"{_t2} · {_src}": _v for _t2, _v in _types.items()})
     wold = data.get("Workouts")
-    if isinstance(wnew, dict):
+    if isinstance(wnew, dict) and wnew:
         # Garmin: {year: {label: {count, hours}}} → aggregated by label
         agg: Dict[str, Dict[str, Any]] = {}
         for yr, types in wnew.items():
@@ -178,14 +208,15 @@ def lifestyle() -> Dict[str, Any]:
             ly = max(yrs.keys())
             workouts.append({"type": typ, "total": sum(yrs.values()), "last_year": ly, "last_count": yrs.get(ly)})
         workouts.sort(key=lambda x: -x["total"])
-    scored = [m["score"] for m in out if m.get("score") is not None]
+    scored = [m["score"] for m in out
+              if m.get("score") is not None and m.get("counts_toward_conclusions", True)]
     fitness = round(sum(scored) / len(scored)) if scored else None
 
     # conclusions for the strategy (metabolic syndrome: bring weight/fat down, raise activity,
     # keep muscle, improve recovery) — from the 3-month trend of the key metrics
     _KEY = ("Weight", "BodyFat", "MuscleMass", "VO2Max", "IntensityMinutesDaily",
             "StepsDaily", "HRV", "BodyBatteryHigh", "RestingHeartRate")
-    by_key = {m["key"]: m for m in out}
+    by_key = {m["key"]: m for m in out if m.get("counts_toward_conclusions", True)}
     good, watch = [], []
     for k in _KEY:
         lbl = _t(f"lifestyle.metric.{k}")
@@ -200,8 +231,16 @@ def lifestyle() -> Dict[str, Any]:
         elif m.get("trend_good") is False:
             watch.append(item)
     conclusions = {"good": good, "watch": watch}
+    unresolved = sorted(k for k, srcs in shared.items() if primary not in srcs)
     return {"metrics": out, "workouts": workouts[:14], "fitness_score": fitness,
-            "conclusions": conclusions, "disclaimer": DISCLAIMER()}
+            "conclusions": conclusions,
+            "sources": [s for s, _ in blocks], "primary_source": primary,
+            "shared_metrics": {k: v for k, v in sorted(shared.items())},
+            # Metrics two devices both report while nobody has said which one
+            # answers: they are shown and they are excluded from every
+            # conclusion, and this is the list a caller prints to say so.
+            "shared_unresolved": unresolved,
+            "disclaimer": DISCLAIMER()}
 
 
 def _prev_point(series) -> Optional[Dict[str, Any]]:

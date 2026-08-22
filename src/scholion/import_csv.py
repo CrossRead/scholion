@@ -148,7 +148,8 @@ def run(path: str, dry_run: bool = False) -> Dict[str, Any]:
 
     for r in res["rows"]:
         w = store.add_lab_point(r["key"], r["date"], r["value"], unit=r["unit"] or None,
-                                ref_low=r["ref_low"], ref_high=r["ref_high"])
+                                ref_low=r["ref_low"], ref_high=r["ref_high"],
+                                date_source="manual", subject="owner")
         if not w.get("ok"):
             # Should be unreachable — preview ran the same gates. If it happens,
             # it is a divergence between the check and the write, and saying so is

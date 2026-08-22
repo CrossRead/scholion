@@ -130,8 +130,17 @@ def _personal_move(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     sig = abs(delta_pct) >= MOVE_MIN_PCT
     if sd is not None and sd > 0:
         sig = sig and abs(v - base) >= MOVE_MIN_SD * sd
+    # Task 100. A shift is the one place where an inexact date stops being a
+    # cell in a table and becomes a statement. If any point of the series was
+    # dated by the day the tests were ORDERED, or by the name of the file, the
+    # claim «this moved between A and B» rests partly on a date the form never
+    # printed, and it has to say so.
+    from ..store import DATE_APPROXIMATE
+    approx = sorted({str(p.get("date"))[:10] for p in series
+                     if p.get("date_source") in DATE_APPROXIMATE})
     return {"baseline": round(base, 4), "points": n, "delta_pct": round(delta_pct, 1),
-            "significant": bool(sig), "direction": "up" if v > base else ("down" if v < base else "flat")}
+            "significant": bool(sig), "approximate_dates": approx,
+            "direction": "up" if v > base else ("down" if v < base else "flat")}
 
 
 def _threshold_value(key: str, t: Dict[str, Any]) -> Dict[str, Any]:
@@ -404,6 +413,11 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         results.append({
             "key": k, "name": m["name"], "unit": m.get("unit", ""),
             "value": latest["value"], "date": latest["date"],
+            # Task 100. Where this point's DATE came from. Carried beside the
+            # date rather than left in the file, because a field the report never
+            # reads is a field that does not exist — `ref_sex_unknown` was
+            # computed for months and read by nobody.
+            "date_source": latest.get("date_source") or "unrecorded",
             "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
             "flag": flag, "abnormal": abnormal, "direction_pref": direction_pref,
             "repeats": _reps,
@@ -453,6 +467,9 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             nl["movement"] = _t("near.no_history")
         elif mv["significant"] and ((nl["side"] == "high" and mv["direction"] == "up") or
                                     (nl["side"] == "low" and mv["direction"] == "down")):
+            if mv.get("approximate_dates"):
+                nl["date_caveat"] = _t("near.moved_approximate_date",
+                                       dates=", ".join(mv["approximate_dates"][:3]))
             nl["movement"] = _t("near.moved_from_baseline", delta=f"{mv['delta_pct']:+g}",
                                 baseline=f"{mv['baseline']:g}")
         else:

@@ -7,9 +7,14 @@ is enough to catch a reintroduction of the exact unescaped interpolation.
 """
 from __future__ import annotations
 
+import http.server
 import io
 import os
 import pathlib
+import shutil
+import ssl
+import subprocess
+import tempfile
 import threading
 import unittest
 
@@ -36,6 +41,55 @@ class TestDiagnoseIsNotAnOpenProxy(unittest.TestCase):
     def test_a_real_reference_host_passes_the_gate(self):
         self.assertTrue(net._diag_url_ok("https://rxnav.nlm.nih.gov/REST/version.json"))
         self.assertTrue(net._diag_url_ok("https://rest.ensembl.org/x"))
+
+    def test_a_redirect_from_an_allowed_host_is_not_followed(self):
+        """The allowlist checks scheme and host, not path or query — and `urlopen`
+        follows redirects by default, so an allowed host redirecting elsewhere
+        would land the request on a host that was never checked. A local HTTPS
+        server standing in for an allowed host, answering only with a redirect,
+        proves the request stops there rather than continuing."""
+        if not shutil.which("openssl"):
+            self.skipTest("openssl is needed to make a test certificate")
+
+        tmp = tempfile.mkdtemp(prefix="scholion-diag-redirect-")
+        cert, key = os.path.join(tmp, "cert.pem"), os.path.join(tmp, "key.pem")
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048",
+                        "-keyout", key, "-out", cert, "-days", "1", "-nodes",
+                        "-subj", "/CN=localhost"],
+                       check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                       stdin=subprocess.DEVNULL)
+
+        class _Redirector(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(302)
+                self.send_header("Location", "https://internal.example.invalid/pwned")
+                self.end_headers()
+
+            def log_message(self, *a):
+                pass
+
+        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.load_cert_chain(cert, key)
+        srv = http.server.HTTPServer(("127.0.0.1", 0), _Redirector)
+        srv.socket = ctx.wrap_socket(srv.socket, server_side=True)
+        port = srv.server_address[1]
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+
+        old_hosts = net._DIAG_HOSTS
+        old_offline = os.environ.pop("SCHOLION_OFFLINE", None)
+        net._DIAG_HOSTS = old_hosts | {"127.0.0.1"}
+        try:
+            r = net.diagnose(f"https://127.0.0.1:{port}/")
+        finally:
+            net._DIAG_HOSTS = old_hosts
+            if old_offline is not None:
+                os.environ["SCHOLION_OFFLINE"] = old_offline
+            srv.shutdown()
+            srv.server_close()
+            shutil.rmtree(tmp, ignore_errors=True)
+
+        self.assertFalse(r.get("ok"), r)
+        self.assertIn("redirect", r.get("error", "").lower(), r)
 
 
 class TestTheWebEscaperClosesAttributes(unittest.TestCase):

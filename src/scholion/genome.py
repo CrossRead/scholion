@@ -12,6 +12,7 @@ from __future__ import annotations
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 import urllib.request
@@ -153,19 +154,49 @@ def vcf_candidates() -> List[Path]:
     return out
 
 
-def vcf_path() -> Optional[Path]:
-    """Path to the personal full VCF. env SCHOLION_GENOME_VCF, or a search in genome/.
-
-    Returns None when the folder holds MORE THAN ONE candidate. That is not a
-    failure to find a genome — `available()` reports it as an ambiguity with the
-    names in it — it is a refusal to answer as if the choice had been obvious.
-    """
+def _resolved_vcf() -> Optional[Path]:
+    """The file the search lands on, before it is asked whose it is."""
     env = os.environ.get("SCHOLION_GENOME_VCF")
     if env:
         p = Path(env).expanduser()
         return p if p.exists() else None
     hits = vcf_candidates()
     return hits[0] if len(hits) == 1 else None
+
+
+def not_ours() -> Optional[Dict[str, Any]]:
+    """Whether the genome found describes somebody other than this profile.
+
+    Task 102. The project can fetch a published reference genome so that the
+    genomic layer has something real to work on. It is a real genome of a real
+    other person, and next to the demonstration profile — a fictional third
+    person — it would produce a case belonging to nobody: this pharmacogenetic
+    genotype, that laboratory history, one report. The folder says whose the
+    file is (`SUBJECT.json`), the profile says whose its data are, and when the
+    two differ nothing is read.
+    """
+    from . import subject as _subject
+    p = _resolved_vcf()
+    return _subject.genome_conflict(p) if p is not None else None
+
+
+def vcf_path() -> Optional[Path]:
+    """Path to the personal full VCF. env SCHOLION_GENOME_VCF, or a search in genome/.
+
+    Returns None when the folder holds MORE THAN ONE candidate. That is not a
+    failure to find a genome — `available()` reports it as an ambiguity with the
+    names in it — it is a refusal to answer as if the choice had been obvious.
+
+    Returns None as well when the file belongs to a different person from the
+    profile (`not_ours`). The check sits HERE, in the one place every reader of
+    the genome passes through, rather than beside each conclusion: a caveat
+    printed next to an answer is read after the answer has been believed.
+    """
+    p = _resolved_vcf()
+    if p is None:
+        return None
+    from . import subject as _subject
+    return None if _subject.genome_conflict(p) else p
 
 
 @lru_cache(maxsize=8)
@@ -219,6 +250,55 @@ _REFERENCE_HINTS = (
     ("grch37", "GRCh37"), ("hg19", "GRCh37"), ("b37", "GRCh37"), ("hs37", "GRCh37"),
     ("chm13", "T2T-CHM13v2.0"), ("t2t", "T2T-CHM13v2.0"),
 )
+
+#: What a provider's own pipeline stamps into the header, and which build that
+#: pipeline calls against. Task 75.
+#:
+#: This is the third-weakest evidence there is and it exists for one narrow,
+#: real class: an exome or a panel whose header carries no `##contig` lengths
+#: and whose data hold no variant past the end of chromosome 1 — nothing to
+#: measure and nothing to probe. On a whole genome none of this is reached,
+#: because the probe settles it from the data.
+#:
+#: Two rules make it evidence rather than a guess, and both are enforced by
+#: `tests/test_a_provider_signature_names_a_build.py`:
+#:
+#:   * **every requirement must be present.** A signature that recognises only
+#:     the PROVIDER answers nothing: DRAGEN runs against either build, so the
+#:     Dante Labs entry demands the reference path as well, and it is the path
+#:     that carries the build.
+#:   * **every entry says why in prose.** «Sequencing.com → GRCh38» is a claim
+#:     about what that service ships, and a claim nobody wrote down is one
+#:     nobody can check when it stops being true.
+#:
+#: What is deliberately NOT here: «an array is GRCh37 by default». That is the
+#: silent default this whole layer exists to remove — a genotyping array with
+#: no evidence of its build gets `None`, and the genomic layer stays off.
+_PROVIDER_SIGNATURES = (
+    {"provider": "Sequencing.com", "assembly": "GRCh38",
+     "needs": (r"##(source|dataAnalysisProvider)=Sequencing\.com",),
+     "why": "the service builds against GRCh38 only, and stamps its own name into the header",
+     "sample": "##dataAnalysisProvider=Sequencing.com"},
+    {"provider": "Dante Labs (DRAGEN)", "assembly": "GRCh37",
+     "needs": (r"##DRAGENCommandLine=<ID=dragen", r"##reference=\S*grch37\S*"),
+     "why": ("DRAGEN runs against either build, so the provider alone settles nothing; "
+             "the reference path in the same header is what names GRCh37"),
+     "sample": ("##DRAGENCommandLine=<ID=dragen,Version=\"05.021\">\n"
+                "##reference=file:///references/grch37/reference.bin")},
+    {"provider": "Nebula Genomics (MegaBOLT)", "assembly": "GRCh38",
+     "needs": (r"MegaBOLT_scheduler",),
+     "why": "the MegaBOLT pipeline this provider runs is aligned to GRCh38",
+     "sample": "##commandline=MegaBOLT_scheduler --runtype WGS"},
+)
+
+
+def _signature_assembly(head: str) -> Optional[Dict[str, str]]:
+    """The provider signature this header carries, if every requirement is met."""
+    for sig in _PROVIDER_SIGNATURES:
+        if all(re.search(pat, head, re.I) for pat in sig["needs"]):
+            return {"assembly": sig["assembly"], "provider": sig["provider"],
+                    "why": sig["why"]}
+    return None
 
 
 def _header_text(vcf: str, limit: int = 4000) -> str:
@@ -281,23 +361,38 @@ def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List
     return tabixlite.query(vcf, name, start, window=end - start)
 
 
-@lru_cache(maxsize=8)
-def assembly_of(vcf: str) -> Optional[str]:
-    """Which reference build this file was called against, or None if it cannot be told.
+#: How a build was established, weakest last. The order is the ranking: a fact
+#: about the reference beats a claim in a header, and a claim beats an inference
+#: about whoever produced the file.
+ASSEMBLY_EVIDENCE = ("declared", "contig_length", "provider_signature",
+                     "reference_line", "probe")
 
-    None is a real answer and must not be turned into a guess. A file whose header
-    carries no contig lengths and no reference line tells us nothing, and refusing
-    on nothing is the same mistake as answering on nothing.
+#: The two that are neither measured nor stated by the person. Everything shown
+#: about a file established this way says so.
+ASSEMBLY_WEAK = ("provider_signature", "reference_line")
+
+
+@lru_cache(maxsize=8)
+def assembly_evidence(vcf: str) -> Dict[str, Any]:
+    """Which build, and HOW that was established. `{"assembly": None}` if it cannot be.
+
+    Task 75 added the third step and, with it, the reason to return the step at
+    all. Four routes lead to the same word «GRCh37», and they are not the same
+    claim: a contig length is a fact about the reference, a `##reference=` line
+    is a path somebody wrote and may no longer own, and a provider signature is
+    an inference about the pipeline that made the file. Returning only the word
+    made the strongest and the weakest indistinguishable downstream.
     """
     # Declared by the person beats anything we can infer. Someone who knows which
     # build their file is in should be able to say so in one variable rather than
     # be told to rewrite the header of a fifty-gigabyte file.
     declared = os.environ.get("SCHOLION_GENOME_ASSEMBLY")
     if declared:
-        return declared.strip()
+        return {"assembly": declared.strip(), "how": "declared"}
     head = _header_text(vcf)
     if not head:
-        return _probe_assembly(vcf)
+        probed = _probe_assembly(vcf)
+        return {"assembly": probed, "how": "probe" if probed else None}
     for line in head.splitlines():
         if line.startswith("##contig=") and "length=" in line:
             try:
@@ -306,14 +401,44 @@ def assembly_of(vcf: str) -> Optional[str]:
                 continue
             hit = _LENGTH_TO_ASSEMBLY.get(length)
             if hit:
-                return hit
+                return {"assembly": hit, "how": "contig_length"}
+    # The provider signature goes BEFORE the reference line and after the contig
+    # lengths. Before, because a signature identifies the pipeline that actually
+    # produced the file, while a reference path is a string about somebody's
+    # disk; after, because a length cannot be edited into being wrong without
+    # also being a different reference.
+    sig = _signature_assembly(head)
+    if sig:
+        return {"assembly": sig["assembly"], "how": "provider_signature",
+                "provider": sig["provider"], "why": sig["why"]}
     for line in head.splitlines():
         if line.startswith("##reference="):
             low = line.lower()
             for needle, name in _REFERENCE_HINTS:
                 if needle in low:
-                    return name
-    return _probe_assembly(vcf)
+                    return {"assembly": name, "how": "reference_line",
+                            "detail": line.strip()[:200]}
+    probed = _probe_assembly(vcf)
+    return {"assembly": probed, "how": "probe" if probed else None}
+
+
+def assembly_of(vcf: str) -> Optional[str]:
+    """Which reference build this file was called against, or None if it cannot be told.
+
+    None is a real answer and must not be turned into a guess. A file whose header
+    carries no contig lengths, no signature and no reference line tells us nothing,
+    and refusing on nothing is the same mistake as answering on nothing.
+    """
+    return assembly_evidence(vcf).get("assembly")
+
+
+#: One cache, one way to clear it. This function used to be the cached one, and
+#: callers — tests among them — clear it by name. Keeping a SECOND cache here so
+#: that the old name still has a `cache_clear` of its own would leave two stores
+#: of the same answer, cleared separately: the project's own defect class, in the
+#: function that decides which coordinates a genome is read in.
+assembly_of.cache_clear = assembly_evidence.cache_clear                  # type: ignore[attr-defined]
+assembly_of.cache_info = assembly_evidence.cache_info                    # type: ignore[attr-defined]
 
 
 #: Which field of a locus holds its position in which build. The catalogue's own
@@ -446,6 +571,82 @@ _FOREIGN_INPUTS = (
 )
 
 
+def _peek_text(path: str, limit: int = 8192) -> str:
+    """The first few kilobytes of a file, whatever it is wrapped in.
+
+    By magic bytes, not by extension. The corpus contains a VCF called `.bz2`, a
+    VCF called `…vcf_5B1_5D.gz` (a provider URL-encoded the square brackets in
+    its own file name) and a VCF that somebody opened in a spreadsheet and saved
+    back with every header line in quotes. Not one of them can be recognised
+    from its name, and all three are ordinary readable data.
+    """
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(4)
+    except OSError:
+        return ""
+    try:
+        if head[:2] == b"\x1f\x8b":
+            import gzip as _gz
+            with _gz.open(path, "rb") as fh:
+                return fh.read(limit).decode("utf-8", "replace")
+        if head[:3] == b"BZh":
+            import bz2 as _bz
+            with _bz.open(path, "rb") as fh:
+                return fh.read(limit).decode("utf-8", "replace")
+        if head[:6] == b"\xfd7zXZ\x00":
+            import lzma as _xz
+            with _xz.open(path, "rb") as fh:
+                return fh.read(limit).decode("utf-8", "replace")
+        if head[:2] == b"PK":
+            import zipfile as _zip
+            with _zip.ZipFile(path) as zf:
+                names = [n for n in zf.namelist() if not n.endswith("/")]
+                if not names:
+                    return ""
+                # The biggest member: a provider archive also carries its README,
+                # and a README parses as nothing at all.
+                with zf.open(max(names, key=lambda n: zf.getinfo(n).file_size)) as fh:
+                    return fh.read(limit).decode("utf-8", "replace")
+        with open(path, "rb") as fh:
+            return fh.read(limit).decode("utf-8", "replace")
+    except Exception:
+        return ""
+
+
+def _sniff_kind(path: str) -> Optional[str]:
+    """Name a data file by what is inside it, when its name says nothing useful."""
+    text = _peek_text(path)
+    if not text:
+        return None
+    lines = [ln for ln in text.splitlines() if ln.strip()][:12]
+    if not lines:
+        return None
+    first = lines[0].lstrip("\ufeff")
+    if first.startswith("##fileformat=VCF") or first.startswith('"##fileformat=VCF'):
+        # A VCF that went through a spreadsheet: every header line comes back
+        # quoted and the commas inside descriptions are now field separators.
+        # That is a different repair from «recompress it», so it is a different
+        # sentence.
+        if any(ln.startswith('"##') for ln in lines[1:]):
+            return "vcf_spreadsheet"
+        return "vcf_compressed"
+    if any(ln.startswith("##FileFormat=Genos") or "##Columns=" in ln for ln in lines):
+        return "genotype_table"
+    # Complete Genomics shipped its own `var` table for years, and PGP is full of
+    # them. It is a variant call set — just not in anybody else's format — and
+    # the vendor's own converter turns it into a VCF in one command.
+    if any(ln.startswith(">locus") and "varType" in ln for ln in lines) or \
+            any("cgatools" in ln for ln in lines if ln.startswith("#")):
+        return "cg_var_table"
+    body = [ln for ln in lines if not ln.startswith(("#", '"#'))]
+    if body:
+        cells = body[0].split("\t")
+        if len(cells) >= 4 and cells[1].strip().isdigit():
+            return "variant_table"
+    return None
+
+
 def foreign_inputs() -> List[Dict[str, str]]:
     """Files in the genome folder that ARE genomic data and are not a readable VCF.
 
@@ -475,11 +676,20 @@ def foreign_inputs() -> List[Dict[str, str]]:
                 continue
             if low.endswith(".vcf.gz") or low.endswith(".vcf"):
                 continue
-            for suffixes, kind in _FOREIGN_INPUTS:
-                if any(low.endswith(s) for s in suffixes):
-                    seen.add(hit)
-                    out.append({"path": hit, "kind": kind})
-                    break
+            # The BYTES ARE ASKED FIRST, and the name only after them. A VCF
+            # zipped by its provider used to be called «an archive, not opened
+            # blind here» — true of the name and false of the file, which holds
+            # one member and that member is a VCF. Looking inside is not opening
+            # it blind; it is the opposite.
+            kind = _sniff_kind(hit)
+            if not kind:
+                for suffixes, k in _FOREIGN_INPUTS:
+                    if any(low.endswith(s) for s in suffixes):
+                        kind = k
+                        break
+            if kind:
+                seen.add(hit)
+                out.append({"path": hit, "kind": kind})
     return out
 
 
@@ -531,20 +741,79 @@ def _tbi_usable(vp, suffix: str = ".tbi") -> bool:
     return len(head) == 2 and head == b"\x1f\x8b"
 
 
+#: The three readers this project can put a genome through, strongest first.
+#: A closed vocabulary, because `SCHOLION_GENOME_ENGINE=bcftool` must not read
+#: as «no preference» — that is the silent default the pin exists to remove.
+ENGINES = ("bcftools", "pysam", "tabixlite")
+
+
+def engine_pin() -> Optional[str]:
+    """Which reader the person pinned, if any.
+
+    Task 78. Without this the reader is whichever happens to be installed
+    (`shutil.which("bcftools")`), and that is a property of the machine, not of
+    the project. It matters for one specific reason: the internal reference
+    test is run to measure what a NEW user gets — somebody with no external
+    tools, going through `tabixlite` — and on a machine that has bcftools the
+    same run silently measures the other path instead. The instrument was
+    reading a different scale from the one printed on it. With the pin the run
+    is made twice, once through each reader, and a disagreement between them is
+    itself a measurement.
+    """
+    v = (os.environ.get("SCHOLION_GENOME_ENGINE") or "").strip()
+    return v or None
+
+
+def engine_problem() -> Optional[Dict[str, str]]:
+    """Why a pinned reader cannot be used — a word nobody declared, or one that
+    is not installed here.
+
+    Both are refusals rather than fallbacks, and that is the whole point. Silently
+    ignoring the pin gives a run through a different reader than the one asked
+    for, which is exactly the state this was written to end — and it would do it
+    at the moment somebody is trying to measure carefully.
+    """
+    pin = engine_pin()
+    if pin is None:
+        return None
+    if pin not in ENGINES:
+        return {"reason": "engine_unknown", "value": pin,
+                "accepted": ", ".join(ENGINES)}
+    if pin == "bcftools" and shutil.which("bcftools") is None:
+        return {"reason": "engine_missing", "value": pin, "accepted": ""}
+    if pin == "pysam" and not _pysam_importable():
+        return {"reason": "engine_missing", "value": pin, "accepted": ""}
+    return None
+
+
 def _have_bcftools() -> bool:
+    pin = engine_pin()
+    if pin is not None and pin != "bcftools":
+        return False
     return shutil.which("bcftools") is not None
 
 
 def available() -> Dict[str, Any]:
     """Status of the genomic database, for the UI and the skill."""
     vp = vcf_path()
+    # Whose file it is, asked before why it cannot be read: a genome belonging to
+    # another person is not an unreadable one, and answering «no genome found»
+    # at it would send the reader to look for a file they are holding.
+    foreign_person = not_ours()
+    # A pin that cannot be honoured stops the layer instead of quietly moving to
+    # another reader: somebody who names a reader is measuring, and a measurement
+    # taken through the wrong instrument is worse than one not taken.
+    engine_bad = engine_problem()
     # The file is asked whether it can be read BEFORE anything is declared about
     # it. This order is the whole of task 64's third item: the check existed and
     # was skipped exactly when a reader was installed, which is almost always.
-    near = file_unreadable(vp) if vp is not None else unusable_nearby()
+    near = (file_unreadable(vp) if vp is not None else
+            (None if foreign_person else unusable_nearby()))
     if near is not None:
         vp = None
     engine = None
+    if engine_bad is not None:
+        vp = None
     if vp is not None and _index_usable(vp):
         engine = ("bcftools" if _have_bcftools() else
                   "pysam" if _have_pysam() else "tabixlite")
@@ -585,7 +854,20 @@ def available() -> Dict[str, Any]:
     # field that says what actually answered, and `limits` prints its ceiling.
     from . import array_genome as _arr
     arr = _arr.summary()
-    asm = assembly_of(str(vp)) if vp is not None else None
+    # A third class of input, and it earns its own name for the same reason the
+    # array does (task 89): a VCF that arrived in a container and a table of
+    # chosen positions are both readable, and neither is a seekable genome. The
+    # scan is only started when nothing better is present, because it is one pass
+    # over the whole file.
+    tab = {"available": False}
+    if vp is None and not arr.get("available"):
+        try:
+            from . import tabular_genome as _tab
+            tab = _tab.summary()
+        except Exception:
+            tab = {"available": False}
+    asm_ev = assembly_evidence(str(vp)) if vp is not None else {}
+    asm = asm_ev.get("assembly")
     want = catalogue_assembly()
     # A file in a build the catalogue carries coordinates for is NOT a mismatch.
     # It used to be: `loci.json` existed only in GRCh38, so seven of the eight
@@ -595,9 +877,19 @@ def available() -> Dict[str, Any]:
     asm_mismatch = bool(asm and asm not in served)
     ready = ((vp is not None and engine is not None and not asm_mismatch
               and ambiguous is None and chosen_i is not None)
-             or bool(arr.get("available")))
+             or bool(arr.get("available")) or bool(tab.get("available")))
     return {
         "unusable": near,
+        # Which reader answered, and whether it was chosen or merely available.
+        # Two runs of the reference test that name different readers are not
+        # comparable, and until this field existed nothing said which was which.
+        "engine_pinned": engine_pin(),
+        "engine_problem": engine_bad,
+        # Not a fault of the file and not an ambiguity: the file is readable and
+        # is somebody else's. It travels as its own field so that no consumer can
+        # fold it into «no genome» — which is the sentence that would let the two
+        # people quietly become one case.
+        "not_ours": foreign_person,
         # Which file, whose sample, and what else was lying beside it. Silence on
         # any of the three is what let «the first one alphabetically» pass for an
         # answer about a person.
@@ -608,6 +900,15 @@ def available() -> Dict[str, Any]:
         "ambiguous": ambiguous,
         "foreign": foreign,
         "assembly": asm,
+        # HOW the build was established, not only what it is. A build taken from
+        # a provider's signature or from a `##reference=` path is a weaker claim
+        # than one measured off a contig length, and the difference belongs where
+        # the answer is, not in a release note.
+        "assembly_how": asm_ev.get("how"),
+        "assembly_provider": asm_ev.get("provider"),
+        "assembly_why": asm_ev.get("why"),
+        "assembly_detail": asm_ev.get("detail"),
+        "assembly_weak": asm_ev.get("how") in ASSEMBLY_WEAK,
         "assembly_expected": want,
         # Which coordinate set will actually be used to read this file, and how
         # much of the catalogue is reachable that way. A build the catalogue only
@@ -625,10 +926,23 @@ def available() -> Dict[str, Any]:
         # A file that IS an array and could not be read is a third state, and it
         # has to be visible: `array: null` alone reads as «no array here».
         "array_unreadable": (arr.get("reason") == "array_unreadable"),
+        "tabular": tab if tab.get("available") else None,
+        # What is ACTUALLY in this file — measured, not assumed. `input_class`
+        # stays two-valued for everything already reading it; `input_profile` is
+        # the measured class, and that is the one deciding what may be promised.
+        "callset": (_callset_of(vp) if (vp is not None and engine is not None
+                                        and not asm_mismatch and ambiguous is None
+                                        and chosen_i is not None) else None),
+        "input_profile": ((_callset_of(vp) or {}).get("class")
+                          if (vp is not None and engine is not None and not asm_mismatch
+                              and ambiguous is None and chosen_i is not None)
+                          else ("array" if arr.get("available")
+                                else (tab.get("class") if tab.get("available") else None))),
         "input_class": ("sequenced" if (vp is not None and engine is not None
                                         and not asm_mismatch and ambiguous is None
                                         and chosen_i is not None)
-                        else ("array" if arr.get("available") else None)),
+                        else ("array" if arr.get("available")
+                              else ("tabular" if tab.get("available") else None))),
         "ready": ready,
         # One machine-readable word for «why not», so that the locus command and
         # the status command cannot tell a person two different stories about the
@@ -636,6 +950,9 @@ def available() -> Dict[str, Any]:
         "reason": (None if ready else
                    ((ambiguous or {}).get("reason") if ambiguous else
                     None) or (
+                    (engine_bad or {}).get("reason") if engine_bad else
+                    None) or (
+                    "another_person" if foreign_person else
                     "unreadable_file" if near else
                     "assembly_unsupported" if asm_mismatch else
                     "no_engine" if (vp is not None and engine is None) else
@@ -645,12 +962,40 @@ def available() -> Dict[str, Any]:
     }
 
 
-def _have_pysam() -> bool:
+#: Every value `available()["reason"]` can take. An explicit enumeration rather
+#: than a set of literals scattered through one conditional, because
+#: `tests/test_no_refusal_prints_a_key.py` has to be able to walk it: a reason
+#: added without a sentence is what printed ⟦genome.refused_head.not_on_chip⟧ at
+#: half the array owners in the reference corpus.
+REFUSAL_REASONS = (
+    "unreadable_file", "assembly_unsupported", "no_engine", "sample_not_chosen",
+    "foreign_input", "no_file", "several_files", "several_samples",
+    "sample_not_found", "another_person", "engine_unknown", "engine_missing",
+)
+
+
+def _callset_of(vp) -> Optional[Dict[str, Any]]:
+    """Measured contents of the chosen VCF; never raises into a status command."""
+    try:
+        from . import callset
+        return callset.measure(str(vp))
+    except Exception:
+        return None
+
+
+def _pysam_importable() -> bool:
     try:
         import pysam  # noqa: F401
         return True
     except Exception:
         return False
+
+
+def _have_pysam() -> bool:
+    pin = engine_pin()
+    if pin is not None and pin != "pysam":
+        return False
+    return _pysam_importable()
 
 
 @lru_cache(maxsize=8)
@@ -820,9 +1165,35 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not vp:
         from . import array_genome as _arr
         st = _arr.status(loc.get("rsid") or "")
-        if st.get("status") == "called":
-            return {"genotype": st["genotype"], "confidence": "called_array",
-                    "source": "array", "vendor": st.get("vendor"), "note": st.get("note")}
+        if st.get("status") in ("called", "called_strand_ambiguous"):
+            # A strand-ambiguous call used to fall through every branch here and
+            # return None, so the locus command answered «the genome file is
+            # there and cannot be read» over a chip that had called the position
+            # perfectly well. Task 1 asked for these six loci to carry a lowered
+            # status, not to vanish: among them are two DPYD markers that dose
+            # chemotherapy, and silence about them is the worst of the three
+            # possible answers. Found by the guard added for task 88.
+            return {"genotype": st["genotype"],
+                    "confidence": st.get("confidence") or "called_array",
+                    "source": "array", "vendor": st.get("vendor"),
+                    "strand_ambiguous": st.get("status") == "called_strand_ambiguous",
+                    "note": st.get("note")}
+        if st.get("status") == "no_array":
+            # Nothing on a chip either — but a VCF in a container or a genotype
+            # table may still be here, and it is READ rather than named (task 89).
+            try:
+                from . import tabular_genome as _tab
+                ts = _tab.status(loc.get("rsid") or "")
+            except Exception:
+                ts = {"status": "no_tabular"}
+            if ts.get("status") == "called":
+                return {"genotype": ts["genotype"],
+                        "confidence": ("called" if ts.get("source") == "container_vcf"
+                                       else "called_table"),
+                        "source": ts.get("source"), "note": ts.get("note")}
+            if ts.get("status") in ("no_call", "not_in_file", "assumed_ref_tabular"):
+                return {"genotype": None, "confidence": ts["status"],
+                        "source": ts.get("source"), "note": ts.get("note")}
         if st.get("status") in ("no_call", "not_on_chip", "array_unreadable"):
             # `array_unreadable` travels with the other two on purpose. It is not
             # «no array» — there IS a file and its vendor was recognised — and it
@@ -880,7 +1251,19 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 out["note"] += _t("genome.low_depth_suffix", depth=dp)
                 out["low_depth"] = True
             return out
+        # Task 87. «No row» means «read, and it matched the reference» only in a
+        # file that carries variants of that kind at all. A call set split by
+        # variant type never read a single substitution, and reporting the
+        # reference at one states something about the person from a property of
+        # the file.
+        from . import callset as _cs
+        _m = _cs.measure(str(vp))
+        if not _cs.answers_variant(_m, ref, loc.get("alt") or ""):
+            return {"genotype": None, "confidence": "not_in_this_callset", "source": "vcf",
+                    "assembly": asm, "read_pos": pos, "callset_class": _m.get("class"),
+                    "note": _t("genome.not_in_this_callset")}
         return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf",
+                "assembly": asm, "read_pos": pos,
                 "note": _t("genome.assumed_ref_note")}
     # take the first variant row at the position
     for f in lines:
@@ -893,11 +1276,21 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         sample = f[9 + col].split(":")
         gt_raw = sample[fmt.index("GT")] if "GT" in fmt else sample[0]
         idx = [i for i in gt_raw.replace("|", "/").split("/") if i.isdigit()]
+        # `./.` is NOT a call. An empty genotype string used to travel onward
+        # labelled `called`, so the refusal head was assembled from the word
+        # «called», no key of that name existed in the message catalogue, and the
+        # reader got ⟦genome.refused_head.called⟧ where a sentence belonged.
+        if not idx:
+            return {"genotype": None, "confidence": "no_call_in_vcf", "source": "vcf",
+                    "assembly": asm, "read_pos": pos, "filter": f[6],
+                    "note": _t("genome.no_call_in_vcf")}
         alleles = [vref] + valt
         try:
             gt = "".join(alleles[int(i)] for i in idx)
         except (IndexError, ValueError):
-            gt = "?"
+            return {"genotype": None, "confidence": "malformed_genotype", "source": "vcf",
+                    "assembly": asm, "read_pos": pos, "filter": f[6],
+                    "note": _t("genome.malformed_genotype", value=gt_raw[:24])}
         dp = None
         if "DP" in fmt:
             try:
@@ -905,7 +1298,20 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             except Exception:
                 dp = None
         out = {"genotype": gt, "confidence": "called", "source": "vcf",
-               "ref": vref, "alt": f[4], "depth": dp}
+               "ref": vref, "alt": f[4], "depth": dp,
+               "assembly": asm, "read_pos": pos, "filter": f[6]}
+        # Task 87, second half. An imputed genotype is not an observation. The
+        # corpus holds a file where 98.8 % of rows carry FILTER=IMP, and the
+        # engine read them level with observed ones and signed them «called from
+        # the VCF». Every VCF has a FILTER column; not looking at it is how the
+        # output of an imputation model is handed over as a measurement.
+        _fl = set(f[6].replace(",", ";").split(";"))
+        if _fl & {"IMP", "IMPUTED", "IMP_PASS"}:
+            out["imputed"] = True
+            out["note"] = _t("genome.imputed_call")
+        elif f[6] not in ("PASS", ".", ""):
+            out["filtered"] = f[6]
+            out["note"] = _t("genome.filtered_call", value=f[6])
         if dp is not None and dp < _MIN_DEPTH:
             out["low_depth"] = True
             out["note"] = _t("genome.low_depth", depth=dp)

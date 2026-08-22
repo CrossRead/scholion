@@ -190,8 +190,11 @@ def ingest(path: str, dry_run: bool = False) -> Dict[str, Any]:
         return res
     added, refused = [], []
     for p in res["points"]:
+        # `effectiveDateTime` on an Observation is when the specimen was taken —
+        # the draw itself, not a stand-in for it.
         r = store.add_lab_point(p["key"], p["date"], p["value"], name=p["label"],
-                                unit=p["unit"], ref_low=p["ref_low"], ref_high=p["ref_high"])
+                                unit=p["unit"], ref_low=p["ref_low"], ref_high=p["ref_high"],
+                                date_source="form", subject="owner")
         if r.get("ok"):
             added.append(p["key"])
         else:

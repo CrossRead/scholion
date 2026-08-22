@@ -48,6 +48,14 @@ def provenance() -> Dict[str, Any]:
                              else _t("sources.local_folder",
                                      path=vp.parent if vp else "genome/*.vcf.gz")),
                   "updated": core.file_date(vp) if vp else None, "present": vp is not None}
+    # A genome refused because it belongs to somebody else is NOT «no genome» on
+    # this strip either: the folder is full, the file is readable, and the reason
+    # the layer is silent has to be readable from the same place the reader looks
+    # to find out where a number came from.
+    _not_ours = genome.not_ours()
+    if _not_ours:
+        genome_vcf["not_ours"] = _not_ours
+        genome_vcf["origin"] = _not_ours.get("message") or genome_vcf["origin"]
 
     # ClinVar findings — an international base (NCBI), synchronisation = the mtime of the file/meta
     cv_meta = None
@@ -77,10 +85,29 @@ def provenance() -> Dict[str, Any]:
                "origin": _t("sources.ensembl_origin"),
                "updated": core.file_date(cache), "present": cache.exists()}
 
+    # The lifestyle strip names the DEVICES, not the file. A path tells a reader
+    # where the numbers are kept; it does not tell them what measured the numbers,
+    # and with two devices in one profile that is the only question that matters.
     p_life = prof / "wearable_trends.json"
+    devices, shared = [], []
+    from .. import wearables as _wear
+    try:
+        # Asked of the DATA and not of the file: a caller that supplied the layer
+        # some other way still gets an honest strip, and «which devices» is a
+        # question about the numbers rather than about where they happen to sit.
+        _data = _wear.migrate(core.wearable_trends() or {})
+        devices = sorted(_data.get("sources") or {})
+        shared = sorted(_wear.shared_metrics(_data))
+    except Exception:                                            # noqa: BLE001
+        devices, shared = [], []
     lifestyle_src = {"kind": "local", "label": _t("sources.lifestyle"),
-                     "origin": _t("sources.local_folder",
-                                  path="profile/wearable_trends.json"),
+                     "origin": (", ".join(_wear.device_label(d) for d in devices)
+                                if devices else
+                                _t("sources.local_folder",
+                                   path="profile/wearable_trends.json")),
+                     "devices": devices,
+                     "shared_metrics": shared,
+                     "primary": core.wearable_primary(),
                      "updated": core.file_date(p_life), "present": p_life.exists()}
     return {
         "labs": loc("labs.json", _t("sources.labs"), "labs"),

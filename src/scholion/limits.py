@@ -190,6 +190,21 @@ def _genome_limits() -> List[Dict[str, str]]:
         else:
             out.append(_item(_t("limits.no_genome_what"), _t("limits.no_genome_why"),
                              _t("limits.no_genome_closes"), kind="genome"))
+
+    # Task 100. Points written before the source of their date was recorded. Said
+    # ONCE, here, with a number — not as a caveat on every one of them: the
+    # person's own carefully entered history would be buried in marks about
+    # itself. What is not claimed is that these dates came off a form.
+    try:
+        _unrec = sum(1 for m in (core.labs().get("markers") or {}).values()
+                     for p in (m.get("series") or [])
+                     if (p.get("date_source") or "unrecorded") == "unrecorded")
+    except Exception:
+        _unrec = 0
+    if _unrec:
+        out.append(_item(_t("limits.date_unrecorded_what", n=_unrec),
+                         _t("limits.date_unrecorded_why"),
+                         _t("limits.date_unrecorded_closes"), kind="labs"))
         return out
     if av.get("assembly_unknown"):
         out.append(_item(_t("limits.assembly_unknown_what"),
@@ -395,12 +410,49 @@ def scope() -> Dict[str, Any]:
                      "note": _t("limits.scope.oligogenic")})
         rows.append({"architecture": "polygenic", "state": "supported",
                      "note": _t("limits.scope.polygenic")})
+    # Task 87. «Whole genome» is a claim about the file, and it used to be made
+    # from the fact that the file was a readable VCF — which is not the same
+    # thing. Measured against real third-party files this sentence was printed
+    # over an imputed call set, two chips distributed as VCF, a low-pass screen
+    # and two call sets holding indels and no substitutions, and it was false for
+    # every one of them. The measured class now decides the sentence, and where
+    # the measurement failed the sentence says so instead of promising breadth.
+    cs = av.get("callset") or {}
+    tb = av.get("tabular") or {}
+    is_tabular = av.get("input_class") == "tabular"
+    profile = av.get("input_profile") if has_vcf else None
+    seq_note = None
+    if has_vcf:
+        if profile in ("panel", "sparse", "imputed_panel",
+                       "partial_callset_indels", "partial_callset_snvs", "unmeasured"):
+            seq_note = _t("limits.scope.input_" + profile,
+                          per_mb=cs.get("observed_per_mb"),
+                          share=int(round((cs.get("imputed_share") or 0) * 100)))
+        else:
+            seq_note = _t("limits.scope.input_wgs")
+    if is_tabular:
+        # Task 89. A container VCF is a call set and answers like one; a genotype
+        # table is a list of chosen positions and carries the array's ceiling.
+        seq_note = (_t("limits.scope.input_tabular_container",
+                       variants=tb.get("variants") or 0,
+                       per_mb=tb.get("observed_per_mb") or 0)
+                    if tb.get("kind") == "container_vcf"
+                    else _t("limits.scope.input_genotype_table", rows=tb.get("rows") or 0))
+        rows.append({"architecture": "monogenic", "state": "not_supported",
+                     "note": _t("limits.scope.array_monogenic")})
+        rows.append({"architecture": "oligogenic", "state": "partial",
+                     "note": _t("limits.scope.array_oligogenic")})
+        rows.append({"architecture": "polygenic", "state": "partial",
+                     "note": _t("limits.scope.array_polygenic")})
     return {
-        "input": "wgs" if has_vcf else ("array" if is_array else "none"),
+        "input": (profile or "wgs") if has_vcf else (
+            "array" if is_array else ("tabular" if is_tabular else "none")),
         "array": av.get("array"),
+        "callset": cs or None,
         # A file in the wrong build is not «no file»: saying so here would
         # contradict the item three lines below, which names it precisely.
-        "input_note": (_t("limits.scope.input_wgs") if has_vcf
+        "tabular": tb or None,
+        "input_note": (seq_note if (has_vcf or is_tabular)
                        else _t("limits.scope.input_array",
                                vendor=(av.get("array") or {}).get("vendor", ""),
                                markers=(av.get("array") or {}).get("markers", 0))

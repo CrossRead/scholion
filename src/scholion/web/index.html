@@ -123,6 +123,9 @@
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--border);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:opacity .2s}
   .toast.show{opacity:1}
   .muted{color:var(--muted)}
+  .srcline{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.35}
+  .srcline.warn{color:var(--warning)}
+  .warnbox{border-left:3px solid var(--warning)}
   .srcbar{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 16px}
   .srcchip{font-size:12.5px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px;display:inline-flex;align-items:center;gap:5px;line-height:1.35}
   .srcchip b{color:var(--ink-2);font-weight:600}
@@ -360,6 +363,18 @@ const withLang=(path)=>path+(path.indexOf('?')>=0?'&':'?')+'lang='+encodeURIComp
 async function api(path,opts){const r=await fetch(API+withLang(path),opts);return r.json();}
 async function post(path,body){const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;return r;}
 function toast(m){const box=$('#toast');box.textContent=m;box.classList.add('show');setTimeout(()=>box.classList.remove('show'),2200);}
+// A demonstration profile erased by the first real measurement is not a toast.
+// A toast is gone in two seconds and this is the largest thing that can happen
+// to a profile: it stays on screen until the reader leaves the view.
+function claimNotice(r){
+  const c=(r&&r.claimed)||null; if(!c||!c.message)return;
+  const v=$('#view'); if(!v)return;
+  const box=document.createElement('div');
+  box.className='card warnbox'; box.style.marginBottom='14px';
+  box.textContent=c.message;
+  v.insertBefore(box,v.firstChild);
+  v.scrollIntoView({behavior:'smooth',block:'start'});
+}
 
 // ---------------- Data sources (date + provenance) ----------------
 let _sources=null;
@@ -924,7 +939,7 @@ function renderAddLab(box, cat){
     const body={marker,date:$('#al-date',box).value.trim(),value:num($('#al-val',box).value),...extra};
     if(!body.marker||!body.date||body.value==null){toast(t('web.form.fill_required'));return;}
     const r=await post('/api/labs',body);
-    if(r.ok){toast(t('web.common.added'));viewLabs($('#view'));}else{toast(t('web.common.error_prefix')+(r.error||''));}
+    if(r.ok){toast(t('web.common.added'));viewLabs($('#view'));claimNotice(r);}else{toast(t('web.common.error_prefix')+(r.error||''));}
   };
 }
 const num=v=>{v=(v||'').toString().replace(',','.').trim();return v===''?null:(isNaN(+v)?null:+v);};
@@ -1302,6 +1317,7 @@ async function viewMeds(root){
     const r=await post('/api/medications',{name,dose:$('#m-dose',root).value,note:$('#m-note',root).value});
     if(!r.ok){toast(t('web.common.error_prefix')+(r.error||''));return;}
     toast(chk.overall&&chk.overall!=='low'?t('web.meds.added_attention'):t('web.common.added'));
+    claimNotice(r);
     // refresh the list without losing the check that is on screen
     const d2=await api('/api/medications');
     $('#mlist',root).innerHTML=d2.medications.map(medItem).join('')||`<div class="muted">${esc(t('web.meds.empty'))}</div>`;
@@ -1389,7 +1405,7 @@ async function viewMetrics(root){
     const body={metric,date:$('#mm-date',ab).value.trim(),value:num($('#mm-val',ab).value),...extra};
     if(!body.metric||!body.date||body.value==null){toast(t('web.form.fill_required'));return;}
     const r=await post('/api/metrics',body);
-    if(r.ok){toast(t('web.common.added'));viewMetrics($('#view'));}else{toast(t('web.common.error_prefix')+(r.error||''));}
+    if(r.ok){toast(t('web.common.added'));viewMetrics($('#view'));claimNotice(r);}else{toast(t('web.common.error_prefix')+(r.error||''));}
   };
 }
 
@@ -1483,6 +1499,24 @@ function bulletBoard(snap){
 }
 
 // --- the metric card (as it was) --------------------------------------------
+// Which device measured this. Shown whenever the number came from one at all —
+// a card that says «HRV 64 ms» and nothing else is a card that invites the reader
+// to compare it with a number from another strap. Where two devices report the
+// same metric and nobody has said which one answers, the card says that too, and
+// the value is greyed out of every conclusion on the page.
+function srcTag(m){
+  if(!m.source) return '';
+  const also=(m.also_measured_by||[]);
+  const name=esc(t('web.life.device.'+m.source));
+  if(!also.length) return `<div class="srcline">${esc(t('web.life.measured_by',{device:name}))}</div>`;
+  const others=also.map(d=>esc(t('web.life.device.'+d))).join(', ');
+  const cls=m.counts_toward_conclusions?'ok':'warn';
+  const tail=m.counts_toward_conclusions
+    ? t('web.life.also_answers',{other:others})
+    : t('web.life.also_unresolved',{other:others});
+  return `<div class="srcline ${cls}">${esc(t('web.life.measured_by',{device:name}))} · ${esc(tail)}</div>`;
+}
+
 function lifeCard(m){
   const ST={ok:{cls:'b-good',key:'web.life.ok'},warn:{cls:'b-warning',key:'web.life.warn'},
             bad:{cls:'b-critical',key:'web.life.bad'},none:{cls:'b-unknown',key:'web.life.none'}};
@@ -1499,6 +1533,7 @@ function lifeCard(m){
     <div class="value">${esc(m.value)} <small>${esc(m.unit)}</small></div>
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
     ${m.series&&m.series.length>1?sparkline(m.series,false):''}
+    ${srcTag(m)}
     <div class="meta">${esc(t('web.life.card_meta',{date:m.date,smooth:m.value_smooth,since:m.first_date}))}${m.why?' · '+esc(m.why):''}</div>
   </div>`);
 }
@@ -1552,8 +1587,8 @@ async function viewLifestyle(root){
 
   let html=`<h2 class="section">${esc(t('web.life.title'))}</h2>${sb}
     <div class="row" style="margin:-2px 0 14px;gap:8px;flex-wrap:wrap;align-items:center">
-      <button class="ghost" id="grefresh">🔄 ${esc(t('web.life.garmin_btn'))}</button>
-      <span class="muted" style="font-size:12.5px" id="gmsg">${esc(t('web.life.garmin_note'))}</span>
+      <button class="ghost" id="grefresh">🔄 ${esc(t('web.life.wearable_btn'))}</button>
+      <span class="muted" style="font-size:12.5px" id="gmsg">${esc(t('web.life.wearable_note'))}</span>
     </div>
     <div class="stat">
       ${fs!=null?`<div class="s"><b style="color:${fcol}">${fs}</b><span>${esc(t('web.life.fitness_score'))}</span></div>`:''}
@@ -1566,6 +1601,23 @@ async function viewLifestyle(root){
   if(!hasM){
     html+=`<div class="muted" style="margin:16px 0">${esc(t('web.life.no_wearable'))}</div>`;
   }else{
+    // Said once, at the top, and not only on the cards: a person looking at the
+    // page should learn that two devices disagree about what is being measured
+    // BEFORE they read a trend drawn from one of them.
+    const un=d.shared_unresolved||[];
+    if(un.length){
+      const names=un.map(k=>{const m=d.metrics.find(x=>x.key===k);return esc(m?m.label:k);}).join(', ');
+      const devs=(d.sources||[]).map(s=>esc(t('web.life.device.'+s))).join(', ');
+      html+=`<div class="card warnbox" style="margin-top:18px">
+        <b>${esc(t('web.life.two_devices_h'))}</b>
+        <div style="margin-top:6px">${esc(t('web.life.two_devices_body',{devices:devs,metrics:names}))}</div>
+        <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">
+          ${(d.sources||[]).map(s=>`<button class="act" data-primary="${esc(s)}">${esc(t('web.life.pick_device',{device:t('web.life.device.'+s)}))}</button>`).join('')}
+        </div></div>`;
+    }else if((d.sources||[]).length>1){
+      const devs=(d.sources||[]).map(s=>esc(t('web.life.device.'+s))).join(', ');
+      html+=`<div class="muted" style="margin-top:14px;font-size:12.5px">${esc(t('web.life.two_devices_settled',{devices:devs,primary:t('web.life.device.'+(d.primary_source||''))}))}</div>`;
+    }
     const c=d.conclusions||{good:[],watch:[]};
     const chip=(x,cls)=>`<span class="badge ${cls}">${esc(x.label)} ${x.arrow} ${x.delta>0?'+':''}${esc(x.delta)}</span>`;
     html+=`<h2 class="section" style="margin-top:24px">${esc(t('web.life.shifted_h'))}</h2>
@@ -1594,14 +1646,24 @@ async function viewLifestyle(root){
   if(hasM){
     ['anthro','activity','recovery'].forEach(g=>{const box=$('#lg-'+g,root);if(box)d.metrics.filter(m=>m.group===g).forEach(m=>box.appendChild(lifeCard(m)));});
   }
+  root.querySelectorAll('[data-primary]').forEach(b=>{b.onclick=async()=>{
+    b.disabled=true;
+    const r=await post('/api/wearable-primary',{device:b.getAttribute('data-primary')});
+    if(r&&r.ok){toast(t('web.life.primary_set',{device:t('web.life.device.'+b.getAttribute('data-primary'))})+' ✓');
+      viewLifestyle($('#view'));}
+    else{b.disabled=false;toast(t('web.common.failed_prefix')+((r&&r.error)||'—'));}
+  };});
   const gref=$('#grefresh',root);
   if(gref)gref.onclick=async()=>{
     gref.disabled=true; const gm=$('#gmsg',root); const old=gm.textContent; gm.textContent=t('web.life.rebuilding');
-    const r=await post('/api/ingest-garmin',{});
+    const r=await post('/api/ingest-wearable',{});
     gref.disabled=false;
-    if(r&&r.ok){toast(t('web.life.garmin_done',{metrics:r.metrics,range:r.range})
+    claimNotice(r);
+    if(r&&r.ok){toast(t('web.life.wearable_done',{device:t('web.life.device.'+r.source),metrics:r.metrics,range:r.range})
         +(r.nights?', '+t('web.life.garmin_nights',{n:r.nights}):'')
         +(r.preserved?', '+t('web.life.garmin_preserved',{n:r.preserved}):'')+' ✓');
+      if(r.unrecognised_columns&&r.unrecognised_columns.length)
+        toast(t('web.life.unknown_columns',{columns:r.unrecognised_columns.join(', ')}));
       viewLifestyle($('#view'));}
     else{gm.textContent=old;toast(t('web.common.failed_prefix')+((r&&r.error)||'—'));}
   };
@@ -1811,7 +1873,7 @@ async function viewGenome(root){
   root.innerHTML=`<h2 class="section">${esc(t('web.genome.title'))}</h2>${sb}
     <div class="subnav">${nav.map(([id,key])=>`<a href="#gs-${id}">${esc(t(key))}</a>`).join('')}</div>
 
-    <div id="gs-sum"><div class="card" style="margin-bottom:8px"><div class="row">${stBadge} <span class="muted">${st.ready?esc(st.vcf||''):esc(t('web.genome.db_after_script'))}</span></div>
+    <div id="gs-sum">${st.not_ours?`<div class="card warnbox" style="margin-bottom:8px"><div>${esc(st.not_ours.message||'')}</div><div class="meta" style="margin-top:6px">${esc(st.not_ours.fix||'')}</div></div>`:''}<div class="card" style="margin-bottom:8px"><div class="row">${stBadge} <span class="muted">${st.ready?esc(st.vcf||''):esc(t('web.genome.db_after_script'))}</span></div>
       <div class="meta" style="margin-top:6px">${esc(t('web.genome.intro'))}</div></div></div>
 
     <h2 class="section" id="gs-upd" style="margin-top:22px">🔄 ${esc(t('web.genome.updates_h'))}</h2>

@@ -127,7 +127,18 @@ def _merge_metrics(fresh: Dict[str, Any], prev_path: Path) -> int:
 
 
 def reingest(folder: Optional[str] = None) -> Dict[str, Any]:
-    """Rebuild wearable_trends.json from the export. Makes a backup of the previous file."""
+    """Kept so that `ingest-garmin` and anything holding this name still work.
+
+    The work moved to `wearables.py` when a second device arrived; this asks for
+    the Garmin one by name, so the old command cannot be handed a WHOOP export
+    and quietly file it under the wrong watch.
+    """
+    from . import wearables
+    return wearables.reingest(folder, source="garmin")
+
+
+def _reingest_garmin_only(folder: Optional[str] = None) -> Dict[str, Any]:
+    """The original implementation, unused — kept until the next release cleans it out."""
     gdir = Path(folder).expanduser() if folder else find_export()
     if not gdir or not gdir.exists():
         # An export that is visible but was not named is reported, not opened.

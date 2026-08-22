@@ -176,6 +176,16 @@ Three things that save a conversation at this point:
   lookups can go out later — a drug name and an rsID — and only when asked for
   by name.
 
+- **The first datum of their own erases the demonstration.** One profile holds
+  one person. As soon as a real value is written — `add-lab`, `add-metric`,
+  `add-med`, an import, or the same actions from the web page — the fictional
+  profile is removed and the new datum lands in an empty one. The command says
+  so and names every file it removed; repeat that sentence to the person rather
+  than letting it scroll past, and do not offer to «keep both». Nothing is lost:
+  `scholion init --demo --dir <folder>` rebuilds the demonstration exactly, from
+  a seed. The same rule refuses a published reference genome next to anybody
+  else's history — it gets a profile of its own.
+
 When the person wants their own data instead of the fiction, `scholion init`
 lays out empty templates, and the entry ladder in the project's README says what
 can be loaded and by which command. The shortest real path is usually
@@ -596,7 +606,9 @@ python3 -m scholion profile                  # profile snapshot: what is loaded,
 # Loading data
 python3 -m scholion ingest-labs "<PDF folder>"     # lab results → labs.json, incrementally
 python3 -m scholion ingest-studies "<folder>"      # physicians' conclusions and imaging studies
-python3 -m scholion ingest-garmin ["<folder>"]     # rebuild lifestyle from a device export (with a backup)
+python3 -m scholion ingest-wearable ["<folder-or-zip>"]  # read a wearable export — Garmin or WHOOP,
+                                                   # recognised by what is inside it (with a backup)
+python3 -m scholion ingest-garmin ["<folder>"]     # the same, restricted to a Garmin export
 python3 -m scholion set-folder labs_docs "<path>"  # where the forms and conclusions live
 
 # Manual entry

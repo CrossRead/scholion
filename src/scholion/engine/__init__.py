@@ -60,6 +60,7 @@ from .goals import (  # noqa: F401 -- the facade re-exports every name
     suggest_goal_targets,
 )
 from .genomics import (  # noqa: F401 -- the facade re-exports every name
+    NARROW_INPUTS,
     genome_lookup,
     genome_status,
     clinvar_findings,

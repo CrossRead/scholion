@@ -68,7 +68,10 @@ def main() -> int:
     prof = metrics.get("profile", {}) if isinstance(metrics, dict) else {}
     sex, birth = prof.get("sex"), prof.get("birth_date") or prof.get("birth_year")
     if sex and birth:
-        print(f"{OK} demographics: sex {sex}, date of birth {birth}")
+        # The value itself is not printed — a first-run check only needs to confirm
+        # demographics were entered, not to put a date of birth on the screen (or
+        # in whatever captures this terminal's scrollback).
+        print(f"{OK} demographics: sex {sex}, date of birth set")
     else:
         print(f"{BAD} demographics are not filled in (profile/metrics.json → profile.sex, birth_date)")
         problems.append("without sex and date of birth, biological age is not computed "

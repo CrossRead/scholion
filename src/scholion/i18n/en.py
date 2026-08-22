@@ -116,7 +116,7 @@ MESSAGES = {
     "genome.called": "called from the VCF",
     "genome.assumed_ref": "reference (the site is not variant)",
     "genome.depth": "depth {value}",
-    "genome.gene_at": "gene **{gene}** ({chrom}:{pos})",
+    "genome.gene_at": 'gene **{gene}** ({assembly}{chrom}:{pos})',
     "genome.genotype": "genotype **{genotype}**",
     "genome.significance": "Clinical significance (ClinVar/Ensembl): {values}",
     "genome.consequence": "Consequence: {text}",
@@ -462,6 +462,9 @@ MESSAGES = {
     "genome.refused_head.several_files": "there is more than one genome file and none was chosen.",
     "genome.refused_head.several_samples": "the file holds several samples and none was chosen.",
     "genome.refused_head.foreign_input": "there is genomic data in the folder, but no readable VCF.",
+    "genome.refused_head.another_person": "the genome in the folder belongs to another person than this profile, so it is not read.",
+    "genome.refused_head.engine_unknown": "SCHOLION_GENOME_ENGINE names a reader this project does not have.",
+    "genome.refused_head.engine_missing": "the reader named in SCHOLION_GENOME_ENGINE is not installed here.",
     "genome.refused_head.no_engine": "the genome file is there and no reader is installed.",
     "genome.refused.no_file": "The coordinate was found, but the full genome database is not connected yet (genome/*.vcf.gz + .tbi are needed).",
     "genome.refused.no_answer": "The coordinate was found and the file is connected, but the reader returned nothing at that position — most often a missing or broken index (`.tbi`/`.csi`). `scholion genome-status` says which. An empty answer is not a reference call and is not reported as one.",
@@ -1100,6 +1103,20 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "store.demo_occupied": "the directory holds data with no synthetic mark — it looks like a "
                            "real profile; the demo will not be written there (--force is "
                            "needed)",
+    "subject.unknown": "«{value}» is not a subject this project knows, and a datum whose person is undeclared reads as the reader\u2019s own \u2014 which is what this field exists to prevent. Nothing was written. Accepted: {accepted}.",
+    "subject.owner": "you",
+    "subject.demo": "the fictional person of the demonstration",
+    "subject.reference": "a published reference sample \u2014 somebody else",
+    "subject.unattributed": "unstated",
+    "subject.demo_erased": "The demonstration profile has been erased \u2014 it described a fictional person, and this is a measurement of yours: two people in one profile give conclusions about nobody. Removed: {files}. The demonstration is generated, so `scholion init --demo --dir <folder>` builds it again exactly as it was.",
+    "subject.genome_not_ours": "the genome in {path} belongs to {who}, while this profile holds the data of {whose}. Nothing is read from it: a genotype of one person beside the laboratory history of another produces conclusions about neither.",
+    "subject.genome_fix": "keep it in a profile of its own: `scholion init --dir <folder>`, then `SCHOLION_PROFILE_DIR=<folder> SCHOLION_GENOME_DIR=<genome folder> scholion genome-status`",
+    "subject.profile_holds": "whose data: {who}",
+    "genome_status.engine_unknown": "SCHOLION_GENOME_ENGINE is set to «{value}», and the readers this project has are: {accepted}. Nothing was read: a pin that is ignored gives a run through a reader nobody asked for, which is what the pin exists to prevent.",
+    "genome_status.engine_missing": "SCHOLION_GENOME_ENGINE names «{value}», which is not installed here. Nothing was read — silently moving to another reader would answer a different question from the one asked.",
+    "genome_status.assembly_from_signature": "the build was established from the provider's own signature ({provider}), not measured from the file: {why}.",
+    "genome_status.assembly_from_reference_line": "the build was taken from the `##reference=` line, which is a path somebody wrote and may no longer have: {detail}",
+    "genome_status.engine_pinned": "reader: {engine} (pinned by SCHOLION_GENOME_ENGINE)",
     "store.templates_missing": "the templates were not found: {path} (the package is "
                                "incompletely built)",
     "store.slot_external": "{slot}/ (external storage)",
@@ -1249,6 +1266,62 @@ will go through them later.
                           "scholion reconcile)",
 
     # ── the Garmin export ─────────────────────────────────────────────
+    "wearables.unknown_device": "«{name}» is not a device this build can read.",
+    "web.life.device.garmin": "Garmin",
+    "web.life.device.whoop": "WHOOP",
+    "web.life.device.apple_health": "Apple Health",
+    "web.life.device.unspecified": "device not recorded",
+    "web.life.device.": "—",
+    "web.life.measured_by": "measured by {device}",
+    "web.life.also_answers": "{other} also measures this; the answer above is the device you named",
+    "web.life.also_unresolved": "{other} also measures this, and no device has been named — "
+                                "this number is shown and enters no conclusion",
+    "web.life.two_devices_h": "Two devices measure some of the same things",
+    "web.life.two_devices_body": "{devices} both report: {metrics}. They are not the same "
+                                 "measurement — different window, different algorithm, different "
+                                 "place on the body — so neither series is averaged into the other "
+                                 "and neither is used for a conclusion until you say which device "
+                                 "answers. Both are shown either way.",
+    "web.life.two_devices_settled": "Two devices in this profile ({devices}); where both measure "
+                                    "the same thing, {primary} answers.",
+    "web.life.pick_device": "{device} answers",
+    "web.life.primary_set": "{device} now answers where two devices measure the same thing",
+    "web.life.wearable_btn": "Re-read a wearable export",
+    "web.life.wearable_note": "Garmin or WHOOP — the export is recognised by what is inside it.",
+    "web.life.wearable_done": "{device}: {metrics} metric series, {range}",
+    "web.life.unknown_columns": "Columns this does not know, and from which nothing was read: {columns}",
+    "wearables.builder_missing": "{path} was not found",
+    "wearables.not_an_export": "{path} is not an export this can read. It was opened and looked "
+                               "at: neither a Garmin export (a DI_CONNECT folder) nor a WHOOP "
+                               "export (the CSV files physiological_cycles, sleeps, workouts, as "
+                               "a folder or as the zip that arrives by email).",
+    "wearables.wrong_device": "{path} is a {found} export, and this command was asked for {asked}. "
+                              "Nothing was read: filing one device's numbers under another's name "
+                              "is the one thing this layer exists to prevent. Run "
+                              "`scholion ingest-wearable '{path}'` to read it as {found}.",
+    "wearables.no_export": "No wearable export was found. Garmin: download a fresh copy from "
+                           "Account → Export Your Data. WHOOP: More → App Settings → Data Export, "
+                           "which arrives as a link by email. Put the folder or the zip into "
+                           "raw/wearables/, or pass it as an argument.",
+    "wearables.candidate_hint": "A {device} export lies next to the data directory: {path}. It is "
+                                "NOT read on a guess — pass it as an argument, name it once with "
+                                "`scholion set-folder {device} '{path}'`, or move it into "
+                                "raw/wearables/.",
+    "wearables.parse_failed": "The export could not be read: {error}",
+    "wearables.nothing_recognised": "{path} was opened as a {device} export and carried no "
+                                    "measurement this knows how to name.",
+    "wearables.nightly_note": "Night-by-night values as {device} reported them. Kept apart from the "
+                              "monthly trends because they answer a different question: what "
+                              "changed after one particular evening.",
+    "wearables.done": "{device}: {metrics} metric series, {nights} nights, {preserved} earlier "
+                      "points kept.",
+    "wearables.columns_unknown": "Columns this does not know, and from which nothing was read: "
+                                 "{columns}. If one of them is a measurement you want, name it in "
+                                 "profile/wearable_metrics.local.json and read the export again.",
+    "wearables.shared": "Both devices report {metrics}. They are kept apart and are NOT averaged: "
+                        "the same name does not make it the same measurement. Name the one that "
+                        "should answer with `scholion profile --wearable <device>`.",
+    "wearables.unspecified": "the device that recorded this was not written down",
     "garmin.builder_missing": "{path} was not found",
     "garmin.candidate_hint": "A wearable export lies next to the data directory: {path}. It is NOT read on a guess — name it once with `scholion set-folder garmin '{path}'`, pass the folder as an argument, or move it into raw/wearables/.",
     "garmin.no_export": "No garmin_export folder (holding DI_CONNECT) was found. Download a "
@@ -1957,9 +2030,6 @@ will go through them later.
     "web.life.stable": "steady",
     "web.life.trend_3m": "{delta} over 3 months",
     "web.life.card_meta": "latest {date} · smoothed {smooth} · since {since}",
-    "web.life.garmin_btn": "Refresh from the Garmin export",
-    "web.life.garmin_note": "rebuilds from a fresh Garmin GDPR export (garmin_export), with a "
-                            "backup",
     "web.life.rebuilding": "rebuilding…",
     "web.life.garmin_done": "Garmin refreshed: {metrics} metrics ({range})",
     "web.life.garmin_nights": "nights of sleep {n}",
@@ -2363,4 +2433,89 @@ will go through them later.
     "tools.declined": "Skipped. `scholion tools --install` does it later; nothing else changes.",
     "tools.installed_ok": "✓ installed: {tools}",
     "tools.install_failed": "✗ still missing: {tools}",
+    "genome.refused_head.unnamed": 'there is no answer at this position, and the sentence below says why.',
+    "genome.refused_head.not_on_chip": 'this position is not on the chip.',
+    "genome.refused_head.no_call": 'the chip has a probe here and it did not call.',
+    "genome.refused_head.array_unreadable": 'the array file is there and could not be read — which is our failure, not a property of the chip.',
+    "genome.refused_head.no_coordinates_for_assembly": 'the catalogue has no coordinate for this locus in the build of your file.',
+    "genome.refused_head.no_call_in_vcf": 'the position was read and no genotype was determined.',
+    "genome.refused_head.malformed_genotype": 'the genotype field at this position could not be parsed.',
+    "genome.refused_head.not_in_this_callset": 'a variant of this kind cannot appear in this file at all.',
+    "genome.refused_head.called": 'the reader returned a row and no genotype with it.',
+    "genome.refused_head.called_array": 'the chip called here, and the value did not reach this line.',
+    "genome.refused_head.called_array_ambiguous": 'the chip called here on a strand-ambiguous locus.',
+    "genome.refused_head.confirmed_ref": 'the position was read and matched the reference.',
+    "genome.refused_head.assumed_ref": 'there is no row at this position.',
+    "genome.refused_head.reported": 'this value came from a report rather than from the file.',
+    "genome.refused_head.curated": 'this entry is curated, not read from your data.',
+    "genome.refused_head.unrecognised_format": 'there is a file here in a shape nothing recognised.',
+    "genome.refused_head.no_array": 'there is no array file either.',
+    "genome.refused_head.plain": 'the genome file is there, uncompressed, and cannot be seeked into.',
+    "genome.refused_head.gzip_not_bgzip": 'the genome file is compressed with ordinary gzip, which no index can seek into.',
+    "genome.refused_head.not_identified": 'the input could not be identified.',
+    "genome.refused_head.offline": 'this needed the network and there is none.',
+    "genome.refused_head.unreachable": 'the source could not be reached.',
+    "genome.no_call_in_vcf": 'the caller reached this position and could not decide: the genotype field is `./.`. That is a no-call — not the reference, and not a variant.',
+    "genome.malformed_genotype": 'the genotype field reads «{value}», which is not a genotype this reader understands. Nothing is assumed from it.',
+    "genome.not_in_this_callset": 'this file is a call set split by variant type, and a variant of this kind is not in it. An absent row here does not mean the reference: it means the file was never able to carry the answer.',
+    "genome.imputed_call": 'this genotype is IMPUTED — inferred from a reference panel, not observed in your sample. The file marks it so in its FILTER column.',
+    "genome.filtered_call": 'the caller flagged this row: FILTER={value}. It passed no quality gate, and is shown rather than hidden.',
+    "genome.imputed_short": 'imputed, not observed',
+    "genome.filtered_short": 'flagged {value} by the caller',
+    "genome.called_array": 'called from the array',
+    "genome_status.array_connected": '**A genotyping array is connected** — {vendor}, {markers} positions.',
+    "genome_status.array_ceiling": 'It is not a genome: a chip carries a probe for chosen positions and reads nothing between them, so a locus with no probe was never interrogated rather than found to be reference.',
+    "genome_status.callset_whole_genome": 'Breadth: {per_mb} observed variants per megabase in three intergenic windows — consistent with whole-genome sequencing.',
+    "genome_status.callset_panel": 'Breadth: {per_mb} observed variants per megabase — far below whole-genome sequencing. This is a genotyping panel distributed as a VCF, and questions that need genome-wide data are not answered from it.',
+    "genome_status.callset_sparse": 'Breadth: {per_mb} observed variants per megabase — a screen, not a genome. Most of the genome carries no row here, and an absent row is not evidence of the reference.',
+    "genome_status.callset_imputed_panel": '{share} % of the rows in this file are IMPUTED — inferred from a reference panel rather than observed. Only {per_mb} observed variants per megabase remain. Imputation is a model, and a model is not a measurement.',
+    "genome_status.callset_partial_callset_indels": 'This file holds INDELS ONLY — not one substitution in the first twenty thousand rows. Every SNV of the catalogue is unreadable from it, and an absent row at an SNV means the file cannot carry the answer, not that you match the reference.',
+    "genome_status.callset_partial_callset_snvs": 'This file holds SUBSTITUTIONS ONLY — not one indel in the first twenty thousand rows. Insertions and deletions are unreadable from it.',
+    "genome_status.foreign_vcf_compressed": '  · {path} — a VCF, in a container the readers cannot seek into (its name says nothing about it; the bytes do). Recompress and index it: `gunzip -c {path} | bgzip -c > genome.vcf.gz && tabix -p vcf genome.vcf.gz` (use `bunzip2 -c` for a bzip2 file).',
+    "genome_status.foreign_vcf_spreadsheet": '  · {path} — a VCF that was opened in a spreadsheet and saved back: its header lines are quoted and its columns are no longer tab-separated. Re-export the original from the provider rather than repairing this copy.',
+    "genome_status.foreign_genotype_table": '  · {path} — a genotype table (one row per position, no VCF header). It is readable data and this build does not read it yet; the format is named here rather than reported as «no genome».',
+    "genome_status.foreign_variant_table": '  · {path} — a tabular variant export from a provider, not a VCF. It is readable data and this build does not read it yet.',
+    "genome_status.foreign_cg_var_table": "  · {path} — a Complete Genomics `var` table. The vendor's own converter turns it into a VCF: `cgatools mkvcf --beta --reference <ref.crr> --variant-file {path}`.",
+    "limits.scope.input_panel": 'Input: a genotyping panel distributed as a VCF — {per_mb} observed variants per megabase, which is a fraction of what sequencing yields. Chosen positions are answered; the genome between them was not read.',
+    "limits.scope.input_sparse": 'Input: a sparse call set — {per_mb} observed variants per megabase. This is a screen, not a genome: most positions carry no row, and an absent row is not evidence of the reference.',
+    "limits.scope.input_imputed_panel": "Input: a call set that is {share} % IMPUTED — genotypes inferred from a reference panel rather than observed in your sample. Only {per_mb} observed variants per megabase remain. A percentile or a screen built on this rests on a model, and the model's errors are not visible in its output.",
+    "limits.scope.input_partial_callset_indels": 'Input: a call set that holds INDELS ONLY. Every single-base substitution in the catalogue is unreadable from this file — not absent from you, unreadable. Ask the provider for the substitution half of the call set.',
+    "limits.scope.input_partial_callset_snvs": 'Input: a call set that holds SUBSTITUTIONS ONLY. Insertions and deletions are unreadable from this file.',
+    "limits.scope.input_unmeasured": 'Input: a genomic file whose breadth could not be measured. Nothing below assumes it covers the whole genome, because that has not been established.',
+    "genome.refused_head.called_strand_ambiguous": "the chip called here, on a locus whose two alleles are each other's complement.",
+    "genome.called_array_ambiguous": 'called from the array — strand-ambiguous',
+    "ingest_labs.date_not_the_draw": 'the form does not print a draw date; it was filed under {date}, which is the date the tests were ordered — a day or two earlier at most, and named here because the form does not claim it as the draw',
+    "tabular.assumed_ref": 'the call set has no row at this position — either the reference, or nothing was read there. The file cannot tell those apart.',
+    "tabular.not_in_file": 'this position is not in the file at all — it was never carried, so nothing about it has been ruled in or out.',
+    "tabular.no_call": 'the file has a row here and no genotype in it.',
+    "tabular.called_container_vcf": 'read from a VCF that arrived compressed in a container — one pass over the whole file, no index needed for a catalogue this size.',
+    "tabular.called_genotype_table": 'read from a table of chosen positions, not from a genome: a locus with no row here was never interrogated.',
+    "genome.refused_head.not_in_file": 'this position is not in that file at all.',
+    "genome.refused_head.assumed_ref_tabular": 'there is no row at this position in that call set.',
+    "genome.refused_head.no_tabular": 'no readable table or container was found either.',
+    "genome.refused_head.called_table": 'the table called here, and the value did not reach this line.',
+    "genome.refused_head.container_vcf": 'the container holds a VCF and it could not be read.',
+    "genome.refused_head.genotype_table": 'the genotype table could not be read.',
+    "genome.refused_head.unreadable": 'the file is there and could not be read.',
+    "genome.refused_head.no_tabular_source": 'there is no readable table or container here.',
+    "genome.called_table": 'read from a table of chosen positions',
+    "genome_status.tabular_container": '**A VCF is connected, and it arrived in a container** — read by one pass over the whole file rather than by seeking, because it cannot be indexed as it stands. {variants} variants, {per_mb} per megabase.',
+    "genome_status.tabular_table": "**A genotype table is connected** — {rows} rows of chosen positions, {present} of the catalogue's loci among them.",
+    "genome_status.tabular_ceiling": 'It is not a genome: a table carries the positions somebody chose to type and nothing between them, so a locus with no row was never interrogated rather than found to be reference.',
+    "limits.scope.input_tabular_container": 'Input: a call set that arrived in a container and is read by one pass, not by seeking — {variants} variants, {per_mb} per megabase. What that breadth supports is the same question as for any other call set, and it is measured above rather than assumed.',
+    "limits.scope.input_genotype_table": 'Input: a table of chosen positions — {rows} rows. It is not a genome: positions nobody typed were not read, and an absent row is not evidence of the reference.',
+    "narrow.path_closed_genotype_table": 'This path is closed for a genotype table. The file carries {rows} positions somebody chose to type and nothing between them, so «nothing found» would mean only that those positions were negative. The predictive value of a chosen-position panel for rare pathogenic variants is low (BMJ 2021: 4.2 % for BRCA1/2; Moscarello 2019: 40 % of submitted variants false), and it does not improve by arriving in a different file format. It stays closed until a frequency floor and an input-quality label exist.',
+    "narrow.path_closed_panel": 'This path is closed for a genotyping panel. Measured on this file: {per_mb} observed variants per megabase, where whole-genome sequencing yields fifteen hundred or more. A chip does not stop being a chip by arriving as a VCF, and «nothing found» here would mean only that the chosen positions were negative (BMJ 2021: 4.2 % predictive value for BRCA1/2; Moscarello 2019: 40 % of submitted variants false). It stays closed until a frequency floor and an input-quality label exist.',
+    "narrow.path_closed_sparse": 'This path is closed for a sparse call set. Measured on this file: {per_mb} observed variants per megabase — a screen, not a genome. Most of the genome carries no row at all here, so «nothing found» would be a statement about the file and not about you.',
+    "narrow.path_closed_imputed_panel": "This path is closed for an imputed call set. {share} % of the rows in this file were inferred from a reference panel rather than observed in your sample, leaving {per_mb} observed variants per megabase. A finding read out of a model's output is the model's finding, not a measurement of you.",
+    "narrow.path_closed_partial_callset_indels": 'This path is closed for a call set that holds indels only. Every single-base substitution is unreadable from this file — not absent from you, unreadable — so a screen run over it would report the absence of variants it could never have seen. Ask the provider for the substitution half of the call set.',
+    "narrow.path_closed_partial_callset_snvs": 'This path is closed for a call set that holds substitutions only. Insertions and deletions are unreadable from this file, so a screen run over it would report the absence of variants it could never have seen.',
+    "narrow.path_closed_unmeasured": 'This path is closed because the breadth of this file could not be measured. These three answers all rest on «the genome was read here and nothing was found», and that sentence needs to be earned. Refusing a genome costs one command; answering from a screen costs a finding you might act on.',
+    "store.date_source_unknown": '«{value}» is not a source a date can come from. Accepted: {accepted}. A value nobody declared would be rendered as if it meant something.',
+    "labs.date_source_ordered": '· date of the ORDER, not of the draw',
+    "labs.date_source_filename": '· date from the FILE NAME, not from the form',
+    "near.moved_approximate_date": '⚠ and at least one point of this series ({dates}) is dated by something other than the form — the order date, or the name of the file. A move measured between two days, one of which the form never printed, is a move of uncertain size.',
+    "limits.date_unrecorded_what": 'For {n} laboratory points it is not recorded where their date came from.',
+    "limits.date_unrecorded_why": 'They were stored before the product began writing that down. They are not claimed to be dated by the draw and they are not suspected of anything either — the record simply does not say, and «probably the form» is the assumption this layer exists to refuse.',
+    "limits.date_unrecorded_closes": 'nothing to run. Points added from now on carry their source, and re-ingesting a folder of forms rewrites the ones that came from it.',
 }

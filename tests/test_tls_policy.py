@@ -71,6 +71,7 @@ class TestAgainstARealBadCertificate(unittest.TestCase):
                         "-subj", "/CN=localhost"],
                        check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ctx.minimum_version = ssl.TLSVersion.TLSv1_2   # no reason for a test fixture to allow less
         ctx.load_cert_chain(cert, key)
         cls.srv = HTTPServer(("127.0.0.1", 0), _Handler)
         cls.srv.socket = ctx.wrap_socket(cls.srv.socket, server_side=True)

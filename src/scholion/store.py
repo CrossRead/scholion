@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from . import core
+from . import subject as _subj
 from .i18n import t as _t
 
 
@@ -149,10 +150,57 @@ def set_draw_context(day: str, reason: str = "", between: str = "",
     return {"ok": True, "day": day, "markers": sorted(touched), "context": ctx}
 
 
+def _subject_gate(subject: Optional[str]) -> tuple:
+    """Check whose datum this is, and let the person's own take the profile.
+
+    Task 102. Two answers come back: the refusal, if the word is not one of
+    `subject.SUBJECTS`, and the report of an erase, if a demonstration profile
+    has just been claimed by its first real measurement.
+
+    The order matters and is the whole point: the erase happens BEFORE the file
+    is read, so the new datum is written into an empty profile rather than
+    appended to a fictional person's series. Doing it the other way round is the
+    defect this was written after — a real glucose value joining a generated
+    series, in a file that went on declaring itself synthetic.
+    """
+    if subject is not None and not _subj.valid(subject):
+        return _subj.unknown_error(subject), None
+    if subject != "owner":
+        return None, None
+    claim = _subj.claim_for_owner()
+    return None, (claim if claim.get("claimed") else None)
+
+
+#: Where the DATE of a point came from. A closed vocabulary, because an open one
+#: is not a vocabulary: a value nobody declared would read as «we know», which is
+#: the assumption this field exists to remove.
+#:
+#: Task 100. Task 84 taught the reader to take a date from three places — the
+#: page, an «Ordered Date» four lipid panels print INSTEAD of a draw date, and
+#: the file name — and printed its caveat once, at ingest, after which it was
+#: gone. In the series a point dated by the day the tests were ordered was then
+#: indistinguishable from one dated by the draw. The project's own argument for
+#: refusing an ambiguous date is that a point filed under the wrong month joins a
+#: series and moves a trend; having refused the ambiguous ones, it went on to
+#: accept the approximate ones in silence.
+DATE_SOURCES = {
+    "form":       "the draw date printed on the form itself",
+    "ordered":    "a date the form prints for the ORDER or the receipt, not the draw",
+    "filename":   "the file name — what somebody called the file, not what the form says",
+    "manual":     "entered by the person",
+    "unrecorded": "written before the source of the date was recorded",
+}
+#: The two that are not the draw and not the person's own word. Everything shown
+#: about such a point carries the caveat.
+DATE_APPROXIMATE = ("ordered", "filename")
+
+
 def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] = None,
                   unit: Optional[str] = None, ref_low: Optional[float] = None,
                   ref_high: Optional[float] = None, direction: Optional[str] = None,
-                  censored: Optional[str] = None, new: bool = False) -> Dict[str, Any]:
+                  censored: Optional[str] = None, new: bool = False,
+                  date_source: Optional[str] = None,
+                  subject: Optional[str] = None) -> Dict[str, Any]:
     """Add/update a marker point in labs.json (by date YYYY-MM or YYYY-MM-DD).
 
     censored — the censoring sign of the result, if the lab printed not a number but a
@@ -160,7 +208,32 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     itself is stored AT THE BOUNDARY (otherwise there is nothing to build the series from),
     while the engine needs the sign so that «less than 10^5» against a lower limit of 10^5
     reads as BELOW the reference range, not as «exactly at the edge, all is well».
+
+    subject — whose measurement this is, one of `subject.SUBJECTS`. `"owner"`
+    means the person whose profile this is, and it CLAIMS the profile: a
+    demonstration lying in it is erased first, because two people in one profile
+    give conclusions about neither. Omitting it writes no mark at all, and the
+    point is then read as belonging to whoever the file belongs to —
+    `tests/test_a_datum_says_whose_it_is.py` walks every call in the tree and
+    requires the argument outright, so silence is a safety net rather than a
+    habit.
+
+    date_source — where the DATE came from, one of `DATE_SOURCES`. Omitting it is
+    not «the form»: it is stored as `unrecorded`, because a caller that did not
+    say cannot be assumed to have known. `tests/test_a_point_says_where_its_date_came_from.py`
+    walks every call in the tree and requires the argument outright, so the honest
+    default is a safety net rather than a habit.
     """
+    err, claimed = _subject_gate(subject)
+    if err:
+        return err
+    if date_source is not None and date_source not in DATE_SOURCES:
+        # An unknown value would travel into the series and be rendered as if it
+        # meant something. Refusing here is cheaper than deciding later what an
+        # undeclared word was supposed to say.
+        return {"ok": False, "error": _t("store.date_source_unknown",
+                                         value=str(date_source),
+                                         accepted=", ".join(sorted(DATE_SOURCES)))}
     if not marker or not date:
         return {"ok": False, "error": _t("store.need_marker_date")}
     try:
@@ -263,25 +336,42 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
         markers[marker] = m
     series: List[Dict[str, Any]] = m.setdefault("series", [])
     series[:] = [pt for pt in series if pt.get("date") != date]  # replacing the point of the same date
-    pt: Dict[str, Any] = {"date": date, "value": value}
+    pt: Dict[str, Any] = {"date": date, "value": value,
+                          "date_source": date_source or "unrecorded"}
+    if subject:
+        pt[_subj.FIELD] = subject
     if censored in ("<", ">"):
         pt["censored"] = censored
     series.append(pt)
     series.sort(key=lambda pt: pt["date"])
     _write_json(p, data)
     core.reset_cache()
-    return {"ok": True, "marker": marker, "points": len(series)}
+    out = {"ok": True, "marker": marker, "points": len(series)}
+    if claimed:
+        out["claimed"] = claimed
+    return out
 
 
 @_serialized
-def add_medication(name: str, dose: str = "", note: str = "") -> Dict[str, Any]:
-    """Add a prescription to medications.json (an editable list)."""
+def add_medication(name: str, dose: str = "", note: str = "", *,
+                   subject: Optional[str] = None) -> Dict[str, Any]:
+    """Add a prescription to medications.json (an editable list).
+
+    `subject` as in `add_lab_point`: a prescription is a fact about a person too,
+    and a real one written into the demonstration would be read beside invented
+    laboratory values.
+    """
     if not name:
         return {"ok": False, "error": _t("store.need_name")}
+    err, claimed = _subject_gate(subject)
+    if err:
+        return err
     p = _path("medications.json")
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"medications": []}
     meds: List[Dict[str, str]] = data.setdefault("medications", [])
     entry = {"name": name.strip(), "dose": dose.strip(), "note": note.strip()}
+    if subject:
+        entry[_subj.FIELD] = subject
     # dedup by name (case-insensitive): adding again UPDATES the entry rather than
     # breeding duplicates — otherwise the interaction/class logic over prescriptions breaks
     replaced = False
@@ -294,7 +384,10 @@ def add_medication(name: str, dose: str = "", note: str = "") -> Dict[str, Any]:
         meds.append(entry)
     _write_json(p, data)
     core.reset_cache()
-    return {"ok": True, "count": len(meds), "updated": replaced}
+    out = {"ok": True, "count": len(meds), "updated": replaced}
+    if claimed:
+        out["claimed"] = claimed
+    return out
 
 
 @_serialized
@@ -319,10 +412,17 @@ def list_medications() -> List[Dict[str, str]]:
 @_serialized
 def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str] = None,
                      unit: Optional[str] = None, ref_low: Optional[float] = None,
-                     ref_high: Optional[float] = None, direction: Optional[str] = None) -> Dict[str, Any]:
-    """Add/update a health metric point in metrics.json (replacing the point of the same date)."""
+                     ref_high: Optional[float] = None, direction: Optional[str] = None,
+                     subject: Optional[str] = None) -> Dict[str, Any]:
+    """Add/update a health metric point in metrics.json (replacing the point of the same date).
+
+    `subject` as in `add_lab_point`.
+    """
     if not metric or not date:
         return {"ok": False, "error": _t("store.need_metric_date")}
+    err, claimed = _subject_gate(subject)
+    if err:
+        return err
     try:
         value = float(value)
     except (TypeError, ValueError):
@@ -342,11 +442,17 @@ def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str
         metrics[metric] = m
     series: List[Dict[str, Any]] = m.setdefault("series", [])
     series[:] = [pt for pt in series if pt.get("date") != date]
-    series.append({"date": date, "value": value})
+    point: Dict[str, Any] = {"date": date, "value": value}
+    if subject:
+        point[_subj.FIELD] = subject
+    series.append(point)
     series.sort(key=lambda pt: pt["date"])
     _write_json(p, data)
     core.reset_cache()
-    return {"ok": True, "metric": metric, "points": len(series)}
+    out = {"ok": True, "metric": metric, "points": len(series)}
+    if claimed:
+        out["claimed"] = claimed
+    return out
 
 
 @_serialized
@@ -362,7 +468,11 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
     p = _path("metrics.json")
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"profile": {}, "metrics": {}}
     prof = data.setdefault("profile", {})
-    for k in ("sex", "birth_year", "height_cm", "ancestry"):
+    # `wearable_primary` is the same kind of fact again: which device answers
+    # where two of them measured the same thing. The engine cannot derive it, and
+    # choosing for the person would make a chart depend on which export was
+    # loaded last rather than on them.
+    for k in ("sex", "birth_year", "height_cm", "ancestry", "wearable_primary"):
         if k in fields and fields[k] not in (None, ""):
             prof[k] = fields[k]
     _write_json(p, data)

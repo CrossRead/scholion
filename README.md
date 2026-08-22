@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.2** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.3** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -39,7 +39,55 @@ refusal is the product, more than any number it prints. The fourth command is wh
 you see it: which panel it is, which markers are missing, and what would complete
 it. Every file in the demo declares itself synthetic in its own `_meta`.
 
+When you bring the first value of your own — a lab point, a metric, a
+prescription, an import, a wearable export — the demo is **erased** and your
+datum is written into an empty profile. One profile holds one person: a real
+number sitting inside a fictional history is a series nobody can untangle
+afterwards, and the demo costs one command to build again. The command tells you
+it happened and names every file it removed. An ordinary profile is never
+touched by this — only data that carries the synthetic mark can be erased.
+
 ---
+
+
+### A real genome, on nobody's privacy
+
+The demo is a fictional person and it works end to end — except in the layer this
+product is strongest in. Without a genome, `limits` answers «nothing can be said
+about the genome at all», which is honest and leaves the argument undemonstrated.
+
+There is a genome anybody may look at. The Genome in a Bottle samples exist to be
+published: they were selected, sequenced and consented for it, and the trio below
+is consented for commercial redistribution. Fetching one is a single command, and
+it says what it is fetching before it does:
+
+```
+python3 src/tools/fetch_demo_genome.py --list     # what it would fetch, fetching nothing
+python3 src/tools/fetch_demo_genome.py            # fetch it into genome-demo/
+```
+
+That genome belongs to a real, published person — not to you, and not to the
+fictional one of the demo. So it gets a profile of its own, and the product
+refuses to read it beside anybody else's history: one genotype under another
+person's laboratory series is a case about nobody. Point it at an empty profile
+and read the two screens that matter:
+
+```
+scholion init --dir genome-demo/profile
+SCHOLION_PROFILE_DIR=genome-demo/profile SCHOLION_GENOME_DIR=genome-demo scholion genome-status
+SCHOLION_PROFILE_DIR=genome-demo/profile SCHOLION_GENOME_DIR=genome-demo scholion limits
+```
+
+`genome-status` measures what the file actually is rather than trusting its
+extension; `limits` turns from «nothing can be said» into a list of what this
+particular file can and cannot answer. That pair is the product's argument, and
+now it can be run by somebody who has brought nothing of their own.
+
+The file name is not written down anywhere here: the benchmark is versioned, the
+release directory moves, and the tool reads the listing and stops if the pick is
+not unambiguous. `SCHOLION_OFFLINE=1` stops it before the network — it is the one
+thing in this tree that goes out on purpose.
+
 
 ## Why
 

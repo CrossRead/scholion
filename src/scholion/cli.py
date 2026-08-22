@@ -114,6 +114,9 @@ def build_parser() -> argparse.ArgumentParser:
                           "corridor is not shown rather than guessed")
     prf.add_argument("--birth-year", type=int, default=None,
                      help="year of birth — age-banded rows on a lab form need it")
+    prf.add_argument("--wearable", choices=["garmin", "whoop"], default=None,
+                     help="which device answers where two of them measured the same thing; "
+                          "without it such a metric is shown from both and enters no conclusion")
     prf.add_argument("--ancestry", choices=["EUR", "AFR", "EAS", "SAS", "AMR"], default=None,
                      help="the reference superpopulation for polygenic scores; without it a "
                           "percentile is printed with the caveat that it was computed against "
@@ -155,6 +158,14 @@ def build_parser() -> argparse.ArgumentParser:
                               "(ECG/ultrasound/MRI/consultations) from the PDFs in a folder → studies.json")
     ist.add_argument("folder", nargs="?", help="the folder with the PDFs (the studies folder by default)")
     ist.add_argument("--force", action="store_true", help="re-read every file")
+
+    igw = sub.add_parser("ingest-wearable", parents=[common],
+                         help="rebuild the lifestyle layer from a wearable export — Garmin or "
+                              "WHOOP, recognised by what is inside it (with a backup)")
+    igw.add_argument("folder", nargs="?",
+                     help="the export folder or zip (looked for in raw/wearables/ by default)")
+    igw.add_argument("--device", choices=["garmin", "whoop"], default=None,
+                     help="read it only if it is this device; without it the file itself decides")
 
     igg = sub.add_parser("ingest-garmin", parents=[common],
                          help="rebuild the lifestyle layer from a Garmin export → profile/wearable_trends.json (with a backup)")
@@ -660,7 +671,8 @@ def _main(argv=None) -> int:
         from . import store as _st
         res = _st.add_lab_point(args.marker, args.date, args.value, name=args.name, new=args.new,
                                 unit=args.unit, ref_low=args.ref_low, ref_high=args.ref_high,
-                                direction=args.direction)
+                                direction=args.direction, date_source="manual",
+                                subject="owner")
         render = fmt.write_result
     elif args.cmd == "redact":
         from . import redact as _red
@@ -679,11 +691,12 @@ def _main(argv=None) -> int:
     elif args.cmd == "add-metric":
         from . import store as _st
         res = _st.add_metric_point(args.metric, args.date, args.value,
-                                   name=args.name, unit=args.unit)
+                                   name=args.name, unit=args.unit, subject="owner")
         render = fmt.write_result
     elif args.cmd == "add-med":
         from . import store as _st
-        res, render = _st.add_medication(args.name, args.dose, args.note), fmt.write_result
+        res, render = (_st.add_medication(args.name, args.dose, args.note, subject="owner"),
+                       fmt.write_result)
     elif args.cmd == "remove-med":
         from . import store as _st
         res, render = _st.remove_medication(args.name), fmt.write_result
@@ -796,6 +809,10 @@ def _main(argv=None) -> int:
                                    added=r.get('added'), updated=r.get('updated'),
                                    seen=r.get('files_seen'), hint=r.get('hint', ''))
                                 if r.get("ok") else f"⚠️ {r.get('error')}")
+    elif args.cmd == "ingest-wearable":
+        from . import wearables as _wear
+        res = _wear.reingest(args.folder, source=getattr(args, "device", None))
+        render = fmt.wearable_ingest_report
     elif args.cmd == "ingest-garmin":
         from . import garmin
         res = garmin.reingest(args.folder)
@@ -823,6 +840,7 @@ def _main(argv=None) -> int:
         render = _pv.format_report
     elif args.cmd == "profile" and (getattr(args, "sex", None)
                                     or getattr(args, "birth_year", None)
+                                    or getattr(args, "wearable", None)
                                     or getattr(args, "ancestry", None)):
         from . import store as _st
         fields = {}
@@ -830,6 +848,8 @@ def _main(argv=None) -> int:
             fields["sex"] = args.sex
         if args.birth_year:
             fields["birth_year"] = args.birth_year
+        if getattr(args, "wearable", None):
+            fields["wearable_primary"] = args.wearable
         if getattr(args, "ancestry", None):
             fields["ancestry"] = args.ancestry
         res = _st.update_metric_profile(fields)

@@ -25,6 +25,21 @@ def genome_status() -> Dict[str, Any]:
     return genome.available()
 
 
+#: Inputs from which ClinVar, the ACMG secondary-findings list and polygenic
+#: scores may not be answered. Named by the MEASURED class (task 87), not by the
+#: file's extension or the vendor's label.
+NARROW_INPUTS = frozenset({
+    "array",                     # a consumer chip, whatever it arrived in
+    "genotype_table",            # a table of chosen positions — a chip by another name
+    "panel",                     # a genotyping panel distributed as a VCF
+    "sparse",                    # a low-pass screen
+    "imputed_panel",             # mostly inferred, not observed
+    "partial_callset_indels",    # half a call set
+    "partial_callset_snvs",      # the other half
+    "unmeasured",                # breadth not established — see the docstring
+})
+
+
 def _array_only_input() -> Optional[Dict[str, Any]]:
     """A refusal when the input is a genotyping array, for the three paths that
     must not run on one.
@@ -43,15 +58,48 @@ def _array_only_input() -> Optional[Dict[str, Any]]:
     The locus catalogue is a different matter and stays open: it is made of
     common pharmacogenetic and trait variants, which is the register where a chip
     works as designed.
+
+    Task 99. The gate used to key on the CARRIER — `input_class == "array"` — and
+    a chip does not stop being a chip by arriving as a VCF. Measured on the
+    reference corpus: a genotyping panel distributed as a VCF holds 553 197
+    variants and a genotype table 48 838 chosen positions, and both of them
+    answered «your VCF has not been annotated yet — run the preparation», which
+    is an INVITATION to do the exact thing this gate exists to prevent. Task 87
+    measured the breadth of every input and nothing read the measurement; now
+    this does.
+
+    `unmeasured` is on the closed side deliberately. The two errors here are not
+    symmetric: refusing a genome whose windows could not be probed costs one
+    command and a sentence, while opening a screen that was never measured costs
+    a finding a person may act on. Where the evidence is missing, the answer is
+    the refusal — the same rule as everywhere else in this codebase.
     """
     from .. import genome
     st = genome.available()
-    if st.get("input_class") != "array":
+    if not st.get("ready"):
+        # No input at all is a different sentence, and the callers already have
+        # it: «this has not been annotated yet». Closing here would tell a person
+        # with no genome that their genome is too narrow.
         return None
-    arr = st.get("array") or {}
-    return {"status": "input_is_an_array", "available": False,
-            "vendor": arr.get("vendor"),
-            "message": _t("array.path_closed"),
+    profile = st.get("input_profile")
+    if profile not in NARROW_INPUTS:
+        return None
+    if profile == "array":
+        arr = st.get("array") or {}
+        return {"status": "input_is_an_array", "available": False,
+                "input_profile": profile, "vendor": arr.get("vendor"),
+                "message": _t("array.path_closed"),
+                "open_instead": _t("array.open_instead")}
+    measured = st.get("callset") or st.get("tabular") or {}
+    return {"status": "input_too_narrow", "available": False,
+            "input_profile": profile,
+            "measured": {k: measured.get(k) for k in
+                         ("observed_per_mb", "variants", "rows", "imputed_share")
+                         if measured.get(k) is not None},
+            "message": _t("narrow.path_closed_" + profile,
+                          per_mb=measured.get("observed_per_mb") or 0,
+                          rows=measured.get("rows") or 0,
+                          share=int(round((measured.get("imputed_share") or 0) * 100))),
             "open_instead": _t("array.open_instead")}
 
 

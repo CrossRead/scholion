@@ -39,12 +39,35 @@ def _diag_url_ok(url: str) -> bool:
 
     Rejects file://, ftp://, http:// downgrade, and every host the tool does not
     itself use — before a request is made, so a rejected url is never fetched.
+
+    This checks scheme and host, not path or query: it was never meant to pin an
+    exact endpoint, only the six hosts the product itself ever talks to. Which is
+    exactly why a redirect must never be followed past this point — see
+    `_NoRedirect` below. A host on this list responding with its own redirect is
+    not this function's problem to solve; not chasing it is.
     """
     try:
         u = urllib.parse.urlsplit(url)
     except ValueError:
         return False
     return u.scheme == "https" and u.hostname in _DIAG_HOSTS
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Refuses every redirect. `_diag_url_ok` approves a host, not a request
+    chain — `urlopen` follows 3xx by default, and a checked host redirecting
+    elsewhere would land the request on a host that was never checked at all."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D102
+        return None
+
+
+def _diag_opener(ctx: Optional[ssl.SSLContext]) -> "urllib.request.OpenerDirector":
+    """An opener for `diagnose()` alone: never redirects, optionally unverified."""
+    handlers = [_NoRedirect()]
+    if ctx is not None:
+        handlers.append(urllib.request.HTTPSHandler(context=ctx))
+    return urllib.request.build_opener(*handlers)
 
 
 def offline() -> bool:
@@ -153,7 +176,8 @@ def diagnose(url: str = "https://rxnav.nlm.nih.gov/REST/version.json") -> Dict[s
 
     Only the product's own hosts over https may be probed (see _DIAG_HOSTS): the
     caller does not get to choose an arbitrary address, because this function runs
-    behind a loopback HTTP route reachable from any page.
+    behind a loopback HTTP route reachable from any page. Redirects are refused
+    rather than followed, for the same reason — see `_NoRedirect`.
     """
     if not _diag_url_ok(url):
         return {"ok": False, "url": url, "error": _t("net.diag_host_refused"),
@@ -166,11 +190,13 @@ def diagnose(url: str = "https://rxnav.nlm.nih.gov/REST/version.json") -> Dict[s
     last = ""
     for label, ctx in (("verified", None), ("unverified", _unverified())):
         try:
-            kw = {"timeout": 10}
-            if ctx is not None:
-                kw["context"] = ctx
-            resp = urllib.request.urlopen(req, **kw)
+            resp = _diag_opener(ctx).open(req, timeout=10)
             return {"ok": True, "mode": label, "status": getattr(resp, "status", 200), "url": url}
+        except urllib.error.HTTPError as e:
+            if 300 <= e.code < 400:
+                last = f"redirect refused ({e.code} → {e.headers.get('Location', '?')})"
+            else:
+                last = f"{type(e).__name__}: {e}"
         except Exception as e:
             last = f"{type(e).__name__}: {e}"
     hint = ""

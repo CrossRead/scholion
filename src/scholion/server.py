@@ -185,7 +185,14 @@ class Handler(BaseHTTPRequestHandler):
         return i18n.set_lang((query.get("lang") or [""])[0])
 
     def _deny(self, state_changing: bool):
-        """The reason for refusal, or None. Checked before any work with the request."""
+        """The reason for refusal, or None. Checked before any work with the request.
+
+        `state_changing` is not only about writing to the profile: /api/diag never
+        touches a file, but it does make an outbound network request on the
+        caller's behalf, and that costs something even though CORS keeps a
+        foreign page from reading the reply — the request itself already went
+        out. `do_GET` passes True for that one route for exactly this reason.
+        """
         if not _host_is_local(self.headers.get("Host", "")):
             return _t("server.deny.foreign_host")
         if state_changing:
@@ -236,7 +243,9 @@ class Handler(BaseHTTPRequestHandler):
         u = urlparse(self.path)
         p, q = u.path, parse_qs(u.query)
         chosen = self._lang(q)
-        deny = self._deny(state_changing=False)
+        # /api/diag is the one GET with a real side effect off the machine — see
+        # the note on _deny. Every other GET here only reads the profile.
+        deny = self._deny(state_changing=(p == "/api/diag"))
         if deny:
             return self._json({"error": deny}, 403)
         try:
@@ -348,7 +357,8 @@ class Handler(BaseHTTPRequestHandler):
                     body.get("marker", ""), body.get("date", ""), body.get("value"),
                     name=body.get("name"), unit=body.get("unit"),
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
-                    direction=body.get("direction")))
+                    direction=body.get("direction"), date_source="manual",
+                    subject="owner"))
             if u.path == "/api/goal":
                 # The keys the reader ticked, not the whole proposal set: the
                 # choice of which targets to adopt is theirs, and a POST that
@@ -360,7 +370,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(store.write_goal_targets(picked))
             if u.path == "/api/medications":
                 return self._json(store.add_medication(
-                    body.get("name", ""), body.get("dose", ""), body.get("note", "")))
+                    body.get("name", ""), body.get("dose", ""), body.get("note", ""),
+                    subject="owner"))
             if u.path == "/api/medications/remove":
                 return self._json(store.remove_medication(body.get("name", "")))
             if u.path == "/api/metrics":
@@ -368,7 +379,7 @@ class Handler(BaseHTTPRequestHandler):
                     body.get("metric", ""), body.get("date", ""), body.get("value"),
                     name=body.get("name"), unit=body.get("unit"),
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
-                    direction=body.get("direction")))
+                    direction=body.get("direction"), subject="owner"))
             if u.path == "/api/focus/log":
                 return self._json(store.add_focus_entry(
                     body.get("date", ""), alcohol=body.get("alcohol") or "",
@@ -393,6 +404,20 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json({"started": False, "busy": True})
                 _run_update_bg()
                 return self._json({"started": True})
+            if u.path == "/api/wearable-primary":
+                # Which device answers where two of them measured the same thing.
+                # Validated against the devices this build can read, so a typo
+                # cannot silently mean «nobody», which looks identical on screen.
+                from . import store as _st, wearables as _wear
+                name = (body.get("device") or "").strip()
+                if name not in {k["source"] for k in _wear.KINDS}:
+                    return self._json({"ok": False, "error": _t("wearables.unknown_device",
+                                                                name=name or "—")})
+                return self._json(_st.update_metric_profile({"wearable_primary": name}))
+            if u.path == "/api/ingest-wearable":
+                from . import wearables as _wear
+                return self._json(_wear.reingest(body.get("path") or None,
+                                                 source=body.get("device") or None))
             if u.path == "/api/ingest-garmin":
                 from . import garmin
                 return self._json(garmin.reingest(body.get("path") or None))

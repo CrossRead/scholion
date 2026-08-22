@@ -40,6 +40,262 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.3 — 22.08.2026
+
+This release is about files that arrive wrapped, laboratory forms printed for an
+American reader, and — the larger half — a report that stops claiming more than
+the file it was given can support.
+
+### What you can bring it now
+
+**A consumer DNA test still inside whatever the provider wrapped it in.** A VCF
+compressed with bzip2, a VCF inside the provider's zip, a VCF whose file name
+carries URL-encoded brackets — all of them ordinary VCFs, and all of them now
+read. A file is identified by its bytes before its name, so an export that
+arrived zipped is no longer «an archive, not opened blind here»: looking inside
+is the opposite of blind. None of these can be seeked into, but the catalogue is
+fifty-four loci, so one cached pass over the file answers all of them — and the
+same pass measures the call set exactly rather than by probe.
+`scholion genome-status` names what it found.
+
+**A genotype table from a chip, with the ceiling of the chip attached.** It is
+read the same way, and a position nobody typed is reported as not read — never
+as the reference.
+
+**Three formats stay named and unread, each with its reason**, because a gap
+left unexplained is indistinguishable from an oversight: a VCF that went through
+a spreadsheet (its structure is gone rather than hidden — the honest answer is
+the original export), a Complete Genomics `var` table (the vendor ships a
+converter that is correct by construction, and a second implementation here
+would be a worse one), and an archive of the FTDNA era keyed by internal SNP
+numbers with no rsID anywhere in it.
+
+**Laboratory forms printed for an American reader.** A LabCorp report prints its
+dates as a table — the column headings on one line, the values on the next — and
+a reader expecting the label and the date side by side finds neither. The
+heading and the line under it are now read, and only while «collected» is the
+leftmost date column; where that cannot be established, nothing is read rather
+than the wrong column filed. A two-digit year is read. And a page carrying
+`12/15/2008` has already said which order it prints in, because there is no
+fifteenth month, so `12/10/2008` beside it is the tenth of December and not a
+coin toss — the evidence is on the same page, in the same table, from the same
+instrument. A page whose dates contradict each other is still refused, and so is
+a lone ambiguous date with nothing on the page to settle it. Two weaker
+witnesses are used only after the page and are named as what they are:
+«Ordered Date», which some lipid panels print instead of a draw date, and the
+file name, where a month spelled out is read and a numeric one is not.
+`scholion ingest-labs` reports what each file gave.
+
+**An exome or a panel whose header does not say which build it is in.** The
+build decides whether the genomic layer may answer at all, and it was
+established from the lengths of the chromosomes in the header, or — failing
+that — from a variant lying past the end of chromosome 1, which only a GRCh37
+file can have. A capture panel has neither: no contig lengths, and no rows out
+at the telomere to probe with. Three providers stamp their own pipeline into the
+header and build against one reference only, so that signature is now read as
+well. Where a pipeline serves both builds, the provider's name alone settles
+nothing and is not used on its own: DRAGEN counts only together with the
+reference path in the same header. `scholion genome-status` prints which of the
+four witnesses answered — a build inferred from who made the file is a weaker
+claim than one measured off the file, and it no longer looks the same.
+
+**A WHOOP export.** The zip that arrives by email — or the folder it was
+unpacked into — is now read: recovery, day strain, resting heart rate, heart
+rate variability, respiration, blood oxygen, skin temperature, sleep with its
+stages, sleep debt, consistency and efficiency, and workouts.
+`scholion ingest-wearable <folder-or-zip>` takes either device and says which
+one it recognised; the Garmin command still does exactly what it did.
+
+WHOOP does not publish the layout of that export, and a layout nobody published
+is one that can change without telling anybody, so the column names are read
+rather than assumed. Each header is looked up in a table that ships as data, and
+a column that is not in the table is **listed by name** with nothing read from
+it — an export carrying a column this has never seen says so instead of quietly
+dropping a measurement.
+
+**The reader can be named.** Three readers can put a genome through: two
+external programs and the one that ships here. Until now whichever was installed
+won, which means the same file on two machines was read two different ways with
+nothing saying so. `SCHOLION_GENOME_ENGINE=tabixlite scholion genome-status`
+pins it — useful for anybody comparing two runs, and the only way to see what
+somebody with no external tools installed actually gets. A name that is not one
+of the three, or a reader that is not installed, stops the genomic layer and
+says which: falling back quietly would answer a different question from the one
+asked.
+
+**Two devices no longer become one line.** A Garmin and a WHOOP both report
+resting heart rate, heart rate variability, respiration and sleep, and they do
+not measure them the same way: different window, different algorithm, different
+place on the body. A measurement is now stored together with the device that
+made it. Where both measured the same thing both series are shown, neither is
+averaged into the other, and no conclusion is drawn from either until the
+question is answered — `scholion profile --wearable whoop` names the one that
+speaks. For anybody with a single device nothing changes at all. A lifestyle
+file written by an earlier version is brought to the new layout when it is read,
+and the device it is filed under is taken from what that file says about itself:
+a file naming no device is filed as unspecified rather than assigned one.
+
+**Every number says which device measured it.** The strip above the lifestyle
+section names the devices in the profile rather than the file they are kept in,
+and each metric card carries `measured by …` under the value. Where two devices
+report the same thing and none has been named to answer, the page says so at the
+top of the section and on each affected card, and offers to settle it in one
+click. A column the reader of a WHOOP export does not recognise is listed by
+name after every import, and can be named once in
+`profile/wearable_metrics.local.json` so the next import reads it — additions
+merge per column and cannot delete what already works.
+
+### What was wrong
+
+**Your own measurement joined a fictional person's history without a word.**
+The demonstration profile marks itself as invented, and the mark was on the
+FILE. Adding a real value to it therefore worked: the point joined a series of
+generated numbers, the file went on declaring itself synthetic — by then untrue
+— and the overview counted the abnormalities of somebody half imaginary. Every
+datum now records whose it is, and one profile holds one person. The first real
+value written — by `scholion add-lab`, `scholion add-metric`, `scholion add-med`,
+an import, or the same actions on the page — erases the demonstration and says
+so, naming every file it removed. Nothing is lost by that: the demonstration is
+generated from a fixed seed, so `scholion init --demo --dir <folder>` builds it
+again exactly as it was, while a series mixing invented values with measured ones
+could not be separated afterwards by anybody. Only data carrying the mark can be
+erased, so an ordinary profile — which carries no mark at all — is never
+touched.
+
+**A published reference genome could be read under somebody else's laboratory
+history.** A genome anybody may look at can be fetched to see the genomic layer
+work, and it belongs to a real, consented, published person — not to the reader,
+and not to the fictional one of the demonstration. Read beside either it produced
+one case out of two people: this genotype, that history, a single report. The
+fetched folder now says whose genome it is, and the genomic layer stays silent
+while the two are in one profile, naming both sides and the folder to give it
+instead. A genome folder that says nothing is still read as before: silence is
+not a claim, and every genome anybody already has is unmarked.
+
+**A chip stopped being a chip by arriving as a VCF.** ClinVar findings, the
+secondary-findings list and polygenic scores can only be answered from a broad
+call set, and the gate that closes them keyed on the CARRIER — a consumer array
+file — rather than on what the input actually holds. A genotyping panel
+distributed as a VCF (553 197 variants) and a table of chosen positions (48 838)
+both went the other way and were told «this has not been annotated yet — run the
+preparation», which is an invitation to do the exact thing the gate exists to
+prevent. Breadth now decides: a chip, a genotype table, a panel, a low-pass
+screen, a mostly-imputed file and half a call set all close those three paths,
+whatever they arrived in. An input whose breadth could not be measured closes
+them too — refusing a genome that could not be probed costs one command, and
+opening a screen that was never measured costs a finding somebody may act on.
+
+**An approximate date stopped looking approximate the moment it was stored.** A
+form printing no draw date is read from two weaker witnesses — an «Ordered
+Date», which some lipid panels print instead of one, and the file name. That
+caveat was printed once, while importing, and afterwards the point sat in the
+series indistinguishable from one dated by the draw itself. Every laboratory
+point now records which of the three answered for it. Points stored before this
+version say «not recorded» rather than claiming a form; `scholion limits` counts
+them in one line instead of marking each, and re-running `scholion ingest-labs`
+over the original forms fills them in.
+
+**«A whole genome» was printed above files that were not one.** Every readable
+VCF used to be described as «a whole genome — every base the sequencing reached,
+so both single variants and polygenic scores are computable». Breadth is now
+measured rather than assumed: observed variants per megabase through three fixed
+intergenic windows, the composition of substitutions against insertions and
+deletions, and whether the file carries reference blocks. The thresholds are
+calibrated against measured files rather than chosen for roundness — a 30×
+whole genome measures 1547–1616 variants per megabase, a genotyping chip shipped
+as a VCF 147–452, a low-pass screen 17–81. Where the measurement cannot be made,
+the report says so and promises nothing.
+
+Two consequences carry the weight. The FILTER column is now read: a file whose
+rows are almost entirely imputed used to have every one of them signed «called
+from the VCF» — the output of an imputation model handed over as a measurement.
+And a call set split by variant type now refuses a variant it cannot hold: a
+file containing only insertions and deletions used to answer `TT (reference)`
+for APOE, which is a statement about a person derived from a property of a file.
+
+**`Genome connected. File: None`** — twice wrong in eight words, and it was what
+every holder of a chip export saw, while the path to that export sat in the
+machine-readable status all along. The status of an array now names the vendor,
+the number of positions, the file itself and the ceiling of the chip.
+
+**A refusal printed its own internal label instead of a sentence.** The
+commonest question anybody asks of a chip came back as an unreadable string in
+brackets. The missing lines are written in both languages, the head of a refusal
+can no longer come back as a label, and every value able to reach it is now
+walked. That walk immediately turned up one more: a call ambiguous by strand
+fell through every branch and vanished, so two DPYD markers — the pair used to
+dose chemotherapy — answered «cannot be read».
+
+**«No genome found» on a file that was sitting right there.** Every refusal now
+names the file by what is inside it and says what to do with it.
+
+**An answer printed a position from the other build.** A GRCh37 file was read at
+GRCh37 positions and printed the catalogue's GRCh38 number, sending the reader
+to a base that is not the one that answered. Answer and refusal both name the
+coordinate set they were read in.
+
+**A page open in your browser on another site could ask your own Scholion
+instance to make an outbound request, and get nothing back but learn whether it
+succeeded.** Every route on this server that changes what is stored is already
+refused when a foreign page calls it — that is what stops a tab on another site
+from quietly editing a profile just because a browser can always reach
+`127.0.0.1`. The one route that does not store anything but does make its own
+request to the outside — the diagnostic check behind `scholion serve`'s
+connection page — was not covered by that refusal, because it answers a plain
+`GET` rather than a `POST`, and the check had only ever been wired to `POST`. It
+is now refused the same way. Separately, the list of addresses that check is
+allowed to reach was being read by scheme and host alone; an allowed address
+that itself answered with a redirect was followed wherever it pointed. It no
+longer is.
+
+### What is retracted
+
+Anything in this list was produced by an earlier version and should not be
+relied on:
+
+- any ClinVar finding, secondary-findings answer or polygenic score computed
+  from an input that is not a broad call set — a chip delivered as a VCF, a
+  table of chosen positions, a genotyping panel, a low-pass or mostly-imputed
+  file, or half a call set;
+- any description of an input as a whole genome, where the input was a chip
+  export, a low-pass screen or a partial call set;
+- any reference genotype returned from a call set that cannot hold that kind of
+  variant — most visibly `TT (reference)` for APOE out of a file containing only
+  insertions and deletions;
+- any row signed «called from the VCF» that came from a file of imputed
+  genotypes;
+- any position printed against a build other than the one the file was read in.
+
+### What needs recomputing
+
+No stored value changes and the knowledge base is untouched, so series already
+on a chart stay comparable. What changed is what can now be read, so:
+
+```
+scholion genome-status
+scholion overview
+```
+
+and, for laboratory PDFs previously refused because no draw date could be found:
+
+```
+scholion ingest-labs <folder>
+```
+
+### Measured
+
+On a fixed set of thirty-seven third-party inputs, kept unchanged between runs:
+
+| | before | after |
+|---|---|---|
+| files read and answering | 19 | 24 |
+| false «no genome found» | 8 | 0 |
+| «a whole genome» claimed on an input that is not one | 7 | 0 |
+| `File: None` on a chip export | 12 | 0 |
+| internal labels in user-facing text | 6 | 0 |
+| laboratory measurements extracted | 126 | 387 |
+
+
 ## v0.4.2 — 20.08.2026
 
 The safety rules now travel with the tools, not only with the skill.

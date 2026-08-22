@@ -115,7 +115,16 @@ _DATE_FALLBACK = re.compile(r"Регистрация\s+биоматериала[
 # ambiguous one is left for the person to enter, with the file skipped as «not a
 # report» exactly as before.
 _EN_LABEL = (r"(?:collected|collection\s+date|date\s+of\s+collection|specimen\s+collected|"
+             r"date\s+collected|specimen\s+date|date\s+of\s+service|"
              r"drawn|draw\s+date|sample\s+date|date\s+drawn|report\s+date|date\s+reported)")
+
+#: Labels that are NEAR the draw and are not it. An American laboratory prints
+#: «Ordered Date» on a lipid panel and never prints the draw at all; four forms
+#: in the reference corpus are dated this way and nothing else on the page dates
+#: them. Refusing all four buys nothing — the order and the draw are a day or two
+#: apart — but taking the number silently would file a point under a date the
+#: form does not claim. So it is read, and the report says which date it is.
+_EN_LABEL_NEAR = r"(?:ordered\s+date|date\s+ordered|received\s+date|date\s+received)"
 
 _DATE_EN = re.compile(_EN_LABEL + r"[^\d]{0,20}(\d{4})-(\d{2})-(\d{2})", re.IGNORECASE)
 
@@ -139,7 +148,112 @@ _DATE_EN_MONTH_FIRST_DAY = re.compile(
 #: wrong month is worse than a point not filed, because it joins a series and
 #: moves a trend. The ambiguous case is NAMED, not guessed: same rule as the
 #: sex-specific interval that is left empty rather than borrowed.
-_DATE_EN_SLASH = re.compile(_EN_LABEL + r"[^\d]{0,20}(\d{1,2})/(\d{1,2})/(\d{4})", re.IGNORECASE)
+_DATE_EN_SLASH = re.compile(_EN_LABEL + r"[^\d]{0,20}(\d{1,2})/(\d{1,2})/(\d{2,4})", re.IGNORECASE)
+_DATE_EN_SLASH_NEAR = re.compile(
+    _EN_LABEL_NEAR + r"[^\d]{0,20}(\d{1,2})/(\d{1,2})/(\d{2,4})", re.IGNORECASE)
+
+#: A bare slashed date anywhere, used only under a column header (below).
+_SLASH_ANY = re.compile(r"(?<![\d/])(\d{1,2})/(\d{1,2})/(\d{2,4})(?![\d/])")
+
+
+def _year(raw: str) -> Optional[int]:
+    """Four digits, or two expanded the way every C library expands them."""
+    n = int(raw)
+    if len(raw) == 4:
+        return n if 1900 <= n <= 2100 else None
+    return 2000 + n if n <= 68 else 1900 + n
+
+
+def page_convention(text: str) -> Optional[str]:
+    """Which order this page prints its slashed dates in, read off the page.
+
+    A laboratory report rarely carries only one date: the draw, the entry and
+    the report are all on it, and one of them is usually decidable — `12/15/2008`
+    can only be the fifteenth of December, because there is no fifteenth month.
+    That single decidable date establishes what the OTHER dates on the same page
+    mean, and «12/10/2008» beside it is then the tenth of December rather than a
+    coin toss.
+
+    This is not the guess the refusal rule exists to prevent. The evidence is on
+    the page, in the same table, printed by the same instrument. What is still
+    refused is a page whose dates CONTRADICT each other, and a page where nothing
+    is decidable at all.
+    """
+    mdy = dmy = False
+    for m in _SLASH_ANY.finditer(text or ""):
+        a, b = int(m.group(1)), int(m.group(2))
+        if a > 12 and b <= 12:
+            dmy = True
+        elif b > 12 and a <= 12:
+            mdy = True
+    if mdy and dmy:
+        return None
+    return "mdy" if mdy else ("dmy" if dmy else None)
+
+
+def _slash_date(a: int, b: int, raw_year: str, raw: str, convention: Optional[str] = None):
+    """(iso, ambiguity) for `a/b/year`, refusing where the order is undecidable.
+
+    One rule, in one place, so the same discipline holds whether the date was
+    found beside its label or underneath a column heading.
+    """
+    year = _year(raw_year)
+    if year is None or a > 31 or b > 31 or a < 1 or b < 1:
+        return None, None
+    if a > 12 and b <= 12:                     # only D/M/Y reads
+        return f"{year}-{b:02d}-{a:02d}", None
+    if b > 12 and a <= 12:                     # only M/D/Y reads
+        return f"{year}-{a:02d}-{b:02d}", None
+    if a == b and a <= 12:
+        # «04/04/2017» reads the same in both orders. Refusing it printed
+        # «which is either 2017-04-04 or 2017-04-04» and threw away a form about
+        # which there was nothing to be unsure of. A refusal costs a real
+        # measurement; spend it only where there is a real choice to be wrong.
+        return f"{year}-{a:02d}-{b:02d}", None
+    if a <= 12 and b <= 12:
+        if convention == "mdy":
+            return f"{year}-{a:02d}-{b:02d}", None
+        if convention == "dmy":
+            return f"{year}-{b:02d}-{a:02d}", None
+        return None, {"raw": raw.strip(), "both": [f"{year}-{a:02d}-{b:02d}",
+                                                   f"{year}-{b:02d}-{a:02d}"]}
+    return None, None
+
+
+#: A form that prints its dates as a TABLE — a heading line naming the columns,
+#: the values on the line below it. Every LabCorp-derived report in the reference
+#: corpus is built this way, and the label-then-date reader finds nothing on such
+#: a page: the words and the numbers are never on the same line.
+_COL_COLLECTED = re.compile(r"(?:date|time)\s+collected", re.IGNORECASE)
+#: Other date columns of the same heading. Reading the first date under the
+#: heading is only sound while «collected» is the leftmost of them — otherwise
+#: the first number belongs to another column and we would be filing the wrong
+#: day. Where that cannot be established, nothing is read.
+_COL_OTHER = re.compile(r"(?:date|time)\s+(?:entered|reported|received|ordered)|date\s+of\s+birth",
+                        re.IGNORECASE)
+
+
+def columnar_date(text: str, convention: Optional[str] = None):
+    """(date, ambiguity) from a heading line with the values on the next line."""
+    lines = [ln for ln in (text or "").splitlines()]
+    for i, line in enumerate(lines):
+        m = _COL_COLLECTED.search(line)
+        if not m or _SLASH_ANY.search(line):
+            continue
+        other = _COL_OTHER.search(line)
+        if other and other.start() < m.start():
+            # «Date Reported … Date Collected»: the first date below the heading
+            # is not the draw. Say nothing rather than file the wrong day.
+            continue
+        for nxt in lines[i + 1:i + 3]:
+            if not nxt.strip():
+                continue
+            hit = _SLASH_ANY.search(nxt)
+            if hit:
+                return _slash_date(int(hit.group(1)), int(hit.group(2)),
+                                   hit.group(3), hit.group(0), convention)
+            break
+    return None, None
 
 
 def english_date(text: str):
@@ -161,24 +275,34 @@ def english_date(text: str):
             next((full for full in _MONTHS if full.startswith(name.lower()[:3])), ""), None)
         if month and 1 <= int(day) <= 31:
             return f"{m.group(3)}-{month:02d}-{int(day):02d}", None
+    conv = page_convention(text)
     m = _DATE_EN_SLASH.search(text)
     if m:
-        a, b, year = int(m.group(1)), int(m.group(2)), m.group(3)
-        if a > 12 and b <= 12:                     # only D/M/Y reads
-            return f"{year}-{b:02d}-{a:02d}", None
-        if b > 12 and a <= 12:                     # only M/D/Y reads
-            return f"{year}-{a:02d}-{b:02d}", None
-        if a == b:
-            # «04/04/2017» reads the same in both orders. Refusing it printed
-            # «which is either 2017-04-04 or 2017-04-04» and threw away a form
-            # about which there was nothing to be unsure of. A refusal costs a
-            # real measurement; it has to be spent only where there is a real
-            # choice to be wrong about.
-            return f"{year}-{a:02d}-{b:02d}", None
-        if a <= 12 and b <= 12:
-            return None, {"raw": m.group(0).strip(), "both": [f"{year}-{a:02d}-{b:02d}",
-                                                              f"{year}-{b:02d}-{a:02d}"]}
-    return None, None
+        iso, amb = _slash_date(int(m.group(1)), int(m.group(2)), m.group(3),
+                               m.group(0), conv)
+        if iso or amb:
+            return iso, amb
+    return columnar_date(text, conv)
+
+
+def english_date_near(text: str):
+    """A date the form gives for something NEAR the draw — the order, the receipt.
+
+    Returned separately from `english_date` on purpose: the caller has to be able
+    to say which date it filed. Same refusal rule, because an order date read in
+    the wrong month is exactly as wrong as a draw date read in the wrong month.
+    """
+    for pattern in (re.compile(_EN_LABEL_NEAR + r"[^\d]{0,20}(\d{4})-(\d{2})-(\d{2})",
+                               re.IGNORECASE),):
+        m = pattern.search(text or "")
+        if m:
+            return f"{m.group(1)}-{m.group(2)}-{m.group(3)}", None, "ordered"
+    m = _DATE_EN_SLASH_NEAR.search(text or "")
+    if m:
+        iso, amb = _slash_date(int(m.group(1)), int(m.group(2)), m.group(3),
+                               m.group(0), page_convention(text))
+        return iso, amb, "ordered"
+    return None, None, None
 
 
 #: A date in the FILE NAME. Usable, and marked as what it is: the name of a file
@@ -188,13 +312,30 @@ def english_date(text: str):
 _DATE_IN_NAME = re.compile(r"(?<!\d)(20\d{2})[-_.]?(\d{2})[-_.]?(\d{2})(?!\d)")
 
 
+#: `Blood_Chemistry_Labs_1-15-2015.pdf`, `LEF_Blood_Tests_April_12__2017.pdf`.
+#: American files are named the American way, and the same refusal rule applies:
+#: a spelled month cannot be misread, `1-15-2015` cannot be misread because
+#: there is no fifteenth month, and `4-11-2017` can — so it is not read.
+_NAME_SLASHED = re.compile(r"(?<!\d)(\d{1,2})[-_.](\d{1,2})[-_.](20\d{2})(?!\d)")
+_NAME_MONTH = re.compile(r"([A-Za-z]{3,9})[-_. ]+(\d{1,2})[-_,. ]+(20\d{2})(?!\d)")
+
+
 def date_from_filename(name: str):
     m = _DATE_IN_NAME.search(name or "")
-    if not m:
-        return None
-    y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    if 1 <= mo <= 12 and 1 <= d <= 31:
-        return f"{y:04d}-{mo:02d}-{d:02d}"
+    if m:
+        y, mo, d = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if 1 <= mo <= 12 and 1 <= d <= 31:
+            return f"{y:04d}-{mo:02d}-{d:02d}"
+    m = _NAME_MONTH.search(name or "")
+    if m:
+        month = _MONTHS.get(m.group(1).lower()) or _MONTHS.get(
+            next((full for full in _MONTHS if full.startswith(m.group(1).lower()[:3])), ""), None)
+        if month and 1 <= int(m.group(2)) <= 31:
+            return f"{m.group(3)}-{month:02d}-{int(m.group(2)):02d}"
+    m = _NAME_SLASHED.search(name or "")
+    if m:
+        iso, _amb = _slash_date(int(m.group(1)), int(m.group(2)), m.group(3), m.group(0))
+        return iso
     return None
 # Paediatric/female references that land on the same row as the name:
 # «Фолликулостимулирующий гормон   Девочки (12-13лет): 1,29 - 8,74» — numbers from here must
@@ -1311,6 +1452,11 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
             continue
         text = _read_any(f) or ""
         hint = None
+        # Task 100. Which of the three date sources actually answered for THIS
+        # file. It travels to the stored point, because the caveat printed here
+        # is gone the moment the ingest output scrolls away, and the point lives
+        # on in a series for years.
+        date_src = "form"
         # THE ROW-WISE READER GOES FIRST for anything that is not a PDF. If the
         # file is a table with a date column, every row is a measurement with its
         # own date and the form-shaped reader below must not see it — that reader
@@ -1327,7 +1473,10 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
                                             or core.marker_display(spec, i18n.lang()) or pt["label"],
                                             unit=pt["unit"] or spec.get("unit"),
                                             ref_low=pt["ref_low"], ref_high=pt["ref_high"],
-                                            direction=spec.get("direction"))
+                                            direction=spec.get("direction"),
+                                            # A delimited export dates every ROW,
+                                            # and that column is the draw.
+                                            date_source="form", subject="owner")
                     if r.get("ok"):
                         added_here.append(pt["key"])
                 manifest[rk] = mt
@@ -1374,12 +1523,34 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
             manifest[rk] = mt
             continue
         if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+            # Before the file name: a date the form gives for something NEAR the
+            # draw. Four lipid panels in the reference corpus print «Ordered
+            # Date» and nothing else — refusing them buys nothing, since the
+            # order and the draw are a day or two apart, but filing the number
+            # without saying which date it is would be a claim the form does not
+            # make. So it is used, and named.
+            near_date, near_amb, near_kind = english_date_near(text)
+            if near_amb:
+                out["not_ingested"].append(
+                    {"file": f.name, "reason": "ambiguous_date",
+                     "detail": _t("ingest_labs.reason_ambiguous_date", raw=near_amb["raw"],
+                                  first=near_amb["both"][0], second=near_amb["both"][1])})
+                manifest[rk] = mt
+                continue
+            if near_date:
+                hint = near_date
+                date_src = "ordered"
+                out.setdefault("date_not_the_draw", []).append(
+                    {"file": f.name, "date": near_date, "kind": near_kind,
+                     "note": _t("ingest_labs.date_not_the_draw", date=near_date)})
+        if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
             # Before giving up: the FILE NAME. It is a weaker witness than the
             # page — people rename files to the day they downloaded them — so it
             # is used only here, at the end, and the report says the date did not
             # come off the form.
             hint = date_from_filename(f.name)
             if hint:
+                date_src = "filename"
                 out.setdefault("date_from_filename", []).append(
                     {"file": f.name, "date": hint,
                      "note": _t("ingest_labs.date_from_filename", date=hint)})
@@ -1468,7 +1639,8 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
             seen_pt.setdefault((key, day), (v["value"], f.name, prio, stamp))
             r = store.add_lab_point(key, stamp, v["value"], name=name, unit=spec.get("unit"),
                                     ref_low=rl, ref_high=rh, direction=spec.get("direction"),
-                                    censored=v.get("censored"))
+                                    censored=v.get("censored"),
+                                    date_source=date_src, subject="owner")
             if r.get("ok"):
                 added.append(key)
         manifest[rk] = mt

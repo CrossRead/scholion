@@ -1,0 +1,5 @@
+Cycle start time,Cycle end time,Cycle timezone,Sleep onset,Wake onset,Sleep performance %,Respiratory rate (rpm),Asleep duration (min),In bed duration (min),Light sleep duration (min),Deep (SWS) duration (min),REM duration (min),Awake duration (min),Sleep need (min),Sleep debt (min),Sleep efficiency %,Sleep consistency %,Nap
+2026-01-04 06:12:00,2026-01-05 06:00:00,UTC+03:00,2026-01-03 23:41:00,2026-01-04 06:12:00,88,14.2,391,425,221,74,96,34,444,35,92,71,false
+2026-01-05 06:20:00,2026-01-06 06:05:00,UTC+03:00,2026-01-04 23:58:00,2026-01-05 06:20:00,81,14.8,362,402,208,66,88,40,447,52,90,68,false
+2026-01-05 06:20:00,2026-01-06 06:05:00,UTC+03:00,2026-01-05 14:10:00,2026-01-05 14:52:00,12,15.1,41,45,30,6,5,4,447,52,91,68,true
+2026-02-02 06:30:00,,UTC+03:00,2026-02-01 22:55:00,2026-02-02 06:30:00,95,13.9,432,460,234,88,110,28,455,10,94,77,false

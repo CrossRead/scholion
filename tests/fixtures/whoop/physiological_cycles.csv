@@ -1,0 +1,5 @@
+Cycle start time,Cycle end time,Cycle timezone,Recovery score %,Resting heart rate (bpm),Heart rate variability (ms),Skin temp (celsius),Blood oxygen %,Day Strain,Energy burned (cal),Max HR (bpm),Average HR (bpm),Sleep onset,Wake onset,Sleep performance %,Respiratory rate (rpm),Asleep duration (min),In bed duration (min),Light sleep duration (min),Deep (SWS) duration (min),REM duration (min),Awake duration (min),Sleep need (min),Sleep debt (min),Sleep efficiency %,Sleep consistency %,Mystery Column
+2026-01-04 06:12:00,2026-01-05 06:00:00,UTC+03:00,71,52,64,33.4,96,12.7,2610,158,71,2026-01-03 23:41:00,2026-01-04 06:12:00,88,14.2,391,425,221,74,96,34,444,35,92,71,7
+2026-01-05 06:20:00,2026-01-06 06:05:00,UTC+03:00,55,55,48,33.6,95,15.2,2890,171,78,2026-01-04 23:58:00,2026-01-05 06:20:00,81,14.8,362,402,208,66,88,40,447,52,90,68,9
+2026-02-02 06:30:00,,UTC+03:00,80,50,72,33.2,97,10.4,2450,151,69,2026-02-01 22:55:00,2026-02-02 06:30:00,95,13.9,432,460,234,88,110,28,455,10,94,77,4
+not-a-date,,,,60,40,,,,,,,,,,,,,,,,,,,,,

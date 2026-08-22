@@ -1,6 +1,6 @@
 """Rendering of engine structures into markdown strings. Used by the CLI, the Claude skill and the Ouroboros plugin."""
 from __future__ import annotations
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from .i18n import plural as _plural, t as _t
 
@@ -50,6 +50,12 @@ def _near_suffix(m) -> str:
     cp = (", " + _t("near.corridor", pct=f"{nl['corridor_pct']:g}")
           if nl.get("corridor_pct") is not None else "")
     mv = f"; {nl['movement']}" if nl.get("movement") else ""
+    # Task 100. The caveat travels WITH the claim it qualifies. A move measured
+    # between two days, one of which the form never printed, is a move of
+    # uncertain size, and saying so anywhere else than here would be saying it
+    # where nobody is reading.
+    if nl.get("date_caveat"):
+        mv += " " + nl["date_caveat"]
     return " · " + _t("near.at_edge", margin=f"{nl['margin_pct']:g}", side=side,
                       bound=f"{nl['bound']:g}") + cp + mv
 _PRIO_ICON = {"high": "🔴", "moderate": "🟠", "low": "🟢"}
@@ -138,7 +144,11 @@ def labs_report(r: Dict[str, Any]) -> str:
         icon = _mark_icon(m)
         ref = _fmt_ref(m)
         val = f"{m['value']} {m['unit']}".strip()
-        line = f"{icon} {m['name']}: **{val}** ({m['date']}){ref}"
+        # Task 100. A date that did not come off the form is marked where the
+        # date is shown, not only in the log of the ingest that stored it.
+        _ds = m.get("date_source")
+        _dmark = (" " + _t("labs.date_source_" + _ds)) if _ds in ("ordered", "filename") else ""
+        line = f"{icon} {m['name']}: **{val}** ({m['date']}{_dmark}){ref}"
         for rep in m.get("repeats") or []:
             times = ", ".join(f"{p['at'] or '—'} {p['value']}" for p in rep["points"])
             line += "\n   " + _t("labs.same_day_repeat", day=rep["day"], points=times)
@@ -202,6 +212,27 @@ def _fmt_ref(m: Dict[str, Any]) -> str:
     return ""
 
 
+def _refused_head(value: Optional[str]) -> str:
+    """The one-line reason a locus has no answer — and never a catalogue key.
+
+    Task 88. This head was built by gluing a value onto a prefix:
+    `"genome.refused_head." + confidence`. `confidence` is not an enumeration of
+    refusal reasons, two of its values had no line in either language, and the
+    resolver printed the key itself — so the commonest question anybody asks of
+    a chip, «what is my APOE», answered with ⟦genome.refused_head.not_on_chip⟧.
+
+    A missing line is now a missing line, not a leak: the fallback says the true
+    and useful thing (there is no answer here and the sentence below explains
+    why), and `tests/test_no_refusal_prints_a_key.py` walks every value that can
+    reach this function so that the next one is caught before a person sees it.
+    """
+    key = "genome.refused_head." + (value or "no_file")
+    text = _t(key)
+    if text.startswith("\u27e6") or text == key:
+        return _t("genome.refused_head.unnamed")
+    return text
+
+
 def genome_report(r: Dict[str, Any]) -> str:
     st = r.get("status")
     if st == "unknown_rsid":
@@ -220,7 +251,7 @@ def genome_report(r: Dict[str, Any]) -> str:
         pos = r.get("pos") or loc.get("pos")
         where = f"{chrom}:{pos}" if chrom and pos else _t("genome.no_coordinate")
         head = (f"⚪ {r.get('rsid')} ({gene}, {where}) — "
-                + _t("genome.refused_head." + (r.get("reason") or "no_file")))
+                + _refused_head(r.get("reason")))
         lines = [head, f"_{r.get('message','')}_"]
         amb = r.get("ambiguous") or {}
         if amb.get("choices"):
@@ -239,9 +270,16 @@ def genome_report(r: Dict[str, Any]) -> str:
         # third leak of the same kind as `(, None:None)`: an absent value
         # rendered in the shape of a present one.
         loc = r.get("locus") or {}
-        where = (f"{r.get('chrom') or loc.get('chrom')}:{r.get('pos') or loc.get('pos')}"
-                 if (r.get("chrom") or loc.get("chrom")) else _t("genome.no_coordinate"))
-        head = _t("genome.refused_head." + (res.get("confidence") or "unreadable_file"))
+        # The same rule as the answered line: print the coordinate that was
+        # actually looked at, and name the set it belongs to. A refusal that
+        # quotes the other build's number sends the reader to the wrong base.
+        _asm = res.get("assembly")
+        _pos = res.get("read_pos") if res.get("read_pos") is not None else (
+            r.get("pos") or loc.get("pos"))
+        _chrom = r.get("chrom") or loc.get("chrom")
+        where = (f"{(_asm + ' ') if _asm else ''}{_chrom}:{_pos}"
+                 if _chrom else _t("genome.no_coordinate"))
+        head = _refused_head(res.get("confidence") or "unreadable_file")
         why = res.get("note") or _t("genome.refused.no_answer")
         return f"⚪ {r.get('rsid')} ({r.get('gene') or '—'}, {where}) — {head}\n_{why}_"
     gt = res.get("genotype", "?")
@@ -251,13 +289,30 @@ def genome_report(r: Dict[str, Any]) -> str:
     # be, while the weaker `assumed_ref` was labelled properly. A reader
     # comparing two loci would have read the better-evidenced one as the vaguer.
     conf = {"called": _t("genome.called"),
+            "called_array": _t("genome.called_array"),
+            "called_array_ambiguous": _t("genome.called_array_ambiguous"),
             "confirmed_ref": _t("genome.confirmed_ref_short"),
             "assumed_ref": _t("genome.assumed_ref")}.get(res.get("confidence"), "")
+    # An imputed genotype is the output of a model over a reference panel, not a
+    # base anybody observed in this person. One corpus file was 98.8 % imputed
+    # and every row of it read as «called from the VCF».
+    if res.get("imputed"):
+        conf = _t("genome.imputed_short")
+    elif res.get("filtered"):
+        conf = _t("genome.filtered_short", value=res["filtered"])
     star = f" {r.get('star')}" if r.get("star") else ""
     dp = ", " + _t("genome.depth", value=res["depth"]) if res.get("depth") is not None else ""
     gene = r.get("gene") or "—"
+    # Task 83, the last item of its acceptance. The catalogue holds two
+    # coordinates for every locus and the file's own build decides which one is
+    # read; printing the other one unlabelled sent a person with a GRCh37 file
+    # to look up a position holding a different base in their own data. Name the
+    # set, and print the number that was actually used.
+    asm_used = res.get("assembly")
+    pos_shown = res.get("read_pos") if res.get("read_pos") is not None else r.get("pos")
     line = (f"🧬 **{r.get('rsid')}**{star} — "
-            + _t("genome.gene_at", gene=gene, chrom=r.get("chrom"), pos=r.get("pos"))
+            + _t("genome.gene_at", gene=gene, chrom=r.get("chrom"), pos=pos_shown,
+                 assembly=(asm_used + " ") if asm_used else "")
             + ": " + _t("genome.genotype", genotype=gt) + f" ({conf}{dp})")
     # Two sources for one position, and what became of them. A flag computed in
     # the data layer and printed nowhere is the failure this project keeps
@@ -536,7 +591,11 @@ def metrics_report(r: Dict[str, Any]) -> str:
 def clinvar_report(r: Dict[str, Any]) -> str:
     """The patient's clinically significant findings (ClinVar × the personal VCF)."""
     st = r.get("status")
-    if st == "input_is_an_array":
+    if st in ("input_is_an_array", "input_too_narrow"):
+        # Task 99. A closed path is INFORMATION, not a warning: nothing went
+        # wrong, the input simply cannot carry this answer. The generic branch
+        # below prefixes ⚠️, and a refusal that looks like a failure sends people
+        # looking for a fix that does not exist.
         return f"ℹ️ {r.get('message','')}\n\n{r.get('open_instead','')}"
     if st == "not_run":
         return f"ℹ️ {r.get('message','')}\n\n" + _t("clinvar.how_to_run")
@@ -581,7 +640,11 @@ def clinvar_report(r: Dict[str, Any]) -> str:
 def acmg_report(r: Dict[str, Any]) -> str:
     """ACMG SF secondary findings — a short list of what is actionable, with caveats."""
     st = r.get("status")
-    if st == "input_is_an_array":
+    if st in ("input_is_an_array", "input_too_narrow"):
+        # Task 99. A closed path is INFORMATION, not a warning: nothing went
+        # wrong, the input simply cannot carry this answer. The generic branch
+        # below prefixes ⚠️, and a refusal that looks like a failure sends people
+        # looking for a fix that does not exist.
         return f"ℹ️ {r.get('message','')}\n\n{r.get('open_instead','')}"
     if st == "not_run":
         return f"ℹ️ {r.get('message','')}\n\n" + _t("acmg.how_to_run")
@@ -1160,14 +1223,71 @@ def genome_status_report(r: Dict[str, Any]) -> str:
                _t("genome_status.file", path=r.get("vcf", "?")),
                _t("genome_status.several_samples_fix", cmd=amb.get("fix", ""))]
         return "\n".join(out)
+    if r.get("ready") and r.get("input_class") == "tabular" and not r.get("vcf"):
+        # Task 89. A third class of input, and the same rule as for the array: it
+        # gets its own headline and its own ceiling rather than borrowing the
+        # genome's, because what may be claimed from it is different.
+        tb = r.get("tabular") or {}
+        if tb.get("kind") == "container_vcf":
+            out = [_t("genome_status.tabular_container",
+                      variants=tb.get("variants") or 0, per_mb=tb.get("observed_per_mb") or 0),
+                   _t("genome_status.file", path=tb.get("path") or "?")]
+            cls = tb.get("class")
+            if cls and cls != "unmeasured":
+                out.append(_t("genome_status.callset_" + cls,
+                              per_mb=tb.get("observed_per_mb"), share=0))
+        else:
+            out = [_t("genome_status.tabular_table", rows=tb.get("rows") or 0,
+                      present=tb.get("loci_present") or 0),
+                   _t("genome_status.file", path=tb.get("path") or "?"),
+                   _t("genome_status.tabular_ceiling")]
+        if r.get("gaps"):
+            out.append(_t("genome_status.gaps", genes=", ".join(r["gaps"])))
+        return "\n".join(out)
+    if r.get("ready") and r.get("input_class") == "array" and not r.get("vcf"):
+        # Task 64, its last item. This line used to read «**Genome connected.**
+        # File: None» — twice wrong in eight words, and printed to every one of
+        # the twelve array owners in the reference corpus. An array is not a genome;
+        # the model already knows that (`input_class: "array"`), and the path to
+        # the array was in the JSON the whole time while the human sentence
+        # printed the path of the VCF that does not exist.
+        arr = r.get("array") or {}
+        out = [_t("genome_status.array_connected",
+                  vendor=arr.get("vendor") or "?", markers=arr.get("markers") or 0),
+               _t("genome_status.file", path=arr.get("path") or "?"),
+               _t("genome_status.array_ceiling")]
+        if r.get("gaps"):
+            out.append(_t("genome_status.gaps", genes=", ".join(r["gaps"])))
+        return "\n".join(out)
     if r.get("ready"):
         out = [_t("genome_status.connected") + " " + _t("genome_status.file", path=r.get("vcf", "?"))]
+        # What this call set actually is, measured rather than assumed (task 87).
+        cs = r.get("callset") or {}
+        if cs.get("class") and cs["class"] != "unmeasured":
+            out.append(_t("genome_status.callset_" + cs["class"],
+                          per_mb=cs.get("observed_per_mb"),
+                          share=int(round((cs.get("imputed_share") or 0) * 100))))
         if r.get("sample"):
             out.append(_t("genome_status.sample", name=r["sample"]))
         if r.get("reader"):
             out.append(_t("genome_status.reader", reader=r["reader"]))
+        if r.get("engine_pinned"):
+            # Which reader answered is part of the answer when somebody pinned
+            # one: two runs through different readers are not comparable, and
+            # the whole reason the pin exists is to make that visible.
+            out.append(_t("genome_status.engine_pinned", engine=r["engine_pinned"]))
         if r.get("assembly"):
             out.append(_t("genome_status.assembly_ok", found=r.get("assembly")))
+            # HOW the build was established, when it was not measured off the
+            # file. «GRCh37» from a contig length and «GRCh37» from a provider's
+            # habit are the same word and not the same claim (task 75).
+            if r.get("assembly_how") == "provider_signature":
+                out.append(_t("genome_status.assembly_from_signature",
+                              provider=r.get("assembly_provider") or "?",
+                              why=r.get("assembly_why") or ""))
+            elif r.get("assembly_how") == "reference_line":
+                out.append(_t("genome_status.assembly_from_reference_line",
+                              detail=r.get("assembly_detail") or ""))
             # Which coordinate set answered, and how much of the catalogue can
             # answer that way. Silence here would hide the one thing that makes
             # the reading possible — and hide that a secondary build covers only
@@ -1202,7 +1322,19 @@ def genome_status_report(r: Dict[str, Any]) -> str:
         # A file that is there and unreadable is a different message from no file
         # at all: one needs a command, the other needs a sequencing run.
         un = r.get("unusable") or {}
-        if un:
+        mine = r.get("not_ours") or {}
+        pin = r.get("engine_problem") or {}
+        if pin:
+            # A pin that could not be honoured is not «no genome»: the file is
+            # there, and the person asked to read it a particular way.
+            out = [_t("genome_status." + pin["reason"], value=pin.get("value", ""),
+                      accepted=pin.get("accepted", ""))]
+        elif mine:
+            # Not «no genome». The file is there and readable, and belongs to
+            # somebody else — the sentence has to say so, or the reader spends
+            # the evening checking a path that is correct.
+            out = [mine.get("message", ""), mine.get("fix", "")]
+        elif un:
             out = [_t("genome_status.unusable_" + un["reason"], path=un["path"]),
                    _t("genome_status.unusable_fix", cmd=un["fix"])]
         elif r.get("foreign"):
@@ -1406,11 +1538,21 @@ def redact_report(r: Dict[str, Any]) -> str:
     return "\n".join(L)
 
 def write_result(r: Dict[str, Any]) -> str:
-    """Result of a writing command. A refusal is printed in words, not silently."""
+    """Result of a writing command. A refusal is printed in words, not silently.
+
+    An erased demonstration is printed FIRST and on its own line. It is the
+    largest thing that happened — a whole profile of a fictional person is gone
+    — and folding it into the «marker: glucose; points: 3» tail would be the same
+    class of quiet as the defect it comes from.
+    """
     if r.get("ok") is False or r.get("error"):
         return f"⚠️ {r.get('error') or _t('write.failed')}"
     bits = [f"{k}: {v}" for k, v in r.items() if k not in ("ok",) and not isinstance(v, (dict, list))]
-    return "✓ " + _t("write.saved") + (" · " + "; ".join(bits) if bits else "") + "."
+    line = "✓ " + _t("write.saved") + (" · " + "; ".join(bits) if bits else "") + "."
+    claimed = r.get("claimed") or {}
+    if claimed.get("message"):
+        return "⚠️ " + claimed["message"] + "\n" + line
+    return line
 
 
 def goal_suggest_report(r: Dict[str, Any]) -> str:
@@ -1601,6 +1743,37 @@ def draw_context_report(r: Dict[str, Any]) -> str:
                n=len(r["markers"])) + "\n")
 
 
+def wearable_ingest_report(r: Dict[str, Any]) -> str:
+    """What one device's export gave — and, when it matters, what it did not.
+
+    Three things are printed that a count of metrics would hide: the device it
+    was actually read as, the columns nothing was read from, and the metrics
+    another device also reports. The last one is the reason this layer was
+    rebuilt: two series under one name is a chart that lies quietly.
+    """
+    if not r.get("ok"):
+        out = f"⚠️ {r.get('error')}"
+        if r.get("candidate_hint"):
+            out += "\n" + r["candidate_hint"]
+        return out + "\n"
+    lines = []
+    if (r.get("claimed") or {}).get("message"):
+        # First, and before the count: a demonstration profile has just gone.
+        lines.append("⚠️ " + r["claimed"]["message"])
+    lines.append(_t("wearables.done", device=r.get("source"), metrics=r.get("metrics"),
+                    nights=r.get("nights"), preserved=r.get("preserved")))
+    if r.get("range"):
+        lines.append(f"  {r['range']}")
+    if r.get("unrecognised_columns"):
+        lines.append(_t("wearables.columns_unknown",
+                        columns=", ".join(r["unrecognised_columns"])))
+    if r.get("shared_metrics"):
+        lines.append(_t("wearables.shared", metrics=", ".join(r["shared_metrics"])))
+    if r.get("backup"):
+        lines.append(_t("ingest.garmin_backup", path=r["backup"]).strip())
+    return "\n".join(lines) + "\n"
+
+
 def profile_set_report(r: Dict[str, Any]) -> str:
     if not r.get("ok"):
         return f"✗ {r.get('error', '')}"
@@ -1631,6 +1804,17 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
                 L.append(f"    · «{row['label']}»{unit}")
         if len(missed) > 20:
             L.append(_t("ingest.not_ingested_more", n=len(missed) - 20))
+    # A point whose date did not come off the form has to say so where the file
+    # is listed, not only in the JSON. Two weaker witnesses, each named: the date
+    # the tests were ORDERED, and the name of the file.
+    named = {it["file"] for it in missed}
+    for key in ("date_not_the_draw", "date_from_filename"):
+        for it in (r.get(key) or [])[:10]:
+            # A file already listed above with its own reason is not listed
+            # again: two lines about one file read as two problems.
+            if it["file"] in named:
+                continue
+            L.append(f"- `{it['file']}` — {it.get('note', '')}")
     for c in (r.get("conflicts") or [])[:10]:
         L.append(_t("ingest.conflict", marker=c["marker"], date=c["date"],
                     kept=c["kept"], other=c["other"]))

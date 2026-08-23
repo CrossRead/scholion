@@ -58,7 +58,15 @@ def data_root():
     are copied in: without them `detect` cannot ask a WHOOP export what it is and
     would answer «not one» for a reason that has nothing to do with the test.
     """
-    tmp = Path(tempfile.mkdtemp(prefix="wearables-")).resolve()
+    # Two levels of our OWN below the temporary root, because the search reaches
+    # `base.parent` and `base.parent.parent` and the test has to be able to put
+    # something there. On this machine `mkdtemp` lands deep enough that writing
+    # above it happens to work; on a Linux runner it lands in `/tmp`, and the
+    # grandparent is `/` — the test then failed for want of permission on the
+    # root of the filesystem rather than for anything it was about.
+    outer = Path(tempfile.mkdtemp(prefix="wearables-")).resolve()
+    tmp = outer / "above" / "data"
+    tmp.mkdir(parents=True)
     (tmp / "profile").mkdir()
     real_ingest = support.ROOT / "src" / "ingest"
     if real_ingest.is_dir():
@@ -77,7 +85,7 @@ def data_root():
             else:
                 os.environ[k] = v
         core.reset_cache()
-        shutil.rmtree(tmp, ignore_errors=True)
+        shutil.rmtree(outer, ignore_errors=True)
 
 
 def make_garmin(path: Path) -> Path:

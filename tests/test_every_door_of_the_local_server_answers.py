@@ -335,6 +335,20 @@ class TestTheNativeFolderDialog(unittest.TestCase):
     puts an error on screen where the person simply changed their mind.
     """
 
+    def setUp(self):
+        """macOS, declared rather than assumed.
+
+        `_choose_folder_native` returns «type the path in by hand» before it
+        reaches osascript on anything but darwin — so on a Linux runner these
+        tests exercised the guard and not the reading of what the dialog said.
+        They were written on a Mac, passed there, and failed the moment they ran
+        anywhere else. The platform belongs to the fixture: the branch under test
+        is the macOS one, and the OTHER branch has its own test below.
+        """
+        self._as_macos = mock.patch.object(server.sys, "platform", "darwin")
+        self._as_macos.start()
+        self.addCleanup(self._as_macos.stop)
+
     @staticmethod
     def _result(code=0, out="", err=""):
         return mock.Mock(returncode=code, stdout=out, stderr=err)

@@ -51,6 +51,40 @@ them are needed for the demo, for labs, for prescriptions or for wearables.
 
 ---
 
+## Then: ask for what is missing, once
+
+`scholion limits` returns items, and the ones with `"kind": "profile"` are the
+facts this product cannot derive and will not invent — sex, year of birth,
+height, reference population, which wearable answers. Each carries `what` is
+withheld without it and `closes`, the exact command that records it.
+
+**Ask from that list, not from this page.** The list is computed from the
+profile, so it holds only what is actually absent, and it shrinks as they answer.
+A list written into an instruction goes stale the day a sixth precondition is
+added, and then a model asks for five things for ever.
+
+Ask in ONE message rather than one question at a time, and add the two that are
+measurements rather than fixed facts:
+
+- **current prescriptions** — without them the interaction check has nothing to
+  work with, and a second opinion on a new drug is a second opinion on nothing.
+  `scholion add-med "atorvastatin" --dose "20 mg"`
+- **current weight** — the body-mass index is computed from it and the height.
+  `scholion add-metric weight 2026-08-24 78.4`
+
+Then record what they said, with the commands the items name.
+
+Three things not to do. Do not guess a value: a sex applied to the wrong person
+prints false anaemia, and the product withholding a corridor is the correct
+behaviour, not a gap to paper over. Do not ask twice — if an item is gone from
+the list it has been answered, and `--wearable none` is an ANSWER, not an empty
+field. And do not hold the answers up: what a person tells you now stands until a
+laboratory form, a wearable export or the genome says otherwise, and when one of
+those does, it is offered to them for confirmation rather than applied behind
+their back.
+
+---
+
 ## The rules that come before any answer
 
 These are not style. Breaking one of them produces a confident wrong statement,

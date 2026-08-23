@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 from .. import core
-from ..i18n import lang as _lang, t as _t
+from ..i18n import lang as _lang, plural as _plural, t as _t
 from ._helpers import DISCLAIMER
 
 
@@ -330,7 +330,8 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
                              "span_months": span},
                 # Deliberately not «what you should reach» — «where you have been».
                 # Nobody recommended this number; the person's own body produced it.
-                "why": _t("goalgen.why.personal_best", date=best["date"], n=len(series),
+                "why": _t("goalgen.why.personal_best", date=best["date"],
+                          readings=_plural(len(series), "count.readings"),
                           months=span),
             })
 

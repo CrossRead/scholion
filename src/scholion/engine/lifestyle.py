@@ -706,14 +706,16 @@ def _focus_lever_check(check: Optional[Dict[str, Any]]) -> Optional[Dict[str, An
             return None
         share = round(100 * sum(1 for v in vals if v <= thr) / len(vals))
         avg = _focus_mean(vals)
-        return {"text": _t("focus.bedtime_share", n=len(vals), share=share,
+        return {"text": _t("focus.bedtime_share",
+                           nights=_plural(len(vals), "count.nights"), share=share,
                            clock=_focus_clock(avg)),
                 "share": share, "mean": avg, "n": len(vals)}
     if kind == "awake_mean":
         vals = [n.get("awake_min") for n in nights if isinstance(n.get("awake_min"), (int, float))]
         if not vals:
             return None
-        return {"text": _t("focus.awake_mean", n=len(vals),
+        return {"text": _t("focus.awake_mean",
+                           nights=_plural(len(vals), "count.nights"),
                            mean=_brief_num(_focus_mean(vals))),
                 "mean": _focus_mean(vals), "n": len(vals)}
     if kind == "journal_alcohol":

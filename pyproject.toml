@@ -74,7 +74,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
 ]
 
-# Empty by decision, not by oversight: see the comment at the top.
+# One dependency, and it is deliberate — the reasoning is at the top of this file.
 dependencies = [
     # Lab PDFs are the first data most people load. See the note at the top.
     "pdfplumber>=0.11",

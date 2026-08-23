@@ -237,13 +237,20 @@ class TestTheSameRuleCoversTheWearableExport(unittest.TestCase):
     Fixing one place and assuming the class is closed is a mistake this project
     has already made — the assistant-rules block leaked into the package through
     a second path after the first was sealed. So after the lab folder, every
-    automatic search in the shipped core was checked, and `garmin.find_export`
-    turned out to carry the same defect reaching one level FURTHER: it walked
-    `base`, `base.parent` and `base.parent.parent`. From a delivered package that
-    is the folder it was unpacked into and the folder above that.
+    automatic search in the shipped core was checked, and the wearable one turned
+    out to carry the same defect reaching one level FURTHER: it walked `base`,
+    `base.parent` and `base.parent.parent`. From a delivered package that is the
+    folder it was unpacked into and the folder above that.
 
     Years of somebody's sleep and heart rate are not less private than a lab
     form.
+
+    Asked of `wearables.find_export` since 23.08.2026. It used to be asked of
+    `garmin.find_export`, and that had quietly stopped being the function the
+    application calls: the search moved to `wearables` when a second device
+    arrived, and the Garmin copy stayed behind unused for a release. The rule was
+    still enforced — and this test was watching the copy where breaking it would
+    have cost nothing. A test pointed at a duplicate reports on the duplicate.
     """
 
     def setUp(self):
@@ -258,8 +265,8 @@ class TestTheSameRuleCoversTheWearableExport(unittest.TestCase):
 
     def _found(self):
         code = ("import sys; sys.path.insert(0, %r);"
-                "from scholion import garmin;"
-                "d = garmin.find_export(); print(d if d else '')" % str(support.SRC))
+                "from scholion import wearables;"
+                "d = wearables.find_export(); print(d[0] if d else '')" % str(support.SRC))
         p = subprocess.run([sys.executable, "-c", code], env=self.L.env(),
                            capture_output=True, text=True, timeout=60, stdin=subprocess.DEVNULL)
         assert p.returncode == 0, p.stderr

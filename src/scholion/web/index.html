@@ -689,7 +689,7 @@ function renderFocus(root,f){
       <span class="muted" style="font-size:13px">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
     <p class="fcwhy">${esc(f.why||'')}</p>
     <div class="fcnum"><b>${m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')}</b><span>${esc(m.unit||'')} · ${esc(m.label||'')}</span>
-      <span>${esc(t('web.focus.mean_over',{n:m.nights_30||0,from:m.window_from||'',to:m.window_to||''}))}</span></div>
+      <span>${esc(t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}))}</span></div>
     ${fcTrack(m)}
     <div class="muted" style="font-size:12.5px;margin-top:8px">${esc(m.target_note||'')}</div>
     <div style="margin-top:16px">
@@ -700,10 +700,10 @@ function renderFocus(root,f){
         <div class="ev">${esc(l.evidence||'')}</div></div></div>`).join('')}
     </div>
     <details class="lsec" style="margin-top:14px">
-      <summary>${esc(t('web.focus.journal_h'))} ${esc(j.logged_nights?t('web.focus.journal_count',{n:j.logged_nights}):t('web.focus.journal_empty'))}</summary>
+      <summary>${esc(t('web.focus.journal_h'))} ${esc(j.logged_nights?t('web.focus.journal_count',{entries:plural(j.logged_nights,'count.entries')}):t('web.focus.journal_empty'))}</summary>
       <div class="blk"><p>${esc((f.journal&&f.journal.why)||'')}</p>
         <div class="fcform">
-          <input type="date" id="fc-date" value="${today}">
+          <input type="date" id="fc-date" value="${esc(today)}">
           <select id="fc-alc"><option value="">${esc(t('web.focus.alcohol_none'))}</option>
             <option value="light">${esc(t('web.focus.alcohol_light'))}</option><option value="heavy">${esc(t('web.focus.alcohol_heavy'))}</option></select>
           <label><input type="checkbox" id="fc-aten"> ${esc(t('web.focus.atenolol'))}</label>
@@ -1363,23 +1363,40 @@ async function viewMetrics(root){
       <button class="ghost" id="toggle-mprof">✎ ${esc(t('web.metrics.profile_btn'))}</button>
       <button class="ghost" id="toggle-madd">+ ${esc(t('web.metrics.add_btn'))}</button>
     </div>
-    <div id="mprof" class="hidden"></div>
+    <div id="mprof"></div>
     <div id="madd" class="hidden"></div>
     <div class="grid" id="mgrid"></div>`;
   const g=$('#mgrid',root);
   d.metrics.forEach(m=>g.appendChild(metricCard(m)));
   // the profile
   const pf=$('#mprof',root);
+  // The year of birth may be stored as a full date (a medical record and the
+  // demonstration both write one), so the box is filled from whichever the file has.
+  const byear = p.birth_year ?? (p.birth_date ? String(p.birth_date).slice(0,4) : '');
+  const devs=(d.devices||[]);
+  // The reference panel is NOT a field. Nobody knows their own superpopulation
+  // in these terms, so a box asking for one collects a guess that nothing
+  // downstream can tell from a measurement. It is determined while a genome is
+  // prepared, and shown here with where it came from.
+  const anc=d.ancestry||{};
+  const panel = anc.source==='genome'
+    ? t('web.metrics.panel_from_genome',{value:anc.value,date:anc.date||'—'})
+    : anc.source==='stated' ? t('web.metrics.panel_stated',{value:anc.value})
+    : t('web.metrics.panel_unknown');
   pf.innerHTML=`<div class="form"><div class="fr">
     <label>${esc(t('web.metrics.sex_label'))}<select id="mp-sex"><option value="">—</option><option value="male"${p.sex==='male'?' selected':''}>${esc(t('web.metrics.male'))}</option><option value="female"${p.sex==='female'?' selected':''}>${esc(t('web.metrics.female'))}</option></select></label>
-    <label>${esc(t('web.metrics.birth_year'))}<input id="mp-year" value="${esc(p.birth_year??'')}" size="6" placeholder="1985"></label>
-    <label>${esc(t('web.metrics.height_label'))}<input id="mp-height" value="${p.height_cm??''}" size="5" placeholder="178"></label>
+    <label>${esc(t('web.metrics.birth_year'))}<input id="mp-year" value="${esc(byear)}" size="6" placeholder="1985"></label>
+    <label>${esc(t('web.metrics.height_label'))}<input id="mp-height" value="${esc(p.height_cm??'')}" size="5" placeholder="178"></label>
+    <label>${esc(t('web.metrics.device_label'))}<select id="mp-dev"><option value="">—</option>${devs.map(s=>`<option value="${esc(s)}"${p.wearable_primary===s?' selected':''}>${esc(t('web.life.device.'+s))}</option>`).join('')}<option value="none"${p.wearable_primary==='none'?' selected':''}>${esc(t('web.metrics.device_none'))}</option></select></label>
     <button class="act" id="mp-save">${esc(t('web.form.save'))}</button>
-  </div><div class="muted" style="font-size:13.5px">${esc(t('web.metrics.profile_note'))}</div></div>`;
+  </div>
+  <div class="why" style="margin-top:10px"><b>${esc(t('web.metrics.panel_label'))}:</b> ${esc(panel)}</div>
+  <div class="muted" style="font-size:13.5px">${esc(t('web.metrics.profile_note2'))}</div></div>`;
   $('#toggle-mprof',root).onclick=()=>pf.classList.toggle('hidden');
   $('#mp-save',pf).onclick=async()=>{
-    const r=await post('/api/metrics/profile',{sex:$('#mp-sex',pf).value,birth_year:num($('#mp-year',pf).value),height_cm:num($('#mp-height',pf).value)});
+    const r=await post('/api/metrics/profile',{sex:$('#mp-sex',pf).value,birth_year:num($('#mp-year',pf).value),height_cm:num($('#mp-height',pf).value),wearable_primary:$('#mp-dev',pf).value});
     if(r.ok){toast(t('web.metrics.profile_saved'));viewMetrics($('#view'));}
+    else{toast(t('web.common.error_prefix')+(r.error||''));}
   };
   // adding a measurement
   const ab=$('#madd',root);
@@ -1628,7 +1645,7 @@ async function viewLifestyle(root){
     const today=new Date().toISOString().slice(0,10);
     const waistBar=`<div class="row" style="gap:8px;margin:2px 0 12px;align-items:flex-end;flex-wrap:wrap">
         <label class="wl">${esc(t('web.life.waist'))}<input id="w-val" size="5" placeholder="${esc(t('web.life.waist_placeholder'))}"></label>
-        <label class="wl">${esc(t('web.life.date'))}<input id="w-date" size="10" value="${today}" placeholder="${esc(t('web.life.date_placeholder'))}"></label>
+        <label class="wl">${esc(t('web.life.date'))}<input id="w-date" size="10" value="${esc(today)}" placeholder="${esc(t('web.life.date_placeholder'))}"></label>
         <button class="act" id="w-save">${esc(t('web.life.waist_save'))}</button>
         <span class="muted" style="font-size:12px">${esc(t('web.life.waist_note'))}</span></div>`;
     const GROUPS=[['anthro','web.life.group_anthro'],['activity','web.life.group_activity'],['recovery','web.life.group_recovery']];
@@ -2036,6 +2053,7 @@ async function viewGuide(root){
 // ten. A map handed over at the end of the journey is a different object.
 const TABS=[
   ['web.tab.overview',viewOverview],['web.tab.guide',viewGuide],
+  ['web.tab.profile',viewMetrics],
   ['web.tab.labs',viewLabs],['web.tab.drugs',viewDrug],['web.tab.genome',viewGenome],
   ['web.tab.lifestyle',viewLifestyle],['web.tab.tests',viewTests],['web.tab.second_opinion',viewSecond],
   ['web.tab.prescriptions',viewMeds],['web.tab.assistant',viewAssistant],

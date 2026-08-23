@@ -62,7 +62,21 @@ CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 # ── what we do not look at at all ────────────────────────────────────────
 PERSONAL_DIRS = {"profile", "genome", "raw", "work", "archive", "reports", "_backups",
                  "_to_delete", "_research", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
-                 "dist", "node_modules"}
+                 "dist", "node_modules",
+                 # `backlog/` is the owner's product backlog and its linter. It is
+                 # Russian by purpose and it TRAVELS NOWHERE: what goes outside is
+                 # the release record, and nothing else. This gate asks one
+                 # question — "was Russian added to what ships" — so a directory
+                 # that does not ship is outside the question, not an exception
+                 # to it.
+                 #
+                 # Every exclusion is a potential hiding place, so this one is not
+                 # a promise: `tests/test_the_backlog_never_leaves_the_machine.py`
+                 # proves the directory is named by neither the sdist include, nor
+                 # the wheel packages, nor make_shareable.build. Should anyone
+                 # ever add it to one of the three, that test fails first — and
+                 # only then does this line start hiding anything.
+                 "backlog"}
 #: Not personal — COPIES. `src/scholion/docs/` holds the documents the output
 #: names, carried inside the package so a `pip install` user can open them. Every
 #: file there is byte-identical to a source that this gate already measures, and

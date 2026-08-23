@@ -111,12 +111,51 @@ def metrics_summary() -> Dict[str, Any]:
             bmi = {"value": bmi_val, "category": cat, "flag": flag}
         except Exception:
             bmi = None
-    age = None
-    if prof.get("birth_year"):
-        try:
-            from datetime import date
-            age = date.today().year - int(prof["birth_year"])
-        except Exception:
-            age = None
-    return {"status": "ok", "profile": prof, "age": age, "bmi": bmi,
+    age = _age_from(prof)
+    # The devices THIS build can read, so a face offering the choice offers
+    # exactly those. A page carrying its own list is a page that goes stale the
+    # day a third reader is added — and the validation on the write side already
+    # comes from here, so the two would then disagree about what exists.
+    from .. import wearables as _wear
+    devices = [k["source"] for k in _wear.KINDS]
+    # A VIEW of the profile, not the file. `sex` is normalised through the one
+    # function that knows the spellings: the file may say `m`, because that is
+    # what the demonstration writes and what a medical record's `gender` field
+    # gives, while a face comparing the raw value against `male` then shows a
+    # recorded sex as «—» and offers an empty box for a question already
+    # answered. The stored file is untouched; anything wanting the raw value
+    # reads metrics.json.
+    view = dict(prof)
+    view["sex"] = core.profile_sex()
+    return {"status": "ok", "profile": view, "age": age, "bmi": bmi,
+            "devices": devices,
+            # Shown, never asked for: which reference panel a percentile is
+            # computed against is determined from the genome, and `source` is
+            # what lets a face say so instead of presenting it as a setting.
+            "ancestry": core.ancestry(),
             "metrics": out, "disclaimer": DISCLAIMER()}
+
+
+def _age_from(prof: Dict[str, Any]):
+    """Age in whole years, from whichever birth field the profile carries.
+
+    Both are real. `birth_year` is what the command line and the page write;
+    `birth_date` is what the demonstration profile and an imported medical
+    record write, and reading only the first reported no age at all for either
+    of those — the interface said «—» while the file held a date. Every other
+    reader in this project already accepted both, which is precisely why the one
+    that did not went unnoticed.
+    """
+    from datetime import date
+    bd = str(prof.get("birth_date") or "").strip()
+    today = date.today()
+    if bd:
+        try:
+            y, m, d = (int(x) for x in bd.split("-")[:3])
+            return today.year - y - ((today.month, today.day) < (m, d))
+        except (ValueError, TypeError):
+            pass
+    try:
+        return today.year - int(prof["birth_year"]) if prof.get("birth_year") else None
+    except (ValueError, TypeError):
+        return None

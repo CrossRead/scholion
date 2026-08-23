@@ -95,5 +95,63 @@ class TestTheApplicableRowIsChosen(unittest.TestCase):
         self.assertGreaterEqual(len(list(FIXTURES.glob("*.txt"))), 5)
 
 
+class TestAnAgeBandedRowSurvivesAnUnknownAge(unittest.TestCase):
+    """GitHub issue #1, filed against 0.4.3: `_row_fits()` compared age to a
+    band/over/under bound without checking `age is not None` first, so a
+    profile with no birth year on file (an ordinary, supported state — `init`
+    itself warns and proceeds) crashed the WHOLE ingest-labs batch on the
+    first form carrying an age-banded reference row, not just that one file.
+
+    `_owner()`'s own docstring already promised the right behaviour — "No
+    profile / no birth date -> (None, None), the logic is off" — `_row_fits()`
+    just did not honour it. Age unknown is not the same claim as age fits:
+    an age-banded row can be neither confirmed nor excluded, so — same as a
+    row that fits more than one candidate — the project's own rule holds:
+    ambiguity is answered with silence, not a crash and not a guess.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = tempfile.mkdtemp()
+        os.environ["SCHOLION_PROFILE_DIR"] = cls.tmp
+        # Sex recorded, birth year not — exactly `scholion init` without
+        # `--birth-year`, which the CLI allows and warns about rather than
+        # refuses (task 72).
+        (pathlib.Path(cls.tmp) / "metrics.json").write_text(
+            json.dumps({"profile": {"sex": "male"}}))
+        core.reset_cache()
+        cls.markers = core.lab_markers()["markers"]
+
+    @classmethod
+    def tearDownClass(cls):
+        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        core.reset_cache()
+
+    def test_an_age_banded_form_does_not_raise(self):
+        text = (FIXTURES / "05_age_bands.txt").read_text(encoding="utf-8")
+        try:
+            _d, found = ingest_labs.parse_report(text, self.markers, source="x")
+        except TypeError as e:
+            self.fail(f"parse_report raised on an age-banded row with no "
+                      f"birth year recorded: {e}")
+        self.assertIn("alp", found, "the marker itself must still be read — "
+                       "only the AGE-BASED row choice is meant to be off")
+
+    def test_it_does_not_guess_which_band_applies(self):
+        """Three rows (children / teens / adults) all count as fitting when age
+        logic is off, so — per the block's own ambiguity rule — none is picked."""
+        text = (FIXTURES / "05_age_bands.txt").read_text(encoding="utf-8")
+        _d, found = ingest_labs.parse_report(text, self.markers, source="x")
+        self.assertIsNone(found["alp"]["ref_low"])
+        self.assertIsNone(found["alp"]["ref_high"])
+
+    def test_sex_filtering_still_applies_with_age_unknown(self):
+        """Age off is not a general bypass — `_row_fits` still enforces sex,
+        which does not depend on the owner's age being known."""
+        from scholion.ingest_labs import _row_fits
+        self.assertFalse(_row_fits("Женщины: 10 - 20", "male", None))
+        self.assertTrue(_row_fits("Мужчины: 10 - 20", "male", None))
+
+
 if __name__ == "__main__":
     unittest.main()

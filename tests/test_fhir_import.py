@@ -75,7 +75,12 @@ class TestEveryObservationIsAccountedFor(FhirCase):
         self.plan = ingest_fhir.plan(BUNDLE)
 
     def test_taken_plus_skipped_equals_every_observation(self):
-        self.assertEqual(len(self.plan["points"]) + len(self.plan["skipped"]),
+        # Three destinations now, not two: a laboratory point, a body
+        # measurement that goes to the metrics layer, or a named refusal. The
+        # invariant is the same one — nothing may fall between them.
+        self.assertEqual(len(self.plan["points"])
+                         + len(self.plan.get("metrics") or [])
+                         + len(self.plan["skipped"]),
                          self.plan["observations"],
                          "an observation that is neither taken nor named has disappeared")
 

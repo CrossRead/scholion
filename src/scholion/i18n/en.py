@@ -214,7 +214,7 @@ MESSAGES = {
     "labs.header": "**Labs:** {abnormal} out of range among {total}",
     "labs.near_more": "{n} more at the edge of the corridor",
     "labs.crossed": "clinical action thresholds crossed: {n}",
-    "labs.draw_context_saved": "recorded for {day}: {context} — applied to {n} markers measured twice that day",
+    "labs.draw_context_saved": "recorded for {day}: {context} — markers measured twice that day: {n}",
     "labs.fasting_after_event": "⚠ the thresholds below presume a fasting sample; this draw followed — {text} — so a crossing here is not the labelled condition",
     "labs.condition_unknown": "⚠ this is the second draw of the day and the thresholds below presume a fasting sample — until it is said what stood between the two, treat the labelled crossing as unconfirmed",
     "labs.same_day_repeat": "two measurements on {day}: {points} — a repeat, not a disagreement in the data",
@@ -224,6 +224,24 @@ MESSAGES = {
     "labs.ref_from_reference_base": "the interval is the general reference one, not printed on your form",
     "labs.genome_link": "genome: {text}",
     "count.abnormal.one": "{n} value",
+    "count.readings.one": "{n} reading",
+    "count.readings.few": "{n} readings",
+    "count.readings.many": "{n} readings",
+    "count.entries.one": "{n} entry",
+    "count.entries.few": "{n} entries",
+    "count.entries.many": "{n} entries",
+    "count.results.one": "{n} result",
+    "count.results.few": "{n} results",
+    "count.results.many": "{n} results",
+    "count.rows.one": "{n} row",
+    "count.rows.few": "{n} rows",
+    "count.rows.many": "{n} rows",
+    "count.genes.one": "{n} gene",
+    "count.genes.few": "{n} genes",
+    "count.genes.many": "{n} genes",
+    "count.bytes.one": "{n} byte",
+    "count.bytes.few": "{n} bytes",
+    "count.bytes.many": "{n} bytes",
     "count.abnormal.few": "{n} values",
     "count.abnormal.many": "{n} values",
     "count.markers_of.one": "{n} marker",
@@ -295,17 +313,13 @@ MESSAGES = {
                           "runs from the project's source tree rather than the installed "
                           "package. `scholion doc preparing-the-genome` describes the whole "
                           "route.",
-    "capabilities.title": "**What this build can do** — Scholion {version}, {n} commands",
+    "capabilities.title": "**What this build can do** — Scholion {version}, commands: {n}",
     "capabilities.how_to_read": "Generated from the command parser and the entry-point map, so "
                                 "it cannot fall behind them. If the instruction you were given "
                                 "and this list disagree, this list is the build in front of you. "
                                 "Every command takes `--json`.",
-    "capabilities.reads_h": "Reads only — {n} commands. Safe to call to answer a question.",
-    "capabilities.writes_h": "CHANGES something — {n} commands. Not to be called to answer a "
-                             "question. Two kinds, marked on each line: one AUTHORS values into "
-                             "the profile and is never handed to a model as a tool; the other "
-                             "TRANSCRIBES the person's own documents into the profile and "
-                             "invents nothing — that one a model may hold.",
+    "capabilities.reads_h": "Reads only — commands: {n}. Safe to call to answer a question.",
+    "capabilities.writes_h": "CHANGES something — commands: {n}. Not to be called to answer a question. Two kinds, marked on each line: one AUTHORS values into the profile and is never handed to a model as a tool; the other TRANSCRIBES the person's own documents into the profile and invents nothing — that one a model may hold.",
     "capabilities.kind.authors": "authors values — never a model's tool",
     "capabilities.kind.transcribes": "transcribes the person's own documents",
     "capabilities.face.web": "in the web interface",
@@ -317,9 +331,9 @@ MESSAGES = {
     "clinvar.how_to_read": "**How to read this.**",
 
     # ── ACMG secondary findings ──────────────────────────────────────────
-    "acmg.unread_header": "Not read deeply enough to decide — {n} genes of the panel. A negative result in these is not a statement:",
-    "acmg.needs_phase_header": "{n} hits in genes that need BOTH copies affected, found as two heterozygous variants. Whether they sit on different chromosomes — which is what would make them biallelic — an unphased file cannot say; in cis the person is an ordinary carrier. A parent's genotype or long reads settle it:",
-    "acmg.needs_class_header": "{n} hits in genes ACMG reports only for a narrow class of variant — the class has to be established before any of these is a finding:",
+    "acmg.unread_header": "Not read deeply enough to decide — genes of the panel: {n}. A negative result in these is not a statement:",
+    "acmg.needs_phase_header": "Hits in genes that need BOTH copies affected, found as two heterozygous variants: {n}. Whether they sit on different chromosomes — which is what would make them biallelic — an unphased file cannot say; in cis the person is an ordinary carrier. A parent's genotype or long reads settle it:",
+    "acmg.needs_class_header": "Hits in genes ACMG reports only for a narrow class of variant: {n} — the class has to be established before any of these is a finding:",
     "acmg.how_to_run": "Run `python3 src/ingest/acmg_sf_scan.py` — it checks your VCF "
                        "against the ACMG Secondary Findings gene list.",
     "acmg.header": "**Secondary findings — {version}** ({genes} genes, {scanned} checked)",
@@ -380,7 +394,7 @@ MESSAGES = {
     "reconcile.markers_seen": "markers recognised: {n}",
     "reconcile.unreadable": "NOT READ ({n}) — data may be lost; open the files on the Mac "
                             "(so iCloud materialises them) and run this again:",
-    "reconcile.bytes": "{n} bytes",
+    "reconcile.bytes": "{bytes}",
     "reconcile.all_readable": "No unreadable files — every PDF gave up its text.",
     "reconcile.missing": "MISSING from the profile ({n}) — present on the form, absent "
                          "from labs.json:",
@@ -532,7 +546,7 @@ MESSAGES = {
                           "incompletely built — reinstall it.",
     "assistant.context_saved": "Context saved: {path} ({chars} characters).",
     "assistant.context_personal": "⚠️ The file contains personal medical data.",
-    "ingest.not_ingested_header": "Nothing was taken from {n} files — each is named, with the reason:",
+    "ingest.not_ingested_header": "Files nothing was taken from: {n} — each is named, with the reason:",
     "ingest.not_ingested_more": "… and {n} more",
     "ingest.conflict": "conflict: {marker} on {date} — kept {kept}, the other form said {other}",
     "ingest.repeat": "repeat: {marker} was measured twice on {day} ({first} and {second}) — `scholion lab-draw --day {day}` records what stood between them",
@@ -951,10 +965,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "focus.direction.up": "up",
     "focus.direction.down": "down",
     "focus.direction.flat": "unchanged",
-    "focus.bedtime_share": "over the last {n} nights of the export the threshold was met "
-                           "{share} % of the time, average lights-out {clock}",
-    "focus.awake_mean": "over the last {n} nights of the export, time awake in bed averaged "
-                        "{mean} min",
+    "focus.bedtime_share": "over {nights} of the export the threshold was met {share} % of the time, average lights-out {clock}",
+    "focus.awake_mean": "over {nights} of the export, time awake in bed averaged {mean} min",
     "focus.journal_not_ready": "the log has been kept for {nights}; to tell alcohol and "
                                "atenolol apart at least {need} episodes of each kind are "
                                "needed (now {a} and {b})",
@@ -1005,6 +1017,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "store.sources_purpose": "The data source folders the user chose. Personal.",
     "store.need_day_and_context": "a day and at least one of --reason / --between are needed",
     "store.no_repeat_that_day": "no marker on {day} has two measurements, so there is nothing to explain",
+    "store.unknown_ancestry": "«{value}» is not a reference population this build knows. Accepted: {accepted}. A percentile is a position within a population, so a name nobody recognises is not a smaller error than none at all.",
+    "store.unknown_sex": "«{value}» was not recognised as a sex. A dozen reference intervals differ by it, so an unrecognised value is refused rather than stored and read back later as «not set».",
     "store.no_labs": "there is no laboratory history in the profile yet",
     "store.need_marker_date": "marker and date are required",
     "redact.no_file": "no file at {path}",
@@ -1043,7 +1057,9 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "limits.gene_not_read_what": "The pharmacogenetic phenotype of {gene} is not determined.",
     "limits.gene_not_read_why": "The gene's markers were not read.",
     "limits.gene_not_read_closes": "See the basis above: it names the positions and the way to genotype them.",
-    "limits.no_corridor_what": "{n} markers are printed without a reference range and therefore without a flag.",
+    "limits.no_corridor_what.one": "{n} marker is printed without a reference range and therefore without a flag.",
+    "limits.no_corridor_what.few": "{n} markers are printed without a reference range and therefore without a flag.",
+    "limits.no_corridor_what.many": "{n} markers are printed without a reference range and therefore without a flag.",
     "limits.no_corridor_why": "Neither your form nor the dictionary gives bounds for: {markers}. Showing them against somebody else's range would be worse than showing no flag.",
     "limits.no_corridor_closes": "Enter the range printed on your own form: `add-lab <marker> <date> <value> --unit ... --ref-low ... --ref-high ...`.",
     "limits.no_labs_what": "Nothing can be said about the laboratory layer.",
@@ -1052,6 +1068,24 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "limits.prs_what": "The percentile for «{trait}» is withdrawn from trust.",
     "limits.prs_why": "Only {pct} % of the model's variants were called — a percentile computed on that is a number without a population behind it.",
     "limits.prs_closes": "Re-genotype the scoring sites from the BAM (src/ingest/prs_genotype_sites.sh), or pick a model with better coverage.",
+    "limits.no_sex_what": "Reference intervals that differ by sex are not shown.",
+    "limits.no_sex_why": "A dozen markers — haemoglobin, ferritin, creatinine, testosterone and others — have a different corridor for a man and for a woman. Applying one of them to the wrong person prints false anaemia and a false-normal testosterone, so with the sex unknown the corridor is withheld rather than guessed.",
+    "limits.no_sex_closes": "Say which: `scholion profile --sex male|female`, or the Profile tab.",
+    "limits.no_birth_what": "Age-banded rows on a laboratory form cannot be read, and no age is shown.",
+    "limits.no_birth_why": "Many forms give the corridor by age band. With no year of birth on file such a row can be neither confirmed nor excluded, so the marker arrives without a corridor at all — and nothing without a corridor is ever called a deviation here.",
+    "limits.no_birth_closes": "`scholion profile --birth-year 1985`, or the Profile tab.",
+    "limits.no_height_what": "There is no body-mass index.",
+    "limits.no_height_why": "It is computed from a height and a weight, and the height is not recorded.",
+    "limits.no_height_closes": "`scholion profile --height-cm 178`, or the Profile tab.",
+    "limits.no_weight_what": "There is still no body-mass index: the height is on file and a weight is not.",
+    "limits.no_weight_why": "A weight is a series rather than a fixed fact, so it is not part of the profile — it is a measurement, and the index is computed from the latest one.",
+    "limits.no_weight_closes": "`scholion add-metric weight 2026-08-24 78.4`, or the Profile tab.",
+    "limits.no_ancestry_what": "Polygenic percentiles are computed against a DEFAULT reference panel.",
+    "limits.no_ancestry_why": "A percentile is a position within a population, and which population applies has not been determined for this genome yet. Against the wrong panel the number is not your position — so every percentile printed meanwhile says which panel it used.",
+    "limits.no_ancestry_closes": "A step of preparing the genome, not a question for you: `python3 src/ingest/ancestry_check.py` compares a few hundred of your own genotypes against the five 1000 Genomes panels and writes the answer beside your profile. It is used from there — nobody is asked to name a superpopulation, because nobody knows their own in those terms.",
+    "limits.no_wearable_answer_what": "Where two devices measured the same thing, neither answer enters a conclusion.",
+    "limits.no_wearable_answer_why": "A watch and a strap do not measure sleep or resting heart rate the same way. With nobody named, the application shows both and concludes from neither, because averaging them would report a change of device as a change in you.",
+    "limits.no_wearable_answer_closes": "Name one: `scholion profile --wearable garmin|whoop`. If you wear none, say so — `--wearable {none}` — and nothing asks again.",
     "limits.no_meds_what": "Nothing can be said about drug interactions or monitoring.",
     "limits.no_meds_why": "The list of prescriptions is empty, so «no interactions found» would mean «nothing was compared».",
     "limits.no_meds_closes": "`add-med` for each drug you take, with its dose.",
@@ -1073,12 +1107,12 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "limits.scope.heritability": "A percentile is not a probability, and inheritance explains only part of the variance of any of these traits — the rest is environment, behaviour and chance. The share differs by trait and is rarely the larger half.",
     "limits.none": "Every layer the system knows about is present and readable. That is not a promise that the answers are complete — it is a statement that nothing is missing that this check knows how to look for.",
     "limits.coverage_line": "Coverage: {genes} genes measured, on average {mean} % of bases at >=10x; ACMG SF panel {acmg_genes} genes at {acmg_pct} %.",
-    "limits.coverage_weak_line": "Below 90 %: {n} genes.",
+    "limits.coverage_weak_line": "Below 90 %: {genes}.",
     "limits.closes_label": "closes it",
     "limits.summary": "{count} limitations, {closable} of them with a stated way to close.",
     "import.row": "row {row}",
-    "import.dry_ok": "the file is clean: {n} rows would be imported. Nothing was written — this was a dry run.",
-    "import.written": "imported: {n} rows",
+    "import.dry_ok": "the file is clean: {rows} would be imported. Nothing was written — this was a dry run.",
+    "import.written": "imported: {rows}",
     "import.markers": "Markers: {markers}",
     "import_csv.empty": "the file has no header row",
     "import_csv.missing_columns": "required columns are missing: {columns}. The header found: {seen}. Expected: marker, date, value, and optionally unit, ref_low, ref_high, note.",
@@ -1088,7 +1122,9 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "import_csv.bad_unit": "the unit «{unit}» is not one this marker takes; accepted: {accepted}",
     "import_csv.file_not_found": "no file at {path}",
     "import_csv.unreadable": "{path} does not open as UTF-8 text: {error}",
-    "import_csv.nothing_written": "{n} rows did not pass — NOTHING was written. A file is imported whole or not at all: half a panel in the profile looks like a whole one.",
+    "import_csv.nothing_written.one": "{n} row did not pass — NOTHING was written. A file is imported whole or not at all: half a panel in the profile looks like a whole one.",
+    "import_csv.nothing_written.few": "{n} rows did not pass — NOTHING was written. A file is imported whole or not at all: half a panel in the profile looks like a whole one.",
+    "import_csv.nothing_written.many": "{n} rows did not pass — NOTHING was written. A file is imported whole or not at all: half a panel in the profile looks like a whole one.",
     "import_csv.write_failed": "row {row} passed the check and failed on the write: {detail}. Nothing further was imported.",
     "store.marker_unknown": "no marker «{marker}» is known, and creating one silently is how a single test ends up as two series under two spellings — nothing was written. Did you mean: {did_you_mean}. To create it deliberately, pass --new together with a unit.",
     "store.no_candidates": "nothing close enough to suggest",
@@ -1416,11 +1452,15 @@ will go through them later.
     "ingest_labs.reason_table_labels": "{n} row labels in this table match no marker in the dictionary — they are listed rather than stored under an approximate name",
     "ingest_labs.reason_no_marker": "the date was read, but not one row matched a known marker",
     "fhir.title": "**FHIR bundle:** {path} — {observations} observations",
-    "fhir.dry_run": "would take {n} results (nothing written)",
+    "fhir.dry_run": "would take {results} (nothing written)",
     "fhir.added": "taken into the profile: {n}",
     "fhir.refused": "{label} — not written: {reason}",
     "fhir.not_taken": "**Not taken, by reason:**",
     "fhir.reason.no_quantity": "no numeric value in the resource (a coded result, a panel that only groups its members, an attachment)",
+    "fhir.reason.metric_unit_not_ours": "a body measurement in a unit this metric does not hold — nothing here converts, and a weight in pounds joining a series in kilograms is exactly the silence this gate exists for",
+    "fhir.metrics_taken": "body measurements written into the metrics layer: {n}",
+    "fhir.metrics_dry": "would take into the metrics layer, body measurements: {n} (nothing written)",
+    "fhir.reason.loinc_is_a_body_metric": "a body measurement, not a laboratory analyte — it does not belong in the marker dictionary at all, and where one of our own metrics holds the same quantity it is named beside the code",
     "fhir.reason.loinc_not_in_catalogue": "the LOINC code is not in this build's dictionary — matching by display name instead would be a guess about which analyte it is",
     "fhir.reason.no_loinc": "the observation carries no LOINC code at all",
     "fhir.reason.no_date": "no effective date, and a result without a date has no place in a series",
@@ -1464,6 +1504,7 @@ will go through them later.
     "sources.manual.acmg": "the ACMG secondary-findings list is published in a paper; a person reads it and records the version",
     "sources.manual.longevitymap": "the licence forbids bundling, so the build script fetches it into your own copy",
     "sources.init_hint": "Reference sources: `scholion sources` shows what this build mirrors; `scholion sources --refresh` brings in what can be imported automatically (CPIC today). Nothing is fetched without that command.",
+    "net.diag_target_unknown": "«{value}» is not a probe this check knows. The connectivity check chooses from a fixed list of addresses rather than accepting one, because this route is reachable from any page in the browser. Known probes: {accepted}.",
     "net.diag_host_refused": "the connectivity check only probes the reference hosts this tool uses, over https — an arbitrary address is not fetched",
     "net.offline_deliberate": "SCHOLION_OFFLINE=1 — network requests are switched off deliberately",
     "net.offline_hint": "unset the SCHOLION_OFFLINE environment variable if the network is wanted",
@@ -1627,7 +1668,7 @@ will go through them later.
     # Two different facts, and the old sentence covered both with the reassuring
     # one: nothing is flagged because nothing is out of range, or because nothing
     # has been measured. The count is what tells them apart.
-    "web.overview.no_red": "Nothing outside its range among the {n} markers measured.",
+    "web.overview.no_red": "Nothing outside its range. Markers measured: {n}.",
     "web.overview.no_red_nodata": "Nothing has been measured yet, so there is nothing to "
                                   "flag. Load lab results and this line will mean something.",
     # Same defect as `web.tests.none_pending`, and on the FIRST screen.
@@ -1641,12 +1682,12 @@ will go through them later.
     "web.focus.target": "target {value} {unit}",
     "web.focus.since": "since {date}",
     "web.focus.vs_baseline": "{delta} vs baseline",
-    "web.focus.mean_over": "mean of {n} nights {from} → {to}",
+    "web.focus.mean_over": "mean over {nights} {from} → {to}",
     "web.focus.levers_h": "Levers — what your own data shows",
     "web.focus.expected_prefix": "expected ",
     "web.focus.now": "now: {text}",
     "web.focus.journal_h": "Episode log",
-    "web.focus.journal_count": "· {n} entries",
+    "web.focus.journal_count": "· {entries}",
     "web.focus.journal_empty": "· still empty",
     "web.focus.alcohol_none": "no alcohol",
     "web.focus.alcohol_light": "1–2 drinks",
@@ -1678,7 +1719,7 @@ will go through them later.
     "web.labs.ingest_points": ", points added: {points}, skipped (unchanged / not lab reports): "
                               "{skipped}.",
     "web.labs.ingest_nothing_new": "No new markers found (it may all be loaded already).",
-    "web.labs.points_added": "{n} points added ✓",
+    "web.labs.points_added": "points added: {n} ✓",
     "web.labs.no_new_data": "There is no new data",
     "web.labs.add_note": "The new point goes into labs.json (profile). The tools and the trends "
                          "update immediately.",
@@ -1862,9 +1903,7 @@ will go through them later.
                                          "something this profile can confirm.",
     "goalgen.why.no_target": "{body} looked at this marker and declined to set a target. "
                              "That is the finding, not a gap — no number is proposed here.",
-    "goalgen.why.personal_best": "The best you have reached — {date}, out of {n} readings "
-                                 "over {months} months. Nobody recommended it; your own "
-                                 "measurements did.",
+    "goalgen.why.personal_best": "The best you have reached — {date}, out of {readings} over {months} months. Nobody recommended it; your own measurements did.",
     "goalgen.why.reference": "The wall of the laboratory corridor. Weaker than the other two: "
                              "«inside the range» is where most people already are, and is "
                              "not an aim.",
@@ -1962,6 +2001,14 @@ will go through them later.
     "web.meds.removed": "Removed",
 
     # ── web: personal metrics ────────────────────────────────────────────
+    "web.tab.profile": "Profile",
+    "web.metrics.device_label": "Main wearable",
+    "web.metrics.device_none": "No wearable device",
+    "web.metrics.profile_note2": "These are preconditions the application cannot derive and will not invent. Without sex, a dozen reference intervals are withheld rather than guessed; without a year of birth, the age-banded rows of a lab form cannot be read; without a height there is no body-mass index; and where two devices measured the same thing, the one named here answers. Saying there is no wearable is an answer too — nothing asks again.",
+    "web.metrics.panel_label": "Reference panel for percentiles",
+    "web.metrics.panel_from_genome": "{value} — determined from your own genome ({date})",
+    "web.metrics.panel_stated": "{value} — set by hand, overriding what the genome says",
+    "web.metrics.panel_unknown": "not determined — percentiles use a default panel and say so. It is settled while a genome is prepared, not by answering a question here.",
     "web.metrics.title": "Personal health metrics",
     "web.metrics.sex": "sex",
     "web.metrics.sex_label": "Sex",
@@ -1971,7 +2018,7 @@ will go through them later.
     "web.metrics.height": "height, cm",
     "web.metrics.height_label": "Height, cm",
     "web.metrics.bmi": "BMI",
-    "web.metrics.profile_btn": "Profile (height/year/sex)",
+    "web.metrics.profile_btn": "Profile fields",
     "web.metrics.add_btn": "Add a measurement",
     "web.metrics.birth_year": "Year of birth",
     "web.metrics.profile_note": "Goes into metrics.json (profile). The BMI is computed from the "
@@ -2033,7 +2080,7 @@ will go through them later.
     "web.life.rebuilding": "rebuilding…",
     "web.life.garmin_done": "Garmin refreshed: {metrics} metrics ({range})",
     "web.life.garmin_nights": "nights of sleep {n}",
-    "web.life.garmin_preserved": "kept from the previous file {n} points",
+    "web.life.garmin_preserved": "kept from the previous file: {n}",
     "web.life.fitness_score": "fitness score /100",
     "web.life.hero": "{label} · goal {target}",
     "web.life.no_wearable": "There is no wearable data yet (profile/wearable_trends.json).",

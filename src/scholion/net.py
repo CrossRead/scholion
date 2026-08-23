@@ -21,17 +21,27 @@ from .i18n import t as _t
 _UNVERIFIED: Optional[ssl.SSLContext] = None
 _UA = {"User-Agent": "scholion", "Accept": "application/json"}
 
-# The only hosts this tool ever contacts, and therefore the only hosts the
-# connectivity check may probe. /api/diag?url= used to pass ANY url straight
-# into a fetch with a fallback to an UNVERIFIED TLS context — which turned the
-# loopback server into a blind SSRF proxy and a file oracle (file:///etc/passwd
-# returned ok:true) reachable from any page in the origin. A diagnostic has no
-# business reaching an address the product itself never reaches; the allowlist
-# is that business rule, enforced before any socket is opened.
-_DIAG_HOSTS = frozenset({
-    "rxnav.nlm.nih.gov", "mor.nlm.nih.gov", "api.mymemory.translated.net",
-    "translate.googleapis.com", "rest.ensembl.org", "api.cpicpgx.org",
-})
+#: What the connectivity check may probe: a NAME, and the exact address behind
+#: it. The caller chooses the name; it never supplies an address.
+#:
+#: The first version took a url and validated its scheme and host against a list.
+#: That closed the hole it was written for — `file:///etc/passwd` came back
+#: `ok: true`, and any page in the origin could make this server fetch anything —
+#: and it left a smaller one open by construction: an allowed HOST still accepts
+#: any path and any query, so the address could still carry a payload outward.
+#: Checking a string the caller composed is always a race between the check and
+#: the imagination of whoever writes the string. Not accepting a string at all
+#: ends it: what leaves this machine is a constant from this file.
+DIAG_TARGETS = {
+    "default": "https://rxnav.nlm.nih.gov/REST/version.json",
+}
+
+# Kept as a second gate over the RESOLVED address rather than as the first gate
+# over the caller's: cheap, and it keeps the rule true if somebody later adds a
+# target by hand. Derived from the table above, so the two cannot disagree.
+_DIAG_HOSTS = frozenset(
+    h for h in (urllib.parse.urlsplit(u).hostname for u in DIAG_TARGETS.values()) if h
+)
 
 
 def _diag_url_ok(url: str) -> bool:
@@ -122,6 +132,41 @@ def _is_cert_error(e: BaseException) -> bool:
     return isinstance(reason, ssl.SSLCertVerificationError)
 
 
+def certificate_fallback(e: BaseException) -> ssl.SSLContext:
+    """The one way, anywhere in this project, to retry a request unverified.
+
+    A caller hands over the exception it caught. This answers with a context only
+    when all three of the following hold, and raises otherwise:
+
+    * the failure really was certificate verification — decided by the TYPE of
+      the exception, never by looking for «SSL» in its text;
+    * the person allowed it out loud, in the environment;
+    * the attempt announces itself, every time it is made.
+
+    It exists because that rule had been fixed in `_open` and nowhere else. This
+    is the module that talks to the network, but it was never the only file that
+    does: `src/ingest/build_longevitymap.py` and
+    `src/ingest/build_longevity_sites.py` each carried their own copy of the
+    fallback `_open` used to have, and both copies still had the two faults it
+    was rewritten to remove — they decided from the text of the error, and they
+    asked nobody. A message that merely mentions SSL (a protocol mismatch, a
+    proxy refusing CONNECT) bought an unverified retry there.
+
+    What those two scripts build is `knowledge/longevitymap.json` and the list of
+    longevity positions — a catalogue that then travels to every reader, not a
+    number on one person's screen. So the fallback stops being a habit each file
+    repeats and becomes a function each file calls.
+    """
+    if not _is_cert_error(e):
+        raise e                        # a timeout, DNS, a 5xx — not our business here
+    if not insecure_allowed():
+        raise RuntimeError(f"{_t('net.tls_verify_failed')} {_t('net.certificates_hint')}") from e
+    # The warning is printed on EVERY request, not once per run: a quiet
+    # insecure mode is bad precisely because it is forgotten.
+    print(_t("net.tls_insecure_warning"), file=sys.stderr, flush=True)
+    return _unverified()
+
+
 def _open(url: str, timeout: int, headers: Optional[Dict[str, str]]) -> bytes:
     """Fetch a public reference source. Certificate verification is NOT dropped
     on its own.
@@ -139,7 +184,9 @@ def _open(url: str, timeout: int, headers: Optional[Dict[str, str]]) -> bytes:
     confidence.
 
     So: the certificate error is caught by its own type, the way round it exists
-    only with explicit permission, and every request made that way says so.
+    only with explicit permission, and every request made that way says so. All
+    three of those now live in `certificate_fallback`, because this was not the
+    only file that needed them — see its own note.
     """
     if offline():
         raise RuntimeError(_t("net.offline"))
@@ -147,14 +194,8 @@ def _open(url: str, timeout: int, headers: Optional[Dict[str, str]]) -> bytes:
     try:
         return urllib.request.urlopen(req, timeout=timeout).read()
     except Exception as e:
-        if not _is_cert_error(e):
-            raise                      # a timeout, DNS, a 5xx — not our business here
-        if not insecure_allowed():
-            raise RuntimeError(f"{_t('net.tls_verify_failed')} {_t('net.certificates_hint')}") from e
-        # The warning is printed on EVERY request, not once per run: a quiet
-        # insecure mode is bad precisely because it is forgotten.
-        print(_t("net.tls_insecure_warning"), file=sys.stderr, flush=True)
-        return urllib.request.urlopen(req, timeout=timeout, context=_unverified()).read()
+        return urllib.request.urlopen(
+            req, timeout=timeout, context=certificate_fallback(e)).read()
 
 
 def get_json(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = None) -> Optional[Any]:
@@ -171,16 +212,21 @@ def get_text(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = No
         return None
 
 
-def diagnose(url: str = "https://rxnav.nlm.nih.gov/REST/version.json") -> Dict[str, Any]:
+def diagnose(target: str = "default") -> Dict[str, Any]:
     """Check internet access from this Python. Returns the mode (verified/unverified) and the error.
 
-    Only the product's own hosts over https may be probed (see _DIAG_HOSTS): the
-    caller does not get to choose an arbitrary address, because this function runs
-    behind a loopback HTTP route reachable from any page. Redirects are refused
-    rather than followed, for the same reason — see `_NoRedirect`.
+    `target` is a NAME from `DIAG_TARGETS`, never an address: this function runs
+    behind a loopback HTTP route that any page in the browser can reach, and a
+    caller who can name an address can make this machine fetch it. A name that is
+    not in the table is refused and nothing is opened. Redirects are refused too,
+    for the same reason — an approved address that answers 3xx would otherwise
+    lead the request to one nobody approved (see `_NoRedirect`).
     """
-    if not _diag_url_ok(url):
-        return {"ok": False, "url": url, "error": _t("net.diag_host_refused"),
+    url = DIAG_TARGETS.get((target or "").strip())
+    if not url or not _diag_url_ok(url):
+        return {"ok": False, "target": target,
+                "error": _t("net.diag_target_unknown", value=str(target),
+                            accepted=", ".join(sorted(DIAG_TARGETS))),
                 "refused": True}
     if offline():
         return {"ok": False, "offline": True, "url": url,

@@ -31,6 +31,7 @@ from typing import Any, Dict, List, Optional
 
 from . import core
 from .i18n import t as _t
+from .i18n import plural as _plural
 
 #: Below this fraction of bases at ≥10× a gene cannot be called negative. 10× is
 #: the depth at which a heterozygote is decided at all — see qc_callability.sh,
@@ -249,7 +250,7 @@ def _lab_limits() -> List[Dict[str, str]]:
                 no_range.append(core.marker_display(spec, lang, m.get("name", key)))
     if no_range:
         out.append(_item(
-            _t("limits.no_corridor_what", n=len(no_range)),
+            _plural(len(no_range), "limits.no_corridor_what"),
             _t("limits.no_corridor_why", markers=", ".join(sorted(no_range)[:12])),
             _t("limits.no_corridor_closes"), kind="labs"))
     if not markers:
@@ -367,6 +368,64 @@ def _input_limits() -> List[Dict[str, str]]:
     return out
 
 
+def _profile_limits() -> List[Dict[str, str]]:
+    """The facts the engine cannot derive and will not invent.
+
+    They belong here rather than in a place of their own. This layer already
+    answers one question — «what cannot be said from this data, and what would
+    close it» — and a missing precondition is exactly that: not an error, not a
+    warning on every screen, but a sentence the product is not allowed to finish
+    and a command that lets it. The assistant reads this list at the start of a
+    conversation, so what it asks for is derived from the profile rather than
+    from a list somebody typed into an instruction and then had to keep in step.
+
+    Each is gated on being able to bite. Naming the reference population to
+    somebody with no genome is noise: nothing will ever compute a percentile for
+    them. Asking about a wearable is gated on the question never having been
+    ANSWERED — `none` is an answer, and a person who gave it is not asked again.
+    """
+    out: List[Dict[str, str]] = []
+    prof = core.metrics_json().get("profile") or {}
+
+    if not core.profile_sex():
+        out.append(_item(_t("limits.no_sex_what"), _t("limits.no_sex_why"),
+                         _t("limits.no_sex_closes"), kind="profile"))
+    if not (prof.get("birth_year") or prof.get("birth_date")):
+        out.append(_item(_t("limits.no_birth_what"), _t("limits.no_birth_why"),
+                         _t("limits.no_birth_closes"), kind="profile"))
+    if not prof.get("height_cm"):
+        out.append(_item(_t("limits.no_height_what"), _t("limits.no_height_why"),
+                         _t("limits.no_height_closes"), kind="profile"))
+    else:
+        # A height with no weight beside it is the same sentence left unfinished
+        # from the other end, and it names a different command.
+        weights = ((core.metrics_json().get("metrics") or {}).get("weight") or {}).get("series")
+        if not weights:
+            out.append(_item(_t("limits.no_weight_what"), _t("limits.no_weight_why"),
+                             _t("limits.no_weight_closes"), kind="profile"))
+
+    if not core.ancestry()["value"]:
+        try:
+            from . import genome as _genome
+            has_genome = bool(_genome.available().get("ready"))
+        except Exception:                                        # noqa: BLE001
+            has_genome = False
+        # Raised only where it can bite, and phrased as what it is: a step of
+        # preparing a genome that has not been run. It is NOT a question for the
+        # person — nobody knows their own superpopulation in those terms, and a
+        # product that asks gets a guess it cannot tell from a measurement.
+        if has_genome:
+            out.append(_item(_t("limits.no_ancestry_what"), _t("limits.no_ancestry_why"),
+                             _t("limits.no_ancestry_closes"), kind="profile"))
+
+    if not core.wearable_answered():
+        out.append(_item(_t("limits.no_wearable_answer_what"),
+                         _t("limits.no_wearable_answer_why"),
+                         _t("limits.no_wearable_answer_closes",
+                            none=core.NO_WEARABLE), kind="profile"))
+    return out
+
+
 def scope() -> Dict[str, Any]:
     """Which cell of the matrix an answer from this profile sits in.
 
@@ -475,7 +534,12 @@ def _disclaimer() -> str:
 
 def report() -> Dict[str, Any]:
     """Everything this profile cannot answer, with the reason and the remedy."""
-    items = _genome_limits() + _lab_limits() + _prs_limits() + _input_limits()
+    # The preconditions come FIRST: they are the cheapest to close — a sentence
+    # from the person rather than a laboratory visit or a sequencing run — and a
+    # reader scanning the list should meet those before the ones that need a
+    # machine.
+    items = (_profile_limits() + _genome_limits() + _lab_limits()
+             + _prs_limits() + _input_limits())
     cov = coverage_summary()
     closable = [i for i in items if i["closes"]]
     return {

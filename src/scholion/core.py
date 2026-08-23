@@ -779,6 +779,21 @@ def loinc_index() -> Dict[str, str]:
         code = (meta or {}).get("loinc")
         if code:
             out[str(code)] = key
+        # A LOINC code is not one per analyte: the same substance has a different
+        # code by material and by method, and a dictionary that holds one code
+        # per marker cannot place the others. Measured on a real bundle: four of
+        # its unplaced observations were analytes this dictionary knows, under a
+        # code it does not — glucose in whole blood against glucose in plasma,
+        # LDL measured directly against LDL calculated.
+        #
+        # Every additional code carries its own `why`: the two are the same
+        # measurement, or they are not, and that decision is medical. Whole blood
+        # and plasma differ by about a tenth — pairing them «because the name
+        # matches» would put a systematic error into somebody's series, which is
+        # the one thing this index exists to prevent.
+        for extra in (meta or {}).get("loinc_also") or []:
+            if isinstance(extra, dict) and extra.get("code") and extra.get("why"):
+                out.setdefault(str(extra["code"]), key)
     try:
         from . import markers_local as _ml
         for k, spec in (_ml.confirmed_markers() or {}).items():
@@ -1116,15 +1131,68 @@ def wearable_trends() -> Dict[str, Any]:
     return wearables.migrate(read_profile_json(p))
 
 
+#: The reference superpopulations a polygenic percentile may be computed
+#: against. Here rather than in the command line's `choices`, because three
+#: faces offer this choice and a list typed in each of them is three lists: the
+#: page would go on offering a population the engine had stopped accepting, and
+#: the person would never learn which of the two was wrong.
+ANCESTRIES = ("EUR", "AFR", "EAS", "SAS", "AMR")
+
+#: «I do not wear one» — an ANSWER, and not the same state as an unanswered
+#: question. Without it the two are one blank field, so anything that asks for
+#: the missing preconditions asks a person who has no watch about their watch
+#: for ever, and no answer they can give will stop it.
+NO_WEARABLE = "none"
+
+
+def ancestry_check() -> Dict[str, Any]:
+    """What the person's OWN genome says about the reference panel, if it was asked.
+
+    Nobody knows their 1000 Genomes superpopulation code, and being asked to
+    choose one is being asked to guess. The genome answers it —
+    `src/ingest/ancestry_check.py` compares a few hundred of the person's own
+    genotypes against the five reference panels — and until now nothing in the
+    product mentioned that the script exists. A remedy nobody is told about is
+    not a remedy.
+
+    Read, never applied. A percentile changes with the panel it is computed
+    against, so which panel applies is the person's to confirm.
+    """
+    p = profile_dir() / "ancestry_check.json"
+    if not p.exists():
+        return {}
+    try:
+        return read_profile_json(p) or {}
+    except Exception:                                            # noqa: BLE001
+        return {}
+
+
 def wearable_primary() -> Optional[str]:
     """Which device answers, when two of them measured the same thing.
 
     A person's own setting (`scholion profile --wearable whoop`), never a
     default: picking one silently is how a chart ends up showing a change of
     watch as a change of health.
+
+    `NO_WEARABLE` reads as None here on purpose. There is then no device to
+    prefer, which is exactly what None already means to every caller — a
+    sentinel leaking out as if it were a device name would have `sources`
+    printing «none» where a watch belongs. Whether the question was ANSWERED is
+    a different question and has its own reader below.
     """
-    v = (metrics_json().get("profile") or {}).get("wearable_primary")
-    return (v or "").strip() or None
+    v = str((metrics_json().get("profile") or {}).get("wearable_primary") or "").strip()
+    return None if v in ("", NO_WEARABLE) else v
+
+
+def wearable_answered() -> bool:
+    """Has the person said anything about a wearable — including «I have none».
+
+    Read by whatever asks for what the profile is missing. `wearable_primary()`
+    cannot answer this: it says None both for «nobody asked» and for «there is
+    no device», and only one of those is worth asking about again.
+    """
+    v = str((metrics_json().get("profile") or {}).get("wearable_primary") or "").strip()
+    return bool(v)
 
 
 def lifestyle_brief_src() -> Dict[str, Any]:
@@ -1493,15 +1561,43 @@ def medications_json() -> Dict[str, Any]:
     return read_profile_json(p) if p.exists() else {"medications": []}
 
 
+def ancestry() -> Dict[str, Any]:
+    """Which reference panel applies to a percentile, and where that came from.
+
+    NOT a question for the person. Nobody knows their own 1000 Genomes
+    superpopulation in those terms, and a field asking for one is a field asking
+    them to guess — after which the guess is indistinguishable from a fact. The
+    genome answers it: `src/ingest/ancestry_check.py` compares a few hundred of
+    their own genotypes against the five panels, and that is a step of preparing
+    a genome rather than a thing to be filled in.
+
+    So the order is: what the person deliberately overrode, else what their
+    genome determined, else nothing. `source` travels with the value because a
+    report saying «against the European panel» owes the reader the difference
+    between a panel measured from their own DNA and one they typed in.
+
+    Nothing is remembered into the profile from here. The determination lives
+    where the pipeline wrote it, and re-running the pipeline replaces it.
+    """
+    stated = (metrics_json().get("profile") or {}).get("ancestry")
+    if stated in ANCESTRIES:
+        return {"value": stated, "source": "stated"}
+    check = ancestry_check()
+    v = check.get("verdict_superpop")
+    if v in ANCESTRIES:
+        return {"value": v, "source": "genome", "date": check.get("date"),
+                "posterior": (check.get("posterior") or {}).get(v)}
+    return {"value": None, "source": None}
+
+
 def profile_ancestry() -> Optional[str]:
-    """The reference superpopulation the person stated, or None.
+    """The panel that applies, or None.
 
     None is the important value: it means a percentile printed for them was
     computed against a default, and the report has to say so rather than let the
-    number stand as if the question had been asked.
+    number stand as if the question had been settled.
     """
-    v = (metrics_json().get("profile") or {}).get("ancestry")
-    return v if v in ("EUR", "AFR", "EAS", "SAS", "AMR") else None
+    return ancestry()["value"]
 
 
 def profile_sex() -> Optional[str]:
@@ -1513,10 +1609,22 @@ def profile_sex() -> Optional[str]:
     false-normal testosterone. An unrecognised value is None, not a guess: a
     silent default to one sex is exactly the failure this exists to prevent.
     """
-    raw = str((metrics_json().get("profile") or {}).get("sex") or "").strip().lower()
-    if raw in ("m", "male", "man", "муж", "мужской", "м"):
+    return profile_sex_of((metrics_json().get("profile") or {}).get("sex"))
+
+
+def profile_sex_of(raw: Any) -> Optional[str]:
+    """The same recognition, applied to a value that is not in the file yet.
+
+    Split out so that a face WRITING a sex answers by the same list the engine
+    READS by. They were separate: the reader accepted six spellings and the
+    writer accepted anything at all, so a third spelling could be stored and
+    then read back as «not set» — the profile would show a sex and every
+    sex-specific reference interval would go on being withheld.
+    """
+    v = str(raw or "").strip().lower()
+    if v in ("m", "male", "man", "муж", "мужской", "м"):
         return "male"
-    if raw in ("f", "female", "woman", "жен", "женский", "ж"):
+    if v in ("f", "female", "woman", "жен", "женский", "ж"):
         return "female"
     return None
 

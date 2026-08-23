@@ -28,6 +28,7 @@ from typing import Any, Dict, List, Optional
 
 from . import core, store
 from .i18n import t as _t
+from .i18n import plural as _plural
 
 REQUIRED = ("marker", "date", "value")
 #: Recognised header spellings → the canonical column name. Both languages,
@@ -140,7 +141,7 @@ def run(path: str, dry_run: bool = False) -> Dict[str, Any]:
            "rejected": len(res["problems"]), "problems": res["problems"],
            "dry_run": bool(dry_run), "written": 0, "markers": []}
     if res["problems"]:
-        out["error"] = _t("import_csv.nothing_written", n=len(res["problems"]))
+        out["error"] = _plural(len(res["problems"]), "import_csv.nothing_written")
         return out
     if dry_run:
         out["markers"] = sorted({r["key"] for r in res["rows"]})

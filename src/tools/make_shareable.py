@@ -514,7 +514,16 @@ def build(repo: Path, out: Path) -> Path:
     # `synthetic_fixture.py` above — a dependency of something shipped is shipped —
     # and both were found by the package's own tests, thirteen minutes into a
     # publication run. `_shipped_tools_resolve()` below now finds them in a second.
-    for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json"):
+    #
+    # `check_test_reach.py` and its baseline join them for the same two reasons at
+    # once. A shipped test imports it, so it is a dependency of something shipped.
+    # And a recipient looking at 1096 green tests has no way of learning how much
+    # of the code they run — which is exactly the question this project got wrong
+    # about itself until the number was taken. The tool declines to COMPARE
+    # outside the source tree, because the package skips the tests only the tree
+    # can run and its reach is legitimately lower; it still measures.
+    for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json",
+                  "check_test_reach.py", "test_reach_baseline.json"):
         _src = repo / "src" / "tools" / _name
         if _src.exists():
             shutil.copy2(_src, shared / "src" / "tools" / _name)

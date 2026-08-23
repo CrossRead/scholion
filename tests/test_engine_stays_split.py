@@ -97,7 +97,8 @@ def _modules():
 
 def _top_level_engine_imports(path):
     """Names of sibling engine modules imported at the TOP LEVEL of `path`."""
-    tree = ast.parse(io.open(path, encoding="utf-8").read())
+    with io.open(path, encoding="utf-8") as fh:
+        tree = ast.parse(fh.read())
     siblings = set(_modules())
     out = set()
     for node in tree.body:
@@ -109,7 +110,8 @@ def _top_level_engine_imports(path):
 
 class TestTheFacadeDefinesNothing(unittest.TestCase):
     def test_init_is_imports_and_a_docstring_only(self):
-        tree = ast.parse(io.open(ENGINE_DIR / "__init__.py", encoding="utf-8").read())
+        with io.open(ENGINE_DIR / "__init__.py", encoding="utf-8") as fh:
+            tree = ast.parse(fh.read())
         offenders = [
             f"line {n.lineno}: {type(n).__name__}"
             for n in tree.body
@@ -161,7 +163,8 @@ class TestEveryModuleHasABudgetAndKeepsIt(unittest.TestCase):
     def test_every_module_fits_its_budget(self):
         for name, path in sorted(_modules().items()):
             with self.subTest(module=name):
-                lines = io.open(path, encoding="utf-8").read().count("\n")
+                with io.open(path, encoding="utf-8") as fh:
+                    lines = fh.read().count("\n")
                 self.assertLessEqual(
                     lines, LINE_BUDGETS[name],
                     f"engine/{name}.py is {lines} lines against a budget of "
@@ -179,7 +182,8 @@ class TestTheFacadeCoversTheDomains(unittest.TestCase):
         for name, path in sorted(_modules().items()):
             if name == "__init__":
                 continue
-            tree = ast.parse(io.open(path, encoding="utf-8").read())
+            with io.open(path, encoding="utf-8") as fh:
+                tree = ast.parse(fh.read())
             for node in tree.body:
                 public = None
                 if isinstance(node, ast.FunctionDef) and not node.name.startswith("_"):

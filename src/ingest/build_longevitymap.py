@@ -18,6 +18,9 @@ from __future__ import annotations
 import csv, io, json, re, sys, urllib.request, urllib.error, zipfile
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))   # src/ — for `scholion`
+from scholion import net                                       # noqa: E402
+
 URL = "https://genomics.senescence.info/longevity/longevity_genes.zip"
 OUT = Path(__file__).resolve().parents[1] / "scholion" / "knowledge" / "longevitymap.json"
 RS = re.compile(r"\brs\d+\b", re.I)
@@ -31,15 +34,22 @@ def _download() -> bytes:
         with urllib.request.urlopen(req, timeout=120) as r:
             return r.read()
     except urllib.error.URLError as e:
-        # macOS Python.framework often has no root certificates → SSL verify fails.
-        # Fallback: an unverified context (the data are public, and unpacking will
-        # check the zip's integrity). The same device as in net.py.
-        if "CERTIFICATE" not in str(e) and "SSL" not in str(e).upper():
-            raise
-        import ssl
-        ctx = ssl._create_unverified_context()
-        print("  (SSL verification failed — downloading through an unverified context)")
-        with urllib.request.urlopen(req, timeout=120, context=ctx) as r:
+        # macOS Python.framework often has no root certificates, so verification
+        # fails on a machine where nothing at all is wrong with the network. That
+        # is the one case worth a second attempt — and whether this is that case
+        # is not decided here. `net.certificate_fallback` checks that the failure
+        # really was the certificate and that the person allowed the retry
+        # (SCHOLION_TLS_INSECURE=1); otherwise it raises and nothing is fetched.
+        #
+        # What stood here decided from the TEXT of the error and retried with
+        # nobody's permission, and the comment justifying it was wrong on the
+        # point that mattered: the zip's own integrity check does not make an
+        # unverified download safe. A CRC catches a damaged transfer, not a
+        # substituted one — whoever can present a certificate this code is no
+        # longer looking at can also hand it a perfectly well-formed archive.
+        # And this archive becomes knowledge/longevitymap.json, which ships.
+        with urllib.request.urlopen(req, timeout=120,
+                                    context=net.certificate_fallback(e)) as r:
             return r.read()
 
 

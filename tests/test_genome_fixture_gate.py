@@ -77,7 +77,8 @@ class TestTheFixtureQualifies(unittest.TestCase):
         self.assertLess(FIXTURE.stat().st_size, sf.MAX_BYTES)
 
     def test_it_says_so_in_its_own_header(self):
-        text = gzip.open(FIXTURE, "rt", encoding="utf-8").read()
+        with gzip.open(FIXTURE, "rt", encoding="utf-8") as fh:
+            text = fh.read()
         header = " ".join(l for l in text.splitlines() if l.startswith("##")).upper()
         self.assertTrue(any(w in header for w in ("SYNTHETIC", "FIXTURE")),
                         "the fixture no longer declares itself invented — the gate "

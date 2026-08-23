@@ -6,15 +6,19 @@ owner's GENOTYPES at these variants, the rsIDs must be resolved into GRCh38 posi
 then re-genotyped from merged.bam (prs_genotype_sites.sh with OUT=...).
 
 Network access is required (Ensembl) — run this on the Mac, not in the cloud sandbox.
-SSL fallback as in net.py (macOS Python.framework).
+A certificate failure is handed to `net.certificate_fallback`, which retries
+without verification only with SCHOLION_TLS_INSECURE=1 and says so when it does.
 
     python3 build_longevity_sites.py [longevitymap.json] [out.bed] [rsmap.json]
     ONLY_SIGNIFICANT=1 python3 build_longevity_sites.py   # significant only (509)
 """
 from __future__ import annotations
-import json, os, ssl, sys, time, urllib.request, urllib.error
+import json, os, sys, time, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(HERE))                      # src/ — for `scholion`
+from scholion import net                                       # noqa: E402
+
 DEF_CATALOG = os.path.join(HERE, "..", "scholion", "knowledge", "longevitymap.json")
 CATALOG = sys.argv[1] if len(sys.argv) > 1 else DEF_CATALOG
 OUT_BED = sys.argv[2] if len(sys.argv) > 2 else "/tmp/longevity_sites.bed"
@@ -32,12 +36,14 @@ def _post(ids):
     try:
         r = urllib.request.urlopen(req, timeout=60)
     except urllib.error.URLError as e:
-        msg = str(getattr(e, "reason", e))
-        if "CERTIFICATE" in msg.upper() or "SSL" in msg.upper():
-            ctx = ssl._create_unverified_context()
-            r = urllib.request.urlopen(req, timeout=60, context=ctx)
-        else:
-            raise
+        # Not «does the message mention SSL» — that answered yes to a protocol
+        # error and to a proxy refusing CONNECT, and dropped verification for
+        # both. `net.certificate_fallback` decides by the type of the failure and
+        # by whether the person permitted the retry; it raises if either answer
+        # is no. These coordinates are what the owner's longevity positions are
+        # re-genotyped at, so an answer from an unchecked channel is a wrong
+        # position, not a slow one.
+        r = urllib.request.urlopen(req, timeout=60, context=net.certificate_fallback(e))
     return json.loads(r.read().decode())
 
 

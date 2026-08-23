@@ -34,7 +34,8 @@ class TestNoLoopVariableShadowsAParameter(unittest.TestCase):
         bad = []
         for path in sorted(SRC.rglob("*.py")):
             try:
-                tree = ast.parse(io.open(path, encoding="utf-8").read())
+                with io.open(path, encoding="utf-8") as fh:
+                    tree = ast.parse(fh.read())
             except SyntaxError:
                 continue
             for fn in ast.walk(tree):

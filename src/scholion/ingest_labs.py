@@ -505,10 +505,14 @@ def _range_span(t: str, pos: int = 0):
     return (start, m.end(), lo, hi)
 
 
-def _row_fits(t: str, sex: str, age: float) -> bool:
+def _row_fits(t: str, sex: str, age: Optional[float]) -> bool:
     """Whether a reference row fits the profile owner (sex + age).
 
     A row without a group label counts as fitting — that is an ordinary single-line reference.
+    `age` follows `_owner()`'s own contract: no birth year on file means `age is None`, and
+    then the age logic is off — an age-banded row is neither confirmed nor excluded by it,
+    the same way a row with no group label at all counts as fitting. Sex is a separate
+    question and is still enforced with age unknown.
     """
     if _ROW_ALIEN.search(t) or _local_row_rule(t, "alien"):
         return False
@@ -517,13 +521,13 @@ def _row_fits(t: str, sex: str, age: float) -> bool:
     if sex == "female" and re.search(r"мужчин|юнош", t, re.IGNORECASE):
         return False
     b = _ROW_BAND.search(t)
-    if b and not (float(b.group(1)) <= age <= float(b.group(2))):
+    if age is not None and b and not (float(b.group(1)) <= age <= float(b.group(2))):
         return False
     o = _ROW_OVER.search(t)
-    if o and age <= float(o.group(1) or o.group(2)):
+    if age is not None and o and age <= float(o.group(1) or o.group(2)):
         return False
     u = _ROW_UNDER.search(t)
-    if u and age >= float(u.group(1)):
+    if age is not None and u and age >= float(u.group(1)):
         return False
     return True
 

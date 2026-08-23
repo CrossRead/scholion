@@ -472,6 +472,38 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
     # where two of them measured the same thing. The engine cannot derive it, and
     # choosing for the person would make a chart depend on which export was
     # loaded last rather than on them.
+    # A value that cannot mean anything is refused rather than stored. Until now
+    # this wrote whatever it was handed: `--ancestry EURO` went in, and every
+    # polygenic percentile afterwards was computed against a reference
+    # population that does not exist — printed as an ordinary number, with the
+    # caveat about a DEFAULT population suppressed, because a value was set.
+    # Nothing downstream could tell. The web face validated the device and
+    # nothing else, so the two faces disagreed about what was acceptable.
+    from . import wearables as _wear
+    if fields.get("ancestry") and fields["ancestry"] not in core.ANCESTRIES:
+        return {"ok": False, "error": _t("store.unknown_ancestry",
+                                         value=fields["ancestry"],
+                                         accepted=", ".join(core.ANCESTRIES))}
+    known_devices = {k["source"] for k in _wear.KINDS} | {core.NO_WEARABLE}
+    if fields.get("wearable_primary") and fields["wearable_primary"] not in known_devices:
+        return {"ok": False, "error": _t("wearables.unknown_device",
+                                         name=fields["wearable_primary"])}
+    # A sex that is BEING WRITTEN is written in the spelling the rest of the
+    # project reads. The file has always been allowed to say `m` — a medical
+    # record's `gender` and the demonstration both do, and `profile_sex()`
+    # accepts it; what nothing accepted was a third spelling arriving from a
+    # face and matching neither list.
+    #
+    # Only the value being written. Normalising whatever the file already held
+    # would rewrite a field nobody touched: set a height, and the sex recorded
+    # years ago silently changes its spelling. A writer that edits what it was
+    # not asked about is the shape of defect this project keeps finding.
+    fields = dict(fields)
+    if fields.get("sex"):
+        normalised = core.profile_sex_of(fields["sex"])
+        if not normalised:
+            return {"ok": False, "error": _t("store.unknown_sex", value=fields["sex"])}
+        fields["sex"] = normalised
     for k in ("sex", "birth_year", "height_cm", "ancestry", "wearable_primary"):
         if k in fields and fields[k] not in (None, ""):
             prof[k] = fields[k]

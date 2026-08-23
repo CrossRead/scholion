@@ -41,7 +41,8 @@ class TestEveryKnowledgeFileDeclaresATier(unittest.TestCase):
         """«Mixed» without the breakdown is just a vaguer claim, not an honest one."""
         import glob, json, os
         for f in glob.glob("src/scholion/knowledge/*.json"):
-            d = json.load(open(f, encoding="utf-8"))
+            with open(f, encoding="utf-8") as fh:
+                d = json.load(fh)
             meta = (d.get("_meta") or {}) if isinstance(d, dict) else {}
             if meta.get("source_tier") == "guideline_mixed":
                 self.assertTrue(meta.get("source_tier_note"),

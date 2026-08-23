@@ -898,7 +898,7 @@ def reconcile_report(r: Dict[str, Any]) -> str:
         lines.append("🔴 " + _t("reconcile.unreadable", n=len(unread)))
         for u in unread:
             lines.append(f"   • {u['file']} — {u['reason']} "
-                         f"({_t('reconcile.bytes', n=u['bytes'])})")
+                         f"({_plural(u['bytes'], 'count.bytes')})")
         lines.append("")
     else:
         lines.append("🟢 " + _t("reconcile.all_readable"))
@@ -1387,7 +1387,8 @@ def fhir_report(r: Dict[str, Any]) -> str:
     L = [_t("fhir.title", path=r.get("path", ""), observations=r.get("observations", 0))]
     added = r.get("added") or []
     if r.get("dry_run"):
-        L.append(_t("fhir.dry_run", n=len(r.get("points") or [])))
+        L.append(_t("fhir.dry_run",
+                    results=_plural(len(r.get("points") or []), "count.results")))
     elif added:
         L.append(_t("fhir.added", n=len(added)))
     for p in (r.get("points") or []):
@@ -1397,6 +1398,12 @@ def fhir_report(r: Dict[str, Any]) -> str:
             rng = f" [{p.get('ref_low')}–{p.get('ref_high')}]"
         L.append(f"  {mark} {p['key']} {p['value']:g} {p.get('unit') or ''} "
                  f"({p['date']}, LOINC {p['loinc']}){rng}")
+    # The body measurements, counted apart from the laboratory points: they went
+    # to a different layer, and a reader who sees one number cannot tell.
+    n_metrics = len(r.get("metrics") or [])
+    if n_metrics:
+        L.append(_t("fhir.metrics_dry" if r.get("dry_run") else "fhir.metrics_taken",
+                    n=len(r.get("added_metrics") or []) if not r.get("dry_run") else n_metrics))
     for ref in (r.get("refused") or []):
         L.append("  ✗ " + _t("fhir.refused", label=ref.get("label"), reason=ref.get("reason")))
     # The skipped ones are grouped by REASON rather than listed one by one: the
@@ -1408,7 +1415,16 @@ def fhir_report(r: Dict[str, Any]) -> str:
     if groups:
         L += ["", _t("fhir.not_taken")]
         for reason, items in sorted(groups.items(), key=lambda kv: -len(kv[1])):
-            names = ", ".join(sorted({str(i["label"]) for i in items})[:6])
+            # The unplaced code is printed WITH the code, not only with its
+            # label: «Calcium» is what somebody has to look up, «Calcium
+            # (49765-1)» is what they can act on — and the code is the thing a
+            # dictionary entry is keyed by. It was carried in the record all
+            # along and stopped one line short of the screen.
+            if reason in ("loinc_not_in_catalogue", "loinc_is_a_body_metric"):
+                shown = sorted({f"{i['label']} ({i.get('detail') or '?'})" for i in items})
+            else:
+                shown = sorted({str(i["label"]) for i in items})
+            names = ", ".join(shown[:6])
             L.append(f"  · {_t('fhir.reason.' + reason)} — {len(items)}: {names}")
     facts = r.get("profile_facts") or {}
     if facts:
@@ -1436,9 +1452,11 @@ def import_report(r: Dict[str, Any]) -> str:
             L.append(f"- {_t('import.row', row=p['row'])}{who}: {p['reason']}")
         return "\n".join(L)
     if r.get("dry_run"):
-        L.append("✓ " + _t("import.dry_ok", n=r.get("accepted", 0)))
+        L.append("✓ " + _t("import.dry_ok",
+                            rows=_plural(r.get("accepted", 0), "count.rows")))
     else:
-        L.append("✓ " + _t("import.written", n=r.get("written", 0)))
+        L.append("✓ " + _t("import.written",
+                            rows=_plural(r.get("written", 0), "count.rows")))
     if r.get("markers"):
         L.append("")
         L.append(_t("import.markers", markers=", ".join(r["markers"])))
@@ -1476,7 +1494,8 @@ def limits_report(r: Dict[str, Any]) -> str:
         if ib.get("note"):
             L.append("  · " + ib["note"])
         if cov.get("weak_total"):
-            L.append(_t("limits.coverage_weak_line", n=cov["weak_total"]))
+            L.append(_t("limits.coverage_weak_line",
+                        genes=_plural(cov["weak_total"], "count.genes")))
         L.append("")
     items = r.get("items") or []
     if not items:

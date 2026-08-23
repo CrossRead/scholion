@@ -190,6 +190,14 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   had, because a class selector always outranks Pico's element-level default.
   Adopted 18.08.2026 when `web/index.html` moved onto it; the next HTML
   surface starts there directly instead of re-deciding.
+- **A command handed to the owner to paste carries no trailing comment.** In
+  interactive zsh a `#` does not start a comment: the words after it arrive as
+  arguments, and the tool answers with its own usage text. `gh api … --jq '…'
+  # what we expect` came back as «accepts 1 arg(s), received 9», which reads as
+  a broken tool rather than a spoiled line — and cost two exchanges twice in one
+  session. `run_tests.sh` already refuses that shape for its own arguments and
+  says why; this is the same rule one level up. Put the explanation in the prose
+  around the block, never inside it.
 - **A working copy reached through a mount that forbids `unlink` needs
   `git --no-optional-locks` for every read.** A plain `git status` creates
   `.git/index.lock` and then cannot remove it, so the NEXT git command dies on
@@ -202,3 +210,17 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   not `rm`: such a mount forbids deleting a file and allows renaming one.
   Learned 22.08.2026, after two sessions concluded the wrong thing from the
   same message.
+- **A shell command run through the bridge to the owner's machine cannot
+  outrun roughly 45 seconds, and nothing backgrounded through it survives
+  past that either.** `run_tests.sh` alone takes 38-45+ s end to end with
+  real variance, so a call that size times out before printing a result.
+  `nohup ... & disown` looks like the fix and is not: the child is gone by
+  the very next call, confirmed by launching one and polling for it
+  immediately after. Narrow instead of trying to outlast the wall:
+  `python3 -m unittest tests.module_a tests.module_b ...` scoped to the
+  touched file and everything importing it finishes in under a second and
+  is real signal, not a shortcut standing in for the whole suite. A clean,
+  unabridged run — reach check included — still wants a native terminal,
+  same as `git commit` did before `--no-optional-locks` was found for it.
+  Learned 23.08.2026 after five timed-out attempts at forcing the full run
+  through.

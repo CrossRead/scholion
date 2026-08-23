@@ -58,6 +58,31 @@ if [ -f src/tools/sync_rules.py ]; then
   echo "▶ the assistant rules are in sync with ASSISTANT-RULES.md"
   python3 src/tools/sync_rules.py
 fi
+# The reach of the suite over the code, measured rather than assumed. It runs the
+# whole suite a second time under the interpreter's coverage hook, which costs
+# about a minute and a half — so it is the LAST step, after everything that can
+# fail cheaply has already had its say.
+#
+# Why it is here at all and not in CI: the matrix in .github/workflows/tests.yml
+# runs in the PUBLIC repository, which this tree reaches only through
+# publish_share.sh. A gate there answers after publication. This is the only
+# place that answers before it.
+#
+# A narrowed run is skipped rather than measured: `./run_tests.sh tests.test_x`
+# executes a fraction of the suite, and comparing that fraction's reach against a
+# baseline taken from the whole would fail for the one reason that is not a
+# defect.
+if [ -f src/tools/check_test_reach.py ]; then
+  if [ "$#" -gt 0 ]; then
+    echo "▶ reach of the suite — not measured: this run was narrowed to $*"
+  elif [ "${SCHOLION_SKIP_REACH:-}" = "1" ] || [ "${SCHOLION_SKIP_REACH:-}" = "true" ] || [ "${SCHOLION_SKIP_REACH:-}" = "yes" ]; then
+    echo "▶ reach of the suite — skipped by SCHOLION_SKIP_REACH"
+  else
+    echo "▶ no module lost reach over the code (~90s; SCHOLION_SKIP_REACH=1 skips it)"
+    python3 src/tools/check_test_reach.py --strict || exit 1
+  fi
+fi
+
 if [ -f src/tools/check_language.py ]; then
   echo "▶ Russian has not been added to what ships"
   python3 src/tools/check_language.py --strict > /dev/null || {

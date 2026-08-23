@@ -25,22 +25,43 @@ WEB = pathlib.Path(net.__file__).resolve().parent / "web" / "index.html"
 
 
 class TestDiagnoseIsNotAnOpenProxy(unittest.TestCase):
-    """Finding 21: /api/diag?url= was a blind SSRF and a file oracle."""
+    """Finding 21: /api/diag?url= was a blind SSRF and a file oracle.
 
-    def test_file_scheme_is_refused_without_a_fetch(self):
-        r = net.diagnose("file:///etc/passwd")
+    The first repair validated the address the caller handed in. It closed the
+    hole and left the shape: a check over a string somebody else composed is a
+    race with whoever composes it, and an approved HOST still took any path and
+    any query. The check now takes a NAME out of a fixed table and never an
+    address, so there is nothing left to validate — what leaves the machine is
+    a constant from the source.
+    """
+
+    def test_an_address_is_not_a_target_however_harmless_it_looks(self):
+        for address in ("file:///etc/passwd",
+                        "https://evil.example.com/x",
+                        # The RIGHT address, refused for being an address: this is
+                        # the whole rule in one assertion.
+                        "https://rxnav.nlm.nih.gov/REST/version.json"):
+            with self.subTest(address=address):
+                r = net.diagnose(address)
+                self.assertTrue(r.get("refused"), r)
+                self.assertFalse(r.get("ok"), r)
+
+    def test_an_unknown_name_names_what_it_would_accept(self):
+        r = net.diagnose("nonsuch")
         self.assertTrue(r.get("refused"))
-        self.assertFalse(r.get("ok"))
-
-    def test_a_foreign_host_is_refused(self):
-        self.assertTrue(net.diagnose("https://evil.example.com/x").get("refused"))
+        for name in net.DIAG_TARGETS:
+            self.assertIn(name, r.get("error", ""))
 
     def test_http_downgrade_is_refused(self):
         self.assertFalse(net._diag_url_ok("http://rxnav.nlm.nih.gov/x"))
 
-    def test_a_real_reference_host_passes_the_gate(self):
-        self.assertTrue(net._diag_url_ok("https://rxnav.nlm.nih.gov/REST/version.json"))
-        self.assertTrue(net._diag_url_ok("https://rest.ensembl.org/x"))
+    def test_every_address_in_the_table_passes_the_second_gate(self):
+        # The table is walked rather than sampled: an entry added by hand with a
+        # plain-http address would otherwise sit there until somebody read it.
+        self.assertTrue(net.DIAG_TARGETS, "the table is empty — nothing can be probed")
+        for name, url in net.DIAG_TARGETS.items():
+            with self.subTest(name=name):
+                self.assertTrue(net._diag_url_ok(url), f"{name} → {url}")
 
     def test_a_redirect_from_an_allowed_host_is_not_followed(self):
         """The allowlist checks scheme and host, not path or query — and `urlopen`
@@ -69,19 +90,27 @@ class TestDiagnoseIsNotAnOpenProxy(unittest.TestCase):
                 pass
 
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        # The floor is named here as it is in every other context this project
+        # builds. This server lives for one test on the loopback, so nothing was
+        # ever at risk — but the alert that asked for it elsewhere was closed one
+        # file away, and a rule kept in one place out of two is not a rule.
+        ctx.minimum_version = ssl.TLSVersion.TLSv1_2
         ctx.load_cert_chain(cert, key)
         srv = http.server.HTTPServer(("127.0.0.1", 0), _Redirector)
         srv.socket = ctx.wrap_socket(srv.socket, server_side=True)
         port = srv.server_address[1]
         threading.Thread(target=srv.serve_forever, daemon=True).start()
 
-        old_hosts = net._DIAG_HOSTS
+        old_hosts, old_targets = net._DIAG_HOSTS, net.DIAG_TARGETS
         old_offline = os.environ.pop("SCHOLION_OFFLINE", None)
+        # The probe is named, so the stand-in is added to the table by name —
+        # which is also the only way a caller could ever reach it.
+        net.DIAG_TARGETS = {**old_targets, "loopback": f"https://127.0.0.1:{port}/"}
         net._DIAG_HOSTS = old_hosts | {"127.0.0.1"}
         try:
-            r = net.diagnose(f"https://127.0.0.1:{port}/")
+            r = net.diagnose("loopback")
         finally:
-            net._DIAG_HOSTS = old_hosts
+            net._DIAG_HOSTS, net.DIAG_TARGETS = old_hosts, old_targets
             if old_offline is not None:
                 os.environ["SCHOLION_OFFLINE"] = old_offline
             srv.shutdown()
@@ -109,9 +138,32 @@ class TestTheWebEscaperClosesAttributes(unittest.TestCase):
         self.assertIn("esc(m.trend.to_date)", self.src)
         self.assertNotIn("${m.trend.from_date}", self.src)
 
-    def test_birth_year_goes_through_esc(self):
-        self.assertIn("esc(p.birth_year", self.src)
+    def test_every_value_attribute_goes_through_esc(self):
+        """A rule with no exceptions, because the exception was the defect.
+
+        This began as a test about the birth year by name, and it held: that one
+        field went through `esc()`. It said nothing about the other four fields of
+        the same form, and the height had been going into the attribute raw the
+        whole time — a profile is a file on disk, and a face that writes one of
+        its fields straight into an attribute trusts whatever is in it.
+
+        Checking the SHAPE rather than the spelling also survives the code being
+        rearranged: the birth-year box is now filled from `birth_year` or from the
+        year of a stored `birth_date`, and a test pinned to the old expression
+        would have failed for a change that kept the property exactly.
+        """
+        import re as _re
+        raw = _re.findall(r'value="\$\{(?!esc\()[^}]{0,60}', self.src)
+        self.assertEqual([], raw,
+                         "these put a value into an attribute without escaping it: "
+                         + ", ".join(raw))
+
+    def test_the_birth_year_box_still_escapes_what_it_shows(self):
+        """Named separately because it is the field the original finding was
+        about, and because it is now filled from two different profile fields."""
+        self.assertIn("esc(byear)", self.src)
         self.assertNotIn('value="${p.birth_year', self.src)
+        self.assertNotIn('value="${p.birth_date', self.src)
 
 
 class TestServerBindsLoopbackOnly(unittest.TestCase):

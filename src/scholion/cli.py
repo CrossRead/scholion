@@ -114,10 +114,23 @@ def build_parser() -> argparse.ArgumentParser:
                           "corridor is not shown rather than guessed")
     prf.add_argument("--birth-year", type=int, default=None,
                      help="year of birth — age-banded rows on a lab form need it")
-    prf.add_argument("--wearable", choices=["garmin", "whoop"], default=None,
+    # The choices come from the build, not from this line: a list typed here goes
+    # stale the day a third reader is added, and then the command refuses a device
+    # the application can read. `none` is a real answer — «I do not wear one» — and
+    # not the same state as never having been asked.
+    from . import core as _core
+    from .wearables import KINDS as _KINDS
+    prf.add_argument("--wearable", choices=[k["source"] for k in _KINDS] + [_core.NO_WEARABLE],
+                     default=None,
                      help="which device answers where two of them measured the same thing; "
-                          "without it such a metric is shown from both and enters no conclusion")
-    prf.add_argument("--ancestry", choices=["EUR", "AFR", "EAS", "SAS", "AMR"], default=None,
+                          "without it such a metric is shown from both and enters no "
+                          f"conclusion. `{_core.NO_WEARABLE}` records that there is no "
+                          "wearable, so nothing asks again")
+    prf.add_argument("--height-cm", type=float, default=None,
+                     help="height in centimetres — the body-mass index is computed from it, "
+                          "and without it nothing that needs a height is shown. The page has "
+                          "always had this field; the command had not.")
+    prf.add_argument("--ancestry", choices=list(_core.ANCESTRIES), default=None,
                      help="the reference superpopulation for polygenic scores; without it a "
                           "percentile is printed with the caveat that it was computed against "
                           "a population that may not be yours")
@@ -840,6 +853,7 @@ def _main(argv=None) -> int:
         render = _pv.format_report
     elif args.cmd == "profile" and (getattr(args, "sex", None)
                                     or getattr(args, "birth_year", None)
+                                    or getattr(args, "height_cm", None)
                                     or getattr(args, "wearable", None)
                                     or getattr(args, "ancestry", None)):
         from . import store as _st
@@ -848,6 +862,8 @@ def _main(argv=None) -> int:
             fields["sex"] = args.sex
         if args.birth_year:
             fields["birth_year"] = args.birth_year
+        if getattr(args, "height_cm", None):
+            fields["height_cm"] = args.height_cm
         if getattr(args, "wearable", None):
             fields["wearable_primary"] = args.wearable
         if getattr(args, "ancestry", None):

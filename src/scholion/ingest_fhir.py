@@ -135,6 +135,11 @@ def plan(path: Path) -> Dict[str, Any]:
     index = core.loinc_index()
     points: List[Dict[str, Any]] = []
     skipped: List[Dict[str, Any]] = []
+    # Body measurements go to the metrics layer, not to the laboratory series:
+    # a weight is the person's own measurement and this product has always
+    # accepted it — from the command line and from the page. Dropping it because
+    # it arrived in a bundle was a hole, not a policy.
+    metrics: List[Dict[str, Any]] = []
     for entry in (bundle.get("entry") or []):
         res = entry.get("resource") or {}
         if res.get("resourceType") != "Observation":
@@ -157,6 +162,34 @@ def plan(path: Path) -> Dict[str, Any]:
             continue
         key = next((index[c] for c in codes if c in index), None)
         if not key:
+            # A body measurement is not an analyte the dictionary is missing —
+            # it is a value that belongs somewhere else entirely. Saying «the
+            # code is not in the dictionary» about a body weight sends the
+            # reader looking for an entry that should never exist there.
+            metric = next((c for c in codes if c in _body_metrics()), None)
+            if metric:
+                known = _body_metrics()[metric]
+                mine, want = known.get("ours"), (known.get("unit") or "").strip()
+                when = _effective(res)
+                got = (qty.get("code") or qty.get("unit") or "").strip()
+                if not mine:
+                    # No metric of ours holds this quantity. The table says what
+                    # it is instead, and that sentence is the answer.
+                    skipped.append({"label": label, "reason": "loinc_is_a_body_metric",
+                                    "detail": metric, "ours": None})
+                elif not when:
+                    skipped.append({"label": label, "reason": "no_date", "detail": metric})
+                elif got.lower() != want.lower():
+                    # Nothing here converts. A weight in pounds joining a series
+                    # in kilograms is the defect this project spends its time
+                    # removing, and it would arrive silently.
+                    skipped.append({"label": label, "reason": "metric_unit_not_ours",
+                                    "detail": f"{metric}: {got or '—'} ≠ {want}"})
+                else:
+                    metrics.append({"metric": mine, "label": label,
+                                    "date": _stamp(when), "value": float(qty["value"]),
+                                    "unit": want, "loinc": metric})
+                continue
             # NOT matched by display text — see the module docstring. This is the
             # list that says what the dictionary is missing, and it is the same
             # kind of material a dictionary proposal is built from.
@@ -173,10 +206,22 @@ def plan(path: Path) -> Dict[str, Any]:
                        "unit": qty.get("code") or qty.get("unit"),
                        "ref_low": low, "ref_high": high,
                        "loinc": codes[0]})
-    return {"ok": True, "path": str(path), "points": points, "skipped": skipped,
+    return {"ok": True, "path": str(path), "points": points, "metrics": metrics,
+            "skipped": skipped,
             "profile_facts": profile_facts(bundle),
             "observations": sum(1 for e in (bundle.get("entry") or [])
                                 if (e.get("resource") or {}).get("resourceType") == "Observation")}
+
+
+def _body_metrics() -> Dict[str, Any]:
+    """LOINC codes that name a body measurement rather than a laboratory analyte.
+
+    Data, not a list in code: the next such code is added by whoever meets it,
+    with the sentence that says where the value belongs — and `ours` names our
+    own metric only where the two are the same quantity in the same unit.
+    """
+    return {k: v for k, v in (core.lab_test_meta().get("body_metrics") or {}).items()
+            if isinstance(v, dict)}
 
 
 def ingest(path: str, dry_run: bool = False) -> Dict[str, Any]:
@@ -202,7 +247,20 @@ def ingest(path: str, dry_run: bool = False) -> Dict[str, Any]:
             # cannot be converted is not written in whatever unit it arrived in.
             refused.append({"label": p["label"], "unit": p["unit"],
                             "reason": r.get("error") or "refused"})
+    # The body measurements, into the metrics layer they belong to. Same person,
+    # same file, same import — a weight is not a laboratory result and it is not
+    # somebody else's business either.
+    added_metrics = []
+    for m in res.get("metrics") or []:
+        r = store.add_metric_point(m["metric"], m["date"], m["value"],
+                                   name=m["label"], unit=m["unit"], subject="owner")
+        if r.get("ok"):
+            added_metrics.append(m["metric"])
+        else:
+            refused.append({"label": m["label"], "unit": m["unit"],
+                            "reason": r.get("error") or "refused"})
     res["added"] = added
+    res["added_metrics"] = added_metrics
     res["refused"] = refused
     core.reset_cache()
     return res

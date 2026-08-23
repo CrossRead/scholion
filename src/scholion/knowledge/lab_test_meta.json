@@ -457,5 +457,54 @@
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
     }
+  },
+  "body_metrics": {
+    "_note": "LOINC codes that name a BODY MEASUREMENT rather than a laboratory analyte. A measurement of the person is written where one of our metrics holds the same quantity in the same unit — `ours` names it and `unit` is the only unit accepted, because nothing here converts and a weight in pounds joining a series in kilograms is the defect this project spends its time removing. Where `ours` is null the reason says what the value is instead, so that a refusal is an answer and not a shrug.",
+    "8302-2": {
+      "name": "Body Height",
+      "ours": null,
+      "why": "height is one field of the profile rather than a series; the bundle's value is reported so it can be set with `scholion profile --height-cm`"
+    },
+    "29463-7": {
+      "name": "Body Weight",
+      "ours": "weight",
+      "unit": "kg",
+      "why": "the same quantity our weight metric holds, in the same unit"
+    },
+    "59576-9": {
+      "name": "Body mass index (BMI) [Percentile] Per age and gender",
+      "ours": null,
+      "why": "a percentile against an age-and-sex reference, not the index our bmi metric holds"
+    },
+    "8310-5": {
+      "name": "Body temperature",
+      "ours": null,
+      "why": "no metric of ours holds temperature"
+    },
+    "8331-1": {
+      "name": "Oral temperature",
+      "ours": null,
+      "why": "no metric of ours holds temperature"
+    },
+    "8867-4": {
+      "name": "Heart rate",
+      "ours": null,
+      "why": "a heart rate at a visit is not the resting home pulse our metric means; the two are not interchangeable"
+    },
+    "9279-1": {
+      "name": "Respiratory rate",
+      "ours": null,
+      "why": "no metric of ours holds respiratory rate"
+    },
+    "2708-6": {
+      "name": "Oxygen saturation in Arterial blood",
+      "ours": null,
+      "why": "no metric of ours holds oxygen saturation; the wearable layer keeps its own, measured differently"
+    },
+    "59408-5": {
+      "name": "Oxygen saturation in Arterial blood by Pulse oximetry",
+      "ours": null,
+      "why": "as above, and by a different method again"
+    }
   }
 }

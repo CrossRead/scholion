@@ -1,7 +1,7 @@
 """The local web server (standard library, without dependencies).
 
 Serves the frontend (web/index.html) and a JSON API on top of the core. Reads and (on
-request) writes profile/. Run with: python3 -m scholion serve  →  http://127.0.0.1:8765
+request) writes profile/. Run with: python3 -m scholion serve  →  http://127.0.0.1:1521
 
 Local only (bind 127.0.0.1). The data does not leave the machine.
 
@@ -150,7 +150,13 @@ def _marker_catalog():
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "Scholion/0.1"
+    # Derived from VERSION for the same reason the header at the top of this file
+    # is — see the note there. This line said `Scholion/0.1` from 0.1 until 0.4.4,
+    # which is the identical mistake one screen further down: a number written by
+    # hand once and true for one release. Nothing depends on it (`_already_ours`
+    # asks /api/ping, not this), so it was wrong quietly, which is the only way a
+    # string like this is ever wrong.
+    server_version = f"Scholion/{VERSION}"
 
     # ---- utilities ----
     def _json(self, obj, code=200):
@@ -263,7 +269,11 @@ class Handler(BaseHTTPRequestHandler):
                                    "messages": i18n.messages(chosen)})
             if p == "/api/diag":
                 from . import net
-                which = (q.get("url") or [""])[0]
+                # A NAME of a probe, not an address. `?url=` is gone on purpose:
+                # a route reachable from any page must not accept an address to
+                # fetch, and accepting one «only from the allowlist» made the
+                # check a race with whoever composes the string.
+                which = (q.get("target") or [""])[0]
                 return self._json(net.diagnose(which) if which else net.diagnose())
             if p in ("/", "/index.html"):
                 return self._file(_WEB / "index.html", "text/html; charset=utf-8")
@@ -410,7 +420,10 @@ class Handler(BaseHTTPRequestHandler):
                 # cannot silently mean «nobody», which looks identical on screen.
                 from . import store as _st, wearables as _wear
                 name = (body.get("device") or "").strip()
-                if name not in {k["source"] for k in _wear.KINDS}:
+                # `none` passes too: «I do not wear one» is an answer, and the
+                # page has to be able to give it. Everything else is still a typo
+                # until proven otherwise.
+                if name not in {k["source"] for k in _wear.KINDS} | {core.NO_WEARABLE}:
                     return self._json({"ok": False, "error": _t("wearables.unknown_device",
                                                                 name=name or "—")})
                 return self._json(_st.update_metric_profile({"wearable_primary": name}))

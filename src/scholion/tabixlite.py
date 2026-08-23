@@ -13,6 +13,7 @@ gzip members, so gzip.GzipFile can read starting from a block boundary.
 from __future__ import annotations
 
 import gzip
+import os
 import struct
 from functools import lru_cache
 from pathlib import Path
@@ -25,7 +26,8 @@ class TabixIndex:
     """Linear .tbi index (bins are skipped — for VCF the linear index suffices)."""
 
     def __init__(self, path: str | Path):
-        raw = gzip.open(str(path), "rb").read()
+        with gzip.open(str(path), "rb") as fh:
+            raw = fh.read()
         if raw[:4] != b"TBI\x01":
             raise ValueError(_t("genome.bad_tabix", path=path))
         p = 4
@@ -63,8 +65,47 @@ class TabixIndex:
 
 
 @lru_cache(maxsize=8)
-def _index(vcf: str) -> TabixIndex:
+def _index_cached(vcf: str, stamp: tuple) -> TabixIndex:
+    """Keyed on the index file's own identity, never on its path alone."""
     return TabixIndex(vcf + ".tbi")
+
+
+def _index(vcf: str) -> TabixIndex:
+    """The parsed index, cached until the index on disk changes.
+
+    The cache used to be keyed on the path. Nothing invalidated it — `reset_cache`
+    clears the JSON readers and the knowledge files, and its own note says
+    readers are invalidated by mtime, which was true of every reader but this
+    one. In a short-lived CLI call that is invisible; `serve` runs for as long as
+    somebody leaves the tab open, and the genome pipeline here is run by hand in
+    another terminal. Rebuild and re-index a VCF under a running server and the
+    old index stays: `voffset` then answers with an offset computed for a file
+    that no longer exists, the seek lands somewhere arbitrary, and the read comes
+    back empty.
+
+    Empty is the dangerous answer rather than a visible one. For a VCF made by
+    `bcftools call -mv` a missing row means HOMOZYGOUS FOR THE REFERENCE, so a
+    stale index does not produce an error or a gap — it produces a confident,
+    ordinary-looking genotype.
+
+    So the key carries the modification time and the size of the `.tbi` itself.
+    That is one `stat` per query against decompressing a block, and it makes this
+    reader behave the way the rest of them already claim to. An index that cannot
+    be stat'd is looked up under an empty stamp and left to fail where it failed
+    before — a missing index is the caller's `except`, not this function's.
+    """
+    try:
+        st = os.stat(vcf + ".tbi")
+        stamp = (st.st_mtime_ns, st.st_size)
+    except OSError:
+        stamp = ()
+    return _index_cached(vcf, stamp)
+
+
+# Kept reachable under the name callers already know, the same way `genome.py`
+# forwards `assembly_of.cache_clear`: a second store nobody can clear is how a
+# cache becomes permanent.
+_index.cache_clear = _index_cached.cache_clear                  # type: ignore[attr-defined]
 
 
 def contigs(vcf: str) -> List[str]:

@@ -40,6 +40,243 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.4 — 23.08.2026
+
+This release is mostly about a medical record read from a file: what such a record
+holds that is not a laboratory number, and how the product names the codes it could
+not place. The rest is about statements being true — a number and the word after it,
+the version the local server gives out about itself, what a connectivity check is
+allowed to fetch, whether a download checked who answered it, and whether an index
+still describes the genome it was built from.
+
+### What you can do now
+
+***The facts the application cannot derive can be given from the page at last.**
+Sex, year of birth, height and which wearable answers are preconditions: without
+them a dozen reference intervals are withheld rather than guessed, the age-banded
+rows of a laboratory form cannot be read, and there is no body-mass index. There
+is now a **Profile** tab, and it offers all four. The main wearable had no field
+anywhere but the command line.
+
+**The reference panel for percentiles is no longer a question.** It used to be
+one: `--ancestry EUR|AFR|EAS|SAS|AMR`, a superpopulation code nobody knows about
+themselves in those terms. What such a box collects is a guess, and a guess
+stored where a measurement goes is indistinguishable from one afterwards — while
+every polygenic percentile depends on it.
+
+Your own genome answers it. Comparing a few hundred of your genotypes against
+the five 1000 Genomes panels is a step of preparing a genome, and the result is
+used from where that step writes it; the Profile tab shows which panel applies
+and says whether it was measured from your DNA or set by hand. Until it has been
+determined, percentiles go on naming the default panel they used. The
+command-line flag remains as a deliberate override.
+
+Saying there is no wearable is an answer of its own. Until now «I do not own one»
+and «nobody asked» were one blank field, so anything listing what the profile
+still needs asked a person with no watch about their watch for ever. Choose «No
+wearable device» once, or `scholion profile --wearable none`, and it stops.
+
+**What the profile is still missing is now part of what the data cannot answer.**
+`scholion limits` already answered one question — what cannot be said here, and
+what would close it — and a missing precondition is exactly that. Each one now
+appears in that list with the sentence it prevents and the command that records
+it, and disappears from it once answered. An assistant reading the list at the
+start of a conversation therefore asks for what is actually absent, rather than
+from a list somebody typed into an instruction and then had to keep in step.
+
+*A body measurement in a bundle is now kept, not dropped.** This product has
+always taken a weight — from the command line and from the page — and an import
+that met one inside a medical record threw it away because it is not a
+laboratory analyte. It goes to the metrics layer where it belongs, with the same
+mark of whose measurement it is as everything else written today. Only where one
+of this product's own metrics holds the same quantity IN THE SAME UNIT: nothing
+here converts, so a weight in pounds is refused rather than joined to a series in
+kilograms. `scholion import-fhir <file>` reports the two layers separately,
+because one number for both would say nothing about either.
+
+**Height can be set from the command line at last.** The page has always had the
+field; the command had not, and the body-mass index needs it —
+`scholion profile --height-cm 178`. A bundle that states a height still does not
+apply it: a file may hold a relative or two people, and a height is one field of
+the profile rather than a series, so it is reported for you to set yourself.
+
+**A marker may now carry more than one LOINC code**, because a LOINC code is not
+one per analyte: the same substance has a different code by material and by
+method, and four of that bundle's unplaced observations were analytes this
+dictionary knows under a code it does not — glucose in whole blood beside
+glucose in plasma, LDL measured directly beside LDL calculated. Every additional
+code has to state why the two are the same measurement, and none ships: whole
+blood and plasma differ by about a tenth, so pairing them because the names
+match would put a systematic error into a series. The mechanism is here; the
+pairings wait for a source, and the refusal now prints the code, so each one can
+be looked up.
+
+**The suite now says how much of the code it runs, and will not quietly run
+less.** A thousand green tests is not a measurement, and this project had been
+reading it as one. The number, once taken, was 69.9% — with the module that
+implements provenance for every answer at 12.8%, and the VCF reader used whenever
+`pysam` is absent, which is most installations, at 35.4%. Nothing could have said
+so, because nothing was counting.
+
+`check_test_reach.py`, which travels with the package beside the other checking
+tools, counts — on the standard library alone and
+including the tests that run the command line in a real subprocess. It reports
+per module, `--strict` fails when a module falls below the reach recorded for it,
+and `--accept` records a new number deliberately. It is the last step of
+`./run_tests.sh`; `SCHOLION_SKIP_REACH=1` skips it while editing.
+
+No module is now under half. Seven that were — polygenic scoring, the provenance
+audit, the study loader, the watch import, every route of the local web
+interface, the online drug lookup and the VCF reader — carry tests for what they
+actually decide: which polygenic model is allowed to speak for a trait, that a
+score is not computed for an organ the person does not have, that a stored number
+which no report holds is told apart from one that a second method explains, that
+a rebuilt watch export cannot erase months it no longer mentions, that a
+judgement written about a study survives the file being read again, and that an
+empty answer from a database that was never reached is never printed as «nothing
+was found».
+
+Nothing about anyone's data changes, and no command behaves differently.
+
+### What was wrong
+
+***A form the interface never showed.** The page holding sex, year of birth and
+height existed, worked, and was in no tab: it had never been reachable, in the
+whole history of the file, so in practice those facts could only be set from the
+command line — while the command's own help said the opposite. Every view the
+page defines is now checked for a way in, because a view nobody can open fails no
+test that calls its functions directly.
+
+**A recorded age and a recorded sex could both show as «—».** The age was
+computed from a year of birth alone, so a profile carrying a full birth date —
+which is what the demonstration writes, and what an imported medical record
+writes — reported no age at all while the file held one. And the page compared
+the stored sex against `male`, while the file is allowed to say `m`; a sex
+already given then showed as blank and was asked for again. Both are read
+through the one function that knows the spellings.
+
+**A value that cannot mean anything was stored rather than refused.** `--ancestry
+EURO` went in, and every polygenic percentile afterwards was computed against a
+reference population that does not exist — printed as an ordinary number, and
+without the caveat about a default one, because a value was set. Nothing
+downstream could tell. Populations, devices and spellings of a sex are now
+checked on the way in, by the same lists in every face; an unrecognised value is
+refused with what is accepted. A profile field a person did not touch is also no
+longer rewritten by a save of a different one.
+
+*«1 markers are printed without a reference range».** A number and the word
+after it did not agree — on the screen that says what the data cannot support,
+which is the screen this project argues from. The machinery for it existed and
+was in use; twenty-three messages simply did not go through it, and in Russian,
+where a noun after a number takes three different forms, the same lines read as
+carelessness about everything else on them. All twenty-three are repaired, and
+the rule that replaces them is mechanical: a message may not put a number
+immediately in front of a word unless it carries all the forms of that word. The
+page and the package now also agree on which form to choose, checked against
+each other rather than each against its author.
+
+**A body weight was reported as a laboratory code nobody knows.** Importing a
+FHIR bundle, ten of the twenty-three observations it could not place were not
+analytes at all — height, weight, body mass index, temperature, heart rate,
+respiratory rate, oxygen saturation. Calling them «a code this build does not
+know» sends the reader looking for a dictionary entry that should never exist.
+They are named for what they are now, each with the code and, where one of this
+product's own metrics holds the same quantity, with that named too — and where
+it does not, the reason is written down rather than left as silence: a heart
+rate at a visit is not the resting home pulse, and a body-mass-index percentile
+against an age-and-sex reference is not the index this product keeps. Nothing is
+written from them yet; what changed is that the list of what a bundle held is no
+longer misleading. On the same bundle the count of «not in the dictionary» falls
+from 23 to 13.
+
+**An observation the dictionary could not place named only its label.** Importing
+a FHIR bundle lists what it did not take and why; for a code the dictionary does
+not know it printed «Calcium» — while the code, which is the thing an entry is
+keyed by and the only way to look the analyte up, sat in the record one line
+short of the screen. It is printed now: «Calcium (49765-1)».
+`scholion import-fhir <file> --dry-run` shows the list without writing anything.
+
+**A profile with no birth year stopped a whole batch of laboratory forms.**
+Reference ranges on a form are often given by age band — one row for 40 to 49,
+another for 50 and over — and choosing the row that applies needs the reader's age.
+A profile without a birth year is an ordinary state, one the setup warns about and
+proceeds from; the comparison was made anyway. `scholion ingest-labs` then failed
+on the first form carrying such a row, and the run stopped there rather than
+setting that one file aside and going on.
+
+An age that is unknown is not the same claim as an age that fits. An age-banded row
+is now neither confirmed nor excluded — the standing a row with no group label has
+always had — and where a block offers several of them, the rule this product
+already followed takes over: more than one row could apply, so none is taken and
+the marker arrives with no reference corridor at all. That is the safe direction
+rather than a gap: nothing without a corridor is ever called a deviation here.
+Sex is a separate question and still filters rows when the age is unknown.
+
+**The connectivity check accepted an address to fetch, and it should never have
+accepted one.** The local server answers a page in your own browser, and any
+other page open in that browser can ask it for something. The check that says
+«is there internet from here» took the address to try as a parameter. The first
+repair made it verify that address — https only, and only the handful of hosts
+this product itself talks to — which closed the hole it was written for and left
+the shape: a host that is allowed still accepts any path and any query, so an
+address could still carry something outward, and a check over a string somebody
+else composed is a race with whoever composes the string.
+
+It no longer takes an address. It takes the NAME of a probe, and the address
+behind that name is a constant in the source; a name that is not in the table is
+refused and nothing is opened. `scholion serve` shows the result in the same
+place as before, and the page asks for it the same way — only `?url=` is gone,
+replaced by `?target=`, and no caller can name an address again.
+
+**A reference download could stop checking who was answering, and said nothing
+about it.** Two of the catalogues this project builds are fetched from public
+reference databases: the collection of longevity variants, and the list of genome
+positions those variants are read at. When the certificate check failed, both
+downloads simply repeated the request without it. Whether a certificate was the
+problem at all was decided by reading the wording of the error — so a message
+that merely mentions SSL, such as a protocol mismatch or a proxy refusing the
+connection, was enough — and nobody was asked for permission. The note written
+beside it argued that the archive's own integrity check made this safe; it does
+not. That check catches a damaged transfer, not a substituted one.
+
+What could have come of it: a catalogue of variants, or a set of coordinates a
+genome is then read at, supplied by somebody other than the database named on it,
+and afterwards reported with exactly the confidence the real thing would carry.
+Nothing on screen would have looked unusual, which is the whole difficulty with
+this class of fault.
+
+Both now refuse. Verification is skipped only when the person allows it out loud
+(`SCHOLION_TLS_INSECURE=1`), only when the failure really was a certificate —
+decided by the kind of failure, not by its wording — and every request made that
+way prints a warning as it is made. This was already how the application's own
+lookups behaved; it is now how everything behaves, and a check that reads the
+whole source tree refuses any new place that goes back to deciding for itself.
+
+**A genome rebuilt while the application was running could report a variant as
+absent.** The reader that answers questions about a variant file without external
+tools keeps that file's index in memory. It kept it under the file NAME alone, and
+nothing ever discarded it — so a genome re-called and re-indexed while `scholion
+serve` was left open went on being read through the previous index. The offsets in
+it no longer describe the file, the read lands nowhere useful, and it comes back
+with no rows.
+
+No rows is the answer that matters. For a variant file produced the usual way, the
+absence of a row at a position means «the same as the reference» — so a stale index
+did not produce an error, and did not leave a gap. It produced an ordinary genotype,
+stated with the ordinary confidence, at a position that may carry a finding.
+
+The index is now remembered together with the modification time and size of the
+index file, so a rebuilt genome is read afresh. Anyone who never rebuilds a genome
+under a running interface was never affected, and a command-line run never was: it
+starts a new process each time and had nothing to remember.
+
+### What needs recomputing
+
+Nothing, unless a warning about unverified certificates was seen while the
+reference catalogues were being built. They are rebuilt by rerunning the build; the
+data already in a profile is not affected, because those files are a shared public
+reference and hold nobody's measurements.
+
 ## v0.4.3 — 22.08.2026
 
 This release is about files that arrive wrapped, laboratory forms printed for an

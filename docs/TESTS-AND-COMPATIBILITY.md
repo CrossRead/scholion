@@ -68,6 +68,40 @@ the next one.
 
 **5. Backward compatibility** (`tests/test_compat.py` + `check_compat.py`).
 
+**6. How far the suite reaches into the code** (`check_test_reach.py` +
+`test_reach_baseline.json`). Not the same question as any of the above, and not
+the same question as `check_coverage.py` next to it — that one asks what the
+build KNOWS, this one asks which lines of `src/scholion` the suite actually
+EXECUTES.
+
+It exists because a review counted a thousand green tests and concluded the code
+was well covered. The number that had never been taken was 69.9%, and the modules
+at the bottom of it were not peripheral: `provenance.py`, which implements the
+sentence the product is sold on, stood at 12.8%; `tabixlite.py`, the VCF reader
+used whenever `pysam` is absent and therefore the one most installations run,
+stood at 35.4%. Nothing in the suite could have said so, because nothing was
+counting.
+
+The measurement is built out of the standard library — this project has no
+dependencies, and `coverage` is one. It uses the interpreter's own coverage hook
+on Python 3.12 and later and `sys.settrace` below that, and it collects the
+twenty-one test files that run the CLI in a real SUBPROCESS: measured without
+them the answer is 54.3% rather than 69.9%, which is the difference between
+believing `reconcile.py` is dead code and knowing it is half exercised.
+
+The gate is a baseline rather than a target, for the same reason as the language
+one: a threshold set at 90% fails on Monday and is switched off on Tuesday, and a
+gate that is off looks exactly like a guarantee. `--strict` fails when a module
+falls below its accepted line, or when a module appears that nobody has reviewed.
+Raising it is `--accept`, and the diff is then somebody's to justify.
+
+Two properties of the tool are themselves tested
+(`tests/test_the_reach_tool_and_the_runner_agree.py`), because a measurement's
+failure mode is a confident zero: that it measures the same run `run_tests.sh`
+performs — the two spellings of that environment are compared mechanically — and
+that its line counter is right about the cases that are easy to get wrong, such
+as a module docstring being executable and a function docstring not being.
+
 ## The public contract
 
 Three things count as the contract:
@@ -100,6 +134,17 @@ is a deliberate act: an accepted narrowing must land in `CHANGELOG.md` in the
   Installed by `bash src/tools/install_hooks.sh`.
 - Emergency bypass — `SCHOLION_SKIP_TESTS=1 git push`. Deliberately and rarely: the
   personal-data leak check still runs regardless.
+- The reach measurement is the last step of `./run_tests.sh` and runs the suite a
+  second time under the coverage hook, which costs about a minute and a half.
+  `SCHOLION_SKIP_REACH=1` skips it for a tight edit loop; a run narrowed to one
+  module (`./run_tests.sh tests.test_x`) skips it on its own, because the reach of
+  a fraction of the suite cannot be compared against a baseline taken from all of
+  it.
+
+  It runs here rather than in CI on purpose. The matrix in
+  `.github/workflows/tests.yml` lives in the public repository and is reached only
+  through `publish_share.sh`, so a gate there would answer after publication. This
+  is the only place that answers before it.
 
 The tests travel into the public package together with the code. The recipient
 must be able to verify their own build without access to our repository —
@@ -114,6 +159,8 @@ otherwise "verified" stays an internal claim of ours.
 | `test_no_range_means_no_flag` | Someone substituted a "generally accepted norm". That manufactures false deviations — the reference range is taken only from the user's own report form. |
 | `test_sex_does_not_influence_the_result` | The PhenoAge formula was edited. Levine 2018 has no sex term. |
 | `test_empty_profile_answers_honestly` | A command crashes for a new user. Empty data is a legitimate state, not an error. |
+| `check_test_reach.py --strict` | A module lost reach, or a new one arrived with none. Add the tests, or accept the number deliberately with `--accept` and say why in the commit. |
+| `test_every_module_in_the_tree_has_an_accepted_number` | A module was added to `src/scholion` and nobody decided how well it is tested. |
 | `test_the_copyright_line_passes` and its neighbours | The single exception to the personal-data check — the authorship line in the licence — was touched. It must not be widened: see below. |
 
 ## Legal conditions are checked by machine

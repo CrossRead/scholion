@@ -65,6 +65,7 @@ saw into one directory as it exits.
 from __future__ import annotations
 
 import argparse
+import ast
 import dis
 import json
 import os
@@ -189,8 +190,19 @@ def executable_lines(path: Path) -> set:
     executes. Every one of those made the first version of this measurement wrong
     in a different direction.
     """
+    src = path.read_text(encoding="utf-8")
     try:
-        code = compile(path.read_text(encoding="utf-8"), str(path), "exec")
+        # A module with no statements at all has nothing to reach, and saying so
+        # from the SOURCE rather than from the compiler is what makes the answer
+        # the same on every Python. An empty `__init__.py` compiles to an
+        # implicit return, and the line it is numbered at moved between 3.10 and
+        # 3.11: line 1 there, line 0 here. This counter drops line 0, so the same
+        # empty file was measured on one interpreter and skipped on the other —
+        # and a baseline taken here then failed on 3.10 for a module that has no
+        # code in it.
+        if not ast.parse(src).body:
+            return set()
+        code = compile(src, str(path), "exec")
     except (SyntaxError, ValueError):                        # pragma: no cover
         return set()
     out, stack = set(), [code]

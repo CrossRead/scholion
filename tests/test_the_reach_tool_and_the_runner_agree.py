@@ -122,6 +122,30 @@ class TestTheLineCounterIsRight(unittest.TestCase):
         self.assertIn(2, got)
         self.assertIn(3, got)
 
+    def test_a_module_with_no_statements_has_nothing_to_reach(self):
+        """And answers the same on every Python this project supports.
+
+        An empty `__init__.py` compiles to an implicit return, and the line that
+        return is numbered at moved between 3.10 and 3.11: 1 there, 0 here. This
+        counter drops line 0, so one empty file was measured on one interpreter
+        and skipped on the other — and a baseline recorded here then failed on
+        3.10 over a module with no code in it. The vendored package has such a
+        file, and the matrix found it the only way it could: after publication.
+
+        So the question is answered from the SOURCE. No statements, nothing to
+        reach, on every version.
+        """
+        self.assertEqual(set(), self._lines(""))
+        self.assertEqual(set(), self._lines("\n\n"))
+        self.assertEqual(set(), self._lines("# only a comment\n"))
+
+    def test_a_docstring_alone_is_still_a_statement(self):
+        """It stores `__doc__`, so it runs. Which LINE it is numbered at is not
+        asserted: that is exactly the kind of detail that differs between
+        versions, and pinning it here would be repeating the mistake above."""
+        self.assertTrue(self._lines('"""just a docstring"""\n'),
+                        "a module docstring executes and must be counted")
+
     def test_a_file_that_does_not_compile_is_not_a_crash(self):
         got = self._lines("def broken(:\n")
         self.assertEqual(set(), got)

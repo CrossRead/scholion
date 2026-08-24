@@ -40,6 +40,29 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.5 — 24.08.2026
+
+<!-- This entry is open. While 0.4.5 is unpublished, further work is added here
+     rather than under a new number. Refresh the date in the heading before
+     publishing, and delete this note. -->
+
+### What was wrong
+
+**A check that travels with the package disagreed with itself between Python
+versions.** The tool that measures how much of the code the test suite actually
+runs asked the compiler whether a file has anything to execute. For a file with
+no statements in it at all — the vendored package carries an empty `__init__.py`
+— what compiles is an implicit return, and the line it is numbered at is 1 on
+Python 3.10 and 0 on 3.11 and later. The tool ignores line 0.
+
+So one empty file was measured on one interpreter and skipped on another, and
+the recorded baseline, taken on a newer Python, failed the suite on 3.10 over a
+module with no code in it. Anybody running the checks on the oldest Python this
+package supports would have met it — the checks travel beside the package and
+`scholion doc contributing` describes how to run them. The question is answered
+from the source now: no statements, nothing to reach, the same answer
+everywhere.
+
 ## v0.4.4 — 23.08.2026
 
 This release is mostly about a medical record read from a file: what such a record

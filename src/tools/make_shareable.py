@@ -5,6 +5,7 @@ Builds TWO packages in the output folder:
   <out>/                   — the full runnable project (code+application+knowledge+
                                    skill+plugin), with an EMPTY profile/ (templates) and genome/README.
   <out>/claude-skill/    — the standalone Claude skill (SKILL.md + guide).
+  <out>/skills/scholion/ — the entry alone, where a skills installer looks.
 
 What it does:
   1) copies ONLY what is portable (whitelist), excluding personal material (profile/, genome/, PDF, VCF, BAM…);
@@ -54,42 +55,46 @@ RASTER_MAX_B64 = 30_000  # base64 characters (~22 KB) — above the threshold it
 # image fails the audit: a text audit cannot look inside a JPEG, and a new screenshot
 # may hold real lab results and genotypes. Add a hash here only after viewing the image.
 APPROVED_RASTER_SHA256 = {
-    # Presentation shots, retaken on 19.08.2026 for the 0.3.2 refresh: the
-    # application on the SYNTHETIC demo profile (an invented person, subject
-    # DEMO-0001, `scholion init --demo`), captured via a real headless run of
-    # `scholion serve`, one full set per language \u2014 English and Russian now each
-    # carry their OWN screenshots, ten tabs each (the Guide tab is new; it did not
-    # exist in the previous set). The audit does not see what is drawn inside an
-    # image \u2014 so the list is approved by eye, and the hash pins exactly what was
-    # looked at. The previous set (nine hashes, English only, Russian reusing the
-    # English images) was replaced wholesale rather than extended, for the same
-    # reason it was replaced wholesale the time before: a page whose screenshots
-    # are stale or in the wrong language reads as carelessness, and keeping old
-    # hashes around would let a stale edition pass right alongside the current one.
+    # Replaced wholesale on 24.08.2026, as every edition of this list has been:
+    # the presentation's screenshots were retaken on 0.4.6 and the old set no
+    # longer appears anywhere. A hash kept past its picture would let a page with
+    # last season's screens pass the audit standing next to the current one.
     #
-    # English (docs/presentation.html):
-    "fa479e1a2e31e262e9dde323fb14a5673bb98aa3764dad8d7714922c21c3ec40": "presentation (en) \u00b7 Overview: the current task, the live marker and the levers",
-    "af63f7f88ee42aaa5784548f56838f8d654b3c06a5e8067d4a60a0c6e3fd0062": "presentation (en) \u00b7 Guide: what every colour, badge and label means",
-    "bc401752cdc67fcd2132eeb936a42a388d6489a97b72b193c3164ac36dee885d": "presentation (en) \u00b7 Labs: flags, sparklines and movement for every marker",
-    "473f81ff9c25a3a6609ab205868c2b84558c9b60f5986b0c2111f3df981173e5": "presentation (en) \u00b7 Drugs: one drug checked against genome x labs x interactions x ClinVar",
-    "84e7d341003e994b7c1072748c0c67005b50883f9f3d35ec0df976bf2598031a": "presentation (en) \u00b7 Genome: findings by tier, polygenic risks and the longevity layer",
-    "6d18749e21aef38fd2b3306819cb8f012ac007f503b45039b3f54feb28aeb6d8": "presentation (en) \u00b7 Lifestyle: anthropometry, activity and recovery with their trends",
-    "f686265dcd280245a44ee03fb8188ee42a4c029e43b0eb0f3387b4d1a2a391c5": "presentation (en) \u00b7 What to test: entries in steps, tube, preparation, age of last value",
-    "1ff87e7c82727636b11ff217890f7ca4704679e628d3e7458f0fc44cf702b719": "presentation (en) \u00b7 Second opinion: summary for the appointment",
-    "9f8844744abdddf13af044831e987acf0c316130c0a3c5111ddce91259cbd165": "presentation (en) \u00b7 Prescriptions: the current regimen as single point of truth",
-    "5bfb54f7683962813ee8fe219148d54855c9ba875141533d6f6f014f0390b563": "presentation (en) \u00b7 Assistant: the core's self-check",
-    # Russian (docs/presentation.ru.html) \u2014 genuinely Russian-interface screenshots,
-    # not the English set reused:
-    "4f1b92d0d168a2876099b4cf8b43b4c74d7da5eb775fb3469381f5b9b9229953": "presentation (ru) \u00b7 Overview: the current task, the live marker and the levers",
-    "d26a0302ae9e689f4bb52384a3296b757a3577681ae5a722ae3e6ad76e23b298": "presentation (ru) \u00b7 Guide: what every colour, badge and label means",
-    "f4c2369e14ac950bc2b54471505c25aba7c4200f9c9a9d4d4f94f5f32a24262d": "presentation (ru) \u00b7 Labs: flags, sparklines and movement for every marker",
-    "0d2371af0287b6acbcdec4d2784bd6b37681f64b73ca8f6a687dbf553bc24d9d": "presentation (ru) \u00b7 Drugs: one drug checked against genome x labs x interactions x ClinVar",
-    "882c05ad3dc8a0387def0a891341a4b96868f555db125b967b6290b87fb8a37e": "presentation (ru) \u00b7 Genome: findings by tier, polygenic risks and the longevity layer",
-    "e91cf2b65e5c8c1764fe54c5e877555cf0f37a84395899a751f5f2691b697c3d": "presentation (ru) \u00b7 Lifestyle: anthropometry, activity and recovery with their trends",
-    "c2d6ba9f5da21a143ab7843a1052a1ae563056b346803048b9f707d1c2cbb139": "presentation (ru) \u00b7 What to test: entries in steps, tube, preparation, age of last value",
-    "e6e87fbf540ee69d73ca7644db6d0e2a86a1ba7124246a987ebe4a3b065ef950": "presentation (ru) \u00b7 Second opinion: summary for the appointment",
-    "6c59a8abf98c4a65997fa65eda33255839c15d1efee628ba190fabfc4b795a02": "presentation (ru) \u00b7 Prescriptions: the current regimen as single point of truth",
-    "3b0e71142ab3ad3c0bab01c56c178151bc88e57b3979b0e815b7f71e46a94f88": "presentation (ru) \u00b7 Assistant: the core's self-check",
+    # WHAT WAS LOOKED AT. Twenty images — ten tabs in each language — captured by
+    # a headless run of `scholion serve` 0.4.6 over the SYNTHETIC demo profile: an
+    # invented person, subject DEMO-0001, the woman of 33 that
+    # `make_demo_profile.py` generates and who belongs to nobody. Every one of
+    # them carries «subject DEMO-0001» in its header and the demo banner in its
+    # own words, and every one was opened and read before its hash was written
+    # here. The machine that took them held no personal material at all: a scratch
+    # checkout whose `genome/` is empty and whose `profile/` is the generated demo
+    # — which is why the genome tab answers «no data» rather than showing
+    # findings. The drug tab was captured with a check actually run, because a
+    # screenshot of an empty search box proves nothing about what the tab does.
+    #
+    # Russian edition (docs/presentation.ru.html), in the order they appear:
+    "bc9904c1ef654d52aede5c9ccf918cf65e9376aa3ceba0732dfe51383f88b391": "presentation (ru) · Assistant: the self-scan, and the only addresses the app can reach",
+    "c544bd110c1bb91d6bdd13a56880982358ba94fc5b7f8367a8086a550f22f95d": "presentation (ru) · Guide: what every colour, badge and label means",
+    "57280fe6e81a6a7559380fdeaa7aeaade308fba2b7f4f8470b49c0eb0c761a2c": "presentation (ru) · Overview: the focus of attention, the live marker and the levers",
+    "a87aba234b5e3c2cf3f7fcd49baf886fa088bfa1b04391a8098f4cfb235e682d": "presentation (ru) · Labs: flags, sparklines and movement for every marker",
+    "3632732297c35d6ef60ce3813ccb86abb93c570efeedcb94bf1d4dce05f7a362": "presentation (ru) · Lifestyle: what moved over three months, anthropometry and recovery",
+    "85ef9ce683fb554eca36a8748664a584feb3b7f33ed2100ac28f967727cb43cc": "presentation (ru) · Drugs: omeprazole checked against CYP2C19, with the phenotype and what to discuss",
+    "c1a812bde7d8cc09a3ae16fbe8da50b50ca6d514e8978e986b1a2024c4d02bf8": "presentation (ru) · Second opinion: the pre-visit summary and the radar over systems",
+    "be9cef66f3c5ceed5cf889d0ed90233274ee06a78cb940e9a2cf68cd567d9545": "presentation (ru) · Genome: what the tab answers while no VCF is connected",
+    "de66dfcb5128f1e8608c4be495b31394f946df3085d500bc709ffbb66c7be330": "presentation (ru) · What to test: two suggestions with their reasons, and routine control already taken",
+    "742707d73707a1fa44bb69464624b18016393a471d3c488fd41c4402207f7567": "presentation (ru) · Prescriptions: the current regimen as the single point of truth",
+    #
+    # English edition (docs/presentation.html), the same ten tabs:
+    "0acbe7222343dfb23a81eef2a0de470f70f4c3ac317c368ae67ae4e1590fa4cd": "presentation (en) · Assistant: the self-scan, and the only addresses the app can reach",
+    "b0e4725c1dd2c3ffe3bb53212d9b5ad7e83f26f5c2fe28dfe28168faef5f7654": "presentation (en) · Guide: what every colour, badge and label means",
+    "0aa4dea9ceca521725aa5ffe62bd4dbdc7d163cf4a97bae57a429508f69108f6": "presentation (en) · Overview: the focus of attention, the live marker and the levers",
+    "502e43dd56048651d2aa2917b1ce5771632f35072f94bcfddda1af335a840fc4": "presentation (en) · Labs: flags, sparklines and movement for every marker",
+    "8d0c85f865684c48ffeda170cc80e6a3c8b25fab2e657e0500b20852d9b453a8": "presentation (en) · Lifestyle: what moved over three months, anthropometry and recovery",
+    "3f29b7db49c94acd5ed0cd3452590073fc8e303b15eb87ab05bfb6438d05d0c4": "presentation (en) · Drugs: omeprazole checked against CYP2C19, with the phenotype and what to discuss",
+    "50396ae6f2ed3059cbfb1bac71d73aefa29ece73b43a264bd496ab12fe8d9c3d": "presentation (en) · Second opinion: the pre-visit summary and the radar over systems",
+    "b9e06af26ac988f636ac0356dd0758a5bce0dbc77db146961526cb300f261170": "presentation (en) · Genome: what the tab answers while no VCF is connected",
+    "1d60bada14d2b38a16e3d7169385d7d94afb1099c1180159c530b9f21bf4a96b": "presentation (en) · What to test: two suggestions with their reasons, and routine control already taken",
+    "da88587b3fbdf28e009a9808dbfb45ae1e03097ec99b9474dbbc4774e8069189": "presentation (en) · Prescriptions: the current regimen as the single point of truth",
 }
 
 
@@ -786,6 +791,28 @@ def build(repo: Path, out: Path) -> Path:
         "scholion`.\n",
         encoding="utf-8")
 
+    # ── 4b) the skill where a skills installer looks for one ──────────────
+    #
+    # `npx skills add owner/repo` scans a repository three levels deep: the root
+    # if it holds a SKILL.md, `skills/`, and the agent folders — the documented
+    # shape being `skills/<name>/SKILL.md`. None of those existed here, so the
+    # entry could only be found by the tool's fallback recursive search, at a
+    # path whose folder is called `skill` rather than `scholion`. The format
+    # requires the folder name to equal the `name` in the file, so the folder is
+    # `scholion`.
+    #
+    # THE ENTRY ALONE, and that is the licensing decision rather than economy.
+    # What is published as a skill is the 12 KB entry; the long instruction and
+    # the canon of rules stay with the package they are printed from. A folder
+    # that carried them would put one licence over two bodies of text.
+    #
+    # Unlike `claude-skill/`, this one is NOT ignored in the public repository:
+    # an installer reads it from GitHub, so a folder excluded from git is a
+    # folder that does not exist for the purpose it was made for.
+    skills_dir = shared / "skills" / "scholion"
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(share / "skill" / "SKILL.md", skills_dir / "SKILL.md")
+
     # ── 5) neutralise personal identifiers ────────────────────────────────
     changed = _substitute_in(shared) + _substitute_in(skillpkg)
     print(f"• substitutions made in files: {changed}")
@@ -886,7 +913,7 @@ def _check_root_fresh(repo: Path, out: Path, shared: Path) -> None:
     # cannot be deleted, so a file that used to be put at the root and is now put
     # elsewhere stays lying there and travels to the recipient. That is how the
     # delivery root acquired a `pyproject.toml` from which an empty wheel is built.
-    expected = {".git", ".gitignore", ".DS_Store", ".github", "claude-skill",
+    expected = {".git", ".gitignore", ".DS_Store", ".github", "claude-skill", "skills",
                 "README.md", "ASSISTANT-RULES.md", "CLAUDE.md",
                 "SHORTCUTS-macOS.md", "LOADING-DATA.md", "PREPARING-THE-GENOME.md",
                 "pyproject.toml", "run_tests.sh",

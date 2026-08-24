@@ -165,15 +165,29 @@ class TestTheManifestCannotFallBehindTheBuild(unittest.TestCase):
         self.assertFalse(set(caps["reads_only"]) & set(caps["writes"]))
 
     def test_the_writes_split_covers_everything_and_nothing_twice(self):
-        """AUTHORS and TRANSCRIBES must partition WRITES exactly.
+        """AUTHORS, TRANSCRIBES and DICTATED must partition WRITES exactly.
 
-        A write outside both sets is a write whose rule nobody wrote down;
-        a write in both is a rule that contradicts itself.
+        A write outside all three is a write whose rule nobody wrote down;
+        a write in two of them is a rule that contradicts itself. The third kind
+        arrived on 24.08.2026 with the owner's decision that the journal may be
+        written by an assistant: the person says what happened and it is recorded
+        verbatim — neither a value invented by a model nor a document moved.
         """
-        self.assertEqual(contract.AUTHORS | contract.TRANSCRIBES, contract.WRITES,
-                         "a write command belongs to neither kind, so no rule covers it")
-        self.assertFalse(contract.AUTHORS & contract.TRANSCRIBES,
-                         "a command cannot both invent values and merely move a document")
+        kinds = (contract.AUTHORS, contract.TRANSCRIBES, contract.DICTATED)
+        self.assertEqual(set().union(*kinds), contract.WRITES,
+                         "a write command belongs to no kind, so no rule covers it")
+        for i, a in enumerate(kinds):
+            for b in kinds[i + 1:]:
+                self.assertFalse(a & b, f"a command claims two kinds at once: {a & b}")
+
+    def test_every_dictated_command_is_accounted_for_either_way(self):
+        """A dictated write MAY be a tool — the decision is recorded, never silent.
+        Same rule as for transcribers, and for the same reason."""
+        for cmd in sorted(contract.DICTATED):
+            with self.subTest(command=cmd):
+                self.assertTrue(cmd in contract.PLUGIN or cmd in contract.NO_PLUGIN,
+                                f"«{cmd}» records what the person dictates and nobody "
+                                f"decided whether a model may hold it")
 
     def test_no_authoring_command_is_offered_to_a_model_as_a_tool(self):
         """The first version of this test banned all of WRITES from the tool list —
@@ -209,7 +223,7 @@ class TestTheManifestCannotFallBehindTheBuild(unittest.TestCase):
         for c in contract.capabilities()["commands"]:
             with self.subTest(command=c["command"]):
                 if c["writes"]:
-                    self.assertIn(c["kind"], ("authors", "transcribes"),
+                    self.assertIn(c["kind"], ("authors", "transcribes", "dictates"),
                                   f"«{c['command']}» writes but does not say how")
                 else:
                     self.assertEqual(c["kind"], "reads",

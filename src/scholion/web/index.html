@@ -1348,6 +1348,13 @@ function metricCard(m){
 }
 async function viewMetrics(root){
   const d=await api('/api/metrics');
+  // What the profile is still missing, shown where it can be filled in. The
+  // engine already computes it — `limits` answers «what cannot be said here and
+  // what would close it», and a missing precondition is exactly that — but no
+  // page had ever asked that route for anything, so the whole layer reached the
+  // command line and the assistant and never a person in a browser.
+  let missing=[];
+  try{ missing=((await api('/api/limits')).items||[]).filter(i=>i.kind==='profile'); }catch(e){}
   const p=d.profile||{};
   const bmi=d.bmi;
   const sb = await sourceBar(['metrics']);
@@ -1363,6 +1370,10 @@ async function viewMetrics(root){
       <button class="ghost" id="toggle-mprof">✎ ${esc(t('web.metrics.profile_btn'))}</button>
       <button class="ghost" id="toggle-madd">+ ${esc(t('web.metrics.add_btn'))}</button>
     </div>
+    ${missing.length?`<div class="card" style="margin-bottom:14px;border-color:var(--warning)">
+      <div class="row"><b>${esc(t('web.metrics.missing_head'))}</b></div>
+      ${missing.map(i=>`<div class="why" style="margin-top:6px">⚠ ${esc(i.what)}</div>`).join('')}
+    </div>`:''}
     <div id="mprof"></div>
     <div id="madd" class="hidden"></div>
     <div class="grid" id="mgrid"></div>`;
@@ -1736,6 +1747,13 @@ function renderPRS(d){
   // to tell which to believe unless the block says so itself.
   const prov=(d.provenance&&d.provenance.note)
     ?`<div class="card muted" style="margin-bottom:10px">⚠ ${esc(d.provenance.note)}</div>`:'';
+  // The panel these numbers are a position inside. Printed here, beside them,
+  // because a percentile computed against another population is not this
+  // person's position — and the sentence that says so was reaching the command
+  // line and the assistant while the page, where most people meet the number,
+  // showed nothing at all.
+  const panelNote=(d.method_caveats||[]).filter(c=>String(c.key||'').indexOf('panel_')===0)
+    .map(c=>`<div class="card" style="margin-bottom:10px;border-color:var(--warning)">⚠ ${esc(c.note)}</div>`).join('');
   // «P94» is the Guide's material, and the Guide is a tab away. A reader meeting
   // the badge for the first time has to leave the page to learn that it is a
   // position in a population and not a probability — so the badge says it where
@@ -1750,7 +1768,7 @@ function renderPRS(d){
     }).join('');
     cats+=`<div class="prs-cat"><div class="prs-cat-h">${esc(c.category)}</div>${rows}</div>`;
   });
-  return `${prov}<div class="stat">
+  return `${prov}${panelNote}<div class="stat">
       <div class="s"><b>${s.total}</b><span>${esc(t('web.prs.stat_traits'))}</span></div>
       <div class="s"><b>${s.reliable}</b><span>${esc(t('web.prs.stat_reliable'))}</span></div>
       <div class="s"><b>${s.high}</b><span>${esc(t('web.prs.stat_high'))}</span></div>

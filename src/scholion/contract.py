@@ -244,6 +244,9 @@ PLUGIN: Dict[str, str] = {
     "acmg": "sch_acmg",
     "goal-suggest": "sch_goal_suggest",
     "lipid-genetics": "sch_lipid_genetics",
+    # The one write a model may hold, and the reason is in DICTATED: the person
+    # says what happened, the assistant writes it down and invents nothing.
+    "focus-log": "sch_focus_log",
 }
 
 # Commands with no tool, and why. The bar is deliberately higher than for the web:
@@ -275,7 +278,7 @@ NO_PLUGIN: Dict[str, str] = {
     # writes: a model does not change the profile. The canon it is handed says so, and
     # the absence of a tool is what makes that more than a promise.
     "add-lab": "a write", "add-med": "a write", "remove-med": "a write",
-    "add-metric": "a write", "focus-log": "a write", "set-folder": "a write",
+    "add-metric": "a write", "set-folder": "a write",
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
     "ingest-wearable": "a write",
     "import-fhir": "a write",
@@ -341,8 +344,12 @@ NO_INSTRUCTION: Dict[str, str] = {
     # invents what it needs instead. The excuse is removed rather than amended —
     # the instruction names the command now, and the four faces agree again.
     "skill": "prints this very instruction to a person. A model calling it reads itself",
-    "redact": "strips identifiers out of text a person is about to publish. Addressed to the "
-              "person, and its whole purpose is that the text reaches fewer places",
+    # `redact` used to be excused here on the reasoning that it is addressed to
+    # the person. The instruction names it as of 24.08.2026, and the guard below
+    # is what noticed the two statements had come apart. Naming it is the better
+    # of the two: an assistant asked «can I show this fragment to my doctor»
+    # should know the command exists — recommending it is not the same act as
+    # running it, and the tool list still does not carry it (see NO_PLUGIN).
 }
 
 
@@ -448,9 +455,27 @@ WRITES = {
 # Creates a value that came from nobody's document. None of these is a tool, and
 # a test keeps it that way.
 AUTHORS = {
-    "add-lab", "add-med", "remove-med", "add-metric", "focus-log",
+    "add-lab", "add-med", "remove-med", "add-metric",
     "init", "demo", "set-folder",
 }
+
+# The third kind, and it was forced by a person rather than by a test. The owner
+# asked to be able to say «note that yesterday had a glass of wine» and have it
+# recorded — and `focus-log` sat in AUTHORS, so no tool could.
+#
+# Reading it as authoring was wrong, but so would reading it as transcription:
+# there is no document. What there is, is the person's own testimony, given in
+# the turn, and the assistant writing it down verbatim. That is a third act and
+# it deserves its own name rather than being smuggled into one of the two.
+#
+# The boundary that makes it safe is not the command, it is what may go in: an
+# entry records THAT there was wine, a late meal, a dose taken. It never records
+# what any of that did — no number that later reads as a measurement, no
+# conclusion the model reached. The journal is evidence to be analysed later,
+# not an analysis. The instruction says this in the same words.
+#
+# Decision of the owner, 24.08.2026.
+DICTATED = {"focus-log"}
 
 # Moves the person's own documents into the profile. `ingest-labs` IS a tool, on
 # purpose and recorded here rather than by omission: a model that has just been
@@ -498,7 +523,8 @@ def capabilities() -> Dict[str, Any]:
             "does": helps.get(cmd, ""),
             "writes": cmd in WRITES,
             "kind": ("authors" if cmd in AUTHORS
-                     else "transcribes" if cmd in TRANSCRIBES else "reads"),
+                     else "transcribes" if cmd in TRANSCRIBES
+                     else "dictates" if cmd in DICTATED else "reads"),
             "faces": {
                 "cli": True,
                 "web": routes.get(cmd),
@@ -578,6 +604,13 @@ def access() -> Dict[str, Any]:
                                 "tools": len(tools)},
             "ouroboros_hub": {"how": "the `scholion` skill", "entry": "plugin.py",
                               "installs": "pip package `scholion`"},
+            # The door that needs no plugin mechanism at all: a folder with an
+            # entry file in it, which several hosts read from one shared path.
+            # Derived rather than described — the size and whether the entry
+            # names the tool server are read off the file, because a runtime
+            # that can only read this one file learns about every other door
+            # from it or not at all.
+            "agent_skills": _agent_skills_door(),
             # Named and marked, rather than left out. An agent that finds a
             # local page and no note beside it will try to drive it; a door that
             # is not for you is a fact worth stating, like any other refusal.
@@ -591,6 +624,52 @@ def access() -> Dict[str, Any]:
             "offline_switch": "SCHOLION_OFFLINE=1",
         },
     }
+
+
+#: Where the hosts that follow the Agent Skills convention look. One path, read
+#: by several runtimes, with no registry and nobody's moderation in between —
+#: which is the whole reason it is worth supporting: it costs one line of
+#: instructions and reaches every host that honours it.
+AGENT_SKILLS_DIR = "~/.agents/skills/scholion/"
+
+
+def skill_entry_path():
+    """The entry a host reads, wherever this build keeps it.
+
+    Three editions of the same file exist and `sync_rules.py` keeps them
+    identical; which one is on disk depends on whether this is the source tree,
+    the public package or an installed wheel. Asking for whichever is here is the
+    difference between a description that is true of this build and one that is
+    true of the author's.
+    """
+    from pathlib import Path as _P
+    here = _P(__file__).resolve().parent
+    for c in (here / "skill" / "SKILL.md",
+              here.parent / "skill" / "SKILL.md",
+              here.parent.parent / "share" / "skill" / "SKILL.md"):
+        if c.exists():
+            return c
+    return None
+
+
+def _agent_skills_door() -> Dict[str, Any]:
+    entry = skill_entry_path()
+    door: Dict[str, Any] = {
+        "how": "copy the skill folder to " + AGENT_SKILLS_DIR,
+        "entry": "SKILL.md",
+        "for": "an agent",
+        "agent_surface": True,
+        "installs": "nothing — the entry tells the host how to install the "
+                    "`scholion` package itself when the person agrees",
+    }
+    if entry is not None:
+        text = entry.read_text(encoding="utf-8", errors="replace")
+        door["entry_bytes"] = len(text.encode("utf-8"))
+        # The property the door exists for. A host without a plugin mechanism
+        # reads this file and nothing else, so if the file does not name the
+        # tool server, that host never learns the server is there.
+        door["names_the_tool_server"] = "scholion mcp" in text
+    return door
 
 
 def check_all_faces() -> Dict[str, List[str]]:

@@ -188,6 +188,63 @@ def apoe() -> Dict[str, Any]:
 # ==========================================================================
 # Polygenic risks (PGS) and the longevity layer (LongevityMap)
 # ==========================================================================
+def _panel_facts(data: Dict[str, Any]) -> Dict[str, Any]:
+    """The panel these numbers were computed against, and whether it is still the
+    one that applies.
+
+    Three separate facts that were being reported as one, wrongly. `stats` used
+    to carry the stored panel beside `ancestry_stated`, and that flag asked the
+    PROFILE whether a panel was known — not the file whether these percentiles
+    had been computed against it. Once the panel began to be determined from the
+    genome, the flag went true for everybody with a genome while the numbers went
+    on being whatever the scoring run had been given, which defaulted to EUR.
+    The interface then said the panel was settled and showed percentiles computed
+    against another one. Nothing could tell.
+
+    So: what the numbers used, where THAT came from, what applies now, and
+    whether the two agree. `ancestry_stated` stays — the contract may not
+    shrink — and now means what it says: the panel behind these numbers was
+    chosen rather than fallen back on. A file written before the source was
+    recorded cannot say, and «cannot say» is not «yes».
+    """
+    meta = data.get("_meta") or {}
+    used = meta.get("superpopulation", "EUR")
+    used_source = meta.get("superpopulation_source")
+    applies = core.ancestry()
+    return {
+        "superpopulation": used,
+        "superpopulation_source": used_source,
+        "ancestry_stated": used_source in ("asked", "stated", "genome"),
+        "ancestry_determined": applies["value"],
+        "ancestry_source": applies["source"],
+        # True only when there IS something to disagree with. No determination
+        # is not a disagreement — it is the ordinary state before the genome has
+        # been asked, and it has its own line in `limits`.
+        "panel_out_of_date": bool(applies["value"]) and applies["value"] != used,
+    }
+
+
+def _panel_caveat(data: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Said out loud when the panel behind the numbers is not the one that applies.
+
+    A field nobody prints is a fact nobody meets. These percentiles carry the
+    panel they were computed against into every screen; when the genome has since
+    named a different one, the number is a position inside the wrong population
+    and the reader is owed that sentence beside it rather than a flag in a
+    structure.
+    """
+    facts = _panel_facts(data)
+    if facts["panel_out_of_date"]:
+        return [{"key": "panel_out_of_date",
+                 "note": _t("prs.caveat.panel_out_of_date",
+                            used=facts["superpopulation"],
+                            applies=facts["ancestry_determined"])}]
+    if not facts["ancestry_stated"]:
+        return [{"key": "panel_defaulted",
+                 "note": _t("prs.caveat.panel_defaulted", used=facts["superpopulation"])}]
+    return []
+
+
 def prs_method_caveats() -> List[Dict[str, str]]:
     """What the polygenic computation does NOT do, said once and carried.
 
@@ -372,13 +429,9 @@ def prs_findings() -> Dict[str, Any]:
         # Said on every report rather than remembered by whoever reads it: the
         # sum happens in another process, and what that process does not do is
         # part of what this number means.
-        "method_caveats": prs_method_caveats(),
+        "method_caveats": prs_method_caveats() + _panel_caveat(data),
         "stats": {"total": len(traits), "reliable": len(reliable),
-                  "high": len(high), "superpopulation": (data.get("_meta") or {}).get("superpopulation", "EUR"),
-                  # Whether the population was STATED by the person or merely
-                  # defaulted to. The number is the same; what may be claimed
-                  # about it is not.
-                  "ancestry_stated": bool(core.profile_ancestry()),
+                  "high": len(high), **_panel_facts(data),
                   "updated": (data.get("_meta") or {}).get("updated")},
         "disclaimer": PRS_DISCLAIMER(),
     }

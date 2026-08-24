@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import re
 import unittest
 
 import support
@@ -200,6 +201,47 @@ class TestTheManifestIsWrittenAndNotRemembered(unittest.TestCase):
         self.assertIn("version: 9.9.9", fresh)
         self.assertIn("77 tools", fresh)
         self.assertNotEqual(fresh, stale)
+
+
+class TestTheReadmeDoesNotCountThingsTheBuildAlsoCounts(unittest.TestCase):
+    """A number in prose beside a number the build derives.
+
+    The README said the plugin «adds 14 tools» while the build offered
+    twenty-nine, and «four doors» while `access()` listed six. Neither was a lie
+    when it was written; both stopped being true and nothing was obliged to
+    notice — which is the same shape `sync_manifest.py` was written for, one file
+    over.
+
+    The rule is not «keep the numbers correct» but «do not write a number the
+    build already knows». A count that must be maintained by hand goes stale in
+    silence; a sentence without one cannot.
+    """
+
+    def setUp(self):
+        readme = support.ROOT / "README.md"
+        if not readme.exists():
+            readme = support.SRC / "scholion" / "docs" / "readme.md"
+        if not readme.exists():
+            self.skipTest("this build carries no README")
+        self.text = readme.read_text(encoding="utf-8")
+
+    def test_no_hand_written_tool_count(self):
+        found = re.findall(r"(\d+)\s+tools\b", self.text)
+        self.assertEqual([], found,
+                         "the README counts tools by hand: " + ", ".join(found)
+                         + " — the build knows the number, so say «the tool set» "
+                           "or let a generator write it")
+
+    def test_no_hand_written_door_count(self):
+        found = re.findall(r"(?i)\b(two|three|four|five|six|seven|\d+)\s+doors\b", self.text)
+        self.assertEqual([], found,
+                         "the README counts doors by hand: " + ", ".join(found)
+                         + " — `access()` lists them, and the list has grown twice")
+
+    def test_no_hand_written_command_count(self):
+        found = re.findall(r"(\d+)\s+commands\b", self.text)
+        self.assertEqual([], found,
+                         "the README counts commands by hand: " + ", ".join(found))
 
 
 class TestEveryDoorCarriesWhatADoorMustCarry(unittest.TestCase):

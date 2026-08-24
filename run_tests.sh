@@ -58,6 +58,49 @@ if [ -f src/tools/sync_rules.py ]; then
   echo "▶ the assistant rules are in sync with ASSISTANT-RULES.md"
   python3 src/tools/sync_rules.py
 fi
+# The suite on the OLDEST Python the package promises, run BEFORE a tag instead
+# of after one.
+#
+# `requires-python = ">=3.10"` is a promise to everyone who installs this, and
+# until now nothing on this machine checked it: the matrix that does lives in the
+# public repository and is reached only through publication. It answered twice in
+# two days, both times about a tag that was already out — once with a failed
+# release build, once with a red matrix on a published version. Both were the
+# same shape: verified on one interpreter, promised about four.
+#
+# The floor is read from pyproject.toml rather than written here. Three places
+# already name it — the promise, the matrix, and this — and a number typed into
+# each is three numbers.
+#
+# `uv` fetches the interpreter and caches it; a second run costs half a second
+# plus the suite. Where uv is absent the step says so and does not pretend: a
+# check that cannot run is not a check that passed.
+if [ "$#" -gt 0 ]; then
+  :
+elif [ "${SCHOLION_SKIP_OLDEST:-}" = "1" ] || [ "${SCHOLION_SKIP_OLDEST:-}" = "true" ]; then
+  echo "▶ the oldest supported Python — skipped by SCHOLION_SKIP_OLDEST"
+elif [ "${CI:-}" = "true" ]; then
+  echo "▶ the oldest supported Python — not here: the matrix runs every version it promises"
+elif [ ! -f pyproject.toml ]; then
+  echo "▶ the oldest supported Python — not asked: no pyproject.toml here to read the floor from"
+else
+  FLOOR="$(sed -n 's/^requires-python[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' pyproject.toml | head -1)"
+  HERE="$(python3 -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
+  case "$FLOOR" in [0-9]*.[0-9]*) ;; *) FLOOR="" ;; esac
+  if [ -z "$FLOOR" ]; then
+    echo "▶ the oldest supported Python — not asked: pyproject.toml names no floor"
+  elif [ "$FLOOR" = "$HERE" ]; then
+    echo "▶ the oldest supported Python — this IS $FLOOR, already covered by the run above"
+  elif ! command -v uv >/dev/null 2>&1; then
+    echo "⚠ the oldest supported Python ($FLOOR) was NOT run: uv is not installed, and there is"
+    echo "  nothing else here to fetch that interpreter with. This machine runs $HERE, so"
+    echo '  requires-python is unverified until the matrix answers — after a tag.'
+  else
+    echo "▶ the suite on Python $FLOOR, the oldest this package promises (uv fetches it; SCHOLION_SKIP_OLDEST=1 skips)"
+    uv run --python "$FLOOR" --no-project -- python -m unittest discover -s tests -t . < /dev/null || exit 1
+  fi
+fi
+
 # The reach of the suite over the code, measured rather than assumed. It runs the
 # whole suite a second time under the interpreter's coverage hook, which costs
 # about a minute and a half — so it is the LAST step, after everything that can

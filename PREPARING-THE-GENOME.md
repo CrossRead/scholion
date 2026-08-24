@@ -395,6 +395,15 @@ python3 src/ingest/longevity_report.py genome/longevity_sites.vcf.gz \
   /tmp/longevity_report.md
 ```
 
+**Which reference panel applies to you.** Those same re-genotyped sites answer a question nobody can answer about themselves: which of the five 1000 Genomes panels a polygenic percentile should be computed against. It is a step of preparing a genome, not a field to fill in — a superpopulation code is not something a person knows, and a box asking for one collects a guess that nothing downstream can tell from a measurement.
+
+```bash
+python3 src/ingest/ancestry_check.py --dry-run   # what it would read and write, fetching nothing
+python3 src/ingest/ancestry_check.py             # ~300 requests to Ensembl, one to two minutes
+```
+
+It writes `profile/ancestry_check.json`. Nothing applies it on its own: the percentile changes with the panel, so `scholion prs` reads the verdict, uses it, and says where it came from — measured from your own DNA, or fallen back on. Until this has been run, every percentile printed says out loud that it used a default panel. **Run it before building the polygenic results above**, or rebuild them afterwards: `scholion prs` marks the stored numbers as computed against a panel that is no longer the one that applies.
+
 `ONLY_SIGNIFICANT=1` limits coordinate resolution to the statistically significant entries of the catalogue — faster, if you do not need a full pass over Ensembl.
 
 Note the separation of layers: **`genome/`** is the cold database (the VCF and the re-genotyped positions), while the tabs of the application read **the distillate in `profile/`**: `profile/prs_results.json` and `profile/longevity_findings.json`. The first is built by the `prs_results_build.py` tool from the raw output of `prs report` (see above) — not by redirection. The second is built by the generator `src/ingest/longevity_findings_build.py`: it overlays the re-genotyped `longevity_sites.vcf.gz` onto the LongevityMap catalogue and onto the **curated catalogue of directions** `knowledge/longevity_directions.json` (which allele is "pro-longevity" according to the primary sources, with PMIDs). The key honesty of this layer lies in that separation: entries with a direction are shown with a verdict (favourable / mild plus / neutral / practical flag) and a short "what to do about it", whereas statistically significant carrier states WITHOUT a curated direction are marked as a navigator through the literature, not as "pluses" — for most LongevityMap entries the direction of the allele was never published at all (aggregate gene-based tests, multi-marker panels). `longevity_report.py` remains a human-readable markdown report.

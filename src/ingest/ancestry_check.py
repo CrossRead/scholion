@@ -30,10 +30,13 @@ MIN_SPACING = 1_000_000     # ≥1 Mb between positions — LD thinning
 TARGET_N = 320
 CLAMP = 1e-3                # a frequency of 0 in a population → 0.001 (guard against -inf)
 
-for p in (VCF, RSMAP):
-    if not p.exists():
-        sys.exit(f"❌ missing input: {p}")
-rsmap = json.loads(RSMAP.read_text())
+#: Filled by `main()`. It used to be loaded at import, together with a check
+#: that exits if the inputs are missing — so merely importing this file read the
+#: genome directory, and any invocation at all ran the whole job. There are no
+#: arguments to parse either, so `--help` did not ask what it does; it did it.
+#: About three hundred requests to Ensembl, on somebody's real genome, from a
+#: question. A step of a pipeline has to be askable before it is runnable.
+rsmap: dict = {}
 
 
 def load_panel():
@@ -98,6 +101,15 @@ def fetch_freqs(rsid, tries=3):
         except Exception:
             time.sleep(2 * (t + 1))
     return None
+
+
+def _inputs_or_exit(vcf: Path, rsmap_path: Path) -> None:
+    """Refuse by name, and only when actually asked to work."""
+    for p in (vcf, rsmap_path):
+        if not p.exists():
+            sys.exit(f"❌ missing input: {p}\n"
+                     f"   It is produced by the longevity step of preparing the genome — see\n"
+                     f"   `scholion doc preparing-the-genome`.")
 
 
 def main():
@@ -171,5 +183,39 @@ def main():
     print("Next: python3 src/ingest/prs_ancestry_sensitivity.py")
 
 
-if __name__ == "__main__":
+def _cli(argv=None) -> int:
+    """An entry point that can be asked what it does without doing it."""
+    import argparse
+    global VCF, RSMAP, OUT, rsmap
+    ap = argparse.ArgumentParser(
+        prog="ancestry_check.py",
+        description=("Which 1000 Genomes reference panel this genome is closest to — a step of "
+                     "preparing a genome, not a question for the person. Reads the re-genotyped "
+                     "longevity sites, thins them to about 300 positions at least 1 Mb apart, "
+                     "and compares them against the five panels' allele frequencies from "
+                     "Ensembl. NEEDS NETWORK: roughly 300 requests, one to two minutes."),
+        epilog=("Writes profile/ancestry_check.json. Nothing applies it on its own: the "
+                "percentile changes with the panel, so `scholion prs` reads the verdict and "
+                "says where it came from."))
+    ap.add_argument("--vcf", type=Path, default=VCF, help=f"re-genotyped sites (default: {VCF})")
+    ap.add_argument("--rsmap", type=Path, default=RSMAP, help=f"rsID→position map (default: {RSMAP})")
+    ap.add_argument("--out", type=Path, default=OUT, help=f"where the verdict goes (default: {OUT})")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="say what would be read and written, ask Ensembl nothing")
+    a = ap.parse_args(argv)
+
+    VCF, RSMAP, OUT = a.vcf, a.rsmap, a.out
+    if a.dry_run:
+        for label, path in (("reads", VCF), ("reads", RSMAP), ("writes", OUT)):
+            print(f"  {label:6s} {path}" + ("" if path.exists() or label == "writes"
+                                            else "   ← missing"))
+        print("  --dry-run: nothing was fetched and nothing was written.")
+        return 0
+    _inputs_or_exit(VCF, RSMAP)
+    rsmap = json.loads(RSMAP.read_text())
     main()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(_cli())

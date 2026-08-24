@@ -323,6 +323,18 @@ def main(argv=None) -> int:
     ap.add_argument("--worst", type=int, default=15, help="how many modules to print")
     a = ap.parse_args(argv)
 
+    # Asked BEFORE the measurement, because the measurement is the expensive part.
+    # `--strict` outside the source tree can only ever answer «nothing compared»:
+    # the package skips the tests only the tree can run, so its reach is
+    # legitimately lower and the accepted numbers do not describe it. Running the
+    # whole suite a second time to reach that conclusion cost a minute and a half
+    # on every cell of the matrix and on the release build — for a sentence that
+    # was decided before a line of it executed.
+    if a.strict and not a.accept and not (ROOT / "share").is_dir():
+        print("· not the source repository: the suite skips what only the tree can run, "
+              "so the accepted numbers do not apply here. Nothing measured, nothing compared.")
+        return 0
+
     result = measure()
 
     if a.json:
@@ -349,13 +361,6 @@ def main(argv=None) -> int:
         return 0
 
     if a.strict:
-        if not (ROOT / "share").is_dir():
-            # The package skips the tests that need the source tree — sixty-nine
-            # of them — so its reach is legitimately lower and comparing it
-            # against a number taken here would fail for being the wrong tree.
-            print("\n· not the source repository: the suite skips what only the tree can run, "
-                  "so the accepted numbers do not apply here. Nothing compared.")
-            return 0
         fell, unlisted, vanished = compare(result)
         for rel, was, now in fell:
             print(f"\n✗ {rel}: reach fell {was}% → {now}%")

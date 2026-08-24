@@ -186,6 +186,50 @@ class TestTheRatchetCanFire(unittest.TestCase):
         self.assertEqual([], fell, "the baseline is a floor, not a target to exceed")
 
 
+class TestNothingIsMeasuredWhenNothingCanBeCompared(unittest.TestCase):
+    """`--strict` in a built package answers before it works, not after.
+
+    The accepted numbers describe the source tree; the package skips the tests
+    only that tree can run, so its reach is legitimately lower and comparing the
+    two would fail for being the wrong tree. That was already the answer — but it
+    was reached AFTER running the whole suite a second time under the coverage
+    hook, on every cell of the matrix and on the release build. A minute and a
+    half, each time, to print a sentence that was decided before a line of it
+    executed.
+    """
+
+    def test_strict_outside_the_source_tree_does_not_run_the_suite(self):
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as elsewhere:
+            with mock.patch.object(reach, "ROOT", pathlib.Path(elsewhere)), \
+                    mock.patch.object(reach, "measure",
+                                      side_effect=AssertionError("the suite was run")) as m:
+                code = reach.main(["--strict"])
+        self.assertEqual(0, code, "a package that cannot compare must not fail the build")
+        self.assertFalse(m.called, "the suite was measured to reach a foregone conclusion")
+
+    def test_a_plain_report_still_measures_wherever_it_is_run(self):
+        """Only the comparison is foregone. Somebody who wants to know how much of
+        their own copy the suite runs is asking a real question, and gets it."""
+        import tempfile
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as elsewhere:
+            with mock.patch.object(reach, "ROOT", pathlib.Path(elsewhere)), \
+                    mock.patch.object(reach, "measure", return_value={
+                        "suite_ok": True, "suite_tail": [], "processes": 1,
+                        "backend": "test", "overall": {"hit": 1, "total": 2, "percent": 50.0},
+                        "modules": {"x.py": {"hit": 1, "total": 2, "percent": 50.0}},
+                    }) as m:
+                # The report prints a table, and a fake one in the middle of a
+                # suite run reads as a real measurement of something. Swallowed.
+                import contextlib as _c, io as _io
+                with _c.redirect_stdout(_io.StringIO()):
+                    code = reach.main([])
+        self.assertEqual(0, code)
+        self.assertTrue(m.called, "a plain report stopped measuring")
+
+
 class TestTheBaselineDescribesThisTree(unittest.TestCase):
     """Cheap, and it catches the case the expensive measurement exists for: a
     module added without anybody deciding how well it is tested."""

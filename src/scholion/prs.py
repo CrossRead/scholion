@@ -269,7 +269,31 @@ def _sex_filtered(traits):
     return kept, withheld
 
 
-def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
+def resolve_superpopulation(asked=None):
+    """Which reference panel this run scores against, and where that came from.
+
+    `EUR` used to be a default in a signature, which is the quietest way a
+    parameter of a medical answer can be chosen: a percentile is a position
+    within a population, and the population was picked by whoever wrote the
+    default. Now the order is what the person overrode, else what their genome
+    determined, else the fallback — and the fallback SAYS it is one.
+
+    Returned with its source because the number is the same either way and what
+    may be claimed about it is not.
+    """
+    if asked:
+        return {"value": asked, "source": "asked"}
+    try:
+        from . import core
+        got = core.ancestry()
+    except Exception:                                            # noqa: BLE001
+        got = {"value": None, "source": None}
+    if got.get("value"):
+        return {"value": got["value"], "source": got["source"]}
+    return {"value": "EUR", "source": "default"}
+
+
+def report(vcf_path: str, traits=None, superpopulation=None,
            only=None, normalize: bool = True, models_per_trait: int = 3,
            profile: str = "curated", include_children: bool = False,
            pick: str = "server", min_match_rate=None, fallback: bool = False) -> dict:
@@ -283,6 +307,8 @@ def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
     min_match_rate — filter models by coverage on the server side.
     fallback — when a model is missing or poorly covered, look for one via search_scores.
     """
+    panel = resolve_superpopulation(superpopulation)
+    superpopulation = panel["value"]
     traits = traits or _load_traits()
     traits, withheld = _sex_filtered(traits)
     if only:
@@ -371,7 +397,12 @@ def report(vcf_path: str, traits=None, superpopulation: str = "EUR",
                 row["status"] = "error"; row["error"] = str(e)
             out.append(row)
         return {"ok": True, "vcf": vcf_path, "genotypes_path": geno,
-                "superpopulation": superpopulation, "pick": pick,
+                "superpopulation": superpopulation,
+                # Travels with the number for the rest of its life: everything
+                # downstream prints the panel, and «EUR» chosen by a default and
+                # «EUR» measured from this person's own DNA are not the same
+                # claim about the percentile beside it.
+                "superpopulation_source": panel["source"], "pick": pick,
                 "profile": profile, "traits": out,
                 # Named, not dropped: a trait that vanishes from the panel in
                 # silence looks exactly like a trait that was never in it.
@@ -387,7 +418,10 @@ def _main(argv=None):
     sub.add_parser("selftest")
     r = sub.add_parser("report")
     r.add_argument("--vcf", required=True)
-    r.add_argument("--pop", default="EUR")
+    r.add_argument("--pop", default=None,
+                   help="override the reference panel. Left alone, the panel determined "
+                        "from the genome is used, and where none has been determined the "
+                        "run says it fell back to a default")
     r.add_argument("--only", nargs="*", default=None,
                    help="substrings to filter the traits by (a quick test, e.g. --only diabetes)")
     r.add_argument("--models", type=int, default=3,

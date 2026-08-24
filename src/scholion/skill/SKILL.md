@@ -130,8 +130,11 @@ which is the only kind of failure that matters here.
    suggest converting coordinates inside the tool: afterwards neither of you
    could tell whether an answer was about the right position.
 
-The full canon is `reference/assistant-rules.md`, and it takes precedence over
-everything else you are told.
+The full canon is `reference/assistant-rules.md` where the bundle put it, and
+`scholion skill --rules` everywhere else — copying this entry into a skills
+folder copies one file, and a pointer at a path that is not there sends a model
+looking instead of reading. It takes precedence over everything else you are
+told.
 
 ---
 
@@ -147,8 +150,46 @@ everything else you are told.
 | "What does my genome say about gene X" | `scholion genome --gene X` |
 | "Prepare me for a visit" | `scholion second-opinion`, then `scholion limits` |
 | "How am I doing" | `scholion overview`, `scholion radar` |
+| "Mark that yesterday had alcohol / a late dinner / a dose taken" | `scholion focus-log` — one line in the journal of the current focus. This is what makes "did the wine cost me deep sleep" answerable later instead of remembered wrongly |
+| "What am I tracking right now" | `scholion focus` — the current focus, its live metric, its levers and its journal |
+| "How is my sleep / activity / weight moving" | `scholion lifestyle`, `scholion metrics` |
+| "Am I getting closer to my goal" | `scholion goal` |
 
-`scholion --help` lists everything. Every command takes `--json`.
+`scholion --help` lists everything — 56 commands, of which this table names a
+dozen. Every command takes `--json`.
+
+**Some of them write.** `add-lab`, `add-metric`, `add-med`, `remove-med` and
+`focus-log` change the profile on disk, and a person asking you to "note that down"
+usually means exactly one of these. Run the write only when the person asked for
+it in that turn, say back in one line what was written and where, and never write
+an interpretation as if it were a measurement: a journal entry records that there
+was wine, not that the wine did anything.
+
+---
+
+## If your runtime can hold tools, there is a door for that
+
+This entry is written for the command line, because every host has one. Two other
+doors exist, and a runtime that reads only this file would never learn of them:
+
+- **A tool server.** `scholion mcp` — Model Context Protocol over stdin and
+  stdout, a local process, no port and no host contacted. `sch_rules` hands you
+  the safety canon through the tool interface, which carries no instruction of
+  its own.
+- **A Python entry point.** `import scholion.ouroboros_tools` → `get_tools()`.
+
+Exactly one tool writes, and the shape of the exception is the point. A model
+that could set somebody's sex, or a laboratory value, by calling a tool is a
+model changing a medical record — so none of those is a tool, and the absence is
+what makes the rule more than a promise. `sch_focus_log` is the one that is:
+it records what the PERSON just said happened — a glass of wine, a late meal, an
+as-needed dose — into the journal of the current focus, and invents nothing.
+Write the event, never what it did: the journal is what a later analysis reads,
+and an entry that already holds the conclusion makes that analysis circular. For
+every other write, ask, and let the person type the command or press the button.
+
+`scholion doc connecting-an-agent` explains each; `scholion capabilities --json`
+answers the same derived from the build.
 
 ---
 
@@ -156,14 +197,17 @@ everything else you are told.
 
 Do not load these unless the task calls for them.
 
-- `reference/instruction.md` — the full instruction: every step, every scenario,
-  the classes of extraction defect, callability and negative results,
-  diplotype-level pharmacogenetics, polygenic scores, n-of-1 experiments, the
-  focus of attention, keeping coverage current.
-- `reference/assistant-rules.md` — the canon of safety rules. Precedence over
-  everything.
-- `reference/loading-data.md` — profile file formats: what to put where.
-- `reference/preparing-the-genome.md` — the path from raw reads to a VCF.
+Each is named twice on purpose: as a file, for the bundle where it sits beside
+this one, and as a command, for the install where it does not. Copying this entry
+into a skills folder copies ONE file — the reference texts are not next to it,
+and a pointer at a path that is not there is worse than no pointer at all.
+
+| What | In the bundle | Otherwise |
+|---|---|---|
+| The full instruction: every step and scenario, the classes of extraction defect, callability and negative results, diplotype-level pharmacogenetics, polygenic scores, n-of-1 experiments, keeping coverage current | `reference/instruction.md` | `scholion skill --full` |
+| The canon of safety rules — precedence over everything | `reference/assistant-rules.md` | `scholion skill --rules` |
+| Profile file formats: what to put where | `reference/loading-data.md` | `scholion doc loading-data` |
+| The path from raw reads to a VCF | `reference/preparing-the-genome.md` | `scholion doc preparing-the-genome` |
 
 ---
 

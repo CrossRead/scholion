@@ -19,20 +19,55 @@ that none of them holds a secret.
 
 ---
 
-## Four doors, one engine
+## Several doors, one engine
+
+The heading used to count them, and the count went stale twice: a fifth door
+arrived with the tool server and a sixth with the skill folder, while the word
+stayed «four». `scholion capabilities --json` answers with the list, derived from
+the build — this table is the readable copy of it.
 
 | Door | Reach it with | Use it when |
 |---|---|---|
 | **Command line** | `scholion <command>` | the assistant can run shell commands |
 | **MCP server** | `scholion mcp` | the assistant speaks the Model Context Protocol |
+| **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
 | **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub |
 
 There is also `scholion serve` — a local web page for a person, bound to
 `127.0.0.1`. It is not an assistant surface and has no API.
 
-All four run the same engine, so an answer does not depend on which door it came
-through. Pick by what the host can do, not by what you want to ask.
+All of them run the same engine, so an answer does not depend on which door it
+came through. Pick by what the host can do, not by what you want to ask.
+
+### The skill folder
+
+The cheapest door there is: a directory with an entry file in it. Nothing is
+registered, nobody moderates it, and no plugin mechanism is involved — which is
+exactly why it is worth carrying, because a host that has none of those can still
+be reached.
+
+`~/.agents/skills/` is the shared path and Codex, Gemini CLI and OpenClaw read it
+as they are; Claude Code and Hermes each keep their own folder and take the same
+single file. OpenClaw is also served through its own registry — that is the
+supported route there, and the `git:` form of its installer is not, because it
+expects a repository whose root is the skill. The README carries the table, with the date it was checked.
+The directory has to be named `scholion` — the format requires the folder name
+and the `name` field to match.
+
+```bash
+pip install scholion
+mkdir -p ~/.agents/skills/scholion
+cp "$(scholion skill --path)" ~/.agents/skills/scholion/SKILL.md
+```
+
+That one file is the whole of it. It is deliberately small and deliberately
+self-describing: it tells the host what this is, what to run for the usual
+requests, the safety rules that come before any answer, and — because a host
+reading only this file would otherwise never learn — that a tool server and an
+in-process module exist for it. The long instruction and the canon of rules are
+NOT copied there; they are printed out of the installed package on demand, so
+there is one copy of each and it is the one that ships.
 
 ---
 

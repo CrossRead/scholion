@@ -248,6 +248,27 @@ def _h_focus(ctx: "ToolContext") -> str:
     return fmt.render_focus(engine.focus_dashboard())
 
 
+def _h_focus_log(ctx: "ToolContext") -> str:
+    """The one tool that writes. See `contract.DICTATED` for why it may.
+
+    It records what the person said happened — a glass of wine, a late meal, a
+    dose taken — and nothing else. What it must NOT be handed is an inference:
+    the journal is the evidence a later analysis reads, and an entry that already
+    contains the conclusion makes that analysis circular.
+    """
+    from . import store
+    date = (ctx.args.get("date") or "").strip()
+    res = store.add_focus_entry(
+        date,
+        alcohol=(ctx.args.get("alcohol") or "").strip(),
+        atenolol=bool(ctx.args.get("atenolol")),
+        late_meal=bool(ctx.args.get("late_meal")),
+        note=(ctx.args.get("note") or "").strip())
+    if not res.get("ok"):
+        return f"⚠️ {res.get('error', '')}"
+    return _t("tool.sch_focus_log.done", date=date, action=res.get("action", ""))
+
+
 def _h_brief(ctx: "ToolContext") -> str:
     return fmt.render_brief(engine.lifestyle_brief())
 
@@ -302,6 +323,8 @@ _TOOLS = (
     ("sch_flag_rate", (), [], _h_flag_rate),
     ("sch_radar", (), [], _h_radar),
     ("sch_focus", (), [], _h_focus),
+    ("sch_focus_log", ("date", "alcohol", "atenolol", "late_meal", "note"), ["date"],
+     _h_focus_log),
     ("sch_brief", (), [], _h_brief),
     ("sch_acmg", (), [], _h_acmg),
     ("sch_goal_suggest", (), [], _h_goal_suggest),
@@ -310,7 +333,7 @@ _TOOLS = (
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"refresh": "boolean"}
+_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:

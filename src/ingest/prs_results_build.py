@@ -193,6 +193,13 @@ def main(argv):
     meta.update({
         "updated": today,
         "superpopulation": raw.get("superpopulation", meta.get("superpopulation", "EUR")),
+        # Carried beside the panel for the whole life of the file. «EUR» chosen
+        # by a default and «EUR» measured from this person's DNA are the same
+        # letters and not the same claim, and everything downstream prints the
+        # letters. A file written before this field existed has no source, and
+        # that reads as «unknown» rather than as «chosen».
+        "superpopulation_source": raw.get("superpopulation_source",
+                                          meta.get("superpopulation_source")),
         "reliable_count": rel, "total": len(traits),
         "built_by": "src/ingest/prs_results_build.py",
         "input_vcf": raw.get("vcf"),

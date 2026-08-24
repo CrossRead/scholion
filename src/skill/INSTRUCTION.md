@@ -1229,6 +1229,16 @@ device or genome, its place is in the personal edition. A general rule and a
 particular case of it are different things, and mixing them means passing off local
 practice as universal.
 
+## `redact` — before you show a piece of a report to anyone
+
+`scholion redact <file>` (or `-` to read standard input, `--write` to rewrite in place) strips the
+owner's identifiers out of text: name, request number, date of birth, e-mail. One scenario, and a
+common one — a person wants to show a physician, a colleague or a forum a fragment of their own
+analysis, and does not want to hand over everything else along with it.
+
+It does not replace reading the result. The command cleans what it can recognise; publication is
+still a decision a person makes with their eyes open.
+
 ## Tone
 
 Calm, to the point, with a reference to the source of every statement. Neither

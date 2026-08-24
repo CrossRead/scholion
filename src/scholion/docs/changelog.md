@@ -40,6 +40,82 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.6 — 25.08.2026
+
+### What you can do now
+
+**A tool that installs skills from a repository can now find this one.**
+`npx skills add` and its kind read a repository rather than a package: the root
+if it holds an entry, then `skills/`, then the agent folders — the documented
+shape being `skills/<name>/SKILL.md`. None of those existed here, so the entry
+was reachable only by such a tool's fallback recursive search, at a path whose
+folder is called `skill` while the file inside calls itself `scholion` — and the
+format requires those two to agree.
+
+The published repository now carries `skills/scholion/`, and it holds the entry
+and nothing else. That is the licensing decision rather than economy: what is
+published as a skill is the entry; the long instruction and the canon of rules
+stay with the package they are printed from, under their own licence, and a
+folder carrying both would put one licence over two bodies of text.
+
+Unlike the standalone skill folder in the downloadable archive, this one is not
+excluded from the repository — a tool fetches it from there, and a folder kept
+out of version control does not exist for the purpose it was made for.
+
+**An assistant that reads skills from a folder can now be given this one, in one
+line.** Several hosts read the same path, with no registry, no account and
+nobody's moderation in between — and until now nothing in this project mentioned
+it:
+
+```bash
+mkdir -p ~/.agents/skills/scholion
+cp "$(scholion skill --path)" ~/.agents/skills/scholion/SKILL.md
+```
+
+That single file is the whole installation, which is what makes it worth doing
+and also what it had to be repaired for. **The entry did not name the tool
+server.** A host with a plugin mechanism finds `scholion mcp` through its own
+means; a host that reads only this file had no way to learn the door existed —
+so the door built for exactly those runtimes was invisible to them. It names the
+tool server and the in-process module now, and says that neither writes to a
+profile.
+
+**And it pointed at reference texts that a one-file install does not have.** The
+full instruction and the canon of safety rules sit beside the entry in the
+downloadable bundle and nowhere else; the entry named them by path regardless, so
+a model following the pointer would report a missing file rather than ask for
+what it needed. Each is now named twice — the path, for the bundle, and the
+command that prints it out of the installed package, for every other way in.
+
+`scholion capabilities --json` lists this door beside the others, derived from
+the build: the size of the entry and whether it names the tool server are read
+off the file rather than asserted about it. `scholion doc connecting-an-agent`
+describes it in words, and the heading there has stopped counting the doors —
+it said «four» through the arrival of a fifth and a sixth.
+
+**The checks now run on the oldest Python the package promises, before a release
+rather than after one.** `pyproject.toml` says this runs on Python 3.10 and
+later. That sentence is a promise to everybody who installs it, and until now
+nothing checked it before a release: the matrix that runs every promised version
+lives with the published repository, so it answers about a version that is
+already out.
+
+It answered twice in two days, both times too late — once with a release build
+that failed and never reached the registry, once with a red matrix on a version
+that had. Both were the same shape: a repair verified on one interpreter and
+promised about four.
+
+`./run_tests.sh` now runs the whole suite a second time under the oldest promised
+version, taking that version from the promise itself rather than from a number
+written into the script — `scholion doc contributing` describes how to run the
+checks that come with the package. Where `uv` is available it fetches the interpreter and
+caches it; where it is not, the run says the check could not be made instead of
+passing over it in silence. `SCHOLION_SKIP_OLDEST=1` skips it while editing.
+
+Three places name that floor — the promise, the versions the matrix runs, and
+this step — and a test now compares them, so a version can no longer be promised
+and never run, or run and never promised.
+
 ## v0.4.5 — 24.08.2026
 
 <!-- This entry is open. While 0.4.5 is unpublished, further work is added here
@@ -47,6 +123,77 @@ lab values, no dates of anyone's tests. This journal records what changed in the
      publishing, and delete this note. -->
 
 ### What was wrong
+
+**The README told you the plugin adds fourteen tools. It adds twenty-nine, and
+there are not four doors but six.** Neither sentence was wrong when it was
+written; both stopped being true and nothing was obliged to notice. They are
+corrected, and the numbers are gone rather than updated: a count kept by hand
+beside a count the build derives will go stale again, so the README no longer
+writes one and a check refuses a new one.
+
+The installation table for a skill folder was rewritten against each product's
+own documentation rather than from memory. `~/.agents/skills/` is the shared
+path and two runtimes read it as they are; the others keep their own folder and
+take the same single file. The table carries the date it was checked, because
+paths move and that is the kind of claim that goes stale quietly.
+
+The published format's own limits are now a test: the name a valid slug matching
+its directory, the description within its ceiling, the body within the
+recommended length, and no frontmatter field the format does not define. They are
+somebody else's rules, which is exactly why they are worth checking — a file that
+breaks one is refused with a message about YAML, and the person meets that
+instead of this product.
+
+**What the data cannot answer reached every way in except the one most people
+use.** `scholion limits` says what cannot be said from a profile and what would
+close it — and the page had never asked for it. Not a broken renderer: no screen
+called that route at all, so the whole layer existed for the command line and for
+an assistant and for nobody sitting in front of the interface.
+
+The Profile tab now opens with what the profile is still missing and what each
+absence costs — a reference interval withheld rather than guessed, the age-banded
+rows of a form that cannot be read — with the fields to fill them in directly
+below. And the caveat about which reference panel a percentile is a position
+inside is printed beside the percentiles, where the number is met.
+
+A check now holds the general rule: every route the server answers is asked for
+by the page, or is named with the reason it is not. Two writes are named — one
+superseded, and one an acknowledged gap: conclusions from a doctor can still only
+be loaded from the command line.
+
+**A percentile said which population it was a position in, and the answer could
+be wrong.** The reference panel a polygenic score is computed against decides
+what the percentile means: against another population it is not your position.
+The report carried a panel and, beside it, a claim that the panel had been
+settled — and those two came from different places. The claim asked the profile
+whether a panel was known; the number had been computed against whatever the
+scoring run was given, which fell back to Europe in a function signature.
+
+While a panel could only be typed in by hand the two rarely disagreed. Once it
+began to be determined from the genome, they came apart for everybody who had
+one: the screen said the panel was settled and showed percentiles computed
+against a different one. No error and no gap — an ordinary number with a wrong
+sentence attached.
+
+Three facts are reported now where one was: the panel the stored numbers used,
+whether it was chosen or fallen back on, and which panel applies today. Where
+they disagree the report says so beside the number and names both, rather than
+leaving it in a field. A result computed before any of this was recorded cannot
+say which panel was chosen, and that reads as «cannot say» rather than as «yes».
+
+`scholion prs` takes the panel from the genome unless told otherwise, and a run
+that had nothing to go on says it used a default.
+
+**Determining that panel is a step of preparing a genome now, and it can be
+asked what it does before it does it.** The tool that answers it existed and was
+reachable from nowhere — no command, no mention in the guide. Worse, it took no
+arguments and checked its inputs while being imported, so any invocation at all
+ran the whole job: about three hundred requests to a public database over
+somebody's real genome, from what was meant to be a question. It has an entry
+point now — `--help` explains, `--dry-run` names what it would read and write and
+fetches nothing, and a missing input is refused by name with where it comes
+from. The guide carries it in the sequence, at the point where the data it needs
+exists.
 
 **A check that travels with the package disagreed with itself between Python
 versions.** The tool that measures how much of the code the test suite actually
@@ -74,7 +221,7 @@ still describes the genome it was built from.
 
 ### What you can do now
 
-***The facts the application cannot derive can be given from the page at last.**
+**The facts the application cannot derive can be given from the page at last.**
 Sex, year of birth, height and which wearable answers are preconditions: without
 them a dozen reference intervals are withheld rather than guessed, the age-banded
 rows of a laboratory form cannot be read, and there is no body-mass index. There
@@ -107,7 +254,7 @@ it, and disappears from it once answered. An assistant reading the list at the
 start of a conversation therefore asks for what is actually absent, rather than
 from a list somebody typed into an instruction and then had to keep in step.
 
-*A body measurement in a bundle is now kept, not dropped.** This product has
+**A body measurement in a bundle is now kept, not dropped.** This product has
 always taken a weight — from the command line and from the page — and an import
 that met one inside a medical record threw it away because it is not a
 laboratory analyte. It goes to the metrics layer where it belongs, with the same
@@ -163,7 +310,7 @@ Nothing about anyone's data changes, and no command behaves differently.
 
 ### What was wrong
 
-***A form the interface never showed.** The page holding sex, year of birth and
+**A form the interface never showed.** The page holding sex, year of birth and
 height existed, worked, and was in no tab: it had never been reachable, in the
 whole history of the file, so in practice those facts could only be set from the
 command line — while the command's own help said the opposite. Every view the
@@ -187,7 +334,7 @@ checked on the way in, by the same lists in every face; an unrecognised value is
 refused with what is accepted. A profile field a person did not touch is also no
 longer rewritten by a save of a different one.
 
-*«1 markers are printed without a reference range».** A number and the word
+**«1 markers are printed without a reference range».** A number and the word
 after it did not agree — on the screen that says what the data cannot support,
 which is the screen this project argues from. The machinery for it existed and
 was in use; twenty-three messages simply did not go through it, and in Russian,

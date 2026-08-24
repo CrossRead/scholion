@@ -83,7 +83,16 @@ LINE_BUDGETS = {
     # arriving as a VCF. The room went to NARROW_INPUTS, the enumeration of the
     # measured classes that may not answer, and to one branch per class so that
     # each refusal names its own number instead of a shared sentence.
-    "genomics": 580,
+    # 580 → 650 on 24.08.2026. The provenance of the reference panel, and it
+    # belongs here because it is a fact ABOUT the percentiles this module
+    # already reports. Three things were being reported as one: the panel the
+    # stored numbers were computed against, where that came from, and which
+    # panel applies now. A flag said «ancestry stated» by asking the profile
+    # rather than the file, so once the panel began to be determined from the
+    # genome it went true for everybody with one while the numbers went on
+    # being scored against a default. Splitting it out would put «what panel
+    # is this percentile in» in a different file from the percentile.
+    "genomics": 650,
     "sources": 180,
     "pgx": 900,
     "lifestyle": 980,

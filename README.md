@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.5** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.6** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -138,9 +138,10 @@ the eight absent ones named. The paths that a chip cannot support — ClinVar
 screening, ACMG SF, polygenic scores — refuse with the reason instead of
 answering.
 
-**Any assistant can reach it, and none of them needs a key.** Four doors onto one
-engine: the command line, a Model Context Protocol server (`scholion mcp`), the
-Ouroboros tools module and the Ouroboros Hub skill. There is no account, no token
+**Any assistant can reach it, and none of them needs a key.** Several doors onto
+one engine: the command line, a Model Context Protocol server (`scholion mcp`),
+a skill folder any host can read, the Ouroboros tools module and the Ouroboros
+Hub skill. There is no account, no token
 and no credential for any of them — the analysis runs on the machine that holds
 the data, so there is nothing to authenticate to. The build answers this itself:
 `scholion capabilities --json` carries every door and, scanned from its own
@@ -304,8 +305,8 @@ in what they can do:
   you would rather install nothing;
 - **only a language model** → the skill bundle (3): one file, and the model does
   the rest;
-- **Ouroboros already running** → the plugin (4), which adds 14 tools to an agent
-  you are using anyway.
+- **Ouroboros already running** → the plugin (4), which adds the whole tool set to
+  an agent you are using anyway.
 
 Analysis is the same core in all four. What changes is who types the commands.
 
@@ -407,6 +408,52 @@ entry is short and the model opens the reference when the task calls for it.
 The model works through the command line: it asks you to run a command and reads
 the output. It gets no access to your machine, and the safety rules in
 `ASSISTANT-RULES.md` take precedence over every other instruction it is given.
+
+**If your assistant reads skills from a folder**, put it where that host looks.
+One file, no registry, no account and nobody's moderation in between:
+
+```bash
+mkdir -p ~/.agents/skills/scholion
+cp "$(scholion skill --path)" ~/.agents/skills/scholion/SKILL.md
+```
+
+`~/.agents/skills/` is the shared path, and three runtimes read it as they are.
+The others keep their own folder and take the same single file:
+
+| Runtime | Where it looks |
+|---|---|
+| OpenAI Codex | `~/.agents/skills/scholion/` — read by default |
+| Gemini CLI | `~/.agents/skills/scholion/` — read by default, ahead of `~/.gemini/skills/` |
+| OpenClaw | `~/.agents/skills/scholion/` — read by default, unless `OPENCLAW_STATE_DIR` has been moved off its default; `openclaw skills install` is the other way |
+| Claude Code | `~/.claude/skills/scholion/` |
+| Hermes Agent | `~/.hermes/skills/scholion/`, or add `~/.agents/skills` to `skills.external_dirs` in `~/.hermes/config.yaml` |
+
+**If your tool installs skills from a repository** — `npx skills add` and the
+like — the published repository carries `skills/scholion/`, which is where such
+a tool looks:
+
+```bash
+npx skills add CrossRead/scholion
+```
+
+**OpenClaw** also has its own registry, and that is the supported route there:
+the skill is published to ClawHub and installed with `openclaw skills install`.
+The `git:` form of that command is not supported — it expects a repository whose
+ROOT is the skill, and this repository is a product with a skill inside it.
+
+The folder must be called `scholion`: the format requires the directory name and
+the `name` in the file to match. Checked against each product's own
+documentation on 24.08.2026 — paths move, and this table is the kind of claim
+that goes stale quietly, so it carries its date.
+
+That single file is the whole installation. It says what this is, what to run for
+the usual requests, and the safety rules that come before any answer — and it
+names the tool server and the in-process module, because a host that reads only
+this file would otherwise never learn they exist. The long instruction and the
+canon of rules are deliberately NOT copied there: they are printed out of the
+installed package on demand, so there is one copy of each and it is the one that
+ships. `scholion doc connecting-an-agent` describes every door, and
+`scholion capabilities --json` answers the same derived from the build.
 
 ### 4. A plugin for Ouroboros
 

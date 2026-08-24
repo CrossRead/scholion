@@ -70,20 +70,34 @@ class TestTheThirdFaceKeepsUp(unittest.TestCase):
         missing = sorted(t for t in contract.PLUGIN.values() if t not in tools)
         self.assertEqual(missing, [], "the map is ahead of the plugin")
 
-    def test_no_tool_writes_to_the_profile(self):
+    def test_no_tool_authors_a_value_into_the_profile(self):
         """The canon says a model does not change therapy or the profile.
 
-        The absence of a write tool is what makes that more than a promise. Every
-        write command is listed in NO_PLUGIN as «a write», and this checks the
-        list has not quietly lost one.
+        The absence of a write tool is what makes that more than a promise. The
+        claim used to be «no tool writes», with the write list spelled out here by
+        hand — and a hand-written list is the shape of a check that agrees with
+        its author. It is now asked of `contract.AUTHORS`, so a write added
+        tomorrow is covered by whichever rule its kind carries.
+
+        ONE WRITE IS DELIBERATELY EXEMPT, and naming it here is the point:
+        `focus-log` records what the PERSON says happened — a glass of wine, a
+        late meal, an as-needed dose — and invents nothing. The owner asked for it
+        on 24.08.2026, having found that «note that down» was the one thing an
+        assistant could not do. It is `contract.DICTATED`, and the boundary that
+        keeps it safe is what may go in: the event, never what it did.
         """
-        writes = {"add-lab", "add-med", "remove-med", "add-metric", "focus-log",
-                  "set-folder", "import-labs", "ingest-studies", "ingest-garmin"}
-        for cmd in sorted(writes & set(contract.cli_commands())):
+        for cmd in sorted(contract.AUTHORS & set(contract.cli_commands())):
             with self.subTest(command=cmd):
                 self.assertNotIn(cmd, contract.PLUGIN,
-                                 f"«{cmd}» writes to the profile and is exposed as a tool")
+                                 f"«{cmd}» invents a value into the profile and is exposed "
+                                 f"as a tool")
                 self.assertIn(cmd, contract.NO_PLUGIN)
+
+        # The exemption is a decision, not a gap: it holds only while the kind is
+        # recorded and only for this one command.
+        self.assertEqual(contract.DICTATED, {"focus-log"},
+                         "a second command joined the dictated kind without anybody "
+                         "deciding it may be a tool")
 
     def test_the_tools_a_model_needs_before_a_negative_statement_are_there(self):
         """Named one by one, because these are the ones whose absence is silent.

@@ -358,6 +358,8 @@ MESSAGES = {
     "prs.caveat.strand_ambiguous": "a variant whose two alleles are each other's complement (A/T, C/G) matches either strand, so a strand flip in the source file is indistinguishable from a correct call — this build identifies such loci for a genotyping array and cannot do so inside a score it does not sum itself",
     "prs.caveat.missing_as_zero": "a variant of the model that is absent from your file is not added to the sum, which is arithmetically an imputed zero dose and biases the score downward; how much of the model's WEIGHT was actually present is measured and shown, and a percentile below the threshold is withdrawn from trust rather than footnoted",
     "prs.caveat.hard_genotypes": "hard genotypes only: an uncertain call is counted as a certain one, with no dosage",
+    "prs.caveat.panel_out_of_date": "These percentiles were computed against the {used} reference panel, and the panel determined from your genome is {applies}. A percentile is a position within a population — against another one it is not your position. Recompute them to have the two agree.",
+    "prs.caveat.panel_defaulted": "These percentiles were computed against the {used} reference panel because none had been determined — nobody chose it. Which panel applies is settled while a genome is prepared, and until then the number is a position inside a population that may not be yours.",
     "prs.caveat.reference_panel": "the percentile is a position within a reference sample; the scoring package is pinned by version rather than by hash, and the reference panel it downloads on first use is not pinned at all — two machines can in principle place the same genome against different reference data",
     "prs.no_model": "no model",
     "prs.evidence_legend": "Level of evidence: ✚ clinically validated · · supporting context · "
@@ -812,6 +814,13 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                  "The denominator is the panel declared for the system, not the "
                                  "part of it that happens to be measured — a system with two "
                                  "values out of nine says so.",
+    "tool.sch_focus_log.description": "Write one line into the journal of the current focus: what happened on a given day — alcohol, a dose taken as needed, a late meal, a free-text note. THE ONLY TOOL THAT WRITES, and it may only record what the person just said happened. Never put an inference here: the journal is what a later analysis reads, and an entry that already holds the conclusion makes that analysis circular. An entry for a date that already exists replaces it; an entry with nothing in it deletes that date.",
+    "tool.sch_focus_log.param.date": "the day the episode belongs to, YYYY-MM-DD",
+    "tool.sch_focus_log.param.alcohol": "what was drunk, in the person's own words — «a glass of dry red», «two beers». Leave empty if there was none",
+    "tool.sch_focus_log.param.atenolol": "true if the as-needed dose was taken that day",
+    "tool.sch_focus_log.param.late_meal": "true if the last meal was late",
+    "tool.sch_focus_log.param.note": "anything else the person said about that day, verbatim",
+    "tool.sch_focus_log.done": "Written into the journal: {date} ({action}).",
     "tool.sch_focus.description": "The one task this profile is concentrating on right now: the "
                                  "live metric, the path baseline → now → target, the levers "
                                  "drawn from the person's own data, and the episode log. Empty "
@@ -2009,6 +2018,7 @@ will go through them later.
     "web.metrics.panel_from_genome": "{value} — determined from your own genome ({date})",
     "web.metrics.panel_stated": "{value} — set by hand, overriding what the genome says",
     "web.metrics.panel_unknown": "not determined — percentiles use a default panel and say so. It is settled while a genome is prepared, not by answering a question here.",
+    "web.metrics.missing_head": "Not recorded yet — and what each absence costs",
     "web.metrics.title": "Personal health metrics",
     "web.metrics.sex": "sex",
     "web.metrics.sex_label": "Sex",

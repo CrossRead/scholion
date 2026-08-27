@@ -1,7 +1,7 @@
 # Vendored from Genomi — what was taken, what changed, how to update
 
 **Upstream:** https://github.com/exon-research/genomi
-**Commit:** `07a255e` (branch `master`, 2026-08-17)
+**Commit:** `3860a23` (branch `master`, 2026-08-25)
 **Licence:** Apache License 2.0 — the same licence this project uses, so the two
 are compatible directly. Apache-2.0 asks that notices be retained, that the
 origin be stated, and that modified files say they were modified. All three are
@@ -20,10 +20,10 @@ reasonable rather than a liability.
 
 | Our file | Upstream path | Lines | sha256 of the upstream original |
 |---|---|---|---|
-| `detection.py` | `src/genomi/active_genome_index/source_intake/detection.py` | 451 | `18916520e824bab2b5ad754753802addc5b14af3b208cb2854bfab76af313411` |
+| `detection.py` | `src/genomi/active_genome_index/source_intake/detection.py` | 462 | `01c4aedccd021a7b564ecdcb29e41830981ccf7eb8b0d1c547adfa53dc6dffe4` |
 | `text_io.py` | `src/genomi/active_genome_index/source_intake/text_io.py` | 285 | `bc597fe770c3644d9ef134aa6edcc75742d08f2d5962d8db2c225f4615190aa1` |
 | `alignment_helpers.py` | extract of `src/genomi/active_genome_index/alignment.py` | 15 of 479 | — (extract, see below) |
-| `../../../../tests/test_genomi_source_detection.py` | `tests/test_source_detection.py` | 316 | `814a8142132c1989827bc832e3aded6c7080857a79579df8a43050187ff2bc35` |
+| `../../../../tests/test_genomi_source_detection.py` | `tests/test_source_detection.py` | 354 | `567a5f8ac92658a5d478620c3b01b4d59b326e304ac1792aba3ed66596797aa6` |
 
 The sha256 values are of the files EXACTLY as fetched, before our headers were
 added. `src/tools/check_vendor.py` re-fetches them and compares.
@@ -43,22 +43,30 @@ their `lab/` layer pulls cloud dependencies. This is bytes, not interpretation.
 
 Every change is marked `SCHOLION CHANGE` at the line it affects.
 
-1. **`detection.py` — `_array_reference_build` no longer asserts a build nobody
-   declared.** Upstream computes whether the header states build 37 and then
-   returns `"GRCh37"` from *both* branches, commented «consumer arrays are GRCh37
-   unless a future export says otherwise». That is the one shape this project
-   exists to remove: the file states its build in prose, the code reads the
-   statement, and answers from a default regardless — and a build asserted where
-   none was declared cannot be told from one that was read. Ours returns `None`
-   when nothing was declared. Behaviour is identical for every export that does
-   declare a build, which is nearly all of them.
-2. **`detection.py` — the import of the two FASTQ pair helpers** points at
+1. **`detection.py` — the import of the two FASTQ pair helpers** points at
    `alignment_helpers.py` instead of the 479-line `alignment.py`.
-3. **`alignment_helpers.py`** is an extraction: four objects copied verbatim.
-4. **The test file** imports from our package, and its two BAM tests are skipped
+2. **`alignment_helpers.py`** is an extraction: four objects copied verbatim.
+3. **The test file** imports from our package, and its two BAM tests are skipped
    rather than deleted — they build their fixture with `pysam`, which we do not
    depend on. The failure is in the test's setup, not in the module, and deleting
-   them would hide that two of twenty-three assertions are not being made.
+   them would hide that two of the assertions are not being made.
+
+## What went back
+
+**The one behavioural change this copy carried is upstream now, and so is gone
+from the list above.** Until 25.08.2026 it read: `_array_reference_build`
+computes whether the header declares build 37 and then returns `"GRCh37"` from
+*both* branches, so a build nobody wrote down cannot be told from one that was
+read — and FamilyTreeDNA exports, which are recognised by having no comment block
+at all, could never declare one and were reported as GRCh37 on an assumption.
+Ours returned `None` instead, leaving the default where it already lived, in
+`_effective_array_build`.
+
+It was offered as [`exon-research/genomi#5`](https://github.com/exon-research/genomi/pull/5)
+with four tests and merged the same day, which is the commit this file now pins.
+The divergence is not carried any more: the code here is theirs, and nobody has
+to re-apply anything at the next refresh. When that is worth doing at all is a
+rule, not a mood — `CLAUDE.md`, «Contributing upstream».
 
 ## How to update
 
@@ -73,7 +81,7 @@ upstream has moved since, and which of our marked changes would have to be
 re-applied. It never overwrites without `--refresh`.
 
 Updating is a decision, not a chore: their change may be a fix worth taking or a
-default worth refusing, as change 1 above was. Re-apply the marked changes, run
+default worth refusing. Re-apply the marked changes, run
 `python3 -m unittest tests.test_genomi_source_detection`, and record the new
 commit and checksums in this file.
 
@@ -81,4 +89,6 @@ commit and checksums in this file.
 
 Apache-2.0 permits taking this silently. A short note to the authors saying what
 was taken, where the attribution sits and what was changed costs ten minutes and
-is the difference between borrowing and helping yourself.
+is the difference between borrowing and helping yourself. Here it became the
+disclosure paragraph of the pull request above, which is better: it arrived
+attached to something useful.

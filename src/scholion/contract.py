@@ -602,8 +602,15 @@ def access() -> Dict[str, Any]:
             "ouroboros_tools": {"how": "import scholion.ouroboros_tools",
                                 "entry": "get_tools() -> list[ToolEntry]",
                                 "tools": len(tools)},
+            # The only door whose owner never had a shell: the skill is
+            # installed by a click into a container whose paths nobody has
+            # seen. So it carries a face for the person as well as tools for
+            # the model, and the model is told about it — «run this command»
+            # is advice that cannot be followed from here.
             "ouroboros_hub": {"how": "the `scholion` skill", "entry": "plugin.py",
-                              "installs": "pip package `scholion`"},
+                              "installs": "pip package `scholion`",
+                              "onboarding": "a Widgets tab that names the data "
+                                            "directory and lays it out on request"},
             # The door that needs no plugin mechanism at all: a folder with an
             # entry file in it, which several hosts read from one shared path.
             # Derived rather than described — the size and whether the entry

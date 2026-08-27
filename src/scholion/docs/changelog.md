@@ -40,6 +40,62 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.7 — 27.08.2026
+
+### What you can do now
+
+**The Ouroboros Hub skill now says where your files go, on a page of its own.**
+Installed there, Scholion arrives by a click into a machine whose paths you have
+never seen and cannot list. Until now it registered thirty tools and nothing
+else: no data directory was created, and the first thing the skill said was a
+tidy report — `markers: 0`, `genome: not connected` — about a person it had
+never been given anything about. A statement of absence, phrased as a finding.
+
+Enabling the skill now adds a **Scholion** tab to the Widgets page, and that tab
+is the first thing to read:
+
+- it names the data directory this installation actually uses, and the exact
+  folders for laboratory forms and for the genome;
+- a button lays that directory out — empty templates, plus a README in every
+  folder saying what belongs in it. Pressing it a second time writes nothing,
+  and it never touches a file that already exists;
+- if your files already live in a folder of their own, a field points at that
+  folder instead of copying them.
+
+The directory the skill creates is one the host keeps, so it survives restarts
+and is not scattered inside a container. To put it somewhere else, set
+`SCHOLION_REPO_DIR` (the whole layout) or `SCHOLION_PROFILE_DIR` (the profile
+alone) in the host environment before enabling — either is respected, and
+nothing is moved.
+
+Nothing changed for the command line or the local web application: the same
+layout is what `scholion init` has always written, and the tab creates it
+through the same command.
+
+### What is fixed
+
+**A freshly created, empty directory was described as a connected genome.** The
+introduction the skill prints was reading the genome section of the report as
+«present» rather than reading its ready flag, so a person who had just pressed
+the button — with no VCF anywhere — was told the genome was connected and then
+handed a list of loci «still unread». Both halves were wrong and the second made
+the first look substantiated. It now says `not connected` until a VCF is
+actually there, which is what `scholion genome-status` said all along.
+
+**A profile that cannot be read is no longer reported as an empty one.** If a
+file in the profile is malformed, the tab now says so, with the reason, instead
+of showing zeroes that look like a person with no history.
+
+### What is retracted
+
+Nothing. No stored value changes, and no conclusion drawn from a previous
+version needs revisiting: the corrections above are to what the skill said about
+its own state, never to a reading of anybody's data.
+
+### What needs recomputing
+
+Nothing.
+
 ## v0.4.6 — 25.08.2026
 
 ### What you can do now

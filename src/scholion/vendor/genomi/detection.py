@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------
 # VENDORED FROM GENOMI — https://github.com/exon-research/genomi
-# commit 07a255e, file src/genomi/active_genome_index/source_intake/detection.py
+# commit 3860a23, file src/genomi/active_genome_index/source_intake/detection.py
 # Copyright Exon Research. Licensed under the Apache License, Version 2.0.
 # A copy of the licence travels with this project (LICENSE, Apache-2.0).
 #
@@ -407,17 +407,17 @@ def _scan_array(lines: list[str], delimiter: str) -> tuple[list[str], list[str] 
 
 
 def _array_reference_build(comments: list[str]) -> str | None:
-    # SCHOLION CHANGE. Upstream computes the token match and then returns
-    # "GRCh37" from BOTH branches, with the comment «consumer arrays are GRCh37
-    # unless a future export says otherwise». That is the one shape this project
-    # exists to remove: the file states its build in prose, the code reads the
-    # statement, and then answers from a default regardless. A build asserted
-    # where none was declared is indistinguishable from one that was read.
-    #
-    # Here an undeclared build returns None, and the caller says «not declared»
-    # rather than naming a build nobody wrote down. Behaviour is unchanged for
-    # every export that does declare one — which is the overwhelming majority,
-    # and is why this costs nothing.
+    """Return the build the export declares, or ``None`` when it declares none.
+
+    Consumer arrays are GRCh37 in practice and the intake pipeline still assumes
+    exactly that: ``_effective_array_build`` resolves an undeclared build to
+    GRCh37. What changes here is where the assumption lives. Returned as a
+    detection result, "GRCh37" cannot be told apart from a build that was
+    actually read out of the header — and one array format can never declare
+    one, since FamilyTreeDNA exports are recognised by having no comment block
+    at all. Detection reports what the file says; the fallback stays in the one
+    place that has to pick a build in order to do coordinate work.
+    """
     joined = "\n".join(comments).lower()
     if any(token in joined for token in _BUILD37_TOKENS):
         return "GRCh37"

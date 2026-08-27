@@ -1,7 +1,7 @@
 """Genomi's own test suite for the vendored format detector, run against our copy.
 
 VENDORED FROM GENOMI — https://github.com/exon-research/genomi
-commit 07a255e, file tests/test_source_detection.py
+commit 3860a23, file tests/test_source_detection.py
 Copyright Exon Research. Licensed under the Apache License, Version 2.0.
 
 Kept because a vendored module without its own tests is a module nobody can
@@ -35,6 +35,7 @@ from pathlib import Path
 
 # SCHOLION CHANGE: upstream imports from its own package.
 from scholion.vendor.genomi.detection import detect_source
+from scholion.vendor.genomi.text_io import _effective_array_build
 
 _ANCESTRY_TXT = (
     "#AncestryDNA raw data download\n"
@@ -57,6 +58,10 @@ _PLAIN_VCF_TXT = (
     "##fileformat=VCFv4.2\n"
     "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tSAMPLE\n"
     "1\t100\trs1\tA\tG\t50\tPASS\t.\tGT\t0/1\n"
+)
+_FTDNA_CSV = (
+    '"RSID","CHROMOSOME","POSITION","RESULT"\n'
+    '"rs3131972","1","752721","GG"\n'
 )
 _FASTQ_TXT = "@READ1\nACGTACGT\n+\nFFFFFFFF\n"
 
@@ -340,6 +345,39 @@ class UnknownContentTests(unittest.TestCase):
             path.write_text("just some prose that is not a genome file at all\n")
             with self.assertRaises(ValueError):
                 detect_source(path)
+
+
+class ArrayReferenceBuildTests(unittest.TestCase):
+    """A build is reported when the export declares one, and only then."""
+
+    def test_declared_build_is_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "AncestryDNA.txt"
+            path.write_text(_ANCESTRY_TXT, encoding="utf-8")
+            detection = detect_source(path)
+            self.assertEqual(detection.source_format, "ancestrydna")
+            self.assertEqual(detection.reference_build, "GRCh37")
+
+    def test_undeclared_build_is_not_asserted(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "genome_23andMe.txt"
+            path.write_text(_23ANDME_TXT, encoding="utf-8")
+            detection = detect_source(path)
+            self.assertEqual(detection.source_format, "23andme")
+            self.assertIsNone(detection.reference_build)
+
+    def test_ftdna_export_can_never_declare_a_build(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "ftdna.csv"
+            path.write_text(_FTDNA_CSV, encoding="utf-8")
+            detection = detect_source(path)
+            self.assertEqual(detection.source_format, "ftdna")
+            self.assertIsNone(detection.reference_build)
+
+    def test_intake_still_resolves_an_undeclared_build_to_grch37(self) -> None:
+        self.assertEqual(_effective_array_build("auto", None), "GRCh37")
+        self.assertEqual(_effective_array_build("auto", "GRCh37"), "GRCh37")
+        self.assertEqual(_effective_array_build("GRCh38", None), "GRCh38")
 
 
 if __name__ == "__main__":

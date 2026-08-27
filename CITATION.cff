@@ -13,8 +13,8 @@ contact:
   - email: "scholion.dev@proton.me"
     name: "Scholion project"
 title: "Scholion"
-version: "0.4.6"
-date-released: "2026-08-18"
+version: "0.4.7"
+date-released: "2026-08-27"
 type: software
 authors:
   - family-names: "Belevtsev"

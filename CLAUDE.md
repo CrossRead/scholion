@@ -115,6 +115,32 @@ notice — its text goes into `NOTICE` in the same commit.
 Personal data never reaches git by construction: `.gitignore`, the pre-commit
 hook and the sanitizer each block it independently.
 
+## Contributing upstream
+
+This project takes from others: vendored code, dependencies, data sources, host
+platforms. What goes back is decided by rule.
+
+- **Only where we already take.** A patch goes to a project this one consumes —
+  the vendored detector, an MCP server we call, a source we read, a host we plug
+  into. Being an open project in the same field is not a reason; being upstream
+  of us is.
+- **Bytes, not interpretation.** Format parsing, content detection, packaging,
+  documentation, and defects of the class this project exists to remove: a
+  plausible default served where a refusal was owed. Never the reasoning layer,
+  never an entry of the curated knowledge base. Those two are what survives the
+  category being absorbed, and they are not given away.
+- **The finding comes from the reference run, not from a search.** Defects in
+  somebody else's code surface on their own while the engine is run over other
+  people's files. What the run turned up is offered; nothing is hunted for.
+- **One contribution per release cycle at most.** The cap is there to protect
+  backlog time, not because the other side is small — size the work by the debt
+  it repays, never by the audience it might reach.
+- **A change held locally is a debt, and offering it upstream is how the debt is
+  paid.** `exon-research/genomi#5` was merged the day it was sent and removed
+  change 1 from `src/scholion/vendor/genomi/UPSTREAM.md` altogether: the code
+  there is theirs again, and the next refresh has nothing to re-apply. That, not
+  a star, is what a contribution is worth measuring by.
+
 ## Demo profile
 
 `demo/profile/` is a synthetic profile of a fictional person, built by
@@ -198,6 +224,24 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   session. `run_tests.sh` already refuses that shape for its own arguments and
   says why; this is the same rule one level up. Put the explanation in the prose
   around the block, never inside it.
+- **Two more shapes zsh does not read the way they are written.** In
+  `"$USER:array-build-declared-only"` the shell takes `:a` as the modifier
+  «absolute path», so `gh pr create --head` was handed the absolute path of the
+  expanded name followed by the branch with its first letters eaten, and GitHub
+  answered «Head ref must be a branch». Brace the variable whenever a colon
+  follows it: `"${USER}:branch"`. And a block handed over for pasting never
+  opens with `set -e` — the first failing line then closes the terminal session,
+  so a file that did not download costs a session instead of a command. Both
+  were paid for while sending `exon-research/genomi#5`.
+- **A count read off a rendered page is not a measurement.** The page-fetching
+  tool reported «2 stars, 0 forks, 0 watching» for `exon-research/genomi` — twice,
+  in two sessions six days apart, the second time while a screenshot of the same
+  page showed **479 stars and 62 forks**. A conclusion was built on that 2 («their
+  path to 476 stars does not exist, so there is nothing to repeat»), it contradicted
+  a correct figure sitting in another document written the same day, and it
+  travelled through three documents before a screenshot ended it. A number about
+  the outside world enters a document with the way it was obtained written beside
+  it, and a number that decides something is confirmed by a second route.
 - **A working copy reached through a mount that forbids `unlink` needs
   `git --no-optional-locks` for every read.** A plain `git status` creates
   `.git/index.lock` and then cannot remove it, so the NEXT git command dies on

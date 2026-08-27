@@ -32,7 +32,7 @@ the build — this table is the readable copy of it.
 | **MCP server** | `scholion mcp` | the assistant speaks the Model Context Protocol |
 | **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
-| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub |
+| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus a **Scholion** tab on the Widgets page, which is where the owner is told what to load and where |
 
 There is also `scholion serve` — a local web page for a person, bound to
 `127.0.0.1`. It is not an assistant surface and has no API.

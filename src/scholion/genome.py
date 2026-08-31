@@ -1102,6 +1102,74 @@ _SITES_FILES = ("loci_sites.vcf.gz", "scoring_sites.vcf.gz",
                 "scoring_sites_ext.vcf.gz", "longevity_sites.vcf.gz")
 _MIN_DEPTH = 10          # below this the call is unreliable, we mark it explicitly
 
+#: Quality-control heuristics, NOT clinical thresholds — the difference matters
+#: and is why they are permissive. What they produce is «have this confirmed by
+#: another method», never «this is wrong»: a call outside these bounds is usually
+#: still right, and a call inside them can still be wrong. They exist because the
+#: opposite of a flag here is not silence but false confidence — a ClinVar finding
+#: read off a heterozygote whose reads split 15/85 is presented today in exactly
+#: the same words as one that split 50/50.
+_MIN_QUAL = 20.0         # Phred: about one call in a hundred wrong by the caller's own estimate
+#: A true heterozygote splits its reads near half. Far from half means one of:
+#: a mosaic, a duplicated region mapping onto this one, contamination, or an
+#: artefact. The band is wide on purpose — only the indefensible is named.
+_HET_BAND = (0.20, 0.80)
+#: A homozygous-alternate call whose reads still carry a fifth of the reference
+#: is not what the genotype says it is.
+_HOM_ALT_FLOOR = 0.80
+
+
+def confirmation_reasons(call, *, qual=None, af=None, idx=(), depth=None):
+    """Everything about this call that would be worth confirming, in one list.
+
+    Gathered rather than left as four separate flags a reader has to know to look
+    for, and every entry names the measurement that raised it: «needs
+    confirmation» without a reason is unanswerable, and a reader who cannot
+    answer it ignores it.
+
+    The order is the order a person would want to hear them in — what the reads
+    looked like first, then what the caller said about them, then what the file
+    said about the row.
+    """
+    why = []
+    if af is not None:
+        het = len({str(i) for i in idx}) > 1
+        first = str(idx[0]) if idx else "0"
+        if het and not (_HET_BAND[0] <= af <= _HET_BAND[1]):
+            why.append({"what": "allele_fraction_off_half", "value": af})
+        elif not het and first.isdigit() and int(first) > 0 and af < _HOM_ALT_FLOOR:
+            why.append({"what": "allele_fraction_low_for_homozygote", "value": af})
+    if qual is not None and qual < _MIN_QUAL:
+        why.append({"what": "low_qual", "value": qual})
+    if call.get("low_depth"):
+        why.append({"what": "low_depth", "value": depth})
+    if call.get("filtered"):
+        why.append({"what": "filtered", "value": call["filtered"]})
+    if call.get("imputed"):
+        why.append({"what": "imputed", "value": True})
+    return why
+
+
+def _allele_fraction(fmt, sample, idx):
+    """The share of reads supporting the alternate allele, from AD — or ``None``.
+
+    AD is «allelic depths», one number per allele of the row. It is the only field
+    that can say whether the reads actually looked like the genotype that was
+    written down, and this project did not read it at all: depth said HOW MANY
+    reads there were, never how they were divided.
+    """
+    if "AD" not in fmt:
+        return None
+    try:
+        parts = [int(x) for x in sample[fmt.index("AD")].split(",") if x not in (".", "")]
+    except (ValueError, IndexError):
+        return None
+    total = sum(parts)
+    if total <= 0 or len(parts) < 2:
+        return None
+    alt = sum(parts[i] for i in {int(i) for i in idx} if 0 < i < len(parts))
+    return round(alt / total, 3)
+
 
 def _sites_vcfs() -> List[str]:
     vp = vcf_path()
@@ -1315,6 +1383,25 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if dp is not None and dp < _MIN_DEPTH:
             out["low_depth"] = True
             out["note"] = _t("genome.low_depth", depth=dp)
+
+        # ── what would have to be confirmed before this call is acted on ──────
+        try:
+            qual = float(f[5]) if f[5] not in (".", "") else None
+        except ValueError:
+            qual = None
+        if qual is not None:
+            out["qual"] = qual
+        af = _allele_fraction(fmt, sample, idx)
+        if af is not None:
+            out["allele_fraction"] = af
+        why = confirmation_reasons(out, qual=qual, af=af, idx=idx, depth=dp)
+        if why:
+            out["needs_confirmation"] = why
+            # The note is the reader's, and the first reason is the one that
+            # brought it here; the rest travel in the structure for whoever asks.
+            out.setdefault("note", _t("genome.needs_confirmation",
+                                      what=_t("genome.confirm_" + why[0]["what"]),
+                                      value=why[0]["value"]))
         return out
     return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf"}
 

@@ -147,6 +147,8 @@ MESSAGES = {
     "basis.not_in_catalogue": "They are not in the locus catalogue either — a laboratory test is needed.",
     "basis.not_called": "The VCF is connected, but {names} have no row in it — that is either the reference or no coverage, and the file cannot tell them apart. Building another VCF changes nothing; those positions have to be genotyped from the aligned reads, and until they are they count as unread.",
     "basis.not_modelled": "The project's catalogue knows {names} for this gene and the interpretation model does not use that yet — so even a full VCF leaves this part unanswered.",
+    "phenotype.from_reported_diplotype": "from the diplotype {diplotype}, as stated by {source} — reported rather than called from your own reads, and it outranks a tag-SNP estimate for the same reason: whoever stated it resolved what tag SNPs cannot",
+    "phenotype.source_unnamed": "a source that did not name itself",
     "phenotype.from_called_diplotype": "from the called diplotype {diplotype} (PyPGx/PharmCAT — copy number and phase resolved), which outranks a tag-SNP estimate",
     "phenotype.assumed": "{label} — ASSUMED, not every marker was read",
     "prescription.title": "**Second opinion: {drug}** — verdict: **{overall}**",
@@ -169,6 +171,7 @@ MESSAGES = {
                            "no genes affecting the dose or the effect were found.",
     "prescription.actionable": "important",
     "prescription.gene_phenotype": "your phenotype **{phenotype}** — {label}",
+    "prescription.tag_snps_only": "tag SNPs read here, which do not by themselves give the diplotype: {list}",
     "prescription.variants": "variants: {list}",
     "prescription.labs_header": "Your labs:",
     # ── red flags from the owner's own profile ───────────────────────────
@@ -221,6 +224,7 @@ MESSAGES = {
     "labs.same_day_context": "between them: {text}",
     "labs.same_day_ask": "why was it taken twice that day, and what happened between the two — a procedure, a dose, a load? `scholion lab-draw --day <date> --reason … --between …`",
     "labs.near_limit_is_flat": "«At the edge» uses a flat 10 % of the bound for every analyte. That is a heuristic, not a reference change value: between draws sodium moves a fraction of a per cent and CRP moves tens, so this zone is too lax for some markers and too strict for others.",
+    "labs.below_own_scatter": "within this marker's own scatter: it has told changes apart only from {pct}% up, measured on its own history ({pairs} intervals)",
     "labs.ref_from_reference_base": "the interval is the general reference one, not printed on your form",
     "labs.genome_link": "genome: {text}",
     "count.abnormal.one": "{n} value",
@@ -381,6 +385,8 @@ MESSAGES = {
     "lifestyle.empty": "There is no lifestyle data (wearable devices) yet.",
     "lifestyle.title": "**Lifestyle (wearable devices)**",
     "lifestyle.fitness_score": "overall fitness score: {score}/100",
+    "lifestyle.coverage": "days with a reading: {n} (of {days})",
+    "lifestyle.not_distinguishable": "the movement over these months is {delta} {unit}, and this data can tell a difference of {mdd} from its own sampling — so no direction is claimed",
     "lifestyle.improving": "improving",
     "lifestyle.worsening": "getting worse",
     "lifestyle.comparable_from": "the series is comparable from {date} "
@@ -894,6 +900,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "prescription.class_undefined": "not determined",
     "gene.covered_by_vcf": "the full genome database covers the gene; the phenotype by star "
                            "alleles comes through PyPGx",
+    "gene.needs_diplotype": "this gene is decided by the full diplotype — copy number and phase — and a single tag SNP cannot establish it",
+    "gene.diplotype_closes": "what closes it: a star-allele call over your reads (PyPGx or PharmCAT, which read copy number), or a laboratory pharmacogenetic report that states the diplotype. A variant file on its own does not close it, however complete it is",
     "gene.vcf_pending": "the full genome database is being prepared (Track 2) — your variants "
                         "for this gene will be pulled in then",
     "near.no_history": "no history",
@@ -1029,6 +1037,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "store.unknown_ancestry": "«{value}» is not a reference population this build knows. Accepted: {accepted}. A percentile is a position within a population, so a name nobody recognises is not a smaller error than none at all.",
     "store.unknown_sex": "«{value}» was not recognised as a sex. A dozen reference intervals differ by it, so an unrecognised value is refused rather than stored and read back later as «not set».",
     "store.no_labs": "there is no laboratory history in the profile yet",
+    "store.date_not_a_date": "«{date}» is not a date. A point is dated in one of these shapes: {accepted} — the last one when two draws fall on one day and the form printed the time.",
+    "store.resolution_mixed": "  · {marker}: this period is already in the series at another resolution — {dates}. One measurement standing twice; decide which of them is the point.",
     "store.need_marker_date": "marker and date are required",
     "redact.no_file": "no file at {path}",
     "redact.no_patterns": "There is no .personal_patterns file, so only the structural classes were removed — your name and your sample number were not, because nothing here knows them. Create the file (it is outside git): printf '%s\n' 'Surname' 'SAMPLE-ID' 'mail@example.com' > .personal_patterns",
@@ -1047,6 +1057,10 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                   "from variants; the score adds nothing to it.",
     "limits.prs_model_closes": "Nothing in your own data closes this — the limitation is in the model, not in what was read. Only a different model would, and where the trait is measured directly, the measurement answers the question outright.",
     "limits.interval_basis_locus": "measured over gene loci with a margin, not over the coding sequence: a small dropout inside a large gene barely moves this number, and a small dropout inside a large gene is the case it is usually consulted about",
+    "limits.bed_never_computed": "coverage has never been measured for this profile — run `bash src/ingest/qc_callability.sh` over your alignment first; without it there is no list of what was not read",
+    "limits.bed_nothing_weak": "every gene of the panel is read above the floor — there is nothing to re-read",
+    "limits.bed_no_coordinates": "the coverage table names the weak genes but not their intervals, and coordinates are not invented from a gene name here: {genes}. Re-run `bash src/ingest/qc_callability.sh`, which now records them",
+    "limits.bed_track": "genes read below {pct}% of bases at 10x — intervals are {basis}, not coding sequence",
     "limits.interval_basis_unknown": "what these percentages were measured over is not recorded — over the coding sequence and over a whole locus they mean different things, and the difference is not small",
     "limits.coverage_unknown": "The coverage of your genome has never been measured, so «nothing found» in a gene cannot be told apart from «not read».",
     "limits.coverage_closes": "Run `bash src/ingest/qc_callability.sh` — it needs mosdepth and the BAM, and it writes profile/callability.tsv.",
@@ -1363,6 +1377,9 @@ will go through them later.
     "wearables.columns_unknown": "Columns this does not know, and from which nothing was read: "
                                  "{columns}. If one of them is a measurement you want, name it in "
                                  "profile/wearable_metrics.local.json and read the export again.",
+    "wearables.correction_applied": "  ✓ your correction applied: {metric} {month} — {action} ({why})",
+    "wearables.correction_stale": "  · your correction no longer matches anything: {metric} {month} — the series does not carry that month any more",
+    "wearables.correction_refused": "  ⚠️ your correction was NOT applied: {metric} {month} — {refused}",
     "wearables.shared": "Both devices report {metrics}. They are kept apart and are NOT averaged: "
                         "the same name does not make it the same measurement. Name the one that "
                         "should answer with `scholion profile --wearable <device>`.",
@@ -1386,6 +1403,13 @@ will go through them later.
     "genome.confirmed_ref": "the reference was confirmed by a call at the site (0/0), not "
                             "inferred from a missing row",
     "genome.low_depth_suffix": "; depth is low ({depth} reads) — the call is unreliable",
+    "genome.needs_confirmation": "this call would be worth confirming by another method — {what} ({value})",
+    "genome.confirm_low_qual": "the caller's own quality score is low",
+    "genome.confirm_allele_fraction_off_half": "the reads do not split near half for a heterozygote",
+    "genome.confirm_allele_fraction_low_for_homozygote": "a fifth of the reads or more still carry the reference",
+    "genome.confirm_low_depth": "too few reads",
+    "genome.confirm_filtered": "the caller marked the row with a filter",
+    "genome.confirm_imputed": "the genotype was inferred, not observed",
     "genome.low_depth": "depth is low ({depth} reads) — the call is unreliable",
     "array.not_on_chip": "this position is not on the {vendor} array at all — it was never interrogated, so nothing about it has been ruled in or out",
     "array.no_call": "the array carries this position but the call failed — no genotype, and that is not the same as no variant",
@@ -1443,6 +1467,13 @@ will go through them later.
     "clinvar.tier.uncertain.hint": "the experts did not agree — as a rule, not a risk",
 
     # ── instrumental studies and doctors' conclusions ─────────────────
+    "studies.reason_several_documents_in_one_file": "several studies in one file: {n} — this loader cannot split them yet, and none of them reached the profile",
+    "studies.reason_part_not_read": "read in pieces: {kept} taken, and this many gave up no conclusion: {n} — they are named below",
+    "studies.part_before_the_first_heading": "the part before the first heading",
+    "studies.reason_no_text": "the PDF gave up no text at all — a scan without OCR",
+    "studies.reason_looks_like_a_lab_form": "a laboratory form: the numbers are taken by `ingest-labs`, not here",
+    "studies.reason_conclusion_not_extracted": "reads like a study, but no conclusion could be lifted out of it",
+    "studies.reason_unclassified": "neither a conclusion nor a laboratory form by any sign this loader knows",
     "studies.kind_default": "a study",
     "studies.from_conclusion": "from the conclusion",
     "studies.no_pdf_reader": "No PDF reader was found: pip3 install pdfplumber",

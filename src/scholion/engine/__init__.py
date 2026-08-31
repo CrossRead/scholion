@@ -34,6 +34,8 @@ from .labs import (  # noqa: F401 -- the facade re-exports every name
     AUTHOR_SETTINGS,
     _near_limit,
     _trend,
+    change_floor,
+    CHANGE_MIN_PAIRS,
     analyze_labs,
     same_day_repeats,
     _latest_value,

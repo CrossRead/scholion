@@ -48,6 +48,132 @@ _AREA = re.compile(r"Область\s+исследовани[яй]\s*:?\s*([^\n]
 _DOCTOR = re.compile(r"Врач[^:\n]*:?\s*([А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?)")
 _REC = re.compile(r"РЕКОМЕНДОВАНО[:\s]*(.{0,400}?)(?:ПОДПИСИ|Врач|$)", re.I | re.S)
 _TAIL = re.compile(r"(?:ПОДПИСИ|Данное заключение не является диагнозом).*$", re.I | re.S)
+#: The text of the conclusion itself. Two things this had wrong, and both were
+#: silent: the recogniser above accepts «Заключение врача» case-insensitively while
+#: this pattern demanded the word in CAPITALS, so a document writing it in mixed
+#: case was accepted as a study and then yielded an empty body; and the word had to
+#: be followed by a newline, so «Заключение: синусовый ритм» — the text on the SAME
+#: line, which is how a discharge summary writes it — matched nothing.
+#:
+#: Anchored to the start of a line on purpose. Unanchored and case-insensitive, it
+#: would also match the printed disclaimer «Данное заключение не является
+#: диагнозом» and lift the small print out as the finding.
+_BODY = re.compile(r"^[ \t]*ЗАКЛЮЧЕНИЕ(?:\s+врача)?[ \t]*:?[ \t]*\n?(.+)",
+                   re.S | re.I | re.M)
+
+#: Why a file yielded no record. Every file that produced nothing lands in exactly
+#: one of these, and the result names it — because the counts alone are what let a
+#: ten-page discharge summary pass in silence for six years. `ingest_labs` learned
+#: this first (see `ingest_labs_report`); this loader is where the lesson was not
+#: applied.
+#:
+#: The four are not equal. A lab form here is EXPECTED — the other loader owns it,
+#: and saying so is bookkeeping, not an alarm. The last two are the alarming ones:
+#: a file that reads like a study but gave up no conclusion, and a file this loader
+#: cannot place at all.
+REASON_SEVERAL = "several_documents_in_one_file"
+#: A file that WAS split, where some pieces still gave up nothing.
+REASON_PART_NOT_READ = "part_of_a_split_file_not_read"
+REASON_NO_TEXT = "no_text"
+REASON_LAB_FORM = "looks_like_a_lab_form"
+REASON_NOT_EXTRACTED = "conclusion_not_extracted"
+REASON_UNCLASSIFIED = "unclassified"
+
+#: The two that mean something was probably lost, as opposed to handed on.
+ALARMING = (REASON_SEVERAL, REASON_PART_NOT_READ, REASON_NO_TEXT, REASON_NOT_EXTRACTED, REASON_UNCLASSIFIED)
+
+
+#: A section heading inside a multi-document file: a title, then the date of THAT
+#: section, alone on the line. Structural on purpose — a list of study names typed
+#: here would be a vocabulary out of memory, and it would go stale the first time a
+#: clinic renamed a section. What is recognised is the SHAPE «title + date + end of
+#: line», and a title ending in a colon is excluded because that is a field label
+#: («Дата рождения: 01.01.1970»), not a heading.
+_SECTION = re.compile(r"^[ \t]*([А-ЯЁ][^\n:]{3,70}?)[ \t]+"
+                      r"(\d{2})[.\-/](\d{2})[.\-/](\d{4})[ \t]*$", re.M)
+
+
+def sections_in(text: str) -> List[Dict[str, str]]:
+    """The study sections of a multi-document file: «what» and «when», in order.
+
+    Two or more of these mean one PDF is carrying several studies. This loader
+    cannot split such a file yet — but a file it cannot split must SAY SO, with the
+    count, instead of being handed to the laboratory loader as somebody else's
+    problem. That handoff is how a ten-page discharge summary fell between the two
+    loaders and stayed out of the profile for six years.
+    """
+    out: List[Dict[str, str]] = []
+    for m in _SECTION.finditer(text or ""):
+        out.append({"what": _clean(m.group(1)),
+                    "date": f"{m.group(4)}-{m.group(3)}-{m.group(2)}"})
+    return out
+
+
+def split_documents(text: str) -> List[Dict[str, str]]:
+    """One PDF holding several studies → one slice per study, in order.
+
+    A section runs from its heading to the next heading; the tail runs to the end
+    of the file. Measured on a real ten-page discharge summary: fifteen headings,
+    of which four are laboratory panels the other loader owns, one is the clinic's
+    own letterhead line, and ten are studies each followed by its conclusion.
+
+    Nothing here decides which slice is a study — the ordinary parser does, on
+    each slice in turn. A slice it cannot make a study of is reported as such, and
+    that is how the letterhead sorts itself out: no vocabulary of clinic names is
+    kept, because a vocabulary of names is the thing that goes stale the first
+    time a clinic renames itself.
+
+    An empty list means this is not a multi-document file, and the caller reads it
+    whole as before.
+    """
+    hits = list(_SECTION.finditer(text or ""))
+    if len(hits) < 2:
+        return []
+    out: List[Dict[str, str]] = []
+    for i, m in enumerate(hits):
+        end = hits[i + 1].start() if i + 1 < len(hits) else len(text)
+        out.append({"what": _clean(m.group(1)),
+                    "date": f"{m.group(4)}-{m.group(3)}-{m.group(2)}",
+                    "text": text[m.start():end]})
+    # The prologue: whatever stood before the first heading. Kept so that nothing
+    # of the file is unaccounted for — the accounting invariant this loader now
+    # keeps is about files, and a file read in pieces owes the same of its pieces.
+    if hits[0].start() > 0:
+        head = text[:hits[0].start()]
+        if head.strip():
+            out.insert(0, {"what": "", "date": "", "text": head})
+    return out
+
+
+def decline_reason(text: str, study: Optional[Dict[str, Any]]) -> Optional[str]:
+    """Why this file produced no study — or ``None`` when it produced one.
+
+    Kept apart from `parse_study` on purpose: the parser answers «what is in this
+    file», and this answers «what happened to it». A parser that returns ``None``
+    for four different situations cannot be reported on, and an unreportable
+    refusal is the same as no refusal at all.
+    """
+    if not (text or "").strip():
+        return REASON_NO_TEXT
+    if len(sections_in(text)) >= 2:
+        # BEFORE the conclusion is accepted, and this order was the whole lesson
+        # of the real file. Its first section carries a conclusion of its own, so
+        # the parser lifted THAT one, the file passed as a single study, and the
+        # other nine went into the profile as a fragment of one record's text.
+        # A file that holds ten studies is not one study with a long conclusion,
+        # however well the first one parses.
+        # Checked BEFORE the laboratory handoff: a file carrying both a lab panel
+        # and several studies would otherwise be declared somebody else's, and the
+        # other loader drops it for a reason of its own. Neither report would then
+        # hold a line about it.
+        return REASON_SEVERAL
+    if study and study.get("conclusion"):
+        return None
+    if _LAB.search(text) and not _KIND.search(text):
+        return REASON_LAB_FORM
+    if _CONCL.search(text) or _KIND.search(text):
+        return REASON_NOT_EXTRACTED
+    return REASON_UNCLASSIFIED
 
 
 def _manifest_file() -> Path:
@@ -107,7 +233,7 @@ def parse_study(text: str, source: str = "") -> Optional[Dict[str, Any]]:
     elif kind:
         kind = f"{kind} — {_clean(area.group(1))}"
     body = ""
-    mm = re.search(r"ЗАКЛЮЧЕНИЕ[^\n]*\n(.+)", text, re.S)
+    mm = _BODY.search(text)
     if mm:
         body = _clean(_TAIL.sub("", mm.group(1)))[:1200]
     rec = _REC.search(text)
@@ -158,6 +284,7 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
     manifest = _load_manifest()
     files = sorted(root.rglob("*.pdf"))
     added, updated, skipped = [], [], 0
+    missed: List[Dict[str, Any]] = []
     for f in files:
         key = str(f)
         mtime = f.stat().st_mtime
@@ -167,8 +294,59 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         text = _read_pdf(f) or ""
         st = parse_study(text, source=f.name)
         manifest[key] = mtime
-        if not st or not st.get("conclusion"):
-            continue                      # an empty conclusion means a form, not a report
+        # ── a file that holds several studies is read as several ─────────────
+        if decline_reason(text, st) == REASON_SEVERAL:
+            kept, lost = 0, []
+            for n, part in enumerate(split_documents(text)):
+                sub = parse_study(part["text"], source=f.name)
+                if not sub or not sub.get("conclusion"):
+                    lost.append(part["what"] or _t("studies.part_before_the_first_heading"))
+                    continue
+                # The section heading is the better name and the better date: the
+                # parser reads what a single form looks like, and inside a summary
+                # the heading is what says which study this is and when.
+                sub["kind"] = part["what"] or sub.get("kind")
+                sub["date"] = part["date"] or sub.get("date")
+                sub["part_of"] = f.name
+                sid = f"{_sid(f, sub['date'])}_{n:02d}"
+                sub["id"] = sid
+                prev = by_id.get(sid)
+                if prev:
+                    for keep in ("answers", "does_not_answer", "note"):
+                        if prev.get(keep):
+                            sub[keep] = prev[keep]
+                    if prev.get("open"):
+                        sub["open"] = prev["open"]
+                    by_id[sid] = sub
+                    updated.append(sid)
+                else:
+                    by_id[sid] = sub
+                    added.append(sid)
+                kept += 1
+            if kept:
+                # Named even when it worked: a file read in pieces owes the same
+                # accounting as one read whole, and the pieces nothing came of are
+                # the ones a person would want to look at by hand.
+                if lost:
+                    missed.append({"file": f.name, "reason": REASON_PART_NOT_READ,
+                                   "detail": _t("studies.reason_part_not_read",
+                                                n=len(lost), kept=kept),
+                                   "parts": lost})
+                continue
+
+        reason = decline_reason(text, st)
+        if reason:
+            # Named, not dropped. Which file, and what happened to it — so that a
+            # document nobody parsed is a line in the report rather than an absence.
+            item = {"file": f.name, "reason": reason,
+                    "detail": _t("studies.reason_" + reason)}
+            if reason == REASON_SEVERAL:
+                found = sections_in(text)
+                item["sections"] = found
+                item["detail"] = _t("studies.reason_several_documents_in_one_file",
+                                    n=len(found))
+            missed.append(item)
+            continue
         sid = _sid(f, st["date"])
         st["id"] = sid
         if sid in by_id:
@@ -192,4 +370,8 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
     return {"ok": True, "files_seen": len(files), "skipped_unchanged": skipped,
             "added": len(added), "updated": len(updated), "total": len(data["studies"]),
             "new_ids": added[:20],
+            # Every file seen is accounted for: taken, unchanged, or named below.
+            # The invariant is asserted by a test, not trusted to this line.
+            "not_ingested": missed,
+            "alarming": sum(1 for m in missed if m["reason"] in ALARMING),
             "hint": _t("studies.hint") if added else ""}

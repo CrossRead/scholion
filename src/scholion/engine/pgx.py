@@ -71,6 +71,18 @@ _PHENO_CODE = {
 }
 
 
+#: Which star-allele callers this project runs over reads. A diplotype whose
+#: source is one of these was computed from the person's own alignments; anything
+#: else arrived some other way — most usefully, a laboratory pharmacogenetic
+#: report, which is the only route open to somebody who has no BAM.
+_FROM_READS = ("pgx_star_alleles.tsv", "pypgx", "pharmcat")
+
+
+def _from_reads(called: Dict[str, Any]) -> bool:
+    src = str(called.get("source") or "").lower()
+    return any(k in src for k in _FROM_READS)
+
+
 def _called_diplotype(gene: str):
     """The PyPGx/PharmCAT star-allele call for a gene, if the profile has one.
 
@@ -117,9 +129,18 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
                            "phenotype_text": called["phenotype"]}],
                 "certainty": "called", "diplotype": called["diplotype"],
                 "basis": {"model": [], "found": [], "missing": [],
-                          "source": called.get("source"), "called": True},
-                "basis_note": _t("phenotype.from_called_diplotype",
-                                 diplotype=called["diplotype"])}
+                          "source": called.get("source"), "called": True,
+                          "from_reads": _from_reads(called)},
+                # The sentence follows the provenance instead of asserting it. It
+                # used to say «PyPGx/PharmCAT — copy number and phase resolved»
+                # about ANY diplotype in the profile, including one typed in from
+                # a laboratory report: a claim about the method, made from a
+                # default rather than read. Both are good evidence, and they are
+                # not the same evidence.
+                "basis_note": _t("phenotype.from_called_diplotype"
+                                 if _from_reads(called) else "phenotype.from_reported_diplotype",
+                                 diplotype=called["diplotype"],
+                                 source=called.get("source") or _t("phenotype.source_unnamed"))}
 
     if gene in core.genome_gaps():
         basis = _basis(gene, gdef, [])
@@ -500,6 +521,27 @@ def _assess_gene(gene: str) -> Dict[str, Any]:
             gt = core.genotype_at(rs)
             if gt and not any(m.get("rsid") == rs for m in markers):
                 markers.append({"rsid": rs, "genotype": gt, "interpretation": ""})
+    # ── a gene a VCF does not answer, however complete the VCF is ────────────
+    # `track2_targets[gene].needs_full_diplotype` has said since the catalogue was
+    # written that CYP2D6 takes copy number and phase and that «a single SNP is not
+    # enough». Nothing read it. So the answer for the gene that decides codeine,
+    # tramadol, tamoxifen and the tricyclics was a bare tag-SNP genotype beside the
+    # word «important», and the promise that a full genome would bring the rest —
+    # which for THIS gene is not true. A fact computed, written down and read by
+    # nobody is indistinguishable, from outside, from a fact nobody established.
+    target = (kb.get("track2_targets") or {}).get(gene) or {}
+    if target.get("needs_full_diplotype"):
+        # `cpic_kb()` already resolved the curated note to the reader's language.
+        note = target.get("note") or _t("gene.needs_diplotype")
+        return {"gene": gene, "computable": False,
+                "phenotype": "needs_diplotype",
+                "needs_full_diplotype": True,
+                "label": note,
+                # The tag SNPs stay visible — they are real readings — but under a
+                # name that says what they are, so that «rs3892097 A/A» beside a
+                # drug cannot be read as the diplotype it is not.
+                "tag_markers": markers, "markers": [],
+                "closes": _t("gene.diplotype_closes")}
     note = _t("gene.covered_by_vcf" if ready else "gene.vcf_pending")
     return {"gene": gene, "computable": False,
             "phenotype": "reported" if markers else "pending",

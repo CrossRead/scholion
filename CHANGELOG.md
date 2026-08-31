@@ -40,6 +40,136 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.8 — 31.08.2026
+
+### What you can do now
+
+**`ingest-studies` names every file it took nothing from.** The report used to be
+four counts, and the number of files seen was never reconciled against them: a
+file that was read and then dropped moved no counter at all. Each such file is
+now listed with the reason it produced nothing — the PDF gave up no text, it is a
+laboratory form that the other loader owns, it reads like a study but no
+conclusion could be lifted out of it, or this loader cannot place it at all. The
+counts and the named files add up to the files that were looked at.
+
+**A PDF holding several studies is reported with what is inside it.** A discharge
+summary — several examinations, and often a laboratory panel, in one file — is
+listed section by section with each section's own date, together with the plain
+statement that this loader cannot split such a file yet and that nothing from it
+reached the profile. Until now such a file was declared a laboratory form and
+handed to the laboratory loader, which dropped it for a reason of its own, and
+neither report held a line about it.
+
+**A decision you made about a wearable series survives the next import.** A
+rebuild is written from the export every time, so an edit made inside
+`wearable_trends.json` was lost at the next run — a weight point removed by hand
+as physically impossible came back as soon as a fresh export was read. Put the
+decision in `profile/wearable_corrections.local.json` instead: `remove` or
+`replace` a month of one metric of one device, with a reason. The import applies
+them over the rebuilt series and says which it applied, which it refused and why,
+and which no longer match anything — a reason is required, and a correction
+without one is refused rather than applied. `LOADING-DATA.md` describes the file.
+
+**A monthly point from a wearable now says what it stands on, and a movement too
+small to see is no longer given a direction.** Each month carries the number of
+days that held a reading, the days the month had, the median beside the mean and
+the spread. From those the lifestyle answer works out the smallest difference the
+data can tell from its own sampling, and when a shift is smaller than that it says
+so instead of naming a direction — for a monthly sleep series measured on a
+typical month that threshold is on the order of several minutes, and movements
+under it were previously reported as improvement or decline. A month measured on
+part of itself — nineteen nights of thirty-one — says that too. A series written
+by an earlier version carries no sample description and behaves exactly as before:
+nothing is invented for it.
+
+**A laboratory arrow says whether the change can be told from the marker's own
+scatter.** «↑ 44 % since the previous measurement» is arithmetic on two numbers
+and it stays; what follows it now is whether this marker's own history has ever
+shown itself able to tell a change that size from its own wobble. The threshold
+is measured from that history — no outside table is required and no coefficient
+is assumed — and it is reported with it, so it can be argued with. A rule that
+suggests a test because a marker is trending no longer fires on a movement the
+series cannot distinguish: a suggested test costs a real draw of blood. Where
+the history is too short to support the statement, none is made.
+
+**A genotype read from a VCF says how well the reads actually supported it.**
+Depth said how many reads there were; nothing said how they were divided. A
+heterozygote whose reads split 15/85 — a mosaic, a duplicated region, an
+artefact — was presented in the same words as one that split evenly. The allele
+fraction and the caller's own quality score are now read, and everything worth
+confirming about a call arrives as one list with the measurement that raised each
+entry, instead of three separate flags a reader had to know to look for. These
+are quality-control heuristics and they say «have this confirmed by another
+method», never «this is wrong».
+
+**A gene a variant file cannot answer now says so, instead of showing a tag
+SNP.** CYP2D6 decides codeine, tramadol, tamoxifen and the tricyclics, and it is
+settled by the full diplotype — copy number and phase — not by any single
+position. Asked about codeine, the answer used to print the gene, the word
+«important», a bare genotype and the promise that a full genome would bring the
+rest, which for this gene is not true. It now states that a diplotype is what
+decides it, shows the tag SNPs under a name that says what they are, and names
+the two things that actually close the gap: a star-allele call over your reads,
+or a laboratory report that states the diplotype — the only route open to
+somebody who has no alignment file. A diplotype already on file is used as
+before, and the sentence beside it now follows where it came from instead of
+asserting the caller's name over both cases.
+
+**The genes a «nothing found» cannot rest on can be handed to a laboratory.**
+The coverage table knew which genes were under-read and could give the list to
+nobody: a percentage names a gene, and re-reading something needs coordinates.
+The intervals the measurement was made over are now recorded and the weak list
+exports as a BED, worst gene first, each interval carrying its own percentage.
+The track line states that these are gene loci with a margin rather than coding
+sequence — a small dropout inside an exon barely moves a locus-wide percentage,
+so the file is a worklist of genes to look at again, not a map of the bases that
+were missed. A coverage table written before the coordinates existed is refused
+with the run that would fill them in: a gene name is not an interval and none is
+invented from it.
+
+### What is fixed
+
+**A conclusion written in mixed case produced an empty record, and an empty
+record was dropped without a word.** The recogniser accepts the heading whatever
+its case; the extractor beneath it demanded the word in capital letters and
+required the text to begin on the following line. A document that writes the
+heading in ordinary case, with the text after a colon on the same line, was
+therefore accepted as a study and then yielded nothing at all. Both shapes are
+read now, and the printed disclaimer that contains the same word is not mistaken
+for the finding.
+
+**A laboratory point is dated in one of three shapes, and anything else is
+refused.** A month, a day, or a day with the clock time of the draw — the last
+one because two draws can fall on one day and a key no finer than the day loses
+the second. Nothing checked the string before: a value that was not a date at all
+would have become a key of the series and been sorted and charted beside real
+dates. And when the same period is already present at another resolution — a
+month point and a dated point of that month, one measurement standing twice — the
+import now says so rather than quietly holding both.
+
+**A doubled measurement was found and then not mentioned, for anyone whose
+results arrive as a table.** The importer notices when one measurement ends up in
+a series twice at two resolutions — a month point and a dated point of that
+month. It said so for results read out of a PDF and stayed silent for results
+read out of a CSV or TSV export, because the two kinds of file reach the profile
+by different routes and only one of them carried the report. The doubling was
+detected in both cases and shown in one. Both now say it.
+
+### What needs recomputing
+
+**Run `scholion ingest-studies --force` over your folder of documents once.**
+Studies that were dropped in silence may now be read, and whatever is still not
+taken will be named in the report.
+
+**Measure coverage once more** if you want the BED of under-read genes: the
+measurement now records the intervals its percentages were taken over, and a
+table produced before it did does not carry them.
+
+**Run `scholion ingest-garmin` once.** Existing months gain the description of
+their sample; the values themselves do not change, so charts and comparisons are
+unaffected. Until an import has run, a series simply has no sample description
+and no statement about what is distinguishable is made for it.
+
 ## v0.4.7 — 27.08.2026
 
 ### What you can do now

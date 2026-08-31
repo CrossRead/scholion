@@ -81,7 +81,34 @@ def lifestyle() -> Dict[str, Any]:
     blocks = wearables.series(data)
     shared = wearables.shared_metrics(data)
     primary = core.wearable_primary()
-    def _life_metric(key, info, sd, since=None):
+    def _smoothing_error(months, stats, k=3):
+        """The standard error of a k-month smoothed point, or ``None``.
+
+        A monthly mean is not the month: it is an average of the days that
+        happened to carry a reading, and it wobbles by `sd/√n` for reasons that
+        have nothing to do with the person. A smoothed point averages up to three
+        such means, so its error is `√(Σ sd²/n) / k`.
+
+        ``None`` when the sample is not described — an older file, another device's
+        reader, a month with a single reading. Nothing is guessed in its place:
+        without the spread there is no honest statement about what is
+        distinguishable, and silence is the correct answer.
+        """
+        if not stats:
+            return None
+        acc, seen = 0.0, 0
+        for mth in months:
+            st = stats.get(mth) or {}
+            n, sdv = st.get("n"), st.get("sd")
+            if not isinstance(n, int) or n < 1 or not isinstance(sdv, (int, float)):
+                return None
+            acc += (float(sdv) ** 2) / n
+            seen += 1
+        if not seen:
+            return None
+        return (acc ** 0.5) / seen
+
+    def _life_metric(key, info, sd, since=None, stats=None):
         """A metric from a monthly series {YYYY-MM: value}: 3-month smoothing, trend, status.
 
         `since` is the month from which the series is COMPARABLE WITH ITSELF. A change of
@@ -104,15 +131,36 @@ def lifestyle() -> Dict[str, Any]:
         latest_sm, first_sm = smooth[-1]["value"], smooth[0]["value"]
         rec = None
         if len(smooth) >= 2:
-            a, b = smooth[max(0, len(smooth) - 4)], smooth[-1]
+            ia, ib = max(0, len(smooth) - 4), len(smooth) - 1
+            a, b = smooth[ia], smooth[ib]
             dv = round(b["value"] - a["value"], 2)
             rec = {"from": a["date"], "to": b["date"], "delta": dv,
                    "direction": "up" if dv > 0 else ("down" if dv < 0 else "flat")}
+            # How big a difference this data can tell from its own sampling. The
+            # months each smoothed point actually averaged are the ones that go
+            # into it — not «three», because the start of a series has fewer.
+            months_a = [p["date"] for p in pts[max(0, ia - 2):ia + 1]]
+            months_b = [p["date"] for p in pts[max(0, ib - 2):ib + 1]]
+            sea = _smoothing_error(months_a, stats)
+            seb = _smoothing_error(months_b, stats)
+            if sea is not None and seb is not None:
+                # 1.96 — the ordinary two-sided 95%. Measured against this
+                # project's own twelve months of deep sleep it lands at ~10.8 min
+                # month-to-month and ~7.6 for two months against two, which is
+                # what the hand calculation that raised this task produced.
+                mdd = round(1.96 * ((sea ** 2 + seb ** 2) ** 0.5), 2)
+                rec["mdd"] = mdd
+                rec["distinguishable"] = abs(dv) >= mdd
         st, score = _wear_status(latest_sm, info)
         d = info.get("direction")
         improving = (latest_sm > first_sm) if d == "higher_better" else ((latest_sm < first_sm) if d == "lower_better" else None)
         trend_good = None
-        if rec and rec["direction"] != "flat" and d in ("higher_better", "lower_better"):
+        if (rec and rec["direction"] != "flat" and d in ("higher_better", "lower_better")
+                and rec.get("distinguishable") is not False):
+            # A movement smaller than what this data can distinguish gets no
+            # verdict at all. Saying «improving» about 1.1 min of deep sleep, when
+            # 10.8 is the smallest difference the sample can show, is the whole
+            # defect: the arrow was drawn from the noise and read as the person.
             up = rec["direction"] == "up"
             trend_good = up if d == "higher_better" else (not up)
         return {"key": key, "label": info.get("label", key), "unit": info.get("unit", ""),
@@ -136,7 +184,13 @@ def lifestyle() -> Dict[str, Any]:
             sd = (block.get("metrics") or {}).get(key)
             if not (isinstance(sd, dict) and sd):
                 continue
-            m = _life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key))
+            stats = (block.get("stats") or {}).get(key)
+            m = _life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key), stats)
+            # What the latest point stands on, where the reader will look for it:
+            # a month computed from nineteen nights of thirty-one is not the month.
+            last_st = (stats or {}).get(m["date"]) if stats else None
+            if last_st:
+                m["coverage"] = {"n": last_st.get("n"), "days": last_st.get("days")}
             m["source"] = src
             others = [s for s in shared.get(key, []) if s != src]
             m["also_measured_by"] = others

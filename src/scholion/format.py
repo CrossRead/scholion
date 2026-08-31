@@ -178,6 +178,13 @@ def labs_report(r: Dict[str, Any]) -> str:
             pct = f" {t['pct']:+g}%" if t.get("pct") is not None else ""
             line += (" · " + _t("common.trend", arrow=arrow, pct=pct)
                      + f" ({t['from_date']}→{t['to_date']})")
+            # The arrow is arithmetic and stays. What follows it is whether this
+            # series has ever shown itself able to tell a change that size from
+            # its own scatter — without which an arrow is read as a finding.
+            if t.get("distinguishable") is False:
+                line += " · " + _t("labs.below_own_scatter",
+                                   pct=t["change_floor"]["rcv_pct"],
+                                   pairs=t["change_floor"]["pairs"])
         if m.get("genome_link"):
             line += " · " + _t("labs.genome_link", text=m["genome_link"])
         line += _near_suffix(m) + _decision_suffix(m)
@@ -431,6 +438,18 @@ def prescription_check(r: Dict[str, Any]) -> str:
                 lines.append(f"- **{ge['gene']}** ({lvl}{tag}): "
                              + _t("prescription.gene_phenotype", phenotype=ge.get("phenotype"),
                                   label=ge.get("label", "")))
+            elif ge.get("needs_full_diplotype"):
+                # The tag SNPs are real readings and stay visible — under a name
+                # that says what they are. Printed as the gene's variants, beside
+                # the word «important», «rs3892097 A/A» is read as the answer, and
+                # for this gene a tag SNP cannot be one.
+                lines.append(f"- **{ge['gene']}** ({lvl}{tag}): {ge.get('label','')}")
+                tm = ", ".join(f"`{m.get('rsid')}` {m.get('genotype','')}"
+                               for m in ge.get("tag_markers", []))
+                if tm:
+                    lines.append("    · " + _t("prescription.tag_snps_only", list=tm))
+                if ge.get("closes"):
+                    lines.append("    · " + ge["closes"])
             else:
                 mk = ", ".join(f"`{m.get('rsid')}` {m.get('genotype','')}" for m in ge.get("markers", []))
                 pre = _t("prescription.variants", list=mk) + "; " if mk else ""
@@ -582,6 +601,10 @@ def metrics_report(r: Dict[str, Any]) -> str:
             arrow = {"up": "↑", "down": "↓", "flat": "→"}[t["direction"]]
             pct = f" {t['pct']:+g}%" if t.get("pct") is not None else ""
             tr = " · " + _t("common.trend", arrow=arrow, pct=pct)
+            if t.get("distinguishable") is False:
+                tr += " · " + _t("labs.below_own_scatter",
+                                 pct=t["change_floor"]["rcv_pct"],
+                                 pairs=t["change_floor"]["pairs"])
         lines.append(f"{icon} {m['name']}: **{m['value']} {m.get('unit','')}**".rstrip() +
                      f" ({m.get('date','')}){tr}")
     lines.append(f"\n_{r.get('disclaimer','')}_")
@@ -735,8 +758,20 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
         # "there was no data before then", while there is data, it is not comparable.
         brk = (" · " + _t("lifestyle.comparable_from", date=m["comparable_from"])
                if m.get("comparable_from") else "")
+        # What the latest month stands on. A month averaged over nineteen nights of
+        # thirty-one is not the month, and the number alone cannot say so.
+        cov = m.get("coverage") or {}
+        cvr = (" · " + _t("lifestyle.coverage", n=cov["n"], days=cov["days"])
+               if cov.get("n") and cov.get("days") and cov["n"] < cov["days"] else "")
         lines.append(f"{icon.get(m.get('status'),'•')} {m['label']}: **{_n(m['value'])} {m['unit']}**".rstrip()
-                     + f" ({m['date']}){tr}{improv}{brk}")
+                     + f" ({m['date']}){tr}{improv}{brk}{cvr}")
+        # A movement the sample cannot tell from its own noise says so, with the
+        # size of the difference that WOULD be visible. Printed under the metric
+        # rather than folded into the arrow: it is the reason there is no arrow.
+        if t and t.get("distinguishable") is False:
+            lines.append("    " + _t("lifestyle.not_distinguishable",
+                                     delta=_n(abs(t["delta"])), mdd=_n(t["mdd"]),
+                                     unit=m.get("unit", "")).rstrip())
     wk = r.get("workouts", [])
     if wk:
         top = ", ".join(f"{x['type']} ({x['total']})" for x in wk[:6])
@@ -1788,6 +1823,16 @@ def wearable_ingest_report(r: Dict[str, Any]) -> str:
                         columns=", ".join(r["unrecognised_columns"])))
     if r.get("shared_metrics"):
         lines.append(_t("wearables.shared", metrics=", ".join(r["shared_metrics"])))
+    # A hand-made decision about this series answers for itself out loud: what was
+    # applied, what no longer matches anything, and what was not accepted and why.
+    # A corrections file that quietly stops matching is one nobody can trust.
+    for key, line in (("corrections_applied", "wearables.correction_applied"),
+                      ("corrections_stale", "wearables.correction_stale"),
+                      ("corrections_refused", "wearables.correction_refused")):
+        for c in (r.get(key) or [])[:10]:
+            lines.append(_t(line, metric=c.get("metric"), month=c.get("month"),
+                            action=c.get("action"), why=c.get("why") or "",
+                            refused=c.get("refused") or ""))
     if r.get("backup"):
         lines.append(_t("ingest.garmin_backup", path=r["backup"]).strip())
     return "\n".join(lines) + "\n"
@@ -1840,8 +1885,49 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
     for rep in (r.get("repeats") or [])[:10]:
         L.append(_t("ingest.repeat", marker=rep["marker"], day=rep["day"],
                     first=rep["first"]["value"], second=rep["second"]["value"]))
+    for mix in (r.get("resolution_mixed") or [])[:10]:
+        L.append(_t("store.resolution_mixed", marker=mix["marker"],
+                    dates=", ".join(mix["others"])))
     return "\n".join(L) + "\n"
 
+
+def ingest_studies_report(r: Dict[str, Any]) -> str:
+    """What was taken, and — by name — every file that gave up nothing.
+
+    The counts used to be the whole report, and `files_seen` was never reconciled
+    against them: a file read and dropped touched no counter, so a ten-page
+    discharge summary carrying four diagnoses could pass through the loader
+    without leaving a trace anywhere. `ingest_labs` had already been taught this;
+    this is the same report for the loader that had not.
+
+    The two lines that head the list are `ingest_labs`'s own: one wording for
+    one meaning, so the two loaders answer «what did you not take» in the same
+    words. A second copy of the same sentence is a second thing to keep in step.
+
+    A laboratory form here is not a complaint — the other loader owns it, and it
+    is listed apart so the two files that DID go missing are not buried under
+    forty that went where they belong.
+    """
+    if not r.get("ok"):
+        return f"⚠️ {r.get('error', '')}"
+    L = [_t("ingest.studies_done", total=r.get("total"), added=r.get("added"),
+            updated=r.get("updated"), seen=r.get("files_seen"), hint=r.get("hint", ""))]
+    missed = r.get("not_ingested") or []
+    if missed:
+        L += ["", _t("ingest.not_ingested_header", n=len(missed))]
+        # The alarming ones first: a reader who stops after three lines should
+        # have read the ones that mean something was lost.
+        order = {"conclusion_not_extracted": 0, "unclassified": 1, "no_text": 2,
+                 "looks_like_a_lab_form": 3}
+        for it in sorted(missed, key=lambda m: order.get(m.get("reason"), 9))[:20]:
+            L.append(f"- `{it['file']}` — {it.get('detail', it.get('reason', ''))}")
+            # What was inside a file that could not be split is the actionable part:
+            # a count says something was lost, these say WHAT was lost.
+            for sec in (it.get("sections") or [])[:8]:
+                L.append(f"    · {sec['what']} — {sec['date']}")
+        if len(missed) > 20:
+            L.append(_t("ingest.not_ingested_more", n=len(missed) - 20))
+    return "\n".join(L) + "\n"
 
 def markers_local_report(r: Dict[str, Any]) -> str:
     """Locally added dictionary entries and what may be claimed on each."""

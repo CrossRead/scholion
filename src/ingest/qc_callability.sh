@@ -192,11 +192,22 @@ if summary.exists():
 # the chromosome is needed so as not to raise an alarm on chrX in a male: there is
 # one copy there, i.e. half the depth — that is expected biology, not a coverage gap
 chrom_of = {}
+span_of = {}
 if bedfile.exists():
     for line in bedfile.read_text(encoding="utf-8").splitlines():
         f = line.split("\t")
         if len(f) >= 4:
-            chrom_of[f[3].partition("|")[0]] = f[0]
+            g = f[3].partition("|")[0]
+            chrom_of[g] = f[0]
+            # The interval each percentage was measured over. It was already in
+            # hand here and thrown away one line later, so the engine knew WHICH
+            # genes were under-read and could hand the list to nobody: a
+            # laboratory asked to re-read something needs coordinates, and a gene
+            # name is not one.
+            try:
+                span_of[g] = (int(f[1]), int(f[2]))
+            except (ValueError, IndexError):
+                pass
 
 rows = []
 for i, line in enumerate(depth.read_text(encoding="utf-8").splitlines()):
@@ -214,6 +225,7 @@ for i, line in enumerate(depth.read_text(encoding="utf-8").splitlines()):
         # a comma as the decimal separator — a legacy of runs made before LC_ALL=C;
         # both forms are read so that the depth does not have to be recomputed
         "gene": gene, "tag": tag or "?", "len": ln, "chrom": chrom,
+        "start": span_of.get(gene, ("", ""))[0], "end": span_of.get(gene, ("", ""))[1],
         "hemi": chrom in ("chrX", "chrY"),   # one copy in a male
         "mean": float(f[2].replace(",", ".")),
         "p1": 100.0 * int(f[3]) / ln, "p10": 100.0 * int(f[4]) / ln,
@@ -236,12 +248,18 @@ for r in rows:
 rows.sort(key=lambda r: (r["p10"], r["rel"]))
 out = project / "profile" / "callability.tsv"
 with out.open("w", encoding="utf-8") as fh:
+    # `start` and `end` are appended rather than inserted, so a reader that
+    # indexes by header name keeps working and one that counted columns is not
+    # silently shifted. They are what makes the weak list exportable at all: a
+    # percentage names a gene, and a laboratory asked to re-read something needs
+    # coordinates. Until they were written down the engine had the list and could
+    # hand it to nobody.
     fh.write("gene\tpanel\tchrom\tlength_bp\tmean_depth\trel_to_panel\t"
-             "pct_1x\tpct_10x\tpct_20x\tpct_30x\n")
+             "pct_1x\tpct_10x\tpct_20x\tpct_30x\tstart\tend\n")
     for r in rows:
         fh.write(f"{r['gene']}\t{r['tag']}\t{r['chrom']}\t{r['len']}\t{r['mean']:.1f}\t"
                  f"{r['rel']:.2f}\t{r['p1']:.1f}\t{r['p10']:.1f}\t"
-                 f"{r['p20']:.1f}\t{r['p30']:.1f}\n")
+                 f"{r['p20']:.1f}\t{r['p30']:.1f}\t{r.get('start','')}\t{r.get('end','')}\n")
 
 acmg = [r for r in rows if r["tag"] == "ACMG"]
 if genome_mean is not None:

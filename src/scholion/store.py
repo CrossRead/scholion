@@ -4,8 +4,10 @@ Writes ONLY into profile/ (labs.json, medications.json) — patient data. The co
 knowledge base are left untouched. After a write it resets the core cache.
 """
 from __future__ import annotations
+import datetime as _dt
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -183,6 +185,74 @@ def _subject_gate(subject: Optional[str]) -> tuple:
 #: refusing an ambiguous date is that a point filed under the wrong month joins a
 #: series and moves a trend; having refused the ambiguous ones, it went on to
 #: accept the approximate ones in silence.
+#: The three resolutions a point of a series may carry, and why there are three.
+#:
+#: `YYYY-MM` is a month; `YYYY-MM-DD` is a day; `YYYY-MM-DDTHH:MM` is a draw at a
+#: named time. The third is not sloppiness and must not be «unified away»: blood
+#: drawn before a procedure and again after it is TWO measurements on one day, and
+#: with a key no finer than the day the second one could only be recorded as a
+#: discrepancy with the first. `ingest_labs` keeps the clock time deliberately for
+#: exactly that reason, and `set_draw_context` finds such a pair by looking for
+#: stamps longer than a day.
+#:
+#: What was missing was not a format. It was a GATE: this docstring promised two
+#: resolutions while the loader wrote three, and nothing at all checked the string,
+#: so «вчера», an empty string or `2026-13-45` would have become a key of the
+#: series and been sorted and charted alongside real dates.
+DATE_SHAPES = ("YYYY-MM", "YYYY-MM-DD", "YYYY-MM-DDTHH:MM")
+
+_MONTH_RE = re.compile(r"^\d{4}-\d{2}$")
+_DAY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_STAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$")
+
+
+def date_resolution(date: str) -> Optional[str]:
+    """`month`, `day`, `stamp` — or ``None`` when this is not a date at all.
+
+    The shape is checked AND the value: `2026-13-45` has the shape of a day and is
+    not one. A calendar is the only thing that can answer that, so one is asked.
+    """
+    d = (date or "").strip()
+    try:
+        if _MONTH_RE.match(d):
+            _dt.date(int(d[:4]), int(d[5:7]), 1)
+            return "month"
+        if _DAY_RE.match(d):
+            _dt.date(int(d[:4]), int(d[5:7]), int(d[8:10]))
+            return "day"
+        if _STAMP_RE.match(d):
+            _dt.datetime(int(d[:4]), int(d[5:7]), int(d[8:10]), int(d[11:13]), int(d[14:16]))
+            return "stamp"
+    except ValueError:
+        return None
+    return None
+
+
+def _mixed_resolution(series: List[Dict[str, Any]], date: str) -> List[str]:
+    """Points already in this series that cover the same period at another resolution.
+
+    This is the harm the mixed granularity actually does, and it is not the
+    granularity itself: a month point and a dated point for the same month, or a
+    dated point and a stamped one for the same day, are ONE measurement standing in
+    the series twice. Both may be legitimate — a hand-entered month from years ago
+    and a form loaded today — so this is reported, not refused. What must not
+    happen is that it happens quietly.
+    """
+    res = date_resolution(date)
+    if not res:
+        return []
+    same = []
+    for pt in series or []:
+        other = str(pt.get("date") or "")
+        if other == date or date_resolution(other) == res:
+            continue
+        short = min(len(other), len(date))
+        # A month against a day: compare the month. A day against a stamp: the day.
+        if other[:short] == date[:short] and short >= 7:
+            same.append(other)
+    return sorted(same)
+
+
 DATE_SOURCES = {
     "form":       "the draw date printed on the form itself",
     "ordered":    "a date the form prints for the ORDER or the receipt, not the draw",
@@ -201,7 +271,12 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
                   censored: Optional[str] = None, new: bool = False,
                   date_source: Optional[str] = None,
                   subject: Optional[str] = None) -> Dict[str, Any]:
-    """Add/update a marker point in labs.json (by date YYYY-MM or YYYY-MM-DD).
+    """Add/update a marker point in labs.json.
+
+    The date is one of `DATE_SHAPES` — a month, a day, or a day with the clock
+    time of the draw — and anything else is refused rather than stored as written.
+    This docstring used to promise two of the three while the laboratory loader
+    deliberately wrote the third, and nothing checked the string at all.
 
     censored — the censoring sign of the result, if the lab printed not a number but a
     boundary: "<" for «less than 10^4» / «<0.4 U/mL», ">" for «more than 10^8». The value
@@ -236,6 +311,12 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
                                          accepted=", ".join(sorted(DATE_SOURCES)))}
     if not marker or not date:
         return {"ok": False, "error": _t("store.need_marker_date")}
+    if date_resolution(date) is None:
+        # Refused rather than stored as written. A string that is not a date still
+        # sorts, still charts and still reads as a point — which is worse than a
+        # rejected write, because nothing downstream can tell it from a real one.
+        return {"ok": False, "error": _t("store.date_not_a_date", date=str(date),
+                                         accepted=", ".join(DATE_SHAPES))}
     try:
         value = float(value)
     except (TypeError, ValueError):
@@ -335,6 +416,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             m["direction"] = direction
         markers[marker] = m
     series: List[Dict[str, Any]] = m.setdefault("series", [])
+    mixed = _mixed_resolution(series, date)
     series[:] = [pt for pt in series if pt.get("date") != date]  # replacing the point of the same date
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
@@ -347,6 +429,10 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     _write_json(p, data)
     core.reset_cache()
     out = {"ok": True, "marker": marker, "points": len(series)}
+    if mixed:
+        # Named in the result, so the loader that wrote the point can print it and
+        # the person can decide which of the two is the measurement.
+        out["resolution_mixed"] = mixed
     if claimed:
         out["claimed"] = claimed
     return out

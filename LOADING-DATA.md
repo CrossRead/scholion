@@ -66,6 +66,25 @@ If one of those columns is a measurement you want, name it yourself in `profile/
 ```
 Additions are merged per column, so yours cannot delete what already works.
 
+### A point you decided about yourself
+A rebuild is a machine artefact: it is written from the export every time, so an
+edit made **inside** `wearable_trends.json` is lost at the next import. A weight
+point removed by hand because it was physically impossible between the two months
+around it came back the moment a fresh export was read.
+
+Put the decision beside the file instead, in `profile/wearable_corrections.local.json`:
+```json
+{"corrections": [
+  {"device": "garmin", "metric": "weight_kg", "month": "2024-10",
+   "action": "remove", "why": "impossible between 91.7 and 95.3", "on": "2026-08-22"}
+]}
+```
+`action` is `remove` or `replace` (with `value`), and **`why` is required** — a
+correction without a stated reason is refused and reported, not applied. The
+import says which corrections it applied, which were refused and why, and which
+no longer match anything in the series, so a file of decisions that has quietly
+stopped matching cannot go unnoticed.
+
 ### The file
 `profile/wearable_trends.json` is assembled on its own, one block per device: monthly trends (weight / BMI / fat / muscle / water from a smart scale, VO₂max, heart rate, HRV, respiration, sleep and its stages, recovery, strain, steps, activity) plus workouts by year, and a night-by-night file beside it. Running it again backs up the previous file, and a month the fresh export does not carry survives from the old one — an export that did not download in full cannot erase history. A file written by an earlier version is brought to the per-device layout when it is read; if it does not say which device produced it, it is filed as **`device not recorded`** rather than assigned to one.
 

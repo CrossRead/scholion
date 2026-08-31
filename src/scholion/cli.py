@@ -818,10 +818,7 @@ def _main(argv=None) -> int:
                            lambda r: f"⚠️ {r['error']}")
         else:
             res = ingest_studies.ingest(folder, force=args.force)
-            render = lambda r: (_t("ingest.studies_done", total=r.get('total'),
-                                   added=r.get('added'), updated=r.get('updated'),
-                                   seen=r.get('files_seen'), hint=r.get('hint', ''))
-                                if r.get("ok") else f"⚠️ {r.get('error')}")
+            render = fmt.ingest_studies_report
     elif args.cmd == "ingest-wearable":
         from . import wearables as _wear
         res = _wear.reingest(args.folder, source=getattr(args, "device", None))

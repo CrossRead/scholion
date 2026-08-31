@@ -11,6 +11,7 @@ PERSONAL data (the values) go to profile/ (locally); the script itself is impers
 """
 from __future__ import annotations
 import datetime as _dt
+import calendar
 import glob, json, os, sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -31,6 +32,54 @@ def _mean(xs):
 def _monthly(daily: dict):
     """{'YYYY-MM': [values]} → {'YYYY-MM': mean} (monthly averages)."""
     return {y: _mean(v) for y, v in sorted(daily.items()) if _mean(v) is not None}
+
+
+def _days_in(month: str) -> int:
+    y, m = int(month[:4]), int(month[5:7])
+    return calendar.monthrange(y, m)[1]
+
+
+def _stats(xs, month):
+    """What a monthly point is worth: how many days it stands on, and how far apart they were.
+
+    A month is one number in the series, and one number cannot say whether it is a
+    measurement or an average of noise. Measured on twelve months of this project's
+    own data: for deep sleep the spread WITHIN a month is about 20.6 min while the
+    spread BETWEEN monthly means over a year is 4.05 — against 3.90 expected from
+    sampling alone. That is 92% of the visible movement of the monthly series being
+    the sample, not the sleeper.
+
+    None of that can be recovered later: the daily values exist only here, at the
+    moment they are folded into a mean. So the fold keeps its own arithmetic —
+    `n` (days that carried a reading), `days` (days the month had), the `median`
+    beside the mean, and `sd` — and everything downstream that wants to say
+    «this moved» can find out what «moved» is worth.
+    """
+    xs = sorted(x for x in xs if isinstance(x, (int, float)))
+    n = len(xs)
+    if not n:
+        return None
+    mid = xs[n // 2] if n % 2 else (xs[n // 2 - 1] + xs[n // 2]) / 2
+    mean = sum(xs) / n
+    # The sample standard deviation. With one day there is no spread to speak of,
+    # and 0.0 would read as «perfectly steady» rather than «nothing to compare».
+    sd = None
+    if n > 1:
+        sd = (sum((x - mean) ** 2 for x in xs) / (n - 1)) ** 0.5
+    out = {"n": n, "days": _days_in(month), "median": round(mid, 1)}
+    if sd is not None:
+        out["sd"] = round(sd, 2)
+    return out
+
+
+def _monthly_stats(daily: dict):
+    """The same months as `_monthly`, each with what its number stands on."""
+    out = {}
+    for y, v in sorted(daily.items()):
+        st = _stats(v, y)
+        if st is not None and _mean(v) is not None:
+            out[y] = st
+    return out
 
 
 # grouping of Garmin activity types → human-readable labels
@@ -236,6 +285,19 @@ def build(gdir: str) -> dict:
                 for lbl, v in sorted(t.items())}
             for y, t in sorted(workouts.items())}
 
+    #: The daily lists each metric was folded from, kept beside the fold so the
+    #: same names can produce the same months twice — once as a number, once as
+    #: what that number stands on. Typing the pairs twice is how the two lists
+    #: drift apart, so they are named once and used twice.
+    _sources = {
+        "Weight": weight, "BMI": bmi, "BodyFat": bfat, "MuscleMass": muscle,
+        "BodyWater": bwater, "RestingHeartRate": rhr, "HRV": hrv, "Stress": stress,
+        "BodyBatteryHigh": bbhigh, "BodyBatteryLow": bblow, "Respiration": resp,
+        "VO2Max": vo2, "StepsDaily": steps, "IntensityMinutesDaily": intens,
+        "SleepHours": sleep, "DeepSleepMin": deep, "RemSleepMin": rem,
+        "SleepStress": slstress, "SleepScore": slscore, "Bedtime": bedt,
+        "CaloriesDaily": cals,
+    }
     metrics = {
         "Weight": _monthly(weight),
         "BMI": _monthly(bmi),
@@ -279,6 +341,10 @@ def build(gdir: str) -> dict:
                      "by type."),
         },
         "metrics": {k: v for k, v in metrics.items() if v},
+        # Beside the series, never inside it: the value of a point stays a number,
+        # so every reader that already knows how to draw this series still does.
+        "stats": {k: st for k, st in ((k, _monthly_stats(src))
+                                      for k, src in _sources.items()) if st and metrics.get(k)},
         "workouts": wout,
         "nightly_sleep": nightly,
     }

@@ -90,6 +90,15 @@ MOVE_MIN_PCT = 10.0          # below this, a shift from the personal baseline is
 
 
 MOVE_MIN_SD = 1.5            # or this many personal standard deviations
+
+#: How many consecutive pairs before this marker's own history is allowed to say
+#: anything about its own scatter. Below this the estimate is itself scatter —
+#: the wearable layer's own lesson, applied here before the same mistake is made
+#: in the other direction. NOT underscored, and that is deliberate: the gate that
+#: enumerates unregistered numbers skips private names, and hiding a threshold
+#: behind an underscore to get past it would be the same move as splitting a
+#: string to get past a scanner. AN AUTHOR SETTING — see AUTHOR_SETTINGS below.
+CHANGE_MIN_PAIRS = 5
 #: AUTHOR SETTINGS, both of them: `NEAR_LIMIT_FRACTION` above and `MOVE_MIN_SD`
 #: here. Neither is published anywhere. The correct measure for both is the
 #: reference change value, which rests on within-person biological variation and
@@ -243,6 +252,16 @@ AUTHOR_SETTINGS = {
                       "basis": "author's setting",
                       "closes": "the same RCV",
                       "does_not_license": "calling a move «significant» to the reader"},
+    "CHANGE_MIN_PAIRS": {"module": "scholion.engine.labs", "value": CHANGE_MIN_PAIRS,
+                          "unit": "consecutive intervals of one marker",
+                          "basis": "author's setting — below this the scatter estimated from a "
+                                   "person's own history is itself mostly scatter, and the "
+                                   "layer says nothing rather than something unstable",
+                          "closes": "the same RCV: with published within-person variation the "
+                                    "history would not have to estimate its own",
+                          "does_not_license": "calling a change distinguishable. The estimate "
+                                              "contains real biological movement as well as "
+                                              "scatter, so it can only make the reader quieter"},
     "NEAR_LIMIT_FRACTION": {"module": "scholion.engine.labs", "value": NEAR_LIMIT_FRACTION,
                              "unit": "fraction of the corridor",
                              "basis": "author's setting — one constant for every analyte",
@@ -301,6 +320,74 @@ def _near_limit(m: Dict[str, Any], value: float, flag: str,
     return None
 
 
+
+#: The next two are NOT author settings and are not registered as such: 1.4826 is
+#: the definition of the MAD→SD conversion for a normal distribution and 1.96 is
+#: the definition of a two-sided 95%. A registry of unpublished numbers that also
+#: held published constants would teach a reader to skim it.
+#:
+#: Median absolute deviation → standard deviation, for a normal distribution. The
+#: median is used rather than the mean because a marker that really moved over the
+#: years would otherwise inflate its own noise floor with that movement.
+_MAD_TO_SD = 1.4826
+
+#: Two-sided 95%. The same constant the wearable layer uses, for the same reason:
+#: «distinguishable» has to mean one thing across the project.
+_Z95 = 1.96
+
+
+def change_floor(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """The smallest relative change this marker's own history can tell from its scatter.
+
+    A laboratory series moves for three reasons: the analyser, the person's own
+    day-to-day biology, and an actual change in the person. Only the third is
+    worth an arrow, and the first two are what the printed «↑ 44 % since the
+    previous measurement» silently attributes to the person.
+
+    The textbook route is the reference change value from published coefficients
+    of analytical and within-subject variation. Those coefficients are not in this
+    build and are NOT invented here — typing clinical numbers from memory is the
+    one thing this project never does. What it does instead is measure: the same
+    marker measured repeatedly in the same person already carries its own scatter,
+    and the median of consecutive relative differences estimates it without any
+    outside table.
+
+    **The estimate is deliberately conservative and says so.** It contains real
+    biological change as well as noise, so it is an UPPER bound: a change it calls
+    indistinguishable really is indistinguishable, while a change it calls
+    distinguishable is not thereby proved. The error therefore falls on the side of
+    claiming less, which is the side this project errs on everywhere else.
+
+    ``None`` when the history cannot support the statement — too few pairs, a
+    value at or below zero (a relative change is undefined), or a series that
+    never moved at all. Nothing is assumed in its place.
+    """
+    s = sorted(series or [], key=lambda p: p["date"])
+    diffs = []
+    for a, b in zip(s, s[1:]):
+        # The same exclusion `_trend` makes, for the same reason: two draws on one
+        # day differ because of what happened between them, not because of scatter.
+        if str(a.get("date", ""))[:10] == str(b.get("date", ""))[:10]:
+            continue
+        va, vb = a.get("value"), b.get("value")
+        if not isinstance(va, (int, float)) or not isinstance(vb, (int, float)):
+            continue
+        if va <= 0 or vb <= 0:
+            return None
+        diffs.append(abs(vb - va) / ((va + vb) / 2.0))
+    if len(diffs) < CHANGE_MIN_PAIRS:
+        return None
+    diffs.sort()
+    n = len(diffs)
+    med = diffs[n // 2] if n % 2 else (diffs[n // 2 - 1] + diffs[n // 2]) / 2.0
+    if med <= 0:
+        return None
+    # `med` estimates the median absolute DIFFERENCE of two measurements, so the
+    # scale it converts to is already the scale of a difference — no second √2.
+    rcv = _Z95 * _MAD_TO_SD * med
+    return {"rcv_pct": round(100 * rcv, 1), "pairs": n, "from": "own_history"}
+
+
 def _trend(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     """The move from the previous measurement to the last one.
 
@@ -323,8 +410,16 @@ def _trend(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     delta = round(last["value"] - prev["value"], 3)
     direction = "up" if delta > 0 else ("down" if delta < 0 else "flat")
     pct = round(100.0 * delta / prev["value"], 1) if prev["value"] else None
-    return {"from_date": prev["date"], "to_date": last["date"], "delta": delta,
-            "direction": direction, "pct": pct}
+    out = {"from_date": prev["date"], "to_date": last["date"], "delta": delta,
+           "direction": direction, "pct": pct}
+    floor = change_floor(s)
+    if floor and pct is not None:
+        out["change_floor"] = floor
+        # The arrow and the percentage stay: they are arithmetic on two numbers
+        # and they are true. What is added is whether this series has ever shown
+        # itself capable of telling a change that size from its own scatter.
+        out["distinguishable"] = abs(pct) >= floor["rcv_pct"]
+    return out
 
 
 def _sex_adjusted_bounds(k: str, m: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -509,6 +604,11 @@ def _eval_condition(cond: Dict[str, Any]) -> bool:
     if "trend" in cond:
         m = core.labs().get("markers", {}).get(cond["trend"]["marker"])
         t = _trend(m["series"]) if m and m.get("series") else None
+        # A rule that fires on a direction must not fire on a movement the series
+        # cannot distinguish from its own scatter: this condition suggests tests
+        # to take, and a test suggested because of noise costs a real draw.
+        if t and t.get("distinguishable") is False:
+            return False
         return bool(t and t["direction"] == cond["trend"]["direction"])
     if "med_contains" in cond:
         q = cond["med_contains"].lower()

@@ -66,7 +66,15 @@ LINE_BUDGETS = {
     # from, and a claim about a shift has to say when one of the two days was not
     # printed on any form. Both are readers of a field that would otherwise be
     # written and never looked at.
-    "labs": 580,
+    # 580 → 680 on 28.08.2026. One capability, and it belongs beside the two
+    # above for the same reason they belong beside each other: it answers «did
+    # this person's number really move», and that question already lives here.
+    # `_personal_move` asks it of the last point against the personal baseline;
+    # `change_floor` asks it of two consecutive points, which is the comparison
+    # `_trend` prints as «↑ 44 %» and which had no notion of scatter at all.
+    # Splitting them would put one question in two files — the split that
+    # produced the corridor defects named above.
+    "labs": 680,
     "goals": 550,
     # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
     # the report is BUILT, not only where the score is computed, because

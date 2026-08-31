@@ -237,18 +237,127 @@ def _merge(fresh: Dict[str, Any], previous: Dict[str, Any], source: str) -> int:
     prev = migrate(previous or {})
     block = (prev.get("sources") or {}).get(source) or {}
     kept = 0
-    fm = fresh.setdefault("metrics", {})
-    for key, months in (block.get("metrics") or {}).items():
-        cur = fm.setdefault(key, {})
-        for month, val in (months or {}).items():
-            if month not in cur:
-                cur[month] = val
-                kept += 1
-        fm[key] = {m: cur[m] for m in sorted(cur)}
+    # `metrics` is the series; `stats` is what each of its points stands on. They
+    # are merged by ONE loop rather than two, because two loops over the same
+    # months are two chances for the number and its sample size to drift apart.
+    # Only the series is counted: `kept` means «months of history preserved», and
+    # counting the same month twice would inflate it.
+    for name in ("metrics", "stats"):
+        fm = fresh.setdefault(name, {})
+        for key, months in (block.get(name) or {}).items():
+            cur = fm.setdefault(key, {})
+            for month, val in (months or {}).items():
+                if month not in cur:
+                    cur[month] = val
+                    if name == "metrics":
+                        kept += 1
+            fm[key] = {m: cur[m] for m in sorted(cur)}
+        if not fm:
+            fresh.pop(name, None)
     return kept
 
 
 OVERLAY = "wearable_metrics.local.json"
+
+#: The person's own decisions about points in a rebuilt series. Same shape of
+#: mechanism as the overlay above and for the same reason: a rebuild is a
+#: MACHINE artefact, and a hand-made judgement about it cannot live inside the
+#: artefact or the next rebuild wins.
+#:
+#: This is not hypothetical. A weight point removed by hand — physically
+#: impossible between the two months around it — came back the moment a fresh
+#: export was read, because the export still carried that month. The edit was
+#: made against the file the build overwrites; there was nowhere else to put it.
+CORRECTIONS = "wearable_corrections.local.json"
+
+#: What a correction may ask for. Kept closed on purpose: an unknown verb is
+#: refused by name rather than ignored, because a correction that silently does
+#: nothing is worse than no correction — the person believes the point is fixed.
+_ACTIONS = ("remove", "replace")
+
+
+def corrections() -> List[Dict[str, Any]]:
+    """Read the corrections file, or an empty list when there is none."""
+    p = core.profile_dir() / CORRECTIONS
+    if not p.exists():
+        return []
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:                                            # noqa: BLE001
+        return []
+    items = d.get("corrections") if isinstance(d, dict) else d
+    return [c for c in (items or []) if isinstance(c, dict)]
+
+
+def apply_corrections(built: Dict[str, Any], source: str,
+                      items: Optional[List[Dict[str, Any]]] = None
+                      ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]],
+                                 List[Dict[str, Any]]]:
+    """Lay the person's decisions over a freshly rebuilt device block.
+
+    Returns three lists — applied, stale, refused — and every one of them is
+    reported. A correction is a claim about the data, so it answers for itself:
+
+    · **`why` is mandatory.** A correction without a stated reason is refused,
+      not applied. The rule is the project's own, and it is the same one that
+      governs a second LOINC code: a change to somebody's record that nobody can
+      account for is a change nobody can review later, including its author.
+    · **A correction that matched nothing is STALE, not ignored.** The month it
+      speaks about is no longer in the series — the export changed, or the
+      decision has been overtaken. Either way it is named, because a file of
+      corrections that quietly stop matching is a file nobody can trust.
+    · **Another device's correction is not touched here**, and does not count as
+      stale: this rebuild only rebuilt one block, and a decision about the other
+      one is neither applied nor invalidated by it.
+    """
+    applied: List[Dict[str, Any]] = []
+    stale: List[Dict[str, Any]] = []
+    refused: List[Dict[str, Any]] = []
+    metrics = built.setdefault("metrics", {})
+    for c in (corrections() if items is None else items):
+        if (c.get("device") or "") != source:
+            continue
+        metric, month = c.get("metric"), c.get("month")
+        action = c.get("action")
+        if not (c.get("why") or "").strip():
+            refused.append({**c, "refused": "no_reason_given"})
+            continue
+        if action not in _ACTIONS:
+            refused.append({**c, "refused": "unknown_action"})
+            continue
+        if not metric or not month:
+            refused.append({**c, "refused": "no_metric_or_month"})
+            continue
+        if action == "replace" and c.get("value") is None:
+            refused.append({**c, "refused": "no_value_to_replace_with"})
+            continue
+        series_ = metrics.get(metric)
+        if not isinstance(series_, dict) or month not in series_:
+            stale.append(dict(c))
+            continue
+        if action == "remove":
+            series_.pop(month, None)
+            # A metric left with nothing in it is not a series; keeping the empty
+            # key would show a measurement that has no points.
+            if not series_:
+                metrics.pop(metric, None)
+            # And what the removed point stood on goes with it. Left behind, an
+            # orphan `n` would answer for a value nobody can see.
+            st = (built.get("stats") or {}).get(metric)
+            if isinstance(st, dict):
+                st.pop(month, None)
+                if not st:
+                    built["stats"].pop(metric, None)
+        else:
+            series_[month] = c["value"]
+            # A replaced value is the person's, not the sample's: the spread that
+            # described the machine's month no longer describes this number.
+            st = (built.get("stats") or {}).get(metric)
+            if isinstance(st, dict) and month in st:
+                st[month] = {**st[month], "corrected": True}
+        applied.append(dict(c))
+    return applied, stale, refused
+
 
 
 def knowledge() -> Dict[str, Any]:
@@ -341,6 +450,10 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None) -> Dict
     nightly = built.pop("nightly_sleep", None)
     built.pop("ok", None)
     preserved = _merge(built, previous, source)
+    # AFTER the merge, or a decision would be overwritten by the very month it is
+    # about: the merge restores what the export lacks, the corrections say what a
+    # person decided about what it carries.
+    fixed, stale, refused = apply_corrections(built, source)
 
     data = migrate(previous) if previous else {"_meta": {}, "sources": {}}
     data.setdefault("_meta", {})["shape"] = SHAPE
@@ -366,6 +479,8 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None) -> Dict
     return {"ok": True, "source": source, "claimed": claimed,
             "metrics": len(built.get("metrics", {})),
             "nights": nights, "preserved": preserved, "range": m.get("range"),
+            "corrections_applied": fixed, "corrections_stale": stale,
+            "corrections_refused": refused,
             "unrecognised_columns": m.get("unrecognised_columns") or [],
             "shared_metrics": sorted(shared),
             "sources_present": sorted(data.get("sources") or {}),

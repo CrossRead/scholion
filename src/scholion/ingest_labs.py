@@ -1428,7 +1428,7 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         return {"ok": False, "error": _t("ingest_labs.no_pdf_reader")}
     out = {"ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
            "points_added": 0, "skipped": 0, "per_file": [], "conflicts": [],
-           "repeats": [], "draw_times": {},
+           "repeats": [], "draw_times": {}, "resolution_mixed": [],
            # Every file that produced nothing says WHY, by name. «19 of 47 went
            # past both counters in silence» was the first real user's report, and
            # the cause was that `skipped` counted only «unchanged since last run»
@@ -1483,6 +1483,15 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
                                             date_source="form", subject="owner")
                     if r.get("ok"):
                         added_here.append(pt["key"])
+                        if r.get("resolution_mixed"):
+                            # The same report the PDF path makes below. A
+                            # delimited export reaches the profile through THIS
+                            # call, so a doubling found here was detected by the
+                            # store and then dropped on the floor — the flag
+                            # existed and the person was never shown it.
+                            out.setdefault("resolution_mixed", []).append(
+                                {"marker": pt["key"], "date": pt["date"],
+                                 "others": r["resolution_mixed"]})
                 manifest[rk] = mt
                 if added_here:
                     out["files_processed"] += 1
@@ -1647,6 +1656,12 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
                                     date_source=date_src, subject="owner")
             if r.get("ok"):
                 added.append(key)
+                if r.get("resolution_mixed"):
+                    # One measurement now standing in the series twice, at two
+                    # resolutions. Not refused — both points may be honest — but a
+                    # doubling nobody is told about is one nobody will ever undo.
+                    out.setdefault("resolution_mixed", []).append(
+                        {"marker": key, "date": stamp, "others": r["resolution_mixed"]})
         manifest[rk] = mt
         if added:
             out["files_processed"] += 1

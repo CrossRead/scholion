@@ -102,6 +102,14 @@ def callability() -> Dict[str, Any]:
                         "rel_to_panel": float(row.get("rel_to_panel") or 0),
                         "pct_10x": float(row.get("pct_10x") or 0),
                         "pct_20x": float(row.get("pct_20x") or 0),
+                        # The interval the percentages were measured over, when
+                        # the pipeline recorded it. Optional on purpose: a file
+                        # written before it did is still a valid coverage table,
+                        # and the export below refuses rather than inventing
+                        # coordinates for it.
+                        "chrom": (row.get("chrom") or "").strip() or None,
+                        "start": int(row["start"]) if (row.get("start") or "").strip().isdigit() else None,
+                        "end": int(row["end"]) if (row.get("end") or "").strip().isdigit() else None,
                     }
                 except ValueError:
                     continue
@@ -141,6 +149,57 @@ def interval_basis() -> Dict[str, Any]:
         pass
     return {"basis": INTERVAL_BASIS_DEFAULT, "stated": False,
             "note": _t("limits.interval_basis_unknown")}
+
+
+def weak_regions_bed(panels: Optional[List[str]] = None) -> Dict[str, Any]:
+    """The genes a negative conclusion cannot rest on, as a BED — or a refusal.
+
+    «Zero pathogenic findings across the ACMG genes» is honest exactly as far as
+    those genes were read, and the coverage table already knows which ones were
+    not. What it could not do is hand the list to anybody: a percentage names a
+    gene, and a laboratory asked to re-read something needs coordinates.
+
+    Two refusals rather than one, because they need different remedies:
+
+    · the table has never been computed — there is nothing to export, and what
+      produces it is named;
+    · the table exists but predates the columns that carry coordinates. The
+      genes are known and their intervals are NOT, and inventing them from a
+      gene name is precisely the substitution this module exists against. The
+      refusal says which run would fill them in.
+
+    **The intervals are whole gene loci with a margin, not coding sequence.**
+    That is stated in the track line rather than left to be assumed: a 200 bp
+    dropout inside an exon moves a locus-wide percentage by almost nothing, so a
+    BED built this way is a worklist of genes to look at again — not a map of
+    the bases that were missed.
+    """
+    rows = callability()
+    if not rows:
+        return {"ok": False, "reason": "never_computed",
+                "note": _t("limits.bed_never_computed")}
+    wanted = {p.upper() for p in (panels or [])}
+    weak = {g: r for g, r in rows.items()
+            if r["pct_10x"] < WEAK_10X
+            and (not wanted or str(r.get("panel", "")).upper() in wanted)}
+    if not weak:
+        return {"ok": True, "regions": 0, "bed": "", "note": _t("limits.bed_nothing_weak")}
+    without = sorted(g for g, r in weak.items()
+                     if not (r.get("chrom") and r.get("start") is not None
+                             and r.get("end") is not None))
+    if without:
+        return {"ok": False, "reason": "no_coordinates", "genes": without,
+                "note": _t("limits.bed_no_coordinates", genes=", ".join(without[:12]))}
+    basis = interval_basis()
+    lines = [f'track name=scholion_weak description="{_t("limits.bed_track", pct=WEAK_10X, basis=basis["basis"])}"']
+    for gene in sorted(weak, key=lambda g: (weak[g]["pct_10x"], g)):
+        r = weak[gene]
+        # The score column carries the percentage, so a reader who opens the file
+        # in a browser sees WHY each interval is here without a second file.
+        lines.append(f"{r['chrom']}\t{r['start']}\t{r['end']}\t{gene}\t{r['pct_10x']:.1f}")
+    return {"ok": True, "regions": len(weak), "basis": basis["basis"],
+            "bed": "\n".join(lines) + "\n",
+            "genes": sorted(weak, key=lambda g: weak[g]["pct_10x"])}
 
 
 def coverage_summary() -> Dict[str, Any]:

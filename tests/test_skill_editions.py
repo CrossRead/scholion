@@ -292,7 +292,10 @@ if __name__ == "__main__":
 # ──────────────────────────────────────────────────────────────────────────
 # One name, one role
 # ──────────────────────────────────────────────────────────────────────────
-_SKIP_PARTS = {"_to_delete", "_backups", "archive", "dist", "node_modules", ".git"}
+_SKIP_PARTS = {"_to_delete", "_backups", "archive", "dist", "node_modules", ".git",
+               # the assistant's own state and its spawned sessions' worktrees —
+               # a second, uncommitted copy of the tree that never ships
+               ".claude"}
 
 
 def _live(p) -> bool:

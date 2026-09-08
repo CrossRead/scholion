@@ -290,6 +290,33 @@
     .printfoot{margin-top:18px;padding-top:8px;border-top:1px solid #999;
                font-size:11.5px;color:#333}
   }
+
+  /* ── the body figure, beside the radar on the Overview ─────────────────── */
+  .sysrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+          border:1px solid var(--border);border-radius:var(--r);overflow:hidden;
+          background:var(--surface)}
+  @media(max-width:900px){.sysrow{grid-template-columns:1fr}}
+  .syspane{padding:12px 14px 10px;min-width:0;display:flex;flex-direction:column}
+  .syspane+.syspane{border-left:1px solid var(--grid)}
+  @media(max-width:900px){.syspane+.syspane{border-left:0;border-top:1px solid var(--grid)}}
+  .sysh{font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+        margin-bottom:6px}
+  .sysbox{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px}
+  .sysbox svg{width:100%;height:auto}
+  .bodyfill{fill:#34332e}
+  .bodyedge{fill:#6d6b60}
+  .organ{cursor:pointer}
+  .organ .blob{mix-blend-mode:screen}
+  .organ .pick{fill:none;stroke:var(--ink);stroke-width:1;opacity:0}
+  .organ:hover .pick,.organ.on .pick{opacity:.5}
+  .organ:focus{outline:none}
+  .organ:focus-visible .pick{opacity:.5}
+  .ringbg{fill:none;stroke:var(--baseline);stroke-width:2.4}
+  .ringfg{fill:none;stroke-width:2.4;stroke-linecap:round}
+  .organlead{stroke:var(--baseline);stroke-width:.9;fill:none}
+  .rdot{cursor:pointer}
+  .nosex{max-width:34ch;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.5}
+  .syscredit{font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
 </style>
 <script src="/chart.min.js"></script>
 </head>
@@ -742,7 +769,8 @@ function bindTabLinks(root){root.querySelectorAll('[data-goto]').forEach(a=>a.on
   e.preventDefault();goTab(a.getAttribute('data-goto'));});}
 
 async function viewOverview(root){
-  const [g,o,sb,f] = await Promise.all([api('/api/goal'), api('/api/overview'), overviewSourceBar(), api('/api/focus')]);
+  const [g,o,sb,f,radar] = await Promise.all([api('/api/goal'), api('/api/overview'),
+    overviewSourceBar(), api('/api/focus'), api('/api/radar')]);
   // Built from parts rather than one format string. The old one always printed all
   // three, so a profile with no subject id came out as «subject ?», an empty profile
   // claimed «1 prescriptions», and «5 genome gaps» — a constant, the same for everyone
@@ -759,6 +787,8 @@ async function viewOverview(root){
       <summary class="section goalsum">🎯 ${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.goal.as_of',{date:g.as_of}))}</span>`:''}</summary>
       <div id="ov-goal"></div>
     </details>
+    <h2 class="section" style="margin-top:28px">${esc(t('web.body.title'))}</h2>
+    <div id="ov-systems"></div>
     <h2 class="section" style="margin-top:30px">📌 ${esc(t('web.overview.watched_h'))}</h2>
     <div class="stat">
       <div class="s"><b style="color:${o.abnormal_count?'var(--critical)':'var(--ink)'}">${o.abnormal_count}/${o.markers_total}</b><span>${esc(t('web.overview.stat_abnormal'))}</span></div>
@@ -772,6 +802,7 @@ async function viewOverview(root){
     <div class="grid" id="ov-red"></div>
     <h2 class="section" style="margin-top:24px">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.tests')}</h2>
     <div id="ov-tests"></div>`;
+  renderSystems($('#ov-systems',root), radar);
   if(f&&f.available) renderFocus($('#ov-focus',root), f);
   renderGoal($('#ov-goal',root), g);
   // Wide screens keep what they had; the fold is for the narrow ones. Measured,
@@ -821,9 +852,12 @@ function nearNote(m){
   return `<span class="trend">${esc(t('web.near.margin',{pct:nl.margin_pct,side:side,bound:nl.bound}))}${esc(cp)}${mv}</span>`;
 }
 function refText(m){
-  return (m.ref_low!=null&&m.ref_high!=null)?t('ref.range',{low:m.ref_low,high:m.ref_high})
+  const base=(m.ref_low!=null&&m.ref_high!=null)?t('ref.range',{low:m.ref_low,high:m.ref_high})
     :(m.ref_high!=null?t('ref.max',{high:m.ref_high})
     :(m.ref_low!=null?t('ref.min',{low:m.ref_low}):''));
+  // Whose corridor: the marker's recorded range answering for a form that
+  // printed none is a weaker claim than the range printed beside the number.
+  return base+(base&&m.ref_origin==='profile'?' '+t('ref.origin_profile'):'');
 }
 
 // ---------------- Labs ----------------
@@ -846,7 +880,7 @@ function markerCard(m){
     <div class="value">${m.value} <small>${esc(m.unit)}</small></div>
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted" style="font-size:12.5px">${esc(m.date)}</span>`:''}${tr}</div>
     ${m.series&&m.series.length>1?sparkline(m.series):''}
-    <div class="meta">${esc(refText(m))}${m.genome_link?` · <span class="glink">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</span>`:''}${m.note?` · ${esc(m.note)}`:''}</div>
+    <div class="meta">${esc(refText(m))}${m.genome_link?` · <span class="glink">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</span>`:''}${m.note?` · ${esc(m.note)}`:''}${m.corridor_note?` · ${esc(m.corridor_note)}`:''}</div>
   </div>`);
 }
 async function viewLabs(root){
@@ -1181,6 +1215,166 @@ function dArrow(dl){ // the delta of the score: ↑ better, ↓ worse
   return dl>0?{txt:'▲'+dl,col:'var(--good)',word:t('web.delta.better',{n:dl})}
              :{txt:'▼'+Math.abs(dl),col:'var(--critical)',word:t('web.delta.worse',{n:Math.abs(dl)})};
 }
+
+// ── The figure on the Overview ───────────────────────────────────────────────
+// The same numbers the radar draws, plus the one it cannot show. A point on the
+// radar says how a system scores; the ring around an organ says how much of that
+// system was measured at all. Liver at 100/100 on one marker out of three is the
+// case this exists for: on the radar it sits at the edge of the web, on the body
+// it is a ring closed a third of the way round.
+//
+// Only three of the systems have a place on a body. The rest say so instead of
+// being scattered onto organs they do not belong to — `knowledge/body_map.json`
+// holds that decision with a reason beside each entry, and the engine sends it
+// down with the radar, so nothing anatomical is decided in this file.
+const SILHOUETTE = {male:{f:'/body-male.webp',w:245,h:440},
+                    female:{f:'/body-female.webp',w:220,h:440}};
+// Fractions of the silhouette's own box, so the marks follow whichever figure is
+// drawn. Approximate on purpose: this is a schematic, not an atlas, and the
+// callout carries the number that actually matters.
+const ORGAN_SPOT = {pituitary:[[0.470,0.095]], thyroid:[[0.500,0.250]],
+                    liver:[[0.318,0.430]], pancreas:[[0.530,0.480]],
+                    adrenals:[[0.392,0.565],[0.608,0.565]],
+                    kidneys:[[0.392,0.665],[0.608,0.665]],
+                    gonads:[[0.500,0.800]]};
+
+function bodySVG(domains, sex){
+  const im = SILHOUETTE[sex];
+  // No third silhouette exists and the profile may not say. Refusing to draw is
+  // the same answer this application gives everywhere else it does not know.
+  if(!im) return `<div class="nosex">${esc(t('web.body.no_sex'))}</div>`;
+  const W=700,H=470,x0=(W-im.w)/2,y0=14;
+  const at=([fx,fy])=>[x0+fx*im.w, y0+fy*im.h];
+  let defs=`<mask id="silh" mask-type="alpha"><image href="${im.f}" x="${x0}" y="${y0}"`
+    +` width="${im.w}" height="${im.h}"/></mask>`
+    +`<filter id="silhedge"><feMorphology operator="dilate" radius="1.6"/></filter>`
+    +`<filter id="silhsoft" x="-70%" y="-70%" width="240%" height="240%">`
+    +`<feGaussianBlur stdDeviation="10"/></filter>`;
+  ['good','warning','critical'].forEach(st=>{
+    defs+=`<radialGradient id="gl-${st}">`
+      +`<stop offset="0" stop-color="${DSTAT[st]}" stop-opacity="1"/>`
+      +`<stop offset="45%" stop-color="${DSTAT[st]}" stop-opacity=".42"/>`
+      +`<stop offset="100%" stop-color="${DSTAT[st]}" stop-opacity="0"/></radialGradient>`;});
+  let s=`<defs>${defs}</defs>`
+    +`<g filter="url(#silhedge)"><rect class="bodyedge" x="0" y="0" width="${W}" height="${H}"`
+    +` mask="url(#silh)"/></g>`
+    +`<rect class="bodyfill" x="0" y="0" width="${W}" height="${H}" mask="url(#silh)"/>`;
+  // One mark per place rather than per system. A system whose markers are made in
+  // different glands cannot honestly be drawn at one point, so the engine hands
+  // it `parts` — a place, and the score of the markers made there — and each part
+  // gets its own mark. Two marks landing on the same organ are drawn as rings
+  // about one centre with their labels stacked, so neither hides under the other.
+  const marks=[];
+  domains.forEach(d=>{
+    const pl=d.place||{};
+    if(pl.parts) pl.parts.forEach(p=>{
+      if(p.score!=null&&ORGAN_SPOT[p.place])
+        marks.push({dom:d, place:p.place, label:p.label, score:p.score, status:p.status,
+                    measured:p.measured, total:p.total, part:true});
+    });
+    else if(pl.place&&d.score!=null&&ORGAN_SPOT[pl.place])
+      marks.push({dom:d, place:pl.place, label:d.label, score:d.score, status:d.status,
+                  measured:d.measured, total:d.total, part:false});
+  });
+  const byPlace={}, order=[];
+  marks.forEach(m=>{ if(!byPlace[m.place]){byPlace[m.place]=[]; order.push(m.place);}
+                     byPlace[m.place].push(m); });
+  // Geometry first, drawing second. Seven places on one figure put the callouts
+  // of two neighbouring organs on the same line, and a label covering a label
+  // hides a number — the one thing this picture exists to show. So every mark is
+  // measured, each side is laid out top to bottom with a minimum gap, and only
+  // then is anything drawn. The leader line takes up the difference.
+  const R0=20, STEP=8, GAP=38;
+  const placed=[];
+  order.forEach(place=>{
+    const P=ORGAN_SPOT[place].map(at);
+    const right = P[P.length-1][0] >= x0+im.w/2;
+    const [rx,ry] = right ? P[P.length-1] : P[0];
+    byPlace[place].forEach((m,i)=>{
+      placed.push(Object.assign({}, m, {P:P, right:right, rx:rx, ry:ry,
+        r:R0+i*STEP, blobr:(P.length>1?22:32)+i*STEP, want:ry-12+i*GAP}));
+    });
+  });
+  [true,false].forEach(side=>{
+    const col=placed.filter(m=>m.right===side).sort((a,b)=>a.want-b.want);
+    let prev=-1e9;
+    col.forEach(m=>{ m.ly=Math.max(m.want, prev+GAP); prev=m.ly; });
+  });
+  placed.forEach(m=>{
+    const d=m.dom, r=m.r, C=2*Math.PI*r, right=m.right, rx=m.rx, ry=m.ry, ly=m.ly;
+    const frac = m.total ? Math.max(0,Math.min(1,m.measured/m.total)) : 0;
+    const col = DSTAT[m.status]||DSTAT.nodata;
+    const tip = m.part
+      ? t('web.body.tip_part',{dom:d.label, label:m.label, place:t('web.body.place.'+m.place),
+                               score:m.score, measured:m.measured, total:m.total})
+      : (m.measured!=null && m.measured<m.total
+          ? t('web.radar.tip_partial',{label:d.label,score:m.score,ok:d.ok,
+                                       measured:m.measured,total:m.total})
+          : t('web.radar.tip',{label:d.label,score:m.score,ok:d.ok,total:m.total}));
+    let g=`<g class="organ" data-dom="${esc(d.key)}" tabindex="0" role="button"`
+      +` aria-label="${esc(m.label)}"><title>${esc(tip)}</title>`;
+    m.P.forEach(([x,y])=>{g+=`<circle class="blob" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"`
+      +` r="${m.blobr}" fill="url(#gl-${m.status})" filter="url(#silhsoft)"/>`;});
+    g+=`<circle class="ringbg" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}"/>`
+      +`<circle class="ringfg" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}" stroke="${col}"`
+      +` stroke-dasharray="${(C*frac).toFixed(1)} ${C.toFixed(1)}"`
+      +` transform="rotate(-90 ${rx.toFixed(1)} ${ry.toFixed(1)})"/>`
+      +`<circle class="pick" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r+7}"/>`;
+    const ex = right ? x0+im.w+30 : x0-30, lx = right ? ex+10 : ex-10;
+    const an = right ? '' : ' text-anchor="end"';
+    g+=`<path class="organlead" d="M${(rx+(right?r:-r)).toFixed(1)} ${ry.toFixed(1)}`
+      +` L${ex.toFixed(1)} ${ly.toFixed(1)} L${(right?ex+4:ex-4).toFixed(1)} ${ly.toFixed(1)}"/>`
+      +`<circle fill="var(--baseline)" cx="${(right?ex+4:ex-4).toFixed(1)}" cy="${ly.toFixed(1)}" r="2"/>`
+      +`<text x="${lx.toFixed(1)}" y="${(ly-5).toFixed(1)}"${an} fill="var(--ink)" font-size="13"`
+      +` font-weight="600">${esc(m.label)}</text>`
+      +`<text x="${lx.toFixed(1)}" y="${(ly+12).toFixed(1)}"${an} fill="${col}" font-size="12.5">`
+      +`${esc(m.score+'/100 · '+t('web.body.of',{measured:m.measured,total:m.total}))}</text></g>`;
+    s+=g;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t('web.body.figure_h'))}">${s}</svg>`;
+}
+
+// Both pictures answer about the same systems, so picking one system marks
+// it in both. Without this they are two charts that happen to sit side by side.
+function wireSystems(box, domains){
+  const by = Object.fromEntries(domains.map(d=>[d.key,d]));
+  const note = $('#sys-note', box);
+  const pick = k => {
+    box.querySelectorAll('[data-dom]').forEach(el=>el.classList.toggle('on', el.dataset.dom===k));
+    box.querySelectorAll('.rdot').forEach(el=>el.setAttribute('r', el.dataset.dom===k?7:4.5));
+    const d = by[k]; if(!d||!note) return;
+    const pl = d.place||{};
+    const where = pl.parts
+      ? t('web.body.where_organs',{places:pl.parts.map(p=>t('web.body.place.'+p.place)).join(', ')})
+      : (pl.place ? t('web.body.where_organ')
+         : (pl.whole_body ? t('web.body.where_whole') : t('web.body.where_blood')));
+    note.textContent = t('web.body.picked',
+      {label:d.label, score:d.score, measured:d.measured, total:d.total, where:where});
+  };
+  box.querySelectorAll('[data-dom]').forEach(el=>{
+    el.addEventListener('click', ()=>pick(el.dataset.dom));
+    el.addEventListener('keydown', e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault(); pick(el.dataset.dom);}
+    });
+  });
+}
+
+function renderSystems(box, radar){
+  const doms = (radar.domains||[]).filter(d=>d.score!=null);
+  if(doms.length<3){ box.innerHTML=`<div class="muted">${esc(t('web.radar.not_enough'))}</div>`; return; }
+  // `radar.sex` is already normalised by the engine — 'male', 'female' or null.
+  const sex = radar.sex || '';
+  box.innerHTML = `<div class="sysrow">
+      <div class="syspane"><div class="sysh">${esc(t('web.body.figure_h'))}</div>
+        <div class="sysbox">${bodySVG(doms, sex)}</div>
+        ${SILHOUETTE[sex]?`<div class="syscredit">${esc(t('web.body.credit'))}</div>`:''}</div>
+      <div class="syspane"><div class="sysh">${esc(t('web.body.radar_h'))}</div>
+        <div class="sysbox">${radarSVG(doms)}</div></div>
+    </div>
+    <div class="muted" id="sys-note" style="font-size:12.5px;margin-top:7px">${esc(t('web.body.hint'))}</div>`;
+  wireSystems(box, doms);
+}
+
 function radarSVG(domains){
   const d=domains.filter(x=>x.score!=null);
   if(d.length<3)return `<div class="muted">${esc(t('web.radar.not_enough'))}</div>`;
@@ -1214,7 +1408,7 @@ function radarSVG(domains){
     const a=dArrow(dom.delta);
     const mv=(dom.moved||[]).map(m=>`\n  · ${m.name}: ${m.from_value} → ${m.to_value} ${m.unit||''}`).join('');
     const dyn=dom.prev_score!=null?'\n'+t('web.radar.was',{score:dom.prev_score,compared:dom.compared,date:dom.prev_date||t('web.radar.prev_measurement'),word:a.word})+mv:'\n'+t('web.radar.no_previous');
-    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${DSTAT[dom.status]}"><title>${esc(dom.measured!=null&&dom.measured<dom.total?t('web.radar.tip_partial',{label:dom.label,score:dom.score,ok:dom.ok,measured:dom.measured,total:dom.total}):t('web.radar.tip',{label:dom.label,score:dom.score,ok:dom.ok,total:dom.total}))}${esc(dyn)}</title></circle>`;
+    return `<circle class="rdot" data-dom="${esc(dom.key)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${DSTAT[dom.status]}"><title>${esc(dom.measured!=null&&dom.measured<dom.total?t('web.radar.tip_partial',{label:dom.label,score:dom.score,ok:dom.ok,measured:dom.measured,total:dom.total}):t('web.radar.tip',{label:dom.label,score:dom.score,ok:dom.ok,total:dom.total}))}${esc(dyn)}</title></circle>`;
   }).join('');
   const legend=`<g font-size="12" dominant-baseline="middle">
     <line x1="188" y1="404" x2="216" y2="404" stroke="var(--accent)" stroke-width="2.5"/>
@@ -1234,7 +1428,7 @@ async function viewSecond(root){
   // — flag, value, corridor, date, movement — so that which tab you are on changes
   // the density and not the facts.
   const abItem=m=>{const f=flagOf(m);
-      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span>${trendNote(m)}</div>${m.genome_link?`<div class="why">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;};
+      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span>${trendNote(m)}</div>${m.genome_link?`<div class="why">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}${m.corridor_note?`<div class="why">${esc(m.corridor_note)}</div>`:''}</div>`;};
   const expl=flagged.map(dom=>{
     const col=dom.status==='critical'?'b-critical':'b-warning';
     const recent=dom.abnormal.filter(m=>!m.stale), stale=dom.abnormal.filter(m=>m.stale);
@@ -1279,7 +1473,7 @@ async function viewSecond(root){
     </div>
     <h2 class="section">${esc(t('web.second.title'))}</h2>${sb}
     <div class="row" style="margin-bottom:10px"><button class="ghost" onclick="window.print()">🖨 ${esc(t('web.second.print'))}</button>${radar.overall!=null?`<span class="muted">${esc(t('web.second.overall'))} <b style="color:${radar.overall>=80?'var(--good)':radar.overall>=50?'var(--warning)':'var(--critical)'}">${radar.overall}</b>/100${radar.prev_overall!=null?` <span style="color:${dArrow(radar.overall_delta).col}">${dArrow(radar.overall_delta).txt||'='}</span> <span style="opacity:.8">${esc(t('web.second.was',{score:radar.prev_overall,date:radar.prev_date||''}))}</span>`:''}</span>`:''}</div>
-    <div class="card" style="display:flex;justify-content:center;padding:10px">${radarSVG(radar.domains)}</div>
+    <div class="card" id="sl-systems" style="padding:10px"></div>
     <div class="so-h" style="margin-top:22px">${esc(t('web.second.factors_h'))}${tabLink('web.tab.labs')}</div>
     ${expl||`<div class="muted">${esc((radar.domains||[]).some(x=>x.status!=='nodata')
       ? t('web.second.no_domain_issues',{n:(radar.domains||[]).filter(x=>x.status!=='nodata').length})
@@ -1288,6 +1482,10 @@ async function viewSecond(root){
     <div class="so-h">${esc(t('web.second.tests_h'))}${tabLink('web.tab.tests')}</div>${tests||testsEmpty}${testsRoutine}
     <div class="meta" style="margin-top:14px">${esc(d.disclaimer)}</div>
     <div class="printonly printfoot">${esc(t('web.second.print_foot'))}</div>`;
+  // The same figure as on the Overview, beside the same radar: the second
+  // opinion is the page a person carries to an appointment, and a body with
+  // its systems marked is read faster across a desk than a web of axes.
+  renderSystems($('#sl-systems',root), radar);
   bindTabLinks(root);
 }
 

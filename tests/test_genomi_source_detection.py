@@ -100,7 +100,7 @@ class CompressionContentTests(unittest.TestCase):
     def test_plain_vcf_without_extension(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "callset"
-            path.write_text(_PLAIN_VCF_TXT)
+            path.write_text(_PLAIN_VCF_TXT, encoding="utf-8")
             self.assertEqual(detect_source(path).source_format, "vcf")
 
 
@@ -116,7 +116,7 @@ class GvcfDiscriminationTests(unittest.TestCase):
     def _detect(self, body: str) -> str:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "callset.vcf"
-            path.write_text(body)
+            path.write_text(body, encoding="utf-8")
             return detect_source(path).source_format
 
     def test_cnv_vcf_with_end_is_plain_vcf(self) -> None:
@@ -342,7 +342,7 @@ class UnknownContentTests(unittest.TestCase):
     def test_unrecognized_content_raises(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "mystery.dat"
-            path.write_text("just some prose that is not a genome file at all\n")
+            path.write_text("just some prose that is not a genome file at all\n", encoding="utf-8")
             with self.assertRaises(ValueError):
                 detect_source(path)
 

@@ -5,6 +5,12 @@
 #   ./setup_just_prs.sh http     # the same, and start the HTTP server on :3011
 set -euo pipefail
 PKG="${PRS_MCP_PKG:-just-prs-mcp@0.1.3}"
+# The sidecar's dependency declaration has no upper bound and, left alone, uv
+# resolves it to a fastmcp the sidecar was not written for — the server then dies
+# at start-up (task 129). `prs_constraints.txt` beside this script pins it; the
+# application does the same from `scholion/prs.py`. An owner's own UV_CONSTRAINT
+# is respected, not overruled.
+export UV_CONSTRAINT="${UV_CONSTRAINT:-$(cd "$(dirname "$0")" && pwd)/prs_constraints.txt}"
 
 if ! command -v uvx >/dev/null 2>&1; then
   echo "→ installing uv (https://docs.astral.sh/uv)…"

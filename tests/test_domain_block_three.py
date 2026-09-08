@@ -40,14 +40,14 @@ class TestReferenceRangesAreSexAware(unittest.TestCase):
 
     def _profile(self, sex, marker, unit, value, ref_low, ref_high):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         pd = pathlib.Path(d)
-        (pd / "metrics.json").write_text(json.dumps({"profile": {"sex": sex, "birth_year": 1985}, "metrics": {}}))
-        (pd / "labs.json").write_text(json.dumps({"markers": {marker: {"name": marker, "unit": unit, "ref_low": ref_low, "ref_high": ref_high, "series": [{"date": "2026-01", "value": value}]}}}))
+        (pd / "metrics.json").write_text(json.dumps({"profile": {"sex": sex, "birth_year": 1985}, "metrics": {}}), encoding="utf-8")
+        (pd / "labs.json").write_text(json.dumps({"markers": {marker: {"name": marker, "unit": unit, "ref_low": ref_low, "ref_high": ref_high, "series": [{"date": "2026-01", "value": value}]}}}), encoding="utf-8")
         core.reset_cache()
         from scholion.engine import labs
         row = labs.analyze_labs([marker])["markers"][0]
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        unpin()
         core.reset_cache()
         return row
 
@@ -91,17 +91,17 @@ class TestPhenoAgeRefusesWrongUnitsInsteadOfMisreporting(unittest.TestCase):
 
     def _run(self, albumin):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         pd = pathlib.Path(d)
-        (pd / "metrics.json").write_text(json.dumps({"profile": {"birth_year": 1980}}))
+        (pd / "metrics.json").write_text(json.dumps({"profile": {"birth_year": 1980}}), encoding="utf-8")
         vals = {"albumin": (albumin, "g/L"), "creatinine": (70, "umol/L"),
                 "glucose": (5, "mmol/L"), "crp": (1, "mg/L"), "lymph": (30, "%"),
                 "mcv": (90, "fL"), "rdw": (13, "%"), "alp": (70, "U/L"), "wbc": (6, "10^9/L")}
-        (pd / "labs.json").write_text(json.dumps({"markers": {k: {"name": k, "unit": u, "series": [{"date": "2026-01", "value": v}]} for k, (v, u) in vals.items()}}))
+        (pd / "labs.json").write_text(json.dumps({"markers": {k: {"name": k, "unit": u, "series": [{"date": "2026-01", "value": v}]} for k, (v, u) in vals.items()}}), encoding="utf-8")
         core.reset_cache()
         from scholion import phenoage
         r = phenoage.compute_panel("2026-01")
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        unpin()
         core.reset_cache()
         return r
 

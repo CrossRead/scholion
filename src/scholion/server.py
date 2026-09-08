@@ -14,6 +14,7 @@ knows about the other. An absent or unknown value means English.
 from __future__ import annotations
 import json
 import os
+import shutil
 import subprocess
 import sys
 import traceback
@@ -71,6 +72,16 @@ def _run_update_bg():
         _UPD["log"] = ""
         _UPD["hint"] = ""
         script = _INGEST / "update_check.sh"
+        if shutil.which("bash") is None:
+            # Said plainly rather than raised: this is a shell script, and a
+            # machine without a shell cannot run it. Everything else the server
+            # does works there, so the answer is «this button, not this program».
+            _UPD["log"] = ("this update runs a shell script, and there is no "
+                           "`bash` on this machine. Everything else works; the "
+                           "ClinVar refresh has to be run where a shell is.")
+            _UPD["rc"] = 6
+            _UPD["running"] = False
+            return
         if not script.exists():
             # The log is the raw output of a shell script, so it is not a catalogue
             # phrase; the line the server adds itself stays in one language.
@@ -85,7 +96,11 @@ def _run_update_bg():
             # write to /opt/homebrew/bin could shadow a system binary the shell then
             # runs. Appended, they are still found when nothing earlier provides the
             # tool, and system binaries keep precedence.
-            env["PATH"] = env.get("PATH", "") + ":/opt/homebrew/bin:/usr/local/bin"
+            # `os.pathsep`, not ":" — on Windows the separator is ";" and a
+            # colon-joined PATH turns the whole variable into one nonsense entry,
+            # so every tool the script looks for goes missing at once.
+            env["PATH"] = os.pathsep.join(
+                [env.get("PATH", ""), "/opt/homebrew/bin", "/usr/local/bin"])
             env["PROJECT_DIR"] = str(_INGEST.parent.parent)
             p = subprocess.Popen(["bash", str(script)], stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT, env=env, text=True, bufsize=1)
@@ -283,6 +298,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(_WEB / "dna.svg", "image/svg+xml")
             if p == "/chart.min.js":
                 return self._file(_WEB / "chart.min.js", "application/javascript; charset=utf-8")
+            if p in ("/body-male.webp", "/body-female.webp"):
+                # The two silhouettes the Overview draws its figure from. Files
+                # rather than data inlined in the page: they are artwork under a
+                # licence of their own, and a file keeps that visible.
+                return self._file(_WEB / p.lstrip("/"), "image/webp")
             if p == "/pico.min.css":
                 return self._file(_WEB / "pico.min.css", "text/css; charset=utf-8")
             if p == "/favicon.ico":

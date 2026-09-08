@@ -1,0 +1,22 @@
+# Resolution constraint for the sidecar just-prs-mcp@0.1.3.
+#
+# Why. The package declares `fastmcp[tasks]>=3.4.2` with no upper bound. Since
+# 17.08.2026 the index carries fastmcp 4.x, and uvx takes it on every fresh
+# install. In 4.x the tasks extension moved into a separate distribution
+# `fastmcp-tasks` and is no longer enabled on its own: the server has to call
+# `mcp.add_extension(TasksExtension(...))`. The 0.1.3 code was written against
+# 3.x and makes no such call — the server dies at start-up with a RuntimeError,
+# before the first request, and the whole PRS layer becomes unavailable.
+#
+# Checked 05.09.2026 (uv 0.12.3, resolution for aarch64-apple-darwin / py3.13):
+#   without the constraint → fastmcp 4.0.3, fastmcp-tasks 4.0.3, mcp 2.1.1
+#   with the constraint    → fastmcp 3.4.7, fastmcp-slim 3.4.7,  mcp 1.29.1
+# Both resolve without conflict; just-prs-mcp itself stays at 0.1.3, so the
+# models and the numbers remain comparable with earlier runs.
+#
+# How it is applied: `uvx -c` reads this file, or the environment variable
+# UV_CONSTRAINT points at it. Lifting the constraint only makes sense together
+# with a move to just-prs-mcp >=0.5.0 (its dependency is already `fastmcp>=3.4.7`
+# without `[tasks]`) — and then the run has to be re-verified against the control
+# trait, because just-prs there is 0.9.x rather than 0.4.12.
+fastmcp<4

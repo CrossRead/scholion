@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional
 
 from . import core
 from .i18n import t as _t
-from .ingest_labs import _read_pdf, _ensure_extractor
+from .ingest_labs import _read_pdf, _ensure_extractor, _manifest_moved
 
 # Signs of a doctor's conclusion / an instrumental study.
 _CONCL = re.compile(r"ЗАКЛЮЧЕНИЕ|ПРОТОКОЛ\s+(?:УЛЬТРАЗВУКОВОГО\s+)?ИССЛЕДОВАНИЯ|"
@@ -176,24 +176,18 @@ def decline_reason(text: str, study: Optional[Dict[str, Any]]) -> Optional[str]:
     return REASON_UNCLASSIFIED
 
 
+# The manifest is `core`'s — the same table, beside the profile, for both
+# loaders; see `core.ingest_manifest_path` for why it left the cache.
 def _manifest_file() -> Path:
-    p = core.mkdir_private(core.cache_dir())
-    return p / "ingest_studies_manifest.json"
+    return core.ingest_manifest_path("studies")
 
 
 def _load_manifest() -> Dict[str, float]:
-    f = _manifest_file()
-    try:
-        return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
-    except Exception:                                                # noqa: BLE001
-        return {}
+    return core.read_ingest_manifest("studies")
 
 
 def _save_manifest(d: Dict[str, float]) -> None:
-    try:
-        core.write_json(_manifest_file(), d, indent=1)
-    except Exception:                                                # noqa: BLE001
-        pass
+    core.write_ingest_manifest("studies", d)
 
 
 def _clean(s: str) -> str:
@@ -281,6 +275,7 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         "_meta": {"what": _t("studies.meta_what")},
         "studies": []}
     by_id = {s.get("id"): s for s in data.get("studies") or []}
+    moved = _manifest_moved("studies")
     manifest = _load_manifest()
     files = sorted(root.rglob("*.pdf"))
     added, updated, skipped = [], [], 0
@@ -374,4 +369,7 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
             # The invariant is asserted by a test, not trusted to this line.
             "not_ingested": missed,
             "alarming": sum(1 for m in missed if m["reason"] in ALARMING),
-            "hint": _t("studies.hint") if added else ""}
+            "hint": _t("studies.hint") if added else "",
+            # The one run that carried the list of already-read files over from
+            # the cache says so (task 133); every other run says None.
+            "manifest_moved": moved}

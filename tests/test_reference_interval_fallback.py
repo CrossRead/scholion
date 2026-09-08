@@ -26,13 +26,13 @@ from scholion.engine import labs
 class TestTheCatalogueFillsAMissingInterval(unittest.TestCase):
     def _run(self, marker):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
-        (pathlib.Path(d) / "labs.json").write_text(json.dumps({"markers": marker}))
+        unpin = support.pin_profile(d)
+        (pathlib.Path(d) / "labs.json").write_text(json.dumps({"markers": marker}), encoding="utf-8")
         core.reset_cache()
         try:
             return labs.analyze_labs()
         finally:
-            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+            unpin()
             core.reset_cache()
 
     def test_a_value_far_out_of_range_is_flagged_even_with_no_range_on_file(self):

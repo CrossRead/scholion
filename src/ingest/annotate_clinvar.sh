@@ -108,11 +108,11 @@ fi
 # clean one is the failure this whole layer exists to prevent.
 REF_FASTA="${SCHOLION_REFERENCE_FASTA:-}"
 if [ -z "$REF_FASTA" ]; then
-  for cand in "$GEN"/*.fa "$GEN"/*.fasta "$GEN"/*.fa.gz "$GEN"/*.fasta.gz; do
+  for cand in "$GENOME_DIR"/*.fa "$GENOME_DIR"/*.fasta "$GENOME_DIR"/*.fa.gz "$GENOME_DIR"/*.fasta.gz; do
     [ -f "$cand" ] && { REF_FASTA="$cand"; break; }
   done
 fi
-NORM_VCF="$GEN/.normalised.vcf.gz"
+NORM_VCF="$GENOME_DIR/.normalised.vcf.gz"
 if [ -n "$REF_FASTA" ] && [ -f "$REF_FASTA" ]; then
   echo "→ Normalising (split multiallelics, left-align indels) against $(basename "$REF_FASTA")…"
   bcftools norm -m -any -f "$REF_FASTA" "$VCF" -Oz -o "$NORM_VCF"
@@ -126,7 +126,7 @@ else
 fi
 tabix -f -p vcf "$NORM_VCF"
 printf '{"left_aligned": %s, "reference": "%s", "normalised": true}\n' \
-  "$LEFT_ALIGNED" "${REF_FASTA:-}" > "$GEN/clinvar_norm.json"
+  "$LEFT_ALIGNED" "${REF_FASTA:-}" > "$GENOME_DIR/clinvar_norm.json"
 
 echo "→ Annotating your VCF with the ClinVar fields (CLNSIG, CLNDN, CLNREVSTAT, RS)…"
 bcftools annotate -a "$ANNOT" \

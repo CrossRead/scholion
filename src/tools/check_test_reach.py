@@ -41,6 +41,24 @@ the diff is then somebody's to justify in a commit message.
 A module that rose above its accepted line is not lowered automatically either.
 Work was done; recording it is a deliberate act.
 
+## Why `--accept` seeds the baseline before it measures
+
+`--accept` refuses to record the reach of a suite that did not pass — a red
+suite says nothing about reach. And the suite carries a cheap guard,
+`TestTheBaselineDescribesThisTree`, that fails whenever a module in the tree has
+no line in the baseline, telling the user to run `--accept`. Together those two
+made a circle: add a module, the guard turns the suite red, the red suite blocks
+`--accept`, and the only exit was to seed the new module at 0.0 by hand and run
+`--accept` a second time. Four modules paid for that on 08.09.2026.
+
+So `--accept` does the seeding itself, before the measurement starts: modules in
+the tree with no accepted number are entered at 0.0, modules in the baseline
+with no file behind them are removed, and both are printed. The measured run
+then sees a baseline that describes the tree, the guard is satisfied, and the
+real numbers overwrite the seeds. If the suite fails anyway the file is put back
+exactly as it was, so a refused `--accept` leaves no half-written state behind.
+`--strict` does none of this: it still fails on a module nobody reviewed.
+
 ## What is counted
 
 The lines the COMPILER considers executable — `dis.findlinestarts` over the
@@ -255,7 +273,7 @@ def measure(argv=None) -> dict:
         merged = {}
         for f in dumps.glob("*.json"):
             try:
-                got = json.loads(f.read_text())
+                got = json.loads(f.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):          # pragma: no cover
                 continue
             for k, v in got.items():
@@ -294,6 +312,70 @@ def _baseline() -> dict:
     return json.loads(BASELINE.read_text(encoding="utf-8")).get("modules", {})
 
 
+def _taken_with(backend: str) -> dict:
+    """What measured: the two backends do not count a line identically, and a
+    module moves by up to about a point between them with no change to the code
+    — seen on the same commit, 3.11 against 3.13 (task 125)."""
+    return {"python": "%d.%d" % sys.version_info[:2], "backend": backend,
+            "platform": sys.platform}
+
+
+def _baseline_meta() -> dict:
+    if not BASELINE.exists():
+        return {}
+    return json.loads(BASELINE.read_text(encoding="utf-8")).get("taken_with", {})
+
+
+def tree_modules() -> set:
+    """The modules the measurement will report on: every file under
+    `src/scholion` with at least one executable line, as a path relative to ROOT.
+    The same set `measure()` builds and the guard test in the suite builds; one
+    spelling, so the three cannot disagree about what a module is."""
+    return {p.relative_to(ROOT).as_posix()
+            for p in MEASURED.rglob("*.py")
+            if "__pycache__" not in p.parts and executable_lines(p)}
+
+
+def seed_baseline() -> tuple:
+    """Make the baseline describe the tree BEFORE the suite is measured.
+
+    Returns `(added, dropped, previous)`: the modules entered at 0.0 because
+    they had no accepted number, the modules removed because no file stands
+    behind them any more, and the file's previous text (`None` if there was no
+    file) so a caller can put it back when the measurement is refused. Nothing
+    is written when there is nothing to change.
+    """
+    present = tree_modules()
+    previous = BASELINE.read_text(encoding="utf-8") if BASELINE.exists() else None
+    doc = json.loads(previous) if previous else {}
+    accepted = dict(doc.get("modules", {}))
+    added = sorted(present - set(accepted))
+    dropped = sorted(set(accepted) - present)
+    if not added and not dropped:
+        return [], [], previous
+    for rel in added:
+        accepted[rel] = 0.0
+    for rel in dropped:
+        del accepted[rel]
+    BASELINE.write_text(json.dumps({
+        "_note": doc.get("_note", _NOTE),
+        # Kept through the seed: what measured the accepted numbers is still
+        # true of them, and the measured run rewrites it anyway.
+        **({"taken_with": doc["taken_with"]} if "taken_with" in doc else {}),
+        "overall": doc.get("overall", 0.0),
+        "modules": dict(sorted(accepted.items())),
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return added, dropped, previous
+
+
+def _restore_baseline(previous) -> None:
+    if previous is None:
+        if BASELINE.exists():
+            BASELINE.unlink()
+    else:
+        BASELINE.write_text(previous, encoding="utf-8")
+
+
 def compare(result: dict) -> tuple:
     """(fell, unlisted, vanished) against the accepted baseline."""
     accepted = _baseline()
@@ -310,6 +392,7 @@ def compare(result: dict) -> tuple:
 def _write_baseline(result: dict) -> None:
     BASELINE.write_text(json.dumps({
         "_note": _NOTE,
+        "taken_with": _taken_with(result["backend"]),
         "overall": result["overall"]["percent"],
         "modules": {k: v["percent"] for k, v in sorted(result["modules"].items())},
     }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -335,13 +418,29 @@ def main(argv=None) -> int:
               "so the accepted numbers do not apply here. Nothing measured, nothing compared.")
         return 0
 
+    # `--accept` first makes the baseline describe the tree, or the suite's own
+    # guard turns the run red over exactly the module `--accept` was asked to
+    # record — see «Why `--accept` seeds the baseline» in the docstring.
+    added, dropped, previous = ([], [], None)
+    if a.accept:
+        added, dropped, previous = seed_baseline()
+        for rel in added:
+            print(f"· {rel}: not in the baseline — entered at 0.0% for the measurement")
+        for rel in dropped:
+            print(f"· {rel}: in the baseline, not in the tree — removed")
+
     result = measure()
 
     if a.json:
+        if a.accept and not result["suite_ok"]:
+            _restore_baseline(previous)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["suite_ok"] else 1
 
     if not result["suite_ok"]:
+        if a.accept and (added or dropped):
+            _restore_baseline(previous)
+            print("· the baseline was put back as it was; nothing was accepted")
         print("✗ the suite did not pass, so its reach says nothing:")
         for line in result["suite_tail"]:
             print("   " + line)
@@ -357,10 +456,22 @@ def main(argv=None) -> int:
 
     if a.accept:
         _write_baseline(result)
-        print(f"\n✓ recorded as accepted: {BASELINE.relative_to(ROOT)}")
+        shown = BASELINE.relative_to(ROOT) if BASELINE.is_relative_to(ROOT) else BASELINE
+        print(f"\n✓ recorded as accepted: {shown}")
         return 0
 
     if a.strict:
+        meta, here = _baseline_meta(), _taken_with(result["backend"])
+        if not meta:
+            print("\n· the accepted numbers do not say what measured them; from the next "
+                  "--accept on, the baseline records the interpreter, the backend and the platform")
+        elif meta != here:
+            print(f"\n· the accepted numbers were taken with Python {meta.get('python')} / "
+                  f"{meta.get('backend')} on {meta.get('platform')}; this run is Python "
+                  f"{here['python']} / {here['backend']} on {here['platform']}. The two backends "
+                  f"do not count a line identically — a module can move by up to about a point "
+                  f"with no change to the code. The numbers below are compared as they are; to "
+                  f"compare like with like, run on that interpreter, or accept anew on this one.")
         fell, unlisted, vanished = compare(result)
         for rel, was, now in fell:
             print(f"\n✗ {rel}: reach fell {was}% → {now}%")

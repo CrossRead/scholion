@@ -135,3 +135,6 @@ from .profile_view import (  # noqa: F401 -- the facade re-exports every name
     _metrics_overview,
     metrics_summary,
 )
+from .prs_quality import (  # noqa: F401 -- the facade re-exports every name
+    P90_P10_SD, annotate_measurement, effect_size,
+)

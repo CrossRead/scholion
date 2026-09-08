@@ -25,6 +25,7 @@ import json
 import re
 import shutil
 import tempfile
+import os
 import unittest
 import zipfile
 from contextlib import redirect_stdout
@@ -555,6 +556,13 @@ class TestTheZipCarriesExecuteBits(unittest.TestCase):
     """
 
     def setUp(self):
+        if os.name != "posix":
+            # An execute bit is a POSIX idea. On a filesystem that keeps
+            # none, `chmod(0o755)` changes nothing and the zip records
+            # nothing, so this would fail for a reason that is not a
+            # defect. The bits it protects matter to whoever RECEIVES the
+            # archive on a Unix machine, and the build runs on one.
+            self.skipTest("execute bits in an archive are POSIX-only")
         self.tmp = Path(tempfile.mkdtemp(prefix="scholion-zip-"))
         self.out = self.tmp / "Scholion-SHARE"
         (self.out / "src" / "tools").mkdir(parents=True)
@@ -692,12 +700,50 @@ class TestTheMainEntryPointRefusesToHandOverABrokenZip(unittest.TestCase):
             self.assertTrue(zp.exists(), "main() reported success but wrote no archive")
             with zipfile.ZipFile(zp) as z:
                 bits = {i.filename: (i.external_attr >> 16) for i in z.infolist()}
-            for rel in ("run_tests.sh", "bin/crossread", "src/tools/nof1_quick_log.sh"):
-                key = f"{out.name}/{rel}"
-                with self.subTest(file=rel):
-                    self.assertIn(key, bits)
-                    self.assertTrue(bits[key] & 0o111, f"{rel} lost +x in the real build's zip")
+            # Every way of starting the suite that CI uses has to BE in the
+            # package. The rule is not «these three files»: the release gate
+            # requires the suite to be run inside the artefact, so a runner CI
+            # invokes and the build does not carry makes that gate impossible for
+            # whoever received the package. Found by carrying a build to a Windows
+            # machine — the shell runner was there, the Python one was not, and
+            # the only way in on that machine was the missing one.
+            for rel in self.RUNNERS_IN_CI():
+                with self.subTest(runner=rel):
+                    # assertTrue, not assertIn: the failure of assertIn prints
+                    # the whole archive listing — three hundred entries — and the
+                    # one line that matters scrolls away.
+                    self.assertTrue(f"{out.name}/{rel}" in bits,
+                                    f"CI starts the suite with `{rel}` and the built "
+                                    f"package does not carry it — the recipient cannot "
+                                    f"run the tests the way the release gate demands")
+            if os.name == "posix":
+                # An execute bit is a POSIX idea; on a filesystem that keeps none
+                # the build records none, and this would fail for a reason that is
+                # not a defect. The bits matter to whoever RECEIVES the archive on
+                # a Unix machine, and the build runs on one.
+                for rel in ("run_tests.sh", "bin/crossread", "src/tools/nof1_quick_log.sh"):
+                    key = f"{out.name}/{rel}"
+                    with self.subTest(file=rel):
+                        self.assertIn(key, bits)
+                        self.assertTrue(bits[key] & 0o111,
+                                        f"{rel} lost +x in the real build's zip")
             self.assertIn("verified INSIDE the archive", buf.getvalue())
+
+    @staticmethod
+    def RUNNERS_IN_CI():
+        """The files CI actually runs the suite with, read from the workflow.
+
+        Read rather than listed, for the reason every other list here is read:
+        a third place to keep in step is the one that goes stale. A new platform
+        cell that starts the suite some new way is covered the day it is added.
+        """
+        import re as _re
+        wf = support.ROOT / ".github" / "workflows" / "tests.yml"
+        if not wf.exists():
+            return ()
+        text = wf.read_text(encoding="utf-8")
+        found = set(_re.findall(r"(?:\./|python3? )([\w/]*run_tests\.(?:sh|py))", text))
+        return tuple(sorted(found))
 
 
 if __name__ == "__main__":
@@ -721,6 +767,13 @@ class TestTheHandoverArchiveCarriesNoRepository(unittest.TestCase):
     """
 
     def setUp(self):
+        if os.name != "posix":
+            # An execute bit is a POSIX idea. On a filesystem that keeps
+            # none, `chmod(0o755)` changes nothing and the zip records
+            # nothing, so this would fail for a reason that is not a
+            # defect. The bits it protects matter to whoever RECEIVES the
+            # archive on a Unix machine, and the build runs on one.
+            self.skipTest("execute bits in an archive are POSIX-only")
         self.root = Path(tempfile.mkdtemp(prefix="zip_git_"))
         self.addCleanup(shutil.rmtree, self.root, ignore_errors=True)
         self.out = self.root / "Pkg"

@@ -52,7 +52,7 @@ class _Local(unittest.TestCase):
     def _value(self, key, value, lo=0, hi=20):
         (pathlib.Path(self.d) / "profile" / "labs.json").write_text(json.dumps(
             {"markers": {key: {"name": key, "unit": "u", "ref_low": lo, "ref_high": hi,
-                               "series": [{"date": "2026-07-01", "value": value}]}}}))
+                               "series": [{"date": "2026-07-01", "value": value}]}}}), encoding="utf-8")
         core.reset_cache()
 
 

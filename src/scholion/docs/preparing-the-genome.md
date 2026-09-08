@@ -555,6 +555,22 @@ Zero pathogenic findings in a gene panel is honest exactly to the extent that th
 
 The known difficult zones for short reads, which will surface for almost everyone: pseudogenes (`PMS2`/PMS2CL, `CYP2D6`/CYP2D7, `FANCD2`) — reads are lost on the MAPQ filter; and high GC (`LDLR`, `STK11`, `APOE`) — coverage sags during library preparation.
 
+### Asking about a gene that is not in the curated catalogue
+
+`loci.json` is a book of pharmacogenetic **loci**, not an index of genes, and it was never meant to be one. Until the annotation below is in place, `scholion genome --gene CASR` answers «Gene CASR is not in the coordinate reference» — a true sentence about the catalogue that is easily read as a sentence about the genome. Three files turn that into a real answer, and each of them is one you already have after the steps above:
+
+| what | where it is looked for | the variable that overrides the search |
+|---|---|---|
+| Ensembl GFF3 (gene → coordinates and coding exons) | `genome/`, `~/genomic_work/csq/` | `SCHOLION_GENE_GFF3` |
+| the reference FASTA with its `.fai` (variant → protein) | `genome/reference/`, `~/genomic_work/reference/` | `SCHOLION_GENOME_REFERENCE` |
+| the BAM with its `.bai` (how much of the region was read) | `~/genomic_work/<sample>/` | `SCHOLION_GENOME_BAM` |
+
+Nothing walks upwards from these folders looking for candidates: an annotation kept anywhere else is named by the variable, deliberately, rather than found by a search that is convenient until the day it finds the wrong file. The GFF3 is the same one `csq_lof_scan.sh` downloads, so on a machine that has run that step the whole path works offline; without it the coordinates are fetched from Ensembl once and cached.
+
+Read the answer in the order it is printed. Coverage comes **before** the variants, because everything a gene report says in the reassuring direction is of the form «no such variant», and that sentence is empty until the region is known to have been read. When a piece is missing the report says which one and what would supply it, instead of dropping the line — a missing row and a row saying «none» look identical on the page and mean opposite things.
+
+Two blind spots survive any amount of depth and are printed on every answer: short reads do not call large deletions or duplications of whole exons, and deep intronic or regulatory variants inside the interval are not interpreted. For a gene where exon-level deletions are a real share of the pathogenic alleles, «nothing found» is not the same as «excluded».
+
 ### Searching for LoF variants that are not in ClinVar
 
 ClinVar annotation is an intersection of coordinates with a database: a variant that breaks a protein but has not been described yet will not be seen by it. Consequence prediction closes this gap, and for a first pass `bcftools csq` is enough (the Ensembl GFF3 transcript model, ~100 MB) instead of a VEP cache (~25 GB): the tool is already installed, and neither Docker nor x86 emulation is needed. Three rakes that make false findings easy to step on:

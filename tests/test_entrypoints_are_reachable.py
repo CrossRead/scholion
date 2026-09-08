@@ -101,6 +101,26 @@ class TestTheInterfaceShowsTheVersionItIs(unittest.TestCase):
         self.assertEqual(__version__.strip(),
                          (support.ROOT / "VERSION").read_text(encoding="utf-8").strip())
 
+    def test_a_foreign_install_does_not_answer_for_the_tree(self):
+        """Task 123. With any `scholion` distribution installed on the machine —
+        an older one from the registry, kept for comparison — the tree used to
+        report THAT number, because installed metadata was asked before the
+        VERSION file beside pyproject.toml. Simulated rather than installed:
+        metadata is made to answer «0.0.1», and the tree must still say what
+        VERSION says."""
+        import importlib.metadata as md
+        import scholion
+        root = Path(scholion.__file__).resolve().parents[2]
+        if not (root / "pyproject.toml").is_file():
+            self.skipTest("not running from a source tree — metadata is the right answer here")
+        real = md.version
+        md.version = lambda name: "0.0.1" if name == "scholion" else real(name)
+        try:
+            self.assertEqual(scholion._detect_version(),
+                             (root / "VERSION").read_text(encoding="utf-8").strip())
+        finally:
+            md.version = real
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -34,6 +34,16 @@ Two rules govern the whole repository:
   database right, unlike CC BY 4.0. For EU users this is a grey area inherited
   from the upstream source, not something this project can resolve.
 
+### Body silhouettes — Servier Medical Art
+
+* Files: `src/scholion/web/body-male.webp`, `src/scholion/web/body-female.webp`
+* Source: https://smart.servier.com/ ("Male silhouette", "Female silhouette")
+* Licence: **Creative Commons Attribution 4.0** — use, modification and
+  commercial use permitted, attribution required
+* What was changed: only the alpha channel is kept, so what ships is the outline
+  of the body and nothing else; the colour is the application's own. The credit
+  is printed under the figure in the interface, not only here.
+
 ### Pharmacogenomic gene–drug reference
 
 * File: `src/scholion/knowledge/cpic_drug_gene.json`

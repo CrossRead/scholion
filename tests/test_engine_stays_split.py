@@ -43,6 +43,13 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 LINE_BUDGETS = {
     "__init__": 220,     # imports only -- claim 1 keeps it honest anyway
     "_helpers": 250,
+    # Added 08.09.2026 with task 132: the two quantities printed beside a
+    # polygenic percentile — its stability under another reference population
+    # or another model, and the model's informativeness. It is about the QUALITY
+    # of a stored score and computes none; `genomics.py` was at its wire, and
+    # the line between «what the score is» and «what the score is worth» is a
+    # domain line, not a page break.
+    "prs_quality": 140,
     # 450 → 480 on 19.08.2026. Three capabilities took the room, all of them in
     # the same place because they are all about what a single measurement means:
     # a draw's clock time and the same-day pair it forms (a repeat is not a
@@ -74,7 +81,23 @@ LINE_BUDGETS = {
     # `_trend` prints as «↑ 44 %» and which had no notion of scatter at all.
     # Splitting them would put one question in two files — the split that
     # produced the corridor defects named above.
-    "labs": 680,
+    # 680 → 710 on 08.09.2026. The age axis of the corridor rule, beside the
+    # sex axis added the same day and for the same reason both sit here: «may
+    # this number be compared with that corridor» is one question, and IGF-1's
+    # band is as much a part of it as HDL's sex. A marker's corridor is refused
+    # for one nearer reason, and the two axes have to be read in one place for
+    # «one reason» to be true.
+    # 710 → 730 the same day: two more words of the same rule — a corridor that
+    # could not be checked (`unreviewed`, lent to nobody) and a test that
+    # exists for one sex only (PSA), which is not a corridor question at all
+    # and had to be told apart from one in the same place.
+    # 730 → 760 the same evening, task 142: the corridor printed on the form
+    # travels with the point and the verdict stands on it, with whose corridor
+    # it is and whether the flags of a series still share one ruler. Third
+    # raise in a day on the same question — the corridor rule has become a
+    # domain of its own, and task 143 is to move it out; the budget is raised
+    # here so that the release carries the fix, and the split follows.
+    "labs": 760,
     "goals": 550,
     # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
     # the report is BUILT, not only where the score is computed, because
@@ -103,7 +126,13 @@ LINE_BUDGETS = {
     "genomics": 650,
     "sources": 180,
     "pgx": 900,
-    "lifestyle": 980,
+    # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a
+    # mark on the figure is about, and the score of the markers made in that
+    # one place. It belongs beside `health_radar` because the domain's own
+    # score is computed from the same list two lines above: splitting them
+    # would put a panel in one file and that panel's places in another, and
+    # the two would drift the way every pair of copies in this project has.
+    "lifestyle": 1010,
     "profile_view": 220,
 }
 

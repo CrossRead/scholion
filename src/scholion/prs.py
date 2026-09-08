@@ -20,7 +20,7 @@ import subprocess
 import re
 from pathlib import Path
 
-from .i18n import t as _t
+from .i18n import plural as _plural, t as _t
 
 _DEFAULT_PKG = "just-prs-mcp@0.1.3"
 
@@ -44,6 +44,34 @@ def _prs_pkg() -> str:
 PKG = _prs_pkg()
 _TRAITS = Path(__file__).resolve().parent / "knowledge" / "prs_traits.json"
 
+#: What the sidecar's own dependency declaration leaves open, closed here.
+#: just-prs-mcp 0.1.3 declares `fastmcp[tasks]>=3.4.2` with no upper bound. Since
+#: 17.08.2026 the index carries fastmcp 4.x, where the tasks extension is a
+#: separate distribution that the server has to register itself — and 0.1.3,
+#: written against 3.x, does not. Left to resolve freely, every fresh uvx cache
+#: took 4.x and the server died at start-up, before the first request, taking
+#: the whole PRS layer with it (`prs`, `/api/prs`, the monthly reanalysis).
+#: Observed on 05.09.2026; with the constraint the resolution is fastmcp 3.4.7
+#: and the control trait reproduces the August number exactly (task 129).
+#: `src/ingest/prs_constraints.txt` carries the same lines with the full account,
+#: for the shell path; a test holds the two copies together.
+PRS_CONSTRAINTS = ("fastmcp<4",)
+
+
+def _constraint_file() -> Path:
+    """The file `uv` reads through UV_CONSTRAINT — written from PRS_CONSTRAINTS.
+
+    An installed copy has no `src/ingest` beside it (the wheel carries only this
+    package), so the file is not looked for but written: a small, stable path
+    under the temporary directory, rewritten on every launch so it can never be
+    stale. The tree's own copy is not read either — one source of truth, and the
+    test is what keeps the shell copy in step with it.
+    """
+    import tempfile
+    p = Path(tempfile.gettempdir()) / "scholion-prs-constraints.txt"
+    p.write_text("".join(f"{c}\n" for c in PRS_CONSTRAINTS), encoding="utf-8")
+    return p
+
 
 class PrsUnavailable(RuntimeError):
     """uvx/the server is unavailable — we show a tidy placeholder in the UI."""
@@ -62,6 +90,10 @@ class _MCP:
             raise PrsUnavailable(_t("prs.offline"))
         env = dict(os.environ)
         env.setdefault("PRS_MCP_MODE", mode)
+        # setdefault, not assignment: an owner who has pointed UV_CONSTRAINT at
+        # their own file (a newer sidecar, a local build) is not overruled.
+        env.setdefault("UV_CONSTRAINT", str(_constraint_file()))
+        self._constraint = env["UV_CONSTRAINT"]
         try:
             # stderr is inherited → the server's logs/progress are visible live (it does not «hang silently»)
             self.p = subprocess.Popen(
@@ -82,7 +114,17 @@ class _MCP:
         for _ in range(10000):
             line = self.p.stdout.readline()
             if not line:
-                raise PrsUnavailable(_t("prs.server_silent"))
+                # The server's own last words went to stderr, which is inherited
+                # and therefore already on the owner's screen — but the exception
+                # is what reaches the log and the UI, and «exited without an
+                # answer» named no cause. The one cause seen so far is named
+                # here, with the constraint that is meant to prevent it, so that
+                # a recurrence reads as «the pin was not applied» rather than as
+                # a server that fell silent for no reason.
+                code = self.p.poll()
+                raise PrsUnavailable(_t("prs.server_silent_why",
+                                        code="?" if code is None else code,
+                                        constraint=" ".join(PRS_CONSTRAINTS)))
             try:
                 msg = json.loads(line)
             except ValueError:
@@ -293,6 +335,54 @@ def resolve_superpopulation(asked=None):
     return {"value": "EUR", "source": "default"}
 
 
+def _models_summary(rep: dict, requested: int) -> dict:
+    """What the server did with the trait's candidate models, in numbers the
+    report can carry — and the rule behind the largest of them, named.
+
+    Task 131c. A run printed `n_skipped: 85` for coronary artery disease — 88
+    candidates, 85 not scored — and nothing said by what rule. The rule is not
+    the server's: it is this client's `limit` (`--models`), and the server's own
+    summary line says so («skipped by limit»). So the number travels with its
+    reason, as a field a report can print, rather than as a count somebody has
+    to go and explain.
+
+    The percentile spread is over the rows whose percentile the server itself
+    calls reliable; a model whose reference distribution is missing has no
+    percentile to spread.
+    """
+    rows = _rows_of(rep)
+    pct = [float(r["percentile"]) for r in rows
+           if r.get("percentile_reliable") is True
+           and isinstance(r.get("percentile"), (int, float))]
+    n = {k: rep.get(k) for k in ("n_scored", "n_returned", "n_skipped", "n_failed")} \
+        if isinstance(rep, dict) else {}
+    scored = n.get("n_scored") if isinstance(n.get("n_scored"), int) else len(rows)
+    not_scored = n.get("n_skipped") if isinstance(n.get("n_skipped"), int) else 0
+    failed = n.get("n_failed") if isinstance(n.get("n_failed"), int) else 0
+    return {"requested": requested, "scored": scored,
+            "returned": n.get("n_returned") if isinstance(n.get("n_returned"), int) else len(rows),
+            "failed": failed, "not_scored": not_scored,
+            # The one rule: candidates beyond `--models` are not scored. Stored as
+            # a token, phrased by the renderer in the reader's language.
+            "not_scored_rule": "limit",
+            "candidates": scored + not_scored + failed,
+            "pgs_ids": [r.get("pgs_id") for r in rows if r.get("pgs_id")],
+            "percentiles": [round(p, 1) for p in pct],
+            "spread_pp": round(max(pct) - min(pct), 1) if len(pct) >= 2 else None}
+
+
+def _rejected_keys(error_text: str, extra: dict) -> set:
+    """Which of `extra` the server refused, read from its own message.
+
+    0.1.3 answers `unexpected_keyword_argument 'profile'` — one name per
+    refusal. When the message names none of the keys that were sent, every
+    optional one is treated as refused: the alternative is to keep sending them
+    and keep being refused, which is the double call this exists to end.
+    """
+    named = {k for k in extra if f"'{k}'" in error_text or f'"{k}"' in error_text}
+    return named or set(extra)
+
+
 def report(vcf_path: str, traits=None, superpopulation=None,
            only=None, normalize: bool = True, models_per_trait: int = 3,
            profile: str = "curated", include_children: bool = False,
@@ -301,8 +391,11 @@ def report(vcf_path: str, traits=None, superpopulation=None,
 
     only — a list of substrings to filter traits (a quick test on a single one).
     models_per_trait — how many PGS models to compute per trait (limit).
-    profile — 'curated' (default) or 'all' (more candidate models).
-    include_children — include models of child traits (a wider pool).
+    profile — 'curated' (default) or 'all' (more candidate models). NOT accepted
+        by the pinned just-prs-mcp 0.1.3: it is offered once, refused, and not
+        offered again in the run — the setting is honoured only by a newer server.
+    include_children — include models of child traits (a wider pool). Same
+        standing as `profile`: not accepted by 0.1.3.
     pick — 'server' (top by the server's ranking) or 'covered' (the best covered here).
     min_match_rate — filter models by coverage on the server side.
     fallback — when a model is missing or poorly covered, look for one via search_scores.
@@ -326,6 +419,13 @@ def report(vcf_path: str, traits=None, superpopulation=None,
     m = _MCP()
     out = []
     geno = None
+    # Parameters the server has refused ONCE are not offered again in this run.
+    # Before this, `profile` and `include_children` — which the pinned 0.1.3 does
+    # not accept — were sent with every trait, refused with every trait, and
+    # every call went twice: a whole panel cost double for a setting that was
+    # never in force (task 131a). The retry itself stays, for a newer server
+    # that does accept them; what changes is that the lesson is kept.
+    unsupported: set = set()
     try:
         # normalise the VCF ONCE and reuse it for all traits
         if normalize:
@@ -353,7 +453,13 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                     base = {"trait_id": efo, "vcf_path": vcf_path, "interpret": True,
                             "superpopulation": superpopulation,
                             "limit": models_per_trait,
-                            "top_n": (50 if pick == "covered" else 1)}
+                            # Every model the server SCORES comes back. `top_n=1`
+                            # used to trim the answer to the server's favourite —
+                            # three models computed, one seen, and the spread
+                            # between them, which for a trait whose score
+                            # explains five per cent of the variance is half the
+                            # answer, never reached the page (task 131b).
+                            "top_n": models_per_trait}
                     if geno:
                         base["genotypes_path"] = geno
                     # optional ones — only if set (present in newer server versions)
@@ -364,12 +470,17 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                         extra["include_children"] = True
                     if min_match_rate is not None:
                         extra["min_match_rate"] = min_match_rate
+                    extra = {k: v for k, v in extra.items() if k not in unsupported}
                     try:
                         rep = m.call("compute_prs_by_trait", {**base, **extra})
                     except RuntimeError as e:
                         if extra and "keyword" in str(e).lower():
-                            _log(_t("prs.args_rejected", args=list(extra)))
-                            rep = m.call("compute_prs_by_trait", base)
+                            gone = _rejected_keys(str(e), extra)
+                            unsupported.update(gone)
+                            _log(_t("prs.args_rejected", args=sorted(gone)))
+                            rep = m.call("compute_prs_by_trait",
+                                         {**base, **{k: v for k, v in extra.items()
+                                                     if k not in gone}})
                         else:
                             raise
                     rows = _rows_of(rep)
@@ -377,6 +488,11 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                     row["efo_id"] = efo
                     row["result"] = rep
                     row["chosen"] = chosen
+                    row["models"] = _models_summary(rep, models_per_trait)
+                    _log(_t("prs.models_line",
+                            scored=_plural(row["models"]["scored"], "count.models"),
+                            candidates=_plural(row["models"]["candidates"], "count.candidates"),
+                            not_scored=row["models"]["not_scored"], limit=models_per_trait))
                     row["status"] = "ok"
                 else:
                     row["status"] = "trait_not_found"

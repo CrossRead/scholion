@@ -95,9 +95,9 @@ class TestGuidanceIsKeyedInItsGenesVocabulary(unittest.TestCase):
         import json, os, pathlib, tempfile
         from scholion.engine import pgx
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps(
-            {"genotypes": [{"rsid": "rs3918290", "genotype": "TT", "confidence": "called"}]}))
+            {"genotypes": [{"rsid": "rs3918290", "genotype": "TT", "confidence": "called"}]}), encoding="utf-8")
         core.reset_cache()
         try:
             r = pgx.check_drug_gene("5-fu")
@@ -107,7 +107,7 @@ class TestGuidanceIsKeyedInItsGenesVocabulary(unittest.TestCase):
             self.assertEqual(r["level"], "high")
             self.assertIn("Avoid", r["cpic"]["recommendation"])
         finally:
-            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+            unpin()
             core.reset_cache()
 
 

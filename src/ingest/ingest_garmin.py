@@ -118,7 +118,7 @@ def build(gdir: str) -> dict:
     # --- daily summaries (UDSFile) ---
     for f in glob.glob(os.path.join(A, "UDSFile_*.json")):
         try:
-            recs = json.load(open(f))
+            recs = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         for r in recs if isinstance(recs, list) else []:
@@ -152,7 +152,7 @@ def build(gdir: str) -> dict:
     hrv = defaultdict(list)
     for f in glob.glob(os.path.join(W, "*healthStatusData.json")):
         try:
-            recs = json.load(open(f))
+            recs = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         for r in recs if isinstance(recs, list) else []:
@@ -168,7 +168,7 @@ def build(gdir: str) -> dict:
                  + glob.glob(os.path.join(M, "*MaxMetData*.json")))
     for f in vo2_files:
         try:
-            recs = json.load(open(f))
+            recs = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         for r in recs if isinstance(recs, list) else []:
@@ -188,7 +188,7 @@ def build(gdir: str) -> dict:
     nightly = []
     for f in glob.glob(os.path.join(W, "*sleepData.json")):
         try:
-            recs = json.load(open(f))
+            recs = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         for r in recs if isinstance(recs, list) else []:
@@ -237,7 +237,7 @@ def build(gdir: str) -> dict:
     bwater = defaultdict(list); muscle = defaultdict(list)
     for f in glob.glob(os.path.join(W, "*userBioMetrics.json")):
         try:
-            recs = json.load(open(f))
+            recs = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         for r in recs if isinstance(recs, list) else []:
@@ -260,7 +260,7 @@ def build(gdir: str) -> dict:
     workouts = defaultdict(lambda: defaultdict(lambda: {"count": 0, "hours": 0.0}))
     for f in glob.glob(os.path.join(F, "*summarizedActivities.json")):
         try:
-            d = json.load(open(f))
+            d = json.load(open(f, encoding="utf-8"))
         except Exception:
             continue
         acts = []

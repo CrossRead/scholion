@@ -40,6 +40,9 @@ class ResolutionCase(unittest.TestCase):
         self.profile.mkdir()
         self._old = os.environ.get("SCHOLION_PROFILE_DIR")
         os.environ["SCHOLION_PROFILE_DIR"] = str(self.profile)
+        # The cache too: the loader's list of already-read files lives beside
+        # the profile now, and an old list found in the cache is carried over.
+        self._restore_cache = support.pin_cache(self.root / "cache")
         from scholion import core
         core.reset_cache()
 
@@ -48,6 +51,7 @@ class ResolutionCase(unittest.TestCase):
             os.environ.pop("SCHOLION_PROFILE_DIR", None)
         else:
             os.environ["SCHOLION_PROFILE_DIR"] = self._old
+        self._restore_cache()
         from scholion import core
         core.reset_cache()
         self.tmp.cleanup()

@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.8** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.4.9** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -317,6 +317,13 @@ analysis runs on the standard library. Reading laboratory PDFs is the exception 
 that needs `pdfplumber`, which the pip package brings with it and this delivery
 does not. Everything else works from the unpacked folder as it stands.
 
+macOS, Linux and Windows, each checked by its own cell of the test matrix. Two
+things are Unix-only and both are optional: the `bin/crossread` wrapper is a
+shell script — on Windows the installed `scholion` command is the same core —
+and building a genome from raw reads drives `bwa`, `samtools` and `mosdepth`
+through the scripts in `src/ingest`. Every external tool is looked for before it
+is used, so where one is missing the answer says which, rather than failing.
+
 ```bash
 ./bin/crossread --help
 SCHOLION_PROFILE_DIR=demo/profile ./bin/crossread overview
@@ -554,8 +561,8 @@ One data directory, the same layout for everyone:
 ```
 
 `scholion init` creates it with a short note in each folder. By default it sits in
-`$XDG_DATA_HOME/scholion`, on macOS `~/Library/Application Support/Scholion`;
-`SCHOLION_REPO_DIR` overrides it. Heavy directories — `raw/` and `work/` — can
+`$XDG_DATA_HOME/scholion`, on macOS `~/Library/Application Support/Scholion`, on
+Windows `%USERPROFILE%\.scholion`; `SCHOLION_REPO_DIR` overrides it. Heavy directories — `raw/` and `work/` — can
 live on another disk: name them in `profile/sources.json`. When that disk is
 absent the application says so by name instead of showing zeros.
 

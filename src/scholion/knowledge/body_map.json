@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "what": "Where each system of the radar is shown on the figure — or why it is nowhere on it.",
+    "rule": "Every key the radar emits appears here exactly once and declares one of four things: a `place` drawn from `vocabulary`; `by_marker`, when the domain's markers are made in different organs and one point would be a claim about all of them and true of one; `systemic` (measured in blood, not located in an organ); or `whole_body`. There is no fifth state and no default: a domain added to the radar without an entry here fails the suite, because a figure that quietly omits a system draws a healthier person than the data describes. A word in `vocabulary` that nobody places fails it too — an allowed place nothing uses is a coordinate waiting to be wrong. Inside `by_marker`, the value `systemic` is how a single marker says it is made nowhere in particular; it still owes a reason.",
+    "source": "Written here. The placements are ordinary anatomy, and the rule is the organ that PRODUCES the substance, not the organ it is read for — an antibody, which is made by lymphocytes everywhere and would mean nothing where they are, is the named exception and is marked at the tissue it is raised against. `basis` states the reason per marker where a domain is split, so a reader can disagree with a specific claim rather than with a drawing.",
+    "source_tier": "curated_reference"
+  },
+  "vocabulary": [
+    "pituitary",
+    "thyroid",
+    "adrenals",
+    "liver",
+    "pancreas",
+    "kidneys",
+    "gonads"
+  ],
+  "places": {
+    "thyroid": {
+      "by_marker": {
+        "tsh": "pituitary",
+        "t4_free": "thyroid",
+        "t3_free": "thyroid",
+        "anti_tpo": "thyroid"
+      },
+      "basis": {
+        "tsh": "TSH is secreted by the anterior pituitary, not by the thyroid it is read for: the number is the pituitary's demand for thyroid hormone. It is marked at the gland that produces it, and the axis it measures — pituitary to thyroid — is what the two marks together show.",
+        "t4_free": "Thyroxine is synthesised by the thyroid follicle; the mark and the gland are the same thing.",
+        "t3_free": "Triiodothyronine is secreted by the thyroid and also made outside it by deiodination of T4 in liver and kidney; the gland is the regulated source and carries the mark.",
+        "anti_tpo": "An antibody against thyroid peroxidase is produced by lymphocytes, which are everywhere and mean nothing as a place. It is the named exception to the producing-organ rule and is marked at the gland it is raised against, which is where its consequence is."
+      }
+    },
+    "adrenals": {
+      "place": "adrenals",
+      "basis": "Cortisol and DHEA-S are both secreted by the adrenal cortex; here the domain and the gland are the same thing."
+    },
+    "gonads": {
+      "by_marker": {
+        "testosterone": "gonads",
+        "dht": "systemic",
+        "estradiol": "systemic"
+      },
+      "basis": {
+        "testosterone": "Testosterone is produced by the gonads — the testis, and the ovary together with the adrenal cortex — so the mark sits at the pelvis on either figure.",
+        "dht": "Dihydrotestosterone is not secreted by a gland: it is converted from testosterone by 5α-reductase in the tissues that respond to it — prostate, skin, hair follicle. There is no one place to mark, and marking the gonad would name the source of its precursor instead.",
+        "estradiol": "Estradiol comes from the ovary in one person and from aromatisation in adipose tissue in another, so no single mark is true of both figures. The number is shown, the place is not claimed."
+      }
+    },
+    "growth": {
+      "by_marker": {
+        "igf1": "liver",
+        "gh": "pituitary"
+      },
+      "basis": {
+        "igf1": "IGF-1 is made by the hepatocyte under growth hormone: the pituitary sends the signal and the liver writes the answer, which is the organ carrying the mark.",
+        "gh": "Growth hormone is secreted by the anterior pituitary, which is where the signal of this axis begins."
+      }
+    },
+    "pancreas": {
+      "place": "pancreas",
+      "basis": "Amylase, its pancreatic fraction and lipase are enzymes of the acinar cell; C-peptide is released by the beta cell of the islet in equal amount with insulin. Both halves of the gland, and one place."
+    },
+    "liver": {
+      "place": "liver",
+      "basis": "ALT, AST and GGT are enzymes released by the hepatocyte; here the domain and the organ are the same thing."
+    },
+    "renal": {
+      "place": "kidneys",
+      "basis": "Creatinine and uric acid are cleared by the kidney and are read as its function."
+    },
+    "glucose": {
+      "by_marker": {
+        "glucose": "systemic",
+        "hba1c": "systemic",
+        "homa_ir": "systemic",
+        "insulin": "pancreas"
+      },
+      "basis": {
+        "glucose": "Circulating glucose is not made in an organ: it is the balance of intake, hepatic output and uptake by everything, and a mark anywhere would name one term of that balance as if it were all.",
+        "hba1c": "Glycated haemoglobin forms inside the red cell wherever the blood happens to be. It is a record of exposure over three months, not a product of a gland.",
+        "homa_ir": "An index computed from glucose and insulin: an arithmetic result, not a substance, and it has no place of origin at all.",
+        "insulin": "Insulin is secreted by the beta cell of the pancreatic islet — the one member of this panel with a gland behind it, and the reason the pancreas is lit by a carbohydrate marker."
+      }
+    },
+    "lipids": {
+      "systemic": true,
+      "basis": "measured in blood; not located in an organ"
+    },
+    "inflammation": {
+      "systemic": true,
+      "basis": "measured in blood; not located in an organ"
+    },
+    "micronutrients": {
+      "systemic": true,
+      "basis": "measured in blood; not located in an organ"
+    },
+    "fitness": {
+      "whole_body": true,
+      "basis": "sleep, resting heart rate, body composition and endurance describe the whole body rather than a place inside it"
+    }
+  }
+}

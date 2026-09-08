@@ -63,6 +63,12 @@ CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 PERSONAL_DIRS = {"profile", "genome", "raw", "work", "archive", "reports", "_backups",
                  "_to_delete", "_research", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
                  "dist", "node_modules",
+                 # `.claude/` holds the assistant's own working state, and since
+                 # 08.09.2026 also the worktrees of its spawned sessions — a whole
+                 # second copy of the tree, uncommitted, under the project root.
+                 # Walked, it reported that copy's `i18n/ru.py` as Russian added
+                 # to what ships. It is not part of the tree and never travels.
+                 ".claude",
                  # `backlog/` is the owner's product backlog and its linter. It is
                  # Russian by purpose and it TRAVELS NOWHERE: what goes outside is
                  # the release record, and nothing else. This gate asks one

@@ -214,7 +214,7 @@ class TestConcurrentWritesDoNotLoseEachOther(unittest.TestCase):
     def test_parallel_metric_writes_all_survive(self):
         import tempfile
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         core.write_json.__wrapped__ if hasattr(core.write_json, "__wrapped__") else None
         try:
             # clear any cache pinned to a previous dir
@@ -239,7 +239,7 @@ class TestConcurrentWritesDoNotLoseEachOther(unittest.TestCase):
             dates = {p["date"] for p in series}
             self.assertEqual(len(dates), 12, f"lost updates: only {len(dates)}/12 survived")
         finally:
-            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+            unpin()
             if hasattr(core, "_JSON_CACHE"):
                 core._JSON_CACHE.clear()
 

@@ -6,6 +6,7 @@ the aggregate that reads labs, drugs and lifestyle together.
 """
 from __future__ import annotations
 
+import json
 from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import lang as _lang, plural as _plural, t as _t
@@ -39,7 +40,21 @@ _RADAR_DOMAINS = [
     ("lipids", ["cholesterol_total", "ldl", "hdl", "triglycerides"]),
     ("glucose", ["glucose", "hba1c", "homa_ir", "insulin"]),
     ("inflammation", ["crp_hs", "rheumatoid_factor", "homocysteine"]),
-    ("hormones", ["testosterone", "igf1", "tsh"]),
+    # The endocrine system is not one system. «Hormones» averaged a thyroid
+    # marker, a gonadal one and a hepatic one into a single number, and the
+    # ring beside it measured how much of that mixture existed — a quantity
+    # nobody orders. These four are the panels a laboratory actually issues.
+    ("thyroid", ["tsh", "t4_free", "t3_free", "anti_tpo"]),
+    ("adrenals", ["cortisol", "dheas"]),
+    ("gonads", ["testosterone", "dht", "estradiol"]),
+    ("growth", ["igf1", "gh"]),
+    # Both halves of the gland: the acinar cell that makes the digestive
+    # enzymes, and the beta cell, whose C-peptide is released with insulin in
+    # equal amount and survives long enough to be measured. Insulin itself
+    # stays in the carbohydrate panel, where HOMA-IR is computed from it —
+    # splitting an index from one of its two inputs would leave neither
+    # system able to explain it — and is MARKED at the pancreas instead.
+    ("pancreas", ["amylase", "amylase_pancreatic", "lipase", "c_peptide"]),
     ("liver", ["alt", "ast", "ggt"]),
     ("micronutrients", ["vitamin_d", "omega3_index", "vitamin_b12", "ferritin"]),
     ("renal", ["uric_acid", "creatinine"]),
@@ -314,10 +329,21 @@ def _marker_health_at(key: str, point: Optional[Dict[str, Any]]) -> Optional[int
                            "ref_low": raw.get("ref_low"), "ref_high": raw.get("ref_high")})
 
 
-def _marker_health(m: Dict[str, Any]) -> int:
+def _marker_health(m: Dict[str, Any]) -> Optional[int]:
     """A 0–100 score for one marker: 100 within range, less — by the DEGREE of deviation.
     That way the radar becomes selective (it does not collapse to 0), and a mild deviation
-    differs from a severe one."""
+    differs from a severe one.
+
+    ``None`` when the marker carries no verdict: no reference interval at all
+    (`norange`), or a locally proposed rule nobody has confirmed. What stood here
+    returned 55 for both — the score for «there is a deviation whose size cannot be
+    assessed» — and there is no deviation: there is nothing to deviate from. A
+    hand-entered number with no corridor beside it took 45 points off its system
+    and appeared among that system's deviations, while the marker list on the same
+    screen said, correctly, that it was not one.
+    """
+    if m.get("flag") in ("norange", "unconfirmed_rule"):
+        return None
     if m.get("flag") == "ok":
         return 100
     v = m.get("value")
@@ -345,24 +371,103 @@ def _marker_health(m: Dict[str, Any]) -> int:
     return 15
 
 
+def _body_map() -> Dict[str, Any]:
+    """Where each system is shown on the figure — read, never guessed.
+
+    The figure on the Overview draws three organs and says of the rest that they
+    have no place on a body. Which is which is a claim about anatomy, so it lives
+    in `knowledge/` with a `basis` beside every entry, and a test refuses a radar
+    domain that has no entry at all. The alternative — the same lookup written
+    into the page — puts a medical claim in a file nobody reviews for one.
+    """
+    try:
+        return json.loads(core.knowledge_path("body_map.json").read_text(encoding="utf-8"))
+    except Exception:                                                # noqa: BLE001
+        # A missing map must not take the radar down with it: the figure then has
+        # nothing to place, and the radar answers exactly as it did before.
+        return {"vocabulary": [], "places": {}}
+
+
+def _placement(entry: Dict[str, Any], keys: List[str],
+               by_key: Dict[str, Any]) -> Dict[str, Any]:
+    """The domain's entry from the body map, with `by_marker` resolved into parts.
+
+    A domain whose markers are made in different glands cannot be drawn at one
+    point. TSH is secreted by the pituitary, IGF-1 is written by the liver,
+    testosterone is made by the gonads: a single mark at the neck was a statement
+    about all three that was true of one. Such a domain declares `by_marker`, and
+    every place gets the score of the markers made THERE — the domain's mean
+    would print the same number in three places and mean it in none.
+
+    Parts carry their own `measured`/`total` for the same reason the domain does:
+    the ring around a mark is the share of that place's panel that exists, and a
+    place with nothing measured has no score and is not drawn.
+    """
+    by_marker = entry.get("by_marker")
+    if not by_marker:
+        return entry
+    order: List[str] = []
+    for k in keys:
+        p = by_marker.get(k)
+        # `systemic` is a place-name for «nowhere in particular»: DHT is converted
+        # in peripheral tissue and estradiol comes from the ovary in one person and
+        # from adipose tissue in another. The marker keeps its reason in the map
+        # and gets no mark, which is the honest drawing of that fact.
+        if p and p != "systemic" and p not in order:
+            order.append(p)
+    parts = []
+    for place in order:
+        mine = [k for k in keys if by_marker.get(k) == place]
+        present = [by_key[k] for k in mine if k in by_key]
+        told = [s for s in (_marker_health(m) for m in present) if s is not None]
+        score = round(sum(told) / len(told)) if told else None
+        parts.append({
+            "place": place,
+            "keys": mine,
+            # The mark is labelled with the hormone rather than with the gland:
+            # the gland is where the line points, the hormone is what was measured.
+            "label": " · ".join(m["name"] for m in present),
+            "score": score,
+            "status": ("nodata" if score is None else
+                       "good" if score >= 80 else
+                       ("warning" if score >= 55 else "critical")),
+            "measured": len(present), "total": len(mine),
+        })
+    out = dict(entry)
+    out["parts"] = parts
+    return out
+
+
 def health_radar() -> Dict[str, Any]:
     """Assessment by body system (for the radar): 0–100 as the MEAN health score of the
     system's markers, accounting for the degree of deviation (and not for the share within range)."""
     labs = analyze_labs()
     by_key = {m["key"]: m for m in labs["markers"]}
+    # Attached to every domain below rather than looked up in the page: the page
+    # draws, the engine says what is true. An empty dict for a domain nobody has
+    # placed — the gate in tests/ is what makes shipping one impossible.
+    places = (_body_map().get("places") or {})
     domains = []
     for key, keys in _RADAR_DOMAINS:
         label = _t(f"radar.domain.{key}")
         present = [by_key[k] for k in keys if k in by_key]
-        if not present:
-            domains.append({"key": key, "label": label, "score": None, "status": "nodata",
+        scores = [s for s in (_marker_health(m) for m in present) if s is not None]
+        if not scores:
+            # Two different silences, and the domain says which: nothing of this
+            # system was taken, or what was taken carries no verdict — a number
+            # with no reference interval beside it. `measured` counts what exists
+            # either way, so «not taken» and «taken and says nothing» stay apart.
+            domains.append({"key": key, "label": label, "place": _placement(places.get(key) or {}, keys, by_key),
+                            "score": None, "status": "nodata",
                             "prev_score": None, "compared_score": None, "delta": None,
                             "prev_date": None, "compared": 0, "moved": [],
-                            "total": len(keys), "measured": 0, "missing": list(keys),
+                            "total": len(keys), "measured": len(present),
+                            "missing": [k for k in keys if k not in by_key],
                             "ok": 0, "abnormal": []})
             continue
-        scores = [_marker_health(m) for m in present]
-        abn = [m for m in present if m["flag"] != "ok"]
+        # `flag != "ok"` counted a marker with no corridor as a deviation, which
+        # the marker list on the same screen denies. One layer decides this.
+        abn = [m for m in present if m.get("abnormal")]
         score = round(sum(scores) / len(scores))
         status = "good" if score >= 80 else ("warning" if score >= 55 else "critical")
         # --- dynamics: ONLY the markers that have a previous point are compared,
@@ -372,10 +477,11 @@ def health_radar() -> Dict[str, Any]:
             raw = core.labs().get("markers", {}).get(m["key"], {})
             pp = _prev_point(raw.get("series"))
             ph = _marker_health_at(m["key"], pp)
-            if ph is None:
+            ch = _marker_health(m)
+            if ph is None or ch is None:
                 continue
             comp.append({"key": m["key"], "name": m["name"], "unit": m.get("unit", ""),
-                         "cur": _marker_health(m), "prev": ph,
+                         "cur": ch, "prev": ph,
                          "from_date": pp["date"], "to_date": m.get("date"),
                          "from_value": pp["value"], "to_value": m.get("value")})
         prev_score = delta = prev_date = compared_score = None
@@ -397,7 +503,8 @@ def health_radar() -> Dict[str, Any]:
             moved = sorted([c for c in comp if c["cur"] != c["prev"]],
                            key=lambda c: -abs(c["cur"] - c["prev"]))[:4]
         domains.append({
-            "key": key, "label": label, "score": score, "status": status,
+            "key": key, "label": label, "place": _placement(places.get(key) or {}, keys, by_key),
+            "score": score, "status": status,
             "prev_score": prev_score, "compared_score": compared_score,
             "delta": delta, "prev_date": prev_date,
             "compared": len(comp), "moved": moved,
@@ -409,7 +516,7 @@ def health_radar() -> Dict[str, Any]:
             # of it the statement actually rests on.
             "total": len(keys), "measured": len(present),
             "missing": [k for k in keys if k not in by_key],
-            "ok": len(present) - len(abn),
+            "ok": sum(1 for m in present if m.get("flag") == "ok"),
             "abnormal": [{"key": m["key"], "name": m["name"], "value": m["value"], "unit": m["unit"],
                           "flag": m["flag"], "ref_low": m["ref_low"], "ref_high": m["ref_high"],
                           "date": m.get("date"), "stale": not _recent(m.get("date"), 18),
@@ -453,6 +560,7 @@ def health_radar() -> Dict[str, Any]:
                 fmoved = sorted([c for c in fcomp if c["cur"] != c["prev"]],
                                 key=lambda c: -abs(c["cur"] - c["prev"]))[:4]
             domains.append({"key": "fitness", "label": _t("radar.domain.fitness"),
+                            "place": places.get("fitness") or {},
                             "score": sc, "status": fstatus,
                             "prev_score": fprev, "compared_score": fcur,
                             "delta": fdelta, "prev_date": fpdate,
@@ -475,7 +583,12 @@ def health_radar() -> Dict[str, Any]:
                               - sum(d["prev_score"] for d in withprev) / len(withprev))
         prev_overall = round(sum(d["prev_score"] for d in withprev) / len(withprev))
         prev_date = max(d["prev_date"] for d in withprev if d.get("prev_date"))
-    return {"domains": domains, "overall": overall, "prev_overall": prev_overall,
+    return {"domains": domains,
+            # Sent with the radar rather than fetched separately: the figure is a
+            # rendering of this answer, and the spelling of a sex is recognised in
+            # one place for the whole product.
+            "sex": core.profile_sex(),
+            "overall": overall, "prev_overall": prev_overall,
             "overall_delta": overall_delta, "prev_date": prev_date,
             "disclaimer": DISCLAIMER()}
 

@@ -419,11 +419,22 @@ def main(argv=None) -> int:
     already says which file, which two versions, and what to do — it only needed
     somewhere to be printed instead of raised.
     """
+    # Before anything is rendered: a report full of arrows and dashes printed to
+    # a stream that cannot carry them dies halfway through, having already
+    # written part of the file. See `console.speak_utf8`.
+    from . import console as _console
+    _console.speak_utf8()
     try:
         return _main(argv)
     except _core.ProfileFromTheFuture as e:
         print(f"⚠️  {e}", file=sys.stderr)
         return 3
+    except _core.ProfileBusy as e:
+        # The same reasoning: a refusal a person can act on, not a traceback. The
+        # code is its own, so a script can tell «somebody else is writing» from
+        # «this profile cannot be read at all».
+        print(f"⚠️  {e}", file=sys.stderr)
+        return 4
 
 
 def _main(argv=None) -> int:
@@ -874,6 +885,12 @@ def _main(argv=None) -> int:
         return 2
 
     print(json.dumps(res, ensure_ascii=False, indent=2) if args.json else render(res))
+    if args.cmd == "ingest-labs" and res.get("errors"):
+        # A file that raised inside the reader is named in the report and the
+        # rest of the folder was still processed — but a partial result is not
+        # a clean one, and a script that chains on this command must be able to
+        # tell the two apart without parsing the text (task 124).
+        return 1
     return 0
 
 

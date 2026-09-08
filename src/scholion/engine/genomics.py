@@ -317,6 +317,8 @@ def _annotate_prs_evidence(traits: List[Dict[str, Any]]) -> None:
 #: a withdrawn percentile failed.
 _PRS_MIN_WEIGHT_MASS = 0.90
 
+from .prs_quality import annotate_measurement as _annotate_prs_measurement  # noqa: E402
+
 
 def _withheld_by_sex(traits):
     """(kept, withheld). A trait the catalogue marks for one sex only.
@@ -403,6 +405,7 @@ def prs_findings() -> Dict[str, Any]:
     # never in it.
     traits, withheld_by_sex = _withheld_by_sex(traits)
     _annotate_prs_evidence(traits)
+    _annotate_prs_measurement(traits)
     cats: Dict[str, List[Dict[str, Any]]] = {}
     order: List[str] = []
     for t in traits:

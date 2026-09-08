@@ -42,7 +42,16 @@ ROOT = Path(__file__).resolve().parents[2]
 RESULTS = ROOT / "profile" / "prs_results.json"
 REGISTRY = ROOT / "src" / "scholion" / "knowledge" / "prs_models.json"
 KEEP = ("percentile", "quality_label", "match_rate", "weight_mass_coverage",
-        "percentile_reliable", "effect_size")
+        "percentile_reliable", "effect_size",
+        # The model's own discrimination, as the server estimates it — the one
+        # informativeness figure on a common scale for a disease trait (task 132).
+        "auroc_estimate")
+#: What travels from the report's per-trait `models` block into the stored row:
+#: how many candidates there were, how many were scored and by what rule the
+#: rest were not, and the spread of the percentile across the scored models.
+#: The spread is the stability figure a bare percentile lacks (tasks 131b, 132).
+MODELS_KEEP = ("candidates", "scored", "not_scored", "not_scored_rule",
+               "pgs_ids", "percentiles", "spread_pp")
 
 
 def _num(x):
@@ -91,6 +100,8 @@ def build_row(t, today):
     for k in KEEP:
         if k in ch:
             row[k] = ch[k]
+    if isinstance(t.get("models"), dict):
+        row["models"] = {k: t["models"].get(k) for k in MODELS_KEEP}
     row["pgs_id"] = _pgs_id(ch)
     p, mr = _num(row.get("percentile")), _num(row.get("match_rate"))
     problems = []

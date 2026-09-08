@@ -172,6 +172,8 @@ def labs_report(r: Dict[str, Any]) -> str:
             # came from their laboratory would be a stronger claim than the data
             # supports.
             line += " · " + _t("labs.ref_from_reference_base")
+        if m.get("corridor_note"):
+            line += "\n   " + m["corridor_note"]
         t = m.get("trend")
         if t:
             arrow = {"up": "↑", "down": "↓", "flat": "→"}[t["direction"]]
@@ -208,14 +210,30 @@ def _fmt_ref(m: Dict[str, Any]) -> str:
     lo, hi = m.get("ref_low"), m.get("ref_high")
     warn = f" {_t('ref.sex_unknown')}" if m.get("ref_sex_unknown") and (
         lo is not None or hi is not None) else ""
+    # A corridor that is not this draw's own says so: the marker's recorded
+    # range answering for a form that printed none is a weaker claim than the
+    # range printed beside the number, and the two must not read alike.
+    origin = f" {_t('ref.origin_profile')}" if m.get("ref_origin") == "profile" else ""
     if lo is not None and hi is not None:
-        return f" [{_t('ref.range', low=lo, high=hi)}]{warn}"
+        return f" [{_t('ref.range', low=lo, high=hi)}]{warn}{origin}"
     if hi is not None:
-        return f" [{_t('ref.max', high=hi)}]{warn}"
+        return f" [{_t('ref.max', high=hi)}]{warn}{origin}"
     if lo is not None:
-        return f" [{_t('ref.min', low=lo)}]{warn}"
+        return f" [{_t('ref.min', low=lo)}]{warn}{origin}"
+    if m.get("sex_not_applicable"):
+        return f" {_t('ref.sex_not_applicable')}"
+    if m.get("ref_sex_other"):
+        return f" {_t('ref.sex_other_no_range')}"
+    if m.get("ref_sex_unreviewed"):
+        return f" {_t('ref.sex_unreviewed_no_range')}"
     if m.get("ref_sex_unknown"):
         return f" {_t('ref.sex_unknown_no_range')}"
+    if m.get("ref_age_other"):
+        return f" {_t('ref.age_other_no_range')}"
+    if m.get("ref_age_unknown"):
+        return f" {_t('ref.age_unknown_no_range')}"
+    if m.get("ref_age_unbanded"):
+        return f" {_t('ref.age_unbanded_no_range')}"
     return ""
 
 
@@ -240,8 +258,94 @@ def _refused_head(value: Optional[str]) -> str:
     return text
 
 
+def _gene_region_report(r: Dict[str, Any]) -> str:
+    """A gene answered from the owner's own reads (task 127).
+
+    The order of the blocks is the argument: what was read comes BEFORE what was
+    found. A report that opens with «no pathogenic variant» and mentions coverage
+    at the bottom has already been believed by the time the qualification arrives.
+    """
+    if r.get("status") == "unresolved_gene":
+        lines = ["\u26a0\ufe0f " + r.get("message", ""), ""]
+        if r.get("searched"):
+            lines.append("\u00b7 " + "\n\u00b7 ".join(r["searched"][:8]))
+        if r.get("fix"):
+            lines += ["", "`" + r["fix"] + "`"]
+        return "\n".join(lines)
+    loc = r.get("location") or {}
+    if r.get("status") == "no_genome":
+        # The coordinate WAS found; it is the personal file that cannot answer.
+        # Saying both, in that order, is what keeps the reader from concluding
+        # that the gene is unknown when the gene is the one thing that is known.
+        return ("\u26a0\ufe0f " + _t("gene.header", gene=r.get("gene"), chrom=loc.get("chrom"),
+                                start=loc.get("start"), end=loc.get("end"),
+                                strand=loc.get("strand"), assembly=loc.get("assembly"),
+                                transcript=loc.get("transcript") or "\u2014")
+                + "\n_" + str(r.get("message", "")) + "_")
+    lines = [_t("gene.header", gene=r.get("gene"), chrom=loc.get("chrom"),
+                start=loc.get("start"), end=loc.get("end"), strand=loc.get("strand"),
+                assembly=loc.get("assembly"), transcript=loc.get("transcript") or "—"),
+             "_" + _t("gene.coords_from", source=loc.get("source_file") or loc.get("source")) + "_",
+             ""]
+    cov = r.get("coverage") or {}
+    if cov.get("source") == "bam":
+        for key, label in (("gene", _t("gene.whole")), ("cds", _t("gene.cds"))):
+            s = cov.get(key)
+            if s:
+                lines.append("· " + _t("gene.coverage_line", what=label, mean=s["mean"],
+                                       min=s["min"], pct10=s["pct_10x"], pct20=s["pct_20x"]))
+    else:
+        lines.append("⚠️ " + _t("gene.coverage_missing", why=cov.get("why", "")))
+    lines.append("")
+    v = r.get("variants") or {}
+    conseq = v.get("consequential")
+    lines.append(_t("gene.counts", total=v.get("total", 0), coding=v.get("coding", 0),
+                    consequential=_t("gene.not_computed") if conseq is None else conseq))
+    rows = v.get("coding_rows") or []
+    if not rows:
+        lines.append("_" + _t("gene.coding_none") + "_")
+    for row in rows:
+        p = row.get("protein") or {}
+        kind = p.get("kind")
+        # The consequence class is a phrase for a reader, not an internal token:
+        # printing `synonymous` inside a Russian report is a hole in the wall
+        # between the code and the page, and it is the reader who falls through.
+        named = _t("gene.kind." + kind) if kind else None
+        what = p.get("hgvs_p") or named or _t("gene.not_computed")
+        ad = row.get("allele_depth")
+        depth = (f", {row['depth']}×" if row.get("depth") else "")
+        alleles = (f" [{'/'.join(str(x) for x in ad)}]" if ad else "")
+        lines.append(f"• {row['chrom']}:{row['pos']} {row['ref']}>{row['alt']} "
+                     f"{row.get('genotype') or '?'}{depth}{alleles} — {what}"
+                     + (f" ({named})" if p.get("hgvs_p") and named else ""))
+    lines.append("")
+    hits = r.get("clinvar") or []
+    if not hits:
+        lines.append("_" + _t("gene.no_flagged") + "_")
+    else:
+        lines.append(_t("gene.flagged"))
+        for h in hits[:20]:
+            lines.append(f"• {h.get('chrom')}:{h.get('pos')} {h.get('rsid') or ''} "
+                         f"{h.get('genotype') or ''} — {h.get('clnsig')}")
+    gaps = r.get("gaps") or []
+    if gaps:
+        lines += ["", _t("gene.gaps")]
+        for g in gaps:
+            lines.append("• " + g["what"] + (f" — `{g['fix']}`" if g.get("fix") else ""))
+    blind = r.get("blind_spots") or []
+    if blind:
+        lines += ["", _t("gene.blind")]
+        lines += ["• " + b for b in blind]
+    return "\n".join(lines)
+
+
 def genome_report(r: Dict[str, Any]) -> str:
     st = r.get("status")
+    # The gene-region answer is recognised BEFORE the refusal branches below.
+    # Those are shaped around a single rsID and print «⚪ None (CASR, …)» when
+    # handed a gene: a real refusal, rendered in the shape of a different question.
+    if r.get("region") or st == "unresolved_gene":
+        return _gene_region_report(r)
     if st == "unknown_rsid":
         return f"⚠️ {r.get('message','')}"
     if st == "unknown_gene":
@@ -780,6 +884,40 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _prs_measurement_line(t: Dict[str, Any]) -> str:
+    """Stability of the number and informativeness of the model, one line.
+
+    Each figure that is not on the machine is named as absent rather than left
+    out: a line with three numbers and a line with one look alike only when the
+    missing two are not mentioned.
+    """
+    st = t.get("stability") or {}
+    inf = t.get("informativeness") or {}
+    stab = []
+    if st.get("ancestry_spread_pp") is not None:
+        stab.append(_t("prs.stab_ancestry", pp=st["ancestry_spread_pp"],
+                       pops=_plural(int(st.get("populations") or 0), "count.populations")))
+    else:
+        stab.append(_t("prs.stab_ancestry_missing"))
+    if st.get("models_spread_pp") is not None:
+        stab.append(_t("prs.stab_models", pp=st["models_spread_pp"],
+                       models=_plural(int(st.get("models_scored") or 0), "count.models")))
+    else:
+        stab.append(_t("prs.stab_models_missing"))
+    if st.get("coverage_pct") is not None:
+        stab.append(_t("prs.stab_coverage", pct=st["coverage_pct"]))
+    info = []
+    if inf.get("auroc") is not None:
+        info.append(_t("prs.info_auroc", auroc=inf["auroc"]))
+    if inf.get("p90_vs_p10_ratio") is not None:
+        info.append(_t("prs.info_ratio", kind=inf.get("kind"), x=inf["p90_vs_p10_ratio"]))
+    elif inf.get("p90_vs_p10_shift") is not None:
+        info.append(_t("prs.info_shift", value=inf["p90_vs_p10_shift"]))
+    if not info:
+        info.append(_t("prs.info_missing"))
+    return _t("prs.measure_line", stability=" · ".join(stab), informativeness=" · ".join(info))
+
+
 def prs_report(r: Dict[str, Any]) -> str:
     """Polygenic risks (PGS): statistics + "above average" + by category."""
     if not r.get("available"):
@@ -813,12 +951,14 @@ def prs_report(r: Dict[str, Any]) -> str:
                 lines.append(f"      {t['evidence_note']}")
             if t.get("validity_note"):
                 lines.append(f"      ⚠ {t['validity_note']}")
+            lines.append("      ↳ " + _prs_measurement_line(t))
         lines.append("")
     for c in (r.get("method_caveats") or []):
         lines.append("· " + c["note"])
     if r.get("method_caveats"):
         lines.append("")
     lines.append(_t("prs.evidence_legend"))
+    lines.append(_t("prs.measure_legend"))
     lines.append("")
     for c in r.get("categories", []):
         lines.append(f"__{c['category']}__")
@@ -828,6 +968,7 @@ def prs_report(r: Dict[str, Any]) -> str:
             warn = "" if t.get("reliable") else " ⚠"
             ev = {"clinical": " ✚", "supportive": " ·"}.get(t.get("evidence"), "")
             lines.append(f"  {t['label']}: {ps}{warn}{ev}")
+            lines.append("    ↳ " + _prs_measurement_line(t))
         lines.append("")
     lines.append(f"_{r.get('disclaimer','')}_")
     return "\n".join(lines)
@@ -1888,6 +2029,17 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
     for mix in (r.get("resolution_mixed") or [])[:10]:
         L.append(_t("store.resolution_mixed", marker=mix["marker"],
                     dates=", ".join(mix["others"])))
+    for rep in (r.get("same_day_replaced") or [])[:10]:
+        L.append(_t("ingest.same_day_replaced", marker=rep["marker"], date=rep["date"],
+                    replaced=", ".join(rep["replaced"])))
+    if r.get("errors"):
+        L.append(_t("ingest.errors_footer",
+                    files=_plural(len(r["errors"]), "count.files_errored")))
+    if r.get("manifest_moved"):
+        # Said once, on the run that carried the list over: a reader who sees
+        # every earlier form counted as «skipped» on a fresh profile deserves the
+        # sentence that explains it (task 133).
+        L.append(r["manifest_moved"]["note"])
     return "\n".join(L) + "\n"
 
 
@@ -1927,6 +2079,8 @@ def ingest_studies_report(r: Dict[str, Any]) -> str:
                 L.append(f"    · {sec['what']} — {sec['date']}")
         if len(missed) > 20:
             L.append(_t("ingest.not_ingested_more", n=len(missed) - 20))
+    if r.get("manifest_moved"):
+        L.append(r["manifest_moved"]["note"])
     return "\n".join(L) + "\n"
 
 def markers_local_report(r: Dict[str, Any]) -> str:

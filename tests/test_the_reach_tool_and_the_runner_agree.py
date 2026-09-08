@@ -261,5 +261,109 @@ class TestTheBaselineDescribesThisTree(unittest.TestCase):
                 self.assertLessEqual(pct, 100.0)
 
 
+class TestAcceptCanBeRunWhenTheGuardAboveIsWhatFails(unittest.TestCase):
+    """The circle, reproduced: a module in the tree with no accepted number.
+
+    `test_every_module_in_the_tree_has_an_accepted_number` turns the suite red
+    and says «run --accept»; `--accept` refuses to record a red suite. For any
+    commit that adds a module the instruction could therefore not be followed,
+    and four modules were seeded at 0.0 by hand on 08.09.2026 to get out. The
+    tool now seeds them itself, BEFORE the measured run starts — which is the
+    property checked here: at the moment the suite is measured, the baseline
+    already lists the module, so the guard above has nothing to object to.
+    """
+
+    def setUp(self):
+        import tempfile
+        self.tmp = pathlib.Path(tempfile.mkdtemp())
+        self.baseline = self.tmp / "test_reach_baseline.json"
+        self.present = reach.tree_modules()
+        self.assertGreater(len(self.present), 1, "nothing in the tree to measure")
+        self.victim = sorted(self.present)[-1]
+        self.assertTrue(self.victim.endswith(".py"))
+        without = {rel: 50.0 for rel in self.present if rel != self.victim}
+        self.baseline.write_text(json.dumps({"_note": "test", "overall": 50.0,
+                                             "modules": without}), encoding="utf-8")
+
+    def tearDown(self):
+        import shutil
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _fake_measure(self, ok=True):
+        """Stands in for the suite. Records what the baseline said when the
+        suite would have been running — the guard test reads it then."""
+        seen = {}
+
+        def measure(argv=None):
+            seen["modules"] = json.loads(self.baseline.read_text(encoding="utf-8"))["modules"]
+            return {"suite_ok": ok, "suite_tail": ["FAILED"] if not ok else ["OK"],
+                    "processes": 1, "backend": "test",
+                    "overall": {"hit": 1, "total": 2, "percent": 50.0},
+                    "modules": {rel: {"hit": 3, "total": 4, "percent": 75.0}
+                                for rel in self.present}}
+        return measure, seen
+
+    def _run(self, argv, ok=True):
+        import contextlib, io
+        from unittest import mock
+        measure, seen = self._fake_measure(ok)
+        out = io.StringIO()
+        with mock.patch.object(reach, "BASELINE", self.baseline), \
+                mock.patch.object(reach, "measure", side_effect=measure), \
+                contextlib.redirect_stdout(out):
+            code = reach.main(argv)
+        return code, seen, out.getvalue()
+
+    def test_accept_succeeds_and_the_written_baseline_names_the_new_module(self):
+        code, seen, out = self._run(["--accept"])
+        self.assertEqual(0, code, out)
+        self.assertIn(self.victim, seen["modules"],
+                      "the suite was measured against a baseline that did not list the "
+                      "new module — the guard test would have turned it red")
+        self.assertEqual(0.0, seen["modules"][self.victim],
+                         "a module nobody has reviewed is seeded at 0.0, not at a number "
+                         "somebody might mistake for a measurement")
+        written = json.loads(self.baseline.read_text(encoding="utf-8"))["modules"]
+        self.assertEqual(75.0, written[self.victim],
+                         "the measured number, not the seed, is what gets recorded")
+        self.assertIn(self.victim, out, "what was seeded is said out loud")
+
+    def test_a_stale_line_is_the_same_circle_from_the_other_side(self):
+        """`test_the_baseline_names_nothing_that_is_gone` is the mirror guard:
+        a module removed from the tree turns the suite red the same way."""
+        doc = json.loads(self.baseline.read_text(encoding="utf-8"))
+        doc["modules"]["src/scholion/no_longer_here.py"] = 12.0
+        self.baseline.write_text(json.dumps(doc), encoding="utf-8")
+        code, seen, out = self._run(["--accept"])
+        self.assertEqual(0, code, out)
+        self.assertNotIn("src/scholion/no_longer_here.py", seen["modules"])
+        written = json.loads(self.baseline.read_text(encoding="utf-8"))["modules"]
+        self.assertNotIn("src/scholion/no_longer_here.py", written)
+
+    def test_a_refused_accept_leaves_the_file_as_it_found_it(self):
+        before = self.baseline.read_text(encoding="utf-8")
+        code, seen, out = self._run(["--accept"], ok=False)
+        self.assertEqual(1, code)
+        self.assertIn(self.victim, seen["modules"], "seeded for the run all the same")
+        self.assertEqual(before, self.baseline.read_text(encoding="utf-8"),
+                         "a red suite records nothing — not even the seed")
+
+    def test_strict_still_refuses_a_module_nobody_reviewed(self):
+        """The seed is `--accept`'s alone. `--strict` is the gate, and a gate
+        that fills in its own gaps is not a gate."""
+        if not (reach.ROOT / "share").is_dir():
+            # Outside the source repository `--strict` compares nothing, by
+            # design (the package skips the tests only the tree can run), and
+            # answers 0 before measuring. The gate this test guards exists in
+            # the tree; in the package there is nothing for it to refuse.
+            self.skipTest("outside the source repository --strict compares nothing")
+        before = self.baseline.read_text(encoding="utf-8")
+        code, seen, out = self._run(["--strict"])
+        self.assertEqual(1, code, out)
+        self.assertNotIn(self.victim, seen["modules"])
+        self.assertIn("nobody has reviewed", out)
+        self.assertEqual(before, self.baseline.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":                                   # pragma: no cover
     unittest.main()

@@ -74,6 +74,11 @@ class FakeProc:
     def terminate(self):
         self.terminated = True
 
+    def poll(self):
+        # A real Popen answers None while the process lives; the silence being
+        # tested here is a server that stopped answering, not one that exited.
+        return None
+
 
 def rpc(id_, result):
     return json.dumps({"jsonrpc": "2.0", "id": id_, "result": result}) + "\n"

@@ -209,7 +209,7 @@ def samples_of(vcf: str) -> List[str]:
     """
     import gzip
     try:
-        with gzip.open(vcf, "rt", errors="replace") as fh:
+        with gzip.open(vcf, "rt", encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 if line.startswith("#CHROM"):
                     return line.rstrip("\n").split("\t")[9:]
@@ -1436,11 +1436,18 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dict[str, 
         return base
     if gene:
         items = [rs for rs, l in loci().get("loci", {}).items() if l.get("gene", "").upper() == gene.upper()]
-        if not items:
-            return {"status": "unknown_gene", "gene": gene}
-        return {"status": "ok", "gene": gene,
-                "loci": [lookup(rsid=rs) for rs in items] if st["ready"] else [{"rsid": rs, "locus": locus(rs)} for rs in items],
-                "genome_ready": st["ready"]}
+        if items:
+            return {"status": "ok", "gene": gene,
+                    "loci": [lookup(rsid=rs) for rs in items] if st["ready"] else [{"rsid": rs, "locus": locus(rs)} for rs in items],
+                    "genome_ready": st["ready"]}
+        # Task 127. The catalogue not holding the gene used to end the query —
+        # «Gene CASR is not in the coordinate reference», a true sentence about
+        # `loci.json` that reads as a sentence about the genome. The catalogue is
+        # a curated book of pharmacogenetic loci and was never a gene index; the
+        # reads, meanwhile, were there the whole time. So a miss here is no longer
+        # a refusal but a second question, asked of the annotation and the VCF.
+        from . import gene_region
+        return gene_region.report(gene)
     return {"status": "error", "message": _t("genome.need_rsid_or_gene")}
 
 

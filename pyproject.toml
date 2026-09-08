@@ -65,6 +65,13 @@ classifiers = [
     "Natural Language :: Russian",
     "Operating System :: MacOS",
     "Operating System :: POSIX :: Linux",
+    # Added with the matrix cell that checks it, not before. Everything
+    # this package does by itself runs there; what needs a Unix machine
+    # is the OPTIONAL genome preparation in src/ingest — shell scripts
+    # driving bwa, samtools and mosdepth — and the tools it looks for
+    # are each behind a `which`, so their absence is reported rather
+    # than fatal. If the Windows cell goes red, this line comes out.
+    "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

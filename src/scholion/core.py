@@ -182,6 +182,109 @@ def cache_dir() -> Path:
     return new_path
 
 
+# ---- what a loader has already read ----------------------------------------
+# `ingest-labs` and `ingest-studies` each keep a manifest — path → mtime of every
+# file they have taken — so that a second run over the same folder reads only
+# what changed. Both loaders carried a private copy of this code; the copies
+# were identical, which is exactly how they would have drifted.
+
+#: Written into the manifest's `_meta` so the file explains itself to whoever
+#: opens it in the profile directory next to `labs.json`.
+INGEST_MANIFEST_SHAPE = ("files: absolute path -> modification time of every file this "
+                         "loader has already read; a file whose mtime is unchanged is "
+                         "skipped on the next run, --force reads everything again")
+
+
+def ingest_manifest_path(loader: str) -> Path:
+    """Where the loader `loader` («labs», «studies») remembers what it has read.
+
+    Beside the profile, not in the application-wide cache. The manifest is a
+    statement ABOUT one profile — «these files went into this labs.json» — so
+    it follows the profile: a second profile has its own, and a test that pins
+    a temporary profile leaves no trace in anyone else's state. Until 0.4.9 it
+    lived under `cache_dir()`, and every ingest test of the suite left its
+    temporary folders in the owner's real list of processed files (task 133 —
+    the same class of defect as task 125, a test touching state outside its
+    fixture). The base name is kept from the old location on purpose: somebody
+    who goes looking for `ingest_labs_manifest.json` where it used to be finds
+    the same name one directory over, not a new word to learn.
+    """
+    return profile_dir() / f"ingest_{loader}_manifest.json"
+
+
+def _manifest_files(data: Any) -> Dict[str, float]:
+    """The path → mtime table out of either shape the file has had.
+
+    The old file WAS the table. The new one is written into the profile, and
+    `write_json` stamps a `_meta` block on everything written there — so the
+    table moved under `files`, where a metadata key cannot be mistaken for a
+    path that was read.
+    """
+    if not isinstance(data, dict):
+        return {}
+    files = data.get("files")
+    if isinstance(files, dict):
+        return dict(files)
+    return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+def read_ingest_manifest(loader: str) -> Dict[str, float]:
+    """The table, or an empty one: a manifest that will not parse costs a
+    re-read of the folder, which is idempotent, not a refusal to ingest."""
+    f = ingest_manifest_path(loader)
+    try:
+        return _manifest_files(json.loads(f.read_text(encoding="utf-8"))) if f.exists() else {}
+    except Exception:                                                # noqa: BLE001
+        return {}
+
+
+def write_ingest_manifest(loader: str, files: Dict[str, float]) -> None:
+    try:
+        write_json(ingest_manifest_path(loader),
+                   {"_meta": {"shape": INGEST_MANIFEST_SHAPE, "loader": loader},
+                    "files": files}, indent=1)
+    except Exception:                                                # noqa: BLE001
+        pass          # a manifest that could not be written costs one extra read next time
+
+
+def adopt_ingest_manifest(loader: str) -> Optional[Dict[str, Any]]:
+    """Carry the manifest over from where it used to live, once.
+
+    Runs on every ingest and does something only while the profile has no
+    manifest of its own and the cache still holds the old one. Without this,
+    the first run after the move would find an empty table and read every file
+    in the folder as new — idempotent for the profile, but a person watching
+    «files processed: 212» after years of «skipped: 212» has been told that
+    something changed, and nothing did.
+
+    The old file is copied, not moved. One manifest served every profile that
+    was ever pointed at through `SCHOLION_PROFILE_DIR`, so this function cannot
+    tell whose it is running for — and a test with a temporary profile is one
+    such caller. Deleting is the only irreversible step here, and the price of
+    not taking it is a stale file in a cache, which is what a cache is for.
+
+    Returns what was carried over — `from`, `to`, `entries` — so the loader can
+    say so in its report, or None when there was nothing to do.
+    """
+    new = ingest_manifest_path(loader)
+    if new.exists():
+        return None
+    old = cache_dir() / f"ingest_{loader}_manifest.json"
+    try:
+        if not old.is_file():
+            return None
+        files = _manifest_files(json.loads(old.read_text(encoding="utf-8")))
+    except Exception:                                                # noqa: BLE001
+        # Unreadable where it lies: nothing to carry. The loader starts an
+        # empty table and reads the folder once more, which is what it would
+        # have done with that file in the old place too.
+        return None
+    write_ingest_manifest(loader, files)
+    if not new.exists():
+        return None
+    return {"from": str(old), "to": str(new), "entries": len(files)}
+
+
 def source_status() -> List[Dict[str, Any]]:
     """Where each slot lies and whether it is connected.
 
@@ -233,8 +336,102 @@ import threading as _threading
 
 try:
     import fcntl as _fcntl
-except ImportError:                                   # non-POSIX; the owner runs POSIX
+except ImportError:                                   # Windows: see _exclusive_lockfile
     _fcntl = None
+
+#: How long a lockfile left behind by a process that died mid-write stays
+#: believed. A profile write is a few milliseconds; a minute is far beyond any
+#: honest one, and short enough that a crashed run does not lock somebody out of
+#: their own history until they find the file and delete it by hand.
+_LOCK_STALE_AFTER = 60.0
+
+#: How long to wait for a lock somebody else holds before refusing. Long enough
+#: to cover an ordinary write by the other process, short enough that a person
+#: gets an answer rather than a hang.
+_LOCK_WAIT = 5.0
+
+
+class ProfileBusy(RuntimeError):
+    """Another process is writing the profile, and this one will not guess.
+
+    On a system with `flock` the second writer simply waits its turn. Windows
+    has no `flock`, and the honest choices there are two: wait on a lock this
+    program takes itself, or write anyway. Writing anyway is the option that
+    loses data silently — the web server and a command line each read the file,
+    change one field and write it back, and whoever finishes last erases the
+    other's change with no error anywhere. That is the failure this whole lock
+    exists to prevent, so on the platform without `flock` the answer is to say
+    so and stop.
+    """
+
+
+@_contextlib.contextmanager
+def _exclusive_lockfile(path: Path):
+    """A lock built out of «create this file, and fail if it is already there».
+
+    `O_CREAT | O_EXCL` is atomic on every filesystem this runs on, Windows
+    included, which is what makes it usable where `flock` is missing. What it
+    does NOT do is release itself when the holder dies — so a stale file would
+    lock the profile forever. Hence the age: a lock older than
+    `_LOCK_STALE_AFTER` is taken over rather than believed.
+
+    Liveness is deliberately judged by age alone. The obvious check — «is that
+    pid still running» — is `os.kill(pid, 0)`, and on Windows `os.kill` does not
+    send a signal: it calls `TerminateProcess`. The check for whether the other
+    writer is alive would kill it.
+    """
+    import time as _time
+    path.parent.mkdir(parents=True, exist_ok=True)
+    deadline = _time.monotonic() + _LOCK_WAIT
+    fd = None
+    while True:
+        try:
+            fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+            break
+        except FileExistsError:
+            try:
+                age = _time.time() - path.stat().st_mtime
+            except OSError:
+                age = 0.0                      # it vanished — try again at once
+            if age > _LOCK_STALE_AFTER:
+                try:
+                    os.unlink(str(path))
+                except OSError:
+                    pass
+                continue
+            if _time.monotonic() >= deadline:
+                held = ""
+                try:
+                    held = path.read_text(encoding="utf-8").strip()[:60]
+                except OSError:
+                    pass
+                raise ProfileBusy(
+                    "another process is writing the profile (" + (held or "?") + ") "
+                    "and this one waited " + str(int(_LOCK_WAIT)) + "s for it. Nothing "
+                    "was changed. This platform has no flock, so writing anyway would "
+                    "erase the other change without a word. Close the other window — "
+                    "the local web application counts as one — and run it again. If "
+                    "nothing else is running, remove " + str(path) + "."
+                )
+            _time.sleep(0.05)
+        except OSError:
+            # The lock cannot be made at all (a read-only directory, say). The
+            # thread lock still holds inside this process, and refusing to write
+            # somebody's data over a lockfile would be the wrong trade.
+            yield
+            return
+    try:
+        try:
+            os.write(fd, f"pid {os.getpid()}".encode("utf-8"))
+        except OSError:
+            pass
+        yield
+    finally:
+        os.close(fd)
+        try:
+            os.unlink(str(path))
+        except OSError:
+            pass
 
 _WRITE_TLOCK = _threading.RLock()
 _WRITE_DEPTH = _threading.local()
@@ -259,10 +456,21 @@ def profile_write_lock():
     """
     depth = getattr(_WRITE_DEPTH, "n", 0)
     with _WRITE_TLOCK:
-        if depth or _fcntl is None:
+        if depth:
             _WRITE_DEPTH.n = depth + 1
             try:
                 yield
+            finally:
+                _WRITE_DEPTH.n = depth
+            return
+        if _fcntl is None:
+            # No flock on this platform. A lockfile taken exclusively gives the
+            # same protection between processes; where it cannot be taken, the
+            # write is refused rather than allowed to erase somebody else's.
+            _WRITE_DEPTH.n = depth + 1
+            try:
+                with _exclusive_lockfile(profile_dir() / ".write.lock"):
+                    yield
             finally:
                 _WRITE_DEPTH.n = depth
             return
@@ -1239,6 +1447,17 @@ def prs_results() -> Dict[str, Any]:
     return read_profile_json(p) if p.exists() else {}
 
 
+def prs_ancestry_sensitivity() -> Dict[str, Any]:
+    """PERSONAL: the same polygenic scores placed against each of the five 1000G
+    superpopulations (profile/prs_ancestry_sensitivity.json). Personal.
+
+    Written by `src/ingest/prs_ancestry_sensitivity.py`; read by the report so
+    that a percentile is printed beside how far it moves when the reference
+    population is changed — the stability figure a bare percentile lacks."""
+    p = profile_dir() / "prs_ancestry_sensitivity.json"
+    return read_profile_json(p) if p.exists() else {}
+
+
 def longevity_data() -> Dict[str, Any]:
     """PERSONAL longevity findings (profile/longevity_findings.json). Personal."""
     p = profile_dir() / "longevity_findings.json"
@@ -1598,6 +1817,41 @@ def profile_ancestry() -> Optional[str]:
     number stand as if the question had been settled.
     """
     return ancestry()["value"]
+
+
+def age_from(prof: Dict[str, Any]) -> Optional[int]:
+    """Age in whole years, from whichever birth field a profile carries.
+
+    Both are real. `birth_year` is what the command line and the page write;
+    `birth_date` is what the demonstration profile and an imported medical
+    record write. One reader, used by the profile view and by the corridor
+    rule alike, so the two cannot disagree about how old somebody is.
+    """
+    from datetime import date
+    bd = str((prof or {}).get("birth_date") or "").strip()
+    today = date.today()
+    if bd:
+        try:
+            y, m, d = (int(x) for x in bd.split("-")[:3])
+            return today.year - y - ((today.month, today.day) < (m, d))
+        except (ValueError, TypeError):
+            pass
+    try:
+        by = (prof or {}).get("birth_year")
+        return today.year - int(by) if by else None
+    except (ValueError, TypeError):
+        return None
+
+
+def profile_age() -> Optional[int]:
+    """The person's age in whole years, or None when no birth field is recorded.
+
+    Read for the same reason as `profile_sex`: a reference interval for IGF-1 or
+    DHEA-S is banded by age at every laboratory, and lending a band transcribed
+    from one person's form to somebody of another age produces a verdict — the
+    wrong one. An unrecorded age is None, never a guess.
+    """
+    return age_from(metrics_json().get("profile") or {})
 
 
 def profile_sex() -> Optional[str]:

@@ -30,17 +30,20 @@ SEX_SPECIFIC = ("uric_acid", "testosterone", "creatinine", "ferritin",
 class _Profile(unittest.TestCase):
     def _profile(self, markers, sex=None):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        self._unpin = support.pin_profile(d)
         (pathlib.Path(d) / "labs.json").write_text(json.dumps({"markers": markers},
-                                                              ensure_ascii=False))
+                                                              ensure_ascii=False), encoding="utf-8")
         if sex:
             (pathlib.Path(d) / "metrics.json").write_text(
-                json.dumps({"profile": {"sex": sex, "birth_year": 1985}}))
+                json.dumps({"profile": {"sex": sex, "birth_year": 1985}}), encoding="utf-8")
         core.reset_cache()
         return pathlib.Path(d)
 
     def tearDown(self):
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        # pinned only by the tests that built a profile; put back what those found
+        unpin = self.__dict__.pop("_unpin", None)
+        if unpin:
+            unpin()
         core.reset_cache()
 
 
@@ -119,7 +122,7 @@ class TestTask67NoGeneticClaimWithoutAGenome(unittest.TestCase):
 class TestTask72TheTwoQuestionsAreAsked(unittest.TestCase):
     def test_the_profile_command_can_record_them(self):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         try:
             core.reset_cache()
             r = store.update_metric_profile({"sex": "female", "birth_year": 1985})
@@ -127,7 +130,7 @@ class TestTask72TheTwoQuestionsAreAsked(unittest.TestCase):
             core.reset_cache()
             self.assertEqual(core.profile_sex(), "female")
         finally:
-            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+            unpin()
             core.reset_cache()
 
 
@@ -142,7 +145,7 @@ class TestTask81ThePopulationIsNotASilentDefault(unittest.TestCase):
 
     def test_the_profile_records_a_stated_ancestry(self):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        unpin = support.pin_profile(d)
         try:
             core.reset_cache()
             self.assertIsNone(core.profile_ancestry())
@@ -150,7 +153,7 @@ class TestTask81ThePopulationIsNotASilentDefault(unittest.TestCase):
             core.reset_cache()
             self.assertEqual(core.profile_ancestry(), "EAS")
         finally:
-            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+            unpin()
             core.reset_cache()
 
     def test_an_unstated_population_is_declared_in_the_report(self):

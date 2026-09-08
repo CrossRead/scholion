@@ -450,6 +450,15 @@ def build(repo: Path, out: Path) -> Path:
     _brief = repo / "src" / "tools" / "brief_edit.py"
     if _brief.exists():
         shutil.copy2(_brief, shared / "src" / "tools" / "brief_edit.py")
+    # The Python way into the suite. Not a convenience: the release gate demands
+    # the tests be run INSIDE this package, and `run_tests.sh` is bash — so on a
+    # machine without a shell the gate could not be performed at all, and the
+    # package would be unverifiable exactly where verification was newest. Found
+    # by carrying a build to a Windows machine: the shell runner had travelled,
+    # the Python one had not, and it was the only one that could have run there.
+    _pyrun = repo / "src" / "tools" / "run_tests.py"
+    if _pyrun.exists():
+        shutil.copy2(_pyrun, shared / "src" / "tools" / "run_tests.py")
     # the daily n-of-1 logging wrapper: user-facing, unlike the rest of tools/
     _qlog = repo / "src" / "tools" / "nof1_quick_log.sh"
     if _qlog.exists():

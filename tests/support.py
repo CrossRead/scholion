@@ -34,6 +34,53 @@ FIXTURE_PROFILE = Path(__file__).resolve().parent / "fixtures" / "profile"
 IN_SOURCE_REPO = (ROOT / "share").is_dir()
 
 
+def pin_profile(path) -> "callable":
+    """Point SCHOLION_PROFILE_DIR at `path` for an in-process test, and return the
+    call that puts back what was there.
+
+    Restoring is the whole point. `core.profile_dir()` falls through to
+    `<repo>/profile` when the variable is absent — on the owner's machine the real
+    profile — so a test that pinned a temporary directory and then merely popped
+    the variable left every later in-process reader of the run on the owner's
+    data. Nothing failed; the reach measurement was inflated by it, and the
+    suite's own promise («neither read nor change anyone's real profile») was not
+    kept. `test_a_test_that_unpins_the_profile_pins_it_back.py` holds the line.
+    """
+    previous = os.environ.get("SCHOLION_PROFILE_DIR")
+    os.environ["SCHOLION_PROFILE_DIR"] = str(path)
+
+    def restore():
+        if previous is None:
+            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        else:
+            os.environ["SCHOLION_PROFILE_DIR"] = previous
+    return restore
+
+
+def pin_cache(path) -> "callable":
+    """Point SCHOLION_CACHE_DIR at `path` for an in-process test; returns the restore.
+
+    The same shape as `pin_profile`, for the other directory a loader touches.
+    `core.cache_dir()` falls through to `<repo>/work/cache` — on the owner's
+    machine the real one, which until 0.4.9 held the list of every file
+    `ingest-labs` had read. Every ingest test of the suite wrote its temporary
+    folders into that list (task 133); and a test that leaves the cache unpinned
+    now READS it instead, because the loader carries an old list it finds there
+    over into whichever profile is pinned. A test that ingests pins both, and
+    `test_what_a_loader_has_read_is_remembered_beside_the_profile.py` names the
+    one that does not.
+    """
+    previous = os.environ.get("SCHOLION_CACHE_DIR")
+    os.environ["SCHOLION_CACHE_DIR"] = str(path)
+
+    def restore():
+        if previous is None:
+            os.environ.pop("SCHOLION_CACHE_DIR", None)
+        else:
+            os.environ["SCHOLION_CACHE_DIR"] = previous
+    return restore
+
+
 def env(profile_dir: Path | None = None, lang: str | None = None) -> dict:
     e = dict(os.environ)
     e["PYTHONPATH"] = str(SRC) + os.pathsep + e.get("PYTHONPATH", "")

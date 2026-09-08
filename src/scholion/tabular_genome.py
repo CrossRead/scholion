@@ -64,11 +64,11 @@ def _open_text(path: str) -> Optional[Iterator[str]]:
         return None
     try:
         if head[:2] == b"\x1f\x8b":
-            return io.TextIOWrapper(gzip.open(path, "rb"), errors="replace")
+            return io.TextIOWrapper(gzip.open(path, "rb"), encoding="utf-8", errors="replace")
         if head[:3] == b"BZh":
-            return io.TextIOWrapper(bz2.open(path, "rb"), errors="replace")
+            return io.TextIOWrapper(bz2.open(path, "rb"), encoding="utf-8", errors="replace")
         if head[:6] == b"\xfd7zXZ\x00":
-            return io.TextIOWrapper(lzma.open(path, "rb"), errors="replace")
+            return io.TextIOWrapper(lzma.open(path, "rb"), encoding="utf-8", errors="replace")
         if head[:2] == b"PK":
             zf = zipfile.ZipFile(path)
             names = [n for n in zf.namelist() if not n.endswith("/")]
@@ -77,8 +77,8 @@ def _open_text(path: str) -> Optional[Iterator[str]]:
             # The biggest member: a provider archive also holds its README, and a
             # README that parses as nothing would look like an unreadable genome.
             biggest = max(names, key=lambda n: zf.getinfo(n).file_size)
-            return io.TextIOWrapper(zf.open(biggest), errors="replace")
-        return open(path, "r", errors="replace")
+            return io.TextIOWrapper(zf.open(biggest), encoding="utf-8", errors="replace")
+        return open(path, "r", encoding="utf-8", errors="replace")
     except Exception:
         return None
 
@@ -210,7 +210,7 @@ def index() -> Dict[str, Any]:
     cache = _cache_file(path, kind)
     if cache is not None and cache.exists():
         try:
-            data = json.loads(cache.read_text())
+            data = json.loads(cache.read_text(encoding="utf-8"))
             data["path"] = path
             return data
         except Exception:
@@ -221,7 +221,7 @@ def index() -> Dict[str, Any]:
     if cache is not None and data.get("ok"):
         try:
             cache.parent.mkdir(parents=True, exist_ok=True)
-            cache.write_text(json.dumps(data))
+            cache.write_text(json.dumps(data), encoding="utf-8")
         except Exception:
             pass
     return data

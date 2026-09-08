@@ -32,6 +32,14 @@ from scholion import core, ingest_labs
 
 FIXTURES = pathlib.Path(__file__).resolve().parent / "fixtures" / "refblocks"
 
+
+def _restore_pin(previous):
+    """Return SCHOLION_PROFILE_DIR to what it was before the class pinned it."""
+    if previous is None:
+        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+    else:
+        os.environ["SCHOLION_PROFILE_DIR"] = previous
+
 #: file → (marker, value, expected low, expected high). None/None means «no
 #: corridor», which for these forms is the correct answer and not a shortfall.
 EXPECTED = {
@@ -47,15 +55,19 @@ class TestTheApplicableRowIsChosen(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.mkdtemp()
+        cls._pin = os.environ.get("SCHOLION_PROFILE_DIR")
         os.environ["SCHOLION_PROFILE_DIR"] = cls.tmp
         (pathlib.Path(cls.tmp) / "metrics.json").write_text(
-            json.dumps({"profile": {"sex": "male", "birth_year": 1985}}))
+            json.dumps({"profile": {"sex": "male", "birth_year": 1985}}), encoding="utf-8")
         core.reset_cache()
         cls.markers = core.lab_markers()["markers"]
 
     @classmethod
     def tearDownClass(cls):
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        # Put back what was found, never just pop: with the pin gone, every later
+        # in-process reader falls through to <repo>/profile — on the owner's
+        # machine that is the real one (task 125).
+        _restore_pin(cls._pin)
         core.reset_cache()
 
     def test_every_fixture_picks_the_row_that_applies(self):
@@ -113,18 +125,19 @@ class TestAnAgeBandedRowSurvivesAnUnknownAge(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = tempfile.mkdtemp()
+        cls._pin = os.environ.get("SCHOLION_PROFILE_DIR")
         os.environ["SCHOLION_PROFILE_DIR"] = cls.tmp
         # Sex recorded, birth year not — exactly `scholion init` without
         # `--birth-year`, which the CLI allows and warns about rather than
         # refuses (task 72).
         (pathlib.Path(cls.tmp) / "metrics.json").write_text(
-            json.dumps({"profile": {"sex": "male"}}))
+            json.dumps({"profile": {"sex": "male"}}), encoding="utf-8")
         core.reset_cache()
         cls.markers = core.lab_markers()["markers"]
 
     @classmethod
     def tearDownClass(cls):
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        _restore_pin(cls._pin)
         core.reset_cache()
 
     def test_an_age_banded_form_does_not_raise(self):
@@ -151,6 +164,62 @@ class TestAnAgeBandedRowSurvivesAnUnknownAge(unittest.TestCase):
         from scholion.ingest_labs import _row_fits
         self.assertFalse(_row_fits("Женщины: 10 - 20", "male", None))
         self.assertTrue(_row_fits("Мужчины: 10 - 20", "male", None))
+
+
+class TestTheOwnersSexIsReadBySameListTheEngineReadsBy(unittest.TestCase):
+    """`core.profile_sex_of` accepts six spellings — «f», «female», «woman» and their
+    male counterparts, plus the Russian ones — precisely so that a profile written
+    by another face is not read back as «not set». `_owner()` read the field raw and
+    `_row_fits` compared it to «male»/«female», so a profile spelled «f» (the demo
+    profile's own spelling) had the sex half of the row filter OFF: a men-only
+    reference row fitted a woman, a women-only row fitted a man — silently, which
+    is the failure this filter exists to prevent (tasks 65, 66)."""
+
+    #: rows quoted from a lab form, the way the parser meets them
+    MEN_ROW = "«Мужчины: 10 - 20»"
+    WOMEN_ROW = "«Женщины: 10 - 20»"
+
+    def setUp(self):
+        self._pin = os.environ.get("SCHOLION_PROFILE_DIR")
+
+    def _owner_with(self, sex):
+        tmp = tempfile.mkdtemp()
+        os.environ["SCHOLION_PROFILE_DIR"] = tmp
+        (pathlib.Path(tmp) / "metrics.json").write_text(
+            json.dumps({"profile": {"sex": sex, "birth_year": 1985}}), encoding="utf-8")
+        core.reset_cache()
+        ingest_labs._OWNER_CACHE.clear()
+        return ingest_labs._owner()
+
+    def tearDown(self):
+        _restore_pin(self._pin)
+        core.reset_cache()
+        ingest_labs._OWNER_CACHE.clear()
+
+    def test_every_accepted_spelling_reaches_the_row_filter_canonical(self):
+        for raw, want in (("f", "female"), ("female", "female"), ("woman", "female"),
+                          ("m", "male"), ("male", "male"), ("man", "male")):
+            with self.subTest(spelling=raw):
+                sex, age = self._owner_with(raw)
+                self.assertEqual(sex, want)
+                self.assertIsNotNone(age)
+
+    def test_a_woman_spelled_f_does_not_fit_a_men_only_row(self):
+        sex, age = self._owner_with("f")
+        self.assertFalse(ingest_labs._row_fits(self.MEN_ROW, sex, age))
+        self.assertTrue(ingest_labs._row_fits(self.WOMEN_ROW, sex, age))
+
+    def test_a_man_spelled_m_does_not_fit_a_women_only_row(self):
+        sex, age = self._owner_with("m")
+        self.assertFalse(ingest_labs._row_fits(self.WOMEN_ROW, sex, age))
+        self.assertTrue(ingest_labs._row_fits(self.MEN_ROW, sex, age))
+
+    def test_an_unknown_spelling_is_still_not_set(self):
+        """Not a guess: a spelling the engine does not know stays None, and with
+        sex unknown neither sex-specific row is excluded — the same standing as
+        age unknown, and the same rule: silence, not a pick."""
+        sex, _age = self._owner_with("x")
+        self.assertIsNone(sex)
 
 
 if __name__ == "__main__":

@@ -223,7 +223,9 @@ class TestWhatThePageItselfIsServed(_Live):
     def test_the_page_and_its_assets_come_back(self):
         for path, kind in (("/", "text/html"), ("/index.html", "text/html"),
                            ("/icon.svg", "image/svg+xml"), ("/dna.svg", "image/svg+xml"),
-                           ("/chart.min.js", "javascript"), ("/pico.min.css", "text/css")):
+                           ("/chart.min.js", "javascript"), ("/pico.min.css", "text/css"),
+                           # the two silhouettes the Overview draws its figure from
+                           ("/body-male.webp", "image/webp"), ("/body-female.webp", "image/webp")):
             with self.subTest(path=path):
                 code, body = self.call(path)
                 self.assertEqual(200, code, f"{path} answered {code}")

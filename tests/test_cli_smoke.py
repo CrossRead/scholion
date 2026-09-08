@@ -271,7 +271,12 @@ class TestTheTwoScreensBeforeAnybodyHasData(unittest.TestCase):
             root = Path(tempfile.mkdtemp())
             self.addCleanup(shutil.rmtree, root, ignore_errors=True)
             old = os.environ.get("SCHOLION_REPO_DIR")
+            old_pin = os.environ.get("SCHOLION_PROFILE_DIR")
             os.environ["SCHOLION_REPO_DIR"] = str(root)
+            # Unpinned on purpose, so that `init` writes under the temporary root
+            # — and pinned back below. Left unpinned, every later in-process
+            # reader of the suite fell through to <repo>/profile, which on the
+            # owner's machine is the real one (task 125).
             os.environ.pop("SCHOLION_PROFILE_DIR", None)
             try:
                 _cli.main(["init"])
@@ -284,5 +289,9 @@ class TestTheTwoScreensBeforeAnybodyHasData(unittest.TestCase):
                     os.environ.pop("SCHOLION_REPO_DIR", None)
                 else:
                     os.environ["SCHOLION_REPO_DIR"] = old
+                if old_pin is None:
+                    os.environ.pop("SCHOLION_PROFILE_DIR", None)
+                else:
+                    os.environ["SCHOLION_PROFILE_DIR"] = old_pin
         finally:
             _tools.offer_after_init = orig

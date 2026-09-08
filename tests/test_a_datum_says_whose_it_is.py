@@ -198,7 +198,7 @@ class TestTheFirstOwnMeasurementTakesTheProfile(unittest.TestCase):
             ensure_ascii=False), encoding="utf-8")
         self.assertEqual([], subject.erasable(d))
         self.assertEqual(["demo", "owner"],
-                         subject.subjects_in(json.loads((d / "labs.json").read_text())))
+                         subject.subjects_in(json.loads((d / "labs.json").read_text(encoding="utf-8"))))
         self.assertEqual("mixed", subject.profile_subject(d))
 
     def test_an_edited_description_is_not_the_demonstrations_to_erase(self):

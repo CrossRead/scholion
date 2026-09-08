@@ -115,10 +115,16 @@ class TestOneMeasurementStandingTwiceIsNamed(_Profile):
         r = self.add("2026-07-04", value=5.6)
         self.assertEqual(r.get("resolution_mixed"), ["2026-07"])
 
-    def test_a_day_and_a_stamp_of_that_day_are_reported(self):
+    def test_a_day_and_a_stamp_of_that_day_are_one_point(self):
+        """Used to be reported and left standing. Task 128 made it a rule: the
+        stamp stands in for the day, and the caller is told what it replaced.
+        `test_a_point_of_the_same_draw_replaces_rather_than_doubles.py` holds
+        the rest."""
         self.add("2026-08-21")
         r = self.add("2026-08-21T10:58", value=5.9)
-        self.assertEqual(r.get("resolution_mixed"), ["2026-08-21"])
+        self.assertNotIn("resolution_mixed", r)
+        self.assertEqual(r.get("replaced"), ["2026-08-21"])
+        self.assertEqual(self.dates(), ["2026-08-21T10:58"])
 
     def test_two_days_of_one_month_are_not_a_doubling(self):
         """Same resolution, different days — an ordinary series, not one

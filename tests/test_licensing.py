@@ -18,6 +18,7 @@ checked here is not "is it nicely written" but three things a machine can check:
 """
 import json
 import re
+import os
 import unittest
 from pathlib import Path
 
@@ -161,6 +162,12 @@ class TestExecutableFiles(unittest.TestCase):
         wrapper = ROOT / "bin" / "crossread"
         if not wrapper.exists():
             self.skipTest("the wrapper is not part of this build")
+        if os.name != "posix":
+            # The wrapper is a shell script, and an execute bit is a POSIX idea:
+            # on Windows the second entry point is the console script the
+            # installer writes. Asserting a mode the filesystem does not keep
+            # would fail for a reason that is not a defect.
+            self.skipTest("a shell wrapper and its execute bit are POSIX-only")
         self.assertTrue(wrapper.stat().st_mode & 0o111, "bin/crossread has no execute bit")
         import subprocess
         p = subprocess.run([str(wrapper), "--help"], capture_output=True, text=True,
@@ -169,6 +176,12 @@ class TestExecutableFiles(unittest.TestCase):
         self.assertIn("crossread", p.stdout, "the help names the wrong command")
 
     def test_the_execute_bit_is_in_place(self):
+        if os.name != "posix":
+            # git checks out a file without a mode on Windows and the filesystem
+            # keeps none, so this asks about something that does not exist there.
+            # What it protects — that a script can be started — is protected on
+            # that platform by the Python entry point into the suite instead.
+            self.skipTest("an execute bit is POSIX-only")
         candidates = [ROOT / "run_tests.sh"] + sorted(ROOT.glob("src/tools/*.sh")) \
             + sorted(ROOT.glob("src/tools/hooks/pre-*"))
         checked = 0
@@ -206,7 +219,7 @@ class TestOldName(unittest.TestCase):
     # directory on somebody's machine is not this test's business, and the string
     # has to keep matching what is actually there or the privacy gate stops firing.
     HIDDEN = {"CHANGELOG.md", "CHANGELOG.private.md", ".personal_patterns"}
-    DIRECTORIES = {".git", "_backups", "_to_delete", "__pycache__", "dist",
+    DIRECTORIES = {".git", ".claude", "_backups", "_to_delete", "__pycache__", "dist",
                    "profile", "genome", "reports", "work", ".cache", "demo",
                    "inbox", "kb"}
 
@@ -324,10 +337,49 @@ class TestTheSupportedVersionsAreActuallyTested(unittest.TestCase):
             f"pyproject promises Python >={major}.{minor} and the matrix does not "
             f"test: {', '.join(missing)} — either test them or stop promising them")
 
-    def test_both_operating_systems_are_in_the_matrix(self):
-        """One of them is where the three-day defect lived."""
-        for os_name in ("ubuntu-latest", "macos-latest"):
-            self.assertIn(os_name, self.text, f"{os_name} is not in the matrix")
+    #: Which runner answers for which claim. A classifier is a promise made to
+    #: everybody who installs the package; a runner is the only thing that can
+    #: keep it. Naming the pairs here is what stops the two from drifting apart —
+    #: which is how a platform ends up claimed and never run.
+    RUNNER_FOR = {
+        "Operating System :: MacOS": "macos-latest",
+        "Operating System :: POSIX :: Linux": "ubuntu-latest",
+        "Operating System :: Microsoft :: Windows": "windows-latest",
+    }
+
+    def test_every_operating_system_the_project_promises_is_in_the_matrix(self):
+        """Derived from the classifiers rather than listed here.
+
+        The Python versions are already checked this way, and the reason is the
+        same: a list typed into the test is a third place to keep in step, and
+        the one that goes stale silently. Adding a platform classifier without a
+        runner now fails here — which is the point, because a promise nobody
+        checks is the shape this project keeps finding in itself.
+        """
+        toml = (support.ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        claimed = [c for c in self.RUNNER_FOR if f'"{c}"' in toml]
+        self.assertTrue(claimed, "pyproject.toml claims no operating system at all")
+        missing = [f"{c} → {self.RUNNER_FOR[c]}"
+                   for c in claimed if self.RUNNER_FOR[c] not in self.text]
+        self.assertEqual(missing, [],
+                         "these platforms are promised in the classifiers and never "
+                         "run: " + "; ".join(missing) + " — either add the runner or "
+                         "stop promising the platform")
+
+    def test_an_unclaimed_platform_is_not_quietly_tested_as_if_promised(self):
+        """The other direction, and it is not symmetry for its own sake.
+
+        A runner without a classifier means somebody checked a platform and did
+        not tell the people installing the package that it works — the work is
+        done and the promise is missing. Left unnoticed, the next person removes
+        the runner as unused.
+        """
+        toml = (support.ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        unclaimed = [f"{runner} → {c}" for c, runner in self.RUNNER_FOR.items()
+                     if runner in self.text and f'"{c}"' not in toml]
+        self.assertEqual(unclaimed, [],
+                         "the matrix runs a platform the classifiers do not claim: "
+                         + "; ".join(unclaimed))
 
     def test_one_red_cell_does_not_hide_the_others(self):
         """`fail-fast` on a matrix turns eight answers into one."""

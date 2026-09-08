@@ -232,11 +232,15 @@ def _mixed_resolution(series: List[Dict[str, Any]], date: str) -> List[str]:
     """Points already in this series that cover the same period at another resolution.
 
     This is the harm the mixed granularity actually does, and it is not the
-    granularity itself: a month point and a dated point for the same month, or a
-    dated point and a stamped one for the same day, are ONE measurement standing in
-    the series twice. Both may be legitimate — a hand-entered month from years ago
-    and a form loaded today — so this is reported, not refused. What must not
-    happen is that it happens quietly.
+    granularity itself: a month point and a dated point for the same month are ONE
+    measurement standing in the series twice. Both may be legitimate — a
+    hand-entered month from years ago and a form loaded today — so this is
+    reported, not refused. What must not happen is that it happens quietly.
+
+    A day against a stamp of that day is no longer reported here, because it is
+    no longer left standing: `_points_this_write_replaces` resolves it, and the
+    only day/stamp pair that reaches this list is the one it cannot resolve — a
+    bare day arriving against TWO draws of that day.
     """
     res = date_resolution(date)
     if not res:
@@ -251,6 +255,43 @@ def _mixed_resolution(series: List[Dict[str, Any]], date: str) -> List[str]:
         if other[:short] == date[:short] and short >= 7:
             same.append(other)
     return sorted(same)
+
+
+def _points_this_write_replaces(series: List[Dict[str, Any]], date: str) -> List[Dict[str, Any]]:
+    """The points a write dated `date` stands in for — same date, or same DAY.
+
+    Task 128. A panel entered by hand as `2026-09-03` and then re-imported from
+    the form, which prints the draw hour, arrived as `2026-09-03T08:22`. The
+    store replaced a point only on an exact match of the string, so the second
+    write joined the series beside the first: 54 markers, each with two points
+    of one draw, values identical. Nothing failed. The series grew, the engine's
+    «previous point» became the same draw, and the mixed-resolution report —
+    which did see it — was a report, not a rule.
+
+    So the rule, in one place for every path that writes a point: a point of
+    the same day replaces a point of the same day whatever its resolution, and
+    the finer date wins (the caller applies that — this only says WHICH points
+    go). The exact-date point goes first in the list, so a caller carrying
+    fields over takes them from the closest match.
+
+    What this deliberately does not do: a bare day arriving against TWO stamps
+    of that day cannot say which draw it is, and choosing one would be a guess
+    about somebody's results. That pair stays, and `_mixed_resolution` reports
+    it. A month is not a day, so a month point is replaced by its own string
+    only — a month entered from memory and a dated form may be two draws.
+    """
+    res = date_resolution(date)
+    exact = [pt for pt in series or [] if pt.get("date") == date]
+    if res not in ("day", "stamp"):
+        return exact
+    day = date[:10]
+    others = [pt for pt in series or []
+              if str(pt.get("date") or "")[:10] == day
+              and pt.get("date") != date
+              and date_resolution(str(pt.get("date") or "")) != res]
+    if res == "day" and len(others) > 1:
+        return exact
+    return exact + others
 
 
 DATE_SOURCES = {
@@ -416,19 +457,67 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             m["direction"] = direction
         markers[marker] = m
     series: List[Dict[str, Any]] = m.setdefault("series", [])
+    # ── one point per draw ───────────────────────────────────────────────────
+    # Replacing by the exact string was the rule, and it let a hand-entered day
+    # and the same form's stamped re-import stand side by side. The write now
+    # stands in for every point of the same day, and the finer date wins: the
+    # clock time on the form is knowledge, and a day entered before the form was
+    # read is not a reason to throw it away.
+    gone = _points_this_write_replaces(series, date)
+    requested = date
+    finest = max((str(pt.get("date") or "") for pt in gone), key=len, default=date)
+    date_kept_from_old = len(finest) > len(date)
+    if date_kept_from_old:
+        date = finest
+    series[:] = [pt for pt in series if not any(pt is g for g in gone)]
     mixed = _mixed_resolution(series, date)
-    series[:] = [pt for pt in series if pt.get("date") != date]  # replacing the point of the same date
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
     if subject:
         pt[_subj.FIELD] = subject
     if censored in ("<", ">"):
         pt["censored"] = censored
+    # The corridor PRINTED ON THIS FORM travels with the point (task 142). It
+    # used to live only on the marker, which keeps the FIRST range it met and
+    # is not rewritten by later forms: a September draw was then judged by a
+    # range recorded in December, or by one entered by hand. A draw's own
+    # reference interval is a fact about that draw. The marker-level range
+    # stays as it is — the first known — for display and for the callers that
+    # read it.
+    if ref_low is not None:
+        pt["ref_low"] = ref_low
+    if ref_high is not None:
+        pt["ref_high"] = ref_high
+    # What the old point knew and this write did not say travels with the
+    # replacement: `context`, `source`, `draw_context` — provenance somebody
+    # wrote down once. Every re-import used to erase it, because a replacement
+    # was a fresh dict. The date's own source follows the date: when the old
+    # stamp is the one kept, the old point is where that stamp came from. The
+    # censoring sign is NOT carried: it describes the number, and the number is
+    # this write's — a «<0.4» re-entered as a measured 0.35 must not keep the «<».
+    for old in gone:
+        for field, kept in old.items():
+            # …nor the old point's corridor: a form that printed no range must
+            # not be shown as having printed the previous form's.
+            if field not in ("date_source", "censored", "ref_low", "ref_high"):
+                pt.setdefault(field, kept)
+    if date_kept_from_old:
+        pt["date_source"] = next((old.get("date_source") for old in gone
+                                  if str(old.get("date")) == date), None) or pt["date_source"]
     series.append(pt)
     series.sort(key=lambda pt: pt["date"])
     _write_json(p, data)
     core.reset_cache()
     out = {"ok": True, "marker": marker, "points": len(series)}
+    # Every date this write folded into one point that is not the date the point
+    # now carries — the old points' dates, and the caller's own when the finer
+    # one already in the series won.
+    replaced = ({str(g.get("date") or "") for g in gone} | {requested}) - {date}
+    if replaced:
+        # Named in the result: a re-import that quietly swallowed a hand entry
+        # would be the mirror image of the defect above.
+        out["replaced"] = sorted(replaced)
+        out["date"] = date
     if mixed:
         # Named in the result, so the loader that wrote the point can print it and
         # the person can decide which of the two is the measurement.

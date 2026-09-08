@@ -137,25 +137,7 @@ def metrics_summary() -> Dict[str, Any]:
 
 
 def _age_from(prof: Dict[str, Any]):
-    """Age in whole years, from whichever birth field the profile carries.
-
-    Both are real. `birth_year` is what the command line and the page write;
-    `birth_date` is what the demonstration profile and an imported medical
-    record write, and reading only the first reported no age at all for either
-    of those — the interface said «—» while the file held a date. Every other
-    reader in this project already accepted both, which is precisely why the one
-    that did not went unnoticed.
-    """
-    from datetime import date
-    bd = str(prof.get("birth_date") or "").strip()
-    today = date.today()
-    if bd:
-        try:
-            y, m, d = (int(x) for x in bd.split("-")[:3])
-            return today.year - y - ((today.month, today.day) < (m, d))
-        except (ValueError, TypeError):
-            pass
-    try:
-        return today.year - int(prof["birth_year"]) if prof.get("birth_year") else None
-    except (ValueError, TypeError):
-        return None
+    """Age in whole years — `core.age_from`, kept under the old name for the
+    callers in this file. The reader moved to core when the corridor rule began
+    to need it too: two readers of the same two fields would drift."""
+    return core.age_from(prof)

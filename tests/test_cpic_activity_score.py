@@ -23,11 +23,11 @@ from scholion.engine import pgx
 
 def _phenotype(gene, genos):
     d = tempfile.mkdtemp()
-    os.environ["SCHOLION_PROFILE_DIR"] = d
-    (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}))
+    unpin = support.pin_profile(d)
+    (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}), encoding="utf-8")
     core.reset_cache()
     r = pgx.compute_phenotype(gene)
-    os.environ.pop("SCHOLION_PROFILE_DIR", None)
+    unpin()
     core.reset_cache()
     return r
 
@@ -113,11 +113,11 @@ class TestThiopurinesConsiderNudt15(unittest.TestCase):
 
     def _aza(self, genos):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
-        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}))
+        unpin = support.pin_profile(d)
+        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}), encoding="utf-8")
         core.reset_cache()
         r = pgx.check_drug_gene("azathioprine")
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        unpin()
         core.reset_cache()
         return r
 
@@ -152,11 +152,11 @@ class TestCalledDiplotypesAreRead(unittest.TestCase):
 
     def _pheno(self, gene, profile):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
-        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps(profile))
+        unpin = support.pin_profile(d)
+        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps(profile), encoding="utf-8")
         core.reset_cache()
         r = pgx.compute_phenotype(gene)
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        unpin()
         core.reset_cache()
         return r
 
@@ -185,13 +185,13 @@ class TestVerbatimRecommendationsReachTheReport(unittest.TestCase):
 
     def _report(self, drug, genos):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
-        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}))
+        unpin = support.pin_profile(d)
+        (pathlib.Path(d) / "pharmacogenomics.json").write_text(json.dumps({"genotypes": genos}), encoding="utf-8")
         core.reset_cache()
         from scholion import format as fmt
         r = pgx.check_drug_gene(drug)
         out = fmt.drug_check(r)
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        unpin()
         core.reset_cache()
         return r, out
 

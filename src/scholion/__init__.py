@@ -33,20 +33,31 @@ _check_python()
 from .engine import check_drug_gene, analyze_labs, suggest_tests, load_profile   # noqa: E402
 
 __all__ = ["check_drug_gene", "analyze_labs", "suggest_tests", "load_profile"]
-# Version — from the installed distribution's metadata, and when running from the
-# source tree — from the VERSION file. Keeping it here as a literal is not possible:
-# it has already diverged from VERSION (0.1.0 against 2.2.0) and would diverge again.
+# Version — when running from the source tree, from the VERSION file beside
+# pyproject.toml; otherwise from the installed distribution's metadata. Keeping it
+# here as a literal is not possible: it has already diverged from VERSION (0.1.0
+# against 2.2.0) and would diverge again.
+#
+# The tree is asked FIRST. It used to be asked only when no distribution was
+# installed, so any `pip install scholion` on the machine — an older one from the
+# registry, kept for comparison — answered for a tree it had nothing to do with:
+# the 0.4.9 tree reported «0.3.1», in the server's header and in the test that
+# exists to catch exactly that (task 123). What marks a tree is `pyproject.toml`
+# two directories up from this file; an installed copy sits in site-packages,
+# where there is none.
 def _detect_version() -> str:
+    from pathlib import Path as _P
+    root = _P(__file__).resolve().parents[2]
+    if (root / "pyproject.toml").is_file():
+        try:
+            return (root / "VERSION").read_text(encoding="utf-8").strip()
+        except OSError:
+            pass
     from importlib.metadata import PackageNotFoundError, version as _v
     try:
         return _v("scholion")
     except PackageNotFoundError:
-        from pathlib import Path as _P
-        try:
-            return (_P(__file__).resolve().parents[2] / "VERSION").read_text(
-                encoding="utf-8").strip()
-        except OSError:
-            return "0+unknown"
+        return "0+unknown"
 
 
 __version__ = _detect_version()

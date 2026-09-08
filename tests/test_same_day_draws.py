@@ -26,14 +26,17 @@ PAIR = {"glucose": {"name": "Глюкоза", "unit": "mmol/L", "ref_low": 4.1, 
 class _Profile(unittest.TestCase):
     def _with(self, markers):
         d = tempfile.mkdtemp()
-        os.environ["SCHOLION_PROFILE_DIR"] = d
+        self._unpin = support.pin_profile(d)
         (pathlib.Path(d) / "labs.json").write_text(json.dumps({"markers": markers},
-                                                              ensure_ascii=False))
+                                                              ensure_ascii=False), encoding="utf-8")
         core.reset_cache()
         return pathlib.Path(d)
 
     def tearDown(self):
-        os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        # pinned only by the tests that built a profile; put back what those found
+        unpin = self.__dict__.pop("_unpin", None)
+        if unpin:
+            unpin()
         core.reset_cache()
 
 

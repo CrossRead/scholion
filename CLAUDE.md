@@ -268,3 +268,13 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   same as `git commit` did before `--no-optional-locks` was found for it.
   Learned 23.08.2026 after five timed-out attempts at forcing the full run
   through.
+- **`shellcheck` does not see an unbound ALL-CAPS name.** SC2154 («referenced
+  but not assigned») is suppressed for upper-case identifiers, which it takes
+  for environment variables — so `"$GEN"` in `annotate_clinvar.sh` passed the
+  linter for weeks and fell over under `set -u` on the first real run. Twenty-five
+  scripts here run under `set -u`; a name that is only read in a rarely taken
+  branch is caught by nothing but executing that branch. When a bridge or CI
+  cannot run the real thing, copy the lines with their numbering kept (blank
+  lines in place of what is skipped) and run that under `set -u` — the error
+  then names the true line. Learned 02.09.2026, when the reported «line 114»
+  turned out to be a `fi` and the crash was on 111.

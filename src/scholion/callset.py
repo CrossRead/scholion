@@ -104,7 +104,7 @@ def _compose(vcf: str) -> Dict[str, int]:
     import gzip
     snv = indel = seen = 0
     try:
-        with gzip.open(vcf, "rt", errors="replace") as fh:
+        with gzip.open(vcf, "rt", encoding="utf-8", errors="replace") as fh:
             for line in fh:
                 if line[:1] == "#":
                     continue
@@ -186,7 +186,7 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
     cp = _cache_path(vcf)
     if cp is not None and cp.exists():
         try:
-            return json.loads(cp.read_text())
+            return json.loads(cp.read_text(encoding="utf-8"))
         except Exception:
             pass
 
@@ -212,7 +212,7 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
     if cp is not None:
         try:
             cp.parent.mkdir(parents=True, exist_ok=True)
-            cp.write_text(json.dumps(out))
+            cp.write_text(json.dumps(out), encoding="utf-8")
         except Exception:
             pass
     return out

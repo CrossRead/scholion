@@ -40,6 +40,420 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.9 — 08.09.2026
+
+### What you can do now
+
+**The Overview draws the body beside the radar.** The same systems, twice:
+the radar as before, and a figure on which every system with a place on a body is
+lit by its score. Around each mark a ring shows how much of that system was
+actually measured, which is the number the radar has never been able to show. A liver scoring 100 out of 100 on one marker of three is a full
+point at the edge of the radar and a ring closed a third of the way on the body.
+Picking a system on either picture marks it on the other.
+
+**The endocrine system is four systems, and each is scored on the panel a
+laboratory actually issues.** One domain called «Hormones», averaged from
+testosterone, IGF-1 and TSH, is gone. In its place the radar carries the thyroid
+axis (TSH, free T4, free T3, anti-TPO), the adrenals (cortisol, DHEA-S), the
+gonads (testosterone, DHT, estradiol) and the growth axis (IGF-1, growth
+hormone). The ring beside each now says how much of that panel exists, instead of
+how much of a mixture of three markers nobody orders together; a system with
+nothing measured is not drawn at all rather than averaged into the picture.
+
+**A hormone is marked at the gland that makes it**, not at the organ it is read
+for: TSH and growth hormone at the pituitary that secretes them, free T4, free T3
+and anti-TPO at the thyroid, cortisol and DHEA-S at the adrenals, IGF-1 at the
+liver that writes it, testosterone at the gonads. Each mark carries the score of
+what is made there — the average of a whole axis would print the same number in
+two places and mean it in neither. Two hormones answer instead that there is no
+one place to mark: DHT is converted in the tissues that respond to it, and
+estradiol comes from the ovary in one person and from adipose tissue in another.
+An antibody is the one named exception to the rule — anti-TPO is made by
+lymphocytes, which are everywhere and mean nothing as a place, so it is marked at
+the gland it is raised against. A reason is recorded beside every placement, and
+beside every refusal to place.
+
+**The pancreas is on the map.** It is a system of its own now — amylase, its
+pancreatic fraction, lipase and C-peptide, the acinar cell and the beta cell
+together — and insulin, which stays in the carbohydrate panel because HOMA-IR is
+computed from it, is marked at the gland that secretes it. Nothing else about
+carbohydrate metabolism moves: glucose, HbA1c and the index itself say plainly
+that they are made nowhere in particular.
+
+**A reference interval that belongs to one sex is no longer lent to the other.**
+Six markers carry both corridors and were already handled. Every other marker
+carries one, transcribed from the forms of one person — and it was borrowed by
+anybody whose own laboratory printed no range. HDL's floor of 1.0 mmol/L is a
+man's; so are AST's ceiling of 40 U/L, GGT's of 60, and the intervals for DHEA-S,
+DHT and estradiol. Borrowed for a woman, none of them failed: each produced a
+verdict, and the wrong one. Every marker a body system is scored on now declares
+whether its corridor depends on sex — silence was what made the class invisible,
+so silence now fails the build — and a corridor is withheld, with the reason
+printed, rather than lent across that boundary. A person's own form is unaffected:
+it is always preferred, and this only ever governed what fills a hole.
+
+**A number with no reference interval beside it no longer costs its system
+points.** Such a marker scored 55 out of 100 — the score for «a deviation whose
+size cannot be assessed» — when there is no deviation, because there is nothing to
+deviate from; and it was counted among the system's deviations, while the marker
+list on the same screen said, correctly, that it was not one. It is now left out
+of the score and out of that count, and still counted as measured: a system whose
+only measured markers carry no corridor reports no score rather than a mediocre
+one.
+
+The five systems with no place on a body say so rather than being drawn on an
+organ they do not belong to; which is which is recorded with a reason beside each
+entry, and a system added to the radar without one now fails the build. The figure
+is drawn male or female from the profile; where the profile does not say, it is
+not drawn at all and the radar answers alone.
+
+**Windows is a supported platform.** The package, the command line, the local
+web application and the assistant skill run there, and a cell of the test matrix
+now says so on every commit rather than leaving it to hope. The promise and the
+check are tied together: a platform named in the package metadata with no runner
+behind it, or a runner with no promise in front of it, now fails the suite.
+
+Two things stay Unix-only and both are optional. The `crossread` wrapper is a
+shell script — on Windows the installed `scholion` command is the same core, so
+nothing is lost but the second name. Building a genome from raw reads drives
+external alignment and coverage tools through shell scripts; every such tool is
+looked for before it is used, so where one is missing the answer names it
+instead of failing. The data directory on Windows is `%USERPROFILE%\.scholion`,
+and `SCHOLION_REPO_DIR` overrides it as everywhere else.
+
+**The suite can be started without a shell.** Until now the only way to run it
+was a bash script, including the run the release procedure requires INSIDE the
+unpacked package. There is now a second entry point written in Python that does
+the same run, so a person who received the package can check it on a machine
+that has no shell at all. The build carries it, and a check makes sure of that:
+every way of starting the suite that the project's own automation uses must be
+present in the package a recipient receives, or the build fails.
+
+**Any gene can be asked about, not only one in the curated catalogue.** `scholion
+genome --gene CASR` used to answer "Gene CASR is not in the coordinate reference"
+— true about `loci.json`, which is a book of pharmacogenetic loci, and easily read
+as a statement about the genome, whose reads were there the whole time. The gene
+name is now resolved to coordinates from a local Ensembl annotation (or from
+Ensembl live, cached afterwards), the interval is cut out of the personal VCF,
+coding variants are separated from the rest by the coding exons of the canonical
+transcript, and what each one does to the protein is computed against the same
+reference the genome was called against — no web service is asked, and no
+coordinate leaves the machine.
+
+**A gene report prints coverage before it prints findings.** Every reassuring
+thing such a report can say has the form "no such variant", and that sentence is
+empty until the region is known to have been read. Read depth is computed
+directly from the alignment, without samtools or pysam, and it reproduces the
+project's own native callability run exactly — mean and every threshold, to the
+last base, on four genes across three chromosomes. Where a piece is missing the
+report names it and what would supply it: coverage without an alignment prints as
+"not measured — because", and "changing the protein: 0" is replaced by "not
+computed" wherever the reference was absent, because a zero and an uncomputed
+number look identical on the page and mean opposite things. The two blind spots
+of short reads — large exon-level deletions, and deep intronic or regulatory
+variants — are printed on every answer, not only on the reassuring ones.
+
+**Three analytes the dictionary did not know are now recognised.** A urine
+albumin-to-creatinine ratio, a urine microalbumin and a **total** T3 went through
+`ingest-labs` without a word: an unrecognised line is skipped, and a skipped line is
+indistinguishable from a line that was never on the form. All three sit on real forms
+of an ordinary laboratory, and the ratio is one of the two axes of KDIGO staging — a
+value whose absence changes what may be said about the kidneys. Total T3 gets its own
+table rather than joining free T3: the two are reported in different units (ng/dL
+against pg/mL) and the same number under the wrong one is out by an order of
+magnitude. The unit table learned `mg/g`, so the ratio prints with a unit rather than
+a code.
+
+**A polygenic percentile is printed with two quantities beside it: how stable
+the number is, and how informative the model is.** A bare percentile looked
+equally convincing for coronary artery disease and for intelligence, and it is
+not: for the second, the choice of reference population moves the number by
+some fifty points while the model's whole range separates the outcome by a
+few. The two are different properties and are shown as such, under every
+percentile in the `prs` report and in its JSON. Stability belongs to the
+measurement — the spread of the percentile across the five reference
+populations, its spread across the models scored for the trait, and the share
+of the model your file actually covers. Informativeness belongs to the model —
+its discrimination (AUROC), and what the score's range from the 10th to the
+90th percentile does to the outcome, read per standard deviation as the
+catalogue reports it. A figure that is not on the machine is named as «not
+recorded» rather than left out, because a line with one number and a line
+with three look alike only when the missing two are silent. The two are not
+folded into one «signal to method» ratio: the effect size cancels out of such
+a ratio, and what remains is the population spread written in other letters.
+
+### What is fixed
+
+**A corridor transcribed at one age was lent at every age, and most corridors
+did not say whose they were.** The rule that keeps one sex's interval from the
+other covered only the markers the body systems score; the other three hundred
+and forty held a corridor and were silent about it, so a man's prolactin or
+LH interval could still be borrowed for a woman whose form printed no range.
+And age was not modelled at all: IGF-1 and DHEA-S depend on it more than on
+sex, every laboratory bands them, and the dictionary held one corridor each.
+Every corridor now declares both — whose it is, and whether age governs it —
+with three states for age: independent, banded with the band on record
+unknown (lent to nobody), or a band in years (lent inside it; an unrecorded
+age is not lent a band). A corridor that could not be checked against a form
+or a standard interval says so in a word — `unreviewed` — and is lent to
+nobody until it is; nine are marked so, the estrogen-metabolite panel among
+them, and that number may only shrink. PSA is a different case again: not a
+man's interval but a test that exists for the male sex only, and for a woman's
+profile the value is shown with that sentence rather than with a borrowed or
+withheld corridor. The reason is printed beside the value in each case, and it
+names what would supply the corridor: the range on the person's own form, or
+the birth year in the profile.
+
+**A value was judged by a range its own form did not print.** The rule that
+the range on the person's own form wins held only at the level of the marker,
+which keeps the first range it met and is not rewritten by later forms; no
+stored value carried the range printed beside it. A September draw was then
+judged by a corridor recorded in December, or by one entered by hand. An ionised
+calcium the form called a hair under its 1.10–1.35 read as deeply low against
+a 1.16–1.32 recorded months before; a DHT five per cent under one corridor was
+twenty-three per cent under the other. The range printed on the form now
+travels with the value and the verdict stands on it; where a value has none,
+the marker's recorded range answers and the report says so; and a series whose
+corridor changed between draws says that its values compare and its flags do
+not.
+
+**A bound printed instead of a number lost its sign.** A laboratory that
+cannot quantify a value prints the limit — «< 0.09 nmol/L» — and the ordinary
+form reader stored the number without the sign, as if 0.09 had been measured.
+The engine has carried a censoring mark for such values all along, and two
+special readers (flora, titres) supplied it; the common path did not, and a
+series of «below the limit» results read as a level that later rose. The sign
+is now read from the text immediately before the value — `<`, `>`, `≤`, `≥`
+and their spelled-out forms — so a bound in a reference column further along
+the row cannot be mistaken for it.
+
+**Calcium measured by two methods was filed as one series.** Elemental
+analysis (ICP) prints calcium in mg/L; a biochemistry panel prints total
+calcium in mmol/L; one marker caught both and converted the second into the
+first by molar mass. The two methods disagree beyond rounding — thirteen per
+cent on the same person two months apart — and a series that holds both
+presents a change of method as a trend. Total calcium is now a marker of its
+own, the elemental one no longer reads a biochemistry form, and the rule is
+written where the next mineral will meet it: a series belongs to a method, not
+to a substance — a unit conversion is legitimate within a method and not
+across methods. Magnesium and the other minerals have not been checked yet.
+
+**A form that printed «HOMA-IR» in the Cyrillic alphabet was not read.** The
+dictionary knew the index by its Latin spelling only; the file was refused
+with an honest reason and the value had to be entered by hand. Both alphabets
+are recognised now, and «insulin resistance index» as well.
+
+**A report could not be redirected to a file.** `scholion labs > labs.txt`, and
+every other command whose output was piped or saved rather than read on screen,
+ended in a crash partway through — thirteen of sixteen commands measured. The
+reports are written with arrows, dashes and guillemets, and the encoding a
+redirected stream inherits from the system cannot always carry them. Output is
+now written as UTF-8 whatever the system would have chosen, so a saved report is
+the report. A character that still cannot be written appears as its own escape
+rather than as a question mark, so what was lost is visible.
+
+**Files were read in whatever encoding the machine assumed.** A genotype table,
+a cached answer or an export written as UTF-8 and read back through a national
+code page does not fail — it decodes, wrongly, and where the read also asked for
+replacement characters the wrongness was silent by construction. Every text read
+and write in the package now states its encoding, and a check over the source
+refuses a new one that does not. Twenty-nine places were corrected; six of them
+were never reached by any test, which is why the check reads the source rather
+than watching a run.
+
+**Two programs writing the profile at once could lose a change.** Where the
+system offers no lock between processes — Windows has none — the local web
+application and a command line each read a file, changed one field and wrote it
+back; whoever finished last erased the other, with no error anywhere. A lock the
+program takes itself now covers that case, and where it is already held the
+second writer says who holds it and stops rather than writing over them. A lock
+left behind by a run that died is taken over after a minute.
+
+**The update button reached for a shell that need not exist.** On a machine
+without one it now says so in a sentence, instead of showing the failure of a
+program it tried to start. The search path it builds is also joined the way the
+platform joins it, rather than always with a colon.
+
+**The monthly reanalysis stopped at its first step.** The ClinVar annotation
+(`annotate_clinvar.sh`) died with «GEN: unbound variable» on the first scheduled
+run: the branch that looks for a reference FASTA named a variable that belongs
+to the orchestrator calling it, not to the script itself, and `set -u` stopped
+it at the first of three such places. All three now use the script's own
+`GENOME_DIR`. The annotation has not yet been re-run against the fresh ClinVar
+release; until it is, findings stand on the release recorded in the profile.
+
+**A profile that spelled its sex «f» or «m» could be measured against the wrong
+reference row.** Several spellings of sex are accepted when a profile is
+written — «f», «female», «woman» and their male counterparts — but the reader
+that picks the applicable row of a multi-row reference interval compared the
+raw spelling with «male»/«female», so for any other spelling the sex half of
+that choice was silently off: a men-only row could fit a woman, a women-only
+row a man. The reader now recognises sex the way everything else does. A
+profile created by `scholion init` was never affected — it can only write the
+two spellings; the demonstration profile and imported or hand-edited profiles
+were.
+
+**The version shown could be another installation's.** With any `scholion`
+distribution installed on the machine — an older one from the registry, kept
+for comparison — a copy run from its source tree reported the installed
+number rather than its own, in the server's header and in `--version`. The tree
+now answers for itself; an installed copy still answers from its metadata.
+
+**The polygenic-score layer could stop starting on a machine that had run it
+the week before.** The scoring sidecar is fetched into an isolated environment
+on first use, and its own dependency declaration left one library unbounded; a
+newer major version of that library reached the index in August, and any fresh
+cache took it — the sidecar then died at start-up, before the first request,
+and `prs`, its page in the web application and the monthly reanalysis all
+reported a server that «exited without an answer». The resolution is now pinned
+below that major version wherever the sidecar is launched, from the application
+and from the setup script alike; a constraint already set in the environment
+by whoever runs it is respected rather than overruled. The message for a server that
+exits without answering now carries its exit code and names this cause and the
+pin, so a recurrence reads as «the pin was not applied» rather than as silence.
+
+**Every polygenic-score computation went to the server twice.** Two optional
+settings of the report — a wider pool of candidate models, and the models of
+child traits — are not accepted by the pinned sidecar; they were sent with every
+trait, refused with every trait, and each trait was computed again without them,
+so a full panel cost double for a setting that was never in force. A refusal is
+now remembered for the rest of the run and the panel pays it once. The two
+settings are honoured only by a newer sidecar than the pinned one, and the help
+says so.
+
+**Three models were computed for a trait and one was shown.** The client asked
+the server to score several models per trait and then to return only its
+favourite, so the spread between them — for a trait whose score explains five
+per cent of the variance, half of the answer to «how much of a number is
+this» — never reached the page. Every scored model now comes back, the spread
+is stored with the panel and printed as part of the percentile's stability.
+And the count of candidate models left unscored — eighty-five of eighty-eight
+for coronary artery disease — travelled without its rule; the rule is the
+report's own `--models` limit, and the count now says so wherever it appears.
+
+**A panel entered by hand and then re-imported from its form stood twice in
+every series.** The form prints the draw hour, so the re-import arrived with a
+finer date than the day entered by hand; the two did not match as strings, and
+the second point joined the series beside the first — identical values, one
+draw, nothing reported. Trends were then computed against a «previous point»
+that was the same blood. A point now stands in for every point of the same day
+whatever precision either carries, the more precise date is the one kept
+whichever order the two arrived in, and what the earlier entry recorded about
+the draw — its context, its source — travels to the replacement instead of
+being erased on every re-import. The importer names each replacement. The one
+case that cannot be decided — a bare day arriving against two timed draws of
+that day — is still reported and left to the person.
+
+**One file the reader could not handle stopped `ingest-labs` for the whole
+folder.** A traceback, every form after it unread, and no indication of which
+file was at fault. Each file is now read on its own: a file that raises is
+listed among the files nothing was taken from, with the exception's type and
+text, the rest of the folder is processed, and the command exits with a
+non-zero status so that a partial run is not mistaken for a clean one. The
+failed file is tried again on the next run rather than remembered as done.
+
+**The list of files already read was shared by every profile on the
+machine.** `ingest-labs` and `ingest-studies` remembered what they had read in
+the application-wide cache rather than beside the profile, so anyone working
+with more than one profile — a family member's, a temporary one — shared a
+single list, and a form already read for one profile could be silently skipped
+for another. The list now lives in the profile directory, one per profile
+(`ingest_labs_manifest.json`, `ingest_studies_manifest.json`); on the first run
+after upgrading the old list is carried over from the cache and the run says so
+once, so no form is read as new because of the move. Both loaders report the
+carry-over as a `manifest_moved` field in `--json`.
+
+**The reach baseline could not be accepted for a commit that added a module.**
+The suite fails when a module of the package has no accepted reach, and its
+message says to run `--accept`; `--accept` in turn refused to record a suite
+that had failed. Adding any module therefore closed a circle the tool could not
+be talked out of, and the only exit was to seed the new module in
+`test_reach_baseline.json` by hand. `--accept` now enters missing modules at
+0.0 before the suite is measured, drops entries whose file is gone, says which
+it did, and records the measured numbers over the seeds. When the suite fails
+anyway the file is put back exactly as it was. `--strict` is unchanged and
+still fails on a module nobody has reviewed.
+
+### A series break
+
+`knowledge/lab_markers.json` now records whose reference interval each scored
+marker holds, and a corridor that belongs to one sex is no longer lent to
+another. On unchanged input that changes the verdict in one place: a profile
+whose sex differs from the corridor's, for a marker whose own laboratory form
+printed no range, used to receive a flag and now receives the value together with
+the reason no corridor is shown. Thirty-six markers can be affected — the six the
+body systems score (HDL, AST, GGT, DHEA-S, DHT, estradiol) and thirty more
+whose adult interval is sex-specific: the red cell count and ESR, iron and
+transferrin saturation, the gonadal and pituitary hormones, calcitonin,
+osteocalcin, leptin, PSA, urine creatinine and the estrogen metabolites — and
+only where the range was borrowed: a person's own form has always been
+preferred, and this governs nothing but the hole it filled. The remedy is the
+form itself, or a range recorded by hand.
+
+Age is the same line, one axis over. Four markers whose interval every
+laboratory bands by age — IGF-1, DHEA-S, inhibin B and total PSA — held one corridor
+each, transcribed at one age, and lent it to everybody. The band on record is
+not known, so the corridor is now lent to nobody and the reason is printed; a
+value that used to receive a verdict against it receives the value alone. The
+same remedy applies. Every corridor in the dictionary now states both — whose
+it is, and whether age governs it — and a marker that does not fails the suite,
+because absence was how the question used to be spelled.
+
+A verdict now stands on the range printed beside the value rather than on the
+range first recorded for the marker. For a value whose own form printed a
+different range from the one on record, the flag can change either way; the
+value does not. Which ruler each flag stands on is printed, so the two can be
+told apart on the page.
+
+The score of a body system also moves where a measured marker had no corridor:
+such a marker used to take 45 points off its system and no longer takes any. The
+overall health index is a mean over systems, so it moves with them. Values from
+either side of this line belong on one chart only with a note.
+
+### What is retracted
+
+No stored value changes and no conclusion is revisited. One correction above —
+the spelling of sex — is to how a reference row is chosen for a profile spelled
+other than «male»/«female»; what that asks of such a profile is under the next
+heading. The rest are to how reports are written and how files are read.
+
+### What needs recomputing
+
+For a profile whose sex is spelled other than «male»/«female» and which has
+ingested forms carrying sex-specific reference rows: the reference intervals
+stored from those forms may have been picked without the sex filter, and
+`ingest-labs --force` on the same folder rewrites them. For every other profile,
+nothing on that account. A report saved from an earlier version may be truncated at the point
+its first unwritable character appeared — running the command again produces the
+whole one.
+
+A form that carried a urine albumin-to-creatinine ratio, a urine microalbumin or
+a total T3 was ingested without those lines, and nothing in the profile says so.
+`ingest-labs --force` on the folder that holds such forms reads them again and
+adds the three analytes; every value already stored stays as it is.
+
+A series that already holds a hand-entered day beside the same draw's timed
+re-import keeps both until that day is written again: the same
+`ingest-labs --force` collapses each such pair into one point, keeps the timed
+date, and names every collapse it made.
+
+A value stored by an earlier version carries no range of its own: until the
+folder is read again with `ingest-labs --force`, it is judged by the marker's
+recorded range and the report marks it so; after, by the range its form
+printed. A value stored from a form that printed a bound («< 0.09») carries no
+sign until the same re-read; points entered by
+hand before the form was read keep whatever was typed. A biochemistry total
+calcium ingested by an earlier version sits in the elemental series converted
+to mg/L: reading the folder again files it under total calcium, but the
+converted point is not removed from the elemental series — that is done by
+hand, and the report until then shows a method change as a trend.
+
+A polygenic panel computed by an earlier version carries no spread across
+models and no AUROC: the report prints «not recorded» in their place until the
+panel is recomputed (`python3 -m scholion.prs report`) and rebuilt with the
+panel-build step of the genome guide. The spread across reference populations
+comes from the ancestry-sensitivity step of the same guide, run once per panel.
+
 ## v0.4.8 — 31.08.2026
 
 ### What you can do now

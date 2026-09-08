@@ -50,7 +50,7 @@ jobs:
       # that something, somewhere, went red first.
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
@@ -71,7 +71,18 @@ jobs:
         # No dependencies are installed on purpose. The project promises to run
         # on the standard library alone, and installing anything here would test
         # a configuration no user has.
+        if: runner.os != 'Windows'
         run: ./run_tests.sh
+
+      - name: The suite (no shell on this runner)
+        # The same run, started the way a recipient without bash has to start it.
+        # This is not a lesser check: the package's own release gate requires the
+        # suite to be run INSIDE the unpacked artefact, and on a machine with no
+        # shell `run_tests.sh` cannot be the way to do it. If this cell is red,
+        # the Windows classifier in pyproject.toml is a promise the project does
+        # not keep and has to come back out.
+        if: runner.os == 'Windows'
+        run: python src/tools/run_tests.py
 
   symlinked-tmpdir:
     name: Linux - TMPDIR through a symlink

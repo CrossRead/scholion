@@ -961,6 +961,25 @@ highly homologous pseudogenes and genes with a complex structure are not reliabl
 covered by short reads; for them the formulation is always "not excluded", not
 "none".
 
+### Any gene can be asked about, not only a catalogued one
+
+`genome --gene <GENE>` no longer stops at the curated `loci.json`. When the gene
+is not in it, the coordinates come from a local Ensembl annotation (or from
+Ensembl live, cached afterwards), the interval is cut out of the personal VCF,
+coding variants are separated from the rest by the CDS of the canonical
+transcript, and the protein consequence is computed against the same reference
+the genome was called against.
+
+Read the answer in the order it prints. Coverage comes before the findings,
+because everything the report says in the reassuring direction has the form "no
+such variant", and that sentence is empty until the region is known to have been
+read. When a piece is missing — the alignment, the reference, the annotation —
+the report names which one and what would supply it rather than dropping the
+line: "changing the protein: 0" and "changing the protein: not computed" look
+alike on the page and mean opposite things. The blind spots of short reads
+(large exon-level deletions, deep intronic and regulatory variants) are printed
+on every answer, not only on the reassuring ones.
+
 ### Diplotype-level pharmacogenetics
 
 A tag SNP answers the question "which allele is at this position", a diplotype

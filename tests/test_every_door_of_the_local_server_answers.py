@@ -213,7 +213,11 @@ class TestTheWritesReallyWrite(_Live):
                              "a file of personal data was left readable by everybody")
 
     def test_a_folder_can_be_set_without_opening_a_dialog(self):
-        got = self.json_of("/api/pick-folder", data={"domain": "labs_docs", "path": "/tmp"})
+        import tempfile
+        # A folder that exists on every platform: «/tmp» does not on Windows,
+        # and the door answered «no such folder» — correctly — to the test.
+        got = self.json_of("/api/pick-folder", data={"domain": "labs_docs",
+                                                     "path": tempfile.gettempdir()})
         self.assertTrue(got.get("ok"))
         self.assertIn("labs_docs", json.dumps(self.json_of("/api/source-config")))
 

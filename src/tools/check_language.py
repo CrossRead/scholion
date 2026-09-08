@@ -188,11 +188,15 @@ def _without_personal(text: str) -> str:
 
 
 def _skip(rel: Path) -> bool:
+    # Keys and lists are posix on every host: on Windows `str(rel)` carries
+    # backslashes, matched nothing in the baseline, and every file read as
+    # «not in the baseline at all» (the first Windows cell that ran, 08.09.2026).
     if set(rel.parts) & PERSONAL_DIRS:
         return True
-    if str(rel) in PERSONAL_FILES or str(rel) in ALLOWED_FILES:
+    key = rel.as_posix()
+    if key in PERSONAL_FILES or key in ALLOWED_FILES:
         return True
-    return str(rel).endswith(ALLOWED_SUFFIXES)
+    return key.endswith(ALLOWED_SUFFIXES)
 
 
 _UNITS: dict = {}
@@ -209,7 +213,7 @@ def _text_hits(rel: Path, text: str) -> int:
             debt += 1
         else:
             samples += 1
-    _SAMPLES[str(rel)] = samples
+    _SAMPLES[rel.as_posix()] = samples
     return debt
 
 
@@ -269,7 +273,7 @@ def _json_hits(path: Path) -> int:
             count += 1
 
     walk(data)
-    _UNITS[str(path.relative_to(ROOT))] = units
+    _UNITS[path.relative_to(ROOT).as_posix()] = units
     return count
 
 
@@ -300,7 +304,7 @@ def remainder() -> dict:
             continue
         n = _json_hits(p) if p.suffix.lower() == ".json" else _text_hits(rel, text)
         if n:
-            found[str(rel)] = n
+            found[rel.as_posix()] = n
     return found
 
 

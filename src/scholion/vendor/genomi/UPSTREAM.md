@@ -50,6 +50,12 @@ Every change is marked `SCHOLION CHANGE` at the line it affects.
    rather than deleted — they build their fixture with `pysam`, which we do not
    depend on. The failure is in the test's setup, not in the module, and deleting
    them would hide that two of the assertions are not being made.
+4. **`detection.py` — the R1/R2 sibling of an archive member is built with
+   `PurePosixPath`**, not `Path`: a zip or tar member is a posix path on every
+   host, and on Windows `Path` joined it with a backslash, so no pair was ever
+   found and every archived FASTQ was refused (found by the Windows cells of the
+   matrix, 08.09.2026). A candidate for upstream under the rule in `CLAUDE.md`
+   — bytes, not interpretation; found by a run, not by a search.
 
 ## What went back
 

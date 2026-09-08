@@ -21,6 +21,7 @@ baseline still describes this tree.
 from __future__ import annotations
 
 import json
+import os
 import pathlib
 import re
 import sys
@@ -58,10 +59,18 @@ class TestTheToolAndTheRunnerAgree(unittest.TestCase):
                          + ", ".join(extra))
 
     def test_every_value_is_the_same_value(self):
+        def same(a, b):
+            # A path from the shell script is «$ROOT/tests/…» with the root
+            # substituted; on Windows the root carries backslashes and the tool
+            # builds the same path with `Path`. Compare the path, not the string.
+            if a and b and ("/" in a or os.sep in a):
+                return os.path.normpath(a) == os.path.normpath(b)
+            return a == b
         for name, want in sorted(self.exported.items()):
             with self.subTest(variable=name):
-                self.assertEqual(want, reach.SUITE_ENV.get(name),
-                                 f"{name} differs between the runner and the measurement")
+                self.assertTrue(same(want, reach.SUITE_ENV.get(name)),
+                                f"{name} differs between the runner and the measurement: "
+                                f"{want!r} vs {reach.SUITE_ENV.get(name)!r}")
 
     def test_the_genome_is_switched_off_in_both(self):
         """The one that would move the number most, named on purpose: a run with

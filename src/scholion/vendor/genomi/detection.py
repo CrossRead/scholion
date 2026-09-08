@@ -35,7 +35,7 @@ import csv
 import json
 import re
 from dataclasses import dataclass, replace
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from .alignment_helpers import paired_fastq_r1_name, paired_fastq_r2_name
 from .text_io import archive_member_names, open_genomic_binary, select_archive_member
@@ -304,7 +304,9 @@ def _validated_archive_fastq_r1_member(source_path: Path, member_name: str) -> s
     members = set(archive_member_names(source_path))
     r2_basename = paired_fastq_r2_name(member_name)
     if r2_basename is not None:
-        r2_member = str(Path(member_name).with_name(r2_basename))
+        # SCHOLION CHANGE: archive members are posix paths on every host; `Path`
+        # joined them with a backslash on Windows and no sibling was ever found.
+        r2_member = str(PurePosixPath(member_name).with_name(r2_basename))
         if r2_member in members:
             return member_name
         raise ValueError(
@@ -312,7 +314,7 @@ def _validated_archive_fastq_r1_member(source_path: Path, member_name: str) -> s
         )
     r1_basename = paired_fastq_r1_name(member_name)
     if r1_basename is not None:
-        r1_member = str(Path(member_name).with_name(r1_basename))
+        r1_member = str(PurePosixPath(member_name).with_name(r1_basename))  # SCHOLION CHANGE: as above
         if r1_member in members:
             return r1_member
         raise ValueError(

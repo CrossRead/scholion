@@ -79,6 +79,11 @@ class TestNoTestCanAskAQuestion(unittest.TestCase):
         """The guard above is about source; this is about the running process."""
         if os.environ.get("SCHOLION_TESTS_KEEP_STDIN"):
             self.skipTest("stdin deliberately kept for an interactive debugger")
+        if os.name == "nt":
+            # On Windows the null device the runner hands the suite is a
+            # character device, and `isatty()` says «terminal» for it — the
+            # probe cannot tell a closed stdin from an open console there.
+            self.skipTest("on Windows the null device reports itself as a terminal")
         self.assertFalse(sys.stdin.isatty() if sys.stdin else False,
                          "the suite is holding a terminal — a test could block on it")
 

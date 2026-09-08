@@ -59,7 +59,10 @@ class GeneOutsideTheCatalogue(unittest.TestCase):
         # 60 bases per line, which is what the .fai below declares. The index and
         # the file have to agree or every fetch is off by the number of newlines.
         body = "\n".join(CONTIG[i:i + 60] for i in range(0, len(CONTIG), 60))
-        fa.write_text(">chrT\n" + body + "\n", encoding="utf-8")
+        # Bytes, not text: in text mode Windows writes «\r\n», the .fai below
+        # declares 61 bytes per line, and the reader then lands one byte early
+        # on every line — which is how a matrix cell read «N» for the first base.
+        fa.write_bytes((">chrT\n" + body + "\n").encode("ascii"))
         header = len(">chrT\n")
         (d / "ref.fa.fai").write_text(f"chrT\t{len(CONTIG)}\t{header}\t60\t61\n",
                                       encoding="utf-8")

@@ -80,7 +80,10 @@ class TestTheLockIsTakenEvenWithoutFlock(unittest.TestCase):
                 self.fail("the write ran while another process held the lock")
         said = str(e.exception)
         self.assertIn("pid 999999", said, "the refusal does not say who holds it")
-        self.assertIn(str(lock), said, "the refusal does not say which file to remove")
+        # `profile_dir()` resolves the path it is handed; a temporary root reached
+        # through a symlink (macOS /var, the CI job that reproduces it) is named
+        # in the refusal in its resolved form. Compare like with like.
+        self.assertIn(str(lock.resolve()), said, "the refusal does not say which file to remove")
 
     def test_a_lock_left_by_a_dead_process_is_taken_over(self):
         """Otherwise a crash mid-write locks somebody out of their own history

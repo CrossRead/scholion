@@ -43,6 +43,14 @@ def environment() -> dict:
     # otherwise get a different run from CI, and a test about language would pass
     # or fail by accident of the terminal.
     e["SCHOLION_LANG"] = "en"
+    # The checking tools print «▶», «✓» and «✗». On a Windows console the
+    # child interpreters inherit a code page that cannot encode them and die on
+    # the first banner, before a single test — which is what every Windows cell
+    # of the matrix did on the first run that reached this far (08.09.2026).
+    # The application itself already writes UTF-8 whatever the system would
+    # choose; the runner and its children have to do the same.
+    e["PYTHONIOENCODING"] = "utf-8"
+    e["PYTHONUTF8"] = "1"
     # The genome is switched off explicitly: otherwise the run would reach for a
     # real VCF of tens of gigabytes, and the result would depend on whose genome
     # happens to lie next to it.
@@ -68,6 +76,10 @@ def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     env = environment()
     os.environ.update(env)
+    # This process's own banners, for the same reason as the children's.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="backslashreplace")
 
     print("▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not "
           "depend on whether some external reference answers today)")

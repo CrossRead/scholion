@@ -42,5 +42,14 @@ def path_of(name: str) -> Optional[Path]:
     key = name.strip().lower().replace("_", "-")
     if key.endswith(".md"):
         key = key[:-3]
+    # Tolerant about spelling, not about shape. While the only caller was a
+    # person typing at their own prompt this was a question of taste; a route
+    # serves this function a string out of a URL, and `../../../etc/passwd`
+    # composes a path outside the package as readily as `data-layout` composes
+    # one inside it. The name is one segment of a file name, or it is nothing.
+    if key != Path(key).name or key in ("", ".", ".."):
+        return None
     p = _DIR / f"{key}.md"
+    if p.resolve().parent != _DIR.resolve():
+        return None
     return p if p.is_file() else None

@@ -109,11 +109,68 @@ def _search_bases() -> List[Path]:
     return bases
 
 
-#: Companions of the main VCF, produced by our own pipeline. They sit in the same
-#: folder by design and must never be counted as «a second genome»: `loci_sites`
-#: and friends are called from the very same reads.
-_DERIVED_VCFS = {"loci_sites.vcf.gz", "scoring_sites.vcf.gz",
-                 "scoring_sites_ext.vcf.gz", "longevity_sites.vcf.gz"}
+#: Options that name a FILE of positions. The lower-case `-r`/`-t` carry an
+#: interval written out in the command itself; the upper-case ones carry a list,
+#: and a call restricted to a list is a call at chosen sites.
+_SITES_OPTS = ("-R", "-T", "--regions-file", "--targets-file")
+
+
+@lru_cache(maxsize=64)
+def _header(vcf: str) -> List[str]:
+    """The `##` lines of a VCF, up to the `#CHROM` row.
+
+    One gzip member is enough for all of them, so this costs the same on a 200 MB
+    file as on a fixture.
+    """
+    import gzip
+    out: List[str] = []
+    try:
+        with gzip.open(vcf, "rt", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                if not line.startswith("##"):
+                    break
+                out.append(line.rstrip("\n"))
+                if len(out) > 600:                       # a header this long is a file we do not know
+                    break
+    except Exception:                                    # noqa: BLE001
+        return []
+    return out
+
+
+def carved_from_a_genome(vcf: str) -> Optional[str]:
+    """Why this file is an extraction rather than a genome, or ``None``.
+
+    What stood here was a set of four names — the outputs our own pipeline
+    happened to write. A list of instances goes stale in silence, and this one
+    did: an output written under a fifth name became a second candidate, the
+    choice became ambiguous, and every locus in the product answered «not read»
+    while the reads sat in the file beside it. Nothing failed, which is why it
+    took a month to notice.
+
+    The class is «this file was carved out of another one», and the file records
+    it. bcftools writes its command into the header: a pileup restricted to a
+    list of sites, or an annotation pass over another file's rows, is not the
+    genome it came from. Our own writers stamp `##scholion=derived` as well, so a
+    tool that leaves no command line of its own is covered too.
+
+    A name is never consulted. `loci_sites.vcf.gz` renamed is still an extraction,
+    and somebody else's `full.vcf.gz` that happens to match one of our names is
+    still their genome.
+    """
+    for line in _header(vcf):
+        if line.startswith("##scholion=derived"):
+            return "declared"
+        if line.startswith("##bcftools") and "Command=" in line:
+            cmd = line.split("Command=", 1)[1].strip()
+            toks = cmd.split()
+            if toks and toks[0] == "annotate":
+                return "annotated_copy"
+            for i, tok in enumerate(toks):
+                if tok in _SITES_OPTS and i + 1 < len(toks):
+                    return "sites_only"
+                if any(tok.startswith(o + "=") for o in _SITES_OPTS):
+                    return "sites_only"
+    return None
 
 
 #: A gVCF is a valid genome file and is NOT a variants-only VCF: it carries
@@ -142,16 +199,68 @@ def vcf_candidates() -> List[Path]:
     ours to do — the person knows which file is theirs, and `SCHOLION_GENOME_VCF`
     is how they say so.
     """
-    out: List[Path] = []
+    return [p for p, _why in _weighed()]
+
+
+def _all_vcfs() -> List[Path]:
+    """Every `.vcf.gz` in the first search base that holds one, nothing removed."""
     for base in _search_bases():
         hits = sorted(glob.glob(str(base / "*.vcf.gz")))
-        hits = [h for h in hits
-                if not h.endswith(".clinvar.vcf.gz")
-                and not _is_gvcf(h)
-                and Path(h).name not in _DERIVED_VCFS]
+        hits = [h for h in hits if not h.endswith(".clinvar.vcf.gz") and not _is_gvcf(h)]
         if hits:
             return [Path(h) for h in hits]
-    return out
+    return []
+
+
+def _weighed() -> List[tuple]:
+    """(file, why-it-is-not-a-candidate) for every file, in one pass.
+
+    The rule may NARROW the set; it may never empty it. A folder holding nothing
+    but extractions still holds the person's reads, and «no genome found» would
+    be a worse answer than the ambiguity — so when every file looks derived,
+    nothing is excluded and the person is asked, as before.
+    """
+    hits = _all_vcfs()
+    weighed = [(p, carved_from_a_genome(str(p))) for p in hits]
+    if all(why for _p, why in weighed) if weighed else False:
+        return [(p, None) for p in hits]
+    return [(p, why) for p, why in weighed if not why]
+
+
+def vcf_excluded() -> List[Dict[str, str]]:
+    """The files the search set aside, each with the reason it gave.
+
+    Printed rather than dropped: a folder that quietly lost a file to a rule is
+    the same silence this whole layer exists to remove, and the reason is the
+    thing that tells a person whether the rule was right about THEIR file.
+    """
+    hits = _all_vcfs()
+    weighed = [(p, carved_from_a_genome(str(p))) for p in hits]
+    if not weighed or all(why for _p, why in weighed):
+        return []
+    return [{"path": str(p), "why": why} for p, why in weighed if why]
+
+
+def chosen_vcf() -> Optional[Path]:
+    """The file the person picked, if they picked one and it is still there.
+
+    `SCHOLION_GENOME_VCF` settles the question for one command; a person whose
+    folder holds several files answers the same question at every start. The
+    answer is theirs either way — this only stops it having to be given twice.
+    """
+    raw = core.chosen_genome_vcf()
+    if not raw:
+        return None
+    p = Path(raw).expanduser()
+    return p if p.exists() else None
+
+
+def chosen_vcf_missing() -> Optional[str]:
+    """A choice that names a file which is no longer there — said, never assumed away."""
+    raw = core.chosen_genome_vcf()
+    if raw and not Path(raw).expanduser().exists():
+        return raw
+    return None
 
 
 def _resolved_vcf() -> Optional[Path]:
@@ -160,6 +269,9 @@ def _resolved_vcf() -> Optional[Path]:
     if env:
         p = Path(env).expanduser()
         return p if p.exists() else None
+    picked = chosen_vcf()
+    if picked is not None:
+        return picked
     hits = vcf_candidates()
     return hits[0] if len(hits) == 1 else None
 
@@ -820,7 +932,8 @@ def available() -> Dict[str, Any]:
     # Task 63: several files, or several samples inside one file, is a question
     # for the person and not a coin toss. Both are carried as one shape so that
     # every consumer — CLI, web, plugin, model — meets the same field.
-    candidates = vcf_candidates() if not os.environ.get("SCHOLION_GENOME_VCF") else []
+    _pinned = bool(os.environ.get("SCHOLION_GENOME_VCF")) or chosen_vcf() is not None
+    candidates = vcf_candidates() if not _pinned else []
     samples = samples_of(str(vp)) if vp is not None else []
     chosen_i = sample_index(str(vp)) if vp is not None else None
     ambiguous = None
@@ -832,6 +945,14 @@ def available() -> Dict[str, Any]:
         ambiguous = {"reason": "sample_not_found", "choices": list(samples),
                      "fix": f"SCHOLION_GENOME_SAMPLE={samples[0]} scholion genome-status"
                             if samples else ""}
+    elif chosen_vcf_missing():
+        # A choice that no longer names a file is not «no choice»: the person
+        # made one, and the file moved. Saying which one is what lets them put it
+        # back or pick again, and it is the difference between a question and a
+        # repetition of the same question.
+        ambiguous = {"reason": "chosen_missing",
+                     "choices": [str(p) for p in vcf_candidates()],
+                     "chosen": chosen_vcf_missing(), "fix": ""}
     elif len(candidates) > 1:
         ambiguous = {"reason": "several_files",
                      "choices": [str(p) for p in candidates],
@@ -894,6 +1015,10 @@ def available() -> Dict[str, Any]:
         # any of the three is what let «the first one alphabetically» pass for an
         # answer about a person.
         "vcf_count": len(candidates),
+        # What the search set aside, and why. A file that drops out of a list in
+        # silence is the same defect one level down: the reason is what tells a
+        # person whether the rule was right about THEIR file.
+        "excluded": vcf_excluded(),
         "vcf_choices": [str(p) for p in candidates] if len(candidates) > 1 else [],
         "samples": samples,
         "sample": samples[chosen_i] if (chosen_i is not None and chosen_i < len(samples)) else None,

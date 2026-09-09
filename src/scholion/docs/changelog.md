@@ -40,6 +40,212 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.10 — 09.09.2026
+
+### What you can do now
+
+**The Genome tab is one page at a time, and it opens with findings.** Seven
+headings on one scroll — all open, the maintenance block above every conclusion,
+and the same gene appearing in four of them without any of them saying so — are
+now panes of one tab. The first is neither ClinVar nor polygenic nor longevity: it
+is one list, ordered by how much a line can change and marked with the source each
+came from. Clicking a gene anywhere on the tab gathers what every source holds
+about it into a single card: the loci and their genotypes with coverage, what
+ClinVar says at those positions, what the longevity layer and the lipid card say
+about that gene. Nothing was removed — the sections are still there, one at a
+time, and the service text each of them opened with is folded rather than first.
+
+**The documents inside the package open as pages, and the second opinion offers
+the one written for a clinician.** The product's own output names files — «see
+PREPARING-THE-GENOME.md» — and after `pip install` the only way to read one was
+`scholion doc <name>` at a terminal, which the person reading the interface may
+not have open. The local server now serves the same nine documents at
+`/doc/<name>`, each as a self-contained page that prints on paper and pulls
+nothing from the network. «Second opinion» carries a button to the one-page
+description for clinicians and researchers: what the program is, what it
+computes, and where it refuses to answer — meant to be handed over at the
+appointment.
+
+**The first screen is the person.** It opened with the one experiment being run
+this month and reached the reader before anything about the reader. The order is
+now the order the questions come in: who the data belong to — sex, age, height,
+body-mass index, the reference panel — then their own indicators, then the
+targets they are aiming at, then the body systems and the figure, then what is
+out of range right now, then what is worth measuring, and last the focus of
+attention. Every block still names the tab that owns it and goes there on a
+click.
+
+**The Profile tab is retired into that first block.** It held four cards and two
+forms, and the four cards were the ones a watch measures every day; as a tab of
+its own it had become the emptiest page in the product. Nothing it could do was
+lost — the profile form, the manual measurement form and the list of what the
+profile is still missing all open at the top of the first screen.
+
+**The state of the genome is said in one place, including when it is not being
+read.** The tab used to show a grey badge and leave the reason unprinted; a
+person whose folder held more than one candidate file met «not read» in six
+places and the cause in none. The state now carries the file, the assembly, the
+sample, what was set aside and why — and, where a choice is open, the names with
+a button beside each. The choice is kept, so it is asked once
+(`scholion choose-genome` at the command line).
+
+**«What to test» is part of the second opinion.** Every row of it is a line for
+the same conversation, and it was a tab that handed half of its own list back to
+the tab beside it. The routine controls travel with it, folded.
+
+**The lifestyle brief's «needs review» can be answered.** The flag is raised when
+a marker a block watches is measured after the block's wording was last read, and
+until now nothing in the product could lower it: it went up once and stayed up, at
+the top of the tab, above the content. There is now one button — the wording still
+holds — which records the date that has always been what the flag compares against
+(`scholion brief-reviewed <block>`). It also moves down the page to sit beside the
+wording it is about.
+
+### What is fixed
+
+**Accepting the reach baseline moved the whole file to whichever machine ran
+it.** A number in `test_reach_baseline.json` is not a property of the code
+alone: it is what the suite reached on one interpreter, with one backend — the
+two do not count a line identically — and, for at least one module, only where a
+file the repository does not carry happens to sit. `--strict` had printed a
+warning whenever the run and the recorded stamp disagreed; `--accept` rewrote
+every number regardless, restamped the file, and reported it in one line.
+
+There are three writing modes now, and only one of them moves the file.
+`--accept` records the whole measurement and refuses when the baseline was taken
+elsewhere — before measuring, since the answer never depended on the ninety
+seconds. `--accept-new` records only modules that have no accepted number yet,
+which is what the suite's own guard asks for when a module is added; it changes
+no other number, not the overall, and not the stamp, and it does not run the
+suite at all when there is nothing to add. `--rebaseline` is the deliberate
+whole-file move and prints every number it lowers, old → new, before writing.
+
+**A document name was tolerant about spelling, which was free until a route
+handed it one.** `DATA_LAYOUT`, `data-layout.md` and `data-layout` are one
+request, and refusing two of them teaches nothing but the exact spelling. While
+the only caller was a person typing at their own prompt, that was the whole
+story; a URL is composed by whoever holds it, and `../../../etc/passwd` builds a
+path outside the package as readily as a name builds one inside it. The
+tolerance stays and the shape does not: a document name is one file name, or it
+is nothing. Anything else opens the list of documents instead.
+
+**Seven of the thirteen rows of the goal table said «—» while the numbers sat in
+the file.** Weight, body-mass index, body fat, muscle mass, VO₂max, resting heart
+rate and steps come from a wearable device, and five of the goal charts drew
+nothing at all. The lifestyle layer stores a measurement together with the device
+that made it — two watches do not measure resting heart rate the same way, and
+one series built out of both shows a step on the month the second export was
+loaded — and the goal reader had been written before that was true. It looked for
+the metrics where they used to sit, found nothing, and returned an empty series.
+Nothing failed and nothing was logged: «—» is what that table prints when there
+is no data, and there was a decade of it.
+
+Two things follow, and both are new behaviour rather than a repair. The reader
+goes through the accessor that knows the file's shape, so a file written by an
+older version answers exactly as a current one does. And a row with no number now
+says which of three things is the matter — nothing carries this series, the
+series is empty, or more than one device measures it and the goal has to say
+whose. The last of those is refused rather than averaged, and a goal may name the
+device (`wear:garmin:RestingHeartRate`) to answer it.
+
+**A number the watch already had was reported as missing, or as three weeks
+old.** Some indicators are kept twice: what a person types in, and what a device
+records every day. Only the first was read. Steps stood at a single figure
+entered in July and were called «below target», while the device series had the
+month just gone above it; sleep showed nothing at all beside seventy-five months
+of nightly data; a resting heart rate from December stood as the current one in
+September. The two are joined now: the newest measurement is the one shown, each
+card says which store it came from and on what date, and the other store is
+printed beside it rather than instead of it. A tie goes to the hand-entered
+reading — a monthly mean and a measurement taken on a day are not the same
+statement. Neither file is written to.
+
+The pairing is declared once, in the shipped wearable reference, and only where
+the two are the same quantity. Where they are merely similar it is left out and
+the row goes on saying it has nothing behind it: intensity minutes are not
+«minutes of activity», and a pairing that is nearly true prints a number nobody
+can act on.
+
+**The goal board was dated by one of the files behind it.** The heading read
+«data as of» the timestamp of the wearables file, while half the rows come from
+the laboratory — so a table carrying a draw from the 3rd was headed with the 23rd
+of the month before. Every row carries its own date now, and the heading carries
+the newest of them.
+
+**A stored result was deciding what language the product speaks.** Polygenic
+risks and longevity markers printed in Russian while the interface was English.
+Neither catalogue is missing a translation — both carry every name in both
+languages. The names were coming from `prs_results.json` and
+`longevity_findings.json`, which are stored RESULTS: each label is a copy of the
+catalogue made on the day of the run, in whatever language that run was speaking.
+The catalogue now decides what a thing is called and the file decides what the
+number is; a trait or a marker the catalogue does not carry keeps the name it was
+stored with, because a percentile with no name is worse than a name in one
+language.
+
+**The longevity layer showed genotypes and explained none of them.** Each row
+printed a gene, an rsID, a genotype — and an explanation line that was always
+empty, because the page asked for a field these rows do not carry. Everything
+that says what a marker MEANS was in the catalogue, in both languages, unread: what
+the allele is, what a second copy does, what it argues for, what population the
+direction holds in, and the papers behind it. Rows now carry all of it, sorted so
+that what was found comes first and what was checked-and-quiet folds away. The
+verdict and the strength of the sources are written out as sentences rather than
+as the internal words they are — and a word the catalogue does not recognise is
+never turned into a message key, which is how «⟦longevity.verdict.…⟧» used to
+reach a reader.
+
+**APOE says what APOE is.** The card led with «APOE — status» over two rsID
+numbers, which tells a reader nothing about the gene or about their own
+combination. It now opens with what the gene is and what this particular pair
+means, says plainly that it is a factor and not a diagnosis, and folds the two
+positions it was computed from underneath.
+
+**A file carved out of a genome was counted as a second genome, and the whole
+genomic layer went dark behind it.** Files called from the same reads at a chosen
+list of positions — the loci of the catalogue, the scoring sites of the polygenic
+models — sit beside the main file by design. They were recognised by NAME, from a
+list of four; an output written under a fifth name became a second candidate, the
+choice became ambiguous, and a refusal to guess between two files means no locus is
+read at all. Nothing failed and nothing was logged. Every genomic answer said «not
+read» — including a card that named two positions and said they had not been read
+while the reads sat in the file beside it.
+
+What a file is called no longer decides anything. bcftools records its command in
+the header, and a pileup restricted to a list of sites, or an annotation pass over
+another file's rows, is an extraction rather than the genome it came from; files
+this project writes stamp themselves besides. The rule may narrow the set of
+candidates and may never empty it — a folder holding nothing but extractions still
+holds the person's reads — and whatever it sets aside is named with its reason
+rather than dropped in silence.
+
+**A card no longer blames the positions when the genome is not being read.** «The
+PCSK9 positions have not been read» is a statement about two rows of a file that is
+open. With no genome connected there is no such file, and the sentence sent a
+reader to look at their sequencing when the answer was in the folder beside it.
+
+### What is retracted
+
+No stored value changes. Answers that said «not read» for the reason above will
+now say what the reads say — which is not a retraction of a claim but the end of
+a refusal.
+
+One claim is retracted, and it was a claim about a person rather than a silence:
+an indicator whose hand-entered point was older than the device series was judged
+against its target on the old point. Where that judgement was «below target» and
+the device disagrees, the flag changes with this version. Nothing was stored, so
+nothing has to be undone — but a printed page or an exported summary made before
+this version may carry the old flag.
+
+### What needs recomputing
+
+Nothing has to be recomputed and nothing has to be re-imported. A profile whose
+genome folder holds one file behaves exactly as before; one that holds several is
+asked, once, which file is the genome, and everything that was silent answers
+from it. The wearable series were on disk the whole time — they are read now, not
+rebuilt — so the goal charts fill in on the first run with no export and no
+ingest.
+
 ## v0.4.9 — 08.09.2026
 
 ### What you can do now

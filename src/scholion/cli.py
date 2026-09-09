@@ -344,6 +344,17 @@ def build_parser() -> argparse.ArgumentParser:
     fl.add_argument("--alcohol", default=""); fl.add_argument("--atenolol", action="store_true")
     fl.add_argument("--late-meal", action="store_true"); fl.add_argument("--note", default="")
 
+    br = sub.add_parser("brief-reviewed", parents=[common],
+                        help="record that a block of the lifestyle brief was read against "
+                             "today's data and its wording still holds")
+    br.add_argument("block", help="the block id, as `brief` prints it")
+
+    cg = sub.add_parser("choose-genome", parents=[common],
+                        help="say which file in the genome folder is your own reads "
+                             "(needed only when the folder holds more than one)")
+    cg.add_argument("path", nargs="?", default="",
+                    help="path to the .vcf.gz; empty clears the choice")
+
     sf = sub.add_parser("set-folder", parents=[common],
                         help="point at a source folder for the data (in the web — the native macOS dialog)")
     sf.add_argument("domain", help="labs_docs | garmin | apple_health | … "
@@ -732,6 +743,12 @@ def _main(argv=None) -> int:
     elif args.cmd == "set-folder":
         from . import store as _st
         res, render = _st.set_source_folder(args.domain, args.path), fmt.write_result
+    elif args.cmd == "brief-reviewed":
+        from . import store as _st
+        res, render = _st.mark_brief_reviewed(args.block), fmt.write_result
+    elif args.cmd == "choose-genome":
+        from . import store as _st
+        res, render = _st.set_genome_vcf(args.path), fmt.write_result
     elif args.cmd == "drug":
         res, render = engine.check_drug_gene(args.name), fmt.drug_check
     elif args.cmd == "labs":

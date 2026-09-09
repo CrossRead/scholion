@@ -345,6 +345,15 @@ MESSAGES = {
                     "and rewrite it for your own goal.",
     "goal.title_default": "Goal",
     "goal.as_of": "data as of {date}",
+    "web.metrics.from_device": "{device}, {date}",
+    "web.metrics.from_hand": "entered by hand, {date}",
+    "web.metrics.also_hand": "by hand: {value} ({date})",
+    "web.metrics.also_device": "{device}: {value} ({date})",
+    "goal.no_now.unknown_metric": "nothing in the profile carries this series",
+    "goal.no_now.several_devices": "more than one device measures this — the goal "
+                                   "must say whose series, e.g. wear:garmin:<metric>",
+    "goal.no_now.empty_series": "the series exists and has no points yet",
+    "goal.measured_by": "measured by {device}",
     "goal.headline": "In one sentence: {text}",
     "goal.targets_header": "Target values (now → goal · best):",
     "goal.best": "best {value}",
@@ -431,6 +440,13 @@ MESSAGES = {
                            "no mark — research grade",
 
     # ── longevity layer ──────────────────────────────────────────────────
+    "longevity.verdict.see_apoe": "read it in the APOE card above",
+    "longevity.verdict.plus": "carrier, full dose",
+    "longevity.verdict.plus_partial": "carrier, one copy",
+    "longevity.verdict.lean_plus": "leans favourable",
+    "longevity.verdict.good": "a favourable variant",
+    "longevity.verdict.neutral": "no effect in this direction",
+    "longevity.verdict.flag": "a variant worth knowing about",
     "longevity.not_ready": "The longevity layer has not been built yet.",
     "longevity.title": "**Longevity — the genetic layer (LongevityMap)**",
     "longevity.apoe": "APOE: **{epsilon}** (rs429358={rs429358}, rs7412={rs7412})",
@@ -542,6 +558,7 @@ MESSAGES = {
     "genome.refused_head.no_file": "the full genome database is not connected yet.",
     "genome.refused_head.unreadable_file": "the genome file is there and cannot be read.",
     "genome.refused_head.assembly_unsupported": "the file is in a build this catalogue cannot answer in.",
+    "genome.refused_head.chosen_missing": "the genome file that was chosen is no longer there, and no other is put in its place: substituting one would answer out of a file nobody picked",
     "genome.refused_head.several_files": "there is more than one genome file and none was chosen.",
     "genome.refused_head.several_samples": "the file holds several samples and none was chosen.",
     "genome.refused_head.foreign_input": "there is genomic data in the folder, but no readable VCF.",
@@ -1102,6 +1119,10 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                     "checking»",
 
     # ── writing commands and the notes left in the data directory ─────
+    "store.brief_absent": "this profile carries no lifestyle brief",
+    "store.brief_no_block": "the brief has no block «{id}»",
+    "store.genome_file_not_found": "no such file: {path}",
+    "store.genome_not_a_vcf": "not a .vcf.gz: {path}",
     "store.unknown_source": "unknown source",
     "store.folder_not_found": "folder not found: {path}",
     "store.sources_purpose": "The data source folders the user chose. Personal.",
@@ -1672,7 +1693,6 @@ will go through them later.
     "web.tab.drugs": "Drugs",
     "web.tab.genome": "Genome",
     "web.tab.lifestyle": "Lifestyle",
-    "web.tab.tests": "What to test",
     "web.tab.second_opinion": "Second opinion",
     "web.tab.prescriptions": "Prescriptions",
     "web.tab.assistant": "Assistant",
@@ -1766,6 +1786,15 @@ will go through them later.
     "count.prescriptions.one": "{n} prescription",
     "count.prescriptions.few": "{n} prescriptions",
     "count.prescriptions.many": "{n} prescriptions",
+    "web.doc.list_title": "Documents in this build",
+    "web.doc.back": "back to the application",
+    "web.doc.foot": "A document shipped inside the package. The same text is printed by "
+                    "`scholion doc <name>` at the command line.",
+    "web.second.for_clinician": "A page for the clinician",
+    "web.second.for_clinician_note": "what this program is, in one page — opens in a new tab, "
+                                     "prints on one side",
+    "web.overview.person_h": "You",
+    "web.overview.metrics_h": "Your indicators",
     "web.overview.focus_h": "Focus of attention",
     "web.overview.watched_h": "Markers under control",
     "web.overview.stat_above": "of them above the ceiling",
@@ -2090,6 +2119,7 @@ will go through them later.
     "lipidgen.headline.unread": "The PCSK9 positions have not been read, so nothing can be said "
                                 "about them yet — which is different from saying there is nothing "
                                 "there.",
+    "lipidgen.headline.no_genome": "No genome is being read at the moment, so nothing is said about PCSK9 — neither present nor absent. The reason, and what to do about it, is in the genome status at the top of the tab.",
     "lipidgen.how_to_read": "Two facts that are misread apart. Carrying a PCSK9 loss-of-function "
                             "variant says how much of the LDL-C picture is fixed at birth. Lp(a) "
                             "is invisible to the rest of a lipid panel — it is set at birth too, "
@@ -2140,7 +2170,6 @@ will go through them later.
     "web.meds.removed": "Removed",
 
     # ── web: personal metrics ────────────────────────────────────────────
-    "web.tab.profile": "Profile",
     "web.metrics.device_label": "Main wearable",
     "web.metrics.device_none": "No wearable device",
     "web.metrics.profile_note2": "These are preconditions the application cannot derive and will not invent. Without sex, a dozen reference intervals are withheld rather than guessed; without a year of birth, the age-banded rows of a lab form cannot be read; without a height there is no body-mass index; and where two devices measured the same thing, the one named here answers. Saying there is no wearable is an answer too — nothing asks again.",
@@ -2252,6 +2281,7 @@ will go through them later.
     "web.brief.needs_review": "the brief needs a review",
     "web.brief.new_data": "New data has arrived since the wording was last edited:",
     "web.brief.block_dates": "text from {reviewed}, data from {newest}",
+    "web.brief.still_true": "The wording still holds",
     "web.brief.numbers_note": "The numbers are recomputed automatically — it is the conclusions "
                               "that need a review. Ask the assistant to update the brief.",
     "web.brief.dropped_h": "Alarms called off — what not to do",
@@ -2260,20 +2290,32 @@ will go through them later.
 
     # ── web: genome ──────────────────────────────────────────────────────
     "web.genome.title": "Genome — the full picture",
+    "web.genome.nav_findings": "Findings",
+    "web.genome.nav_sources": "Sources",
+    "web.genome.findings_none": "Nothing found: either no genome is being read, or no source has marked anything. Which of the two is said in the genome status above.",
+    "web.genome.findings_note": "Ordered by what can be done about a line, not by where it came from. Clicking a gene gathers everything known about it into one card.",
+    "web.common.close": "close",
     "web.genome.nav_summary": "Summary",
     "web.genome.nav_updates": "Updates",
     "web.genome.nav_risks": "Risks (PGS)",
     "web.genome.nav_longevity": "Longevity",
     "web.genome.nav_clinvar": "ClinVar",
     "web.genome.nav_locus": "Locus lookup",
+    "web.genome.pick_h": "The folder holds several files — which one is your genome?",
+    "web.genome.pick_why": "While the choice is open no locus is read at all: the sections below are empty for that reason and not because the genome holds nothing. The choice is kept and will not be asked again.",
+    "web.genome.pick_btn": "This one is mine",
+    "web.genome.chosen_gone": "The file that was chosen is no longer there: {path}",
+    "web.genome.set_aside": "Set aside as extractions from a genome:",
+    "web.genome.why.sites_only": "called at a list of positions",
+    "web.genome.why.annotated_copy": "an annotated copy",
+    "web.genome.why.declared": "declares itself derived",
+    "web.genome.assembly": "assembly {name}",
+    "web.genome.sample": "sample {name}",
     "web.genome.db_connected": "database connected",
     "web.genome.db_not_connected": "database not connected",
     "web.genome.db_after_script": "the genome side answers once a full VCF is connected — "
                                  "`scholion doc preparing-the-genome` describes how",
-    "web.genome.intro": "Everything about your genome in one place: the advantages as well as the "
-                        "risks. Below: what is new in the databases, polygenic risks, longevity, "
-                        "clinically significant ClinVar findings and a lookup for any locus. "
-                        "Nothing leaves the machine. Not a diagnosis — material for the doctor.",
+    "web.genome.intro": "Everything about the genome on one tab: findings first, then the sources each of them came from. Nothing leaves the machine. Not a diagnosis — material for the doctor.",
     "web.genome.updates_h": "Database updates",
     "web.genome.updates_note": "check the genome against a fresh ClinVar and show what is new",
     "web.genome.prs_h": "Polygenic risks (PGS)",
@@ -2310,6 +2352,18 @@ will go through them later.
     "web.longevity.apoe_e4": "There is an ε4 component — a raised risk of Alzheimer's and "
                              "cardiovascular disease; discuss it with the doctor.",
     "web.longevity.apoe_generic": "ε2/ε3/ε4 are determined from these two SNPs.",
+    "web.longevity.what_is_apoe": "APOE is the most studied gene of this layer: the same pair of positions decides both the variant linked to Alzheimer\u2019s risk and the one seen more often in people who live long. It is a factor, not a diagnosis, and it says nothing about what has already happened.",
+    "web.longevity.technical": "How this is computed",
+    "web.longevity.stored_note": "The note written when this layer was built",
+    "web.longevity.action_h": "What to do about it",
+    "web.longevity.no_action": "nothing to do — this is knowledge, not a prescription",
+    "web.longevity.found_h": "What was found",
+    "web.longevity.quiet_h": "Checked, and no effect in this direction",
+    "web.longevity.nothing_found": "None of the markers checked carries an allele in the longevity direction. That is the ordinary answer, not a finding.",
+    "web.longevity.confidence.curated": "source: our own curated catalogue",
+    "web.longevity.confidence.high": "sources: strong",
+    "web.longevity.confidence.medium": "sources: moderate",
+    "web.longevity.confidence.low": "sources: weak",
     "web.longevity.carries": "carries the allele",
     "web.longevity.stat_checked": "variants checked",
     "web.longevity.stat_carrier": "significant — carrier",
@@ -2443,9 +2497,12 @@ will go through them later.
                                    "a value's position, or its absence.",
 
     "web.guide.tour_h": "What each tab is for",
-    "web.guide.tour_overview": "The first screen: one focus-of-attention card — what is most "
-                               "worth looking at right now, and why — above the goal dashboard, "
-                               "if you have set a shape target.",
+    "web.guide.tour_overview": "The whole person on one screen, in the order the "
+                               "questions come: who the data belong to, their own "
+                               "indicators, the targets they are aiming at, the body "
+                               "systems and the figure, what is out of range right now, "
+                               "and last the one thing being worked on. Every block "
+                               "names the tab that owns it.",
     "web.guide.tour_labs": "Every lab marker on file, flagged against its reference range, with "
                            "a trend line where enough measurements exist.",
     "web.guide.tour_drugs": "Check a medication by name before you take it: a quick "

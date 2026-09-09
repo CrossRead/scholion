@@ -64,6 +64,8 @@ PARITY: Dict[str, str] = {
     "POST /api/metrics": "add-metric",
     "POST /api/focus/log": "focus-log",
     "POST /api/pick-folder": "set-folder",
+    "POST /api/choose-genome": "choose-genome",
+    "POST /api/brief-reviewed": "brief-reviewed",
     "POST /api/wearable-primary": "profile",
     "POST /api/ingest-wearable": "ingest-wearable",
     "POST /api/ingest-garmin": "ingest-garmin",
@@ -279,6 +281,17 @@ NO_PLUGIN: Dict[str, str] = {
     # the absence of a tool is what makes that more than a promise.
     "add-lab": "a write", "add-med": "a write", "remove-med": "a write",
     "add-metric": "a write", "set-folder": "a write",
+    # The one question about the genome a program may not answer. Every file in
+    # that folder is the person's, called from the person's own reads; which of
+    # them is the genome and which an extraction from it is a fact only they
+    # hold, and a model picking for them would be picking what everything else
+    # is then read out of.
+    "choose-genome": "a write, and the choice is the person's own",
+    # A model may write the wording of a brief; it may not certify that the
+    # wording still holds against numbers that arrived after it. That sentence is
+    # the person's, and a tool that let a model sign it would put the assistant's
+    # own text beyond the one check there is on it.
+    "brief-reviewed": "a write, and the statement it records is the person's own",
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
     "ingest-wearable": "a write",
     "import-fhir": "a write",

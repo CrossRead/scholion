@@ -283,6 +283,42 @@ def PRS_DISCLAIMER() -> str:
     return _t("disclaimer.prs")
 
 
+def _localise_from_catalogue(rows, cat_rows, key_field, fields, extra_key=None):
+    """Take the named fields from the catalogue, in the reader's language.
+
+    `prs_results.json` and `longevity_findings.json` are STORED RESULTS. A label
+    inside one of them is a copy of the catalogue made on the day the file was
+    written, in the language that run happened to be speaking — so a person
+    reading the product in English met Russian names among the English rows.
+    Neither catalogue is missing a translation: `core._read_knowledge` resolves
+    both languages on read, and nobody asked it.
+
+    The catalogue decides what a thing is CALLED; the stored file decides what
+    the number is. A row the catalogue does not carry keeps every string it was
+    stored with — dropping it would leave a percentile with no name, which is a
+    worse answer than a name in the wrong language.
+    """
+    by_key = {}
+    for c in cat_rows:
+        k = c.get(key_field)
+        if isinstance(k, str) and k:
+            by_key[k.lower()] = c
+        if extra_key:
+            e = c.get(extra_key)
+            if isinstance(e, str) and e:
+                by_key.setdefault(e.lower(), c)
+    for r in rows:
+        src = by_key.get(str(r.get(key_field) or "").lower())
+        if src is None and extra_key:
+            src = by_key.get(str(r.get(extra_key) or "").lower())
+        if src is None:
+            continue
+        for f_from, f_to in fields:
+            v = src.get(f_from)
+            if isinstance(v, str) and v:
+                r[f_to] = v
+
+
 def _annotate_prs_evidence(traits: List[Dict[str, Any]]) -> None:
     """Set the level of evidence from knowledge/prs_traits.json.
 
@@ -404,6 +440,12 @@ def prs_findings() -> Dict[str, Any]:
     # disappears from a panel in silence is indistinguishable from one that was
     # never in it.
     traits, withheld_by_sex = _withheld_by_sex(traits)
+    # The name of a trait and the name of its category are the catalogue's, in
+    # the language being read; the percentile is the file's. Joined on `term`,
+    # which is the one field of a stored trait that is not in any language.
+    _localise_from_catalogue(
+        traits, core._read_knowledge("prs_traits.json").get("traits") or [],
+        "term", (("label", "label"), ("category", "category")), extra_key="label")
     _annotate_prs_evidence(traits)
     _annotate_prs_measurement(traits)
     cats: Dict[str, List[Dict[str, Any]]] = {}
@@ -462,6 +504,46 @@ def longevity_findings() -> Dict[str, Any]:
     if not data or not data.get("known"):
         return {"available": False, "disclaimer": DISCLAIMER(),
                 "message": _t("longevity.not_built")}
+    known = data.get("known", []) or []
+    # Same rule as the polygenic layer, and one more thing: the page was printing
+    # `note`, and these rows carry none. Everything that says what a marker MEANS
+    # — what the allele is, what the dose does, what it argues for — is in the
+    # catalogue with both languages in it, and none of it reached the reader.
+    _localise_from_catalogue(
+        known, [{**v, "rsid": k} for k, v in
+                (core._read_knowledge("longevity_directions.json").get("directions") or {}).items()],
+        "rsid", (("label", "label"), ("action", "action"),
+                 ("zygosity_note", "zygosity_note"),
+                 ("population_caveat", "population_note")))
+    # The verdict is a TOKEN — `plus`, `neutral`, `flag` — and the sentence for it
+    # lives in the message catalogue, so it is written once and in both languages.
+    # Recomputed from the catalogue where the copies are known: a stored verdict
+    # was decided by whatever the catalogue said on the day of the build.
+    _dirs = core._read_knowledge("longevity_directions.json").get("directions") or {}
+    # The set of verdicts the CATALOGUE can produce. A stored file may carry
+    # anything — the demo profile holds «🟢 favourable», a sentence somebody
+    # rendered once — and composing a message key out of an unknown token is how
+    # ⟦longevity.verdict.🟢 favourable⟧ reaches a reader. Known token → the
+    # sentence, in both languages; unknown → whatever the file already says,
+    # which is at least prose.
+    _known_verdicts = {v for d in _dirs.values()
+                       for v in (d.get("verdict_by_copies") or {}).values()}
+    # `see_apoe` is written by our own builder for the two positions the ε-status
+    # is computed FROM. They are not findings of their own — the card above is the
+    # finding — but the word still has to be a sentence wherever it is printed.
+    _known_verdicts.add("see_apoe")
+    _known_conf = {"high", "medium", "low", "curated"}
+    for k in known:
+        src = _dirs.get(k.get("rsid")) or {}
+        by_copies = src.get("verdict_by_copies") or {}
+        c = k.get("copies_favorable")
+        tok = (by_copies.get(str(c)) if c is not None else None) or k.get("verdict")
+        k["verdict_token"] = tok if tok in _known_verdicts else None
+        k["verdict_label"] = (_t("longevity.verdict." + tok) if tok in _known_verdicts
+                              else (k.get("verdict") or None))
+        conf = src.get("confidence") or k.get("confidence")
+        k["confidence_label"] = (_t("web.longevity.confidence." + conf)
+                                 if conf in _known_conf else None)
     sig = data.get("significant_by_gene", {}) or {}
     # the famous longevity genes come first
     famous = ["FOXO3", "APOE", "SIRT1", "SIRT3", "CETP", "IL6", "TP53", "KL", "IGF1R",
@@ -472,7 +554,7 @@ def longevity_findings() -> Dict[str, Any]:
     return {
         "available": True,
         "apoe": data.get("apoe"),
-        "known": data.get("known", []),
+        "known": known,
         "significant_genes": sig_genes,
         "stats": {"genotyped": meta.get("genotyped"), "carriers": meta.get("carriers"),
                   "significant_carriers": meta.get("significant_carriers"),
@@ -522,6 +604,21 @@ def _copies_of(genotype: str, allele: str) -> Optional[int]:
     if not g or set(g) - set("ACGT"):
         return None
     return g.count(allele.upper())
+
+
+def _genome_readable() -> bool:
+    """Whether a genome is being read at all — asked, not assumed.
+
+    Every card in this module has an empty state, and each of them used to be
+    written as if the genome were open and this particular position had nothing
+    in it. The two are different facts with different remedies: one is answered
+    by sequencing, the other by naming which file in a folder is yours.
+    """
+    from .. import genome as _g                              # lazy: core does the same
+    try:
+        return _g.vcf_path() is not None
+    except Exception:                                        # noqa: BLE001
+        return False
 
 
 def lipid_genetics() -> Dict[str, Any]:
@@ -610,9 +707,14 @@ def lipid_genetics() -> Dict[str, Any]:
                                                   _lang())}
                           for r in _PCSK9_WAITING if r in loci],
         "lpa": lpa,
+        # Four facts, and until now three sentences. «The positions have not
+        # been read» is a statement about two rows of a file that IS being read;
+        # when no genome is being read at all, saying it sends the reader to look
+        # at their genome instead of at the folder, which is where the answer is.
         "headline": (_t("lipidgen.headline.carrier") if carriers
                      else (_t("lipidgen.headline.not_carrier") if read
-                           else _t("lipidgen.headline.unread"))),
+                           else (_t("lipidgen.headline.unread") if _genome_readable()
+                                 else _t("lipidgen.headline.no_genome")))),
         "how_to_read": _t("lipidgen.how_to_read"),
         "disclaimer": DISCLAIMER(),
     }

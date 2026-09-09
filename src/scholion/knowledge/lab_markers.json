@@ -4895,8 +4895,7 @@
     "ru": {
      "names": [
       "магний (mg",
-      "магний, mg",
-      "магний"
+      "магний, mg"
      ],
      "exclude": [
       "моче",
@@ -4905,6 +4904,9 @@
      ],
      "prefer_form": [
       "элементный анализ"
+     ],
+     "form_exclude": [
+      "биохимия"
      ]
     },
     "en": {
@@ -4928,7 +4930,60 @@
    },
    "convert_note": "Canonical here is mg/L. Magnesium A = 24.305 g/mol, divalent: 1 mEq/L = 12.15 mg/L.",
    "ref_sex": "any",
-   "ref_age": "any"
+   "ref_age": "any",
+   "method_note": "Elemental analysis (ICP), reported in mg/L. Serum magnesium by the biochemical method, in mmol/L, is a SEPARATE marker (`magnesium_total`): different fractions, different corridors, and one series would be a chart of the method rather than of the person. The name printed on the form is in `labels`, where a recognition string belongs."
+  },
+  "magnesium_total": {
+   "unit": "mmol/L",
+   "ref_low": 0.66,
+   "ref_high": 1.07,
+   "units": {
+    "ммоль/л": 1.0,
+    "mmol/L": 1.0
+   },
+   "convert": {
+    "mg/L": 0.04114,
+    "мг/л": 0.04114,
+    "mg/dL": 0.4114,
+    "мг/дл": 0.4114
+   },
+   "convert_note": "Canonical here is mmol/L. Magnesium A = 24.305 g/mol: 1 mg/L = 0.04114 mmol/L. The elemental (ICP) row `magnesium_blood` keeps mg/L on purpose — different assays, not different units.",
+   "specimen": "blood",
+   "labels": {
+    "ru": {
+     "names": [
+      "магний"
+     ],
+     "exclude": [
+      "(mg",
+      ", mg",
+      "моче",
+      "слюн",
+      "эритроцит",
+      "внутриклеточ"
+     ],
+     "form_exclude": [
+      "исп",
+      "элементный анализ",
+      "витамины и микроэлементы"
+     ]
+    },
+    "en": {
+     "display": "Magnesium, serum",
+     "names": [
+      "magnesium"
+     ],
+     "exclude": [
+      "urine",
+      "urinary",
+      "rbc",
+      "intracellular"
+     ]
+    }
+   },
+   "ref_sex": "any",
+   "ref_age": "any",
+   "method_note": "Serum magnesium by the biochemical method. Entered on 08.09.2026: two points of the ICP series (December 2025 and September 2026) belonged here, and while they sat in the elemental series they read as a fall that never happened."
   },
   "manganese": {
    "unit": "ug/L",
@@ -10103,8 +10158,7 @@
     "ru": {
      "names": [
       "цинк (zn",
-      "цинк, zn",
-      "цинк"
+      "цинк, zn"
      ],
      "exclude": [
       "моче",
@@ -10113,6 +10167,9 @@
      ],
      "prefer_form": [
       "элементный анализ"
+     ],
+     "form_exclude": [
+      "биохимия"
      ]
     },
     "en": {
@@ -10128,7 +10185,59 @@
    },
    "units_note": "ug/dL → ug/L: a power of ten, 1 dL = 0.1 L",
    "ref_sex": "any",
-   "ref_age": "any"
+   "ref_age": "any",
+   "method_note": "Elemental analysis (ICP), reported in ug/L. Serum zinc by the biochemical method, in umol/L, is a SEPARATE marker (`zinc_total`) for the same reason magnesium is: the two methods measure different fractions and share no corridor."
+  },
+  "zinc_total": {
+   "unit": "umol/L",
+   "ref_low": 7.0,
+   "ref_high": 23.0,
+   "units": {
+    "мкмоль/л": 1.0,
+    "umol/L": 1.0
+   },
+   "convert": {
+    "ug/L": 0.015296,
+    "мкг/л": 0.015296,
+    "ug/dL": 0.15296,
+    "мкг/дл": 0.15296
+   },
+   "convert_note": "Canonical here is umol/L. Zinc A = 65.38 g/mol: 1 ug/L = 0.015296 umol/L.",
+   "specimen": "blood",
+   "labels": {
+    "ru": {
+     "names": [
+      "цинк"
+     ],
+     "exclude": [
+      "(zn",
+      "моче",
+      "слюн",
+      "волос",
+      "эритроцит"
+     ],
+     "form_exclude": [
+      "исп",
+      "элементный анализ",
+      "витамины и микроэлементы"
+     ]
+    },
+    "en": {
+     "display": "Zinc, serum",
+     "names": [
+      "zinc"
+     ],
+     "exclude": [
+      "urine",
+      "urinary",
+      "hair",
+      "rbc"
+     ]
+    }
+   },
+   "ref_sex": "any",
+   "ref_age": "any",
+   "method_note": "Serum zinc by the biochemical method. Entered on 08.09.2026 together with `magnesium_total` and `calcium_total`: the third of one order of biochemical minerals, which the elemental series had been absorbing."
   }
  }
 }

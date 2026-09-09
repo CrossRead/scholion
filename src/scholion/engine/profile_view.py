@@ -79,24 +79,90 @@ def _metrics_overview() -> Dict[str, Any]:
             "filled_count": len(filled), "watch": watch}
 
 
+def _device_rows() -> Dict[str, Dict[str, Any]]:
+    """`{person metric key: {source, series, label, unit}}` — what a watch already
+    measures out of what the person is otherwise asked to type in.
+
+    Three things are deliberate here. The pairing is read from the shipped
+    catalogue rather than from a table in this file, so there is one place where
+    «the same quantity» is asserted. The series comes through
+    `wearables.series`, which is the accessor that knows the file's shape — a
+    second reader of that shape is exactly the defect this repairs. And a metric
+    that MORE THAN ONE device reports is skipped rather than picked between: two
+    watches do not measure resting heart rate the same way, and a row that
+    silently switched device between two readings would show a step the person
+    would take for a change in themselves.
+    """
+    from .. import wearables
+    cat = (core.wearable_metrics().get("metrics") or {})
+    blocks = dict(wearables.series(core.wearable_trends()))
+    out: Dict[str, Dict[str, Any]] = {}
+    for name, spec in cat.items():
+        key = (spec or {}).get("person_metric")
+        if not key:
+            continue
+        carry = {s: b for s, b in blocks.items() if name in (b.get("metrics") or {})}
+        if len(carry) != 1:
+            continue
+        src, block = next(iter(carry.items()))
+        months = (block.get("metrics") or {}).get(name) or {}
+        series = sorted(({"date": str(mo), "value": float(v)}
+                         for mo, v in months.items() if isinstance(v, (int, float))),
+                        key=lambda p: p["date"])
+        if series:
+            out[key] = {"source": src, "series": series, "metric": name,
+                        "label": spec.get("label"), "unit": spec.get("unit")}
+    return out
+
+
 def metrics_summary() -> Dict[str, Any]:
-    """Personal health metrics: latest values, trends, flags + the BMI computation."""
+    """Personal health metrics: latest values, trends, flags + the BMI computation.
+
+    Two stores answer for some of these numbers — what the person typed into
+    metrics.json and what their watch recorded — and for a month the page read
+    only the first. It said «steps 6000, below the target» from a single point
+    somebody entered in July while the device series held August, and «sleep —»
+    while the same file carried seventy-five months of it. Nothing was written
+    wrongly; nothing joined the two.
+
+    The rule is the newest measurement wins and the row says which store it came
+    from, with a tie going to the hand-entered one: a monthly mean and a reading
+    taken on a day are not the same statement, and the person made the second on
+    purpose. Neither file is written to — this is a view.
+    """
     data = core.metrics_json()
     prof = data.get("profile", {})
+    dev = _device_rows()
     out = []
     latest_weight = None
     for k, m in data.get("metrics", {}).items():
         series = m.get("series") or []
         latest = _latest(series) if series else None
+        d = dev.get(k)
+        d_last = d["series"][-1] if d else None
+        # Months against days: a monthly point is compared on its month, which is
+        # what it is. Equal month → the hand-entered reading stands.
+        take_device = bool(d_last) and (
+            latest is None or str(d_last["date"])[:7] > str(latest["date"])[:7])
+        shown = d_last if take_device else latest
+        shown_series = d["series"] if take_device else series
         row = {"key": k, "name": m.get("name", k), "unit": m.get("unit", ""),
                "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
                "direction": m.get("direction"),
-               "value": latest["value"] if latest else None,
-               "date": latest["date"] if latest else None,
-               "flag": _flag_value(m, latest["value"], latest.get("censored")) if latest else "unknown",
-               "trend": _trend(series), "series": sorted(series, key=lambda p: p["date"])}
-        if k == "weight" and latest:
-            latest_weight = latest["value"]
+               "value": shown["value"] if shown else None,
+               "date": shown["date"] if shown else None,
+               "flag": _flag_value(m, shown["value"], shown.get("censored")) if shown else "unknown",
+               "trend": _trend(shown_series),
+               "series": sorted(shown_series, key=lambda p: p["date"]),
+               # Where the number on the card came from, and what the other store
+               # holds — so a person who types a weight in can see the watch's
+               # last month beside it rather than instead of it.
+               "origin": ("device" if take_device else "manual" if shown else None),
+               "device": ({"source": d["source"], "metric": d["metric"],
+                           "value": d_last["value"], "date": d_last["date"]} if d_last else None),
+               "manual": ({"value": latest["value"], "date": latest["date"]} if latest else None)}
+        if k == "weight" and shown:
+            latest_weight = shown["value"]
         out.append(row)
     out.sort(key=lambda r: (r["value"] is None, r["name"]))
     # BMI from the height + the latest weight

@@ -57,6 +57,7 @@
     "tests/test_a_number_and_its_word_agree.py": 1,
     "tests/test_a_point_is_dated_in_a_shape_the_series_can_read.py": 2,
     "tests/test_a_report_survives_being_saved.py": 1,
+    "tests/test_a_stored_result_does_not_decide_the_language.py": 11,
     "tests/test_a_study_that_was_done_is_not_called_not_done.py": 12,
     "tests/test_a_summary_read_in_pieces_keeps_the_pieces_that_read.py": 1,
     "tests/test_dates_and_tables.py": 1,

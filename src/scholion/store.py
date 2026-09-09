@@ -100,6 +100,75 @@ def set_source_folder(domain: str, folder: str) -> Dict[str, Any]:
 
 
 @_serialized
+def mark_brief_reviewed(block: str) -> Dict[str, Any]:
+    """Record that the wording of one brief block was read against today's data.
+
+    `reviewed` is a date a person put there, and the engine compares it with the
+    newest measurement the block watches. The comparison worked; the date had no
+    way to be written from anywhere in the product, so the flag it drives could
+    only ever go up. A signal that cannot be lowered stops being read at all —
+    and this one sat at the top of the tab.
+
+    Nothing about the TEXT changes here. The claim being recorded is exactly the
+    one the button makes: somebody looked at this wording beside the newer numbers
+    and it still says what they mean.
+    """
+    block = (block or "").strip()
+    src = core.profile_dir() / "lifestyle_brief.json"
+    if not src.exists():
+        return {"ok": False, "error": _t("store.brief_absent")}
+    data = json.loads(src.read_text(encoding="utf-8"))
+    blocks = data.get("blocks") or []
+    hit = next((b for b in blocks if str(b.get("id")) == block), None)
+    if hit is None:
+        return {"ok": False, "error": _t("store.brief_no_block", id=block)}
+    from datetime import date as _date
+    hit["reviewed"] = _date.today().isoformat()
+    _write_json(src, data)
+    core.reset_cache()
+    return {"ok": True, "block": block, "reviewed": hit["reviewed"]}
+
+
+@_serialized
+def set_genome_vcf(path: str) -> Dict[str, Any]:
+    """Record WHICH file in the genome folder is the person's own reads.
+
+    Only ever asked when the folder holds more than one candidate, and only the
+    person can answer it: the files are all theirs, all called from their reads,
+    and which one is the genome rather than an extraction from it is not
+    something a program may decide by size or by name. Passing an empty path
+    clears the choice.
+
+    The file is checked for existence and for being a `.vcf.gz`, and nothing
+    else: a stricter check here would be this module deciding the very question
+    it is recording somebody else's answer to.
+    """
+    cfgp = core.profile_dir() / "sources.json"
+    cfg = json.loads(cfgp.read_text(encoding="utf-8")) if cfgp.exists() else {}
+    cfg.setdefault("_meta", {"purpose": _t("store.sources_purpose")})
+    raw = (path or "").strip()
+    if not raw:
+        # Clearing a choice nobody made writes nothing. A settings file that
+        # appears the first time somebody asks a question is a file the next
+        # reader has to explain, and the demo profile grew one from a test.
+        if not cfgp.exists() and "genome_vcf" not in cfg:
+            return {"ok": True, "genome_vcf": None}
+        cfg.pop("genome_vcf", None)
+        _write_json(cfgp, cfg)
+        core.reset_cache()
+        return {"ok": True, "genome_vcf": None}
+    fp = Path(raw).expanduser()
+    if not fp.exists() or not fp.is_file():
+        return {"ok": False, "error": _t("store.genome_file_not_found", path=fp)}
+    if not str(fp).endswith(".vcf.gz"):
+        return {"ok": False, "error": _t("store.genome_not_a_vcf", path=fp.name)}
+    cfg["genome_vcf"] = str(fp)
+    _write_json(cfgp, cfg)
+    core.reset_cache()
+    return {"ok": True, "genome_vcf": str(fp)}
+
+
+@_serialized
 def clear_source_folder(domain: str) -> Dict[str, Any]:
     """Return the domain to the default profile folder (whichever section it was set under)."""
     cfgp = core.profile_dir() / "sources.json"

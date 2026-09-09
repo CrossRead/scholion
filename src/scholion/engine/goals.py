@@ -7,7 +7,7 @@ them -- a goal is accepted by the person or it does not exist.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from .. import core
 from ..i18n import lang as _lang, plural as _plural, t as _t
 from ._helpers import DISCLAIMER
@@ -20,24 +20,77 @@ def _goal_series(ref: str) -> List[Dict[str, Any]]:
     'wear:<Metric>' (wearable_trends.json metrics[Metric] = {YYYY-MM: value}).
     That way the goal chart feeds on the project's LIVE data and not on a copy of its own.
     """
+    return _goal_resolve(ref)[0]
+
+
+#: Why a source resolved to nothing. A goal row whose «now» is a dash is a
+#: sentence about the person — «no number for this» — and it was printed for
+#: seven of thirteen rows for a month while every one of those series sat in the
+#: file, because the reader below knew a shape the file had stopped being in. A
+#: reason is what turns that dash back into a question somebody can answer.
+_NO_SERIES, _SEVERAL_DEVICES, _EMPTY = "unknown_metric", "several_devices", "empty_series"
+_NO_NOW = (_NO_SERIES, _SEVERAL_DEVICES, _EMPTY)
+
+
+def _goal_resolve(ref: str) -> Tuple[List[Dict[str, Any]], Optional[str], Optional[str]]:
+    """`(points, device, reason)` for one source reference.
+
+    ref is `lab:<marker>`, `wear:<Metric>` or `wear:<device>:<Metric>`. Points
+    are sorted `[{date, value}]`; `device` names the watch when there is one;
+    `reason` is set only when the list came back empty, and says which of the
+    three things went wrong rather than leaving a dash to mean all of them.
+    """
     if not ref:
-        return []
+        return [], None, _NO_SERIES
     kind, _, key = ref.partition(":")
     pts: List[Dict[str, Any]] = []
     if kind == "lab":
-        m = core.labs().get("markers", {}).get(key) or {}
-        for p in m.get("series", []) or []:
+        markers = core.labs().get("markers", {})
+        if key not in markers:
+            return [], None, _NO_SERIES
+        for p in (markers[key] or {}).get("series", []) or []:
             if p.get("value") is not None and p.get("date"):
                 pts.append({"date": str(p["date"]), "value": float(p["value"])})
-    elif kind == "wear":
-        data = core.wearable_trends()
-        msrc = data.get("metrics") if isinstance(data.get("metrics"), dict) else data
-        sd = (msrc or {}).get(key)
-        if isinstance(sd, dict):
-            for y, v in sd.items():
-                if isinstance(v, (int, float)):
-                    pts.append({"date": str(y), "value": float(v)})
-    return sorted(pts, key=lambda p: p["date"])
+        return sorted(pts, key=lambda p: p["date"]), None, (None if pts else _EMPTY)
+    if kind == "wear":
+        return _wear_series(key)
+    return [], None, _NO_SERIES
+
+
+def _wear_series(key: str) -> Tuple[List[Dict[str, Any]], Optional[str], Optional[str]]:
+    """A monthly series out of the wearables file, through its own accessor.
+
+    The file keeps one block per device on purpose — two watches do not measure
+    resting heart rate the same way — and this reader may not undo that. A
+    metric that more than one device reports resolves to NOTHING unless the
+    reference names which one (`wear:garmin:RestingHeartRate`): averaging them,
+    or taking whichever sorts first, would draw a step on the month the second
+    export was loaded and let a reader take it for a change in themselves.
+
+    It goes through `wearables.series` rather than reaching into the dictionary,
+    which is the whole repair: the shape moved to one block per device, this
+    function kept the old one, and every wearable row of the goal table printed
+    a dash for a month without anything failing or being logged.
+    """
+    from .. import wearables
+    blocks = dict(wearables.series(core.wearable_trends()))
+    dev, _, name = key.rpartition(":")
+    if dev:
+        block = blocks.get(dev)
+        if not block or name not in (block.get("metrics") or {}):
+            return [], None, _NO_SERIES
+        found = {dev: block}
+    else:
+        found = {s: b for s, b in blocks.items() if name in (b.get("metrics") or {})}
+    if not found:
+        return [], None, _NO_SERIES
+    if len(found) > 1:
+        return [], None, _SEVERAL_DEVICES
+    src, block = next(iter(found.items()))
+    pts = [{"date": str(month), "value": float(v)}
+           for month, v in ((block.get("metrics") or {}).get(name) or {}).items()
+           if isinstance(v, (int, float))]
+    return sorted(pts, key=lambda p: p["date"]), src, (None if pts else _EMPTY)
 
 
 def _goal_lv(ref: str) -> Dict[str, Any]:
@@ -73,13 +126,31 @@ def _goal_num(v: Optional[float]) -> str:
     return out.replace(".", ",") if _lang() == "ru" else out
 
 
-def _goal_now(source: str) -> str:
-    """Current value(s) for the source(s). 'lab:a|lab:b' → 'a_last / b_last'."""
-    parts = []
+def _goal_now(source: str) -> Dict[str, Any]:
+    """Current value(s) for the source(s), and what stands behind them.
+
+    `'lab:a|lab:b'` → `a_last / b_last`, as before. What is new is everything
+    around the string: the date the number carries, the device that measured it,
+    and — when a part came back empty — the reason, so the row says «no series
+    for this» or «two devices measure it» instead of a dash that means both.
+    """
+    parts, dates, devices, reasons = [], [], [], []
     for ref in source.split("|"):
-        s = _goal_series(ref.strip())
-        parts.append(_goal_num(s[-1]["value"]) if s else "—")
-    return " / ".join(parts)
+        pts, dev, why = _goal_resolve(ref.strip())
+        parts.append(_goal_num(pts[-1]["value"]) if pts else "—")
+        if pts:
+            dates.append(pts[-1]["date"])
+        if dev:
+            devices.append(dev)
+        if why:
+            reasons.append(why)
+    return {"text": " / ".join(parts),
+            "date": max(dates) if dates else None,
+            # One device across the parts of a row, or none: a row whose two
+            # halves were measured by two different watches names neither,
+            # because the sentence «measured by X» would be false for half of it.
+            "device": devices[0] if len(set(devices)) == 1 and devices else None,
+            "missing": reasons[0] if reasons and not any(p != "—" for p in parts) else None}
 
 
 def goal_dashboard() -> Dict[str, Any]:
@@ -94,9 +165,19 @@ def goal_dashboard() -> Dict[str, Any]:
         return {"available": False, "disclaimer": DISCLAIMER(),
                 "message": _t("goal.not_set")}
 
-    targets = [{"label": t["label"], "now": _goal_now(t.get("source", "")),
-                "best": t.get("best", ""), "target": t.get("target", "")}
-               for t in g.get("targets", [])]
+    targets = []
+    for t in g.get("targets", []):
+        now = _goal_now(t.get("source", ""))
+        targets.append({"label": t["label"], "now": now["text"],
+                        "now_date": now["date"], "now_device": now["device"],
+                        # Not a message key composed at the page — a token this
+                        # module owns, turned into a sentence here, so that a
+                        # reason nobody wrote a phrase for cannot reach a reader
+                        # as ⟦goal.no_now.…⟧.
+                        "now_missing": now["missing"],
+                        "now_missing_text": (_t("goal.no_now." + now["missing"])
+                                             if now["missing"] in _NO_NOW else None),
+                        "best": t.get("best", ""), "target": t.get("target", "")})
 
     ch = g.get("charts", {}) or {}
     charts: Dict[str, Any] = {}
@@ -128,7 +209,16 @@ def goal_dashboard() -> Dict[str, Any]:
         "available": True,
         "title": g.get("title") or _t("goal.title_default"),
         "headline": g.get("headline", ""),
-        "as_of": core.file_date(core.profile_dir() / "wearable_trends.json") or g.get("_meta", {}).get("updated"),
+        # The newest point on the board rather than the date of one of the files
+        # behind it. It read the wearables file's own timestamp while half these
+        # rows come from the laboratory, so a table carrying a draw from the 3rd
+        # was headed «data as of the 23rd» of the month before. Every row states
+        # its own date now; this is the latest of them, and nothing else.
+        # Cut to the day: a lab point carries the hour it was drawn, and a heading
+        # reading «data as of 2026-09-03T08:22» states a precision the board has not got.
+        "as_of": (str(max((t["now_date"] for t in targets if t.get("now_date")), default="") or "")[:10]
+                  or core.file_date(core.profile_dir() / "wearable_trends.json")
+                  or g.get("_meta", {}).get("updated")),
         "peaks": g.get("peaks", []),
         "targets": targets,
         "charts": charts,

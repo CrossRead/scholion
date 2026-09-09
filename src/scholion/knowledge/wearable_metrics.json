@@ -3,7 +3,8 @@
   "purpose": "A PUBLIC reference for interpreting the metrics of wearable devices and smart scales: label/units/direction/target/group/why, plus how each supported export names its columns. Not personal. Used by the «Lifestyle» tab.",
   "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone).",
   "source_tier": "curated_reference",
-  "sources": "A metric is stored together with the device that measured it. Two devices do not measure the same thing the same way — window, algorithm and place on the body all differ — so a single series carrying both would be an artefact of whichever export was loaded last rather than a fact about the person."
+  "sources": "A metric is stored together with the device that measured it. Two devices do not measure the same thing the same way — window, algorithm and place on the body all differ — so a single series carrying both would be an artefact of whichever export was loaded last rather than a fact about the person.",
+  "person_metric": "`person_metric` on a metric names the row of the person's own metrics.json that measures THE SAME QUANTITY, so a value the device already has does not read as missing because nobody typed it in. It is a curated pairing: absent where two things are merely similar, and never inferred from a name."
  },
  "order": [
   "Weight",
@@ -55,7 +56,8 @@
    "why": {
     "en": "in metabolic syndrome, weight reduction is a common goal",
     "ru": "при метаболическом синдроме снижение веса — частая цель"
-   }
+   },
+   "person_metric": "weight"
   },
   "BMI": {
    "label": {
@@ -146,7 +148,8 @@
    "why": {
     "en": "baseline activity — prevention of insulin resistance; the target is 8–10k",
     "ru": "базовая активность — профилактика инсулинорезистентности; цель 8–10к"
-   }
+   },
+   "person_metric": "steps"
   },
   "IntensityMinutesDaily": {
    "label": {
@@ -196,7 +199,8 @@
    "why": {
     "en": "lower is better fitness and autonomic balance",
     "ru": "ниже — лучше тренированность и вегетативный баланс"
-   }
+   },
+   "person_metric": "resting_hr"
   },
   "HRV": {
    "label": {
@@ -230,7 +234,8 @@
    "why": {
     "en": "short sleep worsens insulin resistance, hormones and recovery",
     "ru": "недосып ухудшает инсулинорезистентность, гормоны, восстановление"
-   }
+   },
+   "person_metric": "sleep_hours"
   },
   "Stress": {
    "label": {

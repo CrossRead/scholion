@@ -106,7 +106,17 @@ class TestNotACarrierIsNotSaidAboutAPositionNobodyRead(unittest.TestCase):
                 self.assertIn(x["status"], ("unread", "no_data"))
                 self.assertIsNone(x["carrier"],
                                   "carriage was decided for a position nobody read")
-        self.assertIn("not been read", r["headline"])
+
+    def test_with_no_genome_at_all_the_headline_says_that_and_not_the_positions(self):
+        """The invariant above is «never say not-a-carrier about a position nobody
+        read». The sentence that carried it said something narrower and, on this
+        profile, untrue: «the PCSK9 positions have not been read» is a statement
+        about two rows of a file that is open. With no genome connected, no file
+        is open, and pointing the reader at their positions sends them to look at
+        the genome when the answer is in the folder beside it."""
+        r = self._run()
+        self.assertIn("No genome is being read", r["headline"])
+        self.assertNotIn("positions have not been read", r["headline"])
 
     def test_a_read_genotype_is_counted_by_copies(self):
         r = self._run(genotypes=[{"gene": "PCSK9", "rsid": "rs11591147", "genotype": "GT"}])

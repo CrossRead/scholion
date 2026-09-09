@@ -13,6 +13,11 @@ the command's own help still said «the page has always had this field; the comm
 had not». That is the shape this file tests for now, structurally, because a view
 nobody can reach fails no test that calls its functions directly.
 
+The door has since moved: the form opens the first screen instead of holding a
+tab of its own. So the check walks from the tab list to the function holding the
+form rather than naming either — a test that named the tab would have failed for
+the move and passed for the defect.
+
 Two more defects were found in the same place and are pinned here. The age was
 computed from `birth_year` alone, so a profile carrying `birth_date` — which is
 what the demonstration writes and what an imported medical record writes —
@@ -101,9 +106,58 @@ class TestTheWebHasADoorToTheseFields(unittest.TestCase):
                          "these views are defined and no tab reaches them: "
                          + ", ".join(sorted(defined - mounted)))
 
-    def test_the_profile_tab_is_named_in_both_catalogues(self):
+    # ── the door, asked about as a door ──────────────────────────────────────
+    #
+    # It used to be «is `web.tab.profile` in the page», which was the same
+    # question while the form had a tab of its own. It has not got one any more:
+    # the person, their indicators and the two forms that change them open the
+    # first screen, because a tab holding four cards a watch already measures was
+    # the emptiest page in the product. A test naming the tab would now fail for
+    # the move and pass for the defect — a form nothing reaches — which is
+    # exactly backwards.
+
+    def _functions(self):
+        """`{name: body}` for every function the page defines, in source order."""
+        starts = [(m.start(), m.group(1)) for m in
+                  re.finditer(r"\n(?:async )?function ([A-Za-z_$][\w$]*)\s*\(", self.src)]
+        out = {}
+        for i, (pos, name) in enumerate(starts):
+            end = starts[i + 1][0] if i + 1 < len(starts) else len(self.src)
+            out[name] = self.src[pos:end]
+        return out
+
+    def _reaches(self, target):
+        """Every function reachable from a tab's own view, following calls."""
+        fns = self._functions()
+        tabs = self.src[self.src.index("const TABS=["):]
+        tabs = tabs[:tabs.index("\n];")]
+        seen, todo = set(), list(re.findall(r"(view[A-Za-z]+)\]", tabs))
+        while todo:
+            name = todo.pop()
+            if name in seen or name not in fns:
+                continue
+            seen.add(name)
+            if name == target:
+                return True
+            todo += re.findall(r"\b([A-Za-z_$][\w$]*)\s*\(", fns[name])
+        return False
+
+    def test_the_form_is_reached_from_a_tab(self):
+        """The defect this file was written for: the view holding the form
+        existed, worked, and no tab mounted it. Nothing that calls its functions
+        directly can see that — only walking from the tabs can."""
+        holder = next((n for n, b in self._functions().items()
+                       if "post('/api/metrics/profile'" in b or "#mp-save" in b), None)
+        self.assertIsNotNone(holder, "no function on the page holds the profile form")
+        self.assertTrue(self._reaches(holder),
+                        f"{holder} holds the profile form and no tab reaches it")
+
+    def test_the_walk_can_fail(self):
+        """A reachability check that finds everything proves nothing."""
+        self.assertFalse(self._reaches("a_function_no_page_defines"))
+
+    def test_every_name_the_page_shows_has_a_phrase(self):
         from scholion import contract
-        self.assertIn("web.tab.profile", self.src)
         self.assertEqual([], contract.check_i18n_keys())
 
     def test_the_form_offers_every_field_the_writer_accepts(self):

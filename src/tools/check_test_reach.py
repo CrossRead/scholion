@@ -5,6 +5,8 @@
     python3 src/tools/check_test_reach.py --json     # the same as a structure
     python3 src/tools/check_test_reach.py --strict   # exit 1 if reach fell
     python3 src/tools/check_test_reach.py --accept   # record the current state
+    python3 src/tools/check_test_reach.py --accept-new   # only modules with no number yet
+    python3 src/tools/check_test_reach.py --rebaseline   # move the whole file to this machine
 
 THIS IS NOT `check_coverage.py`, and the two are neighbours in this directory,
 so the difference is stated before anything else. That one asks what this build
@@ -58,6 +60,36 @@ then sees a baseline that describes the tree, the guard is satisfied, and the
 real numbers overwrite the seeds. If the suite fails anyway the file is put back
 exactly as it was, so a refused `--accept` leaves no half-written state behind.
 `--strict` does none of this: it still fails on a module nobody reviewed.
+
+## Why `--accept` refuses to cross machines
+
+A number here is not a property of the code alone. It is what THIS suite reached
+on THIS interpreter with THIS backend — the two backends do not count a line
+identically — and, in at least one case, with a file that is not in the
+repository at all: `bamlite.py` stands at 89.4% because
+`test_read_depth_matches_the_native_run.py` runs against the owner's own
+alignment, and that test says so in its own docstring. It skips everywhere else,
+and the module reads 0.0% there.
+
+So a full `--accept` run from a second machine does not record work. It moves
+the entire baseline to that machine, silently, under one line of output — on
+09.09.2026 that would have restamped the file from 3.13 / darwin to 3.10 /
+linux and lowered six modules, five of them by fractions of a point and one from
+89.4 to 0.0. `--strict` had been printing a warning about exactly this mismatch
+for months; `--accept` was the half of the pair that ignored it.
+
+The three writing modes are therefore not one:
+
+* **`--accept`** records the whole measurement and REFUSES when the baseline was
+  taken elsewhere. It refuses before measuring, because the answer does not
+  depend on the ninety seconds.
+* **`--accept-new`** records only the modules that have no accepted number at
+  all — the operation the suite's own guard asks for when a module is added. It
+  touches no other number, not `overall`, and not the stamp. It runs anywhere,
+  because adding a line nobody had reviewed cannot lower anybody's floor.
+* **`--rebaseline`** is the deliberate whole-file move, and it prints every
+  number that falls, old → new, BEFORE it writes. «Somebody's to justify in a
+  commit message» is only true if somebody was shown it at the time.
 
 ## What is counted
 
@@ -297,7 +329,7 @@ def measure(argv=None) -> dict:
             "suite_ok": proc.returncode == 0,
             "suite_tail": tail,
             "processes": len(list(dumps.glob("*.json"))),
-            "backend": "sys.monitoring" if hasattr(sys, "monitoring") else "sys.settrace",
+            "backend": _backend(),
             "overall": {"hit": hit_all, "total": total_all,
                         "percent": round(100.0 * hit_all / total_all, 1) if total_all else 0.0},
             "modules": modules,
@@ -312,6 +344,12 @@ def _baseline() -> dict:
     return json.loads(BASELINE.read_text(encoding="utf-8")).get("modules", {})
 
 
+def _backend() -> str:
+    """Which hook will count the lines. One spelling, because a refusal that
+    named a backend the run then did not use would be about nothing."""
+    return "sys.monitoring" if hasattr(sys, "monitoring") else "sys.settrace"
+
+
 def _taken_with(backend: str) -> dict:
     """What measured: the two backends do not count a line identically, and a
     module moves by up to about a point between them with no change to the code
@@ -324,6 +362,30 @@ def _baseline_meta() -> dict:
     if not BASELINE.exists():
         return {}
     return json.loads(BASELINE.read_text(encoding="utf-8")).get("taken_with", {})
+
+
+def _here() -> dict:
+    """The stamp this run would write — known before the suite is measured."""
+    return _taken_with(_backend())
+
+
+def stamp_gap():
+    """`(recorded, here)` when the accepted numbers were taken elsewhere, else None.
+
+    `None` also when the file says nothing about what measured it: an unstamped
+    baseline is one written before the stamp existed, and refusing over a fact
+    nobody recorded would refuse for ever.
+    """
+    meta, here = _baseline_meta(), _here()
+    if not meta or meta == here:
+        return None
+    return meta, here
+
+
+def _gap_sentence(meta: dict, here: dict) -> str:
+    return (f"the accepted numbers were taken with Python {meta.get('python')} / "
+            f"{meta.get('backend')} on {meta.get('platform')}; this run is Python "
+            f"{here['python']} / {here['backend']} on {here['platform']}")
 
 
 def tree_modules() -> set:
@@ -389,6 +451,29 @@ def compare(result: dict) -> tuple:
     return fell, unlisted, vanished
 
 
+def _write_only_new(result: dict, added: list, dropped: list, previous) -> None:
+    """Record the measured number for modules that had none; change nothing else.
+
+    Everything the file already said stays as it was, to the byte — the note,
+    the stamp, the overall, and every other module's accepted floor. What is
+    written here is a line that did not exist, which cannot lower anybody's
+    number and therefore does not need the machine to match.
+    """
+    doc = json.loads(previous) if previous else {}
+    accepted = dict(doc.get("modules", {}))
+    for rel in added:
+        m = result["modules"].get(rel)
+        accepted[rel] = m["percent"] if m else 0.0
+    for rel in dropped:
+        accepted.pop(rel, None)
+    BASELINE.write_text(json.dumps({
+        "_note": doc.get("_note", _NOTE),
+        **({"taken_with": doc["taken_with"]} if "taken_with" in doc else {}),
+        "overall": doc.get("overall", result["overall"]["percent"]),
+        "modules": dict(sorted(accepted.items())),
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
 def _write_baseline(result: dict) -> None:
     BASELINE.write_text(json.dumps({
         "_note": _NOTE,
@@ -403,6 +488,10 @@ def main(argv=None) -> int:
     ap.add_argument("--json", action="store_true", help="the structure instead of the table")
     ap.add_argument("--strict", action="store_true", help="exit 1 if reach fell below the baseline")
     ap.add_argument("--accept", action="store_true", help="record the current state as accepted")
+    ap.add_argument("--accept-new", action="store_true", dest="accept_new",
+                    help="record only the modules that have no accepted number yet")
+    ap.add_argument("--rebaseline", action="store_true",
+                    help="move the whole baseline to this machine, printing what falls")
     ap.add_argument("--worst", type=int, default=15, help="how many modules to print")
     a = ap.parse_args(argv)
 
@@ -413,7 +502,27 @@ def main(argv=None) -> int:
     # whole suite a second time to reach that conclusion cost a minute and a half
     # on every cell of the matrix and on the release build — for a sentence that
     # was decided before a line of it executed.
-    if a.strict and not a.accept and not (ROOT / "share").is_dir():
+    writing = a.accept or a.accept_new or a.rebaseline
+
+    # Before the measurement, because the answer does not depend on it: a full
+    # `--accept` from a machine other than the one the numbers were taken on
+    # does not record work, it moves the baseline. The deliberate move has its
+    # own name, and it prints what it lowers.
+    gap = stamp_gap()
+    if a.accept and gap:
+        print("✗ " + _gap_sentence(*gap) + ".")
+        print("\n  A full accept from here would rewrite every number with this "
+              "machine's, and some of them are lower for reasons that are not the "
+              "code: the two backends do not count a line identically, and at least "
+              "one module is reached only where the owner's own alignment is.")
+        print("\n  Add a module's first number:   "
+              "python3 src/tools/check_test_reach.py --accept-new")
+        print("  Move the baseline here anyway: "
+              "python3 src/tools/check_test_reach.py --rebaseline")
+        print("  Or accept on that interpreter, where the comparison is like for like.")
+        return 1
+
+    if a.strict and not writing and not (ROOT / "share").is_dir():
         print("· not the source repository: the suite skips what only the tree can run, "
               "so the accepted numbers do not apply here. Nothing measured, nothing compared.")
         return 0
@@ -422,23 +531,29 @@ def main(argv=None) -> int:
     # guard turns the run red over exactly the module `--accept` was asked to
     # record — see «Why `--accept` seeds the baseline» in the docstring.
     added, dropped, previous = ([], [], None)
-    if a.accept:
+    if writing:
         added, dropped, previous = seed_baseline()
         for rel in added:
             print(f"· {rel}: not in the baseline — entered at 0.0% for the measurement")
         for rel in dropped:
             print(f"· {rel}: in the baseline, not in the tree — removed")
 
+    # `--accept-new` with nothing to add has nothing to measure. The suite costs
+    # a minute and a half and the answer is already known.
+    if a.accept_new and not added and not dropped:
+        print("· every module in the tree already has an accepted number; nothing to record")
+        return 0
+
     result = measure()
 
     if a.json:
-        if a.accept and not result["suite_ok"]:
+        if writing and not result["suite_ok"]:
             _restore_baseline(previous)
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return 0 if result["suite_ok"] else 1
 
     if not result["suite_ok"]:
-        if a.accept and (added or dropped):
+        if writing and (added or dropped):
             _restore_baseline(previous)
             print("· the baseline was put back as it was; nothing was accepted")
         print("✗ the suite did not pass, so its reach says nothing:")
@@ -454,9 +569,35 @@ def main(argv=None) -> int:
     for rel, m in worst:
         print(f"  {m['percent']:5.1f}%  {m['hit']:4d}/{m['total']:4d}  {rel}")
 
+    shown = BASELINE.relative_to(ROOT) if BASELINE.is_relative_to(ROOT) else BASELINE
+
+    if a.accept_new:
+        _write_only_new(result, added, dropped, previous)
+        for rel in added:
+            m = result["modules"].get(rel) or {}
+            print(f"\n✓ {rel}: {m.get('percent', 0.0)}% recorded as its first accepted number")
+        if gap:
+            print("\n· measured here, and the file's stamp is left as it was: "
+                  + _gap_sentence(*gap) + ". Nothing else in it was touched.")
+        print(f"\n✓ {len(added)} added, {len(dropped)} removed: {shown}")
+        return 0
+
+    if a.rebaseline:
+        # What a whole-file move costs, said before it is made rather than left
+        # to `git diff` afterwards.
+        fell, _unlisted, _vanished = compare(result)
+        for rel, was, now in fell:
+            print(f"\n· {rel}: {was}% → {now}% — lowered by this rebaseline")
+        if gap:
+            print("\n· " + _gap_sentence(*gap) + "; the stamp moves to this run.")
+        if not fell:
+            print("\n· no accepted number falls")
+        _write_baseline(result)
+        print(f"\n✓ the baseline now describes this machine: {shown}")
+        return 0
+
     if a.accept:
         _write_baseline(result)
-        shown = BASELINE.relative_to(ROOT) if BASELINE.is_relative_to(ROOT) else BASELINE
         print(f"\n✓ recorded as accepted: {shown}")
         return 0
 
@@ -466,12 +607,10 @@ def main(argv=None) -> int:
             print("\n· the accepted numbers do not say what measured them; from the next "
                   "--accept on, the baseline records the interpreter, the backend and the platform")
         elif meta != here:
-            print(f"\n· the accepted numbers were taken with Python {meta.get('python')} / "
-                  f"{meta.get('backend')} on {meta.get('platform')}; this run is Python "
-                  f"{here['python']} / {here['backend']} on {here['platform']}. The two backends "
-                  f"do not count a line identically — a module can move by up to about a point "
-                  f"with no change to the code. The numbers below are compared as they are; to "
-                  f"compare like with like, run on that interpreter, or accept anew on this one.")
+            print("\n· " + _gap_sentence(meta, here) + ". The two backends "
+                  "do not count a line identically — a module can move by up to about a point "
+                  "with no change to the code. The numbers below are compared as they are; to "
+                  "compare like with like, run on that interpreter, or accept anew on this one.")
         fell, unlisted, vanished = compare(result)
         for rel, was, now in fell:
             print(f"\n✗ {rel}: reach fell {was}% → {now}%")

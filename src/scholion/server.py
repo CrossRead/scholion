@@ -183,6 +183,15 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _html(self, text: str):
+        """A page this build composed, as opposed to a file it hands over."""
+        raw = text.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+
     def _file(self, path: Path, ctype: str):
         if not path.exists():
             self._json({"error": "not found"}, 404)
@@ -292,6 +301,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(net.diagnose(which) if which else net.diagnose())
             if p in ("/", "/index.html"):
                 return self._file(_WEB / "index.html", "text/html; charset=utf-8")
+            if p == "/doc" or p.startswith("/doc/"):
+                # The documents the product's own output points at, opened where
+                # the person is reading rather than at a terminal they may not
+                # have. `scholion doc <name>` is the same nine files; the name
+                # is resolved by the same function, which is why that function
+                # now refuses anything that is not one file name.
+                from . import docpage
+                return self._html(docpage.page(p[5:]))
             if p == "/icon.svg":
                 return self._file(_WEB / "icon.svg", "image/svg+xml")
             if p == "/dna.svg":
@@ -389,6 +406,20 @@ class Handler(BaseHTTPRequestHandler):
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
                     direction=body.get("direction"), date_source="manual",
                     subject="owner"))
+            if u.path == "/api/brief-reviewed":
+                # The wording was read against the newer numbers and still holds.
+                # Only a person can say that, which is why it is a button and not
+                # a rule.
+                r = store.mark_brief_reviewed(body.get("block", ""))
+                core.reset_cache()
+                return self._json(r)
+            if u.path == "/api/choose-genome":
+                # The one question about the genome that a program may not answer
+                # for the person, asked where they are already looking at the
+                # names.
+                r = store.set_genome_vcf(body.get("path", ""))
+                core.reset_cache()
+                return self._json(r)
             if u.path == "/api/goal":
                 # The keys the reader ticked, not the whole proposal set: the
                 # choice of which targets to adopt is theirs, and a POST that

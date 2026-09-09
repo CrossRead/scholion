@@ -167,6 +167,16 @@ ARGS_FOR = {
     # A smoke sweep must not author profile content; covered in full by
     # tests/test_same_day_draws.py on a temporary profile.
     "lab-draw": None,
+    # Writes a date into the person's own brief — the statement «this wording
+    # still holds» is theirs, and a smoke sweep must not make it. Covered in full
+    # by tests/test_a_flag_that_cannot_be_lowered_is_not_a_flag.py.
+    "brief-reviewed": None,
+    # With no path it CLEARS the choice of genome — a write into sources.json,
+    # taken under the profile's write lock. Run on the shared fixture by the
+    # sweep it left `.write.lock` behind in a git-tracked directory (task 149);
+    # the command is covered on a copy by the door test and by
+    # tests/test_one_file_one_person.py.
+    "choose-genome": None,
     # Writes into the local dictionary. A smoke sweep must not author knowledge;
     # covered in full by tests/test_marker_proposals.py on a temporary data dir.
     # Reading it (no flags) is what the sweep exercises, so the entry is [] not None.

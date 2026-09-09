@@ -158,6 +158,18 @@
   .subnav{display:flex;gap:6px;flex-wrap:wrap;margin:-4px 0 16px}
   .subnav a{font-size:13px;color:var(--ink-2);text-decoration:none;padding:4px 11px;border:1px solid var(--border);border-radius:999px}
   .subnav a:hover{background:var(--surface-2);color:var(--ink)}
+  /* The second level of a tab that switches panes rather than scrolling to them:
+     the selected one is underlined, the rest are quiet. A pill per section read
+     as eight buttons of equal weight, which is what the old anchors were. */
+  .subnav{border-bottom:1px solid var(--grid);gap:2px}
+  .subnav button{background:transparent;border:0;border-bottom:2px solid transparent;
+    color:var(--muted);padding:8px 12px;font-size:14px;cursor:pointer;border-radius:0;
+    display:inline-flex;align-items:center;gap:7px;width:auto}
+  .subnav button:hover{color:var(--ink-2)}
+  .subnav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+  .subnav .cnt{font-size:11.5px;color:var(--muted);background:var(--surface-2);
+    border-radius:999px;padding:1px 7px}
+  .gpane{margin-top:16px}
   pre.log{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;white-space:pre-wrap;max-height:160px;overflow:auto;margin-top:8px}
 
   /* ---- the "Lifestyle" tab: bullet bars "now to goal" ---- */
@@ -614,7 +626,16 @@ function renderGoal(root, g){
     $('#gs-go',root).onclick=()=>renderGoalProposal($('#gs-box',root));
     return;
   }
-  const rows=(g.targets||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${esc(r.now)}</td><td class="best">${esc(r.best)}</td><td class="tgt">${esc(r.target)}</td></tr>`).join('');
+  // «—» meant three different things: nothing carries this series, two devices
+  // carry it, or the series is empty. It was printed for seven of thirteen rows
+  // for a month because the reader knew a shape the file had stopped being in,
+  // and there was no way to tell that from the table. The reason is in the cell now.
+  const nowCell=r=>{
+    if(r.now_missing) return `<span class="muted">—</span><div class="why muted">${esc(r.now_missing_text||'')}</div>`;
+    const from=[r.now_date, r.now_device?t('web.life.device.'+r.now_device):''].filter(Boolean).join(' · ');
+    return `${esc(r.now)}${from?`<div class="why muted">${esc(from)}</div>`:''}`;
+  };
+  const rows=(g.targets||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${nowCell(r)}</td><td class="best">${esc(r.best)}</td><td class="tgt">${esc(r.target)}</td></tr>`).join('');
   const peaks=(g.peaks||[]).map(p=>`<div class="peak"><h4>${esc(p.title)} <span class="yr">· ${esc(p.year)}</span></h4><p>${esc(p.text)}</p></div>`).join('');
   const C=g.charts||{};
   root.innerHTML=`<div class="goalboard">
@@ -769,8 +790,9 @@ function bindTabLinks(root){root.querySelectorAll('[data-goto]').forEach(a=>a.on
   e.preventDefault();goTab(a.getAttribute('data-goto'));});}
 
 async function viewOverview(root){
-  const [g,o,sb,f,radar] = await Promise.all([api('/api/goal'), api('/api/overview'),
-    overviewSourceBar(), api('/api/focus'), api('/api/radar')]);
+  const [g,o,sb,f,radar,mx,lim] = await Promise.all([api('/api/goal'), api('/api/overview'),
+    overviewSourceBar(), api('/api/focus'), api('/api/radar'), api('/api/metrics'),
+    api('/api/limits').catch(()=>({items:[]}))]);
   // Built from parts rather than one format string. The old one always printed all
   // three, so a profile with no subject id came out as «subject ?», an empty profile
   // claimed «1 prescriptions», and «5 genome gaps» — a constant, the same for everyone
@@ -780,13 +802,19 @@ async function viewOverview(root){
   parts.push(plural(o.medications_count,'count.prescriptions'));
   if(o.genome_gaps.length) parts.push(t('web.header.genome_gaps',{n:o.genome_gaps.length}));
   $('#subhead').textContent = parts.join(' · ');
+  // The reading order is the order the questions come in: who is this, where are
+  // their numbers now, what are they aiming at, what does the body look like as
+  // a whole, what needs attention, and only then the one thing being worked on.
+  // The focus card led the page and answered none of those first: it is the
+  // narrowest block here and it stood above the person it is about.
   root.innerHTML = `
     ${sb}
-    ${f&&f.available?`<h2 class="section">📌 ${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus" style="margin-bottom:26px"></div>`:''}
-    <details id="ov-goal-wrap"${g&&g.available?'':' open'}>
-      <summary class="section goalsum">🎯 ${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.goal.as_of',{date:g.as_of}))}</span>`:''}</summary>
-      <div id="ov-goal"></div>
-    </details>
+    <h2 class="section">${esc(t('web.overview.person_h'))}</h2>
+    <div id="ov-person"></div>
+    <h2 class="section" style="margin-top:26px">${esc(t('web.overview.metrics_h'))}</h2>
+    <div class="grid" id="ov-metrics"></div>
+    <h2 class="section" style="margin-top:28px">🎯 ${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.goal.as_of',{date:g.as_of}))}</span>`:''}</h2>
+    <div id="ov-goal"></div>
     <h2 class="section" style="margin-top:28px">${esc(t('web.body.title'))}</h2>
     <div id="ov-systems"></div>
     <h2 class="section" style="margin-top:30px">📌 ${esc(t('web.overview.watched_h'))}</h2>
@@ -800,15 +828,17 @@ async function viewOverview(root){
     <h2 class="section" style="margin-top:20px">🔴 ${esc(t('web.overview.red_h'))} <span class="muted" style="font-weight:400;font-size:13px">· ${esc(t('web.overview.red_window'))}</span>${tabLink('web.tab.labs')}</h2>
     ${o.stale_abnormal_count?`<div class="muted" style="font-size:12.5px;margin-bottom:8px">${esc(t('web.overview.stale_hidden',{count:plural(o.stale_abnormal_count,'count.abnormal')}))}</div>`:''}
     <div class="grid" id="ov-red"></div>
-    <h2 class="section" style="margin-top:24px">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.tests')}</h2>
-    <div id="ov-tests"></div>`;
+    <h2 class="section" style="margin-top:24px">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.second_opinion')}</h2>
+    <div id="ov-tests"></div>
+    ${f&&f.available?`<h2 class="section" style="margin-top:30px">📌 ${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus"></div>`:''}`;
+  await renderPerson($('#ov-person',root), ((lim&&lim.items)||[]).filter(i=>i.kind==='profile'));
+  const mg=$('#ov-metrics',root);
+  // Sorted the way the person's own file sorts them — filled first — so a row
+  // nothing measures does not push a row something does below the fold.
+  (mx.metrics||[]).forEach(m=>mg.appendChild(metricCard(m)));
   renderSystems($('#ov-systems',root), radar);
-  if(f&&f.available) renderFocus($('#ov-focus',root), f);
   renderGoal($('#ov-goal',root), g);
-  // Wide screens keep what they had; the fold is for the narrow ones. Measured,
-  // not guessed at a breakpoint in CSS, because the decision is about how far the
-  // reader has to scroll rather than about layout.
-  {const w=$('#ov-goal-wrap',root); if(w&&g&&g.available) w.open = window.innerWidth > 800;}
+  if(f&&f.available) renderFocus($('#ov-focus',root), f);
   const red = $('#ov-red',root);
   // Nothing flagged has two causes and they are not alike: nothing is out of
   // range, or nothing has been measured. The old line gave the reassuring one to
@@ -1193,21 +1223,6 @@ function testItem(s){
     ${s.specialist&&s.specialist!=='—'?`<div class="spec">${esc(t('web.tests.specialist',{name:s.specialist}))}</div>`:''}
   </div>`);
 }
-async function viewTests(root){
-  const d=await api('/api/suggest-tests');
-  const sb=await sourceBar(['test_rules','labs']);
-  const pending=d.suggestions.filter(s=>!s.done_recently);
-  const done=d.suggestions.filter(s=>s.done_recently);
-  root.innerHTML=`<h2 class="section">${esc(t('web.tests.title',{n:pending.length}))}</h2>${sb}<div id="tl"></div>`;
-  const l=$('#tl',root);
-  pending.forEach(s=>l.appendChild(testItem(s)));
-  if(!pending.length)l.appendChild(el(`<div class="muted">${esc(t('web.tests.none_pending'))}</div>`));
-  if(done.length){
-    l.appendChild(el(`<div class="so-h" style="margin-top:20px">${esc(t('web.tests.routine_h'))}</div>`));
-    done.forEach(s=>l.appendChild(testItem(s)));
-  }
-}
-
 // ---------------- Second opinion ----------------
 const DSTAT={good:'var(--good)',warning:'var(--warning)',critical:'var(--critical)',nodata:'var(--muted)'};
 function dArrow(dl){ // the delta of the score: ↑ better, ↓ worse
@@ -1450,11 +1465,19 @@ async function viewSecond(root){
   // — already taken, watched by interval — on two tabs word for word. The second
   // opinion is a document to carry to an appointment, so it keeps what is still to
   // be ordered and hands the rest back to the tab that owns it.
-  const tPending=d.suggestions.filter(s=>!s.done_recently);
-  const tDone=d.suggestions.filter(s=>s.done_recently);
+  // Read from the route that OWNS this list rather than from the copy that
+  // travels inside the second opinion: one source for the block a person acts
+  // on, and the route stays the one place the rule about it lives.
+  const sug=await api('/api/suggest-tests');
+  const tPending=(sug.suggestions||[]).filter(s=>!s.done_recently);
+  const tDone=(sug.suggestions||[]).filter(s=>s.done_recently);
   const tests=tPending.map(s=>testItem(s).outerHTML).join('');
   const testsEmpty=`<div class="muted">${esc(t('web.tests.none_pending'))}</div>`;
-  const testsRoutine=tDone.length?`<div class="meta" style="margin-top:8px">${esc(t('web.second.routine_elsewhere',{n:tDone.length}))} ${tabLink('web.tab.tests')}</div>`:'';
+  // The routine part used to be handed back to a tab of its own. There is no
+  // other tab now, so it is here — folded, because «already taken, watched by
+  // interval» is not what a person is preparing to ask about, and gone entirely
+  // is not the same as folded.
+  const testsRoutine=tDone.length?`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--ink-2);padding:6px 0">${esc(t('web.tests.routine_h'))} · ${tDone.length}</summary>${tDone.map(s=>testItem(s).outerHTML).join('')}</details>`:'';
   // Nothing flagged among the drugs is not the same statement as nothing checkable.
   const drugsEmpty=`<div class="muted">${esc(d.drugs_answerable
     ? t('web.second.no_drug_flags',{n:d.drugs_answerable})
@@ -1474,12 +1497,17 @@ async function viewSecond(root){
     <h2 class="section">${esc(t('web.second.title'))}</h2>${sb}
     <div class="row" style="margin-bottom:10px"><button class="ghost" onclick="window.print()">🖨 ${esc(t('web.second.print'))}</button>${radar.overall!=null?`<span class="muted">${esc(t('web.second.overall'))} <b style="color:${radar.overall>=80?'var(--good)':radar.overall>=50?'var(--warning)':'var(--critical)'}">${radar.overall}</b>/100${radar.prev_overall!=null?` <span style="color:${dArrow(radar.overall_delta).col}">${dArrow(radar.overall_delta).txt||'='}</span> <span style="opacity:.8">${esc(t('web.second.was',{score:radar.prev_overall,date:radar.prev_date||''}))}</span>`:''}</span>`:''}</div>
     <div class="card" id="sl-systems" style="padding:10px"></div>
+    <div class="row" style="margin:2px 0 18px">
+      <a class="ghost" href="/doc/for-clinicians" target="_blank" rel="noopener"
+         style="text-decoration:none">\u{1F4C4} ${esc(t('web.second.for_clinician'))}</a>
+      <span class="muted" style="font-size:12.5px">${esc(t('web.second.for_clinician_note'))}</span>
+    </div>
     <div class="so-h" style="margin-top:22px">${esc(t('web.second.factors_h'))}${tabLink('web.tab.labs')}</div>
     ${expl||`<div class="muted">${esc((radar.domains||[]).some(x=>x.status!=='nodata')
       ? t('web.second.no_domain_issues',{n:(radar.domains||[]).filter(x=>x.status!=='nodata').length})
       : t('web.second.no_domain_data'))}</div>`}
     <div class="so-h">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.drugs')}</div>${drugsBasis}${drugs||drugsEmpty}
-    <div class="so-h">${esc(t('web.second.tests_h'))}${tabLink('web.tab.tests')}</div>${tests||testsEmpty}${testsRoutine}
+    <div class="so-h">${esc(t('web.second.tests_h'))}</div>${tests||testsEmpty}${testsRoutine}
     <div class="meta" style="margin-top:14px">${esc(d.disclaimer)}</div>
     <div class="printonly printfoot">${esc(t('web.second.print_foot'))}</div>`;
   // The same figure as on the Overview, beside the same radar: the second
@@ -1531,6 +1559,22 @@ async function viewMeds(root){
 }
 
 // ---------------- Personal health metrics ----------------
+// Two stores answer for some of these numbers — what the person typed in and
+// what their watch recorded — and the card names which one it is showing. The
+// other one is printed under it rather than instead of it: a weight entered by
+// hand on the 25th and a monthly mean from the scales are both true, and the
+// reader is the one who knows which they meant.
+function metricOrigin(m){
+  if(!m.origin) return '';
+  const dev = m.device&&t('web.life.device.'+m.device.source)||'';
+  const head = m.origin==='device'
+    ? t('web.metrics.from_device',{device:dev,date:m.device.date})
+    : t('web.metrics.from_hand',{date:(m.manual&&m.manual.date)||m.date});
+  const other = m.origin==='device'
+    ? (m.manual?t('web.metrics.also_hand',{value:m.manual.value,date:m.manual.date}):'')
+    : (m.device?t('web.metrics.also_device',{device:dev,value:m.device.value,date:m.device.date}):'');
+  return `<div class="meta">${esc(head)}${other?' · '+esc(other):''}</div>`;
+}
 function metricCard(m){
   const f = FLAG[m.flag]||FLAG.unknown;
   const has = m.value!=null;
@@ -1542,27 +1586,38 @@ function metricCard(m){
     <div class="row">${has?badge(f.cls==='b-good'||f.cls==='b-critical'||f.cls==='b-warning'?f.cls:'b-good', t(f.key)):badge('b-unknown',t('web.flag.unknown'))}${tr}</div>
     ${m.series&&m.series.length>1?sparkline(m.series):''}
     <div class="meta">${esc(refText(m))}${has&&m.date?` · ${esc(m.date)}`:''}</div>
+    ${metricOrigin(m)}
   </div>`);
 }
-async function viewMetrics(root){
+// The person: who the data belong to, their own numbers, and the two forms that
+// change them. It was a tab of its own and had become the emptiest one — the
+// four cards it showed were the four the device already measured, and it read
+// only the file somebody types into. It belongs at the top of the first screen,
+// which is where the reader asks «who is this and where are they now».
+async function renderPerson(root, given){
   const d=await api('/api/metrics');
   // What the profile is still missing, shown where it can be filled in. The
   // engine already computes it — `limits` answers «what cannot be said here and
   // what would close it», and a missing precondition is exactly that — but no
   // page had ever asked that route for anything, so the whole layer reached the
   // command line and the assistant and never a person in a browser.
+  // The whole first screen asks for its data at once. This one used to be
+  // fetched here, after everything else had already come back, and it is the
+  // second slowest route in the product — the person's own block then waited on
+  // it alone, at the top of the page, with the rest of the screen already drawn.
   let missing=[];
-  try{ missing=((await api('/api/limits')).items||[]).filter(i=>i.kind==='profile'); }catch(e){}
+  if(given!==undefined){ missing=given; }
+  else { try{ missing=((await api('/api/limits')).items||[]).filter(i=>i.kind==='profile'); }catch(e){} }
   const p=d.profile||{};
   const bmi=d.bmi;
   const sb = await sourceBar(['metrics']);
-  root.innerHTML=`<h2 class="section">${esc(t('web.metrics.title'))}</h2>
-    ${sb}
+  root.innerHTML=`${sb}
     <div class="stat">
       <div class="s"><b>${p.sex==='male'?esc(t('web.metrics.male')):p.sex==='female'?esc(t('web.metrics.female')):'—'}</b><span>${esc(t('web.metrics.sex'))}</span></div>
       <div class="s"><b>${d.age??'—'}</b><span>${esc(t('web.metrics.age'))}</span></div>
       <div class="s"><b>${p.height_cm??'—'}</b><span>${esc(t('web.metrics.height'))}</span></div>
       <div class="s"><b style="color:${bmi?(bmi.flag==='ok'?'var(--good)':'var(--warning)'):'var(--muted)'}">${bmi?bmi.value:'—'}</b><span>${esc(t('web.metrics.bmi'))}${bmi?' · '+esc(bmi.category):''}</span></div>
+      <div class="s"><b>${esc((d.ancestry&&d.ancestry.value)||'—')}</b><span>${esc(t('web.metrics.panel_label'))}</span></div>
     </div>
     <div class="row" style="margin-bottom:14px">
       <button class="ghost" id="toggle-mprof">✎ ${esc(t('web.metrics.profile_btn'))}</button>
@@ -1604,7 +1659,7 @@ async function viewMetrics(root){
   $('#toggle-mprof',root).onclick=()=>pf.classList.toggle('hidden');
   $('#mp-save',pf).onclick=async()=>{
     const r=await post('/api/metrics/profile',{sex:$('#mp-sex',pf).value,birth_year:num($('#mp-year',pf).value),height_cm:num($('#mp-height',pf).value),wearable_primary:$('#mp-dev',pf).value});
-    if(r.ok){toast(t('web.metrics.profile_saved'));viewMetrics($('#view'));}
+    if(r.ok){toast(t('web.metrics.profile_saved'));viewOverview($('#view'));}
     else{toast(t('web.common.error_prefix')+(r.error||''));}
   };
   // adding a measurement
@@ -1631,7 +1686,7 @@ async function viewMetrics(root){
     const body={metric,date:$('#mm-date',ab).value.trim(),value:num($('#mm-val',ab).value),...extra};
     if(!body.metric||!body.date||body.value==null){toast(t('web.form.fill_required'));return;}
     const r=await post('/api/metrics',body);
-    if(r.ok){toast(t('web.common.added'));viewMetrics($('#view'));claimNotice(r);}else{toast(t('web.common.error_prefix')+(r.error||''));}
+    if(r.ok){toast(t('web.common.added'));viewOverview($('#view'));claimNotice(r);}else{toast(t('web.common.error_prefix')+(r.error||''));}
   };
 }
 
@@ -1782,14 +1837,23 @@ function briefActions(b){
   return `<h2 class="section">${esc(t('web.brief.actions_h'))}</h2>
     <div class="lsact"><ol>${b.actions.map(a=>`<li>${esc(a)}</li>`).join('')}</ol></div>`;
 }
+// The flag, beside the wording it is about, and with the one control that can
+// lower it. It used to open the tab: a warning above the content, raised the
+// first time a watched marker arrived after the text was written, and with no way
+// to answer it from anywhere in the product. So it stayed on — and a permanent
+// warning is not a warning, it is furniture. Saying «still true» is exactly what
+// the `reviewed` date has always meant; it just had no door.
 function briefReview(b){
   if(!b||!b.needs_review) return '';
-  return `<div class="lsrev" style="margin-bottom:16px">
-    <div class="row"><span class="badge b-warning"><span class="dot" style="background:currentColor"></span>${esc(t('web.brief.needs_review'))}</span></div>
-    <div style="margin-top:8px;font-size:14px;color:var(--ink-2)">${esc(t('web.brief.new_data'))}</div>
-    <ul style="margin:6px 0 0 18px;font-size:14px;color:var(--ink-2)">${b.stale_blocks.map(s=>
-      `<li><b>${esc(s.title)}</b> — ${esc(t('web.brief.block_dates',{reviewed:s.reviewed,newest:s.newest_data}))}${s.review_hint?`<div class="muted" style="font-size:13px">${esc(s.review_hint)}</div>`:''}</li>`).join('')}</ul>
-    <div class="muted" style="font-size:13px;margin-top:8px">${esc(t('web.brief.numbers_note'))}</div>
+  return `<div class="lsrev" style="margin:10px 0 16px">
+    <div class="row"><span class="badge b-warning">${esc(t('web.brief.needs_review'))}</span>
+      <span class="muted" style="font-size:13px">${esc(t('web.brief.new_data'))}</span></div>
+    <div style="margin-top:8px">${b.stale_blocks.map(s=>
+      `<div class="list-item" style="margin-bottom:8px"><div class="row"><b>${esc(s.title)}</b>
+         <span class="muted" style="font-size:13px">${esc(t('web.brief.block_dates',{reviewed:s.reviewed,newest:s.newest_data}))}</span></div>
+       ${s.review_hint?`<div class="why">${esc(s.review_hint)}</div>`:''}
+       <div class="row" style="margin-top:8px"><button class="ghost" data-reviewed="${esc(s.id)}">${esc(t('web.brief.still_true'))}</button></div></div>`).join('')}</div>
+    <div class="muted" style="font-size:13px">${esc(t('web.brief.numbers_note'))}</div>
   </div>`;
 }
 function briefDropped(b){
@@ -1863,7 +1927,7 @@ async function viewLifestyle(root){
         html+=`<h2 class="section" style="margin-top:22px">${esc(t(titleKey))}</h2>${g==='anthro'?waistBar:''}<div class="grid" id="lg-${g}"></div>`;
     });
   }
-  html+=`<div style="margin-top:26px">${briefSections(brief)}${briefDropped(brief)}</div>`;
+  html+=`<div style="margin-top:26px">${briefReview(brief)}${briefSections(brief)}${briefDropped(brief)}</div>`;
   if(brief&&brief.available)
     html+=`<div class="muted" style="font-size:12.5px;margin:10px 0 4px">${esc(brief.disclaimer||'')} ${esc(t('web.brief.compiled',{date:brief.compiled||'—'}))}</div>`;
   html+=`<h2 class="section" style="margin-top:26px">${esc(t('web.life.workouts_h'))}</h2><div id="lwk"></div>`;
@@ -1879,6 +1943,11 @@ async function viewLifestyle(root){
       viewLifestyle($('#view'));}
     else{b.disabled=false;toast(t('web.common.failed_prefix')+((r&&r.error)||'—'));}
   };});
+  root.querySelectorAll('[data-reviewed]').forEach(b=>b.onclick=async()=>{
+    const r=await post('/api/brief-reviewed',{block:b.dataset.reviewed});
+    if(r&&r.error){toast(r.error);return;}
+    viewLifestyle(root);
+  });
   const gref=$('#grefresh',root);
   if(gref)gref.onclick=async()=>{
     gref.disabled=true; const gm=$('#gmsg',root); const old=gm.textContent; gm.textContent=t('web.life.rebuilding');
@@ -1977,19 +2046,62 @@ function renderPRS(d){
     <div class="muted" style="font-size:12.5px;margin-bottom:8px">${esc(t('web.prs.legend'))}</div>
     ${cats}`;
 }
+// What the tab found, in sentences. It used to print a gene, an rsID, a genotype
+// and `note` — a field these rows do not carry, so the explanation line was empty
+// on every one of them. The catalogue holds what each allele IS, what a second
+// copy does, what it argues for and what it does not; all of it in both
+// languages, and none of it was being read.
+const _LVERDICT={plus:'b-good',plus_partial:'b-good',lean_plus:'b-good',good:'b-good',
+                 neutral:'b-unknown',flag:'b-warning'};
+function longevityRow(k){
+  // The engine resolved both of these to sentences, or to nothing. It has the
+  // token sets; the page has neither, and a page that composes a message key out
+  // of a value from a stored file prints the key at the reader.
+  const mk=badge(_LVERDICT[k.verdict_token]||'b-unknown', k.verdict_label||'—');
+  const conf=k.confidence_label?`<span class="muted" style="font-size:12px">${esc(k.confidence_label)}</span>`:'';
+  const pm=(k.pmids||[]).length?`<div class="meta">PMID: ${(k.pmids||[]).map(x=>
+    `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(x)}/" target="_blank" rel="noreferrer noopener">${esc(x)}</a>`).join(', ')}</div>`:'';
+  return `<div class="list-item"><div class="row">${mk}<b>${esc(k.gene)}</b>
+      <span class="muted">${esc(t('web.genome.genotype'))} <b>${esc(k.genotype||'—')}</b></span>
+      <code style="margin-left:auto">${esc(k.rsid)}</code></div>
+    ${k.label?`<div class="why">${esc(k.label)}</div>`:''}
+    ${k.zygosity_note?`<div class="why muted">${esc(k.zygosity_note)}</div>`:''}
+    ${k.population_note?`<div class="why" style="color:var(--warning)">⚠ ${esc(k.population_note)}</div>`:''}
+    <div class="why muted">${esc(t('web.longevity.action_h'))}: ${esc(k.action||t('web.longevity.no_action'))}</div>
+    ${conf}${pm}</div>`;
+}
 function renderLongevity(d){
   if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
   const ap=d.apoe;
-  const apNote=!ap?'':(ap.epsilon==='ε2/ε3'||ap.epsilon==='ε2/ε2'?t('web.longevity.apoe_favourable')
-    :((ap.epsilon&&ap.epsilon.indexOf('ε4')>=0)?t('web.longevity.apoe_e4'):t('web.longevity.apoe_generic')));
-  const apCard=ap?`<div class="card" style="border-color:var(--good)">
-    <div class="label">${esc(t('web.longevity.apoe_status'))} <b style="color:var(--good)">${esc(ap.epsilon||'—')}</b></div>
-    <div class="meta" style="margin-top:4px">rs429358=${esc(ap.rs429358)}, rs7412=${esc(ap.rs7412)}. ${esc(apNote)}</div>
+  const e4=!!(ap&&ap.epsilon&&ap.epsilon.indexOf('ε4')>=0);
+  const apNote=!ap?'':((ap.epsilon==='ε2/ε3'||ap.epsilon==='ε2/ε2')?t('web.longevity.apoe_favourable')
+    :(e4?t('web.longevity.apoe_e4'):t('web.longevity.apoe_generic')));
+  // The card led with «APOE — status» over two rsIDs, which tells a reader
+  // nothing about what APOE is or what their own combination means. The
+  // combination is the answer; the two positions it is computed from are the
+  // working, and working belongs underneath.
+  const apCard=ap?`<div class="card" style="border-color:${e4?'var(--warning)':'var(--good)'}">
+    <div class="row"><b style="font-size:17px">APOE</b>
+      ${badge(e4?'b-warning':'b-good',ap.epsilon||'—')}</div>
+    <div class="why" style="margin-top:6px">${esc(t('web.longevity.what_is_apoe'))}</div>
+    <div class="why">${esc(apNote)}</div>
+    <details style="margin-top:8px"><summary style="cursor:pointer;color:var(--ink-2);font-size:13.5px">${esc(t('web.longevity.technical'))}</summary>
+      <div class="meta" style="margin-top:6px">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b> — ${esc(t('web.longevity.apoe_generic'))}</div>
+      ${ap.note?`<div class="meta" style="margin-top:6px">${esc(t('web.longevity.stored_note'))}: ${esc(ap.note)}</div>`:''}
+    </details>
   </div>`:'';
-  const known=d.known.map(k=>{
-    const mk=k.carries_named_allele===true?badge('b-good',t('web.longevity.carries')):(k.carries_named_allele===false?'<span class="muted" style="font-size:12px">—</span>':'');
-    return `<div class="list-item"><div class="row"><b>${esc(k.gene)}</b> <code>${esc(k.rsid)}</code> ${esc(t('web.genome.genotype'))} <b>${esc(k.genotype||'—')}</b> ${mk}</div><div class="why">${esc(k.note)}</div></div>`;
-  }).join('');
+  const rows=(d.known||[]);
+  // «Nothing in this direction» is a token the catalogue produces; a row whose
+  // verdict the catalogue does not recognise is not quietly filed under it.
+  // The two positions the ε-status is computed from are the card above, not two
+  // more findings under it. They are shown there, inside «how this is computed»,
+  // so nothing is lost by not listing them twice.
+  const listed=rows.filter(k=>k.verdict_token!=='see_apoe');
+  const found=listed.filter(k=>k.verdict_token!=='neutral');
+  const quiet=listed.filter(k=>k.verdict_token==='neutral');
+  const known=`${found.length?`<div class="so-h" style="margin-top:12px">${esc(t('web.longevity.found_h'))} · ${found.length}</div>`+found.map(longevityRow).join('')
+      :`<div class="muted" style="margin-top:12px">${esc(t('web.longevity.nothing_found'))}</div>`}
+    ${quiet.length?`<details style="margin-top:12px"><summary style="cursor:pointer;color:var(--ink-2);padding:6px 0">${esc(t('web.longevity.quiet_h'))} · ${quiet.length}</summary>${quiet.map(longevityRow).join('')}</details>`:''}`;
   const genes=d.significant_genes.slice(0,24).map(g=>`<button style="cursor:default" title="${esc(g.variants.map(v=>v.rsid+' '+v.genotype).join(', '))}">${esc(g.gene)}: ${g.variants.length}</button>`).join('');
   const st=d.stats;
   return `<div class="stat">
@@ -1998,8 +2110,7 @@ function renderLongevity(d){
       <div class="s"><b>${st.significant_genes??'—'}</b><span>${esc(t('web.longevity.stat_genes'))}</span></div>
     </div>
     ${apCard}
-    <div class="so-h" style="margin-top:12px">${esc(t('web.longevity.key_markers_h'))}</div>
-    ${known||'<div class="muted">—</div>'}
+    ${known}
     <div class="so-h" style="margin-top:14px">${esc(t('web.longevity.by_gene_h'))}</div>
     <div class="muted" style="font-size:12.5px;margin-bottom:6px">${esc(t('web.longevity.by_gene_note'))}</div>
     <div class="drugchips">${genes||'—'}</div>`;
@@ -2094,47 +2205,198 @@ async function pollUpdate(root){
     const u=await api('/api/genome-updates');box.innerHTML=renderUpdates(u);
   }
 }
+// The state of the genome in ONE place, refusal included. The page used to read
+// three fields out of `/api/genome-status` — `ready`, `vcf`, `not_ours` — and
+// drop `ambiguous`, which is the field that says WHY nothing is being read and
+// carries the fix. So a folder holding the person's reads beside one extraction
+// from them showed a grey badge here and «the positions have not been read» six
+// blocks below, and the cause was printed nowhere. A signal nothing renders is
+// not a signal.
+function genomeState(st){
+  const amb = st.ambiguous || null;
+  const excl = (st.excluded || []);
+  const aside = excl.length
+    ? `<div class="meta" style="margin-top:8px">${esc(t('web.genome.set_aside'))} `
+      + excl.map(x=>`<code>${esc((x.path||'').split('/').pop())}</code> <span class="muted">— `
+      + `${esc(t('web.genome.why.'+(x.why||'')))}</span>`).join(', ') + `</div>`
+    : '';
+  if(st.not_ours){
+    return `<div class="card warnbox" style="margin-bottom:8px"><div>${esc(st.not_ours.message||'')}</div>`
+      + `<div class="meta" style="margin-top:6px">${esc(st.not_ours.fix||'')}</div></div>`;
+  }
+  if(amb && (amb.reason==='several_files'||amb.reason==='chosen_missing')){
+    const gone = amb.reason==='chosen_missing'
+      ? `<div class="meta" style="margin-top:6px">${esc(t('web.genome.chosen_gone',{path:amb.chosen||''}))}</div>` : '';
+    const picks = (amb.choices||[]).map(p=>
+      `<div class="row" style="gap:8px;margin-top:8px"><code>${esc(p.split('/').pop())}</code>`
+      + `<button class="act" data-pick="${esc(p)}">${esc(t('web.genome.pick_btn'))}</button></div>`).join('');
+    return `<div class="card warnbox" style="margin-bottom:8px">
+        <div class="row">${badge('b-warning',t('web.genome.db_not_connected'))} <b>${esc(t('web.genome.pick_h'))}</b></div>
+        ${gone}
+        <div class="meta" style="margin-top:6px">${esc(t('web.genome.pick_why'))}</div>
+        ${picks}${aside}</div>`;
+  }
+  const facts = [];
+  if(st.assembly) facts.push(esc(t('web.genome.assembly',{name:st.assembly})));
+  if(st.sample) facts.push(esc(t('web.genome.sample',{name:st.sample})));
+  const badgeEl = st.ready?badge('b-good',t('web.genome.db_connected')):badge('b-unknown',t('web.genome.db_not_connected'));
+  return `<div class="card" style="margin-bottom:8px"><div class="row">${badgeEl}
+      <span class="muted">${st.ready?esc((st.vcf||'').split('/').pop()):esc(t('web.genome.db_after_script'))}</span></div>
+    ${facts.length?`<div class="meta" style="margin-top:6px">${facts.join(' · ')}</div>`:''}
+    <div class="meta" style="margin-top:6px">${esc(t('web.genome.intro'))}</div>${aside}</div>`;
+}
+// The whole feed of the tab, built from the four answers the tab already has.
+// The sections below are cut by SOURCE — ClinVar, polygenic, longevity, lipids —
+// and a reader thinks by gene and by what to do about it. So the first pane is
+// neither: one list, ordered by how much a line can change, each row saying which
+// source it came from and opening the gene it is about.
+function genomeFindings(cv, prs, lng, lip){
+  const rows = [];
+  const push = (rail, gene, badgeCls, badgeTxt, said, src) =>
+    rows.push({rail, gene, badgeCls, badgeTxt, said, src});
+  // 1. what a doctor would act on
+  (cv && cv.status === 'ok' ? (cv.hits || []) : []).forEach(h => {
+    if (h.tier !== 'pathogenic' && h.tier !== 'drug') return;
+    const sig = String(h.clnsig || '').replace(/[|_]/g, ' ');
+    push(h.tier === 'pathogenic' ? 'crit' : 'warn', h.rsid || '',
+         h.tier === 'pathogenic' ? 'b-critical' : 'b-warning', sig,
+         h.disease || '', 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''));
+  });
+  // 2. the inherited half of the lipid profile
+  if (lip && lip.status === 'ok') {
+    (lip.pcsk9 || []).forEach(x => {
+      if (x.status !== 'read') return;
+      push(x.carrier ? 'good' : 'info', x.gene,
+           x.carrier ? 'b-good' : 'b-unknown',
+           t(x.carrier ? 'lipidgen.carrier' : 'lipidgen.not_carrier'),
+           x.verdict || x.label || '', t('web.genome.nav_lipids'));
+    });
+    const l = (lip.lpa || {});
+    if (!l.measured && l.what_to_do)
+      push('warn', 'LPA', 'b-warning', t('lipidgen.unread'), l.what_to_do,
+           t('web.genome.nav_lipids'));
+    else if (l.measured && l.measured.above)
+      push('crit', 'LPA', 'b-critical',
+           t('lipidgen.lpa.above', {ref: l.measured.ref_high}),
+           t('lipidgen.lpa.measured', {value: l.measured.value, unit: l.measured.unit,
+                                       date: l.measured.date}),
+           t('web.genome.nav_lipids'));
+  }
+  // 3. carriage worth knowing, which is not a risk and is marked as such
+  ((lng && lng.available ? (lng.known || []) : [])).forEach(k => {
+    if (k.carries_named_allele !== true) return;
+    push('good', k.gene, 'b-good', t('web.longevity.carries'), k.note || '',
+         t('web.genome.nav_longevity'));
+  });
+  // 4. a position in a population, last, because that is what it is
+  ((prs && prs.available ? (prs.high || []) : [])).forEach(tr => {
+    push('info', '', 'b-warning', 'P' + Math.round(tr.percentile),
+         tr.label + (tr.category ? ' · ' + tr.category : ''), 'PGS');
+  });
+  if (!rows.length)
+    return `<div class="card muted">${esc(t('web.genome.findings_none'))}</div>`;
+  const body = rows.map(r => `<div class="list-item"${r.gene ? ` data-gene-open="${esc(r.gene)}" style="cursor:pointer"` : ''}>
+      <div class="row">${badge(r.badgeCls, r.badgeTxt)}${r.gene ? `<b>${esc(r.gene)}</b>` : ''}
+        <span class="muted" style="margin-left:auto;font-size:12.5px">${esc(r.src)}</span></div>
+      ${r.said ? `<div class="why">${esc(r.said)}</div>` : ''}</div>`).join('');
+  return `<div class="meta" style="margin-bottom:10px">${esc(t('web.genome.findings_note'))}</div>${body}`;
+}
+
+// Everything the tab knows about ONE gene, in one card. The four sections answer
+// by source; nobody answers by gene, so «what do I have on APOE» meant reading
+// four of them and joining by eye.
+function geneCard(d, cv, lng, lip){
+  if (!d || !d.gene) return genomeCard(d);
+  const loci = d.loci || [];
+  const ids = new Set(loci.map(x => x.rsid));
+  const cvRows = (cv && cv.status === 'ok' ? (cv.hits || []) : []).filter(h => ids.has(h.rsid));
+  const lngRows = (lng && lng.available ? (lng.known || []) : []).filter(k => k.gene === d.gene);
+  const lipRows = (lip && lip.status === 'ok' ? (lip.pcsk9 || []) : []).filter(x => x.gene === d.gene);
+  const cell = (head, body) => `<div class="cell"><div class="cellhead">${esc(head)}</div>${body}</div>`;
+  const lociHTML = loci.map(x => {
+    const g = (x.result || {}).genotype;
+    const dp = (x.result || {}).depth;
+    return `<div><code>${esc(x.rsid)}</code> ${g ? '<b>' + esc(g) + '</b>' : '—'}`
+      + `${dp != null ? ` <span class="muted">${esc(t('web.genome.coverage', {value: dp}))}</span>` : ''}</div>`;
+  }).join('') || '—';
+  return `<div class="card" style="border-color:var(--accent);margin-bottom:14px">
+    <div class="row"><b style="font-size:17px">${esc(d.gene)}</b>
+      <span class="muted">${esc(t('web.genome.loci'))} ${loci.length}</span>
+      <button class="ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>
+    <div class="row4">
+      ${cell(t('web.genome.genotype'), lociHTML)}
+      ${cell('ClinVar', cvRows.length ? cvRows.map(h =>
+        `<div>${esc(String(h.clnsig || '').replace(/[|_]/g, ' '))}${h.disease ? ' — ' + esc(h.disease) : ''}</div>`).join('') : '—')}
+      ${cell(t('web.genome.nav_longevity'), lngRows.length ? lngRows.map(k =>
+        `<div>${esc(k.note || '')}</div>`).join('') : '—')}
+      ${cell(t('web.genome.nav_lipids'), lipRows.length ? lipRows.map(x =>
+        `<div>${esc(x.verdict || x.label || '')}</div>`).join('') : '—')}
+    </div></div>`;
+}
+
 async function viewGenome(root){
   const [st,cv,prs,lng,upd,lip]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
     api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null)]);
   const sb=await sourceBar(['genome_vcf','catalog','ensembl','clinvar']);
-  const stBadge=st.ready?badge('b-good',t('web.genome.db_connected')):badge('b-unknown',t('web.genome.db_not_connected'));
-  const nav=[['sum','web.genome.nav_summary'],['upd','web.genome.nav_updates'],['risks','web.genome.nav_risks'],
-             ['lipids','web.genome.nav_lipids'],['long','web.genome.nav_longevity'],
-             ['clinvar','web.genome.nav_clinvar'],['locus','web.genome.nav_locus']];
-  root.innerHTML=`<h2 class="section">${esc(t('web.genome.title'))}</h2>${sb}
-    <div class="subnav">${nav.map(([id,key])=>`<a href="#gs-${id}">${esc(t(key))}</a>`).join('')}</div>
+  // Seven headings on one scroll, all open, was the tab. The reader met the
+  // maintenance block («update the databases») before any finding, and the same
+  // gene appeared in four places without any of them saying so. One pane at a
+  // time, findings first, maintenance last.
+  const n = x => x==null?'':`<span class="cnt">${x}</span>`;
+  const panes=[
+    ['find', t('web.genome.nav_findings'), '', ()=>genomeFindings(cv,prs,lng,lip)],
+    ['risks',t('web.genome.nav_risks'), n(prs&&prs.available?prs.stats.total:null), ()=>renderPRS(prs)],
+    ['long', t('web.genome.nav_longevity'), n(lng&&lng.available?lng.stats.genotyped:null), ()=>renderLongevity(lng)],
+    ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
+    ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="card muted">${esc(t('web.genome.db_after_script'))}</div>`],
+    ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="min-width:240px"><button class="act" id="g-go">${esc(t('web.genome.find'))}</button></div>
+      <div class="drugchips" id="g-chips"></div>`],
+    ['src',  t('web.genome.nav_sources'), '', ()=>`${sb}
+      <h2 class="section" style="margin-top:18px">🔄 ${esc(t('web.genome.updates_h'))}</h2>
+      <div class="row" style="margin-bottom:8px"><button class="act" id="upd-btn">🔄 ${esc(t('web.updates.check_btn'))}</button>
+        <span class="muted" style="font-size:13px">${esc(t('web.genome.updates_note'))}</span></div>
+      <div id="upd-box">${renderUpdates(upd)}</div>`],
+  ];
+  root.innerHTML=`<h2 class="section">${esc(t('web.genome.title'))}</h2>
+    ${genomeState(st)}
+    <div class="subnav" role="tablist">${panes.map(([id,label,cnt],i)=>
+      `<button role="tab" data-pane="${id}" aria-selected="${i===0}">${esc(label)}${cnt}</button>`).join('')}</div>
+    <div id="g-card"></div>
+    ${panes.map(([id,_l,_c,body],i)=>`<div class="gpane" id="gp-${id}"${i?' hidden':''}>${body()}</div>`).join('')}`;
 
-    <div id="gs-sum">${st.not_ours?`<div class="card warnbox" style="margin-bottom:8px"><div>${esc(st.not_ours.message||'')}</div><div class="meta" style="margin-top:6px">${esc(st.not_ours.fix||'')}</div></div>`:''}<div class="card" style="margin-bottom:8px"><div class="row">${stBadge} <span class="muted">${st.ready?esc(st.vcf||''):esc(t('web.genome.db_after_script'))}</span></div>
-      <div class="meta" style="margin-top:6px">${esc(t('web.genome.intro'))}</div></div></div>
+  const showPane=id=>{
+    root.querySelectorAll('.subnav button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.pane===id)));
+    root.querySelectorAll('.gpane').forEach(p=>{p.hidden=(p.id!=='gp-'+id);});
+  };
+  root.querySelectorAll('.subnav button').forEach(b=>b.onclick=()=>showPane(b.dataset.pane));
 
-    <h2 class="section" id="gs-upd" style="margin-top:22px">🔄 ${esc(t('web.genome.updates_h'))}</h2>
-    <div class="row" style="margin-bottom:8px"><button class="act" id="upd-btn">🔄 ${esc(t('web.updates.check_btn'))}</button>
-      <span class="muted" style="font-size:13px">${esc(t('web.genome.updates_note'))}</span></div>
-    <div id="upd-box">${renderUpdates(upd)}</div>
+  // One question about the genome a program may not answer for the person, asked
+  // where the names are already on screen.
+  root.querySelectorAll('[data-pick]').forEach(b=>b.onclick=async()=>{
+    const r=await post('/api/choose-genome',{path:b.dataset.pick});
+    if(r&&r.error){toast(r.error);return;}
+    viewGenome(root);
+  });
 
-    <h2 class="section" id="gs-risks" style="margin-top:24px">${esc(t('web.genome.prs_h'))}</h2>
-    <div id="risks-box">${renderPRS(prs)}</div>
+  const card=$('#g-card',root);
+  async function openGene(gene){
+    const d=await api('/api/genome?gene='+encodeURIComponent(gene));
+    card.innerHTML=geneCard(d,cv,lng,lip);
+    const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
+    card.scrollIntoView({block:'nearest'});
+  }
+  root.querySelectorAll('[data-gene-open]').forEach(b=>b.onclick=()=>openGene(b.dataset.geneOpen));
 
-    <h2 class="section" id="gs-lipids" style="margin-top:24px">${esc(t('web.genome.lipidgen_h'))}</h2>
-    <div id="lipids-box">${renderLipidGenetics(lip)}</div>
-
-    <h2 class="section" id="gs-long" style="margin-top:24px">${esc(t('web.genome.longevity_h'))}</h2>
-    <div id="long-box">${renderLongevity(lng)}</div>
-
-    <h2 class="section" id="gs-clinvar" style="margin-top:24px">🩺 ${esc(t('web.genome.clinvar_h'))}</h2>
-    <div id="clinvar-box">${renderClinvar(cv)}</div>
-
-    <h2 class="section" id="gs-locus" style="margin-top:24px">${esc(t('web.genome.locus_h'))}</h2>
-    <div class="row"><input id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="min-width:240px"><button class="act" id="g-go">${esc(t('web.genome.find'))}</button></div>
-    <div class="drugchips" id="g-chips"></div>
-    <div id="g-res" style="margin-top:14px"></div>`;
   // locus lookup
   const genes=['SLCO1B1','CYP2C9','CYP2C19','DPYD','APOE','FOXO3','VKORC1','MTHFR'];
   $('#g-chips',root).innerHTML=genes.map(g=>`<button data-gene="${g}">${g}</button>`).join('');
-  $('#g-chips',root).querySelectorAll('button').forEach(b=>b.onclick=async()=>{const d=await api('/api/genome?gene='+encodeURIComponent(b.dataset.gene));$('#g-res',root).innerHTML=genomeCard(d);});
-  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return;const d=await api('/api/genome?rsid='+encodeURIComponent(rs));$('#g-res',root).innerHTML=genomeCard(d);}
+  $('#g-chips',root).querySelectorAll('button').forEach(b=>b.onclick=()=>openGene(b.dataset.gene));
+  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return;
+    const d=await api('/api/genome?rsid='+encodeURIComponent(rs));
+    card.innerHTML=genomeCard(d);
+    const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
+    card.scrollIntoView({block:'nearest'});}
   $('#g-go',root).onclick=go;$('#g-in',root).addEventListener('keydown',e=>{if(e.key==='Enter')go();});
   // updates: the button
   $('#upd-btn',root).onclick=async()=>{
@@ -2143,7 +2405,7 @@ async function viewGenome(root){
     pollUpdate(root);
   };
   // the check is already running (the tab was re-entered) — pick the status up
-  if(upd&&upd.running)pollUpdate(root);
+  if(upd&&upd.running){showPane('src');pollUpdate(root);}
 }
 
 // ---------------- Assistant ----------------
@@ -2226,7 +2488,7 @@ async function viewGuide(root){
   const TOUR=[
     ['web.tab.overview','web.guide.tour_overview'],['web.tab.labs','web.guide.tour_labs'],
     ['web.tab.drugs','web.guide.tour_drugs'],['web.tab.genome','web.guide.tour_genome'],
-    ['web.tab.lifestyle','web.guide.tour_lifestyle'],['web.tab.tests','web.guide.tour_tests'],
+    ['web.tab.lifestyle','web.guide.tour_lifestyle'],
     ['web.tab.second_opinion','web.guide.tour_second_opinion'],['web.tab.prescriptions','web.guide.tour_prescriptions'],
     ['web.tab.assistant','web.guide.tour_assistant'],
   ];
@@ -2269,9 +2531,8 @@ async function viewGuide(root){
 // ten. A map handed over at the end of the journey is a different object.
 const TABS=[
   ['web.tab.overview',viewOverview],['web.tab.guide',viewGuide],
-  ['web.tab.profile',viewMetrics],
   ['web.tab.labs',viewLabs],['web.tab.drugs',viewDrug],['web.tab.genome',viewGenome],
-  ['web.tab.lifestyle',viewLifestyle],['web.tab.tests',viewTests],['web.tab.second_opinion',viewSecond],
+  ['web.tab.lifestyle',viewLifestyle],['web.tab.second_opinion',viewSecond],
   ['web.tab.prescriptions',viewMeds],['web.tab.assistant',viewAssistant],
 ];
 let current=0;

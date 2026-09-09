@@ -123,7 +123,13 @@ LINE_BUDGETS = {
     # genome it went true for everybody with one while the numbers went on
     # being scored against a default. Splitting it out would put «what panel
     # is this percentile in» in a different file from the percentile.
-    "genomics": 650,
+    # 650 → 720 on 09.09.2026. The catalogue names things and the stored file
+    # counts them — one join, used by both the polygenic layer and the longevity
+    # one, plus the verdict recomputed from the catalogue rather than trusted
+    # from a file written months ago. It belongs beside the two readers it
+    # serves: a shared helper one module away would be a third place to ask
+    # «whose string is this», which is the question that produced the defect.
+    "genomics": 720,
     "sources": 180,
     "pgx": 900,
     # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a

@@ -55,8 +55,9 @@ def bgzf(data: bytes) -> bytes:
 _ROW = "19\t44908684\trs429358\tT\tC\t50\tPASS\t.\tGT\t{gts}\n"
 
 
-def _vcf_text(samples, gts) -> bytes:
+def _vcf_text(samples, gts, header=()) -> bytes:
     return ("##fileformat=VCFv4.2\n##source=SYNTHETIC test fixture\n"
+            + "".join(h + "\n" for h in header)
             + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\t"
             + "\t".join(samples) + "\n"
             + _ROW.format(gts="\t".join(gts))).encode()
@@ -84,9 +85,10 @@ class _Folder(unittest.TestCase):
                 os.environ[k] = v
         genome.samples_of.cache_clear()
 
-    def write(self, name, samples=("ME",), gts=("0/1",), bgzip=True, index=True):
+    def write(self, name, samples=("ME",), gts=("0/1",), bgzip=True, index=True,
+              header=()):
         p = self.dir / name
-        raw = _vcf_text(samples, gts)
+        raw = _vcf_text(samples, gts, header)
         p.write_bytes(bgzf(raw) if bgzip else gzip.compress(raw))
         if index:
             # Two bytes of gzip magic is all `_tbi_usable` reads, and all a
@@ -123,11 +125,18 @@ class TestSeveralFilesAreNotOneGenome(_Folder):
         self.assertEqual(av["vcf"], str(a))
 
     def test_our_own_derived_files_do_not_count_as_a_second_genome(self):
-        """`loci_sites.vcf.gz` is called from the same reads and sits beside the
-        main file by design. Counting it would make every complete profile
-        ambiguous — a refusal triggered by our own pipeline."""
+        """A file called from the same reads at a chosen list of sites sits beside
+        the main file by design. Counting it would make every complete profile
+        ambiguous — a refusal triggered by our own pipeline.
+
+        It is recognised by what its header records, not by its name: the name
+        list this test used to rely on is what went stale, and the whole genomic
+        layer went dark behind it. The header lines here are the ones bcftools
+        actually wrote; `test_a_file_carved_out_of_a_genome_is_not_a_second_genome`
+        holds the rest of that story."""
         self.write("genome.vcf.gz")
-        self.write("loci_sites.vcf.gz")
+        self.write("loci_sites.vcf.gz",
+                   header=("##bcftoolsCommand=mpileup -R /tmp/loci_sites.bed -f /ref/x.fa -Ou /w/x.bam",))
         av = genome.available()
         self.assertEqual(av["vcf_count"], 1)
         self.assertIsNone(av["ambiguous"])

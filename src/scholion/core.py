@@ -1587,6 +1587,25 @@ def source_config() -> Dict[str, str]:
     return {}
 
 
+def chosen_genome_vcf() -> Optional[str]:
+    """The genome file the person picked, from profile/sources.json → `genome_vcf`.
+
+    A folder, not a file, is what `source_config` binds — every other domain is
+    answered by a directory plus a known file name. The genome is the exception:
+    the folder may hold the person's reads beside several extractions from them,
+    and which one is theirs is a fact only they hold. It sits at the top level of
+    the same file rather than inside "folders", because a path that is not a
+    folder in a map called folders is how the next reader gets it wrong.
+    """
+    p = profile_dir() / "sources.json"
+    if not p.exists():
+        return None
+    try:
+        return (_read_json(p).get("genome_vcf") or None)
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
 def source_path(domain: str) -> Path:
     """Data file of a domain: <selected folder>/<file> if a folder is set, otherwise profile/<file>."""
     fname = _DOMAIN_FILE.get(domain)

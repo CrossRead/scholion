@@ -54,6 +54,11 @@ SWEEP_EXCEPTIONS = {"GET /api/diag", "POST /api/pick-folder"}
 
 #: Bodies for the POST routes. Every one writes into the temporary profile.
 POST_BODIES = {
+    # An empty path is the «clear the choice» call, and it is the only body that
+    # is safe to send at a profile the test does not own.
+    "/api/choose-genome": {"path": ""},
+    # A block id nothing answers to: refused, and nothing written.
+    "/api/brief-reviewed": {"block": ""},
     "/api/labs": {"marker": "glucose", "date": "2026-05", "value": 5.1},
     "/api/metrics": {"metric": "weight", "date": "2026-05-01", "value": 78.4},
     "/api/medications": {"name": "test-drug", "dose": "1 tab", "note": "from a test"},
@@ -223,6 +228,23 @@ class TestTheWritesReallyWrite(_Live):
 
 
 class TestWhatThePageItselfIsServed(_Live):
+
+    def test_the_documents_open_as_pages_from_the_server(self):
+        """`docpage` is tested on its own; this is the door in front of it. The
+        list, one document by name, and a name that is not a file — which must
+        come back as the list rather than as somebody else's file or a traceback."""
+        code, body = self.call("/doc")
+        self.assertEqual(200, code)
+        self.assertIn("/doc/", body, "the list page names no document")
+        code, body = self.call("/doc/readme")
+        self.assertEqual(200, code)
+        self.assertIn("<html", body.lower()[:400])
+        self.assertIn("Scholion", body)
+        code, body = self.call("/doc/../docs/readme")
+        self.assertEqual(200, code, "a name that is not one file name is answered with the list")
+        self.assertIn("/doc/", body)
+        self.assertNotIn("Traceback", body)
+
 
     def test_the_page_and_its_assets_come_back(self):
         for path, kind in (("/", "text/html"), ("/index.html", "text/html"),

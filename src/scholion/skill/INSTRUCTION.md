@@ -610,6 +610,12 @@ python3 -m scholion ingest-wearable ["<folder-or-zip>"]  # read a wearable expor
                                                    # recognised by what is inside it (with a backup)
 python3 -m scholion ingest-garmin ["<folder>"]     # the same, restricted to a Garmin export
 python3 -m scholion set-folder labs_docs "<path>"  # where the forms and conclusions live
+python3 -m scholion brief-reviewed "<block-id>"   # the brief's wording was read against
+                                                   # newer numbers and still holds
+python3 -m scholion choose-genome "<file.vcf.gz>"  # only when the genome folder holds more than
+                                                   # one file: which of them is the person's own
+                                                   # reads. Until it is answered NO locus is read,
+                                                   # and every genomic answer says «not read».
 
 # Manual entry
 python3 -m scholion import-labs panel.csv [--dry-run]   # a whole panel from CSV/TSV; all rows or none

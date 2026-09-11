@@ -125,7 +125,9 @@ def _basis_note(gene: str, basis: Dict[str, Any]) -> str:
 def _active_names_by_class() -> Dict[str, List[str]]:
     """Which of the patient's concrete prescriptions fall into each active class."""
     out: Dict[str, List[str]] = {}
-    names = core.medications_json().get("medications", [])
+    # `active_medications`, not every row of the file: a stopped prescription used
+    # to arrive here and be printed as the thing a new drug interacts WITH.
+    names = core.active_medications()
     classes = core.med_classes().get("classes", {})
     for m in names:
         nm = m.get("name", "")

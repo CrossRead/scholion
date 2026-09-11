@@ -454,12 +454,44 @@ def _probe_assembly(vcf: str) -> Optional[str]:
     lo, hi = _BEYOND_GRCH38_CHR1
     try:
         rows = _query_region_range(vcf, "1", lo + 1, hi)
+    except RangeNeedsIndex:
+        # The probe did not run. «Rows not found» already means nothing here, and
+        # «the probe could not be made» means nothing in exactly the same way.
+        return None
     except Exception:                                        # noqa: BLE001
         return None
     return "GRCh37" if rows else None
 
 
+class RangeNeedsIndex(Exception):
+    """A question over a whole region asked of a file that has no index.
+
+    The reader that needs no index reads the file once and keeps what was asked
+    for: the catalogue's positions, and nothing else. A region is not a position
+    — a gene is thousands of them, and they are not known in advance — so the
+    single pass cannot answer one, and the seeking readers cannot either without
+    the index they seek by.
+
+    This is an exception rather than an empty list on purpose, and it is the
+    whole point of the change. `[]` from a region query means «this gene carries
+    no variants», which is a statement about the person; the same `[]` produced
+    because nothing could read the file is a false one, delivered under a status
+    line that says the genome is connected. That is the defect the index rule
+    was written against, and returning an empty list here would have walked
+    straight back into it through a side door.
+    """
+
+
 def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List[str]]:
+    # The reader without an index cannot seek, and a region is a seek. Refuse by
+    # name; the callers decide what to say, and one of them (`_probe_assembly`)
+    # is entitled to shrug, because a probe that could not run has learned
+    # nothing and claims nothing. Whether the single pass could read the file
+    # is not asked here: it could not answer a region either way, and the
+    # seeking readers below hand back `[]` for a file with no index — which is
+    # the empty list this exception exists to keep out of a gene report.
+    if engine_pin() == "linear" or not _index_usable(vcf):
+        raise RangeNeedsIndex(chrom)
     pref = _chr_prefix(vcf)
     name = f"{pref}{chrom}" if not str(chrom).startswith("chr") else str(chrom)
     if _have_bcftools():
@@ -663,6 +695,24 @@ def file_unreadable(path) -> Optional[Dict[str, str]]:
     if len(head) == 4 and head[:2] == b"\x1f\x8b" and not (head[3] & 0x04):
         return {"path": p, "reason": "gzip_not_bgzip",
                 "fix": f"gunzip -c {p} | bgzip -c > {p}.bgz && mv {p}.bgz {p} && tabix -p vcf {p}"}
+    if not _index_usable(p):
+        # A file read from beginning to end has to be known to HAVE an end. The
+        # seeking readers verify every block they land on and are told where to
+        # land by the index; the single pass has neither, so the one thing that
+        # proves the file ended where its writer stopped — the empty block bgzip
+        # writes last — is demanded here, and only here. A file cut short by an
+        # interrupted copy answered `assumed_ref` at every locus past the cut.
+        from . import linear as _lin
+        if _lin.bgzf_eof_missing(p):
+            return {"path": p, "reason": "truncated",
+                    "fix": f"cp /path/from/the/provider/{Path(p).name} {p}"}
+        failed = _lin.pass_failure(p)
+        if failed:
+            # The pass over it was started in this process and did not reach
+            # the end. Not «no reader»: a reader was there and the file stopped
+            # it, and the detail says where.
+            return {"path": p, "reason": "pass_failed", "detail": failed,
+                    "fix": f"gzip -t {p}"}
     return None
 
 
@@ -853,10 +903,14 @@ def _tbi_usable(vp, suffix: str = ".tbi") -> bool:
     return len(head) == 2 and head == b"\x1f\x8b"
 
 
-#: The three readers this project can put a genome through, strongest first.
+#: The readers this project can put a genome through, strongest first. The last
+#: of them is not a seeking reader at all: it reads the file from end to end once
+#: and keeps what was asked for. It is what answers when the file arrived without
+#: an index and the machine has none of the tools that build one — which is the
+#: ordinary machine, and was the machine the package was first reviewed on.
 #: A closed vocabulary, because `SCHOLION_GENOME_ENGINE=bcftool` must not read
 #: as «no preference» — that is the silent default the pin exists to remove.
-ENGINES = ("bcftools", "pysam", "tabixlite")
+ENGINES = ("bcftools", "pysam", "tabixlite", "linear")
 
 
 def engine_pin() -> Optional[str]:
@@ -905,6 +959,77 @@ def _have_bcftools() -> bool:
     return shutil.which("bcftools") is not None
 
 
+#: The questions the genomic layer can be asked, in the order a reader meets
+#: them. Each is answerable or not FOR THIS FILE, and the difference is a
+#: property of the input rather than of the software.
+ANSWERABLE_PATHS = ("loci", "pgx", "region", "clinvar", "acmg", "pgs")
+
+
+def _scan_present(name: str) -> bool:
+    """Whether the annotation this path reads has been produced for this file.
+
+    ClinVar and the ACMG list are not computed at question time: a separate scan
+    writes a table, and these paths read it. So «nothing found» has two very
+    different causes — nothing is there, or the scan was never run — and only one
+    of them is about the person.
+    """
+    for base in core.genome_bases():
+        if (base / name).exists():
+            return True
+    return False
+
+
+def answerable_paths(profile: Optional[str], ready: bool,
+                     engine: Optional[str] = None) -> List[Dict[str, Any]]:
+    """What may be asked of this input, and what closes each thing that may not.
+
+    Written because an answer used to arrive with no statement of the question
+    set it belonged to. A reader who is handed pharmacogenetics and nothing else
+    concludes that pharmacogenetics is all there was to find; a reader who is
+    told first which paths this file opens and which it shuts reads the same
+    output as what it is. Observed from outside: a correct refusal, delivered
+    without its frame, was read as a wrong answer.
+    """
+    from .engine import genomics as _g
+    out: List[Dict[str, Any]] = []
+    narrow = profile in _g.NARROW_INPUTS
+    for path in ANSWERABLE_PATHS:
+        item: Dict[str, Any] = {"path": path, "open": bool(ready)}
+        if not ready:
+            item["why"] = "no_genome"
+        elif path == "region" and profile in ("array", "genotype_table"):
+            # A chip reads the positions somebody chose; a gene is a stretch
+            # nobody chose. This frame used to be built from the sequenced
+            # path's readiness alone, so an array owner's status said «array
+            # connected» on one line and «no genome» on every path of the next
+            # six — the catalogue and the pharmacogenetics resting on it, which
+            # a chip answers as designed, were shut with the wrong reason.
+            item["open"] = False
+            item["why"] = "not_sequenced"
+        elif path == "region" and engine in ("linear", "container"):
+            # Read without an index: the catalogue's positions were collected in
+            # one pass, an arbitrary gene was not and cannot be. A VCF inside a
+            # container is read the same way, and for the same reason.
+            item["open"] = False
+            item["why"] = "needs_index"
+        elif path in ("clinvar", "acmg"):
+            scan = "clinvar_hits.tsv" if path == "clinvar" else "acmg_sf_hits.tsv"
+            if narrow:
+                item["open"] = False
+                item["why"] = "input_too_narrow"
+            elif not _scan_present(scan):
+                # Not a refusal about the input: the input is fine and the table
+                # this path reads has not been made yet. Saying «too narrow» here,
+                # or saying nothing, both send the reader to the wrong problem.
+                item["open"] = False
+                item["why"] = "scan_not_run"
+        elif path == "pgs" and (narrow or profile in _g.NARROW_FOR_SCORES):
+            item["open"] = False
+            item["why"] = "input_too_narrow"
+        out.append(item)
+    return out
+
+
 def available() -> Dict[str, Any]:
     """Status of the genomic database, for the UI and the skill."""
     vp = vcf_path()
@@ -929,6 +1054,23 @@ def available() -> Dict[str, Any]:
     if vp is not None and _index_usable(vp):
         engine = ("bcftools" if _have_bcftools() else
                   "pysam" if _have_pysam() else "tabixlite")
+    elif vp is not None and engine_pin() in (None, "linear"):
+        # No index, and nothing installed that could build one. The file is still
+        # a file: it is read once from beginning to end and what was asked for is
+        # kept. Slower, and an answer — where the alternative was «the genome is
+        # not readable» said over a perfectly good VCF.
+        from . import linear as _lin
+        if _lin.usable(str(vp)):
+            # The pass is made HERE, before anything is declared. It would have
+            # been made a few lines down anyway, by the class measurement; making
+            # it first means a pass that dies half-way is met by this status —
+            # and not one question later, under a line that already said
+            # «ready». `file_unreadable` names the failure once it is memoised.
+            if _lin.snapshot(str(vp)).get("failed"):
+                near = file_unreadable(vp)
+                vp = None
+            else:
+                engine = "linear"
     # Task 63: several files, or several samples inside one file, is a question
     # for the person and not a coin toss. Both are carried as one shape so that
     # every consumer — CLI, web, plugin, model — meets the same field.
@@ -996,9 +1138,27 @@ def available() -> Dict[str, Any]:
     # catalogue then knew, and uselessly, given what the files were.
     served = catalogue_assemblies()
     asm_mismatch = bool(asm and asm not in served)
-    ready = ((vp is not None and engine is not None and not asm_mismatch
-              and ambiguous is None and chosen_i is not None)
-             or bool(arr.get("available")) or bool(tab.get("available")))
+    sequenced_ready = (vp is not None and engine is not None and not asm_mismatch
+                       and ambiguous is None and chosen_i is not None)
+    ready = (sequenced_ready or bool(arr.get("available")) or bool(tab.get("available")))
+    # Which questions this input opens, decided from the same `ready` the rest of
+    # the status uses. Computed here rather than inside the literal below so that
+    # the two cannot drift into disagreeing about the same file.
+    # The frame belongs to whichever input ANSWERED, not to the sequenced path
+    # alone: an array is `ready` and was handed `sequenced_ready=False`, so its
+    # six paths all read «no genome» under a status that had just said the chip
+    # was connected. The array's own class is in `NARROW_INPUTS` and shuts what
+    # a chip cannot carry; the catalogue and pharmacogenetics stay open.
+    if sequenced_ready:
+        frame = ((_callset_of(vp) or {}).get("class"), True, engine)
+    elif arr.get("available"):
+        frame = ("array", True, None)
+    elif tab.get("available"):
+        frame = (tab.get("class"), True,
+                 "container" if tab.get("kind") == "container_vcf" else None)
+    else:
+        frame = (None, False, None)
+    paths = answerable_paths(*frame)
     return {
         "unusable": near,
         # Which reader answered, and whether it was chosen or merely available.
@@ -1047,6 +1207,10 @@ def available() -> Dict[str, Any]:
         "vcf_present": vp is not None,
         "vcf": str(vp) if vp else None,
         "engine": engine,
+        # The frame, carried with the status rather than assembled by the reader
+        # out of three commands: which questions this input opens and which it
+        # shuts. See `answerable_paths`.
+        "paths": paths,
         "array": arr if arr.get("available") else None,
         # A file that IS an array and could not be read is a third state, and it
         # has to be visible: `array: null` alone reads as «no array here».
@@ -1168,6 +1332,17 @@ def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
     """VCF rows at the position (bcftools). Empty = the site is not variant (reference)."""
     pref = _chr_prefix(vcf)
     name = f"{pref}{chrom}" if not str(chrom).startswith("chr") else str(chrom)
+    # No index, or a pin naming the reader that does not use one: the answer comes
+    # out of the single pass. Asked first, because the seeking readers below would
+    # each return an empty list here and an empty list is read as «reference».
+    if engine_pin() == "linear" or not _index_usable(vcf):
+        from . import linear as _lin
+        # `rows_at` raises `linear.Unreadable` for a file the pass could not
+        # read to the end, and that exception is not caught here on purpose: the
+        # seeking readers below would answer `[]` for a file with no index, and
+        # `[]` at a position is «reference». A truncated file used to fall
+        # through to exactly that.
+        return _lin.rows_at(vcf, chrom, pos)
     if _have_bcftools():
         region = f"{name}:{pos}-{pos}"
         try:
@@ -1345,6 +1520,145 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return None
 
 
+#: Alternative alleles that are not a variant at all: a gVCF reference block, an
+#: empty field. The spanning deletion `*` is NOT one of them. It says that on one
+#: chromosome this base is inside a deletion that begins upstream — a row `C→*`
+#: left behind when `bcftools norm -m-` split `C→T,*` and the `C→T` half was
+#: filtered away read as a reference block, and a person with a deletion across
+#: the locus was printed homozygous reference.
+_NON_VARIANT_ALT = {"", ".", "<NON_REF>", "<*>"}
+
+
+def _trim_right(vref: str, valt: str) -> tuple:
+    """A row's REF/ALT reduced to the change itself, WITHOUT moving the position.
+
+    Only the shared suffix is trimmed. A full normaliser trims the shared prefix
+    too, and that shifts the coordinate — which is exactly what must not happen
+    here, where the coordinate is the one thing we are sure of.
+    """
+    r, a = (vref or "").upper(), (valt or "").upper()
+    if not r or not a or a[:1] in ("<", "*", "."):
+        return r, a
+    while len(r) > 1 and len(a) > 1 and r[-1] == a[-1]:
+        r, a = r[:-1], a[:-1]
+    return r, a
+
+
+def _row_alleles(vref: str, valts: List[str]) -> List[str]:
+    """The row's alleles with the suffix all of them share removed.
+
+    A caller may write the same substitution as `CA→TA`; read literally, the
+    heterozygote then prints as `CATA`, which is not a genotype anybody can act
+    on. Only the shared suffix goes — the position is not moved.
+    """
+    seq = [(vref or "").upper()] + [(a or "").upper() for a in valts]
+    if any((not x) or x[:1] in ("<", "*", ".") for x in seq):
+        return seq
+    while all(len(x) > 1 for x in seq) and len({x[-1] for x in seq}) == 1:
+        seq = [x[:-1] for x in seq]
+    return seq
+
+
+def _catalogue_alleles(loc: Dict[str, Any]) -> tuple:
+    """The locus's own reference base and the set of alternatives it is written with.
+
+    A catalogue entry carries one letter each; an entry resolved over the network
+    carries the alternatives joined with «/», and reading that as a single allele
+    is how a real alternative stops matching itself.
+    """
+    ref = ((loc.get("ref") or "").upper()) or None
+    raw = (loc.get("alt") or "").upper()
+    alts = {x for x in re.split(r"[/,|]", raw) if x and x not in _NON_VARIANT_ALT}
+    return ref, alts
+
+
+def _row_about_locus(f: List[str], ref: Optional[str], alts: set) -> str:
+    """Is this row about THIS locus? Four answers, and the middle two are the point.
+
+    `match` — the row carries our reference base and one of our alternatives.
+    `ref_block` — a gVCF span at our base: «read, and it is the reference», which
+    is an answer and not a refusal.
+    `other` — our base, somebody else's variant standing on the same coordinate.
+    `mismatch` — not even our base: the file is in another build, or normalised
+    another way, and reading a genotype out of it would be reading a guess.
+    """
+    vref = (f[3] or "").upper()
+    valts = [x for x in (f[4] or "").split(",")]
+    pairs = [_trim_right(vref, a) for a in valts]
+    # The build test is the FIRST base of the row's REF and nothing more: that is
+    # the base standing on the coordinate, and it is the only thing a build
+    # decides. The whole REF was compared here once, so a deletion `CT→C` or a
+    # multi-base change `CG→TA` standing on our own base was reported as «the
+    # file is in another build» — a claim about the file, made from a row that
+    # merely carried a different variant.
+    if ref is not None and vref[:1] != ref:
+        return "mismatch"
+    if ref is None or not alts:
+        # Nothing to verify against — a locus resolved without alleles. The old
+        # behaviour stands, and the caller marks the answer as unverified.
+        return "match"
+    if all((a or "").upper() in _NON_VARIANT_ALT for a in valts):
+        return "ref_block"
+    for nr, na in pairs:
+        if (nr == ref or vref == ref) and na in alts:
+            return "match"
+    return "other"
+
+
+def _alleles_for_genotype(vref: str, valts: List[str], cref: Optional[str], calts: set,
+                          idx: List[str]) -> Optional[List[str]]:
+    """The allele strings a genotype's indices name — trimmed the way the row
+    was CHOSEN, or None when the genotype cannot be written as one pair.
+
+    The row was picked by trimming each alternative against the reference on
+    its own (`_row_about_locus`); the genotype was then rendered by trimming
+    only the suffix ALL alleles share (`_row_alleles`). On `CA→TA,CAG` those
+    disagree: the row is chosen because `CA→TA` is our `C→T`, and the
+    heterozygote printed as `CATA` — the string the module's own docstring calls
+    «not a genotype anybody can act on». One trimming now, the one that chose.
+
+    An allele the genotype names that does not share our trimmed reference — the
+    `CAG` above in a `1/2`, or a spanning deletion `*` — cannot stand beside our
+    allele in a two-letter string, and the answer is a refusal by name rather
+    than a string that looks like one.
+    """
+    pairs = [_trim_right(vref, a) for a in valts]
+    ours = next((i for i, (nr, na) in enumerate(pairs)
+                 if cref is not None and nr == cref and na in calts), None)
+    if ours is None:
+        # A locus with no alleles to verify against (resolved over the network
+        # without them): the old shared-suffix reading stands, and the caller
+        # marks the answer unverified.
+        return _row_alleles(vref, valts)
+    base = pairs[ours][0]
+    for i in idx:
+        j = int(i)
+        if j == 0 or j == ours + 1:
+            continue
+        if j - 1 >= len(pairs) or pairs[j - 1][0] != base or pairs[j - 1][1][:1] in ("*", "<"):
+            return None
+    return [base] + [na for _, na in pairs]
+
+
+def _linear_refusal(why: str, detail: str = "") -> Dict[str, Any]:
+    """A locus answer for a file the single pass could not read — by name.
+
+    Two classes, because they ask two different things of the person. Past the
+    size cap the file is fine and needs an index, which is the answer this
+    package gave before the pass existed. Truncated, or a pass that died, or a
+    file that is not a VCF, is a file that cannot be read as it stands — the
+    same class as ordinary gzip, and it carries the same head.
+    """
+    from . import linear as _lin
+    if why == "too_large":
+        return {"genotype": None, "confidence": "needs_index", "source": "vcf",
+                "reason": why, "note": _t("genome.too_large_for_one_pass", mb=_lin.MAX_MB)}
+    key = why if why in ("truncated", "pass_failed") else "not_a_vcf"
+    return {"genotype": None, "confidence": "unreadable_file", "source": "vcf",
+            "reason": why, "detail": detail,
+            "note": _t("genome.unreadable_" + key, detail=detail)}
+
+
 def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """The patient's genotype at a resolved locus — from the VCF, or from an array.
 
@@ -1396,7 +1710,14 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                     "vendor": st.get("vendor"), "note": st.get("note")}
         return None
     if not _index_usable(vp):
-        return None
+        from . import linear as _lin
+        why = _lin.why_not(str(vp))
+        if why is not None and why != "missing":
+            # Asked before `file_unreadable`, whose answer is the bare None: a
+            # file the single pass cannot read to the end is refused by NAME —
+            # truncated, the pass died, too large for one pass — because each
+            # of those is a different sentence to the person holding the file.
+            return _linear_refusal(why, _lin.pass_failure(str(vp)) or "")
     # A file that cannot be read gives no genotype — not «reference». This is the
     # same guard as in `available()`, placed here too because a caller may reach
     # a locus without asking for the status first.
@@ -1422,7 +1743,14 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "source": "vcf", "assembly": asm,
                 "note": _t("genome.no_coordinates_for_assembly",
                            assembly=asm or "?", rsid=loc.get("rsid") or "")}
-    lines = _query_region(str(vp), loc["chrom"], pos)
+    from . import linear as _lin
+    try:
+        lines = _query_region(str(vp), loc["chrom"], pos)
+    except _lin.Unreadable as exc:
+        # The pass over the file died between the status line and this
+        # question — or was never possible. Not `[]`, which the branch below
+        # would read as «no row here — the reference».
+        return _linear_refusal(exc.why, exc.detail)
     if not lines and asm is None:
         # «No row here» and «we are looking in the wrong coordinate system» produce
         # exactly the same silence, and when the build is not established we cannot
@@ -1458,7 +1786,86 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf",
                 "assembly": asm, "read_pos": pos,
                 "note": _t("genome.assumed_ref_note")}
-    # take the first variant row at the position
+    # ── which of these rows is this locus? ───────────────────────────────────
+    # Until this check the reader took «the first variant row at the position»
+    # and built the genotype out of THAT row's own REF and ALT, without once
+    # asking whether the row was about the locus being looked up. A coordinate is
+    # not an identity: an insertion, a neighbouring substitution, a multiallelic
+    # row can all stand on it, and the genotype printed then belongs to somebody
+    # else's variant while carrying our locus's name and the label «called».
+    #
+    # Found from outside, on three clinical files, at F5 rs6025 — a locus where
+    # the wrong answer is Factor V Leiden. The reviewer caught the conflict by
+    # hand and withheld the conclusion himself; the product would not have.
+    cref, calts = _catalogue_alleles(loc)
+    rows = [f for f in lines if len(f) >= 10 and len(f) > 9 + col]
+    verdicts = [(f, _row_about_locus(f, cref, calts)) for f in rows]
+    chosen = next((f for f, v in verdicts if v == "match"), None)
+    if chosen is None:
+        block = next((f for f, v in verdicts if v == "ref_block"), None)
+        if block is not None:
+            dp = None
+            bfmt = block[8].split(":") if len(block) > 8 else []
+            bsample = block[9 + col].split(":")
+            if "DP" in bfmt:
+                try:
+                    dp = int(bsample[bfmt.index("DP")])
+                except Exception:
+                    dp = None
+            # A reference block is «read, and it is the reference» only when its
+            # genotype says so. GATK writes a `<NON_REF>` block over a stretch it
+            # could NOT read too, with `./.` and a depth of 0 — and this branch
+            # looked at the depth and never at the genotype, so an unread
+            # stretch was printed `confirmed_ref`, the strongest label there is.
+            bgt = bsample[bfmt.index("GT")] if "GT" in bfmt else (bsample[0] if bsample else "")
+            bidx = [i for i in bgt.replace("|", "/").split("/") if i.isdigit()]
+            if not bidx:
+                return {"genotype": None, "confidence": "no_call_in_vcf", "source": "vcf",
+                        "assembly": asm, "read_pos": pos, "filter": block[6], "depth": dp,
+                        "note": _t("genome.no_call_in_vcf")}
+            if any(i != "0" for i in bidx):
+                # A block whose genotype names its symbolic allele: the caller
+                # saw something here that is not the reference and did not say
+                # what. Not ours, and not a reference either.
+                found = f"{(block[3] or '').upper()}>{(block[4] or '').upper()}"
+                return {"genotype": None, "confidence": "other_variant_at_position",
+                        "source": "vcf", "assembly": asm, "read_pos": pos,
+                        "expected": f"{cref}>{'/'.join(sorted(calts))}" if cref else None,
+                        "found": [found],
+                        "note": _t("genome.other_variant_at_position",
+                                   expected=f"{cref}>{'/'.join(sorted(calts))}" if cref else "?",
+                                   found=found)}
+            out = {"genotype": f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
+                   "assembly": asm, "read_pos": pos, "depth": dp,
+                   "note": _t("genome.confirmed_ref")}
+            if dp is not None and dp < _MIN_DEPTH:
+                out["note"] += _t("genome.low_depth_suffix", depth=dp)
+                out["low_depth"] = True
+            return out
+        others = [f for f, v in verdicts if v == "other"]
+        if others:
+            found = [f"{(f[3] or '').upper()}>{(f[4] or '').upper()}" for f in others[:4]]
+            return {"genotype": None, "confidence": "other_variant_at_position",
+                    "source": "vcf", "assembly": asm, "read_pos": pos,
+                    "expected": f"{cref}>{'/'.join(sorted(calts))}" if cref else None,
+                    "found": found,
+                    "note": _t("genome.other_variant_at_position",
+                               expected=f"{cref}>{'/'.join(sorted(calts))}" if cref else "?",
+                               found=", ".join(found))}
+        mism = [f for f, v in verdicts if v == "mismatch"]
+        if mism:
+            seen = sorted({(f[3] or "").upper() for f in mism})[:4]
+            return {"genotype": None, "confidence": "reference_mismatch",
+                    "source": "vcf", "assembly": asm, "read_pos": pos,
+                    "expected_ref": cref, "found_ref": seen,
+                    "note": _t("genome.reference_mismatch",
+                               expected=cref or "?", found=", ".join(seen))}
+        # Rows were returned and none of them carries a sample column we can read.
+        return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf",
+                "assembly": asm, "read_pos": pos,
+                "note": _t("genome.assumed_ref_note")}
+    lines = [chosen]
+
     for f in lines:
         if len(f) < 10:
             continue
@@ -1477,7 +1884,13 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             return {"genotype": None, "confidence": "no_call_in_vcf", "source": "vcf",
                     "assembly": asm, "read_pos": pos, "filter": f[6],
                     "note": _t("genome.no_call_in_vcf")}
-        alleles = [vref] + valt
+        alleles = _alleles_for_genotype(vref, valt, cref, calts, idx)
+        if alleles is None:
+            return {"genotype": None, "confidence": "alleles_not_comparable", "source": "vcf",
+                    "assembly": asm, "read_pos": pos, "filter": f[6],
+                    "ref": vref, "alt": f[4], "raw_genotype": gt_raw[:24],
+                    "note": _t("genome.alleles_not_comparable", ref=vref, alt=f[4],
+                               value=gt_raw[:24])}
         try:
             gt = "".join(alleles[int(i)] for i in idx)
         except (IndexError, ValueError):
@@ -1493,6 +1906,14 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         out = {"genotype": gt, "confidence": "called", "source": "vcf",
                "ref": vref, "alt": f[4], "depth": dp,
                "assembly": asm, "read_pos": pos, "filter": f[6]}
+        # A row carrying more than one alternative answers for our locus AND for
+        # something else at the same base; the genotype may legitimately name an
+        # allele that is not ours, and the reader is told so rather than left to
+        # infer it from a two-letter string.
+        if len([a for a in valt if a]) > 1:
+            out["multiallelic"] = True
+        if cref is None or not calts:
+            out["unverified_locus"] = True
         # Task 87, second half. An imputed genotype is not an observation. The
         # corpus holds a file where 98.8 % of rows carry FILTER=IMP, and the
         # engine read them level with observed ones and signed them «called from
@@ -1786,7 +2207,7 @@ def acmg_sf_findings() -> Dict[str, Any]:
     there anything the medical community considers worth acting on in a healthy person».
     An empty result here is a normal and good outcome, not a sign of breakage.
 
-    The file is prepared by src/ingest/acmg_sf_scan.py.
+    The file is prepared by `scholion acmg-scan`.
     """
     cat = acmg_sf_catalog()
     meta = cat.get("_meta", {})
@@ -1797,6 +2218,36 @@ def acmg_sf_findings() -> Dict[str, Any]:
     else:
         return {"status": "not_run", "version": meta.get("version"), "hits": [],
                 "message": _t("genome.acmg_not_run")}
+    # WHICH BUILDS the table was matched in, before a single row of it is read.
+    # A table is written once and read for months; the file it was matched
+    # against can be replaced by one in another build, and a table written by
+    # the earlier scan against ClinVar of another build holds a silent zero. Both
+    # are a crossed table, and a crossed table is not a list of findings.
+    from . import acmg_scan as _acmg
+    prov = _acmg.read_meta(f)
+    vp = vcf_path()
+    mine = assembly_of(str(vp)) if vp else None
+    table_asm = (prov or {}).get("assembly")
+    cv_asm = (prov or {}).get("clinvar_assembly")
+    crossed = None
+    if table_asm and cv_asm and table_asm != cv_asm:
+        crossed = ("clinvar", table_asm, cv_asm)
+    elif table_asm and mine and table_asm != mine:
+        crossed = ("personal", table_asm, mine)
+    if crossed is not None:
+        kind, have, want = crossed
+        return {"status": "assembly_crossed", "version": meta.get("version"), "hits": [],
+                "reportable": [], "carriers": [], "filtered": [],
+                "needs_variant_class": [], "needs_phase": [],
+                # `provenance` is the catalogue's own record and is already a
+                # field of this answer; the table's sidecar travels under its
+                # own name rather than displacing it.
+                "provenance": meta.get("provenance"), "table_provenance": prov,
+                "source": str(f), "scanned": core.file_date(f),
+                "table_assembly": table_asm,
+                "personal_assembly": mine, "clinvar_assembly": cv_asm,
+                "message": _t("genome.acmg_assembly_crossed_" + kind,
+                              table=have, other=want)}
     try:
         lines = f.read_text(encoding="utf-8").splitlines()
     except Exception as e:
@@ -1840,6 +2291,10 @@ def acmg_sf_findings() -> Dict[str, Any]:
         rule = (cat.get("genes", {}).get(gene) or {}).get("report_rule")
         if rule != "biallelic":
             continue
+        # A row the caller itself did not pass is not a second allele. Counted,
+        # it turned one real heterozygote plus one LowQual row into «two hits,
+        # phase unknown» — a question raised by a call nobody stood behind.
+        rs = [r for r in rs if r.get("reportable") != "filtered"]
         if any(r.get("zygosity") == "hom" for r in rs):
             continue                      # a homozygote settles it
         if len(rs) >= 2:
@@ -1849,9 +2304,22 @@ def acmg_sf_findings() -> Dict[str, Any]:
                 if r not in needs_phase:
                     needs_phase.append(r)
     reportable = [r for r in rows if r.get("reportable") == "yes"]
+    # `filtered` is the scan's own bucket for a row whose FILTER was not PASS:
+    # the caller flagged it, and it is listed on its own — neither a finding nor
+    # a carrier state, because a carrier state is also a claim about a call.
+    filtered = [r for r in rows if r.get("reportable") == "filtered"]
     carriers = [r for r in rows
-                if r.get("reportable") not in ("yes", "needs_variant_class", "needs_phase")]
+                if r.get("reportable") not in ("yes", "needs_variant_class", "needs_phase",
+                                               "filtered")]
     return {"status": "ok", "version": meta.get("version"), "published": meta.get("published"),
+            # What the table says about itself: which builds it was matched in
+            # and when. None for a table written before the sidecar existed —
+            # and that absence is flagged, because a table that cannot say which
+            # build it is in is one that cannot be checked against the file.
+            # (`provenance`, below, is the catalogue's own record — a field that
+            # already existed, and is not displaced.)
+            "table_provenance": prov, "table_provenance_missing": prov is None,
+            "filtered": filtered,
             # The coverage this answer rests on. «No findings» over a gene read to
             # 71 % is a different sentence from «no findings» over one read whole,
             # and until now they were the same sentence.

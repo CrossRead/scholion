@@ -32,6 +32,17 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--lang", choices=_i18n.available(),
                         help=f"output language (default {_i18n.DEFAULT}; "
                              f"also the SCHOLION_LANG variable)")
+    # Which file and whose column, as flags. Both have worked as environment
+    # variables since task 63, and both were documented — and the first outside
+    # reviewer found them by reading the source, because a variable is not where
+    # anybody looks for an option. The variable stays: a flag is for one command,
+    # a variable is for a session.
+    common.add_argument("--vcf", metavar="PATH",
+                        help="the genome file to use for this command "
+                             "(also the SCHOLION_GENOME_VCF variable)")
+    common.add_argument("--sample", metavar="NAME",
+                        help="which sample column inside a multi-sample VCF is yours "
+                             "(also the SCHOLION_GENOME_SAMPLE variable)")
 
     # prog is taken from whatever the command was called by: through the wrapper it is
     # `crossread`, through the module — `python3 -m scholion`. Otherwise the help teaches
@@ -155,7 +166,13 @@ def build_parser() -> argparse.ArgumentParser:
     _gs.add_argument("--write", action="store_true",
                      help="write the proposals into profile/health_goals.json (nothing is "
                           "written without this)")
-    sub.add_parser("clinvar", parents=[common], help="clinically significant findings (ClinVar × VCF)")
+    cv = sub.add_parser("clinvar", parents=[common],
+                        help="clinically significant findings (ClinVar × VCF)")
+    # The scan table carries no gene column, so a gene is matched by COORDINATE:
+    # resolve the symbol to its region and ask which findings sit inside it. The
+    # alternative — leaving the layer unaskable by gene — is what produced «there
+    # is nothing to say about these genes» about a table holding 386 findings.
+    cv.add_argument("--gene", help="only the findings that fall inside this gene")
     sub.add_parser("acmg", parents=[common], help="ACMG SF v3.3 secondary findings (the actionable minimum)")
     sub.add_parser("prs", parents=[common], help="polygenic risks (PGS): percentiles by trait")
     sub.add_parser("longevity", parents=[common], help="the longevity layer (LongevityMap): APOE ε + markers")
@@ -206,6 +223,14 @@ def build_parser() -> argparse.ArgumentParser:
     pv.add_argument("--refresh", action="store_true", help="rebuild the provenance (run reconcile) before the check")
     pv.add_argument("--marker", help="check a single marker only")
     pv.add_argument("--lab-dir", help="the folder with the forms (for --refresh)")
+
+    ac = sub.add_parser("acmg-scan", parents=[common],
+                        help="run the ACMG secondary-findings screen over your VCF and write "
+                             "the table `acmg` reads (needs the published ClinVar VCF for YOUR "
+                             "build; no bcftools, no index)")
+    ac.add_argument("--clinvar", help="the published ClinVar VCF (also SCHOLION_CLINVAR_VCF); "
+                                      "without it the command prints the one download it needs")
+    ac.add_argument("--out-dir", help="where to write the table (the genome folder by default)")
 
     sub.add_parser("capabilities", parents=[common],
                    help="what this build can do — every command, what it does, "
@@ -332,8 +357,15 @@ def build_parser() -> argparse.ArgumentParser:
     amt.add_argument("value", type=float)
     amt.add_argument("--name"); amt.add_argument("--unit")
 
-    am = sub.add_parser("add-med", parents=[common], help="add a drug to the scheme")
+    am = sub.add_parser("add-med", parents=[common],
+                        help="add a drug to the scheme; a name already there is updated, "
+                             "keeping its status unless --status says otherwise")
     am.add_argument("name"); am.add_argument("--dose", default=""); am.add_argument("--note", default="")
+    am.add_argument("--status", default=None,
+                    help="active / paused / stopped, or a word of your own; only entries "
+                         "whose status begins with `active` or `course` take part in the "
+                         "checks, and an entry with none recorded is counted as current "
+                         "and said to be")
 
     rm = sub.add_parser("remove-med", parents=[common], help="remove a drug from the scheme")
     rm.add_argument("name")
@@ -470,6 +502,13 @@ def _main(argv=None) -> int:
     # An explicit flag beats the environment, the environment beats the default.
     if getattr(args, "lang", None):
         _i18n.set_lang(args.lang)
+    # The same rule for the genome: the flag names the file for this command only,
+    # and it is written into the environment because that is the one place every
+    # reader of the genomic layer already looks.
+    if getattr(args, "vcf", None):
+        os.environ["SCHOLION_GENOME_VCF"] = str(args.vcf)
+    if getattr(args, "sample", None):
+        os.environ["SCHOLION_GENOME_SAMPLE"] = str(args.sample)
     _hint_if_empty(getattr(args, "cmd", None))
 
     if args.cmd == "init":
@@ -730,7 +769,8 @@ def _main(argv=None) -> int:
         render = fmt.write_result
     elif args.cmd == "add-med":
         from . import store as _st
-        res, render = (_st.add_medication(args.name, args.dose, args.note, subject="owner"),
+        res, render = (_st.add_medication(args.name, args.dose, args.note,
+                                          status=args.status, subject="owner"),
                        fmt.write_result)
     elif args.cmd == "remove-med":
         from . import store as _st
@@ -776,13 +816,39 @@ def _main(argv=None) -> int:
             res = {**res, "written": _st.write_goal_targets(res["proposals"])}
         render = fmt.goal_suggest_report
     elif args.cmd == "clinvar":
-        res, render = engine.clinvar_findings(), fmt.clinvar_report
+        res, render = ((engine.clinvar_for_gene(args.gene), fmt.clinvar_gene_report)
+                       if getattr(args, "gene", None)
+                       else (engine.clinvar_findings(), fmt.clinvar_report))
     elif args.cmd == "acmg":
         res, render = engine.acmg_findings(), fmt.acmg_report
     elif args.cmd == "prs":
         res, render = engine.prs_findings(), fmt.prs_report
     elif args.cmd == "longevity":
         res, render = engine.longevity_findings(), fmt.longevity_report
+    elif args.cmd == "acmg-scan":
+        from . import acmg_scan as _as
+        res = _as.scan(clinvar_vcf=args.clinvar, out_dir=args.out_dir)
+        # A refusal is a result here — «the ClinVar file is not here, fetch this
+        # one» is printed in full, in both shapes — and the exit code still says
+        # whether the TABLE WAS WRITTEN. The first version returned 0 on every
+        # status, reasoning that the command had worked; but `acmg-scan &&
+        # acmg` then ran the second command over a table the first had refused
+        # to write, and the shell had no way to tell that from a scan that
+        # finished. Same rule as `ingest-labs` with errors (task 124): a script
+        # must be able to tell the two apart without parsing the text.
+        #
+        # The codes are the source-tree wrapper's, which the quarterly script
+        # branches on: 0 written, 2 refused, and 1 is what a crash leaves —
+        # one outcome, one code, whichever door it came through. `--json`
+        # carries the same code as `init` does with its payload: the status
+        # is in the structure for whoever parses it, and the code is there for
+        # the `&&` that does not. An empty table is not a refusal — `ok` with
+        # nothing found exits 0.
+        if args.json:
+            print(json.dumps(res, ensure_ascii=False, indent=2))
+        else:
+            print(res.get("message") or "")
+        return 0 if res.get("status") == "ok" else 2
     elif args.cmd == "capabilities":
         from . import contract as _c
         res, render = _c.capabilities(), fmt.capabilities_report

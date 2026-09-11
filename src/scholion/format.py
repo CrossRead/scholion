@@ -266,11 +266,18 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
     at the bottom has already been believed by the time the qualification arrives.
     """
     if r.get("status") == "unresolved_gene":
+        # A coordinate is one thing we know about a gene, and not the only one.
+        # This branch used to print the failure to obtain it and stop, so a
+        # clinician asking about BRCA1 with no annotation file on the machine was
+        # told nothing at all — while the build ships the 84 symbols of the ACMG
+        # panel and can say, with no network, that BRCA1 is one of them.
         lines = ["\u26a0\ufe0f " + r.get("message", ""), ""]
         if r.get("searched"):
             lines.append("\u00b7 " + "\n\u00b7 ".join(r["searched"][:8]))
         if r.get("fix"):
             lines += ["", "`" + r["fix"] + "`"]
+        if r.get("layers"):
+            lines += ["", gene_layers_report(r["layers"])]
         return "\n".join(lines)
     loc = r.get("location") or {}
     if r.get("status") == "no_genome":
@@ -282,6 +289,18 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
                                 strand=loc.get("strand"), assembly=loc.get("assembly"),
                                 transcript=loc.get("transcript") or "\u2014")
                 + "\n_" + str(r.get("message", "")) + "_")
+    if r.get("status") in ("needs_index", "not_sequenced", "unreadable_file"):
+        # The same shape as `no_genome`: the gene is known, the input is what
+        # cannot carry a region — a chip that reads chosen positions, a file
+        # read in one pass, a file that ends before its end. Rendered here by
+        # name; through the generic listing below these refusals would print as
+        # a gene with no variants, which is a sentence about the person.
+        return ("\u26a0\ufe0f " + _t("gene.header", gene=r.get("gene"), chrom=loc.get("chrom"),
+                                start=loc.get("start"), end=loc.get("end"),
+                                strand=loc.get("strand"), assembly=loc.get("assembly"),
+                                transcript=loc.get("transcript") or "\u2014")
+                + "\n_" + str(r.get("message", "")) + "_"
+                + (f"\n`{r['fix']}`" if r.get("fix") else ""))
     lines = [_t("gene.header", gene=r.get("gene"), chrom=loc.get("chrom"),
                 start=loc.get("start"), end=loc.get("end"), strand=loc.get("strand"),
                 assembly=loc.get("assembly"), transcript=loc.get("transcript") or "—"),
@@ -369,13 +388,35 @@ def genome_report(r: Dict[str, Any]) -> str:
             lines.append("· " + "\n· ".join(str(c) for c in amb["choices"][:8]))
         return "\n".join(lines)
     if r.get("gene") and "loci" in r:
-        lines = [_t("genome.loci", gene=r["gene"])]
+        # The frame first, then the findings — the same rule the genome status
+        # follows and for the same reason. A reader who is not told WHICH
+        # shelves were asked cannot tell an answer from a silence, and the
+        # catalogue is only one of four.
+        lines = []
+        if r.get("layers"):
+            lines += [gene_layers_report(r["layers"]), ""]
+        lines.append(_t("genome.loci", gene=r["gene"]))
         for item in r["loci"]:
             lines.append("• " + genome_report(item).split("\n")[0])
         return "\n".join(lines)
     # a single rsID, ok
     res = r.get("result") or {}
-    if not res.get("genotype"):
+    # `assumed_ref` joins the refusal shape rather than the answer shape.
+    #
+    # It was rendered as an answer: «genotype TT (reference (the site is not
+    # variant))», with the honest note under it. On a single locus a reader saw
+    # both — a reassuring label and a warning contradicting it on the next line.
+    # In a GENE LISTING they saw only the first, because the list keeps
+    # `.split("\n")[0]`, and the note is the second. A physician running
+    # `genome --gene DPYD` met eight positions labelled reference, six of which
+    # have no row in the file at all.
+    #
+    # The engine has been right about this all along — `assumed_ref` is excluded
+    # from every decision in `pgx`, `core` and `genomics`, each with a comment
+    # saying why. Only the last mile asserted. The refusal shape says the same
+    # thing in one line, so it survives being cut down to one line: «there is no
+    # row at this position».
+    if not res.get("genotype") or res.get("confidence") == "assumed_ref":
         # Nothing came back from the reader. Printing `genotype **?** ()` here —
         # a genotype-shaped hole with an empty parenthesis after it — was the
         # third leak of the same kind as `(, None:None)`: an absent value
@@ -441,6 +482,19 @@ def genome_report(r: Dict[str, Any]) -> str:
         line += "\n" + _t("genome.consequence", text=r["consequence"])
     if r.get("resolved_by") and r["resolved_by"] != "catalog":
         line += f"\n_{_t('genome.resolved_by', source=r['resolved_by'])}_"
+        # A genotype read from a position the curated catalogue does not carry
+        # is a number with nothing standing behind it, and the silence where the
+        # reading should be is filled by whoever is talking. It was: a clinician
+        # asked about COMT, the product returned rs4680 = AA with depth 36 and
+        # said, correctly, that the variant is outside its curated set — and the
+        # assistant supplied «the low-activity variant, slower breakdown of
+        # dopamine» out of its own general knowledge, with no source inside the
+        # product and none of its five reading filters applied.
+        #
+        # This line is a statement about THIS BUILD's catalogue, not about
+        # medicine: it says a curated reading does not exist here, which is a
+        # fact we can check, and leaves the medicine to somebody who can.
+        line += "\n_" + _t("genome.no_curated_reading") + "_"
     # Two different notes live here, and only the harmless one was being printed.
     #
     # `r["note"]` is the CATALOGUE's remark about the locus — the same text for
@@ -451,12 +505,125 @@ def genome_report(r: Dict[str, Any]) -> str:
     #
     # The measurement goes first: a warning that the call cannot be trusted
     # changes what the catalogue's remark is worth.
+    # How well the gene around this position was read. On a gene query the frame
+    # above carries it; a single locus has no frame, and «nothing found at this
+    # position» in a gene read at eight per cent is the same silence that made a
+    # missing row print as «reference». Said only when it is worth saying.
+    cov = r.get("coverage") or {}
+    if cov.get("state") == "low":
+        line += "\n⚠️ _" + _coverage_line(cov) + "_"
     if res.get("note"):
         line += f"\n⚠️ _{res['note']}_"
     if r.get("note"):
         line += f"\n_{r['note']}_"
     line += f"\n\n_{r.get('disclaimer','')}_"
     return line
+
+
+def gene_layers_report(l: Dict[str, Any]) -> str:
+    """Which shelves hold anything about this gene, one line each.
+
+    Three outcomes per layer and never two: what it holds, that it holds
+    nothing, or that it could not be asked and what would let it be. A layer
+    that is silently skipped is the defect this block exists to prevent.
+    """
+    out = ["**" + _t("gene.layers_header", gene=l.get("gene", "—")) + "**"]
+    cat = (l.get("catalogue") or {}).get("count") or 0
+    out.append("· " + (_t("gene.layer.catalogue", count=cat) if cat
+                       else _t("gene.layer.catalogue_none")))
+    cv = l.get("clinvar") or {}
+    reg = cv.get("region") or {}
+    status = cv.get("status")
+    # Branched on the STATUS, not on «ok or not». Every status that is not
+    # `ok` used to print «the gene's coordinates were not obtained» — and the
+    # commonest of them, a scan nobody has run yet, arrives WITH a region and
+    # a resolver. The frame then blamed the gene lookup for a missing table,
+    # and sent the reader to fetch an annotation file they did not need.
+    if status == "ok" and reg:
+        out.append("· " + _t("gene.layer.clinvar", count=cv.get("count") or 0,
+                             chrom=reg.get("chrom"), start=reg.get("start"),
+                             end=reg.get("end"), source=cv.get("resolved_by") or "—"))
+        if cv.get("truncated"):
+            out.append("  _" + _t("clinvar.truncated_for_gene",
+                                  read=cv["truncated"]["read"], of=cv["truncated"]["of"]) + "_")
+    elif status == "gene_unresolved":
+        out.append("· " + _t("gene.layer.clinvar_unresolved"))
+        if cv.get("fix"):
+            out.append("  _" + str(cv["fix"]) + "_")
+    elif status == "not_run":
+        out.append("· " + _t("gene.layer.clinvar_not_run"))
+        if cv.get("scan_note"):
+            out.append("  _" + str(cv["scan_note"]) + "_")
+    else:
+        out.append("· " + _t("gene.layer.clinvar_unavailable", status=status or "—"))
+        if cv.get("scan_note") or cv.get("fix"):
+            out.append("  _" + str(cv.get("scan_note") or cv.get("fix")) + "_")
+    ac = l.get("acmg") or {}
+    ac_status = ac.get("status")
+    if ac.get("in_panel") and ac.get("unread"):
+        out.append("· " + _t("gene.layer.acmg_unread"))
+    elif ac.get("in_panel") and ac_status == "not_run":
+        # «In it, 0 findings» over a panel nobody scanned is a false «clean»
+        # on hereditary cancer. The count is a count only once the scan ran.
+        out.append("· " + _t("gene.layer.acmg_not_run"))
+    elif ac.get("in_panel") and ac_status not in (None, "ok"):
+        out.append("· " + _t("gene.layer.acmg_unavailable", status=ac_status))
+    elif ac.get("in_panel"):
+        out.append("· " + _t("gene.layer.acmg_in",
+                             findings=_plural(ac.get("count") or 0, "count.findings")))
+    elif ac.get("in_panel") is False:
+        out.append("· " + _t("gene.layer.acmg_out"))
+    else:
+        out.append("· " + _t("gene.layer.acmg_unavailable", status=ac_status or "—"))
+    out.append("· " + _coverage_line(l.get("coverage") or {}))
+    return "\n".join(out)
+
+
+def _coverage_line(c: Dict[str, Any]) -> str:
+    """One line about how well this gene was read.
+
+    `fine` is deliberately terse and deliberately not «adequate»: the product
+    does not know what the reader's question needs, only that this gene is not
+    unusual for this file. Every other state carries its number.
+    """
+    state = c.get("state")
+    if state == "low":
+        return _t("gene.coverage.low", pct=c.get("pct_20x"),
+                  median=c.get("median_pct_20x"))
+    if state == "fine":
+        return _t("gene.coverage.fine", pct=c.get("pct_20x"))
+    if state == "gene_not_in_table":
+        return _t("gene.coverage.not_in_table", n=c.get("table_size") or 0)
+    if state == "unavailable":
+        # A table that could not be read, told apart from one nobody made:
+        # «not measured» sends the reader to run the measurement, and here the
+        # measurement exists.
+        return _t("gene.coverage.unavailable", reason=c.get("reason") or "—")
+    return _t("gene.layer.coverage_no")
+
+
+def clinvar_gene_report(r: Dict[str, Any]) -> str:
+    """ClinVar findings inside one gene."""
+    g = r.get("gene") or "—"
+    if r.get("status") != "ok":
+        return f"⚠️ {g} — " + str(r.get("fix") or r.get("scan_note")
+                                  or _t("genome.refused.no_answer"))
+    reg = r.get("region") or {}
+    head = ("**" + g + "** — "
+            + _t("gene.layer.clinvar", count=r.get("count") or 0,
+                 chrom=reg.get("chrom"), start=reg.get("start"),
+                 end=reg.get("end"), source=r.get("resolved_by") or "—"))
+    if r.get("scanned") is not None:
+        head += _t("clinvar.gene_of_scanned",
+                   total=_plural(int(r["scanned"]), "count.findings"))
+    if r.get("truncated"):
+        head += "\n_" + _t("clinvar.truncated_for_gene",
+                           read=r["truncated"]["read"], of=r["truncated"]["of"]) + "_"
+    if not r.get("hits"):
+        return head
+    return head + "\n" + clinvar_report({**r, "status": "ok",
+                                         "count": r.get("count"),
+                                         "disclaimer": r.get("disclaimer", "")})
 
 
 _SEV_ICON = {"high": "🔴", "moderate": "🟠", "low": "🟢"}
@@ -619,6 +786,20 @@ def prescription_check(r: Dict[str, Any]) -> str:
                      if not unrec else
                      "_" + _t("prescription.no_interactions_partial",
                               names=", ".join(unrec[:6])) + "_")
+    # What the comparison deliberately did not include. Printed whether or not
+    # anything was found: a warning that disappears because a drug was stopped and
+    # a warning nobody computed read the same on the page, and only one of them is
+    # good news.
+    base = inter.get("baseline") or {}
+    excluded = base.get("excluded") or []
+    if excluded:
+        lines.append("_" + _t("prescription.excluded_from_check",
+                              names=", ".join(f"{e.get('name')} ({e.get('status')})"
+                                              for e in excluded[:6])) + "_")
+    no_status = base.get("status_not_recorded") or []
+    if no_status:
+        lines.append("_" + _t("prescription.status_not_recorded",
+                              names=", ".join(no_status[:6])) + "_")
 
     cvb = _clinvar_block(r.get("clinvar"))
     if cvb:
@@ -1255,6 +1436,13 @@ def overview_report(r: Dict[str, Any]) -> str:
     """
     head = _t("overview.title") + " " + _t(
         "overview.counts", total=r.get("markers_total", 0), abnormal=r.get("abnormal_count", 0))
+    # Only when it is worth saying. A line printed on every run is a line nobody
+    # reads by the third one, and «this build is two days old» is not news.
+    b = r.get("build") or {}
+    if b.get("status") == "ageing":
+        head += "\n" + _t("overview.build_ageing", version=b.get("installed") or "—",
+                          released=b.get("released") or "—",
+                          ago=_plural(int(b.get("days") or 0), "count.days"))
     if r.get("stale_abnormal_count"):
         head += _t("overview.stale_note", n=r["stale_abnormal_count"])
     out = [head + ".", ""]
@@ -1352,18 +1540,105 @@ def second_opinion_report(r: Dict[str, Any]) -> str:
     return "\n".join(out)
 
 
+def _pgx_mark(name: str) -> str:
+    """Whether this entry can take part in a pharmacogenetic answer at all.
+
+    A regimen of thirty supplements produced «no interactions found», which is
+    true and tells the reader nothing: omega-3 and inositol are not in the model
+    and never could be. Which of them the model can even speak about was only
+    discoverable afterwards, by running another command.
+    """
+    try:
+        from . import core
+        q = (name or "").strip().lower()
+        if not q:
+            return ""
+        for entry in core.cpic_kb().get("drugs", []):
+            for n in entry.get("names", []):
+                # Equality, or one name contained in the other AND long enough
+                # for the containment to mean something. The bare substring rule
+                # this was copied from lives inside a lookup where the caller has
+                # already typed a drug name; here it labels a LIST, and «и» — one
+                # letter of a supplement's name — matched «ипп» and earned a
+                # vitamin the tag «pharmacogenetics: CYP2C19».
+                if q == n or (min(len(q), len(n)) >= 4 and (q in n or n in q)):
+                    return " " + _t("medications.in_pgx", gene=entry.get("gene") or "—")
+    except Exception as exc:                                         # noqa: BLE001
+        # An empty mark means «outside the model» — the legend says so under
+        # the list. A base that could not be READ returned the same empty
+        # mark, so one unreadable file declared every drug in the regimen
+        # pharmacogenetically irrelevant. The failure is a mark of its own.
+        return " " + _t("medications.pgx_unavailable", reason=type(exc).__name__)
+    return ""
+
+
+#: The most of a prescription note that the LIST prints. These notes are prose
+#: somebody wrote at the time, and a «first sentence» can itself run for three
+#: hundred characters; `--json` and `prescription` carry the whole of it.
+NOTE_FOLD_CEILING = 150
+
+#: Abbreviations a full stop does not end a sentence after. A fold that cut at
+#: «e.g. » printed «Take with food, e.g…» and lost the example it was folding
+#: to keep. Short on purpose: the cases seen in real notes, not a dictionary.
+_ABBREVIATIONS = ("e.g.", "i.e.", "etc.", "vs.", "т.е.", "т.к.", "напр.", "др.")
+
+
+def _first_sentence(note: str) -> str:
+    """The first sentence of a note, with the ceiling above applied to it."""
+    start = 0
+    head = note
+    while True:
+        cut = note.find(". ", start)
+        if cut < 0:
+            break
+        before = note[:cut + 1]
+        if any(before.endswith(a) for a in _ABBREVIATIONS):
+            start = cut + 1
+            continue
+        head = before[:-1]
+        break
+    head = head.strip()
+    if len(head) > NOTE_FOLD_CEILING:
+        head = head[:NOTE_FOLD_CEILING].rsplit(" ", 1)[0]
+    return head
+
+
+def _status_mark(m: Dict[str, Any]) -> str:
+    """The status of an entry that is NOT current, for a listing.
+
+    Every place that lists the regimen printed a stopped drug in the same
+    shape as one taken this morning. The comparison already excluded it —
+    and a list that does not say so shows the reader a regimen the engine
+    is not using.
+    """
+    from . import core
+    if core.is_active_medication(m):
+        return ""
+    return " " + _t("medications.not_current", status=m.get("status") or "—")
+
+
 def medications_report(r: Dict[str, Any]) -> str:
     meds = r.get("medications") or []
     if not meds:
         return _t("medications.empty")
     out = [_t("medications.header", n=len(meds))]
     for m in meds:
-        line = f"  · {m.get('name', '?')}"
+        line = (f"  · {m.get('name', '?')}" + _status_mark(m)
+                + _pgx_mark(m.get("name")))
         if m.get("dose"):
             line += f" — {m['dose']}"
-        if m.get("note"):
-            line += f" ({m['note']})"
+        # The note is kept and no longer printed in full on the list. Entries in
+        # this profile carry up to fifteen hundred characters of history each,
+        # and a list of forty-five of them is not a list a person reads. The
+        # first sentence says what it is; `--json` and `prescription` carry all
+        # of it, which is where the detail was always meant to be read.
+        note = (m.get("note") or "").strip()
+        if note:
+            head = _first_sentence(note)
+            line += f" ({head}…)" if len(note) > len(head) + 2 else f" ({head})"
         out.append(line)
+    out.append("")
+    out.append(_t("medications.pgx_legend"))
     return "\n".join(out)
 
 
@@ -1411,7 +1686,8 @@ def genome_status_report(r: Dict[str, Any]) -> str:
             cls = tb.get("class")
             if cls and cls != "unmeasured":
                 out.append(_t("genome_status.callset_" + cls,
-                              per_mb=tb.get("observed_per_mb"), share=0))
+                              per_mb=tb.get("observed_per_mb"), share=0,
+                              coding_per_mb=tb.get("coding_per_mb") or 0))
         else:
             out = [_t("genome_status.tabular_table", rows=tb.get("rows") or 0,
                       present=tb.get("loci_present") or 0),
@@ -1442,7 +1718,25 @@ def genome_status_report(r: Dict[str, Any]) -> str:
         if cs.get("class") and cs["class"] != "unmeasured":
             out.append(_t("genome_status.callset_" + cs["class"],
                           per_mb=cs.get("observed_per_mb"),
+                          coding_per_mb=cs.get("coding_per_mb") or 0,
                           share=int(round((cs.get("imputed_share") or 0) * 100))))
+        paths = r.get("paths") or []
+        if paths:
+            # The frame, before the findings. A reader who meets an answer without
+            # the question set it belongs to fills the set in themselves, and
+            # fills it in wrong: pharmacogenetics arrives looking like everything
+            # that was there to find.
+            out.append(_t("genome_status.paths_head"))
+            for it in paths:
+                name = _t("paths." + it["path"])
+                out.append(_t("genome_status.path_open", name=name) if it.get("open")
+                           else _t("genome_status.path_closed", name=name,
+                                   why=_t("paths.why_" + (it.get("why") or "no_genome"))))
+        if r.get("engine") == "linear":
+            # The reader that needs no index is not a detail of implementation
+            # here: it changes how long the first question takes, and a person
+            # who is not told that reads the wait as a hang.
+            out.append(_t("genome_status.no_index_linear"))
         if r.get("sample"):
             out.append(_t("genome_status.sample", name=r["sample"]))
         if r.get("reader"):

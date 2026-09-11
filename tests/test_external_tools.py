@@ -283,13 +283,16 @@ class TestThePlan(unittest.TestCase):
         self.assertIn("base", tools.set_names(st))
         with mock.patch.object(tools, "which", return_value=None):
             st = tools.status()
-            self.assertEqual(tools.tools_of(["base"], st),
-                             ["samtools", "bcftools", "bgzip", "tabix"])
+            # Since 12.09.2026 `base` is htslib alone: a file without an index is
+            # read, and the ACMG screen runs, with no tool at all; samtools and
+            # bcftools moved to `annotate`, which is what they are for.
+            self.assertEqual(tools.tools_of(["base"], st), ["bgzip", "tabix"])
+            self.assertEqual(tools.tools_of(["annotate"], st), ["samtools", "bcftools"])
 
     def test_a_tool_needed_by_two_sets_is_listed_once(self):
         with mock.patch.object(tools, "which", return_value=None):
             st = tools.status()
-            names = tools.tools_of(["base", "hla"], st)
+            names = tools.tools_of(["annotate", "hla"], st)
         self.assertEqual(len(names), len(set(names)), "samtools was listed twice")
 
 

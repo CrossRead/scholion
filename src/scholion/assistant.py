@@ -335,7 +335,12 @@ def _fmt_meds() -> str:
         dose = m.get("dose") or m.get("dosage") or ""
         since = m.get("since") or m.get("start") or ""
         since_s = _t("assistant.ctx.med_since", date=since) if since else ""
-        rows.append(f"— {name} {dose} {since_s}".rstrip())
+        # This text is pasted into a model as «what the person takes». A
+        # stopped entry listed without its status is a drug the model will
+        # reason about as current — the one reader that cannot ask.
+        status_s = ("" if core.is_active_medication(m)
+                    else _t("assistant.ctx.med_status", status=m.get("status") or "—"))
+        rows.append("— " + " ".join(x for x in (name, dose, since_s, status_s) if x))
     return "\n".join(rows) + "\n"
 
 

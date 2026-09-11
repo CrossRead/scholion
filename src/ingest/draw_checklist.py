@@ -44,8 +44,13 @@ try:
 except Exception:                                          # noqa: BLE001
     TEST_META = {}
 
-ACTIVE_PREFIXES = ("active", "course")          # course_postponed is cut off explicitly below
-DEFERRED = {"course_postponed", "paused", "not_started", "planned_no_dose"}
+# One dictionary of statuses, and it lives in `core`. This file carried its own
+# from 1.0.0 — `("active", "course")` — while the interaction check accepted
+# `active*` alone, so a pulse course was current for the draw checklist and
+# absent from the check of a new prescription against it. Two readers of one
+# field, two answers about the same entry. `core.is_active_medication` decides
+# now, and the deferred set — the ones worth a footnote — is read from there too.
+DEFERRED = core.DEFERRED_STATUSES
 
 
 # --------------------------------------------------------------------------- utilities
@@ -146,7 +151,7 @@ def from_medications():
         name, status = str(m.get("name", "")), str(m.get("status", ""))
         if not name:
             continue
-        if status in DEFERRED or not status.startswith(ACTIVE_PREFIXES):
+        if not core.is_active_medication(m):
             classes = [c for c in _classes_for(name) if c in mon]
             if classes and status in DEFERRED:
                 deferred.append((name, status, classes))

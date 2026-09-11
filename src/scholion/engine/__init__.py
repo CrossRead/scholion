@@ -61,11 +61,17 @@ from .goals import (  # noqa: F401 -- the facade re-exports every name
     _guideline_candidate,
     suggest_goal_targets,
 )
-from .genomics import (  # noqa: F401 -- the facade re-exports every name
+from .genomics import (
+    BELOW_MEDIAN_POINTS,
+    POORLY_READ_BELOW,
+    gene_coverage,  # noqa: F401 -- the facade re-exports every name
     NARROW_INPUTS,
+    NARROW_FOR_SCORES,
     genome_lookup,
     genome_status,
     clinvar_findings,
+    clinvar_for_gene,
+    gene_layers,
     _penetrance_block,
     acmg_findings,
     apoe,
@@ -81,10 +87,13 @@ from .genomics import (  # noqa: F401 -- the facade re-exports every name
     _copies_of,
     lipid_genetics,
 )
-from .sources import (  # noqa: F401 -- the facade re-exports every name
+from .sources import (
+    AGEING_AFTER_DAYS,
+    build_freshness,  # noqa: F401 -- the facade re-exports every name
     provenance,
 )
-from .pgx import (  # noqa: F401 -- the facade re-exports every name
+from .pgx import (
+    cpic_snapshot,  # noqa: F401 -- the facade re-exports every name
     compute_phenotype,
     check_drug_gene,
     _guidance_for,

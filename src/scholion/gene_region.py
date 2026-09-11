@@ -239,9 +239,32 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
         out["reason"] = st.get("reason")
         out["message"] = _t("genome.refused." + (st.get("reason") or "no_file"))
         return out
+    # The frame the status carries is the one authority on whether a REGION can
+    # be asked of this input, and the answer here follows it rather than
+    # re-deciding. An array is `ready` — the catalogue answers on it — and this
+    # report used to walk on into the region query with no VCF at all.
+    region = next((p for p in (st.get("paths") or []) if p.get("path") == "region"), None)
+    if region is not None and not region.get("open"):
+        why = region.get("why") or "needs_index"
+        out["status"] = why
+        out["reason"] = why
+        out["message"] = _t("genome.refused." + why)
+        return out
 
     vcf = str(genome.vcf_path())
-    rows = genome._query_region_range(vcf, loc["chrom"], loc["start"], loc["end"])
+    try:
+        rows = genome._query_region_range(vcf, loc["chrom"], loc["start"], loc["end"])
+    except genome.RangeNeedsIndex:
+        # The file is being read without an index: one pass collected the
+        # catalogue's positions and stopped. A gene is thousands of positions
+        # nobody named in advance, so this question is not answered rather than
+        # answered with the empty list the reader would otherwise hand back —
+        # «no variants in this gene» is a statement about the person, and it
+        # would be false.
+        out["status"] = "needs_index"
+        out["reason"] = "needs_index"
+        out["message"] = _t("genome.refused.needs_index")
+        return out
     variants = [_parse_row(r) for r in rows if len(r) > 9]
     for v in variants:
         v["coding"] = _in_cds(v["pos"], loc["cds"])

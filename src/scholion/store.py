@@ -596,10 +596,25 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     return out
 
 
+#: What a re-add keeps from the entry already there unless the caller gives
+#: it. `status` is the one that matters: a stopped drug re-added for its dose
+#: used to come back current, silently, and the interaction check compared
+#: against it again. The other two are history the writers here cannot set.
+MEDICATION_FIELDS_KEPT = ("status", "start_date", "monitoring")
+
+
 @_serialized
 def add_medication(name: str, dose: str = "", note: str = "", *,
+                   status: Optional[str] = None,
                    subject: Optional[str] = None) -> Dict[str, Any]:
     """Add a prescription to medications.json (an editable list).
+
+    `status` is written only when given: an entry with no status is «no status
+    recorded», which the checks treat as current and say so. Re-adding a name
+    MERGES into the entry that is there — dose and note replaced when given,
+    the fields in `MEDICATION_FIELDS_KEPT` kept when not — and the answer says
+    the entry was replaced and what it kept, so that a re-add is never a quiet
+    reset.
 
     `subject` as in `add_lab_point`: a prescription is a fact about a person too,
     and a real one written into the demonstration would be read beside invented
@@ -613,22 +628,38 @@ def add_medication(name: str, dose: str = "", note: str = "", *,
     p = _path("medications.json")
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"medications": []}
     meds: List[Dict[str, str]] = data.setdefault("medications", [])
-    entry = {"name": name.strip(), "dose": dose.strip(), "note": note.strip()}
+    entry: Dict[str, Any] = {"name": name.strip(), "dose": dose.strip(), "note": note.strip()}
+    if status is not None and str(status).strip():
+        entry["status"] = str(status).strip()
     if subject:
         entry[_subj.FIELD] = subject
     # dedup by name (case-insensitive): adding again UPDATES the entry rather than
     # breeding duplicates — otherwise the interaction/class logic over prescriptions breaks
-    replaced = False
+    replaced, kept = False, []
     for i, m in enumerate(meds):
         if m.get("name", "").strip().lower() == entry["name"].lower():
-            meds[i] = entry
+            merged = dict(m)
+            merged["name"] = entry["name"]
+            for field in ("dose", "note"):
+                if entry[field]:
+                    merged[field] = entry[field]
+            if "status" in entry:
+                merged["status"] = entry["status"]
+            if subject:
+                merged[_subj.FIELD] = subject
+            kept = [f for f in MEDICATION_FIELDS_KEPT if f in m and f not in entry]
+            meds[i] = merged
             replaced = True
             break
     if not replaced:
         meds.append(entry)
     _write_json(p, data)
     core.reset_cache()
-    out = {"ok": True, "count": len(meds), "updated": replaced}
+    out: Dict[str, Any] = {"ok": True, "count": len(meds), "updated": replaced}
+    if replaced:
+        out["replaced"] = entry["name"]
+        if kept:
+            out["kept"] = ", ".join(kept)
     if claimed:
         out["claimed"] = claimed
     return out
@@ -648,8 +679,15 @@ def remove_medication(name: str) -> Dict[str, Any]:
     return {"ok": True, "removed": before - len(data["medications"])}
 
 
-def list_medications() -> List[Dict[str, str]]:
-    return core.medications_json().get("medications", [])
+def list_medications() -> List[Dict[str, Any]]:
+    """The regimen as written, and beside each entry whether the checks USE it.
+
+    `current` is computed here, by the one rule in `core`, so that every listing
+    — the command, the page, the assistant's context — marks a stopped entry
+    the same way instead of each deciding, or not deciding, on its own.
+    """
+    return [{**m, "current": core.is_active_medication(m)}
+            for m in core.medications_json().get("medications", [])]
 
 
 # ---- personal health metrics (metrics.json) ------------------------------

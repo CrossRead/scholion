@@ -119,8 +119,12 @@ class TestTwoHeterozygotesAreNotBiallelic(unittest.TestCase):
     Calling two hets «biallelic» turns an ordinary carrier into a patient."""
 
     def test_the_scan_no_longer_calls_two_hets_biallelic(self):
-        import io as _io, pathlib
-        src = pathlib.Path("src/ingest/acmg_sf_scan.py").read_text(encoding="utf-8")
+        """Read off the module that holds the rule. The pass moved into the
+        package on 10.09.2026 — the directory it used to live in does not travel
+        in the wheel, so a pip install had no way to run it."""
+        import inspect
+        from scholion import acmg_scan
+        src = inspect.getsource(acmg_scan._decide)
         self.assertIn("needs_phase", src)
         self.assertNotIn('biallelic = any(r["zygosity"] == "hom" for r in rs) or len(rs) >= 2', src)
 

@@ -45,6 +45,20 @@ PROBES = (("1", 20_000_000, 10_000_000),
           ("1", 150_000_000, 10_000_000),
           ("2", 50_000_000, 10_000_000))
 
+#: Three windows chosen for the opposite reason: they are among the most
+#: gene-dense stretches of the genome, so an EXOME reads thick here while it
+#: reads like nothing at all in the windows above. That contrast — not an
+#: absolute number — is what separates an exome from a narrow panel, and a
+#: contrast survives depth, ancestry and the caller's settings in a way a
+#: threshold does not. Five megabases wide so that the half-megabase offset
+#: between builds cannot walk a probe off its target.
+#: None of these overlaps a window above: a row counted twice would make a panel
+#: look like an exome, and the first draft of this tuple did exactly that on
+#: chromosome 1.
+CODING_PROBES = (("19", 35_000_000, 5_000_000),
+                 ("11", 62_000_000, 5_000_000),
+                 ("17", 40_000_000, 5_000_000))
+
 SAMPLE_ROWS = 20_000
 
 #: Observed variants per megabase. Measured, on real files:
@@ -57,6 +71,27 @@ THRESHOLD_EVIDENCE = {
 }
 DENSE_PER_MB = 800      # below the lowest whole genome (1547), above the highest chip (452)
 PANEL_PER_MB = 100      # separates a chip from a low-pass screen
+
+#: An exome answered `sparse` until this was written, and `sparse` closes ClinVar
+#: and the ACMG list — so the one input on which a pathogenic-variant screen is
+#: most obviously worth running was the input on which it never ran. That is not
+#: caution, it is a refusal aimed at the wrong file.
+#:
+#: The rule is a shape, not a level: gene-poor windows near-empty AND gene-dense
+#: windows carrying real numbers, in at least two of the three, with a clear
+#: contrast between them. A narrow panel fails it — a few hundred genes are not
+#: dense in three unrelated stretches at once — and a whole genome never reaches
+#: it, because it is dense in the gene-poor windows too and is classified before.
+#:
+#: HONESTY ABOUT THESE TWO NUMBERS: the thresholds in `THRESHOLD_EVIDENCE` above
+#: were measured on real files. These two were not — the corpus holds no exome
+#: yet. They are set from the arithmetic (an exome captures on the order of a few
+#: per cent of a gene-dense window, against a whole genome's ~1500/Mb there) and
+#: they are due to be re-measured the day a real exome enters the corpus. Until
+#: then the contrast rule is what carries the decision, and it is the part that
+#: does not depend on where exactly the line sits.
+EXOME_CODING_PER_MB = 20
+EXOME_CONTRAST = 5
 
 _IMPUTED_TOKENS = {"IMP", "IMPUTED", "IMP_PASS"}
 _OPEN_FILTERS = {"PASS", ".", ""}
@@ -99,6 +134,31 @@ def _probe(vcf: str, chrom: str, start: int, width: int) -> Optional[Dict[str, i
     return {"observed": observed, "imputed": imputed, "blocks": blocks}
 
 
+def _coding_probes(vcf: str) -> List[Dict[str, int]]:
+    """The gene-dense windows, where an EMPTY window is a measurement.
+
+    `_probe` returns None for a window it could not read, and «no rows» and «no
+    such contig» look identical from there. In the gene-poor windows that
+    conflation is harmless; here it is the whole question, because a panel's
+    zero and an exome's thousands are the two answers being told apart. So the
+    file's own contig list is consulted: a contig that IS in the file and holds
+    no rows in the window contributes a real zero.
+    """
+    from . import tabixlite
+    try:
+        present = {str(c).lower().replace("chr", "") for c in tabixlite.contigs(vcf)}
+    except Exception:
+        present = set()
+    out: List[Dict[str, int]] = []
+    for chrom, start, width in CODING_PROBES:
+        p = _probe(vcf, chrom, start, width)
+        if p is None and chrom.lower() in present:
+            p = {"observed": 0, "imputed": 0, "blocks": 0}
+        if p is not None:
+            out.append(p)
+    return out
+
+
 def _compose(vcf: str) -> Dict[str, int]:
     """Substitutions against indels among the first rows that carry an allele."""
     import gzip
@@ -126,6 +186,20 @@ def _compose(vcf: str) -> Dict[str, int]:
     return {"snv": snv, "indel": indel, "sampled": seen}
 
 
+def _exome_shape(m: Dict[str, Any]) -> bool:
+    """Empty where genes are not, populated where they are — that is an exome."""
+    rich = m.get("coding_per_mb")
+    if rich is None or rich < EXOME_CODING_PER_MB:
+        return False
+    if (m.get("coding_probes_dense") or 0) < 2:
+        return False
+    poor = m.get("observed_per_mb") if m.get("measured") else 0
+    poor = 0 if poor is None else poor
+    if poor >= PANEL_PER_MB:
+        return False
+    return rich >= EXOME_CONTRAST * max(poor, 1)
+
+
 def _classify(m: Dict[str, Any]) -> str:
     # Composition first, and deliberately before `measured`: what a file
     # CONTAINS is read from the file itself and does not need an index, while
@@ -135,11 +209,18 @@ def _classify(m: Dict[str, Any]) -> str:
         return "partial_callset_indels"
     if m.get("only_snvs"):
         return "partial_callset_snvs"
-    if not m.get("measured"):
-        return "unmeasured"
+    # Imputation is decided before breadth, as before: a file that is mostly a
+    # model is that whatever its windows say.
     share = m.get("imputed_share")
     if share is not None and share >= 0.5:
         return "imputed_panel"
+    # And before «unmeasured», because an exome's gene-poor windows are empty by
+    # construction — the very silence that used to leave it unmeasured is half
+    # of the evidence that it IS an exome.
+    if _exome_shape(m):
+        return "exome"
+    if not m.get("measured"):
+        return "unmeasured"
     per_mb = m.get("observed_per_mb")
     if per_mb is None:
         return "unmeasured"
@@ -162,11 +243,17 @@ def _cache_path(vcf: str) -> Optional[Path]:
         return None
     # hashlib, not hash(): the built-in is salted per process, so the key would
     # change on every run and the cache would never once be read.
+    # Nanosecond mtime: a file rewritten within the same second at the same size
+    # is a different file, and a whole-second key served the old measurement
+    # for it.
     import hashlib
     key = hashlib.sha1(
-        f"{os.path.abspath(vcf)}|{st.st_size}|{int(st.st_mtime)}".encode()
+        f"{os.path.abspath(vcf)}|{st.st_size}|{st.st_mtime_ns}".encode()
     ).hexdigest()[:16]
-    return base / f"callset-{key}.json"
+    # `callset2`: an entry written before the coding probes existed carries no
+    # `coding_per_mb`, and reading it back would classify every exome as sparse
+    # for as long as the cache lives.
+    return base / f"callset2-{key}.json"
 
 
 def measure(vcf: Optional[str]) -> Dict[str, Any]:
@@ -179,7 +266,8 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
     empty = {"measured": False, "class": "unmeasured", "observed_per_mb": None,
              "probes": [], "snv": 0, "indel": 0, "sampled": 0,
              "only_indels": False, "only_snvs": False,
-             "imputed_share": None, "reference_blocks": False}
+             "imputed_share": None, "reference_blocks": False,
+             "coding_per_mb": None, "coding_probes": [], "coding_probes_dense": 0}
     if not vcf or not os.path.exists(vcf):
         return empty
 
@@ -192,6 +280,17 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
 
     probes = [_probe(vcf, c, s, w) for c, s, w in PROBES]
     good = [p for p in probes if p is not None]
+    coding = _coding_probes(vcf)
+    if not good and not coding:
+        # Every window is read through the index, so a file with no index is not
+        # a file of unknown breadth — it is a file nobody looked at. That silence
+        # used to become `unmeasured`, and `unmeasured` closes paths. The single
+        # linear pass counts the same windows on the way through.
+        from . import linear as _lin
+        counted = _lin.probe_counts(vcf)
+        if counted:
+            good = [p for p in counted.get("probes", []) if p]
+            coding = [p for p in counted.get("coding", []) if p]
     comp = _compose(vcf)
 
     out: Dict[str, Any] = dict(empty)
@@ -207,12 +306,23 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
         out["imputed_share"] = (round(sum(p["imputed"] for p in good) / seen_alt, 3)
                                 if seen_alt else None)
         out["reference_blocks"] = any(p["blocks"] for p in good)
+    if coding:
+        wide = CODING_PROBES[0][2] // 1_000_000
+        per_rich = sorted(p["observed"] // wide for p in coding)
+        out["coding_probes"] = [p["observed"] for p in coding]
+        out["coding_per_mb"] = per_rich[len(per_rich) // 2]
+        out["coding_probes_dense"] = sum(1 for v in per_rich if v >= EXOME_CODING_PER_MB)
     out["class"] = _classify(out)
 
     if cp is not None:
         try:
             cp.parent.mkdir(parents=True, exist_ok=True)
-            cp.write_text(json.dumps(out), encoding="utf-8")
+            # Whole or not at all: two status requests on the web server's
+            # threads measured the same file at once and wrote the same entry
+            # over each other, and a third reader parsed the half they left.
+            tmp = cp.with_name(f"{cp.name}.{os.getpid()}.tmp")
+            tmp.write_text(json.dumps(out), encoding="utf-8")
+            os.replace(tmp, cp)
         except Exception:
             pass
     return out

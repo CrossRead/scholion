@@ -251,6 +251,15 @@ def _genome_limits() -> List[Dict[str, str]]:
             out.append(_item(_t("limits.no_genome_what"), _t("limits.no_genome_why"),
                              _t("limits.no_genome_closes"), kind="genome"))
 
+    if ready and av.get("engine") == "linear":
+        # The reader that needs no index answers the catalogue and stops there.
+        # Placed before the laboratory items on purpose: those may return early,
+        # and a person told «connected» with nothing else said will ask this file
+        # about a gene and read the refusal as a property of their genome.
+        out.append(_item(_t("limits.no_index_what"),
+                         _t("limits.no_index_why"),
+                         _t("limits.no_index_closes"), kind="genome"))
+
     # Task 100. Points written before the source of their date was recorded. Said
     # ONCE, here, with a number — not as a caveat on every one of them: the
     # person's own carefully entered history would be buried in marks about
@@ -541,7 +550,7 @@ def scope() -> Dict[str, Any]:
     profile = av.get("input_profile") if has_vcf else None
     seq_note = None
     if has_vcf:
-        if profile in ("panel", "sparse", "imputed_panel",
+        if profile in ("exome", "panel", "sparse", "imputed_panel",
                        "partial_callset_indels", "partial_callset_snvs", "unmeasured"):
             seq_note = _t("limits.scope.input_" + profile,
                           per_mb=cs.get("observed_per_mb"),

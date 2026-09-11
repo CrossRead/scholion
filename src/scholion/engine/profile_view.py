@@ -66,8 +66,22 @@ def overview() -> Dict[str, Any]:
         "medications_count": len(core.medications_json().get("medications", [])),
         "metrics": _metrics_overview(),
         "lifestyle": _lifestyle_overview(),
+        # Computed and printed nowhere is the defect this project keeps finding
+        # in itself, so it goes onto the first screen with everything else.
+        "build": _build_freshness(),
         "disclaimer": DISCLAIMER(),
     }
+
+
+def _build_freshness() -> Dict[str, Any]:
+    from .sources import build_freshness
+    try:
+        return build_freshness()
+    except Exception as exc:                                         # noqa: BLE001
+        # The overview must not fall over on its own age line — but «unknown»
+        # with nothing beside it is the same word a build with no journal
+        # says, and a reader cannot tell the two apart. The reason travels.
+        return {"status": "unknown", "reason": type(exc).__name__}
 
 
 def _metrics_overview() -> Dict[str, Any]:

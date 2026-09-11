@@ -161,6 +161,68 @@ MESSAGES = {
     "genome.significance": "Clinical significance (ClinVar/Ensembl): {values}",
     "genome.consequence": "Consequence: {text}",
     "genome.resolved_by": "coordinate obtained: {source}",
+    "clinvar.gene_unresolved": "The coordinates of {gene} could not be obtained, so no "
+                               "finding can be matched to it. This is a gap in the gene "
+                               "lookup, not a statement about the genome: a local Ensembl "
+                               "GFF3 (SCHOLION_GENE_GFF3) or a live Ensembl lookup closes it.",
+    "drug.not_checked_offline": "«{drug}» is not in this build's own base, and the "
+                                "international name could not be looked up: the network is "
+                                "off (SCHOLION_OFFLINE). Nothing was established about this "
+                                "drug either way.",
+    "drug.no_pair_in_snapshot": "Recognised, and there is no gene–drug pair for it in this "
+                                "build's copy of the CPIC guidelines (refreshed {date}). That "
+                                "is a statement about the copy: either no guideline exists for "
+                                "this drug, or one exists and this build does not carry it — "
+                                "the date tells you which is worth checking.",
+    "medications.in_pgx": "[pharmacogenetics: {gene}]",
+    "medications.pgx_unavailable": "[pharmacogenetics: not checked — the base could not be "
+                                   "read ({reason})]",
+    "medications.not_current": "[not current: {status}]",
+    "medications.pgx_legend": "_Marked entries are the ones this build can answer about "
+                              "pharmacogenetically. The rest are outside the model — not "
+                              "unexamined, but outside what a genotype can say anything about._",
+    "overview.build_ageing": "This build is {version}, released {released} — {ago} ago. "
+                            "A newer one may fix what you are looking at: `pip install -U scholion`.",
+    "pgx.snapshot_unreadable": "unreadable ({reason})",
+    "clinvar.truncated_for_gene": "Only {read} of {of} findings were read, so «none in this "
+                                  "gene» cannot be said: a finding may be past the cut.",
+    "gene.coverage.low": "coverage: {pct}% of this gene read at 20× against {median}% "
+                         "typical for this file — an answer about it carries LOW confidence, "
+                         "and «nothing found» here means little",
+    "gene.coverage.fine": "coverage: {pct}% at 20×, in line with the rest of this file "
+                          "(not the same as «enough» — that depends on the question)",
+    "gene.coverage.not_in_table": "coverage: not measured for this gene — it is not among "
+                                  "the genes the table covers ({n})",
+    "gene.layers_header": "What this build holds about {gene}",
+    "gene.layer.catalogue": "curated loci: {count}",
+    "gene.layer.catalogue_none": "curated loci: none — this gene has no catalogued positions",
+    "gene.layer.clinvar": "ClinVar: {count} in {chrom}:{start}–{end} ({source})",
+    "gene.layer.clinvar_unresolved": "ClinVar: cannot be asked — the gene's coordinates "
+                                     "were not obtained",
+    "gene.layer.acmg_in": "ACMG SF panel: in it, {findings}",
+    "gene.layer.acmg_out": "ACMG SF panel: not in it",
+    "gene.layer.acmg_unread": "ACMG SF panel: in it, and the panel reports this gene as not read",
+    "gene.layer.acmg_not_run": "ACMG SF panel: in it — and the screen has not been run, so "
+                               "there is no count to give; `scholion acmg-scan` produces one",
+    "gene.layer.acmg_unavailable": "ACMG SF panel: could not be asked ({status})",
+    "gene.layer.clinvar_not_run": "ClinVar: the gene's coordinates are known, and the scan "
+                                  "has not been run — no finding can be counted until it is",
+    "gene.layer.clinvar_unavailable": "ClinVar: could not be asked ({status})",
+    "gene.layer.coverage_no": "coverage: not measured — «nothing found» means «nothing in "
+                              "the part that was read»",
+    "gene.coverage.unavailable": "coverage: the table could not be read ({reason}) — not "
+                                 "«not measured»: the measurement exists and did not open",
+    "clinvar.gene_of_scanned": " (of {total} in the whole table)",
+    "count.findings.one": "{n} finding",
+    "count.findings.few": "{n} findings",
+    "count.findings.many": "{n} findings",
+    "count.days.one": "{n} day",
+    "count.days.few": "{n} days",
+    "count.days.many": "{n} days",
+    "genome.no_curated_reading": "This position is not in the project's curated set: "
+                                 "the genotype was read, and the project offers no "
+                                 "clinical reading of it. Anything said about what it "
+                                 "means comes from somewhere else and should say so.",
 
     # ── ClinVar block inside a drug report ───────────────────────────────
     "clinvar_block.header": "ClinVar for this drug:",
@@ -236,6 +298,8 @@ MESSAGES = {
     "prescription.interactions_header": "Your prescriptions:",
     "prescription.interaction": "with **{meds}** — {effect} (mechanism: {mechanism}).",
     "prescription.what_to_do": "What to do: {text}",
+    'prescription.excluded_from_check': 'Not included in the comparison: {names} — the file records these as no longer current, so a new drug is not checked against them. If one of them is in fact being taken, its status in the prescription file is what says so.',
+    'prescription.status_not_recorded': 'Counted as current without a recorded status: {names}. No status is recorded for these entries; they take part in the comparison, and that is an assumption rather than a fact — `add-med --status` records one.',
     "prescription.no_interactions_partial": "No explicit interactions were found with the part "
                                             "of the current list that was recognised. NOT compared, "
                                             "because the class could not be determined: {names}.",
@@ -387,8 +451,10 @@ MESSAGES = {
     "acmg.unread_header": "Not read deeply enough to decide — genes of the panel: {n}. A negative result in these is not a statement:",
     "acmg.needs_phase_header": "Hits in genes that need BOTH copies affected, found as two heterozygous variants: {n}. Whether they sit on different chromosomes — which is what would make them biallelic — an unphased file cannot say; in cis the person is an ordinary carrier. A parent's genotype or long reads settle it:",
     "acmg.needs_class_header": "Hits in genes ACMG reports only for a narrow class of variant: {n} — the class has to be established before any of these is a finding:",
-    "acmg.how_to_run": "Run `python3 src/ingest/acmg_sf_scan.py` — it checks your VCF "
-                       "against the ACMG Secondary Findings gene list.",
+    "acmg.how_to_run": "Run `scholion acmg-scan` — it checks your VCF against the ACMG "
+                       "Secondary Findings gene list. It needs the published ClinVar file for "
+                       "your build and nothing else, and prints that one download when it is "
+                       "not at hand.",
     "acmg.header": "**Secondary findings — {version}** ({genes} genes, {scanned} checked)",
     "acmg.reportable": "**Worth discussing with a geneticist: {n}**",
     "acmg.coverage_unknown": "coverage of these genes has never been measured on this genome, so «none found» here means «none found in what was read», and how much was read is unknown. `scholion limits` says what closes that.",
@@ -574,7 +640,56 @@ MESSAGES = {
     "genome.refused.several_samples": "The coordinate was found. The file holds several samples — a trio or a joint call — and reading the first column would report somebody else as you. `SCHOLION_GENOME_SAMPLE` says which one is yours.",
     "genome.refused.foreign_input": "The coordinate was found. The folder holds genomic data that is not a readable VCF — `scholion genome-status` names each file and what it needs.",
     "genome.refused.no_engine": "The coordinate was found and the file is in place, but no reader is installed: bcftools, pysam, or a working `.tbi` index beside the file.",
+    "genome.refused_head.truncated": "the genome file ends before its end: it was cut short, and nothing past the cut can be read.",
+    "genome.refused_head.pass_failed": "the pass over the genome file stopped part-way, and nothing is read out of it.",
+    "genome.refused_head.needs_index": "this file is too large to be read in one pass and needs an index.",
+    "genome.refused_head.alleles_not_comparable": "the genotype names an allele that cannot be written beside this locus's own.",
+    "genome.refused_head.not_sequenced": "the input is a chip, and a region is not a question a chip can answer.",
+    "genome.unreadable_truncated": "the file ends without the end-of-file block bgzip always writes last: it was cut short — a copy or a download that did not finish. Nothing is read out of it, because a position past the cut has no row and would have answered «reference». Get a complete copy and compare the sizes.",
+    "genome.unreadable_pass_failed": "the pass over the file stopped part-way ({detail}). Nothing is read out of it, because a position past the failure has no row and would have answered «reference». `gzip -t` on the file says where it is damaged.",
+    "genome.unreadable_not_a_vcf": "the file does not open as a VCF — its first line is not a VCF header. Nothing is read out of it.",
+    "genome.too_large_for_one_pass": "the file has no index, and it is larger than the {mb} MB the one-pass reader will take on: past that, one pass is not a wait but a hang. What closes it: an index — `bgzip` + `tabix -p vcf` — or `SCHOLION_LINEAR_MAX_MB` raised by somebody prepared to wait.",
+    "genome.alleles_not_comparable": "the row at this position is {ref}>{alt} and the genotype is «{value}»: it names an allele of another length, or a deletion spanning this base, beside this locus's own. The two cannot be written as one pair of letters, so nothing is read. What closes it: the same variants normalised one per row (`bcftools norm -m-`).",
+    "genome.acmg_assembly_crossed_personal": "The ACMG table on disk was matched in {table}, and the genome file connected now is in {other}. Every coordinate in it is half a million bases off for this file, so it is not read as findings — neither the ones it lists nor the silence between them. `scholion acmg-scan` writes a new table against this file.",
+    "genome.acmg_assembly_crossed_clinvar": "The ACMG table on disk was matched between a genome in {table} and a ClinVar release in {other}. A table matched across builds holds a silent zero — nothing lines up, so nothing was found — and it is not read as findings. `scholion acmg-scan` refuses that pairing now and writes a new table against a ClinVar file for {table}.",
     "genome_status.file": "File: {path}",
+    'genome_status.no_index_linear': 'No index beside this file, and no tool installed that builds one — so it is read from beginning to end once, and what was asked for is kept. The first question takes as long as one pass over the file; the ones after it are immediate. To make every question immediate: `bgzip` and `tabix -p vcf` the file if those tools are available.',
+    'limits.no_index_what': 'any gene outside the 54-locus catalogue, and anything else that needs a whole region',
+    'limits.no_index_why': "the genome file has no index, and none of the tools that build one is installed. It is read once from beginning to end, which answers the catalogue's positions and the pharmacogenetics resting on them — a region is not a position, and there is no way to seek to one. Such a question refuses here rather than returning an empty list, because an empty list would read as «no variants in this gene».",
+    'limits.no_index_closes': 'an index: `bgzip -c file.vcf > file.vcf.gz && tabix -p vcf file.vcf.gz`. Every question in the list is then answered from the same file.',
+    'acmg_scan.no_genome': 'No variant file to scan. `scholion genome-status` says what is in the genome folder and what it made of it.',
+    'acmg_scan.no_clinvar': 'This screen matches your file against ClinVar, and the ClinVar file is not here. It is one download, and it must be the one published for {assembly} — the build your own file is in:\n\n    curl -L -o clinvar.vcf.gz {url}\n\nThen `scholion acmg-scan --clinvar clinvar.vcf.gz`, or put the file in the genome folder and run `scholion acmg-scan`. Nothing about you is sent anywhere: the download is a public reference file, and the matching happens on this machine.',
+    'acmg_scan.assembly_mismatch': 'Your file is called against {personal} and this ClinVar file is published for {clinvar}. Crossed builds do not fail — they find nothing, or they match a coordinate that in the other build belongs to a different base, and both look like an answer. Nothing was scanned. The file for your build:\n\n    curl -L -o clinvar.vcf.gz {url}',
+    'acmg_scan.clinvar_assembly_unknown': "The build of this ClinVar file could not be established from it, and your own file is {assembly}. Matching by position across two builds returns silence or somebody else's variant, so nothing was scanned. The published file for your build states its assembly:\n\n    curl -L -o clinvar.vcf.gz {url}",
+    'acmg_scan.clinvar_empty': "This ClinVar file yielded no pathogenic or likely-pathogenic variant in the 84 genes of the list — which is not a property of anybody's genome but of the file: most often it carries no GENEINFO field, meaning it is an annotated extract rather than the published ClinVar VCF.",
+    'acmg_scan.done': 'The screen has been run: {found} finding(s) in the ACMG secondary-findings genes, {yes} of them for a conversation with a clinician rather than carriership. The table is at {path}, and `scholion acmg` reads it. An empty result is a normal and rather good outcome: it means nothing of this kind was found in what was read, not that there are no genetic risks — structural variants, repeat expansions and pseudogene regions are outside this method.',
+    'acmg_scan.no_sample_column': 'This file carries no sample column — positions and alleles, but nobody\'s genotype. A sites-only file cannot say what anybody carries, so nothing was scanned. `scholion genome-status` says what the file is.',
+    'acmg_scan.sample_not_found': 'The sample named in `SCHOLION_GENOME_SAMPLE` — {name} — is not in this file. It holds: {names}. Nothing was scanned.',
+    'acmg_scan.several_samples': 'This file holds several samples — {names} — and none was chosen. A trio or a joint call puts several people side by side, and reading the first column would screen somebody, possibly a relative, as you. Nothing was scanned. Say which sample is yours: {cmd}',
+    'acmg_scan.personal_assembly_unknown': 'The build of your own file could not be established from it — no contig lengths, no provider signature, no `##reference=` line, and no index for the probe that reads the data. Matching a file of unknown build against ClinVar by position is the crossed-build run with one side left blank, so nothing was scanned. If you know the build, say so: `SCHOLION_GENOME_ASSEMBLY=GRCh38 scholion acmg-scan` (or GRCh37).',
+    'acmg_scan.no_calls.one': 'At {n} position of the list the genotype was not called (`./.`) and the row was left out of the table: a no-call is neither a reference nor a finding — it is a position the file did not read, and «nothing found» there says nothing.',
+    'acmg_scan.no_calls.few': 'At {n} positions of the list the genotype was not called (`./.`) and the rows were left out of the table: a no-call is neither a reference nor a finding — it is a position the file did not read, and «nothing found» there says nothing.',
+    'acmg_scan.no_calls.many': 'At {n} positions of the list the genotype was not called (`./.`) and the rows were left out of the table: a no-call is neither a reference nor a finding — it is a position the file did not read, and «nothing found» there says nothing.',
+    'acmg_scan.filtered.one': '{n} matching row carries a FILTER other than PASS and is written as `filtered` rather than decided: the caller itself did not stand behind that call, and looking at the position again comes before reporting it.',
+    'acmg_scan.filtered.few': '{n} matching rows carry a FILTER other than PASS and are written as `filtered` rather than decided: the caller itself did not stand behind those calls, and looking at the positions again comes before reporting them.',
+    'acmg_scan.filtered.many': '{n} matching rows carry a FILTER other than PASS and are written as `filtered` rather than decided: the caller itself did not stand behind those calls, and looking at the positions again comes before reporting them.',
+    'paths.region': 'any gene beyond the catalogue — a query over a whole region',
+    'paths.why_needs_index': "this file is being read without an index: one pass collected the catalogue's positions, and a region is not a position. `bgzip` + `tabix -p vcf` opens it.",
+    'genome.refused.needs_index': "The gene was found in the annotation, and your file is connected — it is simply being read WITHOUT an index. That reader makes one pass and keeps the catalogue's positions; a gene is thousands of positions nobody named in advance, so this question is not answered here. It is not «no variants in this gene»: that would be a statement about you, and nothing measured it. What closes it: an index — `bgzip -c file.vcf > file.vcf.gz && tabix -p vcf file.vcf.gz` — after which every question in this list is answered from the same file.",
+    'limits.scope.no_index': 'The genome file has no index, and none of the tools that build one is installed. It is read once from beginning to end, which answers the 54 catalogue loci and everything pharmacogenetic that rests on them. What is NOT answered that way: any gene outside the catalogue, and anything else that needs a whole region — those refuse rather than return an empty list. What closes it: `bgzip` + `tabix -p vcf`.',
+    'genome_status.paths_head': 'What this file can be asked, and what it cannot:',
+    'genome_status.path_open': '  · {name} — open',
+    'genome_status.path_closed': '  · {name} — closed: {why}',
+    'paths.loci': 'the locus catalogue (54 curated positions)',
+    'paths.pgx': 'pharmacogenetics — a drug against the genotype',
+    'paths.clinvar': 'ClinVar: pathogenic and likely-pathogenic findings',
+    'paths.acmg': 'the ACMG secondary-findings list (84 genes)',
+    'paths.pgs': 'polygenic scores',
+    'paths.why_no_genome': 'no genome is connected',
+    'paths.why_input_too_narrow': 'this input cannot carry the answer — `scholion limits` says what would',
+    'paths.why_scan_not_run': 'the annotation for this file has not been produced yet — this path reads a table, and the table is not there. `scholion doc preparing-the-genome` has the step that writes it.',
+    'paths.why_not_sequenced': 'this input is a chip, not a sequence: it reads the positions somebody chose, and a gene is a stretch nobody chose. A sequenced genome (a VCF) opens it.',
+    'genome.refused.not_sequenced': "The gene was found in the annotation, and the input connected is a genotyping chip. A chip reads the positions its maker chose — a few hundred thousand — and a gene is a stretch of thousands of positions nobody chose, so this question is not answered here. It is not «no variants in this gene»: nothing looked. What answers it: a sequenced genome (a VCF), from which every question in this list is answered.",
     "genome_status.reader": "Reader: {reader}",
     "genome_status.not_ready": "**Genome found, but not ready to read:** {reason}",
     "genome_status.no_index": "no .tbi index",
@@ -587,6 +702,8 @@ MESSAGES = {
     "genome_status.unusable_plain": "**A genome file is right there and cannot be read yet:** {path} — it is a plain `.vcf`. The readers seek into the file, so it has to be block-compressed and indexed first. This is one command, not a different file.",
     "genome_status.unusable_gzip_not_bgzip": "**A genome file is right there and cannot be read yet:** {path} — it was compressed with ordinary gzip rather than bgzip. It looks right and `tabix` will refuse it with a message about the format that explains nothing.",
     "genome_status.unusable_fix": "Fix it with: {cmd}",
+    "genome_status.unusable_truncated": "**A genome file is right there and cannot be read yet:** {path} — it ends without the end-of-file block bgzip always writes last, so it was cut short by a copy or a download that did not finish. Nothing is read out of it: every position past the cut would have answered «reference». Get a complete copy and compare the sizes.",
+    "genome_status.unusable_pass_failed": "**A genome file is right there and could not be read to the end:** {path} — the pass over it stopped part-way, most often on a damaged block. Nothing is read out of it, because a position past the failure would answer «reference».",
     "genome_status.build_index": "Build the index: tabix -p vcf <file>",
     "genome_status.no_vcf": "**The full VCF is not connected** — the genome side answers "
                             "«the database is not connected».",
@@ -751,6 +868,7 @@ MESSAGES = {
     "assistant.ctx.meds_h": "\n## Prescriptions\n",
     "assistant.ctx.no_meds": "— there are no prescriptions in the profile\n",
     "assistant.ctx.med_since": "since {date}",
+    "assistant.ctx.med_status": "[not current: {status}]",
     "assistant.ctx.ref_range": " (normal {low}–{high})",
     "assistant.ctx.ref_max": " (normal <{high})",
     "assistant.ctx.ref_min": " (normal >{low})",
@@ -1529,18 +1647,23 @@ will go through them later.
     "genome.coordinate_only": "The coordinate was found, but the full genome database is not "
                               "connected yet (genome/*.vcf.gz + .tbi are needed).",
     "genome.need_rsid_or_gene": "an rsid or a gene is required",
-    "genome.clinvar_not_run": "Your VCF has not been annotated against ClinVar yet. The "
-                              "annotation is part of preparing the genome — "
-                              "`scholion doc preparing-the-genome`.",
+    "genome.clinvar_not_run": "Your VCF has not been annotated against ClinVar yet. This "
+                              "wide screen reads the whole file against the whole of ClinVar, "
+                              "and that pass needs bcftools and htslib installed — "
+                              "`scholion tools` says whether they are, and "
+                              "`scholion doc preparing-the-genome` has the step. The narrower "
+                              "screen for findings worth acting on needs none of them: "
+                              "`scholion acmg-scan` runs the 84 ACMG genes here.",
     "genome.conflict": "The laboratory report and your own reads disagree here: the report says "
                        "{reported}, the reads say {called}. Shown above is what the reads say — "
                        "they carry a depth and can be re-examined, and the report was made from "
                        "them. A disagreement of this kind is worth taking to whoever issued the "
                        "report.",
     "genome.confirmed_by_report": "Your own reads and a laboratory report agree at this position.",
-    "genome.acmg_not_run": "Your VCF has not been checked against the ACMG SF list yet. The "
-                           "scan is part of preparing the genome — "
-                           "`scholion doc preparing-the-genome`.",
+    "genome.acmg_not_run": "Your VCF has not been checked against the ACMG SF list yet. "
+                           "`scholion acmg-scan` runs that check here: it needs the published "
+                           "ClinVar file for your build and nothing else — no bcftools, no "
+                           "index — and the command prints the one download when it is missing.",
     "genome.apoe_ambiguous": "Both SNPs are heterozygous, and that genotype is {a} or {b} depending on which allele sits on which chromosome — a fact this file does not carry. {a} is far more common in every studied population, which is a reason to say which is likely, not a reason to print it as the answer. Phasing, or a parent's genotype, settles it.",
     "genome.apoe_unexpected": "rs429358 {a} with rs7412 {b} is not a combination the epsilon haplotypes produce — check the calls before reading anything into them",
     "genome.indels_not_left_aligned": "⚠ Insertions and deletions in this list were matched WITHOUT left-alignment: the annotation ran with no reference FASTA, so an indel spelled differently from ClinVar's copy was not found rather than found and dismissed. Substitutions are unaffected. Set SCHOLION_REFERENCE_FASTA and re-run `annotate_clinvar.sh` to close this.",
@@ -2162,6 +2285,11 @@ will go through them later.
     "web.meds.dose_placeholder": "20 mg",
     "web.meds.comment": "Note",
     "web.meds.comment_placeholder": "indication/comment",
+    "web.meds.status": "Status",
+    "web.meds.status_active": "active",
+    "web.meds.status_paused": "paused",
+    "web.meds.status_stopped": "stopped",
+    "web.meds.not_current": "not current: {status}",
     "web.meds.add": "Add",
     "web.meds.remove": "remove",
     "web.meds.empty": "Nothing here yet.",
@@ -2328,7 +2456,10 @@ will go through them later.
     "web.genome.loci": "loci:",
     "web.genome.genotype": "genotype",
     "web.genome.coverage": "coverage {value}",
-    "web.genome.assumed_ref": "reference (not a variant site)",
+    # Not «reference»: there is no row at this position, and a file of variants
+    # cannot tell a reference base from a base nobody read. The CLI renders this
+    # state as a refusal; the card has one line and says the same thing in it.
+    "web.genome.assumed_ref": "no row at this position — reference or not read",
 
     # ── web: polygenic scores ────────────────────────────────────────────
     "web.prs.not_ready": "The polygenic scores have not been computed yet.",
@@ -2624,9 +2755,12 @@ will go through them later.
     # Appended at the end deliberately: another branch is editing the middle of
     # this file, and a block on its own tail stays a separable change.
     "tools.title": "**External tools**",
-    "tools.intro": "The analysis runs on the standard library. Preparing genome data does not: "
-                   "reading a VCF, indexing it and measuring coverage are done by separate "
-                   "programs. Below is what is here and what is not.",
+    "tools.intro": "The analysis runs on the standard library, and so does reading a variant "
+                   "file: with no index it is read once from beginning to end, which answers the "
+                   "locus catalogue, the pharmacogenetics on it and `scholion acmg-scan`. "
+                   "Separate programs are for the rest — seeking inside a file, building a "
+                   "genome from reads, measuring coverage, annotating against the whole of "
+                   "ClinVar. Below is what is here and what is not; each set says what it buys.",
     "tools.manager_found": "package manager: {name}",
     "tools.no_manager": "No supported package manager found. This command drives Homebrew "
                         "(brew.sh) and conda/mamba, because both install into your own home "
@@ -2701,6 +2835,10 @@ will go through them later.
     "genome.refused_head.unreachable": 'the source could not be reached.',
     "genome.no_call_in_vcf": 'the caller reached this position and could not decide: the genotype field is `./.`. That is a no-call — not the reference, and not a variant.',
     "genome.malformed_genotype": 'the genotype field reads «{value}», which is not a genotype this reader understands. Nothing is assumed from it.',
+    'genome.refused_head.other_variant_at_position': 'a different variant stands on this coordinate, and the row is not about this locus.',
+    'genome.other_variant_at_position': "the file has a row at this position, and it is about another variant: this locus is written {expected}, the file carries {found}. A genotype read out of that row would belong to somebody else's variant under this locus's name, so nothing is read. What closes it: a call set normalised the same way, or the row for this locus itself.",
+    'genome.refused_head.reference_mismatch': 'the reference base at this coordinate is not the one this locus is written with.',
+    'genome.reference_mismatch': "this locus is written with the reference base {expected}; the row found at its coordinate carries {found}. That is a property of the file, not of the person — another build, or another normalisation — and a genotype read across it would be a guess. Nothing is read. What closes it: a file whose build is declared, or the same variants normalised to the catalogue's reference.",
     "genome.not_in_this_callset": 'this file is a call set split by variant type, and a variant of this kind is not in it. An absent row here does not mean the reference: it means the file was never able to carry the answer.',
     "genome.imputed_call": 'this genotype is IMPUTED — inferred from a reference panel, not observed in your sample. The file marks it so in its FILTER column.',
     "genome.filtered_call": 'the caller flagged this row: FILTER={value}. It passed no quality gate, and is shown rather than hidden.',
@@ -2710,6 +2848,10 @@ will go through them later.
     "genome_status.array_connected": '**A genotyping array is connected** — {vendor}, {markers} positions.',
     "genome_status.array_ceiling": 'It is not a genome: a chip carries a probe for chosen positions and reads nothing between them, so a locus with no probe was never interrogated rather than found to be reference.',
     "genome_status.callset_whole_genome": 'Breadth: {per_mb} observed variants per megabase in three intergenic windows — consistent with whole-genome sequencing.',
+    'genome_status.callset_exome': 'Breadth: {per_mb} observed variants per megabase in three intergenic windows and {coding_per_mb} per megabase in three gene-dense ones — the shape of an EXOME. The coding part of the genome was sequenced; the rest of it was not read at all, and an absent row outside a gene is not evidence of the reference.',
+    'limits.scope.input_exome': 'Input: an exome — the coding part of the genome, sequenced; everything between genes unread. Known pathogenic variants in coding sequence are answerable here. What is not: deep intronic and regulatory variants, copy-number and structural changes, and any question that needs genome-wide data. Which genes were actually covered is a property of the assay, not of this file — the manifest is what closes it.',
+    'narrow.path_closed_exome': "This path is closed for an exome. A polygenic score's weights and its reference distribution are built on genome-wide data; summed over the coding two per cent of the genome the result is not a low percentile, it is a number with no distribution behind it. What closes it: a whole-genome call set.",
+    'narrow.exome_boundary': "Read from an exome: the coding sequence was looked at, the rest of the genome was not. A silence here is about coding variants only — deep intronic and regulatory changes, and copy-number or structural variants, are outside what this file can carry. Which genes the assay actually covered is not measured here; the assay's manifest is what would establish it.",
     "genome_status.callset_panel": 'Breadth: {per_mb} observed variants per megabase — far below whole-genome sequencing. This is a genotyping panel distributed as a VCF, and questions that need genome-wide data are not answered from it.',
     "genome_status.callset_sparse": 'Breadth: {per_mb} observed variants per megabase — a screen, not a genome. Most of the genome carries no row here, and an absent row is not evidence of the reference.',
     "genome_status.callset_imputed_panel": '{share} % of the rows in this file are IMPUTED — inferred from a reference panel rather than observed. Only {per_mb} observed variants per megabase remain. Imputation is a model, and a model is not a measurement.',

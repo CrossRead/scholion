@@ -195,6 +195,15 @@ class TestTheWritesReallyWrite(_Live):
         names = [m["name"] for m in self.json_of("/api/medications")["medications"]]
         self.assertNotIn("aspirin-test", names)
 
+    def test_a_prescription_status_reaches_the_file_and_the_listing(self):
+        """The door accepted `{name, dose, note}` and dropped everything else,
+        so the page had no way to say a drug was stopped."""
+        self.call("/api/medications", {"name": "stopped-test", "dose": "1", "status": "stopped"})
+        meds = {m["name"]: m for m in self.json_of("/api/medications")["medications"]}
+        self.assertEqual("stopped", meds["stopped-test"]["status"])
+        self.assertFalse(meds["stopped-test"]["current"])
+        self.call("/api/medications/remove", {"name": "stopped-test"})
+
     def test_a_metric_point_reaches_the_file(self):
         self.call("/api/metrics", {"metric": "weight", "date": "2026-06-01", "value": 77.0})
         series = self.profile_json("metrics.json")["metrics"]["weight"]["series"]

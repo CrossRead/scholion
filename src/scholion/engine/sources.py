@@ -13,6 +13,61 @@ from .. import core
 from ..i18n import t as _t
 
 
+#: A build older than this is worth checking for a newer one. Not a
+#: correctness threshold — releases here have come days apart — only the
+#: point past which silence stops being informative.
+AGEING_AFTER_DAYS = 21
+
+
+def build_freshness() -> Dict[str, Any]:
+    """How old this build is — asked of the build, not of a server.
+
+    The product already says when a reference database went stale and said
+    nothing at all about ITSELF. A physician ran a version one release behind for
+    four days, and the release she was missing fixed the very thing she spent
+    most of her session on; nothing anywhere told her. The same defect this
+    project keeps finding inside itself, pointed outwards: a stale thing that
+    does not announce that it is stale.
+
+    The first attempt asked PyPI, and the privacy guard refused it — correctly.
+    A product whose whole claim is that the profile never leaves the disk should
+    not acquire a fifth outbound host to deliver a convenience, and «this machine
+    asked about scholion» is a fingerprint of a machine running scholion. The
+    build's own release date answers the useful half of the question without
+    anybody being contacted: it cannot say WHAT is new, and it can say that
+    something probably is.
+
+    `days` is the whole content; the threshold only chooses a word for it.
+    """
+    from datetime import date
+    import re as _re
+    import scholion
+    out: Dict[str, Any] = {"installed": getattr(scholion, "__version__", ""),
+                           "released": None, "days": None, "status": "unknown"}
+    try:
+        from .. import docs as _docs
+        p = _docs.path_of("changelog")
+        text = p.read_text(encoding="utf-8") if p else ""
+        m = _re.search(r"^##\s*v(\S+)\s+—\s*(\d{2})\.(\d{2})\.(\d{4})\s*$",
+                       text, _re.M)
+        if not m:
+            # `unknown` with no reason is what a build with no journal says;
+            # a journal whose heading drifted from `## vX — DD.MM.YYYY` says
+            # the same word, and the drift is then found by nobody.
+            out["reason"] = "no_dated_heading" if text else "no_changelog"
+            return out
+        out["released"] = f"{m.group(4)}-{m.group(3)}-{m.group(2)}"
+        d = date(int(m.group(4)), int(m.group(3)), int(m.group(2)))
+        out["days"] = (date.today() - d).days
+    except Exception as exc:                                         # noqa: BLE001
+        out["reason"] = type(exc).__name__
+        return out
+    if out["days"] is None:
+        return out
+    out["status"] = "ageing" if out["days"] >= AGEING_AFTER_DAYS else "fresh"
+    return out
+
+
 def provenance() -> Dict[str, Any]:
     """Origin and freshness of the data by domain — for the "source/updated" marks on the tabs.
 

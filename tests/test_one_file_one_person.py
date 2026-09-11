@@ -35,7 +35,7 @@ import zlib
 from pathlib import Path
 
 import support  # noqa: F401
-from scholion import format as fmt, genome
+from scholion import format as fmt, genome, linear
 
 
 def bgzf(data: bytes) -> bytes:
@@ -49,7 +49,12 @@ def bgzf(data: bytes) -> bytes:
     body = comp.compress(data) + comp.flush()
     extra = b"BC" + struct.pack("<H", 2) + struct.pack("<H", len(body) + 25)
     head = b"\x1f\x8b\x08\x04" + b"\0" * 6 + struct.pack("<H", len(extra)) + extra
-    return head + body + struct.pack("<II", zlib.crc32(data) & 0xFFFFFFFF, len(data))
+    # …closed by the empty EOF block htslib writes last. Without it the file is,
+    # by htslib's own definition, truncated — and since 12.09.2026 the reader of
+    # last resort refuses a truncated file by name rather than reading it up to
+    # the cut (task 155, R1). These tests are about the index, not the ending.
+    return (head + body + struct.pack("<II", zlib.crc32(data) & 0xFFFFFFFF, len(data))
+            + linear.BGZF_EOF)
 
 
 _ROW = "19\t44908684\trs429358\tT\tC\t50\tPASS\t.\tGT\t{gts}\n"
@@ -315,20 +320,31 @@ class TestAReaderThatIsInstalledIsNotAReaderThatCanRead(_Folder):
     The reader was chosen by what is INSTALLED. pysam is installed nearly
     everywhere, so a file with no index at all, or with a truncated one, reported
     «Genome connected» and then printed `genotype **?** ()` — a genotype-shaped
-    hole. Every reader here seeks by position, so every reader needs an index.
+    hole. Every SEEKING reader needs an index, and asking for one is not a
+    preference of a backend.
+
+    What changed on 09.09.2026, after a file with no index was handed to the
+    package from outside: a missing index no longer ends the layer, because there
+    is now a reader that does not seek. It reads the file once from beginning to
+    end. So the property under test here is not «unready» any more — it never was
+    the point. The point is that NOTHING IS INVENTED from an unreadable index:
+    either the file is actually read, or the answer says it was not.
     """
 
-    def test_no_index_is_not_a_connected_genome(self):
+    def test_no_index_means_the_file_is_read_rather_than_seeked(self):
         p = self.write("genome.vcf.gz")
         Path(str(p) + ".tbi").unlink()
         av = genome.available()
-        self.assertFalse(av["ready"])
-        self.assertIsNone(av["engine"])
+        self.assertEqual(av["engine"], "linear")
+        self.assertTrue(av["ready"], "a readable VCF is not «no genome» for want of a sidecar")
 
     def test_a_truncated_index_is_not_an_index(self):
+        """The index is still refused — what follows it is a pass over the file,
+        not an empty query answered as «reference»."""
         p = self.write("genome.vcf.gz")
         Path(str(p) + ".tbi").write_bytes(b"")
-        self.assertFalse(genome.available()["ready"])
+        self.assertFalse(genome._index_usable(p))
+        self.assertEqual(genome.available()["engine"], "linear")
 
     def test_a_csi_index_counts_where_a_reader_can_use_it(self):
         """`.csi` is what tabix writes for long contigs and what some providers
@@ -341,8 +357,15 @@ class TestAReaderThatIsInstalledIsNotAReaderThatCanRead(_Folder):
                          "tabix reader — and claiming otherwise made every locus «reference»")
 
     def test_an_empty_answer_is_never_printed_as_a_genotype(self):
-        p = self.write("genome.vcf.gz")
-        Path(str(p) + ".tbi").unlink()
+        """A file nothing can read at all — no index, and not a VCF underneath.
+
+        The original shape of this test used a file with no index, which since
+        09.09.2026 is read rather than refused. The defect it guards is unchanged
+        and is reproduced here with a file that genuinely cannot be read: an
+        empty answer must not arrive wearing the word «genotype».
+        """
+        p = self.dir / "genome.vcf.gz"
+        p.write_bytes(gzip.compress(b"not a vcf at all\n"))
         out = fmt.genome_report(genome.lookup(rsid="rs429358"))
         self.assertNotIn("genotype", out.lower())
         self.assertIn("rs429358", out)

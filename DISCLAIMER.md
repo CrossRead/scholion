@@ -30,6 +30,30 @@ pharmacogenomic recommendation — it reproduces that guidance with its source
 so it can be verified, and it is the reader's and the clinician's decision what
 follows from it.
 
+## Which genetic questions this answers, and which it does not
+
+The boundary is not the seriousness of the disease. It is who made the
+classification.
+
+**Answered: a known variant that somebody has already classified.** ClinVar
+pathogenic and likely-pathogenic entries, the 84 genes of the ACMG
+secondary-findings list — 28 of which are hereditary-cancer genes — and CPIC
+star alleles for pharmacogenetics. A finding here is reported with its source and
+remains a reason to seek confirmation in a clinical laboratory, never a diagnosis.
+
+**Answered as a position, not as a verdict: the polygenic layer.** A score places
+a person in a distribution built on a reference population. It is not a syndrome
+and does not answer a question about one; a polygenic score for a cancer and a
+hereditary cancer syndrome are different objects, and this software does not
+offer one as an answer about the other.
+
+**Not answered: a variant nobody has classified, in an undiagnosed patient.**
+This build does not classify a novel variant under ACMG/AMP, does not perform
+trio analysis, does not detect copy-number or structural variants, and does not
+prioritise candidates by phenotype terms. A diagnostic search for the cause of an
+undiagnosed condition is outside it, and the honest output in that situation is a
+refusal that names what would be required — which is what the software produces.
+
 ## Limitations you must assume are present
 
 - **A negative result is only as good as the coverage behind it.** A gene read

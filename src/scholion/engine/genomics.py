@@ -16,8 +16,252 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     """Lookup of any locus in the personal full VCF (through the coordinate reference)."""
     from .. import genome
     r = genome.lookup(rsid=rsid, gene=gene)
+    # Asked about a gene, answer with the frame as well as the loci: the
+    # catalogue is one shelf of four, and «not in the coordinate reference» was
+    # being read as a statement about the genome.
+    # The gene this locus belongs to is known from the answer itself, so a single
+    # position can carry the same qualification a gene query gets from its frame.
+    if r.get("gene"):
+        try:
+            r["coverage"] = gene_coverage(r["gene"])
+        except Exception as exc:                                     # noqa: BLE001
+            # Silence here read as «coverage is fine»: the line is printed only
+            # when the state is worth saying, so a state that never arrived
+            # looked like the quiet one. The failure travels as its own state.
+            r["coverage"] = {"gene": r["gene"], "measured": False,
+                             "state": "unavailable", "reason": type(exc).__name__}
+    if gene and not rsid:
+        try:
+            r["layers"] = gene_layers(gene)
+        except Exception as exc:                                     # noqa: BLE001
+            # A frame that failed to build and vanished is a frame the reader
+            # believes was never needed. Same rule as everywhere else here: the
+            # failure is named, not swallowed.
+            r["layers"] = {"gene": (gene or "").upper(), "status": "unavailable",
+                           "reason": type(exc).__name__}
     r["disclaimer"] = DISCLAIMER()
     return r
+
+
+# ── a gene, asked of every layer that holds anything about one ───────────────
+#
+# The product keeps what it knows about a gene on several shelves, and each is
+# keyed differently: the curated catalogue by rsID, the ClinVar scan by
+# coordinate, the ACMG secondary-findings list by gene symbol. Nothing joined
+# them, so «what does this build hold about ABCB4» had no answer — and the one
+# path a person naturally takes, `genome --gene`, reads the catalogue alone and
+# reports «not in the coordinate reference», which sounds like a statement about
+# the genome and is a statement about one shelf.
+#
+# A clinician asked exactly that, about the bile-acid transporters, and was told
+# there was nothing to say «even in general terms from your genome». There may
+# well have been: the ClinVar table on that machine held 386 findings, and ABCB4
+# and ABCB11 carry real pathogenic variants. Nobody looked, because nothing
+# could.
+
+def _chrom_key(c) -> str:
+    """`chr7`, `7`, `Chr7` → `7`. The scan table and the gene cache do not agree
+    on the spelling, and a join that fails on a prefix returns «nothing found»,
+    which is the worst of the possible wrong answers."""
+    s = str(c or "").strip().lower()
+    return s[3:] if s.startswith("chr") else s
+
+
+def clinvar_for_gene(gene: str, limit: int = 2000) -> Dict[str, Any]:
+    """ClinVar findings that fall inside a gene, matched by COORDINATE.
+
+    The scan table carries no gene column — the symbol is lost at the step that
+    writes it — so the join goes the other way: resolve the gene to a region and
+    ask which findings sit in it. That needs no re-scan of the genome, and it
+    fails honestly: a gene whose coordinates nothing can supply is reported as
+    unresolved, with what would resolve it, rather than as a gene with no
+    findings.
+    """
+    from .. import genes
+    out: Dict[str, Any] = {"gene": (gene or "").upper(), "hits": [], "disclaimer": DISCLAIMER()}
+    rec = genes.resolve(gene) if gene else None
+    if not rec or rec.get("chrom") is None:
+        out["status"] = "gene_unresolved"
+        out["fix"] = _t("clinvar.gene_unresolved", gene=out["gene"])
+        return out
+    out["status"] = "ok"
+    out["region"] = {"chrom": rec.get("chrom"), "start": rec.get("start"),
+                     "end": rec.get("end"), "assembly": rec.get("assembly")}
+    out["resolved_by"] = rec.get("resolved_by") or rec.get("source")
+    all_hits = clinvar_findings(limit=limit)
+    out["scanned"] = all_hits.get("count")
+    # A gene filter over a TRUNCATED read returns «no findings in this gene» when
+    # the finding may simply be past the cut. That is the false negative this
+    # whole layer exists to refuse, and it would be silent. Say it instead.
+    got = len(all_hits.get("hits") or [])
+    if all_hits.get("count") is not None and got < all_hits["count"]:
+        out["truncated"] = {"read": got, "of": all_hits["count"]}
+    if all_hits.get("status") and all_hits["status"] != "ok":
+        out["status"] = all_hits["status"]
+        # The scan's own sentence about why it has nothing. `clinvar_hits`
+        # puts it under `message`, the narrow-input refusals under `reason`
+        # or `note`; reading only the last two lost the commonest one — «the
+        # scan has not been run» — and the renderer, finding no note, fell
+        # back to a phrase about a broken index.
+        out["scan_note"] = (all_hits.get("message") or all_hits.get("reason")
+                            or all_hits.get("note"))
+        return out
+    ck, lo, hi = _chrom_key(rec.get("chrom")), rec.get("start"), rec.get("end")
+    for h in all_hits.get("hits") or []:
+        try:
+            pos = int(h.get("pos"))
+        except (TypeError, ValueError):
+            continue
+        if _chrom_key(h.get("chrom")) == ck and lo is not None and lo <= pos <= hi:
+            out["hits"].append({**h, "gene": out["gene"]})
+    out["count"] = len(out["hits"])
+    return out
+
+
+def gene_layers(gene: str) -> Dict[str, Any]:
+    """Which shelves hold anything about this gene, and what each of them says.
+
+    Printed BEFORE the findings, for the same reason the genome frame is: a
+    reader who is not told which questions were asked cannot tell an answer from
+    a silence. Every layer reports one of three things — what it holds, that it
+    holds nothing, or that it could not be asked and why.
+    """
+    from .. import core
+    g = (gene or "").upper()
+    layers: Dict[str, Any] = {"gene": g}
+
+    # 1. the curated catalogue of loci — keyed by rsID, so «a gene» is its loci
+    book = core.loci().get("loci") or {}
+    rows = book.values() if isinstance(book, dict) else book
+    cat = [x for x in rows if isinstance(x, dict) and (x.get("gene") or "").upper() == g]
+    layers["catalogue"] = {"count": len(cat)}
+
+    # 2. ClinVar — by coordinate
+    cv = clinvar_for_gene(g)
+    # `scan_note` and `truncated` travel with the layer. Without the first, a
+    # scan that was never run printed as «coordinates not obtained» — blaming
+    # the gene lookup for a table nobody had written. Without the second, the
+    # warning that the page was cut short died here, and the frame said «0 in
+    # this gene» over a finding past the cut.
+    layers["clinvar"] = {"status": cv.get("status"), "count": cv.get("count"),
+                         "resolved_by": cv.get("resolved_by"),
+                         "region": cv.get("region"), "fix": cv.get("fix"),
+                         "scan_note": cv.get("scan_note"),
+                         "truncated": cv.get("truncated")}
+
+    # 3. the ACMG secondary-findings panel — by symbol, and it says which of its
+    #    genes were not read, which is a coverage statement nothing else gives
+    try:
+        ac = acmg_findings()
+        # The 84 symbols travel inside the build, so whether a gene is in the
+        # panel is answerable with no network and no annotation file. That is
+        # half of what a reader wants from a gene they have just named.
+        panel = {str(x).upper()
+                 for x in (core._read_knowledge("acmg_sf.json").get("genes") or [])}
+        in_panel = g in panel if panel else None
+        hits = [h for h in (ac.get("hits") or []) if (h.get("gene") or "").upper() == g]
+        unread = {str(x).upper() for x in (ac.get("unread_genes") or [])}
+        layers["acmg"] = {"in_panel": in_panel, "count": len(hits),
+                          "unread": (g in unread) if unread else None,
+                          "status": ac.get("status")}
+    except Exception as exc:                                         # noqa: BLE001
+        layers["acmg"] = {"in_panel": None, "status": "unavailable",
+                          "reason": type(exc).__name__}
+
+    # 4. coverage — the one that qualifies every «nothing found» above.
+    #
+    # Judged against THIS FILE's own middle, never against an absolute bar.
+    #
+    # Measured before it was chosen. On a 30× whole genome the callable fraction
+    # at 20× runs: median 79.8 %, best gene 92 %, and not one of ninety-three
+    # reaching 95 %. Any clinical-looking threshold therefore fires on almost
+    # every gene — which is this project's own rule about a flag that goes off on
+    # everything: it is then measuring a property of the data, not of the objects.
+    # Eighty per cent at 20× is the shape of a 30× depth curve, not a defect of
+    # the gene.
+    #
+    # What does stand out stands out by DISTANCE from that middle: GLA at 8 %,
+    # PMS2 at 42 %, and both for reasons that are real — X-linked, and pseudogene
+    # homology. So the ruler is the file's own median, and it travels with the
+    # sequencing depth: the same code says something useful at 30× and at 100×.
+    #
+    # The number is printed whenever anything is said at all. A verdict without
+    # the measurement behind it is the thing this whole layer exists to refuse.
+    #
+    # The first version of this line asked `core.callability()` behind a
+    # `hasattr` guard. There is no such name on `core` — it lives on `limits` —
+    # so the guard was false on every machine and the line said «not measured»
+    # on a profile carrying ninety-three measured genes. A check that cannot
+    # succeed, defaulting to a sentence that sounds cautious and is wrong.
+    #
+    # The table is read inside `gene_coverage`, which is where a read that
+    # fails becomes its own state. Reading it here and handing over `{}` on
+    # failure made an unreadable table print as «not measured» — the same
+    # cautious-sounding wrong sentence, one branch over.
+    layers["coverage"] = gene_coverage(g)
+    return layers
+
+
+#: How far below its own file's middle a gene has to sit before the answer about
+#: it is qualified. Points of the callable fraction, not a clinical bar — see the
+#: measurement in `gene_layers`. Twenty points puts the five genes that stand out
+#: on the owner's file inside it and leaves the other eighty-eight alone.
+BELOW_MEDIAN_POINTS = 20.0
+
+#: And a floor, for the case the relative rule cannot catch: a file poorly read
+#: THROUGHOUT has a low median, so every gene sits near it and nothing is ever
+#: «far below». Half the gene unread is worth saying whatever the neighbours do.
+POORLY_READ_BELOW = 50.0
+
+
+def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
+    """How well this one gene was read — four states, and only one is silent.
+
+    `fine` is the only state that may be left unsaid, and it means «not unusual
+    for this file», never «adequate»: that judgement belongs to whoever knows
+    what the question needs. The other three have to speak, and the reason is the
+    same one that made a missing VCF row print as «reference»: silence is read as
+    reassurance, so a silence that means «nobody measured» is a false one.
+    """
+    from .. import limits as _limits
+    g = (gene or "").upper()
+    if rows is None:
+        try:
+            rows = _limits.callability()
+        except Exception as exc:                                     # noqa: BLE001
+            # A table that exists and cannot be read is not a table nobody
+            # made. `not_measured` sends the reader to run the measurement;
+            # this sends them to the file.
+            return {"gene": g, "measured": False, "state": "unavailable",
+                    "reason": type(exc).__name__}
+    out: Dict[str, Any] = {"gene": g, "measured": bool(rows)}
+    if not rows:
+        out["state"] = "not_measured"
+        return out
+    row = rows.get(g)
+    if not row:
+        # The table is a PANEL, not a genome: most genes are outside it, and for
+        # them «this file measured coverage» is true and says nothing about this
+        # gene.
+        out["state"] = "gene_not_in_table"
+        out["table_size"] = len(rows)
+        return out
+    try:
+        pct = float(row.get("pct_20x"))
+    except (TypeError, ValueError):
+        out["state"] = "not_measured"
+        return out
+    vals = sorted(float(r["pct_20x"]) for r in rows.values()
+                  if str(r.get("pct_20x") or "").replace(".", "", 1).isdigit())
+    median = vals[len(vals) // 2] if vals else None
+    out.update({"pct_20x": pct, "median_pct_20x": median,
+                "mean_depth": row.get("mean_depth")})
+    if pct < POORLY_READ_BELOW or (median is not None
+                                   and median - pct >= BELOW_MEDIAN_POINTS):
+        out["state"] = "low"
+    else:
+        out["state"] = "fine"
+    return out
 
 
 def genome_status() -> Dict[str, Any]:
@@ -39,8 +283,21 @@ NARROW_INPUTS = frozenset({
     "unmeasured",                # breadth not established — see the docstring
 })
 
+#: An exome is NOT in the set above, and that is the whole of a change made after
+#: an outside reviewer ran the package over three clinical files. An exome landed
+#: in `sparse` — its gene-poor windows are empty by construction — and `sparse`
+#: closed ClinVar and the ACMG list. So on the one input where a screen for known
+#: pathogenic variants is most obviously worth running, the screen never ran, and
+#: the output said «input too narrow» about a file covering twenty thousand genes.
+#:
+#: Polygenic scores are a different question and stay shut. A score's weights and
+#: its reference distribution are built on genome-wide data; run over the coding
+#: two per cent, the sum is not a low percentile, it is a number with no
+#: distribution behind it.
+NARROW_FOR_SCORES = frozenset({"exome"})
 
-def _array_only_input() -> Optional[Dict[str, Any]]:
+
+def _array_only_input(also_narrow: frozenset = frozenset()) -> Optional[Dict[str, Any]]:
     """A refusal when the input is a genotyping array, for the three paths that
     must not run on one.
 
@@ -82,7 +339,7 @@ def _array_only_input() -> Optional[Dict[str, Any]]:
         # with no genome that their genome is too narrow.
         return None
     profile = st.get("input_profile")
-    if profile not in NARROW_INPUTS:
+    if profile not in (NARROW_INPUTS | also_narrow):
         return None
     if profile == "array":
         arr = st.get("array") or {}
@@ -103,6 +360,24 @@ def _array_only_input() -> Optional[Dict[str, Any]]:
             "open_instead": _t("array.open_instead")}
 
 
+def _input_boundary() -> Optional[Dict[str, Any]]:
+    """What this input leaves unanswered while the path is OPEN.
+
+    A refusal names its own boundary; an answer used to name none, and the two
+    together taught the reader that an answer means «everything was looked at».
+    On an exome it does not: the coding part was looked at, and a reader who is
+    not told that will read a silence about an intron as an absence.
+    """
+    from .. import genome
+    st = genome.available()
+    if st.get("input_profile") != "exome":
+        return None
+    cs = st.get("callset") or {}
+    return {"input_profile": "exome",
+            "coding_per_mb": cs.get("coding_per_mb"),
+            "note": _t("narrow.exome_boundary")}
+
+
 def clinvar_findings(limit: int = 200) -> Dict[str, Any]:
     """The patient's clinically significant findings (ClinVar × the personal VCF)."""
     closed = _array_only_input()
@@ -111,6 +386,9 @@ def clinvar_findings(limit: int = 200) -> Dict[str, Any]:
     from .. import genome
     r = genome.clinvar_hits(limit=limit)
     r["disclaimer"] = DISCLAIMER()
+    bound = _input_boundary()
+    if bound:
+        r["input_boundary"] = bound
     r["penetrance"] = _penetrance_block()
     # Whether an indel in this list could have been matched at all. Attached
     # always, because it qualifies the SILENCE as much as the hits: without
@@ -169,6 +447,9 @@ def acmg_findings() -> Dict[str, Any]:
     from .. import genome
     r = genome.acmg_sf_findings()
     r["disclaimer"] = DISCLAIMER()
+    bound = _input_boundary()
+    if bound:
+        r["input_boundary"] = bound
     r["penetrance"] = _penetrance_block()
     # An empty result is a claim about the panel, so it has to carry what of the
     # panel was actually readable. Attached whether or not anything was found:
@@ -397,7 +678,7 @@ def prs_findings() -> Dict[str, Any]:
     Returns {categories:[{category, traits:[...]}], high[], stats, disclaimer}.
     high — the reliable traits with a percentile ≥80 (what to look at when screening).
     """
-    closed = _array_only_input()
+    closed = _array_only_input(NARROW_FOR_SCORES)
     if closed:
         return closed
     data = core.prs_results()

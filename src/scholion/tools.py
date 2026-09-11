@@ -1,7 +1,11 @@
 """External command-line tools: what is missing, why it matters, and how to get it.
 
-The analysis runs on the standard library. The data preparation does not: reading
-a VCF needs bcftools, indexing it needs htslib, measuring coverage needs mosdepth.
+The analysis runs on the standard library, and since 10.09.2026 so does reading a
+variant file: with no index it is read once end to end, which answers the locus
+catalogue, the pharmacogenetics on it and the ACMG screen. What still needs an
+external program is everything else — seeking inside a file needs htslib,
+building a genome from reads needs bwa and samtools, measuring coverage needs
+mosdepth, annotating against the whole of ClinVar needs bcftools.
 Each script already checks its own tools and stops with a hint — correct
 behaviour, at the worst possible moment. On the genome path that moment arrives an
 hour into an alignment, and the hint names one binary out of the eleven the job
@@ -442,10 +446,13 @@ def offer_after_init(*, assume_yes: bool = False, skip: bool = False,
     """The first-run question: name what is missing, then ask before touching anything.
 
     Deliberately narrow. Only the sets marked `offer_at_init` are involved — the
-    ones without which the genome layer does not work at all. Everything else is
-    offered by the step that needs it, when it needs it: a first run that opens
-    with eleven installations reads as a demand, and the honest answer to "do you
-    need a container runtime" is "not until you ask for WGS calling".
+    ones that open questions the genome layer cannot otherwise answer (a region,
+    a whole gene). Everything else is offered by the step that needs it, when it
+    needs it: a first run that opens with eleven installations reads as a demand,
+    and the honest answer to "do you need a container runtime" is "not until you
+    ask for WGS calling". Since 12.09.2026 that includes bcftools and samtools:
+    a variant file is read without them, and the scripts that build or annotate
+    one check for them themselves.
     """
     stream = stream or sys.stdout
     if skip:

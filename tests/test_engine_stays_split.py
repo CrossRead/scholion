@@ -129,9 +129,51 @@ LINE_BUDGETS = {
     # from a file written months ago. It belongs beside the two readers it
     # serves: a shared helper one module away would be a third place to ask
     # «whose string is this», which is the question that produced the defect.
-    "genomics": 720,
-    "sources": 180,
-    "pgx": 900,
+    # 720 → 780 on 09.09.2026. An exome stopped being refused as «too narrow»:
+    # the class it now gets opens ClinVar and the ACMG list and keeps polygenic
+    # scores shut, and an answer given on it carries the boundary of the input it
+    # was read from. That is a second gate beside the first and the sentence that
+    # travels with an OPEN path — both belong where the paths are, because the
+    # rule they encode is «which question may this file answer», which is the
+    # only subject this module has.
+    # 780 → 900 on 11.09.2026. A gene is now asked of every shelf that holds
+    # anything about one — the curated catalogue, the ClinVar scan matched by
+    # coordinate, the shipped ACMG panel, coverage — and each reports what it
+    # holds, that it holds nothing, or that it could not be asked and why. The
+    # room went to `clinvar_for_gene` and `gene_layers`. Before them the only
+    # path a person takes for a gene read one shelf and answered «not in the
+    # coordinate reference», which is a statement about that shelf and reads as
+    # a statement about the genome; a clinician was told there was nothing to
+    # say about the bile-acid transporters while the ClinVar table held 386
+    # findings.
+    # 900 → 990 on 11.09.2026. How well THIS gene was read now travels with the
+    # answer about it, judged against the file's own middle rather than a
+    # clinical bar — measured first: at 20× on a 30× genome the median callable
+    # fraction is 79.8 % and no gene of ninety-three reaches 95 %, so an absolute
+    # threshold fires on 89 of them and measures the depth curve instead of the
+    # gene. Against the median, eight fire, and they are the ones hard to
+    # sequence for known reasons.
+    # 990 → 1020 on 12.09.2026. The gene frame stops swallowing: a scan that
+    # was not run carries the scan's own sentence instead of a phrase about
+    # coordinates, the truncation warning travels into the frame, and each
+    # `except` that used to collapse into «not measured» or `pass` names its
+    # failure as a state of its own. Reporting costs lines; silence cost a
+    # false «clean» on a hereditary-cancer gene.
+    "genomics": 1020,
+    # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
+    # journal, a heading that drifted, or a read that raised — instead of
+    # one word for all three.
+    "sources": 200,
+    # 900 → 940 on 10.09.2026. «Which prescriptions is this compared against» is
+    # now asked rather than assumed: a stopped or paused entry takes no part, and
+    # what was left out travels with the answer instead of vanishing from it. Both
+    # halves belong here — the check and the statement of its own baseline are one
+    # capability, and separating them is how a comparison came to be silent about
+    # what it did not include.
+    # 940 → 960 on 12.09.2026: the snapshot date of the guideline copy says
+    # «unreadable (…)» when the provenance could not be read, instead of the
+    # empty string that a provenance WITHOUT a date also returns.
+    "pgx": 960,
     # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a
     # mark on the figure is about, and the score of the markers made in that
     # one place. It belongs beside `health_radar` because the domain's own
@@ -139,7 +181,9 @@ LINE_BUDGETS = {
     # would put a panel in one file and that panel's places in another, and
     # the two would drift the way every pair of copies in this project has.
     "lifestyle": 1010,
-    "profile_view": 220,
+    # 220 → 240 on 12.09.2026: the overview's age line names why it could not
+    # be computed rather than answering «unknown» with nothing beside it.
+    "profile_view": 240,
 }
 
 

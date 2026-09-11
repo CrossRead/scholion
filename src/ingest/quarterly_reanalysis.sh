@@ -89,13 +89,29 @@ if clinvar_ok and wn.exists():
 else:
     entry["steps"]["clinvar"] = {"ok": False}
 
-# ACMG
-ah = proj / "genome" / "acmg_sf_hits.tsv"
+# ACMG. The table lives where the screen reads it — the first genome base the
+# profile declares — not under a path guessed here: since 12.09.2026 the scan
+# writes there, and a reader with its own idea of the path would report «not
+# run» over a table that was written an hour ago (the class of task 155, A6).
+sys.path.insert(0, str(proj / "src"))
+try:
+    from scholion import core as _core, acmg_scan as _acmg
+    ah = _core.genome_bases()[0] / "acmg_sf_hits.tsv"
+    meta = _acmg.read_meta(ah) or {}
+except Exception as e:                       # the product itself unreadable — say so
+    ah, meta = proj / "genome" / "acmg_sf_hits.tsv", {}
+    print(f"  ⚠ the table location could not be asked of the product ({type(e).__name__}); looked under genome/")
 if acmg_ok and ah.exists():
-    rows = [l for l in ah.read_text().splitlines()[1:] if l.strip()]
-    actionable = [l for l in rows if "actionable" in l.lower() or "\tyes" in l.lower()]
-    entry["steps"]["acmg"] = {"rows": len(rows)}
-    print(f"  ACMG SF: rows in the report {len(rows)} (see the scan output above — the gating is there)")
+    rows = [l for l in ah.read_text(encoding="utf-8").splitlines()[1:] if l.strip()]
+    reportable = [l for l in rows if "\tyes" in l.lower()]
+    filtered = [l for l in rows if "\tfiltered" in l.lower()]
+    entry["steps"]["acmg"] = {"rows": len(rows), "reportable": len(reportable), "filtered": len(filtered),
+                              "assembly": meta.get("assembly"), "clinvar_assembly": meta.get("clinvar_assembly"),
+                              "clinvar_file_date": meta.get("clinvar_file_date"), "no_calls": meta.get("no_calls")}
+    print(f"  ACMG SF: rows in the report {len(rows)}, reportable {len(reportable)}, filtered {len(filtered)}"
+          f" — matched {meta.get('assembly','?')} against ClinVar {meta.get('clinvar_assembly','?')}"
+          f" of {meta.get('clinvar_file_date','?')}; positions unread {meta.get('no_calls','?')}"
+          " (see the scan output above — the gating is there)")
 else:
     entry["steps"]["acmg"] = {"ok": False}
 

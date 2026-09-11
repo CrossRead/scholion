@@ -432,7 +432,7 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == "/api/medications":
                 return self._json(store.add_medication(
                     body.get("name", ""), body.get("dose", ""), body.get("note", ""),
-                    subject="owner"))
+                    status=body.get("status"), subject="owner"))
             if u.path == "/api/medications/remove":
                 return self._json(store.remove_medication(body.get("name", "")))
             if u.path == "/api/metrics":

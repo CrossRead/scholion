@@ -1519,7 +1519,11 @@ async function viewSecond(root){
 
 // ---------------- Prescriptions ----------------
 function medItem(m){
-  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''} <button class="ghost" data-rm="${esc(m.name)}" style="margin-left:auto">${esc(t('web.meds.remove'))}</button></div>${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;
+  // `current` is the server's verdict by the one rule in core — the page does not
+  // re-decide which words mean «taking it». A stopped entry drawn like a current
+  // one shows the reader a regimen the checks are not using.
+  const st=m.current===false?` <span class="muted">⏸ ${esc(t('web.meds.not_current',{status:m.status||'—'}))}</span>`:'';
+  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost" data-rm="${esc(m.name)}" style="margin-left:auto">${esc(t('web.meds.remove'))}</button></div>${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;
 }
 async function viewMeds(root){
   const d=await api('/api/medications');
@@ -1532,6 +1536,11 @@ async function viewMeds(root){
       <label>${esc(t('web.meds.drug'))}<input id="m-name" placeholder="${esc(t('web.meds.drug_placeholder'))}"></label>
       <label>${esc(t('web.meds.dose'))}<input id="m-dose" placeholder="${esc(t('web.meds.dose_placeholder'))}" size="10"></label>
       <label>${esc(t('web.meds.comment'))}<input id="m-note" placeholder="${esc(t('web.meds.comment_placeholder'))}" size="18"></label>
+      <label>${esc(t('web.meds.status'))}<select id="m-status">
+        <option value="active">${esc(t('web.meds.status_active'))}</option>
+        <option value="paused">${esc(t('web.meds.status_paused'))}</option>
+        <option value="stopped">${esc(t('web.meds.status_stopped'))}</option>
+      </select></label>
       <button class="act" id="m-add">${esc(t('web.meds.add'))}</button>
     </div></div>
     <div id="m-check" style="margin-top:12px"></div>
@@ -1540,7 +1549,7 @@ async function viewMeds(root){
     const name=$('#m-name',root).value.trim();if(!name){toast(t('web.meds.enter_name'));return;}
     // a second opinion on the new prescription (interactions with the existing ones) — before adding
     const chk=await api('/api/prescription-check?name='+encodeURIComponent(name));
-    const r=await post('/api/medications',{name,dose:$('#m-dose',root).value,note:$('#m-note',root).value});
+    const r=await post('/api/medications',{name,dose:$('#m-dose',root).value,note:$('#m-note',root).value,status:$('#m-status',root).value});
     if(!r.ok){toast(t('web.common.error_prefix')+(r.error||''));return;}
     toast(chk.overall&&chk.overall!=='low'?t('web.meds.added_attention'):t('web.common.added'));
     claimNotice(r);
@@ -1980,7 +1989,7 @@ function genomeCard(r){
   if(r.status==='unknown_rsid') return `<div class="card muted">${esc(r.message)}</div>`;
   if(r.status==='unknown_gene') return `<div class="card muted">${esc(t('web.genome.unknown_gene'))}</div>`;
   if(r.status==='no_genome'){const l=r.locus||{};return `<div class="card"><div class="row">⚪ <b>${esc(r.rsid)}</b> <span class="muted">${esc(l.gene||'')} · ${esc(l.chrom)}:${esc(l.pos)}</span></div><div class="meta">${esc(r.message||'')}</div></div>`;}
-  if(r.gene&&r.loci){return `<div class="card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}<ul class="meta">${r.loci.map(x=>{const g=(x.result||{}).genotype;return `<li><code>${esc(x.rsid)}</code>${x.star?' '+esc(x.star):''} ${x.chrom?esc(x.chrom)+':'+esc(x.pos):''} — ${g?esc(t('web.genome.genotype'))+' <b>'+esc(g)+'</b>':'—'}</li>`;}).join('')}</ul></div>`;}
+  if(r.gene&&r.loci){return `<div class="card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}<ul class="meta">${r.loci.map(x=>{const rs=x.result||{};const g=rs.confidence==='assumed_ref'?null:rs.genotype;return `<li><code>${esc(x.rsid)}</code>${x.star?' '+esc(x.star):''} ${x.chrom?esc(x.chrom)+':'+esc(x.pos):''} — ${g?esc(t('web.genome.genotype'))+' <b>'+esc(g)+'</b>':'—'}</li>`;}).join('')}</ul></div>`;}
   const res=r.result||{};
   // All three confidence levels are named, and the note about THIS read is shown.
   // `res.note` ("depth is low (4 reads) — the call is unreliable") reached no
@@ -1989,9 +1998,15 @@ function genomeCard(r){
   const CONF={called:'genome.called',confirmed_ref:'genome.confirmed_ref_short',assumed_ref:'web.genome.assumed_ref'};
   const conf=CONF[res.confidence]?t(CONF[res.confidence]):'';
   const dp=res.depth!=null?', '+t('web.genome.coverage',{value:res.depth}):'';
+  // The weakest state is not rendered in the shape of the strongest. The engine
+  // hands `assumed_ref` a genotype string — the reference bases, because that is
+  // what «no row» would mean IF the site was read — and the card printed it in the
+  // large answer slot with the caveat in small type beside it. The CLI already
+  // refuses that shape; the page did not. No row, no genotype.
+  const gt=res.confidence==='assumed_ref'?'—':(res.genotype||'?');
   return `<div class="card">
     <div class="row">🧬 <b style="font-size:17px">${esc(r.rsid)}</b>${r.star?' <span class="muted">'+esc(r.star)+'</span>':''} → ${esc(t('web.drug.gene'))} <b>${esc(r.gene)}</b> <span class="muted">${esc(r.chrom)}:${esc(r.pos)}</span></div>
-    <div class="value" style="margin:10px 0">${esc(res.genotype||'?')} <small title="${esc(t('web.guide.term_confidence_body'))}">${esc(conf)}${esc(dp)}</small></div>
+    <div class="value" style="margin:10px 0">${esc(gt)} <small title="${esc(t('web.guide.term_confidence_body'))}">${esc(conf)}${esc(dp)}</small></div>
     ${res.conflict?`<div class="meta" style="color:var(--critical)">⚠️ ${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</div>`:''}
     ${res.confirmed_by==='profile'?`<div class="meta" style="color:var(--good)">${esc(t('genome.confirmed_by_report'))}</div>`:''}
     ${res.note?`<div class="meta">⚠️ ${esc(res.note)}</div>`:''}

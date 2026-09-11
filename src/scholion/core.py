@@ -1617,14 +1617,94 @@ def source_path(domain: str) -> Path:
     return profile_dir() / fname
 
 
+#: A status that means the person is taking it. A WHITE list, and that is the
+#: whole design: a value nobody has taught this code about must not silently mean
+#: «still taking it». `active`, `active_new` and `active_self` are the three the
+#: profile writes today; anything else — `paused`, `not_in_scheme_2026-09-10`,
+#: `historical`, a typo — is not current.
+#:
+#: `course` is current too, and it is here on purpose. A pulse course — an
+#: azole taken one week in four — is a drug the person is on for the whole of
+#: the course, gaps included, and the interaction that made the course worth
+#: watching exists throughout it. The draw checklist has said so since 1.0.0,
+#: with a dictionary of its own; the interaction check said the opposite with
+#: this one. One dictionary now, and the checklist reads it from here.
+ACTIVE_STATUS_PREFIXES = ("active", "course")
+
+#: Statuses that begin like a current one and are not: a course that was put
+#: off has not started. Checked BEFORE the prefix, so that `course_postponed`
+#: does not become current by spelling.
+DEFERRED_STATUSES = frozenset({"course_postponed", "paused", "not_started",
+                               "planned_no_dose"})
+
+
+def is_active_medication(med: Dict[str, Any]) -> bool:
+    """Is this entry a prescription the person is on NOW?
+
+    Until 10.09.2026 nothing asked. `medication_names()` returned every name in
+    the file, and the interaction check compared a new prescription against all of
+    them — so a drug the physician had stopped, one on pause, and one that had
+    simply dropped out of the latest scheme all took part as equals. Found on a
+    real question rather than in a test: a pulse course of an azole was replaced
+    by a single tablet, the statin had left the scheme the same day, and the
+    engine still printed «↑ statin concentration, risk of myopathy» — a warning
+    about a pair that no longer existed, next to a second one about a probiotic
+    paused six weeks earlier.
+
+    ABSENT is not the same as unknown. An entry written before this field existed
+    carries no status at all, and reading that as «stopped» would delete a real
+    prescription from every check at once — silence where a warning belongs, which
+    is the worse of the two mistakes by a distance. So a missing status counts as
+    current, and `medications_without_status()` exists so that it can be said out
+    loud rather than assumed.
+    """
+    if "status" not in med:
+        return True
+    status = str(med.get("status") or "").strip().lower()
+    if not status:
+        return True
+    if status in DEFERRED_STATUSES:
+        return False
+    return status.startswith(ACTIVE_STATUS_PREFIXES)
+
+
+def active_medications() -> List[Dict[str, Any]]:
+    """The entries a comparison may use — named, so every caller uses one rule."""
+    return [m for m in medications_json().get("medications", [])
+            if m.get("name") and is_active_medication(m)]
+
+
+def inactive_medications() -> List[Dict[str, Any]]:
+    """What was left OUT of a comparison, and under which status.
+
+    Returned rather than dropped: an interaction that stops being reported and an
+    interaction nobody computed look identical on the page, and only one of them
+    is good news.
+    """
+    return [m for m in medications_json().get("medications", [])
+            if m.get("name") and not is_active_medication(m)]
+
+
+def medications_without_status() -> List[Dict[str, Any]]:
+    """Entries with no status recorded. Counted as current, and worth saying so.
+
+    Not «entries that predate the field»: an entry added yesterday without
+    `--status` looks exactly the same, and a sentence that dated it would be
+    wrong about it.
+    """
+    return [m for m in medications_json().get("medications", [])
+            if m.get("name") and ("status" not in m or not str(m.get("status") or "").strip())]
+
+
 def medication_names() -> List[str]:
-    """Names of the prescriptions from the STRUCTURED source profile/medications.json (in lower case).
+    """Names of the CURRENT prescriptions from profile/medications.json (lower case).
 
     Only real prescriptions — NOT the prose of medications.md (drug names occur there inside
     explanations, and the patient does not take those). This is a clean personal source of prescriptions.
+    Current: see `is_active_medication` — a stopped or paused entry stays in the
+    file, keeps its history, and takes no part in what the person is compared against.
     """
-    return [m.get("name", "").strip().lower()
-            for m in medications_json().get("medications", []) if m.get("name")]
+    return [m.get("name", "").strip().lower() for m in active_medications()]
 
 
 def active_med_classes() -> List[str]:

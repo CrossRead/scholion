@@ -202,6 +202,10 @@ ARGS_FOR = {
     "ingest-garmin": None,
     "add-lab": None,              # the writing ones are checked separately, on a copy of the profile
     "add-med": None,
+    # A write too, and one that exits 2 when it refuses to write — which on a
+    # fixture with no ClinVar file it always does. The codes and both output
+    # shapes are held by tests/test_a_scan_that_wrote_nothing_does_not_exit_clean.py.
+    "acmg-scan": None,
     "add-metric": None,
     "remove-med": None,
     "focus-log": None,

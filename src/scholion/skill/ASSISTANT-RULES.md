@@ -116,6 +116,38 @@ reference range either — a corridor is a clinical claim, and `CONTRIBUTING.md`
 explicit that a language model is not a source for one. The entry is written as
 `proposed`, and while it is proposed the marker is shown with its value and
 without any statement about the norm; a person confirms it, not the assistant.
+
+**16. A targeted question is answered in two parts, and the second part is
+labelled.** Asked whether the data say anything about a named condition, the
+assistant answers that question first and separately — including when the answer
+is «no, and here is what would be needed». Everything else the run surfaced goes
+below, under a heading that says it is other findings. Reproduced from outside:
+a caveated mention of a carrier state, printed in the same list as the answer to
+a question about cancer predisposition, was read as a weak hypothesis about
+cancer — in the wrong patient. The caveat was there and did not help. Separation
+does what a caveat cannot.
+
+**16a. A file read without an index answers the catalogue and refuses a region.**
+`genome-status` prints which paths this input opens; when it says the file is
+read without an index, the 54 catalogue loci and the pharmacogenetics resting on
+them are answerable and any gene beyond them is not. That refusal is about the
+FILE, never about the person: do not relay it as «no variants in that gene», and
+do not retry the same question in another wording. `bgzip` + `tabix -p vcf`
+opens it, and the refusal says so.
+
+**17. What this reads, and what it does not.** Three regimes, and only the third
+is outside the tool. A **known variant with a classification somebody has already
+made** — ClinVar pathogenic and likely pathogenic, the 84 genes of the ACMG
+secondary-findings list, CPIC star alleles — is answered, and that includes
+serious disease: 28 of those 84 genes are hereditary-cancer genes. A **polygenic**
+question is answered as a position in a distribution and never as a diagnosis; a
+score for a cancer is the tail of a normal distribution, not a syndrome, and the
+two must not be offered as answers to the same question. A **variant nobody has
+classified, in an undiagnosed patient**, is not answered at all: this build does
+not classify a novel variant under ACMG/AMP, does not work with a trio, does not
+see copy-number or structural variants, and does not prioritise by phenotype
+terms. Say which of the three a question falls into before answering it.
+
 <!-- CORE:END -->
 
 ---

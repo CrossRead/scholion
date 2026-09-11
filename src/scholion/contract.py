@@ -111,6 +111,12 @@ CLI_ONLY: Dict[str, str] = {
                 "writes lives on the command line, and this one writes a sentence the person "
                 "composes about their own care. It belongs where the ingest that produced the "
                 "pair already lives.",
+    "acmg-scan": "the pass that produces the table `acmg` reads: it matches the personal "
+                 "variant file against the published ClinVar file and writes a table into the "
+                 "genome folder. It WRITES, and every command that writes lives on the command "
+                 "line; it also takes as long as one pass over two large files, which is not a "
+                 "thing a button should start by accident. The web already shows the result — "
+                 "and, when the table is absent, says which command produces it.",
     "sources": "the register of external reference sources and the import that refreshes "
                "them. A refresh reaches the network and rewrites reference data, so it stays "
                "a typed command rather than a button a click can trigger by accident; the "
@@ -255,6 +261,12 @@ PLUGIN: Dict[str, str] = {
 # a model that cannot see a capability does not know it is missing, and will
 # answer from what it has instead of saying it cannot.
 NO_PLUGIN: Dict[str, str] = {
+    "acmg-scan": "writes the table the ACMG screen reads, out of the person's variant file "
+                 "and a reference file they downloaded. Two reasons it is theirs to start and "
+                 "not a model's: it needs a file fetched onto that machine first, and it runs "
+                 "for as long as a pass over both. The model is not left silent about it — "
+                 "`sch_acmg` answers «this has not been run» and names the command, which is "
+                 "the useful half of what a tool here would have given.",
     "serve": "starts a server; a model has no browser to point at it",
     "init": "creates the profile directory — the person's decision, not a model's",
     "demo": "lays out a fictional profile; a model asking for one is a model about to "

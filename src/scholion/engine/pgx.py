@@ -390,12 +390,40 @@ def _guidance_for(drug: str, gene: str) -> Dict[str, Any]:
     return {}
 
 
+def cpic_snapshot() -> str:
+    """When this build's copy of the pharmacogenetic guidelines was refreshed.
+
+    «No pharmacogenetics for this drug» is a statement about a SNAPSHOT, and
+    without its date the reader cannot tell «the science has nothing» from «we
+    are behind». Both are honest answers; they are not the same answer, and they
+    lead somewhere different.
+    """
+    try:
+        from . import sources as _sources
+        return str((_sources.provenance().get("pgx") or {}).get("updated") or "")
+    except Exception as exc:                                         # noqa: BLE001
+        # An empty string here is what a provenance WITHOUT a date returns,
+        # and the report prints «—» for it. A provenance that could not be
+        # read is a different fact and is printed as one, in the same slot.
+        return _t("pgx.snapshot_unreadable", reason=type(exc).__name__)
+
+
 def _check_drug_online(drug: str) -> Dict[str, Any]:
     """Fallback when the drug is not in the local base: the international RxNorm/RxClass bases are searched."""
     from .. import drugsource
     info = drugsource.resolve_drug(drug)
     if not info:
+        # Two different silences wore one sentence. «We could not look» and «we
+        # looked and there is no such drug» send a reader to different places —
+        # one to their network, the other to the spelling on the box — and the
+        # combined text sent them to neither.
+        from .. import net
+        if net.offline():
+            return {"status": "not_checked", "drug": drug, "disclaimer": DISCLAIMER(),
+                    "reason": "offline",
+                    "message": _t("drug.not_checked_offline", drug=drug)}
         return {"status": "not_found", "drug": drug, "disclaimer": DISCLAIMER(),
+                "reason": "unknown_name",
                 "message": _t("drug.not_found", drug=drug)}
     cls = info.get("internal_class")
     atc_names = ", ".join(a.get("name", "") for a in info.get("atc", []) if a.get("name"))
@@ -429,14 +457,22 @@ def _check_drug_online(drug: str) -> Dict[str, Any]:
                 "markers_found": ph.get("found") or core.markers_for_gene(gene),
                 "resolved_by": "rxnorm", "reference": info.get("url"),
                 "disclaimer": DISCLAIMER()}
-    # found online, but there is no pharmacogene for the class — said honestly + the class for interactions
+    # Found online, and no pharmacogene is known for its class. That is an
+    # answer about OUR SNAPSHOT of the guidelines, and it was delivered as
+    # «discuss it with the doctor» — which leaves the reader unable to tell
+    # whether the literature has nothing or whether we simply have not got to it.
+    # A clinician said so in as many words after asking about ursodiol.
     return {"status": "found_online", "drug": disp,
+            "no_pair_reason": "absent_from_cpic_snapshot",
+            "cpic_snapshot": cpic_snapshot(),
             "drug_class": atc_names or (cls or _t("drug.class_unknown")),
             "internal_class": cls, "reference": info.get("url"), "disclaimer": DISCLAIMER(),
             "message": _t("drug.online_headline", drug=disp,
                           class_note=_t("drug.online_class_note", classes=atc_names) if atc_names else "",
                           tail=_t("drug.online_check_interactions") if cls
-                               else _t("drug.online_ask_doctor"))}
+                               else _t("drug.online_ask_doctor"))
+                       + "\n\n" + _t("drug.no_pair_in_snapshot",
+                                     date=cpic_snapshot() or "—")}
 
 
 def _classes_for(drug: str) -> List[str]:
@@ -495,12 +531,22 @@ def check_interactions(drug: str) -> Dict[str, Any]:
     # sentence "no explicit interactions with the current prescriptions were found" —
     # a negative statement resting on half the list, with the unread half never
     # named. Naming it costs one line and turns a claim into an instruction.
-    unrecognised = [m.get("name", "") for m in core.medications_json().get("medications", [])
-                    if m.get("name") and not core.classify_drug(m["name"])]
+    unrecognised = [m.get("name", "") for m in core.active_medications()
+                    if not core.classify_drug(m["name"])]
+    # …and `excluded` says what was deliberately NOT compared. An entry the
+    # physician has stopped must not produce a warning — and its disappearance
+    # must not be silent either, because a red line that stops being printed and a
+    # red line nobody computed look identical, and only one of them is good news.
+    excluded = [{"name": m.get("name", ""), "status": m.get("status") or ""}
+                for m in core.inactive_medications()]
+    # An entry written before the status field existed counts as current. That is
+    # the safe direction and it is still an assumption, so it is named.
+    no_status = [m.get("name", "") for m in core.medications_without_status()]
     return {"status": "ok", "drug": drug, "new_classes": new_classes,
             "interactions": hits, "count": len(hits),
             "baseline": {"classes": sorted(active), "count": len(active),
-                         "empty": not active, "unclassified": unrecognised}}
+                         "empty": not active, "unclassified": unrecognised,
+                         "excluded": excluded, "status_not_recorded": no_status}}
 
 
 def _assess_gene(gene: str) -> Dict[str, Any]:
@@ -745,6 +791,12 @@ def _own_safety_flags(drug: str, disp: Optional[str] = None) -> List[Dict[str, A
     the defect this project keeps finding in itself — honest prose beside a green
     machine-readable field. `check_new_prescription` therefore lifts `overall` to
     `high` on a `red_flag`, and the renderer prints it before anything else.
+
+    This one path deliberately reads the WHOLE file rather than the current
+    prescriptions. A flag is a documented event — a reaction, an intolerance, a
+    complication — and an event does not stop having happened when the drug is
+    stopped. Filtering it by status would delete the reason the drug was stopped
+    at the very moment somebody is offered it again.
     """
     try:
         meds = (core.medications_json() or {}).get("medications") or []

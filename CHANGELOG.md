@@ -40,6 +40,296 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.4.11 — 12.09.2026
+
+### What you can do now
+
+**A variant file with no index is read.** Every reader of a genome file used to
+need an index beside it, and the tools that build one are not on a physician's
+machine. Such a file is now read once from beginning to end — the catalogue's
+positions in both builds, the counts that tell what kind of file it is, and the
+header — and no index is written, because one written subtly wrong would be
+trusted by every other tool. What that reading cannot answer is refused by
+name: a question about a whole region says it needs an index and names the two
+commands that make one, rather than answering with an empty list that reads as
+«this gene carries no variants».
+
+**The screen for what is worth acting on runs from an installed package.** The
+secondary-findings screen over the 84 ACMG genes does not compute when asked: it
+reads a table, and the pass that writes that table lived in the data-preparation
+directory, which does not travel with `pip install`. `scholion acmg-scan` runs it
+now, with no external tools and no index, from the person's variant file and the
+published ClinVar file; when that file is missing the command prints the one
+download it needs, for the build the person's file is in. Each file's build is
+established from the file itself, and a crossed pair — a GRCh37 genome against a
+GRCh38 ClinVar — is refused before a single position is compared, because a
+crossed pair does not fail: it finds nothing, or matches a position that belongs
+to a different base, and both look like an answer.
+
+**An exome is told apart from a panel.** Breadth used to be probed in windows
+that are gene-poor by construction, where an exome is empty, so an exome was
+classed as a sparse panel — and that class shuts the ClinVar and ACMG paths, on
+the one input where a screen for known pathogenic variants is most obviously
+worth running. A second set of probes in gene-dense windows tells the two apart
+by contrast. The two paths open on an exome and say what an exome can and cannot
+answer; polygenic scores stay shut, because a score summed over the coding two
+per cent of the genome has no distribution behind it.
+
+**The status says which questions this input can carry, before any finding.**
+Six paths — catalogue loci, pharmacogenetics, a whole region, ClinVar, the ACMG
+panel, polygenic scores — each marked open or shut for this file, with the
+reason; «this input cannot carry the answer» is told apart from «the annotation
+this path reads has not been produced», which used to be invisible because the
+narrower gate fired first and blamed the file for a missing table.
+
+**A gene is asked of every shelf that holds anything about one.** What this build
+knows about a gene sits in four places, each keyed differently — the curated
+catalogue by rsID, the ClinVar scan by coordinate, the shipped ACMG secondary
+findings panel by symbol, coverage by gene — and nothing joined them. Asking about
+a gene read the catalogue alone and answered «not in the coordinate reference»,
+which is a statement about one shelf and reads as a statement about the genome. A
+clinician asked about the bile-acid transporters and was told there was nothing to
+say «even in general terms from your genome», while the ClinVar table on that
+machine held 386 findings.
+
+`scholion genome --gene X` now prints a frame before the findings: what each layer holds,
+that it holds nothing, or that it could not be asked and what would let it be. A
+gene in the ACMG panel is recognised with no network and no annotation file,
+because those 84 symbols travel inside the build — so a question about BRCA1 on a
+machine that cannot reach Ensembl gets an answer rather than a shrug.
+
+**ClinVar can be asked by gene.** `scholion clinvar --gene X` matches findings to a gene by
+COORDINATE — the scan table carries no gene column, and this needs no re-scan of
+the genome. A gene whose coordinates cannot be obtained is reported as unresolved,
+with what would resolve it, rather than as a gene with no findings.
+
+### What is fixed
+
+**A row at the position was taken for the locus.** The reader took the first
+variant row at a catalogue position and built the genotype from that row's own
+alleles. A coordinate is not an identity: an insertion, a neighbouring
+substitution or a multi-allelic row can stand on the same base, and the genotype
+printed then belonged to somebody else's variant while carrying the locus's name
+and the label «called». On three clinical files the alleles at the Factor V
+Leiden position disagreed with the catalogue in every one. The row is now
+chosen, not taken — its alleles must be the catalogue's — and the two ways of
+failing to find one are named: another variant on this base, and a reference
+base that is not ours at all, which is a statement about the file's build, never
+about the person.
+
+**A genome file with no index that had been cut short was read up to the cut
+and answered «reference» at every position past it.** A copy or a download that
+did not finish leaves such a file; a heterozygous APOE ε4 carrier could be
+printed as a non-carrier under a status line saying the genome was connected.
+Such a file is now refused by name — the status says the file ends before its
+end — and a reading that dies part-way is answered as a failure rather than as
+an empty result.
+
+**Two shapes of a gVCF row printed the strongest label the layer has over
+stretches that were never read.** A reference block whose genotype is a no-call
+(`./.`, depth 0 — what a caller writes over an unread region) answered
+«confirmed reference»; and a row whose only alternative is a spanning deletion
+(`*`), left behind when a multi-allelic row is split and one half filtered,
+answered «confirmed reference» at a base that lies inside a deletion on one
+chromosome. The first is now a no-call; the second a refusal naming the allele
+found.
+
+**A deletion or multi-base change standing on a catalogue base was reported as
+«the file is in another build»** — a claim about the file made from a row that
+merely carried a different variant; it is now «another variant at this
+position». A multi-allelic row written with a shared trailing base rendered a
+heterozygote as a four-letter string labelled «called»; it now prints the
+locus's own allele pair, and a genotype naming an allele of another length
+beside ours is refused by name instead of concatenated.
+
+**An owner of a genotyping chip saw a status that said the array was connected
+and, six lines later, «no genome is connected» on every question** — closing
+the locus catalogue and the pharmacogenetics a chip answers as designed. The
+frame now belongs to the input that answered: the catalogue and
+pharmacogenetics are open, a gene region is closed because a chip reads chosen
+positions and a gene is a stretch nobody chose, and the screens are closed as
+too narrow; a gene query on a chip refuses with the same reason instead of
+proceeding without a file.
+
+**The secondary-findings screen could report a variant a person does not carry,
+and miss one they do.** A row whose genotype was not called at all — the
+ordinary shape of a family file or a gVCF — was written as a finding, because
+«not a reference» was the only test. A row with two alternate alleles was
+matched on the pathogenic one and judged from the other, so a person homozygous
+for a benign second allele was reported homozygous for the pathogenic first. And
+in a file holding several samples the first column was read as the person's: a
+mother's BRCA1 heterozygote, screened as her child's. Each is now a named step —
+the column is chosen, the allele index is required in the genotype, a no-call is
+counted and said with the result — and a call the caller itself flagged as not
+PASS is written as filtered rather than decided.
+
+**The refusal against matching two builds could be switched off by the one
+variable meant to arm it.** Declaring the build of a headerless personal file
+also declared it for the ClinVar file, so a declared GRCh37 against the
+downloaded GRCh38 ClinVar read as «GRCh37 against GRCh37» and ran. The ClinVar
+build is now read from the ClinVar file alone. And a personal file whose build
+could not be told at all went into the scan with a clean «ok»; it now refuses
+and names what closes it, the same way the ClinVar side already did.
+
+**The table was written beside the variant file while the screen read it from
+the genome folder**, so with the file anywhere else the command said «written»
+and the screen said «not run». It now lands where the screen looks, and carries
+a sidecar saying which builds it was matched in, which ClinVar release, when,
+and how many positions were unread — so a stale or crossed table can be told
+from a current one.
+
+**The advice about external tools described a product that needed them.** The
+first command a new person types offered four binaries and explained that
+without them «the genome layer does not work at all». True when written, false
+since a file without an index became readable and the ACMG screen became
+runnable. It now says what the four buy — seeking a region or a whole gene, and
+the wide ClinVar annotation — and what answers without them.
+
+**The gene frame said the wrong thing about a scan that had not run.** Asking
+about a gene prints, above its findings, which shelves of the build hold
+anything about it. When the ClinVar scan had simply never been run, that frame
+said the gene's coordinates could not be obtained — sending a person to fetch an
+annotation file they did not need — and `clinvar --gene` blamed a missing or
+broken index. Worse, the ACMG line printed «in it, 0 findings» for a panel
+nobody had scanned: a false «clean» on a hereditary-cancer gene. Each layer now
+says which of three things is true — what it holds, that the scan has not been
+run, or that it could not be asked and why — and a warning that only part of the
+findings table was read now reaches the frame instead of dying on the way.
+
+**The web page still showed a genotype for a position with no row.** A position
+absent from the variant file means either «reference» or «never read», and the
+command line had already stopped rendering that state as an answer. The page
+had not: the card printed the reference bases in large type with the caveat in
+small type beside it, and a gene listing did the same for every such locus. The
+page now prints a dash there, on both views.
+
+**A prescription's status could not be set, was erased on re-entry, and stopped
+drugs looked current.** No writer — command, page or API — could record whether
+a drug was current, so for anyone not editing the file by hand every entry was
+«no status recorded» while the wording claimed those entries predated the field.
+Re-adding a name to change its dose replaced the whole entry, so a stopped drug
+came back current with its start date and monitoring gone, silently. And every
+listing of the regimen drew a stopped drug like one taken this morning, while the
+interaction check had already excluded it. A status can now be written
+(`add-med --status`, a field on the page, `status` in the API); re-adding merges
+and says what it kept; and every listing — command, page, and the context handed
+to a model — marks entries that are not current. A pulse course counts as
+current everywhere, by one rule.
+
+**A gene filter over a truncated scan said the gene was clear.** The ClinVar
+scan is read a page at a time, and the gene filter took the page: on a profile
+with more findings than one read, «0 in this gene» would have been printed
+where the finding sat past the cut. The filter now compares what it read with
+what exists and says when it could not see everything. In the same pass: a gene
+frame that failed to build vanished without a trace and now reports itself
+unavailable with the reason; a single letter of a supplement's name matched a
+drug and earned it a pharmacogenetic tag, and a match now needs a whole name; a
+folded provenance note could still run to three hundred characters and now has
+a ceiling.
+
+**What the person is taking NOW is asked instead of assumed.** Every comparison —
+interactions, drug classes, the laboratory monitoring rules, the limitations —
+ran against every name in the prescriptions file, so a drug the physician stopped
+carried exactly as much weight as one taken this morning. A statin that left the
+scheme on the day an azole course was replaced still produced «↑ statin
+concentration, risk of myopathy», and beside it a warning about a probiotic
+paused six weeks earlier.
+
+A status decides now, and it decides by a WHITE list, so a value nobody taught the
+code about is not silently treated as current. An entry with no status at all
+stays current: those predate the field, and reading them as stopped would delete
+real prescriptions from every check at once — silence where a warning belongs is
+the worse mistake. And what was left out is named in the answer, because a red
+line that is absent for a reason and a red line nobody computed look identical on
+the page.
+
+**How well a gene was read comes with the answer about it.** Coverage was a
+footnote at the bottom of a report, and the question it qualifies is asked one
+gene at a time. It now travels beside the answer — and only when it is worth
+saying: a gene read in line with the rest of the file is left in silence, a gene
+far below it says so and says by how much.
+
+The ruler is the file's own middle, and it was measured before it was chosen. At
+20× on a 30× whole genome the callable fraction runs to a median of 79.8 %, with
+the best gene of ninety-three at 92 % and none at 95 %: any clinical-looking
+threshold therefore fires on 89 of 93 and is measuring the shape of a depth curve
+rather than anything about a gene. Against the file's own median, eight fire —
+and they are the genes that are hard to sequence for known reasons, X-linked or
+carrying a pseudogene. The rule travels with the sequencing depth, so it says
+something useful at 30× and at 100×.
+
+Four states, one of them silent. «In line with the rest of this file» is never
+reported as «adequate»: what is adequate depends on the question, which the
+product does not know. A gene the coverage table does not cover, and a profile
+where coverage was never computed, both say so — a silence that means «nobody
+measured» is read as reassurance, which is the same mistake as a missing row
+printing as «reference».
+
+**A position with no row in the file was printed as a confirmed reference.** A VCF
+of variants has no line where the genome matches the reference, and none where
+nothing was read either; the layer calls that state «assumed», and every decision
+in the engine already excluded it. The last mile did not. It rendered the state in
+the shape of an ANSWER — «genotype TT (reference)» — with the honest note beneath.
+On a single locus a reader got both, a reassuring label and a warning contradicting
+it on the next line. In a GENE LISTING they got only the first, because a listing
+keeps one line per locus and the note is the second.
+
+A physician running this over DPYD — fluoropyrimidines, where the genotype is
+required before the first dose — met eight positions labelled reference, six of
+which have no row in the file at all. The state is now rendered as the refusal it
+is, in one line, so it survives being cut to one line.
+
+**A genotype with no curated reading behind it says so.** A variant outside the
+curated set reached the reader as a bare genotype, and the silence where a reading
+should be was filled by whoever was talking: asked about COMT, the product
+correctly said the variant is outside its set, and the conversation supplied «the
+low-activity variant» from general knowledge with no source inside the product.
+The sentence is a statement about this build's catalogue, not about medicine.
+
+**A refusal about a drug names which silence it is.** «We could not look», «we
+looked and there is no such drug» and «we looked, found it, and no guideline for it
+is in our copy» wore one sentence. The third now carries the date of the guideline
+copy it is a statement about — which is what tells «the literature has nothing»
+from «this build is behind».
+
+**The regimen says which entries the model can speak about at all.** A list of
+supplements produced «no interactions found», which is true and uninformative:
+most of them are outside pharmacogenetics and always were. Entries with a
+gene-drug pair are marked; the rest are named as outside the model rather than
+left to look unexamined. Long provenance notes fold to their first sentence — a
+list of forty-five entries carrying a paragraph each is not a list anybody reads.
+
+**The build says when it is old.** It reported a stale reference database and said
+nothing about its own age. It now reads its own release date out of the journal it
+ships and says so on the first screen once that date is old enough to matter.
+Nobody is contacted to find this out: a product whose claim is that the profile
+never leaves the disk does not acquire an outbound host to deliver a convenience.
+
+### What is retracted
+
+Answers that labelled a position «reference» where the file has no row at it. No
+stored value changes — the engine never counted those positions — but a printed
+page or an exported summary made before this version may carry the old label, and
+for DPYD and CYP2D6 that label reads as permission to prescribe.
+
+A genotype printed at a catalogue locus whose row carried other alleles than the
+catalogue's. It was somebody else's variant under our locus's name; it is now
+withheld with the reason, so a report made before this version may carry a call
+that will not be repeated — the Factor V Leiden conclusion among them.
+
+An exome classed as a sparse panel, with ClinVar and the ACMG screen reported
+shut. The same file now opens both paths; the earlier statement about what that
+input could answer no longer stands.
+
+### What needs recomputing
+
+An ACMG table written by an earlier version was matched without checking that
+the personal file and the ClinVar file share a build. If the two were crossed,
+the table is a silent zero or a match on a different base. `scholion acmg-scan`
+rebuilds it from the files, refusing a crossed pair; a table whose files were
+of one build is unchanged by this.
+
+
 ## v0.4.10 — 09.09.2026
 
 ### What you can do now

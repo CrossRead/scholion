@@ -54,8 +54,11 @@ class _Pinned:
 
 class TestThePinIsClosedAndReal(unittest.TestCase):
 
-    def test_the_vocabulary_is_the_three_readers(self):
-        self.assertEqual(("bcftools", "pysam", "tabixlite"), genome.ENGINES)
+    def test_the_vocabulary_is_the_readers_this_build_has(self):
+        """Four since 09.09.2026. The fourth does not seek: it reads the file
+        once from end to end, and it is what answers when the file arrived
+        without an index and nothing installed can build one."""
+        self.assertEqual(("bcftools", "pysam", "tabixlite", "linear"), genome.ENGINES)
 
     def test_a_word_nobody_declared_is_refused_not_ignored(self):
         with _Pinned("bcftool"):                      # one letter short, on purpose

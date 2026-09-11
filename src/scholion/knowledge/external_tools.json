@@ -5,27 +5,40 @@
     "names": "The binary and the package are often not the same name — bgzip and tabix both come from htslib, uvx comes from uv — and a list of binaries cannot be handed to a package manager. That mapping is the point of this file.",
     "unverified": "Where a package name has not been verified against the tool's own documentation, it is absent deliberately. Printing an install command that turns out to be wrong costs more than printing none: the person runs it, it fails, and now they distrust the rest of the list.",
     "sudo": "No entry here needs administrator rights, and that is a selection criterion rather than a coincidence. Homebrew and conda install into the user's own prefix. Anything that would need sudo is shown as text for the person to run themselves.",
-    "updated": "2026-08-16",
-    "sets": "A set names the tools it REQUIRES. Anything that merely makes the step faster or better is listed under `optional` and never counted as missing: a set that looks complete while a required tool is absent is worse than no list at all.",
+    "updated": "2026-09-12",
+    "sets": "A set names the tools it REQUIRES. Anything that merely makes the step faster or better is listed under `optional` and never counted as missing: a set that looks complete while a required tool is absent is worse than no list at all. A tool that buys a DIFFERENT capability is a different set, not a required member of this one: until 12.09.2026 `base` required samtools and bcftools while its own text said they were for building and annotating rather than for reading, and a set whose prose and membership disagree is read by its membership.",
     "source_tier": "curated_reference"
   },
   "sets": {
     "base": {
       "label": {
-        "en": "Reading and calling variants",
-        "ru": "Чтение и вызов вариантов"
+        "en": "Seeking inside a genome file",
+        "ru": "Поиск внутри геномного файла"
       },
       "why": {
-        "en": "Without these the genome layer does not work at all: a VCF can be neither read, nor indexed, nor filtered.",
-        "ru": "Без них геномный слой не работает вовсе: VCF нельзя ни прочитать, ни проиндексировать, ни отфильтровать."
+        "en": "What these buy is the ability to SEEK: a region, a whole gene. Without them a variant file is still read — once, from beginning to end — and that answers the locus catalogue, the pharmacogenetics resting on it, the measured class of the file and `scholion acmg-scan`. What it does not answer is any gene beyond the catalogue, and those questions refuse rather than return an empty list. `bgzip` and `tabix -p vcf` alone open all of it; bcftools and samtools are for building and annotating a genome rather than for reading one, and they are the next set.",
+        "ru": "Эти инструменты дают возможность ИСКАТЬ: область, целый ген. Без них файл вариантов всё равно читается — один раз, от начала до конца, — и этого хватает на каталог локусов, стоящую на нём фармакогенетику, измеренный класс файла и `scholion acmg-scan`. Чего не хватает — на любой ген за пределами каталога; такие вопросы отказывают, а не возвращают пустой список. `bgzip` и `tabix -p vcf` открывают всё это; bcftools и samtools нужны, чтобы геном СОБРАТЬ и аннотировать, а не чтобы его прочитать, — это следующий набор."
       },
       "tools": [
-        "samtools",
-        "bcftools",
         "bgzip",
         "tabix"
       ],
       "offer_at_init": true
+    },
+    "annotate": {
+      "label": {
+        "en": "Building a genome from alignments, and annotating it",
+        "ru": "Сборка генома из выравниваний и его аннотация"
+      },
+      "why": {
+        "en": "Calling variants from a BAM, filtering them, and the wide ClinVar annotation that reads the whole file against the published database with `bcftools annotate`. Nothing here is needed to READ a variant file: the locus catalogue, the pharmacogenetics on it and `scholion acmg-scan` run with none of these installed. Offered by the step that needs them — `annotate_clinvar.sh` and the build scripts check for them and stop with a hint — rather than at first run.",
+        "ru": "Вызов вариантов из BAM, их фильтрация и широкая аннотация ClinVar, которая читает весь файл против опубликованной базы через `bcftools annotate`. Ничто из этого не нужно, чтобы файл вариантов ПРОЧИТАТЬ: каталог локусов, стоящая на нём фармакогенетика и `scholion acmg-scan` работают без единого из этих инструментов. Предлагается тем шагом, которому они нужны, — `annotate_clinvar.sh` и скрипты сборки проверяют их и останавливаются с подсказкой, — а не при первом запуске."
+      },
+      "tools": [
+        "samtools",
+        "bcftools"
+      ],
+      "offer_at_init": false
     },
     "align": {
       "label": {

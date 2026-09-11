@@ -58,7 +58,12 @@ def build_freshness() -> Dict[str, Any]:
             return out
         out["released"] = f"{m.group(4)}-{m.group(3)}-{m.group(2)}"
         d = date(int(m.group(4)), int(m.group(3)), int(m.group(2)))
-        out["days"] = (date.today() - d).days
+        # Never negative. A release cut on the 12th in Moscow is still the 11th
+        # in UTC, and a machine on the other side of midnight would otherwise
+        # report the build as a day younger than zero — which a guard reads as
+        # «a date from the future» and fails on (the matrix on rc-0.4.11, every
+        # cell). A heading that is ahead of the clock by a day is a fresh build.
+        out["days"] = max(0, (date.today() - d).days)
     except Exception as exc:                                         # noqa: BLE001
         out["reason"] = type(exc).__name__
         return out

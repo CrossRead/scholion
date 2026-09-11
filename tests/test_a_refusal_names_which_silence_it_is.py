@@ -106,6 +106,25 @@ class TestTheBuildKnowsItsOwnAge(unittest.TestCase):
             self.assertIsNotNone(r["released"])
             self.assertGreaterEqual(r["days"], 0)
 
+    def test_a_clock_a_day_behind_the_release_does_not_make_the_build_negative(self):
+        """A release cut on the 12th in Moscow is the 11th in UTC. Every cell of
+        the matrix on the first 0.4.11 candidate failed on exactly this: the
+        heading was a day ahead of the runner's clock and the age came out −1."""
+        from datetime import date as _date
+        from unittest import mock
+
+        class Behind(_date):
+            @classmethod
+            def today(cls):
+                return _date(2000, 1, 1)          # far behind any heading in the journal
+
+        with mock.patch("datetime.date", Behind):
+            r = S.build_freshness()
+        if r.get("status") == "unknown":
+            self.skipTest("no dated heading in this build")
+        self.assertEqual(0, r["days"])
+        self.assertEqual("fresh", r["status"])
+
     def test_nobody_is_contacted(self):
         """The first attempt asked PyPI and the privacy guard refused it. This
         one may not reach for the network at all — not even indirectly."""

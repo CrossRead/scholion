@@ -332,6 +332,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.goal_dashboard())
             if p == "/api/goal-suggest":
                 return self._json(engine.suggest_goal_targets())
+            if p == "/api/targets":
+                # The route that OWNS the list «inside the corridor, outside the
+                # clinician's target» (task 170); the page reads it from here.
+                return self._json(engine.targets.clinician_targets_view())
             if p == "/api/labs":
                 return self._json(engine.analyze_labs())
             if p == "/api/drug":
@@ -364,6 +368,15 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.lifestyle_brief())
             if p == "/api/lifestyle":
                 return self._json(engine.lifestyle())
+            if p == "/api/screen":
+                return self._json(engine.screen((q.get("class") or [""])[0] or None))
+            if p == "/api/systems":
+                return self._json(engine.systems())
+            if p == "/api/system":
+                # One system as a card; the register is the density, never
+                # the verdict. With no key the answer names the systems.
+                return self._json(engine.system((q.get("key") or [""])[0],
+                                                (q.get("register") or ["patient"])[0]))
             if p == "/api/clinvar":
                 return self._json(engine.clinvar_findings())
             if p == "/api/prs":
@@ -406,6 +419,16 @@ class Handler(BaseHTTPRequestHandler):
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
                     direction=body.get("direction"), date_source="manual",
                     subject="owner"))
+            if u.path == "/api/targets":
+                # Entered, never derived: the body carries who set it and when,
+                # and the store refuses a target without either.
+                return self._json(store.set_clinician_target(
+                    body.get("marker", ""), low=body.get("low"), high=body.get("high"),
+                    value=body.get("value"), unit=body.get("unit"),
+                    set_by=body.get("set_by") or "", set_on=body.get("set_on") or "",
+                    note=body.get("note") or "", subject="owner"))
+            if u.path == "/api/targets/remove":
+                return self._json(store.remove_clinician_target(body.get("marker", "")))
             if u.path == "/api/brief-reviewed":
                 # The wording was read against the newer numbers and still holds.
                 # Only a person can say that, which is why it is a button and not

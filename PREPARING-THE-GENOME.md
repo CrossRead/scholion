@@ -32,7 +32,7 @@ providers shipped hg19 for years, and most WGS more than a few years old is
 hg19. Seven of the eight real genomes in the public corpus this project is
 tested against are GRCh37.
 
-So the catalogue carries **both** coordinates. All 54 loci have a GRCh38
+So the catalogue carries **both** coordinates. Every locus has a GRCh38
 position and a GRCh37 position, each taken from a primary source and written
 only where at least two independent sources agreed — NCBI dbSNP, the Ensembl
 GRCh37 endpoint, and, for 30 of them, real GRCh37 files that carry rsIDs.

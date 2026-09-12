@@ -1462,14 +1462,18 @@ def _carry_store_flags(out: Dict[str, Any], key: str, date: str, r: Dict[str, An
 
 def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
     """Walk the folder of results and update labs.json with new markers. Incremental."""
+    # `Path("")` is the current directory. A caller that named no folder is
+    # refused by name rather than served whatever the process happens to be
+    # standing in — once that was the source tree, and the profile received
+    # every PDF under it.
+    if not (folder or "").strip():
+        return {"ok": False, "error": _t("ingest_labs.folder_not_named")}
     ex = _ensure_extractor()
     root = Path(folder).expanduser()
     if not root.exists() or not root.is_dir():
         return {"ok": False, "error": _t("ingest_labs.folder_not_found", path=root)}
     markers = core.lab_markers().get("markers", {})
     existing = {k: m.get("name") for k, m in core.labs().get("markers", {}).items()}
-    moved = _manifest_moved("labs")
-    manifest = _load_manifest()
     files = sorted(f for f in root.rglob("*")
                    if f.is_file()
                    and (f.suffix.lower() == ".pdf" or f.suffix.lower() in _TEXT_SUFFIXES))
@@ -1480,6 +1484,10 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
         # names the command. But it is no longer a refusal for the whole folder —
         # a CSV next to those PDFs is readable with no extractor at all.
         return {"ok": False, "error": _t("ingest_labs.no_pdf_reader")}
+    # After the LAST refusal: adopting the manifest from the cache is a write
+    # into the profile, and a refused call writes nothing.
+    moved = _manifest_moved("labs")
+    manifest = _load_manifest()
     out = {"ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
            "points_added": 0, "skipped": 0, "per_file": [], "conflicts": [],
            "repeats": [], "draw_times": {}, "resolution_mixed": [],

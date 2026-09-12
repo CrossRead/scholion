@@ -38,33 +38,28 @@ WEB = Path(lifestyle.__file__).resolve().parents[1] / "web" / "index.html"
 STATES = ("place", "by_marker", "systemic", "whole_body")
 
 
-def _radar_source():
-    src = Path(lifestyle.__file__).read_text(encoding="utf-8")
-    block = src[src.index("_RADAR_DOMAINS = ["):]
-    # Cut at the list's OWN closing bracket, alone on its line — `index("]")`
-    # stops at the first inner list of marker names and reports one domain.
-    return src, block[:block.index(chr(10) + "]")]
+def _radar_domains():
+    """The domains as the build declares them — read off the knowledge file.
+
+    Until 12.09.2026 this test parsed `_RADAR_DOMAINS = [` out of the source of
+    `lifestyle.py`. The list now lives in `knowledge/radar_domains.json` (task
+    168, step 1), and `lifestyle.py` builds the constant from it; the file is
+    what EXISTS, so the file is what is read here. A run on the test fixture
+    would report only the domains that fixture happens to have data for.
+    """
+    return json.loads(core.knowledge_path("radar_domains.json")
+                      .read_text(encoding="utf-8")).get("domains") or []
 
 
 def radar_keys():
-    """Every key `health_radar` can emit — read off the source, not off a run.
-
-    A run on the test fixture reports only the domains that fixture happens to
-    have data for; the question here is about the domains that EXIST.
-    """
-    src, block = _radar_source()
-    keys = re.findall(r'\(\s*"([a-z_]+)"', block)
-    # `fitness` is appended after the loop, from the wearable side.
-    if '"key": "fitness"' in src:
-        keys.append("fitness")
-    return keys
+    """Every key `health_radar` can emit — `fitness` included, which the file
+    lists with `source: wearables` and `health_radar` appends after the loop."""
+    return [d["key"] for d in _radar_domains()]
 
 
 def radar_panels():
-    """domain key → the markers it declares, as the source declares them."""
-    _src, block = _radar_source()
-    return {k: re.findall(r'"([a-z0-9_]+)"', body)
-            for k, body in re.findall(r'\(\s*"([a-z_]+)"\s*,\s*\[([^\]]*)\]', block)}
+    """domain key → the markers it declares, as the file declares them."""
+    return {d["key"]: list(d.get("markers") or []) for d in _radar_domains()}
 
 
 class TestEverySystemDeclaresWhereItIs(unittest.TestCase):

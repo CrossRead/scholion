@@ -36,29 +36,33 @@ _WATCHLIST = [
 
 # The label is a catalogue key, resolved when the radar is built: the key identifies the
 # body system, the phrase names it in the reader's language.
-_RADAR_DOMAINS = [
-    ("lipids", ["cholesterol_total", "ldl", "hdl", "triglycerides"]),
-    ("glucose", ["glucose", "hba1c", "homa_ir", "insulin"]),
-    ("inflammation", ["crp_hs", "rheumatoid_factor", "homocysteine"]),
-    # The endocrine system is not one system. «Hormones» averaged a thyroid
-    # marker, a gonadal one and a hepatic one into a single number, and the
-    # ring beside it measured how much of that mixture existed — a quantity
-    # nobody orders. These four are the panels a laboratory actually issues.
-    ("thyroid", ["tsh", "t4_free", "t3_free", "anti_tpo"]),
-    ("adrenals", ["cortisol", "dheas"]),
-    ("gonads", ["testosterone", "dht", "estradiol"]),
-    ("growth", ["igf1", "gh"]),
-    # Both halves of the gland: the acinar cell that makes the digestive
-    # enzymes, and the beta cell, whose C-peptide is released with insulin in
-    # equal amount and survives long enough to be measured. Insulin itself
-    # stays in the carbohydrate panel, where HOMA-IR is computed from it —
-    # splitting an index from one of its two inputs would leave neither
-    # system able to explain it — and is MARKED at the pancreas instead.
-    ("pancreas", ["amylase", "amylase_pancreatic", "lipase", "c_peptide"]),
-    ("liver", ["alt", "ast", "ggt"]),
-    ("micronutrients", ["vitamin_d", "omega3_index", "vitamin_b12", "ferritin"]),
-    ("renal", ["uric_acid", "creatinine"]),
-]
+#
+# The composition lives in `knowledge/radar_domains.json` and not here any more
+# (task 168, step 1). The genetic half of a system — `engine/system_panels.py` —
+# is keyed by the same eleven names, and a list held as a Python constant in one
+# module and re-typed in another is the shape every pair of copies in this
+# project has drifted into. So both readers take it from the one file, and a
+# test compares what each of them sees. The per-domain reasons that stood here
+# as comments (why the endocrine system is four systems, why insulin is scored
+# with glucose and marked at the pancreas) travel with the file as `why`.
+#
+# Only the laboratory domains are listed here. The twelfth, «fitness», is built
+# from wearable metrics and attached by `health_radar` after the loop; the file
+# names it too, with `source: wearables`, so that it is not lost and does not
+# acquire a genetic half by inattention.
+def _radar_domains_from_knowledge() -> List[tuple]:
+    data = core._read_knowledge("radar_domains.json") or {}
+    out = [(str(d.get("key")), list(d.get("markers") or []))
+           for d in (data.get("domains") or [])
+           if isinstance(d, dict) and d.get("source") == "labs"]
+    if not out:
+        # A radar with no systems is a broken build, not an empty profile, and
+        # it is better met at import than as a figure with nothing on it.
+        raise RuntimeError("knowledge/radar_domains.json holds no laboratory domain")
+    return out
+
+
+_RADAR_DOMAINS = _radar_domains_from_knowledge()
 
 
 def _wear_status(latest: float, meta: Dict[str, Any]):
@@ -251,7 +255,8 @@ def lifestyle() -> Dict[str, Any]:
                 wnew.setdefault(_yr, {}).update({f"{_t2}": _v for _t2, _v in _types.items()}
                                                 if len(blocks) == 1 else
                                                 {f"{_t2} · {_src}": _v for _t2, _v in _types.items()})
-    wold = data.get("Workouts")
+    # The oldest schema ({type: {year: count}}) is turned into this one by
+    # `wearables.migrate` on read, so there is one shape to read here.
     if isinstance(wnew, dict) and wnew:
         # Garmin: {year: {label: {count, hours}}} → aggregated by label
         agg: Dict[str, Dict[str, Any]] = {}
@@ -268,14 +273,6 @@ def lifestyle() -> Dict[str, Any]:
         for typ, a in agg.items():
             workouts.append({"type": typ, "total": a["total"], "hours": round(a["hours"], 1),
                              "last_year": a["last_year"], "last_count": a["last_count"]})
-        workouts.sort(key=lambda x: -x["total"])
-    elif isinstance(wold, dict):
-        # the old Apple schema: {type: {year: count}}
-        for typ, yrs in wold.items():
-            if not isinstance(yrs, dict) or not yrs:
-                continue
-            ly = max(yrs.keys())
-            workouts.append({"type": typ, "total": sum(yrs.values()), "last_year": ly, "last_count": yrs.get(ly)})
         workouts.sort(key=lambda x: -x["total"])
     scored = [m["score"] for m in out
               if m.get("score") is not None and m.get("counts_toward_conclusions", True)]

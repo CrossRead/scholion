@@ -7,8 +7,10 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 from .. import core
+from .targets import outside_target, target_side, target_view  # the target beside the corridor (task 170)
 from ..i18n import t as _t
 from ._helpers import _OPS, _recent, _active_names_by_class, DISCLAIMER
+from .corridor import point_corridor, flags_comparable
 
 
 # ==========================================================================
@@ -422,30 +424,28 @@ def _trend(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     return out
 
 
-def _sex_adjusted_bounds(k: str, m: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """Return sex-corrected {ref_low, ref_high, ref_sex} for a marker, or None.
+def _method_notes(key: str, spec: Dict[str, Any]) -> List[str]:
+    """Curated sentences about HOW this analyte is measured and coded.
 
-    The rule is «a form-read range wins, a defaulted range gets corrected». The
-    reference on a marker in the profile is usually the interval PRINTED on the
-    person's own lab form, and that is already sex-appropriate — it must be left
-    alone. Only when the stored range equals the knowledge-base DEFAULT (the
-    historical male range) do we know it was filled in rather than read, and only
-    then do we swap in the sex-specific bounds. Sex unknown → no correction and a
-    caveat is raised by the caller, never a silent guess.
+    Two files hold them and neither was read: the method note beside the marker
+    and the code note beside the test. They are returned as one list because a
+    reader does not care which file a caveat lives in — only that a number they
+    are about to act on carries one.
     """
-    kb = core.lab_markers().get("markers", {}).get(k) or {}
-    by_sex = kb.get("ref_by_sex")
-    if not by_sex:
-        return None
-    default = (kb.get("ref_low"), kb.get("ref_high"))
-    if (m.get("ref_low"), m.get("ref_high")) != default:
-        return None                       # a form-specific range — trust it
-    sex = core.profile_sex()
-    if sex not in ("male", "female"):
-        return {"ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
-                "ref_sex": None, "ref_sex_unknown": True}
-    b = by_sex.get(sex) or {}
-    return {"ref_low": b.get("ref_low"), "ref_high": b.get("ref_high"), "ref_sex": sex}
+    out: List[str] = []
+    for raw in (spec.get("units_note"),
+                ((core.lab_test_meta().get("tests") or {}).get(key) or {}).get("loinc_note")):
+        if isinstance(raw, dict):        # unresolved catalogue, both languages
+            raw = raw.get("ru") or raw.get("en")
+        if raw and str(raw).strip():
+            out.append(str(raw).strip())
+    return out
+
+
+def _marker_systems() -> Dict[str, str]:
+    """marker → system, asked of the system entry (lazily: it imports this module)."""
+    from .system_panels import marker_systems
+    return marker_systems()
 
 
 def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
@@ -461,99 +461,12 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         if not m or not m.get("series"):
             continue
         latest = _latest(m["series"])
-        # The corridor this draw was judged by on its own form, if it printed one
-        # (task 142). It beats the marker's recorded range and the reference base
-        # alike: those are «the latest known» and «the general population», and
-        # neither is a statement about this draw. An ionised calcium of 1.09
-        # read as deeply low against a range recorded months earlier, while the
-        # form that carried it printed 1.10–1.35 and called it a hair under.
-        own = {k: latest.get(k) for k in ("ref_low", "ref_high") if latest.get(k) is not None}
-        ref_origin: Optional[str] = None
-        if own:
-            m = {**m, "ref_low": own.get("ref_low"), "ref_high": own.get("ref_high")}
-            ref_origin = "form"
-        elif m.get("ref_low") is not None or m.get("ref_high") is not None:
-            ref_origin = "profile"
-        # When the corridor differs between draws, the values remain one series
-        # and the FLAGS do not: a point «low» against 1.16 and a point «ok»
-        # against 1.10 did not move — the ruler did. Said, rather than left for
-        # the reader to notice from two flags that disagree about one number.
-        corridors = sorted({(pt.get("ref_low"), pt.get("ref_high")) for pt in m["series"]
-                            if pt.get("ref_low") is not None or pt.get("ref_high") is not None},
-                           key=lambda c: (c[0] if c[0] is not None else -1e18, c[1] if c[1] is not None else 1e18))
-        flags_comparable = len(corridors) <= 1
-        # A value with NO corridor at all, for a marker the reference base has an
-        # interval for: two facts held and never compared. The person's own form
-        # is always preferred — this only fills a hole, never overrides — and the
-        # borrowed interval is LABELLED, because a general population range is a
-        # weaker statement than the range the person's own laboratory printed and
-        # must not be shown as if it were the same thing.
-        borrowed = False
-        sex_unknown_no_range = False
-        sex_other = False
-        age_other = age_unknown = age_unbanded = False
-        sex_unreviewed = sex_not_applicable = False
-        if m.get("ref_low") is None and m.get("ref_high") is None:
-            kb = core.lab_markers().get("markers", {}).get(k) or {}
-            # The same rule that stops ingest substituting a sex-specific default
-            # applies to borrowing one. Six markers in this base keep the MALE
-            # range as their top-level default; lending it to a person whose sex
-            # was never asked for is the defect, whichever code does the lending.
-            sex_blocked = bool(kb.get("ref_by_sex")) and core.profile_sex() not in ("male", "female")
-            # And the same defect one step further out. A marker with only ONE
-            # corridor is the commoner case, and that corridor was transcribed
-            # from the forms of one person: `ref_sex` says whose. Lending a man's
-            # ceiling for GGT or a man's floor for HDL to a woman does not fail —
-            # it produces a verdict, and the wrong one, with a green tick beside
-            # it. The remedy the person can act on is their own form, so the
-            # corridor is withheld and the reason is printed.
-            owner = kb.get("ref_sex")
-            if owner == "unreviewed":
-                # Declared, and declared unknown: the corridor could not be
-                # checked against a form or a standard interval. Lent to nobody
-                # — an unchecked claim is the thing this whole rule refuses.
-                sex_blocked = sex_unreviewed = True
-            elif owner and owner != "any" and core.profile_sex() != owner:
-                sex_blocked = sex_other = True
-            # A test that exists for one sex only is a different fact from a
-            # corridor that belongs to one sex: PSA does not apply to a woman at
-            # all, and «the interval is a man's» would be the wrong sentence.
-            only = kb.get("applies_to_sex")
-            if only and core.profile_sex() in ("male", "female") and core.profile_sex() != only:
-                sex_blocked = sex_not_applicable = True
-                sex_other = False
-            # Age is the same class as sex, one axis over. IGF-1 and DHEA-S
-            # depend on age more than on sex, and every laboratory bands them;
-            # the dictionary held ONE corridor for each, transcribed from one
-            # person's form at one age, and lent it to everybody. `ref_age` now
-            # says whether the corridor is age-independent, banded with the band
-            # unrecorded (lent to nobody — the person's own form is the remedy),
-            # or a band in years (lent inside it; an unknown age is not lent a
-            # band, because a plausible default is the defect, not the fix).
-            rule = kb.get("ref_age")
-            age_blocked = False
-            if rule and rule != "any":
-                if rule == "banded":
-                    age_blocked = age_unbanded = True
-                elif isinstance(rule, dict):
-                    age = core.profile_age()
-                    if age is None:
-                        age_blocked = age_unknown = True
-                    elif not (float(rule.get("min", 0)) <= age <= float(rule.get("max", 200))):
-                        age_blocked = age_other = True
-            if sex_blocked or age_blocked:
-                # Say WHY the corridor is missing. «No range» and «a range exists
-                # but we may not use it for you» look identical on screen and are
-                # different facts; the second one has a remedy the person can act
-                # on, and printing nothing hides it.
-                sex_unknown_no_range = True
-            elif kb.get("ref_low") is not None or kb.get("ref_high") is not None:
-                m = {**m, "ref_low": kb.get("ref_low"), "ref_high": kb.get("ref_high")}
-                borrowed = True
-                ref_origin = "reference_base"
-        _sx = _sex_adjusted_bounds(k, m)
-        if _sx and not _sx.get("ref_sex_unknown"):
-            m = {**m, "ref_low": _sx["ref_low"], "ref_high": _sx["ref_high"]}
+        # Which corridor this point is judged by, and why — the form that carried
+        # it, the marker's recorded range, or the reference base — is one
+        # question with its own module (`corridor`); this only places the answer.
+        c = point_corridor(k, m, latest)
+        m = {**m, "ref_low": c["ref_low"], "ref_high": c["ref_high"]}
+        rulers = flags_comparable(m["series"])
         _reps = same_day_repeats(m["series"])
         # A marker read by a locally PROPOSED rule keeps its value and loses its
         # verdict. The row is in the series and on the chart — losing it was the
@@ -573,6 +486,14 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         abnormal = flag not in ("ok", "norange", "unconfirmed_rule")
         results.append({
             "key": k, "name": m["name"], "unit": m.get("unit", ""),
+            # What the number is a measurement OF — the method behind the
+            # interval and the code behind the analyte. Both were written and
+            # verified in the knowledge files and read by nothing: `units_note`
+            # says, for four of these markers, that the published limit is a
+            # male one, and `loinc_note` says whether the code is the calculated
+            # LDL or the direct one. A qualification nobody renders qualifies
+            # nothing.
+            "method_notes": _method_notes(k, _spec),
             "value": latest["value"], "date": latest["date"],
             # Task 100. Where this point's DATE came from. Carried beside the
             # date rather than left in the file, because a field the report never
@@ -599,36 +520,48 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             "fasting_not_established": bool(
                 _reps and _fasting_test(k)
                 and str(latest.get("date", "")) == _reps[-1]["points"][-1]["_stamp"]),
-            "ref_reference_base": borrowed,
-            # Whose corridor the flag stands on: this draw's own form, the range
-            # recorded for the marker, or the reference base — three different
-            # strengths of claim, and a verdict is only as strong as its ruler.
-            "ref_origin": ref_origin,
-            "flags_comparable": flags_comparable,
-            "corridor_note": (None if flags_comparable else _t(
-                "labs.corridors_differ",
-                spans=" · ".join(f"{'' if lo is None else lo}–{'' if hi is None else hi}"
-                                 for lo, hi in corridors))),
-            "ref_sex": (_sx or {}).get("ref_sex"),
-            "ref_sex_unknown": bool((_sx and _sx.get("ref_sex_unknown")) or sex_unknown_no_range),
-            # «No corridor» and «a corridor exists and is not yours» are different
-            # facts with different remedies, and the second one is not about a
-            # missing profile field.
-            "ref_sex_other": bool(sex_other),
-            "ref_sex_unreviewed": bool(sex_unreviewed),
-            "sex_not_applicable": bool(sex_not_applicable),
-            # The age axis, three facts apart: outside the corridor's band, band
-            # known and age unrecorded, band never recorded at all.
-            "ref_age_other": bool(age_other),
-            "ref_age_unknown": bool(age_unknown),
-            "ref_age_unbanded": bool(age_unbanded),
+            # Whose corridor the flag stands on and, when the reference base's
+            # was withheld, the one nearer reason — every refusal flag the
+            # renderers read, computed in `corridor.point_corridor`.
+            "ref_reference_base": c["ref_reference_base"],
+            "ref_origin": c["ref_origin"],
+            "flags_comparable": rulers["flags_comparable"],
+            "corridor_note": rulers["corridor_note"],
+            "ref_sex": c["ref_sex"],
+            "ref_sex_unknown": c["ref_sex_unknown"],
+            "ref_sex_other": c["ref_sex_other"],
+            "ref_sex_unreviewed": c["ref_sex_unreviewed"],
+            "sex_not_applicable": c["sex_not_applicable"],
+            "ref_age_other": c["ref_age_other"],
+            "ref_age_unknown": c["ref_age_unknown"],
+            "ref_age_unbanded": c["ref_age_unbanded"],
             "near_limit": None,   # set below, after the personal shift has been assessed
             "personal_move": None,
             "decisions": _decision_limits(k, latest["value"], active_classes),
             "trend": _trend(m["series"]),
             "series": sorted(m["series"], key=lambda p: p["date"]),
             "genome_link": m.get("genome_link"), "note": m.get("note"),
+            # A `genome_link` in the person's own labs.json is free text with no
+            # source: it is the owner's note about a marker, not a curated
+            # sentence that passed the gate, and until task 168 it printed on
+            # the second look in the same voice as one that had. The kind
+            # travels with it so that every renderer can style it as a note —
+            # the field is marked, never dropped, and the profile is not touched.
+            "genome_link_kind": "owner_note" if m.get("genome_link") else None,
+            # The system whose panel holds the marker (task 168): the card of
+            # a system is reached from the marker, so the key travels with it,
+            # read from the one domain file rather than resolved by each face.
+            "system": _marker_systems().get(k),
         })
+    # Task 170. The clinician's target stands BESIDE the corridor and touches
+    # neither `flag` nor `abnormal`: it is the frame of a treatment, not a
+    # diagnosis, and standing outside it is a question for the appointment.
+    _targets = core.clinician_targets_by_marker()
+    for r in results:
+        _tg = _targets.get(r["key"])
+        r["target"] = target_view(_tg, r["value"]) if _tg else None
+        r["outside_target"] = outside_target(_tg, r["value"]) if _tg else None
+
     # "At the edge" is set only if the marker is MOVING towards that bound relative to its
     # own history. Otherwise the flag catches markers that have stood there all their life:
     # without this condition it fired on markers that were flat or even moving away from the
@@ -662,8 +595,10 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
     abnormal = [r for r in results if r["abnormal"]]
     near = [r for r in results if r.get("near_limit")]
     crossed = [r for r in results if any(d["crossed"] for d in r.get("decisions", []))]
+    outside = [r for r in results if r.get("outside_target")]
     return {"status": "ok", "count": len(results), "abnormal_count": len(abnormal),
             "near_limit_count": len(near), "decision_crossed_count": len(crossed),
+            "outside_target_count": len(outside),
             "markers": results, "disclaimer": DISCLAIMER()}
 
 

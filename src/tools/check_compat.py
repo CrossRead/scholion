@@ -91,6 +91,10 @@ ENV_VARS = None      # filled in collect(); see env_vars() above
 PROFILE_FILES = [
     "labs.json", "medications.json", "metrics.json", "health_goals.json",
     "focus.json", "lifestyle_brief.json", "pharmacogenomics.json", "experiments.json",
+    # A target the treating clinician set, beside the corridor (task 170). Its
+    # own file, so a re-import of laboratory forms rewrites the series and
+    # leaves the targets standing.
+    "clinician_targets.json",
 ]
 
 

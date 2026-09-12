@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.4.11** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.0** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -133,7 +133,8 @@ answers one of three ways: called, no-call, or *not on this chip at all*. The
 third is the one that matters: on a chip an absent position was never
 interrogated, so treating it as a reference call would turn «this instrument
 cannot see that locus» into «you do not have that variant». Measured on a real
-23andMe v5 export: 46 of the 54 catalogue loci present, none of them no-call, and
+23andMe v5 export: 46 of the 54 loci the catalogue held that day present, none of
+them no-call, and
 the eight absent ones named. The paths that a chip cannot support — ClinVar
 screening, ACMG SF, polygenic scores — refuse with the reason instead of
 answering.
@@ -150,7 +151,7 @@ source, every environment variable it reads. Instructions:
 
 **Both reference builds.** A file called against GRCh37 is read at GRCh37
 coordinates, because most of the files people actually hold are GRCh37 and
-nobody is going to re-sequence for us. All 54 catalogue loci now carry both
+nobody is going to re-sequence for us. Every catalogue locus carries both
 coordinates, each written only where at least two independent primary sources
 agreed — NCBI dbSNP, the Ensembl GRCh37 endpoint, and real GRCh37 files for 30
 of them. Nothing is converted between builds: the offset is not constant even

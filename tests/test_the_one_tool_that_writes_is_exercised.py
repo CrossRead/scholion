@@ -52,6 +52,18 @@ class FocusLogCase(unittest.TestCase):
         self.core.reset_cache()
 
     def call(self, **args) -> str:
+        """The way the MCP server and the Hub call a handler: `handler(ctx, **args)`.
+
+        Until 12.09.2026 this test set `ctx.args` by hand — the convention the
+        handler alone used — and stayed green while every real call through
+        MCP answered with a TypeError. `call_old_way` keeps the old convention
+        covered, because a host may still pass arguments that way.
+        """
+        from scholion import ouroboros_tools
+        entry = next(e for e in ouroboros_tools.get_tools() if e.name == "sch_focus_log")
+        return entry.handler(ouroboros_tools.ToolContext(), **args)
+
+    def call_old_way(self, **args) -> str:
         from scholion import ouroboros_tools
         entry = next(e for e in ouroboros_tools.get_tools() if e.name == "sch_focus_log")
         ctx = ouroboros_tools.ToolContext()
@@ -68,6 +80,11 @@ class TestItWritesWhatItWasTold(FocusLogCase):
     def test_it_is_offered_to_a_model_at_all(self):
         from scholion import ouroboros_tools
         self.assertIn("sch_focus_log", [e.name for e in ouroboros_tools.get_tools()])
+
+    def test_the_old_calling_convention_still_reaches_the_journal(self):
+        out = self.call_old_way(date="2026-08-21", note="a host that fills ctx.args")
+        self.assertIn("2026-08-21", out)
+        self.assertEqual(["2026-08-21"], [e.get("date") for e in self.journal().get("entries") or []])
 
     def test_a_day_the_person_described_reaches_the_journal(self):
         out = self.call(date="2026-08-20", alcohol="a glass of dry red",

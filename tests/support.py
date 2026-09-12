@@ -181,6 +181,11 @@ ARGS_FOR = {
     # covered in full by tests/test_marker_proposals.py on a temporary data dir.
     # Reading it (no flags) is what the sweep exercises, so the entry is [] not None.
     "marker": [],
+    # `target set` and `target remove` write a clinician's figure into the
+    # profile; the sweep exercises only the reading leaf, and the two writers
+    # are covered on a temporary profile by
+    # tests/test_a_target_the_clinician_set_stands_beside_the_corridor.py.
+    "target": ["list"],
     "flag-rate": [],
     "prescription": ["atorvastatin"],
     "genome": ["rs4149056"],

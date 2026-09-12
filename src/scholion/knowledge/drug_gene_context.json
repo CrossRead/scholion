@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "purpose": "The clinician's EXCEPTIONS over the prescription entry's inherited gene list. Since task 168 (step 7) a prescription no longer waits for a hand-written list of genes: engine/decision.py resolves its genes as class -> system -> the genetic half of that system (the base-composed monogenic list of gencc_gene_disease.json plus the positions of system_gene_panels.json), through the map in drug_class_systems.json. What this file holds is what a clinician wants said ABOUT ONE PRESCRIPTION on top of that: a sentence about a gene and the class of the link, a gene the systems did not name, or a gene struck from the inherited list with a reason.",
+    "who_writes_this": "A clinician. Which genes belong to a prescription is not derived here any more — it is inherited from the system the prescription acts on, and a list nobody derives per drug cannot be falsely negative by omission the way a hand-written one was. What IS hers is the exception: «this gene, for this drug, means this», «this gene is not relevant to this prescription, and here is why». This program applies the exceptions it is given, records their source, and invents none.",
+    "gate": "A row is printed only when it carries BOTH `text` and `source` (its own, or the list's). A gene named with a source and no sentence is kept as pending. An `exclude: true` row strikes the gene from the inherited list only with a source — its own or the list's — and an exclusion with no source anywhere is refused and counted with the other unattributed rows. Anything else is dropped and COUNTED, so that a dropped entry is visible as a number rather than looking like an entry that never existed.",
+    "inheritance": "An inherited gene prints as named and unclassified, with the source of the system it came from («GenCC <version> — through the system thyroid»), until a clinician writes its sentence here. A prescription whose class maps to a system whose genetic half is not composed inherits nothing, and the answer names the system and says so; a prescription whose class has no row in drug_class_systems.json is answered as before: no curated list in this build.",
+    "kinds": {
+      "guideline": "computed — a CPIC table for the pair exists in this build (not authored here)",
+      "pair": "computed — the pair is recognised and no table is held (not authored here)",
+      "mechanism": "the gene handles this substance, and no dosing rule follows from it",
+      "asked_about": "the gene is asked about in connection with this drug and nothing follows from it at all",
+      "no_variant": "named on the list, and this build has no variant to report there — measured against the person's file in four states by engine/decision.variant_state"
+    },
+    "schema": "drugs: { <lowercase drug name or class key>: { names: [aliases], source: '<where these exceptions came from>', genes: { <SYMBOL>: { kind?: mechanism|asked_about|no_variant, text?: {en, ru}, source?: '<citation>', exclude?: true } } } }",
+    "why_empty": "The absence of an entry for a drug is not an empty answer any more: the genes arrive through the system. An entry is written only where a clinician has something to say beyond the system's list, and until she does, the honest answer is the inherited list with every row marked as waiting for a sentence.",
+    "updated": "2026-09-12",
+    "source_tier": "curated_reference",
+    "pending": "A gene named on a list whose sentence nobody has written yet — the clinician's own row, or an inherited one — is kept and printed as pending, not dropped: it is the most informative row on the screen, because it says where the gene came from and that what follows from it is still to be written.",
+    "example": "The `_example` block below is a FORM sample and is not loaded by the engine: only `drugs` is. Its single row is not invented here — it is the sentence this build already carries, verified, in cpic_drug_gene.json under MTHFR.",
+    "proposed": "The `_proposed` block is a draft on a clinician's desk and is NOT read by the engine either. Once she signs it, its rows move into `drugs` — or, where a row is about the working of a system rather than about the drug, into system_gene_panels.json under that system.",
+    "kind_is_hers_too": "The class of link is authored as well. A gene named by a clinician is not silently filed under «handles this substance»: with no class it prints as named and unclassified, which is what it is."
+  },
+  "drugs": {
+    "урсодезоксихолевая кислота": {
+      "names": [
+        "урсодезоксихолевая кислота",
+        "урсодиол",
+        "ursodiol",
+        "ursodeoxycholic acid",
+        "урсосан",
+        "урсофальк"
+      ],
+      "source": "гены названы врачом (сессия 11.09.2026); что из каждого следует — не написано",
+      "genes": {
+        "ABCB4": {},
+        "ABCB11": {},
+        "ATP8B1": {},
+        "NR1H4": {},
+        "SLC10A1": {}
+      }
+    }
+  },
+  "_example": {
+    "метотрексат": {
+      "names": [
+        "метотрексат",
+        "methotrexate"
+      ],
+      "source": "пример формы; строка взята из cpic_drug_gene.json, ген MTHFR",
+      "genes": {
+        "MTHFR": {
+          "kind": "asked_about",
+          "text": {
+            "en": "CPIC publishes no methotrexate/MTHFR guideline, and ACMG recommends AGAINST clinical testing of MTHFR C677T/A1298C. MTHFR is kept for folate context only, not as a pharmacogenetic dosing signal.",
+            "ru": "У CPIC нет гайдлайна метотрексат/MTHFR, а ACMG рекомендует ПРОТИВ клинического тестирования MTHFR C677T/A1298C. MTHFR оставлен только для контекста фолатов, не как фармакогенетический сигнал дозирования."
+          },
+          "source": "CPIC; ACMG practice recommendation — как записано в cpic_drug_gene.json"
+        }
+      }
+    }
+  },
+  "_proposed": {
+    "левотироксин": {
+      "names": [
+        "левотироксин",
+        "l-тироксин",
+        "эутирокс",
+        "levothyroxine",
+        "l-thyroxine",
+        "тироксин"
+      ],
+      "source": "ОБРАЗЕЦ — список предложен 12.09.2026, подтверждение врача не получено",
+      "genes": {
+        "DIO2": {
+          "kind": "asked_about",
+          "text": {
+            "ru": "Дейодиназа 2 превращает T4 в T3 в тканях, то есть к веществу отношение прямое. Самый изученный вариант — Thr92Ala (rs225014), минорный аллель примерно у 38 % людей. Гипотеза была, что носители хуже отвечают на монотерапию левотироксином и лучше — на комбинацию T4 + T3. UK Biobank: 18 761 пациент на левотироксине против 360 534 контролей; ассоциации не найдено ни по одному из четырёх вариантов (rs225014, rs225015, rs12885300, rs17606253), авторы заключают, что взаимодействие «ген × лечение» их данными не поддерживается (PMID 37740545). Из генотипа решения о дозе или о переходе на комбинированную терапию не выводится.",
+            "en": "DIO2 converts T4 to T3 in tissue, so the link to the substance is direct. The most studied variant is Thr92Ala (rs225014), minor allele in about 38 % of people. UK Biobank: 18,761 levothyroxine-treated patients vs 360,534 controls; no association for any of the four variants (rs225014, rs225015, rs12885300, rs17606253); the authors conclude the data do not support a gene–treatment interaction (PMID 37740545). No dosing decision follows from the genotype."
+          },
+          "source": "PMID 37740545 (UK Biobank); частота аллеля — gnomAD"
+        },
+        "SLC16A10": {
+          "kind": "asked_about",
+          "text": {
+            "ru": "MCT10 — транспортёр, заносящий тиреоидный гормон в клетку; тот же путь «доставка и превращение». Вариант rs17606253 входил в ту же проверку, что и варианты DIO2. UK Biobank: 18 761 пациент на левотироксине против 360 534 контролей; ассоциации не найдено ни по одному из четырёх вариантов (rs225014, rs225015, rs12885300, rs17606253), авторы заключают, что взаимодействие «ген × лечение» их данными не поддерживается (PMID 37740545). Решения не выводится.",
+            "en": "MCT10 transports thyroid hormone into the cell. rs17606253 was in the same tested panel. UK Biobank: 18,761 levothyroxine-treated patients vs 360,534 controls; no association for any of the four variants (rs225014, rs225015, rs12885300, rs17606253); the authors conclude the data do not support a gene–treatment interaction (PMID 37740545)."
+          },
+          "source": "PMID 37740545 (UK Biobank)"
+        },
+        "DIO1": {
+          "kind": "mechanism",
+          "text": {
+            "ru": "Дейодиназа 1 даёт циркулирующий T3 и убирает обратный T3 — участие в обмене вещества прямое. Изученные варианты (rs2235544, rs11206244, rs12095080) регуляторные, белок не меняют; описаны ассоциации с соотношением свободных T3 и T4 и с уровнем обратного T3. Клинического правила дозирования по ним нет, и руководства CPIC по паре не существует.",
+            "en": "DIO1 supplies circulating T3 and clears reverse T3. The studied variants are regulatory, not protein-changing; associations with the free T3/T4 ratio and reverse T3 are described. No dosing rule; no CPIC guideline."
+          },
+          "source": "отсутствие руководства — CPIC; ассоциации — литература по параметрам тиреоидных гормонов"
+        },
+        "DIO3": {
+          "kind": "mechanism",
+          "text": {
+            "ru": "Дейодиназа 3 инактивирует тиреоидный гормон — участие в обмене прямое. Изученный вариант rs945006 регуляторный; клинического правила нет, руководства CPIC по паре нет.",
+            "en": "DIO3 inactivates thyroid hormone. rs945006 is regulatory; no clinical rule and no CPIC guideline."
+          },
+          "source": "отсутствие руководства — CPIC"
+        }
+      }
+    },
+    "note": {
+      "ru": "ОБРАЗЕЦ НА ПОДПИСЬ ВРАЧУ, движком НЕ читается (загружается только `drugs`). Составлен 12.09.2026 по просьбе врача: «необходим пример списка и пример заключения». Показывает ФОРМУ двух видов связи сразу — 3 (механизм есть, правила нет) и 4 (маркер проверен, ассоциации нет). Ни одна фраза здесь не выведена нами из общих соображений: каждая опирается на названный источник, и именно это врач подтверждает или правит. Перенести в `drugs` можно только после её подтверждения.",
+      "en": "A FORM SAMPLE awaiting a clinician's signature; not read by the engine (only `drugs` is loaded)."
+    }
+  }
+}

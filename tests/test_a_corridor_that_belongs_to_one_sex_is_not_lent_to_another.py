@@ -36,13 +36,20 @@ ALLOWED = ("any", "male", "female", "unreviewed")
 
 
 def panel_markers():
-    """Every marker any radar domain scores — read off the source, not off a run."""
-    src = Path(lifestyle.__file__).read_text(encoding="utf-8")
-    block = src[src.index("_RADAR_DOMAINS = ["):]
-    block = block[:block.index(chr(10) + "]")]
+    """Every marker any radar domain scores — read off what the build DECLARES.
+
+    Until 12.09.2026 this parsed `_RADAR_DOMAINS = [` out of the source of
+    `lifestyle.py`. The list now lives in `knowledge/radar_domains.json` (task
+    168, step 1) and the module builds its constant from it, so the file is what
+    exists and the file is what is read — the same move the body-map test made.
+    Not off a run: a run on the fixture would report only the domains it happens
+    to have data for.
+    """
+    data = json.loads(core.knowledge_path("radar_domains.json").read_text(encoding="utf-8"))
     out = []
-    for _key, body in re.findall(r'\(\s*"([a-z_]+)"\s*,\s*\[([^\]]*)\]', block):
-        out += re.findall(r'"([a-z0-9_]+)"', body)
+    for d in data.get("domains", []):
+        if d.get("source") == "labs":
+            out += list(d.get("markers") or [])
     return sorted(set(out))
 
 

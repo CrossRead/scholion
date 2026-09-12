@@ -1,0 +1,98 @@
+{
+  "_meta": {
+    "purpose": "The body systems of the health radar, each with the laboratory panel that defines it. Read by engine/lifestyle.py (the laboratory half: score, coverage, dynamics) and by engine/system_panels.py (the genetic half and the questions for a clinician). One file, two readers, so that the two halves of a system cannot drift apart in silence.",
+    "who_writes_this": "The project. Which markers a laboratory issues as one panel is reference knowledge, not a medical claim about a person; the composition was decided in 0.4.9 and is not reopened here.",
+    "source_tier": "curated_reference",
+    "updated": "2026-09-12",
+    "why_four_endocrine_systems": "The endocrine system is not one system. «Hormones» averaged a thyroid marker, a gonadal one and a hepatic one into a single number, and the ring beside it measured how much of that mixture existed — a quantity nobody orders. Thyroid, adrenals, gonads and growth are the panels a laboratory actually issues, and they became four domains in 0.4.9. The composition is not to be changed by a later task: a system with a different marker set is a different system, and every stored radar score before the change would be measured against a panel that no longer exists.",
+    "fitness": "The twelfth system is not a laboratory panel: it is built from wearable metrics, its markers are whatever the device reports, and `health_radar` attaches it after the laboratory domains. It is listed here with `source: wearables` and `genetic_half: false` so that no reader counts eleven and loses it, and no reader attaches a genetic half to it by inattention.",
+    "schema": "domains: [ { key, source: labs|wearables, genetic_half: bool, markers: [marker keys of lab_markers.json], why } ] — `key` is also the i18n key `radar.domain.<key>` and the top-level key of system_gene_panels.json; `markers` is empty for a wearables domain.",
+    "order_matters": "The order of the list is the order the radar draws its axes in and the order the previous stored radars used. Reordering is a visible change, not a cosmetic one."
+  },
+  "domains": [
+    {
+      "key": "lipids",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["cholesterol_total", "ldl", "hdl", "triglycerides"],
+      "why": "The lipid panel as a laboratory issues it."
+    },
+    {
+      "key": "glucose",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["glucose", "hba1c", "homa_ir", "insulin"],
+      "why": "Carbohydrate metabolism. Insulin stays here, where HOMA-IR is computed from it — splitting an index from one of its two inputs would leave neither system able to explain it."
+    },
+    {
+      "key": "inflammation",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["crp_hs", "rheumatoid_factor", "homocysteine"],
+      "why": "Inflammation and its vascular marker."
+    },
+    {
+      "key": "thyroid",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["tsh", "t4_free", "t3_free", "anti_tpo"],
+      "why": "The thyroid panel a laboratory issues. One of the four endocrine systems that replaced «hormones» in 0.4.9 — see _meta.why_four_endocrine_systems."
+    },
+    {
+      "key": "adrenals",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["cortisol", "dheas"],
+      "why": "The adrenal panel. One of the four endocrine systems of 0.4.9."
+    },
+    {
+      "key": "gonads",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["testosterone", "dht", "estradiol"],
+      "why": "The gonadal panel. One of the four endocrine systems of 0.4.9."
+    },
+    {
+      "key": "growth",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["igf1", "gh"],
+      "why": "The growth axis. One of the four endocrine systems of 0.4.9."
+    },
+    {
+      "key": "pancreas",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["amylase", "amylase_pancreatic", "lipase", "c_peptide"],
+      "why": "Both halves of the gland: the acinar cell that makes the digestive enzymes, and the beta cell, whose C-peptide is released with insulin in equal amount and survives long enough to be measured. Insulin itself stays in the carbohydrate panel, where HOMA-IR is computed from it, and is MARKED at the pancreas instead."
+    },
+    {
+      "key": "liver",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["alt", "ast", "ggt"],
+      "why": "The liver enzymes."
+    },
+    {
+      "key": "micronutrients",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["vitamin_d", "omega3_index", "vitamin_b12", "ferritin"],
+      "why": "Vitamins and stores."
+    },
+    {
+      "key": "renal",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["uric_acid", "creatinine"],
+      "why": "The kidney panel."
+    },
+    {
+      "key": "fitness",
+      "source": "wearables",
+      "genetic_half": false,
+      "markers": [],
+      "why": "Built from wearable metrics by `lifestyle()` and attached to the radar after the laboratory domains; it has no laboratory panel and no genetic half. See _meta.fitness."
+    }
+  ]
+}

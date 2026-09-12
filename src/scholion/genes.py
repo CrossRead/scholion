@@ -56,7 +56,22 @@ def gff3_search_roots() -> List[Path]:
     # by `SCHOLION_GENE_GFF3` — one variable, deliberately, instead of a search
     # that is convenient until the day it finds the wrong file.
     roots: List[Path] = list(core.genome_bases())
-    roots += [Path.home() / "genomic_work" / "csq"]
+    roots += [Path.home() / "genomic_work" / "csq", Path.home() / "genomic_work"]
+    # And beside the alignment the person already told us about. An annotation
+    # usually lives in the same working folder as the data it annotates, and a
+    # search that knows where the BAM is and does not look there sends the
+    # reader to set a variable for a file that was one directory away. Three
+    # genes came back «could not be resolved to coordinates» on a machine
+    # holding the file, with the live source unreachable at the same moment —
+    # both roads closed at once, and neither of them needed to be.
+    try:
+        from .gene_region import bam_path
+        bam = bam_path()
+    except Exception:                                                # noqa: BLE001
+        bam = None
+    if bam is not None:
+        here = Path(bam).parent
+        roots += [here, here / "csq", here.parent, here.parent / "csq"]
     out, seen = [], set()
     for r in roots:
         s = str(r)

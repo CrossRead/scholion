@@ -129,7 +129,7 @@ does what a caveat cannot.
 
 **16a. A file read without an index answers the catalogue and refuses a region.**
 `genome-status` prints which paths this input opens; when it says the file is
-read without an index, the 54 catalogue loci and the pharmacogenetics resting on
+read without an index, the catalogue loci and the pharmacogenetics resting on
 them are answerable and any gene beyond them is not. That refusal is about the
 FILE, never about the person: do not relay it as «no variants in that gene», and
 do not retry the same question in another wording. `bgzip` + `tabix -p vcf`

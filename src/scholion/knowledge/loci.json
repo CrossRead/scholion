@@ -4,12 +4,12 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`.",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-    "updated": "2026-08-19",
+    "updated": "2026-09-12",
     "source_tier": "primary_literature",
     "assembly_secondary": "GRCh37",
     "assembly_secondary_note": {
@@ -19,7 +19,8 @@
     "assembly_secondary_open": {
       "en": "The position question is closed — every locus answers in both builds. Two things are not. (1) Allele orientation: rs6025, rs1065852 and rs762551 appear in a corpus GRCh37 file with REF/ALT the reverse of this catalogue's (file T>C vs catalogue C>T; G>A vs A>G; C>A vs A>C). Their GRCh37 positions here come from NCBI and Ensembl, not from that file, so the coordinates are unaffected; what is unresolved is which strand that exporter reports on, and it is left open rather than settled from one caller's output. (2) The same run also compared every GRCh38 position in this catalogue against dbSNP. It reported to the console and the console was not kept, so that comparison is not on record here — the script now writes a report file beside its output, and the next run will leave one.",
       "ru": "Вопрос о позициях закрыт — каждый локус отвечает в обеих сборках. Незакрытых два. (1) Ориентация аллелей: rs6025, rs1065852 и rs762551 встречаются в файле GRCh37 из корпуса с REF/ALT, обратными нашим (в файле T>C против C>T в каталоге; G>A против A>G; C>A против A>C). Координаты GRCh37 у них взяты из NCBI и Ensembl, а не из этого файла, так что на позиции это не влияет; неразрешено то, с какой цепи отчитывается этот экспортёр, и вопрос оставлен открытым, а не решён по выводу одного вызывателя. (2) Тот же прогон сверил и все координаты GRCh38 этого каталога с dbSNP. Он отчитался в консоль, консоль не сохранена — значит, этой сверки здесь нет на бумаге. Теперь скрипт пишет отчёт рядом с выходным файлом, и следующий прогон его оставит."
-    }
+    },
+    "catalog_updated": "2026-09-12"
   },
   "regions": {
     "CYP2D6": {
@@ -677,6 +678,107 @@
         "ru": "L253F — редкий, сообщается о потере функции; направление здесь пока не разрешено"
       },
       "pos_grch37": 55518422
+    },
+    "rs225014": {
+      "gene": "DIO2",
+      "chrom": "14",
+      "pos": 80203237,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "Thr92Ala — the most studied deiodinase-2 variant; T4→T3 conversion in tissue. MAF ≈0.38.",
+        "ru": "Thr92Ala — самый изученный вариант дейодиназы 2; тканевое превращение T4 в T3. Частота минорного аллеля ≈0,38. В панель UK Biobank (18 761 пациент на левотироксине против 360 534 контролей) входил; связи с самочувствием, когнитивными показателями и сердечно-сосудистыми факторами не найдено, взаимодействие «ген × лечение» не подтверждено (PMID 37740545). Вся доказательная база относится к пациентам НА левотироксине; у человека без заместительной терапии из этого варианта ничего не следует."
+      },
+      "clinical_significance": [
+        "other"
+      ],
+      "consequence": "missense_variant",
+      "pos_grch37": 80669580
+    },
+    "rs225015": {
+      "chrom": "14",
+      "pos": 80201236,
+      "ref": "G",
+      "alt": "A",
+      "clinical_significance": [
+        "other"
+      ],
+      "consequence": "3_prime_UTR_variant",
+      "gene": "DIO2",
+      "note": {
+        "ru": "3′-нетранслируемая область. Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится. В панель UK Biobank (18 761 пациент на левотироксине против 360 534 контролей) входил; связи с самочувствием, когнитивными показателями и сердечно-сосудистыми факторами не найдено, взаимодействие «ген × лечение» не подтверждено (PMID 37740545).",
+        "en": "3′-нетранслируемая область. Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится. В панель UK Biobank (18 761 пациент на левотироксине против 360 534 контролей) входил; связи с самочувствием, когнитивными показателями и сердечно-сосудистыми факторами не найдено, взаимодействие «ген × лечение» не подтверждено (PMID 37740545)."
+      },
+      "pos_grch37": 80667579
+    },
+    "rs11206244": {
+      "chrom": "1",
+      "pos": 53910028,
+      "ref": "C",
+      "alt": "T",
+      "clinical_significance": [],
+      "consequence": "3_prime_UTR_variant",
+      "gene": "DIO1",
+      "note": {
+        "ru": "3′-нетранслируемая область (D1a). Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится.",
+        "en": "3′-нетранслируемая область (D1a). Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится."
+      },
+      "pos_grch37": 54375701
+    },
+    "rs12095080": {
+      "chrom": "1",
+      "pos": 53911057,
+      "ref": "A",
+      "alt": "G",
+      "clinical_significance": [],
+      "consequence": "3_prime_UTR_variant",
+      "gene": "DIO1",
+      "note": {
+        "ru": "3′-нетранслируемая область (D1b). Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится.",
+        "en": "3′-нетранслируемая область (D1b). Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится."
+      },
+      "pos_grch37": 54376730
+    },
+    "rs945006": {
+      "chrom": "14",
+      "pos": 101562940,
+      "ref": "T",
+      "alt": "G",
+      "clinical_significance": [],
+      "consequence": "3_prime_UTR_variant",
+      "gene": "DIO3",
+      "note": {
+        "ru": "Дейодиназа 3 — инактивирующий фермент. Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится.",
+        "en": "Дейодиназа 3 — инактивирующий фермент. Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится."
+      },
+      "pos_grch37": 102029277
+    },
+    "rs17606253": {
+      "chrom": "6",
+      "pos": 111205242,
+      "ref": "T",
+      "alt": "C",
+      "clinical_significance": [],
+      "consequence": "intron_variant",
+      "gene": "SLC16A10",
+      "note": {
+        "ru": "MCT10 — транспортёр, заносящий тиреоидный гормон в клетку; не дейодиназа, но тот же путь «доставка и превращение». Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится. В панель UK Biobank (18 761 пациент на левотироксине против 360 534 контролей) входил; связи с самочувствием, когнитивными показателями и сердечно-сосудистыми факторами не найдено, взаимодействие «ген × лечение» не подтверждено (PMID 37740545).",
+        "en": "MCT10 — транспортёр, заносящий тиреоидный гормон в клетку; не дейодиназа, но тот же путь «доставка и превращение». Регуляторный вариант — белок не меняет. Ассоциации описаны, клинического правила нет: из генотипа решения не выводится. В панель UK Biobank (18 761 пациент на левотироксине против 360 534 контролей) входил; связи с самочувствием, когнитивными показателями и сердечно-сосудистыми факторами не найдено, взаимодействие «ген × лечение» не подтверждено (PMID 37740545)."
+      },
+      "pos_grch37": 111526445
+    },
+    "rs4680": {
+      "gene": "COMT",
+      "chrom": "22",
+      "pos": 19963748,
+      "ref": "G",
+      "alt": "A",
+      "star": "Val158Met",
+      "note": {
+        "en": "the A allele is Met: a thermolabile enzyme, so catecholamines are broken down more slowly. CPIC names the gene in its opioid guideline and deliberately issues NO dosing recommendation by it, and the behavioural and cognitive associations of the 2000s do not reproduce in large samples. It is in the catalogue because it is asked about often, not because anything is decided by it",
+        "ru": "аллель A — это Met: фермент термолабилен, и катехоламины разрушаются медленнее. CPIC называет ген в руководстве по опиоидам и намеренно НЕ даёт по нему рекомендаций по дозе, а поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. Локус в каталоге потому, что о нём часто спрашивают, а не потому, что по нему что-то решается"
+      },
+      "pos_grch37": 19951271
     }
   }
 }

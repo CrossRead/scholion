@@ -36,10 +36,27 @@ class TestEveryEntryHasAlleles(unittest.TestCase):
     """Without these the new guard in `_gt_at` has nothing to compare against."""
 
     def test_one_base_each_and_not_the_same_base(self):
+        """Either a comparable pair, or a position held with no alternative chosen.
+
+        The second shape exists because some studied positions carry three
+        alternative alleles, and which of them a paper meant is not in the
+        source. Such an entry keeps its coordinate and the alleles observed
+        there, has no `alt`, and every reader refuses on it by name — task 167.
+        Never both: an entry carrying an `alt` beside `alleles_observed` would be
+        compared against the chosen one while looking like it had refused to
+        choose.
+        """
         for rs, loc in catalogue().items():
             with self.subTest(rs=rs):
                 ref, alt = loc.get("ref"), loc.get("alt")
                 self.assertIn(ref, COMPLEMENT, f"{rs}: reference base")
+                observed = loc.get("alleles_observed")
+                if observed:
+                    self.assertFalse(alt, f"{rs}: both an alt and the observed set")
+                    self.assertGreaterEqual(len(observed), 3, f"{rs}: {observed}")
+                    for a in observed:
+                        self.assertIn(a, COMPLEMENT, f"{rs}: observed allele {a}")
+                    continue
                 self.assertIn(alt, COMPLEMENT, f"{rs}: alternative base")
                 self.assertNotEqual(ref, alt, f"{rs}: a variant that changes nothing")
 

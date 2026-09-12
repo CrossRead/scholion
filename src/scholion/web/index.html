@@ -100,6 +100,9 @@
   .sparkwrap{margin-top:10px}
   .sparkdates{display:flex;justify-content:space-between;width:168px;font-size:11.5px;color:var(--muted);margin-top:3px}
   .sparkwrap .spark{margin-top:0}
+  .sparkleg{display:flex;gap:10px;width:168px;font-size:11px;color:var(--muted);margin-top:2px}
+  .sparkleg .lg-tg,.tgt{color:var(--warning)}
+  .tgt-ask{color:var(--ink-2)}
   .stat{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px}
   .stat .s{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;min-width:120px}
   .stat .s b{font-size:28px;display:block;font-weight:700}
@@ -329,6 +332,35 @@
   .rdot{cursor:pointer}
   .nosex{max-width:34ch;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.5}
   .syscredit{font-size:11px;color:var(--muted);text-align:center;margin-top:6px}
+  /* The second ring: how much of the system's genetic half was READ. Never
+     merged with the laboratory ring — a genotype does not change with the next
+     draw, and one ring made of both could not be refuted by any measurement. */
+  .ringgen{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linecap:round}
+  .ringgen-bg{fill:none;stroke:var(--baseline);stroke-width:1.8;opacity:.6}
+  .ringgen-none{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:2 3;opacity:.7}
+  /* the card of one system, and the second look laid out by system */
+  .syscard .layer{margin-top:16px}
+  .syscard .layer h3{font-size:14.5px;margin:0 0 6px;color:var(--ink)}
+  .syscard .layer h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+  .syscard .row-l{font-size:14px;line-height:1.5;color:var(--ink-2);margin:3px 0}
+  .syscard .verdict{background:var(--surface);border:1px solid var(--border);
+        border-left:3px solid var(--accent);border-radius:var(--r);padding:12px 16px;
+        font-size:14.5px;line-height:1.55;margin:10px 0}
+  .syscard .basket{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+        padding:12px 14px;margin-top:8px}
+  .syscard .basket h4{margin:0 0 6px;font-size:13.5px;letter-spacing:.04em;text-transform:uppercase;
+        color:var(--muted)}
+  .syscard ol{margin:6px 0 0;padding-left:22px}
+  .syscard ol li{margin-bottom:6px;line-height:1.5}
+  .sysblock{border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;
+        background:var(--surface)}
+  .sysblock .so-h{margin-top:0}
+  .ownernote{color:var(--muted);font-style:italic}
+  .ownernote b{font-style:normal;font-weight:600;font-size:12px;letter-spacing:.04em;
+        text-transform:uppercase;color:var(--muted)}
+  .syslink{color:var(--accent);font-size:13px;text-decoration:none;cursor:pointer}
+  .regtoggle button[aria-pressed="true"]{border-color:var(--accent);color:var(--ink)}
+  @media print{.syscard,.sysblock,.basket{break-inside:avoid}}
 </style>
 <script src="/chart.min.js"></script>
 </head>
@@ -400,7 +432,12 @@ async function loadLang(code){
 }
 const withLang=(path)=>path+(path.indexOf('?')>=0?'&':'?')+'lang='+encodeURIComponent(LANG);
 async function api(path,opts){const r=await fetch(API+withLang(path),opts);return r.json();}
-async function post(path,body){const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;return r;}
+async function post(path,body){const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;_systems=null;return r;}
+// The systems listing is read once per page state and shared: three tabs join
+// on it (marker → system, gene → systems, prescription → system) and none of
+// them re-derives the join. Dropped after any write and on a language switch.
+let _systems=null;
+async function systemsIndex(){ if(!_systems) _systems=await api('/api/systems'); return _systems; }
 function toast(m){const box=$('#toast');box.textContent=m;box.classList.add('show');setTimeout(()=>box.classList.remove('show'),2200);}
 // A demonstration profile erased by the first real measurement is not a toast.
 // A toast is gone in two seconds and this is the largest thing that can happen
@@ -487,25 +524,70 @@ function windowSeries(series){
   const within=s.filter(p=>p.date>=cutoff).length;
   return s.slice(-Math.max(3,within));
 }
-function sparkline(series,win){
+// `marks` (task 170): {ref_low, ref_high, target} — drawn only when a clinician's
+// target exists, so every other sparkline stays exactly as it was. The corridor
+// is a faint solid band and the target a dashed band or line in another colour:
+// two kinds of «normal» on one chart must not share a stroke, or the reader
+// cannot tell the laboratory's range from the treatment's aim.
+function sparkline(series,win,marks){
   if(win!==false) series=windowSeries(series);
   if(!series||series.length<2) return '';
   const w=168,h=40,pad=5;
+  const tg=marks&&marks.target;
   const ys=series.map(p=>p.value);
-  const mn=Math.min(...ys),mx=Math.max(...ys),rng=(mx-mn)||1;
+  // the scale stretches to the target so its line is on the chart, never to the
+  // corridor — a wide reference range would flatten the series to a stroke
+  const tv=tg?[tg.low,tg.high,tg.value].filter(v=>v!=null).map(Number):[];
+  const mn=Math.min(...ys,...tv),mx=Math.max(...ys,...tv),rng=(mx-mn)||1;
   const X=i=>pad+(w-2*pad)*(i/(series.length-1));
   const Y=v=>h-pad-(h-2*pad)*((v-mn)/rng);
+  const clampY=v=>Math.max(pad,Math.min(h-pad,Y(v)));
   const pts=series.map((p,i)=>`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`).join(' ');
   // points with the date on hover — the date each measurement was taken
   const dots=series.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.value).toFixed(1)}" r="${i===series.length-1?3.2:2.3}" fill="var(--accent)"><title>${esc(p.date)}: ${p.value}</title></circle>`).join('');
+  let bands='', legend='';
+  if(tg){
+    const lo=marks.ref_low!=null?clampY(Number(marks.ref_low)):h-pad, hi=marks.ref_high!=null?clampY(Number(marks.ref_high)):pad;
+    if(marks.ref_low!=null||marks.ref_high!=null)
+      bands+=`<rect x="${pad}" y="${hi.toFixed(1)}" width="${w-2*pad}" height="${Math.max(0,lo-hi).toFixed(1)}" fill="var(--muted)" opacity=".14"/>`;
+    const dash=(v)=>`<line x1="${pad}" x2="${w-pad}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--warning)" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+    if(tg.low!=null&&tg.high!=null)
+      bands+=`<rect x="${pad}" y="${Y(Number(tg.high)).toFixed(1)}" width="${w-2*pad}" height="${Math.max(0,Y(Number(tg.low))-Y(Number(tg.high))).toFixed(1)}" fill="var(--warning)" opacity=".16"/>`;
+    [tg.low,tg.high,tg.value].filter(v=>v!=null).forEach(v=>bands+=dash(Number(v)));
+    legend=`<div class="sparkleg">${(marks.ref_low!=null||marks.ref_high!=null)?`<span class="lg-corr">▮ ${esc(t('web.target.lg_corridor'))}</span>`:''}<span class="lg-tg">╌ ${esc(t('web.target.lg_target'))} ${esc(targetSpec(tg))}</span></div>`;
+  }
   const d0=series[0].date, dN=series[series.length-1].date;
   return `<div class="sparkwrap">
     <svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+      ${bands}
       <polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>
       ${dots}
     </svg>
     <div class="sparkdates"><span>${esc(d0)}</span>${series.length>2?`<span>${esc(series[Math.floor((series.length-1)/2)].date)}</span>`:''}<span>${esc(dN)}</span></div>
+    ${legend}
   </div>`;
+}
+// The figures of a clinician's target as one token — «1–2», «≤2», «16.7» —
+// the same four shapes the report prints, from the same catalogue keys.
+function targetSpec(tg){
+  const f=v=>String(Number(v));
+  if(tg.low!=null&&tg.high!=null) return t('target.spec_range',{low:f(tg.low),high:f(tg.high)});
+  if(tg.high!=null) return t('target.spec_max',{high:f(tg.high)});
+  if(tg.low!=null) return t('target.spec_min',{low:f(tg.low)});
+  if(tg.value!=null) return t('target.spec_value',{value:f(tg.value)});
+  return '';
+}
+// The question a target asks, or nothing. Only for a value the corridor calls
+// normal: a flagged value has the flag speaking for it already. A question, not
+// an instruction — the target is the frame of a treatment, not a diagnosis.
+function targetAsk(m){
+  if(!m||!m.target||!m.outside_target||m.flag!=='ok') return '';
+  const side=t(m.target.side==='above'?'web.target.side_above':'web.target.side_below');
+  return `<div class="why tgt-ask">${esc(t('web.target.discuss',{side}))}</div>`;
+}
+function targetText(m){
+  if(!m||!m.target) return '';
+  return ` · <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(m.target)}))}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:m.target.set_by,set_on:m.target.set_on}))})</span>`;
 }
 
 // ---------------- The goal dashboard (on the "Overview" tab) ----------------
@@ -909,8 +991,9 @@ function markerCard(m){
     <div class="label">${esc(m.name)}</div>
     <div class="value">${m.value} <small>${esc(m.unit)}</small></div>
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted" style="font-size:12.5px">${esc(m.date)}</span>`:''}${tr}</div>
-    ${m.series&&m.series.length>1?sparkline(m.series):''}
-    <div class="meta">${esc(refText(m))}${m.genome_link?` · <span class="glink">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</span>`:''}${m.note?` · ${esc(m.note)}`:''}${m.corridor_note?` · ${esc(m.corridor_note)}`:''}</div>
+    ${m.series&&m.series.length>1?sparkline(m.series,undefined,m.target?{ref_low:m.ref_low,ref_high:m.ref_high,target:m.target}:null):''}
+    <div class="meta">${esc(refText(m))}${targetText(m)}${m.genome_link?` · ${ownerNoteHtml(m)}`:''}${m.note?` · ${esc(m.note)}`:''}${m.corridor_note?` · ${esc(m.corridor_note)}`:''}${m.system?` · ${systemLinkHtml(m.system)}`:''}</div>
+    ${targetAsk(m)}
   </div>`);
 }
 async function viewLabs(root){
@@ -930,7 +1013,9 @@ async function viewLabs(root){
     <div class="meta" style="margin-bottom:12px">${docs?t('web.labs.docs_folder_set',{path:'<b>'+esc(docs)+'</b>'}):esc(t('web.labs.docs_folder_unset'))}</div>
     <div id="ingest-res" style="margin-bottom:12px"></div>
     <div id="add-lab" class="hidden"></div>
+    <div id="targets-box"></div>
     <div class="grid" id="labgrid"></div>`;
+  renderTargets($('#targets-box',root), cat);
   const g = $('#labgrid',root);
   // The heading says «8 out of range of 27» and the grid then listed all
   // twenty-seven alphabetically, so the eight the sentence is about were
@@ -1007,9 +1092,122 @@ function renderAddLab(box, cat){
   };
 }
 const num=v=>{v=(v||'').toString().replace(',','.').trim();return v===''?null:(isNaN(+v)?null:+v);};
+// ---- targets a clinician set (task 170) ----
+// Read from the route that OWNS the list — «inside the corridor, outside the
+// target» is computed once, in the engine, and the page prints it. The «Second
+// look» abnormal list is not the place: that list is corridor deviations, and
+// a target is deliberately never one of those.
+async function renderTargets(box, cat){
+  const d=await api('/api/targets');
+  const rows=(d.targets||[]).map(tg=>{
+    const cur=tg.current;
+    let now=cur?t('web.target.now',{value:cur.value,date:cur.date}):t('web.target.now_none');
+    if(cur&&tg.outside_target){
+      const side=t(tg.side==='above'?'web.target.side_above':'web.target.side_below');
+      now+=' — '+(tg.in_corridor?t('web.target.discuss',{side}):t('web.target.outside_and_flagged',{side}));
+    }else if(cur&&tg.outside_target===false){now+=' — '+t('web.target.within');}
+    return `<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(tg)}))}${tg.unit?' '+esc(tg.unit):''}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span>
+      <button class="ghost tg-rm" data-marker="${esc(tg.marker)}" style="margin-left:auto">✕ ${esc(t('web.target.remove'))}</button></div>
+      <div class="why">${esc(now)}${tg.note?` · ${esc(tg.note)}`:''}</div></div>`;
+  }).join('');
+  const ask=(d.targets||[]).filter(tg=>d.to_discuss.includes(tg.marker));
+  const askList=ask.length?ask.map(tg=>`<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: ${tg.current.value} ${esc(tg.unit||'')} <span class="muted">${esc(refText(tg.current))}</span></div><div class="why tgt-ask">${esc(t('web.target.discuss',{side:t(tg.side==='above'?'web.target.side_above':'web.target.side_below')}))} <span class="muted">(${esc(t('web.target.beside',{spec:targetSpec(tg)}))}, ${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span></div></div>`).join('')
+    :`<div class="muted">${esc(t('web.target.discuss_none'))}</div>`;
+  box.innerHTML=`<div class="card" style="margin-bottom:12px">
+    <div class="row"><div class="so-h" style="margin:0">${esc(t('web.target.h'))}</div><button class="ghost" id="tg-toggle" style="margin-left:auto">+ ${esc(t('web.target.add_toggle'))}</button></div>
+    <div id="tg-form" class="hidden"></div>
+    ${rows||`<div class="muted">${esc(t('web.target.none'))}</div>`}
+    ${(d.targets||[]).length?`<div class="so-h" style="margin-top:10px">${esc(t('web.target.discuss_h'))}</div>${askList}`:''}
+    <div class="meta" style="margin-top:8px">${esc(t('web.target.frame_note'))}</div>
+  </div>`;
+  $('#tg-toggle',box).onclick=()=>$('#tg-form',box).classList.toggle('hidden');
+  renderTargetForm($('#tg-form',box), cat);
+  box.querySelectorAll('.tg-rm').forEach(b=>b.onclick=async()=>{
+    const r=await post('/api/targets/remove',{marker:b.dataset.marker});
+    if(r.ok){toast(t('web.target.removed'));viewLabs($('#view'));}else toast(t('web.common.error_prefix')+(r.error||''));
+  });
+}
+function renderTargetForm(box, cat){
+  const opts=cat.map(c=>`<option value="${esc(c.key)}" data-unit="${esc(c.canonical_unit||c.unit||'')}">${esc(c.name)} (${esc(c.unit)})</option>`).join('');
+  box.innerHTML=`<div class="form">
+    <div class="so-h" style="margin:0 0 6px">${esc(t('web.target.form_h'))}</div>
+    <div class="fr">
+      <label>${esc(t('web.target.marker'))}<select id="tg-marker">${opts}</select></label>
+      <label>${esc(t('web.target.low'))}<input id="tg-lo" size="6"></label>
+      <label>${esc(t('web.target.high'))}<input id="tg-hi" size="6"></label>
+      <label>${esc(t('web.target.value'))}<input id="tg-val" size="6"></label>
+      <label>${esc(t('web.target.unit'))}<input id="tg-unit" size="8"></label>
+    </div>
+    <div class="fr">
+      <label>${esc(t('web.target.set_by'))}<input id="tg-by" size="18"></label>
+      <label>${esc(t('web.target.set_on'))}<input id="tg-on" placeholder="2026-09-12" size="10"></label>
+      <label>${esc(t('web.target.note'))}<input id="tg-note" size="24"></label>
+      <button class="act" id="tg-save">${esc(t('web.target.save'))}</button>
+    </div>
+  </div>`;
+  const sel=$('#tg-marker',box), unit=$('#tg-unit',box);
+  // the unit follows the marker chosen, as a suggestion the person can overwrite
+  const syncUnit=()=>{const o=sel.options[sel.selectedIndex];unit.value=(o&&o.dataset.unit)||'';};
+  sel.onchange=syncUnit; syncUnit();
+  $('#tg-save',box).onclick=async()=>{
+    const body={marker:sel.value,low:num($('#tg-lo',box).value),high:num($('#tg-hi',box).value),value:num($('#tg-val',box).value),
+      unit:unit.value.trim(),set_by:$('#tg-by',box).value.trim(),set_on:$('#tg-on',box).value.trim(),note:$('#tg-note',box).value.trim()};
+    if(!body.marker||(body.low==null&&body.high==null&&body.value==null)||!body.set_by||!body.set_on){toast(t('web.target.fill_required'));return;}
+    const r=await post('/api/targets',body);
+    if(r.ok){toast(t('web.target.saved'));viewLabs($('#view'));claimNotice(r);}else toast(t('web.common.error_prefix')+(r.error||''));
+  };
+}
 
 // ---------------- Drug check ----------------
 function refLink(d){return d.reference?` · <a href="${esc(d.reference)}" target="_blank" rel="noopener">RxNav ↗</a>`:'';}
+// The verdict about the decision, and the classes of link that carry no rule.
+// The page says them in the engine's words: a face that paraphrases a refusal is
+// a face that will one day soften it.
+function verdictLine(v){
+  if(v.kind==='rule_fires')return t('decision.rule_fires',{genes:(v.genes||[]).join(', ')});
+  if(v.kind==='rule_silent')return t('decision.rule_silent',{genes:(v.genes||[]).join(', ')});
+  return t('decision.no_rule',{why:t('decision.why.'+(v.why||'no_pair'))});
+}
+// Four states, and none of them says a gene is absent: everybody has the gene.
+// Read and matching the reference is a finding; held and unread is a gap; held
+// nowhere is a statement about this build.
+function variantStateLine(v){
+  if(!v||!v.state)return '';
+  if(v.state==='variant_called')return t('decision.variant.variant_called',{n:v.called||0});
+  if(v.state==='no_variant_called'){
+    const lo=v.depth_min,hi=v.depth_max;
+    const span=(lo==null||hi==null)?'—':(lo===hi?lo+'\u00d7':lo+'\u2013'+hi+'\u00d7');
+    let s=t('decision.variant.no_variant_called',{n:v.confirmed_ref||0,total:v.positions||0,depth:span});
+    if(v.unread)s+='; '+t('decision.variant.and_unread',{n:v.unread});
+    return s;
+  }
+  if(v.state==='not_read')return t('decision.variant.not_read',{n:v.positions||0});
+  return t('decision.variant.no_positions');
+}
+function contextHtml(ctx){
+  if(!ctx||!ctx.blocks)return '';
+  let out='';
+  for(const kind of ['mechanism','asked_about','no_variant'])
+    for(const row of (ctx.blocks[kind]||[]))
+      out+=`<div class="list-item"><div><b>${esc(row.gene)}</b> — ${esc(t('decision.kind.'+kind))}: ${esc(row.text||t('decision.not_written_yet'))}</div>`
+         + (variantStateLine(row.variant)?`<div class="why muted">${esc(variantStateLine(row.variant))}</div>`:'')
+         + `<div class="why muted">${esc(t('decision.source',{source:row.source}))}</div></div>`;
+  for(const row of (ctx.named||[]))
+    out+=`<div class="list-item"><div><b>${esc(row.gene)}</b> — ${esc(t('decision.kind.unassigned'))}</div>`
+       + `<div class="why muted">${esc(t('decision.source',{source:row.source}))}</div></div>`;
+  const cur=ctx.curated||{};
+  if(!cur.asked)out+=`<div class="why muted">${esc(t('decision.no_context_list'))}</div>`;
+  else if(cur.refused)out+=`<div class="why muted">${esc(t('decision.entries_without_source',{n:cur.refused}))}</div>`;
+  return out;
+}
+// The same four states the engine has, in the same words. A page that reduces
+// them to one grey line un-does the work of separating them.
+function coverageLine(c){
+  if(c.state==='low')return t('gene.coverage.low',{pct:c.pct_20x,median:c.median_pct_20x});
+  if(c.state==='fine')return t('gene.coverage.fine',{pct:c.pct_20x});
+  if(c.state==='gene_not_in_table')return t('gene.coverage.not_in_table',{n:c.table_size||0});
+  return t('gene.layer.coverage_no');
+}
 function pgxCard(d){
   if(d.status==='not_found'||d.status==='not_in_panel')return `<div class="card"><div class="muted">${esc(d.message)}${refLink(d)}</div></div>`;
   if(d.status==='found_online')return `<div class="card">
@@ -1064,6 +1262,10 @@ function rxCard(r){
   const id=r.identified||{};
   const idLine=id.source==='none'?`<span class="muted">${esc(t('web.rx.not_identified'))}</span>`
     :`${id.source==='rxnorm'?'🌍 RxNorm':'📗 '+esc(t('web.rx.local_db'))}${id.atc?' · '+esc(id.atc):''}${id.reference?' · <a href="'+esc(id.reference)+'" target="_blank" rel="noopener">RxNav ↗</a>':''}`;
+  // The judgement about the decision, above the sections that make it — the
+  // same sentence the command line prints, from the same field.
+  const ctx=r.genetic_context||{};
+  const verdictHtml=ctx.verdict?`<div class="lsact" style="margin:10px 0">🧬 ${esc(verdictLine(ctx.verdict))}</div>`:'';
   // 🧬 the patient's genome
   const g=r.genome||{};
   let genomeHtml;
@@ -1072,7 +1274,7 @@ function rxCard(r){
     // on cpic_lookup(). Only the second one licenses «this drug has none».
     const cp=g.cpic||{};
     genomeHtml=cp.asked
-      ?`<div class="muted">${esc(t('web.rx.no_pgx'))}</div>`
+      ?`<div class="muted">${esc(t('web.rx.no_pgx',{date:cp.snapshot||t('common.unknown_date')}))}</div>`
       :`<div class="muted">${esc(t('web.rx.pgx_unchecked',{why:t('pgx_unchecked.'+(cp.reason||'unreachable'))}))}</div>`;
   }else{
     genomeHtml=g.genes.map(ge=>{
@@ -1084,7 +1286,11 @@ function rxCard(r){
         const mk=(ge.markers||[]).map(m=>`<code>${esc(m.rsid)}</code> ${esc(m.genotype||'')}`).join(', ');
         body=(mk?(esc(t('web.rx.your_variants'))+' '+mk+'<div class="meta" style="margin-top:3px">'+esc(ge.label||'')+'</div>'):'<span class="muted">'+esc(ge.label||'')+'</span>');
       }
-      return `<div class="list-item"><div class="row"><b>${esc(ge.gene)}</b> <span class="badge b-unknown">${lvl}</span>${ge.actionable?' '+badge('b-warning',t('web.rx.actionable')):''}</div><div class="why">${body}</div></div>`;
+      // How well this gene was read, under the answer about it. Silent only
+      // when the gene is read like the rest of the file — and that is not the
+      // same claim as «enough», which depends on a question we do not have.
+      const cv=ge.coverage||{}, cvTxt=(cv.state&&cv.state!=='fine')?coverageLine(cv):'';
+      return `<div class="list-item"><div class="row"><b>${esc(ge.gene)}</b> <span class="badge b-unknown">${lvl}</span>${ge.actionable?' '+badge('b-warning',t('web.rx.actionable')):''}</div><div class="why">${body}</div>${cvTxt?`<div class="why muted">${esc(cvTxt)}</div>`:''}</div>`;
     }).join('');
   }
   // 🧪 the patient's labs
@@ -1231,6 +1437,178 @@ function dArrow(dl){ // the delta of the score: ↑ better, ↓ worse
              :{txt:'▼'+Math.abs(dl),col:'var(--critical)',word:t('web.delta.worse',{n:Math.abs(dl)})};
 }
 
+// ── The card of one system (task 168) ────────────────────────────────────────
+// A `genome_link` on a marker is the owner's own line — free text, no source —
+// and it is styled as a note so that it never reads like a curated sentence
+// that passed the gate. The kind travels from the engine; the page only obeys it.
+function ownerNoteHtml(m){
+  if(!m||!m.genome_link) return '';
+  if(m.genome_link_kind==='owner_note')
+    return `<span class="ownernote"><b>${esc(t('web.labs.owner_note'))}:</b> ${esc(m.genome_link)}</span>`;
+  return `<span class="glink">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</span>`;
+}
+// «system: X →» — the way into a system's card from a marker, a gene or a drug.
+function systemLinkHtml(key, label){
+  if(!key) return '';
+  return `<a href="#" class="syslink" data-system="${esc(key)}">${esc(label||t('system.of_marker',{label:t('radar.domain.'+key)}))} →</a>`;
+}
+// The genetics ring as two numbers: read and unread. `null` when the system
+// has no composed genetic half — drawn as an absence, not as zero read.
+function genRingOf(g){
+  if(!g||g.status!=='composed') return null;
+  const total=(g.read_count||0)+(g.unread_count||0);
+  return {read:g.read_count||0, total:total, frac: total?(g.read_count||0)/total:0};
+}
+function genRingTip(g){
+  const r=genRingOf(g);
+  // The scores, as a third line of the tip and never as a share of either
+  // ring: mapped by the file, scored on this profile.
+  const poly=(g&&g.polygenic&&g.polygenic.mapped)?'\n'+t('systems.polygenic',{scored:g.polygenic.scored||0,mapped:g.polygenic.mapped}):'';
+  if(r) return t('system.ring.genetics',{read:r.read,total:r.total})+poly;
+  const st=g&&g.status==='no_genetic_half'?t('systems.genetics.no_half'):t('systems.genetics.not_composed');
+  return t('system.ring.genetics_none',{status:st})+poly;
+}
+// The common variation of a system as SCORES under their own head — never
+// interleaved with the gene rows (task 178). The registers differ in density:
+// the clinician's adds the model id, the evidence tier and the notes.
+function systemPolygenicHtml(poly, register){
+  if(!poly||!poly.status||poly.status==='no_genetic_half') return '';
+  let b=`<div class="row-l" style="margin-top:8px"><b>${esc(t('system.polygenic.title'))}</b></div>`;
+  if(poly.status!=='ok') return b+`<div class="row-l muted">${esc(poly.why||'')}</div>`;
+  b+=`<div class="row-l">${esc(t('system.polygenic.line',{mapped:poly.mapped||0,scored:poly.scored||0,high:(poly.high||[]).length}))}</div>`;
+  (poly.rows||[]).forEach(r=>{
+    b+=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div>${esc(t('system.polygenic.row',{label:r.label,percentile:r.percentile!=null?r.percentile:'—',reliable:t(r.reliable?'system.polygenic.reliable':'system.polygenic.unreliable')}))}</div>`;
+    if(register==='clinician'){
+      b+=`<div class="why muted">${esc(t('system.polygenic.detail',{pgs_id:r.pgs_id||'—',evidence:r.evidence_label||r.evidence||'—'}))}</div>`;
+      ['validity_note','integrity_note','weight_mass_note','evidence_note'].forEach(k=>{ if(r[k]) b+=`<div class="why muted">${esc(r[k])}</div>`; });
+      if(r.model_changed_from) b+=`<div class="why muted">${esc(t('system.polygenic.model_changed',{previous:r.model_changed_from}))}</div>`;
+    }
+    b+=`</div>`;
+  });
+  if((poly.unscored||[]).length) b+=`<div class="row-l muted">${esc(t('system.polygenic.unscored',{traits:poly.unscored.join(', ')}))}</div>`;
+  return b+`<div class="row-l muted"><i>${esc(poly.caveat||t('system.polygenic.caveat'))}</i></div>`;
+}
+function systemGeneRow(r, register){
+  const mode=t('system.mode.'+(r.mode||'unknown'));
+  const head = r.unit==='position'
+    ? t('system.row.position',{gene:r.gene,rsid:r.rsid||'—',mode:mode,state:t('system.state.'+(r.state||(r.genotype||{}).state||'None'))})
+    : t('system.row.gene',{gene:r.gene,mode:mode,classifications:(r.classifications||[]).join(', ')||'—',
+                           moi:(r.moi_codes||[r.moi||'—']).join(', ')});
+  const marks=[];
+  if(r.findings) marks.push(t('system.row.finding',{n:r.findings}));
+  if(r.carrier) marks.push(t('system.row.carrier'));
+  if(r.pending) marks.push(t('system.row.pending'));
+  if(r.read===false) marks.push(t('system.row.unread',{why:r.read_why_text||r.read_why||'—'}));
+  if(r.not_a_finding_why==='kind') marks.push(t('system.row.not_finding_kind',{kind:t('decision.kind.'+(r.kind||'unassigned'))}));
+  let out=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div><b>${esc(r.gene)}</b> ${esc(head.replace(r.gene,'').trim())}`
+    + (marks.length?` <span class="muted">· ${esc(marks.join(' · '))}</span>`:'')+`</div>`;
+  if(r.text) out+=`<div class="why">${esc(r.text)}</div>`;
+  if(register==='clinician'){
+    const g=r.genotype||{};
+    if(g.genotype) out+=`<div class="why muted">${esc(t('system.row.genotype',{genotype:g.genotype,confidence:g.confidence||'—',depth:g.depth!=null?g.depth:'—'}))}</div>`;
+    (r.assertions||[]).forEach(a=>{out+=`<div class="why muted">${esc(t('system.row.assertion',{disease:a.disease||'—',classification:a.classification||'—',moi:a.moi||'—',submitter:a.submitter||'—',date:a.curated_on||'—'}))}</div>`;});
+    if(r.source) out+=`<div class="why muted">${esc(t('decision.source',{source:r.source}))}</div>`;
+  }
+  return out+`</div>`;
+}
+function basketRowHtml(row){
+  if(row.origin==='rule') return testItem(row).outerHTML;
+  return `<div class="row-l">· ${esc(row.text||'')}${row.closes?` — ${esc(row.closes)}`:''}${row.source?` <span class="muted">(${esc(row.source)})</span>`:''}</div>`;
+}
+// The seven layers in the order of the brief, every one of them present — with
+// its rows or with the reason it is empty — and the three baskets after them.
+function systemCardHtml(r){
+  const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3>${n}. ${esc(t(key))}</h3>${body}</div>`);
+  const lab=r.labs||{};
+  let b='';
+  if(lab.status==='absent') b=`<div class="row-l">${esc(t('system.labs.absent'))}</div>`;
+  else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
+  else{
+    b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
+    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${m.value} ${esc(m.unit||'')} <span class="muted">${esc(m.date||'')}</span></div>`).join('');
+  }
+  if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
+  if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
+  layer(1,'system.layer.labs',b);
+  const dyn=r.dynamics||{};
+  if(dyn.status==='ok'){
+    const d=dyn.delta||0;
+    b=`<div class="row-l">${esc(t('system.dynamics.line',{prev:dyn.prev_score,score:dyn.compared_score,delta:(d>0?'+':'')+d,date:dyn.prev_date||'—',compared:dyn.compared||0}))}</div>`
+     +(dyn.moved||[]).map(m=>`<div class="row-l">· ${esc(t('system.dynamics.moved',{name:m.name,from_value:m.from_value,to_value:m.to_value,unit:m.unit||''}))}</div>`).join('');
+  } else b=`<div class="row-l">${esc(t('system.dynamics.'+(dyn.status||'absent')))}</div>`;
+  layer(2,'system.layer.dynamics',b);
+  const gen=r.genetics||{};
+  if(gen.status==='composed'){
+    const base=gen.base||{};
+    b=`<div class="row-l">${esc(t('system.genetics.composed',{source:base.source||'—',version:base.version||'—',base_genes:base.genes||0,positions:(gen.curated||{}).positions||0,read:gen.read_count||0,unread:gen.unread_count||0,findings:gen.finding_count||0,carriers:gen.carrier_count||0,pending:gen.pending_count||0}))}</div>`;
+    if(gen.withheld_by_classification) b+=`<div class="row-l muted">${esc(t('system.genetics.withheld',{n:gen.withheld_by_classification}))}</div>`;
+    if((gen.excluded||[]).length) b+=`<div class="row-l muted">${esc(t('system.genetics.excluded',{genes:gen.excluded.map(e=>e.gene).join(', ')}))}</div>`;
+    if((gen.refused||{}).total) b+=`<div class="row-l muted">${esc(t('system.genetics.refused',{n:gen.refused.total}))}</div>`;
+    b+=(gen.rows||[]).map(x=>systemGeneRow(x,r.register)).join('');
+    if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
+  } else if(gen.status==='not_composed') b=`<div class="row-l">${esc(t('system.genetics.not_composed',{why:gen.why_empty||t('screen.why.no_panel')}))}</div>`;
+  else b=`<div class="row-l">${esc(t('screen.why.no_genetic_half'))}</div>`;
+  b+=systemPolygenicHtml(gen.polygenic, r.register);
+  layer(3,'system.layer.genetics',b);
+  const med=r.medications||{};
+  b=(med.rows||[]).map(m=>`<div class="row-l">· ${esc(t('system.meds.row',{name:m.name,dose:m.dose||'',classes:(m.via||[]).join(', ')}))}</div>`).join('');
+  if(med.empty_reason) b+=`<div class="row-l muted">${esc(med.empty_reason)}</div>`;
+  if((med.unmapped||[]).length) b+=`<div class="row-l muted">${esc(t('system.meds.unmapped',{names:med.unmapped.map(x=>x.name).join(', ')}))}</div>`;
+  if((med.unclassified||[]).length) b+=`<div class="row-l muted">${esc(t('system.meds.unclassified',{names:med.unclassified.map(x=>x.name).join(', ')}))}</div>`;
+  layer(4,'system.layer.medications',b);
+  const tg=r.target||{};
+  b=(tg.rows||[]).map(x=>{
+    if(!x.current) return `<div class="row-l">· ${esc(t('system.target.no_value',{name:x.name,spec:x.spec,unit:x.unit||'',set_by:x.set_by||'',set_on:x.set_on||''}))}</div>`;
+    const side=x.outside_target?t(x.side==='above'?'target.side_above':'target.side_below'):t('system.target.within');
+    return `<div class="row-l">· ${esc(t('system.target.row',{name:x.name,spec:x.spec,unit:x.unit||'',set_by:x.set_by||'',set_on:x.set_on||'',value:x.current.value,date:x.current.date||'—',side:side}))}</div>`;
+  }).join('');
+  if(tg.empty_reason) b+=`<div class="row-l muted">${esc(tg.empty_reason)}</div>`;
+  layer(5,'system.layer.target',b);
+  const tests=r.tests||{};
+  b=(tests.rows||[]).map(s=>testItem(s).outerHTML).join('');
+  if(tests.empty_why) b+=`<div class="row-l muted">${esc(t('system.why.'+tests.empty_why))}</div>`;
+  layer(6,'system.layer.tests',b);
+  const qs=r.questions||{};
+  b=(qs.rows||[]).length?`<ol>${qs.rows.map(q=>`<li>${esc(q.text)}</li>`).join('')}</ol>`:'';
+  if(qs.empty_why) b+=`<div class="row-l muted">${esc(t('system.why.'+qs.empty_why))}</div>`;
+  layer(7,'system.layer.questions',b);
+  const nxt=r.next||{};
+  b=['lab','genome','ask'].map(k=>{const bk=nxt[k]||{};
+    return `<div class="basket"><h4>${esc(t('system.next.'+k))}</h4>${(bk.rows||[]).map(basketRowHtml).join('')}${bk.empty_reason?`<div class="row-l muted"><i>${esc(bk.empty_reason)}</i></div>`:''}${(bk.full_genome&&bk.full_genome.text)?`<div class="row-l">${esc(bk.full_genome.text)}</div>`:''}</div>`;}).join('');
+  L.push(`<div class="layer"><h3>${esc(t('system.layer.next'))}</h3>${b}</div>`);
+  return L.join('');
+}
+async function viewSystem(key, register){
+  const v=$('#view'); register=register||'patient';
+  v.innerHTML=`<div class="muted">${esc(t('web.common.loading'))}</div>`;
+  const r=await api('/api/system?key='+encodeURIComponent(key)+'&register='+encodeURIComponent(register));
+  if(r.status!=='ok'){
+    const why=r.status==='unknown_register'
+      ? t('system.unknown_register',{register:r.register||register,registers:(r.registers||[]).join(', ')})
+      : t('system.unknown',{key:key,systems:(r.systems||[]).join(', ')});
+    v.innerHTML=`<div class="card">${esc(why)}</div>`;
+    return;
+  }
+  const other=register==='clinician'?'patient':'clinician';
+  v.innerHTML=`<div class="syscard">
+    <div class="row" style="margin-bottom:10px">
+      <button class="ghost" id="sys-back">← ${esc(t('web.common.close'))}</button>
+      <span class="regtoggle row" style="gap:4px"><span class="muted" style="font-size:12.5px">${esc(t('system.register.toggle'))}:</span>
+        <button class="pickbtn" data-reg="patient" aria-pressed="${register==='patient'}">${esc(t('system.register.patient'))}</button>
+        <button class="pickbtn" data-reg="clinician" aria-pressed="${register==='clinician'}">${esc(t('system.register.clinician'))}</button></span>
+      <button class="ghost" onclick="window.print()">\u{1F5A8} ${esc(t('system.print'))}</button>
+    </div>
+    <h2 class="section">${esc(t('system.title',{label:r.label}))}</h2>
+    <div class="verdict">${esc(r.verdict_line||'')}</div>
+    ${systemCardHtml(r)}
+    <div class="meta" style="margin-top:14px">${esc(r.disclaimer||'')}</div>
+  </div>`;
+  $('#sys-back',v).onclick=()=>mount(current);
+  v.querySelectorAll('[data-reg]').forEach(b=>b.onclick=()=>{ if(b.dataset.reg!==register) viewSystem(key,b.dataset.reg); });
+  bindTabLinks(v);
+  window.scrollTo({top:0});
+}
+
 // ── The figure on the Overview ───────────────────────────────────────────────
 // The same numbers the radar draws, plus the one it cannot show. A point on the
 // radar says how a system scores; the ring around an organ says how much of that
@@ -1319,13 +1697,14 @@ function bodySVG(domains, sex){
     const d=m.dom, r=m.r, C=2*Math.PI*r, right=m.right, rx=m.rx, ry=m.ry, ly=m.ly;
     const frac = m.total ? Math.max(0,Math.min(1,m.measured/m.total)) : 0;
     const col = DSTAT[m.status]||DSTAT.nodata;
-    const tip = m.part
+    const tip = (m.part
       ? t('web.body.tip_part',{dom:d.label, label:m.label, place:t('web.body.place.'+m.place),
                                score:m.score, measured:m.measured, total:m.total})
       : (m.measured!=null && m.measured<m.total
           ? t('web.radar.tip_partial',{label:d.label,score:m.score,ok:d.ok,
                                        measured:m.measured,total:m.total})
-          : t('web.radar.tip',{label:d.label,score:m.score,ok:d.ok,total:m.total}));
+          : t('web.radar.tip',{label:d.label,score:m.score,ok:d.ok,total:m.total})))
+      +'\n'+genRingTip(d.genetics)+'\n'+t('system.open');
     let g=`<g class="organ" data-dom="${esc(d.key)}" tabindex="0" role="button"`
       +` aria-label="${esc(m.label)}"><title>${esc(tip)}</title>`;
     m.P.forEach(([x,y])=>{g+=`<circle class="blob" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"`
@@ -1334,7 +1713,8 @@ function bodySVG(domains, sex){
       +`<circle class="ringfg" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}" stroke="${col}"`
       +` stroke-dasharray="${(C*frac).toFixed(1)} ${C.toFixed(1)}"`
       +` transform="rotate(-90 ${rx.toFixed(1)} ${ry.toFixed(1)})"/>`
-      +`<circle class="pick" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r+7}"/>`;
+      +genRingSVG(d.genetics, rx, ry, r+4)
+      +`<circle class="pick" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r+9}"/>`;
     const ex = right ? x0+im.w+30 : x0-30, lx = right ? ex+10 : ex-10;
     const an = right ? '' : ' text-anchor="end"';
     g+=`<path class="organlead" d="M${(rx+(right?r:-r)).toFixed(1)} ${ry.toFixed(1)}`
@@ -1349,14 +1729,30 @@ function bodySVG(domains, sex){
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t('web.body.figure_h'))}">${s}</svg>`;
 }
 
+// The genetics ring, drawn OUTSIDE the laboratory ring and never merged with it.
+// A system with no composed genetic half gets a dotted absence rather than an
+// empty ring: «nothing read» and «nothing to read» are different facts.
+function genRingSVG(g, cx, cy, r){
+  const gr=genRingOf(g);
+  const at=`cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}"`;
+  if(!gr) return `<circle class="ringgen-none" ${at}/>`;
+  const C=2*Math.PI*r;
+  return `<circle class="ringgen-bg" ${at}/><circle class="ringgen" ${at}`
+    +` stroke-dasharray="${(C*gr.frac).toFixed(1)} ${C.toFixed(1)}"`
+    +` transform="rotate(-90 ${cx.toFixed(1)} ${cy.toFixed(1)})"/>`;
+}
+
 // Both pictures answer about the same systems, so picking one system marks
 // it in both. Without this they are two charts that happen to sit side by side.
+// A click OPENS the system's card (task 168): the figure and the radar are the
+// two doors to it; hovering still shows the tip, and the note under the
+// pictures says so.
 function wireSystems(box, domains){
   const by = Object.fromEntries(domains.map(d=>[d.key,d]));
   const note = $('#sys-note', box);
   const pick = k => {
     box.querySelectorAll('[data-dom]').forEach(el=>el.classList.toggle('on', el.dataset.dom===k));
-    box.querySelectorAll('.rdot').forEach(el=>el.setAttribute('r', el.dataset.dom===k?7:4.5));
+    box.querySelectorAll('.rdot').forEach(el=>{const c=el.querySelector('.rdotc'); if(c) c.setAttribute('r', el.dataset.dom===k?7:4.5);});
     const d = by[k]; if(!d||!note) return;
     const pl = d.place||{};
     const where = pl.parts
@@ -1366,17 +1762,24 @@ function wireSystems(box, domains){
     note.textContent = t('web.body.picked',
       {label:d.label, score:d.score, measured:d.measured, total:d.total, where:where});
   };
+  const open = k => { pick(k); viewSystem(k); };
   box.querySelectorAll('[data-dom]').forEach(el=>{
-    el.addEventListener('click', ()=>pick(el.dataset.dom));
+    el.addEventListener('click', ()=>open(el.dataset.dom));
+    el.addEventListener('mouseenter', ()=>pick(el.dataset.dom));
     el.addEventListener('keydown', e=>{
-      if(e.key==='Enter'||e.key===' '){e.preventDefault(); pick(el.dataset.dom);}
+      if(e.key==='Enter'||e.key===' '){e.preventDefault(); open(el.dataset.dom);}
     });
   });
 }
 
-function renderSystems(box, radar){
+async function renderSystems(box, radar){
   const doms = (radar.domains||[]).filter(d=>d.score!=null);
   if(doms.length<3){ box.innerHTML=`<div class="muted">${esc(t('web.radar.not_enough'))}</div>`; return; }
+  // The second ring comes from the systems listing — two counts per system,
+  // joined onto the radar's domains here and nowhere folded into the score.
+  const sys = await systemsIndex().catch(()=>null);
+  const gen = Object.fromEntries(((sys&&sys.systems)||[]).map(s=>[s.key,s.genetics]));
+  doms.forEach(d=>{ d.genetics = gen[d.key]||null; });
   // `radar.sex` is already normalised by the engine — 'male', 'female' or null.
   const sex = radar.sex || '';
   box.innerHTML = `<div class="sysrow">
@@ -1386,7 +1789,7 @@ function renderSystems(box, radar){
       <div class="syspane"><div class="sysh">${esc(t('web.body.radar_h'))}</div>
         <div class="sysbox">${radarSVG(doms)}</div></div>
     </div>
-    <div class="muted" id="sys-note" style="font-size:12.5px;margin-top:7px">${esc(t('web.body.hint'))}</div>`;
+    <div class="muted" id="sys-note" style="font-size:12.5px;margin-top:7px">${esc(t('web.body.hint'))} · ${esc(t('system.open'))}</div>`;
   wireSystems(box, doms);
 }
 
@@ -1423,7 +1826,17 @@ function radarSVG(domains){
     const a=dArrow(dom.delta);
     const mv=(dom.moved||[]).map(m=>`\n  · ${m.name}: ${m.from_value} → ${m.to_value} ${m.unit||''}`).join('');
     const dyn=dom.prev_score!=null?'\n'+t('web.radar.was',{score:dom.prev_score,compared:dom.compared,date:dom.prev_date||t('web.radar.prev_measurement'),word:a.word})+mv:'\n'+t('web.radar.no_previous');
-    return `<circle class="rdot" data-dom="${esc(dom.key)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${DSTAT[dom.status]}"><title>${esc(dom.measured!=null&&dom.measured<dom.total?t('web.radar.tip_partial',{label:dom.label,score:dom.score,ok:dom.ok,measured:dom.measured,total:dom.total}):t('web.radar.tip',{label:dom.label,score:dom.score,ok:dom.ok,total:dom.total}))}${esc(dyn)}</title></circle>`;
+    // Two rings about every dot, the same two as on the figure: the share of
+    // the laboratory panel measured (inner), the share of the genetic half
+    // read (outer). Two numbers, never one.
+    const frac=dom.total?Math.max(0,Math.min(1,(dom.measured||0)/dom.total)):0, rl=8, C=2*Math.PI*rl;
+    const rings=`<circle class="ringbg" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rl}"/>`
+      +`<circle class="ringfg" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rl}" stroke="${DSTAT[dom.status]}" stroke-width="1.8"`
+      +` stroke-dasharray="${(C*frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 ${x.toFixed(1)} ${y.toFixed(1)})"/>`
+      +genRingSVG(dom.genetics, x, y, rl+4);
+    const tip=(dom.measured!=null&&dom.measured<dom.total?t('web.radar.tip_partial',{label:dom.label,score:dom.score,ok:dom.ok,measured:dom.measured,total:dom.total}):t('web.radar.tip',{label:dom.label,score:dom.score,ok:dom.ok,total:dom.total}))
+      +'\n'+genRingTip(dom.genetics)+dyn+'\n'+t('system.open');
+    return `<g class="rdot" data-dom="${esc(dom.key)}" tabindex="0" role="button" aria-label="${esc(dom.label)}" style="cursor:pointer"><title>${esc(tip)}</title>${rings}<circle class="rdotc" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="${DSTAT[dom.status]}"/></g>`;
   }).join('');
   const legend=`<g font-size="12" dominant-baseline="middle">
     <line x1="188" y1="404" x2="216" y2="404" stroke="var(--accent)" stroke-width="2.5"/>
@@ -1435,24 +1848,80 @@ function radarSVG(domains){
 }
 async function viewSecond(root){
   const sb=await sourceBar(['labs','medications','pgx','interactions']);
-  const radar=await api('/api/radar');
-  const d=await api('/api/second-opinion');
-  const flagged=radar.domains.filter(x=>x.status==='warning'||x.status==='critical');
+  const [radar,d,sug,sys,labs]=await Promise.all([api('/api/radar'),api('/api/second-opinion'),
+    api('/api/suggest-tests'),systemsIndex(),api('/api/labs')]);
+  // The radar's rows are a digest of the labs analysis and do not carry the
+  // KIND of a genome link; the kind is what makes an owner's note print as
+  // one, so it is joined back from the analysis by marker key.
+  const kinds=Object.fromEntries((labs.markers||[]).map(m=>[m.key,m.genome_link_kind]));
+  (radar.domains||[]).forEach(x=>(x.abnormal||[]).forEach(m=>{ m.genome_link_kind=kinds[m.key]||null; }));
   // The compact form of the same marker: a row instead of a card because a body
   // system holds several and this page is printed. It carries what the card carries
   // — flag, value, corridor, date, movement — so that which tab you are on changes
   // the density and not the facts.
   const abItem=m=>{const f=flagOf(m);
-      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span>${trendNote(m)}</div>${m.genome_link?`<div class="why">${esc(t('web.labs.genome_link',{text:m.genome_link}))}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}${m.corridor_note?`<div class="why">${esc(m.corridor_note)}</div>`:''}</div>`;};
-  const expl=flagged.map(dom=>{
-    const col=dom.status==='critical'?'b-critical':'b-warning';
-    const recent=dom.abnormal.filter(m=>!m.stale), stale=dom.abnormal.filter(m=>m.stale);
-    const items=recent.map(abItem).join('');
-    const staleBlock=stale.length?`<div class="why" style="margin:6px 0 2px;opacity:.7">${esc(t('web.second.stale_lead'))}</div>${stale.map(abItem).join('')}`:'';
+      return `<div class="list-item"${m.stale?' style="opacity:.5"':''}><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}: ${m.value} ${esc(m.unit)}</b> <span class="muted">${esc(refText(m))}${m.date?' · '+esc(m.date):''}</span>${trendNote(m)}</div>${m.genome_link?`<div class="why">${ownerNoteHtml(m)}</div>`:''}${m.note?`<div class="why">${esc(m.note)}</div>`:''}${m.corridor_note?`<div class="why">${esc(m.corridor_note)}</div>`:''}</div>`;};
+  // The second look is laid out BY SYSTEM (task 168, step 5): one block per
+  // system holding what is outside the corridor, the prescriptions acting on
+  // it, the questions for the clinician, and the rows of «what to test» that
+  // touch its markers. The three former lists are views of one subject now.
+  // A block exists for a system that has something to say — a deviation, a
+  // prescription, a composed genetic half, or a fired rule — and the card of
+  // the system (its questions, its baskets) is read for those and no others:
+  // the card reads the genome, and twelve of them for a page is not free.
+  const byKey=Object.fromEntries((radar.domains||[]).map(x=>[x.key,x]));
+  const acting={};
+  (sys.prescriptions||[]).forEach(p=>(p.systems||[]).forEach(k=>{(acting[k]=acting[k]||[]).push(p);}));
+  const pending=(sug.suggestions||[]).filter(s=>!s.done_recently);
+  const done=(sug.suggestions||[]).filter(s=>s.done_recently);
+  const speaks=s=>{const r=byKey[s.key]||{};
+    return (r.abnormal||[]).length || (acting[s.key]||[]).length || (s.genetics||{}).status==='composed';};
+  const chosen=(sys.systems||[]).filter(speaks);
+  const cards=await Promise.all(chosen.map(s=>api('/api/system?key='+encodeURIComponent(s.key)).catch(()=>null)));
+  // «What to test» stays owned by its route: the rows printed here are the
+  // suggestions as that route returns them, filtered to the ids the system's
+  // card says touch its markers. Nothing is copied into the card.
+  const usedTests=new Set();
+  const blocks=chosen.map((s,i)=>{
+    const dom=byKey[s.key]||{}, card=cards[i];
+    const col=dom.status==='critical'?'b-critical':dom.status==='warning'?'b-warning':'b-good';
+    const recent=(dom.abnormal||[]).filter(m=>!m.stale), stale=(dom.abnormal||[]).filter(m=>m.stale);
     const a=dArrow(dom.delta);
     const dyn=dom.prev_score!=null?` <span class="muted" style="font-weight:400">· <span style="color:${a.col}">${a.txt||'='}</span> ${esc(t('web.second.vs_prev',{date:dom.prev_date||'',score:dom.prev_score}))}</span>`:'';
-    return `<div class="so-h">${badge(col,dom.label+' — '+dom.score+'/100')}${dyn}</div>${items||`<div class="muted">${esc(t('web.second.no_current'))}</div>`}${staleBlock}`;
+    const head=dom.score!=null?badge(col,s.label+' — '+dom.score+'/100'):badge('b-good',s.label);
+    let h=`<div class="sysblock" data-sysblock="${esc(s.key)}"><div class="so-h">${head}${dyn} ${systemLinkHtml(s.key,t('system.open'))}</div>`;
+    h+=recent.map(abItem).join('');
+    if(stale.length) h+=`<div class="why" style="margin:6px 0 2px;opacity:.7">${esc(t('web.second.stale_lead'))}</div>${stale.map(abItem).join('')}`;
+    if((acting[s.key]||[]).length)
+      h+=`<div class="why"><b>${esc(t('system.layer.medications'))}:</b> ${acting[s.key].map(p=>esc(p.name+(p.dose?' '+p.dose:''))).join(', ')}</div>`;
+    if(card&&card.status==='ok'){
+      // The genetic half, in the block's density (task 178): one line for
+      // the composed list and what was read of it, the scores as scores, and
+      // — when this is not a full genome — what a full one would add.
+      const gen=card.genetics||{}, base=gen.base||{};
+      let gl='';
+      if(gen.status==='composed'){
+        gl=esc(t('system.genetics.composed',{source:base.source||'—',version:base.version||'—',base_genes:base.genes||0,positions:(gen.curated||{}).positions||0,read:gen.read_count||0,unread:gen.unread_count||0,findings:gen.finding_count||0,carriers:gen.carrier_count||0,pending:gen.pending_count||0}));
+        if(gen.withheld_by_classification) gl+=` <span class="muted">· ${esc(t('system.genetics.withheld',{n:gen.withheld_by_classification}))}</span>`;
+      } else if(gen.status==='not_composed') gl=esc(t('system.genetics.not_composed',{why:gen.why_empty||t('screen.why.no_panel')}));
+      else gl=esc(t('screen.why.no_genetic_half'));
+      h+=`<div class="why" style="margin-top:8px"><b>${esc(t('system.layer.genetics'))}:</b> ${gl}</div>`;
+      h+=systemPolygenicHtml(gen.polygenic,'patient');
+      const fg=((card.next||{}).genome||{}).full_genome;
+      if(fg&&fg.text) h+=`<div class="why"><b>${esc(t('system.next.genome'))}:</b> ${esc(fg.text)}</div>`;
+      const ids=new Set(((card.tests||{}).rows||[]).map(x=>x.id));
+      const rows=pending.filter(x=>ids.has(x.id)); rows.forEach(x=>usedTests.add(x.id));
+      if(rows.length) h+=`<div class="why" style="margin-top:8px"><b>${esc(t('system.layer.tests'))}:</b></div>`+rows.map(x=>testItem(x).outerHTML).join('');
+      const qs=(card.questions||{}).rows||[];
+      h+=`<div class="why" style="margin-top:8px"><b>${esc(t('system.layer.questions'))}:</b></div>`
+        +(qs.length?`<ol style="margin:4px 0 0;padding-left:22px">${qs.map(q=>`<li>${esc(q.text)}</li>`).join('')}</ol>`
+                   :`<div class="why muted">${esc(t('system.why.'+(card.questions||{}).empty_why))}</div>`);
+      h+=`<div class="why muted" style="margin-top:6px">${esc(card.verdict_line||'')}</div>`;
+    }
+    return h+`</div>`;
   }).join('');
+  const silent=(sys.systems||[]).filter(s=>!speaks(s));
+  const silentLine=silent.length?`<div class="muted" style="font-size:13px;margin:4px 0 12px">${esc(t('web.second.systems_silent',{systems:silent.map(s=>s.label).join(', ')}))}</div>`:'';
   // `phenotype` is the machine code — «UM», «normal_sensitivity» — and it was being
   // printed straight onto the page a patient carries to an appointment. The engine
   // already sends `phenotype_label`, which is both the human form AND the one that
@@ -1461,23 +1930,14 @@ async function viewSecond(root){
   const drugs=d.drug_flags.map(x=>{const lv=LEVEL[x.level]||LEVEL.unknown;
     const ph=x.phenotype_label||String(x.phenotype||'').replace(/_/g,' ');
     return `<div class="list-item"><div class="row">${badge(lv.cls,t(lv.key))}<b>${esc(x.drug)}</b> → ${esc(x.gene)}</div><div class="why" title="${esc(t('web.guide.term_pgx_body'))}"><b>${esc(ph)}</b></div><div class="why">${esc(x.recommendation)}</div></div>`;}).join('');
-  // «What to test» owns this list. Repeating it whole put the routine-control block
-  // — already taken, watched by interval — on two tabs word for word. The second
-  // opinion is a document to carry to an appointment, so it keeps what is still to
-  // be ordered and hands the rest back to the tab that owns it.
-  // Read from the route that OWNS this list rather than from the copy that
-  // travels inside the second opinion: one source for the block a person acts
-  // on, and the route stays the one place the rule about it lives.
-  const sug=await api('/api/suggest-tests');
-  const tPending=(sug.suggestions||[]).filter(s=>!s.done_recently);
-  const tDone=(sug.suggestions||[]).filter(s=>s.done_recently);
-  const tests=tPending.map(s=>testItem(s).outerHTML).join('');
-  const testsEmpty=`<div class="muted">${esc(t('web.tests.none_pending'))}</div>`;
-  // The routine part used to be handed back to a tab of its own. There is no
-  // other tab now, so it is here — folded, because «already taken, watched by
-  // interval» is not what a person is preparing to ask about, and gone entirely
-  // is not the same as folded.
-  const testsRoutine=tDone.length?`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--ink-2);padding:6px 0">${esc(t('web.tests.routine_h'))} · ${tDone.length}</summary>${tDone.map(s=>testItem(s).outerHTML).join('')}</details>`:'';
+  // The suggestions no system block claimed — a rule that fired on a marker
+  // outside every panel — are still printed, under their own heading; and the
+  // routine part stays folded, because «already taken, watched by interval» is
+  // not what a person is preparing to ask about, and gone is not folded.
+  const rest=pending.filter(x=>!usedTests.has(x.id));
+  const tests=rest.map(s=>testItem(s).outerHTML).join('');
+  const testsEmpty=`<div class="muted">${esc(t(usedTests.size?'web.second.tests_all_placed':'web.tests.none_pending'))}</div>`;
+  const testsRoutine=done.length?`<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--ink-2);padding:6px 0">${esc(t('web.tests.routine_h'))} · ${done.length}</summary>${done.map(s=>testItem(s).outerHTML).join('')}</details>`:'';
   // Nothing flagged among the drugs is not the same statement as nothing checkable.
   const drugsEmpty=`<div class="muted">${esc(d.drugs_answerable
     ? t('web.second.no_drug_flags',{n:d.drugs_answerable})
@@ -1502,10 +1962,12 @@ async function viewSecond(root){
          style="text-decoration:none">\u{1F4C4} ${esc(t('web.second.for_clinician'))}</a>
       <span class="muted" style="font-size:12.5px">${esc(t('web.second.for_clinician_note'))}</span>
     </div>
-    <div class="so-h" style="margin-top:22px">${esc(t('web.second.factors_h'))}${tabLink('web.tab.labs')}</div>
-    ${expl||`<div class="muted">${esc((radar.domains||[]).some(x=>x.status!=='nodata')
+    <div class="so-h" style="margin-top:22px">${esc(t('web.second.by_system_h'))}${tabLink('web.tab.labs')}</div>
+    <div class="meta" style="margin:0 0 10px">${esc(t('web.second.genetics_lead'))}</div>
+    ${blocks||`<div class="muted">${esc((radar.domains||[]).some(x=>x.status!=='nodata')
       ? t('web.second.no_domain_issues',{n:(radar.domains||[]).filter(x=>x.status!=='nodata').length})
       : t('web.second.no_domain_data'))}</div>`}
+    ${silentLine}
     <div class="so-h">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.drugs')}</div>${drugsBasis}${drugs||drugsEmpty}
     <div class="so-h">${esc(t('web.second.tests_h'))}</div>${tests||testsEmpty}${testsRoutine}
     <div class="meta" style="margin-top:14px">${esc(d.disclaimer)}</div>
@@ -1518,16 +1980,27 @@ async function viewSecond(root){
 }
 
 // ---------------- Prescriptions ----------------
-function medItem(m){
+// «acts on: system» comes from the class→system map through the systems
+// listing, joined by name; a current prescription the map does not place says
+// so rather than showing nothing.
+function actsOnHtml(m, sys){
+  if(!sys||m.current===false) return '';
+  const p=(sys.prescriptions||[]).find(x=>x.name===m.name);
+  if(!p) return '';
+  if(p.systems&&p.systems.length)
+    return `<div class="why">${esc(t('system.acts_on',{systems:''}))}${p.systems.map(k=>systemLinkHtml(k,t('radar.domain.'+k))).join(', ')}</div>`;
+  return `<div class="why muted">${esc(t('system.acts_on_none',{status:p.map_status}))}</div>`;
+}
+function medItem(m, sys){
   // `current` is the server's verdict by the one rule in core — the page does not
   // re-decide which words mean «taking it». A stopped entry drawn like a current
   // one shows the reader a regimen the checks are not using.
   const st=m.current===false?` <span class="muted">⏸ ${esc(t('web.meds.not_current',{status:m.status||'—'}))}</span>`:'';
-  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost" data-rm="${esc(m.name)}" style="margin-left:auto">${esc(t('web.meds.remove'))}</button></div>${m.note?`<div class="why">${esc(m.note)}</div>`:''}</div>`;
+  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost" data-rm="${esc(m.name)}" style="margin-left:auto">${esc(t('web.meds.remove'))}</button></div>${m.note?`<div class="why">${esc(m.note)}</div>`:''}${actsOnHtml(m,sys)}</div>`;
 }
 async function viewMeds(root){
-  const d=await api('/api/medications');
-  const items=d.medications.map(medItem).join('');
+  const [d,sys]=await Promise.all([api('/api/medications'), systemsIndex().catch(()=>null)]);
+  const items=d.medications.map(m=>medItem(m,sys)).join('');
   const sb=await sourceBar(['medications']);
   root.innerHTML=`<h2 class="section">${esc(t('web.meds.title'))}</h2>
     ${sb}
@@ -1554,8 +2027,8 @@ async function viewMeds(root){
     toast(chk.overall&&chk.overall!=='low'?t('web.meds.added_attention'):t('web.common.added'));
     claimNotice(r);
     // refresh the list without losing the check that is on screen
-    const d2=await api('/api/medications');
-    $('#mlist',root).innerHTML=d2.medications.map(medItem).join('')||`<div class="muted">${esc(t('web.meds.empty'))}</div>`;
+    const [d2,sys2]=await Promise.all([api('/api/medications'), systemsIndex().catch(()=>null)]);
+    $('#mlist',root).innerHTML=d2.medications.map(m=>medItem(m,sys2)).join('')||`<div class="muted">${esc(t('web.meds.empty'))}</div>`;
     bindRemove();
     $('#m-name',root).value='';$('#m-dose',root).value='';$('#m-note',root).value='';
     if(chk.status==='ok'){$('#m-check',root).innerHTML=rxCard(chk);$('#m-check',root).scrollIntoView({behavior:'smooth',block:'nearest'});}
@@ -2255,10 +2728,31 @@ function genomeState(st){
   if(st.assembly) facts.push(esc(t('web.genome.assembly',{name:st.assembly})));
   if(st.sample) facts.push(esc(t('web.genome.sample',{name:st.sample})));
   const badgeEl = st.ready?badge('b-good',t('web.genome.db_connected')):badge('b-unknown',t('web.genome.db_not_connected'));
+  // The frame, on the page and not only on the command line. `/api/genome-status`
+  // has carried `paths` since it was written and the page dropped it, so the tab
+  // showed a green badge and a file name while `scholion genome-status` said which
+  // questions this file opens and which it shuts. A person then asked the tab a
+  // question the file cannot answer and read the refusal as a fact about their
+  // genome. The route test cannot see this: the route WAS called, the field was
+  // thrown away.
+  const size = (st.catalogue_by_assembly||{}).total || 0;
+  // Only for a file that is actually being read, exactly as the command line
+  // does it: with no genome every path is shut for one reason, and the badge
+  // above has already said it.
+  const rows = (st.ready ? (st.paths||[]) : []).map(p=>{
+    const name = t('paths.'+p.path, {n:size});
+    return `<li>${esc(p.open ? t('web.genome.path_open',{name:name})
+                             : t('web.genome.path_closed',{name:name,
+                                 why:t('paths.why.'+(p.why||'no_genome'))}))}</li>`;
+  }).join('');
+  const frame = rows
+    ? `<div class="meta" style="margin-top:8px">${esc(t('genome_status.paths_head'))}</div>`
+      + `<ul class="meta" style="margin:4px 0 0 18px;padding:0">${rows}</ul>`
+    : '';
   return `<div class="card" style="margin-bottom:8px"><div class="row">${badgeEl}
       <span class="muted">${st.ready?esc((st.vcf||'').split('/').pop()):esc(t('web.genome.db_after_script'))}</span></div>
     ${facts.length?`<div class="meta" style="margin-top:6px">${facts.join(' · ')}</div>`:''}
-    <div class="meta" style="margin-top:6px">${esc(t('web.genome.intro'))}</div>${aside}</div>`;
+    <div class="meta" style="margin-top:6px">${esc(t('web.genome.intro'))}</div>${frame}${aside}</div>`;
 }
 // The whole feed of the tab, built from the four answers the tab already has.
 // The sections below are cut by SOURCE — ClinVar, polygenic, longevity, lipids —
@@ -2320,8 +2814,15 @@ function genomeFindings(cv, prs, lng, lip){
 // Everything the tab knows about ONE gene, in one card. The four sections answer
 // by source; nobody answers by gene, so «what do I have on APOE» meant reading
 // four of them and joining by eye.
-function geneCard(d, cv, lng, lip){
+function geneCard(d, cv, lng, lip, sys){
   if (!d || !d.gene) return genomeCard(d);
+  // The honest entry from the genome's side: not «what this gene means» —
+  // the product does not answer that — but «in which systems' genetic half it
+  // is named, and by whom», from the same index the system cards are built on.
+  const named = sys && sys.genes_index ? (sys.genes_index[d.gene] || []) : null;
+  const inSystems = named === null ? '' : `<div class="meta">${named.length
+      ? esc(t('system.of_gene',{systems:''})) + named.map(k=>systemLinkHtml(k, t('radar.domain.'+k))).join(', ')
+      : esc(t('system.of_gene_none'))}</div>`;
   const loci = d.loci || [];
   const ids = new Set(loci.map(x => x.rsid));
   const cvRows = (cv && cv.status === 'ok' ? (cv.hits || []) : []).filter(h => ids.has(h.rsid));
@@ -2346,13 +2847,51 @@ function geneCard(d, cv, lng, lip){
         `<div>${esc(k.note || '')}</div>`).join('') : '—')}
       ${cell(t('web.genome.nav_lipids'), lipRows.length ? lipRows.map(x =>
         `<div>${esc(x.verdict || x.label || '')}</div>`).join('') : '—')}
-    </div></div>`;
+    </div>${inSystems}</div>`;
 }
 
+// The second entry, on the page. The classes are listed beside the answer and
+// not behind it: a reader shown only the answer for one class cannot tell a
+// class this build holds nothing for from one it looked at and found nothing in.
+function screenVerdictLine(v){
+  if(!v)return '';
+  if(v.kind==='finding'){
+    let s=t('screen.finding',{n:v.n||0,genes:(v.genes||[]).join(', ')});
+    if(v.unread)s+='; '+t('screen.and_unread',{unread:v.unread,total:v.total||0});
+    return s;
+  }
+  if(v.kind==='clear_measured')return t('screen.clear_measured',{total:v.total||0});
+  if(v.kind==='clear_partial')return t('screen.clear_partial',{unread:v.unread||0,total:v.total||0,genes:(v.genes||[]).join(', ')});
+  return t('screen.not_determined',{why:t('screen.why.'+(v.why||'scan_not_run'))});
+}
+function renderScreen(scr){
+  if(!scr)return `<div class="card muted">${esc(t('web.common.error'))}</div>`;
+  const c=scr.classes||scr;
+  const chips=(c.held||[]).map(r=>`<button class="ghost sc-cls" data-cls="${esc(r.key)}">${esc(r.label||r.key)} · ${r.count}</button>`).join(' ');
+  const named=(c.named||[]).map(r=>`<div class="list-item"><b>${esc(r.label||r.key)}</b> · ${r.count} — <span class="muted">${esc(r.source||'')}</span></div>`).join('')
+    || `<div class="why muted">${esc(t('screen.no_named'))}</div>`;
+  return `<div class="card"><div class="row"><b>${esc(t('screen.title'))}</b></div>
+    <div class="meta" style="margin:8px 0">${esc(t('screen.classes_header'))}</div>
+    <div class="drugchips">${chips}</div>
+    <div id="sc-box" style="margin-top:14px"></div>
+    <div class="meta" style="margin-top:16px">${esc(t('screen.named_header'))}</div>${named}
+    ${c.refused?`<div class="why muted">${esc(t('screen.dropped',{n:c.refused}))}</div>`:''}</div>`;
+}
+function screenClassHtml(r){
+  const rows=(r.genes||[]).map(g=>{
+    const bits=[];
+    if(g.findings)bits.push(esc(t('screen.gene_findings',{n:g.findings})));
+    if(g.read===false)bits.push(esc(t('screen.gene_unread')));
+    return `<div class="list-item"><b>${esc(g.gene)}</b> — ${esc(g.phenotype||'—')}, ${esc(g.inheritance||'—')}`
+         + (bits.length?` <span class="muted">· ${bits.join(' · ')}</span>`:'')+`</div>`;
+  }).join('');
+  return `<div class="lsact" style="margin-bottom:10px">${esc(screenVerdictLine(r.verdict))}</div>${rows}`;
+}
 async function viewGenome(root){
-  const [st,cv,prs,lng,upd,lip]=await Promise.all([
+  const [st,cv,prs,lng,upd,lip,scr]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
-    api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null)]);
+    api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null),
+    api('/api/screen').catch(()=>null)]);
   const sb=await sourceBar(['genome_vcf','catalog','ensembl','clinvar']);
   // Seven headings on one scroll, all open, was the tab. The reader met the
   // maintenance block («update the databases») before any finding, and the same
@@ -2364,6 +2903,7 @@ async function viewGenome(root){
     ['risks',t('web.genome.nav_risks'), n(prs&&prs.available?prs.stats.total:null), ()=>renderPRS(prs)],
     ['long', t('web.genome.nav_longevity'), n(lng&&lng.available?lng.stats.genotyped:null), ()=>renderLongevity(lng)],
     ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
+    ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)],
     ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="card muted">${esc(t('web.genome.db_after_script'))}</div>`],
     ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="min-width:240px"><button class="act" id="g-go">${esc(t('web.genome.find'))}</button></div>
       <div class="drugchips" id="g-chips"></div>`],
@@ -2373,6 +2913,12 @@ async function viewGenome(root){
         <span class="muted" style="font-size:13px">${esc(t('web.genome.updates_note'))}</span></div>
       <div id="upd-box">${renderUpdates(upd)}</div>`],
   ];
+  const bindScreen=()=>root.querySelectorAll('.sc-cls').forEach(b=>b.onclick=async()=>{
+    const box=$('#sc-box',root); if(!box)return;
+    box.innerHTML=`<div class="muted">${esc(t('web.common.loading'))}</div>`;
+    const r=await api('/api/screen?class='+encodeURIComponent(b.getAttribute('data-cls')));
+    box.innerHTML=screenClassHtml(r);
+  });
   root.innerHTML=`<h2 class="section">${esc(t('web.genome.title'))}</h2>
     ${genomeState(st)}
     <div class="subnav" role="tablist">${panes.map(([id,label,cnt],i)=>
@@ -2396,8 +2942,8 @@ async function viewGenome(root){
 
   const card=$('#g-card',root);
   async function openGene(gene){
-    const d=await api('/api/genome?gene='+encodeURIComponent(gene));
-    card.innerHTML=geneCard(d,cv,lng,lip);
+    const [d,sys]=await Promise.all([api('/api/genome?gene='+encodeURIComponent(gene)), systemsIndex().catch(()=>null)]);
+    card.innerHTML=geneCard(d,cv,lng,lip,sys);
     const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
     card.scrollIntoView({block:'nearest'});
   }
@@ -2588,6 +3134,7 @@ async function switchLang(code){
   const u=new URL(location.href); u.searchParams.set('lang',LANG);
   history.replaceState(null,'',u.pathname+u.search+u.hash);
   _sources=null;                      // the source chips are worded from the catalogue too
+  _systems=null;                      // and so are the systems' labels
   renderChrome(); buildNav(); mount(current);
 }
 
@@ -2596,7 +3143,11 @@ document.addEventListener('click',async e=>{
   const pick=e.target.closest('[data-pick]');
   const clr=e.target.closest('[data-clear]');
   const lng=e.target.closest('[data-lang]');
+  const sysl=e.target.closest('[data-system]');
   if(lng){ switchLang(lng.getAttribute('data-lang')); return; }
+  // «system: X →» anywhere on the page — a marker card, a gene card, a
+  // prescription — opens the system's card; one handler, every face of it.
+  if(sysl){ e.preventDefault(); viewSystem(sysl.getAttribute('data-system')); return; }
   if(pick){
     const domain=pick.getAttribute('data-pick');
     pick.disabled=true;toast(t('web.common.opening_picker'));

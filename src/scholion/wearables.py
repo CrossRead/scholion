@@ -201,10 +201,22 @@ def migrate(data: Dict[str, Any]) -> Dict[str, Any]:
             "apple_health" if "apple" in said else "unspecified")
     meta = dict(data.get("_meta") or {})
     cmp_from = meta.pop("comparable_from", None)
+    workouts = data.get("workouts") or {}
+    if not workouts and isinstance(data.get("Workouts"), dict):
+        # The oldest files kept workouts as {type: {year: count}}; the block
+        # shape is {year: {type: count}}. Carrying the old table over unturned
+        # made the summary print the years as kinds of workout and a kind as
+        # the last active year — found 12.09.2026 by the first test that fed
+        # such a file through, so the turn happens here, on read, once.
+        for kind, years in data["Workouts"].items():
+            if not isinstance(years, dict):
+                continue
+            for year, count in years.items():
+                workouts.setdefault(str(year), {})[kind] = count
     out: Dict[str, Any] = {
         "_meta": {"shape": SHAPE, "migrated": True},
         "sources": {name: {"_meta": meta, "metrics": metrics or {},
-                           "workouts": data.get("workouts") or data.get("Workouts") or {}}},
+                           "workouts": workouts}},
     }
     if cmp_from:
         out["_meta"]["comparable_from"] = cmp_from

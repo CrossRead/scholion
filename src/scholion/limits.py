@@ -256,7 +256,8 @@ def _genome_limits() -> List[Dict[str, str]]:
         # Placed before the laboratory items on purpose: those may return early,
         # and a person told «connected» with nothing else said will ask this file
         # about a gene and read the refusal as a property of their genome.
-        out.append(_item(_t("limits.no_index_what"),
+        n = len((genome.loci() or {}).get("loci") or {})
+        out.append(_item(_t("limits.no_index_what", n=n),
                          _t("limits.no_index_why"),
                          _t("limits.no_index_closes"), kind="genome"))
 
@@ -600,6 +601,39 @@ def _disclaimer() -> str:
     return engine.DISCLAIMER()
 
 
+def _considered_tools_limits() -> List[Dict[str, str]]:
+    """Tools this project looked at, did not take, and wrote down why.
+
+    `would_close` and `why_named_not_taken` were written, verified, translated
+    and read by nothing: `external_tools.json` is consumed only through its
+    `tools` key, so the whole `considered` section existed for nobody. It belongs
+    exactly here — this report's contract is «what cannot be said, and what would
+    close it», and these entries are the two halves of that sentence already
+    written out.
+    """
+    from . import core
+    out: List[Dict[str, str]] = []
+    for name, e in sorted((core.external_tools().get("considered") or {}).items()):
+        if not isinstance(e, dict):
+            continue
+        what, why = _one_language(e.get("would_close")), _one_language(e.get("why_named_not_taken"))
+        if not what:
+            continue
+        label = e.get("label") or name
+        lic = e.get("license")
+        closes = _t("limits.considered_closes", tool=label,
+                    license=lic or "—", url=e.get("url") or "—")
+        out.append(_item(what, why or _t("limits.considered_no_reason"),
+                         closes, "tool", subject=label))
+    return out
+
+
+def _one_language(raw: Any) -> str:
+    if isinstance(raw, dict):            # unresolved catalogue, both languages
+        raw = raw.get("ru") or raw.get("en")
+    return str(raw or "").strip()
+
+
 def report() -> Dict[str, Any]:
     """Everything this profile cannot answer, with the reason and the remedy."""
     # The preconditions come FIRST: they are the cheapest to close — a sentence
@@ -607,7 +641,7 @@ def report() -> Dict[str, Any]:
     # reader scanning the list should meet those before the ones that need a
     # machine.
     items = (_profile_limits() + _genome_limits() + _lab_limits()
-             + _prs_limits() + _input_limits())
+             + _prs_limits() + _input_limits() + _considered_tools_limits())
     cov = coverage_summary()
     closable = [i for i in items if i["closes"]]
     return {

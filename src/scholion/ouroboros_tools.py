@@ -100,15 +100,39 @@ def _h_provenance(ctx: "ToolContext", refresh: bool = False) -> str:
     return _pv.format_report(_pv.audit(refresh=bool(refresh)))
 
 
+def _args(ctx: "ToolContext", given: dict) -> dict:
+    """Arguments by keyword, or off `ctx.args` for a host that still passes them there.
+
+    Three handlers read `ctx.args` while the other twenty-nine took keywords, and
+    the MCP server and the Hub both call `handler(ctx, **args)` — so the one
+    write a model was given, `sch_focus_log`, answered every MCP call with a
+    TypeError from 16.08.2026 until the audit of 12.09.2026 found it. The test
+    that covered it set `ctx.args` by hand, which is why it stayed green.
+    """
+    # Keywords win whenever one of them carries a value; `ctx.args` is read
+    # only when every keyword is at its default, so a host that fills BOTH and
+    # passes empty keywords is answered from `ctx.args` — the one shape no
+    # known host produces.
+    if any(v not in (None, "", False) for v in given.values()):
+        return given
+    old = getattr(ctx, "args", None)
+    return dict(old) if isinstance(old, dict) and old else given
+
+
 def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
     from scholion import ingest_labs  # noqa: E402
+    # An empty folder name is refused HERE as well as in the engine: `Path("")`
+    # is the current directory, and a tool called with no folder once
+    # transcribed every PDF under the process's working directory into the
+    # profile (12.09.2026, in an audit harness — the owner's own reports).
+    if not (folder or "").strip():
+        return "⚠️ " + _t("ingest_labs.folder_not_named")
     r = ingest_labs.ingest(folder)
     if not r.get("ok"):
         return f"⚠️ {r.get('error')}"
-    files = "; ".join(f"{p['file']} ({p['date']}): {len(p['markers'])}" for p in r.get("per_file", []))
-    return (_t("tool.ingest_labs.done", files=r['files_processed'],
-               points=r['points_added'], skipped=r['skipped'])
-            + (f"\n{files}" if files else ""))
+    # The same report the command line prints — the per-file table used to be
+    # a private summary here, and it read a key (`date`) the engine never wrote.
+    return fmt.ingest_labs_report(r)
 
 
 # --- the reports a model asks for ABOUT THE PERSON --------------------------
@@ -154,7 +178,8 @@ def _h_array(ctx: "ToolContext") -> str:
     return fmt.array_report(_arr.catalogue_coverage())
 
 
-def _h_marker_propose(ctx: "ToolContext") -> str:
+def _h_marker_propose(ctx: "ToolContext", key: str = "", names: str = "",
+                      unit: str = "", names_en: str = "") -> str:
     """WRITES a dictionary RULE — never a value, and never a confirmation.
 
     The model may say «a row printed as X in unit Y is probably this marker».
@@ -173,15 +198,16 @@ def _h_marker_propose(ctx: "ToolContext") -> str:
     for one.
     """
     from scholion import markers_local as _ml  # noqa: E402
-    names = [x for x in (ctx.args.get("names") or "").split(";") if x.strip()]
+    a = _args(ctx, {"key": key, "names": names, "unit": unit, "names_en": names_en})
+    names_ru = [x for x in (a.get("names") or "").split(";") if x.strip()]
     return fmt.markers_local_report(_ml.propose(
-        (ctx.args.get("key") or "").strip(),
-        unit=(ctx.args.get("unit") or "").strip(),
-        names_ru=names, names_en=[x for x in (ctx.args.get("names_en") or "").split(";") if x.strip()],
+        (a.get("key") or "").strip(),
+        unit=(a.get("unit") or "").strip(),
+        names_ru=names_ru, names_en=[x for x in (a.get("names_en") or "").split(";") if x.strip()],
         by="model"))
 
 
-def _h_lab_draw(ctx: "ToolContext") -> str:
+def _h_lab_draw(ctx: "ToolContext", day: str = "", reason: str = "", between: str = "") -> str:
     """WRITES: record why a day holds two draws and what stood between them.
 
     The one write the model is given here, and it is given deliberately: the
@@ -193,10 +219,10 @@ def _h_lab_draw(ctx: "ToolContext") -> str:
     form and the model may only add what it was told.
     """
     from scholion import store as _st  # noqa: E402
-    day = (ctx.args.get("day") or "").strip()
-    reason = (ctx.args.get("reason") or "").strip()
-    between = (ctx.args.get("between") or "").strip()
-    return fmt.draw_context_report(_st.set_draw_context(day, reason, between))
+    a = _args(ctx, {"day": day, "reason": reason, "between": between})
+    return fmt.draw_context_report(_st.set_draw_context(
+        (a.get("day") or "").strip(), (a.get("reason") or "").strip(),
+        (a.get("between") or "").strip()))
 
 
 def _h_sources(ctx: "ToolContext") -> str:
@@ -248,7 +274,8 @@ def _h_focus(ctx: "ToolContext") -> str:
     return fmt.render_focus(engine.focus_dashboard())
 
 
-def _h_focus_log(ctx: "ToolContext") -> str:
+def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol: bool = False,
+                 late_meal: bool = False, note: str = "") -> str:
     """The one tool that writes. See `contract.DICTATED` for why it may.
 
     It records what the person said happened — a glass of wine, a late meal, a
@@ -257,13 +284,15 @@ def _h_focus_log(ctx: "ToolContext") -> str:
     contains the conclusion makes that analysis circular.
     """
     from . import store
-    date = (ctx.args.get("date") or "").strip()
+    a = _args(ctx, {"date": date, "alcohol": alcohol, "atenolol": atenolol,
+                    "late_meal": late_meal, "note": note})
+    date = (a.get("date") or "").strip()
     res = store.add_focus_entry(
         date,
-        alcohol=(ctx.args.get("alcohol") or "").strip(),
-        atenolol=bool(ctx.args.get("atenolol")),
-        late_meal=bool(ctx.args.get("late_meal")),
-        note=(ctx.args.get("note") or "").strip())
+        alcohol=(a.get("alcohol") or "").strip(),
+        atenolol=bool(a.get("atenolol")),
+        late_meal=bool(a.get("late_meal")),
+        note=(a.get("note") or "").strip())
     if not res.get("ok"):
         return f"⚠️ {res.get('error', '')}"
     return _t("tool.sch_focus_log.done", date=date, action=res.get("action", ""))
@@ -288,8 +317,20 @@ def _h_goal_suggest(ctx: "ToolContext") -> str:
     return fmt.goal_suggest_report(engine.suggest_goal_targets())
 
 
+def _h_screen(ctx: "ToolContext", disease_class: str = "") -> str:
+    return fmt.screen_report(engine.screen(disease_class or None))
+
+
 def _h_lipid_genetics(ctx: "ToolContext") -> str:
     return fmt.lipid_genetics_report(engine.lipid_genetics())
+
+
+def _h_system(ctx: "ToolContext", key: str = "", register: str = "") -> str:
+    """The third entry. Read-only: the card assembles what the engine already
+    holds around one system and writes nothing."""
+    if not (key or "").strip():
+        return fmt.systems_report(engine.systems())
+    return fmt.system_report(engine.system(key.strip(), (register or "patient").strip()))
 
 
 # --- schemas (OpenAI function-calling) -------------------------------------
@@ -329,6 +370,8 @@ _TOOLS = (
     ("sch_acmg", (), [], _h_acmg),
     ("sch_goal_suggest", (), [], _h_goal_suggest),
     ("sch_lipid_genetics", (), [], _h_lipid_genetics),
+    ("sch_screen", ("disease_class",), [], _h_screen),
+    ("sch_system", ("key", "register"), [], _h_system),
 )
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the

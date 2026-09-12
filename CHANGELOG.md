@@ -40,6 +40,471 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.0 — 13.09.2026
+
+### What you can do now
+
+**Every body system now has its genetic half, composed from a base with a
+version, without waiting for anyone's signature.** Eleven systems of the radar
+carry a gene list taken from the Gene Curation Coalition's export: which genes
+have an asserted link to the diseases of that system, who asserted it, how
+strongly, under which mode of inheritance, and on what date — 945 genes in
+all, from 31 for the growth axis to 218 for the kidneys, every submitter's row
+kept side by side. The disease groups behind each list are named per system
+and tuned title by title against the export; a term that matched the wrong
+things — a bare «gout» that reached a neurological syndrome, «short stature»
+that reached sixty syndromic genes — was vetoed by name, and the tool now
+carries such vetoes so a refresh keeps them. The primary analysis runs on
+every system at once: what was read, what was not, what ClinVar holds, and the
+questions that follow. A clinician's signature is still what the curated
+layer waits for — the positions, the phrases per genotype state, the signed
+exclusions — but a list composed from the base no longer waits for it.
+
+**COMT rs4680 stands on the radar, under the adrenal axis, and says what it
+does not decide.** The catalogue held the locus since the previous release;
+the adrenal system now carries it as an authored position: one or two copies
+of Met are printed with the sentence that CPIC names the gene in its opioid
+guideline and issues no recommendation by it, that the behavioural and
+cognitive associations of the 2000s do not reproduce, and that nothing is
+decided by the genotype — it is shown because it is asked about. It is printed, and it is not a finding: a
+position never read prints as unread, and the named allele not found prints as
+read and absent, with the depth.
+
+**Polygenic scores stand beside every body system, as scores.** Of the seventy
+pinned polygenic models, thirty-eight are placed with the system they measure —
+LDL and coronary disease with the lipids, type 2 diabetes and glycated
+haemoglobin with carbohydrate metabolism, Crohn's and lupus with inflammation,
+gout and kidney disease with the kidneys — and each system's card prints its
+scores under their own heading, never interleaved with the gene rows and never
+inside the 0–100 index or the verdict: a genotype cannot be refuted by the next
+blood draw. A reliable score at or above the eightieth percentile becomes one
+question for the clinician — whether a screening is worth discussing — with the
+caveats in the sentence: a percentile is not a probability, and the panels are
+mostly European. The thirty-two models that fit no system of the radar are
+named, with the reason, in the file that maps them. A profile with no scores
+says so, and says that scores are computed from a full genome.
+
+**The card says what a full genome would add.** For a person whose genome file
+is an array, an exome or a panel — or who has none yet — the «to read in the
+genome» basket names, per system, the genes of the list a full genome would
+read and the polygenic scores it would make possible. A full genome prints
+nothing there, because nothing is missing.
+
+**The «Second opinion» tab is now «Radar», and it carries the whole picture.**
+The figure and the radar with two rings per system, and one block per system
+below them: what is outside the corridor, the genetic half composed from a base
+with a version and how much of it was read, the polygenic scores, the
+prescriptions acting on it, what to test and the questions for the clinician —
+with the system's full card one click away. An explanation of what the rings
+and the genetic half mean stands on the page itself, and the page still prints
+as the sheet to take to an appointment.
+
+**A body system answers as one card on every face.** Click a segment of the
+radar or an organ on the figure, run `scholion system thyroid`, ask the local
+API or the assistant's tool, and the same card comes back: the laboratory now
+and its movement since the previous draw, the genetic half and how much of it
+was actually read, the prescriptions acting on the system, the target a
+clinician set, what to test, and the questions to bring to the appointment. The
+next step comes in three baskets — laboratory, genome, ask — and a basket that
+is empty says why it is empty. The card has two densities, one for the patient
+and one for the clinician; they differ in how much is said, never in the
+verdict, and no line in either is an instruction.
+
+**The second look is laid out by body system.** What is outside the corridor,
+what is prescribed for that system, what to test and what to ask now stand
+together under one heading per system, where before the thyroid appeared three
+times in three layers without being called one subject. Each block prints
+whole, and a system with nothing to say is named as silent rather than left
+out.
+
+**Every system carries two rings, never merged.** How much of its laboratory
+panel has been measured, and how much of its genetic half has been read, drawn
+as two rings on the figure and on the radar. A system whose genetic list is not
+composed shows that ring dotted — an absence, not a zero.
+
+**Markers, genes and prescriptions point to their system.** A marker card says
+which system it belongs to and opens that system's card; a gene says in which
+systems it is named; a prescription says which system it acts on. A
+prescription's genes now come from the system it acts on, and a clinician's own
+rows about that drug stand as exceptions on top — a sentence, a class of link,
+or a signed exclusion; an unsigned exclusion is refused and counted. Thirteen
+drug classes are mapped to a system; the classes whose target is a use rather
+than an organ — blood pressure, anticoagulation, pain — are left unmapped, and
+the file says why.
+
+**Three entries refuse in one voice.** A prescription, a class of disease and a
+body system all judge their gene list through one form: the same gate (printed
+only with a sentence and a source, the rest counted), the same pending row, the
+same four-state verdict with the number of unread genes inside it, and the same
+sentence. A list that was not read end to end is never called clear, whichever
+door was used.
+
+**The genetic half of a body system is composed from a base with a version, and
+a clinician signs exceptions.** For the thyroid the monogenic composition comes
+from GenCC — 38 genes, every submitter's assertion side by side with its
+classification, mode of inheritance and date, and the export the list came
+from printed with it. A clinician's own positions, phrases and exclusions are
+read from a curated file that ships empty and says why. Ten systems say plainly
+that their genetic half is not composed; the twelfth, built from wearables,
+says it has none by design — three different answers where an empty block used
+to be the only one.
+
+**What the engine says about genetics is bounded.** Every row carries its
+evidence mode and the three modes never print alike; an assertion classified
+Limited, Disputed or Refuted is never a finding; one copy of an allele in a
+recessive gene is printed as carriership and raised as a question, never as a
+risk line; a single common variant prints only with an effect size from a named
+study; and genetics does not enter the 0–100 score — a genotype cannot be
+refuted by the next blood draw, so it stands beside the score, not inside it.
+
+**A target your treating clinician set has a place of its own.** «TSH between
+1 and 2», «free T3 5.0» — beside the reference interval printed on the form and
+separate from your personal goals. You enter it with who set it and when; a
+target without either is refused, and the product never proposes a figure of
+its own. The figures convert to the marker's standard unit the way a laboratory
+value does. The labs report, the marker cards and the marker charts show the
+target beside the corridor, drawn in a different stroke so the laboratory's
+range and the treatment's aim are never confused. When a value sits inside the
+corridor but outside the target, the product asks whether it is worth
+discussing at the next visit — a question, not an instruction. Standing outside
+a target is never counted as an abnormality: the flag and the out-of-range
+count are exactly what they were before. Targets live in their own file, so
+re-importing a folder of forms rewrites the series and leaves them in place;
+`scholion target` and a matching block on the labs page list, record and
+withdraw them, and name in one place the values that are in the corridor yet
+outside a target.
+
+**The monogenic half of a system's gene list can come from a curated base
+instead of from one person's memory.** A single command pulls the Gene
+Curation Coalition's weekly export, keeps only the genes whose diseases belong
+to a system, and writes them down with everything a reader needs to weigh each
+line: who asserted the link, how strongly, on what date, under which mode of
+inheritance, and which version of the base it came from. Every submitter's row
+is kept, so two groups disagreeing about one gene are shown side by side rather
+than averaged, and a weak or refuted assertion travels marked as such rather
+than being silently dropped or silently promoted. The thyroid system ships
+composed this way — thirty-eight genes with the recessive ones named recessive,
+which is the difference between «carrier» and «at risk» for a heterozygote. A
+freshness check says how far behind the base the shipped copy is, and the tool
+refuses to touch the network when told to work offline. The other ten systems
+remain unfilled on purpose: their terms are entered from a named panel or
+report, and none has been named yet, so each says so instead of looking like a
+system nobody asked about.
+
+**A gene answers with what has been decided about it, not only with genotypes.**
+Asked about a gene, the build now prints the curated verdict written about that
+gene before the findings and again under them — including the case where the
+verdict is that no clinical decision follows from it. Where such a sentence
+exists it is quoted with the file it came from: a statement about what does not
+follow from a gene is as much a claim as one about what does, and neither is
+printed unattributed.
+
+**How well a gene was read travels with the answer about a prescription.** The
+measure arrived with the gene question and was wired only there. It is now beside
+every gene on the prescription path as well, where «no pharmacogenetic finding»
+is read as permission to proceed and is worth exactly as much of the gene as was
+read. One state stays silent — a gene read like the rest of the file — and that
+is not a claim that the reading was sufficient: sufficiency depends on the
+question, which the product does not know. Without an alignment file the answer
+is «not measured», which is a fact about the input.
+
+**A second way in: a class of disease instead of a prescription.** `scholion
+screen` answers the question a person has when nothing has been prescribed and
+the examination says they are well — what to look at for the conditions where
+inheritance carries most of the weight. The gene list there is fixed in advance,
+which is what a panel is, and this build still invents none: the classes come
+from the published secondary-findings panel it already carries, with the
+panel named as the source, and every class that panel does not cover is printed
+as absent rather than left out. A curated file takes classes a clinician
+supplies, under the same rule as the prescription side — a list without a named
+source is dropped and counted.
+
+The answer for a class is gene by gene, and it will not call a class clear it
+did not read: something reportable was found; nothing was found and every gene
+of the class was read; nothing was found and part of the class was not read,
+with how many and which; or the screen has not been run. On a screening result
+«nothing found» is taken for health, and over a gene nobody read it is a
+statement about the file. A finding does not cancel the gap either — both travel
+in the same sentence.
+
+The entry is on every face at once: the command line, the page (a pane of the
+genome tab), the plugin, the model-facing tool list and the instruction the
+model reads.
+
+**Everybody has the gene; what can be missing is a variant, or knowledge of
+one.** The class of link that used to read as «this gene is not here» was making
+a claim about a person. It now reports what this build can say about variants in
+that gene, measured against the reader's own file and never defaulted: positions
+read and matching the reference, with how many of how many and at what depth —
+which is a measured absence of a finding; positions held and not read in this
+file — which is an absence of measurement; or no position held for the gene at
+all — which is a statement about the build. Positions with no row are counted
+beside the ones that were read, so two confirmed out of eight held no longer
+reads as «nothing here».
+
+**A gene somebody named, whose meaning nobody has written yet, is kept and
+printed as unwritten.** It used to be dropped with the unattributed entries. It
+is the most informative row on such a screen: it says a clinician put the gene
+on the list and that what follows from it is still to be written — and the build
+says plainly that it will not fill that in. The class of link is authored too: a
+gene arriving without one is printed as named and unclassified rather than filed
+under a class this program chose.
+
+**A prescription is answered with a judgement about the choice, not only with
+genotypes.** Asked to check a drug, the answer now opens with one of three
+statements, and each is about what this build holds rather than about what to
+do: a rule for this pair exists and the reading selects a row that is not the
+neutral one; a rule exists and the reading selects the neutral row, which is a
+statement about the rule and not clearance; or no rule could be reached, with
+the reason named.
+
+**The link between a prescription and a gene has a class, and the class decides
+what may be said.** Two classes are computed from this build's own tables — a
+pair with a guideline, and a pair recognised with no table, which travels with
+the date of the copy. Three cannot be computed: a gene that handles the
+substance with no dosing rule following, a gene asked about from which nothing
+follows, and a gene named in a list and unknown here. Which genes belong to a
+prescription is a medical statement and so is «nothing follows from this one»,
+so those three are read from a curated file and never derived. An entry without
+a named source is not printed, and the number of entries dropped that way is
+printed instead — an entry that vanishes quietly is indistinguishable from one
+nobody wrote.
+
+The curated file ships empty, deliberately. Until a clinician writes a row, the
+honest answer to «what else bears on this prescription» is that this build holds
+no list for it — and that sentence is printed, because a silence there is
+completed by whoever is answering the reader, out of knowledge that never passed
+through this build.
+
+**Every locus stands on one of five named things, and two of them license
+nothing.** What permits saying anything about a position — a guideline rule, a
+curated note, a verdict about the gene, or the bare fact that the gene is a
+recognised pharmacogene this build holds no table for — is now decided from the
+files and printed. The fifth state is a position with none of those, and it no
+longer prints a genotype and stops: it says this build holds no reading for the
+position, the genotype is named and not interpreted. A check walks the whole
+catalogue and fails on a locus that stands on nothing silently.
+
+### What is fixed
+
+**A gene the ACMG scan had put through ClinVar was still called «not put
+through ClinVar».** The system card counted a gene as read only when the
+wide ClinVar annotation — a separate pipeline step — had been run; on a full
+genome with only the product's own ACMG scan, APOB and LDLR on the lipid list
+said the annotation had not been run, although the scan had done exactly that
+for its 84 genes. For those genes the scan now counts; every other gene still
+says, in words, that its variants were not put through ClinVar, and what
+closes it.
+
+**Why a gene was not read printed as a code.** «not read (clinvar_not_run)»
+stood on every such row and once per gene in the genome basket — two hundred
+and eighteen lines for the kidneys, none of them saying what to do. A reason
+is now a sentence in the reader's language, the basket groups the genes by
+reason on one line each, and each line names the step that closes it: the
+ClinVar annotation of the file, or the coverage table computed from the reads.
+
+**A position whose author says nothing follows counted as a finding.** An
+authored position of the «asked about» kind — COMT Val/Met — was counted into
+the system's verdict as something reportable, while its own sentence said
+nothing is decided by it. Such rows are printed with their sentence and are
+not findings; the patient's register shows them, since the sentence was
+written to be read, and shows the genotype state on them instead of «not
+determined».
+
+**The demo-genome recipe ended in a refusal.** The fetcher printed «lay out a
+profile, then point the product at both», and the product then refused to
+read the reference genome beside a profile it took for the person's own. A profile
+can now be laid out for a reference sample — `scholion init --subject
+reference` — every file of it says so, the reference genome is read beside
+it, and the refusal that used to print a raw key names this way out.
+
+**The demo-genome fetcher crashed on its first request.** `fetch_demo_genome.py`,
+the one tool that downloads a public Genome in a Bottle sample so the product
+can be shown with a real genome, had `encoding=` pasted onto its HTTP calls to
+satisfy a text-file check, and every run since 0.4.9 stopped with a type
+error before listing anything. The three calls are HTTP openers again, and the
+check now knows them by line.
+
+**Three tools could not be called through the tool server.** A model asking to
+note an episode in the focus journal, to record why a day holds two draws, or
+to propose a marker name received a type error instead of an answer — on every
+call since those tools appeared, because the three read their arguments in a
+way no host passes them, and the test that covered them filled the arguments in
+by hand. All thirty-two tools now answer over the wire with the arguments their
+schemas declare, and a test calls every one of them that way. Nothing stored
+changes.
+
+**Five tools were served without a description.** The register of sources, the
+array report, the flag rate, the draw context and the marker proposal showed a
+raw key where a description belongs, in both languages. They are described now,
+and a raw key in a tool list fails the build.
+
+**Asked to transcribe laboratory forms with no folder named, the tool read the
+current directory.** An empty folder name resolves to wherever the process is
+standing, so a call that named nothing could transcribe every PDF under the
+working directory into the profile. A folder must now be named; an empty name
+is refused before anything is read, a refused call no longer copies the
+transcription manifest into the profile, and on success the tool prints the
+same report as the command line — it used to fail on a spreadsheet export
+after having written the profile. If such a call ever ran against your
+profile, the points it added carry the file names they came from and can be
+removed by re-importing the folder you meant.
+
+**An unknown register was served as the patient's.** Asked for a system card in
+a register that does not exist, the local API and the tool answered the
+patient's card labelled with the word given. The request is now refused by
+name, with the two registers listed; the command line always refused it.
+
+**Two writing commands were listed as reads.** Recording the context of a
+double draw and proposing a marker both write to the profile, and the
+capability manifest called them reads. They are listed as writes of the
+dictated kind — what the person said, never a value — and the skill text and
+the tool descriptions no longer claim that only one tool writes: four do, and
+each records what the person handed over.
+
+**The web's source badges had no command-line twin.** The route the page reads
+its «where this data comes from» badges from was mapped to the provenance
+audit, a different function. `scholion sources --json` now carries the same
+block under `data_sources`.
+
+**A Russian card explained an empty genetic list in English.** The sentence a
+system prints when its genetic list is not composed shipped in one language.
+Both now.
+
+**A wearables file in the oldest layout listed the years as kinds of workout.**
+A file that kept workouts as «kind, then year» was carried over to the current
+layout without being turned, so the summary printed «2024» as a type of
+training and «Walking» as the last active year. The file is now turned on
+read, once; nothing stored changes, and a file already in the current layout
+is read exactly as before.
+
+**A gene link typed into a person's own lab file no longer reads like a curated
+statement.** Such a line is free text without a source; on the second look it
+was printed in the same voice as a sentence that had passed the gate. It now
+travels marked as the person's note, so every page shows it as one. Nothing in
+the stored profile changes.
+
+**A deletion or duplication in a position list could be read as the reference —
+with an empty genotype.** Asked about a position whose event is not a
+single-base substitution — a frameshift deletion, a duplication, an insertion —
+the locus reader fetched the coordinate, found no row there, and answered
+«assumed reference» with an empty string where the genotype belongs. A variant
+of that kind is written one base upstream in a VCF as a pair of alleles of
+different length, so the reader was looking at the wrong base with the wrong
+instrument and calling the silence calm. Such a position is now refused by name
+before any file is opened: the coordinate is given, the event is named, no
+genotype is written and no reference is assumed, and the answer says what would
+read it. A position list that contained such an event now shows a refusal where
+it showed an empty reference.
+
+**A position with three alternative alleles can now be held, without anyone
+choosing one.** The catalogue holds one alternative nucleotide per position,
+which is right for comparing genotypes and left some studied positions unable to
+be entered at all. Such a position is now kept with its coordinate and the
+alleles observed there and no alternative chosen — which of them a study meant is
+not in the source, and this build does not pick. Every reader refuses on it by
+name, before reading anything: the coordinate is given, the observed set is
+named, no verdict is offered. An entry may hold a comparable pair or an observed
+set, never both — one carrying both would be compared against the chosen allele
+while looking as though it had declined to choose.
+
+**A catalogue refresh could rewrite the alleles it was only meant to check.** The
+documented update command refreshes the coordinates of every locus it already
+holds, and it was writing into the alternative-allele field whatever the public
+source returns — the full observed set, `A/T`, `C/G`. The catalogue holds one
+nucleotide on each side and the genotype comparison reads one character from
+each, so a run left thirty-five of fifty-five loci compound, among them the ones
+dose answers are drawn from. A refresh may move a coordinate and may not decide
+what the alleles are: a disagreement about alleles is now reported and never
+applied, since which is right is a curation decision with a source behind it. A
+position the source reports with more than one alternative allele is named and
+left out rather than guessed at, and the whole file is checked against its own
+invariant before anything is written — a run that would break it writes nothing
+and exits non-zero, instead of printing «Written to:» over a broken catalogue.
+Adding a locus no longer leaves an empty record behind when the source does not
+answer.
+
+**«Coverage not measured — » printed with nothing after the dash.** The value of
+that line is the reason: no alignment file, no index, or a gene outside the
+coverage table need opposite actions, and an empty one reads as text that broke
+off. A reason is always printed now, including the one that says nothing said
+why.
+
+**An annotation beside the data was not looked for there.** The gene-coordinate
+search consulted two declared folders, and on a machine where neither was the
+one holding the file — while the live source was unreachable in the same moment
+— three genes came back unresolvable with the file one directory away. The
+folder holding the alignment the profile already knows about, and its
+neighbours, are now part of the declared list. An explicit setting still
+switches the search off entirely.
+
+**A caveat vanished when a gene was listed rather than a position.** Each line of
+a gene listing is cut to its first line, and everything a position had to add
+about itself was on the lines after it. On one locus that discarded sentence was
+the one that decided the answer: the catalogue's own note saying the variant read
+there is the minor one for most readers, and that the main one is not a single
+substitution and cannot be read from a variant file at all. The curated note, the
+note about that particular read, and any refusal are now printed under their
+locus in a listing as well.
+
+**A verdict written about a gene reached nobody.** One gene carried a sentence,
+written and checked, saying that no guideline exists for it and that testing it
+is not recommended. The field was translated into both languages and covered by a
+check — a check that the field was in the file, which is a different claim from a
+reader seeing it. On the screen that gene printed two bare genotypes. Nine more
+curated sentences were in the same position, across four files: how an analyte is
+measured and why its published limit may be the wrong one for the reader, what a
+laboratory code means for that analyte, why a missing guideline row is missing,
+and which tools were examined, not taken, and what taking one would close. All of
+them now reach the reader, each where its own answer is. A check enumerates every
+curated field of this kind and fails on one that nothing renders, so that the
+next such sentence cannot be written for nobody.
+
+**«No meaningful pharmacogenetics for this drug» carried no date.** «Nothing is
+known about this pair» and «our copy of the guidelines is a release behind» are
+different facts, and the date of the copy is what tells them apart. The
+drug-by-name path said it; the prescription check — the path taken before a
+tablet — did not. It does now, in the command line and on the page alike.
+
+**A mineral measured by two methods stayed one series.** An elemental analysis
+(ICP) reports calcium, magnesium, zinc, copper and iron as mass per litre; a
+clinical-chemistry panel reports the same elements in molar units, and the two
+disagree by more than rounding — over ten per cent on the same sample. The
+dictionary converted the molar result by the atomic weight and appended it to
+the elemental series, so a change of method read as a change in the person; for
+iron the elemental row had no unit gate at all, and a molar value carrying the
+symbol was stored as micrograms unchanged. Every such element now has two
+markers, each declaring its method; the elemental one accepts no molar unit, and
+each is kept off the other method's forms. Serum copper by the biochemical method
+is a new marker with a standard adult interval by sex. A check refuses the next
+element that mixes.
+
+**Re-importing laboratory forms could add a second point for a draw the series
+already held.** When the earlier point was dated to the month — the shape older
+imports wrote — and the form carried the day and clock time, nothing was
+refused: the marker count stayed the same while the number of points grew, and a
+trend read the same draw twice. A point of the same period now stands in for the
+earlier one at every resolution: a draw replaces its day or month, a day replaces
+its month, and the finer date is kept whichever order the two arrived in, with
+what the earlier entry recorded about the draw carried over. A month or day that
+arrives against two distinct draws inside it still replaces neither and is
+reported, because choosing one would be a guess.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+A profile already holding a month point beside a dated point of the same draw
+is collapsed by the next write to that marker of any shape, or by re-importing
+the folder once.
+
+Re-importing laboratory forms (`ingest-labs --force`) moves biochemistry copper
+points from the elemental series to the new marker; an elemental-iron point in
+the low tens is a molar value stored as micrograms and should be removed by
+hand.
+
 ## v0.4.11 — 12.09.2026
 
 ### What you can do now

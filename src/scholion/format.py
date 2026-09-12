@@ -1,6 +1,6 @@
 """Rendering of engine structures into markdown strings. Used by the CLI, the Claude skill and the Ouroboros plugin."""
 from __future__ import annotations
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from .i18n import plural as _plural, t as _t
 
@@ -188,13 +188,97 @@ def labs_report(r: Dict[str, Any]) -> str:
                                    pct=t["change_floor"]["rcv_pct"],
                                    pairs=t["change_floor"]["pairs"])
         if m.get("genome_link"):
-            line += " · " + _t("labs.genome_link", text=m["genome_link"])
+            # The owner's own line about a marker, marked as such: free text
+            # with no source, and until task 168 it printed in the same voice
+            # as a curated sentence that had passed the gate.
+            line += " · " + (_t("labs.owner_note", text=m["genome_link"])
+                             if m.get("genome_link_kind") == "owner_note"
+                             else _t("labs.genome_link", text=m["genome_link"]))
+        line += _target_suffix(m)
         line += _near_suffix(m) + _decision_suffix(m)
+        for mn in (m.get("method_notes") or []):
+            line += "\n   _" + mn + "_"
         if m.get("note"):
             line += f" · _{m['note']}_"
         lines.append(line)
     lines.append(f"\n_{r['disclaimer']}_")
     return "\n".join(lines)
+
+
+def target_spec(tg: Dict[str, Any]) -> str:
+    """The figures of a target as one token: «1–2», «≤2», «≥1» or «16.7»."""
+    lo, hi, one = tg.get("low"), tg.get("high"), tg.get("value")
+    f = lambda x: f"{float(x):g}"          # noqa: E731 — one formatter, four branches
+    if lo is not None and hi is not None:
+        return _t("target.spec_range", low=f(lo), high=f(hi))
+    if hi is not None:
+        return _t("target.spec_max", high=f(hi))
+    if lo is not None:
+        return _t("target.spec_min", low=f(lo))
+    if one is not None:
+        return _t("target.spec_value", value=f(one))
+    return ""
+
+
+def _target_suffix(m: Dict[str, Any]) -> str:
+    """The clinician's target beside the corridor, with who set it and when (task 170).
+
+    The provenance is printed on the same line as the figures, every time: a
+    target that appeared without an author would read as the product's own
+    verdict, and the product has none — it prints what the person entered.
+    The question below it is asked ONLY for a value the corridor calls normal:
+    a value already flagged has the flag speaking for it, and two lines saying
+    «look here» about one number is noise. It is a question, not an instruction.
+    """
+    tg = m.get("target")
+    if not tg:
+        return ""
+    out = " · " + _t("target.beside", spec=target_spec(tg), set_by=tg.get("set_by", ""),
+                     set_on=tg.get("set_on", ""))
+    if tg.get("note"):
+        out += f" ({tg['note']})"
+    if m.get("outside_target") and m.get("flag") == "ok":
+        side = _t("target.side_above" if tg.get("side") == "above" else "target.side_below")
+        out += "\n   " + _t("target.discuss", side=side, spec=target_spec(tg),
+                            set_by=tg.get("set_by", ""), set_on=tg.get("set_on", ""))
+    return out
+
+
+def targets_report(r: Dict[str, Any]) -> str:
+    """`scholion target list`: every clinician's target beside its marker's value.
+
+    Ends with the frame note rather than opening with it, and never omits it:
+    a list of targets with «outside» beside half of them reads as a list of
+    deficits unless the reader is told, in the same breath, that it is not one.
+    """
+    if not r.get("targets"):
+        return _t("target.list_none")
+    L = [_t("target.list_title", targets=_plural(r["count"], "count.targets")), ""]
+    for tg in r["targets"]:
+        unit = f" {tg['unit']}" if tg.get("unit") else ""
+        line = "• " + _t("target.list_line", name=tg["name"], spec=target_spec(tg) + unit,
+                         set_by=tg.get("set_by", ""), set_on=tg.get("set_on", ""))
+        if tg.get("note"):
+            line += f" _({tg['note']})_"
+        cur = tg.get("current")
+        if not cur:
+            line += "\n   " + _t("target.now_none")
+        else:
+            now = _t("target.now", value=cur["value"], date=cur["date"])
+            if tg.get("outside_target"):
+                side = _t("target.side_above" if tg.get("side") == "above"
+                          else "target.side_below")
+                if tg.get("in_corridor"):
+                    now += " — " + _t("target.discuss", side=side, spec=target_spec(tg),
+                                      set_by=tg.get("set_by", ""), set_on=tg.get("set_on", ""))
+                else:
+                    now += " — " + _t("target.outside_and_flagged", side=side)
+            elif tg.get("outside_target") is False:
+                now += " — " + _t("target.within")
+            line += "\n   " + now
+        L.append(line)
+    L += ["", "_" + _t("target.frame_note") + "_"]
+    return "\n".join(L)
 
 
 def _fmt_ref(m: Dict[str, Any]) -> str:
@@ -314,7 +398,13 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
                 lines.append("· " + _t("gene.coverage_line", what=label, mean=s["mean"],
                                        min=s["min"], pct10=s["pct_10x"], pct20=s["pct_20x"]))
     else:
-        lines.append("⚠️ " + _t("gene.coverage_missing", why=cov.get("why", "")))
+        # The whole value of this line is the reason. Printed empty it ends in a
+        # dash and nothing — which reads as text that broke off, and a reader
+        # cannot tell «no alignment file» from «the gene is outside the coverage
+        # table» from a render that failed. Those need opposite actions.
+        lines.append("⚠️ " + _t("gene.coverage_missing",
+                                why=(cov.get("why") or "").strip()
+                                or _t("gene.coverage_not_computed")))
     lines.append("")
     v = r.get("variants") or {}
     conseq = v.get("consequential")
@@ -398,6 +488,20 @@ def genome_report(r: Dict[str, Any]) -> str:
         lines.append(_t("genome.loci", gene=r["gene"]))
         for item in r["loci"]:
             lines.append("• " + genome_report(item).split("\n")[0])
+            # The cut to one line is what makes this listing readable, and it is
+            # also what threw away the sentence that mattered most on one of
+            # these loci: the catalogue's own note saying the variant read here
+            # is the minor one for most readers, and that the main one is not a
+            # SNP and cannot be read from this file at all. A caveat that
+            # survives only in the single-locus view is a caveat the reader of a
+            # gene never meets. It is reprinted here, indented, under its locus.
+            for _q in _locus_qualifier_lines(item):
+                lines.append("  " + _q)
+        # And the verdict again, under the genotypes. Each locus line here is cut
+        # to its first line, so anything a locus wants to add about itself is
+        # already gone; a reader who scrolled past the frame to the genotypes
+        # would otherwise meet them bare. Two lines, and the whole point.
+        lines += _verdict_lines((r.get("layers") or {}).get("verdict") or {})
         return "\n".join(lines)
     # a single rsID, ok
     res = r.get("result") or {}
@@ -516,6 +620,8 @@ def genome_report(r: Dict[str, Any]) -> str:
         line += f"\n⚠️ _{res['note']}_"
     if r.get("note"):
         line += f"\n_{r['note']}_"
+    for _q in _locus_basis_lines(r):
+        line += "\n" + _q
     line += f"\n\n_{r.get('disclaimer','')}_"
     return line
 
@@ -528,6 +634,7 @@ def gene_layers_report(l: Dict[str, Any]) -> str:
     that is silently skipped is the defect this block exists to prevent.
     """
     out = ["**" + _t("gene.layers_header", gene=l.get("gene", "—")) + "**"]
+    out += _verdict_lines(l.get("verdict") or {})
     cat = (l.get("catalogue") or {}).get("count") or 0
     out.append("· " + (_t("gene.layer.catalogue", count=cat) if cat
                        else _t("gene.layer.catalogue_none")))
@@ -577,6 +684,473 @@ def gene_layers_report(l: Dict[str, Any]) -> str:
         out.append("· " + _t("gene.layer.acmg_unavailable", status=ac_status or "—"))
     out.append("· " + _coverage_line(l.get("coverage") or {}))
     return "\n".join(out)
+
+
+def _depth_span(v: Dict[str, Any]) -> str:
+    """«26×» when the positions agree, «24–34×» when they do not."""
+    lo, hi = v.get("depth_min"), v.get("depth_max")
+    if lo is None or hi is None:
+        return "—"
+    fmt = lambda x: f"{x:g}"                                    # noqa: E731
+    return fmt(lo) + "×" if lo == hi else f"{fmt(lo)}–{fmt(hi)}×"
+
+
+def screen_report(r: Dict[str, Any]) -> str:
+    """The second entry: no prescription, a class of disease.
+
+    The list of classes is printed with the answer, always. A reader who is not
+    shown which classes are answerable cannot tell a class this build holds
+    nothing for from one it has looked at and found nothing in — which is the
+    same confusion, one level up, that the whole of this layer exists to undo.
+    """
+    from .engine.screening import verdict_line as _line
+    L = ["**" + _t("screen.title") + "**", ""]
+    if r.get("mode") == "class":
+        L.append("**" + str(r.get("class_label") or r.get("class") or "—") + "**"
+                 + (" · " + _t("screen.scanned_on", date=r["scanned"]) if r.get("scanned") else ""))
+        L.append(_line(r.get("verdict") or {}))
+        L.append("")
+        for row in (r.get("genes") or []):
+            line = "· " + _t("screen.gene_row", gene=row.get("gene"),
+                             phenotype=row.get("phenotype") or "—",
+                             inheritance=row.get("inheritance") or "—")
+            if row.get("findings"):
+                line += " — " + _t("screen.gene_findings", n=row["findings"])
+            if row.get("read") is False:
+                line += " — " + _t("screen.gene_unread")
+            L.append(line)
+        L.append("")
+    L += _class_listing(r.get("classes") or r)
+    if r.get("disclaimer"):
+        L += ["", "_" + r["disclaimer"] + "_"]
+    return "\n".join(L)
+
+
+def _names(rows: Any, key: str = "name") -> str:
+    return ", ".join(str((r or {}).get(key) or r) if isinstance(r, dict) else str(r)
+                     for r in (rows or []))
+
+
+def _system_gene_row(r: Dict[str, Any], register: str) -> str:
+    """One row of the genetic half — its mode first, because the three modes
+    make different claims and are never printed alike."""
+    mode = _t("system.mode." + str(r.get("mode") or "unknown"))
+    if r.get("unit") == "position":
+        st = r.get("state") or (r.get("genotype") or {}).get("state")
+        head = _t("system.row.position", gene=r.get("gene"), rsid=r.get("rsid") or "—",
+                  mode=mode, state=_t("system.state." + str(st)))
+    else:
+        head = _t("system.row.gene", gene=r.get("gene"), mode=mode,
+                  classifications=", ".join(r.get("classifications") or []) or "—",
+                  moi=", ".join(r.get("moi_codes") or [r.get("moi") or "—"]))
+    marks = []
+    if r.get("findings"):
+        marks.append(_t("system.row.finding", n=r["findings"]))
+    if r.get("carrier"):
+        marks.append(_t("system.row.carrier"))
+    if r.get("not_a_finding_why") == "kind":
+        marks.append(_t("system.row.not_finding_kind", kind=_t("decision.kind." + str(r.get("kind")))))
+    if r.get("pending"):
+        marks.append(_t("system.row.pending"))
+    if r.get("read") is False:
+        marks.append(_t("system.row.unread", why=r.get("read_why_text") or r.get("read_why") or "—"))
+    line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
+    if r.get("text"):
+        line += "\n   " + str(r["text"])
+    if register == "clinician":
+        detail = []
+        g = r.get("genotype") or {}
+        if g.get("genotype"):
+            detail.append(_t("system.row.genotype", genotype=g["genotype"],
+                             confidence=g.get("confidence") or "—",
+                             depth=g.get("depth") if g.get("depth") is not None else "—"))
+        for a in r.get("assertions") or []:
+            detail.append(_t("system.row.assertion", disease=a.get("disease") or "—",
+                             classification=a.get("classification") or "—",
+                             moi=a.get("moi") or "—", submitter=a.get("submitter") or "—",
+                             date=a.get("curated_on") or "—"))
+        if r.get("source"):
+            detail.append(_t("decision.source", source=r["source"]))
+        line += "".join("\n   _" + d + "_" for d in detail)
+    return line
+
+
+def _system_polygenic(poly: Any, register: str) -> List[str]:
+    """The common variation of a system, as scores under their own head — never
+    interleaved with the gene rows, because a percentile inside a reference
+    panel and a classified variant are two different claims (task 178)."""
+    if not isinstance(poly, dict) or poly.get("status") in (None, "no_genetic_half"):
+        return []
+    L = ["   **" + _t("system.polygenic.title") + "**"]
+    if poly.get("status") != "ok":
+        L.append("   " + str(poly.get("why") or ""))
+        return L
+    L.append("   " + _t("system.polygenic.line", mapped=poly.get("mapped") or 0,
+                        scored=poly.get("scored") or 0, high=len(poly.get("high") or [])))
+    for r in poly.get("rows") or []:
+        line = "   · " + _t("system.polygenic.row", label=r.get("label"),
+                            percentile=r.get("percentile") if r.get("percentile") is not None else "—",
+                            reliable=_t("system.polygenic.reliable" if r.get("reliable")
+                                        else "system.polygenic.unreliable"))
+        if register == "clinician":
+            detail = [_t("system.polygenic.detail", pgs_id=r.get("pgs_id") or "—",
+                         evidence=r.get("evidence_label") or r.get("evidence") or "—")]
+            detail += [str(r[k]) for k in ("validity_note", "integrity_note", "weight_mass_note",
+                                           "evidence_note") if r.get(k)]
+            if r.get("model_changed_from"):
+                detail.append(_t("system.polygenic.model_changed", previous=r["model_changed_from"]))
+            line += "".join("\n     _" + d + "_" for d in detail)
+        L.append(line)
+    if poly.get("unscored"):
+        L.append("   " + _t("system.polygenic.unscored", traits=", ".join(poly["unscored"])))
+    L.append("   _" + (poly.get("caveat") or _t("system.polygenic.caveat")) + "_")
+    return L
+
+
+def system_report(r: Dict[str, Any]) -> str:
+    """The third entry, as one block: seven layers, the verdict, the questions,
+    the three baskets. The two registers print the same facts at two densities
+    and the verdict is the same line in both (brief §7).
+    """
+    if r.get("status") == "unknown_system":
+        return _t("system.unknown", key=r.get("key") or "—", systems=", ".join(r.get("systems") or []))
+    if r.get("status") == "unknown_register":
+        return _t("system.unknown_register", register=r.get("register") or "—",
+                  registers=", ".join(r.get("registers") or []))
+    reg = r.get("register") or "patient"
+    L = ["**" + _t("system.title", label=r.get("label") or r.get("key")) + "** · "
+         + _t("system.register." + reg), "", r.get("verdict_line") or "", ""]
+    # 1 — the laboratory half
+    lab = r.get("labs") or {}
+    L.append("**1. " + _t("system.layer.labs") + "**")
+    if lab.get("status") == "absent":
+        L.append("   " + _t("system.labs.absent"))
+    elif lab.get("status") == "nodata":
+        L.append("   " + _t("system.labs.nodata", total=lab.get("total") or 0))
+    else:
+        L.append("   " + _t("system.labs.line", score=lab.get("score"),
+                            level=_t("system.level." + str(lab.get("level") or "nodata")),
+                            measured=lab.get("measured") or 0, total=lab.get("total") or 0))
+        for m in lab.get("abnormal") or []:
+            L.append(f"   {_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} "
+                     f"{m.get('unit', '')} ({m.get('date', '')})")
+    if lab.get("missing"):
+        L.append("   " + _t("system.labs.missing",
+                            markers=_names(lab.get("missing_names") or lab["missing"])))
+    if lab.get("stale"):
+        L.append("   " + _t("system.labs.stale", markers=_names(lab["stale"])))
+    # 2 — the dynamics
+    dyn = r.get("dynamics") or {}
+    L += ["", "**2. " + _t("system.layer.dynamics") + "**"]
+    if dyn.get("status") == "ok":
+        d = dyn.get("delta") or 0
+        # Both scores are over the SAME markers — the ones with an earlier
+        # point — so the movement is a comparison and not two different means.
+        L.append("   " + _t("system.dynamics.line", prev=dyn.get("prev_score"),
+                            score=dyn.get("compared_score"), delta=f"{'+' if d > 0 else ''}{d}",
+                            date=dyn.get("prev_date") or "—", compared=dyn.get("compared") or 0))
+        for m in dyn.get("moved") or []:
+            L.append("   · " + _t("system.dynamics.moved", name=m.get("name"),
+                                  from_value=m.get("from_value"), to_value=m.get("to_value"),
+                                  unit=m.get("unit") or ""))
+    else:
+        L.append("   " + _t("system.dynamics." + str(dyn.get("status") or "absent")))
+    # 3 — the genetic half
+    gen = r.get("genetics") or {}
+    L += ["", "**3. " + _t("system.layer.genetics") + "**"]
+    if gen.get("status") == "composed":
+        base = gen.get("base") or {}
+        L.append("   " + _t("system.genetics.composed",
+                            source=base.get("source") or "—", version=base.get("version") or "—",
+                            base_genes=base.get("genes") or 0,
+                            positions=(gen.get("curated") or {}).get("positions") or 0,
+                            read=gen.get("read_count") or 0, unread=gen.get("unread_count") or 0,
+                            findings=gen.get("finding_count") or 0,
+                            carriers=gen.get("carrier_count") or 0,
+                            pending=gen.get("pending_count") or 0))
+        if gen.get("withheld_by_classification"):
+            L.append("   " + _t("system.genetics.withheld", n=gen["withheld_by_classification"]))
+        if gen.get("excluded"):
+            L.append("   " + _t("system.genetics.excluded", genes=_names(gen["excluded"], "gene")))
+        refused = gen.get("refused") or {}
+        if refused.get("total"):
+            by = refused.get("by_reason") or {}
+            L.append("   " + _t("system.genetics.refused", n=refused["total"])
+                     + ((" — " + ", ".join(f"{k}: {v}" for k, v in by.items())) if by else ""))
+        for row in gen.get("rows") or []:
+            L.append("   " + _system_gene_row(row, reg).replace("\n", "\n   "))
+        if gen.get("rows_withheld_as_detail"):
+            L.append("   _" + _t("system.row.patient_withheld", n=gen["rows_withheld_as_detail"]) + "_")
+    elif gen.get("status") == "not_composed":
+        L.append("   " + _t("system.genetics.not_composed",
+                            why=gen.get("why_empty") or _t("screen.why.no_panel")))
+    else:
+        L.append("   " + _t("screen.why.no_genetic_half"))
+    L += _system_polygenic(gen.get("polygenic"), reg)
+    # 4 — the prescriptions acting here
+    med = r.get("medications") or {}
+    L += ["", "**4. " + _t("system.layer.medications") + "**"]
+    for m in med.get("rows") or []:
+        L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
+                              classes=", ".join(m.get("via") or [])).replace("  ", " "))
+    if med.get("empty_reason"):
+        L.append("   " + med["empty_reason"])
+    if med.get("unmapped"):
+        L.append("   " + _t("system.meds.unmapped", names=_names(med["unmapped"])))
+    if med.get("unclassified"):
+        L.append("   " + _t("system.meds.unclassified", names=_names(med["unclassified"])))
+    # 5 — the clinician's target
+    tg = r.get("target") or {}
+    L += ["", "**5. " + _t("system.layer.target") + "**"]
+    for row in tg.get("rows") or []:
+        cur = row.get("current")
+        if cur:
+            side = _t("target.side_above" if row.get("side") == "above" else "target.side_below") \
+                if row.get("outside_target") else _t("system.target.within")
+            L.append("   · " + _t("system.target.row", name=row.get("name"), spec=row.get("spec"),
+                                  unit=row.get("unit") or "", set_by=row.get("set_by") or "",
+                                  set_on=row.get("set_on") or "", value=cur.get("value"),
+                                  date=cur.get("date") or "—", side=side))
+        else:
+            L.append("   · " + _t("system.target.no_value", name=row.get("name"), spec=row.get("spec"),
+                                  unit=row.get("unit") or "", set_by=row.get("set_by") or "",
+                                  set_on=row.get("set_on") or ""))
+    if tg.get("empty_reason"):
+        L.append("   " + tg["empty_reason"])
+    # 6 — what to test
+    tests = r.get("tests") or {}
+    L += ["", "**6. " + _t("system.layer.tests") + "**"]
+    for s in tests.get("rows") or []:
+        L.append("   " + _PRIO_ICON.get(s.get("priority", "low"), "•") + " " + _test_row(s))
+    if tests.get("empty_why"):
+        L.append("   " + _t("system.why." + tests["empty_why"]))
+    # 7 — the questions
+    qs = r.get("questions") or {}
+    L += ["", "**7. " + _t("system.layer.questions") + "**"]
+    for i, q in enumerate(qs.get("rows") or [], 1):
+        L.append(f"   {i}. {q.get('text')}")
+    if qs.get("empty_why"):
+        L.append("   " + _t("system.why." + qs["empty_why"]))
+    # the three baskets
+    nxt = r.get("next") or {}
+    L += ["", "**" + _t("system.layer.next") + "**"]
+    for basket in ("lab", "genome", "ask"):
+        b = nxt.get(basket) or {}
+        L.append("   **" + _t("system.next." + basket) + "**")
+        for row in b.get("rows") or []:
+            line = _test_row(row) if row.get("origin") == "rule" else str(row.get("text"))
+            if row.get("closes"):
+                line += " — " + str(row["closes"])
+            L.append("   · " + line)
+        if b.get("empty_reason"):
+            L.append("   _" + b["empty_reason"] + "_")
+        if (b.get("full_genome") or {}).get("text"):
+            L.append("   " + str(b["full_genome"]["text"]))
+    if r.get("disclaimer"):
+        L += ["", "_" + r["disclaimer"] + "_"]
+    return "\n".join(L)
+
+
+def _test_row(s: Dict[str, Any]) -> str:
+    spec = (" · " + _t("tests.specialist", name=s["specialist"])
+            if s.get("specialist") and s["specialist"] != "—" else "")
+    return f"**{s.get('suggest')}**{spec} — " + _t("tests.why", text=s.get("why") or "—")
+
+
+def systems_report(r: Dict[str, Any]) -> str:
+    """The systems, one line each: the two halves and what acts on it."""
+    L = ["**" + _t("systems.title") + "**", ""]
+    acting: Dict[str, int] = {}
+    for p in r.get("prescriptions") or []:
+        for k in p.get("systems") or []:
+            acting[k] = acting.get(k, 0) + 1
+    for s in r.get("systems") or []:
+        lab, gen = s.get("labs") or {}, s.get("genetics") or {}
+        if not s.get("lab_half"):
+            labs = _t("system.labs.absent")
+        elif lab.get("score") is None:
+            labs = _t("common.no_data")
+        else:
+            labs = _t("systems.labs", score=lab.get("score"), measured=lab.get("measured") or 0,
+                      total=lab.get("total") or 0)
+        if gen.get("status") == "composed":
+            g = _t("systems.genetics.composed", n=gen.get("base_genes") or 0,
+                   version=gen.get("base_version") or "—", positions=gen.get("curated_positions") or 0,
+                   read=gen.get("read_count") or 0, unread=gen.get("unread_count") or 0)
+        elif gen.get("status") == "not_composed":
+            g = _t("systems.genetics.not_composed")
+        else:
+            g = _t("systems.genetics.no_half")
+        poly = gen.get("polygenic") or {}
+        if poly.get("mapped"):
+            g += "; " + _t("systems.polygenic", scored=poly.get("scored") or 0, mapped=poly["mapped"])
+        L.append("· **" + str(s.get("label")) + "** (`" + str(s.get("key")) + "`) — " + labs
+                 + "; " + g + "; " + _t("systems.acting", n=acting.get(s.get("key"), 0)))
+    L += ["", _t("systems.hint")]
+    if r.get("disclaimer"):
+        L += ["", "_" + r["disclaimer"] + "_"]
+    return "\n".join(L)
+
+
+def _class_listing(c: Dict[str, Any]) -> List[str]:
+    """What this build can be asked about, and what it is asked about and cannot."""
+    L = ["**" + _t("screen.classes_header") + "**"]
+    for row in (c.get("held") or []):
+        L.append("· " + _t("screen.class_row", label=row.get("label") or row.get("key"),
+                           count=row.get("count") or 0, source=row.get("source") or "—"))
+    named = c.get("named") or []
+    L += ["", "**" + _t("screen.named_header") + "**"]
+    if not named:
+        L.append("_" + _t("screen.no_named") + "_")
+    for row in named:
+        L.append("· " + _t("screen.class_row", label=row.get("label") or row.get("key"),
+                           count=row.get("count") or 0, source=row.get("source") or "—"))
+    if c.get("refused"):
+        L.append("_" + _t("screen.dropped", n=c["refused"]) + "_")
+    return L
+
+
+def _variant_state_line(v: Dict[str, Any]) -> str:
+    """On what evidence this build has nothing to report in a gene.
+
+    Four states and not one of them is «the gene is absent» — everybody has the
+    gene. Read and matching the reference, held and unread, and held nowhere are
+    three different facts, and the first of them is the only one that is a
+    finding rather than a gap.
+    """
+    state = v.get("state")
+    if not state:
+        return ""
+    if state == "variant_called":
+        return "_" + _t("decision.variant.variant_called", n=v.get("called") or 0) + "_"
+    if state == "no_variant_called":
+        line = _t("decision.variant.no_variant_called",
+                  n=v.get("confirmed_ref") or 0, total=v.get("positions") or 0,
+                  depth=_depth_span(v))
+        # The positions with no row are named in the same breath. Two confirmed
+        # out of eight held is not «no variants in this gene»; it is a finding
+        # about two of them and a gap about six.
+        if v.get("unread"):
+            line += "; " + _t("decision.variant.and_unread", n=v["unread"])
+        return "_" + line + "_"
+    if state == "not_read":
+        return "_" + _t("decision.variant.not_read", n=v.get("positions") or 0) + "_"
+    return "_" + _t("decision.variant.no_positions") + "_"
+
+
+def _context_lines(ctx: Dict[str, Any]) -> List[str]:
+    """The three classes that carry no rule, and the named absence of the list.
+
+    The computed classes are printed by the block below this one — they have
+    genotypes to show. These three have only sentences, and a sentence about
+    what does not follow from a gene is printed with its source or not at all.
+
+    The last line is the one worth having. Where nobody has written a context
+    list for this prescription, the answer says so; a screen that says nothing
+    there is completed by whoever is talking to the reader, out of knowledge
+    that is not in this build and has passed none of its filters.
+    """
+    if not ctx:
+        return []
+    out: List[str] = []
+    blocks = ctx.get("blocks") or {}
+    for kind in ("mechanism", "asked_about", "no_variant"):
+        for row in blocks.get(kind) or []:
+            said = (str(row.get("text")) if row.get("text")
+                    else _t("decision.not_written_yet"))
+            out.append("- **" + str(row.get("gene")) + "** — "
+                       + _t("decision.kind." + kind) + ": " + said)
+            vs = _variant_state_line(row.get("variant") or {})
+            if vs:
+                out.append("  " + vs)
+            out.append("  _" + _t("decision.source", source=str(row.get("source"))) + "_")
+    # Named and unclassified: a gene a clinician put on the list, whose class of
+    # link she has not assigned either. Assigning one here would be this program
+    # answering a medical question on her behalf.
+    for row in ctx.get("named") or []:
+        out.append("- **" + str(row.get("gene")) + "** — " + _t("decision.kind.unassigned"))
+        out.append("  _" + _t("decision.source", source=str(row.get("source"))) + "_")
+    cur = ctx.get("curated") or {}
+    # The systems the prescription's class acts on, each with what it handed
+    # over: a system whose genetic half is not composed is named as such,
+    # because «no genes inherited» from it is a fact about the build.
+    for s in cur.get("systems") or []:
+        out.append("_" + (_t("decision.system_reached", system=s.get("key"), n=s.get("genes") or 0)
+                          if s.get("status") == "composed"
+                          else _t("decision.system_not_composed", system=s.get("key"))) + "_")
+    if cur.get("excluded"):
+        out.append("_" + _t("decision.excluded_by_clinician", genes=", ".join(cur["excluded"])) + "_")
+    if not cur.get("asked"):
+        out.append("_" + _t("decision.no_context_list") + "_")
+    elif cur.get("refused"):
+        # Dropped entries are counted out loud. One that vanishes quietly is
+        # indistinguishable from one that was never written, and the gate that
+        # dropped it then looks like an empty file.
+        out.append("_" + _t("decision.entries_without_source", n=cur["refused"]) + "_")
+    if out:
+        out.append("")
+    return out
+
+
+def _gene_coverage_note(ge: Dict[str, Any]) -> str:
+    """The coverage line for a gene on the prescription path, or nothing.
+
+    One state is silent and it is `fine`, which means «not unusual for this
+    file» and never «enough»: sufficiency depends on the question, and the
+    product does not know the question. Every other state speaks, because on
+    this screen a silence is read as permission.
+    """
+    c = ge.get("coverage") or {}
+    if not c or c.get("state") == "fine":
+        return ""
+    return "_" + _coverage_line(c) + "_"
+
+
+def _locus_qualifier_lines(item: Dict[str, Any]) -> List[str]:
+    """Everything about one locus that must not be lost to the one-line cut.
+
+    The curated note, the note about THIS read, and the named refusal. They are
+    the three things that change what the genotype on the line above is worth.
+    """
+    out: List[str] = []
+    res = item.get("result") or {}
+    if res.get("note"):
+        out.append("⚠️ _" + str(res["note"]) + "_")
+    if item.get("note"):
+        out.append("_" + str(item["note"]) + "_")
+    out += _locus_basis_lines(item)
+    return out
+
+
+def _locus_basis_lines(item: Dict[str, Any]) -> List[str]:
+    """The named refusal a locus with nothing behind it has to carry.
+
+    Four of the five states already print something of their own — a rule, a
+    note, a verdict about the gene, or the fact that the pair is recognised. The
+    fifth printed a genotype and stopped, and a genotype that stops is read as a
+    finding. Nothing here interprets: the line says this build holds no reading
+    for the position, which is a fact about the build.
+    """
+    b = item.get("basis") or {}
+    if b.get("kind") == "none":
+        return ["_" + _t("genome.locus_no_basis") + "_"]
+    if b.get("kind") == "pair":
+        return ["_" + _t("genome.locus_pair_only", gene=b.get("gene") or "—") + "_"]
+    return []
+
+
+def _verdict_lines(v: Dict[str, Any]) -> List[str]:
+    """The curated verdict about the gene, with where it came from.
+
+    Two lines and never one: the sentence, and the file it is quoted from. A
+    verdict of this kind says what does not follow from a gene, which is as much
+    a medical statement as saying what does — and this project prints neither
+    without an attributable origin.
+    """
+    if not v.get("text"):
+        return []
+    return ["⚖️ " + _t("gene.verdict", text=v["text"]),
+            "  _" + _t("gene.verdict_source", source=v.get("source") or "—") + "_"]
 
 
 def _coverage_line(c: Dict[str, Any]) -> str:
@@ -657,7 +1231,16 @@ def prescription_check(r: Dict[str, Any]) -> str:
            "none": _t("source.none")}.get(ident.get("source"), "")
     lines = [ov + " " + _t("prescription.title", drug=r.get("drug"), overall=r.get("overall")),
              f"_{_t('prescription.class', value=r.get('class_display', '—'))}_"
-             + (" · " + _t("prescription.source", value=src) if src else ""), ""]
+             + (" · " + _t("prescription.source", value=src) if src else "")]
+    # The judgement about the DECISION, above the sections that make it. The line
+    # at the top of this card grades interactions, labs and flags together; what
+    # it never said is whether anything genetic bears on the choice at all, and
+    # that is the question the card is opened with.
+    ctx = r.get("genetic_context") or {}
+    if ctx.get("verdict"):
+        from .engine.decision import verdict_line as _verdict_line
+        lines.append("🧬 " + _verdict_line(ctx["verdict"]))
+    lines.append("")
 
     # What could not be determined, printed BEFORE the findings rather than after.
     # The engine lifts the verdict off "low" for each of these; if the reason were
@@ -691,11 +1274,14 @@ def prescription_check(r: Dict[str, Any]) -> str:
 
     # 🧬 The patient's genome
     lines.append("**🧬 " + _t("prescription.genome_header") + "**")
+    lines += _context_lines(r.get("genetic_context") or {})
     g = r.get("genome", {})
     genes = g.get("genes", [])
     if not genes:
         cp = g.get("cpic") or {}
-        lines.append(f"_{_t('prescription.no_pgx')}_" if cp.get("asked") else
+        lines.append("_" + _t("prescription.no_pgx",
+                              date=cp.get("snapshot") or _t("common.unknown_date")) + "_"
+                     if cp.get("asked") else
                      "_" + _t("prescription.pgx_unchecked",
                               why=_t("pgx_unchecked." + (cp.get("reason") or "unreachable"))) + "_")
     else:
@@ -725,6 +1311,16 @@ def prescription_check(r: Dict[str, Any]) -> str:
                 mk = ", ".join(f"`{m.get('rsid')}` {m.get('genotype','')}" for m in ge.get("markers", []))
                 pre = _t("prescription.variants", list=mk) + "; " if mk else ""
                 lines.append(f"- **{ge['gene']}** ({lvl}{tag}): {pre}{ge.get('label','')}")
+            # After the branch, not inside it. Put between the `if` and its
+            # `elif` this line broke the chain: a gene that could be phenotyped
+            # and had nothing to say about its coverage fell through to the
+            # generic branch and printed twice, and a gene that could NOT be
+            # phenotyped but did have a coverage note printed the note INSTEAD
+            # of its own answer. How well a gene was read qualifies whichever
+            # answer was given; it does not choose between them.
+            _cov = _gene_coverage_note(ge)
+            if _cov:
+                lines.append("  " + _cov)
 
     # 🧪 The patient's labs
     lines.append("\n**🧪 " + _t("prescription.labs_header") + "**")
@@ -1642,6 +2238,22 @@ def medications_report(r: Dict[str, Any]) -> str:
     return "\n".join(out)
 
 
+def _catalogue_size() -> int:
+    """How many positions the curated catalogue actually holds.
+
+    Written the day a locus was added to it. Several sentences in this build
+    carried the number as a word, and they were stale before anybody noticed: the
+    catalogue had grown from 54 to 60 while the screens still said 54. A count
+    that lives in prose goes stale the first time somebody does the very thing
+    the prose describes.
+    """
+    try:
+        from . import genome
+        return len((genome.loci() or {}).get("loci") or {})
+    except Exception:
+        return 0
+
+
 def genome_status_report(r: Dict[str, Any]) -> str:
     # The build comes first, before «connected» and before «no index». A file in
     # the wrong assembly is neither broken nor missing: it is fine, and it is the
@@ -1728,10 +2340,10 @@ def genome_status_report(r: Dict[str, Any]) -> str:
             # that was there to find.
             out.append(_t("genome_status.paths_head"))
             for it in paths:
-                name = _t("paths." + it["path"])
+                name = _t("paths." + it["path"], n=_catalogue_size())
                 out.append(_t("genome_status.path_open", name=name) if it.get("open")
                            else _t("genome_status.path_closed", name=name,
-                                   why=_t("paths.why_" + (it.get("why") or "no_genome"))))
+                                   why=_t("paths.why." + (it.get("why") or "no_genome"))))
         if r.get("engine") == "linear":
             # The reader that needs no index is not a detail of implementation
             # here: it changes how long the first question takes, and a person
@@ -2221,6 +2833,17 @@ def sources_report(r: Dict[str, Any]) -> str:
                          f"{c.get('was')} → {c.get('now')} ({c.get('upstream')})")
             else:
                 L.append(f"  - {c['gene']}: {c.get('field')} {c.get('was')} → {c.get('now')}")
+    # Where each domain of the profile comes from — the block the web's source
+    # badges read from `/api/sources` (parity, 12.09.2026): a person reading
+    # the markdown sees what the page shows.
+    data = r.get("data_sources") or {}
+    if data:
+        L += ["", _t("sources.data_h")]
+        for key, row in data.items():
+            if not isinstance(row, dict):
+                continue
+            L.append(f"· **{row.get('label') or key}** — {row.get('origin') or '—'}"
+                     + (f" · {row.get('updated')}" if row.get("updated") else ""))
     return "\n".join(L) + "\n"
 
 

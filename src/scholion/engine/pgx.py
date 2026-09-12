@@ -311,8 +311,18 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
             "note": _t("drug.nothing_notable")}
     else:
         gap = True
-        flag = {"level": "unknown",
-                "note": _t("drug.no_guidance_for_phenotype", phenotype=guidance_phenotype, gene=driving_gene)}
+        # The generic sentence says THAT there is no row. Where somebody has
+        # written down WHY there is none — the CPIC line not yet imported
+        # verbatim, or a drug whose guideline is an algorithm and not a phrase
+        # per phenotype — that sentence is the answer, and it was being thrown
+        # away: `guidance_gaps` was known to the language resolver and read by no
+        # renderer at all.
+        note = _t("drug.no_guidance_for_phenotype",
+                  phenotype=guidance_phenotype, gene=driving_gene)
+        why = _guidance_gap_reason(match, guidance_phenotype)
+        if why:
+            note += " " + why
+        flag = {"level": "unknown", "note": note, "gap_reason": why or None}
 
     # An undetermined phenotype cannot yield a reassuring level, whatever the
     # catalogue's `default` says. Five drugs had `default.level = "low"`, so a
@@ -367,6 +377,23 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         "clinvar": clinvar_for_drug(drug, {"genes": [{"gene": gene}]}),
         "disclaimer": DISCLAIMER(),
     }
+
+
+def _guidance_gap_reason(entry: Dict[str, Any], phenotype: str) -> str:
+    """Why THIS drug has no guideline row for THIS phenotype, if somebody said so.
+
+    `__all__` is the whole-drug case: warfarin's guideline is a dosing algorithm
+    over three genes and clinical factors, so no phenotype has a phrase and the
+    reason is the same for every one of them.
+    """
+    gaps = (entry or {}).get("guidance_gaps") or {}
+    if not isinstance(gaps, dict):
+        return ""
+    slot = gaps.get(phenotype) or gaps.get("__all__") or {}
+    raw = slot.get("guidance_gap_reason") if isinstance(slot, dict) else slot
+    if isinstance(raw, dict):            # unresolved catalogue, both languages
+        raw = raw.get("ru") or raw.get("en") or ""
+    return str(raw or "")
 
 
 def _guidance_for(drug: str, gene: str) -> Dict[str, Any]:
@@ -594,6 +621,22 @@ def _assess_gene(gene: str) -> Dict[str, Any]:
             "label": note, "markers": markers}
 
 
+def _gene_coverage(gene: str) -> Dict[str, Any]:
+    """The coverage state of one gene, or an honest nothing.
+
+    Imported inside the call: the genomics layer reaches back into this module
+    for pharmacogenetic facts, and a module-level import of one from the other
+    would close the circle.
+    """
+    try:
+        from .genomics import gene_coverage
+        return gene_coverage(gene)
+    except Exception:                                                # noqa: BLE001
+        # A coverage layer that fails is «not measured», and it says so. Silence
+        # here would be indistinguishable from a gene read end to end.
+        return {"gene": (gene or "").upper(), "measured": False, "state": "not_measured"}
+
+
 def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """Genes important for the drug (the local base + CPIC by rxcui for ANY drug),
     assessed against the patient's genome."""
@@ -617,11 +660,26 @@ def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any
     for gene, meta in genes.items():
         a = _assess_gene(gene)
         a["cpic_level"], a["actionable"] = meta["level"], meta["actionable"]
+        # How well this gene was read, beside the answer about it.
+        #
+        # The rule arrived in 0.4.11 and was wired to the gene question only. On
+        # THIS path the same sentence carries more weight, not less: «no
+        # pharmacogenetic findings» read here is read as permission to prescribe,
+        # and it is worth exactly as much of the gene as was read. On a variant
+        # file with no alignment beside it the honest answer is «not measured»,
+        # which is a fact about the input and not a shrug.
+        a["coverage"] = _gene_coverage(gene)
         assessed.append(a)
     assessed.sort(key=lambda a: (not a.get("actionable"), not a.get("computable")))
     return {"genes": assessed, "genome_ready": genome.available()["ready"],
             "has_pgx": bool(assessed),
-            "cpic": {"asked": cpic.get("asked", False), "reason": cpic.get("reason")}}
+            # The date of the copy travels with the emptiness. «Science holds
+            # nothing about this pair» and «our copy is a release behind» are
+            # different facts that send a reader somewhere different, and only
+            # the date tells them apart. The other drug path learned this in
+            # 0.4.11; this one — the one a prescription check runs — did not.
+            "cpic": {"asked": cpic.get("asked", False), "reason": cpic.get("reason"),
+                     "snapshot": cpic_snapshot()}}
 
 
 def _labs_for_drug(classes: List[str]) -> Dict[str, Any]:
@@ -921,10 +979,18 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
         concerns.append("high" if f.get("severity") == "red_flag" else "moderate")
     overall = "high" if "high" in concerns else ("moderate" if "moderate" in concerns else "low")
 
+    # The question asked from the other end. Everything above answers «what do
+    # we hold about these genes»; this answers «does any of it bear on the
+    # decision being made», which is the question somebody standing over a
+    # prescription pad actually has.
+    from .decision import classify as _classify
+    context = _classify(genome_sec, disp or drug, classes)
+
     return {
         "status": "ok",
         "drug": disp or drug,
         "overall": overall,
+        "genetic_context": context,
         "safety_flags": own_flags,
         "unresolved": unresolved,
         "class_display": class_display,

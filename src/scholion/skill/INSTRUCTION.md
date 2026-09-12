@@ -144,7 +144,7 @@ does what a caveat cannot.
 
 **16a. A file read without an index answers the catalogue and refuses a region.**
 `genome-status` prints which paths this input opens; when it says the file is
-read without an index, the 54 catalogue loci and the pharmacogenetics resting on
+read without an index, the catalogue loci and the pharmacogenetics resting on
 them are answerable and any gene beyond them is not. That refusal is about the
 FILE, never about the person: do not relay it as «no variants in that gene», and
 do not retry the same question in another wording. `bgzip` + `tabix -p vcf`
@@ -289,7 +289,8 @@ one that fires closes the question.
    or low coverage. The check costs seconds and removes most "frightening"
    findings.
 2. **Zygosity, inheritance mode, sex.** A recessive gene in the heterozygous
-   state is carriership, not disease. A trait that applies to one sex only is not
+   state is carriership, not disease — on a system card it is printed as
+   carriership and raised as a question for the clinician, never as a risk line. A trait that applies to one sex only is not
    read in the other. A blood group is not a disease. This filter removes the
    overwhelming majority of pathogenic-tier records.
 3. **Allele direction — from a primary source.** Carrying a non-reference allele
@@ -611,6 +612,27 @@ python3 -m scholion limits                   # what cannot be said from this dat
 python3 -m scholion genome-updates           # what the last reconciliation with a fresh ClinVar produced
 python3 -m scholion prs                      # polygenic scores: percentiles by trait
 python3 -m scholion longevity                # longevity layer: APOE ε and LongevityMap markers
+python3 -m scholion screen                   # the classes of disease this build can screen, and the ones it
+                                             #   is asked about and holds no list for
+python3 -m scholion screen oncology          # one class, gene by gene: which were read in this profile and
+                                             #   which were not. A class is never called clear while part of
+                                             #   it is unread — «nothing found» over a gene nobody read is a
+                                             #   statement about the file
+python3 -m scholion system                   # the body systems of the radar: the laboratory half and the genetic
+                                             #   half of each, and how many prescriptions act on it
+python3 -m scholion system thyroid           # one system as a card, in one block: laboratory now, movement, the
+                                             #   genetic half and how much of it was read, the prescriptions acting
+                                             #   on it, the clinician's target, what to test, the questions for the
+                                             #   clinician — and the next step in three baskets, none silently empty.
+                                             #   `--register clinician` adds rsID, genotype, depth, classification
+                                             #   and the gate's counts; the verdict is the same in both registers
+                                             #   Genetics never enters the 0–100 score: a genotype cannot be refuted by
+                                             #   the next blood draw, so it stands beside the score, not inside it
+                                             #   Polygenic scores appear on every system's card as SCORES with their
+                                             #   caveats — a percentile is not a probability, the panel is mostly
+                                             #   European — and never in the verdict; a reliable score at the 80th
+                                             #   percentile or above is one question, never an instruction. Without a
+                                             #   full genome the card says what one would close for that system
 python3 -m scholion acmg                     # ACMG SF v3.3 secondary findings, with the reporting rules applied
 python3 -m scholion acmg-scan                # produce the table `acmg` reads: your VCF × the published ClinVar
                                              #   file for YOUR build. No bcftools, no index; with no ClinVar file
@@ -661,6 +683,9 @@ python3 -m scholion add-metric KEY DATE VALUE
 python3 -m scholion add-med "drug" --dose "…"
 python3 -m scholion remove-med "drug"
 python3 -m scholion focus-log YYYY-MM-DD [factor flags]
+python3 -m scholion target set MARKER --low … --high … --unit UNIT --set-by "who" --set-on YYYY-MM-DD   # a target the treating clinician set: entered from their word, never derived, never a flag
+python3 -m scholion target list                          # each target beside the current value; a value inside the corridor but outside the target is a question for the visit, not an abnormality
+python3 -m scholion target remove MARKER
 
 # The machine (not the person)
 python3 -m scholion tools                    # external programs (bcftools, htslib, mosdepth…): what is missing, why, and what would install it
@@ -716,11 +741,12 @@ The set of factors for `focus-log` is defined by the user in `profile/focus.json
 The journal is needed where two factors always coincide in time and passive data
 does not separate them.
 
-The Ouroboros tools are the same core through a plugin: `sch_check_prescription`,
-`sch_check_drug_gene`, `sch_analyze_labs`, `sch_suggest_tests`,
-`sch_genome_lookup`, `sch_clinvar_findings`, `sch_health_metrics`,
-`sch_lifestyle`, `sch_prs`, `sch_longevity`, `sch_goal`, `sch_phenoage`,
-`sch_provenance`, `sch_ingest_labs`.
+The Ouroboros tools and the MCP server are the same core through one registry —
+32 tools, one per command that has a tool in the contract; four of them write
+what the person handed over (`sch_ingest_labs`, `sch_focus_log`, `sch_lab_draw`,
+`sch_marker_propose`) and none sets a value: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_sources`, `sch_suggest_tests`, `sch_system`.
+`scholion capabilities --json` derives the list from the build, and is the one
+to trust when this paragraph and the build disagree.
 
 ### Parity of entry points — a project rule
 

@@ -44,6 +44,21 @@ Two rules govern the whole repository:
   of the body and nothing else; the colour is the application's own. The credit
   is printed under the figure in the interface, not only here.
 
+### Gene–disease validity — GenCC
+
+* File: `src/scholion/knowledge/gencc_gene_disease.json`
+* Source: The Gene Curation Coalition, submissions export — https://thegencc.org
+  (the export's own date and the download date are recorded in the file's `_meta`)
+* Licence: **CC0 1.0 Universal** — no restriction; GenCC asks for attribution to
+  GenCC and to the contributing sources (ClinGen, PanelApp, G2P, Orphanet and
+  others, each named per row as `submitter`) whenever possible. Citation form
+  the project requests: «The Gene Curation Coalition. https://thegencc.org
+  [date accessed]».
+* What was changed: filtered to the genes whose diseases belong to a radar
+  system (`knowledge/system_disease_terms.json`), mode of inheritance
+  normalised to a short code beside GenCC's own wording, every submitter's row
+  kept as it was asserted — nothing averaged, nothing dropped by strength.
+
 ### Pharmacogenomic gene–drug reference
 
 * File: `src/scholion/knowledge/cpic_drug_gene.json`

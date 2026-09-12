@@ -1,8 +1,8 @@
 """Deterministic logic (a hybrid: the code computes facts and flags, the LLM words them).
 
 One capability, one facade. The domain logic lives in the submodules --
-_helpers, labs, pgx, genomics, goals, lifestyle, sources, profile_view --
-and this file re-exports EVERY name, private ones included, at the address
+_helpers, labs, corridor, pgx, genomics, goals, lifestyle, sources,
+profile_view -- and this file re-exports EVERY name, private ones included, at the address
 the rest of the tree has always used: engine.<name>. Six consumers
 (__init__, cli, server, ouroboros_tools, assistant, limits) and the tests
 call through this facade; none of them needed a single edit when the flat
@@ -44,6 +44,11 @@ from .labs import (  # noqa: F401 -- the facade re-exports every name
     _marker_last_date,
     suggest_tests,
 )
+from .corridor import (  # noqa: F401 -- the facade re-exports every name
+    _sex_adjusted_bounds,
+    point_corridor,
+    flags_comparable,
+)
 from .goals import (  # noqa: F401 -- the facade re-exports every name
     _goal_series,
     _goal_lv,
@@ -61,10 +66,61 @@ from .goals import (  # noqa: F401 -- the facade re-exports every name
     _guideline_candidate,
     suggest_goal_targets,
 )
+from .panel_form import (  # noqa: F401 -- the facade re-exports every name
+    KINDS as PANEL_KINDS,
+    VERDICTS as PANEL_VERDICTS,
+    one_language,
+    gate,
+    kind_order,
+    scan_for,
+    gene_row,
+    verdict as panel_verdict,
+    verdict_line as panel_verdict_line,
+)
+from .system_panels import (  # noqa: F401 -- the facade re-exports every name
+    MODES,
+    FINDING_GRADE,
+    NOT_A_FINDING,
+    RECESSIVE,
+    STALE_MONTHS,
+    REGISTERS,
+    BASKETS,
+    QUESTION_ORIGINS,
+    POLYGENIC_HIGH_PERCENTILE,
+    domains,
+    systems,
+    prs_system_map,
+    system,
+    genes_index,
+    marker_systems,
+    class_systems,
+    prescriptions,
+    composition,
+)
+from .screening import (  # noqa: F401 -- the facade re-exports every name
+    screen,
+    disease_classes,
+    verdict as screen_verdict,
+    verdict_line as screen_verdict_line,
+    VERDICTS as SCREEN_VERDICTS,
+)
+from .decision import (  # noqa: F401 -- the facade re-exports every name
+    KINDS,
+    VERDICTS,
+    curated_genes,
+    classify,
+    verdict,
+    verdict_line,
+    variant_state,
+    VARIANT_STATES,
+)
 from .genomics import (
     BELOW_MEDIAN_POINTS,
     POORLY_READ_BELOW,
     gene_coverage,  # noqa: F401 -- the facade re-exports every name
+    gene_verdict,
+    locus_basis,
+    BASIS_ORDER,
     NARROW_INPUTS,
     NARROW_FOR_SCORES,
     genome_lookup,
@@ -146,4 +202,7 @@ from .profile_view import (  # noqa: F401 -- the facade re-exports every name
 )
 from .prs_quality import (  # noqa: F401 -- the facade re-exports every name
     P90_P10_SD, annotate_measurement, effect_size,
+)
+from .targets import (  # noqa: F401 -- the facade re-exports every name
+    outside_target, target_side, target_view, clinician_targets_view,
 )

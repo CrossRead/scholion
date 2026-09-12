@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "purpose": "Curated genetic panels of the body systems, keyed by the radar domains of radar_domains.json. Read by engine/system_panels.py as the CURATED layer of a system's genetic half — the author's positions, phrases, expectations and next steps — on top of the base-generated monogenic composition that gencc_gene_disease.json supplies. The two are merged into one list per system; this file never replaces the base and the base never replaces this file.",
+    "who_writes_this": "A clinician. Which positions bear on the working of a system, which allele is the risk allele, and what follows from a genotype state are medical statements, and so is the sentence saying that nothing follows. This program applies the rows it was given, records their source, and derives none; the composition of the monogenic half comes from a base with a version (see gencc_gene_disease.json), and the clinician SIGNS EXCEPTIONS to it here rather than writing the list. The base composition of a system (system_disease_terms.json → gencc_gene_disease.json) needs no signature since 13.09.2026, by the owner's decision; this file stays the clinician's.",
+    "unit_is_a_position": "The unit of a row is a POSITION, not a gene. The panel a clinician sent on 12.09.2026 held six rows for DIO1 alone, each with a different consequence; a schema of «gene → one phrase» cannot express such a panel at all. A position is addressed by rsID plus HGVS with a RefSeq accession (NC_000001.11:g.53909897C>A), never by the genotype letters of a report — those are not always on the same strand as the HGVS, are sometimes protein letters and sometimes conventions, and cannot be parsed.",
+    "risk_allele_is_hers": "`risk_allele` is set by the author and may be null. It is not always the alternate allele, and deriving it from somebody's genotype is not the same as reading it. A row whose risk allele is null is still read — the genotype is printed to the clinician — but no phrase can be chosen for it, and the row is shown as waiting for the author to name the allele.",
+    "text_is_keyed_by_genotype_state": "A phrase is bound to the STATE of the genotype, not to the gene: `text.het` and `text.hom` are the author's, each in both languages or null. This is a second axis, distinct from the kind of link: the kind says what claim may be made, the state says which genotype it is about.",
+    "absent_template": {
+      "text": {
+        "en": "{gene} {rsid}: the allele the author named was not found — the position was read ({confidence}, depth {depth}).",
+        "ru": "{gene} {rsid}: аллель, названный автором, не обнаружен — позиция прочитана ({confidence}, глубина {depth})."
+      },
+      "why": "The phrase for the state «not found» was one and the same on every row of the panel a clinician sent, and it requires no authorship: it is a statement about what was read, not about the person. It lives here once, as a template the engine fills, and is never written per row. It is printed ONLY for a position that was positively read (called, or confirmed against the reference); a position with no row in the file is unread, not absent."
+    },
+    "mode": "REQUIRED on every row: `monogenic` | `common_variant` | `pgx`. The three modes make different claims — «a defect of this gene causes this disease», «this locus shifts a measurement in the population», «this genotype changes the response to a drug» — and they are never printed alike. A row without a mode is dropped and counted.",
+    "modes": {
+      "monogenic": "REQUIRES `classification` (Definitive | Strong | Moderate | Limited | Disputed | Refuted | No Known Disease Relationship | Supportive) and `moi` (AD | AR | XL | XLR | XLD | MT | SD), and names `disease`. Prints with both beside the gene.",
+      "common_variant": "Prints as a single row ONLY with `effect_size` and a `source` naming the study it was measured in; otherwise the polygenic layer (prs_traits.json) is the answer and the row is dropped and counted. For TSH alone 259 independent variants in 159 loci are known; a handful of them read one by one is a format the literature does not support.",
+      "pgx": "As in the prescription entry: the genotype and what the guideline says, with its source."
+    },
+    "limited_is_not_a_finding": "A row whose `classification` is Limited, Disputed, Refuted or No Known Disease Relationship is never printed as a finding, in either register, whatever the genotype. It may be listed, with its classification, as an assertion the base holds; it turns no verdict.",
+    "moi_changes_the_heterozygote": "For an autosomal recessive gene one copy of the named allele is CARRIERSHIP, not risk. The engine prints it as a carrier row and raises a QUESTION for the clinician (whether the second allele is worth looking at); it never prints a risk line for it. `moi` is machine-readable and arrives with the gene — from the base, or from the author here — and not showing it would be lying by the wording.",
+    "common_variant_only_as_score": "Common variation is shown as a polygenic score. A single common variant enters this file only with `effect_size` and the study it came from; the engine drops and counts a common_variant row that lacks either.",
+    "gate": "A row is printed only when it carries a `source` — its own, or the system's — and a `mode` the engine knows. Anything else is dropped and COUNTED, by reason, so that a dropped row is visible as a number rather than looking like a row that never existed.",
+    "pending": "A position named by a clinician whose phrase for the state actually found has not been written is KEPT and printed as pending — it is the most informative row on the screen: it says a clinician put the position here, and that what follows from this genotype is still to be written. On the panel of 12.09.2026 the three positions where the owner carried the named allele were exactly the ones with no phrase.",
+    "kind_is_hers_too": "`kind` (one of the five kinds of link of engine/panel_form.py) is authored as well. A row named without one prints as named and unclassified; defaulting it to `mechanism` would put words in the author's mouth.",
+    "registers": "Two registers, patient and clinician, differ in DENSITY and never in the verdict. The clinician additionally sees rsID and genotype, depth, classification and inheritance, the submitter and date of every assertion, the source and its tier, and the count of rows the gate dropped. There is no reassuring version for the patient: what the clinician's register calls a gap, the patient's calls a gap, shorter.",
+    "expect_is_a_question": "`expect` lets the author declare a direction on a marker of THIS system's panel: {marker, direction: lower|higher, note?}. The engine fills in the person's last value, the corridor and the movement and prints a QUESTION; it never prints a conclusion. An `expect` naming a marker outside the system's panel is dropped and counted; an `expect` on a marker the person never had is printed as a GAP, not as a disagreement. Absence of `expect` is normal.",
+    "next_step": "`next_step` is an optional authored next step with a REQUIRED `kind` from three baskets — lab | genome | ask — because these are three different actions by three different people, and thrown together they read as a prescription.",
+    "exclusions": "The clinician's signature on the base. `systems.<key>.exclusions` names a gene the base composed for this system and says why it is not printed as part of it for this purpose — «in the panel, and nothing follows from it for an asymptomatic adult» — with a `reason` and a `source`. An exclusion without a source is not applied and is counted; an applied exclusion is listed with its reason, never silently removed.",
+    "no_genetic_half": "A system whose genetic half does not exist in this build says so in words and is not left looking empty: the difference between «no list» and «a list with no findings» is visible on the screen, not only in JSON.",
+    "schema": "systems: { <domain key>: { source, no_genetic_half?: { text: {en,ru} }, exclusions?: { <SYMBOL>: { reason: {en,ru}, source, signed_on? } }, positions: [ { rsid, gene, hgvs (RefSeq accession, g.), protein?, risk_allele: <allele or null>, mode: monogenic|common_variant|pgx, classification? (monogenic), moi? (monogenic), disease? , effect_size? (common_variant), study? (common_variant), kind?, text: { het: {en,ru}|null, hom: {en,ru}|null }, source, submitter?, curated_on?, base_version?, expect?: { marker, direction: lower|higher, note?: {en,ru} }, next_step?: { kind: lab|genome|ask, text: {en,ru}, source } } ] } }",
+    "why_empty": {
+      "en": "No list has been authored yet. The empty file is deliberate and is not a placeholder to be filled from general knowledge: until a clinician writes a row, the honest answer is that this build holds no curated panel for the system — and where the base has composed a monogenic half (see gencc_gene_disease.json), that half is printed with its version and the curated layer is named as absent. A draft of the thyroid panel in this schema exists outside the repository, awaiting a clinician's signature; her own genotypes are in no file of this project.",
+      "ru": "Ни один список ещё не написан. Пустой файл — намеренный, а не заглушка под заполнение из общих знаний: пока врач не напишет строку, честный ответ — что в этой сборке нет курируемой панели для системы; там, где база собрала моногенную половину (см. gencc_gene_disease.json), эта половина печатается с версией, а курируемый слой назван отсутствующим. Черновик панели щитовидной железы в этой схеме существует вне репозитория и ждёт подписи врача; её собственные генотипы ни в одном файле проекта нет."
+    },
+    "source_tier": "curated_reference",
+    "updated": "2026-09-13"
+  },
+  "systems": {
+    "adrenals": {
+      "source": "positions carry their own source; see each row",
+      "positions": [
+        {
+          "rsid": "rs4680",
+          "gene": "COMT",
+          "hgvs": "NC_000022.11:g.19963748G>A",
+          "protein": "p.Val158Met",
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
+              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+            },
+            "hom": {
+              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
+              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+            }
+          },
+          "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+          "submitter": "owner",
+          "curated_on": "2026-09-13"
+        }
+      ]
+    }
+  }
+}

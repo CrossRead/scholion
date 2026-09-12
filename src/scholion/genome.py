@@ -1572,6 +1572,101 @@ def _catalogue_alleles(loc: Dict[str, Any]) -> tuple:
     return ref, alts
 
 
+#: The HGVS forms this reader can name an EVENT from, and nothing more. The
+#: string is read for its kind — substitution, deletion, duplication, insertion,
+#: deletion-insertion — never for alleles: `g.89328754del` names the base that
+#: is gone, not the base a VCF anchors the row on, and the letters a clinic's
+#: form prints beside it are somebody's genotype on an unstated strand, at
+#: times at protein level. A `p.` form does not match at all: a protein change
+#: is not a coordinate. An accession in front (`NC_000009.12:`) is tolerated
+#: and dropped; so is `chr9:`.
+_HGVS_EVENT = re.compile(
+    r"^\s*(?:[A-Za-z][\w.]*:)?\s*(?:[gcmn]\.)?"
+    r"(?P<start>\d+)(?:_(?P<end>\d+))?"
+    r"(?P<kind>delins|del|dup|ins|[ACGTNacgtn]>[ACGTNacgtn])"
+    r"(?P<seq>[ACGTNacgtn]*)\s*$")
+
+#: The event names the refusal can carry. The value is the i18n suffix, and
+#: the JSON field holds the same word so that the two never drift apart.
+_EVENT_OF = {"del": "deletion", "dup": "duplication", "ins": "insertion",
+             "delins": "delins"}
+
+
+def _hgvs_event(hgvs: Optional[str]) -> Optional[str]:
+    """What kind of change an HGVS string describes — or None when it does not say.
+
+    Returns `substitution`, `deletion`, `duplication`, `insertion` or `delins`.
+    None is «this string names no genomic event this reader can classify», and
+    it is NOT read as «therefore a substitution»: an unparsed form decides
+    nothing, and the alleles on the locus decide instead.
+    """
+    m = _HGVS_EVENT.match(hgvs or "")
+    if not m:
+        return None
+    kind = m.group("kind")
+    if ">" in kind:
+        return "substitution"
+    return _EVENT_OF[kind.lower()]
+
+
+def _indel_event(loc: Dict[str, Any]) -> Optional[str]:
+    """The name of the event at this locus when it is NOT a single-base
+    substitution — or None when it is one, or when nothing says otherwise.
+
+    Task 172. Two positions of a clinician's panel — a deletion and a
+    duplication, both frameshifts in SECISBP2 — were read «by address» through
+    a locus that carried the HGVS and an empty allele pair, and came back with
+    an EMPTY genotype string labelled `assumed_ref`. The row for a deletion at
+    `g.N del` stands at N-1 in a VCF, anchored on the base before it, as a pair
+    of alleles of different length; a reader that fetches N and compares single
+    bases finds nothing there and calls the nothing «reference».
+
+    The HGVS is asked first, because it is the one thing a form states about the
+    event itself. Then the alleles: a pair whose sides differ in length is an
+    indel however it was named; a pair with a side longer than one base and no
+    length difference is a multi-base change. A locus that carries neither an
+    HGVS this reader can classify nor any allele is left to the existing path —
+    read and marked unverified — because there is nothing to know it by.
+    """
+    kind = _hgvs_event(loc.get("hgvs") or loc.get("hgvs_g") or "")
+    if kind == "substitution":
+        return None
+    if kind:
+        return kind
+    cref, calts = _catalogue_alleles(loc)
+    sides = ([cref] if cref else []) + sorted(calts)
+    if not sides or all(len(x) == 1 for x in sides):
+        return None
+    return "indel" if len({len(x) for x in sides}) > 1 else "multi_base"
+
+
+def _indel_refusal(loc: Dict[str, Any], kind: str) -> Dict[str, Any]:
+    """A locus whose event is not a single-base substitution, refused by name.
+
+    Design (b) of task 172, chosen over representing the indel: the anchor base
+    a VCF writes such a row on is not on the form and not in the catalogue —
+    it takes the reference sequence to construct — so even a locus that says
+    «del» cannot be turned into a REF/ALT pair here, and a pair typed in by
+    hand would be compared by a reader that reads one base a side. The refusal
+    is the answer: the coordinate is given, the event is named, no genotype is
+    written and no reference is assumed. It stands before any file is opened,
+    a chip included: a chip's `D`/`I` letters are a vocabulary of their own and
+    are not this locus's alleles either.
+    """
+    cref, calts = _catalogue_alleles(loc)
+    chrom, pos = loc.get("chrom") or "?", loc.get("pos")
+    where = f"{chrom}:{pos}" if pos else str(chrom)
+    try:
+        region = f"{chrom}:{int(pos) - 1}-{int(pos)}"
+    except (TypeError, ValueError):
+        region = where
+    return {"genotype": None, "confidence": "indel_not_read", "source": "catalogue",
+            "event": kind, "hgvs": loc.get("hgvs") or loc.get("hgvs_g") or None,
+            "expected": f"{cref}>{'/'.join(sorted(calts))}" if cref and calts else None,
+            "note": _t("genome.refused.indel_not_read",
+                       event=_t("genome.event." + kind), where=where, region=region)}
+
+
 def _row_about_locus(f: List[str], ref: Optional[str], alts: set) -> str:
     """Is this row about THIS locus? Four answers, and the middle two are the point.
 
@@ -1668,6 +1763,25 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     interrogated at all, and carrying the assumption across would turn «this
     instrument cannot see that locus» into «you do not have that variant».
     """
+    # A position the source reports with more than one alternative allele is
+    # refused here, before anything is read. The catalogue can hold such a
+    # position — its coordinate and the alleles actually observed there are
+    # facts — but which of the three a paper studied is not in the source, and
+    # comparing a genotype against a guess is worse than not comparing. The
+    # refusal is the answer: the coordinate is known, the observed alleles are
+    # named, and no verdict is offered.
+    if loc.get("alleles_observed") and not (loc.get("alt") or ""):
+        return {"confidence": "multiallelic", "source": "catalogue",
+                "note": _t("genome.refused.multiallelic",
+                           alleles="/".join(str(a) for a in loc["alleles_observed"]),
+                           n=len(loc["alleles_observed"]) - 1)}
+    # A locus whose event is a deletion, a duplication, an insertion — anything
+    # but a single-base substitution — is refused here, before the file, for the
+    # same reason: the reader below compares one base a side at one coordinate,
+    # and such an event does not stand at that coordinate as one base. Task 172.
+    _ev = _indel_event(loc)
+    if _ev:
+        return _indel_refusal(loc, _ev)
     vp = vcf_path()
     if not vp:
         from . import array_genome as _arr
@@ -1731,7 +1845,10 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "samples": samples_of(str(vp)),
                 "note": _t("genome.sample_not_chosen",
                            names=", ".join(samples_of(str(vp))[:8]))}
-    ref = loc.get("ref", "N")
+    # `""` and «no field» are the same absence. A form-built locus carried
+    # `ref: ""`, and `f"{ref}{ref}"` below printed the empty string as the
+    # genotype of an assumed reference — silence, in the shape of an answer.
+    ref = loc.get("ref") or "N"
     # The file's own build decides which coordinate is used. A GRCh37 file is
     # read at `pos_grch37`; nothing is converted, because the offset between
     # builds is not constant even within a chromosome and a converted coordinate

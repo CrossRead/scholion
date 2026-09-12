@@ -1,11 +1,15 @@
-"""A month point and a dated point of that month, in one series.
+"""One measurement standing twice, named where a person would read it.
 
-`add_lab_point` now notices when the same period is already present at another
-resolution — «2026-07» and «2026-07-14» are one measurement standing twice, and
-a series holding both will chart it twice and trend on it twice. The store says
-so, and the tested part stopped there: the importer's own report, which is where
-a person would actually read it, carried the flag through six lines that ran in
-no test.
+`add_lab_point` notices when the same period is already present at another
+resolution. It used to leave every such pair standing and report it — «2026-07»
+and «2026-07-14» charted twice and trended twice — and the tested part stopped
+at the store: the importer's own report, which is where a person would actually
+read it, carried the flag through six lines that ran in no test.
+
+Since tasks 128 and 144 the store resolves such a pair itself, at every
+resolution, and what it still reports is the one pair it cannot resolve: a bare
+day or month arriving against two draws inside it. That is the pair the
+importer's report must carry, and this holds that it does.
 
 The importer is fed CSV rather than PDF for the same reason the table test is:
 the delimiter path needs no reader and no mock, so the test is about the
@@ -63,13 +67,13 @@ class ResolutionCase(unittest.TestCase):
 
 class TestTheDoublingIsNamedInTheReport(ResolutionCase):
 
-    def test_a_month_and_a_day_of_it_are_reported_as_one_measurement_twice(self):
-        # The month point is seeded through the store rather than through a
-        # delimited file: a table dates every row and the importer requires a
-        # full date there, so a month-resolution point reaches a series by the
-        # other routes — a form that printed only the month, or a hand entry.
+    def test_a_bare_day_against_two_draws_of_it_is_reported_as_one_measurement_twice(self):
+        # The two draws are seeded through the store rather than through a
+        # delimited file: the point under test is what the importer PRINTS when
+        # the store cannot resolve a pair, and the file brings the bare day.
         from scholion import store
-        self.assertTrue(store.add_lab_point("ferritin", "2018-05", 12, unit="ng/mL")["ok"])
+        self.assertTrue(store.add_lab_point("ferritin", "2018-05-22T08:22", 31, unit="ng/mL")["ok"])
+        self.assertTrue(store.add_lab_point("ferritin", "2018-05-22T16:40", 29, unit="ng/mL")["ok"])
         (self.forms / "a_day.csv").write_text(BY_DAY, encoding="utf-8")
 
         r = self.ingest()
@@ -77,10 +81,29 @@ class TestTheDoublingIsNamedInTheReport(ResolutionCase):
         mixed = r.get("resolution_mixed") or []
         self.assertTrue(mixed, "the doubling was noticed by the store and lost by the report")
         entry = next(m for m in mixed if m["marker"] == "ferritin")
-        self.assertIn("2018-05", entry["others"],
-                      "the report does not say which other point it stands beside")
-        self.assertTrue(str(entry["date"]).startswith("2018-05-22"),
-                        "the report does not say which point raised it")
+        self.assertEqual(entry["others"], ["2018-05-22T08:22", "2018-05-22T16:40"],
+                         "the report does not say which other points it stands beside")
+        self.assertEqual(entry["date"], "2018-05-22",
+                         "the report does not say which point raised it")
+        self.assertEqual([], r.get("same_day_replaced") or [],
+                         "a day that names neither draw was said to have replaced one")
+
+    def test_a_month_against_the_one_day_in_it_is_no_longer_reported_but_replaced(self):
+        """The pair this file was written for. It is resolved now (task 144):
+        the day is the finer date of one draw, and the report names the
+        replacement instead of a doubling."""
+        from scholion import store
+        self.assertTrue(store.add_lab_point("ferritin", "2018-05", 12, unit="ng/mL")["ok"])
+        (self.forms / "a_day.csv").write_text(BY_DAY, encoding="utf-8")
+
+        r = self.ingest()
+
+        self.assertEqual([], r.get("resolution_mixed") or [],
+                         "resolved and still reported as a doubling")
+        rep = [x for x in r.get("same_day_replaced") or [] if x["marker"] == "ferritin"]
+        self.assertEqual(len(rep), 1, "the monthly point was swallowed and nobody was told")
+        self.assertEqual(rep[0]["replaced"], ["2018-05"])
+        self.assertEqual(rep[0]["date"], "2018-05-22")
 
     def test_a_series_at_one_resolution_raises_nothing(self):
         """Both points dated to the day: two measurements, not one twice."""

@@ -97,7 +97,28 @@ LINE_BUDGETS = {
     # raise in a day on the same question — the corridor rule has become a
     # domain of its own, and task 143 is to move it out; the budget is raised
     # here so that the release carries the fix, and the split follows.
-    "labs": 760,
+    # 760 → 680 on 12.09.2026, task 143: the split followed. «Which corridor
+    # applies to this point and why» and «do the flags of this series share
+    # one ruler» now live in `corridor.py`; `analyze_labs` places their answers
+    # and computes none of them. The budget goes back to where it stood before
+    # the three raises, because the capability they paid for is no longer here.
+    # 680 → 690 on 12.09.2026, task 168 step 6: a marker's row names the system
+    # whose panel holds it, so the card of a system is reachable from the marker
+    # on every face — one field and the lazy helper that reads the domain file.
+    "labs": 690,
+    # Added 12.09.2026, task 170: the clinician's target beside the corridor —
+    # what a treatment aims at, told apart from what a laboratory calls normal.
+    # It landed inside labs.py first and pushed it 90 lines over its wire; the
+    # same domain line as corridor.py, drawn the same day.
+    "targets": 160,
+    # Added 12.09.2026 with task 143, out of `labs`: one question, «may this
+    # number be compared with that corridor», that had raised the budget of
+    # its host three times in one day. Sex, age band, `unreviewed`, a test of
+    # one sex, the form's own printed range, and whether a series' flags still
+    # share one ruler — every refusal is decided here and named once. Sized at
+    # current length plus a third; the next axis of the same question (a
+    # corridor bound to a laboratory or a method, say) belongs here too.
+    "corridor": 250,
     "goals": 550,
     # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
     # the report is BUILT, not only where the score is computed, because
@@ -159,7 +180,65 @@ LINE_BUDGETS = {
     # `except` that used to collapse into «not measured» or `pass` names its
     # failure as a state of its own. Reporting costs lines; silence cost a
     # false «clean» on a hereditary-cancer gene.
-    "genomics": 1020,
+    # 1020 → 1060 on 12.09.2026. A gene answers with the verdict somebody
+    # wrote about it. One such sentence was found written, verified, translated
+    # and read by nothing at all; the shelf that now carries it exists so that
+    # the next one cannot be written for nobody.
+    # 1060 → 1100 on 12.09.2026. What licenses saying anything about a locus is
+    # decided here, in five named states, so that the one which licenses nothing
+    # can be printed instead of leaving a genotype to stand on its own.
+    # New on 12.09.2026. The link between a prescription and a gene has a
+    # class, and the class decides what may be said about it; three of the five
+    # classes are read from a curated file and never derived, so the module is
+    # as much a gate as a classifier.
+    # 200 → 280 on 12.09.2026. A clinician read the fifth class and answered
+    # that «the gene is absent» is a claim about a person we never made. It is
+    # now measured against the person's own file, in four states, and the
+    # measurement lives here.
+    # New on 12.09.2026. The second entry: a class of disease instead of a
+    # prescription. It shares the vocabulary with `decision` and not the
+    # question — there the gene list is derived from a drug, here it is fixed in
+    # advance and comes from a published panel, which is a different contract
+    # with the reader and deserves its own file.
+    # New on 12.09.2026, task 171. What the three list-generating entries share
+    # — the five kinds, the gate that counts what it drops, the pending row, a
+    # gene row with its reading, and the four-state verdict with the unread
+    # count inside it — lives here once, because the refusal sentence is the
+    # product and three copies of it drift into three sentences. `decision` and
+    # `screening` shrank by what moved out.
+    "panel_form": 260,
+    # New on 12.09.2026, task 168 (step 3). The third entry: a body system of
+    # the radar, with its genetic half read from a curated file by POSITION,
+    # the evidence mode of every row, the questions for a clinician and the
+    # three baskets of the next step. Screen-less in this step; sized for the
+    # seven layers it assembles and the reasons each of them can be absent.
+    # 700 → 900 the same day: the monogenic half is MERGED from a base with
+    # a version (GenCC, every submitter side by side) and the clinician's
+    # signed exclusions on top of it — composition from the base, exceptions
+    # from her — and the merge, the carrier rule per gene and the exclusion
+    # block are what the room went to.
+    # 900 → 1060 on 12.09.2026, task 168 steps 4–7: the two layers that were
+    # placeholders became real — the current prescriptions acting on a system
+    # through the class→system map, and the clinician's target beside the
+    # corridor with its question — plus the composition a prescription
+    # inherits and the two counts the second ring is drawn from.
+    # 1060 → 1300 on 13.09.2026, task 178: the common variation of a system
+    # became a block of its own — the pinned polygenic models a map places on
+    # the system, each with the person's percentile, one question per reliable
+    # score above the line, a patient's projection of the rows — and the genome
+    # basket learned to say what a full genome would close for a person who
+    # has an array, an exome, a panel or no file.
+    # 13.09.2026: the ACMG scan counted as the ClinVar source for its 84 genes,
+    # a reason as a sentence with the step that closes it, the genome basket
+    # grouped by reason — found on a reference genome (1300 → 1340).
+    "system_panels": 1340,
+    "screening": 270,
+    # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
+    # longer a hand-written list but are inherited through the system its
+    # class acts on, and the drug entry became the clinician's exceptions —
+    # a sentence, a class, or a signed exclusion, the unsigned one counted.
+    "decision": 340,
+    "genomics": 1100,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.
@@ -173,7 +252,11 @@ LINE_BUDGETS = {
     # 940 → 960 on 12.09.2026: the snapshot date of the guideline copy says
     # «unreadable (…)» when the provenance could not be read, instead of the
     # empty string that a provenance WITHOUT a date also returns.
-    "pgx": 960,
+    # 960 → 1010 on 12.09.2026. Two answers that were empty now say what they
+    # are: how well the gene was read travels with every gene on the
+    # prescription path, and a missing guideline row carries the written reason
+    # there is none instead of the generic sentence that there is none.
+    "pgx": 1010,
     # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a
     # mark on the figure is about, and the score of the markers made in that
     # one place. It belongs beside `health_radar` because the domain's own

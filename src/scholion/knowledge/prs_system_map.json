@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "purpose": "Which body system of the radar each PINNED polygenic model bears on. Read by engine/system_panels.py to print a system's common variation AS SCORES on its card (task 178) — beside the monogenic list, never inside the verdict and never inside the 0–100 score. The trait names are the keys of prs_models.json; the system keys are the keys of radar_domains.json, and a test fails when either side names something the other file does not hold.",
+    "who_writes_this": "The project. Placing a trait on a system is a statement about which laboratory panel is the established screen for that trait — the lipid panel for coronary disease, HbA1c for type 2 diabetes — not a claim about a person. A trait belongs to ONE system: a score printed on two cards would be one number read twice.",
+    "why_partial": {
+      "systolic blood pressure": "no radar domain for blood pressure: the radar measures laboratory panels and wearable metrics, and pressure is neither",
+      "hypertension": "no radar domain for blood pressure",
+      "venous thromboembolism": "no radar domain for coagulation",
+      "ischemic stroke": "no radar domain for the brain's vessels; only the atherosclerotic outcomes whose established screen IS the lipid panel were placed on lipids",
+      "atrial fibrillation": "no radar domain for the heart's rhythm",
+      "heart failure": "no radar domain for the heart as an organ",
+      "chronic lymphocytic leukemia": "no radar domain for the blood and the lymphoid system",
+      "non-Hodgkin lymphoma": "no radar domain for the blood and the lymphoid system",
+      "basal cell carcinoma": "no radar domain for the skin",
+      "malignant melanoma": "no radar domain for the skin",
+      "lung cancer": "no radar domain for the lungs",
+      "colorectal cancer": "no radar domain for the gut",
+      "gastric cancer": "no radar domain for the gut",
+      "diverticular disease": "no radar domain for the gut",
+      "bladder cancer": "no radar domain for the urinary tract: the renal panel measures the kidney's filtration, not the bladder",
+      "Parkinson disease": "no radar domain for the nervous system",
+      "migraine": "no radar domain for the nervous system",
+      "epilepsy": "no radar domain for the nervous system",
+      "Alzheimer disease": "no radar domain for the nervous system",
+      "major depressive disorder": "no radar domain for the nervous system or for mood",
+      "insomnia": "no radar domain for the nervous system; the sleep the wearable records belongs to fitness, which has no genetic half by design",
+      "alcohol consumption": "a behaviour, not a system: no radar domain holds it",
+      "FEV1": "no radar domain for the lungs",
+      "chronic obstructive pulmonary disease": "no radar domain for the lungs",
+      "osteoarthritis": "no radar domain for the joints",
+      "osteoporosis": "no radar domain for bone",
+      "bone mineral density": "no radar domain for bone",
+      "age-related macular degeneration": "no radar domain for the eyes",
+      "cataract": "no radar domain for the eyes",
+      "myopia": "no radar domain for the eyes",
+      "glaucoma": "no radar domain for the eyes",
+      "age-related hearing impairment": "no radar domain for hearing"
+    },
+    "schema": "systems: { <radar domain key>: { traits: [trait names — keys of prs_models.json], why_empty?: {en, ru} } } — a system with no pinned model bearing on it lists no traits and says why; a trait appears under one system at most; every pinned trait that appears under no system is named in _meta.why_partial with the reason. `fitness` is absent on purpose: it has no genetic half (radar_domains.json), so nothing may be placed on it.",
+    "source_tier": "curated_reference",
+    "updated": "2026-09-13"
+  },
+  "systems": {
+    "lipids": {
+      "traits": [
+        "HDL cholesterol",
+        "LDL cholesterol",
+        "total cholesterol",
+        "triglyceride measurement",
+        "lipoprotein A",
+        "coronary artery disease",
+        "myocardial infarction",
+        "peripheral arterial disease",
+        "abdominal aortic aneurysm"
+      ]
+    },
+    "glucose": {
+      "traits": [
+        "type 2 diabetes",
+        "type 1 diabetes",
+        "fasting blood glucose",
+        "glycated hemoglobin HbA1c",
+        "obesity",
+        "body mass index",
+        "waist circumference"
+      ]
+    },
+    "inflammation": {
+      "traits": [
+        "rheumatoid arthritis",
+        "Crohn disease",
+        "ulcerative colitis",
+        "celiac disease",
+        "ankylosing spondylitis",
+        "psoriasis",
+        "systemic lupus erythematosus",
+        "multiple sclerosis",
+        "atopic dermatitis",
+        "asthma"
+      ]
+    },
+    "thyroid": {
+      "traits": [
+        "hypothyroidism",
+        "Graves disease",
+        "thyroid cancer"
+      ]
+    },
+    "adrenals": {
+      "traits": [],
+      "why_empty": {
+        "en": "no pinned polygenic model bears on the adrenal glands: the registry holds none for cortisol, DHEA-S or an adrenal disease",
+        "ru": "ни одна закреплённая полигенная модель не относится к надпочечникам: в реестре нет модели для кортизола, ДГЭА-С или болезни надпочечников"
+      }
+    },
+    "gonads": {
+      "traits": [
+        "testicular germ cell cancer",
+        "prostate cancer"
+      ]
+    },
+    "growth": {
+      "traits": [],
+      "why_empty": {
+        "en": "no pinned polygenic model bears on the growth axis: the registry holds none for IGF-1 or growth hormone",
+        "ru": "ни одна закреплённая полигенная модель не относится к оси роста: в реестре нет модели для ИФР-1 или гормона роста"
+      }
+    },
+    "pancreas": {
+      "traits": [
+        "pancreatic cancer"
+      ]
+    },
+    "liver": {
+      "traits": [
+        "non-alcoholic fatty liver disease",
+        "gallstones"
+      ]
+    },
+    "micronutrients": {
+      "traits": [],
+      "why_empty": {
+        "en": "no pinned polygenic model bears on the vitamins: the registry holds none for vitamin D, B12, ferritin or the omega-3 index",
+        "ru": "ни одна закреплённая полигенная модель не относится к витаминам: в реестре нет модели для витамина D, B12, ферритина или омега-3-индекса"
+      }
+    },
+    "renal": {
+      "traits": [
+        "chronic kidney disease",
+        "gout",
+        "urate measurement",
+        "renal cell carcinoma"
+      ]
+    }
+  }
+}

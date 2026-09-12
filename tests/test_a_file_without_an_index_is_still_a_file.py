@@ -256,7 +256,7 @@ class TestWhatTheLinearReaderMayNotAnswer(_NoIndex):
         for lang in ("en", "ru"):
             _os.environ["SCHOLION_LANG"] = lang
             try:
-                for key in ("paths.region", "paths.why_needs_index",
+                for key in ("paths.region", "paths.why.needs_index",
                             "genome.refused.needs_index", "limits.no_index_what",
                             "limits.no_index_why", "limits.no_index_closes"):
                     with self.subTest(lang=lang, key=key):

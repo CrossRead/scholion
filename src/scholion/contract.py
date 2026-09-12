@@ -49,13 +49,26 @@ PARITY: Dict[str, str] = {
     "GET /api/lifestyle-brief": "brief",
     "GET /api/lifestyle": "lifestyle",
     "GET /api/clinvar": "clinvar",
+    "GET /api/screen": "screen",
+    # One command, two doors: `system` lists, `system KEY` is the card. The map
+    # names commands, not invocations (see `goal-suggest` below).
+    "GET /api/systems": "system",
+    "GET /api/system": "system",
     "GET /api/prs": "prs",
     "GET /api/longevity": "longevity",
     "GET /api/lipid-genetics": "lipid-genetics",
-    "GET /api/sources": "provenance",
+    # Where each domain of the profile comes from: the same block the
+    # command prints under `data_sources` (it was mapped to `provenance`,
+    # a different function, until 12.09.2026).
+    "GET /api/sources": "sources",
     "GET /api/assistant": "assistant",
+    # One command, three doors: `target list`, `target set`, `target remove`.
+    # The map names commands, not invocations (see `goal-suggest` below).
+    "GET /api/targets": "target",
     # writing
     "POST /api/labs": "add-lab",
+    "POST /api/targets": "target",
+    "POST /api/targets/remove": "target",
     # The same command; `--write` is its flag. The map names commands, not
     # invocations — a route whose CLI twin needs an argument is still covered.
     "POST /api/goal": "goal-suggest",
@@ -94,6 +107,11 @@ NO_CLI: Dict[str, str] = {
 
 # CLI commands that have no route and should not have one: this is not a gap in the web.
 CLI_ONLY: Dict[str, str] = {
+    "provenance": "the reverse audit — every profile point traced back to a printed form or "
+                  "a correct derivation — runs for minutes over the laboratory folder and "
+                  "answers a maintainer's question. The web's source badges read "
+                  "`/api/sources`, which is `sources`; until 12.09.2026 that route was "
+                  "mapped here, to a different function, and the parity test could not tell.",
     "flag-rate": "how often each flag fires. The web shows the flags themselves; the share "
                  "they fire on is a question about the RULES rather than about this person, "
                  "which is a maintainer's screen and belongs where the other manifests live.",
@@ -252,6 +270,8 @@ PLUGIN: Dict[str, str] = {
     "acmg": "sch_acmg",
     "goal-suggest": "sch_goal_suggest",
     "lipid-genetics": "sch_lipid_genetics",
+    "screen": "sch_screen",
+    "system": "sch_system",
     # The one write a model may hold, and the reason is in DICTATED: the person
     # says what happened, the assistant writes it down and invents nothing.
     "focus-log": "sch_focus_log",
@@ -307,6 +327,18 @@ NO_PLUGIN: Dict[str, str] = {
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
     "ingest-wearable": "a write",
     "import-fhir": "a write",
+    # Dictated, like `focus-log`, and unlike it not a tool. What the journal
+    # records is an event; what a target records is a NUMBER that from then on
+    # stands beside every value of a marker and shapes a question for the
+    # clinician. A model writing such a number on the person's word is a
+    # narrower act than inventing one and a wider one than noting a glass of
+    # wine, and which side of the line it falls on is the owner's decision to
+    # record here — not this task's to assume. The model is not left silent:
+    # the instruction names the command, and `sch_analyze_labs` already shows
+    # the target beside the corridor once a person has entered it.
+    "target": "a write of a figure the person relays from their clinician; whether "
+              "a model may hold that pen is a decision the owner records, and the "
+              "reading half already reaches the model through sch_analyze_labs",
     "mcp": "it IS the tool surface — a tool that starts the tool server would be a loop, and the "
            "model calling it is already talking to the thing this command would start",
 }
@@ -475,6 +507,12 @@ WRITES = {
     "set-folder", "import-labs", "import-fhir", "ingest-labs", "ingest-studies", "ingest-garmin",
     "ingest-wearable",
     "redact",
+    "target",
+    # Found by the audit of 12.09.2026: both write and neither was listed, so
+    # the partition below did not know them and the capability manifest called
+    # them reads. `lab-draw` writes the reason a day holds two draws; `marker`
+    # files a proposal for a marker name (and a person's confirmation of one).
+    "lab-draw", "marker",
 }
 
 # Creates a value that came from nobody's document. None of these is a tool, and
@@ -500,7 +538,24 @@ AUTHORS = {
 # not an analysis. The instruction says this in the same words.
 #
 # Decision of the owner, 24.08.2026.
-DICTATED = {"focus-log"}
+#
+# `target` is the second of this kind (task 170, 12.09.2026). The person
+# relays what the treating clinician set — «TSH 1–2, set on the 12th» — and it
+# is written down with who said it and when. Nobody's document (the figure was
+# spoken at an appointment), and not the product's own value either: the writer
+# refuses a target that names no author. Being dictated does not make it a
+# tool; that half of the decision is recorded in NO_PLUGIN.
+#
+# `lab-draw` and `marker` are the third and fourth (audit of 12.09.2026, which
+# found both writing while listed nowhere). `lab-draw` is testimony in the
+# same sense as the journal: the person says what stood between two draws,
+# and it is written down verbatim beside the measurements it explains — never
+# a value. `marker` records a NAME the person's forms use for a marker the
+# dictionary does not know, and it is stored as a proposal until a person
+# confirms it; a model may propose (the tool says so in its description) and
+# may not confirm. Both ARE tools, because what they write is what was said
+# and the engine reads a proposal as nothing until it is confirmed.
+DICTATED = {"focus-log", "target", "lab-draw", "marker"}
 
 # Moves the person's own documents into the profile. `ingest-labs` IS a tool, on
 # purpose and recorded here rather than by omission: a model that has just been
@@ -619,13 +674,16 @@ def access() -> Dict[str, Any]:
         },
         "runs": "locally, on the machine that holds the data",
         "doors": {
-            "cli": {"how": "scholion <command>", "commands": len(cli_commands())},
+            "cli": {"how": "scholion <command>", "commands": len(cli_commands()),
+                    "for": "a person, and an agent that has a shell", "agent_surface": True},
             "mcp": {"how": "scholion mcp", "transport": "stdio",
+                    "for": "an agent", "agent_surface": True,
                     "protocol": _mcp.PROTOCOL_VERSION, "tools": len(tools),
                     "note": "a local process spoken to over stdin and stdout; "
                             "no port is opened and no host is contacted"},
             "ouroboros_tools": {"how": "import scholion.ouroboros_tools",
                                 "entry": "get_tools() -> list[ToolEntry]",
+                                "for": "an agent", "agent_surface": True,
                                 "tools": len(tools)},
             # The only door whose owner never had a shell: the skill is
             # installed by a click into a container whose paths nobody has
@@ -633,6 +691,7 @@ def access() -> Dict[str, Any]:
             # the model, and the model is told about it — «run this command»
             # is advice that cannot be followed from here.
             "ouroboros_hub": {"how": "the `scholion` skill", "entry": "plugin.py",
+                              "for": "an agent, with a tab for the person", "agent_surface": True,
                               "installs": "pip package `scholion`",
                               "onboarding": "a Widgets tab that names the data "
                                             "directory and lays it out on request"},

@@ -762,6 +762,17 @@ LOCALIZABLE_FIELDS = {
     "assembly_secondary_note", "assembly_secondary_open", "applies_to_sex_note",
     "zygosity_note", "loinc_note", "common_pitfalls", "hypothesis", "evidence",
     "text", "rule", "summary", "description",
+    # A phrase keyed by GENOTYPE STATE (system_gene_panels.json): `text` there is
+    # not one language map but three — `text.absent`, `text.het`, `text.hom` —
+    # each an author's sentence in both languages. The state names are curated
+    # fields for that reason, and `_localize_tree` walks into a curated field
+    # that turned out to be a container rather than leaving its maps raw.
+    "absent", "het", "hom",
+    # Why a system's genetic list is empty (system_gene_panels.json `_meta`,
+    # system_disease_terms.json per system): a sentence the reader sees on the
+    # card, so it is written in both languages since 12.09.2026 — the audit
+    # found it printed in English inside a Russian card.
+    "why_empty",
     # names and headings shown on screen
     "label", "display_name", "name", "title", "category", "phenotype",
     "suggest", "specialist", "source", "class", "nutritional_dose", "forms",
@@ -840,7 +851,12 @@ def _localize_tree(node: Any, lang: str) -> Any:
         out = {}
         for k, v in node.items():
             if k in LOCALIZABLE_FIELDS:
+                # A curated field that holds a structure rather than a map —
+                # `text` keyed by genotype state — is walked into, so the
+                # phrases inside it are resolved instead of printing raw.
                 out[k] = _localized(v, lang)
+                if isinstance(out[k], dict):
+                    out[k] = _localize_tree(out[k], lang)
             elif k in LOCALIZABLE_CONTAINERS and isinstance(v, dict):
                 out[k] = {kk: _localized(vv, lang) for kk, vv in v.items()}
             else:
@@ -1469,6 +1485,28 @@ def health_goals() -> Dict[str, Any]:
     the reference values and the chart parameters. Current values/series are taken live from labs+wearable."""
     p = profile_dir() / "health_goals.json"
     return read_profile_json(p) if p.exists() else {}
+
+
+def clinician_targets() -> Dict[str, Any]:
+    """PERSONAL targets a treating clinician set (profile/clinician_targets.json).
+
+    The third kind of «normal», beside the corridor printed on the form and the
+    person's own goal: the figure treatment is being steered toward at this
+    stage, which usually lies INSIDE the laboratory corridor. Entered by the
+    person from the clinician's word with who and when (task 170) — never
+    derived here, and never a flag: standing outside it is a question for the
+    appointment, not a deficit."""
+    p = profile_dir() / "clinician_targets.json"
+    return read_profile_json(p) if p.exists() else {}
+
+
+def clinician_targets_by_marker() -> Dict[str, Dict[str, Any]]:
+    """The same targets keyed by marker, one per marker (the writer keeps it so)."""
+    out: Dict[str, Dict[str, Any]] = {}
+    for tg in clinician_targets().get("targets") or []:
+        if isinstance(tg, dict) and tg.get("marker"):
+            out[str(tg["marker"])] = tg
+    return out
 
 
 def genome_dir() -> Path:

@@ -102,9 +102,23 @@ class TestTheWebHasADoorToTheseFields(unittest.TestCase):
         tabs = self.src[self.src.index("const TABS=["):]
         tabs = tabs[:tabs.index("\n];")]          # the closing bracket of the LIST
         mounted = set(re.findall(r"(view[A-Za-z]+)\]", tabs))
-        self.assertEqual(set(), defined - mounted,
-                         "these views are defined and no tab reaches them: "
-                         + ", ".join(sorted(defined - mounted)))
+        # A second kind of door (task 168): a view opened from INSIDE the page —
+        # the card of a body system, reached from a radar dot, an organ on the
+        # figure, a marker, a gene, a prescription — and not from the tab bar.
+        # It is held to the same rule by a different check: something on the
+        # page other than its own definition must call it, or it is dead weight
+        # under a nicer name.
+        opened = set()
+        for name in defined - mounted:
+            body = re.sub(r"async function %s\s*\(.*?\n}\n" % name, "", self.src, count=1, flags=re.S)
+            if re.search(r"\b%s\(" % name, body):
+                opened.add(name)
+        self.assertEqual({"viewSystem"}, opened,
+                         "a view reached from inside the page rather than from a tab is "
+                         "named here on purpose; add it with its door, or mount it")
+        self.assertEqual(set(), defined - mounted - opened,
+                         "these views are defined and nothing reaches them: "
+                         + ", ".join(sorted(defined - mounted - opened)))
 
     # ── the door, asked about as a door ──────────────────────────────────────
     #

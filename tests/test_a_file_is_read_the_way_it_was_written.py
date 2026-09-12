@@ -49,6 +49,17 @@ ACCEPTED = {
     # name, so the walk cannot see what it is. `.open(request)` here returns an
     # HTTP response, which has no encoding to state.
     "src/scholion/net.py:239",
+    # The same opener, in the GenCC fetcher: a HEAD and a GET on an HTTP
+    # response — bytes with a header, no text encoding to state. The bytes are
+    # decoded once, later, with the encoding named at that call.
+    "src/tools/fetch_gencc.py:162",
+    "src/tools/fetch_gencc.py:180",
+    # HTTP openers, not text files: `encoding=` was pasted onto these three on
+    # 0.4.9 to satisfy this test, and the fetcher then crashed on its first
+    # request (TypeError) — found 13.09.2026, the first time it was run since.
+    "src/tools/fetch_demo_genome.py:135",
+    "src/tools/fetch_demo_genome.py:176",
+    "src/tools/fetch_demo_genome.py:197",
 }
 
 
@@ -141,7 +152,11 @@ class TestNothingReadsTextByGuesswork(unittest.TestCase):
         """An entry that no longer matches anything is a claim about code that
         has moved. Left there, it silently accepts a DIFFERENT line later."""
         found = set(walk_the_trees())
-        stale = sorted(set(ACCEPTED) - found)
+        # A file that does not ship — `fetch_demo_genome.py` stays in the
+        # source tree — cannot be stale in the package: the claim is about a
+        # line that is simply not here. The source tree still checks it.
+        here = {e for e in ACCEPTED if (ROOT / e.split(":")[0]).exists()}
+        stale = sorted(here - found)
         self.assertEqual(stale, [], "accepted places that no longer exist")
 
 

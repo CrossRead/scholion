@@ -94,10 +94,22 @@ class TestTheThirdFaceKeepsUp(unittest.TestCase):
                 self.assertIn(cmd, contract.NO_PLUGIN)
 
         # The exemption is a decision, not a gap: it holds only while the kind is
-        # recorded and only for this one command.
-        self.assertEqual(contract.DICTATED, {"focus-log"},
-                         "a second command joined the dictated kind without anybody "
-                         "deciding it may be a tool")
+        # recorded and only for the commands named here. `target` joined on
+        # 12.09.2026 (task 170): the person relays a figure their clinician set,
+        # with who and when — dictated, and deliberately NOT a tool, which
+        # `contract.NO_PLUGIN` records in words. A third name here needs the
+        # same two decisions written down before it is added.
+        # `lab-draw` and `marker` joined on 12.09.2026, when the cross-face
+        # audit found both writing while listed as reads: the first is
+        # testimony about two draws in one day, the second a NAME filed as a
+        # proposal nobody acts on until a person confirms it. Both stay tools —
+        # what they write is what was said, never a value.
+        self.assertEqual(contract.DICTATED, {"focus-log", "target", "lab-draw", "marker"},
+                         "a command joined the dictated kind without anybody "
+                         "deciding whether it may be a tool")
+        self.assertIn("target", contract.NO_PLUGIN,
+                      "the pen that writes a clinician's figure was handed to a model "
+                      "without the owner's decision being recorded")
 
     def test_the_tools_a_model_needs_before_a_negative_statement_are_there(self):
         """Named one by one, because these are the ones whose absence is silent.

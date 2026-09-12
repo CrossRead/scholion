@@ -74,6 +74,9 @@ def build_parser() -> argparse.ArgumentParser:
     ini.add_argument("--sex", choices=["male", "female"], default=None,
                      help="record the sex now: six reference intervals depend on it")
     ini.add_argument("--birth-year", type=int, default=None, help="record the year of birth now")
+    ini.add_argument("--subject", choices=["reference"], default=None,
+                     help="lay the profile out for a published reference sample (the demo genome), "
+                          "not for you: every file says so, and the reference genome is read beside it")
     # The external tools are asked about at the end of `init` and nowhere else.
     # There is no post-install hook in a wheel — pip runs no code of ours after
     # unpacking — so «ask at install time» has to mean «ask at first run», and
@@ -174,6 +177,23 @@ def build_parser() -> argparse.ArgumentParser:
     # is nothing to say about these genes» about a table holding 386 findings.
     cv.add_argument("--gene", help="only the findings that fall inside this gene")
     sub.add_parser("acmg", parents=[common], help="ACMG SF v3.3 secondary findings (the actionable minimum)")
+    sc = sub.add_parser("screen", parents=[common],
+                        help="screening by class of disease: what this build holds for a class, "
+                             "gene by gene, and what it does not hold at all")
+    sc.add_argument("disease_class", nargs="?",
+                    help="the class (either language); omitted, the classes are listed")
+    sy = sub.add_parser("system", parents=[common],
+                        help="one body system of the radar as a card: laboratory now, movement, "
+                             "the genetic half and how much of it was read, the prescriptions "
+                             "acting on it, the clinician's target, what to test, and the "
+                             "questions for the clinician — in three baskets, never silently empty")
+    sy.add_argument("key", nargs="?",
+                    help="the system's key (thyroid, lipids, …); omitted, the systems are listed")
+    sy.add_argument("--register", choices=["patient", "clinician"], default="patient",
+                    help="the density of the same facts: the clinician's register adds rsID, "
+                             "genotype, depth, classification, submitter and the gate's counts; "
+                             "the verdict is the same in both")
+
     sub.add_parser("prs", parents=[common], help="polygenic risks (PGS): percentiles by trait")
     sub.add_parser("longevity", parents=[common], help="the longevity layer (LongevityMap): APOE ε + markers")
     sub.add_parser("lipid-genetics", parents=[common],
@@ -376,6 +396,36 @@ def build_parser() -> argparse.ArgumentParser:
     fl.add_argument("--alcohol", default=""); fl.add_argument("--atenolol", action="store_true")
     fl.add_argument("--late-meal", action="store_true"); fl.add_argument("--note", default="")
 
+    # A target the treating clinician set, kept beside the laboratory corridor
+    # (task 170). Sub-subcommands rather than flags, because `set` and `remove`
+    # write and `list` reads, and a person should not discover which by trying.
+    # The shared flags are attached to each leaf as well: `--json` is typed
+    # after the word it belongs to, and the leaf is what parses it.
+    tg = sub.add_parser("target", parents=[common],
+                        help="a target your clinician set for a marker, kept beside the "
+                             "laboratory corridor: list, set, remove. Entered from the "
+                             "clinician's word with who and when — never derived here")
+    tgs = tg.add_subparsers(dest="target_cmd")
+    tgs.add_parser("list", parents=[common],
+                   help="every recorded target beside the marker's current value")
+    tset = tgs.add_parser("set", parents=[common],
+                          help="record (or replace) the target for one marker")
+    tset.add_argument("marker", help="the marker key or name (see markers)")
+    tset.add_argument("--low", type=float, help="lower bound of the target")
+    tset.add_argument("--high", type=float, help="upper bound of the target")
+    tset.add_argument("--value", type=float,
+                      help="a single figure, when that is what was said (free T3 5.0)")
+    tset.add_argument("--unit", help="the unit the figure was given in; converted to the "
+                                     "marker's canonical unit, refused if unrecognised")
+    tset.add_argument("--set-by", required=True, dest="set_by",
+                      help="who set it — the clinician, as you would name them")
+    tset.add_argument("--set-on", required=True, dest="set_on",
+                      help="when it was set, YYYY-MM-DD")
+    tset.add_argument("--note", default="", help="what was said about it, if anything")
+    trm = tgs.add_parser("remove", parents=[common],
+                         help="withdraw the target recorded for a marker")
+    trm.add_argument("marker")
+
     br = sub.add_parser("brief-reviewed", parents=[common],
                         help="record that a block of the lifestyle brief was read against "
                              "today's data and its wording still holds")
@@ -513,7 +563,8 @@ def _main(argv=None) -> int:
 
     if args.cmd == "init":
         from . import store as _st
-        r = _st.init_profile(target=args.dir, force=args.force, demo=args.demo)
+        r = _st.init_profile(target=args.dir, force=args.force, demo=args.demo,
+                             subject=getattr(args, "subject", None))
         if args.json:
             print(json.dumps(r, ensure_ascii=False, indent=2))
             return 0 if r.get("ok") else 1
@@ -780,6 +831,20 @@ def _main(argv=None) -> int:
         res = _st.add_focus_entry(args.date, alcohol=args.alcohol, atenolol=args.atenolol,
                                   late_meal=args.late_meal, note=args.note)
         render = fmt.write_result
+    elif args.cmd == "target":
+        from . import store as _st
+        if args.target_cmd == "set":
+            res = _st.set_clinician_target(args.marker, low=args.low, high=args.high,
+                                           value=args.value, unit=args.unit,
+                                           set_by=args.set_by, set_on=args.set_on,
+                                           note=args.note, subject="owner")
+            render = fmt.write_result
+        elif args.target_cmd == "remove":
+            res, render = _st.remove_clinician_target(args.marker), fmt.write_result
+        else:
+            # A bare `target` lists, as a bare `marker` does: the reading form
+            # is the safe default and the one a person reaches for first.
+            res, render = engine.targets.clinician_targets_view(), fmt.targets_report
     elif args.cmd == "set-folder":
         from . import store as _st
         res, render = _st.set_source_folder(args.domain, args.path), fmt.write_result
@@ -896,8 +961,18 @@ def _main(argv=None) -> int:
             except KeyError:
                 results = [{"source": args.only, "skipped": True,
                             "reason": f"no such source: {args.only}"}]
-        res = {"sources": _src.state(), "results": results}
+        res = {"sources": _src.state(), "results": results,
+               # Where each domain of the profile comes from — the block the
+               # web's source badges read from `/api/sources` (parity, 12.09.2026).
+               "data_sources": engine.provenance()}
         render = fmt.sources_report
+    elif args.cmd == "screen":
+        res, render = engine.screen(args.disease_class), fmt.screen_report
+    elif args.cmd == "system":
+        if args.key:
+            res, render = engine.system(args.key, args.register), fmt.system_report
+        else:
+            res, render = engine.systems(), fmt.systems_report
     elif args.cmd == "lipid-genetics":
         res, render = engine.lipid_genetics(), fmt.lipid_genetics_report
     elif args.cmd == "ingest-labs":

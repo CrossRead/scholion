@@ -297,6 +297,30 @@ def date_resolution(date: str) -> Optional[str]:
     return None
 
 
+def _holds(outer: str, inner: str) -> bool:
+    """Whether the period of `outer` holds the period of `inner` — or is it.
+
+    THE one comparison of periods, for every resolution the series can carry.
+    A month holds its days and their draws, a day holds its draws, and a period
+    holds itself. Every date the gate lets through is canonical and fixed-width,
+    so one period holds another exactly when its string is a prefix of the
+    other's: `2025-12` of `2025-12-20` of `2025-12-20T07:30`. Two days of one
+    month, or two draws of one day, are not nested — neither is a prefix of the
+    other — and that is what makes them two measurements.
+
+    Task 144. Task 128 wrote the same-draw rule for a day and its stamp and
+    compared the first ten characters; a month has seven, so the shape older
+    imports wrote — `2025-12` — was the same period as nothing, and a re-import
+    of one monthly folder added 254 points where it should have replaced them.
+    Written once, so that a fourth resolution cannot be half-covered the same
+    way. Anything that is not a date holds nothing and is held by nothing.
+    """
+    a, b = (outer or "").strip(), (inner or "").strip()
+    if date_resolution(a) is None or date_resolution(b) is None:
+        return False
+    return b.startswith(a)
+
+
 def _mixed_resolution(series: List[Dict[str, Any]], date: str) -> List[str]:
     """Points already in this series that cover the same period at another resolution.
 
@@ -306,28 +330,23 @@ def _mixed_resolution(series: List[Dict[str, Any]], date: str) -> List[str]:
     hand-entered month from years ago and a form loaded today — so this is
     reported, not refused. What must not happen is that it happens quietly.
 
-    A day against a stamp of that day is no longer reported here, because it is
-    no longer left standing: `_points_this_write_replaces` resolves it, and the
-    only day/stamp pair that reaches this list is the one it cannot resolve — a
-    bare day arriving against TWO draws of that day.
+    Since `_points_this_write_replaces` resolves such a pair at every resolution,
+    what reaches this list is only the pair it cannot resolve: a bare month or
+    day arriving against two draws inside it — two measurements, and a point
+    that names neither.
     """
-    res = date_resolution(date)
-    if not res:
+    if date_resolution(date) is None:
         return []
     same = []
     for pt in series or []:
         other = str(pt.get("date") or "")
-        if other == date or date_resolution(other) == res:
-            continue
-        short = min(len(other), len(date))
-        # A month against a day: compare the month. A day against a stamp: the day.
-        if other[:short] == date[:short] and short >= 7:
+        if other != date and (_holds(other, date) or _holds(date, other)):
             same.append(other)
     return sorted(same)
 
 
 def _points_this_write_replaces(series: List[Dict[str, Any]], date: str) -> List[Dict[str, Any]]:
-    """The points a write dated `date` stands in for — same date, or same DAY.
+    """The points a write dated `date` stands in for — the same period, at any resolution.
 
     Task 128. A panel entered by hand as `2026-09-03` and then re-imported from
     the form, which prints the draw hour, arrived as `2026-09-03T08:22`. The
@@ -337,30 +356,47 @@ def _points_this_write_replaces(series: List[Dict[str, Any]], date: str) -> List
     «previous point» became the same draw, and the mixed-resolution report —
     which did see it — was a report, not a rule.
 
-    So the rule, in one place for every path that writes a point: a point of
-    the same day replaces a point of the same day whatever its resolution, and
-    the finer date wins (the caller applies that — this only says WHICH points
-    go). The exact-date point goes first in the list, so a caller carrying
-    fields over takes them from the closest match.
+    Task 144. The rule written for that pair compared days, and a month is not
+    a day: `2025-12` against `2025-12-20T07:30` — the shape older imports wrote
+    against the shape a form prints — went back to the exact-string rule, and
+    one re-imported folder gave 251 markers two points of one draw. Closed green
+    the first time because the guard covered only the day.
 
-    What this deliberately does not do: a bare day arriving against TWO stamps
-    of that day cannot say which draw it is, and choosing one would be a guess
-    about somebody's results. That pair stays, and `_mixed_resolution` reports
-    it. A month is not a day, so a month point is replaced by its own string
-    only — a month entered from memory and a dated form may be two draws.
+    So the rule, in one place for every path that writes a point: the write
+    stands in for every point whose period holds its own — the month or the day
+    its draw belongs to — and, when it is the coarser one, for the finer points
+    inside its period provided they are ONE draw: a day and its stamp, a month
+    and the one day in it. The finer date wins whichever order the two writes
+    came in (the caller applies that — this only says WHICH points go). The
+    closest match goes first in the list, so a caller carrying fields over takes
+    them from it.
+
+    What this deliberately does not do: a bare day arriving against two draws of
+    that day, or a bare month against two days of that month, cannot say which
+    of them it is, and choosing one would be a guess about somebody's results.
+    Those stay, and `_mixed_resolution` reports them.
     """
-    res = date_resolution(date)
     exact = [pt for pt in series or [] if pt.get("date") == date]
-    if res not in ("day", "stamp"):
+    if date_resolution(date) is None:
         return exact
-    day = date[:10]
-    others = [pt for pt in series or []
-              if str(pt.get("date") or "")[:10] == day
-              and pt.get("date") != date
-              and date_resolution(str(pt.get("date") or "")) != res]
-    if res == "day" and len(others) > 1:
-        return exact
-    return exact + others
+    holding, inside = [], []
+    for pt in series or []:
+        other = str(pt.get("date") or "")
+        if other == date:
+            continue
+        if _holds(other, date):
+            holding.append(pt)
+        elif _holds(date, other):
+            inside.append(pt)
+    # The finer points inside this period are one draw only when each holds the
+    # next — so the finest of them holds every other. Two that neither holds
+    # are two draws, and the write names neither: it replaces none of them.
+    finest = max((str(pt.get("date") or "") for pt in inside), key=len, default="")
+    if any(not _holds(str(pt.get("date") or ""), finest) for pt in inside):
+        inside = []
+    # Stable: the exact match has distance zero and stays first.
+    return sorted(exact + holding + inside,
+                  key=lambda pt: abs(len(str(pt.get("date") or "")) - len(date)))
 
 
 DATE_SOURCES = {
@@ -528,10 +564,12 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     series: List[Dict[str, Any]] = m.setdefault("series", [])
     # ── one point per draw ───────────────────────────────────────────────────
     # Replacing by the exact string was the rule, and it let a hand-entered day
-    # and the same form's stamped re-import stand side by side. The write now
-    # stands in for every point of the same day, and the finer date wins: the
-    # clock time on the form is knowledge, and a day entered before the form was
-    # read is not a reason to throw it away.
+    # and the same form's stamped re-import stand side by side; the rule that
+    # followed compared days, and let a monthly point and the same form's stamp
+    # do the same. The write now stands in for every point of the same period
+    # at any resolution, and the finer date wins: the clock time on the form is
+    # knowledge, and a month or a day entered before the form was read is not a
+    # reason to throw it away.
     gone = _points_this_write_replaces(series, date)
     requested = date
     finest = max((str(pt.get("date") or "") for pt in gone), key=len, default=date)
@@ -820,6 +858,152 @@ def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
     return {"ok": True, "date": date, "removed": empty, "entries": len(entries)}
 
 
+# ---- targets set by a clinician (clinician_targets.json) -----------------
+#
+# Task 170. The product knew two kinds of «normal»: the corridor printed on the
+# form, which travels with each point, and the person's own goal for their
+# metrics. A third kind had nowhere to live — the figure a treating clinician
+# is steering toward at this stage of treatment, which sits INSIDE the
+# laboratory corridor more often than not. On the thyroid axis four markers out
+# of four were in range, the system printed calm, and the clinician was at the
+# same time leading toward TSH 1–2 while the person's 18.6 stood above their
+# free-T4 target of 16.7. The product was not wrong; it was silent about the
+# one number the treatment is run by.
+#
+# A target is ENTERED, never derived: this module proposes no figure and the
+# engine computes none. Provenance is mandatory rather than polite — who set it
+# and when — because a target without an author reads back later as the
+# product's own, which is the one thing it must never be.
+
+TARGET_SOURCE = "clinician"
+
+
+def _target_spec(marker: str) -> Dict[str, Any]:
+    return core.lab_markers().get("markers", {}).get(marker) or {}
+
+
+@_serialized
+def set_clinician_target(marker: str, *, low: Optional[float] = None,
+                         high: Optional[float] = None, value: Optional[float] = None,
+                         unit: Optional[str] = None, set_by: str = "", set_on: str = "",
+                         note: str = "", subject: Optional[str] = None) -> Dict[str, Any]:
+    """Record the target a clinician set for one marker; a second call replaces it.
+
+    `low`/`high` are the bounds the clinician named, `value` the single figure
+    when that is what was said («free T3 5.0»). At least one of the three is
+    required, and a figure is stored as given: whether 16.8 counts as «at 16.7»
+    is the clinician's tolerance to state as bounds, not this function's to
+    assume. `set_by` and `set_on` are refused when absent, each by name.
+
+    The unit is converted to the marker's canonical one exactly as
+    `add_lab_point` converts a value, and for the same reason: the number is
+    later compared with a series stored in that unit, and a target of 95 mg/dL
+    beside a glucose series in mmol/L would read as far above every point.
+
+    `subject` as in `add_lab_point`: a target relayed by the owner claims the
+    profile, so a demonstration is erased before a real person's frame of
+    treatment is written into it.
+    """
+    err, claimed = _subject_gate(subject)
+    if err:
+        return err
+    if not (marker or "").strip():
+        return {"ok": False, "error": _t("store.target_need_marker")}
+    set_by = (set_by or "").strip()
+    if not set_by:
+        return {"ok": False, "error": _t("store.target_needs_set_by")}
+    if date_resolution(set_on or "") != "day":
+        return {"ok": False, "error": _t("store.target_needs_set_on", value=str(set_on or ""))}
+    bounds: Dict[str, Optional[float]] = {}
+    for name, raw in (("low", low), ("high", high), ("value", value)):
+        if raw is None or raw == "":
+            continue
+        try:
+            bounds[name] = float(raw)
+        except (TypeError, ValueError):
+            return {"ok": False, "error": _t("store.value_not_number")}
+    if not bounds:
+        return {"ok": False, "error": _t("store.target_needs_bound")}
+    if "low" in bounds and "high" in bounds and bounds["low"] > bounds["high"]:
+        return {"ok": False, "error": _t("store.target_low_above_high",
+                                         low=f"{bounds['low']:g}", high=f"{bounds['high']:g}")}
+
+    # The same name gate as a lab point: a target filed under a spelling the
+    # dictionary does not know would stand beside no series at all, and nothing
+    # would ever say so.
+    res = core.resolve_marker(marker)
+    if not res.get("key"):
+        cands = ", ".join(f'{c["key"]} ({c["name"]})' for c in res.get("candidates") or [])
+        return {"ok": False,
+                "error": _t("store.target_marker_unknown", marker=marker,
+                            did_you_mean=cands or _t("store.no_candidates")),
+                "candidates": res.get("candidates") or []}
+    marker = res["key"]
+
+    spec = _target_spec(marker)
+    known = bool(spec.get("unit"))
+    if known:
+        if not unit:
+            return {"ok": False, "error": _t("store.target_unit_required", marker=marker,
+                                             accepted=", ".join(core._accepted_units(spec)))}
+        # Every figure converts by the unit it was GIVEN in; the canonical name
+        # replaces it only once all of them have. Switching after the first
+        # bound converted the second by a factor of one — 72–90 mg/dL became
+        # 3.99–90 — which is exactly the mixed-scale corridor this gate exists
+        # to refuse.
+        canonical = unit
+        for name, raw in list(bounds.items()):
+            r = core.convert_to_canonical(spec, unit, raw)
+            if not r.get("ok"):
+                return {"ok": False, "error": _t("store.unit_not_accepted", marker=marker,
+                                                 unit=unit,
+                                                 accepted=", ".join(r.get("accepted") or []))}
+            bounds[name] = r["value"]
+            canonical = r.get("canonical") or unit
+        unit = canonical
+
+    p = core.profile_dir() / "clinician_targets.json"
+    data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
+        "_meta": {"what": _t("store.targets_what")}, "targets": []}
+    before = [tg for tg in (data.get("targets") or []) if tg.get("marker") == marker]
+    entry: Dict[str, Any] = {"marker": marker, **bounds, "unit": unit or "",
+                             "set_by": set_by, "set_on": set_on,
+                             "source": TARGET_SOURCE}
+    if (note or "").strip():
+        entry["note"] = note.strip()
+    if subject:
+        entry[_subj.FIELD] = subject
+    data["targets"] = [tg for tg in (data.get("targets") or []) if tg.get("marker") != marker]
+    data["targets"].append(entry)
+    data["targets"].sort(key=lambda tg: tg.get("marker") or "")
+    _write_json(p, data)
+    core.reset_cache()
+    out: Dict[str, Any] = {"ok": True, "marker": marker, "target": entry,
+                           "replaced": bool(before)}
+    if claimed:
+        out["claimed"] = claimed
+    return out
+
+
+@_serialized
+def remove_clinician_target(marker: str) -> Dict[str, Any]:
+    """Withdraw the target recorded for a marker. The series and its corridor stay."""
+    p = core.profile_dir() / "clinician_targets.json"
+    if not p.exists():
+        return {"ok": False, "error": _t("store.no_targets_file")}
+    res = core.resolve_marker(marker or "")
+    key = res.get("key") or (marker or "").strip()
+    data = json.loads(p.read_text(encoding="utf-8"))
+    kept = [tg for tg in (data.get("targets") or []) if tg.get("marker") != key]
+    removed = len(data.get("targets") or []) - len(kept)
+    if not removed:
+        return {"ok": False, "error": _t("store.target_none_for", marker=key)}
+    data["targets"] = kept
+    _write_json(p, data)
+    core.reset_cache()
+    return {"ok": True, "marker": key, "removed": removed}
+
+
 # ---- initial set-up of the data directory --------------------------------
 
 
@@ -845,7 +1029,7 @@ def _write_private(path: Path, text: str) -> None:
 
 
 def init_profile(target: Optional[str] = None, force: bool = False,
-                 demo: bool = False) -> Dict[str, Any]:
+                 demo: bool = False, subject: Optional[str] = None) -> Dict[str, Any]:
     """Create the data directory and lay the profile templates into it.
 
     Idempotent: existing files are not touched unless `force` is given. This matters
@@ -887,6 +1071,28 @@ def init_profile(target: Optional[str] = None, force: bool = False,
             continue
         _write_private(dst, srcf.read_text(encoding="utf-8"))
         written.append(srcf.name)
+    if subject and subject != "owner":
+        # A profile laid out FOR a published reference sample says so in every
+        # file, or the subject gate reads the empty templates as the owner's
+        # and refuses the reference genome beside them — which is what the
+        # demo fetcher's own recipe ran into on 13.09.2026.
+        if not _subj.valid(subject):
+            return _subj.unknown_error(subject)
+        for name in written:
+            fp = out / name
+            if fp.suffix != ".json":
+                continue
+            try:
+                data = json.loads(fp.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            if isinstance(data, dict):
+                meta = data.get("_meta")
+                if not isinstance(meta, dict):
+                    meta = {}
+                    data = {"_meta": meta, **data}
+                meta[_subj.FIELD] = subject
+                _write_private(fp, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
 
     # The genome/ directory is a neighbour of the profile, and we create it ONLY when
     # the directory was taken by default. If a person gave their own path, climbing up
@@ -909,7 +1115,7 @@ def init_profile(target: Optional[str] = None, force: bool = False,
         written += w
         skipped += s
 
-    return {"ok": True, "dir": str(out), "mode": "templates",
+    return {"ok": True, "dir": str(out), "mode": "templates", "subject": subject or "owner",
             "written": written, "skipped": skipped}
 
 

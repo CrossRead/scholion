@@ -30,6 +30,15 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
             # looked like the quiet one. The failure travels as its own state.
             r["coverage"] = {"gene": r["gene"], "measured": False,
                              "state": "unavailable", "reason": type(exc).__name__}
+    # What this build has to SAY about the locus, as opposed to what it read
+    # there. A genotype with nothing beside it is the shape that invites an
+    # assistant to supply the meaning out of its own general knowledge, which is
+    # how a reader came to be told about a locus this build does not interpret.
+    if r.get("rsid"):
+        r["basis"] = locus_basis(r["rsid"])
+    for _item in (r.get("loci") or []):
+        if isinstance(_item, dict) and _item.get("rsid"):
+            _item["basis"] = locus_basis(_item["rsid"])
     if gene and not rsid:
         try:
             r["layers"] = gene_layers(gene)
@@ -168,6 +177,21 @@ def gene_layers(gene: str) -> Dict[str, Any]:
         layers["acmg"] = {"in_panel": None, "status": "unavailable",
                           "reason": type(exc).__name__}
 
+    # 5. the curated verdict about the GENE itself — the sentence somebody
+    #    wrote and verified about what does NOT follow from it.
+    #
+    # This shelf exists because one such sentence was found written, verified,
+    # translated into both languages, listed in `LOCALIZABLE_FIELDS` and covered
+    # by a test — and read by nothing. The test guarded that the field was IN THE
+    # FILE, which is not the same claim as that a reader ever sees it. On the
+    # screen the gene it belongs to printed two bare genotypes.
+    #
+    # A verdict about a gene is not a shelf note: it is the answer to the
+    # question the reader asked, so it is printed before the shelves and it is
+    # repeated beside the findings, where a reader who scrolled past the frame
+    # still meets it.
+    layers["verdict"] = gene_verdict(g)
+
     # 4. coverage — the one that qualifies every «nothing found» above.
     #
     # Judged against THIS FILE's own middle, never against an absolute bar.
@@ -212,6 +236,69 @@ BELOW_MEDIAN_POINTS = 20.0
 #: THROUGHOUT has a low median, so every gene sits near it and nothing is ever
 #: «far below». Half the gene unread is worth saying whatever the neighbours do.
 POORLY_READ_BELOW = 50.0
+
+
+#: The order the bases are tried in, strongest first. A verdict outranks a
+#: phenotype model on purpose: MTHFR carries both, and the model is exactly what
+#: the verdict exists to say must not be used for dosing.
+BASIS_ORDER = ("verdict", "note", "guideline", "pair", "none")
+
+
+def locus_basis(rsid: str, entry: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """What licenses saying anything at all about this locus.
+
+    Five states, and the last of them has to be printed: a locus that carries no
+    rule, no note and no verdict prints a genotype and nothing else, and a
+    genotype and nothing else is read as meaning something. Which of the five a
+    locus is in is decided from the files, never from the text of a note.
+    """
+    from .. import core
+    book = core.loci().get("loci") or {}
+    e = entry if entry is not None else (book.get(rsid) or {})
+    gene = (e.get("gene") or "").upper()
+    out: Dict[str, Any] = {"rsid": rsid, "gene": gene}
+
+    if gene and gene_verdict(gene)["text"]:
+        out["kind"] = "verdict"
+        return out
+    raw = e.get("note")
+    if isinstance(raw, dict):                 # unresolved catalogue, both languages
+        raw = raw.get("ru") or raw.get("en")
+    if raw and str(raw).strip():
+        out["kind"] = "note"
+        return out
+    kb = core.cpic_kb()
+    gdef = (kb.get("genes") or {}).get(gene) or {}
+    if gdef and not gdef.get("not_a_cpic_drug_pair"):
+        out["kind"] = "guideline"
+        return out
+    pairs = core._read_knowledge("cpic_pairs.json")
+    rows = pairs.get("pairs") if isinstance(pairs, dict) else pairs
+    if any(isinstance(p, dict) and (p.get("gene") or "").upper() == gene
+           for p in (rows or [])):
+        out["kind"] = "pair"
+        return out
+    out["kind"] = "none"
+    return out
+
+
+def gene_verdict(gene: str) -> Dict[str, Any]:
+    """What this project has decided to say about the gene, as opposed to a locus.
+
+    Returns the text with the file and field it came from, so that a verdict can
+    never be printed without being attributable: a sentence of this kind is a
+    medical statement, and an unattributed one is indistinguishable from a guess.
+    """
+    from .. import core
+    g = (gene or "").upper()
+    gd = ((core.cpic_kb().get("genes") or {}).get(g)) or {}
+    raw = gd.get("not_a_cpic_drug_pair")
+    if isinstance(raw, dict):                  # unresolved catalogue, both languages
+        raw = raw.get("ru") or raw.get("en")
+    if not raw:
+        return {"text": None}
+    return {"text": str(raw), "field": "not_a_cpic_drug_pair",
+            "source": "cpic_drug_gene.json"}
 
 
 def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:

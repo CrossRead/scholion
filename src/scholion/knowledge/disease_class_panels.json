@@ -1,0 +1,12 @@
+{
+  "_meta": {
+    "purpose": "Curated «class of disease -> genes» lists for the screening entry, for classes this build does not already hold. Read by engine/screening.py alongside the ACMG secondary-findings panel, which supplies the classes it does hold.",
+    "who_writes_this": "A clinician. Which genes belong to a class of disease is a medical statement and a panel is the shape of it: a gene missing from the list makes the whole answer falsely negative. This program applies a list it was given, records where the list came from, and derives none.",
+    "gate": "A class is used only when it carries a `source`. Anything else is dropped and counted, so a dropped class is visible as a number rather than looking like a class nobody asked for.",
+    "why_empty": "No list has been authored yet, and the emptiness is not a placeholder to be filled from general knowledge. The classes a clinician named on 12.09.2026 — hereditary syndromes, oncology, autoimmune, neurodegenerative, metabolic, endocrine — are only partly covered by the ACMG panel this build carries (oncology, cardiac, metabolic, other). The rest are named as absent, by class and out loud, because a list of what we hold without a list of what we do not reads as the whole of what there is to ask.",
+    "schema": "classes: { <class name as a reader would say it>: { source: '<where this list came from>', genes: [SYMBOL, ...] } }",
+    "source_tier": "curated_reference",
+    "updated": "2026-09-12"
+  },
+  "classes": {}
+}

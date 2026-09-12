@@ -124,7 +124,7 @@ class TestTheSentencesExist(unittest.TestCase):
         for lang in ("en", "ru"):
             os.environ["SCHOLION_LANG"] = lang
             try:
-                for key in ("paths.why_not_sequenced", "genome.refused.not_sequenced",
+                for key in ("paths.why.not_sequenced", "genome.refused.not_sequenced",
                             "genome.refused_head.not_sequenced"):
                     with self.subTest(lang=lang, key=key):
                         self.assertNotIn("⟦", _t(key))

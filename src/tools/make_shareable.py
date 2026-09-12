@@ -536,8 +536,20 @@ def build(repo: Path, out: Path) -> Path:
     # about itself until the number was taken. The tool declines to COMPARE
     # outside the source tree, because the package skips the tests only the tree
     # can run and its reach is legitimately lower; it still measures.
+    #
+    # `check_method_mixing.py` joins for the first reason alone: the guard that a
+    # laboratory series belongs to one method is a shipped test, and the test
+    # imports the tool. The build's own gate below refuses a package whose test
+    # imports what it does not carry — which is how this line came to be written.
+    #
+    # `fetch_gencc.py` and `check_gencc_freshness.py` join for both reasons. The
+    # test that the monogenic half of a system panel comes from a base with a
+    # version imports the fetcher and ships; and the shipped GenCC snapshot goes
+    # stale on its own — the export is refreshed weekly — so a recipient needs
+    # the tool that refreshes it and the check that says when to.
     for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json",
-                  "check_test_reach.py", "test_reach_baseline.json"):
+                  "check_test_reach.py", "test_reach_baseline.json",
+                  "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py"):
         _src = repo / "src" / "tools" / _name
         if _src.exists():
             shutil.copy2(_src, shared / "src" / "tools" / _name)

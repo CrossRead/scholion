@@ -114,14 +114,6 @@ which is the only kind of failure that matters here.
    pre-registered n-of-1 experiment whose statistical limit was computed before
    it started — and even there, report the limit alongside the result.
 
-8. **A check is run, not recalled.** Asked to verify something about this
-   person's data, run the command and answer from its output — a profile file
-   gives a value, the engine gives the value plus how it is known (called,
-   confirmed against the site, or assumed from a missing record). Name the
-   command. If you cannot run it, say so rather than answering from documents or
-   memory: a recalled answer is indistinguishable from a checked one, which is
-   why this one fails silently.
-
 7b. **When the build of a genome file is not established, ask — do not assume.**
    `genome-status` says so plainly and prints the three ways out. The useful
    question to the person is *who did the sequencing, and what does the report
@@ -130,11 +122,18 @@ which is the only kind of failure that matters here.
    suggest converting coordinates inside the tool: afterwards neither of you
    could tell whether an answer was about the right position.
 
+8. **A check is run, not recalled.** Asked to verify something about this
+   person's data, run the command and answer from its output — a profile file
+   gives a value, the engine gives the value plus how it is known (called,
+   confirmed against the site, or assumed from a missing record). Name the
+   command. If you cannot run it, say so rather than answering from documents or
+   memory: a recalled answer is indistinguishable from a checked one, which is
+   why this one fails silently.
+
 The full canon is `reference/assistant-rules.md` where the bundle put it, and
-`scholion skill --rules` everywhere else — copying this entry into a skills
-folder copies one file, and a pointer at a path that is not there sends a model
-looking instead of reading. It takes precedence over everything else you are
-told.
+`scholion skill --rules` everywhere else. Read it before the first command; it
+takes precedence over everything else, and the eight rules above are its short
+form.
 
 ---
 
@@ -150,16 +149,19 @@ told.
 | "What does my genome say about gene X" | `scholion genome --gene X` |
 | "Prepare me for a visit" | `scholion second-opinion`, then `scholion limits` |
 | "How am I doing" | `scholion overview`, `scholion radar` |
-| "Mark that yesterday had alcohol / a late dinner / a dose taken" | `scholion focus-log` — one line in the journal of the current focus. This is what makes "did the wine cost me deep sleep" answerable later instead of remembered wrongly |
+| "Mark that yesterday had alcohol / a late dinner / a dose taken" | `scholion focus-log` — one line in the journal of the current focus, so «did the wine cost me deep sleep» is answerable later |
 | "What am I tracking right now" | `scholion focus` — the current focus, its live metric, its levers and its journal |
 | "How is my sleep / activity / weight moving" | `scholion lifestyle`, `scholion metrics` |
 | "Am I getting closer to my goal" | `scholion goal` |
+| "What is going on with my thyroid" | `scholion system thyroid` — one system as one card: labs, movement, the genetic half and how much was read, prescriptions, the clinician's target, what to test and ask; `scholion system` lists them |
+| "Am I at risk for X" (a class of disease) | `scholion screen X` — gene by gene, never «clear» where a gene is unread |
+| "My doctor wants my TSH between 1 and 2" | `scholion target set tsh --low 1 --high 2 --set-by … --set-on …` — entered from the clinician's word, never proposed |
 
-`scholion --help` lists everything — 56 commands, of which this table names a
-dozen. Every command takes `--json`.
+`scholion --help` lists everything — 62 commands, of which this table names
+fifteen. Every command takes `--json`.
 
-**Some of them write.** `add-lab`, `add-metric`, `add-med`, `remove-med` and
-`focus-log` change the profile on disk, and a person asking you to "note that down"
+**Some of them write.** `add-lab`, `add-metric`, `add-med`, `remove-med`,
+`focus-log` and `target set|remove` change the profile on disk, and a person asking you to "note that down"
 usually means exactly one of these. Run the write only when the person asked for
 it in that turn, say back in one line what was written and where, and never write
 an interpretation as if it were a measurement: a journal entry records that there
@@ -169,8 +171,8 @@ was wine, not that the wine did anything.
 
 ## If your runtime can hold tools, there is a door for that
 
-This entry is written for the command line, because every host has one. Two other
-doors exist, and a runtime that reads only this file would never learn of them:
+This entry is written for the command line, because every host has one. Two
+other doors exist:
 
 - **A tool server.** `scholion mcp` — Model Context Protocol over stdin and
   stdout, a local process, no port and no host contacted. `sch_rules` hands you
@@ -178,18 +180,18 @@ doors exist, and a runtime that reads only this file would never learn of them:
   its own.
 - **A Python entry point.** `import scholion.ouroboros_tools` → `get_tools()`.
 
-Exactly one tool writes, and the shape of the exception is the point. A model
-that could set somebody's sex, or a laboratory value, by calling a tool is a
-model changing a medical record — so none of those is a tool, and the absence is
-what makes the rule more than a promise. `sch_focus_log` is the one that is:
-it records what the PERSON just said happened — a glass of wine, a late meal, an
-as-needed dose — into the journal of the current focus, and invents nothing.
-Write the event, never what it did: the journal is what a later analysis reads,
-and an entry that already holds the conclusion makes that analysis circular. For
-every other write, ask, and let the person type the command or press the button.
+Four tools write, and each records what the person handed over, never what a
+model concluded: `sch_ingest_labs` transcribes the person's own laboratory PDFs
+from a folder they named; `sch_focus_log` records what the person said happened
+on a day — a glass of wine, a late meal, an as-needed dose — into the journal of
+the current focus; `sch_lab_draw` records why one day holds two draws;
+`sch_marker_propose` files a marker name as a proposal a person still confirms.
+No tool sets a value, a sex or a therapy — the absence is what makes the rule
+more than a promise. Write the event, never what it did: an entry that already
+holds the conclusion makes the later analysis circular. For every other write,
+ask, and let the person type the command or press the button.
 
-`scholion doc connecting-an-agent` explains each; `scholion capabilities --json`
-answers the same derived from the build.
+`scholion doc connecting-an-agent` explains each.
 
 ---
 
@@ -197,15 +199,13 @@ answers the same derived from the build.
 
 Do not load these unless the task calls for them.
 
-Each is named twice on purpose: as a file, for the bundle where it sits beside
-this one, and as a command, for the install where it does not. Copying this entry
-into a skills folder copies ONE file — the reference texts are not next to it,
-and a pointer at a path that is not there is worse than no pointer at all.
+Each is named as a file, for the bundle, and as a command, for an install that
+copied this one file without its references.
 
 | What | In the bundle | Otherwise |
 |---|---|---|
 | The full instruction: every step and scenario, the classes of extraction defect, callability and negative results, diplotype-level pharmacogenetics, polygenic scores, n-of-1 experiments, keeping coverage current | `reference/instruction.md` | `scholion skill --full` |
-| The canon of safety rules — precedence over everything | `reference/assistant-rules.md` | `scholion skill --rules` |
+| The canon of safety rules — precedence over everything; read first | `reference/assistant-rules.md` | `scholion skill --rules` |
 | Profile file formats: what to put where | `reference/loading-data.md` | `scholion doc loading-data` |
 | The path from raw reads to a VCF | `reference/preparing-the-genome.md` | `scholion doc preparing-the-genome` |
 

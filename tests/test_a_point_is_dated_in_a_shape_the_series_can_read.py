@@ -110,10 +110,26 @@ class TestWhatIsNotADateDoesNotEnterTheSeries(_Profile):
 
 class TestOneMeasurementStandingTwiceIsNamed(_Profile):
 
-    def test_a_month_and_a_day_of_that_month_are_reported(self):
+    def test_a_month_and_the_one_day_in_it_are_one_point(self):
+        """Used to be reported and left standing. Task 144 made it the same rule
+        as day-and-stamp: the day stands in for the month it is the only draw
+        of, and the caller is told what it replaced. A month against TWO days
+        is the case that is still reported — see below."""
         self.add("2026-07")
         r = self.add("2026-07-04", value=5.6)
-        self.assertEqual(r.get("resolution_mixed"), ["2026-07"])
+        self.assertNotIn("resolution_mixed", r)
+        self.assertEqual(r.get("replaced"), ["2026-07"])
+        self.assertEqual(self.dates(), ["2026-07-04"])
+
+    def test_a_month_against_two_days_of_it_is_reported_and_both_stay(self):
+        """Two draws in the month, and a monthly point that could be either: the
+        mixture is named and nothing is deleted, because choosing would be a
+        guess about which draw the month meant."""
+        self.add("2026-07-04")
+        self.add("2026-07-19", value=5.6)
+        r = self.add("2026-07", value=5.7)
+        self.assertTrue(r.get("resolution_mixed"), r)
+        self.assertEqual(self.dates(), ["2026-07", "2026-07-04", "2026-07-19"])
 
     def test_a_day_and_a_stamp_of_that_day_are_one_point(self):
         """Used to be reported and left standing. Task 128 made it a rule: the
@@ -139,10 +155,13 @@ class TestOneMeasurementStandingTwiceIsNamed(_Profile):
         self.assertNotIn("resolution_mixed", r)
 
     def test_nothing_is_refused_or_deleted_by_the_report(self):
-        """Both points may be honest, so the mixture is reported and BOTH stay."""
-        self.add("2026-07")
-        self.add("2026-07-04", value=5.6)
-        self.assertEqual(self.dates(), ["2026-07", "2026-07-04"])
+        """When the mixture is genuinely undecidable — a bare month against two
+        draws of it — both points may be honest, so it is reported and ALL stay."""
+        self.add("2026-07-04")
+        self.add("2026-07-19", value=5.6)
+        r = self.add("2026-07", value=5.7)
+        self.assertTrue(r.get("ok"), r)
+        self.assertEqual(self.dates(), ["2026-07", "2026-07-04", "2026-07-19"])
 
 
 class TestTheEarlierFixIsNotUndoneByThisOne(_Profile):

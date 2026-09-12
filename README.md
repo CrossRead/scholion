@@ -194,12 +194,52 @@ far outside it.
 **Prescriptions.** The full regimen with doses and statuses, interactions,
 monitoring labs per drug class, open questions for the physician. Any new drug is
 checked as a second opinion: pharmacogenetics, interactions with the current
-regimen, and what to monitor.
+regimen, and what to monitor. The question can be asked from three directions
+and gets the same shape of answer each time — from the prescription («before I
+take this, what in the genome bears on it»), from a class of disease («nothing
+is prescribed and the examination says I am well»), or from a body system («what
+belongs to the working of the thyroid»). All three judge their gene list through
+one gate: a sentence is printed only with a named source, the rest are counted,
+and a list that was not read end to end is never called clear.
 
 **Lifestyle and sleep.** Multi-year wearable trends, body composition, workouts.
 Sleep phases are parsed in full — deep sleep, REM, sleep stress, sleep score,
 bedtime — monthly, plus a per-night file for n-of-1 analysis, where monthly
 averages answer the wrong question.
+
+**And the layer that assembles the rest: eleven body systems, each answering as
+one card.** This is the last item because the list runs deepest first, and it is
+the first thing to open. The body is laid out as the systems a laboratory
+actually issues panels for — lipids, carbohydrate metabolism, inflammation,
+thyroid, adrenals, gonads, growth, pancreas, liver, micronutrients, kidneys —
+and a twelfth built from wearables. Click a segment of the radar, an organ on
+the figure, or run `scholion system thyroid`, and one card comes back: the
+laboratory now and its movement since the previous draw, the genetic half of the
+system and **how much of it was actually read**, the polygenic scores placed on
+it, the prescriptions acting on it, a target your clinician set, what to test,
+and the questions to bring to the appointment.
+
+The genetic half is composed from a base with a version rather than from
+somebody's memory: 945 genes across the eleven systems, taken from the Gene
+Curation Coalition's export with every submitter's assertion kept side by side —
+who asserted the gene–disease link, how strongly, under which mode of
+inheritance, on what date. A weak or refuted assertion travels marked as such
+instead of being quietly dropped or quietly promoted, and one copy of an allele
+in a recessive gene is printed as carriership, never as a risk line.
+
+Two things the card will not do. It will not call a system clear that it did not
+read — «nothing found» over a gene nobody read is a statement about the file, so
+the count of unread genes travels inside the verdict rather than in a footnote
+under it. And genetics does not enter the 0–100 score: a genotype cannot be
+refuted by the next blood draw, so it stands beside the score, never inside it.
+Each system carries two rings — how much of its laboratory panel is measured,
+how much of its genetic half is read — and they are never merged into one
+number.
+
+The next step comes in three baskets, because they are three different actions
+by three different people: **test** (the laboratory), **read in the genome**
+(something you run yourself), **ask the clinician**. A basket that is empty says
+why it is empty — «nothing» without a reason reads as «all is well».
 
 ---
 
@@ -288,6 +328,7 @@ own, and each one makes the ones above it sharper:
 | Russian lab PDFs | `scholion ingest-labs "<folder>"` | Years of forms parsed, with the reference range read off each printed line |
 | A wearable export | `scholion ingest-garmin "<folder>"` | Sleep phases, load, body composition as trends rather than as a daily number |
 | Prescriptions | `scholion add-med "name" --dose "…"` | Interactions, monitoring tests per class, a second opinion on anything new |
+| A target your clinician set | `scholion target set tsh --low 1 --high 2 --unit mIU/L --set-by "Dr N" --set-on 2026-09-12` | Drawn beside the corridor off the form, in a different stroke; standing outside it is a question, never a flag |
 | A VCF or a BAM | see `PREPARING-THE-GENOME.md` | Pharmacogenetics, ClinVar findings, ACMG SF, polygenic scores, longevity |
 | A consumer array | `scholion array` — drop the export in the genome folder, `.zip` and all | The locus catalogue read straight off the chip, each position called, no-call or *not on this chip*; ClinVar, ACMG SF and polygenic scores refuse with the reason |
 | A FHIR bundle | `scholion import-fhir bundle.json` | Results matched by LOINC code, units converted or refused; what the bundle claims about its patient is reported, not applied |
@@ -465,8 +506,9 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 14 `sch_*` tools — second opinion on a
-drug, lab analysis, locus lookup, polygenic scores, longevity, goals and more.
+`scholion/ouroboros_tools.py` registers 32 `sch_*` tools — a body system as one
+card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
+longevity, goals and more.
 Ouroboros discovers tool modules by scanning its own tools package, so the file
 is copied there once:
 

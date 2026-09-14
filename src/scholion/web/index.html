@@ -84,6 +84,10 @@
     padding:9px 12px;border-radius:8px;font-size:var(--t-m);cursor:pointer}
   .menu-panel button:hover,.menu-panel button.active{background:var(--surface-2)}
   .menu-panel .mnote{padding:6px 12px 4px;font-size:var(--t-xs);color:var(--muted);border-top:1px solid var(--grid);margin-top:4px}
+  .menu-panel #mupd{border-top:0;margin-top:0;color:var(--ink-2);max-width:280px;white-space:normal}
+  .ringload{display:inline-flex;align-items:center;gap:8px;margin-left:10px;font-weight:400;color:var(--muted)}
+  .ringload .dna-bar{display:inline-block;width:90px;height:5px}
+  .ringload .dna-fill{display:block}
   nav{display:flex;gap:2px;padding:6px 16px;border-bottom:1px solid var(--border);flex-wrap:nowrap;overflow-x:auto;
       position:sticky;top:0;background:var(--plane);z-index:20;scrollbar-width:none}
   nav::-webkit-scrollbar{display:none}
@@ -595,6 +599,17 @@ function clnsigText(s){
   }).join(' / ');
 }
 const isRsid=s=>/^rs\d+$/.test(String(s||''));
+// ClinVar names a drug-response record «warfarin response - Dosage». The drug
+// stays as ClinVar spells it; the kind of response is said in the reader's
+// language. Any other disease name is printed as the source gives it: a
+// home-made translation of a medical term would be a claim with no source.
+function diseaseText(s){
+  const m=String(s||'').match(/^(.+?)\s+response\s*-\s*([A-Za-z/]+)$/i);
+  if(!m) return String(s||'');
+  const kinds=m[2].toLowerCase().split('/').map(k=>t('clinvar.response_kind.'+k));
+  if(kinds.some(k=>k.startsWith('⟦'))) return String(s);
+  return t('clinvar.response',{drug:m[1],kind:kinds.join(' / ')});
+}
 // A long free-text note, cut at three lines until it is clicked.
 function noteHtml(text,cls){
   if(!text) return '';
@@ -1176,13 +1191,13 @@ async function viewOverview(root){
       <button class="ghost btn-sm ml-auto" id="ov-fill">${esc(t('web.metrics.profile_btn'))}</button></div>
       ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}</div>`;
   }
+  renderSystems($('#ov-systems',root), radar);
   await renderPerson($('#ov-person',root), []);
   const fill=$('#ov-fill',root);
   if(fill) fill.onclick=()=>{const pf=$('#mprof',root); if(pf){pf.classList.remove('hidden'); pf.scrollIntoView({behavior:'smooth',block:'center'});}};
   const mg=$('#ov-metrics',root);
   // Sorted the way the person's own file sorts them — filled first.
   (mx.metrics||[]).forEach(m=>mg.appendChild(metricCard(m)));
-  renderSystems($('#ov-systems',root), radar);
   renderGoal($('#ov-goal',root), g);
   if(f&&f.available) renderFocus($('#ov-focus',root), f);
   // Nothing flagged has two causes and they are not alike: nothing is out of
@@ -1598,7 +1613,7 @@ function rxCard(r){
     cvHtml=cv.slice(0,12).map(h=>{
       const via=h.gene?t('web.rx.via_gene',{gene:h.gene}):t('web.rx.via_drug_name');
       const sig=clnsigText(h.clnsig);
-      return `<div class="list-item"><div class="row"><code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> ${badge(h.tier==='pathogenic'?'b-critical':'b-warning',sig)} <span class="muted">${esc(t('web.rx.genotype',{genotype:h.genotype||'?'}))} · ${esc(via)}</span></div>${h.disease?`<div class="why">${esc(h.disease)}</div>`:''}</div>`;
+      return `<div class="list-item"><div class="row"><code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> ${badge(h.tier==='pathogenic'?'b-critical':'b-warning',sig)} <span class="muted">${esc(t('web.rx.genotype',{genotype:h.genotype||'?'}))} · ${esc(via)}</span></div>${h.disease?`<div class="why">${esc(diseaseText(h.disease))}</div>`:''}</div>`;
     }).join('');
   }
   const cvSection=cvHtml?`<div class="so-h">${esc(t('web.rx.clinvar_h'))} <span class="muted">· ${esc(t('web.rx.clinvar_note'))}</span></div>${cvHtml}`:'';
@@ -1770,6 +1785,7 @@ function genRingOf(g){
   return {read:g.read_count||0, total:total, frac: total?(g.read_count||0)/total:0};
 }
 function genRingTip(g){
+  if(g===undefined) return t('web.body.rings_loading');
   const r=genRingOf(g);
   // The scores, as a third line of the tip and never as a share of either
   // ring: mapped by the file, scored on this profile.
@@ -2198,6 +2214,7 @@ function bodySVG(domains, sex){
 // A system with no composed genetic half gets a dotted absence rather than an
 // empty ring: «nothing read» and «nothing to read» are different facts.
 function genRingSVG(g, cx, cy, r){
+  if(g===undefined) return '';          // still on its way: drawn when the listing arrives
   const gr=genRingOf(g);
   const at=`cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r}"`;
   if(!gr) return `<circle class="ringgen-none" ${at}/>`;
@@ -2239,23 +2256,46 @@ function wireSystems(box, domains){
 
 async function renderSystems(box, radar){
   const doms = (radar.domains||[]).filter(d=>d.score!=null);
-  if(doms.length<3){ box.innerHTML=`<div class="muted">${esc(t('web.radar.not_enough'))}</div>`; return; }
-  // The second ring comes from the systems listing — two counts per system,
-  // joined onto the radar's domains here and nowhere folded into the score.
-  const sys = await systemsIndex().catch(()=>null);
-  const gen = Object.fromEntries(((sys&&sys.systems)||[]).map(s=>[s.key,s.genetics]));
-  doms.forEach(d=>{ d.genetics = gen[d.key]||null; });
+  if(doms.length<3){ box.innerHTML=emptyHtml(t('web.radar.not_enough')); return; }
   // `radar.sex` is already normalised by the engine — 'male', 'female' or null.
   const sex = radar.sex || '';
-  box.innerHTML = `<div class="sysrow">
-      <div class="syspane"><div class="sysh">${esc(t('web.body.figure_h'))}</div>
-        <div class="sysbox">${bodySVG(doms, sex)}</div>
-        ${SILHOUETTE[sex]?`<div class="syscredit">${esc(t('web.body.credit'))}</div>`:''}</div>
-      <div class="syspane"><div class="sysh">${esc(t('web.body.radar_h'))}</div>
-        <div class="sysbox">${radarSVG(doms)}</div></div>
-    </div>
-    <div class="muted" id="sys-note" style="font-size:12.5px;margin-top:7px">${esc(t('web.body.hint'))} · ${esc(t('system.open'))}</div>`;
-  wireSystems(box, doms);
+  // The figure and the radar come from the radar's own answer and are drawn at
+  // once. The second ring — how much of each system's genetic half was read —
+  // comes from the systems listing, the slowest answer on the page (seconds on a
+  // cold server), so it is drawn in when it arrives, with a bar beside the
+  // pictures meanwhile (owner, 14.09.2026). The ring is never folded into the score.
+  const draw = loading => {
+    const bar = loading ? `<span class="ringload" role="progressbar" aria-label="${esc(t('web.body.rings_loading'))}"><span>${esc(t('web.body.rings_loading'))}</span><span class="dna-bar"><span class="dna-fill"></span></span></span>` : '';
+    box.innerHTML = `<div class="sysrow">
+        <div class="syspane"><div class="sysh">${esc(t('web.body.figure_h'))}${bar}</div>
+          <div class="sysbox">${bodySVG(doms, sex)}</div>
+          ${SILHOUETTE[sex]?`<div class="syscredit">${esc(t('web.body.credit'))}</div>`:''}</div>
+        <div class="syspane"><div class="sysh">${esc(t('web.body.radar_h'))}</div>
+          <div class="sysbox">${radarSVG(doms)}</div></div>
+      </div>
+      <div class="muted small mt-2" id="sys-note">${esc(t('web.body.hint'))} · ${esc(t('system.open'))}</div>`;
+    wireSystems(box, doms);
+  };
+  const join = sys => {
+    const gen = Object.fromEntries(((sys&&sys.systems)||[]).map(s=>[s.key,s.genetics]));
+    doms.forEach(d=>{ d.genetics = gen[d.key]||null; });
+  };
+  if(_systems){ join(_systems); draw(false); return; }
+  doms.forEach(d=>{ d.genetics = undefined; });
+  draw(true);
+  // The bar moves with the time waited and stops short of full: one request has
+  // no parts to count, and a bar that reached the end and kept waiting would lie.
+  const t0 = Date.now();
+  const timer = setInterval(()=>{
+    const f = box.querySelector('.ringload .dna-fill');
+    if(!f){ clearInterval(timer); return; }
+    f.style.width = (95*(1-Math.exp(-(Date.now()-t0)/2500))).toFixed(1)+'%';
+  }, 150);
+  const sys = await systemsIndex().catch(()=>null);
+  clearInterval(timer);
+  if(!box.isConnected) return;                       // the reader has left the tab
+  join(sys);
+  draw(false);
 }
 
 function radarSVG(domains){
@@ -3147,7 +3187,7 @@ function renderClinvar(cv){
   const hitHTML=h=>{
     const cls=TCLS[h.tier]||'b-unknown';
     const sigTxt=clnsigText(h.clnsig);
-    const dis=h.disease?`<div class="why">${esc(h.disease)}</div>`:'';
+    const dis=h.disease?`<div class="why">${esc(diseaseText(h.disease))}</div>`:'';
     const rv=(h.review||'').indexOf('expert')>=0?' · '+esc(t('web.clinvar.experts')):((h.review||'').indexOf('multiple')>=0?' · '+esc(t('web.clinvar.several_labs')):'');
     return `<div class="list-item"><div class="row">${badge(cls,sigTxt)} <code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> <span class="muted">${esc(h.chrom)}:${esc(h.pos)} ${esc(h.ref)}→${esc(h.alt)}</span> ${esc(t('web.genome.genotype'))} <b>${esc(h.genotype||'')}</b><span class="muted small">${rv}</span></div>${dis}</div>`;
   };
@@ -3168,8 +3208,8 @@ function renderUpdates(u){
   const cvn=(u.clinvar&&u.clinvar.new)||[];const cvc=(u.clinvar&&u.clinvar.changed)||[];
   let h=`<div class="meta">${esc(t('web.updates.last_check'))} <b>${esc(u.last_checked||'—')}</b>${u.clinvar&&u.clinvar.release?` · ClinVar ${esc(u.clinvar.release)}`:''}.</div>`;
   if(!cvn.length&&!cvc.length){h+=`<div class="meta" style="color:var(--good)">✓ ${esc(t('web.updates.nothing_new'))}</div>`;return h;}
-  if(cvn.length){h+=`<div class="so-h">${esc(t('web.updates.new_h',{n:cvn.length}))}</div>`+cvn.slice(0,20).map(x=>`<div class="list-item"><div class="row"><code>${esc(x.rsid||'')}</code> ${badge('b-warning',clnsigText(x.clnsig))} <b>${esc(x.disease||'')}</b></div></div>`).join('');}
-  if(cvc.length){h+=`<div class="so-h">${esc(t('web.updates.changed_h',{n:cvc.length}))}</div>`+cvc.slice(0,20).map(x=>`<div class="list-item"><div class="row"><code>${esc(x.rsid||'')}</code> <span class="muted">${esc(x.old||'')}</span> → ${badge('b-warning',clnsigText(x.clnsig))} <b>${esc(x.disease||'')}</b></div></div>`).join('');}
+  if(cvn.length){h+=`<div class="so-h">${esc(t('web.updates.new_h',{n:cvn.length}))}</div>`+cvn.slice(0,20).map(x=>`<div class="list-item"><div class="row"><code>${esc(x.rsid||'')}</code> ${badge('b-warning',clnsigText(x.clnsig))} <b>${esc(diseaseText(x.disease))}</b></div></div>`).join('');}
+  if(cvc.length){h+=`<div class="so-h">${esc(t('web.updates.changed_h',{n:cvc.length}))}</div>`+cvc.slice(0,20).map(x=>`<div class="list-item"><div class="row"><code>${esc(x.rsid||'')}</code> <span class="muted">${esc(x.old||'')}</span> → ${badge('b-warning',clnsigText(x.clnsig))} <b>${esc(diseaseText(x.disease))}</b></div></div>`).join('');}
   return h;
 }
 async function pollUpdate(root){
@@ -3263,7 +3303,7 @@ function genomeFindings(cv, prs, lng, lip){
     const sig = clnsigText(h.clnsig);
     push(h.tier === 'pathogenic' ? 'crit' : 'warn', isRsid(h.rsid) ? h.rsid : [h.chrom, h.pos].filter(Boolean).join(':'),
          h.tier === 'pathogenic' ? 'b-critical' : 'b-warning', sig,
-         h.disease || '', 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''));
+         diseaseText(h.disease), 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''));
   });
   // 2. the inherited half of the lipid profile
   if (lip && lip.status === 'ok') {
@@ -3336,7 +3376,7 @@ function geneCard(d, cv, lng, lip, sys){
     <div class="row4">
       ${cell(t('web.genome.genotype'), lociHTML)}
       ${cell('ClinVar', cvRows.length ? cvRows.map(h =>
-        `<div>${esc(clnsigText(h.clnsig))}${h.disease ? ' — ' + esc(h.disease) : ''}</div>`).join('') : '—')}
+        `<div>${esc(clnsigText(h.clnsig))}${h.disease ? ' — ' + esc(diseaseText(h.disease)) : ''}</div>`).join('') : '—')}
       ${cell(t('web.genome.nav_longevity'), lngRows.length ? lngRows.map(k =>
         `<div>${esc(k.note || '')}</div>`).join('') : '—')}
       ${cell(t('web.genome.nav_lipids'), lipRows.length ? lipRows.map(x =>
@@ -3614,8 +3654,34 @@ function buildNav(){
   $('#nav').querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>mount(+b.dataset.tab));
   const mp=$('#menupanel');
   mp.innerHTML=TABS.map(([key],i)=>MENU_KEYS.includes(key)?`<button data-tab="${i}">${esc(t(key))}</button>`:'').join('')
-    +`<div class="mnote">${esc(_version?t('web.header.build',{version:_version}):'')}</div>`;
+    +`<button data-menu="check">${esc(t('web.menu.check_update'))}</button>`
+    +`<button data-menu="recompute">${esc(t('web.menu.recompute'))}</button>`
+    +`<div class="mnote">${esc(_version?t('web.header.build',{version:_version}):'')}</div>`
+    +`<div class="mnote" id="mupd" hidden></div>`;
   mp.querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>{closeMenu();mount(+b.dataset.tab);});
+  // An update is found and installed outside the page — the app does not rewrite
+  // itself — so the menu asks the registry on request and says the command; the
+  // recompute an update may ask for is one click from the same place.
+  $('[data-menu="check"]',mp).onclick=async e=>{
+    e.stopPropagation();
+    const out=$('#mupd',mp); out.hidden=false; out.textContent=t('web.menu.checking');
+    const r=await askRegistry();
+    out.textContent=r.text;
+    // A newer build found here can be installed from here — after a confirmation,
+    // into the environment this server runs from; the server says what it did.
+    if(r.newer){
+      const b=document.createElement('button'); b.className='act btn-sm mt-2'; b.textContent=t('web.menu.install');
+      b.onclick=async ev=>{
+        ev.stopPropagation();
+        if(!confirm(t('web.menu.install_confirm',{latest:r.latest}))) return;
+        b.disabled=true; out.textContent=t('web.menu.installing');
+        const res=await post('/api/update',{confirm:true});
+        out.textContent=(res&&(res.report||res.error))||t('web.common.failed');
+      };
+      out.appendChild(document.createElement('br')); out.appendChild(b);
+    }
+  };
+  $('[data-menu="recompute"]',mp).onclick=()=>{closeMenu(); openRecompute();};
 }
 function closeMenu(){const mp=$('#menupanel'),mb=$('#menubtn'); if(mp) mp.hidden=true; if(mb) mb.setAttribute('aria-expanded','false');}
 function mount(i){
@@ -3638,6 +3704,14 @@ function renderDemoBanner(){
 // person presses «Understood». Nothing is asked of the registry unless the person
 // presses «Check for a newer version» — the one request, and it is theirs.
 let _update=null;
+// The one place the page asks the package registry, and only from a button a
+// person pressed: the update note's and the menu's. Nothing is asked on load.
+async function askRegistry(){
+  const r=await api('/api/version/check').catch(()=>null);
+  const key={offline:'version.check_offline',unreachable:'version.check_unreachable',newer:'version.check_newer',current:'version.check_current'}[r&&r.status]||'version.check_unreachable';
+  return {text:t(key,{installed:(r&&r.installed)||_version||'—',latest:(r&&r.latest)||'—'}),
+          newer:!!(r&&r.status==='newer'), latest:(r&&r.latest)||''};
+}
 function renderUpdateNote(){
   const box=$('#updatenote'); if(!box) return;
   const u=_update;
@@ -3656,9 +3730,7 @@ function renderUpdateNote(){
   const sh=$('#upd-show'); if(sh) sh.onclick=()=>{const it=$('#upd-items'); it.hidden=!it.hidden;};
   $('#upd-recompute').onclick=()=>openRecompute();
   $('#upd-seen').onclick=async()=>{await post('/api/version/seen',{}); _update=null; renderUpdateNote();};
-  $('#upd-check').onclick=async()=>{const r=await api('/api/version/check');
-    const key={offline:'version.check_offline',unreachable:'version.check_unreachable',newer:'version.check_newer',current:'version.check_current'}[r&&r.status]||'version.check_unreachable';
-    $('#upd-check-out').textContent=t(key,{installed:(r&&r.installed)||'—',latest:(r&&r.latest)||'—'});};
+  $('#upd-check').onclick=async()=>{$('#upd-check-out').textContent=(await askRegistry()).text;};
 }
 // Recompute after an update, and the genome steps the data lacks (task 183).
 // The plan and the progress come from the server, and the progress is a file
@@ -3802,7 +3874,7 @@ document.addEventListener('click',async e=>{
   api('/api/ping').then(p=>{
     if(!p)return;
     if(p.version){_version=p.version;$('#ver').textContent=t('web.header.build',{version:_version});
-      const mn=$('#menupanel .mnote'); if(mn) mn.textContent=t('web.header.build',{version:_version});}
+      const mn=$('#menupanel .mnote:not(#mupd)'); if(mn) mn.textContent=t('web.header.build',{version:_version});}
     _synthetic=!!p.synthetic; renderDemoBanner();
   }).catch(()=>{});
   api('/api/version').then(u=>{_update=u; renderUpdateNote();}).catch(()=>{});

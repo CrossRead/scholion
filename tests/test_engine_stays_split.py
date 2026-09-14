@@ -287,6 +287,7 @@ LINE_BUDGETS = {
     # 14.09.2026: the panel of a system as the catalogue describes it, for the
     # clinician — references and sentences, no genome, no labs.
     "panel_catalogue": 120,
+    "pgx_labels": 60,
     # 220 → 240 on 12.09.2026: the overview's age line names why it could not
     # be computed rather than answering «unknown» with nothing beside it.
     "profile_view": 240,

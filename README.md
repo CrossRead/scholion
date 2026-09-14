@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.5.1** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.2** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -521,7 +521,7 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 32 `sch_*` tools — a body system as one
+`scholion/ouroboros_tools.py` registers 34 `sch_*` tools — a body system as one
 card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
 longevity, goals and more.
 Ouroboros discovers tool modules by scanning its own tools package, so one line
@@ -592,9 +592,15 @@ The local web page shows the same note under its header until you press
 «Understood». A profile that has never recorded its version says so; for an update
 from a known version, `scholion version --since 0.4.8` lists everything after it.
 
-Nothing checks for a newer version by itself. `scholion version --check`, or the
-button beside the update note, asks PyPI once — the only request, made because you
-asked for it, and refused when `SCHOLION_OFFLINE=1` is set.
+**From the product itself.** `scholion update` says whether a newer build is out
+and how it installs in this environment — pip, pipx or uv, as it was installed, or
+`git pull` for a source checkout; `scholion update --yes` installs it. It asks PyPI
+at most once a day, sends only the package's name, and asks nothing when
+`SCHOLION_OFFLINE=1` is set. Through an assistant the same is `sch_version` and
+`sch_update`: the first tool answer of a session mentions a newer build once, and
+`sch_update` installs nothing without `confirm=true`, which is for your own yes.
+The local page's ☰ menu checks on request and offers the install after a check.
+`scholion version --check` asks PyPI once, now, whatever the day's check said.
 
 What an update leaves alone: the data directory, and any reference file you
 refreshed with `scholion sources --refresh`, which stays beside your data;

@@ -77,6 +77,8 @@ POST_BODIES = {
     "/api/ingest-studies": {"path": ""},
     "/api/run-update": {},
     "/api/version/seen": {},
+    # 0.5.2: without {"confirm": true} the route installs nothing and says so.
+    "/api/update": {},
     # Without `"confirm": true` nothing starts: the door answers with the plan.
     "/api/recompute": {},
     "/api/recompute/stop": {},

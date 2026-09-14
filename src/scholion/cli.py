@@ -313,6 +313,11 @@ def build_parser() -> argparse.ArgumentParser:
                     help="record that your data is now used with this build")
     vr.add_argument("--check", action="store_true",
                     help="ask PyPI whether a newer version exists (one request, only now)")
+    upd = sub.add_parser("update", parents=[common],
+                         help="is a newer build out (PyPI at most once a day, never offline), and how it "
+                              "installs in this environment; --yes installs it")
+    upd.add_argument("--yes", action="store_true",
+                     help="install the newer build now — only after the person said yes")
     rcp = sub.add_parser("recompute", parents=[common],
                          help="what the releases since your data's version ask to recompute, and the "
                               "genome steps your data lacks; runs them with visible progress after --yes")
@@ -1044,6 +1049,12 @@ def _main(argv=None) -> int:
             res, render = _upd.check_registry(), fmt.version_check_report
         else:
             res, render = _upd.status(since=getattr(args, "since", None)), fmt.version_report
+    elif args.cmd == "update":
+        from . import upgrade as _upg
+        if getattr(args, "yes", False):
+            res, render = _upg.install(confirm=True), fmt.update_install_report
+        else:
+            res, render = _upg.notice(), fmt.update_report
     elif args.cmd == "recompute":
         from . import recompute as _rc
         if getattr(args, "stop", False):

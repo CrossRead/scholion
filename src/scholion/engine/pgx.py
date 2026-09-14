@@ -11,6 +11,7 @@ from ..i18n import t as _t
 from ._helpers import (_active_names_by_class, _basis, _basis_note,
                        _brief_num, _match_count, DISCLAIMER)
 from .labs import analyze_labs
+from .pgx_labels import phenotype_words
 
 
 # CPIC's activity-score model, for the genes it scores that way (CYP2C9, DPYD,
@@ -123,7 +124,7 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
     called = _called_diplotype(gene)
     if called:
         code = _PHENO_CODE.get(str(called["phenotype"]).strip().lower())
-        label = called["phenotype"] if code else called["phenotype"]
+        label = phenotype_words(called["phenotype"])       # CPIC's phrase, in the reader's language
         return {"phenotype": code or "reported", "label": label,
                 "found": [{"diplotype": called["diplotype"], "source": called.get("source"),
                            "phenotype_text": called["phenotype"]}],

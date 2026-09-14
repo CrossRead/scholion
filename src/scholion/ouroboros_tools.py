@@ -327,6 +327,22 @@ def _h_lipid_genetics(ctx: "ToolContext") -> str:
     return fmt.lipid_genetics_report(engine.lipid_genetics())
 
 
+def _h_version(ctx: "ToolContext") -> str:
+    """READ: this build, the version the data was last used with, what the releases in
+    between ask to recompute — and whether a newer build is out (the package registry,
+    at most once a day, never offline). Writes nothing."""
+    from scholion import updates as _upd, upgrade as _upg  # noqa: E402
+    return fmt.version_report(_upd.status()) + "\n\n" + fmt.update_report(_upg.notice())
+
+
+def _h_update(ctx: "ToolContext", confirm=False) -> str:
+    """INSTALLS the newer build into this environment — only with confirm=true, which the
+    description reserves for the person's own yes in this conversation."""
+    from scholion import upgrade as _upg  # noqa: E402
+    yes = confirm is True or str(confirm).strip().lower() in ("true", "yes", "1")
+    return fmt.update_install_report(_upg.install(confirm=yes))
+
+
 def _h_system(ctx: "ToolContext", key: str = "", register: str = "") -> str:
     """The third entry. Read-only: the card assembles what the engine already
     holds around one system and writes nothing."""
@@ -374,11 +390,13 @@ _TOOLS = (
     ("sch_lipid_genetics", (), [], _h_lipid_genetics),
     ("sch_screen", ("disease_class",), [], _h_screen),
     ("sch_system", ("key", "register"), [], _h_system),
+    ("sch_version", (), [], _h_version),
+    ("sch_update", ("confirm",), [], _h_update),
 )
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean"}
+_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:
@@ -394,8 +412,24 @@ def _schema(name: str, params, required) -> dict:
 
 def get_tools():
     """The entry point for the Ouroboros auto-discovery."""
-    return [ToolEntry(name, _schema(name, params, required), handler)
+    return [ToolEntry(name, _schema(name, params, required), _noted(handler))
             for name, params, required, handler in _TOOLS]
+
+
+def _noted(handler):
+    """The first answer of a session carries the note about a newer build — once.
+
+    A person using the product through an assistant never sees the page's update
+    note (owner, 14.09.2026). Whatever the model calls first, the answer ends with
+    one line saying a newer build is out and that installing it is the person's
+    call. The registry is asked at most once a day and never offline."""
+    def run(ctx, **kwargs):
+        out = handler(ctx, **kwargs)
+        from scholion import upgrade as _upg  # noqa: E402
+        note = _upg.session_note()
+        return f"{out}\n\n{note}" if note else out
+    run.__name__, run.__doc__ = handler.__name__, handler.__doc__
+    return run
 
 
 if __name__ == "__main__":  # a quick self-test of the wrapper

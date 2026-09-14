@@ -2623,7 +2623,7 @@ FASTQ, BAM и индексы. Десятки гигабайт — обычное
     "lipidgen.lpa.estimate_limit": "Полигенная оценка Лп(а) — это генетическая ОЦЕНКА, и заменить "
                                    "измерение она не может. Уровень определяется в основном числом "
                                    "повторов KIV-2 внутри LPA — это структурный вариант "
-                                   "(copy-number), который короткие чтения и SNP-чипы видят плохо. "
+                                   "числа копий, который короткие чтения и SNP-чипы видят плохо. "
                                    "Пометка «Moderate» у этой модели в каталоге — это и есть тот "
                                    "предел, а не недоработка каталога.",
     "lipidgen.lpa.measured": "измерено {value} {unit} · {date}",
@@ -3403,4 +3403,44 @@ FASTQ, BAM и индексы. Десятки гигабайт — обычное
     "clinvar.sig.established_risk_allele": "Установленный аллель риска",
     "clinvar.sig.uncertain_risk_allele": "Неопределённый аллель риска",
     "clinvar.sig.low_penetrance": "Низкая пенетрантность",
+    # ── 0.5.2: rings loading, the menu's update entries, ClinVar drug responses in words ──
+    "web.body.rings_loading": "генетические кольца загружаются",
+    "web.menu.check_update": "Проверить обновление",
+    "web.menu.recompute": "Пересчёт после обновления",
+    "web.menu.checking": "Спрашиваю реестр…",
+    "clinvar.response": "{drug}: ответ на препарат — {kind}",
+    "clinvar.response_kind.efficacy": "эффективность",
+    "clinvar.response_kind.dosage": "дозировка",
+    "clinvar.response_kind.metabolism": "метаболизм",
+    "clinvar.response_kind.pk": "фармакокинетика",
+    "clinvar.response_kind.toxicity": "токсичность",
+    "clinvar.response_kind.other": "другое",
+    "phenotype.label.NM": "нормальный метаболизатор",
+    "phenotype.label.IM": "промежуточный метаболизатор",
+    "phenotype.label.PM": "медленный метаболизатор",
+    "phenotype.label.RM": "быстрый метаболизатор",
+    "phenotype.label.UM": "ультрабыстрый метаболизатор",
+    "phenotype.function.normal": "нормальная функция",
+    "phenotype.function.decreased": "сниженная функция",
+    "phenotype.function.poor": "низкая функция",
+    "phenotype.function.increased": "повышенная функция",
+    "phenotype.qualifier.likely": "вероятно {label}",
+    "phenotype.qualifier.possible": "возможно {label}",
+    # ── 0.5.2: the version and the update, for a person and inside an assistant's session ──
+    "tool.sch_version.description": "КАКАЯ СБОРКА ОТВЕЧАЕТ и вышла ли новее. Вызывайте в начале сессии. Сообщает, с какой версией данные работали последний раз и что просят пересчитать выпуски между ними, затем — есть ли в реестре пакетов более новая сборка (запрос не чаще раза в сутки и никогда без сети) и как она ставится в этом окружении. Ничего не пишет. Если новая сборка вышла, скажите человеку и спросите, прежде чем вызывать sch_update.",
+    "tool.sch_update.description": "УСТАНАВЛИВАЕТ новую сборку Scholion в это окружение (pip, pipx или uv — как было установлено). Вызывайте только после того, как человек сказал «да» в этом разговоре, с confirm=true; без него ничего не ставится, а ответ говорит, что было бы выполнено. В рабочую копию исходников не ставит — предлагает git pull. После установки ассистента нужно перезапустить.",
+    "tool.sch_update.param.confirm": "true — только после явного согласия человека на установку в этом разговоре",
+    "upgrade.session_note": "— Вышла Scholion {latest}, в этой сессии работает {installed}. Скажите человеку и устанавливайте только после его согласия: sch_update с confirm=true или `scholion update --yes`.",
+    "update.newer": "Вышла более новая Scholion: {latest} (эта сборка — {installed}).",
+    "update.current": "Это самая новая Scholion: {installed}.",
+    "update.cached": "(проверено за последние сутки — реестр спрашивается не чаще раза в сутки)",
+    "update.how.install": "Установить здесь, когда человек согласится: `scholion update --yes` — будет выполнено `{command}`.",
+    "update.how.source": "Это рабочая копия исходников; она обновляется из своего репозитория: `{command}`.",
+    "update.installed": "Установлена Scholion {after} (была {before}). Перезапустите ассистента или `scholion serve`, чтобы работала новая сборка; если используется копия скилла, выполните `scholion skill --install`.",
+    "update.already_current": "Ставить нечего: {installed} — актуальная версия.",
+    "update.not_confirmed": "Ничего не установлено: обновление ставится только после согласия человека. Было бы выполнено `{command}`.",
+    "update.failed": "Установка не завершилась (код {code}). Команда: `{command}`; последние строки:",
+    "web.menu.install": "Установить обновление",
+    "web.menu.install_confirm": "Установить Scholion {latest} в это окружение? После установки Scholion нужно перезапустить.",
+    "web.menu.installing": "Устанавливаю…",
 }

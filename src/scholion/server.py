@@ -472,6 +472,14 @@ class Handler(BaseHTTPRequestHandler):
                 # now used with this build. The only write, and it is a marker.
                 from . import updates as _upd
                 return self._json(_upd.mark_seen())
+            if u.path == "/api/update":
+                # A person pressed «Install» in the menu and confirmed it: the newer
+                # build goes into the environment this server runs from. The body
+                # must say so — a bare POST installs nothing.
+                from . import upgrade as _upg
+                from . import format as _fmt
+                res = _upg.install(confirm=body.get("confirm") is True)
+                return self._json({**res, "report": _fmt.update_install_report(res)})
             if u.path == "/api/targets":
                 # Entered, never derived: the body carries who set it and when,
                 # and the store refuses a target without either.

@@ -3159,6 +3159,47 @@ def version_check_report(r: Dict[str, Any]) -> str:
     return _t("version.check_current", installed=r.get("installed") or "—")
 
 
+def update_report(n: Dict[str, Any]) -> str:
+    """Whether a newer build is out and how it installs here — what a session opens with."""
+    st = n.get("status")
+    installed = n.get("installed") or "—"
+    if st == "newer":
+        lines = [_t("update.newer", latest=n.get("latest") or "—", installed=installed)]
+    elif st == "current":
+        lines = [_t("update.current", installed=installed)]
+    elif st == "offline":
+        lines = [_t("version.check_offline")]
+    else:
+        lines = [_t("version.check_unreachable", installed=installed)]
+    if n.get("from_cache"):
+        lines.append(_t("update.cached"))
+    route = n.get("route") or {}
+    command = " ".join(route.get("command") or [])
+    if st == "newer":
+        lines.append(_t("update.how.source" if route.get("kind") == "source" else "update.how.install",
+                        command=command))
+    return "\n".join(lines)
+
+
+def update_install_report(r: Dict[str, Any]) -> str:
+    """What an install did — or, when it did nothing, why and what it would have run."""
+    reason = r.get("reason")
+    command = " ".join((r.get("route") or {}).get("command") or [])
+    if reason == "installed":
+        return _t("update.installed", before=r.get("installed") or "—", after=r.get("after") or "—")
+    if reason == "already_current":
+        return _t("update.already_current", installed=r.get("after") or r.get("installed") or "—")
+    if reason == "not_confirmed":
+        return _t("update.not_confirmed", command=command)
+    if reason == "source_tree":
+        return _t("update.how.source", command=command)
+    if reason == "offline":
+        return _t("version.check_offline")
+    code = r.get("code")
+    head = _t("update.failed", code="—" if code is None else code, command=command)
+    return head + ("\n" + r["tail"] if r.get("tail") else "")
+
+
 def skill_install_report(r: Dict[str, Any]) -> str:
     if not r.get("ok"):
         return "✗ " + _t("skill.install.failed", path=r.get("path") or "—")

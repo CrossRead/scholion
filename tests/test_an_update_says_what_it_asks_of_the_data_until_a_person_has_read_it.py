@@ -14,6 +14,7 @@ from __future__ import annotations
 import os
 import shutil
 import tempfile
+import re
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -124,10 +125,18 @@ class TestThePageAsksOnlyWhenPressed(unittest.TestCase):
         page = (Path(updates.__file__).resolve().parent / "web" / "index.html").read_text(encoding="utf-8")
         self.assertEqual(1, page.count("/api/version/check"),
                          "the page asks the registry from more than one place")
+        # Since 0.5.2 two buttons ask — the update note's and the menu's — through
+        # the one function that holds the route; nothing else calls it.
         at = page.index("/api/version/check")
-        handler = page.rfind("$('#upd-check').onclick", 0, at)
-        self.assertGreater(handler, 0, "the registry is asked outside the button's handler")
-        self.assertLess(at - handler, 200)
+        holder = page.rfind("async function askRegistry(){", 0, at)
+        self.assertGreater(holder, 0, "the route is asked outside askRegistry")
+        self.assertLess(at - holder, 200)
+        calls = [m.start() for m in re.finditer(r"askRegistry\(\)", page) if m.start() != holder + len("async function ")]
+        self.assertEqual(2, len(calls), "askRegistry is called from somewhere other than the two buttons")
+        for c in calls:
+            before = page[max(0, c - 300):c]
+            self.assertTrue("$('#upd-check').onclick" in before or "[data-menu=\"check\"]" in before,
+                            "askRegistry is called outside a button's handler")
 
 
 if __name__ == "__main__":

@@ -117,6 +117,12 @@ def _instructions() -> str:
         "decoration: relay it. And before stating that something was not found, "
         "call `sch_limits`, which says what this data cannot show and what would "
         "change that.\n\n"
+        "At the start of a session call `sch_version`. It says which build runs "
+        "and whether a newer one is out — the package registry is asked at most "
+        "once a day, and never with SCHOLION_OFFLINE set. If one is, tell the "
+        "person in a sentence and ask whether to install it; call `sch_update` "
+        "with confirm=true only after they say yes, then tell them to restart "
+        "this assistant so that the new build is the one answering.\n\n"
         "There is no account, key or token for this server. It is a local "
         "process on this machine and there is nothing to authenticate to."
     )

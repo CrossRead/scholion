@@ -40,6 +40,64 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.2 — 14.09.2026
+
+### What you can do now
+
+**An assistant tells a person that a newer version is out, and installs it on
+their word.** Somebody who uses Scholion through Claude or another assistant never
+sees the local page, so a newer version went unnoticed. `scholion update` says
+whether a newer build is out and how it installs in this environment — pip, pipx
+or uv as it was installed, or `git pull` for a source checkout — asking the package
+registry at most once a day, sending only the package's name, and never with
+`SCHOLION_OFFLINE=1`; `scholion update --yes` installs it. Through the tool
+interface the same is `sch_version` and `sch_update`: the first tool answer of a
+session mentions a newer build once, and `sch_update` installs nothing without
+`confirm=true`, which is reserved for the person's own yes. The skill's instruction
+starts every session with `scholion update`.
+
+**The menu checks for an update and opens the recompute.** The ☰ menu beside
+the language switch now carries «Check for an update», which asks the package
+registry on request and, when a newer version is out, prints the command that
+installs it, and «Recompute after an update», which opens the list of steps
+the releases since your data's version ask for. Both used to live only inside
+the note shown right after an upgrade, so once that note was dismissed there
+was no way back to either. The same answers come from `scholion version` and
+`scholion recompute`, and an update itself is `pip install --upgrade scholion`
+followed by a restart.
+
+### What is fixed
+
+The engine's answers are the same; what changed is how they are shown.
+
+**The body figure and the radar no longer wait for the genetic rings.** On the
+Overview the figure appeared seconds after the rest of the page — about seven
+seconds on a server that had just started — because it waited for the listing
+of the systems' genetic halves, the slowest answer of the page, and asked for it
+only after the person's block was drawn. The figure and the radar are drawn at
+once now, a bar beside them shows the rings loading, and the rings are drawn in
+when they arrive.
+
+**A pharmacogenetic phenotype read from a diplotype in the profile is shown in
+the reader's language.** A star-allele call carried by the profile — from PyPGx,
+PharmCAT or a laboratory report — printed its phenotype as the English CPIC
+phrase («Intermediate Metabolizer», «Normal Function») on a Russian page. It is
+worded from the phenotype now, and a «likely» or «possible» qualifier is kept.
+
+**A ClinVar drug-response record says what kind of response it is.** A record
+named like «warfarin response - Dosage» reads «warfarin: response to the drug —
+dosage» in the reader's language; the drug keeps ClinVar's spelling, and disease
+names are still printed as ClinVar gives them rather than translated without a
+source.
+
+**A month without a day no longer reads wrongly after a preposition.** Dates
+that carry only a month are abbreviated like full dates, and a system's
+movement reads «was 80 (Nov 2025)».
+
+### What needs recomputing
+
+Nothing.
+
 ## v0.5.1 — 13.09.2026
 
 ### What you can do now

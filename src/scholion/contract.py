@@ -75,6 +75,7 @@ PARITY: Dict[str, str] = {
     "POST /api/labs": "add-lab",
     "POST /api/targets": "target",
     "POST /api/version/seen": "version",
+    "POST /api/update": "update",
     "POST /api/recompute": "recompute",
     "POST /api/recompute/stop": "recompute",
     "POST /api/targets/remove": "target",
@@ -286,6 +287,12 @@ PLUGIN: Dict[str, str] = {
     "lipid-genetics": "sch_lipid_genetics",
     "screen": "sch_screen",
     "system": "sch_system",
+    # The version and the update (owner, 14.09.2026): a person using the product
+    # through an assistant never sees the page's update note, so the assistant is
+    # told. `sch_version` reads; `sch_update` installs only with confirm=true,
+    # which its description reserves for the person's own yes.
+    "version": "sch_version",
+    "update": "sch_update",
     # The one write a model may hold, and the reason is in DICTATED: the person
     # says what happened, the assistant writes it down and invents nothing.
     "focus-log": "sch_focus_log",
@@ -303,10 +310,6 @@ NO_PLUGIN: Dict[str, str] = {
                 "table beside the profile; a person starts it, for the same reason as `recompute`",
     "genotype-sites": "runs bcftools over an alignment of tens of gigabytes and replaces a file in "
                       "the genome folder; a person starts it, for the same reason as `recompute`",
-    "version": "the build's own version, its age, and what an update asks of the data. A model "
-               "connected through the plugin is handed the tool list of the build it runs; "
-               "asking the registry is a request off the machine a person starts, and "
-               "recording that the update note was read is the person's to say",
     "acmg-scan": "writes the table the ACMG screen reads, out of the person's variant file "
                  "and a reference file they downloaded. Two reasons it is theirs to start and "
                  "not a model's: it needs a file fetched onto that machine first, and it runs "
@@ -548,6 +551,8 @@ WRITES = {
     # Task 183: both rebuild what the person's own documents and alignment
     # already hold; neither decides a value.
     "recompute", "genotype-sites", "coverage",
+    # 0.5.2: installs a newer build into the environment — the program, not the data.
+    "update",
 }
 
 # Creates a value that came from nobody's document. None of these is a tool, and
@@ -600,6 +605,12 @@ TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearabl
                "import-labs", "import-fhir",
                "redact", "recompute", "genotype-sites", "coverage"}
 
+# The fourth kind (owner, 14.09.2026): neither data nor testimony — the program
+# itself. `update` installs a newer build into the environment it runs from. A
+# model may hold it, and only this way: the tool installs nothing without
+# confirm=true, and its description reserves that for the person's own yes.
+INSTALLS = {"update"}
+
 
 def capabilities() -> Dict[str, Any]:
     """What this build can do, for a reader that is not a person.
@@ -639,7 +650,8 @@ def capabilities() -> Dict[str, Any]:
             "writes": cmd in WRITES,
             "kind": ("authors" if cmd in AUTHORS
                      else "transcribes" if cmd in TRANSCRIBES
-                     else "dictates" if cmd in DICTATED else "reads"),
+                     else "dictates" if cmd in DICTATED
+                     else "installs" if cmd in INSTALLS else "reads"),
             "faces": {
                 "cli": True,
                 "web": routes.get(cmd),

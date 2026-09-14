@@ -103,7 +103,11 @@ documents are never uploaded and are never part of a request: no analysis needs 
 network. Two lookups do go out, only when the user asks for them by name, and each
 sends the minimum query term to a named service — a drug name to RxNorm/RxClass
 (and to a translator first if the name is Russian), an rsID to Ensembl, a gene or
-drug identifier to CPIC. Say it that way rather than "nothing leaves the machine":
+drug identifier to CPIC. A third is the version check: the package's own name to
+PyPI, at most once a day and never with SCHOLION_OFFLINE set, so that a person
+using the product through an assistant hears that a newer build is out. Installing
+it is the person's decision: say which version would be installed and install only
+after they say yes. Say it that way rather than "nothing leaves the machine":
 a drug name is itself a statement about the person asking, and a promise wider
 than the truth is worth less than the narrower true one. Personal data does not go
 into public repositories, issue trackers or third-party services. Standard codes
@@ -124,7 +128,7 @@ checked one.
 on a lab form matches no marker, the assistant may draft a DICTIONARY ENTRY for
 it — a canonical key, the printed names that recognise it, the unit as printed —
 and only when the person asks for that specific row by name, exactly as rule 13
-requires for the two network lookups. It never supplies the VALUE: the number
+requires for the lookups a person asks for. It never supplies the VALUE: the number
 comes from deterministic code applying the new rule, which is what makes it
 reproducible a year later and checkable by somebody else. It never supplies a
 reference range either — a corridor is a clinical claim, and `CONTRIBUTING.md` is
@@ -723,6 +727,11 @@ python3 -m scholion version --since 0.4.8    # the same for an update from a ver
 python3 -m scholion version --seen           # WRITES a marker beside the profile: the person has read the update note
 python3 -m scholion version --check          # asks PyPI whether a newer version exists — one request, only when the
                                              #   person asks; say that it reaches the network before running it
+python3 -m scholion update                   # at the START of every session: is a newer build out, and how it installs here.
+                                             #   PyPI at most once a day, never with SCHOLION_OFFLINE. If one is out, tell
+                                             #   the person in one sentence and ask whether to install it
+python3 -m scholion update --yes             # INSTALLS the newer build into this environment — ONLY after the person said yes;
+                                             #   then the session must be restarted, and a copied skill refreshed the way it was installed
 python3 -m scholion recompute                # the plan after an update: what the releases since the data's version ask, and the
                                              #   genome steps the data lacks (catalogue positions never genotyped); each step says
                                              #   whether it will run, what it needs, or that it is for the person to do by hand

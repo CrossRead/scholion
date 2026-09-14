@@ -204,6 +204,7 @@ from .brief_review import (  # noqa: F401 -- the facade re-exports every name
 from .panel_catalogue import (  # noqa: F401 -- the facade re-exports every name
     panel_description,
 )
+from .pgx_labels import phenotype_words  # noqa: F401 -- the facade re-exports every name
 from .profile_view import (  # noqa: F401 -- the facade re-exports every name
     load_profile,
     overview,

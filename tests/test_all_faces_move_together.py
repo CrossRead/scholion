@@ -173,7 +173,8 @@ class TestTheManifestCannotFallBehindTheBuild(unittest.TestCase):
         written by an assistant: the person says what happened and it is recorded
         verbatim — neither a value invented by a model nor a document moved.
         """
-        kinds = (contract.AUTHORS, contract.TRANSCRIBES, contract.DICTATED)
+        # The fourth kind, INSTALLS (owner, 14.09.2026): the program itself, not data.
+        kinds = (contract.AUTHORS, contract.TRANSCRIBES, contract.DICTATED, contract.INSTALLS)
         self.assertEqual(set().union(*kinds), contract.WRITES,
                          "a write command belongs to no kind, so no rule covers it")
         for i, a in enumerate(kinds):
@@ -217,13 +218,22 @@ class TestTheManifestCannotFallBehindTheBuild(unittest.TestCase):
                                 f"«{cmd}» moves the person's documents and nobody decided "
                                 f"whether a model may hold it")
 
+    def test_every_installing_command_is_accounted_for_either_way(self):
+        """An install MAY be a tool — only because it installs nothing without the
+        person's confirmation — and the decision is recorded either way."""
+        for cmd in sorted(contract.INSTALLS):
+            with self.subTest(command=cmd):
+                self.assertTrue(cmd in contract.PLUGIN or cmd in contract.NO_PLUGIN,
+                                f"«{cmd}» installs software and nobody decided whether a "
+                                f"model may hold it")
+
     def test_every_write_in_the_manifest_names_its_kind(self):
         """A caller deciding whether to run a write needs to know WHICH rule
         applies — «never for a model» or «the person's own document only»."""
         for c in contract.capabilities()["commands"]:
             with self.subTest(command=c["command"]):
                 if c["writes"]:
-                    self.assertIn(c["kind"], ("authors", "transcribes", "dictates"),
+                    self.assertIn(c["kind"], ("authors", "transcribes", "dictates", "installs"),
                                   f"«{c['command']}» writes but does not say how")
                 else:
                     self.assertEqual(c["kind"], "reads",

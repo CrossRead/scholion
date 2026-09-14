@@ -9,11 +9,13 @@ own card. So the list lives in `knowledge/radar_domains.json`, `lifestyle.py`
 builds its constant from the file, `system_panels.py` reads the same file, and
 this test compares what each of them sees.
 
-The twelfth system is the other half of the guard. «Fitness» is built from
+The wearables system is the other half of the guard. «Fitness» is built from
 wearable metrics and attached by `health_radar` after the loop; a file that
-listed eleven would lose it, and a reader that counted twelve would attach a
-genetic half to it by inattention. The file names it, says where it comes from,
-and says it has no genetic half — and that is checked, not assumed.
+listed only the laboratory domains would lose it, and a reader that counted
+every domain would attach a genetic half to it by inattention. The file names
+it, says where it comes from, and says it has no genetic half — and that is
+checked, not assumed. (Eleven laboratory domains and a twelfth from wearables
+until 13.09.2026; twelve and a thirteenth since «Heart and vessels» was added.)
 """
 from __future__ import annotations
 
@@ -46,13 +48,16 @@ class TestOneFileFeedsEveryReader(unittest.TestCase):
                          "a cached import or somebody re-typed the list")
 
     def test_the_composition_of_0_4_9_is_intact(self):
-        """Eleven laboratory systems, the endocrine ones split in four. The
-        reason is recorded in the file's _meta; the guard is here."""
+        """Twelve laboratory systems: the eleven of 0.4.9, the endocrine ones
+        split in four, and «Heart and vessels» after lipids since 13.09.2026
+        (the owner's decision; the reason is `_meta.why_cardio`). The 0.4.9
+        composition is recorded in the file's _meta; the guard is here."""
         keys = [k for k, _ in L._RADAR_DOMAINS]
-        self.assertEqual(keys, ["lipids", "glucose", "inflammation", "thyroid",
+        self.assertEqual(keys, ["lipids", "cardio", "glucose", "inflammation", "thyroid",
                                 "adrenals", "gonads", "growth", "pancreas", "liver",
                                 "micronutrients", "renal"])
         self.assertIn("why_four_endocrine_systems", _file()["_meta"])
+        self.assertIn("why_cardio", _file()["_meta"])
 
     def test_system_panels_reads_the_same_file(self):
         self.assertEqual([k for k, _ in L._RADAR_DOMAINS],
@@ -71,7 +76,7 @@ class TestTheTwelfthSystemIsNeitherLostNorGivenGenes(unittest.TestCase):
 
     def test_fitness_is_in_the_file_from_the_wearables_and_without_a_genetic_half(self):
         fit = [d for d in _file()["domains"] if d["key"] == "fitness"]
-        self.assertEqual(1, len(fit), "the twelfth system is missing from the file")
+        self.assertEqual(1, len(fit), "the wearables system is missing from the file")
         self.assertEqual("wearables", fit[0]["source"])
         self.assertIs(False, fit[0]["genetic_half"])
         self.assertEqual([], fit[0]["markers"])

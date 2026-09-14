@@ -448,6 +448,7 @@ def _marker_systems() -> Dict[str, str]:
     return marker_systems()
 
 
+@core.memo_in_reading
 def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
     data = core.labs().get("markers", {})
     keys = markers or list(data.keys())

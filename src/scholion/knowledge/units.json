@@ -1,5 +1,6 @@
 {
  "_meta": {
+  "updated": "2026-09-12",
   "purpose": "Labels for units of measurement, keyed by UCUM code. The marker dictionary stores the code; what a person reads is chosen here, by output language.",
   "why": "A unit is at once input and output: it is read off a form in the language the form was printed in, and it is printed back in the language the reader asked for. Storing one string for both made the dictionary Russian by construction — «ммоль/л» was not a translatable field, it was the value the code compared. Splitting the two ends that: the code is the identity, this file is the rendering.",
   "ucum": "https://ucum.org — the same unit language LOINC speaks, which is why it was chosen over inventing one.",

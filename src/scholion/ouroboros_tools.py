@@ -4,8 +4,10 @@ The Ouroboros mechanism: a module in ouroboros/tools/ exports get_tools() -> lis
 ToolEntry(name, schema, handler), handler(ctx, **args) -> str, the schema in OpenAI format.
 Auto-discovery picks the module up on its own.
 
-Installation: put this file (and the scholion package from src/) where Ouroboros sees them,
-and point SCHOLION_PROFILE_DIR / SCHOLION_REPO_DIR at the user's profile folder. Below is a soft
+Installation: do not copy this file — it imports its neighbours inside the package, and
+a copy in Ouroboros's tools package cannot find them. Place one line there instead,
+`from scholion.ouroboros_tools import get_tools` (README, «A plugin for Ouroboros»), and
+point SCHOLION_PROFILE_DIR / SCHOLION_REPO_DIR at the user's profile folder. Below is a soft
 import, so that the module can be tested outside Ouroboros as well.
 """
 from __future__ import annotations

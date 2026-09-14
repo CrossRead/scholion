@@ -6,7 +6,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 
 def file_date(path: Path) -> Optional[str]:
@@ -61,6 +61,66 @@ def user_data_dir() -> Path:
     if sys.platform.startswith("linux"):
         return home / ".local" / "share" / "scholion"
     return home / ".scholion"
+
+
+# ---- one reading: what does not change while one answer is being composed ----
+# The radar page composes the list of systems and then one card per system, and
+# each of them asked the same questions hundreds of times: is the genome
+# available (891 times, each a fresh search of the genome folder), what the labs
+# say (28 analyses), which copy of a reference file answers (71 083 times). The
+# page took a minute (14.09.2026). Inside one reading those answers are asked
+# once and handed out as copies; outside a reading nothing is remembered, so a
+# test that changes a file or a stub between two calls sees the change.
+import contextlib as _contextlib
+import copy as _copy
+import functools as _functools
+import threading as _threading
+
+_READING = _threading.local()
+
+
+@_contextlib.contextmanager
+def reading_session():
+    """Remember the answers of `memo_in_reading` functions until the outermost reading ends."""
+    depth = getattr(_READING, "depth", 0)
+    if depth == 0:
+        _READING.memo = {}
+    _READING.depth = depth + 1
+    try:
+        yield
+    finally:
+        _READING.depth -= 1
+        if _READING.depth == 0:
+            _READING.memo = None
+
+
+def memo_in_reading(fn):
+    """Inside a reading, compute once per arguments and return a copy; outside, just call."""
+    name = f"{fn.__module__}.{fn.__qualname__}"
+
+    @_functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        memo = getattr(_READING, "memo", None)
+        if memo is None:
+            return fn(*args, **kwargs)
+        key = (name, args, tuple(sorted(kwargs.items())))
+        try:
+            hash(key)
+        except TypeError:
+            return fn(*args, **kwargs)
+        if key not in memo:
+            memo[key] = fn(*args, **kwargs)
+        return _copy.deepcopy(memo[key])
+    return wrapper
+
+
+def in_reading(fn):
+    """Run the function as one reading."""
+    @_functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        with reading_session():
+            return fn(*args, **kwargs)
+    return wrapper
 
 
 def is_installed_mode() -> bool:
@@ -236,6 +296,41 @@ def read_ingest_manifest(loader: str) -> Dict[str, float]:
         return _manifest_files(json.loads(f.read_text(encoding="utf-8"))) if f.exists() else {}
     except Exception:                                                # noqa: BLE001
         return {}
+
+
+def manifest_lookup(files: Dict[str, float], path: Path) -> Tuple[str, Optional[float]]:
+    """The name `path` is remembered under, and the mtime remembered for it.
+
+    The name is the resolved absolute path. It used to be whatever string the
+    caller had typed, and a relative one was then resolved against the working
+    directory of whoever ran the command — which is not a property of the file
+    at all. The owner's manifest held 184 keys of the shape `../<folder>/<name>`
+    beside 3771 absolute ones. Two different folders reached by the same
+    relative name, a file of the same name and the same mtime in each, and the
+    second one is skipped as «unchanged» without ever having been read. The
+    equal mtime is what makes it rare; copying is what makes it possible, since
+    `cp -p`, rsync and every cloud sync carry the mtime over with the bytes.
+
+    Resolving also gives one file one name where several paths lead to it — a
+    symlinked folder, a directory that is itself a symlink (`/tmp` and `/var`
+    on macOS), the same disk seen under two roots.
+
+    A key written by an earlier version is honoured once and then renamed in
+    place, so nothing is re-read because of this change and the old spelling
+    leaves the file on the first run that walks past that file again. The
+    table is mutated for exactly that reason; the caller is the one who saves it.
+    """
+    try:
+        key = str(path.resolve())
+    except OSError:
+        key = str(path)      # a symlink loop, a parent that vanished: read it again
+    if key in files:
+        return key, files[key]
+    typed = str(path)
+    if typed != key and typed in files:
+        files[key] = files.pop(typed)
+        return key, files[key]
+    return key, None
 
 
 def write_ingest_manifest(loader: str, files: Dict[str, float]) -> None:
@@ -716,6 +811,15 @@ def stamp_profile_schema(data: Dict[str, Any]) -> Dict[str, Any]:
         data["_meta"] = meta
         data.pop("meta", None)
     meta[_SCHEMA_FIELD] = PROFILE_SCHEMA
+    # The build that wrote it, beside the shape it was written in. Without it a
+    # release's «re-run the import» stays a request in a journal: nothing could
+    # tell which of a person's files were written before that release (13.09.2026).
+    try:
+        from . import __version__ as _engine
+        if _engine:
+            meta["engine"] = _engine
+    except Exception:                                             # noqa: BLE001
+        pass
     return data
 
 
@@ -880,20 +984,70 @@ def knowledge_dir_local() -> Path:
     return repo_dir() / "knowledge"
 
 
-def knowledge_path(name: str) -> Path:
-    """The file that WINS for a knowledge name: a local refresh over the bundle.
+_STAMP_CACHE: Dict[Tuple[str, int], Optional[str]] = {}
 
-    Both are the same shape; the local one is newer by construction, because the
-    only thing that writes it is an import from the upstream source. `sources`
-    prints which of the two answered, so the precedence is visible rather than
-    inferred.
+
+def _knowledge_stamp(path: Path) -> Optional[str]:
+    """The date a reference file says it was made — its import date or its curation date.
+
+    Read once per (path, mtime): a knowledge file can run to megabytes, and this is
+    asked every time a name is resolved while a local copy exists.
+    """
+    try:
+        key = (str(path), path.stat().st_mtime_ns)
+    except OSError:
+        return None
+    if key in _STAMP_CACHE:
+        return _STAMP_CACHE[key]
+    stamp = None
+    try:
+        meta = (json.loads(path.read_text(encoding="utf-8")) or {}).get("_meta") or {}
+        imported = meta.get("imported") if isinstance(meta.get("imported"), dict) else {}
+        for c in (imported.get("fetched"), meta.get("fetched"), meta.get("updated"),
+                  meta.get("catalog_updated")):
+            if isinstance(c, str) and len(c) >= 10 and c[4] == "-" and c[7] == "-":
+                stamp = c[:10]
+                break
+    except (OSError, ValueError, AttributeError):
+        stamp = None
+    _STAMP_CACHE[key] = stamp
+    return stamp
+
+
+@memo_in_reading
+def knowledge_precedence(name: str) -> Dict[str, Any]:
+    """Which copy of a reference file answers, and why — the one decision, stated.
+
+    The local copy used to win by EXISTING. After `pip install --upgrade` a newer
+    bundled copy then lost to a months-old local import, and nothing said so
+    (13.09.2026). Now the newer stamp answers; a local copy with no stamp keeps
+    the old precedence, and says that it could not be compared.
     """
     local = knowledge_dir_local() / name
     try:
-        if local.is_file():
-            return local
+        has_local = local.is_file()
     except OSError:
-        pass
+        has_local = False
+    bs = _knowledge_stamp(_KNOWLEDGE_DIR / name)
+    if not has_local:
+        return {"answers": "bundled", "why": "no_local", "local_stamp": None, "bundled_stamp": bs}
+    ls = _knowledge_stamp(local)
+    if ls and bs and bs > ls:
+        return {"answers": "bundled", "why": "bundled_newer", "local_stamp": ls, "bundled_stamp": bs}
+    return {"answers": "local", "why": "local_newer" if (ls and bs) else "unstamped",
+            "local_stamp": ls, "bundled_stamp": bs}
+
+
+def knowledge_path(name: str) -> Path:
+    """The file that answers for a knowledge name: the newer of a local refresh and the bundle.
+
+    A local refresh is written by an import from the upstream source and stamped
+    with its date; the bundled copy carries the date it was curated. The newer
+    stamp wins — see `knowledge_precedence` — and `sources` prints which copy
+    answered and why, so the precedence is visible rather than inferred.
+    """
+    if knowledge_precedence(name)["answers"] == "local":
+        return knowledge_dir_local() / name
     return _KNOWLEDGE_DIR / name
 
 
@@ -1623,6 +1777,41 @@ def source_config() -> Dict[str, str]:
         except Exception:
             return {}
     return {}
+
+
+def _chosen_genome_path(key: str) -> Optional[str]:
+    """One of the genome FILES the person named, from profile/sources.json.
+
+    Three of them are files rather than folders — the reads themselves, the
+    alignment they were called from, and the reference they were called against
+    — so they sit at the top level of the same file rather than inside
+    "folders", where a path that is not a folder is how the next reader gets it
+    wrong.
+    """
+    p = profile_dir() / "sources.json"
+    if not p.exists():
+        return None
+    try:
+        return (_read_json(p).get(key) or None)
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
+def chosen_genome_bam() -> Optional[str]:
+    """The alignment the person named (`genome_bam`).
+
+    Until 13.09.2026 nothing recorded it: the alignment was found by the layout
+    the project's own pipeline happens to write, and anybody whose BAM lies
+    elsewhere could only name it with an environment variable — for one run, on
+    one machine, remembered by nobody. Every other input of this product is
+    written down; this one now is too.
+    """
+    return _chosen_genome_path("genome_bam")
+
+
+def chosen_genome_reference() -> Optional[str]:
+    """The reference FASTA the person named (`genome_reference`)."""
+    return _chosen_genome_path("genome_reference")
 
 
 def chosen_genome_vcf() -> Optional[str]:

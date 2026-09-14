@@ -84,8 +84,14 @@ class TestTheClassMapIsSmallAndGated(unittest.TestCase):
     def test_the_left_out_classes_are_named_with_the_reason(self):
         meta = json.loads((core._KNOWLEDGE_DIR / "drug_class_systems.json")
                           .read_text(encoding="utf-8"))["_meta"]
-        for cls in ("ace_inhibitor", "ppi", "nsaid", "iodine"):
+        # `ace_inhibitor` stood in this list until 13.09.2026, when «Heart and
+        # vessels» gave the antihypertensive classes a system (task 179); the
+        # macrolides are the antibiotic that still has none.
+        for cls in ("macrolide", "ppi", "nsaid", "iodine"):
             self.assertIn(cls, meta["why_partial"])
+        for cls in ("ace_inhibitor", "anticoagulant_vka", "antiplatelet_p2y12", "antiarrhythmic"):
+            self.assertNotIn(cls, meta["why_partial"],
+                             f"{cls} is placed on cardio and must not be explained away as well")
 
 
 _REAL_READ = core._read_knowledge

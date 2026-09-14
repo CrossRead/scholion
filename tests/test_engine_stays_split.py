@@ -231,14 +231,30 @@ LINE_BUDGETS = {
     # 13.09.2026: the ACMG scan counted as the ClinVar source for its 84 genes,
     # a reason as a sentence with the step that closes it, the genome basket
     # grouped by reason — found on a reference genome (1300 → 1340).
-    "system_panels": 1340,
+    # 13.09.2026: the segment panels read their unreadable genes (a gene beside its
+    # pseudogene, a repeat) and fold the questions waiting on one untaken marker
+    # into one (1340 → 1380; 1351 lines when raised).
+    # 13.09.2026: a row says WHO signed its sentence — the signer the file names
+    # becomes a state the reader is told about, an unknown signer is not taken
+    # for a signature, and the count and date of the signing reach the summary
+    # (1380 → 1400; 1392 lines when raised).
+    # 13.09.2026: an expectation is asked only of the genotype it names, the
+    # corridor open at one end is written by the end it has, and each half of
+    # the list carries its own read count (1400 → 1430; 1419 when raised).
+    # 1430 → 1450 on 14.09.2026: every panel position is carried as a state in
+    # both registers, so the radar can say the panel was checked whole.
+    "system_panels": 1450,
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its
     # class acts on, and the drug entry became the clinician's exceptions —
     # a sentence, a class, or a signed exclusion, the unsigned one counted.
     "decision": 340,
-    "genomics": 1100,
+    # 13.09.2026: a locus carried in ONE copy is judged against one copy — the
+    # copies are measured from the coverage table itself rather than asked of
+    # a profile, and the reference point is the median of the same kind of
+    # locus (1100 → 1160; 1148 lines when raised).
+    "genomics": 1160,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.
@@ -264,6 +280,13 @@ LINE_BUDGETS = {
     # would put a panel in one file and that panel's places in another, and
     # the two would drift the way every pair of copies in this project has.
     "lifestyle": 1010,
+    # A domain of its own on 14.09.2026: the review of a brief block — what
+    # arrived after its wording was read, and a request built from it. It
+    # reads the brief and the labs and writes nothing.
+    "brief_review": 160,
+    # 14.09.2026: the panel of a system as the catalogue describes it, for the
+    # clinician — references and sentences, no genome, no labs.
+    "panel_catalogue": 120,
     # 220 → 240 on 12.09.2026: the overview's age line names why it could not
     # be computed rather than answering «unknown» with nothing beside it.
     "profile_view": 240,

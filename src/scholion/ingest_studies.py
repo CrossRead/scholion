@@ -21,7 +21,7 @@ import os
 import re
 import datetime as _dt
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 
 from . import core
 from .i18n import t as _t
@@ -263,7 +263,8 @@ def _sid(path: Path, date: Optional[str]) -> str:
     return f"{stem}_{(date or 'nodate').replace('-', '')}"
 
 
-def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
+def ingest(folder: str, force: bool = False,
+           progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
     """Walk the folder of PDFs and update profile/studies.json with conclusions. Incremental."""
     if not _ensure_extractor():
         return {"ok": False, "error": _t("studies.no_pdf_reader")}
@@ -280,10 +281,14 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
     files = sorted(root.rglob("*.pdf"))
     added, updated, skipped = [], [], 0
     missed: List[Dict[str, Any]] = []
-    for f in files:
-        key = str(f)
+    for n_file, f in enumerate(files):
+        if progress is not None:
+            # Outside the per-file `try`: a stop requested here ends the run
+            # before anything is written, never as «this file failed».
+            progress(n_file, len(files), f.name)
+        key, known = core.manifest_lookup(manifest, f)
         mtime = f.stat().st_mtime
-        if not force and manifest.get(key) == mtime:
+        if not force and known == mtime:
             skipped += 1
             continue
         text = _read_pdf(f) or ""

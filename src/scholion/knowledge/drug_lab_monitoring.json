@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "A PUBLIC map: therapeutic class → which laboratory values to monitor while taking it. For a personal assessment: the application checks this against the patient's LAB RESULTS and highlights the deviations that are already there. Portable, without patient data.",
     "note": "labs — keys from labs.json (what we actually track). why — why it is monitored on this class.",
     "note_nutraceutical_layer_20260813": "Monitoring tests have been added for the nutraceutical classes; statin (+CK), testosterone_replacement (+haematocrit, testosterone, DHT) and azole_antifungal (+CK) have been strengthened.",

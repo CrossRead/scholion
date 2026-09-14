@@ -21,7 +21,7 @@ import subprocess
 import sys
 import datetime as _dt
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Callable
 
 from . import core, i18n, store
 from .i18n import t as _t
@@ -1460,7 +1460,8 @@ def _carry_store_flags(out: Dict[str, Any], key: str, date: str, r: Dict[str, An
             {"marker": key, "date": r.get("date") or date, "replaced": r["replaced"]})
 
 
-def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
+def ingest(folder: str, force: bool = False,
+           progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
     """Walk the folder of results and update labs.json with new markers. Incremental."""
     # `Path("")` is the current directory. A caller that named no folder is
     # refused by name rather than served whatever the process happens to be
@@ -1511,13 +1512,17 @@ def ingest(folder: str, force: bool = False) -> Dict[str, Any]:
     # file used to win — silently and non-deterministically. Now the FIRST one in sort order
     # wins, and the discrepancy goes into out["conflicts"] and into the report.
     seen_pt: Dict[tuple, tuple] = {}
-    for f in files:
+    for n_file, f in enumerate(files):
+        if progress is not None:
+            # Outside the per-file `try`: a stop requested here ends the run
+            # before anything is written, never as «this file failed».
+            progress(n_file, len(files), f.name)
         try:
             mt = f.stat().st_mtime
         except Exception:
             continue
-        rk = str(f)
-        if not force and manifest.get(rk) == mt:
+        rk, known = core.manifest_lookup(manifest, f)
+        if not force and known == mt:
             out["skipped"] += 1
             continue
         if f.suffix.lower() == ".pdf" and not ex:

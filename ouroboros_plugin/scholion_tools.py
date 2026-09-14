@@ -6,9 +6,11 @@ the project is unpacked as a folder and never installed: it puts `src/` on the
 import path and re-exports the same entry point, so there is one implementation
 and two ways to reach it.
 
-Install: copy either this file or `scholion/ouroboros_tools.py` into the tools
-package of your Ouroboros checkout — discovery is a scan of `ouroboros.tools.*`,
-and the contract is a module exporting `get_tools() -> list[ToolEntry]`.
+Install: copy this file into the tools package of your Ouroboros checkout — or,
+with the package installed, the one line the README gives. Never the package
+module itself: it imports its neighbours relatively and cannot be imported from
+inside another package. Discovery is a scan of `ouroboros.tools.*`, and the
+contract is a module exporting `get_tools() -> list[ToolEntry]`.
 """
 from __future__ import annotations
 

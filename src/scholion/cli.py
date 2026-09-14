@@ -102,6 +102,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="the FULL instruction (INSTRUCTION.md) instead of the short entry")
     sk.add_argument("--rules", action="store_true",
                     help="the canon of the assistant's rules instead of the instruction (ASSISTANT-RULES.md)")
+    sk.add_argument("--install", nargs="?", const="", default=None, metavar="DIR",
+                    help="copy the entry into a skills folder (default ~/.agents/skills/scholion/) "
+                         "and record this build beside it, so selfcheck can tell a stale copy")
 
     # The same reason `skill` exists. A `pip install` gets `src/scholion` and
     # nothing else, while the output sends the reader to README nine times, to
@@ -189,6 +192,11 @@ def build_parser() -> argparse.ArgumentParser:
                              "questions for the clinician — in three baskets, never silently empty")
     sy.add_argument("key", nargs="?",
                     help="the system's key (thyroid, lipids, …); omitted, the systems are listed")
+    pn = sub.add_parser("panel", parents=[common],
+                        help="the genetic panel of one body system as the catalogue describes it — "
+                             "every position, its sentence per genotype, the guideline or study it "
+                             "rests on, what it expects of a marker, who signed it; no genome, no labs")
+    pn.add_argument("key", nargs="?", help="the system's key; omitted, the panels are listed")
     sy.add_argument("--register", choices=["patient", "clinician"], default="patient",
                     help="the density of the same facts: the clinician's register adds rsID, "
                              "genotype, depth, classification, submitter and the gate's counts; "
@@ -296,6 +304,32 @@ def build_parser() -> argparse.ArgumentParser:
                                                    "a procedure, a dose, a load")
     ldp.add_argument("--marker", default="", help="apply to one marker only (default: all "
                                                   "markers measured twice that day)")
+    vr = sub.add_parser("version", parents=[common],
+                        help="this build and its age, the version your data was last used with, "
+                             "and what the releases in between ask you to recompute")
+    vr.add_argument("--since", default=None,
+                    help="list what every release after this version asks (e.g. 0.4.8)")
+    vr.add_argument("--seen", action="store_true",
+                    help="record that your data is now used with this build")
+    vr.add_argument("--check", action="store_true",
+                    help="ask PyPI whether a newer version exists (one request, only now)")
+    rcp = sub.add_parser("recompute", parents=[common],
+                         help="what the releases since your data's version ask to recompute, and the "
+                              "genome steps your data lacks; runs them with visible progress after --yes")
+    rcp.add_argument("--yes", action="store_true",
+                     help="run every step that is ready, one after another, printing how far each is")
+    rcp.add_argument("--status", action="store_true", help="how far the running or last recompute is")
+    rcp.add_argument("--stop", action="store_true",
+                     help="stop a running recompute after the item it is reading")
+    rcp.add_argument("--since", default=None,
+                     help="plan from this version instead of the one your data recorded (e.g. 0.4.8)")
+    sub.add_parser("coverage", parents=[common],
+                   help="measure, from your alignment (BAM) with samtools, how well every gene the "
+                        "panels read was read, so «nothing found» over a gene stops being a "
+                        "statement about the file")
+    sub.add_parser("genotype-sites", parents=[common],
+                   help="genotype every catalogue position from your alignment (BAM) with bcftools, so "
+                        "a position missing from the VCF reads as the reference instead of as not read")
     srcp = sub.add_parser("sources", parents=[common],
                           help="the external reference sources this build mirrors, "
                                "when each was last imported, and what has to be done by hand")
@@ -426,6 +460,11 @@ def build_parser() -> argparse.ArgumentParser:
                          help="withdraw the target recorded for a marker")
     trm.add_argument("marker")
 
+    brv = sub.add_parser("brief-review", parents=[common],
+                         help="what arrived since a block of the lifestyle brief was last read, and a "
+                              "request for the assistant built from it (every block due for a review "
+                              "when none is named)")
+    brv.add_argument("block", nargs="?", default=None, help="the block id, as `brief` prints it")
     br = sub.add_parser("brief-reviewed", parents=[common],
                         help="record that a block of the lifestyle brief was read against "
                              "today's data and its wording still holds")
@@ -436,6 +475,10 @@ def build_parser() -> argparse.ArgumentParser:
                              "(needed only when the folder holds more than one)")
     cg.add_argument("path", nargs="?", default="",
                     help="path to the .vcf.gz; empty clears the choice")
+    cg.add_argument("--bam", default=None,
+                    help="path to the alignment your reads were called from; empty clears it")
+    cg.add_argument("--reference", default=None,
+                    help="path to the reference FASTA (its .fai must be beside it); empty clears it")
 
     sf = sub.add_parser("set-folder", parents=[common],
                         help="point at a source folder for the data (in the web — the native macOS dialog)")
@@ -500,6 +543,33 @@ def _can_ask() -> bool:
         return bool(sys.stdin) and sys.stdin.isatty()
     except (ValueError, AttributeError):     # a closed or replaced stream
         return False
+
+
+def _progress_to_stderr(line: str) -> None:
+    """One line of progress: rewritten in place on a terminal, appended in a log."""
+    if sys.stderr.isatty():
+        sys.stderr.write("\r" + line[:220] + "\x1b[K")
+    else:
+        sys.stderr.write(line + "\n")
+    sys.stderr.flush()
+
+
+def _recompute_echo(job, i):
+    from . import format as _fmt
+    _progress_to_stderr(_fmt.recompute_progress_line(job, i))
+    if ((job.get("steps") or [{}])[i].get("state") in ("done", "failed", "stopped")
+            and sys.stderr.isatty()):
+        sys.stderr.write("\n")
+
+
+def _coverage_echo(done, total, item=None):
+    _progress_to_stderr(_t("coverage.progress", i=min(done + 1, total), n=total, gene=item)
+                        if item else _t("coverage.progress_write"))
+
+
+def _sites_echo(done, total, item=None):
+    _progress_to_stderr(_t("sites.progress", i=min(done + 1, total), n=total, chrom=item or "—")
+                        if item else _t("sites.progress_merge"))
 
 
 def main(argv=None) -> int:
@@ -735,6 +805,11 @@ def _main(argv=None) -> int:
         print(str(path) if args.path else text, end="" if not args.path else "\n")
         return 0
 
+    if args.cmd == "skill" and getattr(args, "install", None) is not None:
+        from . import updates as _upd
+        res = _upd.install_skill(args.install or None)
+        print(json.dumps(res, ensure_ascii=False, indent=2) if args.json else fmt.skill_install_report(res))
+        return 0 if res.get("ok") else 1
     if args.cmd == "skill":
         # SKILL.md is the entry a model loads first; INSTRUCTION.md is the long text.
         # Printing seventy kilobytes at somebody who typed `scholion skill` to see what
@@ -853,7 +928,17 @@ def _main(argv=None) -> int:
         res, render = _st.mark_brief_reviewed(args.block), fmt.write_result
     elif args.cmd == "choose-genome":
         from . import store as _st
-        res, render = _st.set_genome_vcf(args.path), fmt.write_result
+        # Three files, one command: the reads, the alignment they were called
+        # from, and the reference they were called against. Each is set only
+        # when it was named, so `--bam` alone does not clear the other two.
+        res = {"ok": True}
+        if args.bam is not None:
+            res = {**res, **_st.set_genome_bam(args.bam)}
+        if args.reference is not None and res.get("ok"):
+            res = {**res, **_st.set_genome_reference(args.reference)}
+        if res.get("ok") and (args.path or (args.bam is None and args.reference is None)):
+            res = {**res, **_st.set_genome_vcf(args.path)}
+        render = fmt.write_result
     elif args.cmd == "drug":
         res, render = engine.check_drug_gene(args.name), fmt.drug_check
     elif args.cmd == "labs":
@@ -870,6 +955,8 @@ def _main(argv=None) -> int:
         res, render = engine.focus_dashboard(), fmt.render_focus
     elif args.cmd == "brief":
         res, render = engine.lifestyle_brief(), fmt.render_brief
+    elif args.cmd == "brief-review":
+        res, render = engine.brief_review(args.block), fmt.brief_review_report
     elif args.cmd == "lifestyle":
         res, render = engine.lifestyle(), fmt.lifestyle_report
     elif args.cmd == "goal":
@@ -949,6 +1036,33 @@ def _main(argv=None) -> int:
         res = _st.set_draw_context(args.day, args.reason, args.between,
                                    marker=args.marker or None)
         render = fmt.draw_context_report
+    elif args.cmd == "version":
+        from . import updates as _upd
+        if getattr(args, "seen", False):
+            res, render = _upd.mark_seen(), fmt.version_seen_report
+        elif getattr(args, "check", False):
+            res, render = _upd.check_registry(), fmt.version_check_report
+        else:
+            res, render = _upd.status(since=getattr(args, "since", None)), fmt.version_report
+    elif args.cmd == "recompute":
+        from . import recompute as _rc
+        if getattr(args, "stop", False):
+            res, render = _rc.stop(), fmt.recompute_stop_report
+        elif getattr(args, "status", False):
+            res, render = _rc.status(), fmt.recompute_status_report
+        elif getattr(args, "yes", False):
+            res = _rc.run(confirm=True, since=args.since, echo=None if args.json else _recompute_echo)
+            render = fmt.recompute_run_report
+        else:
+            res, render = _rc.plan(since=args.since), fmt.recompute_plan_report
+    elif args.cmd == "coverage":
+        from . import coverage as _cov
+        res = _cov.measure(progress=None if args.json else _coverage_echo)
+        render = fmt.coverage_report
+    elif args.cmd == "genotype-sites":
+        from . import sites as _sites
+        res = _sites.genotype(progress=None if args.json else _sites_echo)
+        render = fmt.genotype_sites_report
     elif args.cmd == "sources":
         from . import sources as _src
         results = []
@@ -973,6 +1087,8 @@ def _main(argv=None) -> int:
             res, render = engine.system(args.key, args.register), fmt.system_report
         else:
             res, render = engine.systems(), fmt.systems_report
+    elif args.cmd == "panel":
+        res, render = engine.panel_description(args.key), fmt.panel_report
     elif args.cmd == "lipid-genetics":
         res, render = engine.lipid_genetics(), fmt.lipid_genetics_report
     elif args.cmd == "ingest-labs":
@@ -1003,9 +1119,13 @@ def _main(argv=None) -> int:
         from . import reconcile as _rec
         res, render = _rec.reconcile(args.lab_dir, ocr=args.ocr), fmt.reconcile_report
     elif args.cmd == "selfcheck":
-        from . import reconcile as _rec
+        from . import reconcile as _rec, updates as _upd
         res = _rec.reconcile(args.lab_dir)
-        render = _rec.selfcheck_summary
+        if isinstance(res, dict):
+            # A skill copied into a skills folder does not update itself; the
+            # session-start banner is where a stale copy is worth one line.
+            res["skill_copies"] = _upd.skill_copies()
+        render = lambda r: _rec.selfcheck_summary(r) + fmt.skill_copies_lines(r.get("skill_copies"))
     elif args.cmd == "phenoage":
         from . import phenoage as _pa
         if args.panels:
@@ -1048,6 +1168,15 @@ def _main(argv=None) -> int:
         # rest of the folder was still processed — but a partial result is not
         # a clean one, and a script that chains on this command must be able to
         # tell the two apart without parsing the text (task 124).
+        return 1
+    if args.cmd in ("genotype-sites", "coverage") and not res.get("ok"):
+        return 1
+    if args.cmd == "recompute" and res.get("started") and not res.get("ok"):
+        return 1
+    if args.cmd == "selfcheck" and isinstance(res, dict) and any(
+            c.get("severity") == "error" for c in res.get("skill_copies") or []):
+        # A skill copy that differs from this build fails the check: a session
+        # that starts with `selfcheck` must not go on under stale instructions.
         return 1
     return 0
 

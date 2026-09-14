@@ -76,6 +76,10 @@ POST_BODIES = {
     "/api/ingest-labs": {"path": ""},
     "/api/ingest-studies": {"path": ""},
     "/api/run-update": {},
+    "/api/version/seen": {},
+    # Without `"confirm": true` nothing starts: the door answers with the plan.
+    "/api/recompute": {},
+    "/api/recompute/stop": {},
     "/api/assistant/context": {},
     "/api/pick-folder": {"domain": "labs_docs", "path": "/tmp"},
 }
@@ -349,19 +353,29 @@ class TestTheBackgroundUpdate(_Live):
         for field in ("running", "rc", "tail", "hint"):
             self.assertIn(field, got)
 
-    def test_a_missing_update_script_is_reported_rather_than_run(self):
-        """The worker names the script it could not find. Pointed at a directory
-        with no script in it, nothing is executed at all — no subprocess starts
-        during this test."""
+    def test_a_missing_update_script_is_refused_rather_than_run(self):
+        """Pointed at a directory with no script in it, nothing is executed — no
+        subprocess starts during this test — and the refusal is a sentence, not a
+        path. Until 13.09.2026 the log said «not found: <the script's path>»,
+        which after a pip install was a path inside site-packages shown to a
+        person as the reason."""
+        def no_process(*a, **kw):
+            raise AssertionError("a subprocess was started for a script that is not there")
+        server._UPD.update({"running": False, "rc": None, "log": "", "hint": ""})
         with tempfile.TemporaryDirectory() as empty:
-            with mock.patch.object(server, "_INGEST", Path(empty)):
+            with mock.patch.object(server, "_INGEST", Path(empty)), \
+                    mock.patch.object(server.subprocess, "Popen", no_process):
                 server._run_update_bg()
                 for _ in range(100):
-                    if not server._UPD["running"]:
+                    if not server._UPD["running"] and server._UPD["rc"] is not None:
                         break
                     time.sleep(0.02)
         self.assertEqual(5, server._UPD["rc"])
-        self.assertIn("not found", server._UPD["log"])
+        self.assertEqual("server.update.not_in_this_delivery", server._UPD["hint"])
+        self.assertNotIn(empty, server._UPD["log"])
+        self.assertNotIn("update_check", server._UPD["log"])
+        status = self.json_of("/api/update-status")
+        self.assertTrue(status["hint"], "the page is left without the sentence")
 
 
 class TestTheNativeFolderDialog(unittest.TestCase):

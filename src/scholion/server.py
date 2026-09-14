@@ -62,6 +62,23 @@ _INGEST = Path(__file__).resolve().parent.parent / "ingest"
 _UPD = {"running": False, "rc": None, "log": "", "hint": ""}
 
 
+def _update_refusal():
+    """Why this delivery cannot refresh ClinVar from the page — a catalogue key, or None.
+
+    The refresh drives a shell script of the genome-preparation toolkit, and a
+    pip install does not carry that toolkit (the wheel is `src/scholion` alone).
+    Until 13.09.2026 the button ran anyway and answered «not found:
+    …/site-packages/ingest/update_check.sh» — a path inside somebody's Python
+    installation, shown to a person as the reason. The refusal is now a sentence
+    that says where the step is done, and it names no file.
+    """
+    if core.is_installed_mode() or not (_INGEST / "update_check.sh").exists():
+        return "server.update.not_in_this_delivery"
+    if shutil.which("bash") is None:
+        return "server.update.no_shell"
+    return None
+
+
 def _run_update_bg():
     """In the background: update ClinVar and re-check the genome (update_check.sh)."""
     import threading
@@ -72,6 +89,13 @@ def _run_update_bg():
         _UPD["log"] = ""
         _UPD["hint"] = ""
         script = _INGEST / "update_check.sh"
+        refusal = _update_refusal()
+        if refusal:
+            _UPD["log"] = ""
+            _UPD["hint"] = refusal
+            _UPD["rc"] = 5 if refusal == "server.update.not_in_this_delivery" else 6
+            _UPD["running"] = False
+            return
         if shutil.which("bash") is None:
             # Said plainly rather than raised: this is a shell script, and a
             # machine without a shell cannot run it. Everything else the server
@@ -275,7 +299,9 @@ class Handler(BaseHTTPRequestHandler):
         chosen = self._lang(q)
         # /api/diag is the one GET with a real side effect off the machine — see
         # the note on _deny. Every other GET here only reads the profile.
-        deny = self._deny(state_changing=(p == "/api/diag"))
+        # /api/version/check is the second GET that leaves the machine: one request
+        # to the package registry, and only because a person pressed the button.
+        deny = self._deny(state_changing=(p in ("/api/diag", "/api/version/check")))
         if deny:
             return self._json({"error": deny}, 403)
         try:
@@ -366,6 +392,13 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.focus_dashboard())
             if p == "/api/lifestyle-brief":
                 return self._json(engine.lifestyle_brief())
+            if p == "/api/panel":
+                # The panel as the catalogue describes it: references, no person.
+                return self._json(engine.panel_description((q.get("key") or [""])[0] or None))
+            if p == "/api/brief-review":
+                # What arrived since a brief block was read, and the request a
+                # person hands to the assistant. Reads; the verdict stays theirs.
+                return self._json(engine.brief_review((q.get("block") or [""])[0] or None))
             if p == "/api/lifestyle":
                 return self._json(engine.lifestyle())
             if p == "/api/screen":
@@ -385,8 +418,23 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(engine.lipid_genetics())
             if p == "/api/longevity":
                 return self._json(engine.longevity_findings())
+            if p == "/api/version":
+                from . import updates as _upd
+                return self._json(_upd.status())
+            if p == "/api/version/check":
+                from . import updates as _upd
+                return self._json(_upd.check_registry())
+            if p == "/api/recompute":
+                from . import recompute as _rc
+                return self._json(_rc.plan())
+            if p == "/api/recompute/status":
+                from . import recompute as _rc
+                return self._json(_rc.status())
             if p == "/api/genome-updates":
-                return self._json({**engine.genome_updates(), "running": _UPD["running"]})
+                refusal = _update_refusal()
+                return self._json({**engine.genome_updates(), "running": _UPD["running"],
+                                   "can_refresh": refusal is None,
+                                   "refresh_refusal": _t(refusal) if refusal else None})
             if p == "/api/update-status":
                 return self._json({"running": _UPD["running"], "rc": _UPD["rc"],
                                    "tail": _UPD["log"],
@@ -419,6 +467,11 @@ class Handler(BaseHTTPRequestHandler):
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
                     direction=body.get("direction"), date_source="manual",
                     subject="owner"))
+            if u.path == "/api/version/seen":
+                # A person pressed «Understood» under the update note: the data is
+                # now used with this build. The only write, and it is a marker.
+                from . import updates as _upd
+                return self._json(_upd.mark_seen())
             if u.path == "/api/targets":
                 # Entered, never derived: the body carries who set it and when,
                 # and the store refuses a target without either.
@@ -440,7 +493,13 @@ class Handler(BaseHTTPRequestHandler):
                 # The one question about the genome that a program may not answer
                 # for the person, asked where they are already looking at the
                 # names.
-                r = store.set_genome_vcf(body.get("path", ""))
+                r = {"ok": True}
+                if "bam" in body:
+                    r = {**r, **store.set_genome_bam(body.get("bam") or "")}
+                if "reference" in body and r.get("ok"):
+                    r = {**r, **store.set_genome_reference(body.get("reference") or "")}
+                if r.get("ok") and ("path" in body or not ("bam" in body or "reference" in body)):
+                    r = {**r, **store.set_genome_vcf(body.get("path", ""))}
                 core.reset_cache()
                 return self._json(r)
             if u.path == "/api/goal":
@@ -483,7 +542,21 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({**saved, "path": res["path"]})
             if u.path == "/api/clear-folder":
                 return self._json(store.clear_source_folder(body.get("domain", "")))
+            if u.path == "/api/recompute":
+                # Nothing starts without the confirmation the page asks for: a
+                # recompute rewrites profile files for minutes.
+                from . import recompute as _rc
+                if body.get("confirm") is not True:
+                    return self._json({"started": False, "reason": "not_confirmed", "plan": _rc.plan()})
+                return self._json(_rc.start_in_background())
+            if u.path == "/api/recompute/stop":
+                from . import recompute as _rc
+                return self._json(_rc.stop())
             if u.path == "/api/run-update":
+                refusal = _update_refusal()
+                if refusal:
+                    return self._json({"started": False, "reason": refusal.rsplit(".", 1)[-1],
+                                       "message": _t(refusal)})
                 if _UPD["running"]:
                     return self._json({"started": False, "busy": True})
                 _run_update_bg()
@@ -556,6 +629,28 @@ def _already_ours(host: str, port: int) -> bool:
         return False
 
 
+def warm_up() -> int:
+    """Read every system's card once, so the first page finds the reads warm.
+
+    The first radar of a session paid for every cold read — the genome folder,
+    the catalogue positions, the coverage table — while the person watched a
+    bar (owner, 14.09.2026). The same reads happen here, right after the port
+    is bound and on a thread of their own. Returns how many cards were read; a
+    failure is swallowed, because a warm-up that fails has cost nothing.
+    """
+    try:
+        from . import engine as _engine
+        keys = [s["key"] for s in (_engine.systems().get("systems") or [])]
+        for key in keys:
+            _engine.system(key, "patient")
+        return len(keys)
+    except Exception as exc:                                         # noqa: BLE001
+        # Named on stderr rather than hidden: a warm-up that fails costs the
+        # person nothing, but the reason is a defect worth reading.
+        print(f"warm-up skipped: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
+        return 0
+
+
 def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, tries: int = 12) -> None:
     """Bring the server up. If the port is taken by OUR own older instance — open the browser on it.
     If it is taken by something else — take the next free port. The browser opens automatically."""
@@ -611,6 +706,8 @@ def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, 
         print(_t("server.port_busy", wanted=port, chosen=chosen))
     print(_t("server.listening", url=url))
     print(_t("server.profile", path=core.profile_dir()))
+
+    threading.Thread(target=warm_up, daemon=True).start()
     if open_browser:
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
     try:

@@ -4,12 +4,12 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base.",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
-    "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), FADS1 rs174537/rs174546 (not in ClinVar — verify the coordinates against Ensembl REST on the next run on the Mac), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool.",
+    "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool. CLOSED 13.09.2026 — FADS1 rs174537 and rs174546: the coordinates were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary while the radar-segment panels were composed, and both loci are in `loci` with the omega-3 conversion note the vitamins panel reads.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-    "updated": "2026-09-12",
+    "updated": "2026-09-13",
     "source_tier": "primary_literature",
     "assembly_secondary": "GRCh37",
     "assembly_secondary_note": {
@@ -20,7 +20,12 @@
       "en": "The position question is closed — every locus answers in both builds. Two things are not. (1) Allele orientation: rs6025, rs1065852 and rs762551 appear in a corpus GRCh37 file with REF/ALT the reverse of this catalogue's (file T>C vs catalogue C>T; G>A vs A>G; C>A vs A>C). Their GRCh37 positions here come from NCBI and Ensembl, not from that file, so the coordinates are unaffected; what is unresolved is which strand that exporter reports on, and it is left open rather than settled from one caller's output. (2) The same run also compared every GRCh38 position in this catalogue against dbSNP. It reported to the console and the console was not kept, so that comparison is not on record here — the script now writes a report file beside its output, and the next run will leave one.",
       "ru": "Вопрос о позициях закрыт — каждый локус отвечает в обеих сборках. Незакрытых два. (1) Ориентация аллелей: rs6025, rs1065852 и rs762551 встречаются в файле GRCh37 из корпуса с REF/ALT, обратными нашим (в файле T>C против C>T в каталоге; G>A против A>G; C>A против A>C). Координаты GRCh37 у них взяты из NCBI и Ensembl, а не из этого файла, так что на позиции это не влияет; неразрешено то, с какой цепи отчитывается этот экспортёр, и вопрос оставлен открытым, а не решён по выводу одного вызывателя. (2) Тот же прогон сверил и все координаты GRCh38 этого каталога с dbSNP. Он отчитался в консоль, консоль не сохранена — значит, этой сверки здесь нет на бумаге. Теперь скрипт пишет отчёт рядом с выходным файлом, и следующий прогон его оставит."
     },
-    "catalog_updated": "2026-09-12"
+    "catalog_updated": "2026-09-13",
+    "grch37_unresolved": {
+      "rs111033565": "PRSS1, 7q34: Ensembl GRCh37 and dbSNP `chrpos_prev_assm` give different positions — the region is misassembled in GRCh37. Held without a second coordinate rather than with one source's number: a position only one source vouches for is the silent way to read the wrong base.",
+      "rs641738": "MBOAT7/TMC4, 19q13: the two sources disagree on the GRCh37 position, as above."
+    },
+    "grch37_unresolved_note": "A locus here answers in GRCh38 only, and says so: `pos_grch37` is null and the reason is above. `fill_grch37.py` cannot close it — the sources disagree, and the next attempt needs a third one, not another run. Recorded 13.09.2026 with the radar-segment panels."
   },
   "regions": {
     "CYP2D6": {
@@ -520,8 +525,8 @@
       "alt": "A",
       "star": "W154X",
       "note": {
-        "en": "a non-secretor when AA: the composition of the microbiota, resistance to norovirus, ambiguous data on B12. Change the dose of supplements only on a laboratory deficiency, not on the genotype",
-        "ru": "non-secretor при AA: состав микробиоты, устойчивость к норовирусу, неоднозначные данные по B12. Дозу добавок менять только по лабораторному дефициту, не по генотипу"
+        "en": "a non-secretor when AA: the composition of the microbiota and resistance to norovirus. Vitamin B12: the non-secretor allele A goes with a somewhat HIGHER plasma B12 (Hazra 2008 Nat Genet; OMIM «vitamin B12 plasma level QTL 1», allele A; the GWAS Catalog places the B12-deficiency-anaemia risk on G) — checked 13.09.2026 by two routes. Supplement doses are still set by a laboratory B12, never by this genotype",
+        "ru": "несекретор при AA: состав микробиоты, устойчивость к норовирусу. Витамин B12: несекреторный аллель A сопровождается несколько БОЛЕЕ ВЫСОКИМ B12 в плазме (Hazra 2008 Nat Genet; OMIM «vitamin B12 plasma level QTL 1», аллель A; GWAS Catalog относит риск B12-дефицитной анемии к G) — проверено 13.09.2026 двумя путями. Дозу добавок всё равно задаёт лабораторный B12, а не этот генотип"
       },
       "pos_grch37": 49206674
     },
@@ -779,6 +784,682 @@
         "ru": "аллель A — это Met: фермент термолабилен, и катехоламины разрушаются медленнее. CPIC называет ген в руководстве по опиоидам и намеренно НЕ даёт по нему рекомендаций по дозе, а поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. Локус в каталоге потому, что о нём часто спрашивают, а не потому, что по нему что-то решается"
       },
       "pos_grch37": 19951271
+    },
+    "rs5742904": {
+      "gene": "APOB",
+      "chrom": "2",
+      "pos": 21006288,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Arg3527Gln",
+      "note": {
+        "en": "familial hypercholesterolaemia, the APOB form (ligand-defective apoB-100): LDL-C markedly high from birth; the gene is on the minus strand, c.10580G>A is the genomic C>T",
+        "ru": "семейная гиперхолестеринемия, форма APOB (дефект лиганда апоВ-100): ЛПНП высокий с рождения; ген на минус-цепи, c.10580G>A — геномное C>T"
+      },
+      "pos_grch37": 21229160
+    },
+    "rs10455872": {
+      "gene": "LPA",
+      "chrom": "6",
+      "pos": 160589086,
+      "ref": "A",
+      "alt": "G",
+      "star": "intron 25 G",
+      "note": {
+        "en": "the G allele tags a short KIV-2 repeat number and a high Lp(a); Lp(a) is measured once in a lifetime, and this position says whether a high value is the inherited kind (Clarke 2009 NEJM)",
+        "ru": "аллель G метит малое число повторов KIV-2 и высокий Lp(a); Lp(a) измеряют раз в жизни, эта позиция говорит, наследственного ли типа высокое значение (Clarke 2009 NEJM)"
+      },
+      "pos_grch37": 161010118
+    },
+    "rs3798220": {
+      "gene": "LPA",
+      "chrom": "6",
+      "pos": 160540105,
+      "ref": "T",
+      "alt": "C",
+      "star": "p.Ile1891Met (known as I4399M)",
+      "note": {
+        "en": "the C allele (Met) marks a high Lp(a); with rs10455872 the two explain most of the inherited Lp(a) variation in Europeans (Clarke 2009 NEJM)",
+        "ru": "аллель C (Met) метит высокий Lp(a); вместе с rs10455872 объясняет большую часть наследственной вариации Lp(a) у европейцев (Clarke 2009 NEJM)"
+      },
+      "pos_grch37": 160961137
+    },
+    "rs7903146": {
+      "gene": "TCF7L2",
+      "chrom": "10",
+      "pos": 112998590,
+      "ref": "C",
+      "alt": "T",
+      "star": "intron 3 T",
+      "note": {
+        "en": "the strongest common risk allele for type 2 diabetes: OR about 1.4 per T allele (Grant 2006 Nat Genet); a reason to screen earlier, not a diagnosis",
+        "ru": "самый сильный частый аллель риска СД2: OR около 1,4 на аллель T (Grant 2006 Nat Genet); повод для более раннего скрининга, не диагноз"
+      },
+      "pos_grch37": 114758349
+    },
+    "rs12208357": {
+      "gene": "SLC22A1",
+      "chrom": "6",
+      "pos": 160122116,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Arg61Cys",
+      "note": {
+        "en": "reduced-function OCT1 allele; the metformin association is inconsistent and CPIC issues no guideline — asked about, nothing decided",
+        "ru": "аллель OCT1 со сниженной функцией; связь с метформином противоречива, CPIC руководства не даёт — о нём спрашивают, ничего не решается"
+      },
+      "pos_grch37": 160543148
+    },
+    "rs34130495": {
+      "gene": "SLC22A1",
+      "chrom": "6",
+      "pos": 160139792,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Gly401Ser",
+      "note": {
+        "en": "reduced-function OCT1 allele; as rs12208357 — no guideline, nothing decided",
+        "ru": "аллель OCT1 со сниженной функцией; как rs12208357 — руководства нет, ничего не решается"
+      },
+      "pos_grch37": 160560824
+    },
+    "rs1260326": {
+      "gene": "GCKR",
+      "chrom": "2",
+      "pos": 27508073,
+      "ref": "T",
+      "alt": "C",
+      "star": "p.Leu446Pro (the reference T is Leu)",
+      "note": {
+        "en": "the reference T is Leu446: it LOWERS fasting glucose and fasting insulin and RAISES triglycerides — the known opposite pull of GCKR (Orho-Melander 2008; the direction confirmed 13.09.2026 in the GWAS Catalog and in Ensembl's phenotype annotations across many cohorts, BMI-adjusted included). The alternate C is Pro446. An earlier draft of this note had the glucose direction reversed",
+        "ru": "референсный T — это Leu446: он СНИЖАЕТ глюкозу и инсулин натощак и ПОВЫШАЕТ триглицериды — известное разнонаправленное действие GCKR (Orho-Melander 2008; направление подтверждено 13.09.2026 по GWAS Catalog и аннотациям фенотипов Ensembl на многих когортах, включая поправку на ИМТ). Альтернативный C — Pro446. В черновике этой пометки направление по глюкозе было перевёрнуто"
+      },
+      "pos_grch37": 27730940
+    },
+    "rs1801282": {
+      "gene": "PPARG",
+      "chrom": "3",
+      "pos": 12351626,
+      "ref": "C",
+      "alt": "G",
+      "star": "p.Pro12Ala",
+      "note": {
+        "en": "Ala12 (G) lowers type 2 diabetes risk modestly; an association, no rule follows",
+        "ru": "Ala12 (G) немного снижает риск СД2; ассоциация, правила не следует"
+      },
+      "pos_grch37": 12393125
+    },
+    "rs4349859": {
+      "gene": "HLA-B",
+      "chrom": "6",
+      "pos": 31398010,
+      "ref": "G",
+      "alt": "A",
+      "star": "HLA-B*27 tag (MICA region)",
+      "note": {
+        "en": "a tag, not the allele: A marks HLA-B*27 in Europeans with high but imperfect concordance (Evans 2011); HLA typing settles it",
+        "ru": "тег, не сам аллель: A метит HLA-B*27 у европейцев с высокой, но неполной согласованностью (Evans 2011); HLA-типирование решает"
+      },
+      "pos_grch37": 31365787
+    },
+    "rs1205": {
+      "gene": "CRP",
+      "chrom": "1",
+      "pos": 159712443,
+      "ref": "C",
+      "alt": "T",
+      "star": "3' UTR C>T",
+      "note": {
+        "en": "a variant of the CRP gene associated with the baseline CRP level; which allele lowers it was NOT confirmed by a second source when this entry was written (the GWAS Catalog and Ensembl carry the association without the allele), so no direction is claimed and nothing is decided by it",
+        "ru": "вариант гена CRP, связанный с базовым уровнем СРБ; какой аллель его снижает, вторым источником при записи НЕ подтверждено (GWAS Catalog и Ensembl несут ассоциацию без аллеля), поэтому направление не утверждается и ничего не решается"
+      },
+      "pos_grch37": 159682233
+    },
+    "rs2228145": {
+      "gene": "IL6R",
+      "chrom": "1",
+      "pos": 154454494,
+      "ref": "A",
+      "alt": "C",
+      "star": "p.Asp358Ala",
+      "note": {
+        "en": "Ala358 (C) sheds more soluble IL-6 receptor and lowers CRP; an association, no rule follows",
+        "ru": "Ala358 (C) даёт больше растворимого рецептора IL-6 и ниже СРБ; ассоциация, правила не следует"
+      },
+      "pos_grch37": 154426970
+    },
+    "rs2235544": {
+      "gene": "DIO1",
+      "chrom": "1",
+      "pos": 53909897,
+      "ref": "C",
+      "alt": "A",
+      "star": "c.-5C>A",
+      "note": {
+        "en": "named on the clinician's thyroid panel of 12.09.2026; the A allele shifts the free T3/free T4 ratio (Panicker 2008); the phrase is the clinician's to write",
+        "ru": "названа в панели врача по щитовидной железе от 12.09.2026; аллель A сдвигает отношение Т3св/Т4св (Panicker 2008); фраза — за врачом"
+      },
+      "pos_grch37": 54375570
+    },
+    "rs2294512": {
+      "gene": "DIO1",
+      "chrom": "1",
+      "pos": 53904633,
+      "ref": "G",
+      "alt": "A",
+      "star": "intron",
+      "note": {
+        "en": "named on the clinician's thyroid panel of 12.09.2026; no measured effect on its own — waits for the clinician's phrase",
+        "ru": "названа в панели врача от 12.09.2026; собственного измеренного эффекта нет — ждёт фразы врача"
+      },
+      "pos_grch37": 54370306
+    },
+    "rs4926616": {
+      "gene": "DIO1",
+      "chrom": "1",
+      "pos": 53904057,
+      "ref": "T",
+      "alt": "C",
+      "star": "intron",
+      "note": {
+        "en": "named on the clinician's thyroid panel of 12.09.2026; waits for the clinician's phrase",
+        "ru": "названа в панели врача от 12.09.2026; ждёт фразы врача"
+      },
+      "pos_grch37": 54369730
+    },
+    "rs754694815": {
+      "gene": "DIO1",
+      "chrom": "1",
+      "pos": 53894492,
+      "ref": "C",
+      "alt": "A",
+      "star": "p.Asn94Lys",
+      "note": {
+        "en": "rare, named on the clinician's thyroid panel; ClinVar holds no classification for it — printed as named, not as a finding",
+        "ru": "редкая, названа в панели врача; классификации в ClinVar нет — печатается как названная, не как находка"
+      },
+      "pos_grch37": 54360165
+    },
+    "rs201420507": {
+      "gene": "DIO1",
+      "chrom": "1",
+      "pos": 53906216,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Met201Ile",
+      "note": {
+        "en": "rare, named on the clinician's thyroid panel; no classification — printed as named",
+        "ru": "редкая, названа в панели врача; классификации нет — печатается как названная"
+      },
+      "pos_grch37": 54371889
+    },
+    "rs119461976": {
+      "gene": "SECISBP2",
+      "chrom": "9",
+      "pos": 89348095,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Arg540Gln",
+      "note": {
+        "en": "SECISBP2 deficiency (abnormal thyroid hormone metabolism: high T4, low T3, high rT3), autosomal recessive — one copy is carriership (GenCC Strong)",
+        "ru": "дефицит SECISBP2 (аномалия метаболизма тиреоидных гормонов: высокий Т4, низкий Т3, высокий rT3), аутосомно-рецессивно — одна копия это носительство (GenCC Strong)"
+      },
+      "pos_grch37": 91963010
+    },
+    "rs119461977": {
+      "gene": "SECISBP2",
+      "chrom": "9",
+      "pos": 89341356,
+      "ref": "A",
+      "alt": "T",
+      "star": "p.Lys438Ter",
+      "note": {
+        "en": "SECISBP2 deficiency, a stop; autosomal recessive — one copy is carriership",
+        "ru": "дефицит SECISBP2, стоп-кодон; аутосомно-рецессивно — одна копия это носительство"
+      },
+      "pos_grch37": 91956271
+    },
+    "rs730880269": {
+      "gene": "SECISBP2",
+      "chrom": "9",
+      "pos": 89338609,
+      "ref": "G",
+      "alt": "A",
+      "star": "intron/splice",
+      "note": {
+        "en": "SECISBP2 deficiency, named on the clinician's panel; autosomal recessive",
+        "ru": "дефицит SECISBP2, названа в панели врача; аутосомно-рецессивно"
+      },
+      "pos_grch37": 91953524
+    },
+    "rs777447200": {
+      "gene": "SECISBP2",
+      "chrom": "9",
+      "pos": 89325602,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Arg120Ter",
+      "note": {
+        "en": "SECISBP2 deficiency, a stop; autosomal recessive — one copy is carriership",
+        "ru": "дефицит SECISBP2, стоп-кодон; аутосомно-рецессивно — одна копия это носительство"
+      },
+      "pos_grch37": 91940517
+    },
+    "rs200450537": {
+      "gene": "SECISBP2",
+      "chrom": "9",
+      "pos": 89358038,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Arg770Ter",
+      "note": {
+        "en": "SECISBP2 deficiency, a stop; autosomal recessive — one copy is carriership",
+        "ru": "дефицит SECISBP2, стоп-кодон; аутосомно-рецессивно — одна копия это носительство"
+      },
+      "pos_grch37": 91972953
+    },
+    "rs121908876": {
+      "gene": "TSHR",
+      "chrom": "14",
+      "pos": 81143572,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Ser505Asn",
+      "note": {
+        "en": "an activating TSHR variant: familial non-autoimmune hyperthyroidism, autosomal dominant (GenCC Definitive for TSHR)",
+        "ru": "активирующий вариант TSHR: семейный неаутоиммунный гипертиреоз, аутосомно-доминантно (GenCC Definitive для TSHR)"
+      },
+      "pos_grch37": 81609916
+    },
+    "rs189261858": {
+      "gene": "TSHR",
+      "chrom": "14",
+      "pos": 81143407,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Arg450His",
+      "note": {
+        "en": "a loss-of-function TSHR variant: TSH resistance / congenital hypothyroidism, recessive in effect — one copy is carriership",
+        "ru": "вариант TSHR с потерей функции: резистентность к ТТГ / врождённый гипотиреоз, по эффекту рецессивен — одна копия это носительство"
+      },
+      "pos_grch37": 81609751
+    },
+    "rs179247": {
+      "gene": "TSHR",
+      "chrom": "14",
+      "pos": 80966202,
+      "ref": "A",
+      "alt": "G",
+      "star": "intron 1",
+      "note": {
+        "en": "the A allele (the reference) is associated with Graves' disease (Brand 2009); an association only — nothing is decided by it",
+        "ru": "аллель A (референсный) ассоциирован с болезнью Грейвса (Brand 2009); только ассоциация — ничего не решается"
+      },
+      "pos_grch37": 81432546
+    },
+    "rs732609": {
+      "gene": "TPO",
+      "chrom": "2",
+      "pos": 1496155,
+      "ref": "A",
+      "alt": "C",
+      "star": "p.Thr725Pro",
+      "note": {
+        "en": "a common TPO polymorphism, benign in ClinVar; named on the clinician's panel — printed with that note",
+        "ru": "частый полиморфизм TPO, доброкачественный по ClinVar; назван в панели врача — печатается с этой пометкой"
+      },
+      "pos_grch37": 1499927
+    },
+    "rs2076740": {
+      "gene": "TG",
+      "chrom": "8",
+      "pos": 132971813,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Arg1999Trp",
+      "note": {
+        "en": "a common TG polymorphism; named on the clinician's panel, no classification — printed as named",
+        "ru": "частый полиморфизм TG; назван в панели врача, классификации нет — печатается как названный"
+      },
+      "pos_grch37": 133984058
+    },
+    "rs2069550": {
+      "gene": "TG",
+      "chrom": "8",
+      "pos": 132888141,
+      "ref": "T",
+      "alt": "C",
+      "star": "p.Pro778= (synonymous)",
+      "note": {
+        "en": "synonymous TG polymorphism named on the clinician's panel; nothing follows",
+        "ru": "синонимичный полиморфизм TG из панели врача; ничего не следует"
+      },
+      "pos_grch37": 133900386
+    },
+    "rs180223": {
+      "gene": "TG",
+      "chrom": "8",
+      "pos": 132888007,
+      "ref": "T",
+      "alt": "G",
+      "star": "p.Ser734Ala",
+      "note": {
+        "en": "a common TG polymorphism; named on the clinician's panel",
+        "ru": "частый полиморфизм TG; назван в панели врача"
+      },
+      "pos_grch37": 133900252
+    },
+    "rs853326": {
+      "gene": "TG",
+      "chrom": "8",
+      "pos": 132897729,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Met1028Val",
+      "note": {
+        "en": "a common TG polymorphism; named on the clinician's panel",
+        "ru": "частый полиморфизм TG; назван в панели врача"
+      },
+      "pos_grch37": 133909974
+    },
+    "rs151261408": {
+      "gene": "DUOX2",
+      "chrom": "15",
+      "pos": 45110685,
+      "ref": "G",
+      "alt": "C",
+      "star": "p.Pro303Arg",
+      "note": {
+        "en": "named on the clinician's panel; its ClinVar status is not settled — printed as waiting, never as a finding",
+        "ru": "названа в панели врача; статус в ClinVar не установлен — печатается как ожидающая, не как находка"
+      },
+      "pos_grch37": 45402883
+    },
+    "rs1799941": {
+      "gene": "SHBG",
+      "chrom": "17",
+      "pos": 7630105,
+      "ref": "G",
+      "alt": "A",
+      "star": "5' region G>A",
+      "note": {
+        "en": "the A allele raises SHBG and with it total testosterone (Ohlsson 2011) — a total testosterone is read against SHBG, not alone",
+        "ru": "аллель A повышает SHBG и с ним общий тестостерон (Ohlsson 2011) — общий тестостерон читается вместе с SHBG, а не сам по себе"
+      },
+      "pos_grch37": 7533423
+    },
+    "rs6258": {
+      "gene": "SHBG",
+      "chrom": "17",
+      "pos": 7631360,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Pro185Leu (known as P156L)",
+      "note": {
+        "en": "Leu156 (T) lowers SHBG and total testosterone (Ohlsson 2011); free testosterone is the figure to look at",
+        "ru": "Leu156 (T) снижает SHBG и общий тестостерон (Ohlsson 2011); смотреть свободный тестостерон"
+      },
+      "pos_grch37": 7534678
+    },
+    "rs17107315": {
+      "gene": "SPINK1",
+      "chrom": "5",
+      "pos": 147828115,
+      "ref": "T",
+      "alt": "C",
+      "star": "p.Asn34Ser",
+      "note": {
+        "en": "N34S: chronic pancreatitis risk, strongly raised in homozygotes (Witt 2000 Nat Genet); the gene is on the minus strand, so the genomic T>C",
+        "ru": "N34S: риск хронического панкреатита, резко выше у гомозигот (Witt 2000 Nat Genet); ген на минус-цепи, геномное T>C"
+      },
+      "pos_grch37": 147207678
+    },
+    "rs111033565": {
+      "gene": "PRSS1",
+      "chrom": "7",
+      "pos": 142751938,
+      "ref": "G",
+      "alt": "A",
+      "star": "p.Arg122His",
+      "note": {
+        "en": "hereditary pancreatitis, autosomal dominant with high penetrance (GenCC Definitive); GRCh37 position not recorded — the two sources disagree in this misassembled region",
+        "ru": "наследственный панкреатит, аутосомно-доминантно с высокой пенетрантностью (GenCC Definitive); позиция GRCh37 не записана — два источника расходятся в этом плохо собранном регионе"
+      },
+      "pos_grch37": null
+    },
+    "rs738409": {
+      "gene": "PNPLA3",
+      "chrom": "22",
+      "pos": 43928847,
+      "ref": "C",
+      "alt": "G",
+      "star": "p.Ile148Met",
+      "note": {
+        "en": "148Met (G): fatty liver and its progression, risk several-fold in homozygotes (Romeo 2008 Nat Genet); the most useful single position for the liver panel",
+        "ru": "148Met (G): стеатоз и его прогрессирование, риск в разы у гомозигот (Romeo 2008 Nat Genet); самая полезная одиночная позиция печёночной панели"
+      },
+      "pos_grch37": 44324727
+    },
+    "rs58542926": {
+      "gene": "TM6SF2",
+      "chrom": "19",
+      "pos": 19268740,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Glu167Lys",
+      "note": {
+        "en": "167Lys (T): more liver fat, less circulating LDL (Kozlitina 2014) — the liver and the heart pull in opposite directions",
+        "ru": "167Lys (T): больше жира в печени, ниже ЛПНП в крови (Kozlitina 2014) — печень и сердце тянут в разные стороны"
+      },
+      "pos_grch37": 19379549
+    },
+    "rs641738": {
+      "gene": "MBOAT7",
+      "chrom": "19",
+      "pos": 54173068,
+      "ref": "T",
+      "alt": "C",
+      "star": "TMC4/MBOAT7 (T = risk, the reference)",
+      "note": {
+        "en": "the reference T allele is the one associated with fibrosis; alternate C; GRCh37 position not recorded — the two sources disagree",
+        "ru": "референсный аллель T ассоциирован с фиброзом; альтернативный C; позиция GRCh37 не записана — два источника расходятся"
+      },
+      "pos_grch37": null
+    },
+    "rs1801280": {
+      "gene": "NAT2",
+      "chrom": "8",
+      "pos": 18400344,
+      "ref": "T",
+      "alt": "C",
+      "star": "*5 (c.341T>C)",
+      "note": {
+        "en": "a slow-acetylator allele; with *6 and *7 defines the NAT2 phenotype — isoniazid hepatotoxicity, no CPIC guideline",
+        "ru": "аллель медленного ацетилирования; вместе с *6 и *7 задаёт фенотип NAT2 — гепатотоксичность изониазида, руководства CPIC нет"
+      },
+      "pos_grch37": 18257854
+    },
+    "rs1799930": {
+      "gene": "NAT2",
+      "chrom": "8",
+      "pos": 18400593,
+      "ref": "G",
+      "alt": "A",
+      "star": "*6 (c.590G>A)",
+      "note": {
+        "en": "a slow-acetylator allele",
+        "ru": "аллель медленного ацетилирования"
+      },
+      "pos_grch37": 18258103
+    },
+    "rs1799931": {
+      "gene": "NAT2",
+      "chrom": "8",
+      "pos": 18400860,
+      "ref": "G",
+      "alt": "A",
+      "star": "*7 (c.857G>A)",
+      "note": {
+        "en": "a slow-acetylator allele",
+        "ru": "аллель медленного ацетилирования"
+      },
+      "pos_grch37": 18258370
+    },
+    "rs2282679": {
+      "gene": "GC",
+      "chrom": "4",
+      "pos": 71742666,
+      "ref": "T",
+      "alt": "G",
+      "star": "intron (vitamin D binding protein)",
+      "note": {
+        "en": "the G allele lowers 25-OH vitamin D (Wang 2010 Lancet) — a low value may be partly inherited, and the dose is set by the control measurement",
+        "ru": "аллель G снижает 25-OH витамин D (Wang 2010 Lancet) — низкое значение может быть отчасти наследственным, дозу задаёт контрольное измерение"
+      },
+      "pos_grch37": 72608383
+    },
+    "rs10741657": {
+      "gene": "CYP2R1",
+      "chrom": "11",
+      "pos": 14893332,
+      "ref": "A",
+      "alt": "G",
+      "star": "5' region",
+      "note": {
+        "en": "the G allele lowers 25-OH vitamin D through weaker 25-hydroxylation (Wang 2010 Lancet)",
+        "ru": "аллель G снижает 25-OH витамин D через более слабое 25-гидроксилирование (Wang 2010 Lancet)"
+      },
+      "pos_grch37": 14914878
+    },
+    "rs12785878": {
+      "gene": "DHCR7",
+      "chrom": "11",
+      "pos": 71456403,
+      "ref": "G",
+      "alt": "T",
+      "star": "NADSYN1/DHCR7 region",
+      "note": {
+        "en": "the reference G is the lower-vitamin-D allele; the alternate T raises 25-OH vitamin D (Wang 2010 Lancet; the direction confirmed 13.09.2026 in the GWAS Catalog and Ensembl — T increase). An earlier draft of this note named T as the lowering allele",
+        "ru": "референсный G — аллель более низкого витамина D; альтернативный T повышает 25-OH витамин D (Wang 2010 Lancet; направление подтверждено 13.09.2026 по GWAS Catalog и Ensembl — T повышает). В черновике этой пометки понижающим был назван T"
+      },
+      "pos_grch37": 71167449
+    },
+    "rs855791": {
+      "gene": "TMPRSS6",
+      "chrom": "22",
+      "pos": 37066896,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Val727Ala (known as A736V; the reference A is Val)",
+      "note": {
+        "en": "the reference A allele is 736Val: lower iron and haemoglobin, a tendency to iron deficiency (Benyamin 2009); the alternate G is 736Ala",
+        "ru": "референсный аллель A — это 736Val: ниже железо и гемоглобин, склонность к дефициту железа (Benyamin 2009); альтернативный G — 736Ala"
+      },
+      "pos_grch37": 37462936
+    },
+    "rs174546": {
+      "gene": "FADS1",
+      "chrom": "11",
+      "pos": 61802358,
+      "ref": "C",
+      "alt": "T",
+      "star": "3' UTR C>T",
+      "note": {
+        "en": "the T allele converts less ALA into EPA and DHA (Lemaitre 2011): a lower omega-3 index unless EPA/DHA themselves are taken",
+        "ru": "аллель T слабее превращает АЛК в ЭПК и ДГК (Lemaitre 2011): ниже омега-3 индекс, если не принимать сами ЭПК/ДГК"
+      },
+      "pos_grch37": 61569830
+    },
+    "rs174537": {
+      "gene": "FADS1",
+      "chrom": "11",
+      "pos": 61785208,
+      "ref": "G",
+      "alt": "T",
+      "star": "FADS1/MYRF region G>T",
+      "note": {
+        "en": "the T allele marks the low-conversion FADS haplotype (Lemaitre 2011)",
+        "ru": "аллель T метит гаплотип FADS с низкой конверсией (Lemaitre 2011)"
+      },
+      "pos_grch37": 61552680
+    },
+    "rs16890979": {
+      "gene": "SLC2A9",
+      "chrom": "4",
+      "pos": 9920543,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Val282Ile (known as V253I)",
+      "note": {
+        "en": "253Ile (T) lowers serum urate (Vitart 2008) — the strongest common urate locus",
+        "ru": "253Ile (T) снижает урат в сыворотке (Vitart 2008) — самый сильный частый локус урата"
+      },
+      "pos_grch37": 9922167
+    },
+    "rs9263726": {
+      "gene": "HLA-B",
+      "chrom": "6",
+      "pos": 31138722,
+      "ref": "G",
+      "alt": "A",
+      "star": "HLA-B*58:01 tag (PSORS1C1 region)",
+      "note": {
+        "en": "a tag, not the allele: A marks HLA-B*58:01 (allopurinol hypersensitivity, CPIC 2015); HLA typing settles it before allopurinol",
+        "ru": "тег, не сам аллель: A метит HLA-B*58:01 (гиперчувствительность к аллопуринолу, CPIC 2015); HLA-типирование решает до аллопуринола"
+      },
+      "pos_grch37": 31106499
+    },
+    "rs12917707": {
+      "gene": "UMOD",
+      "chrom": "16",
+      "pos": 20356368,
+      "ref": "G",
+      "alt": "T",
+      "star": "5' region G>T",
+      "note": {
+        "en": "the T allele is protective against chronic kidney disease (Köttgen 2009); an association",
+        "ru": "аллель T защищает от ХБП (Köttgen 2009); ассоциация"
+      },
+      "pos_grch37": 20367690
+    },
+    "rs73885319": {
+      "gene": "APOL1",
+      "chrom": "22",
+      "pos": 36265860,
+      "ref": "A",
+      "alt": "G",
+      "star": "G1 (p.Ser342Gly)",
+      "note": {
+        "en": "APOL1 G1; two risk alleles (G1/G1, G1/G2, G2/G2) raise the risk of FSGS and kidney failure several-fold, almost only in people of West-African ancestry (Genovese 2010 Science); G2 is a deletion and is not in this catalogue",
+        "ru": "APOL1 G1; два аллеля риска (G1/G1, G1/G2, G2/G2) повышают риск ФСГС и почечной недостаточности в разы, почти только у людей западноафриканского происхождения (Genovese 2010 Science); G2 — делеция, в каталоге её нет"
+      },
+      "pos_grch37": 36661906
+    },
+    "rs60910145": {
+      "gene": "APOL1",
+      "chrom": "22",
+      "pos": 36265988,
+      "ref": "T",
+      "alt": "G",
+      "star": "G1 (p.Ile384Met)",
+      "note": {
+        "en": "the second position of APOL1 G1, in linkage with rs73885319",
+        "ru": "вторая позиция APOL1 G1, в сцеплении с rs73885319"
+      },
+      "pos_grch37": 36662034
+    },
+    "rs1801253": {
+      "gene": "ADRB1",
+      "chrom": "10",
+      "pos": 114045297,
+      "ref": "G",
+      "alt": "C",
+      "star": "p.Gly389Arg",
+      "note": {
+        "en": "the alternate C is Arg389 — the more active beta-1 receptor and the common allele; the reference G is Gly389. A larger blood-pressure and heart-rate response to beta-blockers is reported for Arg389 homozygotes, and no guideline changes the choice or the dose by it (CPIC and DPWG have none). Checked 13.09.2026 against Ensembl VEP (p.Gly389Arg for the C allele) after an earlier draft named the alleles the other way round",
+        "ru": "альтернативный C — это Arg389, более активный бета-1 рецептор и частый аллель; референсный G — Gly389. Для гомозигот Arg389 описан больший ответ давления и пульса на бета-блокаторы, ни одно руководство по этому не меняет выбор или дозу (у CPIC и DPWG их нет). Проверено 13.09.2026 по Ensembl VEP (p.Gly389Arg для аллеля C) после того, как черновик назвал аллели наоборот"
+      },
+      "pos_grch37": 115805056
     }
   }
 }

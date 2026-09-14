@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "PORTABLE n-of-1 protocol templates: ready designs for self-experiments with the feasibility already computed. There are no personal data; the owner's own experiments live in profile/experiments.json.",
     "how_to_use": "python3 src/ingest/nof1.py register --id <your_id> --hypothesis ... --metric ... --blocks ... --phase-days ... — take the parameters from the template. Registration BEFORE the collection of data begins.",
     "design_rule": "Significance is limited by the number of BLOCKS, not by the number of days: when the labels of n blocks (equally split between A and B) are permuted, the minimum achievable one-sided p equals 1/C(n, n/2). Hence: 4 blocks → 0.167 (significance is impossible), 6 → 0.050, 8 → 0.014, 10 → 0.004. Lengthening the phases is pointless — what has to grow is the NUMBER of blocks.",

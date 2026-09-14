@@ -301,6 +301,54 @@ def gene_verdict(gene: str) -> Dict[str, Any]:
             "source": "cpic_drug_gene.json"}
 
 
+#: Every state `gene_coverage` may return. The engine turns each of them into a
+#: reason a row gives for not being read (`coverage_<state>`), and every one of
+#: those needs a sentence in both languages: two of them — `gene_not_in_table`
+#: and `low` — were added after the sentences were written, so 1120 rows of the
+#: owner's own radar said «coverage_gene_not_in_table» in place of a reason
+#: (13.09.2026). The test enumerates this tuple against the catalogues, and
+#: checks the tuple itself against the states the function assigns.
+#: Below this ratio of sex-chromosome depth to autosomal depth the file is read
+#: as carrying one copy of them. Halfway between the two expectations (1.0 and
+#: 0.5) rather than at either: a ratio of 0.75 cannot be produced by a diploid
+#: sample with ordinary noise, nor by a hemizygous one.
+HALF_DEPTH_BELOW = 0.75
+
+COVERAGE_STATES = ("fine", "low", "not_measured", "gene_not_in_table", "unavailable")
+
+
+#: The chromosomes a person may carry in one copy. chrM is not among them: the
+#: mitochondrion comes at hundreds of times the nuclear depth and needs no
+#: allowance.
+SEX_CHROMOSOMES = ("chrX", "chrY", "X", "Y")
+
+
+def _on_the_same_kind(row: Dict[str, Any], single: bool) -> bool:
+    """Rows the reference point is taken over: like compared with like."""
+    on_sex = str(row.get("chrom") or "") in SEX_CHROMOSOMES
+    return on_sex if single else not on_sex
+
+
+def _single_copy(rows: Dict[str, Any]) -> bool:
+    """Does this person carry the sex chromosomes in ONE copy? — measured, not assumed.
+
+    Nothing here asks for a sex, and nothing reads one from a profile: the table
+    itself says it. If the genes of the X were read to about half the depth of
+    the autosomes, there is one copy of them in this file; if to the same depth,
+    two. A profile with no autosomal rows to compare against answers «no», which
+    leaves the stricter of the two thresholds in force.
+    """
+    def med(on_sex: bool):
+        vals = sorted(float(r.get("mean_depth") or 0) for r in rows.values()
+                      if (str(r.get("chrom") or "") in SEX_CHROMOSOMES) is on_sex
+                      and float(r.get("mean_depth") or 0) > 0)
+        return vals[len(vals) // 2] if vals else None
+    sex, autosomal = med(True), med(False)
+    if not sex or not autosomal:
+        return False
+    return sex / autosomal < HALF_DEPTH_BELOW
+
+
 def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
     """How well this one gene was read — four states, and only one is silent.
 
@@ -333,15 +381,27 @@ def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
         out["state"] = "gene_not_in_table"
         out["table_size"] = len(rows)
         return out
+    single = _single_copy(rows) if str(row.get("chrom") or "") in SEX_CHROMOSOMES else False
+    # A locus present in ONE copy is read to half the depth of a diploid one by
+    # construction, and the fraction of its bases at 20× collapses: on a 26×
+    # genome the chrX median fell to 9 % against 80 % on the autosomes, and every
+    # gene of the X read as «too thin to decide» — 62 of 108 such rows on the
+    # owner's radar (13.09.2026). It is the false alarm the coverage script was
+    # taught to avoid in August and the engine, written later, was not. What
+    # changes is the threshold, not the tolerance: a hemizygous call needs 10×
+    # where a heterozygous one needs 20×, and the reference point is the median
+    # of the same kind of locus.
+    field = "pct_10x" if single else "pct_20x"
     try:
-        pct = float(row.get("pct_20x"))
+        pct = float(row.get(field))
     except (TypeError, ValueError):
         out["state"] = "not_measured"
         return out
-    vals = sorted(float(r["pct_20x"]) for r in rows.values()
-                  if str(r.get("pct_20x") or "").replace(".", "", 1).isdigit())
+    vals = sorted(float(r[field]) for r in rows.values()
+                  if _on_the_same_kind(r, single)
+                  and str(r.get(field) or "").replace(".", "", 1).isdigit())
     median = vals[len(vals) // 2] if vals else None
-    out.update({"pct_20x": pct, "median_pct_20x": median,
+    out.update({field: pct, "median_" + field: median, "copies": 1 if single else 2,
                 "mean_depth": row.get("mean_depth")})
     if pct < POORLY_READ_BELOW or (median is not None
                                    and median - pct >= BELOW_MEDIAN_POINTS):

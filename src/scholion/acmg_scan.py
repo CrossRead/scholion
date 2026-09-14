@@ -51,7 +51,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 
 from . import core
 from .i18n import plural as _plural
@@ -69,6 +69,8 @@ CLINVAR_URL = {
     "GRCh37": "https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/clinvar.vcf.gz",
 }
 
+#: How many data lines of the personal VCF pass between two progress reports.
+PROGRESS_EVERY = 100000
 OUT_NAME = "acmg_sf_hits.tsv"
 #: The table's provenance, beside it. A JSON sidecar rather than `#` lines in the
 #: table, because the reader of the table takes its first line as the header and
@@ -316,7 +318,8 @@ def _refuse_sample(genome, personal: str) -> Dict[str, Any]:
 
 
 def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
-         out_dir: Optional[str] = None) -> Dict[str, Any]:
+         out_dir: Optional[str] = None,
+         progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
     """Run the screen and write the table. Every refusal names what closes it."""
     from . import genome
     personal = personal_vcf or (str(genome.vcf_path()) if genome.vcf_path() else None)
@@ -379,11 +382,17 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
     rows: List[Dict[str, Any]] = []
     scanned = 0
     no_calls = 0
-    with gzip.open(personal, "rt", encoding="utf-8", errors="replace") as fh:
+    total_bytes = os.path.getsize(personal)
+    with open(personal, "rb") as raw, \
+            gzip.open(raw, "rt", encoding="utf-8", errors="replace") as fh:
         for line in fh:
             if line[0] == "#":
                 continue
             scanned += 1
+            if progress is not None and scanned % PROGRESS_EVERY == 0:
+                # Compressed bytes consumed: the one measure of «how far» a
+                # stream offers without reading it twice.
+                progress(raw.tell(), total_bytes, line.split("\t", 1)[0])
             f = line.rstrip("\r\n").split("\t")
             if len(f) < 10 + col:
                 continue

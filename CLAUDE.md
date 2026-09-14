@@ -207,7 +207,11 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   resolved form, so a test comparing that against a bare `tempfile.mkdtemp()`
   passes on Linux and fails on macOS. Resolve the temporary root in `setUp`.
   A macOS-only failure of this shape reproduces on Linux: point `TMPDIR` at a
-  symlink and run again.
+  symlink and run again. **Do that BEFORE handing over any change to how a path
+  is stored or compared** — a cloud run alone cannot see this class, and on
+  14.09.2026 one did not: the manifest moved to resolved keys, 991 tests were
+  green in the container, and the owner's first native run found a test that
+  compared the two spellings of one temporary folder.
 - **pico.css is the base style layer for every HTML surface.** Vendored
   locally — `web/pico.min.css`, no CDN, no build step, served by `server.py`
   the same way as `chart.min.js` — so the interface keeps working with no

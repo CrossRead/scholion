@@ -38,6 +38,10 @@ PARITY: Dict[str, str] = {
     "GET /api/genome": "genome",
     "GET /api/genome-status": "genome-status",
     "GET /api/genome-updates": "genome-updates",
+    "GET /api/version": "version",
+    "GET /api/version/check": "version",
+    "GET /api/recompute": "recompute",
+    "GET /api/recompute/status": "recompute",
     "GET /api/second-opinion": "second-opinion",
     "GET /api/radar": "radar",
     "GET /api/prescription-check": "prescription",
@@ -47,6 +51,8 @@ PARITY: Dict[str, str] = {
     "GET /api/metrics": "metrics",
     "GET /api/focus": "focus",
     "GET /api/lifestyle-brief": "brief",
+    "GET /api/brief-review": "brief-review",
+    "GET /api/panel": "panel",
     "GET /api/lifestyle": "lifestyle",
     "GET /api/clinvar": "clinvar",
     "GET /api/screen": "screen",
@@ -68,6 +74,9 @@ PARITY: Dict[str, str] = {
     # writing
     "POST /api/labs": "add-lab",
     "POST /api/targets": "target",
+    "POST /api/version/seen": "version",
+    "POST /api/recompute": "recompute",
+    "POST /api/recompute/stop": "recompute",
     "POST /api/targets/remove": "target",
     # The same command; `--write` is its flag. The map names commands, not
     # invocations — a route whose CLI twin needs an argument is still covered.
@@ -107,6 +116,11 @@ NO_CLI: Dict[str, str] = {
 
 # CLI commands that have no route and should not have one: this is not a gap in the web.
 CLI_ONLY: Dict[str, str] = {
+    "coverage": "as `genotype-sites`: the page runs it inside the recompute panel, beside the "
+                "other steps, and a button of its own would be a second door onto one long job",
+    "genotype-sites": "the page runs this step inside the recompute panel, where its progress is "
+                      "shown beside the other steps; a button of its own would be a second door "
+                      "onto one job, and two doors onto one long job are how it gets started twice",
     "provenance": "the reverse audit — every profile point traced back to a printed form or "
                   "a correct derivation — runs for minutes over the laboratory folder and "
                   "answers a maintainer's question. The web's source badges read "
@@ -170,8 +184,8 @@ CLI_ONLY: Dict[str, str] = {
                    "a page reachable from a browser must not be able to read an arbitrary file "
                    "by name — that is a file picker's job, and the picker is the next step, not "
                    "this command",
-    "add-med": "manual entry of a drug; in the web it is a form on the «Prescriptions» tab",
-    "remove-med": "withdrawing a drug; in the web it is a button on the «Prescriptions» tab",
+    "add-med": "manual entry of a drug; in the web it is a form on the «Medicines» tab",
+    "remove-med": "withdrawing a drug; in the web it is a button on the «Medicines» tab",
     "init": "the first run on an empty machine: it creates the profile's files. The web does "
             "not even start without a profile — this command can have no route",
     "demo": "unfolds a synthetic profile for demonstrations and tests; a maintenance "
@@ -281,6 +295,18 @@ PLUGIN: Dict[str, str] = {
 # a model that cannot see a capability does not know it is missing, and will
 # answer from what it has instead of saying it cannot.
 NO_PLUGIN: Dict[str, str] = {
+    "recompute": "rewrites profile files and replaces files in the genome folder, for minutes; a "
+                 "person starts it and watches it, and a tool call that times out would leave a "
+                 "model reporting on a job it can no longer see. The instruction names the command "
+                 "so an assistant can tell a person it exists",
+    "coverage": "runs samtools over an alignment of tens of gigabytes and replaces the coverage "
+                "table beside the profile; a person starts it, for the same reason as `recompute`",
+    "genotype-sites": "runs bcftools over an alignment of tens of gigabytes and replaces a file in "
+                      "the genome folder; a person starts it, for the same reason as `recompute`",
+    "version": "the build's own version, its age, and what an update asks of the data. A model "
+               "connected through the plugin is handed the tool list of the build it runs; "
+               "asking the registry is a request off the machine a person starts, and "
+               "recording that the update note was read is the person's to say",
     "acmg-scan": "writes the table the ACMG screen reads, out of the person's variant file "
                  "and a reference file they downloaded. Two reasons it is theirs to start and "
                  "not a model's: it needs a file fetched onto that machine first, and it runs "
@@ -323,6 +349,12 @@ NO_PLUGIN: Dict[str, str] = {
     # wording still holds against numbers that arrived after it. That sentence is
     # the person's, and a tool that let a model sign it would put the assistant's
     # own text beyond the one check there is on it.
+    "panel": "the catalogue's description of a panel — its sentences, sources and studies. A "
+             "model reads the same rows, each with its source, through `sch_system` in the "
+             "clinician's register; a second tool over the same file would be a second door",
+    "brief-review": "builds a request that a person hands to a model; a model in a tool session "
+                    "reads the same facts through `sch_brief` and `sch_analyze_labs` and needs no "
+                    "request addressed to itself",
     "brief-reviewed": "a write, and the statement it records is the person's own",
     "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
     "ingest-wearable": "a write",
@@ -513,6 +545,9 @@ WRITES = {
     # them reads. `lab-draw` writes the reason a day holds two draws; `marker`
     # files a proposal for a marker name (and a person's confirmation of one).
     "lab-draw", "marker",
+    # Task 183: both rebuild what the person's own documents and alignment
+    # already hold; neither decides a value.
+    "recompute", "genotype-sites", "coverage",
 }
 
 # Creates a value that came from nobody's document. None of these is a tool, and
@@ -563,7 +598,7 @@ DICTATED = {"focus-log", "target", "lab-draw", "marker"}
 # writes are the laboratory's, read off the form.
 TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearable",
                "import-labs", "import-fhir",
-               "redact"}
+               "redact", "recompute", "genotype-sites", "coverage"}
 
 
 def capabilities() -> Dict[str, Any]:

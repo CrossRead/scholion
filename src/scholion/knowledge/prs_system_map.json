@@ -1,14 +1,8 @@
 {
   "_meta": {
     "purpose": "Which body system of the radar each PINNED polygenic model bears on. Read by engine/system_panels.py to print a system's common variation AS SCORES on its card (task 178) — beside the monogenic list, never inside the verdict and never inside the 0–100 score. The trait names are the keys of prs_models.json; the system keys are the keys of radar_domains.json, and a test fails when either side names something the other file does not hold.",
-    "who_writes_this": "The project. Placing a trait on a system is a statement about which laboratory panel is the established screen for that trait — the lipid panel for coronary disease, HbA1c for type 2 diabetes — not a claim about a person. A trait belongs to ONE system: a score printed on two cards would be one number read twice.",
+    "who_writes_this": "The project. Placing a trait on a system is a statement about which laboratory panel is the established screen for that trait — HbA1c for type 2 diabetes, the lipid panel for LDL cholesterol — not a claim about a person. A trait belongs to ONE system: a score printed on two cards would be one number read twice. Since 13.09.2026 the cardiovascular OUTCOMES — coronary artery disease, myocardial infarction, peripheral arterial disease, abdominal aortic aneurysm, and the six that had no domain before — stand on «Heart and vessels», the system whose panel (lipoprotein(a), apolipoproteins, fibrinogen, D-dimer) screens for them; the lipid system keeps the lipid MEASUREMENTS.",
     "why_partial": {
-      "systolic blood pressure": "no radar domain for blood pressure: the radar measures laboratory panels and wearable metrics, and pressure is neither",
-      "hypertension": "no radar domain for blood pressure",
-      "venous thromboembolism": "no radar domain for coagulation",
-      "ischemic stroke": "no radar domain for the brain's vessels; only the atherosclerotic outcomes whose established screen IS the lipid panel were placed on lipids",
-      "atrial fibrillation": "no radar domain for the heart's rhythm",
-      "heart failure": "no radar domain for the heart as an organ",
       "chronic lymphocytic leukemia": "no radar domain for the blood and the lymphoid system",
       "non-Hodgkin lymphoma": "no radar domain for the blood and the lymphoid system",
       "basal cell carcinoma": "no radar domain for the skin",
@@ -47,11 +41,21 @@
         "LDL cholesterol",
         "total cholesterol",
         "triglyceride measurement",
-        "lipoprotein A",
+        "lipoprotein A"
+      ]
+    },
+    "cardio": {
+      "traits": [
         "coronary artery disease",
         "myocardial infarction",
         "peripheral arterial disease",
-        "abdominal aortic aneurysm"
+        "abdominal aortic aneurysm",
+        "atrial fibrillation",
+        "heart failure",
+        "hypertension",
+        "systolic blood pressure",
+        "ischemic stroke",
+        "venous thromboembolism"
       ]
     },
     "glucose": {

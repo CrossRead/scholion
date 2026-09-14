@@ -749,9 +749,11 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("carrier"):
         marks.append(_t("system.row.carrier"))
     if r.get("not_a_finding_why") == "kind":
-        marks.append(_t("system.row.not_finding_kind", kind=_t("decision.kind." + str(r.get("kind")))))
+        marks.append(_t("system.row.not_finding_kind", kind=_t("system.kind." + str(r.get("kind") or "unassigned"))))
     if r.get("pending"):
         marks.append(_t("system.row.pending"))
+    if r.get("signature") == "open":
+        marks.append(_t("system.row.signature_open"))
     if r.get("read") is False:
         marks.append(_t("system.row.unread", why=r.get("read_why_text") or r.get("read_why") or "—"))
     line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
@@ -769,6 +771,13 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
                              classification=a.get("classification") or "—",
                              moi=a.get("moi") or "—", submitter=a.get("submitter") or "—",
                              date=a.get("curated_on") or "—"))
+        if r.get("signature") == "clinician":
+            # The exception is marked on the row; the rule is counted in the
+            # summary, which both registers print. With every row signed by the
+            # same hand on the same day, a line under each said nothing the
+            # count does not — and buried the one row a clinician had signed.
+            detail.append(_t("system.row.signature_clinician",
+                             date=r.get("signed_on") or "—"))
         if r.get("source"):
             detail.append(_t("decision.source", source=r["source"]))
         line += "".join("\n   _" + d + "_" for d in detail)
@@ -864,10 +873,18 @@ def system_report(r: Dict[str, Any]) -> str:
                             source=base.get("source") or "—", version=base.get("version") or "—",
                             base_genes=base.get("genes") or 0,
                             positions=(gen.get("curated") or {}).get("positions") or 0,
-                            read=gen.get("read_count") or 0, unread=gen.get("unread_count") or 0,
+                            read_genes=gen.get("read_genes") or 0,
+                            read_positions=gen.get("read_positions") or 0,
                             findings=gen.get("finding_count") or 0,
                             carriers=gen.get("carrier_count") or 0,
                             pending=gen.get("pending_count") or 0))
+        if gen.get("signature_author_count"):
+            L.append("   " + _t("system.genetics.signature_author",
+                                n=gen["signature_author_count"],
+                                date=gen.get("signature_author_date") or "—"))
+        if gen.get("signature_open_count"):
+            L.append("   " + _t("system.genetics.signature_open",
+                                n=gen["signature_open_count"]))
         if gen.get("withheld_by_classification"):
             L.append("   " + _t("system.genetics.withheld", n=gen["withheld_by_classification"]))
         if gen.get("excluded"):
@@ -877,10 +894,18 @@ def system_report(r: Dict[str, Any]) -> str:
             by = refused.get("by_reason") or {}
             L.append("   " + _t("system.genetics.refused", n=refused["total"])
                      + ((" — " + ", ".join(f"{k}: {v}" for k, v in by.items())) if by else ""))
+        for u in gen.get("unreadable") or []:
+            L.append("   " + _t("system.genetics.unreadable", gene=u.get("gene"), reason=u.get("reason") or "—"))
         for row in gen.get("rows") or []:
             L.append("   " + _system_gene_row(row, reg).replace("\n", "\n   "))
+        n_assumed = sum(1 for row in gen.get("rows") or [] if row.get("read_why") == "assumed_ref")
+        if n_assumed:
+            L.append("   " + _t("system.genetics.assumed_ref_hint",
+                                positions=_plural(n_assumed, "count.positions")))
         if gen.get("rows_withheld_as_detail"):
             L.append("   _" + _t("system.row.patient_withheld", n=gen["rows_withheld_as_detail"]) + "_")
+        if gen.get("positions"):
+            L += ["   " + ln for ln in genotype_conclusion_lines(gen["positions"])]
     elif gen.get("status") == "not_composed":
         L.append("   " + _t("system.genetics.not_composed",
                             why=gen.get("why_empty") or _t("screen.why.no_panel")))
@@ -2801,7 +2826,16 @@ def sources_report(r: Dict[str, Any]) -> str:
             if s.get("cadence"):
                 L.append(f"  {_t('sources.cadence', text=s['cadence'])}")
             for f in s.get("files", []):
-                if f.get("local"):
+                why = f.get("why_answers")
+                if why == "bundled_newer":
+                    # A refresh exists and is older than the copy this build carries:
+                    # the bundled one answers, and the reader is told why their
+                    # import is not the one in use.
+                    mark = _t("sources.line_bundled_newer", local=f.get("local_stamp") or "—",
+                              bundled=f.get("bundled_stamp") or "—")
+                elif why == "unstamped":
+                    mark = _t("sources.line_local_undated")
+                elif f.get("local"):
                     mark = _t("sources.line_local", date=f.get("imported") or "—")
                 elif f.get("bundled_stamp"):
                     stamp = str(f["bundled_stamp"])
@@ -3059,3 +3093,352 @@ def prevalence_report(r: Dict[str, Any]) -> str:
         if row.get("notable"):
             L.append("  " + _t("prevalence.notable", pct=round(row["rate"] * 100, 1)))
     return "\n".join(L) + "\n"
+
+
+# ---- the update procedure (scholion version) ---------------------------------
+def version_report(r: Dict[str, Any]) -> str:
+    """The build, its age, and what the releases since the data's version ask for."""
+    b = r.get("build") or {}
+    L = ["**" + _t("version.title", version=r.get("installed") or "—") + "**"]
+    if b.get("released"):
+        L.append(_t("version.released", released=b["released"],
+                    ago=_plural(int(b.get("days") or 0), "count.days")))
+    if r.get("last_used"):
+        L.append(_t("version.last_used", version=r["last_used"]))
+    else:
+        L.append(_t("version.not_recorded"))
+    pend = r.get("pending") or []
+    if r.get("since") and (r.get("changed") or r.get("explicit_since")):
+        if pend:
+            L += ["", _t("version.since_head", since=r["since"],
+                         entries=_plural(len(pend), "count.entries"))]
+            for e in pend:
+                L.append(f"  **v{e['version']}** ({e['date']})")
+                for a in e.get("actions") or []:
+                    lead = (_t("version.by_hand", condition=a["condition"]) if a.get("manual")
+                            else _t("version.run", commands=", ".join(f"`{c}`" for c in a["commands"]),
+                                    condition=a["condition"]))
+                    L.append("   · " + lead)
+                    if a.get("text"):
+                        L.append("     " + a["text"].replace("\n", "\n     "))
+        else:
+            L += ["", _t("version.nothing_since", since=r["since"])]
+        if r.get("changed"):
+            L += ["", _t("version.seen_hint")]
+    wb = r.get("written_before") or {}
+    if wb.get("files"):
+        L += ["", _t("version.written_before_head")]
+        from . import updates as _upd
+        for f in wb["files"]:
+            cmds = sorted({c for a in f["asks"] for c in a["commands"]})
+            rel = sorted({a["version"] for a in f["asks"]}, key=_upd.version_tuple)
+            L.append("   · " + _t("version.written_before_row", file=f["file"], engine=f["engine"],
+                                  commands=", ".join(f"`{c}`" for c in cmds),
+                                  releases=", ".join(rel)))
+    if wb.get("unstamped"):
+        L.append(_t("version.unstamped", files=", ".join(wb["unstamped"])))
+    L += ["", _t("version.how_to_update")]
+    return "\n".join(L)
+
+
+def version_seen_report(r: Dict[str, Any]) -> str:
+    if not r.get("ok"):
+        return "✗ " + _t("version.seen_no_profile")
+    return "✓ " + _t("version.seen_done", version=r.get("recorded") or "—")
+
+
+def version_check_report(r: Dict[str, Any]) -> str:
+    st = r.get("status")
+    if st == "offline":
+        return _t("version.check_offline")
+    if st == "unreachable":
+        return _t("version.check_unreachable", installed=r.get("installed") or "—")
+    if st == "newer":
+        return _t("version.check_newer", installed=r.get("installed") or "—",
+                  latest=r.get("latest") or "—")
+    return _t("version.check_current", installed=r.get("installed") or "—")
+
+
+def skill_install_report(r: Dict[str, Any]) -> str:
+    if not r.get("ok"):
+        return "✗ " + _t("skill.install.failed", path=r.get("path") or "—")
+    key = {"installed": "skill.install.installed", "replaced": "skill.install.replaced",
+           "unchanged": "skill.install.unchanged"}[r.get("action") or "installed"]
+    return "✓ " + _t(key, path=r.get("path") or "—", version=r.get("version") or "—",
+                     previous=r.get("previous") or "—")
+
+
+def skill_copies_lines(copies: Any) -> str:
+    """One line per copy of the skill entry that does not match this build."""
+    lines = []
+    for c in copies or []:
+        icon = "🔴 " if c.get("severity") == "error" else "⚠️ "
+        if c.get("status") == "older":
+            lines.append(icon + _t("selfcheck.skill_copy_older", path=c["path"], version=c.get("version") or "—"))
+        elif c.get("status") == "unmarked":
+            lines.append(icon + _t("selfcheck.skill_copy_unmarked", path=c["path"]))
+    return ("\n" + "\n".join(lines)) if lines else ""
+
+
+# ---------------------------------------------------------------- recompute (task 183)
+_RC_ICON = {"ready": "▶", "needs_input": "⚠️", "not_applicable": "·", "already_current": "✓",
+            "not_run_here": "↪", "by_hand": "✋"}
+_RC_JOB_ICON = {"waiting": "…", "running": "▶", "done": "✓", "failed": "✗", "stopped": "■"}
+
+
+def _clock(seconds: Any) -> str:
+    s = int(round(float(seconds or 0)))
+    h, rest = divmod(s, 3600)
+    m, s = divmod(rest, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
+def recompute_why(step: Dict[str, Any]) -> str:
+    why = step.get("why")
+    if not why:
+        return ""
+    d = step.get("detail") or {}
+    positions = d.get("positions")
+    return _t("recompute.why." + str(why), file=d.get("file") or "—", engine=d.get("engine") or "—",
+              domain=d.get("domain") or "—",
+              positions=_plural(int(positions), "count.positions") if isinstance(positions, int) else "—")
+
+
+def _recompute_step_line(s: Dict[str, Any]) -> str:
+    if s.get("kind") == "by_hand":
+        head = _t("recompute.step.by_hand", condition="; ".join(s.get("conditions") or []))
+    else:
+        head = f"`{s.get('command')}`"
+    versions = ", ".join("v" + v for v in s.get("versions") or [])
+    src = _t("recompute.from_releases", versions=versions) if versions else _t("recompute.from_data")
+    why = recompute_why(s)
+    line = (f"{_RC_ICON.get(s.get('state'), '·')} {head} — {_t('recompute.state.' + str(s.get('state')))}"
+            + (f": {why}" if why else "") + f" ({src})")
+    if s.get("text") and s.get("state") in ("by_hand", "not_run_here"):
+        line += "\n     " + s["text"].replace("\n", "\n     ")
+    return line
+
+
+def recompute_plan_report(r: Dict[str, Any]) -> str:
+    L = ["**" + _t("recompute.title") + "**"]
+    if r.get("since"):
+        L.append(_t("recompute.since", since=r["since"], installed=r.get("installed") or "—"))
+    else:
+        L.append(_t("recompute.since_unknown", installed=r.get("installed") or "—"))
+    steps = r.get("steps") or []
+    if not steps:
+        L += ["", _t("recompute.nothing")]
+        return "\n".join(L)
+    L.append("")
+    L += [_recompute_step_line(s) for s in steps]
+    job = r.get("job") or {}
+    if job.get("status") == "running":
+        L += ["", _t("recompute.running_now")]
+    elif r.get("ready"):
+        L += ["", _t("recompute.hint_run", steps=_plural(int(r["ready"]), "count.steps"))]
+    else:
+        L += ["", _t("recompute.hint_nothing_ready")]
+    return "\n".join(L)
+
+
+def recompute_progress_line(job: Dict[str, Any], i: int) -> str:
+    steps = job.get("steps") or []
+    s = steps[i] if 0 <= i < len(steps) else {}
+    parts = [_t("recompute.progress.step", i=i + 1, n=len(steps), command=s.get("command") or "—")]
+    total = s.get("total")
+    if total:
+        done = int(s.get("done") or 0)
+        parts.append(_t("recompute.progress.percent", pct=min(100, round(100 * done / total)))
+                     if total > 1000 else _t("recompute.progress.items", done=done, total=total))
+    if s.get("item"):
+        parts.append(str(s["item"]))
+    if s.get("elapsed") is not None:
+        parts.append(_t("recompute.progress.elapsed", time=_clock(s["elapsed"])))
+    if s.get("left") is not None:
+        parts.append(_t("recompute.progress.left", time=_clock(s["left"])))
+    parts.append(_t("recompute.job_step." + str(s.get("state") or "waiting")))
+    return " · ".join(parts)
+
+
+def recompute_status_report(job: Dict[str, Any]) -> str:
+    st = job.get("status") or "none"
+    if st == "none":
+        return _t("recompute.status.none")
+    L = ["**" + _t("recompute.status." + st, started=job.get("started") or "—",
+                   finished=job.get("finished") or "—") + "**"]
+    for i, s in enumerate(job.get("steps") or []):
+        L.append(f"{_RC_JOB_ICON.get(s.get('state'), '·')} " + recompute_progress_line(job, i))
+        summary = s.get("summary") or {}
+        err = summary.get("error") or summary.get("message") or summary.get("reason")
+        if s.get("state") == "failed" and err:
+            L.append("     " + str(err))
+    if job.get("backup"):
+        L.append(_t("recompute.backup", path=job["backup"]))
+    if job.get("recorded"):
+        L.append(_t("recompute.recorded", version=job["recorded"]))
+    elif job.get("not_recorded") == "since_unknown":
+        L.append(_t("recompute.not_recorded_since_unknown"))
+    elif st == "finished" and (job.get("by_hand") or job.get("needs_input")):
+        L.append(_t("recompute.remaining", by_hand=_plural(int(job.get("by_hand") or 0), "count.steps"),
+                    needs_input=_plural(int(job.get("needs_input") or 0), "count.steps")))
+    return "\n".join(L)
+
+
+def recompute_run_report(r: Dict[str, Any]) -> str:
+    if r.get("started"):
+        return recompute_status_report(r.get("job") or {})
+    reason = r.get("reason")
+    if reason == "busy":
+        return _t("recompute.busy")
+    head = _t("recompute.not_confirmed") if reason == "not_confirmed" else _t("recompute.nothing_ready")
+    return head + ("\n\n" + recompute_plan_report(r["plan"]) if r.get("plan") else "")
+
+
+def recompute_stop_report(r: Dict[str, Any]) -> str:
+    return _t("recompute.stop_requested") if r.get("ok") else _t("recompute.stop_not_running")
+
+
+def coverage_report(r: Dict[str, Any]) -> str:
+    """What the coverage measurement did, or why it did nothing."""
+    st = r.get("status")
+    if st == "written":
+        line = _t("coverage.done", genes=_plural(int(r.get("genes") or 0), "count.genes"),
+                  seconds=r.get("seconds") if r.get("seconds") is not None else "—",
+                  path=r.get("path") or "—")
+        if r.get("without_clinvar"):
+            line += "\n" + "_" + _t("coverage.without_clinvar", n=r["without_clinvar"]) + "_"
+        return line
+    if st == "stopped":
+        return _t("coverage.stopped", measured=r.get("measured") or 0, genes=r.get("genes") or 0)
+    if st == "failed":
+        return _t("coverage.failed", error=(r.get("error") or "").strip() or "—")
+    return "✗ " + recompute_why({"why": r.get("reason") or "no_bam", "detail": {}})
+
+
+def genotype_sites_report(r: Dict[str, Any]) -> str:
+    st = r.get("status")
+    if st == "written":
+        return _t("sites.done", positions=_plural(int(r.get("positions") or 0), "count.positions"),
+                  assembly=r.get("assembly") or "—",
+                  chromosomes=_plural(int(r.get("chromosomes") or 0), "count.chromosomes"),
+                  seconds=r.get("seconds") if r.get("seconds") is not None else "—",
+                  path=r.get("path") or "—")
+    if st == "failed":
+        return _t("sites.failed", step=r.get("step") or "—", rc=r.get("rc") if r.get("rc") is not None else "—",
+                  error=(r.get("error") or "").strip() or "—")
+    if st == "stopped":
+        return _t("sites.stopped")
+    return "✗ " + recompute_why({"why": r.get("reason") or "no_vcf", "detail": {}})
+
+
+def brief_review_report(r: Dict[str, Any]) -> str:
+    """What arrived since each brief block was read, and the request for the assistant."""
+    if not r.get("ok"):
+        return "✗ " + (r.get("message") or "")
+    blocks = r.get("blocks") or []
+    if not blocks:
+        return _t("brief.review.nothing")
+    from .engine.brief_review import _change_line
+    L: List[str] = []
+    for b in blocks:
+        L += ["**" + _t("brief.review.title", title=b.get("title") or "—", block=b.get("id") or "—") + "**",
+              _t("brief.review.reviewed", reviewed=b.get("reviewed") or "—", newest=b.get("newest_data") or "—")]
+        changed = [c for c in b.get("markers") or [] if c.get("after")]
+        L += ["  · " + _change_line(c) for c in changed] or ["  " + _t("brief.review.no_changes")]
+        if b.get("review_hint"):
+            L.append("  " + b["review_hint"])
+        L += ["", _t("brief.review.request_h"), b.get("request") or "", ""]
+    return "\n".join(L).rstrip()
+
+
+def genotype_conclusion_lines(positions: List[Dict[str, Any]]) -> List[str]:
+    """The genotype of a system as one conclusion — assembled from the panel's
+    own sentences, never phrased here: which named alleles were found and what
+    the panel says of each, which were not carried, which were not read."""
+    # A position with no reading at all — no genome, a build nobody could tell —
+    # is not read, whatever its state says; «none found» over such a panel
+    # would claim a check that never happened.
+    found = [p for p in positions if p.get("read") is True and p.get("state") in ("het", "hom")]
+    absent = [p for p in positions if p.get("read") is True and p.get("state") == "absent"]
+    unread = [p for p in positions if p.get("read") is not True]
+    name = lambda p: f"{p.get('gene')} {p.get('rsid') or ''}".strip()
+    L = ["**" + _t("system.panel.conclusion_h") + "**"]
+    if found:
+        L.append(_t("system.panel.conclusion_found", found=len(found),
+                    positions=_plural(len(positions), "count.positions"),
+                    genes=", ".join(name(p) for p in found)))
+        L += ["  · " + (p.get("text") or name(p)) for p in found]
+    elif len(unread) < len(positions):
+        L.append(_t("system.panel.conclusion_none_found",
+                    positions=_plural(len(positions) - len(unread), "count.positions")))
+    if absent:
+        L.append(_t("system.panel.conclusion_absent", genes=", ".join(name(p) for p in absent)))
+    if unread:
+        L.append(_t("system.panel.conclusion_unread",
+                    positions=_plural(len(unread), "count.positions"),
+                    genes=", ".join(name(p) for p in unread)))
+    # The genotype against the measurements, in the same words as the page: a
+    # found position that names a marker is a question (printed among the
+    # questions); none found says so; the alleles not carried say what did not apply.
+    L.append("**" + _t("system.panel.compare_h") + "**")
+    if not any(p.get("expect") for p in found):
+        L.append(_t("system.panel.compare_none"))
+    na: Dict[str, List[str]] = {}
+    for p in absent:
+        if p.get("expect"):
+            na.setdefault(p["expect"].get("name") or p["expect"].get("marker") or "—", []).append(name(p))
+    L += [_t("system.panel.compare_absent", name=k, positions=", ".join(v)) for k, v in sorted(na.items())]
+    return L
+
+
+def panel_report(r: Dict[str, Any]) -> str:
+    """The panel as the catalogue describes it — for a clinician, with the references."""
+    if r.get("status") == "unknown_system":
+        return "✗ " + _t("system.unknown", key=r.get("key"), systems=", ".join(r.get("systems") or []))
+    if "systems" in r and "positions" not in r:
+        L = ["**" + _t("panel.list_h") + "**"]
+        for s_ in r["systems"]:
+            L.append("· " + _t("panel.list_row", label=s_.get("label"), key=s_.get("key"),
+                               positions=_plural(int(s_.get("positions") or 0), "count.positions"),
+                               unreadable=s_.get("unreadable") or 0))
+        return "\n".join(L)
+    c = r.get("counts") or {}
+    L = ["**" + _t("panel.title", label=r.get("label") or r.get("key")) + "**",
+         _t("panel.counts", positions=_plural(int(c.get("positions") or 0), "count.positions"),
+            genes=_plural(int(c.get("genes") or 0), "count.genes"), with_study=c.get("with_study") or 0,
+            with_expectation=c.get("with_expectation") or 0, signed=c.get("signed_by_clinician") or 0),
+         _t("panel.source", updated=r.get("catalogue_updated") or "—")]
+    for g in r.get("genes") or []:
+        L += ["", "**" + str(g.get("gene")) + "**"]
+        for p in g.get("positions") or []:
+            head = f"· **{p.get('rsid') or '—'}**"
+            if p.get("protein"):
+                head += f" {p['protein']}"
+            head += " — " + _t("system.kind." + str(p.get("kind") or "unassigned")) + \
+                    "; " + _t("system.mode." + str(p.get("mode") or "unknown"))
+            L.append(head)
+            L.append("  " + _t("panel.locus", hgvs=p.get("hgvs") or "—", allele=p.get("risk_allele") or "—"))
+            for state in ("het", "hom"):
+                if (p.get("text") or {}).get(state):
+                    L.append("  " + _t("panel.state." + state) + ": " + p["text"][state])
+            if p.get("classification"):
+                L.append("  " + _t("panel.classification", classification=p["classification"],
+                                   moi=p.get("moi") or "—", disease=p.get("disease") or "—"))
+            if p.get("expect"):
+                e = p["expect"]
+                L.append("  " + _t("panel.expect", marker=e.get("marker") or "—",
+                                   direction=e.get("direction") or "—", note=e.get("note") or "—"))
+            if p.get("effect_size"):
+                L.append("  " + _t("panel.effect", effect=p["effect_size"]))
+            L.append("  " + _t("panel.source_row", source=p.get("source") or "—",
+                               study=p.get("study") or "—"))
+            L.append("  " + _t("panel.signed." + str(p.get("signature") or "open"),
+                               by=p.get("signed_by") or "—", on=p.get("signed_on") or "—",
+                               curated=p.get("curated_on") or "—"))
+    for u in r.get("unreadable") or []:
+        L += ["", "**" + str(u.get("gene")) + "** — " + _t("panel.unreadable", reason=u.get("reason") or "—",
+                                                            source=u.get("source") or "—")]
+    if r.get("disclaimer"):
+        L += ["", "_" + str(r["disclaimer"]) + "_"]
+    return "\n".join(L)
+

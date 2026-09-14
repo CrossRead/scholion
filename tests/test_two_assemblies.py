@@ -54,6 +54,12 @@ class TestTheCatalogueCarriesTwoBuilds(unittest.TestCase):
         self.assertLessEqual(cov["GRCh37"], cov["total"])
         self.assertGreater(cov["GRCh37"], 0)
 
+    def meta(self):
+        """The catalogue's own `_meta`, where a decision about a locus lives."""
+        import json as _json
+        from scholion import core as _core
+        return _json.loads(_core.knowledge_path("loci.json").read_text(encoding="utf-8"))["_meta"]
+
     def test_every_locus_answers_in_both_builds(self):
         """Task 83. Seven of eight corpus genomes were GRCh37 and got nothing.
 
@@ -62,8 +68,18 @@ class TestTheCatalogueCarriesTwoBuilds(unittest.TestCase):
         `src/tools/fill_grch37.py` from a machine with a network — never to type
         the number.
         """
-        missing = sorted(rs for rs, l in self.loci.items() if not l.get("pos_grch37"))
+        unresolved = self.meta().get("grch37_unresolved") or {}
+        missing = sorted(rs for rs, l in self.loci.items()
+                         if not l.get("pos_grch37") and rs not in unresolved)
         self.assertEqual(missing, [], "run src/tools/fill_grch37.py --apply for these")
+        # An exception is an exception only while it is named WITH its reason,
+        # and only while it is real: a locus listed here that does carry a
+        # second coordinate is a note that outlived its decision.
+        for rs, why in unresolved.items():
+            with self.subTest(rs=rs):
+                self.assertIn(rs, self.loci, f"{rs} is named unresolved and is not in the catalogue")
+                self.assertIsNone(self.loci[rs].get("pos_grch37"))
+                self.assertIn("GRCh37", why)
 
     def test_every_second_coordinate_is_a_plausible_position(self):
         for rs, l in self.loci.items():

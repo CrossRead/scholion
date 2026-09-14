@@ -22,7 +22,7 @@ import re
 import unittest
 
 import support  # noqa: F401  — puts src/ on the import path
-from scholion import genome
+from scholion import core, genome
 
 COMPLEMENT = {"A": "T", "T": "A", "C": "G", "G": "C"}
 _CDNA = re.compile(r"\b\d+([ACGT])>([ACGT])\b")
@@ -71,9 +71,23 @@ class TestBothBuildsAreRealCoordinates(unittest.TestCase):
     the silent way to lose that."""
 
     def test_every_locus_carries_both(self):
+        """A locus answers in both builds — unless the catalogue's own `_meta`
+        names it as unresolved, which it does for the two whose GRCh37 position
+        Ensembl and dbSNP give differently (13.09.2026). The exception lives
+        beside the data, not in this file, so one list serves every reader."""
+        import json as _json
+        doc = _json.loads(core.knowledge_path("loci.json").read_text(encoding="utf-8"))
+        unresolved = doc["_meta"].get("grch37_unresolved") or {}
         for rs, loc in catalogue().items():
             with self.subTest(rs=rs):
                 self.assertIsInstance(loc.get("pos"), int)
+                if rs in unresolved:
+                    self.assertIsNone(loc.get("pos_grch37"))
+                    note = loc.get("note")
+                    note = note.get("en", "") if isinstance(note, dict) else str(note or "")
+                    self.assertIn("GRCh37", note,
+                                  "an unresolved GRCh37 position says so in its own note too")
+                    continue
                 self.assertIsInstance(loc.get("pos_grch37"), int)
 
     def test_the_two_builds_do_not_share_a_number(self):

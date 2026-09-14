@@ -153,13 +153,20 @@ class TestTheFormatFactsFromTheRealExport(_Array):
 
 
 class TestStrandAmbiguousLociAreNamed(_Array):
-    """Six catalogue loci have alleles that are their own complement. If a
+    """Eleven catalogue loci have alleles that are their own complement. If a
     provider reported the minus strand the call would still land inside
     {ref, alt} — indistinguishable from a correct one — and DPYD and TPMT, the
-    chemotherapy dosing genes, are among them."""
+    chemotherapy dosing genes, are among them.
+
+    Five joined on 13.09.2026 with the radar-segment panels (PNPLA3 and PPARG
+    C/G, ADRB1 and DUOX2 C/G, SECISBP2 A/T). The list is COMPUTED from the
+    catalogue and only compared here: a new A/T or C/G locus has to appear in
+    this set the day it is entered, which is the point of naming it.
+    """
 
     EXPECTED = {"rs67376798", "rs75017182", "rs1800462",
-                "rs1799945", "rs17580", "rs12934922"}
+                "rs1799945", "rs17580", "rs12934922",
+                "rs738409", "rs1801282", "rs1801253", "rs151261408", "rs119461977"}
 
     def test_they_are_computed_from_the_catalogue_not_hardcoded(self):
         self._use("23andme.txt")

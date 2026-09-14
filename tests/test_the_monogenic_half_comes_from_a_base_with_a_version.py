@@ -23,9 +23,11 @@ What is held here, on a synthetic export that never touches the network:
   refreshed, and the freshness check reads those dates;
 * `SCHOLION_OFFLINE=1` stops the tool before a socket is opened, and `--list`
   downloads nothing;
-* the filter file is keyed by the radar's own eleven domains, only the thyroid
-  entry is composed, and every other entry says why it is empty rather than
-  looking like a system nobody asked about.
+* the filter file is keyed by the radar's own laboratory domains (eleven until
+  13.09.2026, twelve since «Heart and vessels» was added), and every entry is
+  composed from a named source — until 13.09.2026 only the thyroid was, and
+  every other entry said why it was empty rather than looking like a system
+  nobody asked about.
 """
 from __future__ import annotations
 
@@ -100,11 +102,12 @@ SYNTHETIC = "\n".join([
 
 
 def _radar_keys() -> list:
-    """The radar domains that carry a genetic half — the eleven laboratory
-    systems. `knowledge/radar_domains.json` names a twelfth, fitness, built
-    from wearables and flagged `genetic_half: false`; a gene↔disease filter for
-    it would be a filter for nothing, so it is not a key here. The engine's
-    constant is the fallback for a tree where the file has not landed yet."""
+    """The radar domains that carry a genetic half — the laboratory systems
+    (eleven until 13.09.2026, twelve since). `knowledge/radar_domains.json`
+    names one more, fitness, built from wearables and flagged
+    `genetic_half: false`; a gene↔disease filter for it would be a filter for
+    nothing, so it is not a key here. The engine's constant is the fallback
+    for a tree where the file has not landed yet."""
     p = KNOWLEDGE / "radar_domains.json"
     if p.exists():
         doms = (json.loads(p.read_text(encoding="utf-8")).get("domains") or [])
@@ -145,7 +148,7 @@ class _Tmp(unittest.TestCase):
 
 class TestTheFilterComposesFromTheBase(_Tmp):
 
-    def test_the_thyroid_filter_keeps_its_genes_and_drops_the_heart(self):
+    def test_the_thyroid_filter_keeps_its_genes_and_the_heart_gene_lands_on_the_heart(self):
         doc = self._compose()
         # Every laboratory system has a filter since 13.09.2026, so the systems
         # that appear are the ones the synthetic rows matched — and none of them
@@ -153,7 +156,14 @@ class TestTheFilterComposesFromTheBase(_Tmp):
         self.assertIn("thyroid", doc["systems"])
         for key, block in doc["systems"].items():
             self.assertGreater(block["gene_count"], 0, f"{key}: a system with zero genes was written")
-            self.assertNotIn("GENEC", block["genes"], f"{key}: the heart gene matched a filter")
+        # The synthetic «heart gene» (dilated cardiomyopathy) matched no filter
+        # while the radar had no heart; since «Heart and vessels» was added
+        # later on 13.09.2026 it lands there — and only there.
+        self.assertIn("cardio", doc["systems"])
+        self.assertEqual(["GENEC"], sorted(doc["systems"]["cardio"]["genes"]))
+        for key, block in doc["systems"].items():
+            if key != "cardio":
+                self.assertNotIn("GENEC", block["genes"], f"{key}: the heart gene matched a filter")
         genes = doc["systems"]["thyroid"]["genes"]
         self.assertEqual(sorted(genes), ["GENEA", "GENEB"])
         self.assertNotIn("GENEC", genes)
@@ -335,21 +345,26 @@ class TestTheFilterFileIsKeyedByTheRadar(unittest.TestCase):
         cls.keys = _radar_keys()
 
     def test_every_system_is_a_radar_domain_and_every_domain_is_present(self):
-        self.assertEqual(len(self.keys), 11)
+        # Eleven until 13.09.2026; twelve since «Heart and vessels» (cardio) was
+        # added to the radar by the owner's decision of that day (task 179).
+        self.assertEqual(len(self.keys), 12)
+        self.assertIn("cardio", self.keys)
         self.assertEqual(sorted(self.filt["systems"]), sorted(self.keys))
 
     def test_every_laboratory_system_is_composed_from_a_named_source(self):
         """Since 13.09.2026 (owner's decision, task 178) every system carries a
         filter: terms, an `exclude` list, and a source that names the report the
-        terms were tuned in. The thyroid keeps its report-173 terms; the other
-        ten point at report 178. No system says `why_empty` any more — an empty
-        half with a reason was the state of the day before."""
+        terms were tuned in. The thyroid keeps its report-173 terms; ten point
+        at report 178; «Heart and vessels», added later the same day, points at
+        report 179. No system says `why_empty` any more — an empty half with a
+        reason was the state of the day before."""
+        report = {"thyroid": "173", "cardio": "179"}
         for key, spec in self.filt["systems"].items():
             with self.subTest(system=key):
                 self.assertTrue(spec["terms"], "a system with no terms is a system nobody composed")
                 self.assertTrue(spec["source"])
                 self.assertIn("PanelApp", spec["source"])
-                self.assertIn("173" if key == "thyroid" else "178", spec["source"])
+                self.assertIn(report.get(key, "178"), spec["source"])
                 self.assertIsInstance(spec.get("exclude", []), list)
                 self.assertFalse(spec.get("why_empty"), "a composed system carries no why_empty")
         thy = self.filt["systems"]["thyroid"]

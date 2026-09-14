@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "source": "LongevityMap (HAGR) — genomics.senescence.info/longevity",
     "license": "HAGR free for all purposes (genomics.senescence.info/legal.html)",
     "purpose": "A SHARED PUBLIC catalogue of variants associated with longevity (rsID → gene/population/association/PMID). It contains nobody's genotypes. It is applied to a personal VCF by rsID, like loci.json.",

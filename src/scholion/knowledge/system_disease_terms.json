@@ -2,10 +2,10 @@
   "_meta": {
     "purpose": "A SHARED PUBLIC FILTER. Which diseases in GenCC belong to which system of the radar. `src/tools/fetch_gencc.py` reads it and writes `gencc_gene_disease.json`: a gene enters a system when any of its GenCC submissions names a disease that matches the system's filter. This file holds no genes — the genes come from the base, with their classification, mode of inheritance, submitter and date; this file only says what the base is asked for.",
     "who_writes_this": "Whoever composes a system's panel, and they name the source the terms were taken from: a PanelApp panel, a report, a clinical guideline. A system whose entry is empty has not been composed, and the tool leaves it out of the output rather than writing a system with zero genes — «no list» and «a list with no genes» are different states and must stay different on the screen. Since 13.09.2026, by the owner's decision, the BASE composition of every system is written here without waiting for a clinician's signature: a clinically established disease group is composed from the base and the primary analysis runs; what a clinician signs is the curated layer of positions and phrases in system_gene_panels.json, and the exclusions.",
-    "keys": "Top-level keys of `systems` are exactly the eleven radar domains that carry a genetic half — the entries of knowledge/radar_domains.json with `genetic_half: true`. The twelfth domain, fitness, is built from wearables and has no genetic half, so it is not a key here. A key that is not a radar domain is a system nothing on the screen can show.",
+    "keys": "Top-level keys of `systems` are exactly the radar domains that carry a genetic half — the entries of knowledge/radar_domains.json with `genetic_half: true`: eleven until 13.09.2026, twelve since «Heart and vessels» was added. The wearables domain, fitness, has no genetic half, so it is not a key here. A key that is not a radar domain is a system nothing on the screen can show.",
     "schema": "systems: { <radar key>: { terms: [substring, ...], exclude?: [substring, ...], mondo_ids: [MONDO:nnn or OMIM:nnn, ...], source: '<where the terms came from>' | null, why_empty?: {en, ru} } }",
     "matching": "Terms are matched as case-insensitive substrings against GenCC's harmonised disease title and the submitter's original title. `mondo_ids` are matched exactly against the disease curie — the way to catch a syndrome named after a person, which no substring over its name will find. A filter with terms must carry a `source`; the tool refuses one that does not. `exclude` are substrings that veto a row whichever term it matched — `cystinuria` sits inside `homocystinuria`, `gout` inside `Aicardi-Goutieres`, and no positive term separates them.",
-    "version": "2026-09-13.1",
+    "version": "2026-09-13.2",
     "updated": "2026-09-13",
     "source_tier": "curated_reference"
   },
@@ -34,6 +34,47 @@
       "mondo_ids": [],
       "source": "reports/178-system-panels-composition-13.09.2026.md (13.09.2026): composed on the owner's decision of 13.09.2026 without waiting for a clinician's signature — the disease groups of the Genomics England PanelApp panels «Familial hypercholesterolaemia» and «Lipodystrophy», with every term checked title by title against the GenCC export dated 2026-09-06 and the matches listed in the report; syndromic lipodystrophies with a progeroid name are left out by using the partial/generalized forms rather than the bare word",
       "exclude": []
+    },
+    "cardio": {
+      "terms": [
+        "cardiomyopathy",
+        "left ventricular noncompaction",
+        "long qt",
+        "short qt",
+        "brugada",
+        "arrhythmogenic",
+        "ventricular tachycardia",
+        "ventricular fibrillation",
+        "atrial fibrillation",
+        "sick sinus",
+        "heart block",
+        "conduction",
+        "wolff-parkinson-white",
+        "timothy syndrome",
+        "andersen-tawil",
+        "aortic aneurysm",
+        "marfan",
+        "loeys-dietz",
+        "ehlers-danlos syndrome, vascular",
+        "coronary artery",
+        "cerebral arteriopathy",
+        "thrombophilia",
+        "protein c deficiency",
+        "protein s deficiency",
+        "antithrombin",
+        "hypertension",
+        "liddle"
+      ],
+      "mondo_ids": [],
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md (13.09.2026): composed on the owner's decision of 13.09.2026, which added «Heart and vessels» to the radar, without waiting for a clinician's signature — the disease groups of the Genomics England PanelApp panels «Cardiomyopathies - including childhood onset», «Arrhythmogenic right ventricular cardiomyopathy», «Brugada syndrome and cardiac sodium channel disease», «Long QT syndrome», «Catecholaminergic polymorphic VT», «Thoracic aortic aneurysm or dissection» and «Thrombophilia with a likely monogenic cause», plus the monogenic forms of the two outcomes whose polygenic scores stand on this system (coronary artery disease; the cerebral arteriopathy of ischaemic stroke) and monogenic hypertension, with every term checked title by title against the GenCC export dated 2026-09-06. Decisions made by looking: the bare word «cardiomyopathy» covers the hypertrophic, dilated and restrictive titles, so those are not repeated; «ventricular tachycardia» covers the catecholaminergic polymorphic form; pulmonary arterial hypertension is vetoed — a disease of the lung's vessels, its genes belong to a lung domain the radar does not have — and so is portal hypertension, which is the liver's; «marfanoid» vetoes the X-linked intellectual-disability rows the word «marfan» pulled; «muscular dystrophy» vetoes the limb-girdle row that a submitter's title carried «cardiomyopathy» into; «nerve conduction» vetoes the one neuropathy row under «conduction»; «factor v» and «prothrombin» were dropped because their GenCC titles are bleeding disorders, while the thrombophilic alleles of F5 and F2 arrive through «thrombophilia»; pseudohypoaldosteronism stays with the adrenals",
+      "exclude": [
+        "pulmonary hypertension",
+        "pulmonary arterial hypertension",
+        "portal hypertension",
+        "marfanoid",
+        "muscular dystrophy",
+        "nerve conduction"
+      ]
     },
     "glucose": {
       "terms": [

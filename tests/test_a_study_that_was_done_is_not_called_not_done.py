@@ -181,6 +181,14 @@ class TestWalkingTheFolder(unittest.TestCase):
 
     TEXTS = {"u.pdf": ULTRASOUND, "c.pdf": CONSULTATION, "l.pdf": LAB_FORM}
 
+    def test_a_walk_reports_each_file_as_it_starts(self):
+        calls = []
+        with folder_of(self.TEXTS) as tmp:
+            res = ingest_studies.ingest(str(tmp / "reports"),
+                                        progress=lambda done, total, item=None: calls.append((done, total, item)))
+        self.assertTrue(res["ok"])
+        self.assertEqual([(0, 3, "c.pdf"), (1, 3, "l.pdf"), (2, 3, "u.pdf")], calls)
+
     def test_the_conclusions_land_in_the_profile_and_the_form_does_not(self):
         with folder_of(self.TEXTS) as tmp:
             res = ingest_studies.ingest(str(tmp / "reports"))

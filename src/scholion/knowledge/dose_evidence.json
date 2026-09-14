@@ -289,7 +289,7 @@
    },
    "verdict_rule": {
     "en": "Compare the current 25-OH-D with the target of 50–100 before assessing the dose.",
-    "ru": "Сравни текущий 25-OH-D с целью 50–100 перед оценкой дозы."
+    "ru": "Сравните текущий 25-OH-D с целью 50–100 перед оценкой дозы."
    }
   },
   "selenium": {
@@ -441,7 +441,7 @@
    },
    "verdict_rule": {
     "en": "Compare the omega-3 index with 8% and TG with the target before drawing a conclusion about the dose.",
-    "ru": "Сравни омега-3 индекс с 8% и ТГ с целью перед выводом о дозе."
+    "ru": "Сравните омега-3 индекс с 8% и ТГ с целью перед выводом о дозе."
    }
   },
   "atenolol": {
@@ -509,7 +509,7 @@
      },
      "low_dose_note": {
       "en": "the consequence: the nocturnal window of melatonin secretion (the peak is around 02:00–04:00) is covered entirely however it is taken — one cannot count on «for the evening only»",
-      "ru": "следствие: ночное окно секреции мелатонина (пик около 02:00–04:00) перекрыто целиком, как ни принимай — рассчитывать на «только на вечер» нельзя"
+      "ru": "следствие: ночное окно секреции мелатонина (пик около 02:00–04:00) перекрыто целиком, как ни принимайте — рассчитывать на «только на вечер» нельзя"
      },
      "compare_marker": [
       "DeepSleepMin"

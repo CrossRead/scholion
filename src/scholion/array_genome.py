@@ -130,7 +130,29 @@ _VENDOR_OF_FORMAT = {"23andme": "23andMe", "ancestrydna": "AncestryDNA",
                      "livingdna": "LivingDNA", "genome": "23andMe"}
 
 
+#: What `_sniff_vendor` decided about a file, keyed by the file's identity (path,
+#: size, modification time). The decision reads the content, and the genome
+#: folder is searched on every genome read: a folder of 28 files was opened
+#: 23 576 times — 80 832 archive probes — to draw the radar page once, which
+#: took a minute (14.09.2026). A file that changes gets a new key.
+_SNIFF_CACHE: Dict[Tuple[str, int, int], Optional[str]] = {}
+
+
 def _sniff_vendor(path: Path) -> Optional[str]:
+    """Which vendor wrote this file, remembered for as long as the file is unchanged."""
+    try:
+        st = Path(path).stat()
+    except OSError:
+        return _sniff_vendor_uncached(path)
+    key = (str(path), st.st_size, st.st_mtime_ns)
+    if key not in _SNIFF_CACHE:
+        if len(_SNIFF_CACHE) > 4096:
+            _SNIFF_CACHE.clear()
+        _SNIFF_CACHE[key] = _sniff_vendor_uncached(path)
+    return _SNIFF_CACHE[key]
+
+
+def _sniff_vendor_uncached(path: Path) -> Optional[str]:
     """Which vendor wrote this file — decided by CONTENT, never by its name.
 
     The decision is delegated to the vendored Genomi detector (task 74). Its

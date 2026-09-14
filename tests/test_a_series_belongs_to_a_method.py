@@ -186,6 +186,104 @@ class TestMagnesiumInBothShapesLandsInItsOwnSeries(unittest.TestCase):
                               if k in ("copper_total", "magnesium_total", "zinc_total")})
 
 
+
+class TestAFormRuleDoesNotHideInsideAnOrdinaryWord(unittest.TestCase):
+    """«Исполнитель: ООО "ДНКОМ"» stands in the header of every form this
+    laboratory prints, and for four markers it was a rule.
+
+    `form_exclude` held «исп» — meaning the elemental forms, «Ответ ИСП-МС» —
+    and a form rule is matched as a SUBSTRING over the form's text plus its file
+    name. So on every form of that laboratory the four biochemistry keys
+    excluded themselves, while the elemental twins do not answer to the printed
+    names («Кальций общий», «Магний», «Цинк»): three printed lines per form
+    reached no series at all, and nothing failed. Two draws of 2023 sit in the
+    owner's profile with their uric acid and phosphorus and without their
+    calcium, magnesium and zinc — found on 14.09.2026 by reading the forms.
+
+    The matcher is left as it is: a rule such as «макро- и микроэлемент» is a
+    prefix of what the form prints, so a word boundary would break eight
+    elemental keys to fix one. The rule is fixed instead, and the shape is held
+    by the hygiene check below.
+    """
+
+    #: the header of that laboratory, cut to what decides the outcome
+    DNKOM = ('Заказчик: Общество с ограниченной ответственностью «Медгород»\n'
+             'Исполнитель: ООО "ДНКОМ"\n'
+             'Биоматериал: Кровь (сыворотка);\n'
+             'Взятие биоматериала: 28.02.2023 08:37\n'
+             'Биохимический анализ крови\n')
+
+    THREE_LINES = ("Кальций общий 2,31 ммоль/л 2,20 - 2,65\n"
+                   "Магний 0,78 ммоль/л 0,73 - 1,06\n"
+                   "Цинк 11,1 мкмоль/л 10,7 - 18,4\n")
+
+    def parse(self, lines: str):
+        markers = core.lab_markers()["markers"]
+        _date, found = ingest_labs.parse_report(
+            self.DNKOM + lines, markers,
+            source="ПАЦИЕНТ - 3302192728 (Биохимический анализ крови).pdf")
+        return found
+
+    def test_the_three_printed_lines_reach_their_own_series(self):
+        found = self.parse(self.THREE_LINES)
+        self.assertEqual(2.31, found.get("calcium_total", {}).get("value"),
+                         "total calcium printed on the form reached no series")
+        self.assertEqual(0.78, found.get("magnesium_total", {}).get("value"))
+        self.assertEqual(11.1, found.get("zinc_total", {}).get("value"))
+
+    def test_the_elemental_twins_take_nothing_from_this_form(self):
+        found = self.parse(self.THREE_LINES)
+        self.assertEqual({}, {k: v["value"] for k, v in found.items()
+                              if k in ("calcium_blood", "magnesium_blood", "zinc")},
+                         "a biochemistry row was converted into the elemental series")
+
+    def test_an_elemental_form_of_the_same_laboratory_still_feeds_no_biochemistry_series(self):
+        """The rule it replaced has to keep doing its work: the two spellings of
+        that form are «Ответ ИСП-МС» in the file name and «ИСП-МС» in the body."""
+        markers = core.lab_markers()["markers"]
+        for source, body in (("ПАЦИЕНТ - 6140857643 (Ответ ИСП-МС).pdf", "Диагностика микроэлементозов\n"),
+                             ("probe.pdf", "Диагностика микроэлементозов (ИСП-МС)\n")):
+            with self.subTest(form=source):
+                _d, found = ingest_labs.parse_report(
+                    "Дата взятия биоматериала: 16.02.2019\n" + body +
+                    "Кальций общий 2,31 ммоль/л\nМагний 0,78 ммоль/л\nЦинк 11,1 мкмоль/л\n",
+                    markers, source=source)
+                self.assertEqual({}, {k: v["value"] for k, v in found.items()
+                                      if k in ("calcium_total", "magnesium_total", "zinc_total")})
+
+    def test_no_form_rule_can_hide_inside_an_ordinary_word(self):
+        """The shape of the defect, not its instance: a rule of three letters
+        matched a word no one was thinking about. A rule that carries a space or
+        a hyphen («ответ исп», «исп-мс», «гх-мс») cannot; neither can one long
+        enough that containment in a common word is not an accident. Seven is
+        where the rules of this dictionary actually stand: «скрытую» passes,
+        «биохимия» passes, «исп» does not.
+        """
+        #: a rule shorter than that, and without a separator, is accepted only by
+        #: name and with the reason it is safe.
+        accepted = {
+            "lcms": "the separator-less spelling of LC-MS/MS beside «lc-ms» and «lc-ms/ms»; "
+                    "four Latin letters in a corpus of Russian forms, and no word of either "
+                    "language a laboratory prints contains them",
+        }
+        offenders = []
+        for key, spec in core.lab_markers()["markers"].items():
+            for lang, lab in (spec.get("labels") or {}).items():
+                if not isinstance(lab, dict):
+                    continue
+                for field in ("form_require", "form_exclude"):
+                    for rule in lab.get(field) or []:
+                        if " " in rule or "-" in rule or len(rule) >= 7:
+                            continue
+                        if rule.lower() in accepted:
+                            continue
+                        offenders.append(f"{key}.{lang}.{field}: {rule!r}")
+        self.assertEqual(offenders, [],
+                         "a form rule this short is matched as a substring of the whole form and "
+                         "its file name, so it can fire on an ordinary word in the header — give "
+                         "it a space or a hyphen, or spell it out")
+
+
 class TestTypedInputObeysTheSameRule(unittest.TestCase):
     """The web form and the CLI convert through `core.convert_to_canonical`."""
 

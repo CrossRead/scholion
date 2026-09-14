@@ -1,5 +1,6 @@
 {
  "_meta": {
+  "updated": "2026-09-09",
   "purpose": "A PUBLIC reference for interpreting the metrics of wearable devices and smart scales: label/units/direction/target/group/why, plus how each supported export names its columns. Not personal. Used by the «Lifestyle» tab.",
   "note": "direction: higher_better — more is better; lower_better — less is better; null — neutral (the trend only). target_low/target_high — a benchmark. group: anthro (anthropometry/body composition), activity (activity), recovery (recovery/autonomic tone).",
   "source_tier": "curated_reference",

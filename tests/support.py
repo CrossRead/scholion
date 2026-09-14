@@ -186,6 +186,19 @@ ARGS_FOR = {
     # are covered on a temporary profile by
     # tests/test_a_target_the_clinician_set_stands_beside_the_corridor.py.
     "target": ["list"],
+    "version": [],
+    "brief-review": [],
+    "panel": ["lipids"],
+    # The plan only: without --yes nothing runs and nothing is written.
+    "recompute": [],
+    # Replaces a file in the genome folder and runs bcftools over an alignment;
+    # covered with a stand-in runner on a temporary folder by
+    # tests/test_the_catalogue_positions_are_genotyped_from_the_alignment.py.
+    # Both measure from an alignment of tens of gigabytes and replace a file
+    # beside the profile. The sweep may not start them; their own tests do,
+    # with the external program injected.
+    "coverage": None,
+    "genotype-sites": None,
     "flag-rate": [],
     "prescription": ["atorvastatin"],
     "genome": ["rs4149056"],

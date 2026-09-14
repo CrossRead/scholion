@@ -55,46 +55,44 @@ RASTER_MAX_B64 = 30_000  # base64 characters (~22 KB) — above the threshold it
 # image fails the audit: a text audit cannot look inside a JPEG, and a new screenshot
 # may hold real lab results and genotypes. Add a hash here only after viewing the image.
 APPROVED_RASTER_SHA256 = {
-    # Replaced wholesale on 24.08.2026, as every edition of this list has been:
-    # the presentation's screenshots were retaken on 0.4.6 and the old set no
-    # longer appears anywhere. A hash kept past its picture would let a page with
-    # last season's screens pass the audit standing next to the current one.
+    # Replaced wholesale on 14.09.2026 for 0.5.1, as every edition of this list has
+    # been: the interface was redesigned (six tabs, one grammar of a page) and the
+    # presentation's screenshots were retaken. A hash kept past its picture would
+    # let a page with last season's screens pass the audit next to the current one.
     #
-    # WHAT WAS LOOKED AT. Twenty images — ten tabs in each language — captured by
-    # a headless run of `scholion serve` 0.4.6 over the SYNTHETIC demo profile: an
-    # invented person, subject DEMO-0001, the woman of 33 that
-    # `make_demo_profile.py` generates and who belongs to nobody. Every one of
-    # them carries «subject DEMO-0001» in its header and the demo banner in its
-    # own words, and every one was opened and read before its hash was written
-    # here. The machine that took them held no personal material at all: a scratch
-    # checkout whose `genome/` is empty and whose `profile/` is the generated demo
-    # — which is why the genome tab answers «no data» rather than showing
-    # findings. The drug tab was captured with a check actually run, because a
-    # screenshot of an empty search box proves nothing about what the tab does.
+    # WHAT WAS LOOKED AT. Twenty images — ten views in each language — captured by a
+    # headless Chrome over `scholion serve` 0.5.1 started from a clean `git archive`
+    # of the release commit, whose profile is the SYNTHETIC demo that
+    # `make_demo_profile.py` generates (subject DEMO-0001, a woman of 33 who belongs
+    # to nobody), with an empty genome folder and the network off. Every image
+    # carries «subject DEMO-0001» in its header and the demo banner in its own
+    # language, and every one was opened and read before its hash was written here.
+    # The copy held no personal material: no `profile/`, no genome, no lab forms.
+    # The drug view was captured with a check actually run (omeprazole).
     #
-    # Russian edition (docs/presentation.ru.html), in the order they appear:
-    "bc9904c1ef654d52aede5c9ccf918cf65e9376aa3ceba0732dfe51383f88b391": "presentation (ru) · Assistant: the self-scan, and the only addresses the app can reach",
-    "c544bd110c1bb91d6bdd13a56880982358ba94fc5b7f8367a8086a550f22f95d": "presentation (ru) · Guide: what every colour, badge and label means",
-    "57280fe6e81a6a7559380fdeaa7aeaade308fba2b7f4f8470b49c0eb0c761a2c": "presentation (ru) · Overview: the focus of attention, the live marker and the levers",
-    "a87aba234b5e3c2cf3f7fcd49baf886fa088bfa1b04391a8098f4cfb235e682d": "presentation (ru) · Labs: flags, sparklines and movement for every marker",
-    "3632732297c35d6ef60ce3813ccb86abb93c570efeedcb94bf1d4dce05f7a362": "presentation (ru) · Lifestyle: what moved over three months, anthropometry and recovery",
-    "85ef9ce683fb554eca36a8748664a584feb3b7f33ed2100ac28f967727cb43cc": "presentation (ru) · Drugs: omeprazole checked against CYP2C19, with the phenotype and what to discuss",
-    "c1a812bde7d8cc09a3ae16fbe8da50b50ca6d514e8978e986b1a2024c4d02bf8": "presentation (ru) · Second opinion: the pre-visit summary and the radar over systems",
-    "be9cef66f3c5ceed5cf889d0ed90233274ee06a78cb940e9a2cf68cd567d9545": "presentation (ru) · Genome: what the tab answers while no VCF is connected",
-    "de66dfcb5128f1e8608c4be495b31394f946df3085d500bc709ffbb66c7be330": "presentation (ru) · What to test: two suggestions with their reasons, and routine control already taken",
-    "742707d73707a1fa44bb69464624b18016393a471d3c488fd41c4402207f7567": "presentation (ru) · Prescriptions: the current regimen as the single point of truth",
+    # Russian edition (share/presentation.ru.html), in the order they appear:
+    "d8a79e9e9644f2ab941f1da721571f0c86980bab9fe80eb98d3461719dca159d": "presentation (ru) · Assistant (menu): works without a model, how it is checked, what code computes and what a model adds",
+    "62f804c806e789cc49a60aba16191a14b5ad1e5293c13922062653acde20a71d": "presentation (ru) · Guide (menu): where a number comes from, and what every colour and badge means",
+    "89cdd37f567e3cc51a9a60fa4dbf06bdfdcda5921a69f19adab666d816e80b62": "presentation (ru) · Overview: the four numbers, the missing-profile note, the body figure beside the radar",
+    "01f60aa45b60f42de402bd467f4f6dcdf1b204ecbceee893b9a7e100d4f2f918": "presentation (ru) · Labs: out of range, in range and the latest result; the toolbar; the clinician's targets; the first flagged cards",
+    "d6ea19ee637da4dadda365abd05b00cec6fe51d7c9d2243728be77a0f6726293": "presentation (ru) · Lifestyle: the fitness score, what moved over three months, anthropometry",
+    "75f08251ff3d34935471191feb49d04df4c8a6f7d2caa8617d956cf0ab9c6d6d": "presentation (ru) · Medicines: omeprazole checked — the verdict, CYP2C19 from the project database, the labs to watch",
+    "a0d0bb44aa9cba30be267d773a82749b9b20979d41267fe9fc543d3d4932ad6c": "presentation (ru) · Radar: the Thyroid block — verdict, measurements table, genotype not read, genotype against the measurements, questions",
+    "ed0ca9b547d3eb1e2bbfe2374f332bc0373cf46e1bccd2041eb66a16754d501a": "presentation (ru) · Genome: what the tab answers while no VCF is connected, and the findings list",
+    "b0401833ecf9de8b1cae2f56189e657835fa8a3a43dac815a9e5f3b30979c31e": "presentation (ru) · Radar: what is worth taking, with the routine control folded and the sources line",
+    "afefc0e7ce6844f4c7587e375575e2675e764061e5fa99d3d83c30bc03096c4f": "presentation (ru) · Medicines: the list taken now, with what each acts on",
     #
-    # English edition (docs/presentation.html), the same ten tabs:
-    "0acbe7222343dfb23a81eef2a0de470f70f4c3ac317c368ae67ae4e1590fa4cd": "presentation (en) · Assistant: the self-scan, and the only addresses the app can reach",
-    "b0e4725c1dd2c3ffe3bb53212d9b5ad7e83f26f5c2fe28dfe28168faef5f7654": "presentation (en) · Guide: what every colour, badge and label means",
-    "0aa4dea9ceca521725aa5ffe62bd4dbdc7d163cf4a97bae57a429508f69108f6": "presentation (en) · Overview: the focus of attention, the live marker and the levers",
-    "502e43dd56048651d2aa2917b1ce5771632f35072f94bcfddda1af335a840fc4": "presentation (en) · Labs: flags, sparklines and movement for every marker",
-    "8d0c85f865684c48ffeda170cc80e6a3c8b25fab2e657e0500b20852d9b453a8": "presentation (en) · Lifestyle: what moved over three months, anthropometry and recovery",
-    "3f29b7db49c94acd5ed0cd3452590073fc8e303b15eb87ab05bfb6438d05d0c4": "presentation (en) · Drugs: omeprazole checked against CYP2C19, with the phenotype and what to discuss",
-    "50396ae6f2ed3059cbfb1bac71d73aefa29ece73b43a264bd496ab12fe8d9c3d": "presentation (en) · Second opinion: the pre-visit summary and the radar over systems",
-    "b9e06af26ac988f636ac0356dd0758a5bce0dbc77db146961526cb300f261170": "presentation (en) · Genome: what the tab answers while no VCF is connected",
-    "1d60bada14d2b38a16e3d7169385d7d94afb1099c1180159c530b9f21bf4a96b": "presentation (en) · What to test: two suggestions with their reasons, and routine control already taken",
-    "da88587b3fbdf28e009a9808dbfb45ae1e03097ec99b9474dbbc4774e8069189": "presentation (en) · Prescriptions: the current regimen as the single point of truth",
+    # English edition (share/presentation.html), in the order they appear:
+    "1761595593c03b22293f06a386dc9e79fed951592a953e906801f8621561f3a1": "presentation (en) · Assistant (menu): works without a model, how it is checked, what code computes and what a model adds",
+    "0a1f1662e494a7cc7e79981c3bfab55167c08e8f0e0fab3628b841d1d405bc79": "presentation (en) · Guide (menu): where a number comes from, and what every colour and badge means",
+    "a8c1949d3f06443d80459e3ec17a21c6fafe96a6228ec62e39377cbd01b9bc63": "presentation (en) · Overview: the four numbers, the missing-profile note, the body figure beside the radar",
+    "29646361117afda8b8c8547e4e5295663cae72fd171e1af87fe35d495f0fd16b": "presentation (en) · Labs: out of range, in range and the latest result; the toolbar; the clinician's targets; the first flagged cards",
+    "ebb8890806f4a97c1e08bac68541ca280e2d2c83c1a1e9835d0cf798ce80aec7": "presentation (en) · Lifestyle: the fitness score, what moved over three months, anthropometry",
+    "2f05fdc6de8ae45f98c960747d0096daa77676b9a925cc470b83f42ff7b82380": "presentation (en) · Medicines: omeprazole checked — the verdict, CYP2C19 from the project database, the labs to watch",
+    "8f070c90fb8e1f7afa347403d70e3eed51879d28a35baceb1bff9fe8ec79b96b": "presentation (en) · Radar: the Thyroid block — verdict, measurements table, genotype not read, genotype against the measurements, questions",
+    "e946657ce98772455aacecc593b83fc76aff00231f6c9532dd745e50086051f6": "presentation (en) · Genome: what the tab answers while no VCF is connected, and the findings list",
+    "506c62deb016b3c7c277bbcb7bef27e2ef2e779ba2e408e0df5aa678cf948525": "presentation (en) · Radar: what is worth taking, with the routine control folded and the sources line",
+    "dbbaf7e911380a2e6f59f0107d728865496d926c0921f74ce9e5de33ad0b35bf": "presentation (en) · Medicines: the list taken now, with what each acts on",
 }
 
 

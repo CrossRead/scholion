@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-22",
     "purpose": "A PORTABLE map of the properties of laboratory tests: level (tier), biomaterial/tube, preparation, computed indices and their prerequisites. It is needed so that the draw checklist does not turn into a sheet of forty items but goes in steps: the cheap screening first, the expensive only if the screening showed something.",
     "tiers": {
       "1": "basic screening: part of the ordinary panels, cheap, available everywhere",

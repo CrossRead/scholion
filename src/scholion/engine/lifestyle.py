@@ -39,14 +39,14 @@ _WATCHLIST = [
 #
 # The composition lives in `knowledge/radar_domains.json` and not here any more
 # (task 168, step 1). The genetic half of a system — `engine/system_panels.py` —
-# is keyed by the same eleven names, and a list held as a Python constant in one
+# is keyed by the same names, and a list held as a Python constant in one
 # module and re-typed in another is the shape every pair of copies in this
 # project has drifted into. So both readers take it from the one file, and a
 # test compares what each of them sees. The per-domain reasons that stood here
 # as comments (why the endocrine system is four systems, why insulin is scored
 # with glucose and marked at the pancreas) travel with the file as `why`.
 #
-# Only the laboratory domains are listed here. The twelfth, «fitness», is built
+# Only the laboratory domains are listed here. The last one, «fitness», is built
 # from wearable metrics and attached by `health_radar` after the loop; the file
 # names it too, with `source: wearables`, so that it is not lost and does not
 # acquire a genetic half by inattention.
@@ -435,6 +435,7 @@ def _placement(entry: Dict[str, Any], keys: List[str],
     return out
 
 
+@core.memo_in_reading
 def health_radar() -> Dict[str, Any]:
     """Assessment by body system (for the radar): 0–100 as the MEAN health score of the
     system's markers, accounting for the degree of deviation (and not for the share within range)."""

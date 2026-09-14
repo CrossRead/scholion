@@ -383,6 +383,28 @@ python3 src/ingest/prs_extract_models.py scoring_sites_ext.bed PGS000000 PGS0000
 OUT=genome/scoring_sites_ext.vcf.gz bash src/ingest/prs_genotype_sites.sh scoring_sites_ext.bed
 ```
 
+**The catalogue positions.** The full VCF was called with `-v`, so it lists only the positions where you differ from the reference. A catalogue position missing from it means «reference OR not covered», and the segment panels print such a position as not read rather than guess. Genotyping the catalogue positions from the BAM without `-v` turns that silence into a real `0/0` with its depth. The installed package does it by itself, with progress, once `bcftools` is installed and the alignment and the reference are found. It looks for them in three places, in this order: the environment (`SCHOLION_GENOME_BAM`, `SCHOLION_GENOME_REFERENCE`), which names a file for one run; the paths you recorded beside your profile, which name them for every run after:
+
+```bash
+scholion choose-genome --bam ~/genomic_work/<sample>/<sample>.merged.bam \
+                       --reference ~/genomic_work/reference/GRCh38_no_alt.fa
+```
+
+and, last, the layout this guide itself lays out above. So a person who followed this guide needs none of it, and a person whose files live elsewhere writes the two paths down once:
+
+```bash
+scholion genotype-sites
+```
+
+From the source tree the same step is two scripts:
+
+```bash
+python3 src/ingest/loci_sites_bed.py /tmp/loci_sites.bed
+OUT=genome/loci_sites.vcf.gz bash src/ingest/prs_genotype_sites.sh /tmp/loci_sites.bed
+```
+
+The BED is built from the catalogue of the build you have installed, so **repeat this step whenever a release grows the catalogue** — a sites file made earlier holds none of the new positions, and the release notes say so under «What needs recomputing». `scholion recompute` notices it from the record the package writes beside the file, and from the file's date when an older one carries no record. Only the listed positions are read from the BAM, through its index.
+
 **The longevity layer (LongevityMap).** The catalogue stores only rsIDs, so they first have to be resolved into GRCh38 coordinates through Ensembl (this needs network access — which again means the local machine, not the sandbox), and then re-genotyped from the BAM:
 
 ```bash
@@ -547,7 +569,13 @@ FASTQ_DIR="/path/to/folder/with/fq.gz" WORKDIR="$HOME/genomic_work/<SAMPLE>" \
 
 ### Callability: what qualifies a negative result
 
-Zero pathogenic findings in a gene panel is honest exactly to the extent that those genes were actually read. Compute the coverage for each gene (`qc_callability.sh`: a per-gene BED from the ClinVar spans + `samtools depth` with per-interval access through the index — about 0.5 % of the BAM is read, and nothing needs to be installed). Three rules for reading the result:
+Zero pathogenic findings in a gene panel is honest exactly to the extent that those genes were actually read. Compute the coverage for each gene — the installed package does it, over every gene the panels read (about 1150 of them) rather than over one list:
+
+```bash
+scholion coverage
+```
+
+It builds a per-gene interval from the spans of that gene's ClinVar variants and runs `samtools depth` through the index, so about half a percent of the alignment is read; it can be stopped and continued, and `scholion recompute` offers it by itself when the table covers fewer genes than the panels do. In the source tree the same measurement is `src/ingest/qc_callability.sh`. Three rules for reading the result:
 
 - **Calibrate the threshold to the sample's depth.** If mean depth is around 25–30×, the fraction of bases above 30× cannot be high for any gene — that is arithmetic, not a defect. The working threshold is **≥10×** (the boundary of confident heterozygote calling) plus the ratio of the gene's depth to the panel median.
 - **chrX in a male comes at half depth by construction.** This is not a gap: a hemizygous locus is called more confidently than a diploid one at the same depth.

@@ -182,7 +182,7 @@ places at 185 MB each. After the move one copy remains — in `genome/`.
   with a note saying what goes into it, all `0700`. A slot moved to another disk
   is not silently replaced with an empty stub.
 - **The `raw` and `work` keys in `profile/sources.json`** — external storage; on
-  the "Assistant" tab a disconnected source is named out loud: "source not
+  the Assistant page (in the ☰ menu) a disconnected source is named out loud: "source not
   connected, expected <path>".
 - **The cache is one function, `core.cache_dir()`**, instead of an expression
   written out in five files.

@@ -87,6 +87,7 @@ from .system_panels import (  # noqa: F401 -- the facade re-exports every name
     BASKETS,
     QUESTION_ORIGINS,
     POLYGENIC_HIGH_PERCENTILE,
+    SIGNERS,
     domains,
     systems,
     prs_system_map,
@@ -115,6 +116,9 @@ from .decision import (  # noqa: F401 -- the facade re-exports every name
     VARIANT_STATES,
 )
 from .genomics import (
+    COVERAGE_STATES,
+    HALF_DEPTH_BELOW,
+    SEX_CHROMOSOMES,
     BELOW_MEDIAN_POINTS,
     POORLY_READ_BELOW,
     gene_coverage,  # noqa: F401 -- the facade re-exports every name
@@ -193,6 +197,12 @@ from .lifestyle import (  # noqa: F401 -- the facade re-exports every name
     _focus_journal_split,
     _focus_evidence,
     focus_dashboard,
+)
+from .brief_review import (  # noqa: F401 -- the facade re-exports every name
+    brief_review,
+)
+from .panel_catalogue import (  # noqa: F401 -- the facade re-exports every name
+    panel_description,
 )
 from .profile_view import (  # noqa: F401 -- the facade re-exports every name
     load_profile,

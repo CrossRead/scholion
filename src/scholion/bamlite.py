@@ -134,6 +134,25 @@ def references(bam: str | Path) -> Dict[str, int]:
         return names
 
 
+def reference_lengths(bam: str | Path) -> Dict[str, int]:
+    """Reference name → length, from the BAM header. The length of chromosome 1
+    is what tells GRCh38 from GRCh37 whatever the contigs are called."""
+    with open(str(bam), "rb") as fh:
+        gz = gzip.GzipFile(fileobj=fh)
+        head = gz.read(8)
+        if head[:4] != b"BAM\x01":
+            raise ValueError(f"not a BAM: {bam}")
+        (l_text,) = struct.unpack("<i", head[4:8])
+        gz.read(l_text)
+        (n_ref,) = struct.unpack("<i", gz.read(4))
+        lengths = {}
+        for _ in range(n_ref):
+            (l_name,) = struct.unpack("<i", gz.read(4))
+            name = gz.read(l_name)[:-1].decode()
+            (lengths[name],) = struct.unpack("<i", gz.read(4))
+        return lengths
+
+
 def _read_chunk(fh, cb: int, ce: int) -> bytes:
     """The decompressed bytes of one index chunk, from virtual offset cb to ce."""
     coff, uoff = cb >> 16, cb & 0xFFFF

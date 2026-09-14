@@ -78,16 +78,35 @@ AUTHOR_SETTINGS = {
 }
 
 
+#: The parsed coverage table, keyed by the file's identity (path, size,
+#: modification time). Each gene of each system asked for its coverage, and each
+#: ask parsed the whole table again: 1 295 parses of the file to draw the list of
+#: systems once, about 7 of its 10 seconds (14.09.2026). A rewritten table gets
+#: a new key; callers receive their own dict.
+_CALLABILITY_CACHE: Dict[Any, Dict[str, Any]] = {}
+
+
 def callability() -> Dict[str, Any]:
+    """`profile/callability.tsv` → {gene: row}, parsed once while the file is unchanged."""
+    path = core.profile_dir() / "callability.tsv"
+    try:
+        st = path.stat()
+    except OSError:
+        return {}
+    key = (str(path), st.st_size, st.st_mtime_ns)
+    if key not in _CALLABILITY_CACHE:
+        _CALLABILITY_CACHE.clear()
+        _CALLABILITY_CACHE[key] = _read_callability(path)
+    return dict(_CALLABILITY_CACHE[key])
+
+
+def _read_callability(path) -> Dict[str, Any]:
     """`profile/callability.tsv` → {gene: row}. Empty when it has never been computed.
 
     Empty is a normal state and a reportable one: it means the coverage of this
     person's genome is unknown, which is different from being poor, and the
     difference is the whole reason this function does not return zeros.
     """
-    path = core.profile_dir() / "callability.tsv"
-    if not path.exists():
-        return {}
     out: Dict[str, Any] = {}
     try:
         with path.open(encoding="utf-8") as fh:

@@ -626,13 +626,30 @@ python3 -m scholion system thyroid           # one system as a card, in one bloc
                                              #   clinician — and the next step in three baskets, none silently empty.
                                              #   `--register clinician` adds rsID, genotype, depth, classification
                                              #   and the gate's counts; the verdict is the same in both registers
+                                             #   In front of the base stands a panel somebody wrote: 92 positions
+                                             #   across the twelve systems, a row being a POSITION and not a gene.
+                                             #   A row whose phrase for the state found has not been written prints
+                                             #   as pending. Every shipped row is SIGNED BY THE PANEL'S AUTHOR AND BY
+                                             #   NO CLINICIAN, and the card says so with the count and the date — relay
+                                             #   that with the sentence, never as a settled clinical statement. A row a
+                                             #   clinician has signed says so on the row itself. A gene short reads cannot
+                                             #   read (a gene beside its pseudogene, a triplet repeat) is named as
+                                             #   needing a separate method: neither read nor clear. A position the
+                                             #   genome file does not list is the reference only when the alignment
+                                             #   says so; until `scholion recompute` has genotyped the catalogue
+                                             #   positions it prints as not read
                                              #   Genetics never enters the 0–100 score: a genotype cannot be refuted by
                                              #   the next blood draw, so it stands beside the score, not inside it
                                              #   Polygenic scores appear on every system's card as SCORES with their
                                              #   caveats — a percentile is not a probability, the panel is mostly
                                              #   European — and never in the verdict; a reliable score at the 80th
                                              #   percentile or above is one question, never an instruction. Without a
-                                             #   full genome the card says what one would close for that system
+                                             #   full genome the card says what one would close for that system.
+                                             #   Keys: lipids, cardio (heart and vessels: Lp(a), apolipoproteins,
+                                             #   fibrinogen, D-dimer — where the antihypertensives, anticoagulants,
+                                             #   antiplatelets and the cardiovascular scores stand), glucose,
+                                             #   inflammation, thyroid, adrenals, gonads, growth, pancreas, liver,
+                                             #   micronutrients, renal, fitness
 python3 -m scholion acmg                     # ACMG SF v3.3 secondary findings, with the reporting rules applied
 python3 -m scholion acmg-scan                # produce the table `acmg` reads: your VCF × the published ClinVar
                                              #   file for YOUR build. No bcftools, no index; with no ClinVar file
@@ -666,6 +683,8 @@ python3 -m scholion ingest-wearable ["<folder-or-zip>"]  # read a wearable expor
                                                    # recognised by what is inside it (with a backup)
 python3 -m scholion ingest-garmin ["<folder>"]     # the same, restricted to a Garmin export
 python3 -m scholion set-folder labs_docs "<path>"  # where the forms and conclusions live
+python3 -m scholion brief-review ["<block-id>"]    # what arrived since a brief block was read, per watched marker, and a ready request to review it
+python3 -m scholion panel [<system>]       # the genetic panel of a system as the catalogue describes it: every position, its sentence per genotype, source, study, expectation, signature — no genome, no labs
 python3 -m scholion brief-reviewed "<block-id>"   # the brief's wording was read against
                                                    # newer numbers and still holds
 python3 -m scholion choose-genome "<file.vcf.gz>"  # only when the genome folder holds more than
@@ -698,6 +717,25 @@ python3 -m scholion array                    # a consumer genotyping array: cata
 python3 -m scholion marker                   # locally added marker entries; --propose KEY --names "…" adds one, --confirm KEY vouches for it
 python3 -m scholion lab-draw --day YYYY-MM-DD --reason "…" --between "…"   # WRITES: why a day holds two draws and what stood between them
 python3 -m scholion sources                  # the external reference sources this build mirrors, with the date each was last imported
+python3 -m scholion version                  # this build and its age, the version the data was last used with, and what
+                                             #   every release in between asks to recompute (read from the journal)
+python3 -m scholion version --since 0.4.8    # the same for an update from a version the data never recorded
+python3 -m scholion version --seen           # WRITES a marker beside the profile: the person has read the update note
+python3 -m scholion version --check          # asks PyPI whether a newer version exists — one request, only when the
+                                             #   person asks; say that it reaches the network before running it
+python3 -m scholion recompute                # the plan after an update: what the releases since the data's version ask, and the
+                                             #   genome steps the data lacks (catalogue positions never genotyped); each step says
+                                             #   whether it will run, what it needs, or that it is for the person to do by hand
+python3 -m scholion recompute --yes          # WRITES: runs every ready step with progress; rewrites profile and genome files, for
+                                             #   minutes — only when the person asked; files it rewrites are archived first
+python3 -m scholion recompute --status       # how far a running or the last recompute is, step by step, with the time left
+python3 -m scholion coverage                 # WRITES: measures from the BAM (samtools) how well every gene the panels read was
+                                             #   read, into profile/callability.tsv. Until it has run, a gene of the panels is
+                                             #   NOT READ and no card may call it clear — «nothing found» over an unmeasured
+                                             #   gene is a statement about the file. Resumable; `recompute` offers it when the
+                                             #   table covers fewer genes than the panels do
+python3 -m scholion genotype-sites           # WRITES: genotypes every catalogue position from the BAM (bcftools), so a position
+                                             #   missing from the VCF reads as the reference — only when the person asked
 python3 -m scholion capabilities             # every command, what it does, whether it writes
 python3 -m scholion capabilities --json      # the same, machine-readable
 
@@ -831,7 +869,7 @@ file is updated it returns fresh data without a restart.
   are not supported: they need OCR or manual entry of the point. A new unknown
   marker does not break the review — it is not recognised, and it has to be
   entered into the dictionary.
-- **Prescriptions.** The Prescriptions tab or `medications.json`. Classes and
+- **Prescriptions.** The Medicines tab or `medications.json`. Classes and
   interactions are computed from the current list.
 - **Lifestyle.** A fresh wearable export into the folder from the settings → the
   device importer (the button on the Lifestyle tab). A full rebuild with an

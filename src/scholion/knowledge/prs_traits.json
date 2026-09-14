@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "PORTABLE curated panel of traits for polygenic risks (PGS Catalog through just-prs-mcp). Public names and search terms only — holds NO genotypes. EFO IDs are resolved at request time through search_traits.",
     "design": "Two levels: this panel is precomputed (ready scores in the application), while ANY other trait is computed on request from merged.bam (genotyping the scoring positions on demand). The panel covers the main things; the tail is on request.",
     "caveat": {

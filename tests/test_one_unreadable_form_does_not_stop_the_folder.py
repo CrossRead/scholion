@@ -38,7 +38,12 @@ class _Folder(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        # Resolved: on macOS `TMPDIR` lives under `/var`, which is a symlink to
+        # `/private/var`, and the manifest remembers a file by its resolved
+        # path. An unresolved root here compares the two spellings of one file
+        # and fails on macOS while passing on Linux — the shape `CLAUDE.md`
+        # names, and it reproduces on Linux with `TMPDIR` pointed at a symlink.
+        self.root = Path(self.tmp.name).resolve()
         self.forms = self.root / "forms"
         self.forms.mkdir()
         self.profile = self.root / "profile"

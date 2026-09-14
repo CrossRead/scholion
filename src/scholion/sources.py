@@ -451,10 +451,13 @@ def state() -> List[Dict[str, Any]]:
             except (OSError, ValueError):
                 pass
             imported = (meta.get("imported") or {}).get("fetched")
+            prec = core.knowledge_precedence(f)
             files.append({"file": f,
                           "local": core.knowledge_is_local(f),
                           "imported": imported,
-                          "bundled_stamp": meta.get("updated") or meta.get("version"),
+                          "bundled_stamp": prec["bundled_stamp"] or meta.get("updated") or meta.get("version"),
+                          "local_stamp": prec["local_stamp"],
+                          "answers": prec["answers"], "why_answers": prec["why"],
                           "tier": meta.get("source_tier")})
         out.append({"id": sid, "kind": s.get("kind", "mirror"), "title": s["title"],
                     "license": s["license"], "homepage": s.get("homepage"),

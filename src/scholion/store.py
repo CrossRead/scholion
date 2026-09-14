@@ -168,6 +168,64 @@ def set_genome_vcf(path: str) -> Dict[str, Any]:
     return {"ok": True, "genome_vcf": str(fp)}
 
 
+def _set_genome_path(key: str, path: str, check) -> Dict[str, Any]:
+    """Record — or clear — one of the genome files at the top of sources.json."""
+    cfgp = core.profile_dir() / "sources.json"
+    cfg = json.loads(cfgp.read_text(encoding="utf-8")) if cfgp.exists() else {}
+    cfg.setdefault("_meta", {"purpose": _t("store.sources_purpose")})
+    raw = (path or "").strip()
+    if not raw:
+        # Clearing a choice nobody made writes nothing — see set_genome_vcf.
+        if not cfgp.exists() and key not in cfg:
+            return {"ok": True, key: None}
+        cfg.pop(key, None)
+        _write_json(cfgp, cfg)
+        core.reset_cache()
+        return {"ok": True, key: None}
+    fp = Path(raw).expanduser()
+    if not fp.exists() or not fp.is_file():
+        return {"ok": False, "error": _t("store.genome_file_not_found", path=fp)}
+    problem = check(fp)
+    if problem:
+        return {"ok": False, "error": problem}
+    cfg[key] = str(fp)
+    _write_json(cfgp, cfg)
+    core.reset_cache()
+    return {"ok": True, key: str(fp)}
+
+
+@_serialized
+def set_genome_bam(path: str) -> Dict[str, Any]:
+    """Record WHICH alignment the person's reads were called from.
+
+    The index is not required here: a BAM without one is refused later, by name,
+    where the step that needs it explains what to run. Refusing it here would
+    make the path unrecordable for the minute between copying the file and
+    indexing it.
+    """
+    def _check(fp: Path):
+        if fp.suffix.lower() not in (".bam", ".cram"):
+            return _t("store.genome_not_a_bam", path=fp.name)
+        return None
+    return _set_genome_path("genome_bam", path, _check)
+
+
+@_serialized
+def set_genome_reference(path: str) -> Dict[str, Any]:
+    """Record the reference FASTA the reads were called against.
+
+    The `.fai` IS required, and that is not pedantry: every reader of this path
+    skips a FASTA without one, so a path recorded without an index would be a
+    setting the product then ignores in silence — the shape this project keeps
+    removing from its own files.
+    """
+    def _check(fp: Path):
+        if not Path(str(fp) + ".fai").exists():
+            return _t("store.reference_not_indexed", path=fp.name)
+        return None
+    return _set_genome_path("genome_reference", path, _check)
+
+
 @_serialized
 def clear_source_folder(domain: str) -> Dict[str, Any]:
     """Return the domain to the default profile folder (whichever section it was set under)."""
@@ -1028,6 +1086,17 @@ def _write_private(path: Path, text: str) -> None:
 
 
 
+def _baseline_version(out: Path) -> None:
+    """A new profile starts at this build: there is nothing earlier to report."""
+    from . import updates as _upd
+    marker = out / _upd.MARKER
+    if not marker.exists():
+        try:
+            marker.write_text(_upd.installed() + "\n", encoding="utf-8")
+        except OSError:
+            pass
+
+
 def init_profile(target: Optional[str] = None, force: bool = False,
                  demo: bool = False, subject: Optional[str] = None) -> Dict[str, Any]:
     """Create the data directory and lay the profile templates into it.
@@ -1052,6 +1121,7 @@ def init_profile(target: Optional[str] = None, force: bool = False,
             _write_private(out / name,
                            json.dumps(data, ensure_ascii=False, indent=2, sort_keys=False) + "\n")
         _write_private(out / "index.md", _demo.INDEX_MD)
+        _baseline_version(out)
         core.invalidate_cache() if hasattr(core, "invalidate_cache") else None
         return {"ok": True, "dir": str(out), "mode": "demo",
                 "written": sorted(list(files) + ["index.md"]), "skipped": []}
@@ -1115,6 +1185,7 @@ def init_profile(target: Optional[str] = None, force: bool = False,
         written += w
         skipped += s
 
+    _baseline_version(out)
     return {"ok": True, "dir": str(out), "mode": "templates", "subject": subject or "owner",
             "written": written, "skipped": skipped}
 

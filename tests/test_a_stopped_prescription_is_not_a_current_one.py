@@ -302,10 +302,12 @@ class TestAListingMarksWhatIsNotCurrent(_Profile):
         from scholion import engine
         page = (Path(engine.__file__).resolve().parent.parent
                 / "web" / "index.html").read_text(encoding="utf-8")
-        item = page[page.index("function medItem"):page.index("async function viewMeds")]
+        # Task 195: «Drugs» and «Prescriptions» are one tab, «Medicines», and a
+        # stopped entry carries its status as words and a date on a badge.
+        item = page[page.index("function medItem"):page.index("function metricOrigin")]
         self.assertIn("m.current===false", item, "the page does not look at the verdict")
-        self.assertIn("web.meds.not_current", item)
-        form = page[page.index("async function viewMeds"):page.index("function bindRemove")]
+        self.assertIn("medStatusText(m.status)", item)
+        form = page[page.index("async function viewMedicines"):page.index("function bindRemove")]
         self.assertIn('id="m-status"', form, "the form has no status field")
         self.assertIn("status:$('#m-status',root).value", form,
                       "the status is on the form and not in the request")

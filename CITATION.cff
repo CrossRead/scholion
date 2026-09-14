@@ -13,7 +13,7 @@ contact:
   - email: "scholion.dev@proton.me"
     name: "Scholion project"
 title: "Scholion"
-version: "0.5.0"
+version: "0.5.1"
 date-released: "2026-09-13"
 type: software
 authors:

@@ -29,13 +29,18 @@ def build_freshness() -> Dict[str, Any]:
     project keeps finding inside itself, pointed outwards: a stale thing that
     does not announce that it is stale.
 
-    The first attempt asked PyPI, and the privacy guard refused it — correctly.
-    A product whose whole claim is that the profile never leaves the disk should
-    not acquire a fifth outbound host to deliver a convenience, and «this machine
-    asked about scholion» is a fingerprint of a machine running scholion. The
-    build's own release date answers the useful half of the question without
-    anybody being contacted: it cannot say WHAT is new, and it can say that
-    something probably is.
+    The first attempt asked PyPI at start-up, and the privacy guard refused it —
+    correctly: a product whose whole claim is that the profile never leaves the
+    disk should not reach a new host in the background, and «this machine asked
+    about scholion» is a fingerprint of a machine running scholion. The build's
+    own release date answers the useful half of the question without anybody
+    being contacted: it cannot say WHAT is new, and it can say that something
+    probably is. This function still asks nobody.
+
+    On 13.09.2026 the owner allowed the registry for updates, on an explicit
+    request only: `scholion version --check` and the page's «Check for a newer
+    version» ask PyPI once, when a person asks (`scholion.updates`). Nothing
+    asks it at start-up or in the background.
 
     `days` is the whole content; the threshold only chooses a word for it.
     """

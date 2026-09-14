@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
     "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently.",
     "source_tier": "guideline_compiled"

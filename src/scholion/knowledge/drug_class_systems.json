@@ -4,10 +4,10 @@
     "who_writes_this": "The project, and only for rows that are facts BY THE NAME of the class: a thyroid hormone acts on the thyroid, a statin on the lipid panel, a gliflozin on carbohydrate metabolism. Nothing here is a claim about a person; a row is a statement about what the class is called and which laboratory panel carries that name.",
     "gate": "A class with no row here is not silently absent from a system's card: the engine prints the prescription with status «no_map», so that a prescription nobody mapped is visible as an unmapped one rather than looking like one that acts on nothing. A row naming a system key that radar_domains.json does not hold is dropped and counted.",
     "why": "Until this file existed the prescription entry waited for a hand-written gene list per drug, and the system card could not say which of the person's prescriptions bear on it at all. One class-to-system fact closes both: a prescription reaches the genetic half of the system it acts on, and the card lists the prescriptions that act on it. The map is the join, and it is the only new knowledge the join needs.",
-    "why_partial": "Every class whose system is a matter of INDICATION rather than of name is left out, because choosing it would be a clinical judgement made by this project: the antihypertensive classes (ace_inhibitor, arb, beta_blocker, ccb, thiazide, loop_diuretic) have no blood-pressure domain on the radar and act on the kidney, the heart and the vessels at once; anticoagulants and antiplatelets (anticoagulant_vka, doac, antiplatelet_p2y12), antibiotics and antifungals (macrolide, azole_antifungal), acid suppressants (ppi, h2_blocker), analgesics and psychotropics (nsaid, opioid_codeine, ssri_snri), immunosuppressants (thiopurine), antiarrhythmics; and the supplements whose target is a use rather than a name (supplement_k2, soluble_fiber, berberine, niacin, iodine, vitamin_b6_source, probiotic, probiotic_yeast, inositol, alpha_lipoic_acid, rhodiola). A clinician may add any of them with a source; the engine will not.",
+    "why_partial": "Every class whose system is a matter of INDICATION rather than of name is left out, because choosing it would be a clinical judgement made by this project: antibiotics and antifungals (macrolide, azole_antifungal), acid suppressants (ppi, h2_blocker), analgesics and psychotropics (nsaid, opioid_codeine, ssri_snri), immunosuppressants (thiopurine); and the supplements whose target is a use rather than a name (supplement_k2, soluble_fiber, berberine, niacin, iodine, vitamin_b6_source, probiotic, probiotic_yeast, inositol, alpha_lipoic_acid, rhodiola). A clinician may add any of them with a source; the engine will not. Until 13.09.2026 the ten classes of the pressure, the clot and the heart's rhythm were in this list for want of a domain; the radar's «Heart and vessels» system, added that day, is the system those classes are NAMED for, and they are placed on it below.",
     "schema": "classes: { <med_classes.json class key>: { systems: [<radar_domains.json domain key>, ...], source: '<why this row is a fact>' } }",
     "source_tier": "curated_reference",
-    "updated": "2026-09-12"
+    "updated": "2026-09-13"
   },
   "classes": {
     "thyroid_hormone": {"systems": ["thyroid"], "source": "the class name; anatomical"},
@@ -22,6 +22,16 @@
     "testosterone_replacement": {"systems": ["gonads"], "source": "the class name; anatomical"},
     "ursodeoxycholic_acid": {"systems": ["liver"], "source": "the class name; anatomical"},
     "vitamin_d": {"systems": ["micronutrients"], "source": "the class name; the panel carries the marker of the same name"},
-    "gh_secretagogue": {"systems": ["growth"], "source": "the class name; the growth axis carries the hormone of the same name"}
+    "gh_secretagogue": {"systems": ["growth"], "source": "the class name; the growth axis carries the hormone of the same name"},
+    "ace_inhibitor": {"systems": ["cardio"], "source": "the class name; an antihypertensive is named for the pressure in the vessels (13.09.2026)"},
+    "arb": {"systems": ["cardio"], "source": "the class name; an antihypertensive is named for the pressure in the vessels (13.09.2026)"},
+    "beta_blocker": {"systems": ["cardio"], "source": "the class name; the beta-adrenergic receptor it blocks is the heart's (13.09.2026)"},
+    "ccb": {"systems": ["cardio"], "source": "the class name; an antihypertensive is named for the pressure in the vessels (13.09.2026)"},
+    "thiazide": {"systems": ["cardio"], "source": "the class name; an antihypertensive is named for the pressure in the vessels (13.09.2026)"},
+    "loop_diuretic": {"systems": ["cardio"], "source": "the class name; an antihypertensive is named for the pressure in the vessels (13.09.2026)"},
+    "anticoagulant_vka": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
+    "doac": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
+    "antiplatelet_p2y12": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
+    "antiarrhythmic": {"systems": ["cardio"], "source": "the class name; the rhythm it acts on is the heart's (13.09.2026)"}
   }
 }

@@ -190,6 +190,13 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
         return {"kind": "not_determined",
                 "why": (scan or {}).get("reason") or "scan_not_run"}
     found = sum(int(r.get("findings") or 0) for r in rows)
+    # The list holds genes AND, in the system entry, positions of a curated
+    # panel; a row is one entry of it either way. The count below is over the
+    # whole list — the three entries answer in one voice (task 171), and a
+    # per-half count would give three sentences for one state. What was wrong
+    # on the lipid card was the NOUN: «unread of its genes: 34, of a list of
+    # 45» over a list of 38 genes and 7 positions. The sentence now says rows,
+    # and the summary above it counts each half against its own denominator.
     unread = [r["gene"] for r in rows if r.get("read") is False]
     carriers = sum(1 for r in rows if r.get("carrier"))
     out: Dict[str, Any]

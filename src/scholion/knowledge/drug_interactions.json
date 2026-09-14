@@ -1,5 +1,6 @@
 {
  "_meta": {
+  "updated": "2026-09-12",
   "purpose": "A PUBLIC base of clinically important drug interactions by drug CLASSES. Portable, without patient data. A starting curated set — it keeps growing. The class pairs come from med_classes.json.",
   "disclaimer": "Does not replace a check against the label/with the doctor. A guide for the «second opinion»: what to pay attention to with a new prescription.",
   "severity_levels": [

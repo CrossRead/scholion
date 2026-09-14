@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "PUBLIC dictionary for recognising lab markers in the text of a report (per-language name substrings → the labs.json key, units, references). Feeds the auto-ingest of a folder of lab PDFs. Holds no patient data, portable.",
     "note": "labels.<lang> holds everything that is a language: names — lower-case substrings to look for in a row of the form; exclude — if one occurs, the row is skipped; require / next_require / form_require and their negatives — the same, scoped to the segment after the name, to the next row, and to the form as a whole; display — the name shown on screen. A language absent from a marker falls back to one that is present.\nLanguage-independent, and deliberately outside labels: unit (a UCUM code — the label for it comes from knowledge/units.json in the output language), units ({unit surface form: multiplier to the canonical unit} — at once a gate and a conversion, populated only where a conversion is genuinely needed), specimen (blood/serum/plasma/urine/stool/saliva), the reference bounds, direction, plausible, loinc.",
-    "updated": "2026-07-31 (add-on order of 22.07: ANA immunoblot, 15 specificities + reticulin antibodies IgA/IgG)",
+    "updated": "2026-09-13 (English display names for D-dimer and lactate dehydrogenase, for the «Heart and vessels» panel; before that 2026-07-31, the add-on order of 22.07: ANA immunoblot, 15 specificities + reticulin antibodies IgA/IgG)",
     "generated": "2026-07-26: the dictionary was expanded from 57 to 193 markers after the actual names on 176 forms.",
     "markers": 415,
     "schema": 2,
@@ -1944,7 +1944,8 @@
             "корриг"
           ],
           "form_exclude": [
-            "исп",
+            "исп-мс",
+            "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
           ],
@@ -2470,6 +2471,9 @@
           "names": [
             "д-димер"
           ]
+        },
+        "en": {
+          "display": "D-dimer"
         }
       },
       "ref_sex": "any",
@@ -4642,6 +4646,9 @@
           "names": [
             "лактатдегидрогеназа (лдг"
           ]
+        },
+        "en": {
+          "display": "Lactate dehydrogenase"
         }
       },
       "ref_sex": "any",
@@ -5032,7 +5039,8 @@
             "внутриклеточ"
           ],
           "form_exclude": [
-            "исп",
+            "исп-мс",
+            "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
           ]
@@ -10296,7 +10304,8 @@
             "эритроцит"
           ],
           "form_exclude": [
-            "исп",
+            "исп-мс",
+            "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
           ]
@@ -10351,7 +10360,8 @@
             "эритроцит"
           ],
           "form_exclude": [
-            "исп",
+            "исп-мс",
+            "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
           ],

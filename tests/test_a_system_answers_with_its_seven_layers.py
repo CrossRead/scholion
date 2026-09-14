@@ -243,9 +243,58 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         self.assertIsNone(basket["empty_why"])
 
     def test_an_expect_on_a_marker_never_taken_is_a_gap_not_a_disagreement(self):
+        """Never a disagreement, and since 13.09.2026 never a question of its
+        own when the marker already stands in «never taken»: the positions that
+        wait on it are named inside that one question."""
         qs = SP.system("thyroid")["questions"]["rows"]
-        self.assertTrue(any(q["origin"] == "expect_gap" and q["marker"] == "tsh" for q in qs))
         self.assertFalse(any(q["origin"] == "expect" for q in qs))
+        gap = [q for q in qs if q["origin"] == "gap" and "tsh" in (q["data"].get("waiting") or {})]
+        standalone = [q for q in qs if q["origin"] == "expect_gap" and q["marker"] == "tsh"]
+        self.assertEqual(1, len(gap) + len(standalone),
+                         "the expectation on TSH is asked once — folded into the gap, or alone")
+
+    def _three_waiting_on_tsh(self, tests_layer=None):
+        cur = {"_meta": CURATED["_meta"], "systems": {"thyroid": {"source": "the author", "positions": [
+            _pos("rsPL", "PL", expect={"marker": "tsh", "direction": "higher"}),
+            _pos("rsPAR", "PAR", expect={"marker": "tsh", "direction": "lower"}),
+            _pos("rsPEXP", "PEXP", expect={"marker": "tsh", "direction": "higher"})]}}}
+        patches = [mock.patch.object(SP, "_base", lambda: {}),
+                   mock.patch.object(SP, "_curated", lambda: cur),
+                   mock.patch("scholion.genome.available", lambda: {"ready": True}),
+                   mock.patch.object(core, "loci", lambda: LOCI),
+                   mock.patch("scholion.genome.lookup", _lookup)]
+        if tests_layer is not None:
+            patches.append(mock.patch.object(SP, "_tests_layer", tests_layer))
+        for pt in patches:
+            pt.start()
+        try:
+            return SP.system("thyroid")["questions"]["rows"]
+        finally:
+            for pt in reversed(patches):
+                pt.stop()
+
+    def test_several_positions_waiting_on_one_untaken_marker_make_one_question(self):
+        """13.09.2026: the lipid card of a profile with no labs asked «take LDL»
+        five times, once per position, beside a sixth question saying the same.
+        One marker, one question; every waiting position named in it."""
+        qs = self._three_waiting_on_tsh()
+        mentioning = [q for q in qs if any(f"{g} rs{g}" in q["text"] for g in ("PL", "PAR", "PEXP"))]
+        self.assertEqual(1, len(mentioning), [q["origin"] for q in mentioning])
+        (q,) = mentioning
+        self.assertEqual("gap", q["origin"])
+        # In the card's own row order (by gene), not in the order they were written.
+        self.assertEqual(["PAR rsPAR", "PEXP rsPEXP", "PL rsPL"], q["data"]["waiting"]["tsh"])
+        self.assertFalse(any(x["origin"] == "expect_gap" for x in qs))
+
+    def test_when_a_rule_already_asks_for_the_marker_the_positions_still_share_one_question(self):
+        fired = lambda markers: {"status": "ok", "rows": [{"id": "r", "markers_hit": ["tsh"]}], "empty_why": None}
+        qs = self._three_waiting_on_tsh(tests_layer=fired)
+        eg = [q for q in qs if q["origin"] == "expect_gap"]
+        self.assertEqual(1, len(eg))
+        self.assertEqual("tsh", eg[0]["marker"])
+        self.assertEqual(["PAR rsPAR", "PEXP rsPEXP", "PL rsPL"], eg[0]["positions"])
+        self.assertTrue(eg[0]["text"].rstrip().endswith("?"))
+        self.assertFalse(any("tsh" in (q.get("markers") or []) for q in qs if q["origin"] == "gap"))
 
     def test_a_system_with_an_unread_row_is_never_clear_measured(self):
         cur = json.loads(json.dumps(CURATED))
@@ -321,10 +370,12 @@ class TestGeneticsNeverTouchesTheScore(unittest.TestCase):
 class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
 
     def test_every_laboratory_system_is_composed_and_fitness_has_no_half(self):
-        """Since 13.09.2026 (task 178) all eleven laboratory systems carry a
-        genetic half composed from the base; the day before, ten said
-        `not_composed` with a reason, and that answer is still the one an
-        empty base produces (tested with a mocked base elsewhere)."""
+        """Since 13.09.2026 (task 178) every laboratory system carries a
+        genetic half composed from the base — eleven that day, twelve since
+        «Heart and vessels» joined the radar later the same day (task 179);
+        the day before, ten said `not_composed` with a reason, and that answer
+        is still the one an empty base produces (tested with a mocked base
+        elsewhere)."""
         for d in SP.domains():
             with self.subTest(system=d["key"]):
                 r = SP.system(d["key"])
@@ -351,7 +402,9 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
 
     def test_the_real_base_shows_disagreeing_submitters_and_its_date(self):
         r = SP.system("thyroid", "clinician")
-        tg = [x for x in r["genetics"]["rows"] if x["gene"] == "TG"][0]
+        # The gene-unit row: the TG positions of the clinician's panel stand
+        # beside it since 13.09.2026 and carry no assertions of their own.
+        tg = [x for x in r["genetics"]["rows"] if x["gene"] == "TG" and x["unit"] == "gene"][0]
         self.assertGreaterEqual(len(tg["assertions"]), 2)
         self.assertIn("Limited", tg["classifications"])
         self.assertIn("Strong", tg["classifications"])
@@ -366,29 +419,44 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
                 self.assertTrue(set(data.get("systems") or {}) <= keys,
                                 f"{name} names a system the radar does not have")
 
-    def test_the_shipped_curated_file_holds_one_authored_position_and_its_rules(self):
-        """Until 13.09.2026 the file shipped empty. It now carries exactly one
-        authored position — COMT rs4680 under the adrenal axis, by the owner's
-        decision — and everything else it says is still the rules. A second
-        position added here is a decision to write down, not a test to loosen."""
+    def test_the_shipped_panels_pass_their_own_gate_in_every_system(self):
+        """Until 13.09.2026 the file shipped empty; the segment panels agreed by
+        the owner that day (task 179) fill twelve systems. Every row goes
+        through the gate — a source, a mode the engine knows, a classification
+        with an inheritance for a monogenic row, an effect size for a common
+        variant — and nothing is refused; the three genes short reads cannot
+        read are named as such and never counted as read."""
         book = SP._curated()
-        self.assertEqual(["adrenals"], sorted(book.get("systems") or {}),
-                         "a panel was authored here — the tests that read it need updating")
-        (pos,) = book["systems"]["adrenals"]["positions"]
-        self.assertEqual(("rs4680", "COMT", "pgx", "asked_about", "A"),
-                         (pos["rsid"], pos["gene"], pos["mode"], pos["kind"], pos["risk_allele"]))
-        self.assertIn("CPIC", pos["source"])
-        for state in ("het", "hom"):
-            self.assertTrue(pos["text"][state], f"no phrase for {state}")
-        # Through the gate, not refused, and the row stands in the card.
-        g = SP.system("adrenals", "clinician")["genetics"]
-        self.assertEqual(0, g["refused"]["total"], g["refused"])
-        self.assertIn("rs4680", [r.get("rsid") for r in g["rows"]])
-        self.assertEqual(1, g["curated"]["positions"])
+        systems = book.get("systems") or {}
+        self.assertEqual(12, len(systems))
+        total = 0
+        for key, spec in systems.items():
+            with self.subTest(system=key):
+                g = SP.system(key, "clinician")["genetics"]
+                self.assertEqual(0, g["refused"]["total"], g["refused"])
+                pos = [r for r in g["rows"] if r["unit"] == "position"]
+                self.assertEqual(len(spec.get("positions") or []), len(pos))
+                total += len(pos)
+                for r in pos:
+                    self.assertTrue(r.get("source"), f"{key}/{r.get('rsid')}: no source")
+                    self.assertIn(r.get("mode"), SP.MODES)
+                # The panel stands before the base list.
+                units = [r["unit"] for r in g["rows"]]
+                self.assertEqual(units, sorted(units, key=lambda u: u != "position"))
+                for u in spec.get("unreadable") or {}:
+                    self.assertIn(u, [x["gene"] for x in g["unreadable"]])
+                    for r in g["rows"]:
+                        if r["unit"] == "gene" and r["gene"] == u.upper():
+                            self.assertFalse(r["read"]); self.assertEqual("separate_method", r["read_why"])
+        self.assertGreater(total, 80)
+        self.assertEqual({"adrenals": ["CYP21A2"], "gonads": ["AR (CAG repeat)"], "liver": ["UGT1A1*28"]},
+                         {k: list(v["unreadable"]) for k, v in systems.items() if v.get("unreadable")})
+        (comt,) = [r for r in systems["adrenals"]["positions"] if r["rsid"] == "rs4680"]
+        self.assertEqual(("COMT", "pgx", "asked_about", "A"), (comt["gene"], comt["mode"], comt["kind"], comt["risk_allele"]))
         meta = book.get("_meta") or {}
         for key in ("why_empty", "gate", "pending", "kind_is_hers_too", "registers", "modes",
                     "limited_is_not_a_finding", "moi_changes_the_heterozygote",
-                    "common_variant_only_as_score", "absent_template", "exclusions"):
+                    "common_variant_only_as_score", "absent_template", "exclusions", "unreadable"):
             self.assertIn(key, meta)
         self.assertTrue(meta["absent_template"]["text"])
 
@@ -399,8 +467,10 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
     def test_the_listing_says_what_each_system_holds(self):
         s = SP.systems()
         by = {r["key"]: r for r in s["systems"]}
-        self.assertEqual(12, s["count"])
+        # 12 until 13.09.2026; 13 since «Heart and vessels» was added (task 179).
+        self.assertEqual(13, s["count"])
         self.assertEqual("composed", by["thyroid"]["genetics"]["status"])
+        self.assertEqual("composed", by["cardio"]["genetics"]["status"])
         self.assertEqual("no_genetic_half", by["fitness"]["genetics"]["status"])
         self.assertEqual("composed", by["lipids"]["genetics"]["status"])
         self.assertGreater(by["renal"]["genetics"]["base_genes"], by["growth"]["genetics"]["base_genes"])

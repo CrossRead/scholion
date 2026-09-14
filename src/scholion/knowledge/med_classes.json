@@ -1,5 +1,6 @@
 {
  "_meta": {
+  "updated": "2026-09-12",
   "purpose": "A PUBLIC dictionary: drug/brand → therapeutic class. Like a pharmacy classification. It is used by the monitoring rules by CLASS, not by the patient's particular drug. It holds no patient data, portable.",
   "note": "Extensible. The patient's personal prescriptions live ONLY in profile/medications.json and profile/medications.md.",
   "match": "It fires on the occurrence of any of the names in the text of the patient's prescriptions (case-insensitively).",

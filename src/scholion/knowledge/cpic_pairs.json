@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "The list of gene↔drug pairs CPIC classifies at level A — prescribing guidance exists and is actionable. Carried NOT to answer with, but to be COMPARED against what this build models: a pair CPIC calls actionable and we do not carry is a gap, and a gap nobody enumerates is one a person has to find by being harmed by it. This is the file the NUDT15 omission would have been caught by.",
     "source": "CPIC (api.cpicpgx.org/v1/pair, cpiclevel=A, removed=false), CC0, fetched 2026-08-19.",
     "source_tier": "guideline_verbatim",

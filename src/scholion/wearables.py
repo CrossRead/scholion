@@ -35,7 +35,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Callable
 
 from . import core
 from .i18n import t as _t
@@ -406,7 +406,8 @@ def knowledge() -> Dict[str, Any]:
     return merged
 
 
-def reingest(folder: Optional[str] = None, source: Optional[str] = None) -> Dict[str, Any]:
+def reingest(folder: Optional[str] = None, source: Optional[str] = None,
+             progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
     """Rebuild one device's part of the lifestyle layer. Backs up the file first."""
     if folder:
         path = Path(folder).expanduser()
@@ -428,6 +429,9 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None) -> Dict
         path, source = hit
 
     kind = _BY_SOURCE[source]
+    if progress is not None:
+        # Two stages a person can tell apart: reading the export, writing the series.
+        progress(0, 2, Path(path).name)
     try:
         mod = _builder(kind["builder"])
         built = (mod.build(str(path), knowledge())
@@ -443,6 +447,8 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None) -> Dict
     # person's months of sleep beside a fictional one's. The erase is read
     # BEFORE `previous`, or the merge below would carry the demonstration's own
     # generated series forward into the file that replaced it.
+    if progress is not None:
+        progress(1, 2, Path(path).name)
     from . import subject as _subject
     claimed = _subject.claim_for_owner()
     claimed = claimed if claimed.get("claimed") else None

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "purpose": "Curated genetic panels of the body systems, keyed by the radar domains of radar_domains.json. Read by engine/system_panels.py as the CURATED layer of a system's genetic half — the author's positions, phrases, expectations and next steps — on top of the base-generated monogenic composition that gencc_gene_disease.json supplies. The two are merged into one list per system; this file never replaces the base and the base never replaces this file.",
-    "who_writes_this": "A clinician. Which positions bear on the working of a system, which allele is the risk allele, and what follows from a genotype state are medical statements, and so is the sentence saying that nothing follows. This program applies the rows it was given, records their source, and derives none; the composition of the monogenic half comes from a base with a version (see gencc_gene_disease.json), and the clinician SIGNS EXCEPTIONS to it here rather than writing the list. The base composition of a system (system_disease_terms.json → gencc_gene_disease.json) needs no signature since 13.09.2026, by the owner's decision; this file stays the clinician's.",
+    "who_writes_this": "A clinician. Which positions bear on the working of a system, which allele is the risk allele, and what follows from a genotype state are medical statements, and so is the sentence saying that nothing follows. This program applies the rows it was given, records their source, and derives none; the composition of the monogenic half comes from a base with a version (see gencc_gene_disease.json), and the clinician SIGNS EXCEPTIONS to it here rather than writing the list. The base composition of a system (system_disease_terms.json → gencc_gene_disease.json) needs no signature since 13.09.2026, by the owner's decision; this file stays the clinician's. Signed by the owner on 13.09.2026 (see `signature`): the responsibility for every phrase in this build is the panel author's, and a clinician's counter-signature — correcting a row, striking one out, or adding one — remains open and is what is being asked of clinicians.",
     "unit_is_a_position": "The unit of a row is a POSITION, not a gene. The panel a clinician sent on 12.09.2026 held six rows for DIO1 alone, each with a different consequence; a schema of «gene → one phrase» cannot express such a panel at all. A position is addressed by rsID plus HGVS with a RefSeq accession (NC_000001.11:g.53909897C>A), never by the genotype letters of a report — those are not always on the same strand as the HGVS, are sometimes protein letters and sometimes conventions, and cannot be parsed.",
     "risk_allele_is_hers": "`risk_allele` is set by the author and may be null. It is not always the alternate allele, and deriving it from somebody's genotype is not the same as reading it. A row whose risk allele is null is still read — the genotype is printed to the clinician — but no phrase can be chosen for it, and the row is shown as waiting for the author to name the allele.",
     "text_is_keyed_by_genotype_state": "A phrase is bound to the STATE of the genotype, not to the gene: `text.het` and `text.hom` are the author's, each in both languages or null. This is a second axis, distinct from the kind of link: the kind says what claim may be made, the state says which genotype it is about.",
@@ -29,15 +29,1571 @@
     "next_step": "`next_step` is an optional authored next step with a REQUIRED `kind` from three baskets — lab | genome | ask — because these are three different actions by three different people, and thrown together they read as a prescription.",
     "exclusions": "The clinician's signature on the base. `systems.<key>.exclusions` names a gene the base composed for this system and says why it is not printed as part of it for this purpose — «in the panel, and nothing follows from it for an asymptomatic adult» — with a `reason` and a `source`. An exclusion without a source is not applied and is counted; an applied exclusion is listed with its reason, never silently removed.",
     "no_genetic_half": "A system whose genetic half does not exist in this build says so in words and is not left looking empty: the difference between «no list» and «a list with no findings» is visible on the screen, not only in JSON.",
-    "schema": "systems: { <domain key>: { source, no_genetic_half?: { text: {en,ru} }, exclusions?: { <SYMBOL>: { reason: {en,ru}, source, signed_on? } }, positions: [ { rsid, gene, hgvs (RefSeq accession, g.), protein?, risk_allele: <allele or null>, mode: monogenic|common_variant|pgx, classification? (monogenic), moi? (monogenic), disease? , effect_size? (common_variant), study? (common_variant), kind?, text: { het: {en,ru}|null, hom: {en,ru}|null }, source, submitter?, curated_on?, base_version?, expect?: { marker, direction: lower|higher, note?: {en,ru} }, next_step?: { kind: lab|genome|ask, text: {en,ru}, source } } ] } }",
+    "schema": "systems: { <domain key>: { source, no_genetic_half?: { text: {en,ru} }, exclusions?: { <SYMBOL>: { reason: {en,ru}, source, signed_on? } }, positions: [ { rsid, gene, hgvs (RefSeq accession, g.), protein?, risk_allele: <allele or null>, mode: monogenic|common_variant|pgx, classification? (monogenic), moi? (monogenic), disease? , effect_size? (common_variant), study? (common_variant), kind?, text: { het: {en,ru}|null, hom: {en,ru}|null }, source, submitter?, curated_on?, signed_by?, signed_on?, base_version?, expect?: { marker, direction: lower|higher, note?: {en,ru} }, next_step?: { kind: lab|genome|ask, text: {en,ru}, source } } ] } }",
     "why_empty": {
       "en": "No list has been authored yet. The empty file is deliberate and is not a placeholder to be filled from general knowledge: until a clinician writes a row, the honest answer is that this build holds no curated panel for the system — and where the base has composed a monogenic half (see gencc_gene_disease.json), that half is printed with its version and the curated layer is named as absent. A draft of the thyroid panel in this schema exists outside the repository, awaiting a clinician's signature; her own genotypes are in no file of this project.",
       "ru": "Ни один список ещё не написан. Пустой файл — намеренный, а не заглушка под заполнение из общих знаний: пока врач не напишет строку, честный ответ — что в этой сборке нет курируемой панели для системы; там, где база собрала моногенную половину (см. gencc_gene_disease.json), эта половина печатается с версией, а курируемый слой назван отсутствующим. Черновик панели щитовидной железы в этой схеме существует вне репозитория и ждёт подписи врача; её собственные генотипы ни в одном файле проекта нет."
     },
     "source_tier": "curated_reference",
-    "updated": "2026-09-13"
+    "updated": "2026-09-13",
+    "unreadable": "`systems.<key>.unreadable` names a gene or an allele of this system that short-read sequencing cannot read — a gene beside its pseudogene (CYP21A2), a repeat (the AR CAG repeat, UGT1A1*28) — with the reason and a source. The engine prints such a gene as «requires a separate method» and never as read or as clear (owner's decision of 13.09.2026, task 179).",
+    "signature": "`signed_by` and `signed_on` say WHO took responsibility for the phrase of a row. Every row shipped in this build is signed by the OWNER of the build — the author of the panel — and by no clinician: the composition was agreed on 13.09.2026 (task 179) and the phrases were signed on 13.09.2026, after each was read against the source it names. The engine prints this as authorship and never as a clinical endorsement: the card says the row is signed by the panel's author and not by a clinician, and the summary of the genetic half counts such rows. A row carrying `note_on_signature` instead of `signed_by` is a draft nobody has signed, and the engine says THAT on the row — the mechanism stays for a panel that arrives unsigned, and is held by a test in both directions."
   },
   "systems": {
+    "lipids": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 2; each row names its own source",
+      "positions": [
+        {
+          "rsid": "rs4149056",
+          "gene": "SLCO1B1",
+          "hgvs": "NC_000012.12:g.21178615T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "SLCO1B1 *5, one copy (decreased function): higher simvastatin and atorvastatin exposure and a higher risk of statin myopathy. CPIC: prefer a statin and dose the guideline lists for decreased function (avoid simvastatin above 20 mg); with muscle symptoms on a statin, this is the first thing to check.",
+              "ru": "SLCO1B1 *5, одна копия (сниженная функция): выше экспозиция симвастатина и аторвастатина, выше риск статиновой миопатии. CPIC: выбирать статин и дозу из руководства для сниженной функции (симвастатин не выше 20 мг); при мышечных симптомах на статине — проверять первым."
+            },
+            "hom": {
+              "en": "SLCO1B1 *5 in two copies (poor function): the highest statin myopathy risk. CPIC: avoid simvastatin, keep atorvastatin at or below 20 mg, prefer rosuvastatin/pravastatin/fluvastatin at guideline doses.",
+              "ru": "SLCO1B1 *5 в двух копиях (нарушенная функция): наибольший риск статиновой миопатии. CPIC: симвастатин не назначать, аторвастатин не выше 20 мг, предпочесть розувастатин/правастатин/флувастатин в дозах руководства."
+            }
+          },
+          "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2231142",
+          "gene": "ABCG2",
+          "hgvs": "NC_000004.12:g.88131171G>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "ABCG2 Q141K, one copy: rosuvastatin exposure higher; CPIC: rosuvastatin at or below 20 mg for poor function, and this genotype also raises serum urate.",
+              "ru": "ABCG2 Q141K, одна копия: выше экспозиция розувастатина; CPIC: розувастатин не выше 20 мг при нарушенной функции; этот же генотип повышает урат."
+            },
+            "hom": {
+              "en": "ABCG2 Q141K in two copies (poor function): CPIC — rosuvastatin at or below 20 mg; urate is raised by the same genotype.",
+              "ru": "ABCG2 Q141K в двух копиях (нарушенная функция): CPIC — розувастатин не выше 20 мг; тот же генотип повышает урат."
+            }
+          },
+          "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs11591147",
+          "gene": "PCSK9",
+          "hgvs": "NC_000001.11:g.55039974G>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "PCSK9 R46L, one copy: a lifelong lower LDL-C — a low value here is inherited, not a sign of undernutrition or a missed disease; the coronary risk that goes with it is lower.",
+              "ru": "PCSK9 R46L, одна копия: пожизненно более низкий ЛПНП — низкое значение здесь наследственное, а не признак недоедания или пропущенной болезни; коронарный риск при этом ниже."
+            },
+            "hom": {
+              "en": "PCSK9 R46L in two copies: a markedly lower lifelong LDL-C; the same reading as one copy, stronger.",
+              "ru": "PCSK9 R46L в двух копиях: заметно ниже пожизненный ЛПНП; чтение то же, что при одной копии, только сильнее."
+            }
+          },
+          "source": "Cohen 2006 NEJM (PCSK9 R46L: LDL-C about 15 % lower, coronary events about 47 % fewer)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "LDL-C about −15 % per allele; coronary events about −47 %",
+          "study": "Cohen 2006 NEJM",
+          "expect": {
+            "marker": "ldl",
+            "direction": "lower",
+            "note": {
+              "en": "a loss-of-function PCSK9 allele: LDL-C is expected below the person's untreated norm",
+              "ru": "аллель PCSK9 с потерей функции: ЛПНП ожидается ниже нелеченой нормы"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs28362286",
+          "gene": "PCSK9",
+          "hgvs": "NC_000001.11:g.55063542C>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "PCSK9 C679X, one copy: a stop in PCSK9 — a lifelong lower LDL-C and lower coronary risk; an inherited low LDL-C.",
+              "ru": "PCSK9 C679X, одна копия: стоп-кодон в PCSK9 — пожизненно более низкий ЛПНП и ниже коронарный риск; наследственно низкий ЛПНП."
+            },
+            "hom": {
+              "en": "PCSK9 C679X, two copies: a stop in PCSK9 — a lifelong lower LDL-C and lower coronary risk; an inherited low LDL-C.",
+              "ru": "PCSK9 C679X, две копии: стоп-кодон в PCSK9 — пожизненно более низкий ЛПНП и ниже коронарный риск; наследственно низкий ЛПНП."
+            }
+          },
+          "source": "Cohen 2006 NEJM (PCSK9 C679X)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "LDL-C about −28 % (Cohen 2006, African-American carriers)",
+          "study": "Cohen 2006 NEJM",
+          "expect": {
+            "marker": "ldl",
+            "direction": "lower",
+            "note": {
+              "en": "a loss-of-function PCSK9 allele: LDL-C is expected below the untreated norm",
+              "ru": "аллель PCSK9 с потерей функции: ЛПНП ожидается ниже нелеченой нормы"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs5742904",
+          "gene": "APOB",
+          "hgvs": "NC_000002.12:g.21006288C>T",
+          "protein": "p.Arg3527Gln",
+          "risk_allele": "T",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "APOB R3527Q, one copy: familial hypercholesterolaemia of the APOB kind — LDL-C is high from birth, treatment starts early and the family is screened; one copy is enough, the disease is dominant.",
+              "ru": "APOB R3527Q, одна копия: семейная гиперхолестеринемия формы APOB — ЛПНП высокий с рождения, лечение начинают рано, семью обследуют; одной копии достаточно, болезнь доминантная."
+            },
+            "hom": {
+              "en": "APOB R3527Q in two copies: a severe form; a lipid specialist from the start.",
+              "ru": "APOB R3527Q в двух копиях: тяжёлая форма; липидолог с самого начала."
+            }
+          },
+          "source": "GenCC Definitive (APOB — familial hypercholesterolaemia); ClinVar pathogenic",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AD",
+          "disease": "familial hypercholesterolaemia (APOB)",
+          "expect": {
+            "marker": "ldl",
+            "direction": "higher",
+            "note": {
+              "en": "familial hypercholesterolaemia: LDL-C is expected well above the corridor",
+              "ru": "семейная гиперхолестеринемия: ЛПНП ожидается заметно выше коридора"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs429358",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908684T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "APOE rs429358 C (the ε4 allele), one copy: LDL-C tends to run higher and the LDL response to statins is somewhat smaller; the ε genotype itself is read from both positions (with rs7412) on the genome tab.",
+              "ru": "APOE rs429358 C (аллель ε4), одна копия: ЛПНП склонен быть выше, ответ ЛПНП на статины несколько меньше; сам ε-генотип читается по обеим позициям (вместе с rs7412) на вкладке генома."
+            },
+            "hom": {
+              "en": "APOE rs429358 C in two copies: the ε4 base on both chromosomes. Whether that is ε4/ε4 is read from BOTH positions (with rs7412) — the genome tab gives the ε genotype; with ε4/ε4, LDL-C runs higher and the LDL response to statins is smaller, and the Alzheimer's caveat on the genome tab belongs to the same answer.",
+              "ru": "APOE rs429358 C в двух копиях: основание ε4 на обеих хромосомах. Будет ли это ε4/ε4, читается по ОБЕИМ позициям (вместе с rs7412) — ε-генотип даёт вкладка генома; при ε4/ε4 ЛПНП выше, ответ ЛПНП на статины меньше, и оговорка про болезнь Альцгеймера на вкладке генома относится к тому же ответу."
+            }
+          },
+          "source": "Bennet 2007 JAMA (APOE and lipids/CHD meta-analysis)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "LDL-C about +0.1–0.2 mmol/L per ε4 allele",
+          "study": "Bennet 2007 JAMA",
+          "expect": {
+            "marker": "ldl",
+            "direction": "higher",
+            "note": {
+              "en": "an ε4 allele: LDL-C tends to be higher",
+              "ru": "аллель ε4: ЛПНП склонен быть выше"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs7412",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908822C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "APOE rs7412 T (the ε2 allele), one copy: LDL-C tends to run lower.",
+              "ru": "APOE rs7412 T (аллель ε2), одна копия: ЛПНП склонен быть ниже."
+            },
+            "hom": {
+              "en": "APOE ε2 in two copies (ε2/ε2): usually a low LDL-C, but with a second hit (obesity, diabetes, hypothyroidism) the remnant lipoproteins accumulate — type III hyperlipoproteinaemia, high cholesterol AND triglycerides; the lipid panel of such a person is read differently.",
+              "ru": "APOE ε2 в двух копиях (ε2/ε2): обычно низкий ЛПНП, но при втором факторе (ожирение, диабет, гипотиреоз) накапливаются ремнантные липопротеины — гиперлипопротеинемия III типа, высокие и холестерин, и триглицериды; липидограмма такого человека читается иначе."
+            }
+          },
+          "source": "Bennet 2007 JAMA; Mahley 2009 (type III hyperlipoproteinaemia in ε2/ε2)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "LDL-C about −0.3 mmol/L per ε2 allele",
+          "study": "Bennet 2007 JAMA",
+          "expect": {
+            "marker": "ldl",
+            "direction": "lower",
+            "note": {
+              "en": "an ε2 allele: LDL-C tends to be lower",
+              "ru": "аллель ε2: ЛПНП склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "cardio": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 13; each row names its own source",
+      "positions": [
+        {
+          "rsid": "rs9923231",
+          "gene": "VKORC1",
+          "hgvs": "NC_000016.10:g.31096368C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "VKORC1 −1639 A, one copy: higher warfarin sensitivity — the CPIC dosing algorithm gives a lower starting dose; INR reaches range on less drug.",
+              "ru": "VKORC1 −1639 A, одна копия: выше чувствительность к варфарину — алгоритм CPIC даёт меньшую стартовую дозу; МНО выходит в диапазон на меньшей дозе."
+            },
+            "hom": {
+              "en": "VKORC1 −1639 A in two copies: the most warfarin-sensitive genotype; a markedly lower starting dose by the CPIC algorithm and closer INR control.",
+              "ru": "VKORC1 −1639 A в двух копиях: самый чувствительный к варфарину генотип; заметно меньшая стартовая доза по алгоритму CPIC и более частый контроль МНО."
+            }
+          },
+          "source": "CPIC guideline for warfarin (Johnson 2017)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799853",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94942290C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *2, one copy: slower warfarin clearance — a lower dose by the CPIC algorithm; also relevant to NSAIDs and fluvastatin.",
+              "ru": "CYP2C9 *2, одна копия: медленнее выведение варфарина — ниже доза по алгоритму CPIC; касается также НПВС и флувастатина."
+            },
+            "hom": {
+              "en": "CYP2C9 *2, two copies: slower warfarin clearance — a lower dose by the CPIC algorithm; also relevant to NSAIDs and fluvastatin.",
+              "ru": "CYP2C9 *2, две копии: медленнее выведение варфарина — ниже доза по алгоритму CPIC; касается также НПВС и флувастатина."
+            }
+          },
+          "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1057910",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94981296A>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *3, one copy: markedly slower warfarin clearance — a lower dose by the CPIC algorithm; NSAIDs at the lowest dose with monitoring.",
+              "ru": "CYP2C9 *3, одна копия: заметно медленнее выведение варфарина — ниже доза по алгоритму CPIC; НПВС в минимальной дозе с контролем."
+            },
+            "hom": {
+              "en": "CYP2C9 *3 in two copies (poor metaboliser): warfarin at a small fraction of the usual dose; CPIC advises avoiding NSAIDs cleared by CYP2C9 or a quarter of the dose.",
+              "ru": "CYP2C9 *3 в двух копиях (медленный метаболизатор): варфарин в малой доле обычной дозы; CPIC советует избегать НПВС, выводимых CYP2C9, или четверть дозы."
+            }
+          },
+          "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2108622",
+          "gene": "CYP4F2",
+          "hgvs": "NC_000019.10:g.15879621C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP4F2 V433M, one copy: slightly higher warfarin requirement — a small upward adjustment in the CPIC algorithm.",
+              "ru": "CYP4F2 V433M, одна копия: чуть выше потребность в варфарине — небольшая поправка вверх в алгоритме CPIC."
+            },
+            "hom": {
+              "en": "CYP4F2 V433M, two copies: slightly higher warfarin requirement — a small upward adjustment in the CPIC algorithm.",
+              "ru": "CYP4F2 V433M, две копии: чуть выше потребность в варфарине — небольшая поправка вверх в алгоритме CPIC."
+            }
+          },
+          "source": "CPIC guideline for warfarin (Johnson 2017)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs4244285",
+          "gene": "CYP2C19",
+          "hgvs": "NC_000010.11:g.94781859G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C19 *2, one copy (intermediate metaboliser): less active clopidogrel — CPIC: after a coronary stent or stroke prefer prasugrel or ticagrelor where not contraindicated.",
+              "ru": "CYP2C19 *2, одна копия (промежуточный метаболизатор): меньше активного клопидогрела — CPIC: после стента или инсульта предпочесть прасугрел или тикагрелор, если нет противопоказаний."
+            },
+            "hom": {
+              "en": "CYP2C19 *2 in two copies (poor metaboliser): clopidogrel largely ineffective — CPIC: prasugrel or ticagrelor.",
+              "ru": "CYP2C19 *2 в двух копиях (медленный метаболизатор): клопидогрел практически не работает — CPIC: прасугрел или тикагрелор."
+            }
+          },
+          "source": "CPIC guideline for clopidogrel (Lee 2022)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs12248560",
+          "gene": "CYP2C19",
+          "hgvs": "NC_000010.11:g.94761900C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C19 *17, one copy (rapid metaboliser): clopidogrel works normally; proton-pump inhibitors are cleared faster — CPIC suggests a higher PPI dose if acid is not controlled.",
+              "ru": "CYP2C19 *17, одна копия (быстрый метаболизатор): клопидогрел работает нормально; ингибиторы протонной помпы выводятся быстрее — CPIC предлагает большую дозу ИПП, если кислотность не контролируется."
+            },
+            "hom": {
+              "en": "CYP2C19 *17 in two copies (ultrarapid): PPIs may need a higher dose; clopidogrel works.",
+              "ru": "CYP2C19 *17 в двух копиях (ультрабыстрый): ИПП может понадобиться большая доза; клопидогрел работает."
+            }
+          },
+          "source": "CPIC guideline for clopidogrel (Lee 2022); CPIC PPIs 2020",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs6025",
+          "gene": "F5",
+          "hgvs": "NC_000001.11:g.169549811C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "Factor V Leiden, one copy: venous thrombosis risk about 5-fold; under oestrogen or testosterone therapy the risk multiplies — a reason to prefer transdermal routes and to watch the haematocrit, not a contraindication by itself.",
+              "ru": "Фактор V Лейден, одна копия: риск венозного тромбоза примерно в 5 раз; на терапии эстрогенами или тестостероном риск умножается — повод предпочесть трансдермальные формы и следить за гематокритом, сама по себе не противопоказание."
+            },
+            "hom": {
+              "en": "Factor V Leiden in two copies: venous thrombosis risk tens-fold; a haematologist before any hormonal therapy or long immobilisation.",
+              "ru": "Фактор V Лейден в двух копиях: риск венозного тромбоза в десятки раз; гематолог до любой гормональной терапии или длительной иммобилизации."
+            }
+          },
+          "source": "ACOG/ESHRE guidance on thrombophilia and hormonal therapy; Rosendaal 1995 Lancet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "VTE OR about 5 (heterozygote), about 50 (homozygote)",
+          "study": "Rosendaal 1995 Lancet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799963",
+          "gene": "F2",
+          "hgvs": "NC_000011.10:g.46739505G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "Prothrombin G20210A, one copy: venous thrombosis risk about 2–3-fold; with Factor V Leiden the two add up — hormonal therapy and long immobilisation are the moments to remember it.",
+              "ru": "Протромбин G20210A, одна копия: риск венозного тромбоза примерно в 2–3 раза; вместе с фактором V Лейден риски складываются — гормональная терапия и длительная иммобилизация — моменты, когда об этом помнят."
+            },
+            "hom": {
+              "en": "Prothrombin G20210A, two copies: venous thrombosis risk about 2–3-fold; with Factor V Leiden the two add up — hormonal therapy and long immobilisation are the moments to remember it.",
+              "ru": "Протромбин G20210A, две копии: риск венозного тромбоза примерно в 2–3 раза; вместе с фактором V Лейден риски складываются — гормональная терапия и длительная иммобилизация — моменты, когда об этом помнят."
+            }
+          },
+          "source": "Poort 1996 Blood; ACOG/ESHRE guidance",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "VTE OR about 2–3 (heterozygote)",
+          "study": "Poort 1996 Blood",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs10455872",
+          "gene": "LPA",
+          "hgvs": "NC_000006.12:g.160589086A>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "LPA rs10455872 G, one copy: an inherited high lipoprotein(a) is likely — Lp(a) is measured once; if high, the LDL-C target is set lower and the family is told.",
+              "ru": "LPA rs10455872 G, одна копия: вероятен наследственно высокий липопротеин(a) — Lp(a) измеряют один раз; при высоком значении цель по ЛПНП ставят ниже, семье сообщают."
+            },
+            "hom": {
+              "en": "LPA rs10455872 G in two copies: a high Lp(a) is very likely; Lp(a) once, and a lower LDL-C target.",
+              "ru": "LPA rs10455872 G в двух копиях: высокий Lp(a) очень вероятен; Lp(a) один раз, цель по ЛПНП ниже."
+            }
+          },
+          "source": "Clarke 2009 NEJM",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "Lp(a) markedly higher; CAD OR about 1.7 per allele",
+          "study": "Clarke 2009 NEJM",
+          "expect": {
+            "marker": "lpa",
+            "direction": "higher",
+            "note": {
+              "en": "an LPA risk allele: lipoprotein(a) is expected high",
+              "ru": "аллель риска LPA: липопротеин(a) ожидается высоким"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs3798220",
+          "gene": "LPA",
+          "hgvs": "NC_000006.12:g.160540105T>C",
+          "protein": "p.Ile1891Met",
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "LPA I4399M (C), one copy: a high lipoprotein(a) is likely — measured once, and the LDL-C target is set lower if it is high.",
+              "ru": "LPA I4399M (C), одна копия: вероятен высокий липопротеин(a) — измеряют один раз, при высоком значении цель по ЛПНП ниже."
+            },
+            "hom": {
+              "en": "LPA I4399M (C), two copies: a high lipoprotein(a) is likely — measured once, and the LDL-C target is set lower if it is high.",
+              "ru": "LPA I4399M (C), две копии: вероятен высокий липопротеин(a) — измеряют один раз, при высоком значении цель по ЛПНП ниже."
+            }
+          },
+          "source": "Clarke 2009 NEJM",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "Lp(a) markedly higher; CAD OR about 1.9 per allele",
+          "study": "Clarke 2009 NEJM",
+          "expect": {
+            "marker": "lpa",
+            "direction": "higher",
+            "note": {
+              "en": "an LPA risk allele: lipoprotein(a) is expected high",
+              "ru": "аллель риска LPA: липопротеин(a) ожидается высоким"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1801253",
+          "gene": "ADRB1",
+          "hgvs": "NC_000010.11:g.114045297G>C",
+          "protein": "p.Gly389Arg",
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "ADRB1 Arg389 (C), one copy (Arg/Gly): a more active beta-1 receptor on one chromosome; the response to beta-blockers reported for Arg389 carriers is somewhat larger, and no guideline changes the choice or the dose by it.",
+              "ru": "ADRB1 Arg389 (C), одна копия (Arg/Gly): более активный бета-1 рецептор на одной хромосоме; для носителей Arg389 описан несколько больший ответ на бета-блокаторы, ни одно руководство по этому не меняет выбор или дозу."
+            },
+            "hom": {
+              "en": "ADRB1 Arg389 in two copies (Arg/Arg), the commonest genotype: the most active beta-1 receptor; the largest blood-pressure and heart-rate response to beta-blockers is reported here, and still no guideline sets the drug or the dose by it.",
+              "ru": "ADRB1 Arg389 в двух копиях (Arg/Arg), самый частый генотип: наиболее активный бета-1 рецептор; здесь описан наибольший ответ давления и пульса на бета-блокаторы, и всё равно ни одно руководство не задаёт по нему препарат или дозу."
+            }
+          },
+          "source": "the locus catalogue; no CPIC/DPWG guideline for beta-blockers",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "glucose": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 3",
+      "positions": [
+        {
+          "rsid": "rs1050828",
+          "gene": "G6PD",
+          "hgvs": "NC_000023.11:g.154536002C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "G6PD A− (V68M), one copy: in a woman a partial deficiency, in a man (X-linked) a deficiency — HbA1c reads LOWER than the true glycaemia because red cells live shorter; judge diabetes control by glucose or fructosamine. Dapsone, primaquine, rasburicase, nitrofurantoin are the drugs CPIC restricts.",
+              "ru": "G6PD A− (V68M), одна копия: у женщины частичный дефицит, у мужчины (X-сцепленный) — дефицит; HbA1c показывает НИЖЕ истинной гликемии, потому что эритроциты живут меньше; контроль диабета — по глюкозе или фруктозамину. Дапсон, примахин, расбуриказа, нитрофурантоин — препараты, которые CPIC ограничивает."
+            },
+            "hom": {
+              "en": "G6PD A− in two copies: deficiency — HbA1c is not a reliable measure of control; the CPIC drug list applies in full.",
+              "ru": "G6PD A− в двух копиях: дефицит — HbA1c не надёжная мера контроля; список препаратов CPIC действует полностью."
+            }
+          },
+          "source": "CPIC G6PD (Gammal 2023); Wheeler 2017 PLoS Med (HbA1c underestimates glycaemia in G6PD deficiency)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "expect": {
+            "marker": "hba1c",
+            "direction": "lower",
+            "note": {
+              "en": "with G6PD deficiency HbA1c underestimates glycaemia",
+              "ru": "при дефиците G6PD HbA1c занижает гликемию"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs5030868",
+          "gene": "G6PD",
+          "hgvs": "NC_000023.11:g.154534419G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "G6PD Mediterranean (S188F), one copy: as the A− allele but more severe — HbA1c underestimates glycaemia; the CPIC-restricted drugs apply.",
+              "ru": "G6PD Mediterranean (S188F), одна копия: как аллель A−, но тяжелее — HbA1c занижает гликемию; действует список ограниченных CPIC препаратов."
+            },
+            "hom": {
+              "en": "G6PD Mediterranean (S188F), two copies: as the A− allele but more severe — HbA1c underestimates glycaemia; the CPIC-restricted drugs apply.",
+              "ru": "G6PD Mediterranean (S188F), две копии: как аллель A−, но тяжелее — HbA1c занижает гликемию; действует список ограниченных CPIC препаратов."
+            }
+          },
+          "source": "CPIC G6PD (Gammal 2023)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "expect": {
+            "marker": "hba1c",
+            "direction": "lower",
+            "note": {
+              "en": "with G6PD deficiency HbA1c underestimates glycaemia",
+              "ru": "при дефиците G6PD HbA1c занижает гликемию"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs7903146",
+          "gene": "TCF7L2",
+          "hgvs": "NC_000010.11:g.112998590C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "TCF7L2 T, one copy: type 2 diabetes risk about 1.4-fold — a reason to screen glucose and HbA1c earlier and to weigh lifestyle, not a diagnosis.",
+              "ru": "TCF7L2 T, одна копия: риск СД2 примерно в 1,4 раза — повод раньше проверять глюкозу и HbA1c и взвесить образ жизни, не диагноз."
+            },
+            "hom": {
+              "en": "TCF7L2 T in two copies: type 2 diabetes risk about 2-fold; the same advice, earlier.",
+              "ru": "TCF7L2 T в двух копиях: риск СД2 примерно в 2 раза; тот же совет, раньше."
+            }
+          },
+          "source": "Grant 2006 Nat Genet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "T2D OR about 1.4 per allele",
+          "study": "Grant 2006 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1260326",
+          "gene": "GCKR",
+          "hgvs": "NC_000002.12:g.27508073T>C",
+          "protein": "p.Leu446Pro",
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "GCKR Leu446 (T, the reference base), one copy: fasting glucose and insulin run slightly LOWER and triglycerides HIGHER — the gene pulls the two readings in opposite directions, so a raised triglyceride here is not a sign of worse glucose control.",
+              "ru": "GCKR Leu446 (T, референсное основание), одна копия: глюкоза и инсулин натощак чуть НИЖЕ, а триглицериды ВЫШЕ — ген тянет два показателя в разные стороны, поэтому повышенные триглицериды здесь не признак худшего контроля глюкозы."
+            },
+            "hom": {
+              "en": "GCKR Leu446 in two copies: the same opposite pull, larger — lower fasting glucose, higher triglycerides.",
+              "ru": "GCKR Leu446 в двух копиях: то же разнонаправленное действие, сильнее — ниже глюкоза натощак, выше триглицериды."
+            }
+          },
+          "source": "Orho-Melander 2008 Diabetes",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "fasting glucose about −0.03 to −0.08 mmol/L per T allele; triglycerides higher",
+          "study": "Orho-Melander 2008 Diabetes; GWAS Catalog (many cohorts, BMI-adjusted included)",
+          "expect": {
+            "marker": "glucose",
+            "direction": "lower",
+            "note": {
+              "en": "the GCKR Leu446 allele: fasting glucose tends to be slightly lower",
+              "ru": "аллель GCKR Leu446: глюкоза натощак склонна быть чуть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1801282",
+          "gene": "PPARG",
+          "hgvs": "NC_000003.12:g.12351626C>G",
+          "protein": "p.Pro12Ala",
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "PPARG Ala12 (G), one copy: type 2 diabetes risk modestly lower; nothing follows for treatment.",
+              "ru": "PPARG Ala12 (G), одна копия: риск СД2 немного ниже; для лечения ничего не следует."
+            },
+            "hom": {
+              "en": "PPARG Ala12 (G), two copies: type 2 diabetes risk modestly lower; nothing follows for treatment.",
+              "ru": "PPARG Ala12 (G), две копии: риск СД2 немного ниже; для лечения ничего не следует."
+            }
+          },
+          "source": "Altshuler 2000 Nat Genet (PPARG Pro12Ala)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "T2D OR about 0.8 per Ala allele",
+          "study": "Altshuler 2000 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs12208357",
+          "gene": "SLC22A1",
+          "hgvs": "NC_000006.12:g.160122116C>T",
+          "protein": "p.Arg61Cys",
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "SLC22A1 R61C, one copy: a reduced-function OCT1 allele; studies disagree on whether metformin works less well — no guideline changes the prescription by it.",
+              "ru": "SLC22A1 R61C, одна копия: аллель OCT1 со сниженной функцией; исследования расходятся, работает ли метформин хуже — ни одно руководство по этому не меняет назначение."
+            },
+            "hom": {
+              "en": "SLC22A1 R61C, two copies: a reduced-function OCT1 allele; studies disagree on whether metformin works less well — no guideline changes the prescription by it.",
+              "ru": "SLC22A1 R61C, две копии: аллель OCT1 со сниженной функцией; исследования расходятся, работает ли метформин хуже — ни одно руководство по этому не меняет назначение."
+            }
+          },
+          "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs34130495",
+          "gene": "SLC22A1",
+          "hgvs": "NC_000006.12:g.160139792G>A",
+          "protein": "p.Gly401Ser",
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "SLC22A1 G401S, one copy: a reduced-function OCT1 allele; as R61C — asked about, nothing decided.",
+              "ru": "SLC22A1 G401S, одна копия: аллель OCT1 со сниженной функцией; как R61C — о нём спрашивают, ничего не решается."
+            },
+            "hom": {
+              "en": "SLC22A1 G401S, two copies: a reduced-function OCT1 allele; as R61C — asked about, nothing decided.",
+              "ru": "SLC22A1 G401S, две копии: аллель OCT1 со сниженной функцией; как R61C — о нём спрашивают, ничего не решается."
+            }
+          },
+          "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "inflammation": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 4",
+      "positions": [
+        {
+          "rsid": "rs1801133",
+          "gene": "MTHFR",
+          "hgvs": "NC_000001.11:g.11796321G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "MTHFR 677T, one copy: homocysteine slightly higher when folate is low; folate and B12 status is what to check — the genotype itself is not a diagnosis and does not call for treatment.",
+              "ru": "MTHFR 677T, одна копия: гомоцистеин чуть выше при низком фолате; проверять статус фолата и B12 — сам генотип не диагноз и лечения не требует."
+            },
+            "hom": {
+              "en": "MTHFR 677TT: homocysteine about 20–25 % higher when folate is low — check folate and B12; with them replete the difference largely disappears.",
+              "ru": "MTHFR 677TT: гомоцистеин на ~20–25 % выше при низком фолате — проверить фолат и B12; при их достатке разница почти исчезает."
+            }
+          },
+          "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "homocysteine about +20–25 % in TT with low folate",
+          "study": "Klerk 2002 JAMA",
+          "expect": {
+            "marker": "homocysteine",
+            "direction": "higher",
+            "note": {
+              "en": "MTHFR 677T: homocysteine tends to be higher when folate is low",
+              "ru": "MTHFR 677T: гомоцистеин склонен быть выше при низком фолате"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1801131",
+          "gene": "MTHFR",
+          "hgvs": "NC_000001.11:g.11794419T>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
+              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+            },
+            "hom": {
+              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
+              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+            }
+          },
+          "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "no reproducible effect on homocysteine alone",
+          "study": "Weisberg 1998",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1800462",
+          "gene": "TPMT",
+          "hgvs": "NC_000006.12:g.18143724C>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "TPMT *2, one copy (intermediate metaboliser): azathioprine and mercaptopurine at a reduced starting dose (CPIC: 30–80 % of normal) with blood-count monitoring.",
+              "ru": "TPMT *2, одна копия (промежуточный метаболизатор): азатиоприн и меркаптопурин со сниженной стартовой дозы (CPIC: 30–80 % обычной) с контролем крови."
+            },
+            "hom": {
+              "en": "TPMT *2 in two copies (poor metaboliser): CPIC — a drastic dose reduction or another drug; standard doses cause severe myelosuppression.",
+              "ru": "TPMT *2 в двух копиях (медленный метаболизатор): CPIC — резкое снижение дозы или другой препарат; стандартные дозы дают тяжёлую миелосупрессию."
+            }
+          },
+          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1142345",
+          "gene": "TPMT",
+          "hgvs": "NC_000006.12:g.18130687T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "TPMT *3C, one copy (intermediate metaboliser): thiopurines at a reduced starting dose with monitoring (CPIC).",
+              "ru": "TPMT *3C, одна копия (промежуточный метаболизатор): тиопурины со сниженной стартовой дозы с контролем (CPIC)."
+            },
+            "hom": {
+              "en": "TPMT *3C in two copies (poor metaboliser): CPIC — a drastic dose reduction or another drug.",
+              "ru": "TPMT *3C в двух копиях (медленный метаболизатор): CPIC — резкое снижение дозы или другой препарат."
+            }
+          },
+          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs116855232",
+          "gene": "NUDT15",
+          "hgvs": "NC_000013.11:g.48045719C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "NUDT15 *3, one copy (intermediate metaboliser): thiopurines at a reduced starting dose (CPIC), especially relevant in East-Asian ancestry.",
+              "ru": "NUDT15 *3, одна копия (промежуточный метаболизатор): тиопурины со сниженной стартовой дозы (CPIC), особенно значимо при восточноазиатском происхождении."
+            },
+            "hom": {
+              "en": "NUDT15 *3 in two copies (poor metaboliser): CPIC — a drastic reduction or another drug.",
+              "ru": "NUDT15 *3 в двух копиях (медленный метаболизатор): CPIC — резкое снижение или другой препарат."
+            }
+          },
+          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799853",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94942290C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *2, one copy: NSAIDs cleared by CYP2C9 (celecoxib, ibuprofen, meloxicam, piroxicam) at the lowest effective dose; the same allele matters for warfarin.",
+              "ru": "CYP2C9 *2, одна копия: НПВС, выводимые CYP2C9 (целекоксиб, ибупрофен, мелоксикам, пироксикам), в минимальной эффективной дозе; тот же аллель значим для варфарина."
+            },
+            "hom": {
+              "en": "CYP2C9 *2, two copies: NSAIDs cleared by CYP2C9 (celecoxib, ibuprofen, meloxicam, piroxicam) at the lowest effective dose; the same allele matters for warfarin.",
+              "ru": "CYP2C9 *2, две копии: НПВС, выводимые CYP2C9 (целекоксиб, ибупрофен, мелоксикам, пироксикам), в минимальной эффективной дозе; тот же аллель значим для варфарина."
+            }
+          },
+          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1057910",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94981296A>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *3, one copy: CPIC — start CYP2C9-cleared NSAIDs at the lowest dose and titrate; for meloxicam and piroxicam consider another drug.",
+              "ru": "CYP2C9 *3, одна копия: CPIC — начинать НПВС, выводимые CYP2C9, с минимальной дозы и титровать; для мелоксикама и пироксикама подумать о другом препарате."
+            },
+            "hom": {
+              "en": "CYP2C9 *3 in two copies: CPIC — avoid CYP2C9-cleared NSAIDs or use a quarter of the lowest dose; warfarin at a small fraction of the usual dose.",
+              "ru": "CYP2C9 *3 в двух копиях: CPIC — избегать НПВС, выводимых CYP2C9, или четверть минимальной дозы; варфарин в малой доле обычной дозы."
+            }
+          },
+          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs4349859",
+          "gene": "HLA-B",
+          "hgvs": "NC_000006.12:g.31398010G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "HLA-B*27 tag (A), one copy: HLA-B*27 is likely — with inflammatory back pain or uveitis a reason to see a rheumatologist; the allele itself is confirmed by HLA typing.",
+              "ru": "Тег HLA-B*27 (A), одна копия: HLA-B*27 вероятен — при воспалительной боли в спине или увеите повод к ревматологу; сам аллель подтверждает HLA-типирование."
+            },
+            "hom": {
+              "en": "HLA-B*27 tag (A), two copies: HLA-B*27 is likely — with inflammatory back pain or uveitis a reason to see a rheumatologist; the allele itself is confirmed by HLA typing.",
+              "ru": "Тег HLA-B*27 (A), две копии: HLA-B*27 вероятен — при воспалительной боли в спине или увеите повод к ревматологу; сам аллель подтверждает HLA-типирование."
+            }
+          },
+          "source": "Evans 2011 Nat Genet (HLA-B27 tag SNP)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "ankylosing spondylitis OR about 40 for HLA-B*27",
+          "study": "Evans 2011 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1205",
+          "gene": "CRP",
+          "hgvs": "NC_000001.11:g.159712443C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "CRP rs1205, one copy: a variant of the CRP gene associated with the baseline CRP level; which allele lowers it was not confirmed by a second source, so a measured hs-CRP is read on its own and nothing follows from this genotype.",
+              "ru": "CRP rs1205, одна копия: вариант гена CRP, связанный с базовым уровнем СРБ; какой аллель его снижает, вторым источником не подтверждено, поэтому измеренный hs-СРБ читается сам по себе и из генотипа ничего не следует."
+            },
+            "hom": {
+              "en": "CRP rs1205 in two copies: the same — associated with the baseline CRP level, direction not confirmed; nothing follows.",
+              "ru": "CRP rs1205 в двух копиях: то же — связь с базовым СРБ, направление не подтверждено; ничего не следует."
+            }
+          },
+          "source": "Kathiresan 2006 Circulation (CRP gene variants and CRP level)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "association with the baseline CRP level; the allele direction not confirmed by a second source",
+          "study": "Kathiresan 2006 Circulation",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2228145",
+          "gene": "IL6R",
+          "hgvs": "NC_000001.11:g.154454494A>C",
+          "protein": "p.Asp358Ala",
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "IL6R Ala358 (C), one copy: more soluble IL-6 receptor, CRP somewhat lower; an association without a rule.",
+              "ru": "IL6R Ala358 (C), одна копия: больше растворимого рецептора IL-6, СРБ несколько ниже; ассоциация без правила."
+            },
+            "hom": {
+              "en": "IL6R Ala358 (C), two copies: more soluble IL-6 receptor, CRP somewhat lower; an association without a rule.",
+              "ru": "IL6R Ala358 (C), две копии: больше растворимого рецептора IL-6, СРБ несколько ниже; ассоциация без правила."
+            }
+          },
+          "source": "Ferreira 2013 PLoS Genet (IL6R Asp358Ala)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "CRP about −10 % per C allele",
+          "study": "Ferreira 2013 PLoS Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "thyroid": {
+      "source": "reports/164-thyroid-panel-draft.json (the clinician's blank of 12.09.2026) sorted by type in reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 5",
+      "positions": [
+        {
+          "rsid": "rs225014",
+          "gene": "DIO2",
+          "hgvs": "NC_000014.9:g.80203237T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "DIO2 Thr92Ala, one copy: a somewhat less active type-2 deiodinase — on levothyroxine alone some people report less well-being; ETA does not recommend routine testing, so this is a question about the LT4+LT3 option, not a reason to change treatment.",
+              "ru": "DIO2 Thr92Ala, одна копия: несколько менее активная дейодиназа 2 типа — на монотерапии левотироксином часть людей отмечает худшее самочувствие; ETA не рекомендует рутинно тестировать, так что это вопрос о варианте LT4+LT3, а не повод менять лечение."
+            },
+            "hom": {
+              "en": "DIO2 Ala92 in two copies: the effect reported is stronger; the same question about LT4+LT3, with the same caveat.",
+              "ru": "DIO2 Ala92 в двух копиях: описанный эффект сильнее; тот же вопрос об LT4+LT3 с той же оговоркой."
+            }
+          },
+          "source": "Panicker 2009 JCEM (DIO2 Thr92Ala and LT4/LT3 response); ETA 2012 guideline",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "psychological well-being on LT4 lower in Ala/Ala (Panicker 2009); no effect on TSH or fT4",
+          "study": "Panicker 2009 JCEM",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2235544",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53909897C>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "DIO1 rs2235544 A, one copy: the free T3/free T4 ratio shifts (more T4, less T3) — a low-normal free T3 next to a high-normal free T4 may be this, not a problem of the gland.",
+              "ru": "DIO1 rs2235544 A, одна копия: отношение Т3св/Т4св сдвигается (больше Т4, меньше Т3) — низконормальный Т3св рядом с высоконормальным Т4св может быть этим, а не проблемой железы."
+            },
+            "hom": {
+              "en": "DIO1 rs2235544 A, two copies: the free T3/free T4 ratio shifts (more T4, less T3) — a low-normal free T3 next to a high-normal free T4 may be this, not a problem of the gland.",
+              "ru": "DIO1 rs2235544 A, две копии: отношение Т3св/Т4св сдвигается (больше Т4, меньше Т3) — низконормальный Т3св рядом с высоконормальным Т4св может быть этим, а не проблемой железы."
+            }
+          },
+          "source": "Panicker 2008 JCEM (DIO1 variants and the fT3/fT4 ratio)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "fT3/fT4 ratio lower per A allele (Panicker 2008)",
+          "study": "Panicker 2008 JCEM",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs11206244",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53910028C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "DIO1 rs11206244 T, one copy: free T4 and reverse T3 slightly higher, T3 slightly lower — the same ratio shift as rs2235544.",
+              "ru": "DIO1 rs11206244 T, одна копия: Т4св и обратный Т3 чуть выше, Т3 чуть ниже — тот же сдвиг отношения, что у rs2235544."
+            },
+            "hom": {
+              "en": "DIO1 rs11206244 T, two copies: free T4 and reverse T3 slightly higher, T3 slightly lower — the same ratio shift as rs2235544.",
+              "ru": "DIO1 rs11206244 T, две копии: Т4св и обратный Т3 чуть выше, Т3 чуть ниже — тот же сдвиг отношения, что у rs2235544."
+            }
+          },
+          "source": "Peeters 2003 JCEM (DIO1 C785T and thyroid hormone levels)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "fT4 higher, T3 lower per T allele (Peeters 2003)",
+          "study": "Peeters 2003 JCEM",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2294512",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53904633G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DIO1 rs2294512, one copy: named on the clinician's panel; no measured effect of its own — the clinician's phrase is awaited.",
+              "ru": "DIO1 rs2294512, одна копия: названа в панели врача; собственного измеренного эффекта нет — ждём фразы врача."
+            },
+            "hom": {
+              "en": "DIO1 rs2294512, two copies: named on the clinician's panel; no measured effect of its own — the clinician's phrase is awaited.",
+              "ru": "DIO1 rs2294512, две копии: названа в панели врача; собственного измеренного эффекта нет — ждём фразы врача."
+            }
+          },
+          "source": "the clinician's thyroid panel of 12.09.2026",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none established on its own",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs4926616",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53904057T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DIO1 rs4926616, one copy: named on the clinician's panel; no measured effect of its own.",
+              "ru": "DIO1 rs4926616, одна копия: названа в панели врача; собственного измеренного эффекта нет."
+            },
+            "hom": {
+              "en": "DIO1 rs4926616, two copies: named on the clinician's panel; no measured effect of its own.",
+              "ru": "DIO1 rs4926616, две копии: названа в панели врача; собственного измеренного эффекта нет."
+            }
+          },
+          "source": "the clinician's thyroid panel of 12.09.2026",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none established on its own",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs754694815",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53894492C>A",
+          "protein": "p.Asn94Lys",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DIO1 N94K, one copy: a rare change named on the clinician's panel; ClinVar holds no classification — printed as named, no conclusion follows.",
+              "ru": "DIO1 N94K, одна копия: редкая замена из панели врача; в ClinVar классификации нет — печатается как названная, вывода не следует."
+            },
+            "hom": {
+              "en": "DIO1 N94K, two copies: a rare change named on the clinician's panel; ClinVar holds no classification — printed as named, no conclusion follows.",
+              "ru": "DIO1 N94K, две копии: редкая замена из панели врача; в ClinVar классификации нет — печатается как названная, вывода не следует."
+            }
+          },
+          "source": "the clinician's thyroid panel of 12.09.2026; ClinVar — no classification",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "No Known Disease Relationship",
+          "moi": "AD",
+          "disease": "none classified",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs201420507",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53906216G>A",
+          "protein": "p.Met201Ile",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DIO1 M201I, one copy: a rare change named on the clinician's panel; no classification — printed as named.",
+              "ru": "DIO1 M201I, одна копия: редкая замена из панели врача; классификации нет — печатается как названная."
+            },
+            "hom": {
+              "en": "DIO1 M201I, two copies: a rare change named on the clinician's panel; no classification — printed as named.",
+              "ru": "DIO1 M201I, две копии: редкая замена из панели врача; классификации нет — печатается как названная."
+            }
+          },
+          "source": "the clinician's thyroid panel of 12.09.2026; ClinVar — no classification",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "No Known Disease Relationship",
+          "moi": "AD",
+          "disease": "none classified",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs119461976",
+          "gene": "SECISBP2",
+          "hgvs": "NC_000009.12:g.89348095G>A",
+          "protein": "p.Arg540Gln",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SECISBP2 R540Q, one copy: carriership of SECISBP2 deficiency (autosomal recessive) — nothing follows for the carrier; the profile high T4 / low T3 / high rT3 belongs to two copies.",
+              "ru": "SECISBP2 R540Q, одна копия: носительство дефицита SECISBP2 (аутосомно-рецессивно) — для носителя ничего не следует; профиль высокий Т4 / низкий Т3 / высокий rT3 — у двух копий."
+            },
+            "hom": {
+              "en": "SECISBP2 R540Q in two copies: SECISBP2 deficiency — abnormal thyroid hormone metabolism (high T4, low T3, high rT3); an endocrinologist who knows the condition.",
+              "ru": "SECISBP2 R540Q в двух копиях: дефицит SECISBP2 — аномалия метаболизма тиреоидных гормонов (высокий Т4, низкий Т3, высокий rT3); эндокринолог, знающий это состояние."
+            }
+          },
+          "source": "GenCC Strong (SECISBP2 — thyroid hormone metabolism abnormality, AR); Dumitrescu 2005",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Strong",
+          "moi": "AR",
+          "disease": "thyroid hormone metabolism abnormality 1 (SECISBP2)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs119461977",
+          "gene": "SECISBP2",
+          "hgvs": "NC_000009.12:g.89341356A>T",
+          "protein": "p.Lys438Ter",
+          "risk_allele": "T",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SECISBP2 K438X, one copy: carriership (recessive); nothing follows for the carrier.",
+              "ru": "SECISBP2 K438X, одна копия: носительство (рецессивно); для носителя ничего не следует."
+            },
+            "hom": {
+              "en": "SECISBP2 K438X in two copies: SECISBP2 deficiency.",
+              "ru": "SECISBP2 K438X в двух копиях: дефицит SECISBP2."
+            }
+          },
+          "source": "GenCC Strong (SECISBP2, AR)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Strong",
+          "moi": "AR",
+          "disease": "thyroid hormone metabolism abnormality 1 (SECISBP2)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs730880269",
+          "gene": "SECISBP2",
+          "hgvs": "NC_000009.12:g.89338609G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SECISBP2 rs730880269, one copy: carriership (recessive).",
+              "ru": "SECISBP2 rs730880269, одна копия: носительство (рецессивно)."
+            },
+            "hom": {
+              "en": "SECISBP2 rs730880269 in two copies: SECISBP2 deficiency.",
+              "ru": "SECISBP2 rs730880269 в двух копиях: дефицит SECISBP2."
+            }
+          },
+          "source": "GenCC Strong (SECISBP2, AR); the clinician's panel",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Strong",
+          "moi": "AR",
+          "disease": "thyroid hormone metabolism abnormality 1 (SECISBP2)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs777447200",
+          "gene": "SECISBP2",
+          "hgvs": "NC_000009.12:g.89325602C>T",
+          "protein": "p.Arg120Ter",
+          "risk_allele": "T",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SECISBP2 R120X, one copy: carriership (recessive).",
+              "ru": "SECISBP2 R120X, одна копия: носительство (рецессивно)."
+            },
+            "hom": {
+              "en": "SECISBP2 R120X in two copies: SECISBP2 deficiency.",
+              "ru": "SECISBP2 R120X в двух копиях: дефицит SECISBP2."
+            }
+          },
+          "source": "GenCC Strong (SECISBP2, AR)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Strong",
+          "moi": "AR",
+          "disease": "thyroid hormone metabolism abnormality 1 (SECISBP2)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs200450537",
+          "gene": "SECISBP2",
+          "hgvs": "NC_000009.12:g.89358038C>T",
+          "protein": "p.Arg770Ter",
+          "risk_allele": "T",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SECISBP2 R770X, one copy: carriership (recessive).",
+              "ru": "SECISBP2 R770X, одна копия: носительство (рецессивно)."
+            },
+            "hom": {
+              "en": "SECISBP2 R770X in two copies: SECISBP2 deficiency.",
+              "ru": "SECISBP2 R770X в двух копиях: дефицит SECISBP2."
+            }
+          },
+          "source": "GenCC Strong (SECISBP2, AR)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Strong",
+          "moi": "AR",
+          "disease": "thyroid hormone metabolism abnormality 1 (SECISBP2)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs121908876",
+          "gene": "TSHR",
+          "hgvs": "NC_000014.9:g.81143572G>A",
+          "protein": "p.Ser505Asn",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "TSHR S505N, one copy: an activating receptor — familial non-autoimmune hyperthyroidism; one copy is enough (dominant). With a suppressed TSH and no antibodies this is the explanation to check.",
+              "ru": "TSHR S505N, одна копия: активирующий рецептор — семейный неаутоиммунный гипертиреоз; одной копии достаточно (доминантно). При подавленном ТТГ без антител — объяснение, которое стоит проверить."
+            },
+            "hom": {
+              "en": "TSHR S505N in two copies: the same, severe; an endocrinologist.",
+              "ru": "TSHR S505N в двух копиях: то же, тяжёлая форма; эндокринолог."
+            }
+          },
+          "source": "GenCC Definitive (TSHR — hyperthyroidism, AD); ClinVar pathogenic",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AD",
+          "disease": "familial non-autoimmune hyperthyroidism (TSHR)",
+          "expect": {
+            "marker": "tsh",
+            "direction": "lower",
+            "note": {
+              "en": "an activating TSHR variant: TSH is expected suppressed",
+              "ru": "активирующий вариант TSHR: ТТГ ожидается подавленным"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs189261858",
+          "gene": "TSHR",
+          "hgvs": "NC_000014.9:g.81143407G>A",
+          "protein": "p.Arg450His",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "TSHR R450H, one copy: carriership of TSH resistance — a mildly raised TSH with normal free T4 can be this in a carrier; two copies give congenital hypothyroidism.",
+              "ru": "TSHR R450H, одна копия: носительство резистентности к ТТГ — слегка повышенный ТТГ при нормальном Т4св у носителя может быть этим; две копии дают врождённый гипотиреоз."
+            },
+            "hom": {
+              "en": "TSHR R450H in two copies: TSH resistance / congenital hypothyroidism.",
+              "ru": "TSHR R450H в двух копиях: резистентность к ТТГ / врождённый гипотиреоз."
+            }
+          },
+          "source": "GenCC Definitive (TSHR — congenital hypothyroidism / TSH resistance); ClinVar",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "congenital hypothyroidism, non-goitrous (TSHR)",
+          "expect": {
+            "marker": "tsh",
+            "direction": "higher",
+            "note": {
+              "en": "a TSH-resistance allele: TSH may run mildly high with a normal free T4",
+              "ru": "аллель резистентности к ТТГ: ТТГ может быть слегка повышен при нормальном Т4св"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs179247",
+          "gene": "TSHR",
+          "hgvs": "NC_000014.9:g.80966202A>G",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TSHR rs179247 A (the reference), one copy: an association with Graves' disease; nothing is decided by it.",
+              "ru": "TSHR rs179247 A (референсный), одна копия: ассоциация с болезнью Грейвса; ничего не решается."
+            },
+            "hom": {
+              "en": "TSHR rs179247 A (the reference), two copies: an association with Graves' disease; nothing is decided by it.",
+              "ru": "TSHR rs179247 A (референсный), две копии: ассоциация с болезнью Грейвса; ничего не решается."
+            }
+          },
+          "source": "Brand 2009 Hum Mol Genet (TSHR intron 1 and Graves' disease)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "Graves' disease OR about 1.5 per A allele",
+          "study": "Brand 2009 Hum Mol Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs732609",
+          "gene": "TPO",
+          "hgvs": "NC_000002.12:g.1496155A>C",
+          "protein": "p.Thr725Pro",
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TPO T725P, one copy: a common polymorphism, benign in ClinVar; named on the clinician's panel — nothing follows.",
+              "ru": "TPO T725P, одна копия: частый полиморфизм, доброкачественный по ClinVar; названа в панели врача — ничего не следует."
+            },
+            "hom": {
+              "en": "TPO T725P, two copies: a common polymorphism, benign in ClinVar; named on the clinician's panel — nothing follows.",
+              "ru": "TPO T725P, две копии: частый полиморфизм, доброкачественный по ClinVar; названа в панели врача — ничего не следует."
+            }
+          },
+          "source": "the clinician's panel; ClinVar benign",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none (benign polymorphism)",
+          "study": "ClinVar",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2076740",
+          "gene": "TG",
+          "hgvs": "NC_000008.11:g.132971813C>T",
+          "protein": "p.Arg1999Trp",
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TG R1999W, one copy: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG R1999W, одна копия: частый полиморфизм из панели врача; ничего не следует."
+            },
+            "hom": {
+              "en": "TG R1999W, two copies: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG R1999W, две копии: частый полиморфизм из панели врача; ничего не следует."
+            }
+          },
+          "source": "the clinician's panel",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none established",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs2069550",
+          "gene": "TG",
+          "hgvs": "NC_000008.11:g.132888141T>C",
+          "protein": "p.Pro778= (synonymous)",
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TG P778= (synonymous), one copy: named on the clinician's panel; nothing follows.",
+              "ru": "TG P778= (синонимичная), одна копия: названа в панели врача; ничего не следует."
+            },
+            "hom": {
+              "en": "TG P778= (synonymous), two copies: named on the clinician's panel; nothing follows.",
+              "ru": "TG P778= (синонимичная), две копии: названа в панели врача; ничего не следует."
+            }
+          },
+          "source": "the clinician's panel",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none (synonymous)",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs180223",
+          "gene": "TG",
+          "hgvs": "NC_000008.11:g.132888007T>G",
+          "protein": "p.Ser734Ala",
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TG S734A, one copy: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG S734A, одна копия: частый полиморфизм из панели врача; ничего не следует."
+            },
+            "hom": {
+              "en": "TG S734A, two copies: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG S734A, две копии: частый полиморфизм из панели врача; ничего не следует."
+            }
+          },
+          "source": "the clinician's panel",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none established",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs853326",
+          "gene": "TG",
+          "hgvs": "NC_000008.11:g.132897729A>G",
+          "protein": "p.Met1028Val",
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TG M1028V, one copy: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG M1028V, одна копия: частый полиморфизм из панели врача; ничего не следует."
+            },
+            "hom": {
+              "en": "TG M1028V, two copies: a common polymorphism named on the clinician's panel; nothing follows.",
+              "ru": "TG M1028V, две копии: частый полиморфизм из панели врача; ничего не следует."
+            }
+          },
+          "source": "the clinician's panel",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "none established",
+          "study": "the clinician's panel",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs151261408",
+          "gene": "DUOX2",
+          "hgvs": "NC_000015.10:g.45110685G>C",
+          "protein": "p.Pro303Arg",
+          "risk_allele": "C",
+          "mode": "monogenic",
+          "kind": null,
+          "text": {
+            "het": null,
+            "hom": null
+          },
+          "source": "the clinician's panel; ClinVar — conflicting",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Limited",
+          "moi": "AR",
+          "disease": "thyroid dyshormonogenesis 6 (DUOX2) — status not settled",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
     "adrenals": {
       "source": "positions carry their own source; see each row",
       "positions": [
@@ -61,7 +1617,1064 @@
           },
           "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
           "submitter": "owner",
-          "curated_on": "2026-09-13"
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ],
+      "unreadable": {
+        "CYP21A2": {
+          "reason": {
+            "en": "21-hydroxylase deficiency (congenital adrenal hyperplasia) cannot be read by short-read sequencing: the gene sits next to the pseudogene CYP21A1P and reads map to both — a «nothing found» here would be a statement about the method, not the person. It needs MLPA or long-read sequencing.",
+            "ru": "Дефицит 21-гидроксилазы (ВДКН) не читается коротким чтением: ген лежит рядом с псевдогеном CYP21A1P, и чтения ложатся на оба — «ничего не найдено» здесь было бы утверждением о методе, а не о человеке. Нужен MLPA или длинное чтение."
+          },
+          "source": "the owner's decision of 13.09.2026 (task 179, item 2); ACMG/AMP practice on segmental duplications"
+        }
+      }
+    },
+    "gonads": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 7",
+      "positions": [
+        {
+          "rsid": "rs1799941",
+          "gene": "SHBG",
+          "hgvs": "NC_000017.11:g.7630105G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SHBG rs1799941 A, one copy: SHBG runs higher and with it total testosterone — a high-normal total testosterone may be SHBG; free or bioavailable testosterone is the figure to judge by.",
+              "ru": "SHBG rs1799941 A, одна копия: SHBG выше и с ним общий тестостерон — высоконормальный общий тестостерон может быть SHBG; судить по свободному или биодоступному."
+            },
+            "hom": {
+              "en": "SHBG rs1799941 A, two copies: SHBG runs higher and with it total testosterone — a high-normal total testosterone may be SHBG; free or bioavailable testosterone is the figure to judge by.",
+              "ru": "SHBG rs1799941 A, две копии: SHBG выше и с ним общий тестостерон — высоконормальный общий тестостерон может быть SHBG; судить по свободному или биодоступному."
+            }
+          },
+          "source": "Ohlsson 2011 PLoS Genet (SHBG variants and testosterone)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "total testosterone about +0.3 SD per A allele",
+          "study": "Ohlsson 2011 PLoS Genet",
+          "expect": {
+            "marker": "testosterone",
+            "direction": "higher",
+            "note": {
+              "en": "an SHBG-raising allele: total testosterone tends to be higher",
+              "ru": "аллель, повышающий SHBG: общий тестостерон склонен быть выше"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs6258",
+          "gene": "SHBG",
+          "hgvs": "NC_000017.11:g.7631360C>T",
+          "protein": "p.Pro185Leu",
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SHBG P156L (T), one copy: SHBG binds testosterone less — total testosterone reads lower while the free fraction is normal; judge by free testosterone.",
+              "ru": "SHBG P156L (T), одна копия: SHBG слабее связывает тестостерон — общий тестостерон ниже при нормальной свободной фракции; судить по свободному."
+            },
+            "hom": {
+              "en": "SHBG P156L (T), two copies: SHBG binds testosterone less — total testosterone reads lower while the free fraction is normal; judge by free testosterone.",
+              "ru": "SHBG P156L (T), две копии: SHBG слабее связывает тестостерон — общий тестостерон ниже при нормальной свободной фракции; судить по свободному."
+            }
+          },
+          "source": "Ohlsson 2011 PLoS Genet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "total testosterone lower per T allele",
+          "study": "Ohlsson 2011 PLoS Genet",
+          "expect": {
+            "marker": "testosterone",
+            "direction": "lower",
+            "note": {
+              "en": "the SHBG P156L allele: total testosterone tends to read lower",
+              "ru": "аллель SHBG P156L: общий тестостерон склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs6025",
+          "gene": "F5",
+          "hgvs": "NC_000001.11:g.169549811C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "Factor V Leiden, one copy: under testosterone or oestrogen therapy the venous thrombosis risk multiplies — prefer transdermal routes, watch the haematocrit; not a contraindication by itself.",
+              "ru": "Фактор V Лейден, одна копия: на терапии тестостероном или эстрогенами риск венозного тромбоза умножается — предпочесть трансдермальные формы, следить за гематокритом; само по себе не противопоказание."
+            },
+            "hom": {
+              "en": "Factor V Leiden in two copies: a haematologist before any hormonal therapy.",
+              "ru": "Фактор V Лейден в двух копиях: гематолог до любой гормональной терапии."
+            }
+          },
+          "source": "ACOG/ESHRE guidance; Rosendaal 1995",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "VTE OR about 5 (heterozygote)",
+          "study": "Rosendaal 1995 Lancet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1800562",
+          "gene": "HFE",
+          "hgvs": "NC_000006.12:g.26092913G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "HFE C282Y, one copy: carriership — iron overload is unlikely on one copy; a low testosterone is not explained by it.",
+              "ru": "HFE C282Y, одна копия: носительство — перегрузка железом на одной копии маловероятна; низкий тестостерон этим не объясняется."
+            },
+            "hom": {
+              "en": "HFE C282Y in two copies: haemochromatosis genotype — iron settles in the pituitary and testes, and hypogonadism is one of its faces; ferritin and transferrin saturation are the next measurement.",
+              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — железо откладывается в гипофизе и яичках, гипогонадизм — одно из его лиц; следующий анализ — ферритин и насыщение трансферрина."
+            }
+          },
+          "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM (penetrance)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "haemochromatosis type 1 (HFE)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ],
+      "unreadable": {
+        "AR (CAG repeat)": {
+          "reason": {
+            "en": "Androgen sensitivity by the AR CAG-repeat length is a repeat count, not a position: short reads do not call it reliably. It needs a fragment-length assay or long-read sequencing.",
+            "ru": "Чувствительность к андрогенам по длине CAG-повтора AR — это число повторов, не позиция: короткое чтение его надёжно не вызывает. Нужен анализ длины фрагмента или длинное чтение."
+          },
+          "source": "the owner's decision of 13.09.2026 (task 179, item 2)"
+        }
+      }
+    },
+    "growth": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 8 — monogenic only, no position has an effect useful for a prescription",
+      "positions": []
+    },
+    "pancreas": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 9",
+      "positions": [
+        {
+          "rsid": "rs17107315",
+          "gene": "SPINK1",
+          "hgvs": "NC_000005.10:g.147828115T>C",
+          "protein": "p.Asn34Ser",
+          "risk_allele": "C",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SPINK1 N34S, one copy: chronic pancreatitis risk raised — with recurrent lipase rises, look for a cause and keep alcohol at zero; the variant alone rarely causes disease.",
+              "ru": "SPINK1 N34S, одна копия: риск хронического панкреатита повышен — при повторных подъёмах липазы искать причину и держать алкоголь на нуле; сам по себе вариант редко вызывает болезнь."
+            },
+            "hom": {
+              "en": "SPINK1 N34S in two copies: a strongly raised pancreatitis risk (OR above 10) — a gastroenterologist, no alcohol.",
+              "ru": "SPINK1 N34S в двух копиях: резко повышенный риск панкреатита (OR выше 10) — гастроэнтеролог, без алкоголя."
+            }
+          },
+          "source": "Witt 2000 Nat Genet (SPINK1 N34S and chronic pancreatitis)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "chronic pancreatitis OR about 12 (homozygotes), about 2–3 (heterozygotes)",
+          "study": "Witt 2000 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs111033565",
+          "gene": "PRSS1",
+          "hgvs": "NC_000007.14:g.142751938G>A",
+          "protein": "p.Arg122His",
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "PRSS1 R122H, one copy: hereditary pancreatitis — dominant with high penetrance; recurrent pancreatitis from youth and a raised pancreatic cancer risk later, which is why surveillance is discussed.",
+              "ru": "PRSS1 R122H, одна копия: наследственный панкреатит — доминантно, с высокой пенетрантностью; рецидивирующий панкреатит с молодости и повышенный риск рака поджелудочной позже, поэтому обсуждают наблюдение."
+            },
+            "hom": {
+              "en": "PRSS1 R122H in two copies: the same, from earlier.",
+              "ru": "PRSS1 R122H в двух копиях: то же, с более раннего возраста."
+            }
+          },
+          "source": "GenCC Definitive (PRSS1 — hereditary pancreatitis, AD); ClinVar pathogenic",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AD",
+          "disease": "hereditary pancreatitis (PRSS1)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs671",
+          "gene": "ALDH2",
+          "hgvs": "NC_000012.12:g.111803962G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "ALDH2 *2, one copy: acetaldehyde is cleared slowly — flushing after alcohol, and a raised risk of oesophageal cancer and pancreatitis with drinking; the practical reading is «alcohol harms this person more».",
+              "ru": "ALDH2 *2, одна копия: ацетальдегид выводится медленно — покраснение после алкоголя, повышенный риск рака пищевода и панкреатита при употреблении; практическое чтение — «алкоголь этому человеку вреднее»."
+            },
+            "hom": {
+              "en": "ALDH2 *2 in two copies: alcohol is barely tolerated at all; the same risks, stronger.",
+              "ru": "ALDH2 *2 в двух копиях: алкоголь почти не переносится; те же риски, сильнее."
+            }
+          },
+          "source": "Brooks 2009 PLoS Med (ALDH2*2 and alcohol)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+          "study": "Brooks 2009 PLoS Med",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "liver": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 10",
+      "positions": [
+        {
+          "rsid": "rs738409",
+          "gene": "PNPLA3",
+          "hgvs": "NC_000022.11:g.43928847C>G",
+          "protein": "p.Ile148Met",
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "PNPLA3 148M (G), one copy: fatty liver is more likely and progresses faster — a raised ALT with a normal ultrasound is a reason for elastography; weight and alcohol matter more for this person.",
+              "ru": "PNPLA3 148M (G), одна копия: стеатоз вероятнее и прогрессирует быстрее — повышенный АЛТ при нормальном УЗИ повод для эластографии; вес и алкоголь для этого человека значат больше."
+            },
+            "hom": {
+              "en": "PNPLA3 148M in two copies: hepatic fat about twice, fibrosis and liver cancer risk several-fold in fatty liver — alcohol at zero, elastography, weight.",
+              "ru": "PNPLA3 148M в двух копиях: жира в печени примерно вдвое больше, риск фиброза и рака печени при стеатозе в разы — алкоголь ноль, эластография, вес."
+            }
+          },
+          "source": "Romeo 2008 Nat Genet (PNPLA3 I148M and hepatic fat)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "hepatic fat about +25 % per G allele; NAFLD OR about 3.5 in GG",
+          "study": "Romeo 2008 Nat Genet",
+          "expect": {
+            "marker": "alt",
+            "direction": "higher",
+            "note": {
+              "en": "the PNPLA3 148M allele: ALT tends to run higher with liver fat",
+              "ru": "аллель PNPLA3 148M: АЛТ склонен быть выше при жире в печени"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs58542926",
+          "gene": "TM6SF2",
+          "hgvs": "NC_000019.10:g.19268740C>T",
+          "protein": "p.Glu167Lys",
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "TM6SF2 167K (T), one copy: more liver fat and a LOWER circulating LDL-C — the liver keeps the fat the blood does not show; a low LDL-C here is not reassurance about the liver.",
+              "ru": "TM6SF2 167K (T), одна копия: больше жира в печени и НИЖЕ ЛПНП в крови — печень удерживает жир, которого не показывает кровь; низкий ЛПНП здесь не успокаивает насчёт печени."
+            },
+            "hom": {
+              "en": "TM6SF2 167K (T), two copies: more liver fat and a LOWER circulating LDL-C — the liver keeps the fat the blood does not show; a low LDL-C here is not reassurance about the liver.",
+              "ru": "TM6SF2 167K (T), две копии: больше жира в печени и НИЖЕ ЛПНП в крови — печень удерживает жир, которого не показывает кровь; низкий ЛПНП здесь не успокаивает насчёт печени."
+            }
+          },
+          "source": "Kozlitina 2014 Nat Genet (TM6SF2 E167K)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "hepatic fat higher, LDL-C about −0.1 mmol/L per T allele",
+          "study": "Kozlitina 2014 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1800562",
+          "gene": "HFE",
+          "hgvs": "NC_000006.12:g.26092913G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "HFE C282Y, one copy: carriership — a mildly raised ferritin is more often inflammation or fat than iron; one copy rarely overloads.",
+              "ru": "HFE C282Y, одна копия: носительство — слегка повышенный ферритин чаще воспаление или жир, чем железо; одна копия редко даёт перегрузку."
+            },
+            "hom": {
+              "en": "HFE C282Y in two copies: the haemochromatosis genotype — ferritin and transferrin saturation decide whether iron is accumulating; phlebotomy treats it, and the liver is protected by starting early.",
+              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — ферритин и насыщение трансферрина решают, накапливается ли железо; лечит флеботомия, печень защищает раннее начало."
+            }
+          },
+          "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "haemochromatosis type 1 (HFE)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799945",
+          "gene": "HFE",
+          "hgvs": "NC_000006.12:g.26090951C>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "HFE H63D, one copy: a common allele that does not cause iron overload on its own; with C282Y (compound heterozygote) a mild overload is possible — otherwise nothing follows.",
+              "ru": "HFE H63D, одна копия: частый аллель, сам по себе перегрузки железом не вызывает; вместе с C282Y (компаунд-гетерозигота) возможна лёгкая перегрузка — иначе ничего не следует."
+            },
+            "hom": {
+              "en": "HFE H63D, two copies: a common allele that does not cause iron overload on its own; with C282Y (compound heterozygote) a mild overload is possible — otherwise nothing follows.",
+              "ru": "HFE H63D, две копии: частый аллель, сам по себе перегрузки железом не вызывает; вместе с C282Y (компаунд-гетерозигота) возможна лёгкая перегрузка — иначе ничего не следует."
+            }
+          },
+          "source": "GenCC (HFE); Gochee 2002 (H63D alone is not a disease allele)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Limited",
+          "moi": "AR",
+          "disease": "haemochromatosis (H63D alone: not a disease allele)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs28929474",
+          "gene": "SERPINA1",
+          "hgvs": "NC_000014.9:g.94378610C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SERPINA1 Pi*Z, one copy (MZ): a modest liver and lung risk that alcohol, fatty liver and smoking amplify — the reading is «protect this liver more than average».",
+              "ru": "SERPINA1 Pi*Z, одна копия (MZ): умеренный риск для печени и лёгких, который усиливают алкоголь, стеатоз и курение — чтение: «беречь эту печень больше обычного»."
+            },
+            "hom": {
+              "en": "SERPINA1 Pi*Z in two copies (ZZ): alpha-1-antitrypsin deficiency — liver disease and early emphysema; a specialist, no smoking, alpha-1-antitrypsin level measured.",
+              "ru": "SERPINA1 Pi*Z в двух копиях (ZZ): дефицит альфа-1-антитрипсина — болезнь печени и ранняя эмфизема; специалист, никакого курения, измерить уровень альфа-1-антитрипсина."
+            }
+          },
+          "source": "GenCC Definitive (SERPINA1 — alpha-1-antitrypsin deficiency); ClinVar pathogenic",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "alpha-1-antitrypsin deficiency (SERPINA1)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs17580",
+          "gene": "SERPINA1",
+          "hgvs": "NC_000014.9:g.94380925T>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "SERPINA1 Pi*S, one copy (MS): a mild allele; nothing follows on its own — with Pi*Z (SZ) a moderate deficiency.",
+              "ru": "SERPINA1 Pi*S, одна копия (MS): мягкий аллель; сам по себе ничего не следует — вместе с Pi*Z (SZ) умеренный дефицит."
+            },
+            "hom": {
+              "en": "SERPINA1 Pi*S, two copies (MS): a mild allele; nothing follows on its own — with Pi*Z (SZ) a moderate deficiency.",
+              "ru": "SERPINA1 Pi*S, две копии (MS): мягкий аллель; сам по себе ничего не следует — вместе с Pi*Z (SZ) умеренный дефицит."
+            }
+          },
+          "source": "GenCC (SERPINA1); Pi*S is a mild allele",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Limited",
+          "moi": "AR",
+          "disease": "alpha-1-antitrypsin deficiency (mild allele)",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs4148323",
+          "gene": "UGT1A1",
+          "hgvs": "NC_000002.12:g.233760498G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "UGT1A1 *6, one copy: reduced bilirubin conjugation — an isolated mildly raised unconjugated bilirubin is Gilbert's, not liver disease; irinotecan and atazanavir are the drugs CPIC adjusts.",
+              "ru": "UGT1A1 *6, одна копия: сниженная конъюгация билирубина — изолированно слегка повышенный непрямой билирубин это Жильбер, а не болезнь печени; иринотекан и атазанавир — препараты, которые корректирует CPIC."
+            },
+            "hom": {
+              "en": "UGT1A1 *6 in two copies: Gilbert's syndrome genotype; CPIC — a reduced irinotecan starting dose.",
+              "ru": "UGT1A1 *6 в двух копиях: генотип синдрома Жильбера; CPIC — сниженная стартовая доза иринотекана."
+            }
+          },
+          "source": "CPIC guideline for irinotecan / atazanavir (UGT1A1); Gilbert syndrome",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1801280",
+          "gene": "NAT2",
+          "hgvs": "NC_000008.11:g.18400344T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "NAT2 *5 (341C), one copy: one of three slow-acetylator alleles — with two slow alleles isoniazid is cleared slowly and hepatotoxicity is likelier; no guideline sets a dose by it.",
+              "ru": "NAT2 *5 (341C), одна копия: один из трёх аллелей медленного ацетилирования — при двух медленных аллелях изониазид выводится медленно и гепатотоксичность вероятнее; дозу по этому ни одно руководство не задаёт."
+            },
+            "hom": {
+              "en": "NAT2 *5 (341C), two copies: one of three slow-acetylator alleles — with two slow alleles isoniazid is cleared slowly and hepatotoxicity is likelier; no guideline sets a dose by it.",
+              "ru": "NAT2 *5 (341C), две копии: один из трёх аллелей медленного ацетилирования — при двух медленных аллелях изониазид выводится медленно и гепатотоксичность вероятнее; дозу по этому ни одно руководство не задаёт."
+            }
+          },
+          "source": "no CPIC/DPWG guideline; isoniazid hepatotoxicity literature (NAT2 slow acetylators)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799930",
+          "gene": "NAT2",
+          "hgvs": "NC_000008.11:g.18400593G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "NAT2 *6 (590A), one copy: a slow-acetylator allele; read together with *5 and *7.",
+              "ru": "NAT2 *6 (590A), одна копия: аллель медленного ацетилирования; читать вместе с *5 и *7."
+            },
+            "hom": {
+              "en": "NAT2 *6 (590A), two copies: a slow-acetylator allele; read together with *5 and *7.",
+              "ru": "NAT2 *6 (590A), две копии: аллель медленного ацетилирования; читать вместе с *5 и *7."
+            }
+          },
+          "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799931",
+          "gene": "NAT2",
+          "hgvs": "NC_000008.11:g.18400860G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "NAT2 *7 (857A), one copy: a slow-acetylator allele; read together with *5 and *6.",
+              "ru": "NAT2 *7 (857A), одна копия: аллель медленного ацетилирования; читать вместе с *5 и *6."
+            },
+            "hom": {
+              "en": "NAT2 *7 (857A), two copies: a slow-acetylator allele; read together with *5 and *6.",
+              "ru": "NAT2 *7 (857A), две копии: аллель медленного ацетилирования; читать вместе с *5 и *6."
+            }
+          },
+          "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs671",
+          "gene": "ALDH2",
+          "hgvs": "NC_000012.12:g.111803962G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "ALDH2 *2, one copy: alcohol is more harmful to this person (acetaldehyde clears slowly) — the liver counts it double.",
+              "ru": "ALDH2 *2, одна копия: алкоголь этому человеку вреднее (ацетальдегид выводится медленно) — печень считает его вдвойне."
+            },
+            "hom": {
+              "en": "ALDH2 *2, two copies: alcohol is more harmful to this person (acetaldehyde clears slowly) — the liver counts it double.",
+              "ru": "ALDH2 *2, две копии: алкоголь этому человеку вреднее (ацетальдегид выводится медленно) — печень считает его вдвойне."
+            }
+          },
+          "source": "Brooks 2009 PLoS Med",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+          "study": "Brooks 2009 PLoS Med",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ],
+      "unreadable": {
+        "UGT1A1*28": {
+          "reason": {
+            "en": "The Gilbert allele *28 is a TA repeat in the promoter, not a base change: short reads do not call it reliably and this catalogue does not hold it. A separate tool (PyPGx or a targeted indel call) settles it; *6 above is read.",
+            "ru": "Аллель Жильбера *28 — TA-повтор в промоторе, не замена основания: короткое чтение его надёжно не вызывает, и в каталоге его нет. Решает отдельный инструмент (PyPGx или целевой вызов индела); *6 выше читается."
+          },
+          "source": "the locus catalogue's pending note; the owner's decision of 13.09.2026 (task 179, item 2)"
+        }
+      }
+    },
+    "micronutrients": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 11",
+      "positions": [
+        {
+          "rsid": "rs2282679",
+          "gene": "GC",
+          "hgvs": "NC_000004.12:g.71742666T>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "GC rs2282679 G, one copy: 25-OH vitamin D runs lower and the rise on a standard dose is smaller — the dose is set by the control measurement, not by the table.",
+              "ru": "GC rs2282679 G, одна копия: 25-OH витамин D ниже и прирост на стандартной дозе меньше — дозу задаёт контрольное измерение, а не таблица."
+            },
+            "hom": {
+              "en": "GC rs2282679 G, two copies: 25-OH vitamin D runs lower and the rise on a standard dose is smaller — the dose is set by the control measurement, not by the table.",
+              "ru": "GC rs2282679 G, две копии: 25-OH витамин D ниже и прирост на стандартной дозе меньше — дозу задаёт контрольное измерение, а не таблица."
+            }
+          },
+          "source": "Wang 2010 Lancet (GWAS of 25-hydroxyvitamin D)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "25-OH-D about −5 nmol/L per G allele",
+          "study": "Wang 2010 Lancet",
+          "expect": {
+            "marker": "vitamin_d",
+            "direction": "lower",
+            "note": {
+              "en": "a GC allele: 25-OH vitamin D tends to be lower",
+              "ru": "аллель GC: 25-OH витамин D склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs10741657",
+          "gene": "CYP2R1",
+          "hgvs": "NC_000011.10:g.14893332A>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "CYP2R1 rs10741657 G, one copy: weaker 25-hydroxylation — 25-OH vitamin D somewhat lower for the same intake.",
+              "ru": "CYP2R1 rs10741657 G, одна копия: слабее 25-гидроксилирование — 25-OH витамин D несколько ниже при том же поступлении."
+            },
+            "hom": {
+              "en": "CYP2R1 rs10741657 G, two copies: weaker 25-hydroxylation — 25-OH vitamin D somewhat lower for the same intake.",
+              "ru": "CYP2R1 rs10741657 G, две копии: слабее 25-гидроксилирование — 25-OH витамин D несколько ниже при том же поступлении."
+            }
+          },
+          "source": "Wang 2010 Lancet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "25-OH-D about −3 nmol/L per G allele",
+          "study": "Wang 2010 Lancet",
+          "expect": {
+            "marker": "vitamin_d",
+            "direction": "lower",
+            "note": {
+              "en": "a CYP2R1 allele: 25-OH vitamin D tends to be lower",
+              "ru": "аллель CYP2R1: 25-OH витамин D склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs12785878",
+          "gene": "DHCR7",
+          "hgvs": "NC_000011.10:g.71456403G>T",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "DHCR7 rs12785878 G (the reference base), one copy: 25-OH vitamin D runs somewhat lower for the same sun and intake (Wang 2010).",
+              "ru": "DHCR7 rs12785878 G (референсное основание), одна копия: 25-OH витамин D несколько ниже при том же солнце и поступлении (Wang 2010)."
+            },
+            "hom": {
+              "en": "DHCR7 rs12785878 G in two copies: 25-OH vitamin D runs lower — the dose is set by the control measurement.",
+              "ru": "DHCR7 rs12785878 G в двух копиях: 25-OH витамин D ниже — дозу задаёт контрольное измерение."
+            }
+          },
+          "source": "Wang 2010 Lancet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "25-OH-D about −3 nmol/L per G allele (T raises it)",
+          "study": "Wang 2010 Lancet; direction confirmed in the GWAS Catalog and Ensembl, 13.09.2026",
+          "expect": {
+            "marker": "vitamin_d",
+            "direction": "lower",
+            "note": {
+              "en": "a DHCR7 allele: 25-OH vitamin D tends to be lower",
+              "ru": "аллель DHCR7: 25-OH витамин D склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs601338",
+          "gene": "FUT2",
+          "hgvs": "NC_000019.10:g.48703417G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "FUT2 W154X (the non-secretor allele), one copy: a secretor still — nothing changes for vitamin B12.",
+              "ru": "FUT2 W154X (несекреторный аллель), одна копия: всё ещё секретор — для витамина B12 ничего не меняется."
+            },
+            "hom": {
+              "en": "FUT2 W154X in two copies (non-secretor): plasma B12 runs somewhat HIGHER (Hazra 2008) — a normal B12 is not by itself proof that B12 reaches the tissues; if deficiency is suspected, methylmalonic acid or homocysteine answers it.",
+              "ru": "FUT2 W154X в двух копиях (несекретор): B12 в плазме несколько ВЫШЕ (Hazra 2008) — нормальный B12 сам по себе не доказывает, что B12 доходит до тканей; при подозрении на дефицит отвечает метилмалоновая кислота или гомоцистеин."
+            }
+          },
+          "source": "Hazra 2008 Nat Genet (FUT2 and vitamin B12)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "plasma B12 somewhat higher in non-secretors",
+          "study": "Hazra 2008 Nat Genet; OMIM vitamin B12 plasma level QTL 1",
+          "expect": {
+            "marker": "vitamin_b12",
+            "direction": "higher",
+            "note": {
+              "en": "a non-secretor: plasma B12 tends to be higher",
+              "ru": "несекретор: B12 в плазме склонен быть выше"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1800562",
+          "gene": "HFE",
+          "hgvs": "NC_000006.12:g.26092913G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "HFE C282Y, one copy: carriership — a high ferritin is not explained by it; look at inflammation and the liver first.",
+              "ru": "HFE C282Y, одна копия: носительство — высокий ферритин этим не объясняется; сначала смотреть воспаление и печень."
+            },
+            "hom": {
+              "en": "HFE C282Y in two copies: the haemochromatosis genotype — a high ferritin here IS iron; transferrin saturation next, phlebotomy if confirmed.",
+              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — высокий ферритин здесь ЭТО железо; следующим — насыщение трансферрина, при подтверждении флеботомия."
+            }
+          },
+          "source": "GenCC Definitive (HFE, AR); Allen 2008 NEJM",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "haemochromatosis type 1 (HFE)",
+          "expect": {
+            "marker": "ferritin",
+            "direction": "higher",
+            "note": {
+              "en": "two copies of C282Y: ferritin is expected to rise with age",
+              "ru": "две копии C282Y: ферритин ожидается растущим с возрастом"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs855791",
+          "gene": "TMPRSS6",
+          "hgvs": "NC_000022.11:g.37066896A>G",
+          "protein": "p.Val727Ala",
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "TMPRSS6 736V (A, the reference), one copy: more hepcidin, less iron absorbed — a tendency to low ferritin and a slower response to oral iron.",
+              "ru": "TMPRSS6 736V (A, референсный), одна копия: больше гепсидина, меньше всасывается железа — склонность к низкому ферритину и более медленный ответ на пероральное железо."
+            },
+            "hom": {
+              "en": "TMPRSS6 736V in two copies: the iron-deficiency tendency is stronger; intravenous iron works where tablets do not.",
+              "ru": "TMPRSS6 736V в двух копиях: склонность к дефициту железа сильнее; внутривенное железо работает там, где таблетки нет."
+            }
+          },
+          "source": "Benyamin 2009 Nat Genet (TMPRSS6 A736V and iron)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "ferritin and haemoglobin lower per V allele",
+          "study": "Benyamin 2009 Nat Genet",
+          "expect": {
+            "marker": "ferritin",
+            "direction": "lower",
+            "note": {
+              "en": "the TMPRSS6 736V allele: ferritin tends to be lower",
+              "ru": "аллель TMPRSS6 736V: ферритин склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs174546",
+          "gene": "FADS1",
+          "hgvs": "NC_000011.10:g.61802358C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "FADS1 rs174546 T, one copy: less ALA is converted into EPA and DHA — the omega-3 index runs lower on a plant-oil diet; EPA/DHA themselves (fish, fish oil) work regardless.",
+              "ru": "FADS1 rs174546 T, одна копия: меньше АЛК превращается в ЭПК и ДГК — омега-3 индекс ниже на растительных маслах; сами ЭПК/ДГК (рыба, рыбий жир) работают независимо от этого."
+            },
+            "hom": {
+              "en": "FADS1 rs174546 T, two copies: less ALA is converted into EPA and DHA — the omega-3 index runs lower on a plant-oil diet; EPA/DHA themselves (fish, fish oil) work regardless.",
+              "ru": "FADS1 rs174546 T, две копии: меньше АЛК превращается в ЭПК и ДГК — омега-3 индекс ниже на растительных маслах; сами ЭПК/ДГК (рыба, рыбий жир) работают независимо от этого."
+            }
+          },
+          "source": "Lemaitre 2011 PLoS Genet (FADS and long-chain omega-3)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "EPA and DHA lower per T allele",
+          "study": "Lemaitre 2011 PLoS Genet",
+          "expect": {
+            "marker": "omega3_index",
+            "direction": "lower",
+            "note": {
+              "en": "a low-conversion FADS allele: the omega-3 index tends to be lower",
+              "ru": "аллель FADS с низкой конверсией: омега-3 индекс склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs174537",
+          "gene": "FADS1",
+          "hgvs": "NC_000011.10:g.61785208G>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "FADS rs174537 T, one copy: the low-conversion haplotype — read together with rs174546.",
+              "ru": "FADS rs174537 T, одна копия: гаплотип низкой конверсии — читать вместе с rs174546."
+            },
+            "hom": {
+              "en": "FADS rs174537 T, two copies: the low-conversion haplotype — read together with rs174546.",
+              "ru": "FADS rs174537 T, две копии: гаплотип низкой конверсии — читать вместе с rs174546."
+            }
+          },
+          "source": "Lemaitre 2011 PLoS Genet",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "EPA and DHA lower per T allele",
+          "study": "Lemaitre 2011 PLoS Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs4988235",
+          "gene": "MCM6",
+          "hgvs": "NC_000002.12:g.135851076G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "MCM6 rs4988235, one copy of the persistence allele: lactase persists into adulthood — dairy is tolerated; asked about for calcium and vitamin D, nothing decided.",
+              "ru": "MCM6 rs4988235, одна копия аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится; о нём спрашивают ради кальция и витамина D, ничего не решается."
+            },
+            "hom": {
+              "en": "MCM6 rs4988235, two copies of the persistence allele: lactase persists into adulthood — dairy is tolerated; asked about for calcium and vitamin D, nothing decided.",
+              "ru": "MCM6 rs4988235, две копии аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится; о нём спрашивают ради кальция и витамина D, ничего не решается."
+            }
+          },
+          "source": "Enattah 2002 Nat Genet (MCM6 and lactase persistence)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "lactase persistence (a trait, not a risk)",
+          "study": "Enattah 2002 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        }
+      ]
+    },
+    "renal": {
+      "source": "reports/179-panels-per-radar-segment-proposal-13.09.2026.md, section 12",
+      "positions": [
+        {
+          "rsid": "rs2231142",
+          "gene": "ABCG2",
+          "hgvs": "NC_000004.12:g.88131171G>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "ABCG2 Q141K, one copy: less urate excreted through the gut — serum urate higher and gout earlier; allopurinol works on this genotype, and rosuvastatin exposure is higher (CPIC).",
+              "ru": "ABCG2 Q141K, одна копия: меньше урата выводится через кишечник — урат выше и подагра раньше; аллопуринол на этом генотипе работает, а экспозиция розувастатина выше (CPIC)."
+            },
+            "hom": {
+              "en": "ABCG2 Q141K in two copies: urate markedly higher; the same reading, stronger.",
+              "ru": "ABCG2 Q141K в двух копиях: урат заметно выше; то же чтение, сильнее."
+            }
+          },
+          "source": "Dehghan 2008 Lancet (ABCG2 and urate); Woodward 2009 PNAS",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "serum urate about +0.2–0.3 mg/dL per K allele; gout OR about 1.7",
+          "study": "Dehghan 2008 Lancet",
+          "expect": {
+            "marker": "uric_acid",
+            "direction": "higher",
+            "note": {
+              "en": "the ABCG2 141K allele: urate tends to be higher",
+              "ru": "аллель ABCG2 141K: урат склонен быть выше"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs16890979",
+          "gene": "SLC2A9",
+          "hgvs": "NC_000004.12:g.9920543C>T",
+          "protein": "p.Val282Ile",
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "SLC2A9 253Ile (T), one copy: more urate excreted — serum urate lower, especially in women.",
+              "ru": "SLC2A9 253Ile (T), одна копия: больше урата выводится — урат в сыворотке ниже, особенно у женщин."
+            },
+            "hom": {
+              "en": "SLC2A9 253Ile (T), two copies: more urate excreted — serum urate lower, especially in women.",
+              "ru": "SLC2A9 253Ile (T), две копии: больше урата выводится — урат в сыворотке ниже, особенно у женщин."
+            }
+          },
+          "source": "Vitart 2008 Nat Genet (SLC2A9 and urate)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "serum urate about −0.3 mg/dL per T allele",
+          "study": "Vitart 2008 Nat Genet",
+          "expect": {
+            "marker": "uric_acid",
+            "direction": "lower",
+            "note": {
+              "en": "the SLC2A9 253Ile allele: urate tends to be lower",
+              "ru": "аллель SLC2A9 253Ile: урат склонен быть ниже"
+            }
+          },
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs9263726",
+          "gene": "HLA-B",
+          "hgvs": "NC_000006.12:g.31138722G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "HLA-B*58:01 tag (A), one copy: HLA-B*58:01 is likely — CPIC: do not start allopurinol; febuxostat instead. The tag is confirmed by HLA typing before the decision.",
+              "ru": "Тег HLA-B*58:01 (A), одна копия: HLA-B*58:01 вероятен — CPIC: аллопуринол не начинать; вместо него фебуксостат. Тег подтверждается HLA-типированием до решения."
+            },
+            "hom": {
+              "en": "HLA-B*58:01 tag in two copies: the same, more certain; HLA typing confirms.",
+              "ru": "Тег HLA-B*58:01 в двух копиях: то же, увереннее; HLA-типирование подтверждает."
+            }
+          },
+          "source": "CPIC guideline for allopurinol (Saito 2016) — HLA-B*58:01, read here through a tag SNP",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs12917707",
+          "gene": "UMOD",
+          "hgvs": "NC_000016.10:g.20356368G>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "UMOD rs12917707 T, one copy: a somewhat lower risk of chronic kidney disease; an association, nothing decided.",
+              "ru": "UMOD rs12917707 T, одна копия: несколько ниже риск ХБП; ассоциация, ничего не решается."
+            },
+            "hom": {
+              "en": "UMOD rs12917707 T, two copies: a somewhat lower risk of chronic kidney disease; an association, nothing decided.",
+              "ru": "UMOD rs12917707 T, две копии: несколько ниже риск ХБП; ассоциация, ничего не решается."
+            }
+          },
+          "source": "Köttgen 2009 Nat Genet (UMOD and CKD)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "CKD OR about 0.8 per T allele",
+          "study": "Köttgen 2009 Nat Genet",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs73885319",
+          "gene": "APOL1",
+          "hgvs": "NC_000022.11:g.36265860A>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "APOL1 G1, one copy: a single risk allele carries little risk; the kidney risk belongs to two risk alleles (G1/G1, G1/G2, G2/G2) and is seen almost only in people of West-African ancestry.",
+              "ru": "APOL1 G1, одна копия: один аллель риска почти ничего не значит; почечный риск — у двух аллелей риска (G1/G1, G1/G2, G2/G2), и виден он почти только у людей западноафриканского происхождения."
+            },
+            "hom": {
+              "en": "APOL1 G1 in two copies: FSGS and kidney failure risk several-fold (Genovese 2010) — creatinine, albuminuria and blood pressure watched from youth; G2 is a deletion this catalogue does not read, so G1/G2 is not seen here.",
+              "ru": "APOL1 G1 в двух копиях: риск ФСГС и почечной недостаточности в разы (Genovese 2010) — креатинин, альбуминурия и давление наблюдаются смолоду; G2 — делеция, которую каталог не читает, так что G1/G2 здесь не видно."
+            }
+          },
+          "source": "Genovese 2010 Science (APOL1 G1/G2 and kidney disease)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "FSGS OR about 10–17 with two risk alleles",
+          "study": "Genovese 2010 Science",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs60910145",
+          "gene": "APOL1",
+          "hgvs": "NC_000022.11:g.36265988T>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "APOL1 G1 (second position), one copy: in linkage with rs73885319 — read as one.",
+              "ru": "APOL1 G1 (вторая позиция), одна копия: в сцеплении с rs73885319 — читать как одно."
+            },
+            "hom": {
+              "en": "APOL1 G1 (second position), two copies: in linkage with rs73885319 — read as one.",
+              "ru": "APOL1 G1 (вторая позиция), две копии: в сцеплении с rs73885319 — читать как одно."
+            }
+          },
+          "source": "Genovese 2010 Science",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "effect_size": "see rs73885319",
+          "study": "Genovese 2010 Science",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1799853",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94942290C>T",
+          "protein": null,
+          "risk_allele": "T",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *2, one copy: NSAIDs cleared by CYP2C9 stay longer — for the kidney that means the lowest dose for the shortest time.",
+              "ru": "CYP2C9 *2, одна копия: НПВС, выводимые CYP2C9, задерживаются дольше — для почек это минимальная доза на минимальный срок."
+            },
+            "hom": {
+              "en": "CYP2C9 *2, two copies: NSAIDs cleared by CYP2C9 stay longer — for the kidney that means the lowest dose for the shortest time.",
+              "ru": "CYP2C9 *2, две копии: НПВС, выводимые CYP2C9, задерживаются дольше — для почек это минимальная доза на минимальный срок."
+            }
+          },
+          "source": "CPIC guideline for NSAIDs (Theken 2020) — NSAIDs and the kidney",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
+        },
+        {
+          "rsid": "rs1057910",
+          "gene": "CYP2C9",
+          "hgvs": "NC_000010.11:g.94981296A>C",
+          "protein": null,
+          "risk_allele": "C",
+          "mode": "pgx",
+          "kind": "guideline",
+          "text": {
+            "het": {
+              "en": "CYP2C9 *3, one copy: CPIC — CYP2C9-cleared NSAIDs at the lowest dose, titrated; the kidney is the organ that pays for a high dose.",
+              "ru": "CYP2C9 *3, одна копия: CPIC — НПВС, выводимые CYP2C9, в минимальной дозе с титрованием; почки — орган, который платит за высокую дозу."
+            },
+            "hom": {
+              "en": "CYP2C9 *3 in two copies: CPIC — avoid CYP2C9-cleared NSAIDs or a quarter of the lowest dose.",
+              "ru": "CYP2C9 *3 в двух копиях: CPIC — избегать НПВС, выводимых CYP2C9, или четверть минимальной дозы."
+            }
+          },
+          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "submitter": "owner",
+          "curated_on": "2026-09-13",
+          "signed_by": "owner",
+          "signed_on": "2026-09-13"
         }
       ]
     }

@@ -113,7 +113,10 @@ class TestTheWebHasADoorToTheseFields(unittest.TestCase):
             body = re.sub(r"async function %s\s*\(.*?\n}\n" % name, "", self.src, count=1, flags=re.S)
             if re.search(r"\b%s\(" % name, body):
                 opened.add(name)
-        self.assertEqual({"viewSystem"}, opened,
+        # `viewPanel` (14.09.2026): the panel of a system as the catalogue
+        # describes it, for a clinician — opened from the link on a radar block
+        # and on the system's card, never from a tab.
+        self.assertEqual({"viewSystem", "viewPanel"}, opened,
                          "a view reached from inside the page rather than from a tab is "
                          "named here on purpose; add it with its door, or mount it")
         self.assertEqual(set(), defined - mounted - opened,

@@ -40,6 +40,312 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.1 — 13.09.2026
+
+### What you can do now
+
+**An update can now run what it asks, and shows how far it is.** `scholion
+recompute` lists every step the releases since your data's version ask for,
+together with the genome steps your data lacks, and says for each one whether it
+will run, what it still needs — a folder of forms not named, an alignment not
+found — or that it is yours to do by hand. `scholion recompute --yes` runs the
+ready steps one after another and prints the step, the item being read, the time
+spent and an estimate of the time left; `--status` shows the same from another
+terminal, and `--stop` stops after the item being read. Files a step rewrites are
+copied into the archive first, and the version is recorded as done only when
+nothing is left for you. The local web page offers the same from the update note,
+keeps the progress through a reload, and on the radar a panel with positions not
+read for this reason offers the step where the gap is seen.
+
+**The catalogue positions can be genotyped from the alignment without the source
+tree.** `scholion genotype-sites` reads every catalogue position from your BAM
+with `bcftools`, one chromosome at a time with progress, in the build of the
+alignment, and writes the file that lets a position missing from the VCF read as
+the reference. It records beside the file which catalogue it answers for, so a
+later release that grows the catalogue can tell that the file is behind. Until now
+this step needed two scripts that only the source tree carries.
+
+**Every file in a profile now records the build that wrote it.** `scholion
+version` names the files a later release asks to rebuild — laboratory results
+written by an older build before a release asked to re-read the forms — with the
+command to run. Files written before this release carry no such record; they are
+counted as such, and `scholion version --since` lists what to rebuild from a
+version you name.
+
+**A skill copied into a skills folder can say which build it came from.**
+`scholion skill --install` copies the entry into `~/.agents/skills/scholion/`, or a
+folder you name, records the build beside it and says what it replaced; `scholion
+selfcheck` reports a copy that differs from the installed build as an error and
+exits with a non-zero status until the copy is replaced.
+
+**An update now says what it asks of the data you already have.**
+`scholion version` names this build and its age, the version your data was last
+used with, and — for every release in between — what that release asks: a command
+to run and when it applies, or a step to take by hand. The same note stands under
+the header of the local web page until you press «Understood»
+(`scholion version --seen` on the command line). A profile that never recorded its
+version says so, and `scholion version --since 0.4.8` lists everything after a
+version you name. `scholion version --check`, or the button beside the note, asks
+PyPI whether a newer version exists — one request, only when you ask, refused when
+the network is switched off. The README has a new section, «Updating», with the
+command for each way of installing.
+
+**The panel of a radar segment is one picture of the system's genotype, and it
+says it was checked whole.** Each panel opens with the genotype of the system,
+assembled from the panel's own sentences and nothing else: in which positions
+the named allele was found and what the panel says of each, which alleles are
+not carried, which positions were not read. Every position is then a card by
+gene — found ones bright, the rest muted with the sentence that says what «not
+found» means for that one — until now the patient's view showed two rows of a
+seven-position panel and nothing about the other five. The polygenic scores
+mapped to the system fold into one line and open by a click. «Genotype against
+the measurements» puts, for every found position that names a marker, the
+expected direction beside the measured value with its place in the corridor and
+the number of the question it raises; whether they agree stays that question.
+Where no found position predicts a measured marker, the block says so: the
+panel's genotype does not account for those measurements and their cause lies
+outside it — and the expectations the panel holds for alleles not carried are
+listed as what did not apply, so the check is seen to have happened.
+Positions a guideline weighs when a drug is chosen are named last, as what they
+are: not a prescription, and no statement that a drug is taken. The same view is
+on the system's own card, both for the patient and for the clinician, and the command line prints the
+same conclusion.
+
+**The panel itself, with its studies, on a page of its own for the clinician.**
+Every radar block with a panel, and the system's card, link to a description of
+that panel as the catalogue holds it: each position with its locus and named
+allele, the sentence it prints for one copy and for two, the kind of link, the
+guideline or study it rests on with the effect size, what it expects of a marker,
+the gene–disease classification where there is one, and who signed the sentence
+and when. It reads no genome and no laboratory result, so it is the same page
+for anybody; the reading against a person's genome stays on the radar. `scholion
+panel <system>` prints the same, and `scholion panel` lists the panels.
+
+**One design across the application.** Every page is built the same way now:
+a title, the question the page answers, a strip of the few numbers worth
+seeing first, the sections, the details folded, and the sources in one line
+at the bottom. There are six tabs — Overview, Radar, Labs, Genome, Medicines,
+Lifestyle — with the Guide and the Assistant in a menu beside the language
+switch. Medicines joins the list of prescriptions and the check of a new
+drug, which used to be two tabs under two names. The body figure and the radar
+open both the Overview and the Radar; the Radar adds an index of the systems, and each
+system's block leads with a one-sentence verdict, the measurements as a table,
+the genotype as findings with whether it agrees with the measurements, and the
+questions for the doctor; every position of the panel, the scores and the notes
+are under «More». Labs shows what is out of range first and folds the values
+in range. Dates read «3 Sep 2026» instead of «2026-09-03T08:22», ClinVar
+significance is shown in the reader's language, long notes are cut at three
+lines until clicked, and a finding without a usable rsID is named by its
+position. The Russian interface addresses the reader formally throughout. On a
+phone the header takes one line, the tabs scroll sideways, the disclaimer sits
+in the footer instead of covering the tabs, and the page no longer scrolls
+sideways. A prescription that could not be removed now says so instead of
+doing nothing, a test's priority is shown in words instead of an English code,
+and the count of unread target genes agrees with its number.
+
+**The radar shows its head at once and fills the systems in as they arrive.**
+The tab used to wait for everything before showing anything. The head of the
+tab now appears as soon as the quick answers are back, well under a
+second; the blocks by system, which are the slow part, fill in under
+their own loader. The server also reads every system's card once right after
+it starts, on a thread of its own, so the first page of a session finds the
+genome folder, the catalogue positions and the coverage table already read.
+The two ways out of a block — the system's card, and the panel with its
+studies for the clinician — are labelled buttons with a hint each, no longer
+two blue links run together.
+
+**Switching tabs no longer fetches every answer again.** What a tab has fetched
+is kept for the session: coming back to the radar takes a tenth of a second
+instead of seconds. Every write made from the page, a finished recompute or
+ClinVar refresh, and a change of language forget what was kept; the answers that
+describe a running job are never kept.
+
+**A block of the lifestyle brief due for a review opens what changed.** The
+flag «needs a review» is a button: for every block due it shows, per watched
+marker, the value at the review date, every measurement since, where each stands
+against its range and whether that position moved — beside «the wording still
+holds» and a request for the assistant built from the same facts, carrying the
+block's live tokens. The flag on the Assistant page, in the menu, goes there. `scholion
+brief-review [block]` prints the same.
+
+**The coverage of the genes the panels read can be measured from the package.**
+`scholion coverage` reads, with `samtools`, how well the alignment covered every
+gene of the ACMG list, the CPIC genes and the composed genetic half of each body
+system, and writes the table the cards judge coverage by. Until now that step was
+a shell script of the source tree, and its table held 93 genes while the systems
+read 1203 — so most genes were honestly reported as not read, with nothing a pip
+install could do about it. `scholion recompute` plans this step when the table
+is missing or covers fewer genes than the panels read.
+
+**A loading view shows the project's helix and how much has arrived.** Every
+view that loads shows the DNA mark turning above a bar that fills as the view's
+requests come back, with a count of what has arrived; the motion stops under the
+system's reduced-motion setting.
+
+**Every segment of the radar has a panel of its own: the positions a
+clinician acts on, read on the genome and set beside the segment's laboratory
+markers.** Ninety-two authored positions across twelve systems, each of one of
+three kinds and saying which: a position that changes a prescription by a
+guideline (the statin, thiopurine, NSAID, warfarin, clopidogrel and
+allopurinol genes), a position that explains a laboratory marker with a
+measured effect from a named study (PCSK9 and LDL-C, the LPA positions and
+lipoprotein(a), PNPLA3 and liver fat, GC and vitamin D, FUT2 and B12, TMPRSS6
+and ferritin, ABCG2 and urate, SHBG and testosterone, DIO1 and the T3/T4
+ratio), and a position people ask about that decides nothing, printed with
+that note. Each row prints the person's genotype with its depth, the sentence
+written for that state, and — where the position bears on a marker of the
+segment — a question comparing the expected direction with the last value; when the marker was
+never taken, the positions waiting on it are named inside one question
+rather than asking for the same test once per position. The
+panel follows the verdict on the segment's card and in each block of the radar page; the broad
+disease list from the base stands after it as the background. The clinician's
+blank for the thyroid is in, sorted by kind rather than copied as a list. The
+locus catalogue grew from 61 to 113 positions, every new one verified against
+two independent sources; two whose second-build position the sources disagree
+on are held without it and say so.
+
+**A gene short reads cannot read is named as such, never as clear.** The
+21-hydroxylase gene beside its pseudogene, the androgen-receptor repeat and
+the Gilbert promoter repeat are printed as «requires a separate method», with
+the method named, and are never counted as read; a «nothing found» over them
+would have been a statement about the method.
+
+**The radar page shows panels, not scores.** Polygenic scores stay on the
+genome tab; on the radar each system's block opens with its verdict and panel,
+and the scores mapped to it are folded under «More».
+
+**The radar has a thirteenth segment, «Heart and vessels».** Until now the
+body was laid out as eleven laboratory panels and one wearables segment, and
+the heart had no panel of its own — so the pharmacogenetics that matter most in
+a cardiology prescription (warfarin with VKORC1, CYP2C9 and CYP4F2; clopidogrel
+with CYP2C19; the beta-blockers; the anticoagulants and antiplatelets) and the
+cardiovascular polygenic scores had no card to stand on. The new segment is
+built from the five markers a laboratory issues beside the lipid panel rather
+than inside it — lipoprotein(a), apolipoprotein B, apolipoprotein A1,
+fibrinogen and D-dimer — and answers like every other system: `scholion system
+cardio` prints the laboratory now and its movement, a genetic half of 258
+genes composed from the Gene Curation Coalition export (cardiomyopathies,
+channelopathies and inherited arrhythmias, aortic aneurysm and dissection,
+monogenic thrombophilia and hypertension, the monogenic forms of coronary
+disease and of cerebral small-vessel stroke; pulmonary arterial and portal
+hypertension are excluded by name because they belong to the lungs and the
+liver), the ten cardiovascular scores, the prescriptions acting on it, and the
+questions for a clinician. On the figure it is drawn at the heart. Lipids stay
+a separate segment and keep the lipid measurements; the pulse and heart-rate
+variability a wearable records stay in fitness, because a segment has one
+source. Nothing stored is rewritten: the five markers were already recorded
+under their own keys, and the segment reads them where they are.
+
+### What is fixed
+
+**A click on a radar label opened nothing, and the dot beside it was hard to
+hit.** The dot's hit area was eighteen pixels across, and the label beside it —
+«Lipids 56» — was not a door at all, so a click on it did nothing and looked like
+a hang. The label opens the system like the dot does, and the dot answers within
+a wider circle around it. A click from the radar now opens the system's card at
+once and asks the server for nothing: the answer the radar already drew is the
+one the card shows.
+
+**The radar tab took about a minute to open on a real profile.** The list of
+systems and every card asked the same questions hundreds of times: the genome
+folder was searched and each file in it opened by content on every genome read,
+the genotyping program was started once per position for the list and again for
+every card, the laboratory results were analysed again for each card, and the
+coverage table was parsed again for every gene. What a file's content says is
+now remembered while the file is unchanged, the rows read at a position are
+remembered while the file and its index are unchanged, and inside one reading
+each of those questions is asked once. The list of systems opens in about four
+seconds after a start and under a second after that; the cards in about two.
+
+**The Ouroboros installation never loaded.** The instructions copied the tools
+module into Ouroboros's own tools package, where it could not import its
+neighbours, so the plugin failed on its first line and registered nothing. They
+now place one line that imports the installed package, which also means an
+upgrade of the package is the whole update of the plugin.
+
+**A reference file refreshed on this machine outranked a newer one the package
+carries.** An import kept answering for as long as the file existed, so after an
+upgrade a months-old local copy silently beat the newer copy the build brought. The
+newer of the two now answers, by the date each carries; `scholion sources` says
+which copy answers each file and why, and a local copy with no date keeps
+answering and says that it cannot be compared.
+
+**The button labelled «Check for updates» refreshed ClinVar, and after a pip
+install it answered with a file path.** It never updated the program: it ran a step
+of genome preparation that a pip install does not carry, and the reason it printed
+was a path inside the Python installation. It is now called «Refresh ClinVar»,
+where it cannot run it is replaced by a sentence saying where that step is done,
+and updating the program itself is `scholion version`.
+
+**A cardiology prescription was printed as acting on nothing, and six
+polygenic scores appeared on no card.** An ACE inhibitor, a sartan, a
+beta-blocker, a calcium-channel blocker, a thiazide or loop diuretic, warfarin,
+a direct oral anticoagulant, clopidogrel or an antiarrhythmic was listed as
+«unmapped» on every system card, so `scholion prescription` could not
+reach its genes through a system; the scores for atrial fibrillation, heart
+failure, hypertension, systolic blood pressure, ischemic stroke and venous
+thromboembolism were computed and shown on the genome tab but placed on no
+system. All of them now stand on «Heart and vessels», and coronary artery
+disease, myocardial infarction, peripheral arterial disease and abdominal
+aortic aneurysm move there from the lipid card, where they had been the only
+outcomes among measurements.
+
+**Three lines of every form from one laboratory were read by nobody.** Total
+calcium, magnesium, zinc and serum copper — the biochemical rows, printed in
+mmol/L and µmol/L — were excluded from any form whose text or file name
+contained «исп», the three letters that stand for the elemental method. Those
+letters also stand inside «Исполнитель», the word that names the performing
+laboratory in the header of every form one Russian laboratory prints, so on
+those forms the four rows matched nothing at all: the elemental series does not
+answer to the plain printed names, and the biochemical series had excluded
+itself. Nothing failed — the other rows of the same form were read as usual, and
+the missing ones were simply absent. The rule now names the form it meant
+(«ИСП-МС», «Ответ ИСП»), and a check refuses any form rule short enough to hide
+inside an ordinary word.
+
+**A form could be counted as already read without ever having been read.** The
+list of files a loader has taken remembered each one by the name it was given on
+the command line. Named by a path relative to the directory the command ran in —
+`ingest-labs ../forms` — that name meant a different folder from a different
+directory. Two folders reached by the same relative name, a file of the same name
+and the same modification time in each, and the second was passed over in
+silence: present, never refused, its rows simply absent from the history.
+Copying is what makes modification times equal, since `cp -p`, rsync and every
+cloud sync carry them over with the bytes. A file is now remembered by its full
+resolved path, so two files can no longer be one entry, and one file reached
+through two paths — a folder of forms opened through a symbolic link, say — is no
+longer read twice. Lists written by earlier versions go on working and are
+renamed as each file is met again, so nothing is re-read because of this change.
+
+### What needs recomputing
+
+**Run `scholion genotype-sites` — if the catalogue positions were genotyped from an alignment before this version.**
+The locus catalogue grew from 61 to 113 positions. A position the genome file
+does not list counts as the reference only when a sites file genotyped from the
+alignment confirms it, and a sites file made before this version holds none of
+the new positions: in a segment panel they print as not read, never as the
+reference. `scholion recompute` finds this step by itself and runs it with the
+alignment and the reference it names. Everything else in the panels, the
+heart-and-vessels segment included, is read from the reference base at every run
+and needs nothing.
+
+**Run `scholion ingest-labs --force` over your folder of laboratory forms — if a form names its performing laboratory in its header.**
+Total
+calcium, magnesium, zinc and serum copper from those forms are in no series at
+all; re-reading adds them. Two cautions. A value converted by an earlier version
+out of the biochemical row into the elemental series — a calcium of 2.31 mmol/L
+stored as 92.58 mg/L, and the same shape for magnesium, zinc and copper — is NOT
+removed by re-reading: it stays beside the true elemental readings, where a
+change of method reads as a trend. Such a point carries no date beyond its month
+and no source, which is how to recognise it. Delete it by hand — but only AFTER
+the re-read has put the printed row where it belongs, or the value leaves the
+profile altogether.
+
+**Run `scholion ingest-labs --force` — if the folder of forms has ever been named by a path relative to the directory the command ran in.**
+A form passed over for that reason left nothing behind to find it by: it counted
+as unchanged, not as refused, so no report names it. One full pass over the
+folder is what rules it out, and it is the same pass the note above asks for.
+
 ## v0.5.0 — 13.09.2026
 
 ### What you can do now
@@ -496,14 +802,14 @@ Nothing.
 
 ### What needs recomputing
 
-A profile already holding a month point beside a dated point of the same draw
-is collapsed by the next write to that marker of any shape, or by re-importing
-the folder once.
 
-Re-importing laboratory forms (`ingest-labs --force`) moves biochemistry copper
-points from the elemental series to the new marker; an elemental-iron point in
-the low tens is a molar value stored as micrograms and should be removed by
-hand.
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if forms were ingested by an earlier version.**
+A month point beside a dated point of the same draw is collapsed into one (the
+next write to that marker, of any shape, does the same), and biochemistry copper
+points move from the elemental series to their own marker.
+
+**By hand — if an elemental-iron point sits in the low tens.**
+It is a molar value stored as micrograms; remove it from the series.
 
 ## v0.4.11 — 12.09.2026
 
@@ -788,12 +1094,12 @@ input could answer no longer stands.
 
 ### What needs recomputing
 
-An ACMG table written by an earlier version was matched without checking that
-the personal file and the ClinVar file share a build. If the two were crossed,
-the table is a silent zero or a match on a different base. `scholion acmg-scan`
-rebuilds it from the files, refusing a crossed pair; a table whose files were
-of one build is unchanged by this.
 
+**Run `scholion acmg-scan` — if an ACMG table was written by an earlier version.**
+That table was matched without checking that the personal file and the ClinVar
+file share a build; if the two were crossed, it is a silent zero or a match on a
+different base. The scan rebuilds it from the files and refuses a crossed pair; a
+table whose files were of one build comes out unchanged.
 
 ## v0.4.10 — 09.09.2026
 
@@ -1380,40 +1686,32 @@ heading. The rest are to how reports are written and how files are read.
 
 ### What needs recomputing
 
-For a profile whose sex is spelled other than «male»/«female» and which has
-ingested forms carrying sex-specific reference rows: the reference intervals
-stored from those forms may have been picked without the sex filter, and
-`ingest-labs --force` on the same folder rewrites them. For every other profile,
-nothing on that account. A report saved from an earlier version may be truncated at the point
-its first unwritable character appeared — running the command again produces the
-whole one.
 
-A form that carried a urine albumin-to-creatinine ratio, a urine microalbumin or
-a total T3 was ingested without those lines, and nothing in the profile says so.
-`ingest-labs --force` on the folder that holds such forms reads them again and
-adds the three analytes; every value already stored stays as it is.
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if forms were ingested by an earlier version.**
+The folder is read again, and for each of these what an earlier version stored
+is corrected: reference intervals picked without the sex filter, for a profile
+whose sex is spelled other than «male»/«female»; urine albumin-to-creatinine
+ratio, urine microalbumin and total T3 lines that were left out; a hand-entered
+day beside the same draw's timed re-import, collapsed into one point that keeps
+the timed date, with every collapse named; the range each form printed, which
+replaces the marker's recorded range a value was judged by until then; and the
+sign of a bound («< 0.09»). Points entered by hand before the form was read keep
+whatever was typed.
 
-A series that already holds a hand-entered day beside the same draw's timed
-re-import keeps both until that day is written again: the same
-`ingest-labs --force` collapses each such pair into one point, keeps the timed
-date, and names every collapse it made.
+**By hand — if a biochemistry total calcium was ingested by an earlier version.**
+It sits in the elemental series converted to mg/L. Reading the folder again files
+it under total calcium, but the converted point is not removed from the elemental
+series; remove it, or the report shows a method change as a trend.
 
-A value stored by an earlier version carries no range of its own: until the
-folder is read again with `ingest-labs --force`, it is judged by the marker's
-recorded range and the report marks it so; after, by the range its form
-printed. A value stored from a form that printed a bound («< 0.09») carries no
-sign until the same re-read; points entered by
-hand before the form was read keep whatever was typed. A biochemistry total
-calcium ingested by an earlier version sits in the elemental series converted
-to mg/L: reading the folder again files it under total calcium, but the
-converted point is not removed from the elemental series — that is done by
-hand, and the report until then shows a method change as a trend.
-
-A polygenic panel computed by an earlier version carries no spread across
-models and no AUROC: the report prints «not recorded» in their place until the
-panel is recomputed (`python3 -m scholion.prs report`) and rebuilt with the
-panel-build step of the genome guide. The spread across reference populations
+**Run `python3 -m scholion.prs report` — if a polygenic panel was computed by an earlier version.**
+Such a panel carries no spread across models and no AUROC, and the report prints
+«not recorded» in their place. Recompute it, then rebuild the panel with the
+panel-build step of the genome guide; the spread across reference populations
 comes from the ancestry-sensitivity step of the same guide, run once per panel.
+
+**By hand — if a report saved from an earlier version stops short.**
+It may be truncated at its first unwritable character; running the same command
+again produces the whole report.
 
 ## v0.4.8 — 31.08.2026
 
@@ -1532,18 +1830,21 @@ detected in both cases and shown in one. Both now say it.
 
 ### What needs recomputing
 
-**Run `scholion ingest-studies --force` over your folder of documents once.**
+
+**Run `scholion ingest-studies --force <folder of documents>` — once, if studies were ingested by an earlier version.**
 Studies that were dropped in silence may now be read, and whatever is still not
-taken will be named in the report.
+taken is named in the report.
 
-**Measure coverage once more** if you want the BED of under-read genes: the
-measurement now records the intervals its percentages were taken over, and a
-table produced before it did does not carry them.
+**By hand — if you want the BED of under-read genes.**
+Measure coverage once more: the measurement now records the intervals its
+percentages were taken over, and a table produced before it did does not carry
+them.
 
-**Run `scholion ingest-garmin` once.** Existing months gain the description of
-their sample; the values themselves do not change, so charts and comparisons are
-unaffected. Until an import has run, a series simply has no sample description
-and no statement about what is distinguishable is made for it.
+**Run `scholion ingest-garmin` — once, if Garmin months were imported by an earlier version.**
+Existing months gain the description of their sample; the values themselves do
+not change, so charts and comparisons are unaffected. Until an import has run, a
+series simply has no sample description and no statement about what is
+distinguishable is made for it.
 
 ## v0.4.7 — 27.08.2026
 
@@ -2236,19 +2537,13 @@ relied on:
 
 ### What needs recomputing
 
-No stored value changes and the knowledge base is untouched, so series already
-on a chart stay comparable. What changed is what can now be read, so:
 
-```
-scholion genome-status
-scholion overview
-```
+Nothing stored changes value and the knowledge base is untouched, so series
+already on a chart stay comparable. What changed is what can now be read.
 
-and, for laboratory PDFs previously refused because no draw date could be found:
+**Run `scholion genome-status` and `scholion overview` — to see what can now be read.**
 
-```
-scholion ingest-labs <folder>
-```
+**Run `scholion ingest-labs <folder>` — if laboratory PDFs were refused because no draw date could be found.**
 
 ### Measured
 
@@ -2503,18 +2798,21 @@ chart without a note.
 
 ### What needs recomputing
 
-* `scholion labs` and `scholion overview` — the sex-dependent thresholds.
-* `scholion drug <name>` for CYP2D6, CYP2C19, CYP2C9, DPYD, TPMT, NUDT15,
-  SLCO1B1 and the rest of the eighteen, if a star-allele table or a called
-  diplotype is in the profile.
-* `scholion acmg` — the report now carries coverage.
-* `scholion prs` — sex-specific traits are withheld and the method caveats are
-  printed.
-* `scholion ingest-labs` on any folder holding non-PDF files, and on any American
-  form.
-* `scholion genome` and everything downstream of it, on a GRCh37 file, on a
-  consumer array, on a multi-sample file, on a folder with several genomes, or on
-  a file that was never actually readable.
+
+**Run `scholion labs` and `scholion overview` — if their output was saved with an earlier version.**
+The thresholds that depend on sex have changed.
+
+**Run `scholion drug <name>` — if a star-allele table or a called diplotype is in the profile.**
+For CYP2D6, CYP2C19, CYP2C9, DPYD, TPMT, NUDT15, SLCO1B1 and the rest of the
+eighteen.
+
+**Run `scholion acmg` and `scholion prs` — if their output was saved with an earlier version.**
+The ACMG report now carries coverage; sex-specific polygenic traits are withheld
+and the method caveats are printed.
+
+**Run `scholion ingest-labs <folder>` — if the folder holds non-PDF files or an American form.**
+
+**Run `scholion genome` — on a GRCh37 file, a consumer array, a multi-sample file, a folder with several genomes, or a file that was never actually readable.**
 
 ### Measured
 
@@ -3511,10 +3809,11 @@ were never in the alignment target; `./.` there means «not looked at», not
 
 ### What needs recomputing
 
-For anyone whose VCF came through `fastq_to_vcf.sh`: **re-run the extraction**,
-because the target now reaches five markers it did not before. Genotypes read
-from a full-genome VCF produced elsewhere are unaffected — only the targeted
-route was narrow.
+
+**By hand — if your VCF came through `fastq_to_vcf.sh`.**
+Re-run the extraction: the target now reaches five markers it did not before.
+Genotypes read from a full-genome VCF produced elsewhere are unaffected — only
+the targeted route was narrow.
 
 Nothing else needs recomputing. The wider DPYD panel does not change a stored
 value; it changes how much of the panel an answer admits to having read.

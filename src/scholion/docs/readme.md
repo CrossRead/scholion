@@ -8,7 +8,7 @@ Four ways in, one core: a local web app, a skill for a language model, a plugin
 for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
 model that speaks the protocol can call the same tools.
 
-**Version 0.5.0** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.1** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -194,12 +194,73 @@ far outside it.
 **Prescriptions.** The full regimen with doses and statuses, interactions,
 monitoring labs per drug class, open questions for the physician. Any new drug is
 checked as a second opinion: pharmacogenetics, interactions with the current
-regimen, and what to monitor.
+regimen, and what to monitor. The question can be asked from three directions
+and gets the same shape of answer each time — from the prescription («before I
+take this, what in the genome bears on it»), from a class of disease («nothing
+is prescribed and the examination says I am well»), or from a body system («what
+belongs to the working of the thyroid»). All three judge their gene list through
+one gate: a sentence is printed only with a named source, the rest are counted,
+and a list that was not read end to end is never called clear.
 
 **Lifestyle and sleep.** Multi-year wearable trends, body composition, workouts.
 Sleep phases are parsed in full — deep sleep, REM, sleep stress, sleep score,
 bedtime — monthly, plus a per-night file for n-of-1 analysis, where monthly
 averages answer the wrong question.
+
+**And the layer that assembles the rest: twelve body systems, each answering as
+one card.** This is the last item because the list runs deepest first, and it is
+the first thing to open. The body is laid out as the systems a laboratory
+actually issues panels for — lipids, heart and vessels, carbohydrate
+metabolism, inflammation, thyroid, adrenals, gonads, growth, pancreas, liver,
+micronutrients, kidneys — and a thirteenth built from wearables. Click a segment of the radar, an organ on
+the figure, or run `scholion system thyroid`, and one card comes back: the
+laboratory now and its movement since the previous draw, the genetic half of the
+system and **how much of it was actually read**, the polygenic scores placed on
+it, the prescriptions acting on it, a target your clinician set, what to test,
+and the questions to bring to the appointment.
+
+The genetic half is composed from a base with a version rather than from
+somebody's memory: 1203 genes across the twelve systems, taken from the Gene
+Curation Coalition's export with every submitter's assertion kept side by side —
+who asserted the gene–disease link, how strongly, under which mode of
+inheritance, on what date. A weak or refuted assertion travels marked as such
+instead of being quietly dropped or quietly promoted, and one copy of an allele
+in a recessive gene is printed as carriership, never as a risk line.
+
+**In front of that base stands the layer a base cannot supply: 92 positions
+across the twelve systems, authored rather than generated.** The unit of a row is
+a position, not a gene — an rsID with its HGVS on a RefSeq accession, the allele
+the author named, the kind of claim the link permits, and the phrase for one copy
+and for two. Where the phrase for the state actually found has not been written,
+the row is kept and printed as pending, because that is the most informative row
+on the screen: somebody put the position here and what follows from that genotype
+is still to be written. Every row that ships is signed — by the author of the
+panel, and by no clinician — and the card says exactly that, with the count and
+the date, rather than letting a reader assume a clinician stood behind it; a
+clinician's counter-signature, a correction or a striking out is what is being
+asked for. Where short reads cannot read a gene at all — a gene
+beside its pseudogene, a triplet repeat — the panel names it as needing a separate
+method, and it counts as neither read nor clear.
+
+A position the genome file does not list is the reference only when the alignment
+says so. Until the catalogue positions have been genotyped from the aligned reads,
+such a position prints as not read rather than as the reference — and the panel
+where the gap shows offers the step that closes it: `scholion recompute` finds it,
+names what it still needs, and runs it.
+
+Two things the card will not do. It will not call a system clear that it did not
+read — «nothing found» over a gene nobody read is a statement about the file, so
+the count of unread genes travels inside the verdict rather than in a footnote
+under it. And genetics does not enter the 0–100 score: a genotype cannot be
+refuted by the next blood draw, so it stands beside the score, never inside it.
+Each system carries two rings — how much of its laboratory panel is measured,
+how much of its genetic half is read — and they are never merged into one
+number.
+
+The next step comes in three baskets, because they are three different actions
+by three different people: **test** (the laboratory), **read in the genome**
+(something you run yourself), **ask the clinician**. A basket that is empty says
+why it is empty — «nothing» without a reason reads as «all is well».
 
 ---
 
@@ -261,17 +322,11 @@ An honest account of what the system does not do.
   exceed the signal.
 - **A catalogue of published associations is not a risk estimate.** The existence
   of a paper does not make a variant a factor.
-- **A consumer array (23andMe and the like) is not read directly.** A raw export
-  has to be converted to a GRCh38 VCF with external tools first — `genome/README.md`
-  describes the route — and from there everything works, minus the polygenic
-  scores, which need a BAM. What the next wave adds is the import itself and the
-  three-valued status of a locus: *called* / *not called* / *not on the chip*.
-  Until then the third case is reported as the second, which is the safe direction
-  but a coarse one: an array covers a fraction of the positions, and the absence
-  of a variant there does not equal reference. A positive finding off an array
-  will be reported as a signal to confirm rather than as a finding, for the same
-  reason — the positive predictive value of a chip for BRCA1/2 has been measured
-  at around 4 %.
+- **A consumer array (23andMe and the like) reads a fraction of the positions.**
+  A position the chip does not carry is reported as *not on this chip*, never as
+  the reference. A positive finding off an array is a signal to confirm rather
+  than a finding — the positive predictive value of a chip for BRCA1/2 has been
+  measured at around 4 %.
 
 ---
 
@@ -286,8 +341,9 @@ own, and each one makes the ones above it sharper:
 | A few numbers off a form | `scholion add-lab "Ferritin" 2026-08 41 --unit ng/mL` | A series, a corridor, a flag — and a unit that is converted rather than believed |
 | A whole panel | `scholion import-labs panel.csv` | Thirty results in one command; the file is imported whole or not at all |
 | Russian lab PDFs | `scholion ingest-labs "<folder>"` | Years of forms parsed, with the reference range read off each printed line |
-| A wearable export | `scholion ingest-garmin "<folder>"` | Sleep phases, load, body composition as trends rather than as a daily number |
+| A wearable export | `scholion ingest-wearable "<folder>"` (Garmin or WHOOP) | Sleep phases, load, body composition as trends rather than as a daily number |
 | Prescriptions | `scholion add-med "name" --dose "…"` | Interactions, monitoring tests per class, a second opinion on anything new |
+| A target your clinician set | `scholion target set tsh --low 1 --high 2 --unit mIU/L --set-by "Dr N" --set-on 2026-09-12` | Drawn beside the corridor off the form, in a different stroke; standing outside it is a question, never a flag |
 | A VCF or a BAM | see `PREPARING-THE-GENOME.md` | Pharmacogenetics, ClinVar findings, ACMG SF, polygenic scores, longevity |
 | A consumer array | `scholion array` — drop the export in the genome folder, `.zip` and all | The locus catalogue read straight off the chip, each position called, no-call or *not on this chip*; ClinVar, ACMG SF and polygenic scores refuse with the reason |
 | A FHIR bundle | `scholion import-fhir bundle.json` | Results matched by LOINC code, units converted or refused; what the bundle claims about its patient is reported, not applied |
@@ -465,20 +521,84 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 14 `sch_*` tools — second opinion on a
-drug, lab analysis, locus lookup, polygenic scores, longevity, goals and more.
-Ouroboros discovers tool modules by scanning its own tools package, so the file
-is copied there once:
+`scholion/ouroboros_tools.py` registers 32 `sch_*` tools — a body system as one
+card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
+longevity, goals and more.
+Ouroboros discovers tool modules by scanning its own tools package, so one line
+is placed there once. The line imports the installed package, which means the
+tools are always the build pip installed and nothing is copied again after an
+upgrade:
 
 ```bash
 pip install scholion
-cp "$(python3 -c 'import scholion.ouroboros_tools as m; print(m.__file__)')" \
-   <ouroboros>/ouroboros/tools/
-export SCHOLION_REPO_DIR=~/.local/share/scholion    # where your data lives
 ```
+
+```bash
+echo 'from scholion.ouroboros_tools import get_tools' > <ouroboros>/ouroboros/tools/scholion_tools.py
+```
+
+Point `SCHOLION_REPO_DIR` at the directory that holds your data, in the environment
+Ouroboros runs in. Do not copy the module itself: it imports its neighbours inside
+the package, and a copy placed in another package cannot find them.
 
 Self-check outside Ouroboros: `python3 -m scholion.ouroboros_tools` prints the
 tool list.
+
+## Updating
+
+An update is two steps, and the second is the one that gets forgotten: install the
+newer build, then ask it what the releases in between want done with the data you
+already have.
+
+**1. Install the newer build** — the command depends on how you installed:
+
+- **pip package:** `pip install --upgrade scholion` (and `"scholion[genome]"` if
+  you use that extra).
+- **Unpacked folder:** download the new folder. Your data lives INSIDE the old one
+  unless `SCHOLION_REPO_DIR` points elsewhere, so copy the data directories —
+  `profile/`, `genome/`, `raw/`, `work/`, `archive/` — into the new folder before
+  you remove the old one. Pointing `SCHOLION_REPO_DIR` at a directory outside the
+  folder makes every later update a plain replacement.
+- **Skill copied into a folder:** the copy does not update itself. After upgrading
+  the package, `scholion skill --install` replaces it and records the build beside
+  it (`scholion skill --install ~/.claude/skills/scholion` for another host's
+  folder); `scholion selfcheck` fails on a copy that differs from the installed
+  build until it is replaced. A copy downloaded from the published page, or added with
+  `npx skills add CrossRead/scholion`, is replaced the same way it was added.
+- **Ouroboros tools module:** upgrade the package, and that is all: the one line
+  placed in Ouroboros's tools package imports the installed build. A copy of the
+  whole module, made by an earlier version of these instructions, never imported;
+  replace it with that line.
+- **Ouroboros hub:** the host installs the package named in the skill's install
+  specification. Once the host has updated the skill,
+  `python3 -m scholion version` in that environment reports which build it runs.
+
+**2. Ask the new build what it wants done:**
+
+```bash
+scholion version            # this build, its age, and what to recompute since your data's version
+scholion version --seen     # when you have done it or read it
+```
+
+```bash
+scholion recompute          # the steps those releases ask for, and the genome steps your data lacks
+scholion recompute --yes    # run the ready ones, with the step, the item and the time left shown
+```
+
+`scholion version` reads the journal the package carries: for every release
+between the version your data was last used with and this one, it lists what that
+release asks — a command to run and when it applies, or a step to take by hand.
+The local web page shows the same note under its header until you press
+«Understood». A profile that has never recorded its version says so; for an update
+from a known version, `scholion version --since 0.4.8` lists everything after it.
+
+Nothing checks for a newer version by itself. `scholion version --check`, or the
+button beside the update note, asks PyPI once — the only request, made because you
+asked for it, and refused when `SCHOLION_OFFLINE=1` is set.
+
+What an update leaves alone: the data directory, and any reference file you
+refreshed with `scholion sources --refresh`, which stays beside your data;
+`scholion sources` shows which copy answers for each file.
 
 ---
 
@@ -615,7 +735,9 @@ docs/                     versioning policy, data layout, tests and compatibilit
 
 src/scholion/             the core: engine, server, CLI, genome, PGS, wearables, web
 src/scholion/knowledge/   public catalogues: loci, ACMG SF, thresholds,
-                          pinned PGS models, interactions, marker recognition
+                          pinned PGS models, interactions, marker recognition,
+                          the twelve body systems and the gene lists composed
+                          for them from the GenCC export
 src/scholion/i18n/        message catalogues, one file per language
 src/scholion/skill/       the instruction for a language model
 src/ingest/               pipelines: FASTQ→VCF, ClinVar, PGS, LongevityMap,

@@ -73,6 +73,25 @@ if cpic_path.exists():
     cpic_genes |= set(cpic.get("genes", {}) or {})
     cpic_genes |= set(cpic.get("genes_of_interest", []) or [])
 genes |= cpic_genes
+# The genes of the body-system panels (13.09.2026). Since 0.5.0 the genetic half
+# of a system is composed from GenCC — 1203 genes — while this table held the 93
+# of ACMG SF and CPIC, so 1120 rows of the radar said «not read» and were right
+# to: over a gene whose coverage nobody measured, «nothing found» is a statement
+# about the file. Measuring them is what closes it.
+panel_genes = set()
+gencc_path = K / "gencc_gene_disease.json"
+if gencc_path.exists():
+    gencc = json.loads(gencc_path.read_text(encoding="utf-8")).get("systems") or {}
+    for spec in gencc.values():
+        panel_genes |= {str(g).upper() for g in (spec.get("genes") or {})}
+curated_path = K / "system_gene_panels.json"
+if curated_path.exists():
+    curated = json.loads(curated_path.read_text(encoding="utf-8")).get("systems") or {}
+    for spec in curated.values():
+        panel_genes |= {str(p.get("gene") or "").upper()
+                        for p in (spec.get("positions") or []) if p.get("gene")}
+panel_genes.discard("")
+genes |= panel_genes
 
 span = {}
 with gzip.open(clinvar, "rt", errors="replace") as fh:
@@ -95,7 +114,7 @@ with gzip.open(clinvar, "rt", errors="replace") as fh:
 missing = sorted(genes - set(span))
 rows = []
 for g, (c, lo, hi) in span.items():
-    tag = "ACMG" if g in acmg else "CPIC"
+    tag = "ACMG" if g in acmg else ("CPIC" if g in cpic_genes else "PANEL")
     rows.append((c, max(0, lo - PAD), hi + PAD, f"{g}|{tag}"))
 
 def key(c):
@@ -104,9 +123,13 @@ def key(c):
 rows.sort(key=lambda r: (key(r[0]), r[1]))
 with out.open("w", encoding="utf-8") as fh:
     for c, lo, hi, name in rows:
-        fh.write(f"chr{c}\t{lo}\t{hi}\t{name}\n")
+        # ClinVar calls the mitochondrion MT, a GRCh38 alignment calls it chrM.
+        # «chrMT» is a region samtools cannot parse, and the run died on the last
+        # interval of 1142 with everything else already measured (13.09.2026).
+        fh.write(f"chr{'M' if c == 'MT' else c}\t{lo}\t{hi}\t{name}\n")
 total = sum(hi - lo for _, lo, hi, _ in rows)
-print(f"  genes in the list: {len(genes)} (ACMG SF {len(acmg)} + CPIC {len(cpic_genes)})")
+print(f"  genes in the list: {len(genes)} (ACMG SF {len(acmg)} + CPIC {len(cpic_genes)}"
+      f" + body-system panels {len(panel_genes - acmg - cpic_genes)})")
 print(f"  intervals in the BED: {len(rows)}, {total/1e6:.1f} Mb in total")
 if missing:
     print(f"  ⚠ no ClinVar records, so not in the BED: {', '.join(missing)}")
@@ -151,12 +174,17 @@ PY
     # the needed slice of the BAM is read. -a — including positions with zero
     # coverage, otherwise unread bases simply vanish from the output and the
     # fraction comes out overstated
-    : > "$DEPTH.part"
-    printf 'name\tlength\tmean\tb1\tb10\tb20\tb30\n' > "$DEPTH.part"
+    # Resumable per interval. With 93 genes the step took minutes and a lost run
+    # cost little; over the panels it is more than a thousand intervals, and a
+    # step that must start from the beginning after any interruption is a step
+    # people stop running (13.09.2026).
+    [ -s "$DEPTH.part" ] || printf 'name\tlength\tmean\tb1\tb10\tb20\tb30\n' > "$DEPTH.part"
+    tail -n +2 "$DEPTH.part" | cut -f1 > "$WORK/.measured"
     TOTAL=$(wc -l < "$BED" | tr -d ' ')
     N=0
     while IFS=$'\t' read -r CHROM START END NAME; do
       N=$((N + 1))
+      if grep -qxF "$NAME" "$WORK/.measured" 2>/dev/null; then continue; fi
       printf '\r  %s/%s %-24s' "$N" "$TOTAL" "${NAME%%|*}" >&2
       samtools depth -a -Q "$MINMAPQ" -r "$CHROM:$((START + 1))-$END" "$BAM" \
         | awk -v name="$NAME" -v len="$((END - START))" '

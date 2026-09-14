@@ -134,9 +134,12 @@ class TestTheWebEscaperClosesAttributes(unittest.TestCase):
             self.assertIn(ch, line, f"esc() does not produce {ch}")
 
     def test_trend_dates_go_through_esc(self):
-        self.assertIn("esc(m.trend.from_date)", self.src)
-        self.assertIn("esc(m.trend.to_date)", self.src)
+        # Task 195 prints the dates as a person writes them; the formatted string
+        # is what reaches the DOM, and it still goes through esc().
+        self.assertIn("esc(fmtDate(m.trend.from_date))", self.src)
+        self.assertIn("esc(fmtDate(m.trend.to_date))", self.src)
         self.assertNotIn("${m.trend.from_date}", self.src)
+        self.assertNotIn("${fmtDate(m.trend.from_date)}", self.src)
 
     def test_every_value_attribute_goes_through_esc(self):
         """A rule with no exceptions, because the exception was the defect.

@@ -17,7 +17,7 @@ conversation with a physician.
 | Layer | Format | State |
 |---|---|---|
 | Genome | VCF (from whole-genome sequencing) | works |
-| Genome | consumer array export (23andMe and the like) | not yet — deliberately, see below |
+| Genome | consumer array export (23andMe, AncestryDNA, MyHeritage, FamilyTreeDNA, Living DNA) | works, as a distinct class of input — see below |
 | Laboratory results | PDF forms (Russian laboratories), CSV, or values typed in one at a time | works |
 | Prescriptions | entered by the person, with doses and dates | works |
 | Wearables | Garmin and Apple Health exports | works |
@@ -69,12 +69,99 @@ is verified by computation against 1000 Genomes rather than assumed, and the
 sensitivity of the percentile to the choice of reference population is measured
 (median spread across populations: 26.7 percentage points).
 
-**Consumer arrays are not read yet, on purpose.** Positive predictive value of a
-chip for BRCA1/2 is 4.2% (BMJ 2021), and 40% of variants taken from raw
-direct-to-consumer data and sent for clinical confirmation are false positives
-(Moscarello 2019). Support is being built with a frequency floor, so that rare
-findings from a chip are reported as a signal requiring confirmation and not as a
-finding.
+**A consumer array is read as a different class of input, not as a weaker
+genome.** Every catalogued position answers one of three ways — called, no-call,
+or *not on this chip at all* — and the third is the one that matters: on an array
+an absent position was never interrogated, so treating it as a reference call
+would turn «this instrument cannot see that locus» into «you do not have that
+variant». The paths a chip cannot support — ClinVar screening, ACMG secondary
+findings, polygenic scores — refuse with the reason rather than answering.
+
+**What is still missing there, and it matters clinically.** Positive predictive
+value of a chip for BRCA1/2 is 4.2% (BMJ 2021), and 40% of variants taken from
+raw direct-to-consumer data and sent for clinical confirmation are false
+positives (Moscarello 2019). The frequency floor that would report a rare
+array-derived finding as a signal requiring confirmation rather than as a finding
+is **not implemented yet**. Until it is, the honest reading of an array here is
+pharmacogenetics and the catalogued loci, not screening.
+
+---
+
+## A body system as one card
+
+This is the shape most of the product now takes, and it is the part a clinician
+is likeliest to want.
+
+The body is laid out as the systems a laboratory actually issues panels for —
+lipids, heart and vessels, carbohydrate metabolism, inflammation, thyroid,
+adrenals, gonads, growth axis, pancreas, liver, micronutrients, kidneys — plus
+a thirteenth built from wearable metrics. Asked about one of them, the program answers with a single
+card: the laboratory now and its movement since the previous draw, the genetic
+half of that system and how much of it was actually read, the polygenic scores
+placed on it, the prescriptions acting on it, a target the treating clinician
+set, what the test rules suggest, and the questions left open.
+
+**The genetic half is composed from a base with a version, not from anybody's
+memory.** 1203 genes across the twelve systems, taken from the Gene Curation
+Coalition export, with every submitter's assertion kept side by side: who
+asserted the gene–disease link, how strongly, under which mode of inheritance,
+and on what date. Two groups disagreeing about one gene are shown disagreeing
+rather than averaged. An assertion classified Limited, Disputed or Refuted is
+never presented as a finding, and one copy of an allele in a recessive gene is
+printed as carriership and raised as a question — never as a risk line.
+
+**In front of that base stands what a base cannot supply: 92 authored positions
+across the twelve systems.** The unit of a row is a position, not a gene: an rsID
+with its HGVS on a RefSeq accession, the allele the author named, the mode of the
+claim — monogenic, common variant, pharmacogenetic — and the phrase for one copy
+and for two, each in both languages. The panel a clinician sent in September held
+six rows for DIO1 alone, each with a different consequence, and a schema of «gene
+→ one phrase» cannot express such a panel at all. A row whose phrase for the state
+actually found has not been written is kept and printed as pending. Every row
+that ships is signed by the author of the panel and by no clinician, and the card
+says that in those words, with the count and the date: a reader is never left to
+assume that a clinician stood behind a sentence. When a clinician signs a row,
+that row says so instead — the mark is on the exception, the count on the rule. A row without a source, or without a
+mode, is dropped and counted by reason rather than quietly omitted. Where short
+reads cannot read a gene at all — a gene beside its pseudogene, a triplet repeat —
+the panel names it as needing a separate method, and it is never counted as read
+and never as clear.
+
+A position the genome file does not list is the reference only when the alignment
+says so: until the catalogue positions have been genotyped from the aligned reads,
+such a position prints as not read, and the panel where the gap shows names the
+step that closes it.
+
+Three properties of the card are deliberate and are the reason it exists:
+
+- **It will not call a system clear that it did not read.** «Nothing found» over
+  a gene nobody read is a statement about the file. The count of unread genes
+  travels inside the verdict, not in a footnote under it.
+- **Genetics does not enter the 0–100 index.** A genotype cannot be refuted by
+  the next blood draw; a score of laboratory deviation can. They stand side by
+  side, and each system carries two rings — how much of its laboratory panel is
+  measured and how much of its genetic half is read — which are never merged.
+- **The next step comes in three baskets**, because they are three different
+  actions by three different people: what to test, what to read in the genome,
+  and what to ask the clinician. An empty basket says why it is empty.
+
+The card has two densities, one for the patient and one for the clinician. They
+differ in how much is said and **never in the verdict** — there is no reassuring
+version. The clinician's density adds rsIDs and genotypes, coverage as a figure,
+the class of each link, the source and its tier, the date and provenance of every
+point, and the number of rows a gate dropped. The page prints as the sheet to
+take to an appointment.
+
+Where a curated statement is wanted — «this genotype means the following for this
+drug» — the program does not write it. A curated layer takes such sentences from
+a clinician, prints them only with a named source, counts what it dropped, and
+until a sentence is written says plainly that it is not written. What has changed
+since that arrangement was first offered is that the layer no longer ships empty:
+92 positions are in the build, each with its source, the date it was curated, and
+a signature — the panel author's, not a clinician's, which is what the card says.
+Counter-signing a row, correcting it, or striking it out is the whole of what is
+being asked of a clinician who wants to take part, and it is a smaller ask than
+writing the list was.
 
 ---
 
@@ -116,13 +203,45 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-Published as version 0.1.x. **No external clinical validation and no benchmark
-against existing systems** — nobody outside the author has run it on their own
-data yet. That is the next thing needed, and it is the reason this page exists.
+This page ships with the build numbered 0.5.1. **There is still no clinical
+validation study and no benchmark against existing systems.** What there is, is two external runs by
+people who are not the author, and both are worth stating plainly because both
+were useful and neither was flattering.
 
-What would be most useful from a clinical side, in order: twenty to thirty
-de-identified cases with a genome and at least two laboratory panels, to run a
-pilot; a clinician co-author for the first paper; and — least obvious, most
+**A geneticist ran it blind on three clinical VCFs** with established diagnoses —
+developmental delay, a suspected cancer syndrome, congenital short stature —
+telling the program no phenotype. It found none of the three. By the criterion
+this project sets itself it passed: it did not report «clear». It classified the
+files as panel-class rather than whole-genome, declared the ClinVar and ACMG
+paths closed before reading, and answered the direct question with «no — and this
+is not a negative genetic result», listing what such an answer would require. By
+the geneticist's criterion — find the causal variant — it failed.
+
+The run produced one real defect and one real over-refusal, and both are fixed.
+The defect: reading a locus took the first row at that coordinate without
+checking its REF and ALT against the catalogue, so a clinically charged position
+could return another variant's genotype carrying a confident label. It now
+matches, and refuses by name when nothing matches. The over-refusal: an exome was
+being classed as a narrow panel, which closed exactly the paths worth running on
+an exome. It also produced four items of friction that a clinic would not
+survive — missing index files, environment variables discovered by reading the
+source, one profile per patient assembled by hand — and three of the four have
+since been closed.
+
+**A practising physician ran it on her own data** and asked it the questions she
+asks in her own work: what to check before prescribing, and what to look at when
+the examination says a person is well. Her answers reshaped the product — the
+three entries, the curated gate, and the system card described above came out of
+that exchange. The thing she asked for that the program still does not have is
+a clinician's signature under the curated sentences. The mechanism that holds
+them is no longer empty — 92 positions over the twelve systems, each signed by
+the panel's author against the source it names — but a signature by the author of
+a panel is not a clinical endorsement, and the card says whose it is rather than
+letting the distinction blur.
+
+What would be most useful from a clinical side is unchanged, in order: twenty to
+thirty de-identified cases with a genome and at least two laboratory panels, to
+run a pilot; a clinician co-author for the first paper; and — least obvious, most
 valuable — two or three specialists marking up, by hand, **what cannot be said**
 on a dozen cases. That last one is the ground truth against which the central
 claim of this project can be tested at all. Everything else can be computed.

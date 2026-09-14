@@ -3,9 +3,10 @@
     "purpose": "The body systems of the health radar, each with the laboratory panel that defines it. Read by engine/lifestyle.py (the laboratory half: score, coverage, dynamics) and by engine/system_panels.py (the genetic half and the questions for a clinician). One file, two readers, so that the two halves of a system cannot drift apart in silence.",
     "who_writes_this": "The project. Which markers a laboratory issues as one panel is reference knowledge, not a medical claim about a person; the composition was decided in 0.4.9 and is not reopened here.",
     "source_tier": "curated_reference",
-    "updated": "2026-09-12",
+    "updated": "2026-09-13",
+    "why_cardio": "The thirteenth system, «Heart and vessels», was added on the owner's decision of 13.09.2026 so that the strongest pharmacogenetic pairs — warfarin with VKORC1/CYP2C9/CYP4F2, clopidogrel with CYP2C19, the beta-blockers, the anticoagulants and antiplatelets — and the cardiovascular polygenic scores have a system to stand on. Its laboratory panel is the cardiovascular-risk and coagulation markers a laboratory issues beside, not inside, the lipid panel: lipoprotein(a), apolipoproteins B and A1, fibrinogen, D-dimer. Lipids stay a separate system. The pulse and heart-rate variability the wearable records stay in fitness, because a domain has one source and this one's is the laboratory.",
     "why_four_endocrine_systems": "The endocrine system is not one system. «Hormones» averaged a thyroid marker, a gonadal one and a hepatic one into a single number, and the ring beside it measured how much of that mixture existed — a quantity nobody orders. Thyroid, adrenals, gonads and growth are the panels a laboratory actually issues, and they became four domains in 0.4.9. The composition is not to be changed by a later task: a system with a different marker set is a different system, and every stored radar score before the change would be measured against a panel that no longer exists.",
-    "fitness": "The twelfth system is not a laboratory panel: it is built from wearable metrics, its markers are whatever the device reports, and `health_radar` attaches it after the laboratory domains. It is listed here with `source: wearables` and `genetic_half: false` so that no reader counts eleven and loses it, and no reader attaches a genetic half to it by inattention.",
+    "fitness": "The wearables system (the twelfth until 13.09.2026, the thirteenth since — see why_cardio) is not a laboratory panel: it is built from wearable metrics, its markers are whatever the device reports, and `health_radar` attaches it after the laboratory domains. It is listed here with `source: wearables` and `genetic_half: false` so that no reader counts the laboratory domains and loses it, and no reader attaches a genetic half to it by inattention.",
     "schema": "domains: [ { key, source: labs|wearables, genetic_half: bool, markers: [marker keys of lab_markers.json], why } ] — `key` is also the i18n key `radar.domain.<key>` and the top-level key of system_gene_panels.json; `markers` is empty for a wearables domain.",
     "order_matters": "The order of the list is the order the radar draws its axes in and the order the previous stored radars used. Reordering is a visible change, not a cosmetic one."
   },
@@ -16,6 +17,13 @@
       "genetic_half": true,
       "markers": ["cholesterol_total", "ldl", "hdl", "triglycerides"],
       "why": "The lipid panel as a laboratory issues it."
+    },
+    {
+      "key": "cardio",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": ["lpa", "apob", "apoa1", "fibrinogen", "d_dimer"],
+      "why": "Heart and vessels: the cardiovascular-risk markers a laboratory issues beside the lipid panel — lipoprotein(a) and the two apolipoproteins — and the two coagulation markers, fibrinogen and D-dimer. Added 13.09.2026 by the owner's decision so that the pharmacogenetics of warfarin, clopidogrel, the beta-blockers, the anticoagulants and antiplatelets, and the cardiovascular polygenic scores have a system of their own. See _meta.why_cardio."
     },
     {
       "key": "glucose",

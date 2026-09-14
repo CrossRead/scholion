@@ -178,6 +178,22 @@ class TestTheClinvarBuildIsReadFromTheClinvarFile(_Files):
         self.assertEqual(res["status"], "ok", res.get("message"))
         self.assertEqual(res["found"], 1)
 
+    def test_a_scan_reports_how_far_through_the_file_it_is(self):
+        """The recompute page shows a long scan's progress by compressed bytes read."""
+        from unittest import mock
+        os.environ["SCHOLION_GENOME_ASSEMBLY"] = "GRCh38"
+        me = vcf(self.dir / "me.vcf.gz", None, [personal_row("17", 43092919, "G", "A")])
+        cv = brca1_clinvar(self.dir, "GRCh38")
+        ticks = []
+        with mock.patch.object(acmg_scan, "PROGRESS_EVERY", 1):
+            res = acmg_scan.scan(str(me), str(cv), out_dir=str(self.dir),
+                                 progress=lambda done, total, item=None: ticks.append((done, total, item)))
+        self.assertEqual(res["status"], "ok", res.get("message"))
+        self.assertTrue(ticks, "a scan with progress reported nothing")
+        done, total, item = ticks[-1]
+        self.assertEqual((total, item), (me.stat().st_size, "17"))
+        self.assertLessEqual(done, total)
+
 
 class TestAPersonalFileOfUnknownBuildIsRefused(_Files):
     """A5. The ClinVar side already refused when its build could not be told; the

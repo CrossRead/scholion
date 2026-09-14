@@ -56,6 +56,12 @@ def bam_path() -> Optional[Path]:
     if env:
         p = Path(env).expanduser()
         return p if p.exists() else None
+    # Then what the person recorded, and only then the layout: a variable names
+    # it for one run, a recorded path names it for every run after.
+    named = core.chosen_genome_bam()
+    if named:
+        p = Path(named).expanduser()
+        return p if p.exists() else None
     from . import genome
     vcf = genome.vcf_path()
     stems = []
@@ -83,6 +89,10 @@ def reference_path() -> Optional[Path]:
     env = os.environ.get("SCHOLION_GENOME_REFERENCE")
     if env:
         p = Path(env).expanduser()
+        return p if p.exists() and Path(str(p) + ".fai").exists() else None
+    named = core.chosen_genome_reference()
+    if named:
+        p = Path(named).expanduser()
         return p if p.exists() and Path(str(p) + ".fai").exists() else None
     # Declared locations only — see the note in `genes.gff3_search_roots`.
     roots = [b / "reference" for b in core.genome_bases()]

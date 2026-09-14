@@ -46,7 +46,9 @@ JSON shape of `system(key, register)` — two other streams render it:
                     why_empty, base {source, version, downloaded, filter_version,
                     genes}, curated {status, source, positions}, rows[],
                     excluded[], refused {total, by_reason}, read_count,
-                    unread_count, finding_count, carrier_count, pending_count,
+                    unread_count, read_genes, read_positions,
+                    finding_count, carrier_count, pending_count,
+                    signature_open_count, signature_author_count, signature_author_date,
                     withheld_by_classification, verdict, verdict_line, scan,
                     polygenic {status ok|no_scores|no_map|no_genetic_half,
                     rows[] ({trait, label, pgs_id, percentile, evidence,
@@ -442,6 +444,22 @@ def _fill_absent(row: Dict[str, Any], geno: Dict[str, Any]) -> str:
         return tpl
 
 
+def _corridor(low, high) -> str:
+    """The reference interval as a person writes it, with one bound missing.
+
+    «выше коридора —–3.0» stood on the lipid card: an em dash for the absent
+    lower bound, then the en dash of the interval, then the number. A corridor
+    open at one end is written by naming the end it has.
+    """
+    if low is not None and high is not None:
+        return f"{low}–{high}"
+    if high is not None:
+        return _t("system.corridor.up_to", high=high)
+    if low is not None:
+        return _t("system.corridor.from", low=low)
+    return "—"
+
+
 def _expect_check(exp: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
     """The author's expectation next to the person's numbers — a question's data.
 
@@ -552,6 +570,16 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                "effect_size": p.get("effect_size"), "study": p.get("study"),
                "source": source, "submitter": p.get("submitter"),
                "curated_on": p.get("curated_on"), "base_version": p.get("base_version"),
+               # WHO took responsibility for the phrase, not merely whether
+               # somebody did. The file holds `signed_by`; a row with none but
+               # a `note_on_signature` is a draft nobody signed, and that was
+               # the state of ninety-one shipped rows until the owner signed
+               # them on 13.09.2026. The STATE travels on the row and the
+               # wording belongs to the renderer, because the file says it in
+               # one language and a row prints in two. A signer the engine does
+               # not know is NOT treated as a signature: it cannot say who.
+               "signature": _signature(p),
+               "signed_on": p.get("signed_on"),
                "text": text, "pending": pending, "pending_why": pending_why,
                "findings": finding, "not_a_finding_why": not_why, "carrier": carrier,
                "caveat": "moderate" if (finding and cls == "Moderate") else None,
@@ -564,6 +592,17 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         row["read"] = geno.get("read")          # the position's own reading, not the gene's
         row["read_why_text"] = _read_why_text(row.get("read_why"))
         rows.append(row)
+    # What short reads cannot read in this system — a gene beside its
+    # pseudogene, a repeat — named with the reason and a source; without a
+    # source it is counted and not applied, like an exclusion (13.09.2026).
+    unreadable = []
+    for name, u in (spec.get("unreadable") or {}).items() if isinstance(spec.get("unreadable"), dict) else []:
+        src = panel_form.one_language((u or {}).get("source")) if isinstance(u, dict) else ""
+        if not src:
+            refused["unreadable_without_source"] = refused.get("unreadable_without_source", 0) + 1
+            continue
+        unreadable.append({"gene": str(name), "reason": panel_form.one_language(u.get("reason")) or None,
+                           "source": src})
     excluded, exclusions = [], spec.get("exclusions") or {}
     for gene, e in (exclusions.items() if isinstance(exclusions, dict) else []):
         src = panel_form.one_language((e or {}).get("source")) if isinstance(e, dict) else ""
@@ -573,7 +612,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         excluded.append({"gene": str(gene).upper(),
                          "reason": panel_form.one_language(e.get("reason")) or None,
                          "source": src, "signed_on": e.get("signed_on")})
-    return {"rows": rows, "refused": refused, "excluded": excluded,
+    return {"rows": rows, "refused": refused, "excluded": excluded, "unreadable": unreadable,
             "source": sys_source or None}
 
 
@@ -818,6 +857,18 @@ def _tests_layer(markers: List[str]) -> Dict[str, Any]:
             "empty_why": None if rows else "no_rule_fired"}
 
 
+def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
+    """One panel position as a state, kept in EVERY register. The patient's
+    density withholds the rows where nothing was found, and the page then
+    showed two rows of a seven-position panel with no word about the other
+    five — as if they had not been checked (owner, 14.09.2026)."""
+    ec = r.get("expect_check") if isinstance(r.get("expect_check"), dict) else None
+    return {"gene": r.get("gene"), "rsid": r.get("rsid"), "kind": r.get("kind"),
+            "state": r.get("state"), "read": r.get("read"), "read_why": r.get("read_why"),
+            "read_why_text": r.get("read_why_text"), "text": r.get("text"),
+            "expect": {k: ec.get(k) for k in ("marker", "name", "direction", "gap", "position")} if ec else None}
+
+
 def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
     """Layer 3: the base composition and the curated positions, merged and gated."""
     key = dom["key"]
@@ -853,14 +904,26 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
     scan = panel_form.scan_for(genes)
     clinvar = _clinvar_by_gene(scan)
     cur = _curated_rows(key, cur_spec or {}, dom["markers"], scan, by_key) \
-        if cur_spec else {"rows": [], "refused": {}, "excluded": [], "source": None}
+        if cur_spec else {"rows": [], "refused": {}, "excluded": [], "unreadable": [], "source": None}
     excluded_genes = {e["gene"] for e in cur["excluded"]}
     rows = [_finish_base_row(r, scan, clinvar) for r in base["rows"]
             if r["gene"] not in excluded_genes]
+    # A gene short reads cannot read is never «read» and never «clear»: the
+    # method, not the person, is what the answer is about (owner, 13.09.2026).
+    unreadable_genes = {u["gene"].upper() for u in cur["unreadable"]}
+    for r in rows:
+        if r["gene"] in unreadable_genes and r.get("read") is not False or (
+                r["gene"] in unreadable_genes and r.get("read_why") != "separate_method"):
+            r["read"], r["read_why"] = False, "separate_method"
+            r["read_why_text"] = _read_why_text("separate_method")
+            r["findings"], r["carrier"] = 0, False
     rows += cur["rows"]
-    rows.sort(key=lambda r: (r["gene"], r["unit"] != "gene", r.get("rsid") or ""))
+    # The panel first — the positions a clinician acts on — and the base list
+    # after it; within each, by gene.
+    rows.sort(key=lambda r: (r["unit"] != "position", r["gene"], r.get("rsid") or ""))
     v = panel_form.verdict(rows, scan)
     return {"status": "composed", "rows": rows, "scan": scan,
+            "positions": [_position_state(r) for r in rows if r["unit"] == "position"],
             "base": {**{k: base[k] for k in ("status", "source", "version", "downloaded",
                                                "filter_version")},
                      "genes": base.get("genes", 0), "source_text": base.get("source_text")},
@@ -869,18 +932,41 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
                         "why_empty": None if cur["rows"]
                         else panel_form.one_language((_curated().get("_meta") or {}).get("why_empty"))},
             "excluded": cur["excluded"],
+            "unreadable": cur["unreadable"],
             "refused": {"total": sum(cur["refused"].values()), "by_reason": cur["refused"]},
             "read_count": sum(1 for r in rows if r.get("read") is True),
             "unread_count": sum(1 for r in rows if r.get("read") is False),
             "finding_count": sum(int(r.get("findings") or 0) for r in rows),
             "carrier_count": sum(1 for r in rows if r.get("carrier")),
             "pending_count": sum(1 for r in rows if r.get("pending")),
+            "read_genes": sum(1 for r in rows if r.get("unit") != "position" and r.get("read") is True),
+            "read_positions": sum(1 for r in rows if r.get("unit") == "position" and r.get("read") is True),
+            "signature_open_count": sum(1 for r in rows if r.get("signature") == "open"),
+            "signature_author_count": sum(1 for r in rows if r.get("signature") == "author"),
+            "signature_author_date": max([str(r.get("signed_on")) for r in rows
+                                          if r.get("signature") == "author" and r.get("signed_on")],
+                                         default=None),
             "withheld_by_classification": sum((r.get("clinvar") or {}).get("withheld", 0)
                                               for r in rows if r["unit"] == "gene")
             + sum(1 for r in rows if r.get("not_a_finding_why") == "classification"),
             "clinvar": {"status": clinvar.get("status"), "reason": clinvar.get("reason")},
             "polygenic": poly,
             "verdict": v, "verdict_line": panel_form.verdict_line(v)}
+
+
+#: Who the file may name as the signer of a row, and what the reader is told.
+#: «owner» is the author of the panel — not a clinician, and the card says so.
+SIGNERS = {"owner": "author", "clinician": "clinician"}
+
+
+def _signature(p: Dict[str, Any]) -> Optional[str]:
+    """The state of the row's signature: who signed, or that nobody did."""
+    who = SIGNERS.get(str(p.get("signed_by") or "").strip().lower())
+    if who:
+        return who
+    # An unknown signer is not a signature: the card would have to name whom,
+    # and it cannot. It falls back to the honest state.
+    return "open" if (p.get("note_on_signature") or p.get("signed_by")) else None
 
 
 def _read_why_text(code) -> Optional[str]:
@@ -944,23 +1030,43 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
                                     spec=tr.get("spec") or "", set_by=tr.get("set_by") or "",
                                     set_on=tr.get("set_on") or ""),
                          "data": tr})
+    # Positions whose author expects a direction on a marker nobody has taken,
+    # gathered BY MARKER. One question per position repeated the same «take LDL»
+    # five times on the lipid card of a profile with no labs (13.09.2026); the
+    # clinician needs one question naming the positions that wait on it.
+    waiting: Dict[str, List[str]] = {}
     for r in gen.get("rows") or []:
         g, rs = r.get("gene"), r.get("rsid")
         ec = r.get("expect_check")
         if ec and ec.get("gap"):
-            rows.append({"origin": "expect_gap", "gene": g, "rsid": rs, "marker": ec["marker"],
-                         "text": _t("system.q.expect_gap", gene=g, rsid=rs, marker=ec["marker"]),
-                         "data": ec})
+            waiting.setdefault(ec["marker"], []).append(f"{g} {rs}")
+        elif ec and str(r.get("state")) not in ("het", "hom"):
+            # «The author expects LDL higher WITH THIS GENOTYPE» was asked of a
+            # position read as ABSENT — a question about a genotype the person
+            # does not carry. On the owner's lipid card four of the five
+            # questions were of that kind, and they buried the fifth, which was
+            # the one he carries (13.09.2026). An expectation is a claim about
+            # the named allele; without it there is nothing to agree or disagree
+            # with, and the row already prints that the allele was not found.
+            pass
+        elif ec and r.get("read") is not True:
+            # «The author expects LDL to be higher WITH THIS GENOTYPE» was
+            # printed for a position nobody had read: on the demo profile, whose
+            # genome is not readable at all, five such questions stood on the
+            # lipid card (13.09.2026). The expectation is about a genotype, and
+            # there is no genotype until the position is read — the position is
+            # already named in the genome basket as unread, which is the true
+            # next step, so nothing is lost by not asking.
+            pass
         elif ec:
             rows.append({"origin": "expect", "gene": g, "rsid": rs, "marker": ec["marker"],
                          "text": _t("system.q.expect", gene=g, rsid=rs,
                                     marker=ec.get("name") or ec["marker"],
                                     direction=_t("system.direction." + str(ec.get("direction"))),
                                     value=ec.get("value"), unit=ec.get("unit") or "",
-                                    date=ec.get("date") or "—",
+                                    date=str(ec.get("date") or "—")[:10],
                                     position=_t("system.position." + ec["position"]),
-                                    low=ec.get("ref_low") if ec.get("ref_low") is not None else "—",
-                                    high=ec.get("ref_high") if ec.get("ref_high") is not None else "—",
+                                    corridor=_corridor(ec.get("ref_low"), ec.get("ref_high")),
                                     from_value=ec.get("from_value") if ec.get("from_value") is not None else "—",
                                     to_value=ec.get("value")),
                          "data": ec})
@@ -995,8 +1101,21 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
     gap = [k for k in (labs.get("missing") or []) if k not in fired]
     if gap:
         names = ", ".join(_marker_name(k) for k in gap)
-        rows.append({"origin": "gap", "markers": gap,
-                     "text": _t("system.q.gap", markers=names), "data": {"missing": gap}})
+        text = _t("system.q.gap", markers=names)
+        held = {k: waiting.pop(k) for k in gap if k in waiting}
+        if held:
+            text += _t("system.gap_waiting", waiting="; ".join(
+                f"{_marker_name(k)} — {', '.join(v)}" for k, v in held.items()))
+        rows.append({"origin": "gap", "markers": gap, "text": text,
+                     "data": {"missing": gap, "waiting": held}})
+    # An expectation on a marker that is missing yet not in the plain gap (a
+    # rule already asks for it, or it is outside the panel's missing list):
+    # still one question per marker, never one per position.
+    for k, positions in waiting.items():
+        rows.append({"origin": "expect_gap", "marker": k, "positions": positions,
+                     "text": _t("system.q.expect_gap", marker=_marker_name(k),
+                                positions=", ".join(positions)),
+                     "data": {"marker": k, "positions": positions}})
     empty_why = None
     if not rows:
         empty_why = {"no_genetic_half": "no_genetic_half",
@@ -1136,7 +1255,8 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
 # ---- registers --------------------------------------------------------------
 _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification", "state", "kind",
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
-                "carrier", "caveat", "read", "read_why", "read_why_text", "expect_check")
+                "carrier", "caveat", "read", "read_why", "read_why_text", "expect_check",
+                "signature", "signed_on")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
@@ -1168,6 +1288,7 @@ def _project(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
 
 
 # ---- the API ----------------------------------------------------------------
+@core.in_reading
 def systems() -> Dict[str, Any]:
     """The systems: key, label in both languages, source, whether a laboratory
     half and a genetic half exist, and where the genetic list comes from.
@@ -1235,6 +1356,7 @@ def systems() -> Dict[str, Any]:
             "disclaimer": DISCLAIMER()}
 
 
+@core.in_reading
 def system(key: str, register: str = "patient") -> Dict[str, Any]:
     """One system whole: the seven layers, the verdict, the three baskets."""
     dom = _domain(key)

@@ -24,14 +24,15 @@ it collects the attention meant for the original.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Callable
 
 
-def reingest(folder: Optional[str] = None) -> Dict[str, Any]:
+def reingest(folder: Optional[str] = None,
+             progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
     """Rebuild the Garmin part of the lifestyle layer.
 
     Asks for the Garmin watch by name, so the old command cannot be handed a
     WHOOP export and quietly file it under the wrong device.
     """
     from . import wearables
-    return wearables.reingest(folder, source="garmin")
+    return wearables.reingest(folder, source="garmin", progress=progress)

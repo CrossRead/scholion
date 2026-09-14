@@ -90,6 +90,8 @@ class TestHostList(unittest.TestCase):
         "api.cpicpgx.org",              # gene↔drug pairs from CPIC
         "api.mymemory.translated.net",  # translation of the Russian drug name
         "mor.nlm.nih.gov",              # RxClass — the drug class
+        "pypi.org",                     # the version check: `scholion version --check` and its
+                                        # button, on an explicit request only (owner, 13.09.2026)
         "rest.ensembl.org",             # parsing an rsID
         "rxnav.nlm.nih.gov",            # RxNorm — normalising the name
         "translate.googleapis.com",     # the fallback translation
@@ -114,7 +116,9 @@ class TestHostList(unittest.TestCase):
         "genomics.senescence.info",     # LongevityMap (HAGR)
         "github.com",                   # sources of the build tools
         "hgdownload.soe.ucsc.edu",      # UCSC chain files
-        "pypi.org",                     # installing the pipeline's python packages
+        # pypi.org is contacted by the preparation scripts too, and since 13.09.2026 by
+        # the core (the version check). The inventory names a host once, under the
+        # core when the core uses it (`ing_hosts - hosts`), so it moved to that list.
     }
 
     def test_the_data_preparation_list_matches(self):

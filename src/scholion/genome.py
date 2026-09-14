@@ -18,7 +18,7 @@ import subprocess
 import urllib.request
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from . import core
 from .i18n import t as _t
@@ -776,7 +776,26 @@ def _peek_text(path: str, limit: int = 8192) -> str:
         return ""
 
 
+#: `_sniff_kind` answers, keyed by the file's identity, for the reason given at
+#: `array_genome._SNIFF_CACHE`: the folder is searched on every genome read.
+_KIND_CACHE: Dict[Tuple[str, int, int], Optional[str]] = {}
+
+
 def _sniff_kind(path: str) -> Optional[str]:
+    """Name a data file by what is inside it, remembered while the file is unchanged."""
+    try:
+        st = os.stat(path)
+    except OSError:
+        return _sniff_kind_uncached(path)
+    key = (str(path), st.st_size, st.st_mtime_ns)
+    if key not in _KIND_CACHE:
+        if len(_KIND_CACHE) > 4096:
+            _KIND_CACHE.clear()
+        _KIND_CACHE[key] = _sniff_kind_uncached(path)
+    return _KIND_CACHE[key]
+
+
+def _sniff_kind_uncached(path: str) -> Optional[str]:
     """Name a data file by what is inside it, when its name says nothing useful."""
     text = _peek_text(path)
     if not text:
@@ -1030,6 +1049,7 @@ def answerable_paths(profile: Optional[str], ready: bool,
     return out
 
 
+@core.memo_in_reading
 def available() -> Dict[str, Any]:
     """Status of the genomic database, for the UI and the skill."""
     vp = vcf_path()
@@ -1328,6 +1348,24 @@ def _chr_prefix(vcf: str) -> str:
     return ""
 
 
+#: Rows bcftools returned for one region of one file, keyed by the file's and its
+#: index's identity. One process per position was spent on every read, and the
+#: radar page asks the same positions once for the list of systems and again for
+#: each card — 637 processes for one page (14.09.2026). A failed run is never
+#: remembered, and a changed file or index gets a new key.
+_REGION_CACHE: Dict[Tuple[Any, ...], Tuple[Tuple[str, ...], ...]] = {}
+
+
+def _region_key(vcf: str, region: str) -> Optional[Tuple[Any, ...]]:
+    try:
+        st = os.stat(vcf)
+        idx = [os.stat(vcf + s) for s in (".tbi", ".csi") if os.path.exists(vcf + s)]
+    except OSError:
+        return None
+    return (vcf, st.st_size, st.st_mtime_ns,
+            tuple((i.st_size, i.st_mtime_ns) for i in idx), region)
+
+
 def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
     """VCF rows at the position (bcftools). Empty = the site is not variant (reference)."""
     pref = _chr_prefix(vcf)
@@ -1345,12 +1383,20 @@ def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
         return _lin.rows_at(vcf, chrom, pos)
     if _have_bcftools():
         region = f"{name}:{pos}-{pos}"
+        key = _region_key(vcf, region)
+        if key is not None and key in _REGION_CACHE:
+            return [list(row) for row in _REGION_CACHE[key]]
         try:
             r = subprocess.run(["bcftools", "view", "-H", "-r", region, vcf],
                                capture_output=True, text=True, timeout=60)
-            return [ln.split("\t") for ln in r.stdout.splitlines() if ln.strip()]
+            rows = [ln.split("\t") for ln in r.stdout.splitlines() if ln.strip()]
         except Exception:
             return []
+        if key is not None and r.returncode == 0:
+            if len(_REGION_CACHE) > 20000:
+                _REGION_CACHE.clear()
+            _REGION_CACHE[key] = tuple(tuple(row) for row in rows)
+        return rows
     # pysam before tabixlite: it was already being REPORTED as the reader while
     # never being used to read anything, and it is the only one of the three that
     # can seek a `.csi` without an external binary.

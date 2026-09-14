@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-09-13",
     "what": "Where each system of the radar is shown on the figure — or why it is nowhere on it.",
     "rule": "Every key the radar emits appears here exactly once and declares one of four things: a `place` drawn from `vocabulary`; `by_marker`, when the domain's markers are made in different organs and one point would be a claim about all of them and true of one; `systemic` (measured in blood, not located in an organ); or `whole_body`. There is no fifth state and no default: a domain added to the radar without an entry here fails the suite, because a figure that quietly omits a system draws a healthier person than the data describes. A word in `vocabulary` that nobody places fails it too — an allowed place nothing uses is a coordinate waiting to be wrong. Inside `by_marker`, the value `systemic` is how a single marker says it is made nowhere in particular; it still owes a reason.",
     "source": "Written here. The placements are ordinary anatomy, and the rule is the organ that PRODUCES the substance, not the organ it is read for — an antibody, which is made by lymphocytes everywhere and would mean nothing where they are, is the named exception and is marked at the tissue it is raised against. `basis` states the reason per marker where a domain is split, so a reader can disagree with a specific claim rather than with a drawing.",
@@ -8,6 +9,7 @@
   "vocabulary": [
     "pituitary",
     "thyroid",
+    "heart",
     "adrenals",
     "liver",
     "pancreas",
@@ -84,6 +86,10 @@
     "lipids": {
       "systemic": true,
       "basis": "measured in blood; not located in an organ"
+    },
+    "cardio": {
+      "place": "heart",
+      "basis": "The second named exception to the producing-organ rule (13.09.2026). Lipoprotein(a), apolipoprotein B, apolipoprotein A1 and fibrinogen are all secreted by the hepatocyte, and D-dimer is a fragment of a clot dissolving wherever the clot was — by the rule, four marks on the liver and one nowhere, for a panel nobody reads as a liver panel. Like anti-TPO, it is marked at the organ whose consequence it measures: the heart and the vessels leaving it."
     },
     "inflammation": {
       "systemic": true,

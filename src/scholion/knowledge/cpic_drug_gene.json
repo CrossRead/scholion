@@ -1,5 +1,6 @@
 {
   "_meta": {
+    "updated": "2026-08-19",
     "purpose": "A SHARED (de-identified) gene↔drug reference base for pharmacogenetics. Does NOT contain the data of a particular patient — the genotype is taken from profile/pharmacogenomics.json at the moment of the request. Freely shareable.",
     "source": "Derived from CPIC (api.cpicpgx.org, CC0), fetched 2026-08-19. Three layers, each labelled: (1) the PHENOTYPE models — allele functional status, activity-score→phenotype bands, NUDT15 function combinations — are verbatim from the CPIC tables; (2) each guidance entry that carries a `cpic` block quotes CPIC's OWN recommendation and implication wording verbatim, with its strength of recommendation; (3) the `note` beside it is this project's plain-language line for the patient, in their language — a paraphrase, and never presented as the guideline's words. Pairs without a `cpic` block have no verbatim text yet (warfarin needs the dosing algorithm, amitriptyline the joint CYP2D6+CYP2C19 table); their level and note remain project-compiled. `scholion sources --refresh --only cpic` re-checks all of this against the live source. Genotypes are never here; they come from profile/pharmacogenomics.json at request time.",
     "levels": {

@@ -35,7 +35,9 @@ PAGES = (("README.md",),
          ("docs/FOR-CLINICIANS.md", "src/scholion/docs/for-clinicians.md"),
          ("share/presentation.html", "docs/presentation.html"),
          ("share/presentation.ru.html", "docs/presentation.ru.html"),
-         ("share/skill/INSTRUCTION.md", "claude-skill/INSTRUCTION.md"))
+         ("share/skill/INSTRUCTION.md", "claude-skill/INSTRUCTION.md",
+          # the packaged copy: the one path the public repository commits
+          "src/scholion/skill/INSTRUCTION.md"))
 
 
 def _path(page: tuple) -> Path:

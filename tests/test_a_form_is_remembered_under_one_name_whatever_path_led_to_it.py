@@ -227,10 +227,12 @@ class TestTheLookupItself(unittest.TestCase):
     def test_a_file_nobody_has_read_has_a_name_and_no_time(self):
         key, known = core.manifest_lookup({}, pathlib.Path("/x/y/../z/a.pdf"))
         self.assertIsNone(known)
-        self.assertEqual(str(pathlib.Path("/x/z/a.pdf")), key)
+        # Resolved, as the lookup resolves it: on Windows «/x/z/a.pdf» gains the
+        # drive of the working directory, and the name is the one with the drive.
+        self.assertEqual(str(pathlib.Path("/x/z/a.pdf").resolve()), key)
 
     def test_the_table_is_left_alone_when_the_name_is_already_right(self):
-        p = pathlib.Path("/x/z/a.pdf")
+        p = pathlib.Path("/x/z/a.pdf").resolve()
         table = {str(p): 5.0}
         key, known = core.manifest_lookup(table, p)
         self.assertEqual((str(p), 5.0), (key, known))

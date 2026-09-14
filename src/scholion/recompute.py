@@ -139,12 +139,46 @@ def _write(job: Dict[str, Any], force: bool = False) -> None:
     os.replace(tmp, path)
 
 
-def _alive(pid: Any) -> bool:
+_STILL_ACTIVE = 259            # GetExitCodeProcess: the process has not exited
+_ERROR_ACCESS_DENIED = 5       # OpenProcess refused: the process exists, it is not ours
+
+
+def _alive_windows(pid: int, kernel32: Any = None, last_error: Any = None) -> bool:
+    """Whether a process is running, asked the way Windows answers it.
+
+    Windows has no signal 0: `os.kill(pid, 0)` raises OSError for a process that
+    is gone, and read as «alive» that left a stopped job «running» for ever. The
+    exit code is asked instead; a process that exists but cannot be opened is
+    alive. `kernel32` and `last_error` are passed in so the answer can be checked
+    on any machine.
+    """
+    import ctypes
+    kernel32 = kernel32 or ctypes.WinDLL("kernel32", use_last_error=True)
+    last_error = last_error or ctypes.get_last_error
+    handle = kernel32.OpenProcess(0x1000, False, pid)       # PROCESS_QUERY_LIMITED_INFORMATION
+    if not handle:
+        return last_error() == _ERROR_ACCESS_DENIED
     try:
-        os.kill(int(pid), 0)
+        code = ctypes.c_ulong()
+        if not kernel32.GetExitCodeProcess(handle, ctypes.byref(code)):
+            return True
+        return code.value == _STILL_ACTIVE
+    finally:
+        kernel32.CloseHandle(handle)
+
+
+def _alive(pid: Any, windows: bool = os.name == "nt") -> bool:
+    try:
+        pid = int(pid)
+    except (TypeError, ValueError):
+        return True
+    if windows:
+        return _alive_windows(pid)
+    try:
+        os.kill(pid, 0)
     except ProcessLookupError:
         return False
-    except (PermissionError, ValueError, TypeError, OSError):
+    except (PermissionError, OSError):
         return True
     return True
 

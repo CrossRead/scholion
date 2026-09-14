@@ -291,6 +291,54 @@ class TestTheRun(_Profile):
         self.assertIn("interrupted", fmt.recompute_status_report(job))
 
 
+class _Kernel32:
+    """A stand-in for kernel32: the handle OpenProcess returns and the exit code it reports."""
+
+    def __init__(self, handle=7, code=259, query_ok=True):
+        self.handle, self.code, self.query_ok, self.closed = handle, code, query_ok, []
+
+    def OpenProcess(self, access, inherit, pid):
+        return self.handle
+
+    def GetExitCodeProcess(self, handle, ref):
+        if not self.query_ok:
+            return 0
+        ref._obj.value = self.code
+        return 1
+
+    def CloseHandle(self, handle):
+        self.closed.append(handle)
+
+
+class TestAProcessIsAskedTheWayItsSystemAnswers(unittest.TestCase):
+    """Windows has no signal 0. `os.kill(pid, 0)` raised OSError for a process that
+    was gone, the check read that as alive, and a stopped job stayed «running» on
+    every Windows cell of the release matrix. The exit code is asked there instead."""
+
+    def test_a_process_that_has_not_exited_is_alive_and_its_handle_is_closed(self):
+        k = _Kernel32(code=recompute._STILL_ACTIVE)
+        self.assertTrue(recompute._alive_windows(42, k, lambda: 0))
+        self.assertEqual([7], k.closed)
+
+    def test_a_process_that_exited_is_gone(self):
+        self.assertFalse(recompute._alive_windows(42, _Kernel32(code=0), lambda: 0))
+
+    def test_an_exit_code_that_cannot_be_read_is_not_taken_for_an_exit(self):
+        self.assertTrue(recompute._alive_windows(42, _Kernel32(query_ok=False), lambda: 0))
+
+    def test_a_process_that_cannot_be_opened_is_alive_only_when_access_was_refused(self):
+        self.assertTrue(recompute._alive_windows(42, _Kernel32(handle=0), lambda: recompute._ERROR_ACCESS_DENIED))
+        self.assertFalse(recompute._alive_windows(42, _Kernel32(handle=0), lambda: 87))
+
+    def test_windows_is_asked_through_its_own_check(self):
+        with mock.patch.object(recompute, "_alive_windows", return_value=False) as w:
+            self.assertFalse(recompute._alive("123", windows=True))
+        w.assert_called_once_with(123)
+
+    def test_a_pid_that_is_not_a_number_is_not_declared_gone(self):
+        self.assertTrue(recompute._alive("not-a-pid", windows=False))
+
+
 class TestTheFaces(unittest.TestCase):
 
     def test_the_plan_and_the_status_answer_from_the_command_line(self):

@@ -1,0 +1,55 @@
+#!/bin/sh
+# Start the Scholion MCP server for a client that reads the Agent Plugins format.
+#
+# THIS LAUNCHER INSTALLS NOTHING. The format has no install step of its own, and
+# the alternative — putting software on somebody's machine at the moment a model
+# first reaches for a tool — is not a thing this product does quietly. When the
+# engine is missing, the refusal below names the one command that fixes it.
+#
+# A plugin-relative `./bin/...` command is what the specification allows beside a
+# bare name; the search below is ours, so nothing here depends on how a client
+# resolves PATH — which conformance forbids relying on.
+set -u
+
+if [ -n "${PLUGIN_DATA:-}" ] && [ -x "${PLUGIN_DATA}/venv/bin/scholion" ]; then
+    exec "${PLUGIN_DATA}/venv/bin/scholion" mcp
+fi
+
+if command -v scholion >/dev/null 2>&1; then
+    exec scholion mcp
+fi
+
+# A desktop client started from the Dock does not inherit the PATH of a terminal:
+# on macOS it gets the system folders only, where no user-installed engine lives
+# and where `python3` is older than the engine needs. So the usual places a
+# user-level install leaves the command are looked at by name.
+for exe in "${HOME:-/nonexistent}/.local/bin/scholion" \
+           /opt/homebrew/bin/scholion /usr/local/bin/scholion \
+           "${HOME:-/nonexistent}"/Library/Python/3.*/bin/scholion; do
+    if [ -x "$exe" ]; then
+        exec "$exe" mcp
+    fi
+done
+
+for py in python3 python /opt/homebrew/bin/python3 /usr/local/bin/python3; do
+    if command -v "$py" >/dev/null 2>&1 && "$py" -c 'import scholion' >/dev/null 2>&1; then
+        exec "$py" -m scholion mcp
+    fi
+done
+
+# Printed with the shell's own `echo`, not with `cat`: this branch runs exactly
+# when nothing can be found, and a client that hands us a bare environment has no
+# /bin/cat either. The first version of this file used a here-document, and the
+# test for the refusal found `cat: not found` where the sentence should have been.
+{
+    echo "scholion: the engine is not installed on this machine, and this plugin does not"
+    echo "install it for you. Install it once, then start the plugin again:"
+    echo ""
+    echo "    pipx install scholion"
+    echo "    (or: python3 -m pip install --user scholion)"
+    echo ""
+    echo "Scholion reads one person's own genome, laboratory forms and prescriptions from"
+    echo "their own disk, and uploads nothing. Software that quietly installed itself to do"
+    echo "that would be the wrong kind of quiet."
+} >&2
+exit 127

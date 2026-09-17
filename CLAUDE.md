@@ -258,6 +258,14 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   not `rm`: such a mount forbids deleting a file and allows renaming one.
   Learned 22.08.2026, after two sessions concluded the wrong thing from the
   same message.
+- **A branch is not switched through that mount either.** `git checkout` replaces
+  a file by unlinking it, so moving to a branch that differs in many files leaves
+  the working tree half-updated — 33 files at the old content while HEAD is the
+  new branch, and every later `checkout -f` answers `Operation not permitted` per
+  file. The repair is to write each file back from `git show HEAD:<path>` with
+  truncation, which the mount does allow; files the branch DELETES cannot be
+  removed at all and stay as untracked leftovers. Branch work belongs in a native
+  terminal. Learned 15.09.2026 while preparing the hub submission.
 - **A shell command run through the bridge to the owner's machine cannot
   outrun roughly 45 seconds, and nothing backgrounded through it survives
   past that either.** `run_tests.sh` alone takes 38-45+ s end to end with

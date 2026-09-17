@@ -4,11 +4,13 @@ A local analysis layer over your own medical data: genome, years of lab results,
 prescriptions, wearables. Read them against each other, with the source shown
 behind every statement.
 
-Four ways in, one core: a local web app, a skill for a language model, a plugin
-for [Ouroboros](https://github.com/razzant/ouroboros), and an MCP server so any
-model that speaks the protocol can call the same tools.
+Five ways in, one core: a local web app, a skill for a language model, a plugin
+for [Ouroboros](https://github.com/razzant/ouroboros), an MCP server so any
+model that speaks the protocol can call the same tools, and a plugin package in
+the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
+Copilot and Kiro.
 
-**Version 0.5.2** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.3** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -141,8 +143,10 @@ answering.
 
 **Any assistant can reach it, and none of them needs a key.** Several doors onto
 one engine: the command line, a Model Context Protocol server (`scholion mcp`),
-a skill folder any host can read, the Ouroboros tools module and the Ouroboros
-Hub skill. There is no account, no token
+a skill folder any host can read, a plugin package in the Agent Plugins format,
+the Ouroboros tools module and the Ouroboros Hub skill. The server speaks the
+July 2026 revision of the protocol and the handshake revisions before it, and
+thirteen of its tools return structured answers. There is no account, no token
 and no credential for any of them — the analysis runs on the machine that holds
 the data, so there is nothing to authenticate to. The build answers this itself:
 `scholion capabilities --json` carries every door and, scanned from its own
@@ -353,9 +357,9 @@ it. Nothing here silently degrades: a layer that is missing is named as missing.
 
 ---
 
-## Four ways to install
+## Five ways to install
 
-The same core, four deliveries. They differ in what you must already have, not
+The same core, five deliveries. They differ in what you must already have, not
 in what they can do:
 
 - **a terminal and Python** → the pip package (2), or the unpacked folder (1) if
@@ -363,9 +367,12 @@ in what they can do:
 - **only a language model** → the skill bundle (3): one file, and the model does
   the rest;
 - **Ouroboros already running** → the plugin (4), which adds the whole tool set to
-  an agent you are using anyway.
+  an agent you are using anyway;
+- **ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot or Kiro** → the plugin
+  package (5): one import brings the tools and the instruction for them together.
+  Any other client that speaks MCP can start the server on its own.
 
-Analysis is the same core in all four. What changes is who types the commands.
+Analysis is the same core in all five. What changes is who types the commands.
 
 ### 1. A folder you unpack and run
 
@@ -543,6 +550,46 @@ the package, and a copy placed in another package cannot find them.
 
 Self-check outside Ouroboros: `python3 -m scholion.ouroboros_tools` prints the
 tool list.
+
+### 5. A plugin package for ChatGPT, Codex, Cursor and others
+
+**New in 0.5.3.** The folder `agent-plugin/` in the repository holds
+Scholion in the Agent Plugins format. Five vendors agreed on this format in
+August 2026, and ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot and
+Kiro read it. The folder holds a manifest (`plugin.json`), the skill
+(`skills/scholion/`) and the description of the local tool server
+(`mcp.json`). A client imports the three in one step. The instruction arrives
+with the tools, and the two cannot be installed apart.
+
+The package runs the engine and installs nothing. Install the engine once:
+
+```bash
+pipx install scholion
+```
+
+Then import the folder into the client. Its launcher finds `scholion` on the
+search path, and also in `~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`
+and `~/Library/Python/3.*/bin`. That matters because an application started
+from the Dock on macOS does not get a terminal's search path. When no engine is
+found, the launcher refuses and prints the install command. ChatGPT marks such a
+plugin *Desktop only*, which is correct: the engine reads files on your own
+disk, and a cloud session has none of them. For ChatGPT desktop the steps are in
+`scholion doc connecting-an-agent`.
+
+**The MCP server on its own.** A client that speaks the Model Context Protocol
+but not the plugin format can start the same server directly:
+
+```json
+{ "mcpServers": { "scholion": { "command": "scholion", "args": ["mcp"] } } }
+```
+
+The server works over standard input and output. It opens no port and needs no
+key. It speaks the `2026-07-28` revision of the protocol, which has no
+handshake, and answers `server/discover`. Clients that open with the older
+handshake (`2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`) are
+served under the revision they ask for. From `2025-06-18` on, thirteen tools
+also return their answer as a structure: the fields their command prints with
+`--json`, plus the rendered report with its qualifications.
 
 ## Updating
 
@@ -750,6 +797,7 @@ src/ingest/               pipelines: FASTQ→VCF, ClinVar, PGS, LongevityMap,
                           pharmacogenomics, callability, LoF scan, wearables
 src/tools/                package sanitizer, hooks, release notes, publication
 ouroboros_plugin/         tool registration for Ouroboros
+agent-plugin/             the Agent Plugins package: manifest, skill, tool server
 tests/                    the whole test suite; runs on the standard library alone
 ```
 

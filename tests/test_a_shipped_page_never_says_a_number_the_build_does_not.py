@@ -19,6 +19,7 @@ reader. This holds only the mechanical half.
 """
 from __future__ import annotations
 
+import json
 import re
 import unittest
 from pathlib import Path
@@ -122,6 +123,67 @@ class TestThePagesAgreeWithTheBuild(unittest.TestCase):
     def test_the_number_of_authored_positions_is_the_number_that_ships(self):
         self._check("positions", r"(\d+) (?:authored )?positions\b|(\d+) позици\w+",
                     _positions(), least=4)
+
+
+class TestTheHubEntryAgreesWithTheBuild(unittest.TestCase):
+    """The catalogue entry is a shipped page too, and nobody was comparing it.
+
+    `ouroboros_plugin/hub/scholion/SKILL.md` is what the Ouroboros hub publishes:
+    its frontmatter IS the catalogue row, and its prose says how many tools the
+    skill registers. On 15.09.2026 the published row still read v0.4.7 and «30
+    tools» seven releases later, and the copy in this tree had quietly lost
+    `plugin_api: "2.0"` — a key 26 of the 35 hub skills declare and the published
+    row still carried, so submitting this copy would have dropped it. The same
+    class as the pages above: a second copy of a fact with nobody reading it.
+    """
+
+    ENTRY = "ouroboros_plugin/hub/scholion/SKILL.md"
+
+    #: Exactly the keys the published row carries, frozen on purpose. A key that
+    #: disappears costs the entry a field the hub reads; a key that appears
+    #: unannounced has been reviewed by nobody.
+    KEYS = ["name", "description", "version", "type", "runtime", "entry",
+            "plugin_api", "os", "permissions", "env_from_settings",
+            "install_specs", "when_to_use", "timeout_sec"]
+
+    def setUp(self):
+        path = ROOT / self.ENTRY
+        if not path.is_file():
+            self.skipTest("the hub package does not travel with the built package")
+        self.text = path.read_text(encoding="utf-8")
+        blocks = self.text.split("---", 2)
+        self.assertEqual(3, len(blocks), "the entry carries no frontmatter block")
+        self.front = blocks[1]
+
+    def test_the_row_carries_every_key_the_catalogue_reads_and_no_other(self):
+        keys = [m.group(1) for m in re.finditer(r"^([a-z_]+):", self.front, re.M)]
+        self.assertEqual(self.KEYS, keys)
+
+    def test_the_version_it_declares_is_the_version_that_ships(self):
+        """Against `VERSION`, and not against the index — a correction made the
+        day this class was written. The looser rule («any release that is on the
+        index») was mine; the stricter one was already here, in
+        `test_an_agent_can_ask_how_to_connect`, and it is the right one: this
+        file is a source file describing THIS build, and publishing the row is a
+        separate act that happens later. Opening a release therefore obliges
+        updating this entry, exactly as it obliges the footers of the pages."""
+        m = re.search(r"^version:\s*(\S+)\s*$", self.front, re.M)
+        self.assertTrue(m, "the entry names no version")
+        self.assertEqual(_version(), m.group(1))
+
+    def test_the_version_it_declares_is_a_release_or_the_one_being_prepared(self):
+        """The second half of the same fact: a row may describe the release being
+        prepared, never a number nobody will ever be able to install."""
+        published = json.loads((ROOT / "published.json").read_text(encoding="utf-8"))
+        m = re.search(r"^version:\s*(\S+)\s*$", self.front, re.M)
+        self.assertTrue(m.group(1) in published or m.group(1) == _version())
+
+    def test_every_tool_count_it_prints_is_the_number_registered(self):
+        found = re.findall(r"\b(\d+) tools\b", self.text)
+        self.assertGreaterEqual(len(found), 2,
+                                "the rule matched fewer places than the description and the "
+                                "body — a gate that cannot fail is worse than no gate")
+        self.assertEqual([str(len(ouroboros_tools._TOOLS))] * len(found), found)
 
 
 if __name__ == "__main__":  # pragma: no cover

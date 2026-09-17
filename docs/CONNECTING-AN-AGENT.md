@@ -33,6 +33,7 @@ the build — this table is the readable copy of it.
 | **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
 | **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus a **Scholion** tab on the Widgets page, which is where the owner is told what to load and where |
+| **Agent Plugins package** | import the folder agent-plugin/ into a client that reads Agent Plugins | ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot, Kiro — one import brings the tools and the instruction that governs them together |
 
 There is also `scholion serve` — a local web page for a person, bound to
 `127.0.0.1`. It is not an assistant surface and has no API.
@@ -69,6 +70,75 @@ in-process module exist for it. The long instruction and the canon of rules are
 NOT copied there; they are printed out of the installed package on demand, so
 there is one copy of each and it is the one that ships.
 
+### The Agent Plugins package
+
+`agent-plugin/` is this product packaged in the portable format five
+vendors agreed on in August 2026 — AWS, Cursor, Microsoft, OpenAI and Vercel —
+which is not a protocol but a folder shape: `plugin.json`, a `skills/` directory
+holding Agent Skills, and `mcp.json` describing MCP servers. Nothing in it is new
+here. It is the skill folder and the tool server, in one directory a client can
+import in a single step.
+
+That single step is the whole point, and the half that matters is the second one:
+through the tool interface a model is handed a list of functions and **no
+instruction with it**, which is why `sch_rules` has to be a tool at all. In this
+package the instruction sits in the same folder as the functions and cannot be
+installed without them.
+
+**The launcher installs nothing.** The format has no install step, so
+`mcp.json` points at `./bin/scholion-mcp`. The launcher looks for an installed
+engine in this order:
+
+1. A virtual environment the client keeps for this plugin, under `PLUGIN_DATA`.
+2. `scholion` on the search path.
+3. `scholion` in `~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin` and
+   `~/Library/Python/3.*/bin`.
+4. A Python that can import the package.
+
+The third step exists because a desktop application started from the Dock on
+macOS gets only the system search path, where neither pipx nor Homebrew puts
+anything. If no engine is found, the launcher refuses and prints the command
+that installs one. This product does not put software on a machine at the
+moment a model first reaches for a tool.
+
+**Installing it in ChatGPT desktop.** These steps follow OpenAI's guide to
+packaging plugins.
+
+1. Install the engine once: `pipx install scholion`.
+2. In ChatGPT, open Settings → Security and login and turn on Developer mode.
+3. Create `~/.agents/plugins/marketplace.json`. The `path` is counted from your
+   home folder, so replace `./path/to/scholion` with the location of your copy
+   of the repository:
+
+   ```json
+   {
+     "name": "local-scholion",
+     "interface": { "displayName": "Scholion (local)" },
+     "plugins": [
+       {
+         "name": "scholion",
+         "source": { "source": "local", "path": "./path/to/scholion/agent-plugin" },
+         "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+         "category": "Productivity"
+       }
+     ]
+   }
+   ```
+
+4. Restart ChatGPT and install Scholion from the plugin directory.
+5. Ask the assistant to call `sch_version`. The answer names the build that
+   runs.
+
+Codex reads the same file. For a marketplace kept inside a repository, the
+file goes in `.agents/plugins/` at the repository's root, and `path` is counted
+from there.
+
+**It runs where the data is, and only there.** A client that declares MCP servers
+in a plugin runs them locally; ChatGPT labels such a plugin *Desktop only* and
+will not run it on the web. That is the correct label rather than a limitation:
+this product reads one person's genome and laboratory forms off their own disk,
+and in a cloud sandbox there is nothing for it to read.
+
 ---
 
 ## The MCP server
@@ -80,9 +150,35 @@ tools the Ouroboros plugin registers, without a plugin and without a shell.
 
 A **local process**, spoken to over **standard input and output**. It opens no
 port, contacts no host, and has no authentication step, because there is nobody
-on the other end of the pipe but the program that started it. Protocol version
-`2024-11-05`; the tool list is derived from the plugin's rather than written a
-second time, so the two cannot disagree.
+on the other end of the pipe but the program that started it. The tool list is
+derived from the plugin's rather than written a second time, so the two cannot
+disagree.
+
+### Protocol revisions
+
+**Since 0.5.3** the server speaks both eras of the protocol:
+
+- **`2026-07-28`, without a handshake.** Each request names its revision in
+  `_meta` (`io.modelcontextprotocol/protocolVersion`). `server/discover` lists
+  the revisions, capabilities and instructions. Every result carries
+  `resultType`, and `tools/list` carries `ttlMs` and `cacheScope`. A revision
+  the server does not know is answered with error `-32022` and the list it does
+  know.
+- **`2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`, through
+  `initialize`.** The server agrees on the revision the client asks for. A
+  revision it does not know is answered with `2025-11-25`, never echoed back.
+  Only `2025-03-26` receives JSON-RPC batches, because only that revision has
+  them.
+
+**Structured output.** From `2025-06-18` on, thirteen tools declare an
+`outputSchema` and answer with `structuredContent`: the structure their report
+was rendered from, with the same top-level fields as the matching command's
+`--json`, plus a `report` field. The text block holds the rendered report
+rather than the serialised JSON, and `report` repeats the same text inside the
+structure. The report carries the qualifications a model must pass on, and some
+clients show a model only the structure.
+
+`scholion capabilities --json` lists them under `access.doors.mcp.protocols`.
 
 ### Configure it
 

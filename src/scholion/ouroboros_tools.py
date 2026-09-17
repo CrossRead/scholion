@@ -36,49 +36,48 @@ except Exception:  # standalone mode (tests / development outside Ouroboros)
 
 
 # --- handlers (ctx is ignored; the profile is read from SCHOLION_PROFILE_DIR) ---
-def _h_check_drug(ctx: "ToolContext", drug: str = "") -> str:
-    return fmt.drug_check(engine.check_drug_gene(drug))
+def _reported(data, render):
+    """A handler that builds a structure and renders it — and can hand back both.
+
+    `both(**args)` is what the MCP server calls when a client reads structured
+    tool output: the structure the report was rendered from, not a second one
+    computed beside it, so the text and the JSON cannot describe different runs.
+    """
+    def handler(ctx: "ToolContext", **kwargs) -> str:
+        return render(data(**kwargs))
+
+    def both(**kwargs):
+        r = data(**kwargs)
+        return render(r), r
+    handler.both = both
+    return handler
 
 
-def _h_analyze_labs(ctx: "ToolContext", markers: str = "") -> str:
-    keys = [m.strip() for m in markers.split(",") if m.strip()] or None
-    return fmt.labs_report(engine.analyze_labs(keys))
-
-
-def _h_suggest_tests(ctx: "ToolContext") -> str:
-    return fmt.tests_report(engine.suggest_tests())
+_h_check_drug = _reported(lambda drug="": engine.check_drug_gene(drug),
+                          lambda r: fmt.drug_check(r))
+_h_analyze_labs = _reported(
+    lambda markers="": engine.analyze_labs([m.strip() for m in markers.split(",") if m.strip()] or None),
+    lambda r: fmt.labs_report(r))
+_h_suggest_tests = _reported(lambda: engine.suggest_tests(), lambda r: fmt.tests_report(r))
 
 
 def _h_genome(ctx: "ToolContext", rsid: str = "", gene: str = "") -> str:
     return fmt.genome_report(engine.genome_lookup(rsid=rsid or None, gene=gene or None))
 
 
-def _h_prescription(ctx: "ToolContext", drug: str = "") -> str:
-    return fmt.prescription_check(engine.check_new_prescription(drug))
-
-
-def _h_metrics(ctx: "ToolContext") -> str:
-    return fmt.metrics_report(engine.metrics_summary())
-
-
-def _h_clinvar(ctx: "ToolContext") -> str:
-    return fmt.clinvar_report(engine.clinvar_findings())
+_h_prescription = _reported(lambda drug="": engine.check_new_prescription(drug),
+                            lambda r: fmt.prescription_check(r))
+_h_metrics = _reported(lambda: engine.metrics_summary(), lambda r: fmt.metrics_report(r))
+_h_clinvar = _reported(lambda: engine.clinvar_findings(), lambda r: fmt.clinvar_report(r))
 
 
 def _h_lifestyle(ctx: "ToolContext") -> str:
     return fmt.lifestyle_report(engine.lifestyle())
 
 
-def _h_prs(ctx: "ToolContext") -> str:
-    return fmt.prs_report(engine.prs_findings())
-
-
-def _h_longevity(ctx: "ToolContext") -> str:
-    return fmt.longevity_report(engine.longevity_findings())
-
-
-def _h_goal(ctx: "ToolContext") -> str:
-    return fmt.goal_report(engine.goal_dashboard())
+_h_prs = _reported(lambda: engine.prs_findings(), lambda r: fmt.prs_report(r))
+_h_longevity = _reported(lambda: engine.longevity_findings(), lambda r: fmt.longevity_report(r))
+_h_goal = _reported(lambda: engine.goal_dashboard(), lambda r: fmt.goal_report(r))
 
 
 def _h_phenoage(ctx: "ToolContext", panel: str = "latest") -> str:
@@ -149,12 +148,8 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
 # `limits` is the one that mattered most. It is the answer to «what can this data
 # NOT tell you», the capability the whole project is built around, and the model
 # that most needed it was the one that could not call it.
-def _h_overview(ctx: "ToolContext") -> str:
-    return fmt.overview_report(engine.overview())
-
-
-def _h_second_opinion(ctx: "ToolContext") -> str:
-    return fmt.second_opinion_report(engine.second_opinion())
+_h_overview = _reported(lambda: engine.overview(), lambda r: fmt.overview_report(r))
+_h_second_opinion = _reported(lambda: engine.second_opinion(), lambda r: fmt.second_opinion_report(r))
 
 
 def _h_flag_rate(ctx: "ToolContext") -> str:
@@ -268,8 +263,7 @@ def _h_limits(ctx: "ToolContext") -> str:
     return fmt.limits_report(_lim.report())
 
 
-def _h_radar(ctx: "ToolContext") -> str:
-    return fmt.radar_report(engine.health_radar())
+_h_radar = _reported(lambda: engine.health_radar(), lambda r: fmt.radar_report(r))
 
 
 def _h_focus(ctx: "ToolContext") -> str:
@@ -304,8 +298,7 @@ def _h_brief(ctx: "ToolContext") -> str:
     return fmt.render_brief(engine.lifestyle_brief())
 
 
-def _h_acmg(ctx: "ToolContext") -> str:
-    return fmt.acmg_report(engine.acmg_findings())
+_h_acmg = _reported(lambda: engine.acmg_findings(), lambda r: fmt.acmg_report(r))
 
 
 def _h_goal_suggest(ctx: "ToolContext") -> str:
@@ -423,12 +416,19 @@ def _noted(handler):
     note (owner, 14.09.2026). Whatever the model calls first, the answer ends with
     one line saying a newer build is out and that installing it is the person's
     call. The registry is asked at most once a day and never offline."""
-    def run(ctx, **kwargs):
-        out = handler(ctx, **kwargs)
+    def noted(out):
         from scholion import upgrade as _upg  # noqa: E402
         note = _upg.session_note()
         return f"{out}\n\n{note}" if note else out
+
+    def run(ctx, **kwargs):
+        return noted(handler(ctx, **kwargs))
     run.__name__, run.__doc__ = handler.__name__, handler.__doc__
+    if hasattr(handler, "both"):
+        def both(**kwargs):
+            text, data = handler.both(**kwargs)
+            return noted(text), data
+        run.both = both
     return run
 
 

@@ -37,15 +37,102 @@ import json
 import sys
 from typing import Any, Dict, Iterable, Optional
 
-#: The revision of the protocol this server speaks. Stated rather than echoed
-#: back from whatever the client asks for: answering «yes, that one» to a version
-#: we have never seen is how a client ends up sending frames we cannot read.
-PROTOCOL_VERSION = "2024-11-05"
+#: The revisions this server speaks, and the one it answers an unknown request with.
+#: Stated rather than echoed back from whatever the client asks for: answering «yes,
+#: that one» to a version we have never seen is how a client ends up sending frames
+#: we cannot read. `tests/test_the_mcp_revisions_we_claim_are_the_ones_we_speak.py`
+#: runs the server once per entry and asks what that revision obliges it to do — a
+#: revision added here without the behaviour fails there.
+#:
+#: MODERN (2026-07-28): no handshake; every request carries its version in `_meta`,
+#: `server/discover` is mandatory, every result has `resultType`, list results carry
+#: `ttlMs` and `cacheScope`, and `ping` is gone.
+#: LEGACY (up to 2025-11-25): an `initialize` handshake fixes one revision for the
+#: process. 2025-03-26 alone receives JSON-RPC batches (added then, removed in
+#: 2025-06-18); from 2025-06-18 on, a tool with an `outputSchema` answers with
+#: `structuredContent` as well.
+MODERN_VERSIONS = ("2026-07-28",)
+LEGACY_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")
+SUPPORTED_VERSIONS = MODERN_VERSIONS + LEGACY_VERSIONS
+#: What a legacy request is served under when no handshake named a revision: the
+#: behaviour this server had before it knew any other, so a client that skips
+#: `initialize` gets exactly what it used to.
+DEFAULT_LEGACY = "2024-11-05"
+#: Kept for readers of the old name: the newest revision a handshake can agree on.
+PROTOCOL_VERSION = LEGACY_VERSIONS[0]
+STRUCTURED_FROM = "2025-06-18"
+BATCH_VERSIONS = ("2025-03-26",)
 
+INVALID_REQUEST = -32600
 METHOD_NOT_FOUND = -32601
 INVALID_PARAMS = -32602
 INTERNAL_ERROR = -32603
 PARSE_ERROR = -32700
+UNSUPPORTED_PROTOCOL_VERSION = -32022
+
+_META_VERSION = "io.modelcontextprotocol/protocolVersion"
+_META_SERVER = "io.modelcontextprotocol/serverInfo"
+
+#: How long a client may keep the tool list or the discovery answer. Both are fixed
+#: for the life of the process (the language of a run is chosen at start) and carry
+#: nothing about the person, so any cache may hold them.
+LIST_TTL_MS = 3_600_000
+LIST_CACHE_SCOPE = "public"
+
+#: The shape each structured tool answers with: the top-level fields its command's
+#: `--json` is bound to by the public contract (`tests/contracts/public_contract.json`,
+#: which a test compares this with). Listed, not required: the contract was taken on
+#: a profile without a genome, and a report with one carries other fields beside
+#: these. Adding is allowed; removing is the same incompatible change it is there.
+OUTPUT_FIELDS = {
+    "sch_overview": "overview", "sch_analyze_labs": "labs",
+    "sch_suggest_tests": "suggest-tests", "sch_second_opinion": "second-opinion",
+    "sch_radar": "radar", "sch_health_metrics": "metrics", "sch_goal": "goal",
+    "sch_clinvar_findings": "clinvar", "sch_acmg": "acmg", "sch_prs": "prs",
+    "sch_longevity": "longevity", "sch_check_drug_gene": "drug",
+    "sch_check_prescription": "prescription",
+}
+_CONTRACT_FIELDS = {
+    "overview": ("abnormal_count", "disclaimer", "flagged", "genome", "genome_gaps", "high_flags",
+                 "high_suggestions", "lifestyle", "markers_total", "medications_count", "metrics",
+                 "pending_suggestions", "stale_abnormal_count", "subject_id", "suggestions_count",
+                 "synthetic", "watch_flags"),
+    "labs": ("abnormal_count", "count", "decision_crossed_count", "disclaimer", "markers",
+             "near_limit_count", "status"),
+    "suggest-tests": ("count", "disclaimer", "status", "suggestions", "total"),
+    "second-opinion": ("disclaimer", "drug_flags", "drugs_answerable", "drugs_checked", "red_labs",
+                       "suggestions", "suggestions_pending"),
+    "radar": ("disclaimer", "domains", "overall", "overall_delta", "prev_date", "prev_overall"),
+    "metrics": ("age", "bmi", "disclaimer", "metrics", "profile", "status"),
+    "goal": ("as_of", "available", "charts", "disclaimer", "headline", "peaks", "targets", "title"),
+    "clinvar": ("disclaimer", "hits", "indel_caveat", "message", "normalisation", "penetrance",
+                "status", "tiers"),
+    "acmg": ("disclaimer", "hits", "message", "penetrance", "status", "unread_genes", "version"),
+    "prs": ("available", "disclaimer", "message"),
+    "longevity": ("available", "disclaimer", "message"),
+    "drug": ("basis", "certainty", "clinvar", "co_genes", "cpic", "disclaimer", "driving_gene", "drug",
+             "drug_class", "gene", "guidance_gap", "level", "markers_found", "phenotype",
+             "phenotype_label", "recommendation", "status", "why"),
+    "prescription": ("class_display", "classes", "clinvar", "disclaimer", "dose_context", "drug",
+                     "genome", "identified", "interactions", "labs", "overall", "pharmacogenetics",
+                     "safety_flags", "status", "unresolved"),
+}
+
+
+#: The rendered report, carried inside the structure as well. Some clients hand a
+#: model the structure INSTEAD of the text block; without this field such a model
+#: would get the numbers and lose the qualifications the canon says to relay.
+REPORT_FIELD = "report"
+
+
+def output_schema(tool: str) -> Optional[Dict[str, Any]]:
+    """The `outputSchema` of a structured tool, or None for a tool that answers in text only."""
+    command = OUTPUT_FIELDS.get(tool)
+    if command is None:
+        return None
+    props: Dict[str, Any] = {f: {} for f in _CONTRACT_FIELDS[command]}
+    props[REPORT_FIELD] = {"type": "string"}
+    return {"type": "object", "properties": props, "required": [REPORT_FIELD]}
 
 
 def _tools() -> list:
@@ -53,18 +140,31 @@ def _tools() -> list:
     return list(ouroboros_tools.get_tools())
 
 
-def tool_descriptors() -> list:
-    """The MCP shape of the tool list, derived from the plugin's own schemas."""
+def _structured(version: str) -> bool:
+    return version >= STRUCTURED_FROM
+
+
+def tool_descriptors(version: str = DEFAULT_LEGACY) -> list:
+    """The MCP shape of the tool list, derived from the plugin's own schemas.
+
+    In the order the plugin registers them, which is fixed: the 2026 revision asks
+    for a deterministic order so that a client's cache and a model's prompt cache
+    both hold.
+    """
     out = []
     for t in _tools():
         schema = dict(t.schema)
-        out.append({"name": schema.get("name", t.name),
-                    "description": schema.get("description", ""),
-                    # MCP calls it `inputSchema`; the plugin calls the same object
-                    # `parameters`. One rename, in one place, rather than a second
-                    # copy of every schema.
-                    "inputSchema": schema.get("parameters")
-                    or {"type": "object", "properties": {}}})
+        d = {"name": schema.get("name", t.name),
+             "description": schema.get("description", ""),
+             # MCP calls it `inputSchema`; the plugin calls the same object
+             # `parameters`. One rename, in one place, rather than a second
+             # copy of every schema.
+             "inputSchema": schema.get("parameters")
+             or {"type": "object", "properties": {}}}
+        out_schema = output_schema(d["name"]) if _structured(version) else None
+        if out_schema is not None:
+            d["outputSchema"] = out_schema
+        out.append(d)
     return out
 
 
@@ -73,24 +173,48 @@ def _server_info() -> Dict[str, Any]:
     return {"name": "scholion", "version": str(_v)}
 
 
-def call_tool(name: str, arguments: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def _as_json(value: Any) -> Any:
+    """The structure as a client will read it: dates and paths become strings."""
+    return json.loads(json.dumps(value, ensure_ascii=False, default=str))
+
+
+def call_tool(name: str, arguments: Optional[Dict[str, Any]] = None,
+              version: str = DEFAULT_LEGACY) -> Dict[str, Any]:
     """Run one tool and answer in MCP's content shape.
 
     A failure is reported as `isError` with the text of what went wrong, not as
     an empty result: «nothing came back» and «this went wrong» are different
     facts, and a model handed the first will usually assume the second did not
     happen.
+
+    A structured tool answers with the report as text AND the structure it was
+    rendered from. The text block is the rendered report rather than the
+    serialised JSON the revision suggests for older clients, on purpose: the
+    report carries the qualifications the safety canon says must be relayed, and
+    a client that reads only text should be handed those, not a bare structure.
     """
     from .ouroboros_tools import ToolContext
     for t in _tools():
         if t.name == name:
+            wants = _structured(version) and output_schema(name) is not None
             try:
-                text = t.handler(ToolContext(), **(arguments or {}))
+                if wants and hasattr(t.handler, "both"):
+                    text, data = t.handler.both(**(arguments or {}))
+                else:
+                    text, data = t.handler(ToolContext(), **(arguments or {})), None
             except TypeError as e:                       # a wrong or missing argument
                 return {"content": [{"type": "text", "text": f"{name}: {e}"}], "isError": True}
             except Exception as e:                       # noqa: BLE001 - reported, not swallowed
                 return {"content": [{"type": "text", "text": f"{name}: {e}"}], "isError": True}
-            return {"content": [{"type": "text", "text": str(text)}], "isError": False}
+            out: Dict[str, Any] = {"content": [{"type": "text", "text": str(text)}], "isError": False}
+            if wants:
+                # The schema says «an object», so the answer is one even when a
+                # report function returned something else — wrapped, not dropped.
+                data = _as_json(data)
+                data = dict(data) if isinstance(data, dict) else {"value": data}
+                data[REPORT_FIELD] = str(text)
+                out["structuredContent"] = data
+            return out
     return {"content": [{"type": "text", "text": f"unknown tool: {name}"}], "isError": True}
 
 
@@ -128,35 +252,102 @@ def _instructions() -> str:
     )
 
 
-def handle(message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+def _capabilities() -> Dict[str, Any]:
+    return {"tools": {"listChanged": False}}
+
+
+class Session:
+    """What one stdio process remembers: the revision its handshake agreed on, if any.
+
+    Only legacy requests read it. A modern request names its own revision and is
+    answered from nothing else — the 2026 revision forbids relying on earlier
+    requests over the same connection.
+    """
+
+    def __init__(self) -> None:
+        self.legacy_version: Optional[str] = None
+
+
+def handle(message: Dict[str, Any], session: Optional[Session] = None) -> Optional[Dict[str, Any]]:
     """One JSON-RPC message in, one answer out (or None for a notification)."""
+    session = session or Session()          # a direct call remembers nothing
+    if not isinstance(message, dict):
+        return {"jsonrpc": "2.0", "id": None,
+                "error": {"code": INVALID_REQUEST, "message": "a request is a JSON object"}}
     method = message.get("method")
     mid = message.get("id")
-    params = message.get("params") or {}
+    params = message.get("params") if isinstance(message.get("params"), dict) else {}
+    meta = params.get("_meta") if isinstance(params.get("_meta"), dict) else {}
+    asked = meta.get(_META_VERSION)
+    modern = asked is not None and asked not in LEGACY_VERSIONS
+    version = asked if asked in LEGACY_VERSIONS else (session.legacy_version or DEFAULT_LEGACY)
 
     def ok(result):
-        return None if mid is None else {"jsonrpc": "2.0", "id": mid, "result": result}
+        if mid is None:
+            return None
+        if modern:
+            result = {**result, "resultType": "complete",
+                      "_meta": {**(result.get("_meta") or {}), _META_SERVER: _server_info()}}
+        return {"jsonrpc": "2.0", "id": mid, "result": result}
 
-    def err(code, text):
-        return None if mid is None else {"jsonrpc": "2.0", "id": mid,
-                                         "error": {"code": code, "message": text}}
+    def err(code, text, data=None):
+        if mid is None:
+            return None
+        e: Dict[str, Any] = {"code": code, "message": text}
+        if data is not None:
+            e["data"] = data
+        return {"jsonrpc": "2.0", "id": mid, "error": e}
 
-    if method == "initialize":
-        return ok({"protocolVersion": PROTOCOL_VERSION,
-                   "capabilities": {"tools": {"listChanged": False}},
-                   "instructions": _instructions(), "serverInfo": _server_info()})
-    if method in ("notifications/initialized", "initialized"):
+    if method in ("notifications/initialized", "initialized", "notifications/cancelled"):
         return None
-    if method == "ping":
+    if modern and asked not in MODERN_VERSIONS:
+        return err(UNSUPPORTED_PROTOCOL_VERSION, "Unsupported protocol version",
+                   {"supported": list(SUPPORTED_VERSIONS), "requested": str(asked)})
+    if method == "server/discover":
+        return ok({"supportedVersions": list(SUPPORTED_VERSIONS),
+                   "capabilities": _capabilities(), "instructions": _instructions(),
+                   "_meta": {_META_SERVER: _server_info()},
+                   "ttlMs": LIST_TTL_MS, "cacheScope": LIST_CACHE_SCOPE})
+    if method == "initialize" and not modern:
+        wanted = params.get("protocolVersion")
+        session.legacy_version = wanted if wanted in LEGACY_VERSIONS else LEGACY_VERSIONS[0]
+        return ok({"protocolVersion": session.legacy_version,
+                   "capabilities": _capabilities(),
+                   "instructions": _instructions(), "serverInfo": _server_info()})
+    if method == "ping" and not modern:
         return ok({})
     if method == "tools/list":
-        return ok({"tools": tool_descriptors()})
+        result: Dict[str, Any] = {"tools": tool_descriptors(asked if modern else version)}
+        if modern:
+            result.update(ttlMs=LIST_TTL_MS, cacheScope=LIST_CACHE_SCOPE)
+        return ok(result)
     if method == "tools/call":
         name = params.get("name")
         if not name:
             return err(INVALID_PARAMS, "tools/call needs a tool name")
-        return ok(call_tool(name, params.get("arguments") or {}))
+        return ok(call_tool(name, params.get("arguments") or {}, asked if modern else version))
     return err(METHOD_NOT_FOUND, f"method not found: {method}")
+
+
+def _answer(message: Any, session: Session) -> Any:
+    """One line's worth of answer: a message, or a batch where the agreed revision has them."""
+    if isinstance(message, list):
+        if session.legacy_version not in BATCH_VERSIONS or not message:
+            return {"jsonrpc": "2.0", "id": None,
+                    "error": {"code": INVALID_REQUEST,
+                              "message": "JSON-RPC batches are received only under 2025-03-26"}}
+        answers = [a for a in (_answer_one(m, session) for m in message) if a is not None]
+        return answers or None
+    return _answer_one(message, session)
+
+
+def _answer_one(message: Any, session: Session) -> Optional[Dict[str, Any]]:
+    try:
+        return handle(message, session)
+    except Exception as e:                            # noqa: BLE001
+        mid = message.get("id") if isinstance(message, dict) else None
+        return {"jsonrpc": "2.0", "id": mid,
+                "error": {"code": INTERNAL_ERROR, "message": str(e)}}
 
 
 def serve(stdin: Optional[Iterable[str]] = None, stdout=None) -> int:
@@ -167,6 +358,7 @@ def serve(stdin: Optional[Iterable[str]] = None, stdout=None) -> int:
     """
     src = stdin if stdin is not None else sys.stdin
     out = stdout if stdout is not None else sys.stdout
+    session = Session()
     for line in src:
         line = (line or "").strip()
         if not line:
@@ -179,11 +371,7 @@ def serve(stdin: Optional[Iterable[str]] = None, stdout=None) -> int:
                                             "message": f"not JSON: {e}"}}) + "\n")
             out.flush()
             continue
-        try:
-            answer = handle(message)
-        except Exception as e:                            # noqa: BLE001
-            answer = {"jsonrpc": "2.0", "id": message.get("id"),
-                      "error": {"code": INTERNAL_ERROR, "message": str(e)}}
+        answer = _answer(message, session)
         if answer is not None:
             out.write(json.dumps(answer, ensure_ascii=False) + "\n")
             out.flush()

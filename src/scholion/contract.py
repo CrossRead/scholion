@@ -725,7 +725,10 @@ def access() -> Dict[str, Any]:
                     "for": "a person, and an agent that has a shell", "agent_surface": True},
             "mcp": {"how": "scholion mcp", "transport": "stdio",
                     "for": "an agent", "agent_surface": True,
-                    "protocol": _mcp.PROTOCOL_VERSION, "tools": len(tools),
+                    # The revision a handshake agrees on by default, which is what
+                    # a host configured by hand quotes; `protocols` is the full list.
+                    "protocol": _mcp.PROTOCOL_VERSION,
+                    "protocols": list(_mcp.SUPPORTED_VERSIONS), "tools": len(tools),
                     "note": "a local process spoken to over stdin and stdout; "
                             "no port is opened and no host is contacted"},
             "ouroboros_tools": {"how": "import scholion.ouroboros_tools",
@@ -749,6 +752,7 @@ def access() -> Dict[str, Any]:
             # that can only read this one file learns about every other door
             # from it or not at all.
             "agent_skills": _agent_skills_door(),
+            "agent_plugin": _agent_plugin_door(),
             # Named and marked, rather than left out. An agent that finds a
             # local page and no note beside it will try to drive it; a door that
             # is not for you is a fact worth stating, like any other refusal.
@@ -788,6 +792,50 @@ def skill_entry_path():
         if c.exists():
             return c
     return None
+
+
+AGENT_PLUGIN_DIR = "agent-plugin/"
+
+
+def agent_plugin_path():
+    """The Agent Plugins package, if this build carries it.
+
+    It travels with the repository and not with the wheel — the folder is what a
+    person imports into a client, the way `ouroboros_plugin/` is what goes to the
+    hub. A build without it still declares the door: the door is a fact about the
+    product, not about which files this particular copy happens to hold.
+    """
+    from pathlib import Path as _P
+    here = _P(__file__).resolve().parent
+    for c in (here.parent.parent / "agent-plugin",):
+        if (c / "plugin.json").exists():
+            return c
+    return None
+
+
+def _agent_plugin_door() -> Dict[str, Any]:
+    folder = agent_plugin_path()
+    door: Dict[str, Any] = {
+        "how": "import the folder " + AGENT_PLUGIN_DIR + " into a client that reads Agent Plugins",
+        "entry": "plugin.json",
+        "format": "Agent Plugins 1.0.0",
+        "for": "an agent",
+        "agent_surface": True,
+        "carries": ["skills/scholion/SKILL.md", "mcp.json"],
+        # The half this door exists for. Through the tool interface a model is
+        # handed functions and no instruction — the reason `sch_rules` is a tool
+        # at all. Here the instruction arrives in the same folder as the
+        # functions, and the two cannot be installed apart.
+        "instruction_travels_with_the_tools": True,
+        "installs": "nothing — the launcher looks for the installed package and, "
+                    "not finding it, refuses and names the one command that fixes it",
+        "runs": "on the machine that holds the data; a client that cannot start a "
+                "local process does not get this door",
+    }
+    if folder is not None:
+        door["files"] = sorted(p.relative_to(folder).as_posix()
+                               for p in folder.rglob("*") if p.is_file())
+    return door
 
 
 def _agent_skills_door() -> Dict[str, Any]:

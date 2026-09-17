@@ -83,8 +83,8 @@ class TestEveryCommandPromisedExists(unittest.TestCase):
         """What the system does NOT do is the differentiator, not the fine print."""
         heads = [l.lower() for l in self.text.splitlines() if l.startswith("## ")]
         self.assertIn("## boundaries", heads)
-        self.assertLess(heads.index("## boundaries"),
-                        heads.index("## four ways to install"),
+        install = next(h for h in heads if h.endswith(" ways to install"))
+        self.assertLess(heads.index("## boundaries"), heads.index(install),
                         "the honest account of the limits reads as fine print when it stands "
                         "below the installation steps")
 
@@ -96,7 +96,8 @@ class TestEveryCommandPromisedExists(unittest.TestCase):
         """
         low = self.text.lower()
         i = low.index("## bring what you have")
-        block = self.text[i:low.index("## four ways to install")]
+        # The count of ways grows with the doors; the heading's shape does not.
+        block = self.text[i:low.index(" ways to install\n", i)]
         self.assertIn("add-lab", block)
         self.assertIn("import-labs", block)
         self.assertIn("Nothing at all", block)

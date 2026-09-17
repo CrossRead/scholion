@@ -40,6 +40,65 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.3 — 16.09.2026
+
+### What you can do now
+
+**The tools and the instruction that governs them now travel as one package.**
+Scholion is packaged in the portable plugin format agreed in August 2026 — a
+manifest, the skill folder, and the description of the local tool server — which
+a client reads in a single import instead of three separate steps: install the
+package, register the server by hand, copy the skill folder beside it. The
+convenience is the smaller half. A model that reaches these tools through a bare
+server is handed a list of functions and no instruction with them, which is why
+the safety canon has to be a tool of its own; in this package the instruction
+sits in the same folder as the functions and cannot be installed without them.
+The launcher installs nothing: where the engine is absent it refuses and names
+the one command that installs it, because software that quietly put itself on a
+machine in order to read somebody's genome would be the wrong kind of quiet. It
+starts on the machine that holds the data and nowhere else — a client that cannot
+run a local process does not get this door, and that is the correct answer rather
+than a limitation. The launcher also looks where a per-user installation puts the
+`scholion` command. A desktop application started from the Dock does not get a
+terminal's search path, and without that look it would have refused on a
+machine where the engine was installed.
+
+**The tool server speaks the 2026 revision of the protocol and hands back
+structures.** `scholion mcp` now answers clients of the July 2026 revision,
+which has no handshake: a client can ask the server which revisions it speaks,
+and a revision the server does not know gets an error listing the ones it does.
+Clients that open with the older handshake are served as before, under the
+revision they ask for. From the June 2025 revision on, thirteen tools also
+return their answer as a structure, the same one their command prints with
+`--json`: overview, labs, suggested tests, second opinion, radar, metrics, goal,
+ClinVar, ACMG, polygenic scores, longevity, drug check and prescription check.
+An assistant no longer has to parse the report back into numbers. The rendered
+report stays in the answer, and a copy of it sits inside the structure, because
+it carries the qualifications an assistant has to pass on, and some clients
+show a model only the structure. `scholion capabilities --json` lists the
+revisions under `access.doors.mcp.protocols`.
+
+### What is fixed
+
+**The catalogue entry in the plugin hub advertised an older build.** The row a
+person reads before installing said version 0.4.7 and thirty tools, while the
+package on the index had moved seven releases past it and registered thirty-four.
+That row is a shipped page like any other, and nothing compared its numbers with
+the build. The copy kept beside the source had also lost the field that declares
+which plugin contract the skill speaks, so publishing it would have dropped that
+field from the row as well. The numbers and the required fields of the entry are
+now read from the build and refused when they disagree, and the version the row
+offers is checked against the releases that are actually on the index — a row may
+name an older release, never one nobody can install.
+
+### What needs recomputing
+
+Nothing has to be recomputed and nothing has to be re-imported. What changed is
+what the catalogue says about this skill, not anything the skill computes: a host
+installing it already received the tools of the published package, because the
+entry installs that package from the index instead of carrying its own copy.
+`scholion version` names the build you are on.
+
 ## v0.5.2 — 14.09.2026
 
 ### What you can do now

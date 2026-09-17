@@ -81,6 +81,15 @@ MIRROR = (
     # runtime looks for SKILL.md there — so the entry is mirrored into the
     # owner's directory as well. Nothing personal is in it.
     (ROOT / "share" / "skill" / "SKILL.md", ROOT / "src" / "skill" / "SKILL.md"),
+    # The Agent Plugins package carries the same public edition, because the
+    # format's `skills/` folder IS an Agent Skills folder and a second edition
+    # would be a second copy of one fact. Laid out mechanically for the reason
+    # this file exists: the hub's entry lost a field by being a hand copy that
+    # nothing compared (task 196).
+    (ROOT / "share" / "skill" / "SKILL.md",
+     ROOT / "agent-plugin" / "skills" / "scholion" / "SKILL.md"),
+    (ROOT / "share" / "skill" / "INSTRUCTION.md",
+     ROOT / "agent-plugin" / "skills" / "scholion" / "INSTRUCTION.md"),
     (SOURCE, ROOT / "src" / "scholion" / "skill" / "ASSISTANT-RULES.md"),
 )
 HEADER = (

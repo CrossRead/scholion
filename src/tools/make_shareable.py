@@ -832,6 +832,14 @@ def build(repo: Path, out: Path) -> Path:
     skills_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(share / "skill" / "SKILL.md", skills_dir / "SKILL.md")
 
+    # The Agent Plugins package, at the root, where every document names it. It is a
+    # folder a person imports into a client, so it has to be in the repository they
+    # download: until 0.5.3 the build left it behind, and the guide told a reader to
+    # import a folder their copy did not have. `copytree` keeps the launcher's mode.
+    plugin_src = repo / "agent-plugin"
+    if (plugin_src / "plugin.json").exists():
+        shutil.copytree(plugin_src, shared / "agent-plugin", dirs_exist_ok=True)
+
     # ── 5) neutralise personal identifiers ────────────────────────────────
     changed = _substitute_in(shared) + _substitute_in(skillpkg)
     print(f"• substitutions made in files: {changed}")

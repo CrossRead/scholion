@@ -95,6 +95,9 @@ engine in this order:
    `~/Library/Python/3.*/bin`.
 4. A Python that can import the package.
 
+The launcher is a POSIX shell script, so it runs on macOS and Linux. On Windows,
+register the MCP server directly with `scholion mcp` (see below).
+
 The third step exists because a desktop application started from the Dock on
 macOS gets only the system search path, where neither pipx nor Homebrew puts
 anything. If no engine is found, the launcher refuses and prints the command

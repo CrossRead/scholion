@@ -573,8 +573,9 @@ and `~/Library/Python/3.*/bin`. That matters because an application started
 from the Dock on macOS does not get a terminal's search path. When no engine is
 found, the launcher refuses and prints the install command. ChatGPT marks such a
 plugin *Desktop only*, which is correct: the engine reads files on your own
-disk, and a cloud session has none of them. For ChatGPT desktop the steps are in
-`scholion doc connecting-an-agent`.
+disk, and a cloud session has none of them. The launcher is a shell script for macOS
+and Linux; on Windows, use the MCP server on its own, below. For ChatGPT
+desktop the steps are in `scholion doc connecting-an-agent`.
 
 **The MCP server on its own.** A client that speaks the Model Context Protocol
 but not the plugin format can start the same server directly:

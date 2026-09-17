@@ -105,6 +105,13 @@ class TestTheServerEntry(Package):
 
 class TestTheLauncherRefusesRatherThanInstalls(Package):
 
+    def setUp(self):
+        super().setUp()
+        # The launcher is a POSIX shell script. Windows has no /bin/sh, and a
+        # client there starts `scholion mcp` directly (the guide says so).
+        if not Path("/bin/sh").is_file():
+            self.skipTest("no POSIX shell here to run the launcher with")
+
     def run_with_nothing_on_the_path(self):
         """An environment where no engine can be found: an empty PATH, so even
         `python3` is out of reach, and no data directory from a client."""

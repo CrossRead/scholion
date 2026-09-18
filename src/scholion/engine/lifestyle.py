@@ -64,6 +64,26 @@ def _radar_domains_from_knowledge() -> List[tuple]:
 
 _RADAR_DOMAINS = _radar_domains_from_knowledge()
 
+#: A system's long panel (task 200): its markers are not scored one by one, and
+#: the share of them outside their corridor enters the score as ONE term, so a
+#: panel that has drifted shows at the top level without thirty corridors
+#: outvoting the system's own markers (owner, 17.09.2026).
+_RADAR_PANELS = {str(d.get("key")): list(d.get("panel_markers") or [])
+                 for d in (core._read_knowledge("radar_domains.json") or {}).get("domains") or []
+                 if isinstance(d, dict) and d.get("panel_markers")}
+
+
+def _panel_term(key: str, by_key: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """The panel's share outside its corridor, as a 0–100 term — or None."""
+    rows = [by_key[k] for k in _RADAR_PANELS.get(key, []) if k in by_key]
+    judged = [m for m in rows if _marker_health(m) is not None]
+    if not judged:
+        return None
+    out = [m for m in judged if m.get("abnormal")]
+    return {"measured": len(rows), "judged": len(judged), "outside": len(out),
+            "score": round(100 * (1 - len(out) / len(judged))),
+            "outside_keys": [m["key"] for m in out]}
+
 
 def _wear_status(latest: float, meta: Dict[str, Any]):
     """Status of a lifestyle metric vs the target. Returns (status, score 0–100 or None)."""
@@ -450,6 +470,9 @@ def health_radar() -> Dict[str, Any]:
         label = _t(f"radar.domain.{key}")
         present = [by_key[k] for k in keys if k in by_key]
         scores = [s for s in (_marker_health(m) for m in present) if s is not None]
+        panel = _panel_term(key, by_key)
+        if panel is not None:
+            scores.append(panel["score"])
         if not scores:
             # Two different silences, and the domain says which: nothing of this
             # system was taken, or what was taken carries no verdict — a number
@@ -512,7 +535,7 @@ def health_radar() -> Dict[str, Any]:
             # of range of 1» — a statement about a body system made from a quarter
             # of it. The declared size is the denominator; `measured` says how much
             # of it the statement actually rests on.
-            "total": len(keys), "measured": len(present),
+            "total": len(keys), "measured": len(present), "panel": panel,
             "missing": [k for k in keys if k not in by_key],
             "ok": sum(1 for m in present if m.get("flag") == "ok"),
             "abnormal": [{"key": m["key"], "name": m["name"], "value": m["value"], "unit": m["unit"],

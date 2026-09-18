@@ -81,6 +81,11 @@ class TestOneStateThreeEntriesOneSentence(unittest.TestCase):
             mock.patch.object(D, "_context", lambda: DRUG_BOOK),
             mock.patch.object(S, "_curated", lambda: CLASS_BOOK),
             mock.patch("scholion.engine.genomics.acmg_findings", _acmg_scan),
+            # Every gene measured and ordinary for the file: whether a gene
+            # was read at all is the coverage table's to say (task 175).
+            mock.patch("scholion.limits.callability", lambda: {
+                g: {"chrom": "1", "pct_20x": 98.0, "pct_10x": 99.0, "mean_depth": 30.0}
+                for g in ("GA", "GB", "GC", "PEND")}),
             mock.patch.object(SP, "_curated", lambda: SYSTEM_BOOK),
             mock.patch.object(SP, "_base", lambda: {}),
             mock.patch.object(SP, "_clinvar_by_gene",
@@ -132,9 +137,13 @@ class TestOneStateThreeEntriesOneSentence(unittest.TestCase):
                          y["verdict_line"]}
                 self.assertEqual(1, len(lines), f"{code}: three sentences for one state: {lines}")
                 line = next(iter(lines))
-                self.assertIn("GB", line)
+                # The names left this sentence on 17.09.2026 (owner: «это вообще
+                # лишнее»); what it must still carry is the count, and the names
+                # are on the rows underneath it.
+                self.assertIn("4", line)
                 self.assertNotIn("⟦", line)
                 self.assertNotIn("{", line)
+                self.assertEqual(["GB"], d["panel_verdict"]["genes"])
         finally:
             i18n.set_lang(None)
             core.reset_cache()

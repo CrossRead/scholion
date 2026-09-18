@@ -904,6 +904,44 @@ def _fitting_rows(lines, i, o_sex, o_age):
     return out
 
 
+#: A ratio sign between two names: a slash, or a colon written tight («Phe:Tyr»)
+#: or spaced on both sides («Glu : Gln»). «Глюкоза: 5,4» — a colon closing a
+#: label — is none of these, and neither is a sign followed by a number.
+_RATIO_SIGN = re.compile(r"\s*/\s*|(?<=[^\s]):(?=[^\s])|\s+:\s+")
+
+
+def _against_ratio_sign(low: str, start: int, end: int) -> bool:
+    """Does the name at [start, end) stand on one side of a ratio sign?"""
+    after = re.match(r"[)\]]*", low[end:]).end() + end
+    m = _RATIO_SIGN.match(low, after)
+    if m and re.match(r"[\s(\[]*[^\W\d_]", low[m.end():]):
+        return True
+    return bool(_RATIO_BEFORE.search(low[:start]))
+
+
+_RATIO_BEFORE = re.compile(r"[^\W\d_][)\]]*(?:\s*/\s*|:(?!\s)|\s+:\s+)[(\[]*$")
+
+
+def _drop_ratio_components(low: str, hits: Dict[str, Any]) -> Dict[str, Any]:
+    """Remove the names that stand against a «/» or «:» in this line.
+
+    `hits` maps a key to `(length, name, positions)`. A name with a slash or a
+    colon right before it, or right after it (past the closing bracket of its
+    abbreviation), is one side of a printed ratio — «Phe/Tyr», «Глутамат (Glu) :
+    Глутамин (Gln)» — and the line is not its value. A longer hit that covers
+    the name is the ratio's own key and keeps the line.
+    """
+    spans = [(k, pos, pos + length) for k, (length, _syn, poss) in hits.items() for pos in poss]
+    joined = set()
+    for k, s0, e0 in spans:
+        if not _against_ratio_sign(low, s0, e0):
+            continue
+        if any(s1 <= s0 and e1 >= e0 and (e1 - s1) > (e0 - s0) for k1, s1, e1 in spans if k1 != k):
+            continue
+        joined.add(k)
+    return {k: v for k, v in hits.items() if k not in joined}
+
+
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                  date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
@@ -1060,6 +1098,22 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                 hits[key] = best
         if not hits:
             continue
+        # 1a) two names joined by «/» or «:» are one printed RATIO, not two values.
+        #     «Фенилаланин (Phe)/Тирозин (Tyr)  1,13» used to give tyrosine 1.13 —
+        #     a value forty times below its range, read off a line that holds no
+        #     tyrosine at all (task 68). Neither name takes such a line; a ratio
+        #     key whose own name covers it still does.
+        if "/" in low or ":" in low:
+            every = {}
+            for key, spec in markers.items():
+                for syn in core.marker_rules(spec, "names"):
+                    pos = _occ(low, syn)
+                    if pos and (key not in every or len(syn) > every[key][0]):
+                        every[key] = (len(syn), syn, pos)
+            joined = set(every) - set(_drop_ratio_components(low, every))
+            hits = {k: v for k, v in hits.items() if k not in joined}
+            if not hits:
+                continue
         # 2) a longer name beats a shorter one ONLY when they compete for the same text,
         #    i.e. the short one is a substring of the long one («тестостерон свободный»
         #    beats «тестостерон»). Lengths used to be compared across the whole row, and in

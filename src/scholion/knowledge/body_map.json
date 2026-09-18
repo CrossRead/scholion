@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-09-13",
+    "updated": "2026-09-17",
     "what": "Where each system of the radar is shown on the figure — or why it is nowhere on it.",
     "rule": "Every key the radar emits appears here exactly once and declares one of four things: a `place` drawn from `vocabulary`; `by_marker`, when the domain's markers are made in different organs and one point would be a claim about all of them and true of one; `systemic` (measured in blood, not located in an organ); or `whole_body`. There is no fifth state and no default: a domain added to the radar without an entry here fails the suite, because a figure that quietly omits a system draws a healthier person than the data describes. A word in `vocabulary` that nobody places fails it too — an allowed place nothing uses is a coordinate waiting to be wrong. Inside `by_marker`, the value `systemic` is how a single marker says it is made nowhere in particular; it still owes a reason.",
     "source": "Written here. The placements are ordinary anatomy, and the rule is the organ that PRODUCES the substance, not the organ it is read for — an antibody, which is made by lymphocytes everywhere and would mean nothing where they are, is the named exception and is marked at the tissue it is raised against. `basis` states the reason per marker where a domain is split, so a reader can disagree with a specific claim rather than with a drawing.",
@@ -102,6 +102,18 @@
     "fitness": {
       "whole_body": true,
       "basis": "sleep, resting heart rate, body composition and endurance describe the whole body rather than a place inside it"
+    },
+    "amino_acids": {
+      "systemic": true,
+      "basis": "measured in blood; amino acids and protein are made, used and cleared by every tissue, and a point on the figure would name one of them"
+    },
+    "immune": {
+      "systemic": true,
+      "basis": "measured in blood; white cells and immunoglobulins are made in the marrow and the lymphoid tissue everywhere, and a point would name one of them"
+    },
+    "musculoskeletal": {
+      "whole_body": true,
+      "basis": "bone is the whole skeleton; calcium, phosphorus and the markers of bone turnover describe all of it rather than a place inside it"
     }
   }
 }

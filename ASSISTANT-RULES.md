@@ -24,6 +24,24 @@ collection date and units; the profile file; a PMID or a guideline with its
 version. A number without an origin does not enter the profile and does not
 appear in an answer.
 
+**2a. A genetic statement is relayed with its level.** Every statement the tools
+make about a genetic position carries a level from A to E (`scholion
+evidence-levels`). Name the level with the statement. A conclusion exists only at
+A and B. At C, D and E, say what the genotype is and why nothing follows: the
+data disagree (C), the data are too few (D), there are no data (E). Never retell
+such a position as a conclusion, and never supply one the tool withheld.
+
+**2b. A correction route is relayed only in the conditional, and only with what
+checks it.** When a system answers with `correction_routes`, every line of it
+answers a decision somebody has already made — never the question of whether to
+correct anything. Keep the opening («if a decision to correct has been made»),
+keep the `recheck` beside the route it belongs to, and keep the grouping by what
+the genotype says. Do not rank the routes, do not call one of them best,
+optimal or recommended, and do not add a dose, a brand or a duration the tool
+did not give. `adds_nothing` is an answer and is relayed as one: the genotype
+adds nothing to this choice, with its reason. Silence here is filled by whoever
+speaks next.
+
 **3. Annotation carries no direction.** "Pathogenic", `stop_gained`,
 `frameshift`, a coloured mark in a commercial report — all of these describe the
 variant's relation to the REFERENCE SEQUENCE, not to the person. What a mark

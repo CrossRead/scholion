@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "scholion",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Local second-opinion layer over one person's own medical data — genome (VCF), laboratory history, prescriptions, wearables. The tools and the instruction that governs them travel together. Not a medical device.",
   "homepage": "https://github.com/CrossRead/scholion",
   "repository": "https://github.com/CrossRead/scholion",

@@ -346,8 +346,10 @@ class TestTheFilterFileIsKeyedByTheRadar(unittest.TestCase):
 
     def test_every_system_is_a_radar_domain_and_every_domain_is_present(self):
         # Eleven until 13.09.2026; twelve since «Heart and vessels» (cardio) was
-        # added to the radar by the owner's decision of that day (task 179).
-        self.assertEqual(len(self.keys), 12)
+        # added to the radar by the owner's decision of that day (task 179);
+        # fifteen since amino acids, immunity and the musculoskeletal system
+        # joined on 17.09.2026 (tasks 199 and 200).
+        self.assertEqual(len(self.keys), 15)
         self.assertIn("cardio", self.keys)
         self.assertEqual(sorted(self.filt["systems"]), sorted(self.keys))
 
@@ -358,12 +360,16 @@ class TestTheFilterFileIsKeyedByTheRadar(unittest.TestCase):
         at report 178; «Heart and vessels», added later the same day, points at
         report 179. No system says `why_empty` any more — an empty half with a
         reason was the state of the day before."""
-        report = {"thyroid": "173", "cardio": "179"}
+        report = {"thyroid": "173", "cardio": "179", "amino_acids": "200-new-systems",
+                  "immune": "200-new-systems", "musculoskeletal": "200-new-systems"}
+        # The three systems of 17.09.2026 name the classification they were
+        # composed from instead of a PanelApp panel.
+        classification = {"amino_acids": "Orphanet", "immune": "IUIS", "musculoskeletal": "Nosology"}
         for key, spec in self.filt["systems"].items():
             with self.subTest(system=key):
                 self.assertTrue(spec["terms"], "a system with no terms is a system nobody composed")
                 self.assertTrue(spec["source"])
-                self.assertIn("PanelApp", spec["source"])
+                self.assertIn(classification.get(key, "PanelApp"), spec["source"])
                 self.assertIn(report.get(key, "178"), spec["source"])
                 self.assertIsInstance(spec.get("exclude", []), list)
                 self.assertFalse(spec.get("why_empty"), "a composed system carries no why_empty")

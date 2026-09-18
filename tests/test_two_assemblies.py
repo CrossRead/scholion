@@ -82,9 +82,10 @@ class TestTheCatalogueCarriesTwoBuilds(unittest.TestCase):
                 self.assertIn("GRCh37", why)
 
     def test_every_second_coordinate_is_a_plausible_position(self):
+        same = self.meta().get("grch37_same_as_grch38") or {}
         for rs, l in self.loci.items():
             g37 = l.get("pos_grch37")
-            if g37 is None:
+            if g37 is None or rs in same:
                 continue
             with self.subTest(rsid=rs):
                 self.assertIsInstance(g37, int)

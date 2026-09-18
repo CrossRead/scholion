@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from ..i18n import t as _t
-from . import panel_form
+from . import panel_form, panel_gate
 from ._helpers import DISCLAIMER
 from .system_panels import _curated, _labels, domains
 
@@ -22,7 +22,7 @@ from .system_panels import _curated, _labels, domains
 #: reader's own.
 _FIELDS = ("rsid", "gene", "hgvs", "protein", "risk_allele", "mode", "kind", "source", "study",
            "effect_size", "classification", "moi", "disease", "submitter", "curated_on",
-           "signed_by", "signed_on")
+           "review")
 
 
 def _position(p: Dict[str, Any]) -> Dict[str, Any]:
@@ -35,8 +35,9 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     exp = p.get("expect") if isinstance(p.get("expect"), dict) else None
     out["expect"] = ({"marker": exp.get("marker"), "direction": exp.get("direction"),
                       "note": panel_form.one_language(exp.get("note"))} if exp else None)
-    out["signature"] = "clinician" if p.get("signed_by") == "clinician" else (
-        "author" if p.get("signed_by") else "open")
+    # Who checked the sentence against its source, by role (task 199).
+    out["signature"] = panel_gate.review_state(p) or "open"
+    out["signed_on"] = panel_gate.reviewed_on(p)
     return out
 
 
@@ -46,6 +47,12 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
     systems = cur.get("systems") or {}
     meta = cur.get("_meta") or {}
     known = {d["key"] for d in domains()}
+    from .system_panels import _on_demand
+    on_demand = _on_demand().get("panels") or {}
+    if key in on_demand:
+        # A panel without a domain (task 199 F) is described the same way; its
+        # label is its own, not a radar domain's.
+        systems = dict(systems); systems[key] = on_demand[key]; known = known | {key}
     if key and key not in known:
         return {"status": "unknown_system", "key": key, "systems": sorted(known)}
     if not key:
@@ -62,9 +69,10 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
                    "source": (u or {}).get("source")}
                   for g, u in (spec.get("unreadable") or {}).items()]
     # The catalogue's `_meta` notes and the spec's `source` are written to the
-    # panel's authors — a repository path, a note on how `signed_by` is read.
+    # panel's authors — a repository path, a note on how `review` is read.
     # The page for a clinician carries each row's own source and study instead.
-    return {"status": "ok", "key": key, "label": _t("radar.domain." + key), "labels": _labels(key),
+    label = (panel_form.one_language(spec.get("label")) if key in on_demand else _t("radar.domain." + key))
+    return {"status": "ok", "key": key, "label": label, "labels": _labels(key) if key not in on_demand else spec.get("label"),
             "catalogue_updated": meta.get("updated"), "source_tier": meta.get("source_tier"),
             "positions": positions, "genes": [{"gene": g, "positions": v} for g, v in sorted(by_gene.items())],
             "unreadable": unreadable,

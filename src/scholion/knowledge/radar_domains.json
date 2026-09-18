@@ -3,97 +3,243 @@
     "purpose": "The body systems of the health radar, each with the laboratory panel that defines it. Read by engine/lifestyle.py (the laboratory half: score, coverage, dynamics) and by engine/system_panels.py (the genetic half and the questions for a clinician). One file, two readers, so that the two halves of a system cannot drift apart in silence.",
     "who_writes_this": "The project. Which markers a laboratory issues as one panel is reference knowledge, not a medical claim about a person; the composition was decided in 0.4.9 and is not reopened here.",
     "source_tier": "curated_reference",
-    "updated": "2026-09-13",
+    "updated": "2026-09-17",
     "why_cardio": "The thirteenth system, «Heart and vessels», was added on the owner's decision of 13.09.2026 so that the strongest pharmacogenetic pairs — warfarin with VKORC1/CYP2C9/CYP4F2, clopidogrel with CYP2C19, the beta-blockers, the anticoagulants and antiplatelets — and the cardiovascular polygenic scores have a system to stand on. Its laboratory panel is the cardiovascular-risk and coagulation markers a laboratory issues beside, not inside, the lipid panel: lipoprotein(a), apolipoproteins B and A1, fibrinogen, D-dimer. Lipids stay a separate system. The pulse and heart-rate variability the wearable records stay in fitness, because a domain has one source and this one's is the laboratory.",
     "why_four_endocrine_systems": "The endocrine system is not one system. «Hormones» averaged a thyroid marker, a gonadal one and a hepatic one into a single number, and the ring beside it measured how much of that mixture existed — a quantity nobody orders. Thyroid, adrenals, gonads and growth are the panels a laboratory actually issues, and they became four domains in 0.4.9. The composition is not to be changed by a later task: a system with a different marker set is a different system, and every stored radar score before the change would be measured against a panel that no longer exists.",
     "fitness": "The wearables system (the twelfth until 13.09.2026, the thirteenth since — see why_cardio) is not a laboratory panel: it is built from wearable metrics, its markers are whatever the device reports, and `health_radar` attaches it after the laboratory domains. It is listed here with `source: wearables` and `genetic_half: false` so that no reader counts the laboratory domains and loses it, and no reader attaches a genetic half to it by inattention.",
-    "schema": "domains: [ { key, source: labs|wearables, genetic_half: bool, markers: [marker keys of lab_markers.json], why } ] — `key` is also the i18n key `radar.domain.<key>` and the top-level key of system_gene_panels.json; `markers` is empty for a wearables domain.",
-    "order_matters": "The order of the list is the order the radar draws its axes in and the order the previous stored radars used. Reordering is a visible change, not a cosmetic one."
+    "schema": "domains: [ { key, source: labs|wearables, genetic_half: bool, markers: [marker keys of lab_markers.json], why } ] — `key` is also the i18n key `radar.domain.<key>` and the top-level key of system_gene_panels.json; `markers` is empty for a wearables domain. panel_markers? (shown, never scored), derived? (ratios of provenance.DERIVED, shown, never scored).",
+    "order_matters": "The order of the list is the order the radar draws its axes in and the order the previous stored radars used. Reordering is a visible change, not a cosmetic one.",
+    "why_a_marker_in_two_systems": "Since 17.09.2026 a marker may count in the score of two systems: homocysteine in inflammation and in amino acids, uric acid and creatinine in the kidneys and in amino acids, C-reactive protein in inflammation and in immunity, vitamin D in vitamins and in the musculoskeletal system. Each system reads it for its own question. The first system in this file is the marker's home, where a single place is needed."
   },
   "domains": [
     {
       "key": "lipids",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["cholesterol_total", "ldl", "hdl", "triglycerides"],
+      "markers": [
+        "cholesterol_total",
+        "ldl",
+        "hdl",
+        "triglycerides"
+      ],
       "why": "The lipid panel as a laboratory issues it."
     },
     {
       "key": "cardio",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["lpa", "apob", "apoa1", "fibrinogen", "d_dimer"],
+      "markers": [
+        "lpa",
+        "apob",
+        "apoa1",
+        "fibrinogen",
+        "d_dimer"
+      ],
       "why": "Heart and vessels: the cardiovascular-risk markers a laboratory issues beside the lipid panel — lipoprotein(a) and the two apolipoproteins — and the two coagulation markers, fibrinogen and D-dimer. Added 13.09.2026 by the owner's decision so that the pharmacogenetics of warfarin, clopidogrel, the beta-blockers, the anticoagulants and antiplatelets, and the cardiovascular polygenic scores have a system of their own. See _meta.why_cardio."
     },
     {
       "key": "glucose",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["glucose", "hba1c", "homa_ir", "insulin"],
+      "markers": [
+        "glucose",
+        "hba1c",
+        "homa_ir",
+        "insulin"
+      ],
       "why": "Carbohydrate metabolism. Insulin stays here, where HOMA-IR is computed from it — splitting an index from one of its two inputs would leave neither system able to explain it."
     },
     {
       "key": "inflammation",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["crp_hs", "rheumatoid_factor", "homocysteine"],
+      "markers": [
+        "crp_hs",
+        "rheumatoid_factor",
+        "homocysteine"
+      ],
       "why": "Inflammation and its vascular marker."
     },
     {
       "key": "thyroid",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["tsh", "t4_free", "t3_free", "anti_tpo"],
+      "markers": [
+        "tsh",
+        "t4_free",
+        "t3_free",
+        "anti_tpo"
+      ],
       "why": "The thyroid panel a laboratory issues. One of the four endocrine systems that replaced «hormones» in 0.4.9 — see _meta.why_four_endocrine_systems."
     },
     {
       "key": "adrenals",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["cortisol", "dheas"],
+      "markers": [
+        "cortisol",
+        "dheas"
+      ],
       "why": "The adrenal panel. One of the four endocrine systems of 0.4.9."
     },
     {
       "key": "gonads",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["testosterone", "dht", "estradiol"],
+      "markers": [
+        "testosterone",
+        "dht",
+        "estradiol"
+      ],
       "why": "The gonadal panel. One of the four endocrine systems of 0.4.9."
     },
     {
       "key": "growth",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["igf1", "gh"],
+      "markers": [
+        "igf1",
+        "gh"
+      ],
       "why": "The growth axis. One of the four endocrine systems of 0.4.9."
     },
     {
       "key": "pancreas",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["amylase", "amylase_pancreatic", "lipase", "c_peptide"],
+      "markers": [
+        "amylase",
+        "amylase_pancreatic",
+        "lipase",
+        "c_peptide"
+      ],
       "why": "Both halves of the gland: the acinar cell that makes the digestive enzymes, and the beta cell, whose C-peptide is released with insulin in equal amount and survives long enough to be measured. Insulin itself stays in the carbohydrate panel, where HOMA-IR is computed from it, and is MARKED at the pancreas instead."
     },
     {
       "key": "liver",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["alt", "ast", "ggt"],
+      "markers": [
+        "alt",
+        "ast",
+        "ggt"
+      ],
       "why": "The liver enzymes."
     },
     {
       "key": "micronutrients",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["vitamin_d", "omega3_index", "vitamin_b12", "ferritin"],
+      "markers": [
+        "vitamin_d",
+        "omega3_index",
+        "vitamin_b12",
+        "ferritin"
+      ],
       "why": "Vitamins and stores."
     },
     {
       "key": "renal",
       "source": "labs",
       "genetic_half": true,
-      "markers": ["uric_acid", "creatinine"],
+      "markers": [
+        "uric_acid",
+        "creatinine"
+      ],
       "why": "The kidney panel."
+    },
+    {
+      "key": "immune",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": [
+        "wbc",
+        "lymph_abs",
+        "lymph_pct",
+        "iga",
+        "esr",
+        "crp_hs",
+        "ana_screen",
+        "anti_ccp"
+      ],
+      "why": "Immunity: the white cells and lymphocytes, immunoglobulin A, the inflammatory markers and the two autoantibody screens a laboratory issues for autoimmune disease. Added on the owner's decision of 17.09.2026 (task 199), with the clinicians agreeing to the system; its rheumatoid panel lands here. C-reactive protein also counts in inflammation: a marker may count in two systems."
+    },
+    {
+      "key": "musculoskeletal",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": [
+        "calcium_total",
+        "phosphorus",
+        "alp",
+        "pth",
+        "osteocalcin",
+        "vitamin_d"
+      ],
+      "why": "The musculoskeletal system, read through bone and mineral metabolism: calcium, phosphorus, alkaline phosphatase, parathyroid hormone, osteocalcin and vitamin D. Added on the owner's decision of 17.09.2026 (task 199), with the clinicians agreeing to the system. Vitamin D also counts in vitamins: a marker may count in two systems."
+    },
+    {
+      "key": "amino_acids",
+      "source": "labs",
+      "genetic_half": true,
+      "markers": [
+        "total_protein",
+        "albumin",
+        "urea",
+        "creatinine",
+        "uric_acid",
+        "homocysteine",
+        "citrulline"
+      ],
+      "panel_markers": [
+        "aa_aaa",
+        "aa_aaba",
+        "aa_alanine",
+        "aa_arginine",
+        "aa_asparagine",
+        "aa_aspartate",
+        "aa_baiba",
+        "aa_beta_alanine",
+        "aa_cystathionine",
+        "aa_cystine",
+        "aa_gaba",
+        "aa_glutamate",
+        "aa_glutamine",
+        "aa_glycine",
+        "aa_histidine",
+        "aa_hydroxyproline",
+        "aa_isoleucine",
+        "aa_leucine",
+        "aa_lysine",
+        "aa_methionine",
+        "aa_ornithine",
+        "aa_phenylalanine",
+        "aa_pipecolic",
+        "aa_proline",
+        "aa_sarcosine",
+        "aa_serine",
+        "aa_taurine",
+        "aa_threonine",
+        "aa_tryptophan",
+        "aa_tyrosine",
+        "valine",
+        "kynurenine"
+      ],
+      "derived": [
+        "aa_ratio_phe_tyr",
+        "aa_ratio_gly_ser",
+        "aa_fischer_ratio",
+        "aa_ratio_gln_glu",
+        "aa_ratio_glu_gln",
+        "aa_ratio_met_hcy",
+        "aa_ratio_aaba_leu",
+        "aa_ratio_kyn_trp",
+        "urea_creatinine_ratio",
+        "urine_cystine_creatinine_ratio",
+        "urine_plasma_cystine_ratio",
+        "urine_plasma_lysine_ratio"
+      ],
+      "why": "Amino acids and protein: what feeds the body's own synthesis. The score is built from seven markers that mean something one by one; the amino acid panel and its ratios are shown beside it and never scored — a single amino acid says little on its own, and the panel is read as a picture. Homocysteine, uric acid and creatinine also count in inflammation and in the kidneys: a marker may count in two systems (owner, 17.09.2026). The panel outside its corridor enters the score as one term, so a drifting panel shows at the top level. The genetic half is composed from the gene–disease base and carries the authored positions of the chain: digestion and absorption, carriage into tissues, use inside the cell, renal losses."
     },
     {
       "key": "fitness",

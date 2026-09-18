@@ -161,6 +161,14 @@ def labs_report(r: Dict[str, Any]) -> str:
                 line += "\n   " + _t("labs.same_day_ask")
         if m.get("proposed_rule"):
             line += "\n   " + _t("markers.proposed_no_flag", key=m["key"])
+        if m.get("positions"):
+            # The genetics of this marker (task 199 G): gene, rsID, level, the
+            # direction the author expects; the state is on the system card.
+            line += "\n   " + _t("labs.genetics_line", positions=", ".join(
+                f"{p.get('gene')} {p.get('rsid')}" + (f" ({p.get('level')})" if p.get("level") else "")
+                + (f" {_t('system.panel.dir.' + str(p['direction']))}" if p.get("direction") else "")
+                + (f" — {p['system_label']}" if p.get("system_label") else "")
+                for p in m["positions"]))
         if m.get("fasting_not_established"):
             ctx = next((r.get("context") for r in reversed(m.get("repeats") or [])
                         if r.get("context")), "")
@@ -721,297 +729,6 @@ def screen_report(r: Dict[str, Any]) -> str:
             L.append(line)
         L.append("")
     L += _class_listing(r.get("classes") or r)
-    if r.get("disclaimer"):
-        L += ["", "_" + r["disclaimer"] + "_"]
-    return "\n".join(L)
-
-
-def _names(rows: Any, key: str = "name") -> str:
-    return ", ".join(str((r or {}).get(key) or r) if isinstance(r, dict) else str(r)
-                     for r in (rows or []))
-
-
-def _system_gene_row(r: Dict[str, Any], register: str) -> str:
-    """One row of the genetic half — its mode first, because the three modes
-    make different claims and are never printed alike."""
-    mode = _t("system.mode." + str(r.get("mode") or "unknown"))
-    if r.get("unit") == "position":
-        st = r.get("state") or (r.get("genotype") or {}).get("state")
-        head = _t("system.row.position", gene=r.get("gene"), rsid=r.get("rsid") or "—",
-                  mode=mode, state=_t("system.state." + str(st)))
-    else:
-        head = _t("system.row.gene", gene=r.get("gene"), mode=mode,
-                  classifications=", ".join(r.get("classifications") or []) or "—",
-                  moi=", ".join(r.get("moi_codes") or [r.get("moi") or "—"]))
-    marks = []
-    if r.get("findings"):
-        marks.append(_t("system.row.finding", n=r["findings"]))
-    if r.get("carrier"):
-        marks.append(_t("system.row.carrier"))
-    if r.get("not_a_finding_why") == "kind":
-        marks.append(_t("system.row.not_finding_kind", kind=_t("system.kind." + str(r.get("kind") or "unassigned"))))
-    if r.get("pending"):
-        marks.append(_t("system.row.pending"))
-    if r.get("signature") == "open":
-        marks.append(_t("system.row.signature_open"))
-    if r.get("read") is False:
-        marks.append(_t("system.row.unread", why=r.get("read_why_text") or r.get("read_why") or "—"))
-    line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
-    if r.get("text"):
-        line += "\n   " + str(r["text"])
-    if register == "clinician":
-        detail = []
-        g = r.get("genotype") or {}
-        if g.get("genotype"):
-            detail.append(_t("system.row.genotype", genotype=g["genotype"],
-                             confidence=g.get("confidence") or "—",
-                             depth=g.get("depth") if g.get("depth") is not None else "—"))
-        for a in r.get("assertions") or []:
-            detail.append(_t("system.row.assertion", disease=a.get("disease") or "—",
-                             classification=a.get("classification") or "—",
-                             moi=a.get("moi") or "—", submitter=a.get("submitter") or "—",
-                             date=a.get("curated_on") or "—"))
-        if r.get("signature") == "clinician":
-            # The exception is marked on the row; the rule is counted in the
-            # summary, which both registers print. With every row signed by the
-            # same hand on the same day, a line under each said nothing the
-            # count does not — and buried the one row a clinician had signed.
-            detail.append(_t("system.row.signature_clinician",
-                             date=r.get("signed_on") or "—"))
-        if r.get("source"):
-            detail.append(_t("decision.source", source=r["source"]))
-        line += "".join("\n   _" + d + "_" for d in detail)
-    return line
-
-
-def _system_polygenic(poly: Any, register: str) -> List[str]:
-    """The common variation of a system, as scores under their own head — never
-    interleaved with the gene rows, because a percentile inside a reference
-    panel and a classified variant are two different claims (task 178)."""
-    if not isinstance(poly, dict) or poly.get("status") in (None, "no_genetic_half"):
-        return []
-    L = ["   **" + _t("system.polygenic.title") + "**"]
-    if poly.get("status") != "ok":
-        L.append("   " + str(poly.get("why") or ""))
-        return L
-    L.append("   " + _t("system.polygenic.line", mapped=poly.get("mapped") or 0,
-                        scored=poly.get("scored") or 0, high=len(poly.get("high") or [])))
-    for r in poly.get("rows") or []:
-        line = "   · " + _t("system.polygenic.row", label=r.get("label"),
-                            percentile=r.get("percentile") if r.get("percentile") is not None else "—",
-                            reliable=_t("system.polygenic.reliable" if r.get("reliable")
-                                        else "system.polygenic.unreliable"))
-        if register == "clinician":
-            detail = [_t("system.polygenic.detail", pgs_id=r.get("pgs_id") or "—",
-                         evidence=r.get("evidence_label") or r.get("evidence") or "—")]
-            detail += [str(r[k]) for k in ("validity_note", "integrity_note", "weight_mass_note",
-                                           "evidence_note") if r.get(k)]
-            if r.get("model_changed_from"):
-                detail.append(_t("system.polygenic.model_changed", previous=r["model_changed_from"]))
-            line += "".join("\n     _" + d + "_" for d in detail)
-        L.append(line)
-    if poly.get("unscored"):
-        L.append("   " + _t("system.polygenic.unscored", traits=", ".join(poly["unscored"])))
-    L.append("   _" + (poly.get("caveat") or _t("system.polygenic.caveat")) + "_")
-    return L
-
-
-def system_report(r: Dict[str, Any]) -> str:
-    """The third entry, as one block: seven layers, the verdict, the questions,
-    the three baskets. The two registers print the same facts at two densities
-    and the verdict is the same line in both (brief §7).
-    """
-    if r.get("status") == "unknown_system":
-        return _t("system.unknown", key=r.get("key") or "—", systems=", ".join(r.get("systems") or []))
-    if r.get("status") == "unknown_register":
-        return _t("system.unknown_register", register=r.get("register") or "—",
-                  registers=", ".join(r.get("registers") or []))
-    reg = r.get("register") or "patient"
-    L = ["**" + _t("system.title", label=r.get("label") or r.get("key")) + "** · "
-         + _t("system.register." + reg), "", r.get("verdict_line") or "", ""]
-    # 1 — the laboratory half
-    lab = r.get("labs") or {}
-    L.append("**1. " + _t("system.layer.labs") + "**")
-    if lab.get("status") == "absent":
-        L.append("   " + _t("system.labs.absent"))
-    elif lab.get("status") == "nodata":
-        L.append("   " + _t("system.labs.nodata", total=lab.get("total") or 0))
-    else:
-        L.append("   " + _t("system.labs.line", score=lab.get("score"),
-                            level=_t("system.level." + str(lab.get("level") or "nodata")),
-                            measured=lab.get("measured") or 0, total=lab.get("total") or 0))
-        for m in lab.get("abnormal") or []:
-            L.append(f"   {_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} "
-                     f"{m.get('unit', '')} ({m.get('date', '')})")
-    if lab.get("missing"):
-        L.append("   " + _t("system.labs.missing",
-                            markers=_names(lab.get("missing_names") or lab["missing"])))
-    if lab.get("stale"):
-        L.append("   " + _t("system.labs.stale", markers=_names(lab["stale"])))
-    # 2 — the dynamics
-    dyn = r.get("dynamics") or {}
-    L += ["", "**2. " + _t("system.layer.dynamics") + "**"]
-    if dyn.get("status") == "ok":
-        d = dyn.get("delta") or 0
-        # Both scores are over the SAME markers — the ones with an earlier
-        # point — so the movement is a comparison and not two different means.
-        L.append("   " + _t("system.dynamics.line", prev=dyn.get("prev_score"),
-                            score=dyn.get("compared_score"), delta=f"{'+' if d > 0 else ''}{d}",
-                            date=dyn.get("prev_date") or "—", compared=dyn.get("compared") or 0))
-        for m in dyn.get("moved") or []:
-            L.append("   · " + _t("system.dynamics.moved", name=m.get("name"),
-                                  from_value=m.get("from_value"), to_value=m.get("to_value"),
-                                  unit=m.get("unit") or ""))
-    else:
-        L.append("   " + _t("system.dynamics." + str(dyn.get("status") or "absent")))
-    # 3 — the genetic half
-    gen = r.get("genetics") or {}
-    L += ["", "**3. " + _t("system.layer.genetics") + "**"]
-    if gen.get("status") == "composed":
-        base = gen.get("base") or {}
-        L.append("   " + _t("system.genetics.composed",
-                            source=base.get("source") or "—", version=base.get("version") or "—",
-                            base_genes=base.get("genes") or 0,
-                            positions=(gen.get("curated") or {}).get("positions") or 0,
-                            read_genes=gen.get("read_genes") or 0,
-                            read_positions=gen.get("read_positions") or 0,
-                            findings=gen.get("finding_count") or 0,
-                            carriers=gen.get("carrier_count") or 0,
-                            pending=gen.get("pending_count") or 0))
-        if gen.get("signature_author_count"):
-            L.append("   " + _t("system.genetics.signature_author",
-                                n=gen["signature_author_count"],
-                                date=gen.get("signature_author_date") or "—"))
-        if gen.get("signature_open_count"):
-            L.append("   " + _t("system.genetics.signature_open",
-                                n=gen["signature_open_count"]))
-        if gen.get("withheld_by_classification"):
-            L.append("   " + _t("system.genetics.withheld", n=gen["withheld_by_classification"]))
-        if gen.get("excluded"):
-            L.append("   " + _t("system.genetics.excluded", genes=_names(gen["excluded"], "gene")))
-        refused = gen.get("refused") or {}
-        if refused.get("total"):
-            by = refused.get("by_reason") or {}
-            L.append("   " + _t("system.genetics.refused", n=refused["total"])
-                     + ((" — " + ", ".join(f"{k}: {v}" for k, v in by.items())) if by else ""))
-        for u in gen.get("unreadable") or []:
-            L.append("   " + _t("system.genetics.unreadable", gene=u.get("gene"), reason=u.get("reason") or "—"))
-        for row in gen.get("rows") or []:
-            L.append("   " + _system_gene_row(row, reg).replace("\n", "\n   "))
-        n_assumed = sum(1 for row in gen.get("rows") or [] if row.get("read_why") == "assumed_ref")
-        if n_assumed:
-            L.append("   " + _t("system.genetics.assumed_ref_hint",
-                                positions=_plural(n_assumed, "count.positions")))
-        if gen.get("rows_withheld_as_detail"):
-            L.append("   _" + _t("system.row.patient_withheld", n=gen["rows_withheld_as_detail"]) + "_")
-        if gen.get("positions"):
-            L += ["   " + ln for ln in genotype_conclusion_lines(gen["positions"])]
-    elif gen.get("status") == "not_composed":
-        L.append("   " + _t("system.genetics.not_composed",
-                            why=gen.get("why_empty") or _t("screen.why.no_panel")))
-    else:
-        L.append("   " + _t("screen.why.no_genetic_half"))
-    L += _system_polygenic(gen.get("polygenic"), reg)
-    # 4 — the prescriptions acting here
-    med = r.get("medications") or {}
-    L += ["", "**4. " + _t("system.layer.medications") + "**"]
-    for m in med.get("rows") or []:
-        L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
-                              classes=", ".join(m.get("via") or [])).replace("  ", " "))
-    if med.get("empty_reason"):
-        L.append("   " + med["empty_reason"])
-    if med.get("unmapped"):
-        L.append("   " + _t("system.meds.unmapped", names=_names(med["unmapped"])))
-    if med.get("unclassified"):
-        L.append("   " + _t("system.meds.unclassified", names=_names(med["unclassified"])))
-    # 5 — the clinician's target
-    tg = r.get("target") or {}
-    L += ["", "**5. " + _t("system.layer.target") + "**"]
-    for row in tg.get("rows") or []:
-        cur = row.get("current")
-        if cur:
-            side = _t("target.side_above" if row.get("side") == "above" else "target.side_below") \
-                if row.get("outside_target") else _t("system.target.within")
-            L.append("   · " + _t("system.target.row", name=row.get("name"), spec=row.get("spec"),
-                                  unit=row.get("unit") or "", set_by=row.get("set_by") or "",
-                                  set_on=row.get("set_on") or "", value=cur.get("value"),
-                                  date=cur.get("date") or "—", side=side))
-        else:
-            L.append("   · " + _t("system.target.no_value", name=row.get("name"), spec=row.get("spec"),
-                                  unit=row.get("unit") or "", set_by=row.get("set_by") or "",
-                                  set_on=row.get("set_on") or ""))
-    if tg.get("empty_reason"):
-        L.append("   " + tg["empty_reason"])
-    # 6 — what to test
-    tests = r.get("tests") or {}
-    L += ["", "**6. " + _t("system.layer.tests") + "**"]
-    for s in tests.get("rows") or []:
-        L.append("   " + _PRIO_ICON.get(s.get("priority", "low"), "•") + " " + _test_row(s))
-    if tests.get("empty_why"):
-        L.append("   " + _t("system.why." + tests["empty_why"]))
-    # 7 — the questions
-    qs = r.get("questions") or {}
-    L += ["", "**7. " + _t("system.layer.questions") + "**"]
-    for i, q in enumerate(qs.get("rows") or [], 1):
-        L.append(f"   {i}. {q.get('text')}")
-    if qs.get("empty_why"):
-        L.append("   " + _t("system.why." + qs["empty_why"]))
-    # the three baskets
-    nxt = r.get("next") or {}
-    L += ["", "**" + _t("system.layer.next") + "**"]
-    for basket in ("lab", "genome", "ask"):
-        b = nxt.get(basket) or {}
-        L.append("   **" + _t("system.next." + basket) + "**")
-        for row in b.get("rows") or []:
-            line = _test_row(row) if row.get("origin") == "rule" else str(row.get("text"))
-            if row.get("closes"):
-                line += " — " + str(row["closes"])
-            L.append("   · " + line)
-        if b.get("empty_reason"):
-            L.append("   _" + b["empty_reason"] + "_")
-        if (b.get("full_genome") or {}).get("text"):
-            L.append("   " + str(b["full_genome"]["text"]))
-    if r.get("disclaimer"):
-        L += ["", "_" + r["disclaimer"] + "_"]
-    return "\n".join(L)
-
-
-def _test_row(s: Dict[str, Any]) -> str:
-    spec = (" · " + _t("tests.specialist", name=s["specialist"])
-            if s.get("specialist") and s["specialist"] != "—" else "")
-    return f"**{s.get('suggest')}**{spec} — " + _t("tests.why", text=s.get("why") or "—")
-
-
-def systems_report(r: Dict[str, Any]) -> str:
-    """The systems, one line each: the two halves and what acts on it."""
-    L = ["**" + _t("systems.title") + "**", ""]
-    acting: Dict[str, int] = {}
-    for p in r.get("prescriptions") or []:
-        for k in p.get("systems") or []:
-            acting[k] = acting.get(k, 0) + 1
-    for s in r.get("systems") or []:
-        lab, gen = s.get("labs") or {}, s.get("genetics") or {}
-        if not s.get("lab_half"):
-            labs = _t("system.labs.absent")
-        elif lab.get("score") is None:
-            labs = _t("common.no_data")
-        else:
-            labs = _t("systems.labs", score=lab.get("score"), measured=lab.get("measured") or 0,
-                      total=lab.get("total") or 0)
-        if gen.get("status") == "composed":
-            g = _t("systems.genetics.composed", n=gen.get("base_genes") or 0,
-                   version=gen.get("base_version") or "—", positions=gen.get("curated_positions") or 0,
-                   read=gen.get("read_count") or 0, unread=gen.get("unread_count") or 0)
-        elif gen.get("status") == "not_composed":
-            g = _t("systems.genetics.not_composed")
-        else:
-            g = _t("systems.genetics.no_half")
-        poly = gen.get("polygenic") or {}
-        if poly.get("mapped"):
-            g += "; " + _t("systems.polygenic", scored=poly.get("scored") or 0, mapped=poly["mapped"])
-        L.append("· **" + str(s.get("label")) + "** (`" + str(s.get("key")) + "`) — " + labs
-                 + "; " + g + "; " + _t("systems.acting", n=acting.get(s.get("key"), 0)))
-    L += ["", _t("systems.hint")]
     if r.get("disclaimer"):
         L += ["", "_" + r["disclaimer"] + "_"]
     return "\n".join(L)
@@ -2570,6 +2287,11 @@ def import_report(r: Dict[str, Any]) -> str:
     return "\n".join(L)
 
 
+def _level_counts_line(counts: Dict[str, int]) -> str:
+    parts = [f"{k} — {counts[k]}" for k in ("A", "B", "C", "D", "E") if counts.get(k)]
+    return _t("system.genetics.levels", levels=", ".join(parts) or "—", none=counts.get("none", 0))
+
+
 def limits_report(r: Dict[str, Any]) -> str:
     """«What cannot be said from this data» — and what would close each item.
 
@@ -3096,6 +2818,18 @@ def prevalence_report(r: Dict[str, Any]) -> str:
 
 
 # ---- the update procedure (scholion version) ---------------------------------
+def spelling_note(tail: str = "recompute") -> str:
+    """One line, only where it is needed: how this machine spells the commands just printed.
+
+    Empty when `scholion` is a word the shell knows, which is the usual case and
+    deserves no line at all."""
+    from . import recompute as _rc  # noqa: E402
+    prefix = _rc.program_prefix()
+    if prefix == "scholion":
+        return ""
+    return _t("command.spelled_here", prefix=prefix, example=f"{prefix} {tail}".strip())
+
+
 def version_report(r: Dict[str, Any]) -> str:
     """The build, its age, and what the releases since the data's version ask for."""
     b = r.get("build") or {}
@@ -3114,6 +2848,8 @@ def version_report(r: Dict[str, Any]) -> str:
                          entries=_plural(len(pend), "count.entries"))]
             for e in pend:
                 L.append(f"  **v{e['version']}** ({e['date']})")
+                for n in e.get("news") or []:
+                    L.append("   ✦ " + _t("version.news", news=n))
                 for a in e.get("actions") or []:
                     lead = (_t("version.by_hand", condition=a["condition"]) if a.get("manual")
                             else _t("version.run", commands=", ".join(f"`{c}`" for c in a["commands"]),
@@ -3138,6 +2874,9 @@ def version_report(r: Dict[str, Any]) -> str:
     if wb.get("unstamped"):
         L.append(_t("version.unstamped", files=", ".join(wb["unstamped"])))
     L += ["", _t("version.how_to_update")]
+    note = spelling_note("version")
+    if note:
+        L += ["", note]
     return "\n".join(L)
 
 
@@ -3269,6 +3008,9 @@ def recompute_plan_report(r: Dict[str, Any]) -> str:
     steps = r.get("steps") or []
     if not steps:
         L += ["", _t("recompute.nothing")]
+        note = spelling_note("recompute --since 0.4.8")
+        if note:
+            L += ["", note]
         return "\n".join(L)
     L.append("")
     L += [_recompute_step_line(s) for s in steps]
@@ -3279,6 +3021,9 @@ def recompute_plan_report(r: Dict[str, Any]) -> str:
         L += ["", _t("recompute.hint_run", steps=_plural(int(r["ready"]), "count.steps"))]
     else:
         L += ["", _t("recompute.hint_nothing_ready")]
+    note = spelling_note("recompute --yes")
+    if note:
+        L += ["", note]
     return "\n".join(L)
 
 
@@ -3474,7 +3219,7 @@ def panel_report(r: Dict[str, Any]) -> str:
             L.append("  " + _t("panel.source_row", source=p.get("source") or "—",
                                study=p.get("study") or "—"))
             L.append("  " + _t("panel.signed." + str(p.get("signature") or "open"),
-                               by=p.get("signed_by") or "—", on=p.get("signed_on") or "—",
+                               on=p.get("signed_on") or "—",
                                curated=p.get("curated_on") or "—"))
     for u in r.get("unreadable") or []:
         L += ["", "**" + str(u.get("gene")) + "** — " + _t("panel.unreadable", reason=u.get("reason") or "—",
@@ -3483,3 +3228,8 @@ def panel_report(r: Dict[str, Any]) -> str:
         L += ["", "_" + str(r["disclaimer"]) + "_"]
     return "\n".join(L)
 
+
+# The system card and the pages beside it live in `format_system.py` since
+# 18.09.2026; the names stay reachable here, because every face and every
+# test calls them at this address.
+from .format_system import (_names, _system_gene_row, _system_polygenic, _correction_route_lines, system_report, _test_row, systems_report, _panel_lines, evidence_levels_report)  # noqa: E402,F401

@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.5.3** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.4** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -211,12 +211,13 @@ Sleep phases are parsed in full — deep sleep, REM, sleep stress, sleep score,
 bedtime — monthly, plus a per-night file for n-of-1 analysis, where monthly
 averages answer the wrong question.
 
-**And the layer that assembles the rest: twelve body systems, each answering as
+**And the layer that assembles the rest: fifteen body systems, each answering as
 one card.** This is the last item because the list runs deepest first, and it is
 the first thing to open. The body is laid out as the systems a laboratory
 actually issues panels for — lipids, heart and vessels, carbohydrate
 metabolism, inflammation, thyroid, adrenals, gonads, growth, pancreas, liver,
-micronutrients, kidneys — and a thirteenth built from wearables. Click a segment of the radar, an organ on
+micronutrients, kidneys, immunity, the musculoskeletal system, amino acids and
+protein — and a sixteenth built from wearables. Click a segment of the radar, an organ on
 the figure, or run `scholion system thyroid`, and one card comes back: the
 laboratory now and its movement since the previous draw, the genetic half of the
 system and **how much of it was actually read**, the polygenic scores placed on
@@ -224,15 +225,16 @@ it, the prescriptions acting on it, a target your clinician set, what to test,
 and the questions to bring to the appointment.
 
 The genetic half is composed from a base with a version rather than from
-somebody's memory: 1203 genes across the twelve systems, taken from the Gene
+somebody's memory: 1469 genes across the fifteen systems, taken from the Gene
 Curation Coalition's export with every submitter's assertion kept side by side —
 who asserted the gene–disease link, how strongly, under which mode of
 inheritance, on what date. A weak or refuted assertion travels marked as such
 instead of being quietly dropped or quietly promoted, and one copy of an allele
 in a recessive gene is printed as carriership, never as a risk line.
 
-**In front of that base stands the layer a base cannot supply: 92 positions
-across the twelve systems, authored rather than generated.** The unit of a row is
+**In front of that base stands the layer a base cannot supply: 214 positions
+across fourteen of the systems, authored rather than generated, each with its
+evidence level.** The unit of a row is
 a position, not a gene — an rsID with its HGVS on a RefSeq accession, the allele
 the author named, the kind of claim the link permits, and the phrase for one copy
 and for two. Where the phrase for the state actually found has not been written,
@@ -528,7 +530,7 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 34 `sch_*` tools — a body system as one
+`scholion/ouroboros_tools.py` registers 35 `sch_*` tools — a body system as one
 card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
 longevity, goals and more.
 Ouroboros discovers tool modules by scanning its own tools package, so one line
@@ -790,7 +792,7 @@ docs/                     versioning policy, data layout, tests and compatibilit
 src/scholion/             the core: engine, server, CLI, genome, PGS, wearables, web
 src/scholion/knowledge/   public catalogues: loci, ACMG SF, thresholds,
                           pinned PGS models, interactions, marker recognition,
-                          the twelve body systems and the gene lists composed
+                          the fifteen body systems and the gene lists composed
                           for them from the GenCC export
 src/scholion/i18n/        message catalogues, one file per language
 src/scholion/skill/       the instruction for a language model

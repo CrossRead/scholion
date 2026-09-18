@@ -343,13 +343,11 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
                 "message": _t("acmg_scan.personal_assembly_unknown")}
 
     if not clinvar_vcf:
-        clinvar_vcf = os.environ.get("SCHOLION_CLINVAR_VCF") or None
-    if not clinvar_vcf:
-        for base in core.genome_bases():
-            here = base / "clinvar.vcf.gz"
-            if here.exists():
-                clinvar_vcf = str(here)
-                break
+        # One search for the published ClinVar, shared with the coverage step
+        # and the recompute plan.
+        from .coverage import clinvar_path
+        found = clinvar_path()
+        clinvar_vcf = str(found) if found else (os.environ.get("SCHOLION_CLINVAR_VCF") or None)
     if not clinvar_vcf or not Path(clinvar_vcf).exists():
         # Not «run the preparation»: the one file this needs, named, for the build
         # this person's file is actually in.

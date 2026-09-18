@@ -227,6 +227,12 @@
   table.dt td{padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
   table.dt td.v{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
   table.dt td.d{color:var(--muted);white-space:nowrap}
+  table.dt.gentbl tr.genrow{cursor:pointer}
+  table.dt.gentbl tr.genrow:hover td{background:rgba(127,127,127,.08)}
+  table.dt.gentbl tr.gengroup td{font-size:var(--t-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding-top:12px}
+  table.dt.gentbl tr.gendet td{background:rgba(127,127,127,.05)}
+  tr.labgen td{padding-top:2px;padding-bottom:8px;border-bottom:1px solid var(--grid)}
+  .why.localnote{border-left:3px solid var(--warning,#d9a441);padding-left:8px}
   table.dt tr:last-child td{border-bottom:0}
   table.dt tr[data-system]{cursor:pointer}
   table.dt tr[data-system]:hover td{background:var(--surface-2)}
@@ -401,6 +407,8 @@
   .ringgen-none{fill:none;stroke:var(--muted);stroke-width:1.2;stroke-dasharray:2 3;opacity:.7}
 
   /* ── the card of one system, and the radar laid out by system ───────── */
+  #gd-levels{scroll-margin-top:140px}
+  .lvl{cursor:pointer;font-weight:700;min-width:1.6em;text-align:center}
   .syscard .layer{margin-top:var(--sp5)}
   .syscard .layer h3{font-size:var(--t-m);font-weight:650;margin:0 0 8px;color:var(--ink);padding-bottom:6px;border-bottom:1px solid var(--grid)}
   .syscard .layer h3 small{color:var(--muted);font-weight:400;margin-left:6px}
@@ -623,11 +631,20 @@ function markerTable(list){
   const rows=list.map(m=>{const f=flagOf(m);
     return `<tr${m.system?` data-system="${esc(m.system)}" title="${esc(t('system.open'))}"`:''}><td>${esc(m.name)}</td>`
       +`<td class="v">${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit||'')}</span></td>`
-      +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`;}).join('');
+      +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`
+      +markerGeneticsRow(m);}).join('');
   return `<div class="tblwrap"><table class="dt"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
     +`<th>${esc(t('web.table.ref'))}</th><th class="opt">${esc(t('web.table.date'))}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
+// The third entry (task 199 G): a marker with positions behind it says so
+// under its own row — gene, rsID, level, the direction the author expects —
+// and the row is a door to the system card, where the person's state is.
+function markerGeneticsRow(m){
+  const ps=m.positions||[]; if(!ps.length) return '';
+  const items=ps.map(p=>`${p.level?levelChip(p.level,p.level_short)+' ':''}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${p.direction?` <span class="muted small">${esc(t('system.panel.dir.'+p.direction))}</span>`:''}`+(p.system?` ${systemLinkHtml(p.system,p.system_label||t('radar.domain.'+p.system))}`:'')).join(' · ');
+  return `<tr class="labgen"><td colspan="5" class="small"><span class="muted">${esc(t('labs.genetics_of',{n:ps.length}))}:</span> ${items}</td></tr>`;
+}
 function wantedLang(){
   const q=new URLSearchParams(location.search).get('lang');
   let stored=null;
@@ -638,6 +655,7 @@ async function loadLang(code){
   const r=await fetch(API+'/api/i18n?lang='+encodeURIComponent(code));
   const d=await r.json();
   LANG=d.lang||'en'; LANGS=d.available||[LANG]; MSG=d.messages||{};
+  _levels=null;   // the legend is read in the page's language
   document.documentElement.lang=LANG;
   try{sessionStorage.setItem('scholion.lang',LANG);}catch(e){}
 }
@@ -1814,6 +1832,90 @@ function systemPolygenicHtml(poly, register){
   if((poly.unscored||[]).length) b+=`<div class="row-l muted">${esc(t('system.polygenic.unscored',{traits:poly.unscored.join(', ')}))}</div>`;
   return b+`<div class="row-l muted"><i>${esc(poly.caveat||t('system.polygenic.caveat'))}</i></div>`;
 }
+// The genetic half as a TABLE, by chain link where the system has links and by
+// gene otherwise (owner, 17.09.2026: an endless list of cards does not read).
+// One line per position or gene; the card that used to be the only form is what
+// a row opens into, so nothing was removed — it stopped being the default.
+function geneStateBadge(r){
+  if(r.findings) return badge('b-warning',t('system.gen.state.finding'));
+  if(r.carrier) return badge('b-near',t('system.gen.state.carrier'));
+  if(r.read===false) return badge('b-unknown',t('system.gen.state.unread'),r.read_why_text||r.read_why||'');
+  return badge('b-good',t('system.gen.state.clear'));
+}
+function genTableRow(id,cells,detail){
+  return `<tr class="genrow" data-genrow="${esc(id)}">${cells}</tr>`
+    +`<tr class="gendet" data-gendet="${esc(id)}" hidden><td colspan="5">${detail}</td></tr>`;
+}
+function genTableHtml(gen,card,register){
+  const states=gen.positions||[];
+  const rows=(gen.rows||[]).filter(x=>x.unit==='position');
+  const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
+  const genes=(gen.rows||[]).filter(x=>x.unit!=='position');
+  if(!states.length&&!genes.length) return '';
+  const head=`<thead><tr><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_level'))}</th>`
+    +`<th>${esc(t('web.gen.col_state'))}</th><th class="opt">${esc(t('web.gen.col_link'))}</th>`
+    +`<th>${esc(t('web.gen.col_what'))}</th></tr></thead>`;
+  const short=x=>{const v=String(x||'');return v.length>140?v.slice(0,138)+'…':v;};
+  const posRow=p=>{
+    const r=byId[p.gene+'|'+p.rsid]||{};
+    const id='p:'+p.gene+':'+p.rsid;
+    const cells=`<td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td>`
+      +`<td>${p.level?levelChip(p.level,p.level_short):`<span class="muted small">${esc(t('system.row.level_none'))}</span>`}</td>`
+      +`<td>${pnlStateBadge(p)}</td>`
+      +`<td class="opt muted small">${esc(p.link_text||'')}</td>`
+      +`<td>${esc(short(p.text||r.text||''))}</td>`;
+    const detail=`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}">`
+      +`${p.local_note?`<div class="why localnote">${esc(t('system.row.local_note',{by:t('system.row.local_note_by.'+(p.local_note.by_role||'clinician')),on:fmtDate(p.local_note.on)||'—'}))}: ${esc(p.local_note.text)}</div>`:''}`
+      +`${p.depth_note?`<div class="why muted">${esc(p.depth_note)}</div>`:''}`
+      +`${p.presumed&&p.closes_text?`<div class="why muted">${esc(p.closes_text)}</div>`:''}`
+      +`${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}`
+      +`${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}`
+      +`${register==='clinician'?geneRowDetail(r):''}</div>`;
+    return genTableRow(id,cells,detail);
+  };
+  const geneRow=g=>{
+    const id='g:'+g.gene;
+    const cells=`<td><b>${esc(g.gene)}</b></td><td class="muted small">${esc((g.classifications||[]).join(', ')||'—')}</td>`
+      +`<td>${geneStateBadge(g)}</td><td class="opt muted small">${esc((g.moi_codes||[]).join(', ')||'')}</td>`
+      +`<td>${esc(short(g.text||g.file_says_text||''))}</td>`;
+    const detail=`<div class="pnl k-c">${g.text?`<div class="pnl-text">${esc(g.text)}</div>`:''}`
+      +`${g.file_says_text?`<div class="why muted">${esc(g.file_says_text)}</div>`:''}`
+      +`${g.read===false?`<div class="why muted">${esc(t('system.row.unread',{why:g.read_why_text||g.read_why||'—'}))}</div>`:''}`
+      +`${register==='clinician'?geneRowDetail(g):''}</div>`;
+    return genTableRow(id,cells,detail);
+  };
+  let body='';
+  // Groups (task 199): one row for N positions — name, count, level, one
+  // sentence — opening into the members' own rows.
+  const grouped=new Set();
+  (gen.groups||[]).forEach(g=>{
+    (g.positions||[]).forEach(rs=>grouped.add(rs));
+    const id='grp:'+g.key;
+    const st=g.states||{}; const stTxt=Object.keys(st).map(k=>`${t('system.panel.state.'+k)} ${st[k]}`).join(', ');
+    const cells=`<td><b>${esc(g.label)}</b> <span class="muted small">${esc(plural(g.count||0,'count.positions'))}</span></td>`
+      +`<td>${g.level?levelChip(g.level,g.level_short):''}</td><td class="muted small">${esc(stTxt)}</td><td class="opt"></td><td>${esc(short(g.text||''))}</td>`;
+    const detail=`<div class="pnl k-b"><div class="pnl-text">${esc(g.text||'')}</div>`
+      +(g.source?`<div class="why muted">${esc(t('decision.source',{source:g.source}))}</div>`:'')
+      +`<table class="dt">${(g.members||[]).map(p=>`<tr><td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td><td>${p.level?levelChip(p.level,p.level_short):''}</td><td>${pnlStateBadge(p)}</td><td>${esc(short(p.text||''))}${ladderHtml(p)}</td></tr>`).join('')}</table></div>`;
+    body+=genTableRow(id,cells,detail);
+  });
+  const linked=states.filter(p=>p.link_text&&!grouped.has(p.rsid)), plain=states.filter(p=>!p.link_text&&!grouped.has(p.rsid));
+  if(linked.length){
+    const order=[];
+    linked.forEach(p=>{ if(order.indexOf(p.link_text)<0) order.push(p.link_text); });
+    order.forEach(link=>{
+      body+=`<tr class="gengroup"><td colspan="5">${esc(link)}</td></tr>`
+        +linked.filter(p=>p.link_text===link).map(posRow).join('');
+    });
+  }
+  body+=plain.slice().sort((a,b)=>String(a.gene).localeCompare(String(b.gene))).map(posRow).join('');
+  if(genes.length){
+    body+=`<tr class="gengroup"><td colspan="5">${esc(t('web.gen.group_base',{n:genes.length}))}</td></tr>`
+      +genes.map(geneRow).join('');
+  }
+  return `<div class="tblwrap"><table class="dt gentbl">${head}<tbody>${body}</tbody></table></div>`
+    +`<div class="why muted">${esc(t('web.gen.table_hint'))}</div>`;
+}
 // The panel of a segment as a picture rather than a paragraph: a summary of
 // the whole panel, the line «what to look at», a card per position where the
 // named allele was found (coloured by the kind of link, the genotype as a chip,
@@ -1824,8 +1926,15 @@ function systemPolygenicHtml(poly, register){
 const PNL_KIND={guideline:'k-a',pair:'k-a',mechanism:'k-b',asked_about:'k-c'};
 const PNL_KIND_BADGE={guideline:'b-warning',pair:'b-warning',mechanism:'b-near',asked_about:'b-unknown'};
 function pnlStateBadge(p){
+  // Taken by the reference (task 201): a value with its caveat inside the
+  // sentence, never a reading — one muted badge, never the colour of a state.
+  if(p.presumed) return badge('b-unknown',t('system.gen.state.presumed'),p.read_why_text||'');
   if(p.read!==true) return badge('b-unknown',t('system.panel.state.unread'),p.read_why_text||p.read_why||'');
   const st=p.state||'None';
+  // Read from the file, the depth unverified: the state keeps its colour and a
+  // second, muted badge says what is not known about it.
+  if(p.depth_note) return badge(st==='hom'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st))
+    +' '+badge('b-unknown',t('system.gen.state.file_only'),p.depth_note);
   return badge(st==='hom'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st));
 }
 function pnlExpect(ec,qn){
@@ -1856,8 +1965,8 @@ function panelHtml(gen,card,register){
   const other=states.filter(p=>!found.includes(p)&&!absent.includes(p)&&!unread.includes(p));
   let h=`<div class="sys-sec">${esc(t('system.panel.h'))} <span class="muted small">· ${esc(t('system.panel.checked',{positions:plural(states.length,'count.positions')}))}</span></div>`;
   const cardOf=(p,dim)=>{const r=byId[p.gene+'|'+p.rsid]||{};
-    return `<div class="pnl ${PNL_KIND[p.kind]||'k-c'}${dim?' pnl-dim':''}"><div class="pnl-head"><b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${pnlStateBadge(p)}<span class="muted small">${esc(t('system.panel.kind.'+(p.kind||'unassigned')))}</span>${r.signature==='open'?`<span class="muted small">· ${esc(t('system.row.signature_open'))}</span>`:''}</div>
-      ${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}${register==='clinician'?geneRowDetail(r):''}</div>`;};
+    return `<div class="pnl ${PNL_KIND[p.kind]||'k-c'}${dim?' pnl-dim':''}"><div class="pnl-head">${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${pnlStateBadge(p)}<span class="muted small">${esc(t('system.panel.kind.'+(p.kind||'unassigned')))}</span>${p.link_text?`<span class="muted small">· ${esc(t('system.panel.link',{link:p.link_text}))}</span>`:''}${r.signature==='open'?`<span class="muted small">· ${esc(t('system.row.signature_open'))}</span>`:''}</div>
+      ${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}${register==='clinician'?geneRowDetail(r):''}</div>`;};
   const byGene=list=>{const g={}; list.forEach(p=>{(g[p.gene]=g[p.gene]||[]).push(p);}); return Object.keys(g).sort().flatMap(k=>g[k]);};
   h+=byGene(found).map(p=>cardOf(p,false)).join('')+byGene(other).map(p=>cardOf(p,false)).join('')+byGene(absent).map(p=>cardOf(p,true)).join('')+byGene(unread).map(p=>cardOf(p,true)).join('');
   // the polygenic scores of the system, folded (owner, 14.09.2026)
@@ -1890,7 +1999,7 @@ function genSummaryHtml(gen, card){
     return Object.keys(c).sort().map(g=>c[g]>1?g+' ×'+c[g]:g).join(', ');};
   let h=`<div class="sys-sec">${esc(t('system.panel.conclusion_h'))} <span class="muted small">· ${esc(t('web.second.gen_h',{found:found.length,positions:plural(st.length,'count.positions')}))}</span></div>`;
   h+=found.map(p=>{const r=byId[p.gene+'|'+p.rsid]||{}; const txt=String(p.text||r.text||'');
-    return `<div class="gen-find"><b>${esc(p.gene)}</b>${pnlStateBadge(p)}<span class="txt${txt.length>160?' clamp':''}">${esc(txt)}</span>${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}</div>`;}).join('');
+    return `<div class="gen-find">${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b>${pnlStateBadge(p)}<span class="txt${txt.length>160?' clamp':''}">${esc(txt)}</span>${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}</div>`;}).join('');
   if(absent.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_absent',{genes:names(absent)}))}</div>`;
   if(unread.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_unread',{genes:names(unread)}))}</div>`;
   // Positions read as «not read» only because the catalogue positions were never
@@ -1927,12 +2036,62 @@ function systemGeneRow(r, register){
   if(r.pending) marks.push(t('system.row.pending'));
   if(r.signature==='open') marks.push(t('system.row.signature_open'));
   if(r.read===false) marks.push(t('system.row.unread',{why:r.read_why_text||r.read_why||'—'}));
+  if(r.unit==='position'&&!r.level) marks.unshift(t('system.row.level_none'));
+  if(r.needs_confirmation) marks.push(t('system.row.needs_confirmation'));
+  if(r.not_a_finding_why==='level') marks.push(t('system.row.not_finding_level'));
   if(r.not_a_finding_why==='kind') marks.push(t('system.row.not_finding_kind',{kind:t('system.kind.'+(r.kind||'unassigned'))}));
-  let out=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div><b>${esc(r.gene)}</b> ${esc(head.replace(r.gene,'').trim())}`
+  let out=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div>${r.level?levelChip(r.level,r.level_short)+' ':''}<b>${esc(r.gene)}</b> ${esc(head.replace(r.gene,'').trim())}`
     + (marks.length?` <span class="muted">· ${esc(marks.join(' · '))}</span>`:'')+`</div>`;
   if(r.text) out+=`<div class="why">${esc(r.text)}</div>`;
+  if(r.file_says_text) out+=`<div class="why muted">${esc(r.file_says_text)}</div>`;
+  out+=ladderHtml(r);
   if(register==='clinician') out+=geneRowDetail(r);
   return out+`</div>`;
+}
+// A system's long panel and its ratios (task 200): shown, never scored. A ratio
+// with no published range is a value — no arrow, no colour.
+function panelLabsHtml(p){
+  if(!p) return '';
+  const ms=(p.markers||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span></div>`).join('');
+  const KEY={printed:'system.panel_labs.ratio_printed',computed:'system.panel_labs.ratio_computed',
+    missing:'system.panel_labs.ratio_missing',not_same_day:'system.panel_labs.ratio_not_same_day',
+    not_computable:'system.panel_labs.ratio_not_computable'};
+  const rs=(p.ratios||[]).map(x=>{
+    const got=x.origin==='printed'||x.origin==='computed';
+    const txt=got?t(KEY[x.origin],{name:x.name||x.key,value:fmtNum(x.value),date:fmtDate(x.date)||'—'})+(x.has_range?'':' — '+t('system.panel_labs.no_range'))
+               :t(KEY[x.origin]||KEY.not_computable,{name:x.name||x.key,missing:(x.missing_names||x.missing||[]).join(', ')||'—'});
+    return `<div class="row-l${got?'':' muted'}">· ${esc(txt)}</div>`;}).join('');
+  return `<details class="pnl-fold"><summary>${esc(t('system.panel_labs.head',{measured:(p.markers||[]).length,total:p.total||0}))}</summary>${ms}${rs}</details>`;
+}
+// The three genotypes of a common variant, the person's own in bold (task 199).
+function ladderHtml(r){
+  if(!r||!r.ladder) return '';
+  const own=String((r.genotype||{}).genotype||'').replace(/[\/|]/g,'').split('').sort().join('');
+  const rungs=['base','het','hom'].map(k=>r.ladder[k]).filter(Boolean)
+    .map(g=>own&&g.split('').sort().join('')===own?`<b>${esc(g)}</b>`:esc(g)).join(' · ');
+  return `<div class="why muted">${esc(t('system.row.ladder',{rungs:'§'})).replace('§',rungs)}</div>`;
+}
+// The same position on the three routes protein arrives by (task 200): one
+// line, because what a reader needs here is which route makes it moot.
+function routeHtml(r){
+  const rt=r&&r.route; if(!rt||!rt.routes) return '';
+  const parts=rt.routes.map(x=>`${esc(x.route_text)} — ${esc(t('system.panel.route.'+x.state))}`);
+  return `<div class="why muted">${esc(t('system.panel.route_head',{list:'§'})).replace('§',parts.join(' · '))}`
+    +` <span class="muted small">(${esc(t('system.panel.route_basis.'+(rt.basis||'mechanism')))})</span></div>`;
+}
+// A position a fasting corridor cannot answer for (task 200).
+function underLoadHtml(r){
+  const u=r&&r.under_load; if(!u||!u.what_it_reveals) return '';
+  return `<div class="why muted">${esc(t('system.panel.under_load',{test:u.test_text||u.test,reveals:u.what_it_reveals}))}</div>`;
+}
+// What the level lets a position say, beside its chip.
+function levelNoteHtml(r){
+  if(!r||r.unit!=='position') return '';
+  const n=[];
+  if(!r.level) n.push(t('system.row.level_none'));
+  if(r.not_a_finding_why==='level') n.push(t('system.row.not_finding_level'));
+  if(r.needs_confirmation) n.push(t('system.row.needs_confirmation'));
+  return n.length?`<div class="why muted">${esc(n.join(' · '))}</div>`:'';
 }
 function geneRowDetail(r){
   let out='';
@@ -1947,10 +2106,42 @@ function basketRowHtml(row){
   if(row.origin==='rule') return testItem(row).outerHTML;
   return `<div class="row-l">· ${esc(row.text||'')}${row.closes?` — ${esc(row.closes)}`:''}${row.source?` <span class="muted">(${esc(row.source)})</span>`:''}</div>`;
 }
+// «If a decision to correct has been made» (task 200). Grouped by what the
+// genotype says, never ranked; every printed line carries what to recheck, and
+// `adds_nothing` is printed rather than left as silence.
+function correctionRoutesHtml(cr){
+  if(!cr||cr.status!=='ok') return '';
+  const line=x=>`<div class="row-l">· <b>${esc(x.route_text||'')}</b> — ${esc(x.because||'')}`
+    +(x.on&&x.on.length?`<div class="why muted">${esc(t('system.routes.on',{markers:x.on.join(', ')}))}</div>`:'')
+    +(x.positions&&x.positions.length?`<div class="why muted">${esc(t('system.routes.positions',{positions:x.positions.join(', ')}))}</div>`:'')
+    +(x.recheck?`<div class="why">${esc(t('system.routes.recheck',{marker:x.recheck.marker_name||x.recheck.marker,weeks:plural(x.recheck.after_weeks,'count.weeks'),change:x.recheck.what_counts_as_change}))}</div>`:'')
+    +((x.evidence&&x.evidence.source)?`<div class="why muted">${esc(t('system.routes.source',{source:x.evidence.source}))}</div>`:'')
+    +`</div>`;
+  let h=`<div class="row-l"><b>${esc(cr.head)}</b></div><div class="why muted">${esc(cr.caveat)}</div>`;
+  (cr.groups||[]).forEach(g=>{
+    h+=`<div class="sys-sec">${esc(g.says_text||g.says)}</div>`+g.rows.map(line).join('');
+  });
+  if((cr.adds_nothing||[]).length){
+    h+=`<div class="sys-sec">${esc((cr.adds_nothing[0]||{}).says_text||'')}</div>`
+      +cr.adds_nothing.map(line).join('');
+  }
+  return h;
+}
 // The seven layers in the order of the brief, every one of them present — with
 // its rows or with the reason it is empty — and the three baskets after them.
 function systemCardHtml(r){
   const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3>${n}. ${esc(t(key))}</h3>${body}</div>`);
+  if(r.on_demand){
+    // A panel without a radar domain (task 199 F): no score, no figure, the
+    // same rows through the same gate — and the reason at the top. The
+    // laboratory layers do not exist for it and are not drawn.
+    L.push(`<div class="layer"><h3>${esc(t('system.on_demand.head'))}</h3><div class="why">${esc(t('system.on_demand.why',{why:r.why_no_domain||'—'}))}</div>`
+      +(r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:'')+`</div>`);
+    const gen=r.genetics||{};
+    let b=genSummaryHtml(gen,r)+genTableHtml(gen,r,r.register);
+    L.push(`<div class="layer"><h3>${esc(t('system.layer.on_demand_genetics'))}</h3>${b}</div>`);
+    return L.join('');
+  }
   const lab=r.labs||{};
   let b='';
   if(lab.status==='absent') b=`<div class="row-l">${esc(t('system.labs.absent'))}</div>`;
@@ -1961,6 +2152,8 @@ function systemCardHtml(r){
   }
   if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
   if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
+  if(lab.panel_term) b+=`<div class="row-l">${esc(t('system.panel_labs.term',{outside:lab.panel_term.outside,judged:lab.panel_term.judged,score:lab.panel_term.score}))}</div>`;
+  b+=panelLabsHtml(lab.panel);
   layer(1,'system.layer.labs',b);
   const dyn=r.dynamics||{};
   if(dyn.status==='ok'){
@@ -1979,18 +2172,22 @@ function systemCardHtml(r){
     const base=gen.base||{};
     b=`<div class="row-l">${esc(t('system.genetics.composed',{source:base.source||'—',version:base.version||'—',base_genes:base.genes||0,positions:(gen.curated||{}).positions||0,read_genes:gen.read_genes||0,read_positions:gen.read_positions||0,findings:gen.finding_count||0,carriers:gen.carrier_count||0,pending:gen.pending_count||0}))}</div>`
       +(gen.signature_author_count?`<div class="row-l">${esc(t('system.genetics.signature_author',{n:gen.signature_author_count,date:gen.signature_author_date||'—'}))}</div>`:'')
-      +(gen.signature_open_count?`<div class="row-l">${esc(t('system.genetics.signature_open',{n:gen.signature_open_count}))}</div>`:'');
+      +(gen.signature_open_count?`<div class="row-l">${esc(t('system.genetics.signature_open',{n:gen.signature_open_count}))}</div>`:'')
+      +(gen.level_counts?`<div class="row-l">${esc(t('system.genetics.levels',{levels:['A','B','C','D','E'].filter(k=>gen.level_counts[k]).map(k=>k+' — '+gen.level_counts[k]).join(', ')||'—',none:gen.level_counts.none||0}))}</div>`:'');
     if(gen.withheld_by_classification) b+=`<div class="row-l muted">${esc(t('system.genetics.withheld',{n:gen.withheld_by_classification}))}</div>`;
     if((gen.excluded||[]).length) b+=`<div class="row-l muted">${esc(t('system.genetics.excluded',{genes:gen.excluded.map(e=>e.gene).join(', ')}))}</div>`;
     if((gen.refused||{}).total) b+=`<div class="row-l muted">${esc(t('system.genetics.refused',{n:gen.refused.total}))}</div>`;
     (gen.unreadable||[]).forEach(u=>{ b+=`<div class="row-l">${esc(t('system.genetics.unreadable',{gene:u.gene,reason:u.reason||'—'}))}</div>`; });
-    b+=panelHtml(gen,r,r.register);
-    b+=(gen.rows||[]).filter(x=>x.unit!=='position').map(x=>systemGeneRow(x,r.register)).join('');
+    b+=genTableHtml(gen,r,r.register);
     if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
   }
   if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
   b=summary+(b?`<details class="fold"${r.register==='clinician'?' open':''}><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
   layer(3,'system.layer.genetics',b);
+  b=correctionRoutesHtml(r.correction_routes);
+  // Not a numbered layer: the seven layers are the brief's own frame, and this
+  // block answers a decision that is not the product's to make.
+  if(b) L.push(`<div class="layer"><h3>${esc(t('system.routes.layer'))}</h3>${b}</div>`);
   const med=r.medications||{};
   b=(med.rows||[]).map(m=>`<div class="row-l">· ${esc(t('system.meds.row',{name:m.name,dose:m.dose||'',classes:(m.via||[]).join(', ')}))}</div>`).join('');
   if(med.empty_reason) b+=`<div class="row-l muted">${esc(med.empty_reason)}</div>`;
@@ -2035,7 +2232,7 @@ async function viewPanel(key){
     ${p.expect?`<div class="why">${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</div>`:''}
     ${p.effect_size?`<div class="why">${esc(t('panel.effect',{effect:p.effect_size}))}</div>`:''}
     <div class="why muted">${esc(t('panel.source_row',{source:p.source||'—',study:p.study||'—'}))}</div>
-    <div class="why muted">${esc(t('panel.signed.'+(p.signature||'open'),{by:p.signed_by||'—',on:fmtDate(p.signed_on)||'—',curated:fmtDate(p.curated_on)||'—'}))}</div></div>`;
+    <div class="why muted">${esc(t('panel.signed.'+(p.signature||'open'),{on:fmtDate(p.signed_on)||'—',curated:fmtDate(p.curated_on)||'—'}))}</div></div>`;
   const facts=[factHtml(String(c.positions||0),t('web.panel.fact_positions')),factHtml(String(c.genes||0),t('web.panel.fact_genes')),
                factHtml(String(c.with_study||0),t('web.panel.fact_studies')),factHtml(String(c.signed_by_clinician||0),t('web.panel.fact_signed'))];
   v.innerHTML=`<div class="syscard">
@@ -2079,7 +2276,7 @@ async function viewSystem(key, register){
       ${st.length?`<button class="ghost" data-panel="${esc(r.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}
     </div>
     ${pageHead(r.label||key,'',facts)}
-    <div class="verdict">${esc(r.verdict_line||'')}</div>
+    <div class="verdict">${esc(r.verdict_line||'')}</div>${r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:''}
     ${systemCardHtml(r)}
     <div class="meta mt-4">${esc(r.disclaimer||'')}</div>
   </div>`;
@@ -2298,6 +2495,13 @@ async function renderSystems(box, radar){
   draw(false);
 }
 
+function radarLabelLines(label){
+  const s=String(label||'');
+  if(s.length<=18||s.indexOf(' ')<0) return [s];
+  const mid=s.length/2; let best=-1;
+  for(let i=0;i<s.length;i++) if(s[i]===' '&&(best<0||Math.abs(i-mid)<Math.abs(best-mid))) best=i;
+  return [s.slice(0,best),s.slice(best+1)];
+}
 function radarSVG(domains){
   const d=domains.filter(x=>x.score!=null);
   if(d.length<3)return `<div class="muted">${esc(t('web.radar.not_enough'))}</div>`;
@@ -2317,10 +2521,14 @@ function radarSVG(domains){
     // 18 px and the label beside it opened nothing, so a click on «Lipids 56»
     // looked like a hang. The label carries the same key as the dot.
     const padX=anchor==='start'?lx-6:anchor==='end'?lx-114:lx-60;
+    // A long name («Опорно-двигательная система») is split at the space nearest
+    // its middle, so it does not run off the edge of the picture.
+    const lines=radarLabelLines(dom.label);
+    const extra=(lines.length-1)*15;
     labels+=`<g class="rlabel" data-dom="${esc(dom.key)}" tabindex="0" role="button" aria-label="${esc(dom.label)}" style="cursor:pointer"><title>${esc(t('system.open'))}</title>`
-      +`<rect x="${padX.toFixed(1)}" y="${(ly-12).toFixed(1)}" width="120" height="38" fill="transparent"/>`
-      +`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(--ink-2)" font-size="13" text-anchor="${anchor}" dominant-baseline="middle">${esc(dom.label)}</text>`
-      +`<text x="${lx.toFixed(1)}" y="${(ly+16).toFixed(1)}" font-size="12.5" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">`
+      +`<rect x="${padX.toFixed(1)}" y="${(ly-12).toFixed(1)}" width="120" height="${38+extra}" fill="transparent"/>`
+      +`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(--ink-2)" font-size="13" text-anchor="${anchor}" dominant-baseline="middle">${lines.map((l,k)=>`<tspan x="${lx.toFixed(1)}" dy="${k?15:0}">${esc(l)}</tspan>`).join('')}</text>`
+      +`<text x="${lx.toFixed(1)}" y="${(ly+16+extra).toFixed(1)}" font-size="12.5" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">`
       +`<tspan fill="${DSTAT[dom.status]}">${dom.score}</tspan>`
       +(a.txt?`<tspan fill="${a.col}" font-size="11.5"> ${a.txt}</tspan>`:'')+`</text></g>`;
   });
@@ -2430,7 +2638,7 @@ async function viewSecond(root){
   // «What to test» stays owned by its route: the rows printed here are the
   // suggestions as that route returns them, filtered to the ids the card names.
   const usedTests=new Set(); let questions=0;
-  const blocks=chosen.map((s,i)=>{
+  let blocks=chosen.map((s,i)=>{
     const dom=byKey[s.key]||{}, card=cards[i];
     const recent=(dom.abnormal||[]).filter(m=>!m.stale), stale=(dom.abnormal||[]).filter(m=>m.stale);
     const a=dArrow(dom.delta);
@@ -2467,12 +2675,13 @@ async function viewSecond(root){
          +(gen.signature_open_count?' · '+esc(t('system.genetics.signature_open',{n:gen.signature_open_count})):'');
         if(gen.withheld_by_classification) gl+=` <span class="muted">· ${esc(t('system.genetics.withheld',{n:gen.withheld_by_classification}))}</span>`;
       }
-      more+=panelHtml(gen,card);
+      more+=genTableHtml(gen,card,card.register);
       if(gl) more+=`<div class="why mt-3"><b>${esc(t('system.layer.genetics'))}:</b> ${gl}</div>`;
       (gen.unreadable||[]).forEach(u=>{ more+=`<div class="why">${esc(t('system.genetics.unreadable',{gene:u.gene,reason:u.reason||'—'}))}</div>`; });
       const fg=((card.next||{}).genome||{}).full_genome;
       if(fg&&fg.text) more+=`<div class="why"><b>${esc(t('system.next.genome'))}:</b> ${esc(fg.text)}</div>`;
       if(card.verdict_line) more+=`<div class="why muted mt-2">${esc(card.verdict_line)}</div>`;
+      if(card.unread_line) more+=`<div class="why muted">${esc(card.unread_line)}</div>`;
     }
     if(more) h+=`<details class="fold more"><summary>${esc(t('web.second.more'))}</summary>${more}</details>`;
     // Two doors out of the block, after it has been read: the card of the
@@ -2480,6 +2689,12 @@ async function viewSecond(root){
     h+=`<div class="actions"><button class="act" data-system="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}">${esc(t('web.second.open_card'))}</button>${hasPanel?`<button class="ghost" data-panel="${esc(s.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}</div>`;
     return h+`</div>`;
   }).join('');
+  const onDemand=(sys.on_demand||[]);
+  // `h` is the accumulator INSIDE the map above and does not exist out here:
+  // the tab threw «h is not defined» before it painted anything (owner, 18.09.2026).
+  if(onDemand.length) blocks+=`<div class="sysblock"><div class="sys-h"><span class="name">${esc(t('web.panels.on_demand'))}</span></div>`
+    +onDemand.map(p=>`<div class="row-l">· <b>${esc(p.label)}</b> <span class="muted small">${esc(plural(p.positions||0,'count.positions'))}</span> — <span class="muted">${esc(p.why_no_domain||'')}</span> <button class="ghost btn-sm" data-system="${esc(p.key)}">${esc(t('web.second.open_card'))}</button></div>`).join('')
+    +`</div>`;
   const silent=(sys.systems||[]).filter(s=>!speaks(s));
   const silentLine=silent.length?`<div class="meta mb-3">${esc(t('web.second.systems_silent',{systems:silent.map(s=>s.label).join(', ')}))}</div>`:'';
   // `phenotype_label` is both the human form AND the one that carries the
@@ -3583,10 +3798,31 @@ async function viewAssistant(root){
 }
 
 // ---------------- Guide ----------------
-// A static reference, not a computed one: nothing here is fetched from the
-// engine, because none of it is about the owner's own data — it explains the
-// interface itself, so the file that has to be opened to understand a badge
-// is this tab, not a source file.
+// A reference, not a computation: nothing here is about the owner's own data —
+// it explains the interface itself, so the file that has to be opened to
+// understand a badge is this tab, not a source file. One section is fetched:
+// the legend of evidence levels, whose words live in the product's knowledge so
+// that the page, the command line and the answers cannot say different things.
+let _levels=null;
+async function evidenceLegend(){
+  if(!_levels) _levels=await api('/api/evidence-levels').catch(()=>({status:'unavailable',levels:[]}));
+  return _levels;
+}
+// A level chip beside a genetic statement (task 199). Its title is the level's
+// short name; a click opens the legend in the Guide.
+function levelChip(level,short){
+  if(!level) return '';
+  const cls=({A:'b-good',B:'b-good',C:'b-near',D:'b-unknown',E:'b-unknown'})[level]||'b-unknown';
+  return `<span class="badge ${cls} lvl" data-level="${esc(level)}" role="button" tabindex="0" title="${esc(t('evidence.level_chip',{level,short:short||'—'}))}">${esc(level)}</span>`;
+}
+// One listener for every chip, wherever a view draws it.
+document.addEventListener('click',async ev=>{
+  const el=ev.target.closest&&ev.target.closest('.lvl[data-level]');
+  if(!el||el.closest('#gd-levels-list')) return;
+  ev.stopPropagation();
+  await mount(TABS.findIndex(x=>x[0]==='web.tab.guide'));
+  const s=document.getElementById('gd-levels'); if(s) s.scrollIntoView({block:'start'});
+});
 function guideStatusRow(cls,labelKey,whyKey){
   return `<div class="list-item"><div class="row">${badge(cls,t(labelKey))}</div><div class="why">${esc(t(whyKey))}</div></div>`;
 }
@@ -3615,6 +3851,9 @@ async function viewGuide(root){
     <h2 class="section">${esc(t('web.guide.sources_h'))}</h2>
     <div class="card">${esc(t('web.guide.sources_body'))}</div>
 
+    <h2 class="section" id="gd-levels">${esc(t('evidence.title'))}</h2>
+    <div id="gd-levels-body" class="muted">…</div>
+
     <h2 class="section">${esc(t('web.guide.status_h'))}</h2>
     <div class="muted small mb-3">${esc(t('web.guide.status_intro'))}</div>
     ${guideStatusRow('b-good','web.guide.status_good_label','web.guide.status_good_why')}
@@ -3632,6 +3871,10 @@ async function viewGuide(root){
 
     <div class="meta mt-4">${esc(t('web.guide.footer'))}</div>`;
   root.querySelectorAll('[data-tabkey]').forEach(el=>el.onclick=()=>mount(TABS.findIndex(x=>x[0]===el.getAttribute('data-tabkey'))));
+  const lg=await evidenceLegend(), box=$('#gd-levels-body',root);
+  if(box) box.outerHTML=lg.status!=='ok'?`<div class="card">${esc(t('evidence.unavailable'))}</div>`
+    :'<div id="gd-levels-list">'+lg.levels.map(x=>`<div class="list-item"><div class="row">${levelChip(x.level,x.short)} <b>${esc(x.short)}</b></div><div class="why">${esc(x.full)} ${esc(x.says)}</div></div>`).join('')+'</div>'
+     +`<div class="meta mt-2">${esc(t('evidence.boundary',{levels:(lg.verdict_levels||[]).join(', ')}))}</div>`;
 }
 
 // ---------------- Navigation ----------------
@@ -3688,7 +3931,7 @@ function mount(i){
   current=i;
   document.querySelectorAll('#nav button[data-tab],#menupanel button[data-tab]').forEach(b=>b.classList.toggle('active',+b.dataset.tab===i));
   const v=$('#view');showLoader(v);
-  TABS[i][1](v).catch(e=>v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message));
+  return TABS[i][1](v).catch(e=>v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message));
 }
 
 // The parts of the page that live outside the tabs. Redrawn on a language switch, so
@@ -3719,6 +3962,7 @@ function renderUpdateNote(){
   const pend=u.pending||[];
   const count=pend.length?t('web.update.pending',{entries:plural(pend.length,'count.entries')}):t('web.update.nothing');
   const items=pend.map(e=>`<div class="row-l"><b>v${esc(e.version)}</b> <span class="muted">${esc(e.date)}</span></div>`+
+    (e.news||[]).map(n=>`<div class="row-l">✦ ${esc(t('version.news',{news:n}))}</div>`).join('')+
     (e.actions||[]).map(a=>`<div class="row-l">· ${a.manual?esc(t('version.by_hand',{condition:a.condition})):esc(t('version.run',{commands:(a.commands||[]).map(c=>'`'+c+'`').join(', '),condition:a.condition}))}</div>${a.text?`<div class="why muted">${esc(a.text)}</div>`:''}`).join('')).join('');
   box.hidden=false;
   box.innerHTML=`<div class="row"><b>${esc(t('web.update.note',{from:u.last_used,to:u.installed}))}</b> <span>${esc(count)}</span>
@@ -3770,12 +4014,31 @@ function rcJob(j){
 function rcAttention(p){
   if(!p||_rcDismissed) return false; const j=p.job||{};
   if(j.status==='running'||j.status==='interrupted') return true;
-  return (p.steps||[]).some(s=>s.source==='data'&&s.state==='ready');}
+  const fp=rcFingerprint(p);
+  return !!fp&&fp!==rcSeen();}
+// What is ready to recompute RIGHT NOW, as one string. A finished job is not a
+// reason to open anything: the panel used to reappear at full height on every
+// reload after a run, showing the report of a run the person had just watched.
+// Attention is owed to a step that is ready and has not been shown yet.
+function rcFingerprint(p){
+  return (p.steps||[]).filter(s=>s.source==='data'&&s.state==='ready')
+    .map(s=>s.command).sort().join('|');}
+function rcSeen(){try{return localStorage.getItem('scholion.rc.seen')||'';}catch(e){return '';}}
+function rcRemember(p){try{localStorage.setItem('scholion.rc.seen',rcFingerprint(p));}catch(e){}}
 function renderRecompute(){
   const box=$('#recomputebox'); if(!box) return; clearTimeout(_rcTimer);
   const p=_recompute;
   if(!p||!(_rcOpen||rcAttention(p))){box.hidden=true;box.innerHTML='';return;}
   const j=p.job||{}, running=j.status==='running', steps=p.steps||[];
+  if(!_rcOpen&&!running&&j.status!=='interrupted'){
+    box.hidden=false;
+    box.innerHTML=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span>${esc(t('web.recompute.pending',{steps:plural(p.ready||0,'count.steps')}))}</span>`
+      +`<button class="ghost btn-sm" id="rc-open">${esc(t('web.recompute.open'))}</button>`
+      +`<button class="ghost btn-sm" id="rc-later">${esc(t('web.recompute.later'))}</button></div>`;
+    $('#rc-open').onclick=()=>{_rcOpen=true; renderRecompute();};
+    $('#rc-later').onclick=()=>{rcRemember(p); _rcDismissed=true; box.hidden=true; box.innerHTML='';};
+    return;
+  }
   let h=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span class="muted">${esc(t('web.recompute.cli'))}</span></div>`;
   if(j.status&&j.status!=='none') h+=rcJob(j);
   if(running) h+=`<div class="row"><button class="ghost" id="rc-stop">${esc(t('web.recompute.stop'))}</button></div>`;
@@ -3791,7 +4054,7 @@ function renderRecompute(){
     if(r&&r.started){_rcOpen=true; pollRecompute();}
     else{st.disabled=false; $('#rc-out').textContent=t(r&&r.reason==='busy'?'recompute.busy':'recompute.nothing_ready');}
   };
-  const cl=$('#rc-close'); if(cl) cl.onclick=()=>{_rcOpen=false; _rcDismissed=true; box.hidden=true; box.innerHTML='';};
+  const cl=$('#rc-close'); if(cl) cl.onclick=()=>{rcRemember(p); _rcOpen=false; _rcDismissed=true; box.hidden=true; box.innerHTML='';};
   const sp=$('#rc-stop'); if(sp) sp.onclick=async()=>{sp.disabled=true; await post('/api/recompute/stop',{});};
   if(running) _rcTimer=setTimeout(pollRecompute,1500);
 }
@@ -3800,10 +4063,17 @@ async function pollRecompute(){
   try{ j=await api('/api/recompute/status'); }catch(e){ _rcTimer=setTimeout(pollRecompute,3000); return; }
   if(j.status==='running'){ _recompute=Object.assign({steps:[]},_recompute||{},{job:j}); renderRecompute(); return; }
   try{ _recompute=await api('/api/recompute'); _update=await api('/api/version'); renderUpdateNote(); }catch(e){}
-  _recompute=Object.assign({steps:[]},_recompute||{},{job:j}); _rcOpen=true; renderRecompute();
+  _recompute=Object.assign({steps:[]},_recompute||{},{job:j}); _rcOpen=true; rcRemember(_recompute); renderRecompute();
   if(j.status==='finished'){ forgetAnswers(); _systems=null; _sources=null; try{ mount(current); }catch(e){} }
 }
 document.addEventListener('click',e=>{ if(e.target.closest('[data-recompute-open]')) openRecompute(); });
+// A row of the genetic table opens into the card it used to be.
+document.addEventListener('click',e=>{
+  const tr=e.target.closest('tr.genrow'); if(!tr) return;
+  const id=tr.getAttribute('data-genrow');
+  const det=tr.parentNode.querySelector(`tr.gendet[data-gendet="${CSS.escape(id)}"]`);
+  if(det){ det.hidden=!det.hidden; tr.classList.toggle('open',!det.hidden); }
+});
 function renderChrome(){
   renderDemoBanner();
   renderUpdateNote();

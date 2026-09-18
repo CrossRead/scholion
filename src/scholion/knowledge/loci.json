@@ -4,12 +4,12 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so.",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so. The 28 positions added on 2026-09-17 (the three new systems of task 200 and the amino acid panel) carry the coordinate of their HGVS, which was itself verified against Ensembl REST GRCh38 and, for the amino acid positions, against the GWAS Catalog; `ref` is the reference base of that HGVS and `alt` its alternative on the plus strand, so a row whose risk allele is written on the minus strand says so in its note. On 2026-09-17 the two sources agreed on the GRCh37 position of rs111033565 (PRSS1) and rs641738 (MBOAT7/TMC4), which had been held without a second coordinate since they disagreed; both numbers are now carried, written by the same check that compares them. Nine more amino acid positions on 2026-09-18 (ABCG2, SLC16A9, PPM1K rs7678928, GLS2, NAT8, GCKR, GNMT, PSPH region, PRODH): coordinates from Ensembl REST GRCh38 fetched for each rsID, alleles from the GWAS Catalog records; ABCG2 and GCKR are spelled on the plus strand and their notes say what the literature's spelling is.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool. CLOSED 13.09.2026 — FADS1 rs174537 and rs174546: the coordinates were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary while the radar-segment panels were composed, and both loci are in `loci` with the omega-3 conversion note the vitamins panel reads.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-    "updated": "2026-09-13",
+    "updated": "2026-09-18",
     "source_tier": "primary_literature",
     "assembly_secondary": "GRCh37",
     "assembly_secondary_note": {
@@ -20,12 +20,12 @@
       "en": "The position question is closed — every locus answers in both builds. Two things are not. (1) Allele orientation: rs6025, rs1065852 and rs762551 appear in a corpus GRCh37 file with REF/ALT the reverse of this catalogue's (file T>C vs catalogue C>T; G>A vs A>G; C>A vs A>C). Their GRCh37 positions here come from NCBI and Ensembl, not from that file, so the coordinates are unaffected; what is unresolved is which strand that exporter reports on, and it is left open rather than settled from one caller's output. (2) The same run also compared every GRCh38 position in this catalogue against dbSNP. It reported to the console and the console was not kept, so that comparison is not on record here — the script now writes a report file beside its output, and the next run will leave one.",
       "ru": "Вопрос о позициях закрыт — каждый локус отвечает в обеих сборках. Незакрытых два. (1) Ориентация аллелей: rs6025, rs1065852 и rs762551 встречаются в файле GRCh37 из корпуса с REF/ALT, обратными нашим (в файле T>C против C>T в каталоге; G>A против A>G; C>A против A>C). Координаты GRCh37 у них взяты из NCBI и Ensembl, а не из этого файла, так что на позиции это не влияет; неразрешено то, с какой цепи отчитывается этот экспортёр, и вопрос оставлен открытым, а не решён по выводу одного вызывателя. (2) Тот же прогон сверил и все координаты GRCh38 этого каталога с dbSNP. Он отчитался в консоль, консоль не сохранена — значит, этой сверки здесь нет на бумаге. Теперь скрипт пишет отчёт рядом с выходным файлом, и следующий прогон его оставит."
     },
-    "catalog_updated": "2026-09-13",
-    "grch37_unresolved": {
-      "rs111033565": "PRSS1, 7q34: Ensembl GRCh37 and dbSNP `chrpos_prev_assm` give different positions — the region is misassembled in GRCh37. Held without a second coordinate rather than with one source's number: a position only one source vouches for is the silent way to read the wrong base.",
-      "rs641738": "MBOAT7/TMC4, 19q13: the two sources disagree on the GRCh37 position, as above."
-    },
-    "grch37_unresolved_note": "A locus here answers in GRCh38 only, and says so: `pos_grch37` is null and the reason is above. `fill_grch37.py` cannot close it — the sources disagree, and the next attempt needs a third one, not another run. Recorded 13.09.2026 with the radar-segment panels."
+    "catalog_updated": "2026-09-18",
+    "grch37_unresolved": {},
+    "grch37_unresolved_note": "A locus here answers in GRCh38 only, and says so: `pos_grch37` is null and the reason is above. `fill_grch37.py` cannot close it — the sources disagree, and the next attempt needs a third one, not another run. Recorded 13.09.2026 with the radar-segment panels.",
+    "grch37_same_as_grch38": {
+      "rs1800955": "DRD4 promoter, 11p15.5 at 636 kb from the telomere: NCBI and Ensembl both give 636784 in GRCh37 AND in GRCh38 — the assemblies coincide there, and the equal number is a coordinate, not a copy"
+    }
   },
   "regions": {
     "CYP2D6": {
@@ -1225,7 +1225,7 @@
         "en": "hereditary pancreatitis, autosomal dominant with high penetrance (GenCC Definitive); GRCh37 position not recorded — the two sources disagree in this misassembled region",
         "ru": "наследственный панкреатит, аутосомно-доминантно с высокой пенетрантностью (GenCC Definitive); позиция GRCh37 не записана — два источника расходятся в этом плохо собранном регионе"
       },
-      "pos_grch37": null
+      "pos_grch37": 142459789
     },
     "rs738409": {
       "gene": "PNPLA3",
@@ -1264,7 +1264,7 @@
         "en": "the reference T allele is the one associated with fibrosis; alternate C; GRCh37 position not recorded — the two sources disagree",
         "ru": "референсный аллель T ассоциирован с фиброзом; альтернативный C; позиция GRCh37 не записана — два источника расходятся"
       },
-      "pos_grch37": null
+      "pos_grch37": 54676763
     },
     "rs1801280": {
       "gene": "NAT2",
@@ -1460,6 +1460,1661 @@
         "ru": "альтернативный C — это Arg389, более активный бета-1 рецептор и частый аллель; референсный G — Gly389. Для гомозигот Arg389 описан больший ответ давления и пульса на бета-блокаторы, ни одно руководство по этому не меняет выбор или дозу (у CPIC и DPWG их нет). Проверено 13.09.2026 по Ensembl VEP (p.Gly389Arg для аллеля C) после того, как черновик назвал аллели наоборот"
       },
       "pos_grch37": 115805056
+    },
+    "rs7521902": {
+      "gene": "WNT4",
+      "chrom": "1",
+      "pos": 22164231,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "WNT4: the A allele is associated with endometriosis, OR about 1.15",
+        "ru": "WNT4: аллель A связан с эндометриозом, OR около 1,15"
+      },
+      "pos_grch37": 22490724
+    },
+    "rs13394619": {
+      "gene": "GREB1",
+      "chrom": "2",
+      "pos": 11587381,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "GREB1: the G allele is associated with endometriosis, OR about 1.1",
+        "ru": "GREB1: аллель G связан с эндометриозом, OR около 1,1"
+      },
+      "pos_grch37": 11727507
+    },
+    "rs13429458": {
+      "gene": "THADA",
+      "chrom": "2",
+      "pos": 43411699,
+      "ref": "A",
+      "alt": "C",
+      "note": {
+        "en": "THADA: the C allele is associated with polycystic ovary syndrome in some populations",
+        "ru": "THADA: аллель C связан с синдромом поликистозных яичников в части популяций"
+      },
+      "pos_grch37": 43638838
+    },
+    "rs2476601": {
+      "gene": "PTPN22",
+      "chrom": "1",
+      "pos": 113834946,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Arg620Trp",
+      "note": {
+        "en": "PTPN22 R620W: the risk allele T is on the minus strand, G on the plus strand; rheumatoid arthritis OR about 1.6-1.9 in Europe",
+        "ru": "PTPN22 R620W: аллель риска T записан на минус-цепи, на плюс-цепи это G; ревматоидный артрит, OR около 1,6-1,9 в Европе"
+      },
+      "pos_grch37": 114377568
+    },
+    "rs7574865": {
+      "gene": "STAT4",
+      "chrom": "2",
+      "pos": 191099907,
+      "ref": "T",
+      "alt": "G",
+      "note": {
+        "en": "STAT4: the T allele, rheumatoid arthritis OR about 1.3 and lupus OR about 1.55",
+        "ru": "STAT4: аллель T, ревматоидный артрит OR около 1,3, волчанка OR около 1,55"
+      },
+      "pos_grch37": 191964633
+    },
+    "rs2230926": {
+      "gene": "TNFAIP3",
+      "chrom": "6",
+      "pos": 137874929,
+      "ref": "T",
+      "alt": "G",
+      "star": "p.Phe127Cys",
+      "note": {
+        "en": "TNFAIP3 F127C: the G allele, lupus OR about 1.7-2",
+        "ru": "TNFAIP3 F127C: аллель G, волчанка OR около 1,7-2"
+      },
+      "pos_grch37": 138196066
+    },
+    "rs30187": {
+      "gene": "ERAP1",
+      "chrom": "5",
+      "pos": 96788627,
+      "ref": "T",
+      "alt": "C",
+      "star": "p.Lys528Arg",
+      "note": {
+        "en": "ERAP1 K528R: the T allele, ankylosing spondylitis OR about 1.4 in HLA-B27 carriers",
+        "ru": "ERAP1 K528R: аллель T, анкилозирующий спондилит OR около 1,4 у носителей HLA-B27"
+      },
+      "pos_grch37": 96124330
+    },
+    "rs33980500": {
+      "gene": "TRAF3IP2",
+      "chrom": "6",
+      "pos": 111592059,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Asp10Asn",
+      "note": {
+        "en": "TRAF3IP2 D10N: the T allele, psoriatic arthritis OR about 1.9",
+        "ru": "TRAF3IP2 D10N: аллель T, псориатический артрит OR около 1,9"
+      },
+      "pos_grch37": 111913262
+    },
+    "rs2004640": {
+      "gene": "IRF5",
+      "chrom": "7",
+      "pos": 128938247,
+      "ref": "T",
+      "alt": "G",
+      "note": {
+        "en": "IRF5: the T allele creates a splice donor site; lupus OR about 1.5",
+        "ru": "IRF5: аллель T создаёт донорный сайт сплайсинга; волчанка OR около 1,5"
+      },
+      "pos_grch37": 128578301
+    },
+    "rs2240340": {
+      "gene": "PADI4",
+      "chrom": "1",
+      "pos": 17336144,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "PADI4: the T allele, rheumatoid arthritis OR about 1.3, mostly in East Asian cohorts",
+        "ru": "PADI4: аллель T, ревматоидный артрит OR около 1,3, в основном в восточноазиатских когортах"
+      },
+      "pos_grch37": 17662639
+    },
+    "rs1561570": {
+      "gene": "OPTN",
+      "chrom": "10",
+      "pos": 13113726,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "OPTN: the T allele, Paget disease of bone OR about 1.4",
+        "ru": "OPTN: аллель T, болезнь Педжета костей OR около 1,4"
+      },
+      "pos_grch37": 13155726
+    },
+    "rs1256328": {
+      "gene": "ALPL",
+      "chrom": "1",
+      "pos": 21570274,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "ALPL: associated with serum alkaline phosphatase and with bone phenotypes",
+        "ru": "ALPL: связан с уровнем щелочной фосфатазы и с костными признаками"
+      },
+      "pos_grch37": 21896767
+    },
+    "rs1800012": {
+      "gene": "COL1A1",
+      "chrom": "17",
+      "pos": 50200388,
+      "ref": "C",
+      "alt": "A",
+      "star": "Sp1 binding site",
+      "note": {
+        "en": "COL1A1 Sp1: the risk allele T is on the minus strand, A on the plus strand; bone density slightly lower",
+        "ru": "COL1A1 Sp1: аллель риска T записан на минус-цепи, на плюс-цепи это A; плотность кости немного ниже"
+      },
+      "pos_grch37": 48277749
+    },
+    "rs1107946": {
+      "gene": "COL1A1",
+      "chrom": "17",
+      "pos": 50203629,
+      "ref": "A",
+      "alt": "C",
+      "note": {
+        "en": "COL1A1 promoter: the A allele, associated with bone density in some studies",
+        "ru": "промотор COL1A1: аллель A, в части исследований связан с плотностью кости"
+      },
+      "pos_grch37": 48280990
+    },
+    "rs2412298": {
+      "gene": "COL1A1",
+      "chrom": "17",
+      "pos": 50203294,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "COL1A1: the risk allele T is on the minus strand, A on the plus strand; associated with bone density in a few studies",
+        "ru": "COL1A1: аллель риска T записан на минус-цепи, на плюс-цепи это A; в нескольких исследованиях связан с плотностью кости"
+      },
+      "pos_grch37": 48280655
+    },
+    "rs3736228": {
+      "gene": "LRP5",
+      "chrom": "11",
+      "pos": 68433827,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Ala1330Val",
+      "note": {
+        "en": "LRP5 A1330V: the T allele, bone density slightly lower",
+        "ru": "LRP5 A1330V: аллель T, плотность кости немного ниже"
+      },
+      "pos_grch37": 68201295
+    },
+    "rs715": {
+      "gene": "CPS1",
+      "chrom": "2",
+      "pos": 210678331,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "CPS1: the C allele raises plasma glycine, one of the strongest metabolite associations",
+        "ru": "CPS1: аллель C повышает глицин плазмы — одна из самых сильных метаболитных ассоциаций"
+      },
+      "pos_grch37": 211543055
+    },
+    "rs1440581": {
+      "gene": "PPM1K",
+      "chrom": "4",
+      "pos": 88305270,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "PPM1K: the C allele raises the branched-chain amino acids",
+        "ru": "PPM1K: аллель C повышает разветвлённые аминокислоты"
+      },
+      "pos_grch37": 89226422
+    },
+    "rs1744297": {
+      "gene": "ASPG",
+      "chrom": "14",
+      "pos": 104102135,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "ASPG: the T allele raises plasma asparagine",
+        "ru": "ASPG: аллель T повышает аспарагин плазмы"
+      },
+      "pos_grch37": 104568472
+    },
+    "rs37369": {
+      "gene": "AGXT2",
+      "chrom": "5",
+      "pos": 35037010,
+      "ref": "C",
+      "alt": "T",
+      "star": "p.Val140Ile",
+      "note": {
+        "en": "AGXT2 V140I: the T allele raises beta-aminoisobutyric acid",
+        "ru": "AGXT2 V140I: аллель T повышает бета-аминоизомасляную кислоту"
+      },
+      "pos_grch37": 35037115
+    },
+    "rs56335308": {
+      "gene": "SLC7A2",
+      "chrom": "8",
+      "pos": 17561952,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "SLC7A2: associated with plasma arginine, with the direction differing between studies",
+        "ru": "SLC7A2: связан с аргинином плазмы, направление в исследованиях расходится"
+      },
+      "pos_grch37": 17419461
+    },
+    "rs505802": {
+      "gene": "SLC22A12",
+      "chrom": "11",
+      "pos": 64589600,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "SLC22A12 (URAT1): the T allele lowers serum uric acid",
+        "ru": "SLC22A12 (URAT1): аллель T снижает мочевую кислоту"
+      },
+      "pos_grch37": 64357072
+    },
+    "rs734553": {
+      "gene": "SLC2A9",
+      "chrom": "4",
+      "pos": 9921380,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "SLC2A9: the T allele raises serum uric acid by about 0.2-0.4 mg/dL",
+        "ru": "SLC2A9: аллель T повышает мочевую кислоту примерно на 0,2-0,4 мг/дл"
+      },
+      "pos_grch37": 9923004
+    },
+    "rs10934753": {
+      "gene": "SHMT1",
+      "chrom": "3",
+      "pos": 126187336,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "SHMT1: the A allele raises plasma glycine",
+        "ru": "SHMT1: аллель A повышает глицин плазмы"
+      },
+      "pos_grch37": 125906179
+    },
+    "rs10273639": {
+      "gene": "PRSS1",
+      "chrom": "7",
+      "pos": 142749077,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "PRSS1-PRSS2: the C allele, chronic pancreatitis OR about 1.4",
+        "ru": "PRSS1-PRSS2: аллель C, хронический панкреатит OR около 1,4"
+      },
+      "pos_grch37": 142456928
+    },
+    "rs1805087": {
+      "gene": "MTR",
+      "chrom": "1",
+      "pos": 236885200,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Asp919Gly",
+      "note": {
+        "en": "MTR A2756G: the G allele, a small and inconsistent effect on homocysteine",
+        "ru": "MTR A2756G: аллель G, небольшой и непоследовательный эффект на гомоцистеин"
+      },
+      "pos_grch37": 237048500
+    },
+    "rs1801394": {
+      "gene": "MTRR",
+      "chrom": "5",
+      "pos": 7870860,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Ile22Met",
+      "note": {
+        "en": "MTRR A66G: the G allele, a small and inconsistent effect on homocysteine",
+        "ru": "MTRR A66G: аллель G, небольшой и непоследовательный эффект на гомоцистеин"
+      },
+      "pos_grch37": 7870973
+    },
+    "rs5742905": {
+      "gene": "CBS",
+      "chrom": "21",
+      "pos": 43063074,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Ile278Thr",
+      "note": {
+        "en": "CBS I278T: the C allele is on the minus strand, G on the plus strand; in two copies, pyridoxine-responsive classic homocystinuria",
+        "ru": "CBS I278T: аллель C записан на минус-цепи, на плюс-цепи это G; в двух копиях — пиридоксин-чувствительная классическая гомоцистинурия"
+      },
+      "pos_grch37": 44483184
+    },
+    "rs12356193": {
+      "gene": "SLC16A9",
+      "chrom": "10",
+      "pos": 59653595,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "SLC16A9 (MCT9): the A allele raises serum urate and carnitine",
+        "ru": "SLC16A9 (MCT9): аллель A повышает мочевую кислоту и карнитин"
+      },
+      "pos_grch37": 61413353
+    },
+    "rs7678928": {
+      "gene": "PPM1K",
+      "chrom": "4",
+      "pos": 88301675,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "PPM1K, 21 kb upstream: the T allele raises the branched-chain amino acids",
+        "ru": "PPM1K, 21 кб выше гена: аллель T повышает разветвлённые аминокислоты"
+      },
+      "pos_grch37": 89222827
+    },
+    "rs7302925": {
+      "gene": "GLS2",
+      "chrom": "12",
+      "pos": 56467674,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "GLS2 region: the A allele lowers plasma glutamine",
+        "ru": "область GLS2: аллель A снижает глутамин плазмы"
+      },
+      "pos_grch37": 56861458
+    },
+    "rs13538": {
+      "gene": "NAT8",
+      "chrom": "2",
+      "pos": 73641201,
+      "ref": "A",
+      "alt": "G",
+      "star": "p.Phe143Ser",
+      "note": {
+        "en": "NAT8 F143S: the G allele raises the N-acetylated amino acids in blood",
+        "ru": "NAT8 F143S: аллель G повышает N-ацетилированные аминокислоты в крови"
+      },
+      "pos_grch37": 73868328
+    },
+    "rs9296404": {
+      "gene": "GNMT",
+      "chrom": "6",
+      "pos": 42958065,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "GNMT, upstream: the T allele raises homocysteine after a methionine load in one study",
+        "ru": "GNMT, выше гена: аллель T повышает гомоцистеин после метиониновой нагрузки в одном исследовании"
+      },
+      "pos_grch37": 42925803
+    },
+    "rs13244654": {
+      "gene": "PSPH",
+      "chrom": "7",
+      "pos": 56079263,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "PSPH region (not PHGDH): the T allele lowers plasma serine in one Japanese cohort",
+        "ru": "область PSPH (не PHGDH): аллель T снижает серин плазмы в одной японской когорте"
+      },
+      "pos_grch37": 56146956
+    },
+    "rs2238732": {
+      "gene": "PRODH",
+      "chrom": "22",
+      "pos": 18927834,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "PRODH: a strong proline locus; the two studies disagree on which allele raises proline",
+        "ru": "PRODH: сильный локус пролина; два исследования расходятся в том, какой аллель его повышает"
+      },
+      "pos_grch37": 18915347
+    },
+    "rs2066844": {
+      "gene": "NOD2",
+      "chrom": "16",
+      "pos": 50712015,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "NOD2: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "NOD2: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 50745926
+    },
+    "rs10488631": {
+      "gene": "TNPO3",
+      "chrom": "7",
+      "pos": 128954129,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "TNPO3: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "TNPO3: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 128594183
+    },
+    "rs7216389": {
+      "gene": "GSDMB",
+      "chrom": "17",
+      "pos": 39913696,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "GSDMB: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "GSDMB: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 38069949
+    },
+    "rs20541": {
+      "gene": "IL13",
+      "chrom": "5",
+      "pos": 132660272,
+      "ref": "A",
+      "alt": "C",
+      "note": {
+        "en": "IL13: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "IL13: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 131995964
+    },
+    "rs3118470": {
+      "gene": "IL2RA",
+      "chrom": "10",
+      "pos": 6059750,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "IL2RA: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "IL2RA: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 6101713
+    },
+    "rs1800629": {
+      "gene": "TNF",
+      "chrom": "6",
+      "pos": 31575254,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "TNF: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "TNF: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 31543031
+    },
+    "rs532098": {
+      "gene": "TNF",
+      "chrom": "6",
+      "pos": 32610275,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "TNF: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "TNF: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 32578052
+    },
+    "rs2287845": {
+      "gene": "C3",
+      "chrom": "19",
+      "pos": 6696586,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "C3: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "C3: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 6696597
+    },
+    "rs1544410": {
+      "gene": "VDR",
+      "chrom": "12",
+      "pos": 47846052,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "VDR: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "VDR: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 48239835
+    },
+    "rs731236": {
+      "gene": "VDR",
+      "chrom": "12",
+      "pos": 47844974,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "VDR: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "VDR: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 48238757
+    },
+    "rs3134069": {
+      "gene": "TNFRSF11B",
+      "chrom": "8",
+      "pos": 118952749,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "TNFRSF11B: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "TNFRSF11B: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 119964988
+    },
+    "rs7639618": {
+      "gene": "COL6A4P1",
+      "chrom": "3",
+      "pos": 15174922,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "COL6A4P1: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "COL6A4P1: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 15216429
+    },
+    "rs16879765": {
+      "gene": "EPDR1",
+      "chrom": "7",
+      "pos": 37949493,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "EPDR1: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "EPDR1: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 37989095
+    },
+    "rs27044": {
+      "gene": "ERAP1",
+      "chrom": "5",
+      "pos": 96783148,
+      "ref": "G",
+      "alt": "C",
+      "note": {
+        "en": "ERAP1: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "ERAP1: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 96118852
+    },
+    "rs4988321": {
+      "gene": "LRP5",
+      "chrom": "11",
+      "pos": 68406721,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "LRP5: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "LRP5: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 68174189
+    },
+    "rs9514089": {
+      "gene": "SLC10A2",
+      "chrom": "13",
+      "pos": 103058487,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "SLC10A2: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "SLC10A2: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 103710837
+    },
+    "rs2109505": {
+      "gene": "ABCB4",
+      "chrom": "7",
+      "pos": 87450090,
+      "ref": "T",
+      "alt": "A",
+      "note": {
+        "en": "ABCB4: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "ABCB4: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 87079406
+    },
+    "rs759330": {
+      "gene": "PAQR6",
+      "chrom": "1",
+      "pos": 156243466,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "PAQR6: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "PAQR6: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 156213257
+    },
+    "rs4293393": {
+      "gene": "UMOD",
+      "chrom": "16",
+      "pos": 20353266,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "UMOD: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "UMOD: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 20364588
+    },
+    "rs2237892": {
+      "gene": "KCNQ1",
+      "chrom": "11",
+      "pos": 2818521,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "KCNQ1: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "KCNQ1: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 2839751
+    },
+    "rs5015480": {
+      "gene": "HHEX",
+      "chrom": "10",
+      "pos": 92705802,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "HHEX: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "HHEX: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 94465559
+    },
+    "rs6738028": {
+      "gene": "BCL2L11",
+      "chrom": "2",
+      "pos": 111191750,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "BCL2L11: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "BCL2L11: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 111949327
+    },
+    "rs7181230": {
+      "gene": "BMF",
+      "chrom": "15",
+      "pos": 40068540,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "BMF: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "BMF: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 40360741
+    },
+    "rs2987983": {
+      "gene": "ESR2",
+      "chrom": "14",
+      "pos": 64296935,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "ESR2: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "ESR2: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 64763653
+    },
+    "rs4986938": {
+      "gene": "ESR2",
+      "chrom": "14",
+      "pos": 64233098,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "ESR2: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "ESR2: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 64699816
+    },
+    "rs590688": {
+      "gene": "PGR",
+      "chrom": "11",
+      "pos": 101105243,
+      "ref": "C",
+      "alt": "G",
+      "note": {
+        "en": "PGR: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "PGR: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 100975974
+    },
+    "rs7850258": {
+      "gene": "FOXE1",
+      "chrom": "9",
+      "pos": 97786731,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "FOXE1: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "FOXE1: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 100549013
+    },
+    "rs699": {
+      "gene": "AGT",
+      "chrom": "1",
+      "pos": 230710048,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "AGT: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "AGT: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 230845794
+    },
+    "rs6725887": {
+      "gene": "WDR12",
+      "chrom": "2",
+      "pos": 202881162,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "WDR12: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
+        "ru": "WDR12: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
+      },
+      "pos_grch37": 203745885
+    },
+    "rs794727993": {
+      "gene": "COPA",
+      "chrom": "1",
+      "pos": 160323439,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "COPA: a variant of the panel author's list; GenCC links the gene to autoimmune interstitial lung disease-arthritis syndrome (Strong)",
+        "ru": "COPA: вариант из списка автора панели; GenCC связывает ген с «autoimmune interstitial lung disease-arthritis syndrome» (Strong)"
+      },
+      "pos_grch37": 160293229
+    },
+    "rs1357409506": {
+      "gene": "CTLA4",
+      "chrom": "2",
+      "pos": 203870896,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "CTLA4: a variant of the panel author's list; GenCC links the gene to autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency (Definitive)",
+        "ru": "CTLA4: вариант из списка автора панели; GenCC связывает ген с «autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency» (Definitive)"
+      },
+      "pos_grch37": 204735619
+    },
+    "rs778993919": {
+      "gene": "FAS",
+      "chrom": "10",
+      "pos": 89014190,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "FAS: a variant of the panel author's list; GenCC links the gene to autoimmune lymphoproliferative syndrome type 1 (Definitive)",
+        "ru": "FAS: вариант из списка автора панели; GenCC связывает ген с «autoimmune lymphoproliferative syndrome type 1» (Definitive)"
+      },
+      "pos_grch37": 90773947
+    },
+    "rs587777446": {
+      "gene": "IFIH1",
+      "chrom": "2",
+      "pos": 162273913,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "IFIH1: a variant of the panel author's list; GenCC links the gene to IFIH1-related type 1 interferonopathy (Definitive)",
+        "ru": "IFIH1: вариант из списка автора панели; GenCC связывает ген с «IFIH1-related type 1 interferonopathy» (Definitive)"
+      },
+      "pos_grch37": 163130423
+    },
+    "rs1236009877": {
+      "gene": "IFNGR1",
+      "chrom": "6",
+      "pos": 137203727,
+      "ref": "T",
+      "alt": "A",
+      "note": {
+        "en": "IFNGR1: a variant of the panel author's list; GenCC links the gene to immunodeficiency 27A (Definitive)",
+        "ru": "IFNGR1: вариант из списка автора панели; GenCC связывает ген с «immunodeficiency 27A» (Definitive)"
+      },
+      "pos_grch37": 137524864
+    },
+    "rs530073586": {
+      "gene": "IKZF1",
+      "chrom": "7",
+      "pos": 50382664,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "IKZF1: a variant of the panel author's list; GenCC links the gene to pancytopenia due to IKZF1 mutations (Strong)",
+        "ru": "IKZF1: вариант из списка автора панели; GenCC связывает ген с «pancytopenia due to IKZF1 mutations» (Strong)"
+      },
+      "pos_grch37": 50450362
+    },
+    "rs387906914": {
+      "gene": "IL36RN",
+      "chrom": "2",
+      "pos": 113060902,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "IL36RN: a variant of the panel author's list; GenCC links the gene to autoinflammatory syndrome (Strong)",
+        "ru": "IL36RN: вариант из списка автора панели; GenCC связывает ген с «autoinflammatory syndrome» (Strong)"
+      },
+      "pos_grch37": 113818479
+    },
+    "rs28940579": {
+      "gene": "MEFV",
+      "chrom": "16",
+      "pos": 3243310,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "MEFV: a variant of the panel author's list; GenCC links the gene to familial Mediterranean fever (Definitive)",
+        "ru": "MEFV: вариант из списка автора панели; GenCC связывает ген с «familial Mediterranean fever» (Definitive)"
+      },
+      "pos_grch37": 3293310
+    },
+    "rs397514332": {
+      "gene": "NFKB2",
+      "chrom": "10",
+      "pos": 102402138,
+      "ref": "C",
+      "alt": "G",
+      "note": {
+        "en": "NFKB2: a variant of the panel author's list; GenCC links the gene to immunodeficiency, common variable, 10 (Definitive)",
+        "ru": "NFKB2: вариант из списка автора панели; GenCC связывает ген с «immunodeficiency, common variable, 10» (Definitive)"
+      },
+      "pos_grch37": 104161895
+    },
+    "rs587781260": {
+      "gene": "NLRC4",
+      "chrom": "2",
+      "pos": 32250842,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "NLRC4: a variant of the panel author's list; GenCC links the gene to periodic fever-infantile enterocolitis-autoinflammatory syndrome (Definitive)",
+        "ru": "NLRC4: вариант из списка автора панели; GenCC связывает ген с «periodic fever-infantile enterocolitis-autoinflammatory syndrome» (Definitive)"
+      },
+      "pos_grch37": 32475911
+    },
+    "rs1404302953": {
+      "gene": "NLRP12",
+      "chrom": "19",
+      "pos": 53798379,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "NLRP12: a variant of the panel author's list; GenCC links the gene to familial cold autoinflammatory syndrome 2 (Strong)",
+        "ru": "NLRP12: вариант из списка автора панели; GenCC связывает ген с «familial cold autoinflammatory syndrome 2» (Strong)"
+      },
+      "pos_grch37": 54301633
+    },
+    "rs121908150": {
+      "gene": "NLRP3",
+      "chrom": "1",
+      "pos": 247424227,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "NLRP3: a variant of the panel author's list; GenCC links the gene to cryopyrin-associated periodic syndrome (Definitive)",
+        "ru": "NLRP3: вариант из списка автора панели; GenCC связывает ген с «cryopyrin-associated periodic syndrome» (Definitive)"
+      },
+      "pos_grch37": 247587529
+    },
+    "rs104895477": {
+      "gene": "NOD2",
+      "chrom": "16",
+      "pos": 50711058,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "NOD2: a variant of the panel author's list; GenCC links the gene to Blau syndrome (Definitive)",
+        "ru": "NOD2: вариант из списка автора панели; GenCC связывает ген с «Blau syndrome» (Definitive)"
+      },
+      "pos_grch37": 50744969
+    },
+    "rs397518423": {
+      "gene": "PIK3CD",
+      "chrom": "1",
+      "pos": 9726972,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "PIK3CD: a variant of the panel author's list; GenCC links the gene to immunodeficiency 14 (Definitive)",
+        "ru": "PIK3CD: вариант из списка автора панели; GenCC связывает ген с «immunodeficiency 14» (Definitive)"
+      },
+      "pos_grch37": 9787030
+    },
+    "rs587777709": {
+      "gene": "PIK3R1",
+      "chrom": "5",
+      "pos": 68293835,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "PIK3R1: a variant of the panel author's list; GenCC links the gene to immunodeficiency 36 with lymphoproliferation (Definitive)",
+        "ru": "PIK3R1: вариант из списка автора панели; GenCC связывает ген с «immunodeficiency 36 with lymphoproliferation» (Definitive)"
+      },
+      "pos_grch37": 67589663
+    },
+    "rs28939089": {
+      "gene": "PSTPIP1",
+      "chrom": "15",
+      "pos": 77032304,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "PSTPIP1: a variant of the panel author's list; GenCC links the gene to hyperzincemia with functional zinc depletion (Strong)",
+        "ru": "PSTPIP1: вариант из списка автора панели; GenCC связывает ген с «hyperzincemia with functional zinc depletion» (Strong)"
+      },
+      "pos_grch37": 77324645
+    },
+    "rs587777630": {
+      "gene": "STAT1",
+      "chrom": "2",
+      "pos": 190986921,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "STAT1: a variant of the panel author's list; GenCC links the gene to immunodeficiency 31B (Definitive)",
+        "ru": "STAT1: вариант из списка автора панели; GenCC связывает ген с «immunodeficiency 31B» (Definitive)"
+      },
+      "pos_grch37": 191851647
+    },
+    "rs869312892": {
+      "gene": "STAT3",
+      "chrom": "17",
+      "pos": 42316899,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "STAT3: a variant of the panel author's list; GenCC links the gene to hyper-IgE recurrent infection syndrome 1, autosomal dominant (Definitive)",
+        "ru": "STAT3: вариант из списка автора панели; GenCC связывает ген с «hyper-IgE recurrent infection syndrome 1, autosomal dominant» (Definitive)"
+      },
+      "pos_grch37": 40468917
+    },
+    "rs864321626": {
+      "gene": "TNFAIP3",
+      "chrom": "6",
+      "pos": 137877081,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "TNFAIP3: a variant of the panel author's list; GenCC links the gene to autoinflammatory syndrome, familial, Behcet-like 1 (Strong)",
+        "ru": "TNFAIP3: вариант из списка автора панели; GenCC связывает ген с «autoinflammatory syndrome, familial, Behcet-like 1» (Strong)"
+      },
+      "pos_grch37": 138198218
+    },
+    "rs104895217": {
+      "gene": "TNFRSF1A",
+      "chrom": "12",
+      "pos": 6334109,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "TNFRSF1A: a variant of the panel author's list; GenCC links the gene to TNF receptor 1-associated periodic fever syndrome (Definitive)",
+        "ru": "TNFRSF1A: вариант из списка автора панели; GenCC связывает ген с «TNF receptor 1-associated periodic fever syndrome» (Definitive)"
+      },
+      "pos_grch37": 6443275
+    },
+    "rs111033566": {
+      "gene": "PRSS1",
+      "chrom": "7",
+      "pos": 142750600,
+      "ref": "A",
+      "alt": "C",
+      "note": {
+        "en": "PRSS1: a variant of the panel author's list; GenCC links the gene to hereditary chronic pancreatitis (Definitive)",
+        "ru": "PRSS1: вариант из списка автора панели; GenCC связывает ген с «hereditary chronic pancreatitis» (Definitive)"
+      },
+      "pos_grch37": 142458451
+    },
+    "rs863225072": {
+      "gene": "SLC2A9",
+      "chrom": "4",
+      "pos": 10019000,
+      "ref": "A",
+      "alt": "C",
+      "note": {
+        "en": "SLC2A9: a variant of the panel author's list; GenCC links the gene to hypouricemia, renal, 2 (Strong)",
+        "ru": "SLC2A9: вариант из списка автора панели; GenCC связывает ген с «hypouricemia, renal, 2» (Strong)"
+      },
+      "pos_grch37": 10020624
+    },
+    "rs1204038": {
+      "gene": "AR",
+      "chrom": "X",
+      "pos": 67568383,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "AR: PSA concentration differs by genotype; no measured effect on androgen sensitivity",
+        "ru": "AR: PSA concentration differs by genotype; no measured effect on androgen sensitivity"
+      },
+      "pos_grch37": 66788225
+    },
+    "rs6152": {
+      "gene": "AR",
+      "chrom": "X",
+      "pos": 67545785,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "AR: androgenetic alopecia association in a meta-analysis; no effect on androgen-dependent processes shown",
+        "ru": "AR: androgenetic alopecia association in a meta-analysis; no effect on androgen-dependent processes shown"
+      },
+      "pos_grch37": 66765627
+    },
+    "rs743572": {
+      "gene": "CYP17A1",
+      "chrom": "10",
+      "pos": 102837395,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "CYP17A1: polycystic ovary syndrome association per C allele, replicated",
+        "ru": "CYP17A1: polycystic ovary syndrome association per C allele, replicated"
+      },
+      "pos_grch37": 104597152
+    },
+    "rs2470152": {
+      "gene": "CYP19A1",
+      "chrom": "15",
+      "pos": 51302775,
+      "ref": "G",
+      "alt": "C",
+      "note": {
+        "en": "CYP19A1: serum estradiol and aromatase activity differ by genotype",
+        "ru": "CYP19A1: serum estradiol and aromatase activity differ by genotype"
+      },
+      "pos_grch37": 51594972
+    },
+    "rs2234693": {
+      "gene": "ESR1",
+      "chrom": "6",
+      "pos": 151842200,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "ESR1: no measured effect for this variant in the sources named",
+        "ru": "ESR1: no measured effect for this variant in the sources named"
+      },
+      "pos_grch37": 152163335
+    },
+    "rs2881766": {
+      "gene": "ESR1",
+      "chrom": "6",
+      "pos": 151797984,
+      "ref": "T",
+      "alt": "G",
+      "note": {
+        "en": "ESR1: breast cancer risk in one Korean study; nothing on estrogen-dependent phenotypes as claimed",
+        "ru": "ESR1: breast cancer risk in one Korean study; nothing on estrogen-dependent phenotypes as claimed"
+      },
+      "pos_grch37": 152119119
+    },
+    "rs9340799": {
+      "gene": "ESR1",
+      "chrom": "6",
+      "pos": 151842246,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "ESR1: endometriosis association per G allele, replicated",
+        "ru": "ESR1: endometriosis association per G allele, replicated"
+      },
+      "pos_grch37": 152163381
+    },
+    "rs1042838": {
+      "gene": "PGR",
+      "chrom": "11",
+      "pos": 101062681,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "PGR: endometriosis association per PROGINS allele, replicated",
+        "ru": "PGR: endometriosis association per PROGINS allele, replicated"
+      },
+      "pos_grch37": 100933412
+    },
+    "rs10895068": {
+      "gene": "PGR",
+      "chrom": "11",
+      "pos": 101129483,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "PGR: a lower risk of deep infiltrating endometriosis per A allele",
+        "ru": "PGR: a lower risk of deep infiltrating endometriosis per A allele"
+      },
+      "pos_grch37": 101000214
+    },
+    "rs12150660": {
+      "gene": "SHBG",
+      "chrom": "17",
+      "pos": 7618597,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "SHBG: SHBG higher per T allele; total testosterone follows SHBG",
+        "ru": "SHBG: SHBG higher per T allele; total testosterone follows SHBG"
+      },
+      "pos_grch37": 7521915
+    },
+    "rs2637125": {
+      "gene": "SULT2A1",
+      "chrom": "19",
+      "pos": 47898636,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "SULT2A1: DHEA-S lower per A allele",
+        "ru": "SULT2A1: DHEA-S lower per A allele"
+      },
+      "pos_grch37": 48401893
+    },
+    "rs11761528": {
+      "gene": "ZKSCAN5",
+      "chrom": "7",
+      "pos": 99521178,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "ZKSCAN5: DHEA-S lower per T allele",
+        "ru": "ZKSCAN5: DHEA-S lower per T allele"
+      },
+      "pos_grch37": 99118801
+    },
+    "rs5985": {
+      "gene": "F13A1",
+      "chrom": "6",
+      "pos": 6318562,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "F13A1: venous thromboembolism risk LOWER per Leu34 allele",
+        "ru": "F13A1: venous thromboembolism risk LOWER per Leu34 allele"
+      },
+      "pos_grch37": 6318795
+    },
+    "rs1126643": {
+      "gene": "ITGA2",
+      "chrom": "5",
+      "pos": 53051539,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "ITGA2: ischaemic stroke association per T allele; higher platelet collagen receptor density",
+        "ru": "ITGA2: ischaemic stroke association per T allele; higher platelet collagen receptor density"
+      },
+      "pos_grch37": 52347369
+    },
+    "rs5918": {
+      "gene": "ITGB3",
+      "chrom": "17",
+      "pos": 47283364,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "ITGB3: a small increase in some arterial events per PlA2 allele",
+        "ru": "ITGB3: a small increase in some arterial events per PlA2 allele"
+      },
+      "pos_grch37": 45360730
+    },
+    "rs1501299": {
+      "gene": "ADIPOQ",
+      "chrom": "3",
+      "pos": 186853334,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "ADIPOQ: adiponectin and lipid levels differ by genotype in a meta-analysis",
+        "ru": "ADIPOQ: adiponectin and lipid levels differ by genotype in a meta-analysis"
+      },
+      "pos_grch37": 186571123
+    },
+    "rs2241766": {
+      "gene": "ADIPOQ",
+      "chrom": "3",
+      "pos": 186853103,
+      "ref": "T",
+      "alt": "G",
+      "note": {
+        "en": "ADIPOQ: adiponectin lower and obesity association per G allele",
+        "ru": "ADIPOQ: adiponectin lower and obesity association per G allele"
+      },
+      "pos_grch37": 186570892
+    },
+    "rs7754840": {
+      "gene": "CDKAL1",
+      "chrom": "6",
+      "pos": 20661019,
+      "ref": "G",
+      "alt": "C",
+      "note": {
+        "en": "CDKAL1: type 2 diabetes association per C allele; glucose-stimulated insulin secretion lower",
+        "ru": "CDKAL1: type 2 diabetes association per C allele; glucose-stimulated insulin secretion lower"
+      },
+      "pos_grch37": 20661250
+    },
+    "rs9465871": {
+      "gene": "CDKAL1",
+      "chrom": "6",
+      "pos": 20717024,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "CDKAL1: type 2 diabetes association per C allele",
+        "ru": "CDKAL1: type 2 diabetes association per C allele"
+      },
+      "pos_grch37": 20717255
+    },
+    "rs7756992": {
+      "gene": "CDKAL1",
+      "chrom": "6",
+      "pos": 20679478,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "CDKAL1: type 2 diabetes association per G allele",
+        "ru": "CDKAL1: type 2 diabetes association per G allele"
+      },
+      "pos_grch37": 20679709
+    },
+    "rs1121980": {
+      "gene": "FTO",
+      "chrom": "16",
+      "pos": 53775335,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "FTO: obesity association per A allele in a meta-analysis",
+        "ru": "FTO: obesity association per A allele in a meta-analysis"
+      },
+      "pos_grch37": 53809247
+    },
+    "rs1421085": {
+      "gene": "FTO",
+      "chrom": "16",
+      "pos": 53767042,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "FTO: obesity association per C allele; the functional variant of the locus",
+        "ru": "FTO: obesity association per C allele; the functional variant of the locus"
+      },
+      "pos_grch37": 53800954
+    },
+    "rs17817449": {
+      "gene": "FTO",
+      "chrom": "16",
+      "pos": 53779455,
+      "ref": "T",
+      "alt": "G",
+      "note": {
+        "en": "FTO: obesity association per G allele; OR about 1.5 per allele in the early meta-analysis",
+        "ru": "FTO: obesity association per G allele; OR about 1.5 per allele in the early meta-analysis"
+      },
+      "pos_grch37": 53813367
+    },
+    "rs9939609": {
+      "gene": "FTO",
+      "chrom": "16",
+      "pos": 53786615,
+      "ref": "T",
+      "alt": "A",
+      "note": {
+        "en": "FTO: body mass index and obesity association per A allele",
+        "ru": "FTO: body mass index and obesity association per A allele"
+      },
+      "pos_grch37": 53820527
+    },
+    "rs5215": {
+      "gene": "KCNJ11",
+      "chrom": "11",
+      "pos": 17387083,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "KCNJ11: type 2 diabetes association per G allele",
+        "ru": "KCNJ11: type 2 diabetes association per G allele"
+      },
+      "pos_grch37": 17408630
+    },
+    "rs5219": {
+      "gene": "KCNJ11",
+      "chrom": "11",
+      "pos": 17388025,
+      "ref": "T",
+      "alt": "A",
+      "note": {
+        "en": "KCNJ11: type 2 diabetes association per T (Lys23) allele",
+        "ru": "KCNJ11: type 2 diabetes association per T (Lys23) allele"
+      },
+      "pos_grch37": 17409572
+    },
+    "rs17782313": {
+      "gene": "MC4R",
+      "chrom": "18",
+      "pos": 60183864,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "MC4R: obesity association per C allele, replicated",
+        "ru": "MC4R: obesity association per C allele, replicated"
+      },
+      "pos_grch37": 57851097
+    },
+    "rs10830963": {
+      "gene": "MTNR1B",
+      "chrom": "11",
+      "pos": 92975544,
+      "ref": "C",
+      "alt": "G",
+      "note": {
+        "en": "MTNR1B: fasting glucose about +0.07 mmol/L per G allele",
+        "ru": "MTNR1B: fasting glucose about +0.07 mmol/L per G allele"
+      },
+      "pos_grch37": 92708710
+    },
+    "rs13266634": {
+      "gene": "SLC30A8",
+      "chrom": "8",
+      "pos": 117172544,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "SLC30A8: type 2 diabetes association per C (Arg325) allele",
+        "ru": "SLC30A8: type 2 diabetes association per C (Arg325) allele"
+      },
+      "pos_grch37": 118184783
+    },
+    "rs12255372": {
+      "gene": "TCF7L2",
+      "chrom": "10",
+      "pos": 113049143,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "TCF7L2: type 2 diabetes association per T allele; insulin secretion lower",
+        "ru": "TCF7L2: type 2 diabetes association per T allele; insulin secretion lower"
+      },
+      "pos_grch37": 114808902
+    },
+    "rs7901695": {
+      "gene": "TCF7L2",
+      "chrom": "10",
+      "pos": 112994329,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "TCF7L2: type 2 diabetes association per C allele",
+        "ru": "TCF7L2: type 2 diabetes association per C allele"
+      },
+      "pos_grch37": 114754088
+    },
+    "rs9272346": {
+      "gene": "HLA-DQA1",
+      "chrom": "6",
+      "pos": 32636595,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "HLA-DQA1: type 1 diabetes association per A allele, very strong in the HLA region",
+        "ru": "HLA-DQA1: type 1 diabetes association per A allele, very strong in the HLA region"
+      },
+      "pos_grch37": 32604372
+    },
+    "rs2071403": {
+      "gene": "TPO",
+      "chrom": "2",
+      "pos": 1413472,
+      "ref": "A",
+      "alt": "G",
+      "note": {
+        "en": "TPO: anti-TPO antibodies and autoimmune thyroid disease association per G allele",
+        "ru": "TPO: anti-TPO antibodies and autoimmune thyroid disease association per G allele"
+      },
+      "pos_grch37": 1417244
+    },
+    "rs11174811": {
+      "gene": "AVPR1A",
+      "chrom": "12",
+      "pos": 63146696,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "AVPR1A: substance use disorder association in one study; a miRNA target-site effect in another",
+        "ru": "AVPR1A: substance use disorder association in one study; a miRNA target-site effect in another"
+      },
+      "pos_grch37": 63540476
+    },
+    "rs6265": {
+      "gene": "BDNF",
+      "chrom": "11",
+      "pos": 27658369,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "BDNF: declarative memory slightly lower per Met allele; a stress-dependent depression association",
+        "ru": "BDNF: declarative memory slightly lower per Met allele; a stress-dependent depression association"
+      },
+      "pos_grch37": 27679916
+    },
+    "rs242941": {
+      "gene": "CRHR1",
+      "chrom": "17",
+      "pos": 45815154,
+      "ref": "A",
+      "alt": "T",
+      "note": {
+        "en": "CRHR1: depression association in one study",
+        "ru": "CRHR1: depression association in one study"
+      },
+      "pos_grch37": 43892520
+    },
+    "rs686": {
+      "gene": "DRD1",
+      "chrom": "5",
+      "pos": 175441697,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "DRD1: allele-specific expression of DRD1; no clinical outcome measured",
+        "ru": "DRD1: allele-specific expression of DRD1; no clinical outcome measured"
+      },
+      "pos_grch37": 174868700
+    },
+    "rs1800497": {
+      "gene": "DRD2",
+      "chrom": "11",
+      "pos": 113400106,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "DRD2: striatal D2/3 receptor binding differs per A1 allele; the variant is in ANKK1, beside DRD2",
+        "ru": "DRD2: striatal D2/3 receptor binding differs per A1 allele; the variant is in ANKK1, beside DRD2"
+      },
+      "pos_grch37": 113270828
+    },
+    "rs6277": {
+      "gene": "DRD2",
+      "chrom": "11",
+      "pos": 113412737,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "DRD2: extrastriatal D2 receptor availability differs per T allele in one PET study",
+        "ru": "DRD2: extrastriatal D2 receptor availability differs per T allele in one PET study"
+      },
+      "pos_grch37": 113283459
+    },
+    "rs1800955": {
+      "gene": "DRD4",
+      "chrom": "11",
+      "pos": 636784,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "DRD4: a smoking association in one study",
+        "ru": "DRD4: a smoking association in one study"
+      },
+      "pos_grch37": 636784
+    },
+    "rs6295": {
+      "gene": "HTR1A",
+      "chrom": "5",
+      "pos": 63962738,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "HTR1A: mood disorder association and antidepressant response differ per G allele",
+        "ru": "HTR1A: mood disorder association and antidepressant response differ per G allele"
+      },
+      "pos_grch37": 63258565
+    },
+    "rs594242": {
+      "gene": "HTR2A",
+      "chrom": "13",
+      "pos": 46883917,
+      "ref": "C",
+      "alt": "A",
+      "note": {
+        "en": "HTR2A: temperament trait associations in two studies",
+        "ru": "HTR2A: temperament trait associations in two studies"
+      },
+      "pos_grch37": 47458052
+    },
+    "rs6311": {
+      "gene": "HTR2A",
+      "chrom": "13",
+      "pos": 46897343,
+      "ref": "C",
+      "alt": "T",
+      "note": {
+        "en": "HTR2A: the meta-analysed association per A allele",
+        "ru": "HTR2A: the meta-analysed association per A allele"
+      },
+      "pos_grch37": 47471478
+    },
+    "rs6314": {
+      "gene": "HTR2A",
+      "chrom": "13",
+      "pos": 46834899,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "HTR2A: receptor function and antidepressant response differ per Tyr452 allele",
+        "ru": "HTR2A: receptor function and antidepressant response differ per Tyr452 allele"
+      },
+      "pos_grch37": 47409034
+    },
+    "rs1799836": {
+      "gene": "MAOB",
+      "chrom": "X",
+      "pos": 43768752,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "MAOB: no replicated association; one negative study",
+        "ru": "MAOB: no replicated association; one negative study"
+      },
+      "pos_grch37": 43627999
+    },
+    "rs6198": {
+      "gene": "NR3C1",
+      "chrom": "5",
+      "pos": 143278056,
+      "ref": "T",
+      "alt": "C",
+      "note": {
+        "en": "NR3C1: no source for this variant as such",
+        "ru": "NR3C1: no source for this variant as such"
+      },
+      "pos_grch37": 142657621
+    },
+    "rs1042778": {
+      "gene": "OXTR",
+      "chrom": "3",
+      "pos": 8752859,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "OXTR: a gene × environment effect in one study",
+        "ru": "OXTR: a gene × environment effect in one study"
+      },
+      "pos_grch37": 8794545
+    },
+    "rs2254298": {
+      "gene": "OXTR",
+      "chrom": "3",
+      "pos": 8760542,
+      "ref": "G",
+      "alt": "T",
+      "note": {
+        "en": "OXTR: small sociality-related effects in a meta-analysis",
+        "ru": "OXTR: small sociality-related effects in a meta-analysis"
+      },
+      "pos_grch37": 8802228
+    },
+    "rs53576": {
+      "gene": "OXTR",
+      "chrom": "3",
+      "pos": 8762685,
+      "ref": "A",
+      "alt": "T",
+      "note": {
+        "en": "OXTR: small sociality-related effects per A allele in meta-analyses",
+        "ru": "OXTR: small sociality-related effects per A allele in meta-analyses"
+      },
+      "pos_grch37": 8804371
+    },
+    "rs5569": {
+      "gene": "SLC6A2",
+      "chrom": "16",
+      "pos": 55697923,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "SLC6A2: no replicated association",
+        "ru": "SLC6A2: no replicated association"
+      },
+      "pos_grch37": 55731835
+    },
+    "rs1800790": {
+      "gene": "FGB",
+      "chrom": "4",
+      "pos": 154562556,
+      "ref": "G",
+      "alt": "A",
+      "note": {
+        "en": "FGB: plasma fibrinogen higher per A allele",
+        "ru": "FGB: plasma fibrinogen higher per A allele"
+      },
+      "pos_grch37": 155483708
     }
   }
 }

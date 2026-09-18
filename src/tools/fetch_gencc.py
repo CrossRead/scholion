@@ -362,6 +362,10 @@ def build(text: str, filt: Dict[str, Any], *, export_date: Optional[str],
         "license": LICENSE,
         "citation": CITATION,
         "downloaded": downloaded,
+        # The stamp the local-refresh comparison reads (core.knowledge_precedence).
+        # It used to be added by hand after each run, and a run that forgot left
+        # the bundled file with no date to compare a local copy against.
+        "updated": _dt.date.today().isoformat(),
         "origin": origin,
         "export_last_modified": export_date,
         "export_last_modified_header": export_meta.get("last_modified"),

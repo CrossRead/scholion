@@ -81,6 +81,112 @@ def fingerprint() -> str:
     return h.hexdigest()
 
 
+CATALOGUE = ("src", "scholion", "knowledge", "loci.json")
+#: The lead a release entry has to carry when the catalogue grew. It is matched as
+#: text rather than parsed: the journal is prose for a reader, and what matters here
+#: is that the command a person must run is named in the entry at all.
+REGENOTYPE = "genotype-sites"
+
+
+def version_tuple(v) -> tuple:
+    out = []
+    for part in str(v).split("."):
+        digits = "".join(c for c in part if c.isdigit())
+        out.append(int(digits) if digits else 0)
+    return tuple(out)
+
+
+def catalogue():
+    """The size of the locus catalogue that travels in this build, and its date.
+
+    A person's `loci_sites.vcf.gz` answers for the catalogue it was made from. The
+    catalogue grew three times in five weeks — 61 → 113 → 141 → 250 — and every time
+    the positions added since read as «not read» on a profile that was never
+    re-genotyped, and every time it was noticed on the owner's own data rather than
+    at the release (task 202). Recording the size at publication is what lets a
+    release know it grew.
+    """
+    try:
+        data = json.loads(ROOT.joinpath(*CATALOGUE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        # A tree with no catalogue is not a tree with an empty one. The anonymised
+        # package and the probe trees the tests build are the honest cases: there
+        # is nothing to record and nothing to compare, and saying «0 positions»
+        # would be a measurement nobody made.
+        return None
+    meta = data.get("_meta") or {}
+    stamp = str(meta.get("catalog_updated") or meta.get("updated") or "")[:10]
+    return {"positions": len(data.get("loci") or {}), "updated": stamp or None}
+
+
+def _entry(value) -> dict:
+    """One record, whichever shape it was written in.
+
+    Everything published before 0.5.5 recorded the fingerprint alone, as a string.
+    Those entries are read, not rewritten: a record of what was published is not a
+    place to invent a number nobody measured at the time.
+    """
+    if isinstance(value, str):
+        return {"fingerprint": value, "catalogue": None}
+    if isinstance(value, dict):
+        return {"fingerprint": value.get("fingerprint"), "catalogue": value.get("catalogue")}
+    return {"fingerprint": None, "catalogue": None}
+
+
+def _last_recorded_catalogue(data: dict, before: str):
+    """The newest version below this one that recorded a catalogue, and what it recorded."""
+    best, found = None, None
+    for version, value in data.items():
+        cat = _entry(value).get("catalogue")
+        if not cat or version_tuple(version) >= version_tuple(before):
+            continue
+        if best is None or version_tuple(version) > version_tuple(best):
+            best, found = version, cat
+    return best, found
+
+
+def _entry_body(version: str) -> str:
+    """The journal section of one version, as text."""
+    try:
+        text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+    except OSError:
+        return ""
+    m = re.search(r"^##\s+v?" + re.escape(version) + r"\b(.*?)(?=^##\s+v?\d|\Z)",
+                  text, re.M | re.S)
+    return m.group(1) if m else ""
+
+
+def catalogue_check(version: str, data: dict) -> int:
+    """Did the catalogue grow, and if so does this entry tell people to re-run the step?"""
+    now = catalogue()
+    if now is None:
+        return 0
+    was_version, was = _last_recorded_catalogue(data, version)
+    if not was:
+        print(f"  · the locus catalogue: {now['positions']} positions ({now['updated'] or '—'});")
+        print("    no earlier version recorded one, so there is nothing to compare it with yet")
+        return 0
+    if int(was.get("positions") or 0) == int(now["positions"]):
+        print(f"  ✓ the locus catalogue is the same size as in {was_version} "
+              f"({now['positions']} positions)")
+        return 0
+    grew = int(now["positions"]) - int(was.get("positions") or 0)
+    body = _entry_body(version)
+    if REGENOTYPE in body:
+        print(f"  ✓ the locus catalogue changed since {was_version} "
+              f"({was.get('positions')} → {now['positions']}, {grew:+d}), and the entry for "
+              f"{version} says to run `scholion {REGENOTYPE}`")
+        return 0
+    print(f"  ✗ the locus catalogue changed since {was_version}: "
+          f"{was.get('positions')} → {now['positions']} ({grew:+d} positions).")
+    print("    Everybody's `loci_sites.vcf.gz` was made for the smaller one, so every position")
+    print("    added since will read as «not read» on their profile until they re-run the step —")
+    print(f"    and the entry for {version} does not mention `scholion {REGENOTYPE}`.")
+    print(f"    Add it under «What needs recomputing» in CHANGELOG.md, or say there why this")
+    print("    growth needs nothing.")
+    return 1
+
+
 def _record() -> dict:
     try:
         return json.loads(RECORD.read_text(encoding="utf-8"))
@@ -107,7 +213,7 @@ def check(allow_unverified: bool = False) -> int:
 
     if out is False:
         print(f"  ✓ {name} {version} is not in the registry yet — this is a first publication")
-        return 0
+        return catalogue_check(version, _record())
     if out is None:
         print(f"  ⚠ could not ask PyPI whether {name} {version} exists.")
         if not allow_unverified:
@@ -119,7 +225,8 @@ def check(allow_unverified: bool = False) -> int:
         print("    --allow-unverified: continuing without the comparison.")
         return 0
 
-    was = _record().get(version)
+    data = _record()
+    was = _entry(data.get(version)).get("fingerprint") if version in data else None
     if was is None:
         print(f"  ⚠ {name} {version} is already published, and there is no record of what")
         print("    went into it, so «has the package changed» cannot be answered here.")
@@ -133,7 +240,7 @@ def check(allow_unverified: bool = False) -> int:
         print(f"  ✓ {name} {version} is published and the package is unchanged")
         print("    (the registry will skip the upload; only what travels outside the")
         print("    package is being re-published)")
-        return 0
+        return catalogue_check(version, data)
 
     print(f"  ✗ {name} {version} is already published AND the package has changed since.")
     print("    A published version cannot be rewritten: the upload would be skipped, the")
@@ -146,9 +253,15 @@ def check(allow_unverified: bool = False) -> int:
 def record() -> int:
     version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     data = _record()
-    data[version] = fingerprint()
+    cat = catalogue()
+    if cat is not None and not cat.get("positions"):
+        print("  ✗ the locus catalogue is there and reads as empty; nothing was recorded.")
+        return 1
+    data[version] = {"fingerprint": fingerprint(), "catalogue": cat}
     RECORD.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"  ✓ recorded what went into {version}")
+    said = (f" — and its locus catalogue ({cat['positions']} positions, "
+            f"{cat['updated'] or 'no date'})") if cat else ""
+    print(f"  ✓ recorded what went into {version}{said}")
     return 0
 
 

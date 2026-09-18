@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "updated": "2026-08-19",
+    "updated": "2026-09-17",
     "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
-    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently.",
+    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently; {never_measured:[keys]} — true while none of them was ever measured; {measured:[keys]} — true when any of them was.",
     "source_tier": "guideline_compiled"
   },
   "rules": [
@@ -218,6 +218,438 @@
         "ru": "ε-статус сдвигает оценки сердечно-сосудистого и когнитивного риска, читается один раз и больше не меняется."
       },
       "specialist": "—"
+    },
+    {
+      "id": "amino_urine_profile",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "urine_aa_cystine",
+              "urine_aa_lysine",
+              "urine_aa_arginine",
+              "urine_aa_ornithine",
+              "urine_aa_glycine",
+              "urine_aa_proline"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "A urine amino acid profile (a 24-hour or a spot collection)",
+        "ru": "Аминокислоты мочи (полный профиль) — суточная или разовая моча"
+      },
+      "priority": "high",
+      "why": {
+        "en": "A plasma panel alone cannot tell «little was absorbed» from «it was lost through the kidney»: the same low plasma value comes from both, and only urine separates them.",
+        "ru": "По одной плазме нельзя отличить «мало усвоил» от «потерял через почку»: одно и то же низкое значение даёт и то, и другое, а разделяет их только моча."
+      },
+      "covers": [
+        "urine_aa_cystine",
+        "urine_aa_lysine",
+        "urine_aa_arginine",
+        "urine_aa_ornithine",
+        "urine_aa_glycine",
+        "urine_aa_proline"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_urine_cystine",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "urine_aa_cystine"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Cystine in a 24-hour urine collection",
+        "ru": "Цистин суточной мочи"
+      },
+      "priority": "high",
+      "why": {
+        "en": "Carriers of cystinuria excrete more cystine while their plasma stays ordinary; stones form in a minority of them, and the excretion is what says whether the question applies at all.",
+        "ru": "У носителей цистинурии экскреция цистина повышена при обычной плазме; камни бывают у меньшинства, и именно экскреция говорит, стоит ли вообще этот вопрос."
+      },
+      "covers": [
+        "urine_aa_cystine"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_ammonia",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "ammonia"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Plasma ammonia, fasting",
+        "ru": "Аммиак плазмы натощак"
+      },
+      "priority": "high",
+      "why": {
+        "en": "The capacity of the urea cycle is read from ammonia together with glutamine, citrulline and urea — the panel already holds the other three.",
+        "ru": "Ёмкость цикла мочевины читается по аммиаку вместе с глутамином, цитруллином и мочевиной — остальные три в панели уже есть."
+      },
+      "covers": [
+        "ammonia"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_kynurenine",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "kynurenine"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Kynurenine, with the kynurenine/tryptophan ratio",
+        "ru": "Кинуренин и отношение кинуренин/триптофан"
+      },
+      "priority": "high",
+      "why": {
+        "en": "Tryptophan low with no shortage of protein is usually tryptophan spent down the kynurenine path in inflammation; the ratio is what shows it.",
+        "ru": "Низкий триптофан без нехватки белка — это чаще всего триптофан, потраченный по кинурениновому пути при воспалении; показывает это отношение."
+      },
+      "covers": [
+        "kynurenine"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_b6",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "vitamin_b6"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Vitamin B6 as pyridoxal phosphate",
+        "ru": "Витамин B6 (пиридоксальфосфат)"
+      },
+      "priority": "high",
+      "why": {
+        "en": "B6 is the cofactor of transsulfuration and of the kynurenine path, and it is also what a B6-responsive variant would be responding to — without the value neither question can be answered.",
+        "ru": "B6 — кофактор транссульфурации и кинуренинового пути, и именно на него отвечал бы B6-отзывчивый вариант; без значения ни один из этих вопросов не решается."
+      },
+      "covers": [
+        "vitamin_b6"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_fecal_elastase",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "fecal_elastase"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Fecal elastase",
+        "ru": "Эластаза кала"
+      },
+      "priority": "high",
+      "why": {
+        "en": "The first link of the chain is digestion of protein. Without it, low plasma amino acids have nothing to be explained by.",
+        "ru": "Первое звено цепи — переваривание белка. Без него низкие аминокислоты плазмы нечем объяснить."
+      },
+      "covers": [
+        "fecal_elastase"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_dimethylarginines",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "adma",
+              "sdma"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "ADMA and SDMA, to discuss",
+        "ru": "АДМА и СДМА — обсудить"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "The methylated arginines brake nitric oxide synthesis, and they are what ties the arginine part of the panel to AGXT2 and DDAH1.",
+        "ru": "Метилированные аргинины тормозят синтез оксида азота — через них аргининовая часть панели связана с AGXT2 и DDAH1."
+      },
+      "covers": [
+        "adma",
+        "sdma"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_3_methylhistidine",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "urine_3_methylhistidine"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "3-methylhistidine in urine, to discuss",
+        "ru": "3-метилгистидин мочи — обсудить"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "It separates «I eat little» from «I am losing my own»: it comes from the breakdown of the person's own muscle protein.",
+        "ru": "Он отличает «мало ем» от «теряю своё»: это распад собственного мышечного белка."
+      },
+      "covers": [
+        "urine_3_methylhistidine"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_urine_urea_nitrogen",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          },
+          {
+            "never_measured": [
+              "urine_urea_nitrogen"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Urea nitrogen in a 24-hour urine collection, to discuss",
+        "ru": "Азот мочевины суточной мочи — обсудить"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "The nitrogen balance: how much protein was actually used against how much was eaten.",
+        "ru": "Азотистый баланс: сколько белка действительно усвоено против съеденного."
+      },
+      "covers": [
+        "urine_urea_nitrogen"
+      ],
+      "recheck_months": 12,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+    },
+    {
+      "id": "amino_methionine_load",
+      "when": {
+        "all": [
+          {
+            "measured": [
+              "homocysteine"
+            ]
+          },
+          {
+            "measured": [
+              "aa_glycine",
+              "aa_glutamine",
+              "aa_valine",
+              "aa_leucine",
+              "aa_isoleucine",
+              "aa_phenylalanine",
+              "aa_tyrosine",
+              "aa_methionine",
+              "aa_lysine",
+              "aa_arginine",
+              "aa_ornithine",
+              "citrulline"
+            ]
+          }
+        ]
+      },
+      "suggest": {
+        "en": "Homocysteine after a methionine load, to discuss with a clinician",
+        "ru": "Гомоцистеин после метиониновой нагрузки — обсудить с врачом"
+      },
+      "priority": "moderate",
+      "why": {
+        "en": "A fasting corridor excludes nothing here: a partial capacity of transsulfuration shows under a load and is invisible at rest. The whole product reads a person at rest, which is why this one is a test and not a reading.",
+        "ru": "Коридор натощак здесь ничего не исключает: частичная ёмкость транссульфурации видна под нагрузкой и невидима в покое. Весь продукт читает человека в покое — поэтому это проба, а не показание."
+      },
+      "covers": [
+        "homocysteine"
+      ],
+      "recheck_months": 24,
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
     }
   ]
 }

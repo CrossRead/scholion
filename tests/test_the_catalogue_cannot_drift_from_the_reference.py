@@ -91,7 +91,16 @@ class TestBothBuildsAreRealCoordinates(unittest.TestCase):
                 self.assertIsInstance(loc.get("pos_grch37"), int)
 
     def test_the_two_builds_do_not_share_a_number(self):
+        """Unless the catalogue's own `_meta` names the locus and says why — the
+        assemblies do coincide in places, and a named exception with its reason
+        is the difference between a coordinate and a copy."""
+        import json as _json
+        from scholion import core as _core
+        same = (_json.loads(_core.knowledge_path("loci.json").read_text(encoding="utf-8"))["_meta"]
+                .get("grch37_same_as_grch38") or {})
         for rs, loc in catalogue().items():
+            if rs in same:
+                self.assertIn("GRCh37", same[rs]); continue
             with self.subTest(rs=rs):
                 self.assertNotEqual(loc["pos"], loc["pos_grch37"],
                                     f"{rs}: the same number in both builds is a copy, not a coordinate")

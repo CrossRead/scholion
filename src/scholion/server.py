@@ -384,6 +384,9 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/limits":
                 from . import limits as _lim
                 return self._json(_lim.report())
+            if p == "/api/evidence-levels":
+                from .engine import panel_gate as _pg
+                return self._json(_pg.legend())
             if p == "/api/markers":
                 return self._json({"markers": _marker_catalog()})
             if p == "/api/metrics":

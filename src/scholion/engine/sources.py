@@ -185,6 +185,8 @@ def provenance() -> Dict[str, Any]:
         "catalog": pub("loci.json", _t("sources.catalog"), _t("sources.catalog_origin")),
         "test_rules": pub("test_rules.json", _t("sources.test_rules"),
                           _t("sources.test_rules_origin")),
+        "correction_routes": pub("correction_routes.json", _t("sources.correction_routes"),
+                                 _t("sources.correction_routes_origin")),
         "genome_vcf": genome_vcf,
         "clinvar": clinvar,
         "ensembl": ensembl,

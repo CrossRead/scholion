@@ -94,15 +94,16 @@ is likeliest to want.
 
 The body is laid out as the systems a laboratory actually issues panels for —
 lipids, heart and vessels, carbohydrate metabolism, inflammation, thyroid,
-adrenals, gonads, growth axis, pancreas, liver, micronutrients, kidneys — plus
-a thirteenth built from wearable metrics. Asked about one of them, the program answers with a single
+adrenals, gonads, growth axis, pancreas, liver, micronutrients, kidneys, immunity,
+the musculoskeletal system, amino acids and protein — plus a sixteenth built from
+wearable metrics. Asked about one of them, the program answers with a single
 card: the laboratory now and its movement since the previous draw, the genetic
 half of that system and how much of it was actually read, the polygenic scores
 placed on it, the prescriptions acting on it, a target the treating clinician
 set, what the test rules suggest, and the questions left open.
 
 **The genetic half is composed from a base with a version, not from anybody's
-memory.** 1203 genes across the twelve systems, taken from the Gene Curation
+memory.** 1469 genes across the fifteen systems, taken from the Gene Curation
 Coalition export, with every submitter's assertion kept side by side: who
 asserted the gene–disease link, how strongly, under which mode of inheritance,
 and on what date. Two groups disagreeing about one gene are shown disagreeing
@@ -110,8 +111,8 @@ rather than averaged. An assertion classified Limited, Disputed or Refuted is
 never presented as a finding, and one copy of an allele in a recessive gene is
 printed as carriership and raised as a question — never as a risk line.
 
-**In front of that base stands what a base cannot supply: 92 authored positions
-across the twelve systems.** The unit of a row is a position, not a gene: an rsID
+**In front of that base stands what a base cannot supply: 214 authored positions
+across fourteen of the systems, each with an evidence level from A to E.** The unit of a row is a position, not a gene: an rsID
 with its HGVS on a RefSeq accession, the allele the author named, the mode of the
 claim — monogenic, common variant, pharmacogenetic — and the phrase for one copy
 and for two, each in both languages. The panel a clinician sent in September held
@@ -157,7 +158,7 @@ drug» — the program does not write it. A curated layer takes such sentences f
 a clinician, prints them only with a named source, counts what it dropped, and
 until a sentence is written says plainly that it is not written. What has changed
 since that arrangement was first offered is that the layer no longer ships empty:
-92 positions are in the build, each with its source, the date it was curated, and
+214 positions are in the build, each with its source, the date it was curated, and
 a signature — the panel author's, not a clinician's, which is what the card says.
 Counter-signing a row, correcting it, or striking it out is the whole of what is
 being asked of a clinician who wants to take part, and it is a smaller ask than
@@ -203,7 +204,7 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-This page ships with the build numbered 0.5.3. **There is still no clinical
+This page ships with the build numbered 0.5.4. **There is still no clinical
 validation study and no benchmark against existing systems.** What there is, is two external runs by
 people who are not the author, and both are worth stating plainly because both
 were useful and neither was flattering.
@@ -234,7 +235,7 @@ the examination says a person is well. Her answers reshaped the product — the
 three entries, the curated gate, and the system card described above came out of
 that exchange. The thing she asked for that the program still does not have is
 a clinician's signature under the curated sentences. The mechanism that holds
-them is no longer empty — 92 positions over the twelve systems, each signed by
+them is no longer empty — 214 positions over fourteen of the systems, each checked by
 the panel's author against the source it names — but a signature by the author of
 a panel is not a clinical endorsement, and the card says whose it is rather than
 letting the distinction blur.

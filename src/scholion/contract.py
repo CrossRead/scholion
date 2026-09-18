@@ -47,6 +47,7 @@ PARITY: Dict[str, str] = {
     "GET /api/prescription-check": "prescription",
     "GET /api/medications": "medications",
     "GET /api/limits": "limits",
+    "GET /api/evidence-levels": "evidence-levels",
     "GET /api/markers": "markers",
     "GET /api/metrics": "metrics",
     "GET /api/focus": "focus",
@@ -293,6 +294,15 @@ PLUGIN: Dict[str, str] = {
     # which its description reserves for the person's own yes.
     "version": "sch_version",
     "update": "sch_update",
+    # The recompute (owner, 18.09.2026: «надо упростить путь CLI и MCP»). Until
+    # 0.5.4 this was in NO_PLUGIN, for a reason that has since stopped being true:
+    # «a tool call that times out would leave a model reporting on a job it can no
+    # longer see». The progress is a file now, and the tool never blocks on the
+    # job — without `confirm` it only reads the plan, with `confirm` it starts the
+    # steps in the background and returns, and the next call reads the same file
+    # the page and the terminal read. A person whose only face is an assistant had
+    # no way at all to be told what their data needs recomputing.
+    "recompute": "sch_recompute",
     # The one write a model may hold, and the reason is in DICTATED: the person
     # says what happened, the assistant writes it down and invents nothing.
     "focus-log": "sch_focus_log",
@@ -302,10 +312,6 @@ PLUGIN: Dict[str, str] = {
 # a model that cannot see a capability does not know it is missing, and will
 # answer from what it has instead of saying it cannot.
 NO_PLUGIN: Dict[str, str] = {
-    "recompute": "rewrites profile files and replaces files in the genome folder, for minutes; a "
-                 "person starts it and watches it, and a tool call that times out would leave a "
-                 "model reporting on a job it can no longer see. The instruction names the command "
-                 "so an assistant can tell a person it exists",
     "coverage": "runs samtools over an alignment of tens of gigabytes and replaces the coverage "
                 "table beside the profile; a person starts it, for the same reason as `recompute`",
     "genotype-sites": "runs bcftools over an alignment of tens of gigabytes and replaces a file in "
@@ -320,6 +326,9 @@ NO_PLUGIN: Dict[str, str] = {
     "init": "creates the profile directory — the person's decision, not a model's",
     "demo": "lays out a fictional profile; a model asking for one is a model about to "
             "confuse it with the person's own",
+    "evidence-levels": "the legend travels inside every answer that carries a level, and "
+                       "`sch_rules` holds the rule to name the level with the statement; a "
+                       "separate tool would be a second copy of words the answers already carry",
     "doc": "prints a document that ships with the package; the model is handed the "
            "instruction directly and does not read the product's manuals",
     "assistant": "describes how to connect a model — addressed to the person doing the "

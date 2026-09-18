@@ -1,0 +1,316 @@
+{
+  "_meta": {
+    "updated": "2026-09-17",
+    "purpose": "What a genotype says about the ROUTE of a correction somebody has already decided on — never about whether to correct. A deviation in a panel is a fact; the decision is not ours; the comparison of routes with the genotype in hand is what exists nowhere else. Curated by hand, never derived.",
+    "why_a_class_and_not_a_ranking": "Genetics excludes better than it chooses. It almost never says «this route is best», and it regularly says «this route is probably wasted on you». So a rule carries a class — bypasses, against, favours, dose_response_differs, adds_nothing, route_fact — and rules are grouped by that class, never ranked: a ranking implies an optimum, which needs cost, availability, the clinical picture and the person's preference, none of which a genotype knows.",
+    "gate": "Printed only at evidence level A or B, only with a named source, only with a recheck, and only in the conditional. Below B the product prints «the genotype adds nothing here» with the reason, because silence on this screen is filled by whoever speaks to the reader next.",
+    "source": "the panel author's table of 17.09.2026 (thirteen rules of response to a supplement or a cofactor), of which the seven starting rules were taken; every PMID below was confirmed against Europe PMC on 17.09.2026, and the rules whose source could not be confirmed are not here.",
+    "waiting": {
+      "otc_carrier_on_the_iv_route": "the statement cites a case of 100 g of protein a day intravenously raising ammonia to 472 µmol/L in an OTC carrier; no such report could be confirmed in Europe PMC, so the rule is not shipped",
+      "cndp1_beta_alanine": "the CTG repeat of CNDP1 is not a position short reads genotype here, so the dose-response rule has nothing to stand on yet (Janssen 2005 PMID 16046297, Freedman 2007 PMID 17205963)",
+      "oxalate_reduce_load": "AGXT and HOGA1 are not in the gene–disease base for this system, and urine oxalate is not a marker the product holds",
+      "slc6a19_niacinamide": "Hartnup carriership and nicotinamide: the only source named is a GeneReviews chapter, which Europe PMC does not index as a study with an effect; not shipped until a primary source is named"
+    },
+    "source_tier": "primary_literature"
+  },
+  "routes": {
+    "food": {
+      "en": "protein from food",
+      "ru": "белок из еды"
+    },
+    "oral_free": {
+      "en": "free amino acids by mouth",
+      "ru": "свободные аминокислоты внутрь"
+    },
+    "oral_peptide": {
+      "en": "a hydrolysate or a peptide form",
+      "ru": "гидролизат или пептидная форма"
+    },
+    "iv": {
+      "en": "intravenously",
+      "ru": "внутривенно"
+    },
+    "cofactor": {
+      "en": "a cofactor",
+      "ru": "кофактор"
+    },
+    "precursor": {
+      "en": "a precursor instead of the substance itself",
+      "ru": "предшественник вместо самого вещества"
+    },
+    "reduce_load": {
+      "en": "taking the load off",
+      "ru": "снятие нагрузки"
+    }
+  },
+  "rules": [
+    {
+      "key": "cystinuria_free_amino_acids",
+      "trigger": {
+        "markers": [
+          "aa_lysine",
+          "aa_arginine",
+          "aa_ornithine",
+          "aa_cystine"
+        ],
+        "direction": "low"
+      },
+      "depends_on": {
+        "genes": [
+          "SLC7A9",
+          "SLC3A1"
+        ],
+        "state": "carrier"
+      },
+      "route": "oral_free",
+      "says": "against",
+      "because": {
+        "en": "If a decision to correct has been made: free amino acids go through the very transporter this carriership sits on, so the dibasic amino acids among them are the ones least likely to arrive.",
+        "ru": "Если принято решение корректировать: свободные аминокислоты идут через тот самый транспортёр, на котором стоит это носительство, и двухосновные из них доходят хуже всего."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "PMID 5045711 (Asatoor 1972, Gut: an arginine-containing peptide is absorbed in cystinuria while the free amino acid is not)",
+        "effect_size": "the free dibasic amino acids are poorly absorbed in cystinuria; the peptide-bound ones are absorbed normally"
+      },
+      "recheck": {
+        "marker": "aa_lysine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — for plasma amino acids that is roughly 15%, repeated on the same laboratory and the same fasting state",
+          "ru": "изменение больше разброса метода — для аминокислот плазмы это примерно 15 %, на той же лаборатории и в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-17",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "cystinuria_peptide_form",
+      "trigger": {
+        "markers": [
+          "aa_lysine",
+          "aa_arginine",
+          "aa_ornithine",
+          "aa_cystine"
+        ],
+        "direction": "low"
+      },
+      "depends_on": {
+        "genes": [
+          "SLC7A9",
+          "SLC3A1"
+        ],
+        "state": "carrier"
+      },
+      "route": "oral_peptide",
+      "says": "favours",
+      "because": {
+        "en": "If a decision to correct has been made: the peptide path is a separate door, and a defect of the dibasic transporter does not stand on it — the same amino acids bound in peptides are absorbed the ordinary way.",
+        "ru": "Если принято решение корректировать: пептидный путь — отдельная дверь, и дефект двухосновного транспортёра на ней не стоит: те же аминокислоты в составе пептидов всасываются обычным образом."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "PMID 5045711 (Asatoor 1972, Gut: an arginine-containing peptide is absorbed in cystinuria while the free amino acid is not)",
+        "effect_size": "peptide-bound absorption preserved where free absorption is not"
+      },
+      "recheck": {
+        "marker": "aa_lysine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — for plasma amino acids that is roughly 15%, repeated on the same laboratory and the same fasting state",
+          "ru": "изменение больше разброса метода — для аминокислот плазмы это примерно 15 %, на той же лаборатории и в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-17",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "arginine_through_citrulline",
+      "trigger": {
+        "markers": [
+          "aa_arginine"
+        ],
+        "direction": "low"
+      },
+      "depends_on": null,
+      "route": "precursor",
+      "says": "route_fact",
+      "because": {
+        "en": "If a decision to correct has been made: this one is not about your genotype — oral citrulline raises plasma arginine more than the same dose of arginine does, because arginase in the gut and the liver takes a large part of arginine on the first pass.",
+        "ru": "Если принято решение корректировать: это не про ваш генотип — цитруллин внутрь поднимает аргинин плазмы сильнее, чем та же доза аргинина, потому что аргиназа кишки и печени забирает значительную часть аргинина на первом проходе."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "PMID 17662090 (Schwedhelm 2008, Br J Clin Pharmacol: pharmacokinetics of oral L-citrulline and L-arginine)",
+        "effect_size": "oral citrulline raises plasma arginine more than an equal dose of arginine"
+      },
+      "recheck": {
+        "marker": "aa_arginine",
+        "after_weeks": 4,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 15% for plasma amino acids, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 15 % для аминокислот плазмы, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-17",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "b6_for_cbs_carrier",
+      "trigger": {
+        "markers": [
+          "homocysteine"
+        ],
+        "direction": "high"
+      },
+      "depends_on": {
+        "genes": [
+          "CBS"
+        ],
+        "state": "carrier"
+      },
+      "route": "cofactor",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If a decision to correct has been made: pyridoxine responsiveness is a property of the disease with two copies, where the genotype does predict it. One copy is not that state, and no study says what B6 does for a carrier — so the genotype adds nothing to this choice.",
+        "ru": "Если принято решение корректировать: отзывчивость на пиридоксин — свойство болезни с двумя копиями, где генотип её действительно предсказывает. Одна копия — не это состояние, и что делает B6 у носителя, не говорит ни одно исследование, поэтому генотип к выбору здесь ничего не добавляет."
+      },
+      "evidence": {
+        "level": "A",
+        "source": "PMID 19819175 (Skovby 2010, Mol Genet Metab: the natural history of CBS homocystinuria, where pyridoxine responsiveness is a property of the two-copy state)",
+        "effect_size": "responsiveness is defined in the disease, not in carriership"
+      },
+      "recheck": {
+        "marker": "homocysteine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 10% for homocysteine, in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 10 % для гомоцистеина, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-17",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "tryptophan_away_from_a_protein_meal",
+      "trigger": {
+        "medications": [
+          "триптофан",
+          "tryptophan",
+          "5-htp",
+          "5-гидрокситриптофан",
+          "тирозин",
+          "tyrosine"
+        ]
+      },
+      "depends_on": null,
+      "route": "oral_free",
+      "says": "route_fact",
+      "because": {
+        "en": "If it is being taken anyway: the aromatic and the branched-chain amino acids share one carrier into the brain, so the same gram works differently beside a protein meal and away from one. This is true for everybody, whatever the genotype.",
+        "ru": "Если это всё равно принимается: ароматические и разветвлённые аминокислоты входят в мозг через один транспортёр, поэтому один и тот же грамм работает по-разному рядом с белковой едой и отдельно от неё. Это верно для всех, независимо от генотипа."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "PMID 23395255 (Fernstrom 2013, J Nutr: dietary proteins change the plasma ratios of the large neutral amino acids); PMID 1688706 (Leathwood 1990)",
+        "effect_size": "a protein meal changes the tryptophan to large-neutral-amino-acid ratio several-fold"
+      },
+      "recheck": {
+        "marker": "aa_tryptophan",
+        "after_weeks": 4,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 15% for plasma amino acids, in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 15 % для аминокислот плазмы, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-17",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "mthfr_folate_form",
+      "trigger": {
+        "markers": [
+          "homocysteine"
+        ],
+        "direction": "high"
+      },
+      "depends_on": {
+        "positions": [
+          "rs1801133"
+        ],
+        "state": "hom"
+      },
+      "route": "cofactor",
+      "says": "favours",
+      "because": {
+        "en": "If a decision to correct has been made: the effect of MTHFR 677TT is seen with a low folate and disappears with an adequate one, and no study shows the methylated form of folate doing what ordinary folate does not at this genotype.",
+        "ru": "Если принято решение корректировать: эффект MTHFR 677TT виден при низком фолате и исчезает при достаточном, и ни одно исследование не показывает, чтобы метилированная форма фолата делала при этом генотипе то, чего не делает обычная."
+      },
+      "evidence": {
+        "level": "C",
+        "source": "PMID 23824729 (van Meurs 2013, Am J Clin Nutr: the homocysteine loci, MTHFR among them); the form-of-folate comparison has no replicated study at this genotype",
+        "effect_size": "the homocysteine effect of 677TT is folate-dependent; no measured advantage of one form of folate over another"
+      },
+      "recheck": {
+        "marker": "homocysteine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 10% for homocysteine, in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 10 % для гомоцистеина, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-18",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    }
+  ],
+  "route_classes": {
+    "bypasses": {
+      "en": "the route goes around the link the variant sits on, so the genotype stops mattering",
+      "ru": "маршрут обходит звено, где стоит вариант, — генотип перестаёт быть важен"
+    },
+    "against": {
+      "en": "for this person the route probably works worse than average",
+      "ru": "у этого человека маршрут, вероятно, работает хуже среднего"
+    },
+    "favours": {
+      "en": "the route goes around exactly this person's narrow place",
+      "ru": "маршрут обходит именно его узкое место"
+    },
+    "dose_response_differs": {
+      "en": "it works, but the response to the same dose is different",
+      "ru": "сработает, но ответ на ту же дозу другой"
+    },
+    "adds_nothing": {
+      "en": "the genotype adds nothing to the choice of route",
+      "ru": "генотип к выбору маршрута ничего не добавляет"
+    },
+    "route_fact": {
+      "en": "the route differs for everybody, whatever the genotype",
+      "ru": "маршрут различается у всех, независимо от генотипа"
+    }
+  }
+}

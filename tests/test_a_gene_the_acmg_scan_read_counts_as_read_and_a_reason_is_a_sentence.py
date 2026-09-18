@@ -71,7 +71,7 @@ class TestAnAskedAboutPositionIsPrintedAndIsNotAFinding(unittest.TestCase):
     def _card(self, register):
         a, b, c = _frames()
         with a, b, c, mock.patch.object(SP, "_curated", lambda: self.CUR), \
-                mock.patch.object(SP, "_genotype", lambda rsid, hgvs, gene, risk, scan:
+                mock.patch.object(SP, "_genotype", lambda rsid, hgvs, gene, risk, scan, at=None, **kw:
                                   {"state": "het", "read": True, "genotype": "GA", "confidence": "called", "depth": 40}):
             return SP.system("adrenals", register)
 

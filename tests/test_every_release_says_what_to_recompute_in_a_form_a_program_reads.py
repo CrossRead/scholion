@@ -73,9 +73,22 @@ class TestTheReaderReadsWhatItShould(unittest.TestCase):
         self.assertIn("0.4.11", versions)
         self.assertIn("0.4.9", versions)
         self.assertNotIn("0.4.8", versions, "the version one updates FROM is already applied")
-        self.assertNotIn("0.4.10", versions, "a release that asks for nothing is not listed")
+        # Since 17.09.2026 a release that asks for nothing is listed for what it
+        # brings: an update note that named only commands told nobody what arrived.
+        by = {e["version"]: e for e in got}
+        self.assertEqual([], by["0.4.10"]["actions"])
+        self.assertTrue(by["0.4.10"]["news"], "a release listed with neither news nor an action")
+        for e in got:
+            self.assertTrue(e["actions"] or e["news"], e["version"])
         cmds = {c for e in got for a in e["actions"] for c in a["commands"]}
         self.assertIn("scholion acmg-scan", cmds)
+
+    def test_the_news_are_the_bold_leads_of_what_you_can_do_now(self):
+        text = ("## v9.9.9 — 01.01.2030\n\n### What you can do now\n\n**A first thing.** More.\n\n"
+                "**A second\nthing.** More.\n\nNo lead here.\n\n### What is fixed\n\n**Not news.**\n\n"
+                "### What needs recomputing\n\nNothing.\n")
+        (e,) = updates.parse_journal(text)
+        self.assertEqual(["A first thing.", "A second thing."], e["news"])
 
     def test_a_free_prose_section_and_a_malformed_lead_are_named(self):
         self.assertTrue(updates.parse_section("Re-run the import once.")["problems"])

@@ -37,6 +37,11 @@ PANEL = {"genes": {
             "phenotype": {"en": "p", "ru": "ф"}}}}
 
 
+def _table(*genes):
+    """A coverage table in which every named gene was read as usual for the file."""
+    return {g: {"chrom": "1", "pct_20x": 98.0, "pct_10x": 99.0, "mean_depth": 30.0} for g in genes}
+
+
 def _scan(weak=(), hits=(), status="ok"):
     return {"status": status, "scanned": "2026-09-01",
             "coverage": {"weak": [{"gene": g, "pct_10x": 80.0} for g in weak],
@@ -76,10 +81,31 @@ class TestTheClassesComeFromAPublishedPanelAndKeepAStableKey(unittest.TestCase):
 
 class TestNoClassIsCalledClearWhereItWasNotRead(unittest.TestCase):
 
-    def _screen(self, **kw):
+    def _screen(self, table=True, **kw):
+        rows = _table("AAA", "BBB", "CCC") if table else {}
         with mock.patch.object(S, "_panel", lambda: PANEL), \
+             mock.patch("scholion.limits.callability", lambda: rows), \
              mock.patch("scholion.engine.genomics.acmg_findings", lambda: _scan(**kw)):
             return S.screen("oncology")
+
+    def test_a_coverage_table_that_cannot_be_read_is_not_measured(self):
+        """A table that exists and fails to load is not a table that says «read»."""
+        def broken():
+            raise OSError("unreadable")
+        with mock.patch.object(S, "_panel", lambda: PANEL), \
+             mock.patch("scholion.limits.callability", broken), \
+             mock.patch("scholion.engine.genomics.acmg_findings", lambda: _scan()):
+            r = S.screen("oncology")
+        self.assertEqual("clear_partial", r["verdict"]["kind"])
+        self.assertEqual(0, r["read_count"])
+
+    def test_a_class_with_no_coverage_table_is_never_clear(self):
+        """Task 175: without a table nobody measured whether the genes were read,
+        and the answer says so gene by gene — never «read end to end»."""
+        r = self._screen(table=False)
+        self.assertEqual("clear_partial", r["verdict"]["kind"])
+        self.assertEqual({"coverage_not_measured"}, {g["read_why"] for g in r["genes"]})
+        self.assertEqual(0, r["read_count"])
 
     def test_a_weakly_read_gene_keeps_the_class_off_clear(self):
         r = self._screen(weak=("AAA",))
@@ -91,6 +117,7 @@ class TestNoClassIsCalledClearWhereItWasNotRead(unittest.TestCase):
         """`unread_genes` on the scan is a NUMBER. Read as a list it yields an
         empty set of names, and every gene then looks read."""
         with mock.patch.object(S, "_panel", lambda: PANEL), \
+             mock.patch("scholion.limits.callability", lambda: _table("AAA", "BBB")), \
              mock.patch("scholion.engine.genomics.acmg_findings",
                         lambda: {**_scan(weak=("AAA",)), "unread_genes": 1}):
             r = S.screen("oncology")

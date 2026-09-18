@@ -32,7 +32,21 @@ class TestEveryPositionIsAState(unittest.TestCase):
         self.assertEqual(clin.get("positions"), pat.get("positions"),
                          "the patient's density withholds rows, never the panel's states")
         for p in pat.get("positions") or []:
-            self.assertEqual({"gene", "rsid", "kind", "state", "read", "read_why", "read_why_text", "text", "expect"},
+            # Since task 199 a state also carries its evidence level, the genotype
+            # ladder and why it concludes nothing — in every register.
+            self.assertEqual({"gene", "rsid", "kind", "state", "read", "read_why", "read_why_text", "text",
+                              "expect", "unit", "genotype", "level", "level_short", "ladder",
+                              "not_a_finding_why", "needs_confirmation",
+                          # task 200: the chain link, the intake route and the
+                          # load a fasting corridor cannot stand in for
+                          "link", "link_text", "route", "under_load",
+                          # task 200 / owner 18.09.2026: a position with no row
+                          # in a variant-only file, and the value the reference
+                          # implies when there is no alignment to check it
+                          "read_state", "presumed", "closes_text", "depth_note",
+                          # task 199 G/H: the group a position belongs to, and
+                          # the clinician's own note from the profile
+                          "local_note", "group"},
                              set(p), p)
             self.assertIn(p["state"], ("het", "hom", "absent", "unread", "risk_allele_not_declared", None))
             if p["expect"]:
@@ -87,9 +101,11 @@ class TestThePageDrawsThePanelFromTheStates(unittest.TestCase):
         self.assertIn("function panelHtml(gen,card,register)", html)
         # Task 195: the block leads with the genotype's summary (`genSummaryHtml`)
         # and keeps every position's card under «More».
-        self.assertIn("more+=panelHtml(gen,card);", html, "the radar block draws the panel, folded")
+        self.assertIn("more+=genTableHtml(gen,card,card.register);", html,
+                      "the radar block draws the genetic table, folded (task 200, owner 17.09.2026)")
         self.assertIn("h+=genSummaryHtml(gen,card);", html, "and says what was found above it")
-        self.assertIn("b+=panelHtml(gen,r,r.register);", html, "and so does the card page, in its register")
+        self.assertIn("b+=genTableHtml(gen,r,r.register);", html,
+                      "and so does the card page, in its register")
         self.assertNotIn("panel.map(x=>`<div class=\"row-l\">${systemGeneRow(x,'patient')}</div>`)", html,
                          "the radar no longer prints the panel as a paragraph per row")
         for key in ("system.panel.conclusion_h", "system.panel.compare_h", "system.panel.prescribing_h",

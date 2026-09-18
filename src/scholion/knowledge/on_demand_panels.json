@@ -1,0 +1,653 @@
+{
+  "_meta": {
+    "updated": "2026-09-18",
+    "source_tier": "primary_literature",
+    "what": "Panels WITHOUT a radar domain (task 199 F). The radar has two halves, laboratory and genetic; these panels have no laboratory half and will not get one — an empty half on the main picture teaches the reader that the picture lies. So they are a separate view: the same rows as a system's genetic half, the same gate, the same levels, no score and no figure.",
+    "rows": "Every position follows the schema of system_gene_panels.json and goes through panel_gate.refusal with an empty marker list. The product's own sentence in both languages, a level from the legend, a review by role.",
+    "why_empty": {
+      "en": "no position of this panel has passed the gate yet",
+      "ru": "ни одна позиция этой панели ещё не прошла сторожа"
+    }
+  },
+  "panels": {
+    "behaviour": {
+      "label": {
+        "en": "Behaviour and stress response",
+        "ru": "Поведение и стрессовый ответ"
+      },
+      "why_no_domain": {
+        "en": "there is no laboratory marker a behaviour is read by; these are candidate genes of neurotransmission and the stress axis, and most of them stay at level C or D — a value and a reason, not a conclusion",
+        "ru": "поведение не читается лабораторным маркёром; это кандидатные гены нейромедиации и стрессовой оси, и большинство из них остаются на уровне C или D — значение и причина, а не вывод"
+      },
+      "source": "the panel author's list of 29.06.2026 and the phrases of 17.09.2026 with their sources; the sentences are the product's own",
+      "positions": [
+        {
+          "rsid": "rs11174811",
+          "gene": "AVPR1A",
+          "hgvs": "NC_000012.12:g.63146696C>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "AVPR1A 3'UTR (A), one copy: the vasopressin V1A receptor; a substance-use association in one study and a microRNA target-site effect in another — different traits, no conclusion follows.",
+              "ru": "AVPR1A 3'UTR (A), одна копия: рецептор вазопрессина V1A; ассоциация с зависимостями в одном исследовании и эффект сайта микроРНК в другом — разные признаки, вывода нет."
+            },
+            "hom": {
+              "en": "AVPR1A 3'UTR (A), two copies: the same; no conclusion follows.",
+              "ru": "AVPR1A 3'UTR (A), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "substance use disorder association in one study; a miRNA target-site effect in another",
+          "study": "Maher 2011",
+          "source": "PMID 21514569 (Maher 2011: AVPR1A and substance use disorders); PMID 31053625 (Zhang 2019: miRNA target site polymorphisms in AVPR1A)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 21514569 (Maher 2011: AVPR1A and substance use disorders); PMID 31053625 (Zhang 2019: miRNA target site polymorphisms in AVPR1A)",
+            "assigned": "2026-09-18",
+            "judged": "two studies on different traits (substance use; a miRNA target site and hypertension)"
+          }
+        },
+        {
+          "rsid": "rs6265",
+          "gene": "BDNF",
+          "hgvs": "NC_000011.10:g.27658369C>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "BDNF Val66Met (A), one copy: less activity-dependent BDNF secretion; declarative memory slightly lower on average, and the depression association shows only together with stress; an association, not a trait of the person.",
+              "ru": "BDNF Val66Met (A), одна копия: меньше активность-зависимой секреции BDNF; декларативная память в среднем чуть ниже, а ассоциация с депрессией проявляется только вместе со стрессом; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "BDNF Val66Met (A), two copies: Met/Met, the same associations, stronger; an association, not a trait of the person.",
+              "ru": "BDNF Val66Met (A), две копии: Met/Met, те же ассоциации, сильнее; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "declarative memory slightly lower per Met allele; a stress-dependent depression association",
+          "study": "Kambeitz 2012",
+          "source": "PMID 22813992 (Kambeitz 2012: BDNF Val66Met and declarative memory, meta-analysis); PMID 24433458 (Hosang 2014: stress and BDNF Val66Met in depression, meta-analysis)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 22813992 (Kambeitz 2012: BDNF Val66Met and declarative memory, meta-analysis); PMID 24433458 (Hosang 2014: stress and BDNF Val66Met in depression, meta-analysis)",
+            "assigned": "2026-09-18",
+            "judged": "two meta-analyses: declarative memory, and stress × genotype in depression"
+          },
+          "protein": "p.Val66Met"
+        },
+        {
+          "rsid": "rs242941",
+          "gene": "CRHR1",
+          "hgvs": "NC_000017.11:g.45815154A>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "CRHR1 (T), one copy: the receptor of corticotropin-releasing hormone; a depression association in one study; no conclusion follows.",
+              "ru": "CRHR1 (T), одна копия: рецептор кортикотропин-рилизинг-гормона; ассоциация с депрессией в одном исследовании; вывода нет."
+            },
+            "hom": {
+              "en": "CRHR1 (T), two copies: the same single study; no conclusion follows.",
+              "ru": "CRHR1 (T), две копии: то же единственное исследование; вывода нет."
+            }
+          },
+          "effect_size": "depression association in one study",
+          "study": "Hernández-Díaz 2021",
+          "source": "PMID 34279801 (Hernández-Díaz 2021: rs242941, rs1876828, rs242939 and rs110402 of CRHR1 and depression)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 34279801 (Hernández-Díaz 2021: rs242941, rs1876828, rs242939 and rs110402 of CRHR1 and depression)",
+            "assigned": "2026-09-18",
+            "judged": "one study of four CRHR1 variants and depression"
+          }
+        },
+        {
+          "rsid": "rs686",
+          "gene": "DRD1",
+          "hgvs": "NC_000005.10:g.175441697G>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DRD1 3'UTR (A), one copy: the dopamine D1 receptor; the allele changes how a microRNA regulates its expression in one study; no outcome was measured, and no conclusion follows.",
+              "ru": "DRD1 3'UTR (A), одна копия: дофаминовый рецептор D1; аллель меняет регуляцию его экспрессии микроРНК в одном исследовании; исход не измерялся, вывода нет."
+            },
+            "hom": {
+              "en": "DRD1 3'UTR (A), two copies: the same; no conclusion follows.",
+              "ru": "DRD1 3'UTR (A), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "allele-specific expression of DRD1; no clinical outcome measured",
+          "study": "Huang 2009",
+          "source": "PMID 19135651 (Huang 2009: differential allelic expression of DRD1 modulated by miR-504)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 19135651 (Huang 2009: differential allelic expression of DRD1 modulated by miR-504)",
+            "assigned": "2026-09-18",
+            "judged": "one functional study of allelic expression"
+          }
+        },
+        {
+          "rsid": "rs1800497",
+          "gene": "DRD2",
+          "hgvs": "NC_000011.10:g.113400106G>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DRD2/ANKK1 Taq1A (A1), one copy: striatal dopamine D2/3 receptor availability differs; the variant sits in the neighbouring kinase gene ANKK1; an association with receptor binding, not a trait of the person.",
+              "ru": "DRD2/ANKK1 Taq1A (A1), одна копия: доступность дофаминовых рецепторов D2/3 в стриатуме различается; вариант лежит в соседнем гене киназы ANKK1; ассоциация с рецепторным связыванием, а не свойство человека."
+            },
+            "hom": {
+              "en": "DRD2/ANKK1 Taq1A (A1), two copies: A1/A1, the same, stronger; an association, not a trait of the person.",
+              "ru": "DRD2/ANKK1 Taq1A (A1), две копии: A1/A1, то же, сильнее; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "striatal D2/3 receptor binding differs per A1 allele; the variant is in ANKK1, beside DRD2",
+          "study": "Savitz 2013",
+          "source": "PMID 23683269 (Savitz 2013: DRD2/ANKK1 Taq1A and D2/3 receptor binding); PMID 15146457 (Neville 2004: ANKK1, a kinase gene closely linked to DRD2)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 23683269 (Savitz 2013: DRD2/ANKK1 Taq1A and D2/3 receptor binding); PMID 15146457 (Neville 2004: ANKK1, a kinase gene closely linked to DRD2)",
+            "assigned": "2026-09-18",
+            "judged": "the Taq1A variant: receptor binding (Savitz 2013) and the ANKK1 locus (Neville 2004)"
+          }
+        },
+        {
+          "rsid": "rs6277",
+          "gene": "DRD2",
+          "hgvs": "NC_000011.10:g.113412737G>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DRD2 C957T (T), one copy: dopamine D2 receptor availability outside the striatum differs in one imaging study; no conclusion follows.",
+              "ru": "DRD2 C957T (T), одна копия: доступность рецептора D2 вне стриатума различается в одном визуализационном исследовании; вывода нет."
+            },
+            "hom": {
+              "en": "DRD2 C957T (T), two copies: the same single study; no conclusion follows.",
+              "ru": "DRD2 C957T (T), две копии: то же единственное исследование; вывода нет."
+            }
+          },
+          "effect_size": "extrastriatal D2 receptor availability differs per T allele in one PET study",
+          "study": "Hirvonen 2009",
+          "source": "PMID 19285111 (Hirvonen 2009: C957T of DRD2 predicts extrastriatal dopamine receptor availability)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 19285111 (Hirvonen 2009: C957T of DRD2 predicts extrastriatal dopamine receptor availability)",
+            "assigned": "2026-09-18",
+            "judged": "one PET study of extrastriatal receptor availability"
+          }
+        },
+        {
+          "rsid": "rs1800955",
+          "gene": "DRD4",
+          "hgvs": "NC_000011.10:g.636784T>C",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "DRD4 promoter (T), one copy: a smoking association in one study; no replication, no conclusion follows.",
+              "ru": "промотор DRD4 (T), одна копия: ассоциация с курением в одном исследовании; воспроизведения нет, вывода нет."
+            },
+            "hom": {
+              "en": "DRD4 promoter (T), two copies: the same; no conclusion follows.",
+              "ru": "промотор DRD4 (T), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "a smoking association in one study",
+          "study": "Pérez-Rubio 2017",
+          "source": "PMID 28103253 (Pérez-Rubio 2017: HTR2A and DRD4 polymorphisms and smoking)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "D",
+            "basis": "judged",
+            "source": "PMID 28103253 (Pérez-Rubio 2017: HTR2A and DRD4 polymorphisms and smoking)",
+            "assigned": "2026-09-18",
+            "judged": "one study on smoking, the variant not named in its title"
+          }
+        },
+        {
+          "rsid": "rs6295",
+          "gene": "HTR1A",
+          "hgvs": "NC_000005.10:g.63962738C>A",
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "HTR1A −1019C/G (G), one copy: the serotonin 1A receptor; a mood-disorder association and a different antidepressant response in two meta-analyses; an association, not a trait of the person.",
+              "ru": "HTR1A −1019C/G (G), одна копия: серотониновый рецептор 1A; ассоциация с расстройствами настроения и иной ответ на антидепрессанты в двух метаанализах; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "HTR1A −1019C/G (G), two copies: the same, stronger; an association, not a trait of the person.",
+              "ru": "HTR1A −1019C/G (G), две копии: то же, сильнее; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "mood disorder association and antidepressant response differ per G allele",
+          "study": "Kishi 2013",
+          "source": "PMID 22752684 (Kishi 2013: the serotonin 1A receptor gene and mood disorders, extended meta-analysis); PMID 22890315 (Zhao 2012: rs6295 and antidepressants, meta-analysis)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 22752684 (Kishi 2013: the serotonin 1A receptor gene and mood disorders, extended meta-analysis); PMID 22890315 (Zhao 2012: rs6295 and antidepressants, meta-analysis)",
+            "assigned": "2026-09-18",
+            "judged": "two meta-analyses: mood disorders, and antidepressant response"
+          }
+        },
+        {
+          "rsid": "rs594242",
+          "gene": "HTR2A",
+          "hgvs": "NC_000013.11:g.46883917C>A",
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "HTR2A (G), one copy: the serotonin 2A receptor; temperament-trait associations in two studies that do not single out this variant; no conclusion follows.",
+              "ru": "HTR2A (G), одна копия: серотониновый рецептор 2A; ассоциации с чертами темперамента в двух исследованиях, которые не выделяют именно этот вариант; вывода нет."
+            },
+            "hom": {
+              "en": "HTR2A (G), two copies: the same; no conclusion follows.",
+              "ru": "HTR2A (G), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "temperament trait associations in two studies",
+          "study": "Giegling 2006",
+          "source": "PMID 16814396 (Giegling 2006: anger- and aggression-related traits and the 5-HT2A gene); PMID 17590256 (Serretti 2007: 5-HT2A SNPs and the Temperament and Character Inventory)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 16814396 (Giegling 2006: anger- and aggression-related traits and the 5-HT2A gene); PMID 17590256 (Serretti 2007: 5-HT2A SNPs and the Temperament and Character Inventory)",
+            "assigned": "2026-09-18",
+            "judged": "two studies of temperament traits, the variant not named in either title"
+          }
+        },
+        {
+          "rsid": "rs6311",
+          "gene": "HTR2A",
+          "hgvs": "NC_000013.11:g.46897343C>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "HTR2A −1438A/G (A), one copy: a promoter variant of the serotonin 2A receptor; the association the meta-analysis found; an association, not a trait of the person.",
+              "ru": "HTR2A −1438A/G (A), одна копия: промоторный вариант серотонинового рецептора 2A; ассоциация, найденная в метаанализе; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "HTR2A −1438A/G (A), two copies: the same, stronger; an association, not a trait of the person.",
+              "ru": "HTR2A −1438A/G (A), две копии: то же, сильнее; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "the meta-analysed association per A allele",
+          "study": "Jin 2013",
+          "source": "PMID 23317793 (Jin 2013: the −1438A/G (rs6311) polymorphism of HTR2A, meta-analysis)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 23317793 (Jin 2013: the −1438A/G (rs6311) polymorphism of HTR2A, meta-analysis)",
+            "assigned": "2026-09-18",
+            "judged": "a meta-analysis of the −1438A/G promoter variant"
+          }
+        },
+        {
+          "rsid": "rs6314",
+          "gene": "HTR2A",
+          "hgvs": "NC_000013.11:g.46834899G>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "HTR2A His452Tyr (A), one copy: a missense change in the serotonin 2A receptor that alters its signalling; a different antidepressant response in a network meta-analysis; an association, not a trait of the person.",
+              "ru": "HTR2A His452Tyr (A), одна копия: миссенс-замена в серотониновом рецепторе 2A, меняющая его сигнал; иной ответ на антидепрессанты в сетевом метаанализе; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "HTR2A His452Tyr (A), two copies: Tyr/Tyr, the same, stronger; an association, not a trait of the person.",
+              "ru": "HTR2A His452Tyr (A), две копии: Tyr/Tyr, то же, сильнее; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "receptor function and antidepressant response differ per Tyr452 allele",
+          "study": "Wagner 2008",
+          "source": "PMID 18611292 (Wagner 2008: the His452Tyr variant of the 5-HT2A receptor); PMID 32819202 (Du 2020: genetic polymorphism and antidepressants, network meta-analysis)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 18611292 (Wagner 2008: the His452Tyr variant of the 5-HT2A receptor); PMID 32819202 (Du 2020: genetic polymorphism and antidepressants, network meta-analysis)",
+            "assigned": "2026-09-18",
+            "judged": "the His452Tyr missense variant: a specific association (Wagner 2008) and a network meta-analysis of antidepressants"
+          },
+          "protein": "p.His452Tyr"
+        },
+        {
+          "rsid": "rs1799836",
+          "gene": "MAOB",
+          "hgvs": "NC_000023.11:g.43768752T>C",
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "MAOB intron 13 (G), one copy: monoamine oxidase B; one positive and one negative study; no conclusion follows.",
+              "ru": "MAOB, интрон 13 (G), одна копия: моноаминоксидаза B; одно положительное и одно отрицательное исследование; вывода нет."
+            },
+            "hom": {
+              "en": "MAOB intron 13 (G), two copies: the same; no conclusion follows.",
+              "ru": "MAOB, интрон 13 (G), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "no replicated association; one negative study",
+          "study": "Wei 2011",
+          "source": "PMID 21978760 (Wei 2011: MAOA/B genes and schizophrenia in Han Chinese); PMID 31275445 (Perfilyeva 2019: no association of rs1799836 with autism)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "D",
+            "basis": "judged",
+            "source": "PMID 21978760 (Wei 2011: MAOA/B genes and schizophrenia in Han Chinese); PMID 31275445 (Perfilyeva 2019: no association of rs1799836 with autism)",
+            "assigned": "2026-09-18",
+            "judged": "one schizophrenia study and one negative autism study"
+          }
+        },
+        {
+          "rsid": "rs6198",
+          "gene": "NR3C1",
+          "hgvs": "NC_000005.10:g.143278056T>C",
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "NR3C1 3'UTR (G), one copy: the glucocorticoid receptor; the source named describes a different variant of the gene; no conclusion follows.",
+              "ru": "NR3C1 3'UTR (G), одна копия: глюкокортикоидный рецептор; названный источник описывает другой вариант гена; вывода нет."
+            },
+            "hom": {
+              "en": "NR3C1 3'UTR (G), two copies: the same; no conclusion follows.",
+              "ru": "NR3C1 3'UTR (G), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "no source for this variant as such",
+          "study": "Kumsta 2009",
+          "source": "PMID 18663733 (Kumsta 2009: a glucocorticoid receptor promoter polymorphism — not the 3'UTR variant this position is)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "D",
+            "basis": "judged",
+            "source": "PMID 18663733 (Kumsta 2009: a glucocorticoid receptor promoter polymorphism — not the 3'UTR variant this position is)",
+            "assigned": "2026-09-18",
+            "judged": "the source characterises a promoter polymorphism, whereas rs6198 is the 3'UTR variant"
+          }
+        },
+        {
+          "rsid": "rs1042778",
+          "gene": "OXTR",
+          "hgvs": "NC_000003.12:g.8752859G>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "OXTR (T), one copy: the oxytocin receptor; one study finds the family environment matters more with this allele; no conclusion follows.",
+              "ru": "OXTR (T), одна копия: рецептор окситоцина; одно исследование находит, что семейная среда значит больше при этом аллеле; вывода нет."
+            },
+            "hom": {
+              "en": "OXTR (T), two copies: the same; no conclusion follows.",
+              "ru": "OXTR (T), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "a gene × environment effect in one study",
+          "study": "Dobewall 2018",
+          "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)",
+            "assigned": "2026-09-18",
+            "judged": "one study of a gene × family-environment effect"
+          }
+        },
+        {
+          "rsid": "rs2254298",
+          "gene": "OXTR",
+          "hgvs": "NC_000003.12:g.8760542G>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "OXTR intron (A), one copy: the oxytocin receptor; the meta-analysis of genotype effects on social behaviour finds small effects at most; an association, not a trait of the person.",
+              "ru": "OXTR, интрон (A), одна копия: рецептор окситоцина; метаанализ эффектов генотипа на социальное поведение находит в лучшем случае малые эффекты; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "OXTR intron (A), two copies: the same; an association, not a trait of the person.",
+              "ru": "OXTR, интрон (A), две копии: то же; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "small sociality-related effects in a meta-analysis",
+          "study": "Bakermans-Kranenburg 2014",
+          "source": "PMID 23921259 (Bakermans-Kranenburg 2014: a sociability gene? meta-analysis of oxytocin receptor genotype effects)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 23921259 (Bakermans-Kranenburg 2014: a sociability gene? meta-analysis of oxytocin receptor genotype effects)",
+            "assigned": "2026-09-18",
+            "judged": "a meta-analysis of oxytocin receptor genotype effects"
+          }
+        },
+        {
+          "rsid": "rs53576",
+          "gene": "OXTR",
+          "hgvs": "NC_000003.12:g.8762685A>T",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "OXTR (A), one copy: the most studied oxytocin receptor variant; two meta-analyses find small sociality-related effects; an association, not a trait of the person.",
+              "ru": "OXTR (A), одна копия: самый изученный вариант рецептора окситоцина; два метаанализа находят малые эффекты на социальность; ассоциация, а не свойство человека."
+            },
+            "hom": {
+              "en": "OXTR (A), two copies: the same; an association, not a trait of the person.",
+              "ru": "OXTR (A), две копии: то же; ассоциация, а не свойство человека."
+            }
+          },
+          "effect_size": "small sociality-related effects per A allele in meta-analyses",
+          "study": "Li 2015",
+          "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)",
+            "assigned": "2026-09-18",
+            "judged": "two meta-analyses of sociality"
+          }
+        },
+        {
+          "rsid": "rs5569",
+          "gene": "SLC6A2",
+          "hgvs": "NC_000016.10:g.55697923G>A",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "SLC6A2 (T), one copy: the noradrenaline transporter; two studies on different questions, no replication; no conclusion follows.",
+              "ru": "SLC6A2 (T), одна копия: транспортёр норадреналина; два исследования на разные вопросы, воспроизведения нет; вывода нет."
+            },
+            "hom": {
+              "en": "SLC6A2 (T), two copies: the same; no conclusion follows.",
+              "ru": "SLC6A2 (T), две копии: то же; вывода нет."
+            }
+          },
+          "effect_size": "no replicated association",
+          "study": "Kim 2014",
+          "source": "PMID 29230023 (Myer 2018: pharmacogenetic predictors of methylphenidate efficacy); PMID 24655776 (Kim 2014: SLC6A2 polymorphisms and suicide in MDD)",
+          "submitter": "panel_2026_09_18",
+          "curated_on": "2026-09-18",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-18",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "D",
+            "basis": "judged",
+            "source": "PMID 29230023 (Myer 2018: pharmacogenetic predictors of methylphenidate efficacy); PMID 24655776 (Kim 2014: SLC6A2 polymorphisms and suicide in MDD)",
+            "assigned": "2026-09-18",
+            "judged": "a pharmacogenetic study that does not name the gene in its title, and one suicide study"
+          }
+        }
+      ]
+    },
+    "dental": {
+      "label": {
+        "en": "Dental",
+        "ru": "Стоматология"
+      },
+      "why_no_domain": {
+        "en": "no laboratory marker reads the teeth; the seven positions the statement names have not been handed over yet",
+        "ru": "зубы не читаются лабораторным маркёром; семь позиций, названных в постановке, ещё не переданы"
+      },
+      "source": "the statement of task 199 names seven dental positions; none has arrived in the panel author's files",
+      "positions": []
+    }
+  }
+}

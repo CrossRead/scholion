@@ -877,6 +877,15 @@ LOCALIZABLE_FIELDS = {
     # card, so it is written in both languages since 12.09.2026 — the audit
     # found it printed in English inside a Russian card.
     "why_empty",
+    # Task 200: the sentence of a correction route, what counts as a change when
+    # it is rechecked, and what a load would reveal. All three are the product's
+    # own prose in both languages, written beside the rule they belong to.
+    "because", "what_counts_as_change", "what_it_reveals",
+    # Task 199 F: why a panel is not on the radar — a sentence at the top of its card.
+    "why_no_domain",
+    # The legend of evidence levels (evidence_levels.json, task 199): the short
+    # name of a level, what stands behind it, and what the product says at it.
+    "short", "full", "says",
     # names and headings shown on screen
     "label", "display_name", "name", "title", "category", "phenotype",
     "suggest", "specialist", "source", "class", "nutritional_dose", "forms",
@@ -928,7 +937,13 @@ def _localized(value: Any, lang: str) -> Any:
 # unit cannot be converted. A field-name rule cannot reach inside a map keyed by
 # data, which is what this set is for.
 LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status",
-                          "convert_refused"}
+                          "convert_refused",
+                          # Task 200, keyed by a name the code compares and a
+                          # phrase the reader sees: the chain links of a system,
+                          # the routes protein arrives by, what each route state
+                          # means, the load tests and the classes of what a
+                          # genotype says about a route.
+                          "links", "routes", "load_tests", "route_classes"}
 
 # A language map whose values are STRUCTURE, not prose: `labels` in the marker
 # dictionary holds, per language, a marker's display name together with the

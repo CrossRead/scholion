@@ -364,6 +364,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="what the latest check against a fresh ClinVar has brought")
     sub.add_parser("limits", parents=[common],
                    help="what cannot be said from this data, why, and what would close it")
+    sub.add_parser("evidence-levels", parents=[common],
+                   help="the legend of evidence levels A–E carried by every genetic statement")
     sub.add_parser("markers", parents=[common],
                    help="the catalogue of the profile's markers: key, name, units, reference range")
 
@@ -870,6 +872,9 @@ def _main(argv=None) -> int:
     elif args.cmd == "limits":
         from . import limits as _lim
         res, render = _lim.report(), fmt.limits_report
+    elif args.cmd == "evidence-levels":
+        from .engine import panel_gate as _pg
+        res, render = _pg.legend(), fmt.evidence_levels_report
     elif args.cmd == "markers":
         res, render = {"markers": core.marker_catalog()}, fmt.markers_report
     elif args.cmd == "add-lab":

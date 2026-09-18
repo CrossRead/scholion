@@ -152,10 +152,20 @@ class TestTheWork(_Genome):
                     seen[Path(c[c.index("-R") + 1]).stem] = Path(c[c.index("-R") + 1]).read_text(encoding="utf-8")
             return self.fake_run()(cmds)
 
-        r = self.genotype(build=GRCH37, run=run)
+        cat = sites.catalogue()
+        # Every shipped locus carries both builds today, so the case this test
+        # is about — a locus the second build has no number for — is made here
+        # rather than borrowed from the catalogue, which would make the test
+        # pass or fail by what somebody added to it.
+        held = {**cat, "loci": {**cat["loci"],
+                                "rs999999999": {"gene": "HELD", "chrom": "1", "pos": 1000,
+                                                "ref": "A", "alt": "G", "pos_grch37": None}}}
+        held["positions"] = len(held["loci"])
+        with mock.patch.object(sites, "catalogue", return_value=held):
+            r = self.genotype(build=GRCH37, run=run)
+        cat = held
         self.assertTrue(r["ok"], r)
         self.assertIn("19\t45411940\t45411941\trs429358|APOE\n", seen["19"])
-        cat = sites.catalogue()
         without = sum(1 for l in cat["loci"].values() if not l.get("pos_grch37"))
         self.assertGreater(without, 0)
         self.assertEqual(r["positions"], sum(len(v.splitlines()) for v in seen.values()))

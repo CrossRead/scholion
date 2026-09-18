@@ -60,6 +60,27 @@ def _section_body(block: str) -> Optional[str]:
     return (body[:stop.start()] if stop else body).strip()
 
 
+def news_of(block: str) -> List[str]:
+    """The bold leads of «What you can do now»: what a release lets a person do.
+
+    An update note that listed only what to re-run told nobody what had arrived
+    (owner, 17.09.2026); the first bold sentence of each paragraph is the
+    capability in one line.
+    """
+    s = re.search(r"^### What you can do now\s*$", block, re.M)
+    if not s:
+        return []
+    body = block[s.end():]
+    stop = re.search(r"^### ", body, re.M)
+    body = body[:stop.start()] if stop else body
+    out = []
+    for para in re.split(r"\n\s*\n", body):
+        m = re.match(r"\s*\*\*(.+?)\*\*", para, re.S)
+        if m:
+            out.append(" ".join(m.group(1).split()))
+    return out
+
+
 def parse_section(body: str) -> Dict[str, Any]:
     """One section → {nothing, actions[], problems[]}."""
     paras = [p.strip() for p in re.split(r"\n\s*\n", body.strip()) if p.strip()]
@@ -107,7 +128,8 @@ def parse_journal(text: str) -> List[Dict[str, Any]]:
         if nxt:
             block = block[:nxt.start()]
         body = _section_body(block)
-        entry = {"version": m.group(1), "date": m.group(2), "has_section": body is not None}
+        entry = {"version": m.group(1), "date": m.group(2), "has_section": body is not None,
+                 "news": news_of(block)}
         entry.update(parse_section(body) if body is not None
                      else {"nothing": True, "actions": [], "problems": []})
         out.append(entry)
@@ -122,11 +144,12 @@ def journal_text() -> str:
 
 
 def between(since: Any, until: Any, text: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Entries newer than `since` and not newer than `until` that ask for an action."""
+    """Entries newer than `since` and not newer than `until` that ask for an action
+    or bring something new to do."""
     lo, hi = version_tuple(since), version_tuple(until)
     entries = parse_journal(journal_text() if text is None else text)
     return [e for e in entries
-            if lo < version_tuple(e["version"]) <= hi and e["actions"]]
+            if lo < version_tuple(e["version"]) <= hi and (e["actions"] or e.get("news"))]
 
 
 #: The one address the version check asks. A constant, never composed from input.

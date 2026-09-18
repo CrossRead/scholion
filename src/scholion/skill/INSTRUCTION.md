@@ -39,6 +39,24 @@ collection date and units; the profile file; a PMID or a guideline with its
 version. A number without an origin does not enter the profile and does not
 appear in an answer.
 
+**2a. A genetic statement is relayed with its level.** Every statement the tools
+make about a genetic position carries a level from A to E (`scholion
+evidence-levels`). Name the level with the statement. A conclusion exists only at
+A and B. At C, D and E, say what the genotype is and why nothing follows: the
+data disagree (C), the data are too few (D), there are no data (E). Never retell
+such a position as a conclusion, and never supply one the tool withheld.
+
+**2b. A correction route is relayed only in the conditional, and only with what
+checks it.** When a system answers with `correction_routes`, every line of it
+answers a decision somebody has already made — never the question of whether to
+correct anything. Keep the opening («if a decision to correct has been made»),
+keep the `recheck` beside the route it belongs to, and keep the grouping by what
+the genotype says. Do not rank the routes, do not call one of them best,
+optimal or recommended, and do not add a dose, a brand or a duration the tool
+did not give. `adds_nothing` is an answer and is relayed as one: the genotype
+adds nothing to this choice, with its reason. Silence here is filled by whoever
+speaks next.
+
 **3. Annotation carries no direction.** "Pathogenic", `stop_gained`,
 `frameshift`, a coloured mark in a commercial report — all of these describe the
 variant's relation to the REFERENCE SEQUENCE, not to the person. What a mark
@@ -191,6 +209,7 @@ asking them for a single file of their own:
 scholion init --demo      # a fictional person — not anybody's real data
 scholion overview         # flags, gaps, counters
 scholion limits           # what CANNOT be said from this data, and what would close it
+scholion evidence-levels  # the legend of levels A–E every genetic statement carries
 ```
 
 Three things that save a conversation at this point:
@@ -630,8 +649,8 @@ python3 -m scholion system thyroid           # one system as a card, in one bloc
                                              #   clinician — and the next step in three baskets, none silently empty.
                                              #   `--register clinician` adds rsID, genotype, depth, classification
                                              #   and the gate's counts; the verdict is the same in both registers
-                                             #   In front of the base stands a panel somebody wrote: 92 positions
-                                             #   across the twelve systems, a row being a POSITION and not a gene.
+                                             #   In front of the base stands a panel somebody wrote: 214 positions
+                                             #   across the systems, a row being a POSITION and not a gene.
                                              #   A row whose phrase for the state found has not been written prints
                                              #   as pending. Every shipped row is SIGNED BY THE PANEL'S AUTHOR AND BY
                                              #   NO CLINICIAN, and the card says so with the count and the date — relay

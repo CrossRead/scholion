@@ -53,9 +53,12 @@ class TestOneFileFeedsEveryReader(unittest.TestCase):
         (the owner's decision; the reason is `_meta.why_cardio`). The 0.4.9
         composition is recorded in the file's _meta; the guard is here."""
         keys = [k for k, _ in L._RADAR_DOMAINS]
-        self.assertEqual(keys, ["lipids", "cardio", "glucose", "inflammation", "thyroid",
-                                "adrenals", "gonads", "growth", "pancreas", "liver",
-                                "micronutrients", "renal"])
+        # The systems added since keep the first twelve in place and in order
+        # (amino acids, task 200): the axes a stored radar drew stay where they were.
+        self.assertEqual(keys[:12], ["lipids", "cardio", "glucose", "inflammation", "thyroid",
+                                     "adrenals", "gonads", "growth", "pancreas", "liver",
+                                     "micronutrients", "renal"])
+        self.assertIn("amino_acids", keys[12:])
         self.assertIn("why_four_endocrine_systems", _file()["_meta"])
         self.assertIn("why_cardio", _file()["_meta"])
 

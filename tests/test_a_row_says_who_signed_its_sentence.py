@@ -18,8 +18,12 @@ Held here:
     in the summary, which both registers print;
   * a row with a note and no signer still prints as unsigned, in both registers
     and both languages;
-  * a signer the engine does not know is not treated as a signature — the card
-    would have to name whom, and it cannot.
+  * a reviewer the engine does not know is not treated as a review — since task
+    199 such a row is refused at the gate and counted, because a reviewer is
+    named by role, and a role nobody defined may be a person's name.
+
+Since task 199 the field is `review {by_role, on, scope}`: the file says who
+checked the sentence against its source by ROLE, never by name.
 """
 from __future__ import annotations
 
@@ -37,7 +41,7 @@ from scholion.i18n import en, ru
 #: with the person's own numbers, and the signer becomes a state because the
 #: file says it in one language and a row prints in two.
 RENAMED = {"text": "text", "expect": "expect_check",
-           "note_on_signature": "signature", "signed_by": "signature"}
+           "note_on_review": "signature"}
 
 
 def _shipped() -> dict:
@@ -67,7 +71,7 @@ class TestEveryFieldOfAShippedRowReachesTheRow(unittest.TestCase):
     def test_every_shipped_row_is_signed_by_the_author_and_by_no_clinician(self):
         systems = (_shipped().get("systems") or {})
         signed = {(k, p["rsid"]) for k, spec in systems.items()
-                  for p in (spec.get("positions") or []) if p.get("signed_by")}
+                  for p in (spec.get("positions") or []) if p.get("review")}
         self.assertTrue(signed, "no shipped row names a signer")
         seen, unsigned = set(), []
         for key in systems:
@@ -120,17 +124,19 @@ def _lookup(rsid=None, gene=None):
 def _pos(rs, gene, **over):
     row = {"rsid": rs, "gene": gene, "hgvs": "NC_000001.11:g.100A>G", "risk_allele": "G",
            "mode": "monogenic", "classification": "Strong", "moi": "AD", "kind": "mechanism",
-           "text": {"het": TXT, "hom": TXT}, "source": "the author"}
+           "text": {"het": TXT, "hom": TXT}, "source": "the author",
+           "evidence": {"level": "A", "basis": "gencc", "source": "the author"}}
     row.update(over)
     return row
 
 
 CURATED = {"_meta": {"why_empty": "nobody wrote a row"},
            "systems": {"thyroid": {"source": None, "positions": [
-               _pos("rsSIGNED", "SIGNED", signed_by="owner", signed_on="2026-09-13"),
+               _pos("rsSIGNED", "SIGNED", review={"by_role": "panel_author", "on": "2026-09-13",
+                                                   "scope": "sentence_against_source"}),
                _pos("rsDRAFT", "DRAFT",
-                    note_on_signature="a draft; a clinician's signature is still open"),
-               _pos("rsSTRANGE", "STRANGE", signed_by="somebody nobody knows")]}}}
+                    note_on_review="a draft; a clinician's review is still open"),
+               _pos("rsSTRANGE", "STRANGE", review={"by_role": "Dr Somebody", "on": "2026-09-13"})]}}}
 
 
 class TestTheUnsignedRowSaysSoOnTheScreen(unittest.TestCase):
@@ -155,9 +161,11 @@ class TestTheUnsignedRowSaysSoOnTheScreen(unittest.TestCase):
     def _rows(self):
         return {r["gene"]: r for r in SP.system("thyroid", "clinician")["genetics"]["rows"]}
 
-    def test_a_signer_the_engine_does_not_know_is_not_a_signature(self):
-        self.assertEqual("open", self._rows()["STRANGE"]["signature"],
-                         "a row whose signer cannot be named must not read as signed")
+    def test_a_reviewer_the_engine_does_not_know_refuses_the_row(self):
+        self.assertNotIn("STRANGE", self._rows(),
+                         "a row reviewed by an unknown role must not print at all")
+        refused = SP.system("thyroid", "clinician")["genetics"].get("refused") or {}
+        self.assertEqual(1, (refused.get("by_reason") or {}).get("personal_name_in_package"), refused)
         self.assertEqual("author", self._rows()["SIGNED"]["signature"])
         self.assertEqual("open", self._rows()["DRAFT"]["signature"])
 
@@ -173,18 +181,18 @@ class TestTheUnsignedRowSaysSoOnTheScreen(unittest.TestCase):
                         i18n.set_lang(None)
                     self.assertIn(phrase, text)
                     said = [ln for ln in text.splitlines() if phrase in ln]
-                    self.assertTrue(all(("rsDRAFT" in ln or "rsSTRANGE" in ln) for ln in said), said)
+                    self.assertTrue(all("rsDRAFT" in ln for ln in said), said)
 
     def test_the_summary_counts_the_signed_and_the_unsigned_apart(self):
         gen = SP.system("thyroid", "clinician")["genetics"]
-        self.assertEqual(2, gen["signature_open_count"])
+        self.assertEqual(1, gen["signature_open_count"])
         self.assertEqual(1, gen["signature_author_count"])
         i18n.set_lang("en")
         try:
             text = F.system_report(SP.system("thyroid", "clinician"))
         finally:
             i18n.set_lang(None)
-        self.assertIn(en.MESSAGES["system.genetics.signature_open"].format(n=2), text)
+        self.assertIn(en.MESSAGES["system.genetics.signature_open"].format(n=1), text)
         self.assertIn(en.MESSAGES["system.genetics.signature_author"].format(
             n=1, date="2026-09-13"), text)
 

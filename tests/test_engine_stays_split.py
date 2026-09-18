@@ -41,7 +41,8 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 # small enough that a module heading back toward monolith trips the wire while
 # the diff is still one review long. Raising a number is allowed and visible.
 LINE_BUDGETS = {
-    "__init__": 220,     # imports only -- claim 1 keeps it honest anyway
+    # task 200 put a domain of its own (routes) and the gate's LINKS on the facade
+    "__init__": 250,     # imports only -- claim 1 keeps it honest anyway
     "_helpers": 250,
     # Added 08.09.2026 with task 132: the two quantities printed beside a
     # polygenic percentile — its stability under another reference population
@@ -105,7 +106,9 @@ LINE_BUDGETS = {
     # 680 → 690 on 12.09.2026, task 168 step 6: a marker's row names the system
     # whose panel holds it, so the card of a system is reachable from the marker
     # on every face — one field and the lazy helper that reads the domain file.
-    "labs": 690,
+    # +10 for the list of every system a marker counts in (task 200).
+    # task 200: the two conditions that ask for a test nobody has ever taken
+    "labs": 760,
     # Added 12.09.2026, task 170: the clinician's target beside the corridor —
     # what a treatment aims at, told apart from what a laboratory calls normal.
     # It landed inside labs.py first and pushed it 90 lines over its wire; the
@@ -206,7 +209,11 @@ LINE_BUDGETS = {
     # count inside it — lives here once, because the refusal sentence is the
     # product and three copies of it drift into three sentences. `decision` and
     # `screening` shrank by what moved out.
-    "panel_form": 260,
+    # 175 added the one rule for whether a gene's bases were read.
+    # task 200 / owner 17.09.2026: a gene the file read with its depth
+    # unmeasured is a third state, and a list that is not read whole says
+    # WHICH reason and what closes it — both live here
+    "panel_form": 400,
     # New on 12.09.2026, task 168 (step 3). The third entry: a body system of
     # the radar, with its genetic half read from a curated file by POSITION,
     # the evidence mode of every row, the questions for a clinician and the
@@ -243,7 +250,10 @@ LINE_BUDGETS = {
     # the list carries its own read count (1400 → 1430; 1419 when raised).
     # 1430 → 1450 on 14.09.2026: every panel position is carried as a state in
     # both registers, so the radar can say the panel was checked whole.
-    "system_panels": 1450,
+    # +20: a system's long panel beside its score, and markers in two systems (task 200).
+    # task 200: the chain link, the intake route, the load a fasting corridor
+    # cannot stand in for, and the block that answers a decision to correct
+    "system_panels": 1600,
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its
@@ -288,6 +298,21 @@ LINE_BUDGETS = {
     # clinician — references and sentences, no genome, no labs.
     "panel_catalogue": 120,
     "pgx_labels": 60,
+    # The gate a curated panel row passes (task 199): the locus rule, the
+    # impersonal review, the evidence legend — split out of system_panels.
+    "panel_gate": 330,
+    # A system's long laboratory panel, shown and never scored (task 200).
+    "panel_labs": 120,
+    # task 200: the correction-route block — a curated object, its gate and its
+    # grouping; the rules themselves live in knowledge/, not here
+    "routes": 230,
+    # tasks 175/201/203: what «read» means and why a row was not read — out of panel_form
+    "panel_reading": 200,
+    # tasks 199/201: a person's state at one position — out of system_panels
+    "panel_genotype": 170,
+    # task 199: what the book holds beyond its rows — groups, panels on demand,
+    # the local note, the marker index; lifted out of system_panels on 18.09.2026
+    "panel_book": 260,
     # 220 → 240 on 12.09.2026: the overview's age line names why it could not
     # be computed rather than answering «unknown» with nothing beside it.
     "profile_view": 240,

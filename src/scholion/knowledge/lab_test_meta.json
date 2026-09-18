@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-08-22",
+    "updated": "2026-09-17",
     "purpose": "A PORTABLE map of the properties of laboratory tests: level (tier), biomaterial/tube, preparation, computed indices and their prerequisites. It is needed so that the draw checklist does not turn into a sheet of forty items but goes in steps: the cheap screening first, the expensive only if the screening showed something.",
     "tiers": {
       "1": "basic screening: part of the ordinary panels, cheap, available everywhere",
@@ -457,6 +457,186 @@
       },
       "loinc": null,
       "loinc_status": "not verified — do not write the code from memory, take it from the official LOINC table"
+    },
+    "aa_ratio_phe_tyr": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_phenylalanine",
+        "aa_tyrosine"
+      ],
+      "note": {
+        "en": "an index, not an assay: rises with inflammation (tetrahydrobiopterin depletion) and in carriers of phenylketonuria — it separates the two causes of a high phenylalanine",
+        "ru": "индекс, а не анализ: растёт при воспалении (истощение тетрагидробиоптерина) и у носителей фенилкетонурии — разводит две причины высокого фенилаланина"
+      }
+    },
+    "aa_ratio_gly_ser": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_glycine",
+        "aa_serine"
+      ],
+      "note": {
+        "en": "an index, not an assay: looks at the one-carbon node: a low glycine with a normal serine points to use rather than supply",
+        "ru": "индекс, а не анализ: смотрит на одноуглеродный узел: низкий глицин при нормальном серине говорит о расходе, а не о поступлении"
+      }
+    },
+    "aa_fischer_ratio": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_leucine",
+        "aa_isoleucine",
+        "valine",
+        "aa_phenylalanine",
+        "aa_tyrosine"
+      ],
+      "note": {
+        "en": "an index, not an assay: the classic liver index: branched-chain over aromatic amino acids; it falls when liver function is impaired",
+        "ru": "индекс, а не анализ: классический печёночный индекс: разветвлённые аминокислоты к ароматическим; падает при нарушении функции печени"
+      }
+    },
+    "aa_ratio_gln_glu": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_glutamine",
+        "aa_glutamate"
+      ],
+      "note": {
+        "en": "an index, not an assay: falls with insulin resistance; indirectly, a view of the ammonia buffer",
+        "ru": "индекс, а не анализ: падает при инсулинорезистентности; косвенно — про аммиачный буфер"
+      }
+    },
+    "aa_ratio_glu_gln": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_glutamate",
+        "aa_glutamine"
+      ],
+      "note": {
+        "en": "an index, not an assay: the same pair as glutamine/glutamate, the other way up, as some laboratories print it",
+        "ru": "индекс, а не анализ: та же пара, что глутамин/глутамат, в обратную сторону — так её печатают некоторые лаборатории"
+      }
+    },
+    "aa_ratio_met_hcy": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_methionine",
+        "homocysteine"
+      ],
+      "note": {
+        "en": "an index, not an assay: where the bottleneck is: methionine supply or the transsulfuration pathway",
+        "ru": "индекс, а не анализ: где узкое место: поступление метионина или ход транссульфурации"
+      }
+    },
+    "aa_ratio_aaba_leu": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_aaba",
+        "aa_leucine"
+      ],
+      "note": {
+        "en": "an index, not an assay: printed by some amino acid panels beside the single values; recomputed here from its two components",
+        "ru": "индекс, а не анализ: печатается некоторыми панелями аминокислот рядом с отдельными значениями; здесь пересчитывается из двух компонентов"
+      }
+    },
+    "urea_creatinine_ratio": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "urea",
+        "creatinine"
+      ],
+      "note": {
+        "en": "an index, not an assay: separates a protein load from a kidney cause of a high urea; computed with both in mmol/L",
+        "ru": "индекс, а не анализ: разводит белковую нагрузку и почечную причину высокой мочевины; считается при обеих величинах в ммоль/л"
+      }
+    },
+    "kynurenine": {
+      "tier": 3,
+      "biomaterial": "serum",
+      "fasting": true,
+      "note": {
+        "en": "needed for the kynurenine/tryptophan ratio, a marker of IDO activation that rises with inflammation and age",
+        "ru": "нужен для отношения кинуренин/триптофан — маркёра активации IDO, который растёт с воспалением и возрастом"
+      }
+    },
+    "aa_ratio_kyn_trp": {
+      "tier": 3,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "kynurenine",
+        "aa_tryptophan"
+      ],
+      "note": {
+        "en": "an index, not an assay: a marker of IDO activation; it rises with inflammation and age",
+        "ru": "индекс, а не анализ: маркёр активации IDO; растёт с воспалением и возрастом"
+      }
+    },
+    "urine_cystine_creatinine_ratio": {
+      "tier": 2,
+      "biomaterial": "urine",
+      "fasting": false,
+      "computed": true,
+      "requires": [
+        "urine_aa_cystine",
+        "urine_creatinine"
+      ],
+      "note": {
+        "en": "an index, not an assay: cystine excretion normalised to creatinine — carriership of cystinuria and the risk of stones; computed when both are in one urine collection",
+        "ru": "индекс, а не анализ: экскреция цистина к креатинину — носительство цистинурии и риск камней; считается, когда оба в одной порции мочи"
+      }
+    },
+    "urine_plasma_cystine_ratio": {
+      "tier": 2,
+      "biomaterial": "urine",
+      "fasting": false,
+      "computed": true,
+      "requires": [
+        "urine_aa_cystine",
+        "aa_cystine"
+      ],
+      "note": {
+        "en": "an index, not an assay: urine over plasma cystine — the one way to see renal losses, when the plasma is ordinary and the urine is high",
+        "ru": "индекс, а не анализ: цистин мочи к цистину плазмы — единственный способ увидеть почечные потери, когда плазма обычная, а моча высокая"
+      }
+    },
+    "urine_plasma_lysine_ratio": {
+      "tier": 2,
+      "biomaterial": "urine",
+      "fasting": false,
+      "computed": true,
+      "requires": [
+        "urine_aa_lysine",
+        "aa_lysine"
+      ],
+      "note": {
+        "en": "an index, not an assay: urine over plasma lysine — renal losses of the dibasic amino acids, read with cystine",
+        "ru": "индекс, а не анализ: лизин мочи к лизину плазмы — почечные потери двухосновных аминокислот, читается вместе с цистином"
+      }
     }
   },
   "body_metrics": {

@@ -38,6 +38,12 @@ from .i18n import t as _t
 # report next to the numbers, and it names the markers in the reader's language.
 # strict=True  → a discrepancy counts as a defect (the index definition is universal);
 # strict=False → for reference only (the lab may have used a direct method).
+def _ratio(num: str, den: str, expr: str) -> Dict[str, Any]:
+    """A plain ratio of two markers of the same unit."""
+    return {"needs": [num, den], "fn": lambda v: v[num] / v[den],
+            "expr": expr, "tol": 0.10, "strict": False}
+
+
 DERIVED: Dict[str, Dict[str, Any]] = {
     "homa_ir": {
         "needs": ["insulin", "glucose"],
@@ -51,9 +57,12 @@ DERIVED: Dict[str, Dict[str, Any]] = {
         "needs": ["testosterone", "shbg"],
         "fn": lambda v: v["testosterone"] / v["shbg"] * 100.0,
         "expr": "provenance.expr.free_androgen_index", "tol": 0.10, "strict": True},
+    # `total_protein`, the key the base has. Until 0.5.4 this said `protein_total`,
+    # a key nothing ever stores, so the index was never recomputed and a printed
+    # A/G ratio could not be checked against its own components.
     "ag_ratio": {
-        "needs": ["albumin", "protein_total"],
-        "fn": lambda v: v["albumin"] / (v["protein_total"] - v["albumin"]),
+        "needs": ["albumin", "total_protein"],
+        "fn": lambda v: v["albumin"] / (v["total_protein"] - v["albumin"]),
         "expr": "provenance.expr.ag_ratio", "tol": 0.10, "strict": True},
     "non_hdl": {
         "needs": ["cholesterol_total", "hdl"],
@@ -64,6 +73,42 @@ DERIVED: Dict[str, Dict[str, Any]] = {
         "fn": lambda v: v["cholesterol_total"] - v["hdl"] - v["triglycerides"] / 2.2,
         "expr": "provenance.expr.ldl", "tol": 0.15, "strict": False,
         "skip_if": lambda v: v["triglycerides"] >= 4.5},
+    # The amino acid panel read as a picture (task 200, stage C; task 68). A
+    # laboratory that prints a ratio is checked against its own components; one
+    # that does not gets the ratio computed. None of these is strict: a
+    # laboratory may round its components before dividing.
+    "aa_ratio_phe_tyr": _ratio("aa_phenylalanine", "aa_tyrosine", "provenance.expr.aa_ratio_phe_tyr"),
+    "aa_ratio_gly_ser": _ratio("aa_glycine", "aa_serine", "provenance.expr.aa_ratio_gly_ser"),
+    "aa_ratio_gln_glu": _ratio("aa_glutamine", "aa_glutamate", "provenance.expr.aa_ratio_gln_glu"),
+    "aa_ratio_glu_gln": _ratio("aa_glutamate", "aa_glutamine", "provenance.expr.aa_ratio_glu_gln"),
+    "aa_ratio_met_hcy": _ratio("aa_methionine", "homocysteine", "provenance.expr.aa_ratio_met_hcy"),
+    "aa_ratio_aaba_leu": _ratio("aa_aaba", "aa_leucine", "provenance.expr.aa_ratio_aaba_leu"),
+    "aa_ratio_kyn_trp": _ratio("kynurenine", "aa_tryptophan", "provenance.expr.aa_ratio_kyn_trp"),
+    "aa_fischer_ratio": {
+        "needs": ["aa_leucine", "aa_isoleucine", "valine", "aa_phenylalanine", "aa_tyrosine"],
+        "fn": lambda v: (v["aa_leucine"] + v["aa_isoleucine"] + v["valine"])
+        / (v["aa_phenylalanine"] + v["aa_tyrosine"]),
+        "expr": "provenance.expr.aa_fischer_ratio", "tol": 0.10, "strict": False},
+    # Urea in mmol/L over creatinine in µmol/L, brought to mmol/L.
+    "urea_creatinine_ratio": {
+        "needs": ["urea", "creatinine"],
+        "fn": lambda v: v["urea"] / (v["creatinine"] / 1000.0),
+        "expr": "provenance.expr.urea_creatinine_ratio", "tol": 0.10, "strict": False},
+    # Task 200, decision 10: the urine half is declared, never invented. These
+    # three compute only when a urine amino acid panel has been taken; until
+    # then they say what is missing.
+    "urine_cystine_creatinine_ratio": {
+        "needs": ["urine_aa_cystine", "urine_creatinine"],
+        "fn": lambda v: v["urine_aa_cystine"] / v["urine_creatinine"] * 1000.0,
+        "expr": "provenance.expr.urine_cystine_creatinine_ratio", "tol": 0.10, "strict": False},
+    "urine_plasma_cystine_ratio": {
+        "needs": ["urine_aa_cystine", "aa_cystine"],
+        "fn": lambda v: v["urine_aa_cystine"] / v["aa_cystine"],
+        "expr": "provenance.expr.urine_plasma_cystine_ratio", "tol": 0.10, "strict": False},
+    "urine_plasma_lysine_ratio": {
+        "needs": ["urine_aa_lysine", "aa_lysine"],
+        "fn": lambda v: v["urine_aa_lysine"] / v["aa_lysine"],
+        "expr": "provenance.expr.urine_plasma_lysine_ratio", "tol": 0.10, "strict": False},
     "omega6_omega3_ratio": {
         "needs": ["omega6", "omega3"],
         "fn": lambda v: v["omega6"] / v["omega3"],

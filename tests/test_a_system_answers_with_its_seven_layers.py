@@ -76,7 +76,10 @@ CLINVAR = {"status": "ok", "by_gene": {"LIM": [{"zygosity": "hom"}], "REC": [{"z
 def _pos(rs, gene, **over):
     row = {"rsid": rs, "gene": gene, "hgvs": "NC_000001.11:g.100A>G", "risk_allele": "G",
            "mode": "monogenic", "classification": "Strong", "moi": "AD",
-           "text": {"het": TXT, "hom": TXT}, "source": "the author"}
+           "text": {"het": TXT, "hom": TXT}, "source": "the author",
+           # A level that allows a conclusion, so that what these rows test is
+           # the classification and the mode; the level has its own test.
+           "evidence": {"level": "A", "basis": "gencc", "source": "the author"}}
     row.update(over)
     return row
 
@@ -235,12 +238,21 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         self.assertIn("30", p["text"])
 
     def test_a_position_with_no_row_is_unread_and_goes_to_the_genome_basket(self):
-        p = self.rows()["PUNR"]
-        self.assertIs(False, p["read"])
-        self.assertEqual("assumed_ref", p["read_why"])
-        basket = SP.system("thyroid")["next"]["genome"]
-        self.assertIn("rsPUNR", [x.get("rsid") for x in basket["rows"]])
-        self.assertIsNone(basket["empty_why"])
+        """With an alignment on the machine the answer is «not read yet»: the
+        depth IS measurable there, and reading the position from it is the step
+        (owner, 18.09.2026)."""
+        from unittest import mock
+        from scholion import core as _core
+        with mock.patch("scholion.gene_region.bam_path", lambda: "/tmp/a.bam"):
+            _core.reset_cache()                 # the card is memoised per profile
+            p = self.rows()["PUNR"]
+            self.assertIs(False, p["read"])
+            self.assertEqual("assumed_ref", p["read_why"])
+            self.assertEqual("unread", p["read_state"])
+            basket = SP.system("thyroid")["next"]["genome"]
+            self.assertIn("rsPUNR", [x.get("rsid") for x in basket["rows"]])
+            self.assertIsNone(basket["empty_why"])
+        _core.reset_cache()
 
     def test_an_expect_on_a_marker_never_taken_is_a_gap_not_a_disagreement(self):
         """Never a disagreement, and since 13.09.2026 never a question of its
@@ -304,6 +316,9 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         with mock.patch.object(SP, "_base", lambda: {}), \
              mock.patch.object(SP, "_curated", lambda: cur):
             v = SP.system("thyroid")["verdict"]
+        # The row with no row in the file is either unread, or — with no
+        # alignment on the machine — taken by the reference (task 201). Neither
+        # lets the list be called read end to end.
         self.assertEqual("clear_partial", v["kind"])
         self.assertEqual(1, v["unread"])
         self.assertEqual(2, v["total"])
@@ -421,14 +436,15 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
 
     def test_the_shipped_panels_pass_their_own_gate_in_every_system(self):
         """Until 13.09.2026 the file shipped empty; the segment panels agreed by
-        the owner that day (task 179) fill twelve systems. Every row goes
+        the owner that day (task 179) filled twelve systems; the three systems
+        added on 17.09.2026 (task 200) carry their own. Every row goes
         through the gate — a source, a mode the engine knows, a classification
         with an inheritance for a monogenic row, an effect size for a common
         variant — and nothing is refused; the three genes short reads cannot
         read are named as such and never counted as read."""
         book = SP._curated()
         systems = book.get("systems") or {}
-        self.assertEqual(12, len(systems))
+        self.assertEqual(15, len(systems))
         total = 0
         for key, spec in systems.items():
             with self.subTest(system=key):
@@ -467,8 +483,9 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
     def test_the_listing_says_what_each_system_holds(self):
         s = SP.systems()
         by = {r["key"]: r for r in s["systems"]}
-        # 12 until 13.09.2026; 13 since «Heart and vessels» was added (task 179).
-        self.assertEqual(13, s["count"])
+        # 12 until 13.09.2026; 13 since «Heart and vessels» was added (task 179);
+        # the count follows the domain file since amino acids joined (task 200).
+        self.assertEqual(len(SP.domains()), s["count"])
         self.assertEqual("composed", by["thyroid"]["genetics"]["status"])
         self.assertEqual("composed", by["cardio"]["genetics"]["status"])
         self.assertEqual("no_genetic_half", by["fitness"]["genetics"]["status"])

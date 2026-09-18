@@ -52,7 +52,8 @@ def _name(page: tuple) -> str:
     return _path(page).relative_to(ROOT).as_posix()
 
 WORDS = {11: ("eleven", "одиннадцать"), 12: ("twelve", "двенадцать"),
-         13: ("thirteen", "тринадцать"), 14: ("fourteen", "четырнадцать")}
+         13: ("thirteen", "тринадцать"), 14: ("fourteen", "четырнадцать"),
+         15: ("fifteen", "пятнадцать"), 16: ("sixteen", "шестнадцать")}
 
 
 def _version() -> str:
@@ -65,8 +66,10 @@ def _lab_systems() -> int:
 
 
 def _genes() -> int:
+    """UNIQUE genes. The pages said 1203 while the base held 1097 genes: 1203 was
+    the sum over systems, with 98 genes counted in more than one (task 199)."""
     systems = core._read_knowledge("gencc_gene_disease.json")["systems"]
-    return sum(len(v.get("genes") or {}) for v in systems.values())
+    return len({g for v in systems.values() for g in (v.get("genes") or {})})
 
 
 def _positions() -> int:
@@ -104,8 +107,8 @@ class TestThePagesAgreeWithTheBuild(unittest.TestCase):
         n = _lab_systems()
         self.assertIn(n, WORDS, f"no word is known for {n} systems — add it")
         for lang, pattern in (
-                ("en", r"(?i)\b(eleven|twelve|thirteen|fourteen)\s+(?:body\s+)?systems\b"),
-                ("ru", r"(?i)\b(одиннадцать|двенадцать|тринадцать|четырнадцать)\s+систем")):
+                ("en", r"(?i)\b(eleven|twelve|thirteen|fourteen|fifteen|sixteen)\s+(?:body\s+)?systems\b"),
+                ("ru", r"(?i)\b(одиннадцать|двенадцать|тринадцать|четырнадцать|пятнадцать|шестнадцать)\s+систем")):
             with self.subTest(language=lang):
                 found = [(p, m.group(1).lower())
                          for p in PAGES

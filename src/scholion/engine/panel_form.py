@@ -22,7 +22,9 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, Iterable, List, Optional
 
-from ..i18n import CATALOGUES, DEFAULT as _DEFAULT, t as _t
+from ..i18n import CATALOGUES, DEFAULT as _DEFAULT, plural as _plural, t as _t
+from .panel_reading import (CLOSES_WITH, NO_TABLE, UNREAD_CLASSES, _unread_breakdown, _unread_counts,  # noqa: F401
+                            read_state, unread_block, unread_class, unread_line)
 
 #: In the order a reader should meet them: what decides, what is recognised but
 #: undecided, what explains without deciding, what explains nothing, what is
@@ -125,7 +127,9 @@ def scan_for(genes: Iterable[str]) -> Dict[str, Any]:
     except Exception as exc:                                         # noqa: BLE001
         return {"status": "unavailable", "reason": type(exc).__name__, "genes": names}
     if st.get("ready"):
-        return {"status": "ok", "genes": names}
+        # The measured class of the input travels with the scan: a rare variant
+        # read off a chip is a signal to confirm, not a finding (task 2).
+        return {"status": "ok", "genes": names, "input_profile": st.get("input_profile")}
     # `reason` is what the verdict prints and it names THIS refusal — the genome
     # is not readable — while the frame's own code travels beside it for the
     # basket that sends the reader to the genome status. Put straight into the
@@ -173,6 +177,25 @@ def gene_row(gene: str, entry: Optional[Dict[str, Any]] = None,
     return row
 
 
+def bases_read(gene: str, coverage: Optional[Dict[str, Any]] = None,
+               rows=None) -> "tuple":
+    """Were this gene's bases read — `(True, None)` or `(False, reason)`.
+
+    One definition for every entry that asks (task 175). Only a coverage table
+    that measured the gene and found it ordinary for this file says yes; a table
+    nobody made says `coverage_not_measured`, never yes. The screening entry
+    used to take its unread genes from the ACMG scan's weak list alone, which is
+    empty without a table — and a class read nowhere came back «read end to
+    end».
+    """
+    from .genomics import gene_coverage
+    cov = coverage if coverage is not None else gene_coverage(gene, rows)
+    state = (cov or {}).get("state")
+    if state == "fine":
+        return True, None
+    return False, "coverage_" + str(state or "not_measured")
+
+
 def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
     """Four answers, and the third is why this form exists.
 
@@ -197,7 +220,17 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
     # on the lipid card was the NOUN: «unread of its genes: 34, of a list of
     # 45» over a list of 38 genes and 7 positions. The sentence now says rows,
     # and the summary above it counts each half against its own denominator.
+    # Taken by the reference (task 201): not read, and not a gap either — its
+    # own counter, outside «read N of M», and it never lets the list be called
+    # read end to end.
+    # It stays among the unread for the VERDICT — the three entries answer one
+    # state in one voice, and two of them do not know a position's state — and
+    # is named apart on the line beside it.
+    presumed = [r["gene"] for r in rows if r.get("read_state") == "presumed"]
     unread = [r["gene"] for r in rows if r.get("read") is False]
+    # Read by the file, with the depth unmeasured: not a gap in the list and not
+    # a measured «nothing here» either, so it is counted on its own and said.
+    depthless = [r["gene"] for r in rows if r.get("read_state") == "file_only"]
     carriers = sum(1 for r in rows if r.get("carrier"))
     out: Dict[str, Any]
     if found:
@@ -205,13 +238,25 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
         # sentence that reports the first and drops the second lets a reader
         # take the rest of the list for checked.
         out = {"kind": "finding", "n": found, "unread": len(unread),
-               "total": len(rows),
+               "total": len(rows), "why_counts": _unread_counts(rows),
                "genes": sorted({r["gene"] for r in rows if r.get("findings")})}
     elif unread:
         out = {"kind": "clear_partial", "unread": len(unread),
-               "total": len(rows), "genes": sorted(set(unread))[:12]}
+               "total": len(rows), "genes": sorted(set(unread))[:12],
+               "why_counts": _unread_counts(rows),
+               # The rows are counted, the NAMES are listed, and one gene can
+               # hold two rows — so the two numbers differ and the sentence says
+               # so rather than letting a reader count the names and disbelieve
+               # the number (owner, 17.09.2026).
+               "gene_count": len(set(unread)), "genes_shown": min(12, len(set(unread)))}
+    elif depthless:
+        out = {"kind": "clear_file_only", "total": len(rows), "depthless": len(depthless)}
     else:
         out = {"kind": "clear_measured", "total": len(rows)}
+    if depthless and out["kind"] != "clear_file_only":
+        out["depthless"] = len(depthless)
+    if presumed:
+        out["presumed"] = len(presumed)
     if carriers:
         out["carriers"] = carriers
     return out
@@ -236,16 +281,24 @@ def verdict_line(v: Dict[str, Any]) -> str:
         line = _t("screen.finding", n=v.get("n") or 0,
                   genes=", ".join(v.get("genes") or []))
         if v.get("unread"):
-            line += "; " + _t("screen.and_unread", unread=v["unread"],
+            line += "; " + _t("screen.and_unread", unread=_plural(v["unread"], "count.rows"),
                               total=v.get("total") or 0)
     elif kind == "clear_measured":
         line = _t("screen.clear_measured", total=v.get("total") or 0)
+    elif kind == "clear_file_only":
+        line = _t("screen.clear_file_only", total=v.get("total") or 0,
+                  depthless=v.get("depthless") or 0)
     elif kind == "clear_partial":
-        line = _t("screen.clear_partial", unread=v.get("unread") or 0,
-                  total=v.get("total") or 0, genes=", ".join(v.get("genes") or []))
+        # No list of names and no lecture: the names are in the rows underneath,
+        # and the sentence a reader needs here is what is missing and what would
+        # close it (owner, 17.09.2026: «это вообще лишнее»).
+        line = _t("screen.clear_partial", unread=_plural(v.get("unread") or 0, "count.rows"),
+                  total=v.get("total") or 0)
     else:
         return _t("screen.not_determined",
                   why=_why_text((v or {}).get("why") or "scan_not_run"))
+    if v.get("depthless") and kind != "clear_file_only":
+        line += "; " + _t("screen.and_depth_unmeasured", rows=_plural(v["depthless"], "count.rows"))
     if v.get("carriers"):
         line += "; " + _t("screen.and_carriers", n=v["carriers"])
     return line

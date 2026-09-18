@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "PUBLIC dictionary for recognising lab markers in the text of a report (per-language name substrings → the labs.json key, units, references). Feeds the auto-ingest of a folder of lab PDFs. Holds no patient data, portable.",
     "note": "labels.<lang> holds everything that is a language: names — lower-case substrings to look for in a row of the form; exclude — if one occurs, the row is skipped; require / next_require / form_require and their negatives — the same, scoped to the segment after the name, to the next row, and to the form as a whole; display — the name shown on screen. A language absent from a marker falls back to one that is present.\nLanguage-independent, and deliberately outside labels: unit (a UCUM code — the label for it comes from knowledge/units.json in the output language), units ({unit surface form: multiplier to the canonical unit} — at once a gate and a conversion, populated only where a conversion is genuinely needed), specimen (blood/serum/plasma/urine/stool/saliva), the reference bounds, direction, plausible, loinc.",
-    "updated": "2026-09-13 (English display names for D-dimer and lactate dehydrogenase, for the «Heart and vessels» panel; before that 2026-07-31, the add-on order of 22.07: ANA immunoblot, 15 specificities + reticulin antibodies IgA/IgG)",
+    "updated": "2026-09-17",
     "generated": "2026-07-26: the dictionary was expanded from 57 to 193 markers after the actual names on 176 forms.",
     "markers": 415,
     "schema": 2,
@@ -24,7 +24,11 @@
         "ru": {
           "names": [
             "a-аминоадипиновая кислота (aaa"
-          ]
+          ],
+          "display": "α-аминоадипиновая кислота"
+        },
+        "en": {
+          "display": "α-aminoadipic acid"
         }
       }
     },
@@ -37,7 +41,11 @@
           "names": [
             "a-аминомасляная кислота (aaba",
             "альфа-аминомасляная"
-          ]
+          ],
+          "display": "α-аминомасляная кислота"
+        },
+        "en": {
+          "display": "α-aminobutyric acid"
         }
       },
       "ref_sex": "any",
@@ -51,7 +59,11 @@
         "ru": {
           "names": [
             "аланин (ala"
-          ]
+          ],
+          "display": "Аланин"
+        },
+        "en": {
+          "display": "Alanine"
         }
       },
       "ref_sex": "any",
@@ -65,7 +77,11 @@
         "ru": {
           "names": [
             "аргинин (arg"
-          ]
+          ],
+          "display": "Аргинин"
+        },
+        "en": {
+          "display": "Arginine"
         }
       },
       "ref_sex": "any",
@@ -79,7 +95,11 @@
         "ru": {
           "names": [
             "аспарагин (asn"
-          ]
+          ],
+          "display": "Аспарагин"
+        },
+        "en": {
+          "display": "Asparagine"
         }
       },
       "ref_sex": "any",
@@ -92,7 +112,11 @@
         "ru": {
           "names": [
             "аспарагиновая кислота (asp"
-          ]
+          ],
+          "display": "Аспарагиновая кислота"
+        },
+        "en": {
+          "display": "Aspartic acid"
         }
       },
       "ref_sex": "any",
@@ -104,7 +128,11 @@
         "ru": {
           "names": [
             "b-аминоизомасляная кислота (baiba"
-          ]
+          ],
+          "display": "β-аминоизомасляная кислота"
+        },
+        "en": {
+          "display": "β-aminoisobutyric acid"
         }
       }
     },
@@ -115,7 +143,11 @@
         "ru": {
           "names": [
             "b-аланин (bala"
-          ]
+          ],
+          "display": "β-аланин"
+        },
+        "en": {
+          "display": "β-alanine"
         }
       },
       "ref_sex": "any",
@@ -128,7 +160,11 @@
         "ru": {
           "names": [
             "цистатионин (cyst"
-          ]
+          ],
+          "display": "Цистатионин"
+        },
+        "en": {
+          "display": "Cystathionine"
         }
       },
       "ref_sex": "any",
@@ -142,6 +178,36 @@
         "ru": {
           "names": [
             "цистин (cys"
+          ],
+          "display": "Цистин"
+        },
+        "en": {
+          "display": "Cystine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_fischer_ratio": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "индекс фишера",
+            "коэффициент фишера",
+            "bcaa/aaa"
+          ],
+          "display": "Индекс Фишера"
+        },
+        "en": {
+          "display": "Fischer ratio (BCAA/AAA)",
+          "names": [
+            "bcaa/aaa"
           ]
         }
       },
@@ -157,7 +223,11 @@
           "names": [
             "y-аминомасляная кислота (gaba",
             "гамма-аминомасляная"
-          ]
+          ],
+          "display": "ГАМК"
+        },
+        "en": {
+          "display": "GABA"
         }
       },
       "ref_sex": "any",
@@ -171,7 +241,11 @@
         "ru": {
           "names": [
             "глутаминовая кислота (glu"
-          ]
+          ],
+          "display": "Глутаминовая кислота"
+        },
+        "en": {
+          "display": "Glutamic acid"
         }
       },
       "ref_sex": "any",
@@ -185,7 +259,11 @@
         "ru": {
           "names": [
             "глутамин (gln"
-          ]
+          ],
+          "display": "Глутамин"
+        },
+        "en": {
+          "display": "Glutamine"
         }
       },
       "ref_sex": "any",
@@ -199,7 +277,11 @@
         "ru": {
           "names": [
             "глицин (gly"
-          ]
+          ],
+          "display": "Глицин"
+        },
+        "en": {
+          "display": "Glycine"
         }
       },
       "ref_sex": "any",
@@ -213,7 +295,11 @@
         "ru": {
           "names": [
             "гистидин (his"
-          ]
+          ],
+          "display": "Гистидин"
+        },
+        "en": {
+          "display": "Histidine"
         }
       },
       "ref_sex": "any",
@@ -228,7 +314,11 @@
           "names": [
             "гидроксипролин (hpro",
             "гидроксипролин (hyp"
-          ]
+          ],
+          "display": "Гидроксипролин"
+        },
+        "en": {
+          "display": "Hydroxyproline"
         }
       },
       "ref_sex": "any",
@@ -243,7 +333,11 @@
           "names": [
             "изолейцин (ileu",
             "изолейцин (ile"
-          ]
+          ],
+          "display": "Изолейцин"
+        },
+        "en": {
+          "display": "Isoleucine"
         }
       },
       "ref_sex": "any",
@@ -257,7 +351,11 @@
         "ru": {
           "names": [
             "лейцин (leu"
-          ]
+          ],
+          "display": "Лейцин"
+        },
+        "en": {
+          "display": "Leucine"
         }
       },
       "ref_sex": "any",
@@ -271,7 +369,11 @@
         "ru": {
           "names": [
             "лизин (lys"
-          ]
+          ],
+          "display": "Лизин"
+        },
+        "en": {
+          "display": "Lysine"
         }
       },
       "ref_sex": "any",
@@ -285,7 +387,11 @@
         "ru": {
           "names": [
             "метионин (met"
-          ]
+          ],
+          "display": "Метионин"
+        },
+        "en": {
+          "display": "Methionine"
         }
       },
       "ref_sex": "any",
@@ -299,7 +405,11 @@
         "ru": {
           "names": [
             "орнитин (orn"
-          ]
+          ],
+          "display": "Орнитин"
+        },
+        "en": {
+          "display": "Ornithine"
         }
       },
       "ref_sex": "any",
@@ -313,7 +423,11 @@
         "ru": {
           "names": [
             "фенилаланин (phe"
-          ]
+          ],
+          "display": "Фенилаланин"
+        },
+        "en": {
+          "display": "Phenylalanine"
         }
       },
       "ref_sex": "any",
@@ -326,7 +440,11 @@
         "ru": {
           "names": [
             "пипеколиновая кислота"
-          ]
+          ],
+          "display": "Пипеколиновая кислота"
+        },
+        "en": {
+          "display": "Pipecolic acid"
         }
       },
       "ref_sex": "any",
@@ -340,6 +458,196 @@
         "ru": {
           "names": [
             "пролин (pro"
+          ],
+          "display": "Пролин"
+        },
+        "en": {
+          "display": "Proline"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_aaba_leu": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "aaba/leu",
+            "aaba:leu"
+          ],
+          "display": "α-аминобутират/лейцин"
+        },
+        "en": {
+          "display": "α-aminobutyrate/leucine ratio",
+          "names": [
+            "aaba/leu",
+            "aaba:leu"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_gln_glu": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "gln/glu",
+            "gln:glu",
+            "глутамин/глутамат"
+          ],
+          "display": "Глутамин/глутамат"
+        },
+        "en": {
+          "display": "Glutamine/glutamate ratio",
+          "names": [
+            "gln/glu",
+            "gln:glu"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_glu_gln": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "glu/gln",
+            "glu:gln",
+            "глутамат/глутамин"
+          ],
+          "display": "Глутамат/глутамин"
+        },
+        "en": {
+          "display": "Glutamate/glutamine ratio",
+          "names": [
+            "glu/gln",
+            "glu:gln"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_gly_ser": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "gly/ser",
+            "gly:ser",
+            "глицин/серин"
+          ],
+          "display": "Глицин/серин"
+        },
+        "en": {
+          "display": "Glycine/serine ratio",
+          "names": [
+            "gly/ser",
+            "gly:ser"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_kyn_trp": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "кинуренин/триптофан",
+            "kyn/trp"
+          ],
+          "display": "Кинуренин/триптофан"
+        },
+        "en": {
+          "display": "Kynurenine/tryptophan ratio",
+          "names": [
+            "kyn/trp",
+            "kynurenine/tryptophan"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_met_hcy": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "met/hcy",
+            "метионин/гомоцистеин"
+          ],
+          "display": "Метионин/гомоцистеин"
+        },
+        "en": {
+          "display": "Methionine/homocysteine ratio",
+          "names": [
+            "met/hcy"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "aa_ratio_phe_tyr": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "phe/tyr",
+            "phe:tyr",
+            "фенилаланин/тирозин",
+            "фенилаланин : тирозин"
+          ],
+          "display": "Фенилаланин/тирозин"
+        },
+        "en": {
+          "display": "Phenylalanine/tyrosine ratio",
+          "names": [
+            "phe/tyr",
+            "phe:tyr"
           ]
         }
       },
@@ -354,7 +662,11 @@
         "ru": {
           "names": [
             "саркозин (sar"
-          ]
+          ],
+          "display": "Саркозин"
+        },
+        "en": {
+          "display": "Sarcosine"
         }
       },
       "ref_sex": "any",
@@ -368,7 +680,11 @@
         "ru": {
           "names": [
             "серин (ser"
-          ]
+          ],
+          "display": "Серин"
+        },
+        "en": {
+          "display": "Serine"
         }
       },
       "ref_sex": "any",
@@ -382,7 +698,11 @@
         "ru": {
           "names": [
             "таурин (tau"
-          ]
+          ],
+          "display": "Таурин"
+        },
+        "en": {
+          "display": "Taurine"
         }
       },
       "ref_sex": "any",
@@ -397,7 +717,11 @@
           "names": [
             "треонин (thre",
             "треонин (thr"
-          ]
+          ],
+          "display": "Треонин"
+        },
+        "en": {
+          "display": "Threonine"
         }
       },
       "ref_sex": "any",
@@ -412,7 +736,11 @@
           "names": [
             "триптофан (trp",
             "триптофан (try"
-          ]
+          ],
+          "display": "Триптофан"
+        },
+        "en": {
+          "display": "Tryptophan"
         }
       },
       "ref_sex": "any",
@@ -426,7 +754,37 @@
         "ru": {
           "names": [
             "тирозин (tyr"
-          ]
+          ],
+          "display": "Тирозин"
+        },
+        "en": {
+          "display": "Tyrosine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "adma": {
+      "unit": "umol/L",
+      "plausible": [
+        0.1,
+        3
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "адма",
+            "асимметричный диметиларгинин"
+          ],
+          "display": "АДМА"
+        },
+        "en": {
+          "names": [
+            "adma",
+            "asymmetric dimethylarginine"
+          ],
+          "display": "ADMA"
         }
       },
       "ref_sex": "any",
@@ -440,7 +798,11 @@
         "ru": {
           "names": [
             "альбумин/глобулиновый (а/г) - коэффициент"
-          ]
+          ],
+          "display": "Альбумин-глобулиновый коэффициент"
+        },
+        "en": {
+          "display": "Albumin/globulin ratio"
         }
       },
       "ref_sex": "any",
@@ -463,7 +825,11 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Индекс АК : ЭПК"
+        },
+        "en": {
+          "display": "AA/EPA index"
         }
       },
       "ref_sex": "any",
@@ -554,7 +920,11 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "Альдостерон"
+        },
+        "en": {
+          "display": "Aldosterone"
         }
       },
       "ref_sex": "any",
@@ -582,7 +952,8 @@
             "кислая",
             "простат",
             "костн"
-          ]
+          ],
+          "display": "Щелочная фосфатаза"
         },
         "en": {
           "display": "Alkaline phosphatase (ALP)",
@@ -604,7 +975,11 @@
         "ru": {
           "names": [
             "альфа-1 - глобулин abs"
-          ]
+          ],
+          "display": "Альфа-1-глобулины, абс."
+        },
+        "en": {
+          "display": "Alpha-1 globulin, absolute"
         }
       }
     },
@@ -623,7 +998,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Альфа-1-глобулины, %"
+        },
+        "en": {
+          "display": "Alpha-1 globulin, %"
         }
       },
       "ref_sex": "any",
@@ -635,7 +1014,11 @@
         "ru": {
           "names": [
             "альфа-2 - глобулин abs"
-          ]
+          ],
+          "display": "Альфа-2-глобулины, абс."
+        },
+        "en": {
+          "display": "Alpha-2 globulin, absolute"
         }
       }
     },
@@ -654,7 +1037,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Альфа-2-глобулины, %"
+        },
+        "en": {
+          "display": "Alpha-2 globulin, %"
         }
       },
       "ref_sex": "any",
@@ -669,7 +1056,8 @@
             "аланинаминотрансфераза",
             "(алт",
             "алат"
-          ]
+          ],
+          "display": "Аланинаминотрансфераза (АЛТ)"
         },
         "en": {
           "display": "Alanine aminotransferase (ALT)",
@@ -702,7 +1090,33 @@
         "ru": {
           "names": [
             "алюминий (al"
-          ]
+          ],
+          "display": "Алюминий"
+        },
+        "en": {
+          "display": "Aluminium"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "ammonia": {
+      "unit": "umol/L",
+      "ref_low": 11.0,
+      "ref_high": 32.0,
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "аммиак"
+          ],
+          "display": "Аммиак"
+        },
+        "en": {
+          "names": [
+            "ammonia"
+          ],
+          "display": "Ammonia"
         }
       },
       "ref_sex": "any",
@@ -725,7 +1139,8 @@
           "exclude": [
             "панкреат",
             "мочи"
-          ]
+          ],
+          "display": "Альфа-амилаза"
         },
         "en": {
           "display": "Amylase",
@@ -747,7 +1162,8 @@
           "names": [
             "альфа-амилаза панкреатическая",
             "амилаза панкреатическая"
-          ]
+          ],
+          "display": "Панкреатическая амилаза"
         },
         "en": {
           "display": "Pancreatic amylase",
@@ -777,7 +1193,11 @@
         "ru": {
           "names": [
             "антитела к митохондриям"
-          ]
+          ],
+          "display": "Антитела к митохондриям (AMA-M2)"
+        },
+        "en": {
+          "display": "Anti-mitochondrial antibodies (AMA-M2)"
         }
       },
       "ref_sex": "any",
@@ -800,7 +1220,11 @@
         "ru": {
           "names": [
             "антитела к cenp-b"
-          ]
+          ],
+          "display": "Антитела к CENP-B"
+        },
+        "en": {
+          "display": "Anti-CENP-B antibodies"
         }
       },
       "ref_sex": "any",
@@ -824,7 +1248,11 @@
           "names": [
             "антитела к dsdna",
             "антитела к дснк"
-          ]
+          ],
+          "display": "Антитела к дсДНК"
+        },
+        "en": {
+          "display": "Anti-dsDNA antibodies"
         }
       },
       "ref_sex": "any",
@@ -847,7 +1275,11 @@
         "ru": {
           "names": [
             "антитела к гистонам"
-          ]
+          ],
+          "display": "Антитела к гистонам"
+        },
+        "en": {
+          "display": "Anti-histone antibodies"
         }
       },
       "ref_sex": "any",
@@ -870,7 +1302,11 @@
         "ru": {
           "names": [
             "антитела к jo-1"
-          ]
+          ],
+          "display": "Антитела к Jo-1"
+        },
+        "en": {
+          "display": "Anti-Jo-1 antibodies"
         }
       },
       "ref_sex": "any",
@@ -893,7 +1329,11 @@
         "ru": {
           "names": [
             "антитела к нуклеосомам"
-          ]
+          ],
+          "display": "Антитела к нуклеосомам"
+        },
+        "en": {
+          "display": "Anti-nucleosome antibodies"
         }
       },
       "ref_sex": "any",
@@ -916,7 +1356,11 @@
         "ru": {
           "names": [
             "антитела к pcna"
-          ]
+          ],
+          "display": "Антитела к PCNA"
+        },
+        "en": {
+          "display": "Anti-PCNA antibodies"
         }
       },
       "ref_sex": "any",
@@ -939,7 +1383,11 @@
         "ru": {
           "names": [
             "антитела к рибосомам"
-          ]
+          ],
+          "display": "Антитела к рибосомальному белку P"
+        },
+        "en": {
+          "display": "Anti-ribosomal P antibodies"
         }
       },
       "ref_sex": "any",
@@ -962,7 +1410,11 @@
         "ru": {
           "names": [
             "антитела к rnp-70"
-          ]
+          ],
+          "display": "Антитела к RNP-70"
+        },
+        "en": {
+          "display": "Anti-RNP-70 antibodies"
         }
       },
       "ref_sex": "any",
@@ -985,7 +1437,11 @@
         "ru": {
           "names": [
             "антитела к rnp/sm"
-          ]
+          ],
+          "display": "Антитела к RNP/Sm"
+        },
+        "en": {
+          "display": "Anti-RNP/Sm antibodies"
         }
       },
       "ref_sex": "any",
@@ -1008,7 +1464,11 @@
         "ru": {
           "names": [
             "антитела к ro-52"
-          ]
+          ],
+          "display": "Антитела к Ro-52"
+        },
+        "en": {
+          "display": "Anti-Ro-52 antibodies"
         }
       },
       "ref_sex": "any",
@@ -1031,7 +1491,11 @@
         "ru": {
           "names": [
             "антитела к scl-70"
-          ]
+          ],
+          "display": "Антитела к Scl-70"
+        },
+        "en": {
+          "display": "Anti-Scl-70 antibodies"
         }
       },
       "ref_sex": "any",
@@ -1046,7 +1510,11 @@
           "names": [
             "антитела к ядерным антигенам",
             "ana-screen"
-          ]
+          ],
+          "display": "Антинуклеарные антитела, скрининг"
+        },
+        "en": {
+          "display": "Antinuclear antibodies, screen"
         }
       },
       "ref_sex": "any",
@@ -1069,7 +1537,11 @@
         "ru": {
           "names": [
             "антитела к sm"
-          ]
+          ],
+          "display": "Антитела к Sm"
+        },
+        "en": {
+          "display": "Anti-Sm antibodies"
         }
       },
       "ref_sex": "any",
@@ -1092,7 +1564,11 @@
         "ru": {
           "names": [
             "антитела к ss-a"
-          ]
+          ],
+          "display": "Антитела к SS-A"
+        },
+        "en": {
+          "display": "Anti-SS-A antibodies"
         }
       },
       "ref_sex": "any",
@@ -1115,7 +1591,11 @@
         "ru": {
           "names": [
             "антитела к ss-b"
-          ]
+          ],
+          "display": "Антитела к SS-B"
+        },
+        "en": {
+          "display": "Anti-SS-B antibodies"
         }
       },
       "ref_sex": "any",
@@ -1132,7 +1612,11 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "Андростендион"
+        },
+        "en": {
+          "display": "Androstenedione"
         }
       },
       "ref_sex": "male",
@@ -1145,7 +1629,11 @@
         "ru": {
           "names": [
             "андростендион"
-          ]
+          ],
+          "display": "Андростендион, слюна"
+        },
+        "en": {
+          "display": "Androstenedione, saliva"
         }
       }
     },
@@ -1159,7 +1647,11 @@
             "антитела к циклическому цитруллиновому пептиду",
             "аццп",
             "антитела к циклическому"
-          ]
+          ],
+          "display": "Антитела к ЦЦП"
+        },
+        "en": {
+          "display": "Anti-CCP antibodies"
         }
       },
       "ref_sex": "any",
@@ -1177,7 +1669,11 @@
         "ru": {
           "names": [
             "антитела к эндомизию"
-          ]
+          ],
+          "display": "Антитела к эндомизию, IgA"
+        },
+        "en": {
+          "display": "Anti-endomysial antibodies, IgA"
         }
       },
       "ref_sex": "any",
@@ -1192,7 +1688,11 @@
           "names": [
             "антитела к глиадину, iga",
             "антитела к глиадину iga"
-          ]
+          ],
+          "display": "Антитела к глиадину, IgA"
+        },
+        "en": {
+          "display": "Anti-gliadin antibodies, IgA"
         }
       },
       "ref_sex": "any",
@@ -1207,7 +1707,11 @@
           "names": [
             "антитела к глиадину, igg",
             "антитела к глиадину igg"
-          ]
+          ],
+          "display": "Антитела к глиадину, IgG"
+        },
+        "en": {
+          "display": "Anti-gliadin antibodies, IgG"
         }
       },
       "ref_sex": "any",
@@ -1232,7 +1736,11 @@
           "names": [
             "антитела к ретикулину iga",
             "антитела к ретикулину igа"
-          ]
+          ],
+          "display": "Антитела к ретикулину, IgA"
+        },
+        "en": {
+          "display": "Anti-reticulin antibodies, IgA"
         }
       },
       "ref_sex": "any",
@@ -1256,7 +1764,11 @@
         "ru": {
           "names": [
             "антитела к ретикулину igg"
-          ]
+          ],
+          "display": "Антитела к ретикулину, IgG"
+        },
+        "en": {
+          "display": "Anti-reticulin antibodies, IgG"
         }
       },
       "ref_sex": "any",
@@ -1283,7 +1795,8 @@
             "рецептор",
             "полиморфизм",
             "ттг"
-          ]
+          ],
+          "display": "Антитела к тиреоглобулину (АТ-ТГ)"
         },
         "en": {
           "display": "Thyroglobulin antibodies (anti-TG)",
@@ -1322,7 +1835,8 @@
           "exclude": [
             "ген ",
             "полиморфизм"
-          ]
+          ],
+          "display": "Антитела к тиреопероксидазе (АТ-ТПО)"
         },
         "en": {
           "display": "Thyroid peroxidase antibodies (anti-TPO)",
@@ -1344,7 +1858,11 @@
         "ru": {
           "names": [
             "антитела к рецепторам ттг"
-          ]
+          ],
+          "display": "Антитела к рецепторам ТТГ"
+        },
+        "en": {
+          "display": "TSH receptor antibodies (TRAb)"
         }
       },
       "ref_sex": "any",
@@ -1360,7 +1878,11 @@
             "антитела к тканевой трансглутаминазе iga",
             "трансглутаминазе iga",
             "трансглутаминазе igа"
-          ]
+          ],
+          "display": "Антитела к тканевой трансглутаминазе, IgA"
+        },
+        "en": {
+          "display": "Anti-tissue transglutaminase antibodies, IgA"
         }
       },
       "ref_sex": "any",
@@ -1375,7 +1897,11 @@
           "names": [
             "антитела к тканевой трансглутаминазе igg",
             "трансглутаминазе igg"
-          ]
+          ],
+          "display": "Антитела к тканевой трансглутаминазе, IgG"
+        },
+        "en": {
+          "display": "Anti-tissue transglutaminase antibodies, IgG"
         }
       },
       "ref_sex": "any",
@@ -1395,7 +1921,8 @@
         "ru": {
           "names": [
             "аполипопротеин а1"
-          ]
+          ],
+          "display": "Аполипопротеин A1"
         },
         "en": {
           "display": "Apolipoprotein A1",
@@ -1436,7 +1963,8 @@
             "апо а",
             "a1",
             "апо a"
-          ]
+          ],
+          "display": "Аполипопротеин B"
         },
         "en": {
           "display": "Apolipoprotein B",
@@ -1462,7 +1990,11 @@
         "ru": {
           "names": [
             "ачтв"
-          ]
+          ],
+          "display": "АЧТВ"
+        },
+        "en": {
+          "display": "Activated partial thromboplastin time (aPTT)"
         }
       },
       "ref_sex": "any",
@@ -1476,7 +2008,11 @@
         "ru": {
           "names": [
             "мышьяк (as"
-          ]
+          ],
+          "display": "Мышьяк"
+        },
+        "en": {
+          "display": "Arsenic"
         }
       },
       "ref_sex": "any",
@@ -1491,7 +2027,8 @@
             "аспартатаминотрансфераза",
             "(аст",
             "асат"
-          ]
+          ],
+          "display": "Аспартатаминотрансфераза (АСТ)"
         },
         "en": {
           "display": "Aspartate aminotransferase (AST)",
@@ -1512,7 +2049,11 @@
         "ru": {
           "names": [
             "индекс атерогенности"
-          ]
+          ],
+          "display": "Индекс атерогенности"
+        },
+        "en": {
+          "display": "Atherogenic index"
         }
       },
       "ref_sex": "any",
@@ -1526,7 +2067,11 @@
         "ru": {
           "names": [
             "палочкоядерные нейтрофилы"
-          ]
+          ],
+          "display": "Палочкоядерные нейтрофилы"
+        },
+        "en": {
+          "display": "Band neutrophils"
         }
       },
       "ref_sex": "any",
@@ -1634,7 +2179,11 @@
         "ru": {
           "names": [
             "бериллий (be"
-          ]
+          ],
+          "display": "Бериллий"
+        },
+        "en": {
+          "display": "Beryllium"
         }
       },
       "ref_sex": "any",
@@ -1646,7 +2195,11 @@
         "ru": {
           "names": [
             "бета1-глобулин abs"
-          ]
+          ],
+          "display": "Бета-1-глобулины, абс."
+        },
+        "en": {
+          "display": "Beta-1 globulin, absolute"
         }
       }
     },
@@ -1665,7 +2218,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Бета-1-глобулины, %"
+        },
+        "en": {
+          "display": "Beta-1 globulin, %"
         }
       },
       "ref_sex": "any",
@@ -1677,7 +2234,11 @@
         "ru": {
           "names": [
             "бета2-глобулин abs"
-          ]
+          ],
+          "display": "Бета-2-глобулины, абс."
+        },
+        "en": {
+          "display": "Beta-2 globulin, absolute"
         }
       }
     },
@@ -1696,7 +2257,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Бета-2-глобулины, %"
+        },
+        "en": {
+          "display": "Beta-2 globulin, %"
         }
       },
       "ref_sex": "any",
@@ -1709,7 +2274,8 @@
         "ru": {
           "names": [
             "билирубин прямой"
-          ]
+          ],
+          "display": "Билирубин прямой"
         },
         "en": {
           "display": "Bilirubin, direct",
@@ -1736,7 +2302,11 @@
         "ru": {
           "names": [
             "билирубин непрямой"
-          ]
+          ],
+          "display": "Билирубин непрямой"
+        },
+        "en": {
+          "display": "Bilirubin, indirect"
         }
       },
       "ref_sex": "any",
@@ -1749,7 +2319,8 @@
         "ru": {
           "names": [
             "билирубин общий"
-          ]
+          ],
+          "display": "Билирубин общий"
         },
         "en": {
           "display": "Bilirubin, total",
@@ -1776,7 +2347,11 @@
         "ru": {
           "names": [
             "биологически активный тестостерон"
-          ]
+          ],
+          "display": "Биодоступный тестостерон"
+        },
+        "en": {
+          "display": "Bioavailable testosterone"
         }
       },
       "ref_sex": "male",
@@ -1790,7 +2365,11 @@
         "ru": {
           "names": [
             "бор (b"
-          ]
+          ],
+          "display": "Бор"
+        },
+        "en": {
+          "display": "Boron"
         }
       },
       "ref_sex": "any",
@@ -1804,7 +2383,8 @@
         "ru": {
           "names": [
             "с-пептид"
-          ]
+          ],
+          "display": "С-пептид"
         },
         "en": {
           "display": "C-peptide",
@@ -1831,7 +2411,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Кадмий"
+        },
+        "en": {
+          "display": "Cadmium"
         }
       },
       "ref_sex": "any",
@@ -1844,7 +2428,11 @@
         "ru": {
           "names": [
             "кальцитонин"
-          ]
+          ],
+          "display": "Кальцитонин"
+        },
+        "en": {
+          "display": "Calcitonin"
         }
       },
       "ref_sex": "male",
@@ -1873,7 +2461,8 @@
           ],
           "form_exclude": [
             "биохимия"
-          ]
+          ],
+          "display": "Кальций (цельная кровь)"
         },
         "en": {
           "display": "Calcium",
@@ -1907,7 +2496,11 @@
         "ru": {
           "names": [
             "кальций ионизированный"
-          ]
+          ],
+          "display": "Кальций ионизированный"
+        },
+        "en": {
+          "display": "Calcium, ionised"
         }
       },
       "ref_sex": "any",
@@ -1978,7 +2571,11 @@
         "ru": {
           "names": [
             "раковоэмбриональный антиген"
-          ]
+          ],
+          "display": "Раково-эмбриональный антиген (РЭА)"
+        },
+        "en": {
+          "display": "Carcinoembryonic antigen (CEA)"
         }
       },
       "ref_sex": "any",
@@ -1992,7 +2589,8 @@
         "ru": {
           "names": [
             "хлориды"
-          ]
+          ],
+          "display": "Хлориды"
         },
         "en": {
           "display": "Chloride",
@@ -2021,7 +2619,8 @@
           "names": [
             "общий холестерин",
             "холестерин общий"
-          ]
+          ],
+          "display": "Холестерин общий"
         },
         "en": {
           "display": "Cholesterol, total",
@@ -2055,7 +2654,11 @@
         "ru": {
           "names": [
             "хром (cr"
-          ]
+          ],
+          "display": "Хром"
+        },
+        "en": {
+          "display": "Chromium"
         }
       },
       "ref_sex": "any",
@@ -2079,9 +2682,15 @@
             "антител",
             "ccp",
             "гомоцитруллин"
-          ]
+          ],
+          "display": "Цитруллин"
+        },
+        "en": {
+          "display": "Citrulline"
         }
-      }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
     },
     "ck": {
       "unit": "U/L",
@@ -2132,7 +2741,11 @@
         "ru": {
           "names": [
             "карбоксиметиллизин"
-          ]
+          ],
+          "display": "Карбоксиметиллизин"
+        },
+        "en": {
+          "display": "Carboxymethyl-lysine"
         }
       },
       "ref_sex": "any",
@@ -2146,7 +2759,11 @@
         "ru": {
           "names": [
             "кобальт (co"
-          ]
+          ],
+          "display": "Кобальт"
+        },
+        "en": {
+          "display": "Cobalt"
         }
       },
       "ref_sex": "any",
@@ -2179,13 +2796,84 @@
           ],
           "form_exclude": [
             "биохимия"
-          ]
+          ],
+          "display": "Медь"
+        },
+        "en": {
+          "display": "Copper"
         }
       },
       "ref_sex": "any",
       "ref_age": "any",
       "method": "icp",
       "method_note": "Elemental analysis (ICP / ICP-MS), reported in ug/L. Serum copper by the biochemical (colorimetric) method, in umol/L, is a SEPARATE marker, `copper_total`. Until 12.09.2026 this one key took both: a biochemistry row in umol/L was multiplied by 63.546 and stored as an ICP point. This row's unit gate is mass-per-litre only; a row in umol/L is refused here rather than converted."
+    },
+    "copper_total": {
+      "unit": "umol/L",
+      "ref_low": 11.0,
+      "ref_high": 22.0,
+      "units": {
+        "мкмоль/л": 1.0,
+        "umol/L": 1.0,
+        "µmol/L": 1.0
+      },
+      "convert": {
+        "ug/dL": 0.1574,
+        "µg/dL": 0.1574,
+        "мкг/дл": 0.1574,
+        "ug/L": 0.01574,
+        "мкг/л": 0.01574
+      },
+      "convert_note": "Canonical here is umol/L. Copper A = 63.546 g/mol: 1 ug/dL = 10/63.546 = 0.1574 umol/L, 1 ug/L = 0.01574 umol/L. The elemental (ICP) row `copper` keeps ug/L on purpose — different assays, not different units.",
+      "specimen": "blood",
+      "method": "biochemistry",
+      "labels": {
+        "ru": {
+          "names": [
+            "медь"
+          ],
+          "exclude": [
+            "моче",
+            "слюн",
+            "волос",
+            "церулоплазмин",
+            "эритроцит"
+          ],
+          "form_exclude": [
+            "исп-мс",
+            "ответ исп",
+            "элементный анализ",
+            "витамины и микроэлементы"
+          ],
+          "display": "Медь (сыворотка)"
+        },
+        "en": {
+          "display": "Copper, serum",
+          "names": [
+            "copper"
+          ],
+          "exclude": [
+            "urine",
+            "urinary",
+            "hair",
+            "rbc",
+            "ceruloplasmin"
+          ]
+        }
+      },
+      "ref_by_sex": {
+        "male": {
+          "ref_low": 11.0,
+          "ref_high": 22.0
+        },
+        "female": {
+          "ref_low": 12.6,
+          "ref_high": 24.4
+        }
+      },
+      "ref_sex_source": "standard adult serum copper interval, sex-specific: 70-140 ug/dL for men and 80-155 ug/dL for women (Tietz), converted at A = 63.546 (x 0.1574). The male range is the default. A range printed on the person's own lab form always wins over this — it is used only when the value carries no form range.",
+      "ref_age": "any",
+      "method_note": "Serum copper by the biochemical (colorimetric) method, in umol/L. Entered on 12.09.2026 when the rule «a series belongs to a method, not to a substance» was applied to every element: the ICP row `copper` had been absorbing biochemistry rows by multiplying them by the atomic weight. The corridor is the standard adult interval, not one read off a form — a form range wins over it."
     },
     "corticosterone": {
       "unit": "nmol/L",
@@ -2205,7 +2893,11 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "Кортикостерон"
+        },
+        "en": {
+          "display": "Corticosterone"
         }
       },
       "ref_sex": "any",
@@ -2237,7 +2929,8 @@
             "стероидный профиль",
             "ответ мс",
             "жх-мс"
-          ]
+          ],
+          "display": "Кортизол"
         },
         "en": {
           "display": "Cortisol",
@@ -2290,7 +2983,11 @@
             "ответ мс",
             "жх-мс",
             "стероидный профиль"
-          ]
+          ],
+          "display": "Кортизол (иммунохимия)"
+        },
+        "en": {
+          "display": "Cortisol (immunoassay)"
         }
       },
       "ref_sex": "any",
@@ -2308,7 +3005,11 @@
             "дезокси",
             "11-",
             "21-"
-          ]
+          ],
+          "display": "Кортизол, слюна"
+        },
+        "en": {
+          "display": "Cortisol, saliva"
         }
       }
     },
@@ -2332,7 +3033,11 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "Кортизон"
+        },
+        "en": {
+          "display": "Cortisone"
         }
       },
       "ref_sex": "any",
@@ -2345,7 +3050,11 @@
         "ru": {
           "names": [
             "кортизон"
-          ]
+          ],
+          "display": "Кортизон, слюна"
+        },
+        "en": {
+          "display": "Cortisone, saliva"
         }
       }
     },
@@ -2364,7 +3073,8 @@
             "моч",
             "фильтрац",
             "скф"
-          ]
+          ],
+          "display": "Креатинин"
         },
         "en": {
           "display": "Creatinine",
@@ -2410,7 +3120,8 @@
             "c-реактивный белок",
             "с-реактивный белок",
             "срб"
-          ]
+          ],
+          "display": "С-реактивный белок, высокочувствительный"
         },
         "en": {
           "display": "C-reactive protein (hs-CRP)",
@@ -2470,7 +3181,8 @@
         "ru": {
           "names": [
             "д-димер"
-          ]
+          ],
+          "display": "Д-димер"
         },
         "en": {
           "display": "D-dimer"
@@ -2490,7 +3202,11 @@
         "ru": {
           "names": [
             "11-дезоксикортизол"
-          ]
+          ],
+          "display": "11-дезоксикортизол"
+        },
+        "en": {
+          "display": "11-deoxycortisol"
         }
       },
       "ref_sex": "any",
@@ -2510,7 +3226,11 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "ДГЭА"
+        },
+        "en": {
+          "display": "DHEA"
         }
       }
     },
@@ -2526,7 +3246,11 @@
           "exclude": [
             "сульфат",
             "-с"
-          ]
+          ],
+          "display": "ДГЭА, слюна"
+        },
+        "en": {
+          "display": "DHEA, saliva"
         }
       }
     },
@@ -2554,7 +3278,8 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "ДГЭА-сульфат"
         },
         "en": {
           "display": "DHEA-S",
@@ -2595,7 +3320,8 @@
           ],
           "prefer_form": [
             "стероидный профиль"
-          ]
+          ],
+          "display": "Дигидротестостерон"
         },
         "en": {
           "display": "Dihydrotestosterone (DHT)",
@@ -2652,7 +3378,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Bacillus spp."
         },
         "en": {
           "display": "Bacillus spp."
@@ -2757,7 +3484,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Citrobacter spp."
         },
         "en": {
           "display": "Citrobacter spp."
@@ -2887,7 +3615,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Enterobacter spp."
         },
         "en": {
           "display": "Enterobacter spp."
@@ -2939,7 +3668,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Hafnia spp."
         },
         "en": {
           "display": "Hafnia spp."
@@ -2964,7 +3694,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Klebsiella spp."
         },
         "en": {
           "display": "Klebsiella spp."
@@ -3098,7 +3829,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Peptostreptococcus spp."
         },
         "en": {
           "display": "Peptostreptococcus spp."
@@ -3123,7 +3855,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Proteus spp."
         },
         "en": {
           "display": "Proteus spp."
@@ -3148,7 +3881,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Pseudomonas aeruginosa"
         },
         "en": {
           "display": "Pseudomonas aeruginosa"
@@ -3173,7 +3907,8 @@
           "form_require": [
             "дисбактериоз",
             "ответ микроб"
-          ]
+          ],
+          "display": "Serratia spp."
         },
         "en": {
           "display": "Serratia spp."
@@ -3376,7 +4111,8 @@
           ],
           "exclude": [
             "мутаци"
-          ]
+          ],
+          "display": "СОЭ"
         },
         "en": {
           "display": "Erythrocyte sedimentation rate (ESR)",
@@ -3406,7 +4142,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "16α-гидроксиэстрон"
+        },
+        "en": {
+          "display": "16α-hydroxyestrone"
         }
       },
       "ref_sex": "unreviewed",
@@ -3428,7 +4168,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "2-гидроксиэстрон"
+        },
+        "en": {
+          "display": "2-hydroxyestrone"
         }
       },
       "ref_sex": "unreviewed",
@@ -3450,7 +4194,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "2-гидроксиэстрадиол"
+        },
+        "en": {
+          "display": "2-hydroxyestradiol"
         }
       },
       "ref_sex": "unreviewed",
@@ -3472,7 +4220,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "2-OHE1 + 2-OHE2"
+        },
+        "en": {
+          "display": "2-OHE1 + 2-OHE2"
         }
       },
       "ref_sex": "unreviewed",
@@ -3494,7 +4246,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "2-метоксиэстрон"
+        },
+        "en": {
+          "display": "2-methoxyestrone"
         }
       },
       "ref_sex": "unreviewed",
@@ -3515,7 +4271,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "4-гидроксиэстрон"
+        },
+        "en": {
+          "display": "4-hydroxyestrone"
         }
       },
       "ref_sex": "unreviewed",
@@ -3537,7 +4297,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "4-метоксиэстрон"
+        },
+        "en": {
+          "display": "4-methoxyestrone"
         }
       },
       "ref_sex": "unreviewed",
@@ -3559,7 +4323,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "(2-OHE1 + 2-OHE2)/16α-OHE1"
+        },
+        "en": {
+          "display": "(2-OHE1 + 2-OHE2)/16α-OHE1"
         }
       },
       "ref_sex": "any",
@@ -3580,7 +4348,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "2-OHE1/2-OMeE1"
+        },
+        "en": {
+          "display": "2-OHE1/2-OMeE1"
         }
       },
       "ref_sex": "any",
@@ -3604,7 +4376,11 @@
           "form_require": [
             "метаболиты эстрогенов",
             "гормоны мочи"
-          ]
+          ],
+          "display": "2-OMeE1/2-OHE1"
+        },
+        "en": {
+          "display": "2-OMeE1/2-OHE1"
         }
       },
       "ref_sex": "any",
@@ -3625,7 +4401,11 @@
           ],
           "form_require": [
             "метаболиты эстрогенов"
-          ]
+          ],
+          "display": "4-OHE1/4-OMeE1"
+        },
+        "en": {
+          "display": "4-OHE1/4-OMeE1"
         }
       },
       "ref_sex": "any",
@@ -3648,7 +4428,11 @@
           "form_require": [
             "метаболиты эстрогенов",
             "гормоны мочи"
-          ]
+          ],
+          "display": "4-OMeE1/4-OHE1"
+        },
+        "en": {
+          "display": "4-OMeE1/4-OHE1"
         }
       },
       "ref_sex": "any",
@@ -3685,7 +4469,8 @@
             "ответ мс",
             "жх-мс",
             "лх-мс"
-          ]
+          ],
+          "display": "Эстрадиол"
         },
         "en": {
           "display": "Estradiol",
@@ -3732,10 +4517,41 @@
             "ген ",
             "метаболит",
             "нмоль"
-          ]
+          ],
+          "display": "Эстрадиол (иммунохимия)"
+        },
+        "en": {
+          "display": "Estradiol (immunoassay)"
         }
       },
       "ref_sex": "male",
+      "ref_age": "any"
+    },
+    "fecal_elastase": {
+      "unit": "ug/g",
+      "ref_low": 200.0,
+      "plausible": [
+        0,
+        1000
+      ],
+      "specimen": "stool",
+      "labels": {
+        "ru": {
+          "names": [
+            "эластаза кала",
+            "панкреатическая эластаза"
+          ],
+          "display": "Эластаза кала"
+        },
+        "en": {
+          "names": [
+            "fecal elastase",
+            "pancreatic elastase"
+          ],
+          "display": "Fecal elastase"
+        }
+      },
+      "ref_sex": "any",
       "ref_age": "any"
     },
     "ferritin": {
@@ -3746,7 +4562,8 @@
         "ru": {
           "names": [
             "ферритин"
-          ]
+          ],
+          "display": "Ферритин"
         },
         "en": {
           "display": "Ferritin",
@@ -3793,7 +4610,8 @@
             "полиморф",
             "fgb",
             "генотип"
-          ]
+          ],
+          "display": "Фибриноген"
         },
         "en": {
           "display": "Fibrinogen",
@@ -3827,7 +4645,8 @@
             "цикл",
             "mthfr",
             "мтгфр"
-          ]
+          ],
+          "display": "Фолиевая кислота"
         },
         "en": {
           "display": "Folate",
@@ -3857,7 +4676,11 @@
         "ru": {
           "names": [
             "индекс свободных андрогенов"
-          ]
+          ],
+          "display": "Индекс свободных андрогенов"
+        },
+        "en": {
+          "display": "Free androgen index"
         }
       },
       "ref_sex": "male",
@@ -3884,7 +4707,8 @@
             "расчет",
             "индекс",
             "биодоступ"
-          ]
+          ],
+          "display": "Тестостерон свободный"
         },
         "en": {
           "display": "Testosterone, free",
@@ -3954,7 +4778,11 @@
         "ru": {
           "names": [
             "фолликулостимулирующий гормон"
-          ]
+          ],
+          "display": "Фолликулостимулирующий гормон (ФСГ)"
+        },
+        "en": {
+          "display": "Follicle-stimulating hormone (FSH)"
         }
       },
       "ref_sex": "male",
@@ -3966,7 +4794,11 @@
         "ru": {
           "names": [
             "гамма-глобулин abs"
-          ]
+          ],
+          "display": "Гамма-глобулины, абс."
+        },
+        "en": {
+          "display": "Gamma globulin, absolute"
         }
       }
     },
@@ -3985,7 +4817,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Гамма-глобулины, %"
+        },
+        "en": {
+          "display": "Gamma globulin, %"
         }
       },
       "ref_sex": "any",
@@ -4002,7 +4838,8 @@
             "(ггт",
             "ггтп",
             "гамма-гт"
-          ]
+          ],
+          "display": "Гамма-глутамилтрансфераза (ГГТ)"
         },
         "en": {
           "display": "Gamma-glutamyl transferase (GGT)",
@@ -4025,7 +4862,8 @@
         "ru": {
           "names": [
             "соматотропный гормон (стг"
-          ]
+          ],
+          "display": "Соматотропный гормон (СТГ)"
         },
         "en": {
           "display": "Growth hormone",
@@ -4052,7 +4890,8 @@
             "толерантн",
             "гликирован",
             "нагрузк"
-          ]
+          ],
+          "display": "Глюкоза"
         },
         "en": {
           "display": "Glucose",
@@ -4099,7 +4938,11 @@
             "амоксициллин",
             "кларитромицин",
             "метронидазол"
-          ]
+          ],
+          "display": "Антитела к Helicobacter pylori, IgG"
+        },
+        "en": {
+          "display": "Helicobacter pylori antibodies, IgG"
         }
       },
       "ref_sex": "any",
@@ -4114,7 +4957,8 @@
           "names": [
             "гликированный гемоглобин",
             "hba1c"
-          ]
+          ],
+          "display": "Гликированный гемоглобин (HbA1c)"
         },
         "en": {
           "display": "Glycated haemoglobin (HbA1c)",
@@ -4148,7 +4992,11 @@
         "ru": {
           "names": [
             "антитела к поверхностному антигену вируса гепатита в"
-          ]
+          ],
+          "display": "Антитела к HBs-антигену (анти-HBs)"
+        },
+        "en": {
+          "display": "Hepatitis B surface antibodies (anti-HBs)"
         }
       }
     },
@@ -4162,7 +5010,8 @@
             "холестерин лпвп",
             "лпвп",
             "hdl"
-          ]
+          ],
+          "display": "Холестерин ЛПВП"
         },
         "en": {
           "display": "HDL cholesterol",
@@ -4199,7 +5048,8 @@
           "names": [
             "гематокрит (hct",
             "гематокрит(hct"
-          ]
+          ],
+          "display": "Гематокрит"
         },
         "en": {
           "display": "Haematocrit",
@@ -4245,7 +5095,8 @@
           ],
           "exclude": [
             "гликирован"
-          ]
+          ],
+          "display": "Гемоглобин"
         },
         "en": {
           "display": "Haemoglobin",
@@ -4298,7 +5149,8 @@
             "хламид",
             "chlamydia",
             "титр"
-          ]
+          ],
+          "display": "Индекс HOMA-IR"
         },
         "en": {
           "display": "HOMA-IR",
@@ -4324,7 +5176,8 @@
           ],
           "exclude": [
             "аденозил"
-          ]
+          ],
+          "display": "Гомоцистеин"
         },
         "en": {
           "display": "Homocysteine",
@@ -4454,7 +5307,11 @@
             "аскарид",
             "токсокар",
             "total"
-          ]
+          ],
+          "display": "Иммуноглобулин A"
+        },
+        "en": {
+          "display": "Immunoglobulin A"
         }
       },
       "ref_sex": "any",
@@ -4468,7 +5325,11 @@
         "ru": {
           "names": [
             "иммуноглобулин е общий"
-          ]
+          ],
+          "display": "Иммуноглобулин E общий"
+        },
+        "en": {
+          "display": "Immunoglobulin E, total"
         }
       },
       "ref_sex": "any",
@@ -4486,7 +5347,8 @@
             "соматомедин",
             "igf-1",
             "ифр-1"
-          ]
+          ],
+          "display": "ИФР-1"
         },
         "en": {
           "display": "IGF-1",
@@ -4511,7 +5373,11 @@
             "ингибин b",
             "ингибин б",
             "ингибин в"
-          ]
+          ],
+          "display": "Ингибин B"
+        },
+        "en": {
+          "display": "Inhibin B"
         }
       },
       "ref_sex": "male",
@@ -4531,7 +5397,8 @@
             "резистент",
             "индекс",
             "homa"
-          ]
+          ],
+          "display": "Инсулин"
         },
         "en": {
           "display": "Insulin",
@@ -4566,7 +5433,11 @@
         "ru": {
           "names": [
             "йод (i"
-          ]
+          ],
+          "display": "Йод"
+        },
+        "en": {
+          "display": "Iodine"
         }
       },
       "ref_sex": "any",
@@ -4585,7 +5456,8 @@
             "ответ исп",
             "исп-мс",
             "элементный анализ"
-          ]
+          ],
+          "display": "Железо сывороточное"
         },
         "en": {
           "display": "Iron",
@@ -4624,7 +5496,11 @@
           ],
           "form_exclude": [
             "биохимия"
-          ]
+          ],
+          "display": "Железо (цельная кровь)"
+        },
+        "en": {
+          "display": "Iron, whole blood"
         }
       },
       "ref_sex": "any",
@@ -4637,6 +5513,40 @@
       },
       "method_note": "Elemental analysis (ICP / ICP-MS), whole blood, reported in ug/L. Serum iron by the biochemical method, in umol/L, is a SEPARATE marker, `iron`. Until 12.09.2026 this row had no unit gate at all, so a row in umol/L that carried the symbol was stored as if it were ug/L — not converted, simply misread. The gate is mass-per-litre only; a row in umol/L is refused here."
     },
+    "kynurenine": {
+      "unit": "umol/L",
+      "plausible": [
+        0.1,
+        50
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "кинуренин"
+          ],
+          "exclude": [
+            "кинуренов",
+            "соотношение",
+            "/"
+          ],
+          "display": "Кинуренин"
+        },
+        "en": {
+          "display": "Kynurenine",
+          "names": [
+            "kynurenine"
+          ],
+          "exclude": [
+            "kynurenic",
+            "ratio",
+            "/"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
     "ldh": {
       "unit": "U/L",
       "ref_low": 135.0,
@@ -4645,7 +5555,8 @@
         "ru": {
           "names": [
             "лактатдегидрогеназа (лдг"
-          ]
+          ],
+          "display": "Лактатдегидрогеназа (ЛДГ)"
         },
         "en": {
           "display": "Lactate dehydrogenase"
@@ -4663,7 +5574,8 @@
             "холестерин лпнп",
             "лпнп",
             "ldl"
-          ]
+          ],
+          "display": "Холестерин ЛПНП"
         },
         "en": {
           "display": "LDL cholesterol",
@@ -4702,7 +5614,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Свинец"
+        },
+        "en": {
+          "display": "Lead"
         }
       },
       "ref_sex": "any",
@@ -4716,7 +5632,11 @@
         "ru": {
           "names": [
             "лептин"
-          ]
+          ],
+          "display": "Лептин"
+        },
+        "en": {
+          "display": "Leptin"
         }
       },
       "ref_sex": "male",
@@ -4730,7 +5650,11 @@
         "ru": {
           "names": [
             "лютеинизирующий гормон"
-          ]
+          ],
+          "display": "Лютеинизирующий гормон (ЛГ)"
+        },
+        "en": {
+          "display": "Luteinising hormone (LH)"
         }
       },
       "ref_sex": "male",
@@ -4752,7 +5676,8 @@
           "exclude": [
             "липазы",
             "ген "
-          ]
+          ],
+          "display": "Липаза"
         },
         "en": {
           "display": "Lipase",
@@ -4778,7 +5703,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Литий"
+        },
+        "en": {
+          "display": "Lithium"
         }
       },
       "ref_sex": "any",
@@ -4801,7 +5730,11 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Индекс ЛК : ДГДК"
+        },
+        "en": {
+          "display": "LA/DGLA index"
         }
       },
       "ref_sex": "any",
@@ -4820,7 +5753,8 @@
             "апопротеин",
             "апо а",
             "апо a"
-          ]
+          ],
+          "display": "Липопротеин(а)"
         },
         "en": {
           "display": "Lipoprotein(a)",
@@ -4910,7 +5844,9 @@
         "тыс/мкл": 1.0,
         "тыс./мкл": 1.0
       },
-      "convert_note": "10³ per microlitre IS 10⁹ per litre — a factor of exactly 1, not a conversion. The US spellings (K/uL, K/µL) and the caret form (10^9/L) name the same quantity as the canonical 10*9/L; refusing them refuses the panel, not the unit."
+      "convert_note": "10³ per microlitre IS 10⁹ per litre — a factor of exactly 1, not a conversion. The US spellings (K/uL, K/µL) and the caret form (10^9/L) name the same quantity as the canonical 10*9/L; refusing them refuses the panel, not the unit.",
+      "ref_sex": "any",
+      "ref_age": "any"
     },
     "lymph_pct": {
       "unit": "%",
@@ -4956,7 +5892,11 @@
         "ru": {
           "names": [
             "макроциты (macror"
-          ]
+          ],
+          "display": "Макроциты"
+        },
+        "en": {
+          "display": "Macrocytes"
         }
       }
     },
@@ -4984,7 +5924,8 @@
           ],
           "form_exclude": [
             "биохимия"
-          ]
+          ],
+          "display": "Магний (цельная кровь)"
         },
         "en": {
           "display": "Magnesium",
@@ -5043,7 +5984,8 @@
             "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
-          ]
+          ],
+          "display": "Магний сывороточный"
         },
         "en": {
           "display": "Magnesium, serum",
@@ -5077,7 +6019,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Марганец"
+        },
+        "en": {
+          "display": "Manganese"
         }
       },
       "ref_sex": "any",
@@ -5093,7 +6039,8 @@
             "среднее содержание гемоглобина в эритроците (mch",
             "средн. содержание гемоглобина в эритроците (mch",
             "среднее содержание hb в эритроците (mch"
-          ]
+          ],
+          "display": "Среднее содержание гемоглобина в эритроците (MCH)"
         },
         "en": {
           "display": "Mean corpuscular haemoglobin (MCH)",
@@ -5127,7 +6074,8 @@
             "средняя концентрация hb в эритроците (mchc",
             "концентрация гемоглобина в эритроците (mchc",
             "концентрация hb в эритроците (mchc"
-          ]
+          ],
+          "display": "Средняя концентрация гемоглобина в эритроците (MCHC)"
         },
         "en": {
           "display": "Mean corpuscular haemoglobin concentration (MCHC)",
@@ -5152,7 +6100,8 @@
             "объем эритроцита(mcv",
             "объем эритроцита (mcv",
             "объём эритроцита (mcv"
-          ]
+          ],
+          "display": "Средний объём эритроцита (MCV)"
         },
         "en": {
           "display": "Mean corpuscular volume (MCV)",
@@ -5171,7 +6120,11 @@
         "ru": {
           "names": [
             "антитела к вирусу кори lgg, measles virus igg"
-          ]
+          ],
+          "display": "Антитела к вирусу кори, IgG"
+        },
+        "en": {
+          "display": "Measles virus antibodies, IgG"
         }
       }
     },
@@ -5183,7 +6136,11 @@
         "ru": {
           "names": [
             "ртуть (hg"
-          ]
+          ],
+          "display": "Ртуть"
+        },
+        "en": {
+          "display": "Mercury"
         }
       },
       "ref_sex": "any",
@@ -5197,7 +6154,11 @@
         "ru": {
           "names": [
             "метамиелоциты"
-          ]
+          ],
+          "display": "Метамиелоциты"
+        },
+        "en": {
+          "display": "Metamyelocytes"
         }
       },
       "ref_sex": "any",
@@ -5209,7 +6170,11 @@
         "ru": {
           "names": [
             "микроциты (micror"
-          ]
+          ],
+          "display": "Микроциты"
+        },
+        "en": {
+          "display": "Microcytes"
         }
       }
     },
@@ -5225,7 +6190,11 @@
             "альбумин/креатинин",
             "альбумин-креатининовое отношение",
             "отношение альбумин/креатинин"
-          ]
+          ],
+          "display": "Альбумин/креатинин, моча"
+        },
+        "en": {
+          "display": "Albumin/creatinine ratio, urine"
         }
       },
       "ref_sex": "any",
@@ -5239,7 +6208,11 @@
         "ru": {
           "names": [
             "молибден (mo"
-          ]
+          ],
+          "display": "Молибден"
+        },
+        "en": {
+          "display": "Molybdenum"
         }
       },
       "ref_sex": "any",
@@ -5347,7 +6320,8 @@
         "ru": {
           "names": [
             "средний объем тромбоцитов (mpv"
-          ]
+          ],
+          "display": "Средний объём тромбоцитов (MPV)"
         },
         "en": {
           "display": "Mean platelet volume (MPV)",
@@ -5368,7 +6342,11 @@
         "ru": {
           "names": [
             "миелоциты"
-          ]
+          ],
+          "display": "Миелоциты"
+        },
+        "en": {
+          "display": "Myelocytes"
         }
       },
       "ref_sex": "any",
@@ -5502,7 +6480,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Никель"
+        },
+        "en": {
+          "display": "Nickel"
         }
       },
       "ref_sex": "any",
@@ -5610,7 +6592,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "2-гидроксимасляная кислота"
+        },
+        "en": {
+          "display": "2-hydroxybutyric acid"
         }
       },
       "ref_sex": "any",
@@ -5628,7 +6614,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "2-гидроксиизовалериановая кислота"
+        },
+        "en": {
+          "display": "2-hydroxyisovaleric acid"
         }
       },
       "ref_sex": "any",
@@ -5646,7 +6636,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "2-кетоглутаровая кислота"
+        },
+        "en": {
+          "display": "2-ketoglutaric acid"
         }
       },
       "ref_sex": "any",
@@ -5664,7 +6658,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "2-кетоизовалериановая кислота"
+        },
+        "en": {
+          "display": "2-ketoisovaleric acid"
         }
       },
       "ref_sex": "any",
@@ -5682,7 +6680,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "2-метилглутаровая кислота"
+        },
+        "en": {
+          "display": "2-methylglutaric acid"
         }
       },
       "ref_sex": "any",
@@ -5700,7 +6702,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-гидроксимасляная кислота"
+        },
+        "en": {
+          "display": "3-hydroxybutyric acid"
         }
       },
       "ref_sex": "any",
@@ -5718,7 +6724,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-гидроксиизовалериановая кислота"
+        },
+        "en": {
+          "display": "3-hydroxyisovaleric acid"
         }
       },
       "ref_sex": "any",
@@ -5736,7 +6746,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-индолилуксусная кислота"
+        },
+        "en": {
+          "display": "3-indoleacetic acid"
         }
       },
       "ref_sex": "any",
@@ -5754,7 +6768,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-метил-2-оксовалериановая кислота"
+        },
+        "en": {
+          "display": "3-methyl-2-oxovaleric acid"
         }
       },
       "ref_sex": "any",
@@ -5772,7 +6790,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-метилкротонилглицин"
+        },
+        "en": {
+          "display": "3-methylcrotonylglycine"
         }
       },
       "ref_sex": "any",
@@ -5790,7 +6812,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-метилглутаровая кислота"
+        },
+        "en": {
+          "display": "3-methylglutaric acid"
         }
       },
       "ref_sex": "any",
@@ -5808,7 +6834,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-фенилмолочная кислота"
+        },
+        "en": {
+          "display": "3-phenyllactic acid"
         }
       },
       "ref_sex": "any",
@@ -5826,7 +6856,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "4-метил-2-оксовалериановая кислота"
+        },
+        "en": {
+          "display": "4-methyl-2-oxovaleric acid"
         }
       },
       "ref_sex": "any",
@@ -5844,7 +6878,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "5-гидроксииндолуксусная кислота (5-ГИУК)"
+        },
+        "en": {
+          "display": "5-hydroxyindoleacetic acid (5-HIAA)"
         }
       },
       "ref_sex": "any",
@@ -5862,7 +6900,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Ацетоуксусная кислота"
+        },
+        "en": {
+          "display": "Acetoacetic acid"
         }
       },
       "ref_sex": "any",
@@ -5880,7 +6922,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Адипиновая кислота"
+        },
+        "en": {
+          "display": "Adipic acid"
         }
       },
       "ref_sex": "any",
@@ -5898,7 +6944,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Бензойная кислота"
+        },
+        "en": {
+          "display": "Benzoic acid"
         }
       },
       "ref_sex": "any",
@@ -5916,7 +6966,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Кофейная кислота"
+        },
+        "en": {
+          "display": "Caffeic acid"
         }
       },
       "ref_sex": "any",
@@ -5934,7 +6988,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "цис-Аконитовая кислота"
+        },
+        "en": {
+          "display": "cis-Aconitic acid"
         }
       },
       "ref_sex": "any",
@@ -5952,7 +7010,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Цитрамалевая кислота"
+        },
+        "en": {
+          "display": "Citramalic acid"
         }
       },
       "ref_sex": "any",
@@ -5970,7 +7032,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Лимонная кислота"
+        },
+        "en": {
+          "display": "Citric acid"
         }
       },
       "ref_sex": "any",
@@ -5988,7 +7054,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Этилмалоновая кислота"
+        },
+        "en": {
+          "display": "Ethylmalonic acid"
         }
       },
       "ref_sex": "any",
@@ -6006,7 +7076,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Формиминоглутаминовая кислота (FIGLU)"
+        },
+        "en": {
+          "display": "Formiminoglutamic acid (FIGLU)"
         }
       },
       "ref_sex": "any",
@@ -6024,7 +7098,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Фумаровая кислота"
+        },
+        "en": {
+          "display": "Fumaric acid"
         }
       },
       "ref_sex": "any",
@@ -6042,7 +7120,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Глутаровая кислота"
+        },
+        "en": {
+          "display": "Glutaric acid"
         }
       },
       "ref_sex": "any",
@@ -6060,7 +7142,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Глицериновая кислота"
+        },
+        "en": {
+          "display": "Glyceric acid"
         }
       },
       "ref_sex": "any",
@@ -6078,7 +7164,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Гликолевая кислота"
+        },
+        "en": {
+          "display": "Glycolic acid"
         }
       },
       "ref_sex": "any",
@@ -6096,7 +7186,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Гиппуровая кислота"
+        },
+        "en": {
+          "display": "Hippuric acid"
         }
       },
       "ref_sex": "any",
@@ -6114,7 +7208,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "3-гидрокси-3-метилглутаровая кислота"
+        },
+        "en": {
+          "display": "3-hydroxy-3-methylglutaric acid"
         }
       },
       "ref_sex": "any",
@@ -6132,7 +7230,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Гомогентизиновая кислота"
+        },
+        "en": {
+          "display": "Homogentisic acid"
         }
       },
       "ref_sex": "any",
@@ -6150,7 +7252,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Гомованилиновая кислота"
+        },
+        "en": {
+          "display": "Homovanillic acid (HVA)"
         }
       },
       "ref_sex": "any",
@@ -6168,7 +7274,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Изолимонная кислота"
+        },
+        "en": {
+          "display": "Isocitric acid"
         }
       },
       "ref_sex": "any",
@@ -6186,7 +7296,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Изовалерилглицин"
+        },
+        "en": {
+          "display": "Isovalerylglycine"
         }
       },
       "ref_sex": "any",
@@ -6204,7 +7318,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Кинуреновая кислота"
+        },
+        "en": {
+          "display": "Kynurenic acid"
         }
       },
       "ref_sex": "any",
@@ -6222,7 +7340,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Молочная кислота"
+        },
+        "en": {
+          "display": "Lactic acid"
         }
       },
       "ref_sex": "any",
@@ -6240,7 +7362,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Яблочная кислота"
+        },
+        "en": {
+          "display": "Malic acid"
         }
       },
       "ref_sex": "any",
@@ -6258,7 +7384,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Малоновая кислота"
+        },
+        "en": {
+          "display": "Malonic acid"
         }
       },
       "ref_sex": "any",
@@ -6276,7 +7406,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Миндальная кислота"
+        },
+        "en": {
+          "display": "Mandelic acid"
         }
       },
       "ref_sex": "any",
@@ -6294,7 +7428,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Метилмалоновая кислота"
+        },
+        "en": {
+          "display": "Methylmalonic acid"
         }
       },
       "ref_sex": "any",
@@ -6312,7 +7450,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Метилянтарная кислота"
+        },
+        "en": {
+          "display": "Methylsuccinic acid"
         }
       },
       "ref_sex": "any",
@@ -6330,7 +7472,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "N-ацетиласпарагиновая кислота"
+        },
+        "en": {
+          "display": "N-acetylaspartic acid"
         }
       },
       "ref_sex": "any",
@@ -6348,7 +7494,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "орто-Гидроксифенилуксусная кислота"
+        },
+        "en": {
+          "display": "ortho-Hydroxyphenylacetic acid"
         }
       },
       "ref_sex": "any",
@@ -6366,7 +7516,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Оротовая кислота"
+        },
+        "en": {
+          "display": "Orotic acid"
         }
       },
       "ref_sex": "any",
@@ -6384,7 +7538,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Щавелевая кислота"
+        },
+        "en": {
+          "display": "Oxalic acid"
         }
       },
       "ref_sex": "any",
@@ -6402,7 +7560,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "пара-Гидроксибензойная кислота"
+        },
+        "en": {
+          "display": "para-Hydroxybenzoic acid"
         }
       },
       "ref_sex": "any",
@@ -6420,7 +7582,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "пара-Гидроксифенилуксусная кислота"
+        },
+        "en": {
+          "display": "para-Hydroxyphenylacetic acid"
         }
       },
       "ref_sex": "any",
@@ -6438,7 +7604,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "пара-Гидроксифенилмолочная кислота"
+        },
+        "en": {
+          "display": "para-Hydroxyphenyllactic acid"
         }
       },
       "ref_sex": "any",
@@ -6456,7 +7626,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "пара-Гидроксифенилпировиноградная кислота"
+        },
+        "en": {
+          "display": "para-Hydroxyphenylpyruvic acid"
         }
       },
       "ref_sex": "any",
@@ -6474,7 +7648,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Фенилглиоксиловая кислота"
+        },
+        "en": {
+          "display": "Phenylglyoxylic acid"
         }
       },
       "ref_sex": "any",
@@ -6492,7 +7670,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Пиколиновая кислота"
+        },
+        "en": {
+          "display": "Picolinic acid"
         }
       },
       "ref_sex": "any",
@@ -6510,7 +7692,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Пироглутаминовая кислота"
+        },
+        "en": {
+          "display": "Pyroglutamic acid"
         }
       },
       "ref_sex": "any",
@@ -6528,7 +7714,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Пировиноградная кислота"
+        },
+        "en": {
+          "display": "Pyruvic acid"
         }
       },
       "ref_sex": "any",
@@ -6546,7 +7736,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Хинолиновая кислота"
+        },
+        "en": {
+          "display": "Quinolinic acid"
         }
       },
       "ref_sex": "any",
@@ -6564,7 +7758,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Себациновая кислота"
+        },
+        "en": {
+          "display": "Sebacic acid"
         }
       },
       "ref_sex": "any",
@@ -6582,7 +7780,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Субериновая кислота"
+        },
+        "en": {
+          "display": "Suberic acid"
         }
       },
       "ref_sex": "any",
@@ -6600,7 +7802,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Янтарная кислота"
+        },
+        "en": {
+          "display": "Succinic acid"
         }
       },
       "ref_sex": "any",
@@ -6619,7 +7825,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Винная кислота"
+        },
+        "en": {
+          "display": "Tartaric acid"
         }
       },
       "ref_sex": "any",
@@ -6637,7 +7847,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Трикарбаллиловая кислота"
+        },
+        "en": {
+          "display": "Tricarballylic acid"
         }
       },
       "ref_sex": "any",
@@ -6655,7 +7869,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Ванилилминдальная кислота"
+        },
+        "en": {
+          "display": "Vanillylmandelic acid (VMA)"
         }
       },
       "ref_sex": "any",
@@ -6673,7 +7891,11 @@
           ],
           "form_require": [
             "органические кислоты"
-          ]
+          ],
+          "display": "Ксантуреновая кислота"
+        },
+        "en": {
+          "display": "Xanthurenic acid"
         }
       },
       "ref_sex": "any",
@@ -6690,7 +7912,11 @@
           ],
           "exclude": [
             "прегненолон"
-          ]
+          ],
+          "display": "17-гидроксипрогестерон"
+        },
+        "en": {
+          "display": "17-hydroxyprogesterone"
         }
       }
     },
@@ -6718,7 +7944,8 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Индекс омега-3"
         },
         "en": {
           "display": "Omega-3 index",
@@ -6748,7 +7975,11 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Омега-6/омега-3"
+        },
+        "en": {
+          "display": "Omega-6/omega-3 ratio"
         }
       },
       "ref_sex": "any",
@@ -6762,7 +7993,11 @@
         "ru": {
           "names": [
             "остеокальцин"
-          ]
+          ],
+          "display": "Остеокальцин"
+        },
+        "en": {
+          "display": "Osteocalcin"
         }
       },
       "ref_sex": "unreviewed",
@@ -6776,7 +8011,11 @@
         "ru": {
           "names": [
             "коэффициент числа крупных тромбоцитов (p-lcr"
-          ]
+          ],
+          "display": "Доля крупных тромбоцитов (P-LCR)"
+        },
+        "en": {
+          "display": "Platelet large cell ratio (P-LCR)"
         }
       },
       "ref_sex": "any",
@@ -6790,7 +8029,11 @@
         "ru": {
           "names": [
             "гетерогенность тромбоцитов по объему (pdw"
-          ]
+          ],
+          "display": "Ширина распределения тромбоцитов (PDW)"
+        },
+        "en": {
+          "display": "Platelet distribution width (PDW)"
         }
       },
       "ref_sex": "any",
@@ -6811,7 +8054,8 @@
             "слюн",
             "щелочн",
             "фосфорилир"
-          ]
+          ],
+          "display": "Фосфор"
         },
         "en": {
           "display": "Phosphorus",
@@ -6858,7 +8102,8 @@
             "средний объем",
             "адгези",
             "рецептор"
-          ]
+          ],
+          "display": "Тромбоциты"
         },
         "en": {
           "display": "Platelets (PLT)",
@@ -6895,7 +8140,8 @@
         "ru": {
           "names": [
             "калий"
-          ]
+          ],
+          "display": "Калий"
         },
         "en": {
           "display": "Potassium",
@@ -6926,7 +8172,11 @@
         "ru": {
           "names": [
             "17-oh-прегненолон"
-          ]
+          ],
+          "display": "17-гидроксипрегненолон"
+        },
+        "en": {
+          "display": "17-hydroxypregnenolone"
         }
       }
     },
@@ -6943,7 +8193,11 @@
             "стероидный профиль",
             "ответ мс",
             "жх-мс"
-          ]
+          ],
+          "display": "Прогестерон"
+        },
+        "en": {
+          "display": "Progesterone"
         }
       },
       "ref_sex": "male",
@@ -6971,7 +8225,11 @@
             "ответ мс",
             "жх-мс",
             "стероидный профиль"
-          ]
+          ],
+          "display": "Прогестерон (иммунохимия)"
+        },
+        "en": {
+          "display": "Progesterone (immunoassay)"
         }
       },
       "ref_sex": "male",
@@ -6990,7 +8248,11 @@
             "17-oh",
             "17он",
             "гидрокси"
-          ]
+          ],
+          "display": "Прогестерон, слюна"
+        },
+        "en": {
+          "display": "Progesterone, saliva"
         }
       }
     },
@@ -7003,7 +8265,11 @@
         "ru": {
           "names": [
             "пролактин"
-          ]
+          ],
+          "display": "Пролактин"
+        },
+        "en": {
+          "display": "Prolactin"
         }
       },
       "ref_sex": "male",
@@ -7028,7 +8294,8 @@
           ],
           "next_require": [
             "свободн"
-          ]
+          ],
+          "display": "ПСА свободный"
         },
         "en": {
           "display": "PSA, free",
@@ -7072,7 +8339,11 @@
           ],
           "require": [
             "%"
-          ]
+          ],
+          "display": "Доля свободного ПСА"
+        },
+        "en": {
+          "display": "Free PSA, % of total"
         }
       },
       "ref_sex": "male",
@@ -7099,7 +8370,8 @@
           ],
           "next_exclude": [
             "свободн"
-          ]
+          ],
+          "display": "ПСА общий"
         },
         "en": {
           "display": "PSA, total",
@@ -7149,7 +8421,11 @@
         "ru": {
           "names": [
             "паратгормон"
-          ]
+          ],
+          "display": "Паратгормон"
+        },
+        "en": {
+          "display": "Parathyroid hormone"
         }
       },
       "ref_sex": "any",
@@ -7172,7 +8448,11 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Индекс ПНЖК : НЖК"
+        },
+        "en": {
+          "display": "PUFA/SFA index"
         }
       },
       "ref_sex": "any",
@@ -7203,7 +8483,8 @@
             "1012/л",
             "10*12",
             "10 12/л"
-          ]
+          ],
+          "display": "Эритроциты"
         },
         "en": {
           "display": "Red blood cells (RBC)",
@@ -7290,7 +8571,11 @@
           "require": [
             "фл",
             "fl"
-          ]
+          ],
+          "display": "Ширина распределения эритроцитов (RDW)"
+        },
+        "en": {
+          "display": "Red cell distribution width (RDW)"
         }
       },
       "ref_sex": "any",
@@ -7303,7 +8588,8 @@
         "ru": {
           "names": [
             "ревматоидный фактор"
-          ]
+          ],
+          "display": "Ревматоидный фактор"
         },
         "en": {
           "names": [
@@ -7321,7 +8607,11 @@
         "ru": {
           "names": [
             "антитела к вирусу краснухи lgg, rubella igg"
-          ]
+          ],
+          "display": "Антитела к вирусу краснухи, IgG"
+        },
+        "en": {
+          "display": "Rubella virus antibodies, IgG"
         }
       }
     },
@@ -7333,7 +8623,37 @@
         "ru": {
           "names": [
             "scc - антиген плоскоклеточной"
-          ]
+          ],
+          "display": "Антиген плоскоклеточной карциномы (SCC)"
+        },
+        "en": {
+          "display": "Squamous cell carcinoma antigen (SCC)"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "sdma": {
+      "unit": "umol/L",
+      "plausible": [
+        0.1,
+        3
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "сдма",
+            "симметричный диметиларгинин"
+          ],
+          "display": "СДМА"
+        },
+        "en": {
+          "names": [
+            "sdma",
+            "symmetric dimethylarginine"
+          ],
+          "display": "SDMA"
         }
       },
       "ref_sex": "any",
@@ -7347,7 +8667,11 @@
         "ru": {
           "names": [
             "сегментоядерные нейтрофилы"
-          ]
+          ],
+          "display": "Сегментоядерные нейтрофилы"
+        },
+        "en": {
+          "display": "Segmented neutrophils"
         }
       },
       "ref_sex": "any",
@@ -7379,7 +8703,11 @@
           ],
           "prefer_form": [
             "элементный анализ"
-          ]
+          ],
+          "display": "Селен"
+        },
+        "en": {
+          "display": "Selenium"
         }
       },
       "ref_sex": "any",
@@ -7397,7 +8725,8 @@
             "глобулин связывающий половые",
             "shbg",
             "гспг"
-          ]
+          ],
+          "display": "Глобулин, связывающий половые гормоны (ГСПГ)"
         },
         "en": {
           "display": "Sex hormone-binding globulin (SHBG)",
@@ -7425,7 +8754,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Серебро"
+        },
+        "en": {
+          "display": "Silver"
         }
       },
       "ref_sex": "any",
@@ -7439,7 +8772,8 @@
         "ru": {
           "names": [
             "натрий"
-          ]
+          ],
+          "display": "Натрий"
         },
         "en": {
           "display": "Sodium",
@@ -9326,7 +10660,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Стронций"
+        },
+        "en": {
+          "display": "Strontium"
         }
       },
       "ref_sex": "any",
@@ -9346,7 +10684,8 @@
           "names": [
             "трийодтиронин свободный",
             "т3 свободный"
-          ]
+          ],
+          "display": "Т3 свободный"
         },
         "en": {
           "display": "Free T3",
@@ -9387,7 +10726,11 @@
             "трийодтиронин общий",
             "общий трийодтиронин",
             "т3 (общий)"
-          ]
+          ],
+          "display": "Т3 общий"
+        },
+        "en": {
+          "display": "Total T3"
         }
       },
       "ref_sex": "any",
@@ -9407,7 +10750,8 @@
           "names": [
             "тироксин свободный",
             "т4 свободный"
-          ]
+          ],
+          "display": "Т4 свободный"
         },
         "en": {
           "display": "Free T4",
@@ -9453,7 +10797,8 @@
             "стероидный профиль",
             "ответ мс",
             "жх-мс"
-          ]
+          ],
+          "display": "Тестостерон общий"
         },
         "en": {
           "display": "Testosterone, total",
@@ -9496,7 +10841,11 @@
         "ru": {
           "names": [
             "тестостерон, связанный с альбумином"
-          ]
+          ],
+          "display": "Тестостерон, связанный с альбумином"
+        },
+        "en": {
+          "display": "Albumin-bound testosterone"
         }
       }
     },
@@ -9526,7 +10875,11 @@
             "ответ мс",
             "жх-мс",
             "стероидный профиль"
-          ]
+          ],
+          "display": "Тестостерон (иммунохимия)"
+        },
+        "en": {
+          "display": "Testosterone (immunoassay)"
         }
       },
       "ref_sex": "male",
@@ -9545,7 +10898,11 @@
             "дигидро",
             "связанн",
             "индекс"
-          ]
+          ],
+          "display": "Тестостерон, слюна"
+        },
+        "en": {
+          "display": "Testosterone, saliva"
         }
       }
     },
@@ -9555,7 +10912,11 @@
         "ru": {
           "names": [
             "антитела к возбудителю столбняка (clostridium tetani"
-          ]
+          ],
+          "display": "Антитела к столбнячному токсину, IgG"
+        },
+        "en": {
+          "display": "Tetanus antibodies, IgG"
         }
       }
     },
@@ -9576,7 +10937,11 @@
           "form_require": [
             "гх-мс",
             "ответ гх"
-          ]
+          ],
+          "display": "Индекс транс-жирных кислот"
+        },
+        "en": {
+          "display": "Trans fatty acid index"
         }
       },
       "ref_sex": "any",
@@ -9590,7 +10955,11 @@
         "ru": {
           "names": [
             "таллий (tl"
-          ]
+          ],
+          "display": "Таллий"
+        },
+        "en": {
+          "display": "Thallium"
         }
       },
       "ref_sex": "any",
@@ -9604,7 +10973,11 @@
         "ru": {
           "names": [
             "тромбокрит (pct"
-          ]
+          ],
+          "display": "Тромбокрит"
+        },
+        "en": {
+          "display": "Plateletcrit (PCT)"
         }
       },
       "ref_sex": "any",
@@ -9618,7 +10991,11 @@
         "ru": {
           "names": [
             "тиреоглобулин (тг"
-          ]
+          ],
+          "display": "Тиреоглобулин"
+        },
+        "en": {
+          "display": "Thyroglobulin"
         }
       },
       "ref_sex": "any",
@@ -9684,7 +11061,8 @@
             "ожсс",
             "железосвязывающая способность",
             "железовсязывающая способность"
-          ]
+          ],
+          "display": "Общая железосвязывающая способность (ОЖСС)"
         },
         "en": {
           "display": "Total iron-binding capacity (TIBC)",
@@ -9721,7 +11099,11 @@
             "ответ исп",
             "исп-мс",
             "макро- и микроэлемент"
-          ]
+          ],
+          "display": "Титан"
+        },
+        "en": {
+          "display": "Titanium"
         }
       },
       "ref_sex": "any",
@@ -9735,7 +11117,8 @@
         "ru": {
           "names": [
             "общий белок"
-          ]
+          ],
+          "display": "Общий белок"
         },
         "en": {
           "display": "Total protein",
@@ -9777,7 +11160,8 @@
           "exclude": [
             "насыщен",
             "коэффициент"
-          ]
+          ],
+          "display": "Трансферрин"
         },
         "en": {
           "display": "Transferrin",
@@ -9801,7 +11185,8 @@
         "ru": {
           "names": [
             "коэффициент насыщения трансферрина"
-          ]
+          ],
+          "display": "Насыщение трансферрина"
         },
         "en": {
           "display": "Transferrin saturation",
@@ -9822,7 +11207,8 @@
         "ru": {
           "names": [
             "триглицериды"
-          ]
+          ],
+          "display": "Триглицериды"
         },
         "en": {
           "display": "Triglycerides",
@@ -9850,7 +11236,8 @@
             "тиреотропин",
             "(ттг",
             "ттг"
-          ]
+          ],
+          "display": "Тиреотропный гормон (ТТГ)"
         },
         "en": {
           "display": "Thyroid-stimulating hormone (TSH)",
@@ -9885,7 +11272,8 @@
         "ru": {
           "names": [
             "мочевина"
-          ]
+          ],
+          "display": "Мочевина"
         },
         "en": {
           "display": "Urea",
@@ -9912,6 +11300,29 @@
       "ref_sex": "any",
       "ref_age": "any"
     },
+    "urea_creatinine_ratio": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "мочевина/креатинин",
+            "соотношение мочевина/креатинин"
+          ],
+          "display": "Мочевина/креатинин"
+        },
+        "en": {
+          "display": "Urea/creatinine ratio",
+          "names": []
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
     "uric_acid": {
       "unit": "umol/L",
       "ref_low": 202,
@@ -9920,7 +11331,8 @@
         "ru": {
           "names": [
             "мочевая кислота"
-          ]
+          ],
+          "display": "Мочевая кислота"
         },
         "en": {
           "display": "Uric acid",
@@ -9952,6 +11364,175 @@
       "ref_sex_source": "standard adult venous reference intervals, sex-specific; the male range is the historical default kept unchanged. A range printed on the person's own lab form always wins over this — this is used only when the value carries no form range.",
       "ref_age": "any"
     },
+    "urine_3_methylhistidine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        600
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "3-метилгистидин"
+          ],
+          "display": "3-метилгистидин в моче"
+        },
+        "en": {
+          "names": [
+            "3-methylhistidine"
+          ],
+          "display": "3-methylhistidine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_arginine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "аргинин в моче"
+          ],
+          "display": "Аргинин мочи"
+        },
+        "en": {
+          "names": [
+            "arginine urine"
+          ],
+          "display": "Arginine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_cystine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "цистин в моче",
+            "цистин мочи"
+          ],
+          "display": "Цистин мочи"
+        },
+        "en": {
+          "names": [
+            "cystine urine"
+          ],
+          "display": "Cystine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_glycine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "глицин в моче"
+          ],
+          "display": "Глицин мочи"
+        },
+        "en": {
+          "names": [
+            "glycine urine"
+          ],
+          "display": "Glycine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_lysine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "лизин в моче"
+          ],
+          "display": "Лизин мочи"
+        },
+        "en": {
+          "names": [
+            "lysine urine"
+          ],
+          "display": "Lysine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_ornithine": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "орнитин в моче"
+          ],
+          "display": "Орнитин мочи"
+        },
+        "en": {
+          "names": [
+            "ornithine urine"
+          ],
+          "display": "Ornithine, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_aa_proline": {
+      "unit": "umol/L",
+      "plausible": [
+        0,
+        20000
+      ],
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "пролин в моче"
+          ],
+          "display": "Пролин мочи"
+        },
+        "en": {
+          "names": [
+            "proline urine"
+          ],
+          "display": "Proline, urine"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
     "urine_creatinine": {
       "unit": "umol/L",
       "ref_low": 3000.0,
@@ -9961,10 +11542,38 @@
         "ru": {
           "names": [
             "креатинин в моче разовой"
-          ]
+          ],
+          "display": "Креатинин в моче"
+        },
+        "en": {
+          "display": "Creatinine, urine"
         }
       },
       "ref_sex": "unreviewed",
+      "ref_age": "any"
+    },
+    "urine_cystine_creatinine_ratio": {
+      "unit": "umol/mmol creat",
+      "specimen": "urine",
+      "plausible": [
+        0,
+        100000
+      ],
+      "labels": {
+        "ru": {
+          "names": [
+            "цистин мочи / креатинин"
+          ],
+          "display": "Цистин мочи / креатинин"
+        },
+        "en": {
+          "names": [
+            "cystine/creatinine, urine"
+          ],
+          "display": "Cystine/creatinine, urine"
+        }
+      },
+      "ref_sex": "any",
       "ref_age": "any"
     },
     "urine_density": {
@@ -9984,7 +11593,11 @@
           "exclude": [
             "костн",
             "минеральн"
-          ]
+          ],
+          "display": "Относительная плотность мочи"
+        },
+        "en": {
+          "display": "Urine specific gravity"
         }
       },
       "ref_sex": "any",
@@ -10000,7 +11613,11 @@
             "микроальбумин в моче разовой",
             "микроальбумин в моче",
             "микроальбумин"
-          ]
+          ],
+          "display": "Микроальбумин в моче"
+        },
+        "en": {
+          "display": "Microalbumin, urine"
         }
       },
       "ref_sex": "any",
@@ -10019,7 +11636,81 @@
         "ru": {
           "names": [
             "мочи разовой"
-          ]
+          ],
+          "display": "pH мочи"
+        },
+        "en": {
+          "display": "Urine pH"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_plasma_cystine_ratio": {
+      "unit": "ratio",
+      "specimen": "urine",
+      "plausible": [
+        0,
+        100000
+      ],
+      "labels": {
+        "ru": {
+          "names": [
+            "цистин: моча / плазма"
+          ],
+          "display": "Цистин: моча / плазма"
+        },
+        "en": {
+          "names": [
+            "cystine, urine/plasma"
+          ],
+          "display": "Cystine, urine/plasma"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_plasma_lysine_ratio": {
+      "unit": "ratio",
+      "specimen": "urine",
+      "plausible": [
+        0,
+        100000
+      ],
+      "labels": {
+        "ru": {
+          "names": [
+            "лизин: моча / плазма"
+          ],
+          "display": "Лизин: моча / плазма"
+        },
+        "en": {
+          "names": [
+            "lysine, urine/plasma"
+          ],
+          "display": "Lysine, urine/plasma"
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
+    "urine_urea_nitrogen": {
+      "unit": "g/24h",
+      "ref_low": 6.0,
+      "ref_high": 17.0,
+      "specimen": "urine",
+      "labels": {
+        "ru": {
+          "names": [
+            "азот мочевины мочи"
+          ],
+          "display": "Азот мочевины суточной мочи"
+        },
+        "en": {
+          "names": [
+            "urea nitrogen urine"
+          ],
+          "display": "Urea nitrogen, 24-hour urine"
         }
       },
       "ref_sex": "any",
@@ -10033,7 +11724,11 @@
         "ru": {
           "names": [
             "валин"
-          ]
+          ],
+          "display": "Валин"
+        },
+        "en": {
+          "display": "Valine"
         }
       },
       "ref_sex": "any",
@@ -10051,7 +11746,8 @@
             "витамин b12",
             "витамин в12",
             "кобаламин"
-          ]
+          ],
+          "display": "Витамин B12"
         },
         "en": {
           "display": "Vitamin B12",
@@ -10097,7 +11793,11 @@
             "маркёр",
             "маркер",
             "датчик"
-          ]
+          ],
+          "display": "Витамин B6"
+        },
+        "en": {
+          "display": "Vitamin B6"
         }
       },
       "ref_sex": "any",
@@ -10137,7 +11837,8 @@
             "выраженный дефицит",
             "моче",
             "связывающ"
-          ]
+          ],
+          "display": "Витамин D, 25-OH"
         },
         "en": {
           "display": "Vitamin D (25-OH)",
@@ -10188,7 +11889,8 @@
             "109/л",
             "10*9",
             "10 9/л"
-          ]
+          ],
+          "display": "Лейкоциты"
         },
         "en": {
           "display": "White blood cells (WBC)",
@@ -10257,7 +11959,8 @@
           ],
           "form_exclude": [
             "биохимия"
-          ]
+          ],
+          "display": "Цинк (цельная кровь)"
         },
         "en": {
           "display": "Zinc",
@@ -10308,7 +12011,8 @@
             "ответ исп",
             "элементный анализ",
             "витамины и микроэлементы"
-          ]
+          ],
+          "display": "Цинк сывороточный"
         },
         "en": {
           "display": "Zinc, serum",
@@ -10327,73 +12031,6 @@
       "ref_age": "any",
       "method_note": "Serum zinc by the biochemical method. Entered on 08.09.2026 together with `magnesium_total` and `calcium_total`: the third of one order of biochemical minerals, which the elemental series had been absorbing. The symbol in parentheses is a laboratory's typography, not a method, and since 12.09.2026 it is not excluded here. Today the parser hands a row to the longest matching name first, so a row that prints the symbol AND a molar unit reaches the ICP key, is refused by its unit gate, and is dropped rather than misfiled; it lands here the day the parser falls through on a refused unit.",
       "method": "biochemistry"
-    },
-    "copper_total": {
-      "unit": "umol/L",
-      "ref_low": 11.0,
-      "ref_high": 22.0,
-      "units": {
-        "мкмоль/л": 1.0,
-        "umol/L": 1.0,
-        "µmol/L": 1.0
-      },
-      "convert": {
-        "ug/dL": 0.1574,
-        "µg/dL": 0.1574,
-        "мкг/дл": 0.1574,
-        "ug/L": 0.01574,
-        "мкг/л": 0.01574
-      },
-      "convert_note": "Canonical here is umol/L. Copper A = 63.546 g/mol: 1 ug/dL = 10/63.546 = 0.1574 umol/L, 1 ug/L = 0.01574 umol/L. The elemental (ICP) row `copper` keeps ug/L on purpose — different assays, not different units.",
-      "specimen": "blood",
-      "method": "biochemistry",
-      "labels": {
-        "ru": {
-          "names": [
-            "медь"
-          ],
-          "exclude": [
-            "моче",
-            "слюн",
-            "волос",
-            "церулоплазмин",
-            "эритроцит"
-          ],
-          "form_exclude": [
-            "исп-мс",
-            "ответ исп",
-            "элементный анализ",
-            "витамины и микроэлементы"
-          ],
-          "display": "Медь (сыворотка)"
-        },
-        "en": {
-          "display": "Copper, serum",
-          "names": [
-            "copper"
-          ],
-          "exclude": [
-            "urine",
-            "urinary",
-            "hair",
-            "rbc",
-            "ceruloplasmin"
-          ]
-        }
-      },
-      "ref_by_sex": {
-        "male": {
-          "ref_low": 11.0,
-          "ref_high": 22.0
-        },
-        "female": {
-          "ref_low": 12.6,
-          "ref_high": 24.4
-        }
-      },
-      "ref_sex_source": "standard adult serum copper interval, sex-specific: 70-140 ug/dL for men and 80-155 ug/dL for women (Tietz), converted at A = 63.546 (x 0.1574). The male range is the default. A range printed on the person's own lab form always wins over this — it is used only when the value carries no form range.",
-      "ref_age": "any",
-      "method_note": "Serum copper by the biochemical (colorimetric) method, in umol/L. Entered on 12.09.2026 when the rule «a series belongs to a method, not to a substance» was applied to every element: the ICP row `copper` had been absorbing biochemistry rows by multiplying them by the atomic weight. The corridor is the standard adult interval, not one read off a form — a form range wins over it."
     }
   }
 }

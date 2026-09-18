@@ -40,6 +40,250 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.4 — 17.09.2026
+
+### What you can do now
+
+**An assistant can run the recompute, not only describe it.** A new tool shows
+the plan by default and starts the ready steps when asked to with a
+confirmation, the same way the page does; the progress is a file, so nothing is
+lost if the call ends first. A system's answer also carries, as a field rather
+than prose, why rows were not read and what closes each reason.
+
+**The reports say how a command is typed on this machine.** Where the word
+`scholion` is not on the PATH, `version` and `recompute` add one line with the
+spelling that works here.
+
+**A release records the size of the catalogue it ships.** A catalogue that grew
+without the release notes naming the step that re-reads the new positions now
+stops the publication, instead of being noticed on somebody's profile.
+
+**The panel of authored positions grew from 120 to 214, in three kinds of row.**
+Thirty-four positions rest on a named study whose reference was checked
+against Europe PMC — every one of them carries the product's own sentence in
+both languages, a level from B to D by how well the source replicates, and the
+source itself. Twenty-two rare variants of immunity, the pancreas and the
+kidney are read through the gene–disease base: the classification and the
+inheritance come from GenCC, the sentence says what one copy and two copies
+mean, and a carrier is never printed as a finding. Twenty-nine positions the
+list named without any source are shipped at level E: the genotype is shown,
+and the row says that nothing stands behind it. One source on an older row
+pointed at a paper about another subject and was replaced by the paper about
+the variant.
+
+**Fifteen groups of positions print as one row each.** Linked variants of one
+locus — the FTO block, TCF7L2, the deiodinases, the estrogen and progesterone
+receptors, SHBG, the rare variants of SECISBP2 and TSHR — say one thing, and
+the card said it three or five times. A group prints its name, its count, one
+sentence, one level and one source, and opens into its members.
+
+**Two panels without a radar domain.** Behaviour and the stress response —
+seventeen candidate positions of neurotransmission, most at level C or D — open
+as a card of their own, with the reason at the top: there is no laboratory
+marker a behaviour is read by, and an empty half on the radar would teach a
+reader that an empty half means a clean one. The dental panel is declared and
+waits for its positions.
+
+**«The genetics of this marker».** A laboratory marker with positions behind it
+says so under its own row — gene, rsID, level, the direction the panel
+expects — and the row is a door to the system card, where the person's own
+state is.
+
+**A clinician's local note.** A note kept in the profile prints on the row it is
+about, in its own voice, and never reaches the package.
+
+**A system can now answer the question that comes after a deviation: if a
+decision to correct has been made, what does the genotype say about the
+route.** The amino acid system carries it first. Routes are grouped by what the
+genotype says — this one goes around your narrow place, this one probably works
+worse for you, this one makes the genotype beside the point, this one needs a
+different dose, this one the genotype says nothing about — and never ranked,
+because a ranking would mean an optimum, which needs cost, availability, the
+clinical picture and your own preference. A route is printed only at evidence
+level A or B, only with a named source, only in the conditional, and only with
+the other half of the answer: which marker to recheck, after how long, and what
+counts as a change rather than the scatter of the method. Where nothing
+reaches that bar, the product says the genotype adds nothing here, with the
+reason, instead of saying nothing at all.
+
+**Every position of the amino acid system says which link of the chain it sits
+on** — digestion and absorption, carriage into tissues, use inside the cell,
+renal losses — **and how it reads on the three routes protein can arrive by.**
+A drip removes the gut and the first pass through the liver; free amino acids
+remove the digestion of protein and the peptide path. So the same variant
+matters on one route and is beside the point on another, and the card says
+which, marking what is a mechanistic reading rather than a measured comparison.
+
+**Where a fasting corridor cannot answer, the position names the load that
+would.** Carriership of the transsulfuration is invisible at rest; the
+methionine load is what shows it. The same for the urea cycle under a protein
+load and for urate under a purine load. The product names the test and what it
+would reveal, and never says to do it.
+
+**The second half of the amino acid picture is now asked for.** Urine amino
+acids, cystine in a 24-hour collection, plasma ammonia, kynurenine with its
+ratio, vitamin B6 and fecal elastase appear in «what else to take» while they
+are missing, and disappear the day they are taken.
+
+**The genetic half of a system is read as a table.** One line per position or
+gene — level, state, chain link, what it means — grouped by link where the
+system has links. A line opens into the card it used to be, so the density is
+the reader's choice and not the page's.
+
+**Every statement about a genetic position now says what stands behind it.**
+A position on a system's card carries a level from A to E: A is a clinical
+guideline or a gene–disease link GenCC rates Definitive or Strong, B a
+replicated association with a measured effect size, C single or conflicting
+studies, D a candidate gene whose association was never replicated, E no
+source at all. A conclusion is printed at A and B only. Below them the card
+shows your genotype and says why nothing follows. The same letter appears on
+the page, in the command line and in what an assistant is told to relay.
+`scholion evidence-levels` prints the legend, and so does the Guide page.
+A position with no level assigned yet says so and draws no conclusion.
+
+**Three new body systems: immunity, the musculoskeletal system, and amino
+acids and protein.** The radar now has fifteen laboratory systems. Immunity is
+read through white cells, lymphocytes, IgA, ESR, C-reactive protein and two
+autoantibody screens. The musculoskeletal system is read through calcium,
+phosphorus, alkaline phosphatase, parathyroid hormone, osteocalcin and vitamin D.
+Amino acids and protein are scored on seven markers: total protein, albumin,
+urea, creatinine, uric acid, homocysteine and citrulline. Beside them the card
+shows the amino acid panel and its ratios. The share of the panel outside its
+corridor counts in the score as one term, so a drifting panel shows at the top
+level. A marker can now count in two systems, for example C-reactive protein in
+inflammation and in immunity. Each new system has a genetic half composed from
+the gene–disease base: 75, 366 and 97 genes. In front of that base stand 28
+authored positions: seven for immunity, six for bone, twelve for amino acids
+(glycine, branched-chain amino acids, asparagine, uric acid, homocysteine and
+classic homocystinuria among them), and three more for the gonads. The panel
+now holds 120 positions across fourteen systems.
+
+**The gene–disease base is refreshed to the export of 13 September 2026.** The
+kidneys gain one gene. The systems now hold 1,469 different genes.
+
+**A common variant shows its three genotypes, with yours marked.** The card
+lists them from the base genotype to the one with two copies of the named
+allele.
+
+**An amino acid panel is read as a picture.** Nine ratios have their own
+values: phenylalanine/tyrosine, glycine/serine, the Fischer ratio,
+glutamine/glutamate (and glutamate/glutamine, as some laboratories print
+it), methionine/homocysteine, α-aminobutyrate/leucine,
+kynurenine/tryptophan and urea/creatinine. A ratio a laboratory prints is
+read and checked against the value its components give. No reference range
+was invented for them: until a source gives one, a ratio is shown as a value.
+
+### What is fixed
+
+**A position written on the other strand could read as «the allele is
+absent».** When the named letter was not one of the two at the position, the
+genotype was searched for it, it was never there, and the card said the
+allele was not found. Such a position is now refused before any genotype is
+read.
+
+**The recompute panel took over the screen after the recompute was done.**
+It reappeared at full height on every reload, showing the report of a run the
+person had just watched. A finished run is no longer a reason to open it: what
+is ready to recompute is one line with the panel one click away, and a line
+dismissed stays dismissed until something new is ready.
+
+**A ratio refused to compute when one of its components had been measured
+again later.** Urea/creatinine — the only ratio of the amino acid panel with a
+published corridor — and methionine/homocysteine were both dropped although
+their components were drawn together: the engine compared each marker's newest
+point instead of looking for the last draw that held them all. Two values drawn
+months apart still do not make a ratio; a draw that exists is now found.
+
+**Two lines of one card contradicted each other**: the panel said it does not
+enter the score while the line above it said the share outside the corridor
+enters as one term. The panel is not scored marker by marker — that is what it
+says now.
+
+**A gene whose coverage was never measured was called «not read», which is
+false about the file.** The file did read the gene; what nobody measured is how
+deeply. That is now a state of its own — read, with the depth unmeasured — and
+the row says what the file holds in the gene, with the alignment named as what
+measures the rest. A coverage table that WAS made and found the gene thin is a
+different answer and still counts as not read.
+
+**A position a whole-genome file has no row for is answered, not left blank.**
+Such a file omits a position BECAUSE it matched the reference, so the answer is
+almost certainly there. With an alignment on the machine the position says it
+is not read yet and names the step that reads it. With none, it is taken by the
+reference — and the caveat stands inside the sentence, not beside it: «the risk
+allele is absent — taken by the reference: the file has no row here, and no
+alignment was checked». That is never allowed on a chip, a genotype table or a
+panel, where a missing row means the position is not on the chip; never where a
+coverage table calls the gene low; never for a position outside the catalogue.
+It is not a finding, it is counted apart from what was read, and it never lets
+a list be called read end to end.
+
+The other side of the same question: a position whose row IS in the file is
+read — and where the row states no depth and no alignment is on the machine to
+measure one, it says so: read from the file, the depth of reading not verified.
+
+**«Not read end to end» did not say what was in the way.** A reader who had just
+run every recompute the product offered was told that 28 rows of 373 were
+unread and left to guess the next step. The count now comes with the reason and
+with what closes it: read too thinly — deeper sequencing; no row in the genome
+file — genotyping those positions from the alignment; the depth never measured
+— a coverage table. The sentence no longer lists a dozen gene names or explains
+what «nothing found» means over an unread gene: the names are on the rows.
+
+**A system card could take three quarters of a minute to open, and could show
+a position as unread on a machine with no network.** A position whose
+coordinate the build did not carry was looked up online at every opening, once
+per position. Every position a panel ships now carries its coordinate in the
+build, confirmed against two independent sources, and a card opens without
+reaching the network at all.
+
+**A rare variant read off a genotyping chip could be printed as a finding.**
+Chips often report rare variants that are not there. Such a variant is now
+shown as a signal to confirm by sequencing, not as a finding.
+
+**A disease class could read as «every gene read, nothing found» with no
+coverage measured.** Without a coverage table, no gene now counts as read,
+and the answer says so gene by gene.
+
+**A ratio printed with full names was read as one of its components.**
+«Phenylalanine (Phe)/Tyrosine (Tyr) 1.13» was stored as tyrosine 1.13, a value
+far below its range, and ratios printed as «Phe:Tyr», «AABA:Leu» or
+«Glu:Gln» were not read at all.
+
+**A printed albumin/globulin ratio was never checked against its
+components**, and could be flagged as having nothing behind it.
+
+**The warning about calcium on high-dose vitamin D showed calcium as not
+taken** even when it had been measured.
+
+### What needs recomputing
+
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if the profile holds a urine or an amino acid panel this version added markers for.**
+Ammonia, fecal elastase, the dimethylarginines, 3-methylhistidine, urea
+nitrogen in urine and six urine amino acids are new keys: a form that holds
+them was stored without them.
+
+**Run `scholion genotype-sites` — if a sites file was made by an earlier version and an alignment is at hand.**
+The positions added in this version are not in a sites file made before it, so
+a position the raw genome file has no row for is shown as not read rather than
+as the reference. Reading those positions from the alignment settles what is
+there. Without an alignment the step says so and is not offered as ready: a
+position stays honestly not read, which is what it is.
+
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if an amino acid panel whose form prints ratios was ingested by an earlier version.**
+A ratio line could have been stored as one of its components: tyrosine,
+glutamine and the other single values are read again from their own lines, and
+the printed ratios get values of their own.
+
+**Run `scholion coverage` — if a coverage table was computed by an earlier version.**
+The three new systems add 372 genes that a coverage table made before this
+version does not hold. Until the table is computed again, they are shown as not
+measured, never as read.
+
+**Run `scholion provenance` — if the profile holds an albumin/globulin ratio or an amino acid panel.**
+The printed ratios, and the albumin/globulin ratio that was never recomputed
+before, are checked against the values their components give.
+
 ## v0.5.3 — 16.09.2026
 
 ### What you can do now

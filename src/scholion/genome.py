@@ -56,6 +56,28 @@ def _save_cache(d: Dict[str, Any]) -> None:
         pass
 
 
+def _mark_depth_unverified(out: Dict[str, Any]) -> None:
+    """A row that IS in the file is read — and says what it does not know.
+
+    Decided HERE, in the reader, so that every face says it the same way
+    (owner, 18.09.2026): where the row states no depth and no alignment is on
+    this machine to measure one, the answer is «read from the file, the depth of
+    reading not verified». A row that carries its own depth needs no caveat, and
+    with an alignment at hand the depth is measurable — the coverage step's job.
+    """
+    if out.get("depth") is not None:
+        return
+    try:
+        from .gene_region import bam_path
+        if bam_path():
+            return
+    except Exception:                                                # noqa: BLE001 — no alignment to ask
+        pass
+    out["depth_unverified"] = True
+    note = _t("genome.depth_unverified")
+    out["note"] = (str(out["note"]).rstrip() + " " + note) if out.get("note") else note
+
+
 def resolve_rsid(rsid: str, allow_network: bool = True) -> Optional[Dict[str, Any]]:
     """Coordinate + annotation for ANY rsID.
 
@@ -1934,6 +1956,7 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             if dp is not None and dp < _MIN_DEPTH:
                 out["note"] += _t("genome.low_depth_suffix", depth=dp)
                 out["low_depth"] = True
+            _mark_depth_unverified(out)
             return out
         # Task 87. «No row» means «read, and it matched the reference» only in a
         # file that carries variants of that kind at all. A call set split by
@@ -2092,6 +2115,7 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         if dp is not None and dp < _MIN_DEPTH:
             out["low_depth"] = True
             out["note"] = _t("genome.low_depth", depth=dp)
+        _mark_depth_unverified(out)
 
         # ── what would have to be confirmed before this call is acted on ──────
         try:

@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "purpose": "The legend of evidence levels A–E: the one place their meaning is written. Every claim the product prints about a genetic position carries one of these letters, on every surface — the page, the command line, a tool's JSON, a printed report, what an assistant retells. The docs page `scholion doc evidence-levels`, the web legend and the assistant rule all read their words from here.",
+    "boundary": "A verdict — «this means something for you» — is printed at A and B only. The line between B and C does not move. C, D and E are three different reasons for printing the value without a verdict, and they tell a reader different things: the data disagree, the data are too few, there are no data.",
+    "who_assigns": "A level is the curator's judgement of the source a row names, recorded with the row. The program never assigns one, and a row without a source can only be E.",
+    "updated": "2026-09-17",
+    "source_tier": "curated_reference",
+    "schema": "levels: [ { level: A|B|C|D|E, basis: [guideline|gencc|gwas|candidate|none], verdict_allowed: bool, short: {en, ru}, full: {en, ru}, says: {en, ru} } ]"
+  },
+  "levels": [
+    {
+      "level": "A",
+      "basis": ["guideline", "gencc"],
+      "verdict_allowed": true,
+      "short": {"en": "clinical guideline", "ru": "клиническое руководство"},
+      "full": {
+        "en": "A clinical practice guideline, or a gene–disease link GenCC rates Definitive or Strong.",
+        "ru": "Клиническое руководство или связь гена с болезнью, которую GenCC оценивает как Definitive или Strong."
+      },
+      "says": {
+        "en": "The product states what follows, with the source.",
+        "ru": "Продукт говорит, что из этого следует, и называет источник."
+      }
+    },
+    {
+      "level": "B",
+      "basis": ["gwas"],
+      "verdict_allowed": true,
+      "short": {"en": "replicated association", "ru": "воспроизведённая ассоциация"},
+      "full": {
+        "en": "An association replicated in independent cohorts, with a measured effect size.",
+        "ru": "Ассоциация, воспроизведённая в независимых когортах, с измеренным размером эффекта."
+      },
+      "says": {
+        "en": "The product states what follows, with the effect size and the source.",
+        "ru": "Продукт говорит, что из этого следует, с размером эффекта и источником."
+      }
+    },
+    {
+      "level": "C",
+      "basis": ["gwas", "candidate"],
+      "verdict_allowed": false,
+      "short": {"en": "the data disagree", "ru": "данные спорят"},
+      "full": {
+        "en": "Single studies, or studies that contradict each other.",
+        "ru": "Единичные работы или работы, которые противоречат друг другу."
+      },
+      "says": {
+        "en": "The product shows your genotype and why no conclusion follows.",
+        "ru": "Продукт показывает ваш генотип и объясняет, почему вывода нет."
+      }
+    },
+    {
+      "level": "D",
+      "basis": ["candidate"],
+      "verdict_allowed": false,
+      "short": {"en": "too little data", "ru": "данных мало"},
+      "full": {
+        "en": "A candidate gene whose association has not been replicated.",
+        "ru": "Кандидатный ген, ассоциация которого не воспроизведена."
+      },
+      "says": {
+        "en": "The product shows your genotype and why no conclusion follows.",
+        "ru": "Продукт показывает ваш генотип и объясняет, почему вывода нет."
+      }
+    },
+    {
+      "level": "E",
+      "basis": ["none"],
+      "verdict_allowed": false,
+      "short": {"en": "no source", "ru": "источника нет"},
+      "full": {
+        "en": "No source at all: the position came from a laboratory report and nothing published stands behind it.",
+        "ru": "Источника нет вовсе: позиция пришла из отчёта лаборатории, и за ней нет ни одной публикации."
+      },
+      "says": {
+        "en": "The product shows your genotype only, with no interpretation.",
+        "ru": "Продукт показывает только ваш генотип, без всякой трактовки."
+      }
+    }
+  ]
+}

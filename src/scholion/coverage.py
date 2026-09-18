@@ -104,7 +104,17 @@ def clinvar_path() -> Optional[Path]:
     if env:
         p = Path(env).expanduser()
         return p if p.exists() else None
-    for base in core.genome_bases():
+    bases = list(core.genome_bases())
+    # Where the project's own pipeline caches it (src/ingest/annotate_clinvar.sh):
+    # SCHOLION_CLINVAR_CACHE, else ~/genomic_work/clinvar. Until 17.09.2026 the
+    # engine never looked there, so a machine that had run the pipeline was told
+    # «no ClinVar» by the coverage step, the ACMG scan and the recompute plan.
+    # An explicit genome directory — a test, a synthetic run — keeps the search
+    # inside it.
+    if not os.environ.get("SCHOLION_GENOME_DIR"):
+        cache = os.environ.get("SCHOLION_CLINVAR_CACHE")
+        bases.append(Path(cache).expanduser() if cache else Path.home() / "genomic_work" / "clinvar")
+    for base in bases:
         for name in ("clinvar.vcf.gz", "clinvar.chr.vcf.gz"):
             if (base / name).exists():
                 return base / name

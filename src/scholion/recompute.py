@@ -45,6 +45,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -63,6 +64,13 @@ class Stopped(Exception):
 def _call_labs(step, tick):
     from . import ingest_labs
     return ingest_labs.ingest(step["folder"], force=bool(step.get("force")), progress=tick)
+
+
+def _call_provenance(step, tick):
+    """The reverse check of the lab points against the forms — reads, rewrites
+    only the coverage cache of the forms, and counts what disagrees."""
+    from . import provenance
+    return provenance.audit(refresh=True, lab_dir=step["folder"])
 
 
 def _call_studies(step, tick):
@@ -102,6 +110,7 @@ RUNNERS: Dict[str, Dict[str, Any]] = {
     "scholion acmg-scan": {"genome_file": "acmg_sf_hits.tsv", "call": _call_acmg},
     "scholion genotype-sites": {"genome_file": "loci_sites.vcf.gz", "call": _call_sites},
     "scholion coverage": {"profile_file": "callability.tsv", "call": _call_coverage},
+    "scholion provenance": {"folder": "labs_docs", "profile_file": "labs.json", "call": _call_provenance},
 }
 
 
@@ -280,10 +289,8 @@ def _judge(step: Dict[str, Any]) -> None:
     if step["key"] == "scholion acmg-scan":
         # The scan refuses without the published ClinVar VCF; said here, before
         # anything runs, rather than as a failed step after the ones before it.
-        env = os.environ.get("SCHOLION_CLINVAR_VCF")
-        found = (bool(env) and Path(env).exists()) or any(
-            (b / "clinvar.vcf.gz").exists() for b in core.genome_bases())
-        if not found:
+        from .coverage import clinvar_path
+        if clinvar_path() is None:
             step["state"], step["why"] = "needs_input", "no_clinvar"
             return
     domain = spec.get("folder")
@@ -295,6 +302,28 @@ def _judge(step: Dict[str, Any]) -> None:
             return
         step["folder"] = str(Path(folder).expanduser())
     step["state"], step["why"] = "ready", None
+
+
+_UNSET = object()
+
+
+def program_prefix(installed: Any = _UNSET) -> str:
+    """How `scholion` has to be spelled on THIS machine: the word itself, or `python3 -m scholion`.
+
+    Every command this product prints is written the way the project names it. On a
+    machine where the package is installed but its console script is not on the PATH —
+    a system Python on macOS, a virtual environment that was never activated — the word
+    `scholion` is not one the shell knows, and a person who copies the line printed to
+    them gets «command not found» instead of the step it promised (owner, 18.09.2026).
+    The commands stay written as they are, in one spelling for every language; what is
+    said, once, is how this machine spells them. `installed` is the answer of the PATH,
+    passed in by the tests so a run does not depend on what the machine happens to have.
+    """
+    found = shutil.which("scholion") if installed is _UNSET else installed
+    if found:
+        return "scholion"
+    python = os.path.basename(sys.executable or "") or "python3"
+    return python + " -m scholion"
 
 
 def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, Any]:

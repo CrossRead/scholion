@@ -168,14 +168,27 @@ def screen(class_key: Optional[str] = None) -> Dict[str, Any]:
     for h in hits:
         by_gene.setdefault(str(h.get("gene") or "").upper(), []).append(h)
 
+    # The scan's weak list names genes read poorly; the coverage table decides
+    # whether a gene was read at all, by the same rule the system entry uses —
+    # a table nobody made is «not measured», never «read» (task 175).
+    from .. import limits as _limits
+    try:
+        table = _limits.callability()
+    except Exception:                                                # noqa: BLE001
+        table = None
     rows: List[Dict[str, Any]] = []
     for gene in row["genes"]:
         spec = panel.get(gene) or {}
+        read, why = (None, None)
+        if scan.get("status") == "ok":
+            read, why = panel_form.bases_read(gene, rows=table or {})
+            if gene in unread:
+                read, why = False, why or "coverage_low"
         rows.append({"gene": gene,
                      "phenotype": _one_language(spec.get("phenotype")) or None,
                      "inheritance": spec.get("inheritance"),
                      "in_panel": gene in panel,
-                     "read": (gene not in unread) if scan.get("status") == "ok" else None,
+                     "read": read, "read_why": why,
                      "findings": len(by_gene.get(gene) or [])})
 
     return {"status": "ok", "mode": "class", "class": row["key"],

@@ -442,6 +442,16 @@ def _method_notes(key: str, spec: Dict[str, Any]) -> List[str]:
     return out
 
 
+def _marker_systems_all() -> Dict[str, List[str]]:
+    from .system_panels import marker_systems_all
+    return marker_systems_all()
+
+
+def _positions_by_marker() -> Dict[str, List[Dict[str, Any]]]:
+    from .system_panels import positions_by_marker
+    return positions_by_marker()
+
+
 def _marker_systems() -> Dict[str, str]:
     """marker → system, asked of the system entry (lazily: it imports this module)."""
     from .system_panels import marker_systems
@@ -553,6 +563,10 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             # a system is reached from the marker, so the key travels with it,
             # read from the one domain file rather than resolved by each face.
             "system": _marker_systems().get(k),
+            # The genetics of this marker (task 199 G): the curated positions
+            # whose expectation names it, static; the state is the card's.
+            "positions": _positions_by_marker().get(k) or [],
+            "systems": _marker_systems_all().get(k) or [],
         })
     # Task 170. The clinician's target stands BESIDE the corridor and touches
     # neither `flag` nor `abnormal`: it is the frame of a treatment, not a
@@ -639,6 +653,16 @@ def _eval_condition(cond: Dict[str, Any]) -> bool:
         return cond["med_class"] in core.active_med_classes()
     if "genome_gap" in cond:
         return cond["genome_gap"] in core.genome_gaps()
+    # Task 200: a test nobody has ever taken. The amino acid panel is read as a
+    # picture, and half of that picture is in urine, in ammonia and in the
+    # cofactors — things a plasma panel cannot say anything about. Such an item
+    # is owed while it is missing and gone the day it is taken, which is what
+    # these two conditions are: `measured` gates the suggestion on the panel
+    # existing at all, `never_measured` keeps it only until the draw.
+    if "never_measured" in cond:
+        return all(_latest_value(k) is None for k in cond["never_measured"])
+    if "measured" in cond:
+        return any(_latest_value(k) is not None for k in cond["measured"])
     return False
 
 

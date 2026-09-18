@@ -105,11 +105,14 @@ from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import CATALOGUES, plural as _plural, t as _t
 from ._helpers import DISCLAIMER, _recent
-from . import panel_form
+from . import panel_form, panel_gate, panel_labs
+from .panel_genotype import _genotype, _has_alignment  # noqa: F401
+from .panel_book import (_attach_local_notes, _groups, _on_demand, _on_demand_card,  # noqa: F401
+                         on_demand_panels, positions_by_marker)
 from .panel_form import KINDS, verdict, verdict_line  # noqa: F401 -- the form's, re-exported
 
 #: The three evidence modes, and they never print alike (brief §5.0).
-MODES = ("monogenic", "common_variant", "pgx")
+MODES = panel_gate.MODES
 #: Classifications that may turn a row into a finding; Moderate carries a caveat.
 FINDING_GRADE = ("Definitive", "Strong", "Moderate")
 #: Never a finding, in any register, whatever the genotype (brief §5.0, rule 1).
@@ -139,7 +142,9 @@ def domains() -> List[Dict[str, Any]]:
         if isinstance(d, dict) and d.get("key"):
             out.append({"key": str(d["key"]), "source": d.get("source") or "labs",
                         "genetic_half": bool(d.get("genetic_half")),
-                        "markers": list(d.get("markers") or []), "why": d.get("why")})
+                        "markers": list(d.get("markers") or []), "why": d.get("why"),
+                        "panel_markers": list(d.get("panel_markers") or []),
+                        "derived": list(d.get("derived") or [])})
     return out
 
 
@@ -178,8 +183,26 @@ def _labels(key: str) -> Dict[str, str]:
 
 
 def marker_systems() -> Dict[str, str]:
-    """marker key → the system whose panel holds it, from the one domain file."""
-    return {m: d["key"] for d in domains() for m in d["markers"]}
+    """marker key → the first system whose score holds it, from the one domain file.
+
+    A marker may count in two systems since 17.09.2026 (homocysteine in
+    inflammation and in amino acids); the first in the file is its home, and
+    `marker_systems_all` names every one.
+    """
+    out: Dict[str, str] = {}
+    for d in domains():
+        for m in d["markers"]:
+            out.setdefault(m, d["key"])
+    return out
+
+
+def marker_systems_all() -> Dict[str, List[str]]:
+    """marker key → every system whose score holds it, in the file's order."""
+    out: Dict[str, List[str]] = {}
+    for d in domains():
+        for m in d["markers"]:
+            out.setdefault(m, []).append(d["key"])
+    return out
 
 
 # ---- the class → system map (layer 4, and the prescription entry's join) ----
@@ -337,10 +360,8 @@ def _finish_base_row(row: Dict[str, Any], scan: Dict[str, Any],
     if not through_clinvar:
         code = clinvar.get("status") or "not_run"
         row["read"], row["read_why"] = False, "clinvar_" + ("not_run" if code == "acmg_scan" else str(code))
-    elif cov.get("state") == "fine":
-        row["read"], row["read_why"] = True, None
     else:
-        row["read"], row["read_why"] = False, "coverage_" + str(cov.get("state") or "not_measured")
+        row["read"], row["read_why"] = panel_form.bases_read(row["gene"], cov)
     hits = clinvar.get("by_gene", {}).get(row["gene"]) or []
     findings, carrier, withheld = 0, False, 0
     for h in hits:
@@ -355,12 +376,30 @@ def _finish_base_row(row: Dict[str, Any], scan: Dict[str, Any],
                                  else clinvar.get("status")),
                       "via": "acmg_scan" if clinvar.get("status") == "acmg_scan" and through_clinvar else None,
                       "hits": len(hits), "withheld": withheld}
+    row["read_state"] = panel_form.read_state(bool(row["read"]), row.get("read_why"))
+    if row["read_state"] == "file_only":
+        # The file read the gene; what is missing is the MEASUREMENT of how
+        # deeply. Calling that «not read» said something false about the file
+        # (owner, 17.09.2026), and the row says the true half instead.
+        row["read"] = True
     row["read_why_text"] = _read_why_text(row.get("read_why"))
+    # A gene whose bases were never measured is not read — and the file still
+    # said something about it. Until 17.09.2026 the row printed the gap and
+    # dropped the answer: after a base grew, a gene waited for a coverage table
+    # (and therefore for an alignment, which not everybody has) before it would
+    # say that the file holds nothing pathogenic in it. What the file says is
+    # said now, with what settles it named beside it — never as «read».
+    if through_clinvar and row["read_state"] == "file_only":
+        row["file_says"] = {"variants": len(hits), "findings": findings, "carrier": carrier}
+        row["file_says_text"] = _t(
+            "system.row.file_says_found" if findings else
+            "system.row.file_says_carrier" if carrier else "system.row.file_says_clear",
+            gene=row["gene"], variants=_plural(findings or len(hits), "count.variants"))
     return row
 
 
 # ---- the curated positions -------------------------------------------------
-_HGVS = re.compile(r"^(NC_\d{6})\.\d+:g\.(\d+)([ACGT])>([ACGT])$")
+_HGVS = panel_gate.HGVS
 
 
 def _loc_from_hgvs(hgvs: str, rsid: str, gene: str) -> Optional[Dict[str, Any]]:
@@ -381,56 +420,6 @@ def _loc_from_hgvs(hgvs: str, rsid: str, gene: str) -> Optional[Dict[str, Any]]:
     chrom = {23: "X", 24: "Y"}.get(n, str(n)) if acc != "NC_012920" else "MT"
     return {"rsid": rsid, "gene": gene, "chrom": chrom, "pos": int(pos),
             "ref": ref, "alt": alt, "source": "hgvs"}
-
-
-def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
-              scan: Dict[str, Any]) -> Dict[str, Any]:
-    """The person's genotype at one position, as a STATE of the named allele.
-
-    absent / het / hom count copies of the allele the author named; a position
-    that was positively read (called, or confirmed against the reference) with
-    no allele named is `risk_allele_not_declared` — read, and no phrase can be
-    chosen for it; everything else is `unread`, with the reader's own reason,
-    because a position with no row in the file is not a reference call.
-    """
-    if scan.get("status") != "ok":
-        return {"state": None, "read": None, "why": scan.get("reason")}
-    from .. import genome
-    from .genomics import _copies_of
-    try:
-        r = genome.lookup(rsid) or {}
-    except Exception as exc:                                         # noqa: BLE001
-        return {"state": "unread", "read": False, "why": type(exc).__name__}
-    res: Optional[Dict[str, Any]] = None
-    if r.get("status") == "ok":
-        res = r.get("result") or {}
-    elif r.get("status") == "unknown_rsid":
-        loc = _loc_from_hgvs(hgvs, rsid, gene)
-        if loc is None:
-            return {"state": "unread", "read": False, "why": "position_not_resolved"}
-        try:
-            res = genome._gt_at(loc) or {}
-        except Exception as exc:                                     # noqa: BLE001
-            return {"state": "unread", "read": False, "why": type(exc).__name__}
-    else:
-        return {"state": "unread", "read": False, "why": r.get("status")}
-    conf = res.get("confidence")
-    out = {"genotype": res.get("genotype"), "confidence": conf, "depth": res.get("depth")}
-    m = _HGVS.match((hgvs or "").strip())
-    ref = m.group(3) if m else None
-    if conf == "called":
-        if not risk_allele:
-            return {**out, "state": "risk_allele_not_declared", "read": True}
-        copies = _copies_of(res.get("genotype") or "", risk_allele)
-        if copies is None:
-            return {**out, "state": "unread", "read": False, "why": "genotype_not_comparable"}
-        return {**out, "state": ("absent", "het", "hom")[min(copies, 2)], "read": True}
-    if conf == "confirmed_ref":
-        if not risk_allele:
-            return {**out, "state": "risk_allele_not_declared", "read": True}
-        same = bool(ref) and ref.upper() == str(risk_allele).upper()
-        return {**out, "state": "hom" if same else "absent", "read": True}
-    return {**out, "state": "unread", "read": False, "why": conf or "no_row"}
 
 
 def _fill_absent(row: Dict[str, Any], geno: Dict[str, Any]) -> str:
@@ -491,6 +480,21 @@ def _expect_check(exp: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]
             "from_date": prev.get("date") if prev else None}
 
 
+def _level_counts(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    """How many positions stand at each level, and how many have none yet."""
+    out: Dict[str, int] = {}
+    for r in rows:
+        if r.get("unit") == "position":
+            k = r.get("level") or "none"
+            out[k] = out.get(k, 0) + 1
+    return out
+
+
+def _levels() -> Optional[Dict[str, Any]]:
+    """The legend of evidence levels, when the build carries one (task 199)."""
+    return {x["level"]: x for x in panel_gate.legend().get("levels") or []} or None
+
+
 def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                   scan: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
     """The clinician's positions through the gate, each with the person's state.
@@ -502,35 +506,20 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
     refused: Dict[str, int] = {}
     rows: List[Dict[str, Any]] = []
     sys_source = panel_form.one_language(spec.get("source"))
+    levels = _levels()
+    has_bam = _has_alignment() if scan.get("status") == "ok" else False
     for p in spec.get("positions") or []:
-        if not isinstance(p, dict):
-            refused["not_a_row"] = refused.get("not_a_row", 0) + 1
-            continue
-        why = None
-        source = panel_form.one_language(p.get("source")) or sys_source
-        mode, kind = p.get("mode"), p.get("kind")
-        exp = p.get("expect") if isinstance(p.get("expect"), dict) else None
-        if not source:
-            why = "no_source"
-        elif not p.get("rsid"):
-            why = "no_rsid"
-        elif mode not in MODES:
-            why = "no_mode"
-        elif kind is not None and kind not in KINDS:
-            why = "bad_kind"
-        elif mode == "monogenic" and not (p.get("classification") and p.get("moi")):
-            why = "monogenic_without_classification_or_moi"
-        elif mode == "common_variant" and not (p.get("effect_size")
-                                              and (p.get("study") or source)):
-            why = "common_variant_without_effect"
-        elif exp is not None and str(exp.get("marker") or "") not in markers:
-            why = "expect_marker_not_in_panel"
+        source = (panel_form.one_language(p.get("source")) if isinstance(p, dict) else "") or sys_source
+        why = panel_gate.refusal(p, markers, sys_source, source, levels,
+                                 links=spec.get("links"))
         if why:
             refused[why] = refused.get(why, 0) + 1
             continue
+        mode, kind = p.get("mode"), p.get("kind")
+        exp = p.get("expect") if isinstance(p.get("expect"), dict) else None
         gene = str(p.get("gene") or "").upper()
         geno = _genotype(str(p["rsid"]), str(p.get("hgvs") or ""), gene,
-                         p.get("risk_allele"), scan)
+                         panel_gate.risk_on_plus(p), scan, panel_gate.locus(p), has_bam=has_bam)
         state = geno.get("state")
         texts = p.get("text") if isinstance(p.get("text"), dict) else {}
         text = None
@@ -539,6 +528,12 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             text = panel_form.one_language(texts.get(state)) or None
             if not text:
                 pending, pending_why = True, "no_text_for_state"
+        elif state == "absent" and geno.get("presumed"):
+            # A presumption about the reference is a presumption about the
+            # absence of a risk: it always turns «unknown» into good news. So the
+            # caveat stands inside the sentence — a footnote is read once, a
+            # conclusion every time (task 201).
+            text = _t("system.row.presumed_absent", gene=gene, rsid=p["rsid"])
         elif state == "absent":
             text = _fill_absent({"gene": gene, "rsid": p["rsid"]}, geno)
         elif state == "risk_allele_not_declared":
@@ -547,7 +542,22 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         carrier = (mode == "monogenic" and state == "het" and moi in RECESSIVE)
         finding = 0
         not_why = None
-        if state in ("het", "hom") and text:
+        presumed = bool(geno.get("presumed"))
+        if presumed and state == "hom":
+            text = _t("system.row.presumed_hom", gene=gene, rsid=p["rsid"])
+        lv = panel_gate.level_of(p, levels)
+        confirm = state in ("het", "hom") and panel_gate.needs_confirmation(p, scan.get("input_profile"))
+        if confirm:
+            # The author's sentence describes a variant that is there; off a chip
+            # it most often is not, so the row says what to do first instead.
+            not_why, text, pending, pending_why = "needs_confirmation", _t(
+                "system.row.needs_confirmation_text", gene=gene, rsid=p["rsid"],
+                input=scan.get("input_profile") or "—"), False, None
+        elif presumed:
+            # A value the reference implies is not a reading: it is shown, and
+            # it is never a finding or a carriership.
+            not_why, carrier = "presumed", False
+        elif state in ("het", "hom") and text:
             if mode == "monogenic":
                 if cls in NOT_A_FINDING or cls not in FINDING_GRADE:
                     not_why = "classification"
@@ -563,25 +573,32 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                 not_why = "kind"
             else:
                 finding = 1
+            if finding and not lv["verdict_allowed"]:
+                # A conclusion is printed at A and B only; a row with no level,
+                # or a lower one, keeps its value and loses the verdict (task 199).
+                finding, not_why = 0, "level"
         row = {"unit": "position", "origin": "curated", "gene": gene, "state": state,
-               "rsid": p["rsid"], "hgvs": p.get("hgvs"), "protein": p.get("protein"),
+               **lv, "evidence": p.get("evidence"), "ladder": panel_gate.ladder(p),
+               "rsid": p["rsid"], "hgvs": p.get("hgvs"), "strand": p.get("strand") or "+", "protein": p.get("protein"),
+               "link": p.get("link"), "link_text": _link_text(p.get("link"), spec.get("links")),
+               "under_load": _under_load(p.get("under_load"), spec.get("load_tests")),
+               "route": _route(p.get("route"), spec.get("routes")),
                "risk_allele": p.get("risk_allele"), "mode": mode, "kind": kind,
                "classification": cls, "moi": moi, "disease": p.get("disease"),
                "effect_size": p.get("effect_size"), "study": p.get("study"),
                "source": source, "submitter": p.get("submitter"),
                "curated_on": p.get("curated_on"), "base_version": p.get("base_version"),
-               # WHO took responsibility for the phrase, not merely whether
-               # somebody did. The file holds `signed_by`; a row with none but
-               # a `note_on_signature` is a draft nobody signed, and that was
-               # the state of ninety-one shipped rows until the owner signed
-               # them on 13.09.2026. The STATE travels on the row and the
-               # wording belongs to the renderer, because the file says it in
-               # one language and a row prints in two. A signer the engine does
-               # not know is NOT treated as a signature: it cannot say who.
-               "signature": _signature(p),
-               "signed_on": p.get("signed_on"),
+               # WHO reviewed the phrase against its source, by role and never
+               # by name (task 199; until then the file held `signed_by`). The
+               # STATE travels on the row and the wording belongs to the
+               # renderer. A role the engine does not know is refused at the
+               # gate, so it never reads as a review.
+               "signature": panel_gate.review_state(p),
+               "signed_on": panel_gate.reviewed_on(p),
+               "review": p.get("review"),
                "text": text, "pending": pending, "pending_why": pending_why,
-               "findings": finding, "not_a_finding_why": not_why, "carrier": carrier,
+               "findings": finding, "not_a_finding_why": not_why, "carrier": carrier and not confirm,
+               "needs_confirmation": confirm,
                "caveat": "moderate" if (finding and cls == "Moderate") else None,
                "genotype": geno, "read": geno.get("read"),
                "read_why": geno.get("why") if geno.get("read") is False else None,
@@ -590,6 +607,13 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                and p["next_step"].get("kind") in BASKETS else None}
         row = panel_form.gene_row(gene, row, scan)
         row["read"] = geno.get("read")          # the position's own reading, not the gene's
+        row["read_state"] = panel_form.read_state(bool(row["read"]), row.get("read_why"))
+        if row["read"] is True and geno.get("depth_unverified"):
+            row["read_state"] = "file_only"
+            row["depth_note"] = _t("system.row.depth_unverified")
+        row["presumed"] = bool(geno.get("presumed"))
+        if row["presumed"]:
+            row["closes_text"] = _closes_text("presumed_ref")
         row["read_why_text"] = _read_why_text(row.get("read_why"))
         rows.append(row)
     # What short reads cannot read in this system — a gene beside its
@@ -611,7 +635,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             continue
         excluded.append({"gene": str(gene).upper(),
                          "reason": panel_form.one_language(e.get("reason")) or None,
-                         "source": src, "signed_on": e.get("signed_on")})
+                         "source": src, "signed_on": panel_gate.reviewed_on(e or {})})
     return {"rows": rows, "refused": refused, "excluded": excluded, "unreadable": unreadable,
             "source": sys_source or None}
 
@@ -738,7 +762,8 @@ def _labs_layer(dom: Dict[str, Any], rd: Optional[Dict[str, Any]],
             # Layer 7 already printed names for the same gap while this layer
             # printed `cholesterol_total` — one card, two spellings of one fact.
             "missing_names": [_marker_name(k) for k in (rd.get("missing") or [])],
-            "stale": stale}
+            "stale": stale, "panel": panel_labs.panel_view(dom, by_key),
+            "panel_term": rd.get("panel")}
 
 
 def _dynamics_layer(rd: Optional[Dict[str, Any]]) -> Dict[str, Any]:
@@ -857,6 +882,49 @@ def _tests_layer(markers: List[str]) -> Dict[str, Any]:
             "empty_why": None if rows else "no_rule_fired"}
 
 
+def _link_text(link, links) -> Optional[str]:
+    """The name of the chain link in the reader's language — the file carries
+    both, because a link is a heading a person reads, not a code."""
+    if not link or not isinstance(links, dict):
+        return None
+    return panel_form.one_language((links.get(link) or {})) or None
+
+
+def _route(block, names) -> Optional[Dict[str, Any]]:
+    """How the same position reads on the three routes protein can arrive by.
+
+    A drip removes the gut and the first pass through the liver; free amino
+    acids remove the digestion of protein and the peptide path and put
+    everything through one transporter. So the same genotype is not equally
+    important on all three, and the row says which — with the basis it rests
+    on, because most of these are mechanism rather than a measured comparison.
+    """
+    if not isinstance(block, dict):
+        return None
+    out = []
+    for name in ("food", "oral_free", "iv"):
+        state = block.get(name)
+        out.append({"route": name,
+                    "route_text": panel_form.one_language((names or {}).get(name) or {}) or name,
+                    "state": state, "state_text": _t("system.panel.route." + str(state))})
+    return {"routes": out, "basis": block.get("basis"), "source": block.get("source")}
+
+
+def _under_load(block, names) -> Optional[Dict[str, Any]]:
+    """A position a fasting corridor cannot answer for: the load that shows it.
+
+    The whole product reads a person at rest (task 200). Where a source says the
+    state is only visible under a load, the position says which load and what it
+    would reveal — and never that the load should be done.
+    """
+    if not isinstance(block, dict):
+        return None
+    test = block.get("test")
+    return {"test": test,
+            "test_text": panel_form.one_language((names or {}).get(test) or {}) or test,
+            "what_it_reveals": panel_form.one_language(block.get("what_it_reveals")) or None}
+
+
 def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
     """One panel position as a state, kept in EVERY register. The patient's
     density withholds the rows where nothing was found, and the page then
@@ -866,6 +934,14 @@ def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
     return {"gene": r.get("gene"), "rsid": r.get("rsid"), "kind": r.get("kind"),
             "state": r.get("state"), "read": r.get("read"), "read_why": r.get("read_why"),
             "read_why_text": r.get("read_why_text"), "text": r.get("text"),
+            "level": r.get("level"), "level_short": r.get("level_short"), "ladder": r.get("ladder"),
+            "link": r.get("link"), "link_text": r.get("link_text"), "under_load": r.get("under_load"),
+            "read_state": r.get("read_state"), "presumed": r.get("presumed"),
+            "closes_text": r.get("closes_text"), "depth_note": r.get("depth_note"),
+            "local_note": r.get("local_note"), "group": r.get("group"),
+            "route": r.get("route"),
+            "not_a_finding_why": r.get("not_a_finding_why"), "needs_confirmation": r.get("needs_confirmation"),
+            "genotype": r.get("genotype"), "unit": "position",
             "expect": {k: ec.get(k) for k in ("marker", "name", "direction", "gap", "position")} if ec else None}
 
 
@@ -915,14 +991,20 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
         if r["gene"] in unreadable_genes and r.get("read") is not False or (
                 r["gene"] in unreadable_genes and r.get("read_why") != "separate_method"):
             r["read"], r["read_why"] = False, "separate_method"
+            r["read_state"] = "unread"
             r["read_why_text"] = _read_why_text("separate_method")
+            r.pop("file_says", None); r.pop("file_says_text", None)
             r["findings"], r["carrier"] = 0, False
     rows += cur["rows"]
     # The panel first — the positions a clinician acts on — and the base list
     # after it; within each, by gene.
     rows.sort(key=lambda r: (r["unit"] != "position", r["gene"], r.get("rsid") or ""))
     v = panel_form.verdict(rows, scan)
+    _attach_local_notes(rows)
+    groups = _groups(key, (_curated().get("systems") or {}).get(key) or {}, rows)
     return {"status": "composed", "rows": rows, "scan": scan,
+            "groups": [g for g in groups if not g.get("refused")],
+            "groups_refused": {g["key"]: g["refused"] for g in groups if g.get("refused")},
             "positions": [_position_state(r) for r in rows if r["unit"] == "position"],
             "base": {**{k: base[k] for k in ("status", "source", "version", "downloaded",
                                                "filter_version")},
@@ -940,8 +1022,10 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             "carrier_count": sum(1 for r in rows if r.get("carrier")),
             "pending_count": sum(1 for r in rows if r.get("pending")),
             "read_genes": sum(1 for r in rows if r.get("unit") != "position" and r.get("read") is True),
+            "depthless_genes": sum(1 for r in rows if r.get("unit") != "position" and r.get("read_state") == "file_only"),
             "read_positions": sum(1 for r in rows if r.get("unit") == "position" and r.get("read") is True),
             "signature_open_count": sum(1 for r in rows if r.get("signature") == "open"),
+            "level_counts": _level_counts(rows),
             "signature_author_count": sum(1 for r in rows if r.get("signature") == "author"),
             "signature_author_date": max([str(r.get("signed_on")) for r in rows
                                           if r.get("signature") == "author" and r.get("signed_on")],
@@ -952,21 +1036,6 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             "clinvar": {"status": clinvar.get("status"), "reason": clinvar.get("reason")},
             "polygenic": poly,
             "verdict": v, "verdict_line": panel_form.verdict_line(v)}
-
-
-#: Who the file may name as the signer of a row, and what the reader is told.
-#: «owner» is the author of the panel — not a clinician, and the card says so.
-SIGNERS = {"owner": "author", "clinician": "clinician"}
-
-
-def _signature(p: Dict[str, Any]) -> Optional[str]:
-    """The state of the row's signature: who signed, or that nobody did."""
-    who = SIGNERS.get(str(p.get("signed_by") or "").strip().lower())
-    if who:
-        return who
-    # An unknown signer is not a signature: the card would have to name whom,
-    # and it cannot. It falls back to the honest state.
-    return "open" if (p.get("note_on_signature") or p.get("signed_by")) else None
 
 
 def _read_why_text(code) -> Optional[str]:
@@ -1255,7 +1324,8 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
 # ---- registers --------------------------------------------------------------
 _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification", "state", "kind",
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
-                "carrier", "caveat", "read", "read_why", "read_why_text", "expect_check",
+                "needs_confirmation", "level", "level_short", "ladder", "carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
+                "link", "link_text", "route", "under_load", "file_says", "file_says_text",
                 "signature", "signed_on")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
@@ -1275,6 +1345,7 @@ def _project(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
     out["rows"] = [{k: r.get(k) for k in _PATIENT_ROW if k in r}
                    for r in gen.get("rows") or []
                    if r.get("findings") or r.get("carrier") or r.get("pending")
+                   or r.get("needs_confirmation")
                    or (r.get("unit") == "position" and r.get("text")
                        and r.get("not_a_finding_why") == "kind")]
     out["rows_withheld_as_detail"] = len(gen.get("rows") or []) - len(out["rows"])
@@ -1345,8 +1416,9 @@ def systems() -> Dict[str, Any]:
                                   "base_version": (_base().get("_meta") or {}).get("export_last_modified")
                                   if b else None,
                                   "read_count": read, "unread_count": unread,
+                                  "depthless_genes": g.get("depthless_genes", 0),
                                   "scan": scan, "polygenic": poly}})
-    return {"status": "ok", "systems": rows, "count": len(rows),
+    return {"status": "ok", "systems": rows, "count": len(rows), "on_demand": on_demand_panels(),
             "why_empty": panel_form.one_language((_curated().get("_meta") or {}).get("why_empty")),
             # The joins the other faces read from here rather than recomputing:
             # a prescription's systems, a gene's systems, a class's systems.
@@ -1361,8 +1433,12 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
     """One system whole: the seven layers, the verdict, the three baskets."""
     dom = _domain(key)
     if dom is None:
+        spec = (_on_demand().get("panels") or {}).get((key or "").strip().lower())
+        if isinstance(spec, dict) and register in REGISTERS:
+            return _on_demand_card((key or "").strip().lower(), spec, register)
         return {"status": "unknown_system", "key": key,
-                "systems": [d["key"] for d in domains()]}
+                "systems": [d["key"] for d in domains()],
+                "on_demand": [p["key"] for p in on_demand_panels()]}
     if register not in REGISTERS:
         # Refused, not defaulted: a plausible register served where a refusal
         # was owed would hand a clinician the patient's density under the
@@ -1379,6 +1455,13 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
     tests = _tests_layer(dom["markers"])
     questions = _questions(gen, labs, tests, by_key, target)
     nxt = _next(dom, gen, labs, tests, questions)
+    # Task 200: what the genotype says about the ROUTE of a correction somebody
+    # has already decided on. It reads the layers above it and decides nothing
+    # about whether to correct — see `engine/routes.py` for the gate.
+    from . import routes as _routes
+    off = any((by_key.get(k) or {}).get("abnormal")
+              for k in list(dom["markers"]) + list(dom.get("panel_markers") or []))
+    correction = _routes.correction_routes_for(dom["key"], by_key, gen.get("rows") or [], off)
     return {"status": "ok", "key": dom["key"], "label": _t("radar.domain." + dom["key"]),
             "labels": _labels(dom["key"]), "register": register,
             "source": dom["source"], "genetic_half": dom["genetic_half"],
@@ -1388,7 +1471,10 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
             "medications": _medications_layer(dom["key"]),
             "target": target,
             "tests": tests, "questions": questions,
+            "correction_routes": correction,
             "verdict": gen["verdict"], "verdict_line": gen["verdict_line"],
+            "unread_line": panel_form.unread_line(gen["verdict"]),
+            "unread": panel_form.unread_block(gen["verdict"]),
             "next": nxt, "disclaimer": DISCLAIMER()}
 
 

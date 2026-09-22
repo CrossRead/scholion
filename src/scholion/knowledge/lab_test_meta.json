@@ -472,6 +472,20 @@
         "ru": "индекс, а не анализ: растёт при воспалении (истощение тетрагидробиоптерина) и у носителей фенилкетонурии — разводит две причины высокого фенилаланина"
       }
     },
+    "aa_ratio_hyp_pro": {
+      "tier": 2,
+      "biomaterial": "serum",
+      "fasting": true,
+      "computed": true,
+      "requires": [
+        "aa_hydroxyproline",
+        "aa_proline"
+      ],
+      "note": {
+        "en": "an index, not an assay; one of the ratios the panel author reads in practice (21.09.2026). No reference range is carried: it is shown as a value",
+        "ru": "индекс, а не анализ; одно из отношений, которыми автор панели пользуется на практике (21.09.2026). Референсного коридора нет — показывается значением"
+      }
+    },
     "aa_ratio_gly_ser": {
       "tier": 2,
       "biomaterial": "serum",

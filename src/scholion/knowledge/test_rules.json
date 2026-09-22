@@ -3,7 +3,8 @@
     "updated": "2026-09-17",
     "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
     "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently; {never_measured:[keys]} — true while none of them was ever measured; {measured:[keys]} — true when any of them was.",
-    "source_tier": "guideline_compiled"
+    "source_tier": "guideline_compiled",
+    "held": "A rule with `held` does not fire: it records a test the reviewer said is not for everyone, until the condition that selects the people it is for is written. The rule's own `when` is kept so the history of what was offered stays readable."
   },
   "rules": [
     {
@@ -479,7 +480,12 @@
         "fecal_elastase"
       ],
       "recheck_months": 12,
-      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
+      "held": {
+        "reason": "the panel author, 21.09.2026: «not always» — elastase is a functional marker of the pancreas and not the only cause of low amino acids; the condition under which it is offered is to be named by her (task 205 G)",
+        "by_role": "panel_author",
+        "on": "2026-09-21"
+      }
     },
     {
       "id": "amino_dimethylarginines",
@@ -523,7 +529,12 @@
         "sdma"
       ],
       "recheck_months": 12,
-      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
+      "held": {
+        "reason": "the panel author, 21.09.2026: «in some cases, not for everyone»; the condition is to be named by her (task 205 G)",
+        "by_role": "panel_author",
+        "on": "2026-09-21"
+      }
     },
     {
       "id": "amino_3_methylhistidine",
@@ -649,7 +660,12 @@
         "homocysteine"
       ],
       "recheck_months": 24,
-      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
+      "held": {
+        "reason": "the panel author, 21.09.2026: «in some cases, not for everyone»; the condition is to be named by her (task 205 G)",
+        "by_role": "panel_author",
+        "on": "2026-09-21"
+      }
     }
   ]
 }

@@ -307,6 +307,10 @@ class TestNoAutomaticSearchLeavesTheDataDirectory(unittest.TestCase):
         # names a candidate for a person to read, never opens it
         "reconcile.py": 1,
         "garmin.py": 1,
+        # `knowledge_dir_local` (task 177): the parent of a profile named
+        # `profile` is the data root it belongs to — it is taken only then, and a
+        # profile of any other name keeps its overlay inside itself.
+        "core.py": 1,
     }
 
     def test_no_new_upward_search_appears_in_the_core(self):

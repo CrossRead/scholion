@@ -689,6 +689,11 @@ def suggest_tests() -> Dict[str, Any]:
     (3 by default) — then it is not an extra order but routine monitoring: it goes down the list."""
     triggered = []
     for rule in core.test_rules().get("rules", []):
+        # A rule the panel author asked to hold (task 205 G): «not for everyone»
+        # is a condition nobody has written yet. Until it is, the rule does not
+        # fire at all — offering the test to everyone is the thing that was refused.
+        if rule.get("held"):
+            continue
         try:
             if _eval_condition(rule["when"]):
                 item = {k: rule[k] for k in ("id", "suggest", "why", "priority", "specialist") if k in rule}

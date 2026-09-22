@@ -40,6 +40,118 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.5 — 21.09.2026
+
+### What you can do now
+
+**The genes a «nothing found» cannot rest on can be handed to a laboratory in one
+step.** `scholion limits --bed` prints them as a BED — worst gene first, each
+interval carrying its percentage — `--out` writes the file, and `--panel` narrows
+it to one panel (ACMG, pharmacogenetics, HLA). The genome tab offers the same file
+under the screen, and an assistant can ask for it. The list existed before; no
+command, page or tool reached it.
+
+**The amino acid panel reads by pathway.** Branched-chain amino acids, the urea
+cycle, methionine metabolism, phenylalanine → tyrosine and the sulphur amino
+acids each show as a group, with how many of its markers were measured. A marker
+stands in every group it belongs to — methionine in both its own cycle and the
+sulphur chain. A group counts nothing: the panel's term in the score is what it
+was.
+
+**Five markers are shown as values only.** β-alanine, β-aminoisobutyric acid,
+aspartate, asparagine and pipecolic acid are printed with their values, say so
+on the line, and no longer enter the panel's share outside its corridor.
+
+**A marker names the ones to read beside it.** Under histidine when it is low,
+under cystathionine when it is high, under phenylalanine always, and so on for
+ten markers: the companions are listed with their values, or as not measured.
+Nothing more is said about what they mean together.
+
+**Hydroxyproline/proline is shown**, computed from a draw that holds both. No
+range is carried for it, so it is a value, not a deviation.
+
+### What is fixed
+
+**Forms from one laboratory lost their dates.** Laboratory forms that print the
+draw as «Дата/время забора» had their markers found and then dropped, because no
+date was recognised. Studies that print their date and kind as one header line —
+a two-digit year, the clock time and the kind in capitals — were stored without a
+date and mostly without a kind. Both are read now. Where a study also prints when
+the examination was done, that is its date rather than the time it was written
+up; a birth date, the print time in a footer and a date inside a recommendation
+are never taken for it, and a two-digit year later than this one is refused
+rather than read as last century.
+
+**Three answers sent a person to a script the package does not carry.** When
+coverage had never been measured, or had been measured before the intervals were
+recorded, the answer said to run a shell script of the source tree — which a
+`pip install` does not have. It names `scholion coverage` now, which has done the
+same measurement from the package for some time.
+
+**A proposed marker name belongs to the profile it was proposed for.** It was
+written beside the data root — in a source checkout, the checkout itself — and
+shared by every profile the same installation was pointed at. It now lives in
+the profile. A proposal an earlier version wrote is read until the next one, and
+moves with it.
+
+**The journal's yes/no factors are the ones the person declared.**
+`scholion focus-log --factor NAME` records any yes/no field `profile/focus.json`
+declares for the journal, the page draws those fields, and the assistant's tool
+takes `factors`. The earlier flag named after one drug still works and is no
+longer listed. The journal analysis names the factor it separates instead of a
+drug.
+
+**Three tests are no longer offered to everyone with an amino acid panel.**
+Faecal elastase, the methionine load and the dimethylarginines were suggested
+whenever the panel was measured and they were not. They are held until the
+conditions that select the people they are for are written; urine urea nitrogen
+stays.
+
+**Under the Ouroboros Hub, `update` no longer installs into the host's Python.**
+The Hub runs a skill in a child of the host's interpreter, so the route «pip in
+the running interpreter» would have changed the host's environment rather than
+the skill's own. Under the Hub the answer now names the host, whose catalogue
+brings the newer build. Through the classic tools module, the MCP server, the
+page and `scholion update` on the command line, updating works as before.
+
+**The note about a newer build no longer ends every answer on a host that starts
+a process per call.** «Once» was kept in the memory of a process. It is now
+remembered beside the registry's answer, so it is said once a day for a given
+release, on every door.
+
+**The Hub manifest says what the package does.** It declares `subprocess` — the
+package starts `bcftools`, `pdftotext`, `pdftoppm` and `tesseract` when they are
+installed — and counts the once-a-day question to PyPI among what goes out. Both
+corrections came from the Hub's maintainer; a test now holds the first, so a
+later manifest cannot drop it.
+
+**No position of an authored list leaves it without a word.** Every position a
+curated list names is now either in the catalogue and on a panel, or waiting,
+with the reason and the work that closes it. The first check of the list of
+29 June 2026 found twelve positions absent with no reason recorded anywhere, and
+thirteen covered only by a note about their whole class; each now carries its
+own. It also found one reason that had outlived its position — the position had
+arrived later — and removed it.
+
+**The ClinVar annotation script is run by the tests in every branch.** The
+branch for a genome with `chr`-named chromosomes stopped once on a variable that
+was never set; each branch is now executed end to end, with the external
+programs replaced by stand-ins.
+
+**A reviewed sentence names a role, never a person or a clinic.** This was
+already how a review was recorded; it is now a rule over everything that
+ships, with a test that fails the build when a clinician or a clinic is named.
+
+### What needs recomputing
+
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if the folder holds forms that print the draw as «Дата/время забора».**
+Their markers were found and dropped for want of a date; they are stored with it now.
+
+**Run `scholion ingest-studies <folder of studies>` — if the folder holds studies whose header is one line of date, time and kind.**
+They were stored without a date and mostly without a kind.
+
+Nothing.
+
 ## v0.5.4 — 17.09.2026
 
 ### What you can do now

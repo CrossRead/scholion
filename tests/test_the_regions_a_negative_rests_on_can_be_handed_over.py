@@ -69,7 +69,7 @@ class TestWhenThereIsNothingToExport(_Profile):
         r = limits.weak_regions_bed()
         self.assertFalse(r["ok"])
         self.assertEqual(r["reason"], "never_computed")
-        self.assertIn("qc_callability.sh", r["note"])
+        self.assertIn("scholion coverage", r["note"])
 
     def test_a_panel_read_above_the_floor_exports_nothing_and_says_why(self):
         self.write(HEAD_NEW, [row("BRCA1", "ACMG", "chr17", 99.4, 100, 200)])
@@ -88,7 +88,7 @@ class TestCoordinatesAreNotInvented(_Profile):
         self.assertEqual(r["reason"], "no_coordinates")
         self.assertEqual(r["genes"], ["BRCA2"])
         self.assertIn("BRCA2", r["note"])
-        self.assertIn("qc_callability.sh", r["note"])
+        self.assertIn("scholion coverage", r["note"])
 
     def test_one_gene_without_coordinates_stops_the_whole_export(self):
         """A partial BED is worse than none: whoever receives it re-reads what it

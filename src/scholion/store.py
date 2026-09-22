@@ -892,7 +892,8 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
 
 @_serialized
 def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
-                    late_meal: bool = False, note: str = "") -> Dict[str, Any]:
+                    late_meal: bool = False, note: str = "",
+                    factors: Optional[List[str]] = None) -> Dict[str, Any]:
     """Add/replace an entry in the episode log (profile/focus_log.json).
 
     An entry of the same date is replaced — as lab points are. An empty entry (nothing
@@ -904,11 +905,20 @@ def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
     p = core.profile_dir() / "focus_log.json"
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
         "_meta": {"what": _t("store.focus_log_what")}, "entries": []}
+    # `factors` names the journal's own yes/no fields (task 176); `atenolol` and
+    # `late_meal` are kept as synonyms for callers written before it.
+    named = [str(f).strip() for f in (factors or []) if str(f).strip()]
+    named += [k for k, on in (("atenolol", atenolol), ("late_meal", late_meal)) if on and k not in named]
+    known = [f["key"] for f in core.focus_factors()]
+    unknown = [f for f in named if f not in known]
+    if unknown:
+        return {"ok": False, "error": _t("store.focus_unknown_factor", factors=", ".join(unknown),
+                                         known=", ".join(known) or "—")}
     entries = [e for e in (data.get("entries") or []) if e.get("date") != date]
-    empty = not (alcohol or atenolol or late_meal or (note or "").strip())
+    empty = not (alcohol or named or (note or "").strip())
     if not empty:
-        entries.append({"date": date, "alcohol": alcohol or "", "atenolol": bool(atenolol),
-                        "late_meal": bool(late_meal), "note": (note or "").strip()})
+        entries.append({"date": date, "alcohol": alcohol or "",
+                        **{k: (k in named) for k in known}, "note": (note or "").strip()})
     entries.sort(key=lambda e: e.get("date") or "")
     data["entries"] = entries
     core.write_json(p, data, indent=1)

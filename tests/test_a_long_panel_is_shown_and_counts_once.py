@@ -101,7 +101,8 @@ class TestThePanelCountsOnce(unittest.TestCase):
         self.assertTrue(d["panel_markers"])
         self.assertFalse(set(d["markers"]) & set(d["panel_markers"]),
                          "a marker is either scored or shown, never both")
-        self.assertEqual(12, len(d["derived"]))
+        # 12 → 13 on 21.09.2026: Hyp:Pro, one of the ratios the panel author reads (task 205 H)
+        self.assertEqual(13, len(d["derived"]))
         self.assertIn("amino_acids", L._RADAR_PANELS)
 
 

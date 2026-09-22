@@ -19,6 +19,7 @@ import os
 import pathlib
 import tempfile
 import unittest
+from unittest import mock
 
 import support  # noqa: F401
 from scholion import core, format as fmt, markers_local as ml
@@ -123,7 +124,8 @@ class TestTheOverlayIsAdditive(_Local):
 
     def test_the_overlay_lives_beside_the_profile_not_in_the_package(self):
         ml.propose("x_marker", names_en=["x marker"])
-        self.assertTrue((pathlib.Path(self.d) / "knowledge" / "lab_markers.local.json").is_file())
+        self.assertTrue((pathlib.Path(self.d) / "profile" / "lab_markers.local.json").is_file())
+        self.assertFalse((pathlib.Path(self.d) / "knowledge" / "lab_markers.local.json").exists())
         pkg = pathlib.Path(core.__file__).resolve().parent / "knowledge" / "lab_markers.json"
         self.assertNotIn("x_marker", pkg.read_text(encoding="utf-8"))
 
@@ -191,3 +193,29 @@ class TestTheSameMechanismCoversThreeKinds(_Local):
     def test_confirm_reaches_any_kind(self):
         ml.propose_unit("glucose", "mg%", factor=0.0555)
         self.assertEqual(ml.confirm("glucose|mg%")["kind"], "units")
+
+
+class TestTheOverlayBelongsToOneProfile(_Local):
+    """Task 177: a proposal about one person's form is that person's, wherever the profile is."""
+
+    def test_a_profile_named_elsewhere_takes_its_overlay_with_it(self):
+        other = pathlib.Path(tempfile.mkdtemp()) / "someone" / "profile"
+        other.mkdir(parents=True)
+        with mock.patch.dict(os.environ, {"SCHOLION_PROFILE_DIR": str(other)}):
+            core.reset_cache()
+            ml.propose("x_marker", names_en=["x marker"])
+            self.assertTrue((other / "lab_markers.local.json").is_file())
+            self.assertFalse((pathlib.Path(self.d) / "profile" / "lab_markers.local.json").exists())
+            self.assertFalse((pathlib.Path(self.d) / "knowledge").exists())
+        core.reset_cache()
+
+    def test_an_overlay_an_earlier_version_left_is_read_and_moved_on_the_next_write(self):
+        legacy = pathlib.Path(self.d) / "knowledge" / "lab_markers.local.json"
+        legacy.parent.mkdir(parents=True)
+        legacy.write_text(json.dumps({"_meta": {}, "markers": {"old_marker": {"unit": "U/L",
+                          "labels": {"en": {"names": ["old marker"]}}}}}), encoding="utf-8")
+        core.reset_cache()
+        self.assertIn("old_marker", core.lab_markers()["markers"])
+        ml.propose("x_marker", names_en=["x marker"])
+        own = json.loads((pathlib.Path(self.d) / "profile" / "lab_markers.local.json").read_text(encoding="utf-8"))
+        self.assertEqual({"old_marker", "x_marker"}, set(own["markers"]))

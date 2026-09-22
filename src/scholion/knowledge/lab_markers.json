@@ -654,6 +654,33 @@
       "ref_sex": "any",
       "ref_age": "any"
     },
+    "aa_ratio_hyp_pro": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "hyp/pro",
+            "hyp:pro",
+            "гидроксипролин/пролин"
+          ],
+          "display": "Гидроксипролин/пролин"
+        },
+        "en": {
+          "display": "Hydroxyproline/proline ratio",
+          "names": [
+            "hyp/pro",
+            "hyp:pro"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
+    },
     "aa_sarcosine": {
       "unit": "umol/L",
       "ref_low": 2.0,

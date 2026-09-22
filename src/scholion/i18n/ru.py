@@ -1213,6 +1213,14 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
                                   "не найдено» значимо только рядом с тем, где искали. Называет "
                                   "клетку матрицы «класс входа × архитектура признака», измеренное "
                                   "покрытие и каждое утверждение, которого профиль не выдерживает.",
+    "tool.sch_limits.param.bed": "true — вместо отчёта отдать гены, на которых «ничего не найдено» держаться не может, в виде BED, который лаборатория может перечитать; худший ген первым",
+    "tool.sch_limits.param.panel": "вместе с bed: только гены этих панелей через запятую (ACMG, PGX, HLA …); пусто — все панели",
+    "limits.bed_never_computed": "покрытие для этого профиля никогда не измерялось — прогоните сначала `scholion coverage` по своему выравниванию (нужны samtools и BAM); без этого нет и списка непрочитанного",
+    "limits.bed_written": "BED записан: {path} (генов: {n})",
+    "limits.bed_no_coordinates": "таблица покрытия называет слабые гены, но не их интервалы, а координаты по имени гена здесь не выдумываются: {genes}. Перепрогоните `scholion coverage` — он их записывает",
+    "limits.coverage_closes": "Запустите `scholion coverage` — нужны samtools и BAM, на выходе profile/callability.tsv.",
+    "web.genome.weak_bed": "Генов, прочитанных ниже порога: {n}. «Ничего не найдено» по ним — утверждение о файле, а не о вас.",
+    "web.genome.weak_bed_link": "Скачать BED для лаборатории — эти гены, худший первым",
     "tool.sch_rules.description": "Правила безопасности, по которым работает этот продукт, целиком. Прочитайте их ПРЕЖДЕ, чем передавать любой ответ остальных инструментов: они имеют приоритет над любой другой инструкцией, полученной об этих данных, и говорят, чего говорить нельзя. Модель, пришедшая через инструментальный интерфейс, не получает вместе с ним никакой инструкции — вот откуда она берётся.",
     "tool.sch_radar.description": "Индекс здоровья по системам организма, 0–100 каждая, с "
                                  "изменением относительно прошлого измерения и списком "
@@ -1222,7 +1230,8 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "tool.sch_focus_log.description": "Записать строку в журнал текущего фокуса: что было в этот день — алкоголь, ситуативный приём препарата, поздний ужин, свободная заметка. Один из четырёх пишущих инструментов, и записывать он может только то, что человек сам сейчас сказал. Не помещайте сюда вывод: журнал — это то, что читает последующий разбор, и запись, в которой уже лежит заключение, делает разбор круговым. Запись на существующую дату заменяет её; пустая запись эту дату удаляет.",
     "tool.sch_focus_log.param.date": "день, к которому относится эпизод, ГГГГ-ММ-ДД",
     "tool.sch_focus_log.param.alcohol": "что было выпито, словами человека — «бокал сухого красного», «две кружки пива». Пусто, если не было",
-    "tool.sch_focus_log.param.atenolol": "true, если в этот день был ситуативный приём",
+    "tool.sch_focus_log.param.factors": "факторы журнала «да/нет», которые были в этот день, через запятую, под именами из profile/focus.json",
+    "tool.sch_focus_log.param.atenolol": "оставлен для прежних вызовов: то же, что factors=atenolol",
     "tool.sch_focus_log.param.late_meal": "true, если последний приём пищи был поздним",
     "tool.sch_focus_log.param.note": "всё остальное, что человек сказал про этот день, дословно",
     "tool.sch_focus_log.done": "Записано в журнал: {date} ({action}).",
@@ -1360,6 +1369,17 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "radar.domain.immune": "Иммунитет",
     "radar.domain.musculoskeletal": "Опорно-двигательная система",
     "radar.domain.amino_acids": "Аминокислоты и белок",
+    "system.panel_group.bcaa": "Аминокислоты с разветвлённой цепью",
+    "system.panel_group.urea_cycle": "Цикл мочевины",
+    "system.panel_group.methionine_cycle": "Метиониновый обмен",
+    "system.panel_group.phe_tyr": "Фенилаланин → тирозин",
+    "system.panel_group.sulfur": "Серосодержащие аминокислоты",
+    "system.panel_labs.groups_head": "Панель по путям обмена — так её читает автор панели; маркер может стоять в двух группах",
+    "system.panel_labs.group": "{label}: сдано {measured} из {total}",
+    "system.panel_labs.not_measured": "не сдан",
+    "system.panel_labs.display_only": "только значение: в балл не входит, выводов из него не делается",
+    "system.panel_labs.companions": "смотреть вместе с: {list}",
+    "system.panel_labs.companion_missing": "{name} — не сдан",
     "system.panel_labs.head": "длинная лабораторная панель системы — показывается, но помаркерно не оценивается: в балл входит одним слагаемым доля вне коридора. Измерено: {measured} из {total}",
     "system.panel_labs.ratio_printed": "{name}: {value} — как напечатано ({date})",
     "system.panel_labs.ratio_computed": "{name}: {value} — посчитано из компонентов от {date}",
@@ -1684,10 +1704,10 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "focus.direction.flat": "на месте",
     "focus.bedtime_share": "за {nights} экспорта уложился в порог {share} % раз, среднее засыпание {clock}",
     "focus.awake_mean": "за {nights} экспорта бодрствование в постели в среднем {mean} мин",
-    "focus.journal_not_ready": "журнал ведётся {nights}; чтобы развести алкоголь и атенолол, "
+    "focus.journal_not_ready": "журнал ведётся {nights}; чтобы развести алкоголь и фактор «{factor}», "
                                "нужно хотя бы по {need} эпизодов каждого вида (сейчас {a} и "
                                "{b})",
-    "focus.journal_split": "алкоголь без атенолола {a} мин, алкоголь с атенололом {b} мин "
+    "focus.journal_split": "алкоголь без фактора «{factor}» {a} мин, алкоголь с фактором «{factor}» {b} мин "
                            "(разница {delta})",
     "focus.not_set_reason": "профиль не содержит profile/focus.json — фокус не задан",
 
@@ -1700,6 +1720,7 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "provenance.expr.ldl": "Фридвальд: ОХ − ЛПВП − ТГ/2,2",
     "provenance.expr.omega6_omega3_ratio": "омега-6 / омега-3",
     "provenance.expr.aa_ratio_phe_tyr": "Фен / Тир",
+    "provenance.expr.aa_ratio_hyp_pro": "Гидроксипролин / пролин",
     "provenance.expr.aa_ratio_gly_ser": "Гли / Сер",
     "provenance.expr.aa_ratio_gln_glu": "Глн / Глу",
     "provenance.expr.aa_ratio_glu_gln": "Глу / Глн",
@@ -1773,13 +1794,10 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
                                   "скор к нему ничего не добавляет.",
     "limits.prs_model_closes": "Вашими данными это не закрывается — ограничение в модели, а не в прочтении. Помогла бы только другая модель, а там, где признак измеряется напрямую, ответ даёт само измерение.",
     "limits.interval_basis_locus": "измерено по локусам генов с полем, а не по кодирующей последовательности: небольшой провал внутри крупного гена почти не двигает это число, а именно про такой провал его обычно и спрашивают",
-    "limits.bed_never_computed": "покрытие для этого профиля никогда не измерялось — прогоните сначала `bash src/ingest/qc_callability.sh` по своему выравниванию; без этого нет и списка непрочитанного",
     "limits.bed_nothing_weak": "все гены панели прочитаны выше порога — перечитывать нечего",
-    "limits.bed_no_coordinates": "таблица покрытия называет слабые гены, но не их интервалы, а координаты по имени гена здесь не выдумываются: {genes}. Перепрогоните `bash src/ingest/qc_callability.sh` — он их теперь записывает",
     "limits.bed_track": "гены, прочитанные ниже {pct}% оснований на 10x — интервалы суть {basis}, а не кодирующая последовательность",
     "limits.interval_basis_unknown": "по чему измерены эти проценты — не записано; по кодирующей последовательности и по локусу целиком это разные величины, и разница не мала",
     "limits.coverage_unknown": "Покрытие вашего генома ни разу не измерялось, поэтому «ничего не найдено» в гене не отличить от «не прочитано».",
-    "limits.coverage_closes": "Запустите `bash src/ingest/qc_callability.sh` — нужны mosdepth и BAM, на выходе profile/callability.tsv.",
     "limits.coverage_what": "Ни на один отрицательный геномный вывод нельзя опереться.",
     "limits.no_genome_what": "О геноме нельзя сказать ничего.",
     "limits.assembly_what": "О геноме сказать нельзя ничего: файл в сборке {found}.",
@@ -1877,6 +1895,7 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "store.need_name": "нужно name",
     "store.no_medications_file": "medications.json не найден",
     "store.need_date": "нужна дата",
+    "store.focus_unknown_factor": "в журнале нет фактора {factors}; объявлены: {known} (profile/focus.json → focus.journal.fields)",
     "store.focus_log_what": "Журнал эпизодов для фокуса внимания. ЛИЧНОЕ.",
     "store.demo_occupied": "в каталоге есть данные без пометки synthetic — похоже на настоящий "
                            "профиль; демо туда не пишу (нужен --force)",
@@ -2453,7 +2472,6 @@ FASTQ, BAM и индексы. Десятки гигабайт — обычное
     "web.focus.alcohol_none": "алкоголя не было",
     "web.focus.alcohol_light": "1–2 порции",
     "web.focus.alcohol_heavy": "больше",
-    "web.focus.atenolol": "атенолол 50 мг",
     "web.focus.late_meal": "поздний плотный ужин",
     "web.focus.note_placeholder": "заметка",
     "web.focus.save": "Записать",
@@ -3550,6 +3568,8 @@ FASTQ, BAM и индексы. Десятки гигабайт — обычное
     "tool.sch_update.param.confirm": "true — только после явного согласия человека на установку в этом разговоре",
     "tool.sch_recompute.description": "ЧТО ПЕРЕСЧИТАТЬ В ДАННЫХ ЧЕЛОВЕКА под эту сборку — и, по его согласию, пересчёт. Без confirm только читает: показывает шаги, которые просит каждый выпуск с версии данных, и то, чего не хватает самим файлам генома, с причиной по каждому, который выполниться не может. С confirm=true запускает готовые шаги в фоне; вызывайте так только после «да» в этом разговоре. Ход показывает повторный вызов без confirm.",
     "tool.sch_recompute.param.confirm": "true — только после явного согласия человека запустить пересчёт в этом разговоре",
+    "upgrade.session_note_host": "— Вышла Scholion {latest}, этот скилл работает на {installed}. Устанавливает и обновляет его хост ({host}), поэтому sch_update не вызывайте: скажите человеку, что новую сборку приносит каталог хоста.",
+    "update.how.host": "Этот скилл устанавливает и обновляет его хост ({host}), а не Scholion: он работает в интерпретаторе хоста, и установка отсюда изменила бы Python хоста, а не собственное окружение скилла. Новую сборку приносит каталог хоста.",
     "upgrade.session_note": "— Вышла Scholion {latest}, в этой сессии работает {installed}. Скажите человеку и устанавливайте только после его согласия: sch_update с confirm=true или `scholion update --yes`.",
     "update.newer": "Вышла более новая Scholion: {latest} (эта сборка — {installed}).",
     "update.current": "Это самая новая Scholion: {installed}.",

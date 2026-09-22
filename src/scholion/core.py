@@ -1217,14 +1217,30 @@ def lab_test_meta() -> Dict[str, Any]:
 
 
 def markers_overlay_path() -> Path:
-    """Where locally added marker entries live: <data>/knowledge/lab_markers.local.json.
+    """Where locally added marker entries live: beside the profile, in the profile.
 
     A separate file, never the shipped one. The overlay is how the dictionary
     grows from the person in front of it without the build lying about what it
     ships: an entry here is theirs until somebody reviews it, and an upgrade
     cannot silently overwrite or silently keep it.
+
+    Until 0.5.5 it lived in `<data root>/knowledge/`, and the data root of a
+    source checkout is the checkout itself: a proposal a model made about one
+    person's form was written into the repository's root, kept out of git by one
+    line of `.gitignore` and nothing else, and shared by every profile the same
+    tree was pointed at with SCHOLION_PROFILE_DIR (task 177). Inside the profile
+    it belongs to one person, travels with that person's data, and is behind the
+    three guards every profile file is behind.
     """
-    return knowledge_dir_local() / "lab_markers.local.json"
+    return profile_dir() / "lab_markers.local.json"
+
+
+def markers_overlay_read_path() -> Path:
+    """The overlay to read: the profile's own, or — until the first write — the one
+    an earlier version left at the data root, so no proposal is lost by the move."""
+    own = markers_overlay_path()
+    legacy = knowledge_dir_local() / "lab_markers.local.json"
+    return own if own.is_file() or not legacy.is_file() else legacy
 
 
 def lab_markers() -> Dict[str, Any]:
@@ -1244,7 +1260,7 @@ def lab_markers() -> Dict[str, Any]:
     `ref_sex_unknown`: keep the number, withhold the claim.
     """
     base = _read_knowledge("lab_markers.json")
-    p = markers_overlay_path()
+    p = markers_overlay_read_path()
     try:
         if not p.is_file():
             return base
@@ -1610,6 +1626,32 @@ def focus_src() -> Dict[str, Any]:
     concentrated on right now. Curated wording and levers; the numbers the engine takes live."""
     p = profile_dir() / "focus.json"
     return read_profile_json(p) if p.exists() else {}
+
+
+#: The yes/no fields a journal had before a profile could declare its own (task 176).
+_LEGACY_FACTORS = ("atenolol", "late_meal")
+
+
+def focus_factors() -> List[Dict[str, Any]]:
+    """The yes/no factors the focus journal declares, as `[{key, label}]`.
+
+    Read from `profile/focus.json` → `focus.journal.fields`, the entries whose
+    type is bool. Two spellings are in use — `key`/`type` and `id`/`kind` — and
+    both are read. A journal that declares none gets the two the product used to
+    hard-code, so an older profile keeps what it had. The set is the person's:
+    which drug they take as needed, and whether they log it, is not the build's
+    business, and until 0.5.5 a public command-line flag was named after one
+    person's prescription (task 176).
+    """
+    f = (focus_src().get("focus") or {})
+    out = []
+    for x in ((f.get("journal") or {}).get("fields") or []):
+        if not isinstance(x, dict):
+            continue
+        key = x.get("key") or x.get("id")
+        if key and (x.get("type") or x.get("kind")) == "bool":
+            out.append({"key": str(key), "label": x.get("label") or str(key)})
+    return out or [{"key": k, "label": k} for k in _LEGACY_FACTORS]
 
 
 def focus_log() -> Dict[str, Any]:

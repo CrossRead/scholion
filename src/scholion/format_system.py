@@ -432,9 +432,42 @@ def _panel_lines(panel: Optional[Dict[str, Any]]) -> List[str]:
         return []
     L = ["   " + _t("system.panel_labs.head", measured=len(panel.get("markers") or []),
                     total=panel.get("total") or 0)]
+    by_key = {m["key"]: m for m in panel.get("markers") or []}
+
+    def marker(m: Dict[str, Any], pad: str) -> List[str]:
+        out = [f"{pad}{_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} {m.get('unit') or ''}"
+               f" ({m.get('date') or '—'})"
+               + (" — " + _t("system.panel_labs.display_only") if m.get("display_only") else "")]
+        comp = m.get("companions") or []
+        if comp:
+            out.append(pad + "  " + _t("system.panel_labs.companions", list="; ".join(
+                f"{c['name']} {c['value']} {c.get('unit') or ''}".rstrip() if c.get("measured")
+                else _t("system.panel_labs.companion_missing", name=c["name"]) for c in comp)))
+        return out
+
+    grouped = set()
+    if panel.get("groups"):
+        L.append("   " + _t("system.panel_labs.groups_head"))
+        for g in panel["groups"]:
+            L.append("   ▸ " + _t("system.panel_labs.group", label=g["label"], measured=g["measured"], total=g["total"]))
+            for x in g["members"]:
+                grouped.add(x["key"])
+                if not g["measured"]:
+                    continue          # «measured 0 of N» already says it; N empty lines would not
+                if x["key"] in by_key:
+                    L += marker(by_key[x["key"]], "      ")
+                elif x.get("measured"):
+                    L.append(f"      {_flag_icon(x.get('flag'))} {x['name']}: {x['value']} {x.get('unit') or ''}"
+                             f" ({x.get('date') or '—'})")
+                else:
+                    L.append(f"      · {x['name']} — " + _t("system.panel_labs.not_measured"))
+            for r in g.get("ratios") or []:
+                if r.get("origin") in ("printed", "computed"):
+                    L.append("      · " + _t("system.panel_labs.ratio_" + r["origin"], name=r.get("name") or r["key"],
+                                               value=r.get("value"), date=r.get("date") or "—"))
     for m in panel.get("markers") or []:
-        L.append(f"   {_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} {m.get('unit') or ''}"
-                 f" ({m.get('date') or '—'})")
+        if m["key"] not in grouped:
+            L += marker(m, "   ")
     for x in panel.get("ratios") or []:
         if x.get("origin") in ("printed", "computed"):
             L.append("   · " + _t("system.panel_labs.ratio_" + x["origin"], name=x.get("name") or x["key"],

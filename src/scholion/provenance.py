@@ -78,6 +78,7 @@ DERIVED: Dict[str, Dict[str, Any]] = {
     # that does not gets the ratio computed. None of these is strict: a
     # laboratory may round its components before dividing.
     "aa_ratio_phe_tyr": _ratio("aa_phenylalanine", "aa_tyrosine", "provenance.expr.aa_ratio_phe_tyr"),
+    "aa_ratio_hyp_pro": _ratio("aa_hydroxyproline", "aa_proline", "provenance.expr.aa_ratio_hyp_pro"),
     "aa_ratio_gly_ser": _ratio("aa_glycine", "aa_serine", "provenance.expr.aa_ratio_gly_ser"),
     "aa_ratio_gln_glu": _ratio("aa_glutamine", "aa_glutamate", "provenance.expr.aa_ratio_gln_glu"),
     "aa_ratio_glu_gln": _ratio("aa_glutamate", "aa_glutamine", "provenance.expr.aa_ratio_glu_gln"),

@@ -362,8 +362,15 @@ def build_parser() -> argparse.ArgumentParser:
                    help="the state of the genome base: is the VCF connected, is there an index, gaps")
     sub.add_parser("genome-updates", parents=[common],
                    help="what the latest check against a fresh ClinVar has brought")
-    sub.add_parser("limits", parents=[common],
-                   help="what cannot be said from this data, why, and what would close it")
+    lp = sub.add_parser("limits", parents=[common],
+                        help="what cannot be said from this data, why, and what would close it")
+    # Task 5. The weak list existed as a BED since 0.4.8 and no door reached it.
+    lp.add_argument("--bed", action="store_true",
+                    help="the genes a «nothing found» cannot rest on, as a BED a laboratory can re-read")
+    lp.add_argument("--panel", action="append", default=[],
+                    help="only genes of this panel (ACMG, PGX, HLA …); repeatable, or comma-separated")
+    lp.add_argument("--out", default="",
+                    help="write the BED to this file instead of printing it")
     sub.add_parser("evidence-levels", parents=[common],
                    help="the legend of evidence levels A–E carried by every genetic statement")
     sub.add_parser("markers", parents=[common],
@@ -434,7 +441,13 @@ def build_parser() -> argparse.ArgumentParser:
     fl = sub.add_parser("focus-log", parents=[common],
                         help="mark an episode for the focus of attention (alcohol, a drug, a late dinner)")
     fl.add_argument("date", help="YYYY-MM-DD")
-    fl.add_argument("--alcohol", default=""); fl.add_argument("--atenolol", action="store_true")
+    fl.add_argument("--alcohol", default="")
+    # The yes/no factors are the journal's own, declared in profile/focus.json
+    # (task 176). `--atenolol` named one person's prescription in a public command;
+    # it stays as a synonym of `--factor atenolol` and is no longer listed.
+    fl.add_argument("--factor", action="append", default=[], metavar="NAME",
+                    help="a yes/no factor of the journal, as profile/focus.json names it; repeat for several")
+    fl.add_argument("--atenolol", action="store_true", help=argparse.SUPPRESS)
     fl.add_argument("--late-meal", action="store_true"); fl.add_argument("--note", default="")
 
     # A target the treating clinician set, kept beside the laboratory corridor
@@ -871,7 +884,16 @@ def _main(argv=None) -> int:
         res, render = engine.genome_updates(), fmt.genome_updates_report
     elif args.cmd == "limits":
         from . import limits as _lim
-        res, render = _lim.report(), fmt.limits_report
+        if args.bed:
+            panels = [x.strip() for v in args.panel for x in v.split(",") if x.strip()]
+            res = _lim.weak_regions_bed(panels)
+            if res.get("ok") and res.get("bed") and args.out:
+                out = Path(args.out).expanduser()
+                out.write_text(res["bed"], encoding="utf-8")
+                res = {**res, "written": str(out)}
+            render = fmt.weak_bed_report
+        else:
+            res, render = _lim.report(), fmt.limits_report
     elif args.cmd == "evidence-levels":
         from .engine import panel_gate as _pg
         res, render = _pg.legend(), fmt.evidence_levels_report
@@ -914,7 +936,7 @@ def _main(argv=None) -> int:
     elif args.cmd == "focus-log":
         from . import store as _st
         res = _st.add_focus_entry(args.date, alcohol=args.alcohol, atenolol=args.atenolol,
-                                  late_meal=args.late_meal, note=args.note)
+                                  late_meal=args.late_meal, note=args.note, factors=args.factor)
         render = fmt.write_result
     elif args.cmd == "target":
         from . import store as _st
@@ -1186,6 +1208,10 @@ def _main(argv=None) -> int:
         # tell the two apart without parsing the text (task 124).
         return 1
     if args.cmd in ("genotype-sites", "coverage") and not res.get("ok"):
+        return 1
+    if args.cmd == "limits" and args.bed and not res.get("ok"):
+        # `scholion limits --bed > weak.bed` must not leave a refusal sentence
+        # in a file a laboratory will read as intervals.
         return 1
     if args.cmd == "recompute" and res.get("started") and not res.get("ok"):
         return 1

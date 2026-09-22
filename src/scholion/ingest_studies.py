@@ -21,7 +21,7 @@ import os
 import re
 import datetime as _dt
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import core
 from .i18n import t as _t
@@ -35,7 +35,17 @@ _LAB = re.compile(r"референсн|единиц[аы]\s+измерени|б�
                   re.I | re.M)
 # «Дата: DD.MM.YYYY», «Дата обследования: DD.MM.YYYY», «Дата исследования …».
 # The birth date is excluded explicitly — it stands higher up and used to match first.
-_DATE = re.compile(r"Дата(?!\s+рождения)(?:\s+\w+)?\s*:?\s*(\d{2})[.\-/](\d{2})[.\-/](\d{4})")
+# «Дата/время: DD.MM.YYYY HH:MM:SS» — the time the examination was done, printed
+# under the header by one laboratory's forms — is the same statement and is read the same way.
+_DATE = re.compile(r"Дата(?!\s+рождения)(?:\s*/\s*время)?(?:\s+\w+)?\s*:?\s*(\d{2})[.\-/](\d{2})[.\-/](\d{4})")
+#: One laboratory prints the kind and the time of a document as ONE header line —
+#: «04.10.23 14:15 ВЕЛОЭРГОМЕТРИЯ РЕЗУЛЬТАТ»: a two-digit year, the clock time, the
+#: kind in capitals, and «РЕЗУЛЬТАТ» on most of them (task 115). Every study of
+#: that clinic came out with no date at all and most with no kind. Anchored to the
+#: line and to the clock time on purpose, so a date inside a recommendation
+#: («через 2 месяца (18.09.24 г)») is never mistaken for it.
+_HEADER = re.compile(r"^[ \t]*(\d{2})\.(\d{2})\.(\d{2})[ \t]+\d{1,2}:\d{2}[ \t]+"
+                     r"([А-ЯЁ][А-ЯЁ0-9 ,\-()]{1,80}?)(?:[ \t]+РЕЗУЛЬТАТ)?[ \t]*$", re.M)
 # The kind of study is looked for BY KEYWORDS in the header, not as «the first row in caps»:
 # the fallback «first row in upper case» caught the radiographer's signature and the row
 # «Консультация невролога» out of the block of recommendations.
@@ -171,7 +181,7 @@ def decline_reason(text: str, study: Optional[Dict[str, Any]]) -> Optional[str]:
         return None
     if _LAB.search(text) and not _KIND.search(text):
         return REASON_LAB_FORM
-    if _CONCL.search(text) or _KIND.search(text):
+    if _CONCL.search(text) or _KIND.search(text) or _HEADER.search(text):
         return REASON_NOT_EXTRACTED
     return REASON_UNCLASSIFIED
 
@@ -207,6 +217,22 @@ def looks_like_conclusion(text: str) -> bool:
     return bool(_CONCL.search(text))
 
 
+def _header(text: str) -> Tuple[Optional[str], str]:
+    """(date, kind) from a one-line header of date, time and kind, or (None, "") when there is none.
+
+    The century is not guessed past what is possible: a two-digit year later than
+    this one is not a date this document can carry, and it is refused rather than
+    read as 19xx.
+    """
+    m = _HEADER.search(text or "")
+    if not m:
+        return None, ""
+    kind = _clean(m.group(4))
+    if int(m.group(3)) > _dt.date.today().year % 100:
+        return None, kind
+    return f"20{m.group(3)}-{m.group(2)}-{m.group(1)}", kind
+
+
 def parse_study(text: str, source: str = "") -> Optional[Dict[str, Any]]:
     """Extract the date, the kind, the doctor, the conclusion and the recommendations."""
     if not looks_like_conclusion(text):
@@ -215,6 +241,14 @@ def parse_study(text: str, source: str = "") -> Optional[Dict[str, Any]]:
     date = f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
     k = _KIND.search(text)
     kind = _clean(k.group(1)) if k else ""
+    h_date, h_kind = _header(text)
+    # The «Дата/время» line is when the examination was done; the header is when
+    # the document was written, sometimes two days later. The first wins.
+    date = date or h_date
+    # The header is the document's own title. A keyword match can land on a line
+    # of the findings («МРТ-признаков …»), and where the clinic names the document
+    # itself, that name is the better one.
+    kind = h_kind or kind
     area = _AREA.search(text)
     if not area:
         # In ultrasound protocols the organ stands on the NEXT row after the heading, in caps

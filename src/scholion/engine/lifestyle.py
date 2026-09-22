@@ -68,7 +68,10 @@ _RADAR_DOMAINS = _radar_domains_from_knowledge()
 #: the share of them outside their corridor enters the score as ONE term, so a
 #: panel that has drifted shows at the top level without thirty corridors
 #: outvoting the system's own markers (owner, 17.09.2026).
-_RADAR_PANELS = {str(d.get("key")): list(d.get("panel_markers") or [])
+#: Markers the panel author reads as values only (task 205 D) are shown and never
+#: judged: an arrow on them would be a statement the author declined to make.
+_RADAR_PANELS = {str(d.get("key")): [k for k in (d.get("panel_markers") or [])
+                                     if k not in set(d.get("display_only") or [])]
                  for d in (core._read_knowledge("radar_domains.json") or {}).get("domains") or []
                  if isinstance(d, dict) and d.get("panel_markers")}
 
@@ -920,7 +923,8 @@ def _focus_clock(mins: Optional[float]) -> str:
 
 
 def _focus_journal_split(window: int = 120) -> Dict[str, Any]:
-    """Separate the superimposed factors with the journal: clean / alcohol / alcohol + atenolol.
+    """Separate the superimposed factors with the journal: clean / alcohol / alcohol + a factor —
+    the journal's own (task 176): `journal.split_factor`, or its first yes/no field.
 
     The point of this computation is not to "prove harm" but to SEPARATE what is inseparable
     in passive data: the drug is taken on exactly the evenings when there is alcohol.
@@ -928,26 +932,28 @@ def _focus_journal_split(window: int = 120) -> Dict[str, Any]:
     """
     entries = {e.get("date"): e for e in (core.focus_log().get("entries") or []) if e.get("date")}
     nights = {n["date"]: n for n in _focus_nights(window)}
-    groups: Dict[str, List[float]] = {"clean": [], "alcohol": [], "alcohol_atenolol": []}
+    fs, want = core.focus_factors(), ((core.focus_src().get("focus") or {}).get("journal") or {}).get("split_factor")
+    fac = next((f for f in fs if f["key"] == want), None) or (fs[0] if fs else {"key": "", "label": ""})
+    groups: Dict[str, List[float]] = {"clean": [], "alcohol": [], "alcohol_factor": []}
     for date, n in nights.items():
         e = entries.get(date) or {}
         alc = bool(e.get("alcohol"))
-        aten = bool(e.get("atenolol"))
-        key = "alcohol_atenolol" if (alc and aten) else "alcohol" if alc else "clean"
+        key = "alcohol_factor" if (alc and fac["key"] and e.get(fac["key"])) else "alcohol" if alc else "clean"
         groups[key].append(n["deep_min"])
     logged = sum(1 for d in entries if d in nights)
     res = {"kind": "journal", "window": window, "logged_nights": logged,
+           "factor": fac["key"], "factor_label": fac["label"],
            "groups": [{"id": k, "n": len(v), "mean": _focus_mean(v)} for k, v in groups.items()]}
     need = 8
-    if len(groups["alcohol"]) < need or len(groups["alcohol_atenolol"]) < need:
+    if len(groups["alcohol"]) < need or len(groups["alcohol_factor"]) < need:
         res["ready"] = False
-        res["text"] = _t("focus.journal_not_ready",
+        res["text"] = _t("focus.journal_not_ready", factor=fac["label"],
                          nights=_plural(logged, "count.nights"), need=need,
-                         a=len(groups['alcohol']), b=len(groups['alcohol_atenolol']))
+                         a=len(groups['alcohol']), b=len(groups['alcohol_factor']))
     else:
         res["ready"] = True
-        a, b = _focus_mean(groups["alcohol"]), _focus_mean(groups["alcohol_atenolol"])
-        res["text"] = _t("focus.journal_split", a=a, b=b,
+        a, b = _focus_mean(groups["alcohol"]), _focus_mean(groups["alcohol_factor"])
+        res["text"] = _t("focus.journal_split", a=a, b=b, factor=fac["label"],
                          delta=round((b or 0) - (a or 0), 1))
     return res
 
@@ -993,7 +999,7 @@ def focus_dashboard() -> Dict[str, Any]:
             "why": f.get("why") or "",
             "metric": _focus_metric(f.get("metric") or {}),
             "levers": levers,
-            "journal": {**jr, "state": split},
+            "journal": {**jr, "state": split, "factors": core.focus_factors()},
             "questions": f.get("questions") or [],
             "evidence": _focus_evidence(),
             # The owner's four goals (2026-08-14). The main task stays in `focus`,

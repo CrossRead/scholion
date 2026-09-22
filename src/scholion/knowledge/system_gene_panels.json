@@ -49,8 +49,7 @@
       "rs387906896": "immune: NCSTN has no GenCC assertion in the base",
       "rs373740199": "immune: RTEL1 has no GenCC assertion in the base",
       "rs770066110": "immune: TERT has no GenCC assertion in the base",
-      "rs769471844": "immune: TMC6 has no GenCC assertion in the base",
-      "rs1800790": "cardio: not resolved by Ensembl"
+      "rs769471844": "immune: TMC6 has no GenCC assertion in the base"
     }
   },
   "systems": {

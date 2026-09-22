@@ -258,8 +258,12 @@ def _h_rules(ctx: "ToolContext") -> str:
         return _t("skill.file_missing", path=str(path))
 
 
-def _h_limits(ctx: "ToolContext") -> str:
+def _h_limits(ctx: "ToolContext", bed: bool = False, panel: str = "") -> str:
     from scholion import limits as _lim  # noqa: E402
+    a = _args(ctx, {"bed": bed, "panel": panel})
+    if a.get("bed"):
+        panels = [x.strip() for x in str(a.get("panel") or "").split(",") if x.strip()]
+        return fmt.weak_bed_report(_lim.weak_regions_bed(panels))
     return fmt.limits_report(_lim.report())
 
 
@@ -271,7 +275,7 @@ def _h_focus(ctx: "ToolContext") -> str:
 
 
 def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol: bool = False,
-                 late_meal: bool = False, note: str = "") -> str:
+                 late_meal: bool = False, note: str = "", factors: str = "") -> str:
     """The one tool that writes. See `contract.DICTATED` for why it may.
 
     It records what the person said happened — a glass of wine, a late meal, a
@@ -281,14 +285,15 @@ def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol
     """
     from . import store
     a = _args(ctx, {"date": date, "alcohol": alcohol, "atenolol": atenolol,
-                    "late_meal": late_meal, "note": note})
+                    "late_meal": late_meal, "note": note, "factors": factors})
     date = (a.get("date") or "").strip()
     res = store.add_focus_entry(
         date,
         alcohol=(a.get("alcohol") or "").strip(),
         atenolol=bool(a.get("atenolol")),
         late_meal=bool(a.get("late_meal")),
-        note=(a.get("note") or "").strip())
+        note=(a.get("note") or "").strip(),
+        factors=[x.strip() for x in str(a.get("factors") or "").split(",") if x.strip()])
     if not res.get("ok"):
         return f"⚠️ {res.get('error', '')}"
     return _t("tool.sch_focus_log.done", date=date, action=res.get("action", ""))
@@ -376,7 +381,7 @@ _TOOLS = (
     ("sch_ingest_labs", ("folder",), ["folder"], _h_ingest_labs),
     ("sch_overview", (), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
-    ("sch_limits", (), [], _h_limits),
+    ("sch_limits", ("bed", "panel"), [], _h_limits),
     ("sch_rules", (), [], _h_rules),
     ("sch_sources", (), [], _h_sources),
     ("sch_lab_draw", ("day", "reason", "between"), ["day"], _h_lab_draw),
@@ -386,7 +391,7 @@ _TOOLS = (
     ("sch_flag_rate", (), [], _h_flag_rate),
     ("sch_radar", (), [], _h_radar),
     ("sch_focus", (), [], _h_focus),
-    ("sch_focus_log", ("date", "alcohol", "atenolol", "late_meal", "note"), ["date"],
+    ("sch_focus_log", ("date", "alcohol", "factors", "atenolol", "late_meal", "note"), ["date"],
      _h_focus_log),
     ("sch_brief", (), [], _h_brief),
     ("sch_acmg", (), [], _h_acmg),
@@ -401,7 +406,8 @@ _TOOLS = (
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean"}
+_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
+               "bed": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:

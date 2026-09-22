@@ -47,6 +47,8 @@ PARITY: Dict[str, str] = {
     "GET /api/prescription-check": "prescription",
     "GET /api/medications": "medications",
     "GET /api/limits": "limits",
+    # `limits --bed`: the genes a negative cannot rest on, as a BED (task 5).
+    "GET /api/limits/bed": "limits",
     "GET /api/evidence-levels": "evidence-levels",
     "GET /api/markers": "markers",
     "GET /api/metrics": "metrics",

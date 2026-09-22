@@ -80,7 +80,10 @@ _ROW_LOWER = re.compile(r"(?:>|\bболее\b)\s*(" + _NUM_ANY + r")", re.IGNORE
 # Different labs label the draw date differently: «Дата взятия биоматериала»
 # (Invitro/Medgorod), «Взятие биоматериала: DD.MM.YYYY HH:MM» (DNKOM/Gemotest).
 # If it goes unrecognised, the form silently drops out of both ingest and reconcile.
-_DATE = re.compile(r"(?:Дата\s+взятия|Взятие\s+биоматериала|Дата\s+забора|Забор\s+биоматериала)[^\d]*(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
+# «Дата/время забора: DD.MM.YYYY HH:MM:SS» (one laboratory's forms) joined on 21.09.2026 (task
+# 115): its forms were read, their markers found, and every one dropped for want
+# of a date — seven files, twenty-two values.
+_DATE = re.compile(r"(?:Дата\s+взятия|Взятие\s+биоматериала|Дата\s+забора|Дата\s*/\s*время\s+забора|Забор\s+биоматериала)[^\d]*(\d{2})\.(\d{2})\.(\d{4})", re.IGNORECASE)
 # The CLOCK TIME of the draw, when the form prints one right after the date.
 #
 # Until now a point was stored at month granularity, so two draws on one day

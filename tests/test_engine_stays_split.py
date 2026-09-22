@@ -302,7 +302,11 @@ LINE_BUDGETS = {
     # impersonal review, the evidence legend — split out of system_panels.
     "panel_gate": 330,
     # A system's long laboratory panel, shown and never scored (task 200).
-    "panel_labs": 120,
+    # 120 → 190 on 21.09.2026 (task 205 D, E): the panel author's pathway groups,
+    # value-only markers and companion markers. A split was tried and undone: a
+    # new module has no accepted reach number until the suite is measured on the
+    # machine the baseline belongs to, and this is one reading of one panel.
+    "panel_labs": 190,
     # task 200: the correction-route block — a curated object, its gate and its
     # grouping; the rules themselves live in knowledge/, not here
     "routes": 230,

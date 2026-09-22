@@ -207,6 +207,17 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _download(self, text: str, filename: str):
+        """A text file the browser saves rather than shows (a BED for a laboratory)."""
+        raw = text.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
+        self.end_headers()
+        self.wfile.write(raw)
+
     def _html(self, text: str):
         """A page this build composed, as opposed to a file it hands over."""
         raw = text.encode("utf-8")
@@ -384,6 +395,16 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/limits":
                 from . import limits as _lim
                 return self._json(_lim.report())
+            if p == "/api/limits/bed":
+                # Task 5: the same list the command writes. JSON by default so
+                # the page can say what it holds before offering it; `?download=1`
+                # is the file itself, named for the person who will receive it.
+                from . import limits as _lim
+                panels = [x.strip() for v in q.get("panel", []) for x in v.split(",") if x.strip()]
+                res = _lim.weak_regions_bed(panels)
+                if (q.get("download") or [""])[0] == "1" and res.get("ok") and res.get("bed"):
+                    return self._download(res["bed"], "scholion_weak_genes.bed")
+                return self._json(res)
             if p == "/api/evidence-levels":
                 from .engine import panel_gate as _pg
                 return self._json(_pg.legend())
@@ -538,7 +559,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(store.add_focus_entry(
                     body.get("date", ""), alcohol=body.get("alcohol") or "",
                     atenolol=bool(body.get("atenolol")), late_meal=bool(body.get("late_meal")),
-                    note=body.get("note") or ""))
+                    note=body.get("note") or "",
+                    factors=[str(x) for x in (body.get("factors") or []) if isinstance(x, str)]))
             if u.path == "/api/metrics/profile":
                 return self._json(store.update_metric_profile(body))
             if u.path == "/api/pick-folder":

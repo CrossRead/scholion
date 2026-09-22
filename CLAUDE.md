@@ -115,6 +115,15 @@ notice — its text goes into `NOTICE` in the same commit.
 Personal data never reaches git by construction: `.gitignore`, the pre-commit
 hook and the sanitizer each block it independently.
 
+**No clinician and no clinic is named** (owner, 21.09.2026). The clinics and
+doctors who review panels are never named — not in code, knowledge, tests,
+documents, pages, commit messages, reports or project notes; not by full name,
+not by initials. A reviewed sentence carries a role and a date
+(`review {by_role, on, scope}`); a note that names its author lives in the
+profile and never ships. Write «the panel author» or «a clinician». Guarded by
+`tests/test_no_clinician_or_clinic_is_named.py`, which holds digests of stems,
+never the names.
+
 ## Contributing upstream
 
 This project takes from others: vendored code, dependencies, data sources, host

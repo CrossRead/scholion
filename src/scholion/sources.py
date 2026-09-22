@@ -381,7 +381,7 @@ SOURCES: Dict[str, Dict[str, Any]] = {
         "cadence": "a release every few months, tied to RefSeq/Ensembl",
         "auto": False,
         "why_manual": "sources.manual.mane",
-        "command": "bash src/ingest/qc_callability.sh",
+        "command": "scholion coverage",
     },
     "reference_genome": {
         "kind": "pipeline",

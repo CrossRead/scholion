@@ -1119,8 +1119,7 @@ function renderFocus(root,f){
           <input type="date" id="fc-date" value="${esc(today)}">
           <select id="fc-alc"><option value="">${esc(t('web.focus.alcohol_none'))}</option>
             <option value="light">${esc(t('web.focus.alcohol_light'))}</option><option value="heavy">${esc(t('web.focus.alcohol_heavy'))}</option></select>
-          <label><input type="checkbox" id="fc-aten"> ${esc(t('web.focus.atenolol'))}</label>
-          <label><input type="checkbox" id="fc-meal"> ${esc(t('web.focus.late_meal'))}</label>
+          ${((f.journal&&f.journal.factors)||[]).map(x=>`<label><input type="checkbox" class="fc-factor" data-key="${esc(x.key)}"> ${esc(x.label||x.key)}</label>`).join('')}
           <input id="fc-note" placeholder="${esc(t('web.focus.note_placeholder'))}" style="flex:1;min-width:150px">
           <button class="act" id="fc-save">${esc(t('web.focus.save'))}</button>
         </div>
@@ -1135,8 +1134,10 @@ function renderFocus(root,f){
   if(btn) btn.onclick=async()=>{
     btn.disabled=true;
     const r=await post('/api/focus/log',{date:$('#fc-date',root).value,
-      alcohol:$('#fc-alc',root).value, atenolol:$('#fc-aten',root).checked,
-      late_meal:$('#fc-meal',root).checked, note:$('#fc-note',root).value});
+      alcohol:$('#fc-alc',root).value,
+      // The journal's own yes/no factors (task 176), not one drug by name.
+      factors:[...root.querySelectorAll('.fc-factor')].filter(c=>c.checked).map(c=>c.dataset.key),
+      note:$('#fc-note',root).value});
     btn.disabled=false;
     if(r&&r.ok){ toast(r.removed?t('web.focus.entry_removed'):t('web.focus.entry_saved',{n:r.entries}));
                  renderFocus(root, await api('/api/focus')); }
@@ -2052,7 +2053,21 @@ function systemGeneRow(r, register){
 // with no published range is a value — no arrow, no colour.
 function panelLabsHtml(p){
   if(!p) return '';
-  const ms=(p.markers||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span></div>`).join('');
+  // Task 205 D, E: the author's pathways first, a value-only marker says so, and
+  // the markers to read beside one are listed under it — measured or not.
+  const comp=m=>(m.companions||[]).length?`<div class="muted small" style="margin-left:1.2em">${esc(t('system.panel_labs.companions',{list:m.companions.map(c=>c.measured?`${c.name} ${fmtNum(c.value)} ${c.unit||''}`.trim():t('system.panel_labs.companion_missing',{name:c.name})).join('; ')}))}</div>`:'';
+  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m);
+  const byKey={}; (p.markers||[]).forEach(m=>byKey[m.key]=m);
+  const grouped=new Set();
+  let gs='';
+  if((p.groups||[]).length){
+    gs=`<div class="muted small mt-1">${esc(t('system.panel_labs.groups_head'))}</div>`+p.groups.map(g=>{
+      const mem=g.members.map(x=>{grouped.add(x.key); if(!g.measured) return '';
+        return byKey[x.key]?row(byKey[x.key]):x.measured?row(x):`<div class="row-l muted">· ${esc(x.name)} — ${esc(t('system.panel_labs.not_measured'))}</div>`;}).join('');
+      const rr=(g.ratios||[]).filter(r=>r.origin==='printed'||r.origin==='computed').map(r=>`<div class="row-l">· ${esc(t(r.origin==='printed'?'system.panel_labs.ratio_printed':'system.panel_labs.ratio_computed',{name:r.name||r.key,value:fmtNum(r.value),date:fmtDate(r.date)||'—'}))}</div>`).join('');
+      return `<div class="sysblock"><div class="sys-h"><span class="name">${esc(t('system.panel_labs.group',{label:g.label,measured:g.measured,total:g.total}))}</span></div>${mem}${rr}</div>`;}).join('');
+  }
+  const ms=(p.markers||[]).filter(m=>!grouped.has(m.key)).map(row).join('');
   const KEY={printed:'system.panel_labs.ratio_printed',computed:'system.panel_labs.ratio_computed',
     missing:'system.panel_labs.ratio_missing',not_same_day:'system.panel_labs.ratio_not_same_day',
     not_computable:'system.panel_labs.ratio_not_computable'};
@@ -2061,7 +2076,7 @@ function panelLabsHtml(p){
     const txt=got?t(KEY[x.origin],{name:x.name||x.key,value:fmtNum(x.value),date:fmtDate(x.date)||'—'})+(x.has_range?'':' — '+t('system.panel_labs.no_range'))
                :t(KEY[x.origin]||KEY.not_computable,{name:x.name||x.key,missing:(x.missing_names||x.missing||[]).join(', ')||'—'});
     return `<div class="row-l${got?'':' muted'}">· ${esc(txt)}</div>`;}).join('');
-  return `<details class="pnl-fold"><summary>${esc(t('system.panel_labs.head',{measured:(p.markers||[]).length,total:p.total||0}))}</summary>${ms}${rs}</details>`;
+  return `<details class="pnl-fold"><summary>${esc(t('system.panel_labs.head',{measured:(p.markers||[]).length,total:p.total||0}))}</summary>${gs}${ms}${rs}</details>`;
 }
 // The three genotypes of a common variant, the person's own in bold (task 199).
 function ladderHtml(r){
@@ -3636,11 +3651,20 @@ function screenClassHtml(r){
   }).join('');
   return `<div class="lsact" style="margin-bottom:10px">${esc(screenVerdictLine(r.verdict))}</div>${rows}`;
 }
+function weakBedHtml(r){
+  if(!r) return '';
+  if(r.ok && r.regions) return `<div class="card" style="margin-top:10px">
+      <div>${esc(t('web.genome.weak_bed',{n:r.regions}))}</div>
+      <div class="meta" style="margin-top:6px"><a href="/api/limits/bed?download=1" download>${esc(t('web.genome.weak_bed_link'))}</a>
+        <span class="muted">· ${esc((r.genes||[]).slice(0,8).join(', '))}${(r.genes||[]).length>8?' …':''}</span></div></div>`;
+  if(!r.ok && r.note) return `<div class="card muted" style="margin-top:10px">${esc(r.note)}</div>`;
+  return '';
+}
 async function viewGenome(root){
-  const [st,cv,prs,lng,upd,lip,scr]=await Promise.all([
+  const [st,cv,prs,lng,upd,lip,scr,wb]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
     api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null),
-    api('/api/screen').catch(()=>null)]);
+    api('/api/screen').catch(()=>null),api('/api/limits/bed').catch(()=>null)]);
   const sb=await sourceBar(['genome_vcf','catalog','ensembl','clinvar']);
   // Seven headings on one scroll, all open, was the tab. The reader met the
   // maintenance block («update the databases») before any finding, and the same
@@ -3652,7 +3676,7 @@ async function viewGenome(root){
     ['risks',t('web.genome.nav_risks'), n(prs&&prs.available?prs.stats.total:null), ()=>renderPRS(prs)],
     ['long', t('web.genome.nav_longevity'), n(lng&&lng.available?lng.stats.genotyped:null), ()=>renderLongevity(lng)],
     ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
-    ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)],
+    ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)+weakBedHtml(wb)],
     ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="card muted">${esc(t('web.genome.db_after_script'))}</div>`],
     ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="flex:1 1 240px"><button class="act" id="g-go">${esc(t('web.genome.find'))}</button></div>
       <div class="drugchips" id="g-chips"></div>`],

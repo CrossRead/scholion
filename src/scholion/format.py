@@ -2292,6 +2292,19 @@ def _level_counts_line(counts: Dict[str, int]) -> str:
     return _t("system.genetics.levels", levels=", ".join(parts) or "—", none=counts.get("none", 0))
 
 
+def weak_bed_report(r: Dict[str, Any]) -> str:
+    """The BED itself when there is one, so `limits --bed > file` is the file.
+
+    Everything else — a refusal, an empty list, a file already written — is a
+    sentence, because there is nothing a laboratory could read in it.
+    """
+    if r.get("ok") and r.get("written"):
+        return _t("limits.bed_written", path=r["written"], n=r.get("regions", 0))
+    if r.get("ok") and r.get("bed"):
+        return r["bed"].rstrip("\n")
+    return r.get("note") or ""
+
+
 def limits_report(r: Dict[str, Any]) -> str:
     """«What cannot be said from this data» — and what would close each item.
 
@@ -2915,8 +2928,9 @@ def update_report(n: Dict[str, Any]) -> str:
     route = n.get("route") or {}
     command = " ".join(route.get("command") or [])
     if st == "newer":
-        lines.append(_t("update.how.source" if route.get("kind") == "source" else "update.how.install",
-                        command=command))
+        kind = route.get("kind")
+        key = {"source": "update.how.source", "host": "update.how.host"}.get(kind, "update.how.install")
+        lines.append(_t(key, command=command, host=route.get("host") or "—"))
     return "\n".join(lines)
 
 
@@ -2932,6 +2946,8 @@ def update_install_report(r: Dict[str, Any]) -> str:
         return _t("update.not_confirmed", command=command)
     if reason == "source_tree":
         return _t("update.how.source", command=command)
+    if reason == "host_managed":
+        return _t("update.how.host", host=(r.get("route") or {}).get("host") or "—")
     if reason == "offline":
         return _t("version.check_offline")
     code = r.get("code")

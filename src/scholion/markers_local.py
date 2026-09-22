@@ -47,7 +47,7 @@ _ALLOWED = ("key", "unit", "direction", "loinc", "labels", "specimen", "note")
 
 
 def _load() -> Dict[str, Any]:
-    p = core.markers_overlay_path()
+    p = core.markers_overlay_read_path()
     try:
         return json.loads(p.read_text(encoding="utf-8"))
     except (OSError, ValueError):

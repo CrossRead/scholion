@@ -144,7 +144,11 @@ def domains() -> List[Dict[str, Any]]:
                         "genetic_half": bool(d.get("genetic_half")),
                         "markers": list(d.get("markers") or []), "why": d.get("why"),
                         "panel_markers": list(d.get("panel_markers") or []),
-                        "derived": list(d.get("derived") or [])})
+                        "derived": list(d.get("derived") or []),
+                        # task 205 D, E: how the panel author reads the panel
+                        "display_only": list(d.get("display_only") or []),
+                        "panel_groups": list(d.get("panel_groups") or []),
+                        "interpret_with": dict(d.get("interpret_with") or {})})
     return out
 
 

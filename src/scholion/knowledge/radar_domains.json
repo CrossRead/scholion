@@ -227,6 +227,7 @@
       ],
       "derived": [
         "aa_ratio_phe_tyr",
+        "aa_ratio_hyp_pro",
         "aa_ratio_gly_ser",
         "aa_fischer_ratio",
         "aa_ratio_gln_glu",
@@ -239,7 +240,133 @@
         "urine_plasma_cystine_ratio",
         "urine_plasma_lysine_ratio"
       ],
-      "why": "Amino acids and protein: what feeds the body's own synthesis. The score is built from seven markers that mean something one by one; the amino acid panel and its ratios are shown beside it and never scored — a single amino acid says little on its own, and the panel is read as a picture. Homocysteine, uric acid and creatinine also count in inflammation and in the kidneys: a marker may count in two systems (owner, 17.09.2026). The panel outside its corridor enters the score as one term, so a drifting panel shows at the top level. The genetic half is composed from the gene–disease base and carries the authored positions of the chain: digestion and absorption, carriage into tissues, use inside the cell, renal losses."
+      "why": "Amino acids and protein: what feeds the body's own synthesis. The score is built from seven markers that mean something one by one; the amino acid panel and its ratios are shown beside it and never scored — a single amino acid says little on its own, and the panel is read as a picture. Homocysteine, uric acid and creatinine also count in inflammation and in the kidneys: a marker may count in two systems (owner, 17.09.2026). The panel outside its corridor enters the score as one term, so a drifting panel shows at the top level. The genetic half is composed from the gene–disease base and carries the authored positions of the chain: digestion and absorption, carriage into tissues, use inside the cell, renal losses.",
+      "display_only": [
+        "aa_beta_alanine",
+        "aa_baiba",
+        "aa_aspartate",
+        "aa_asparagine",
+        "aa_pipecolic"
+      ],
+      "panel_groups": [
+        {
+          "key": "bcaa",
+          "markers": [
+            "aa_leucine",
+            "aa_isoleucine",
+            "valine"
+          ]
+        },
+        {
+          "key": "urea_cycle",
+          "markers": [
+            "aa_arginine",
+            "aa_ornithine",
+            "citrulline"
+          ]
+        },
+        {
+          "key": "methionine_cycle",
+          "markers": [
+            "aa_methionine",
+            "homocysteine",
+            "aa_serine",
+            "aa_glycine",
+            "aa_cystathionine"
+          ]
+        },
+        {
+          "key": "phe_tyr",
+          "markers": [
+            "aa_phenylalanine",
+            "aa_tyrosine"
+          ],
+          "ratios": [
+            "aa_ratio_phe_tyr"
+          ]
+        },
+        {
+          "key": "sulfur",
+          "markers": [
+            "aa_methionine",
+            "homocysteine",
+            "aa_cystathionine",
+            "aa_cystine",
+            "aa_taurine"
+          ]
+        }
+      ],
+      "interpret_with": {
+        "aa_histidine": {
+          "when": "low",
+          "with": [
+            "crp_hs",
+            "ferritin"
+          ]
+        },
+        "aa_methionine": {
+          "when": "any",
+          "with": [
+            "homocysteine"
+          ]
+        },
+        "aa_phenylalanine": {
+          "when": "any",
+          "with": [
+            "aa_tyrosine",
+            "aa_ratio_phe_tyr"
+          ]
+        },
+        "aa_tyrosine": {
+          "when": "any",
+          "with": [
+            "aa_phenylalanine"
+          ]
+        },
+        "aa_cystine": {
+          "when": "low",
+          "with": [
+            "aa_methionine",
+            "homocysteine",
+            "aa_cystathionine"
+          ]
+        },
+        "aa_cystathionine": {
+          "when": "high",
+          "with": [
+            "homocysteine",
+            "aa_methionine",
+            "vitamin_b6"
+          ]
+        },
+        "aa_ornithine": {
+          "when": "any",
+          "with": [
+            "aa_arginine",
+            "citrulline"
+          ]
+        },
+        "aa_alanine": {
+          "when": "high",
+          "with": [
+            "glucose",
+            "alt"
+          ]
+        },
+        "aa_glycine": {
+          "when": "high",
+          "with": [
+            "creatinine"
+          ]
+        },
+        "aa_taurine": {
+          "when": "high",
+          "with": [
+            "creatinine"
+          ]
+        }
+      },
+      "panel_structure_source": "the panel author's answer of 21.09.2026 (task 205 D, E): the five groups, the five markers shown as values only, and which markers to read beside which. Structure, not a statement about a person: the product says nothing more about a value for being in a group or beside a companion."
     },
     {
       "key": "fitness",

@@ -1,0 +1,1182 @@
+{
+ "_meta": {
+  "purpose": "The intake ledger of an authored position list: every position the list names is either in the locus catalogue or waiting with a reason. A position may not leave a list without a word — the rule task 204 wrote as a sentence and nothing checked, until twelve rows of the list of 29.06.2026 were found missing with no reason anywhere (task 205, 21.09.2026).",
+  "what_is_here": "rsID, gene and the row number of the list — nothing else from the author's file. No genotype of anybody, no phrase, no source text.",
+  "dispositions": {
+   "in_catalogue": "the rsID is in loci.json",
+   "waiting": "not in the catalogue; `reason` says why and `task` names the backlog row that closes it",
+   "refused": "will not enter; `reason` says why"
+  },
+  "guarded_by": "tests/test_no_position_of_an_authored_list_falls_out_silently.py",
+  "updated": "2026-09-21",
+  "source_tier": "curated_reference"
+ },
+ "lists": {
+  "panel_author_2026_06_29": {
+   "label": "the panel author's list of 29.06.2026",
+   "rows": 179,
+   "distinct_positions": 179,
+   "rows_note": "every row names one rsID; row 174 spells it in capitals (RS1800790) and is entered in lower case, as the catalogue keys are",
+   "positions": [
+    {
+     "row": 1,
+     "rsid": "rs1801282",
+     "gene": "PPARG2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 2,
+     "rsid": "rs7903146",
+     "gene": "TCF7L2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 3,
+     "rsid": "rs1801131",
+     "gene": "MTHFR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 4,
+     "rsid": "rs1801133",
+     "gene": "MTHFR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 5,
+     "rsid": "rs4680",
+     "gene": "COMT",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 6,
+     "rsid": "rs11206244",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 7,
+     "rsid": "rs201420507",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 8,
+     "rsid": "rs2235544",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 9,
+     "rsid": "rs2294512",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 10,
+     "rsid": "rs4926616",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 11,
+     "rsid": "rs754694815",
+     "gene": "DIO1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 12,
+     "rsid": "rs225014",
+     "gene": "DIO2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 13,
+     "rsid": "rs151261408",
+     "gene": "DUOX2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 14,
+     "rsid": "rs200450537",
+     "gene": "SECISBP2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 15,
+     "rsid": "rs777447200",
+     "gene": "SECISBP2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 16,
+     "rsid": "rs1799941",
+     "gene": "SHBG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 17,
+     "rsid": "rs6258",
+     "gene": "SHBG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 18,
+     "rsid": "rs180223",
+     "gene": "TG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 19,
+     "rsid": "rs2069550",
+     "gene": "TG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 20,
+     "rsid": "rs2076740",
+     "gene": "TG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 21,
+     "rsid": "rs853326",
+     "gene": "TG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 22,
+     "rsid": "rs732609",
+     "gene": "TPO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 23,
+     "rsid": "rs121908876",
+     "gene": "TSHR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 24,
+     "rsid": "rs179247",
+     "gene": "TSHR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 25,
+     "rsid": "rs189261858",
+     "gene": "TSHR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 26,
+     "rsid": "rs1799963",
+     "gene": "F2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 27,
+     "rsid": "rs6025",
+     "gene": "F5",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 28,
+     "rsid": "rs17085007",
+     "gene": null,
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 29,
+     "rsid": "rs2066844",
+     "gene": "NOD2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 30,
+     "rsid": "rs111033566",
+     "gene": "PRSS1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 31,
+     "rsid": "rs9514089",
+     "gene": "SLC10A2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 32,
+     "rsid": "rs10488631",
+     "gene": "TNPO3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 33,
+     "rsid": "rs1544410",
+     "gene": "VDR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 34,
+     "rsid": "rs2228570",
+     "gene": "VDR",
+     "disposition": "waiting",
+     "reason": "musculoskeletal: the list names no single base as the allele (A / G)",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 35,
+     "rsid": "rs731236",
+     "gene": "VDR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 36,
+     "rsid": "rs1805087",
+     "gene": "MTR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 37,
+     "rsid": "rs1801394",
+     "gene": "MTRR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 38,
+     "rsid": "rs8052123",
+     "gene": "CCDC102A",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 39,
+     "rsid": "rs3753841",
+     "gene": "COL11A1",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 40,
+     "rsid": "rs7044529",
+     "gene": "COL5A1",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 41,
+     "rsid": "rs11200638",
+     "gene": "HTRA1",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 42,
+     "rsid": "rs3134069",
+     "gene": "OPG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 43,
+     "rsid": "rs7216389",
+     "gene": "GSDMB",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 44,
+     "rsid": "rs20541",
+     "gene": "IL13",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 45,
+     "rsid": "rs3118470",
+     "gene": "IL2RA",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 46,
+     "rsid": "rs1800629",
+     "gene": "TNF",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 47,
+     "rsid": "rs532098",
+     "gene": "TNF",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 48,
+     "rsid": "rs1204038",
+     "gene": "AR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 49,
+     "rsid": "rs6152",
+     "gene": "AR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 50,
+     "rsid": "rs2470152",
+     "gene": "CYP19A1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 51,
+     "rsid": "rs2234693",
+     "gene": "ESR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 52,
+     "rsid": "rs2881766",
+     "gene": "ESR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 53,
+     "rsid": "rs1691053",
+     "gene": "SRD5A1",
+     "disposition": "waiting",
+     "reason": "the author placed it in the gonads on 17.09.2026 as a value without a conclusion (no replicated ladder); import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 54,
+     "rsid": "rs9340799",
+     "gene": "ESR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 55,
+     "rsid": "rs759330",
+     "gene": "PAQR6",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 56,
+     "rsid": "rs4293393",
+     "gene": "UMOD",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 57,
+     "rsid": "rs1256328",
+     "gene": "ALPL",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 58,
+     "rsid": "rs1801197",
+     "gene": "CALC",
+     "disposition": "waiting",
+     "reason": "the source gives no linear ladder for this position",
+     "task": "204 (d)"
+    },
+    {
+     "row": 59,
+     "rsid": "rs11174811",
+     "gene": "AVPR1A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 60,
+     "rsid": "rs6265",
+     "gene": "BDNF",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 61,
+     "rsid": "rs3178250",
+     "gene": "BMP2",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 62,
+     "rsid": "rs242941",
+     "gene": "CRHR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 63,
+     "rsid": "rs6977820",
+     "gene": "DPP6",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 64,
+     "rsid": "rs686",
+     "gene": "DRD1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 65,
+     "rsid": "rs1800497",
+     "gene": "DRD2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 66,
+     "rsid": "rs6277",
+     "gene": "DRD2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 67,
+     "rsid": "rs1800955",
+     "gene": "DRD4",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 68,
+     "rsid": "rs964112",
+     "gene": "ELP4",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 69,
+     "rsid": "rs6295",
+     "gene": "HTR1A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 70,
+     "rsid": "rs594242",
+     "gene": "HTR2A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 71,
+     "rsid": "rs6311",
+     "gene": "HTR2A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 72,
+     "rsid": "rs6314",
+     "gene": "HTR2A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 73,
+     "rsid": "rs11172113",
+     "gene": "LPR1",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 74,
+     "rsid": "rs1799836",
+     "gene": "MAOB",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 75,
+     "rsid": "rs2300478",
+     "gene": "MEIS1",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 76,
+     "rsid": "rs11012732",
+     "gene": "MLLT10",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 77,
+     "rsid": "rs7120118",
+     "gene": "NR1H3",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 78,
+     "rsid": "rs6198",
+     "gene": "NR3C1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 79,
+     "rsid": "rs1042778",
+     "gene": "OXTR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 80,
+     "rsid": "rs2254298",
+     "gene": "OXTR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 81,
+     "rsid": "rs53576",
+     "gene": "OXTR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 82,
+     "rsid": "rs2305795",
+     "gene": "P2RY11",
+     "disposition": "waiting",
+     "reason": "the list gives no system the product has for this row's disease class; where it goes is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 83,
+     "rsid": "rs34424986",
+     "gene": "PRKN",
+     "disposition": "waiting",
+     "reason": "the author placed it in the behaviour layer on 17.09.2026 with a sentence; import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 84,
+     "rsid": "rs5569",
+     "gene": "SLC6A2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 85,
+     "rsid": "rs6356",
+     "gene": "TPH2",
+     "disposition": "waiting",
+     "reason": "the author placed it in the behaviour layer on 17.09.2026 with a sentence; import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 86,
+     "rsid": "rs2275376",
+     "gene": "ALPL",
+     "disposition": "waiting",
+     "reason": "musculoskeletal: the list names no single base as the allele",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 87,
+     "rsid": "rs1107946",
+     "gene": "COL1R1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 88,
+     "rsid": "rs1800012",
+     "gene": "COL1R1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 89,
+     "rsid": "rs2412298",
+     "gene": "COL1R1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 90,
+     "rsid": "rs7639618",
+     "gene": "COL6A4P1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 91,
+     "rsid": "rs16879765",
+     "gene": "EPDR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 92,
+     "rsid": "rs27044",
+     "gene": "ERAP1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 93,
+     "rsid": "rs3736228",
+     "gene": "LRP",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 94,
+     "rsid": "rs4988321",
+     "gene": "LRP5",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 95,
+     "rsid": "rs2073618",
+     "gene": "OPG",
+     "disposition": "waiting",
+     "reason": "the source gives no linear ladder for this position",
+     "task": "204 (d)"
+    },
+    {
+     "row": 96,
+     "rsid": "rs1561570",
+     "gene": "OPTN",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 97,
+     "rsid": "rs863225072",
+     "gene": "SLC2A9",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 98,
+     "rsid": "rs1501299",
+     "gene": "ADIPOQ",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 99,
+     "rsid": "rs182052",
+     "gene": "ADIPOQ",
+     "disposition": "waiting",
+     "reason": "the author placed it in carbohydrate metabolism on 17.09.2026 as a value without a conclusion (direction depends on population); import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 100,
+     "rsid": "rs2241766",
+     "gene": "ADIPOQ",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 101,
+     "rsid": "rs6738028",
+     "gene": "BCL2L11",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 102,
+     "rsid": "rs7181230",
+     "gene": "BMF",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 103,
+     "rsid": "rs7754840",
+     "gene": "CDKAL1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 104,
+     "rsid": "rs9465871",
+     "gene": "CDKAL1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 105,
+     "rsid": "rs743572",
+     "gene": "CYP17A1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 106,
+     "rsid": "rs2185570",
+     "gene": "CYP2C9",
+     "disposition": "refused",
+     "reason": "a pharmacogene has no place in a disease panel (decision of 15.09.2026): CYP2C9 is answered by the prescription entry, through the positions the build reads for its CPIC star alleles (rs1799853 for *2, rs1057910 for *3), and this position is not one of them",
+     "task": "—"
+    },
+    {
+     "row": 107,
+     "rsid": "rs2987983",
+     "gene": "ESR2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 108,
+     "rsid": "rs4986938",
+     "gene": "ESR2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 109,
+     "rsid": "rs7850258",
+     "gene": "FOXE1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 110,
+     "rsid": "rs1121980",
+     "gene": "FTO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 111,
+     "rsid": "rs1421085",
+     "gene": "FTO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 112,
+     "rsid": "rs17817449",
+     "gene": "FTO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 113,
+     "rsid": "rs9939609",
+     "gene": "FTO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 114,
+     "rsid": "rs9272346",
+     "gene": "HLA-DQA1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 115,
+     "rsid": "rs5215",
+     "gene": "KCNJ11",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 116,
+     "rsid": "rs5219",
+     "gene": "KCNJ11",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 117,
+     "rsid": "rs17782313",
+     "gene": "MC4R",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 118,
+     "rsid": "rs3816873",
+     "gene": "MC4R",
+     "disposition": "waiting",
+     "reason": "the author placed it in carbohydrate metabolism on 17.09.2026 as a value without a conclusion and named rs17782313 as the stronger marker; import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 119,
+     "rsid": "rs10830963",
+     "gene": "MTNR1B",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 120,
+     "rsid": "rs5934505",
+     "gene": null,
+     "disposition": "waiting",
+     "reason": "the author placed it in the gonads on 17.09.2026 without a sentence of her own; import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 121,
+     "rsid": "rs1042838",
+     "gene": "PGR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 122,
+     "rsid": "rs10895068",
+     "gene": "PGR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 123,
+     "rsid": "rs590688",
+     "gene": "PGR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 124,
+     "rsid": "rs2476601",
+     "gene": "PTPN22",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 125,
+     "rsid": "rs730880269",
+     "gene": "SECISBP2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 126,
+     "rsid": "rs119461977",
+     "gene": "SECISBP2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 127,
+     "rsid": "rs119461976",
+     "gene": "SECISBP2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 128,
+     "rsid": "rs1587874400",
+     "gene": "SECISBP2",
+     "disposition": "refused",
+     "reason": "a deletion (NC_000009.12:g.89328754del, p.Pro224LeufsTer32): the build refuses an insertion or deletion by name instead of reading it, because the base a VCF anchors it on is neither on the form nor in the catalogue (task 172)",
+     "task": "172"
+    },
+    {
+     "row": 129,
+     "rsid": "rs1587875298",
+     "gene": "SECISBP2",
+     "disposition": "refused",
+     "reason": "a duplication (NC_000009.12:g.89328885dup, p.Gly268_Glu269insTer): the build refuses an insertion or deletion by name instead of reading it, because the base a VCF anchors it on is neither on the form nor in the catalogue (task 172)",
+     "task": "172"
+    },
+    {
+     "row": 130,
+     "rsid": "rs12150660",
+     "gene": "SHBG",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 131,
+     "rsid": "rs13266634",
+     "gene": "SLC30A8",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 132,
+     "rsid": "rs2637125",
+     "gene": "SULT2A1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 133,
+     "rsid": "rs12255372",
+     "gene": "TCF7L2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 134,
+     "rsid": "rs7901695",
+     "gene": "TCF7L2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 135,
+     "rsid": "rs2071403",
+     "gene": "TPO",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 136,
+     "rsid": "rs11761528",
+     "gene": "ZKSCAN5",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 137,
+     "rsid": "rs7756992",
+     "gene": "CDKAL1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 138,
+     "rsid": "rs2237892",
+     "gene": "KCNQ1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 139,
+     "rsid": "rs5015480",
+     "gene": "HHEX-IDE",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 140,
+     "rsid": "rs886041402",
+     "gene": "CARD14",
+     "disposition": "waiting",
+     "reason": "immune: CARD14 has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 141,
+     "rsid": "rs794727993",
+     "gene": "COPA",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 142,
+     "rsid": "rs1357409506",
+     "gene": "CTLA4",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 143,
+     "rsid": "rs104893624",
+     "gene": "CXCR4",
+     "disposition": "waiting",
+     "reason": "immune: CXCR4 has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 144,
+     "rsid": "rs778993919",
+     "gene": "FAS(TNFRSF6)",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 145,
+     "rsid": "rs138726443",
+     "gene": "FLG",
+     "disposition": "waiting",
+     "reason": "immune: FLG has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 146,
+     "rsid": "rs587777446",
+     "gene": "IFIH1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 147,
+     "rsid": "rs1236009877",
+     "gene": "IFNGR1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 148,
+     "rsid": "rs587776856",
+     "gene": "IFNGR1",
+     "disposition": "waiting",
+     "reason": "immune: not a single-base variant (ATTAATT/ATT)",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 149,
+     "rsid": "rs530073586",
+     "gene": "IKZF1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 150,
+     "rsid": "rs387906914",
+     "gene": "IL36RN",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 151,
+     "rsid": "rs28940579",
+     "gene": "MEFV",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 152,
+     "rsid": "rs387906896",
+     "gene": "NCSTN",
+     "disposition": "waiting",
+     "reason": "immune: NCSTN has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 153,
+     "rsid": "rs397514332",
+     "gene": "NFKB2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 154,
+     "rsid": "rs587781260",
+     "gene": "NLRC4",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 155,
+     "rsid": "rs1404302953",
+     "gene": "NLRP12",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 156,
+     "rsid": "rs121908150",
+     "gene": "NLRP3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 157,
+     "rsid": "rs104895477",
+     "gene": "NOD2(CARD15)",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 158,
+     "rsid": "rs2240340",
+     "gene": "PADI4",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 159,
+     "rsid": "rs397518423",
+     "gene": "PIK3CD",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 160,
+     "rsid": "rs587777709",
+     "gene": "PIK3R1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 161,
+     "rsid": "rs63750082",
+     "gene": "PSEN1",
+     "disposition": "waiting",
+     "reason": "listed as a common variant under inflammation, which has no genetic half for it: the gene–disease base this build carries relates PSEN1 only to dilated cardiomyopathy 1U, at Disputed and Limited, and the build has no neurological system; where rows of the nervous system outside behaviour go is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 162,
+     "rsid": "rs63750900",
+     "gene": "PSEN1",
+     "disposition": "waiting",
+     "reason": "listed as a common variant under inflammation, which has no genetic half for it: the gene–disease base this build carries relates PSEN1 only to dilated cardiomyopathy 1U, at Disputed and Limited, and the build has no neurological system; where rows of the nervous system outside behaviour go is the owner's decision",
+     "task": "204 (a)"
+    },
+    {
+     "row": 163,
+     "rsid": "rs28939089",
+     "gene": "PSTPIP1(C2BP1)",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 164,
+     "rsid": "rs373740199",
+     "gene": "RTEL1",
+     "disposition": "waiting",
+     "reason": "immune: RTEL1 has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 165,
+     "rsid": "rs587777630",
+     "gene": "STAT1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 166,
+     "rsid": "rs869312892",
+     "gene": "STAT3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 167,
+     "rsid": "rs770066110",
+     "gene": "TERT",
+     "disposition": "waiting",
+     "reason": "immune: TERT has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 168,
+     "rsid": "rs769471844",
+     "gene": "TMC6",
+     "disposition": "waiting",
+     "reason": "immune: TMC6 has no GenCC assertion in the base",
+     "recorded_in": "system_gene_panels.json _meta.waiting_199d",
+     "task": "204 (b)"
+    },
+    {
+     "row": 169,
+     "rsid": "rs864321626",
+     "gene": "TNFAIP3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 170,
+     "rsid": "rs104895217",
+     "gene": "TNFRSF1A",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 171,
+     "rsid": "rs699",
+     "gene": "AGT",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 172,
+     "rsid": "rs6725887",
+     "gene": "WDR12",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 173,
+     "rsid": "rs5985",
+     "gene": "F13",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 174,
+     "rsid": "rs1800790",
+     "gene": "FGB",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 175,
+     "rsid": "rs1126643",
+     "gene": "ITGA2",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 176,
+     "rsid": "rs5918",
+     "gene": "ITGB3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 177,
+     "rsid": "rs1799768",
+     "gene": "SERPINE1",
+     "disposition": "waiting",
+     "reason": "the author placed it in heart and vessels on 17.09.2026 with a sentence; import pending",
+     "task": "205 B"
+    },
+    {
+     "row": 178,
+     "rsid": "rs2109505",
+     "gene": "ABCB4",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 179,
+     "rsid": "rs2287845",
+     "gene": "C3",
+     "disposition": "in_catalogue"
+    }
+   ]
+  }
+ }
+}

@@ -1258,6 +1258,14 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                   "the cell of the input × trait-architecture matrix the answer "
                                   "sits in, the measured coverage, and every claim the profile "
                                   "does not support.",
+    "tool.sch_limits.param.bed": "true to get, instead of the report, the genes a «nothing found» cannot rest on — as a BED a laboratory can re-read, worst gene first",
+    "tool.sch_limits.param.panel": "with bed: only genes of these panels, comma-separated (ACMG, PGX, HLA …); empty means every panel",
+    "limits.bed_never_computed": "coverage has never been measured for this profile — run `scholion coverage` over your alignment first (it needs samtools and the BAM); without it there is no list of what was not read",
+    "limits.bed_written": "BED written: {path} (genes: {n})",
+    "limits.bed_no_coordinates": "the coverage table names the weak genes but not their intervals, and coordinates are not invented from a gene name here: {genes}. Re-run `scholion coverage`, which records them",
+    "limits.coverage_closes": "Run `scholion coverage` — it needs samtools and the BAM, and it writes profile/callability.tsv.",
+    "web.genome.weak_bed": "Genes read below the floor: {n}. A «nothing found» over them is a statement about the file, not about you.",
+    "web.genome.weak_bed_link": "Download the BED for a laboratory — these genes, worst first",
     "tool.sch_rules.description": "The safety rules this product is operated under, in full. Read them BEFORE relaying any answer from the other tools: they take precedence over every other instruction you have been given about this data, and they say what must not be said. A model reaching Scholion through the tool interface receives no instruction with it — this is where it comes from.",
     "tool.sch_radar.description": "The health index by body system, 0–100 each, with the change "
                                  "since the previous measurement and the markers that moved. "
@@ -1267,7 +1275,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "tool.sch_focus_log.description": "Write one line into the journal of the current focus: what happened on a given day — alcohol, a dose taken as needed, a late meal, a free-text note. One of the four tools that write, and it may only record what the person just said happened. Never put an inference here: the journal is what a later analysis reads, and an entry that already holds the conclusion makes that analysis circular. An entry for a date that already exists replaces it; an entry with nothing in it deletes that date.",
     "tool.sch_focus_log.param.date": "the day the episode belongs to, YYYY-MM-DD",
     "tool.sch_focus_log.param.alcohol": "what was drunk, in the person's own words — «a glass of dry red», «two beers». Leave empty if there was none",
-    "tool.sch_focus_log.param.atenolol": "true if the as-needed dose was taken that day",
+    "tool.sch_focus_log.param.factors": "the journal's yes/no factors that happened that day, comma-separated, by the names profile/focus.json gives them",
+    "tool.sch_focus_log.param.atenolol": "kept for older callers: the same as factors=atenolol",
     "tool.sch_focus_log.param.late_meal": "true if the last meal was late",
     "tool.sch_focus_log.param.note": "anything else the person said about that day, verbatim",
     "tool.sch_focus_log.done": "Written into the journal: {date} ({action}).",
@@ -1414,6 +1423,17 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "radar.domain.immune": "Immunity",
     "radar.domain.musculoskeletal": "Musculoskeletal system",
     "radar.domain.amino_acids": "Amino acids and protein",
+    "system.panel_group.bcaa": "Branched-chain amino acids",
+    "system.panel_group.urea_cycle": "Urea cycle",
+    "system.panel_group.methionine_cycle": "Methionine metabolism",
+    "system.panel_group.phe_tyr": "Phenylalanine → tyrosine",
+    "system.panel_group.sulfur": "Sulphur amino acids",
+    "system.panel_labs.groups_head": "The panel by pathway — how the panel author reads it; a marker may stand in two groups",
+    "system.panel_labs.group": "{label}: measured {measured} of {total}",
+    "system.panel_labs.not_measured": "not measured",
+    "system.panel_labs.display_only": "a value only: not scored, and nothing is read from it",
+    "system.panel_labs.companions": "read beside: {list}",
+    "system.panel_labs.companion_missing": "{name} — not measured",
     "system.panel_labs.head": "the system's long laboratory panel — shown, not scored marker by marker; the share of it outside its corridor enters the score as one term. Measured: {measured} of {total}",
     "system.panel_labs.ratio_printed": "{name}: {value} as printed ({date})",
     "system.panel_labs.ratio_computed": "{name}: {value}, computed from its components of {date}",
@@ -1739,9 +1759,9 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "focus.bedtime_share": "over {nights} of the export the threshold was met {share} % of the time, average lights-out {clock}",
     "focus.awake_mean": "over {nights} of the export, time awake in bed averaged {mean} min",
     "focus.journal_not_ready": "the log has been kept for {nights}; to tell alcohol and "
-                               "atenolol apart at least {need} episodes of each kind are "
+                               "«{factor}» apart at least {need} episodes of each kind are "
                                "needed (now {a} and {b})",
-    "focus.journal_split": "alcohol without atenolol {a} min, alcohol with atenolol {b} min "
+    "focus.journal_split": "alcohol without «{factor}» {a} min, alcohol with «{factor}» {b} min "
                            "(difference {delta})",
     "focus.not_set_reason": "the profile holds no profile/focus.json — no focus has been set",
 
@@ -1754,6 +1774,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "provenance.expr.ldl": "Friedewald: TC − HDL − TG/2.2",
     "provenance.expr.omega6_omega3_ratio": "omega-6 / omega-3",
     "provenance.expr.aa_ratio_phe_tyr": "Phe / Tyr",
+    "provenance.expr.aa_ratio_hyp_pro": "Hyp / Pro",
     "provenance.expr.aa_ratio_gly_ser": "Gly / Ser",
     "provenance.expr.aa_ratio_gln_glu": "Gln / Glu",
     "provenance.expr.aa_ratio_glu_gln": "Glu / Gln",
@@ -1829,13 +1850,10 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                   "from variants; the score adds nothing to it.",
     "limits.prs_model_closes": "Nothing in your own data closes this — the limitation is in the model, not in what was read. Only a different model would, and where the trait is measured directly, the measurement answers the question outright.",
     "limits.interval_basis_locus": "measured over gene loci with a margin, not over the coding sequence: a small dropout inside a large gene barely moves this number, and a small dropout inside a large gene is the case it is usually consulted about",
-    "limits.bed_never_computed": "coverage has never been measured for this profile — run `bash src/ingest/qc_callability.sh` over your alignment first; without it there is no list of what was not read",
     "limits.bed_nothing_weak": "every gene of the panel is read above the floor — there is nothing to re-read",
-    "limits.bed_no_coordinates": "the coverage table names the weak genes but not their intervals, and coordinates are not invented from a gene name here: {genes}. Re-run `bash src/ingest/qc_callability.sh`, which now records them",
     "limits.bed_track": "genes read below {pct}% of bases at 10x — intervals are {basis}, not coding sequence",
     "limits.interval_basis_unknown": "what these percentages were measured over is not recorded — over the coding sequence and over a whole locus they mean different things, and the difference is not small",
     "limits.coverage_unknown": "The coverage of your genome has never been measured, so «nothing found» in a gene cannot be told apart from «not read».",
-    "limits.coverage_closes": "Run `bash src/ingest/qc_callability.sh` — it needs mosdepth and the BAM, and it writes profile/callability.tsv.",
     "limits.coverage_what": "No negative genomic conclusion can be relied on.",
     "limits.no_genome_what": "Nothing can be said about the genome at all.",
     "limits.assembly_what": "Nothing can be said about the genome: the file is in {found}.",
@@ -1933,6 +1951,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "store.need_name": "name is required",
     "store.no_medications_file": "medications.json was not found",
     "store.need_date": "a date is required",
+    "store.focus_unknown_factor": "the journal declares no factor {factors}; it declares: {known} (profile/focus.json → focus.journal.fields)",
     "store.focus_log_what": "A log of episodes for the focus of attention. PERSONAL.",
     "store.demo_occupied": "the directory holds data with no synthetic mark — it looks like a "
                            "real profile; the demo will not be written there (--force is "
@@ -2522,7 +2541,6 @@ will go through them later.
     "web.focus.alcohol_none": "no alcohol",
     "web.focus.alcohol_light": "1–2 drinks",
     "web.focus.alcohol_heavy": "more",
-    "web.focus.atenolol": "atenolol 50 mg",
     "web.focus.late_meal": "late heavy dinner",
     "web.focus.note_placeholder": "note",
     "web.focus.save": "Log it",
@@ -3664,6 +3682,8 @@ will go through them later.
     "tool.sch_update.param.confirm": "true only after the person explicitly agreed, in this conversation, to install the update",
     "tool.sch_recompute.description": "WHAT THIS BUILD ASKS THE PERSON'S DATA TO RECOMPUTE — and, with their yes, the recompute itself. Without confirm it only reads: the steps every release since the data's version asks for, plus what the genome files themselves lack, each with the reason it can or cannot run. With confirm=true it starts the ready steps in the background; call it that way only after a yes in this conversation. Calling it again without confirm shows how far it is.",
     "tool.sch_recompute.param.confirm": "true only after the person explicitly agreed, in this conversation, to start the recompute",
+    "upgrade.session_note_host": "— Scholion {latest} is out; this skill runs {installed}. Its host ({host}) installs and updates it, so do not call sch_update: tell the person that the host's catalogue brings the newer build.",
+    "update.how.host": "This skill is installed and updated by its host ({host}), not by Scholion: it runs in the host's interpreter, and installing from here would change the host's Python rather than the skill's own environment. The host's catalogue brings the newer build.",
     "upgrade.session_note": "— Scholion {latest} is out; this session runs {installed}. Tell the person, and install it only if they say yes: sch_update with confirm=true, or `scholion update --yes`.",
     "update.newer": "A newer Scholion is out: {latest} (this build is {installed}).",
     "update.current": "This is the newest Scholion: {installed}.",

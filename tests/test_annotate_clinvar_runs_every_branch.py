@@ -57,8 +57,32 @@ exit 0
 _TABIX = "#!/bin/sh\nexit 0\n"
 
 
-@unittest.skipUnless(SCRIPT.exists() and shutil.which("sh") and shutil.which("bash"),
-                     "the script and a POSIX shell are needed")
+def _stubs_run_here() -> bool:
+    """Whether a `#!/bin/sh` stub on PATH is something this machine executes.
+
+    Windows has `bash` and `sh` on PATH (Git for Windows), so asking for a shell
+    is not enough: a script written here and made executable is still not a
+    program to Windows, and every branch then ends in 1 for a reason that has
+    nothing to do with the script under test. 0.5.5's matrix found it — two
+    Windows jobs red on this class alone, ubuntu and macOS green. Try one stub
+    and let the answer decide.
+    """
+    if not (SCRIPT.exists() and shutil.which("sh") and shutil.which("bash")):
+        return False
+    tmp = Path(tempfile.mkdtemp(prefix="scholion-stub-"))
+    try:
+        stub = tmp / "probe"
+        stub.write_text("#!/bin/sh\nexit 7\n", encoding="utf-8")
+        stub.chmod(stub.stat().st_mode | stat.S_IEXEC)
+        return subprocess.run([str(stub)], capture_output=True, stdin=subprocess.DEVNULL).returncode == 7
+    except OSError:
+        return False
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+@unittest.skipUnless(_stubs_run_here(),
+                     "the script, a POSIX shell, and a machine that executes a #!/bin/sh stub are needed")
 class TestEveryBranchRunsToTheEnd(unittest.TestCase):
 
     def setUp(self):

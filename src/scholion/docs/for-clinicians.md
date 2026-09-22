@@ -204,7 +204,7 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-This page ships with the build numbered 0.5.5. **There is still no clinical
+This page ships with the build numbered 0.5.6. **There is still no clinical
 validation study and no benchmark against existing systems.** What there is, is two external runs by
 people who are not the author, and both are worth stating plainly because both
 were useful and neither was flattering.

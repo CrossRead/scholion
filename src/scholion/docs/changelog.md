@@ -40,6 +40,31 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.6 — 22.09.2026
+
+### What you can do now
+
+Nothing new: this build is 0.5.5 with one test corrected.
+
+### What is fixed
+
+**The test suite went red on Windows for a reason that had nothing to do with
+the product.** One test runs a shell script of the genome pipeline with its
+external programs stubbed by small shell scripts. Windows carries `bash` on its
+PATH and still cannot run such a stub, so on that system the four branches of
+the test failed before the script under test was reached — while every other
+test passed there. The test now skips where a stub is not a program. Nothing
+that runs for a person changed: `scholion version` reports 0.5.6, and every
+answer is the one 0.5.5 gave.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+Nothing.
+
 ## v0.5.5 — 21.09.2026
 
 ### What you can do now

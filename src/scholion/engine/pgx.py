@@ -5,6 +5,7 @@ limits; check_new_prescription is a second opinion, not a verdict.
 """
 from __future__ import annotations
 
+import re
 from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import t as _t
@@ -12,6 +13,35 @@ from ._helpers import (_active_names_by_class, _basis, _basis_note,
                        _brief_num, _match_count, DISCLAIMER)
 from .labs import analyze_labs
 from .pgx_labels import phenotype_words
+
+
+def name_matches(query: str, name: str) -> bool:
+    """Whether a typed drug query names this catalogue drug.
+
+    Equal, or one of them standing in the other as WHOLE WORDS: «atorvastatin 20 mg»
+    finds «atorvastatin», «clopidogrel» finds «clopidogrel bisulfate». Plain substring
+    containment is what this replaced, and in both directions it found the wrong
+    drug: «statin» inside «nystatin», the Russian abbreviation for a proton pump
+    inhibitor inside the name of a cold remedy, «epa» inside «heparin» — each one a
+    guideline, a dose claim or a lab comparison printed for a medicine the person
+    never named.
+    """
+    q = " ".join((query or "").casefold().split())
+    n = " ".join((name or "").casefold().split())
+    if not q or not n:
+        return False
+    if q == n:
+        return True
+
+    def _inside(a: str, b: str, declined: bool = False) -> bool:
+        # A Cyrillic catalogue name may carry a Russian case ending in the QUERY
+        # (zinc picolinate is written with «zinc» in the genitive) — up to three
+        # letters after a stem of four or more, never a new word in front of it,
+        # and never the other way round.
+        tail = (r"(?:[а-яё]{1,3})?" if declined and len(a) >= 4 and re.search(r"[а-яё]", a)
+                else "")
+        return re.search(r"(?<!\w)" + re.escape(a) + tail + r"(?!\w)", b) is not None
+    return _inside(n, q, declined=True) or _inside(q, n)
 
 
 # CPIC's activity-score model, for the genes it scores that way (CYP2C9, DPYD,
@@ -69,7 +99,28 @@ _PHENO_CODE = {
     "ultrarapid metabolizer": "UM", "ultrarapid metaboliser": "UM",
     "likely intermediate metabolizer": "IM", "possible intermediate metabolizer": "IM",
     "likely poor metabolizer": "PM",
+    # A caller that could not decide says so, and that is not a phenotype. It used
+    # to fall through to «reported», which the drug check answered out of
+    # `default` — «nothing notable in the markers» about a gene nobody could read.
+    "indeterminate": "unknown", "indeterminate metabolizer": "unknown",
+    "indeterminate function": "unknown", "n/a": "unknown", "no result": "unknown",
 }
+
+# Transporter and sensitivity genes speak their own words. SLCO1B1's CPIC
+# phenotypes are about function, and the statin table is keyed by them; without
+# this a called «Poor Function» was a phrase nothing understood and a statin was
+# answered as if the transporter were normal.
+_PHENO_CODE_BY_GENE = {
+    "SLCO1B1": {"normal function": "normal_function",
+                "decreased function": "intermediate_function",
+                "possible decreased function": "intermediate_function",
+                "poor function": "low_function"},
+}
+
+
+def _called_code(gene: str, text: str) -> str:
+    t = " ".join(str(text or "").strip().lower().split())
+    return (_PHENO_CODE_BY_GENE.get(gene, {}).get(t) or _PHENO_CODE.get(t) or "reported")
 
 
 #: Which star-allele callers this project runs over reads. A diplotype whose
@@ -104,6 +155,31 @@ def _called_diplotype(gene: str):
     return None
 
 
+def _copies_at_locus(st: Dict[str, Any], variant: str) -> Optional[int]:
+    """Copies of the counted allele, or None when the genotype is not a reading of it.
+
+    Counting the letter in the string answered «zero copies — normal» for three
+    genotypes that say nothing of the kind: a strand-ambiguous chip call, a
+    multi-allelic site where the person carries the OTHER alternative allele, and
+    a call written on the opposite strand («A/A» where the locus is C/T). Each is
+    now unread, which the phenotype reports as such, instead of absent.
+    """
+    if st.get("confidence") == "called_array_ambiguous":
+        return None
+    g = str(st.get("genotype") or "").replace("|", "").replace("/", "").strip().upper()
+    v = str(variant or "").upper()
+    if not g or not v:
+        return None
+    ref = str(st.get("ref") or "").upper()
+    if ref:
+        # The letters the counted question is about: the reference and this
+        # variant. Anything else — another ALT at the site, the other strand —
+        # is a genotype of a different question.
+        from .panel_gate import copies as _gate_copies
+        return _gate_copies(g, v, (ref, v))
+    return g.count(v)
+
+
 def compute_phenotype(gene: str) -> Dict[str, Any]:
     """The patient's phenotype for a gene, WITH the basis it rests on.
 
@@ -123,9 +199,9 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
     # model: it resolved copy number and phase. If one is on file, use it.
     called = _called_diplotype(gene)
     if called:
-        code = _PHENO_CODE.get(str(called["phenotype"]).strip().lower())
+        code = _called_code(gene, called["phenotype"])
         label = phenotype_words(called["phenotype"])       # CPIC's phrase, in the reader's language
-        return {"phenotype": code or "reported", "label": label,
+        return {"phenotype": code, "label": label,
                 "found": [{"diplotype": called["diplotype"], "source": called.get("source"),
                            "phenotype_text": called["phenotype"]}],
                 "certainty": "called", "diplotype": called["diplotype"],
@@ -181,7 +257,10 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
             unread.append(m["rsid"])
             continue
         gt = st["genotype"]
-        copies = gt.upper().count(m["variant_allele"].upper())
+        copies = _copies_at_locus(st, m["variant_allele"])
+        if copies is None:
+            unread.append(m["rsid"])
+            continue
         # A haplotype defined by more than one tag is ONE allele, however many of
         # its tags were read. DPYD HapB3 is tagged by rs75017182 and rs56038477,
         # which travel together; adding both would make a single heterozygous
@@ -246,7 +325,7 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     match = None
     for entry in kb.get("drugs", []):
         for name in entry.get("names", []):
-            if q == name or q in name or name in q:
+            if name_matches(q, name):
                 match = entry
                 break
         if match:
@@ -279,11 +358,19 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     _SEVERITY = {"PM": 3, "IM": 2, "RM": 2, "UM": 2, "NM": 1}
     co_genes = []
     worst_gene, worst_ph, worst_rank = gene, phenotype, _SEVERITY.get(phenotype, 0)
+    # A co-gene that could not be read is not a co-gene that is normal. Its rank
+    # used to be zero, so an unread NUDT15 disappeared from the azathioprine
+    # answer and a normal TPMT alone produced «standard dose» — the exact case
+    # the two-gene rule exists for. It is now named, and it keeps the answer off
+    # a reassuring level below.
+    unresolved_co: List[str] = []
     for g2 in match.get("also_genes", []):
         ph2 = compute_phenotype(g2)
         co_genes.append({"gene": g2, "phenotype": ph2["phenotype"],
                          "phenotype_label": ph2.get("label", ""),
                          "certainty": ph2.get("certainty")})
+        if ph2["phenotype"] in ("unknown", "reported"):
+            unresolved_co.append(g2)
         r2 = _SEVERITY.get(ph2["phenotype"], 0)
         if r2 > worst_rank:
             worst_gene, worst_ph, worst_rank = g2, ph2["phenotype"], r2
@@ -338,6 +425,14 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # leaving that sentence would have been the mirror of what this change is
     # for. So the answer opens by saying the phenotype was not determined, and
     # whatever the catalogue advises follows that.
+    if phenotype == "reported":
+        # A phenotype arrived that the guidance table has no word for — a
+        # laboratory's own phrase, or a gene with no model here. «Default» is not
+        # an answer about it; the level is lifted and the phrase is quoted.
+        lead = _t("drug.phenotype_unmapped", gene=gene, label=ph.get("label") or "—")
+        flag = {**flag,
+                "level": "unknown" if flag.get("level") in ("low", None) else flag["level"],
+                "note": " ".join(x for x in (lead, flag.get("note") or "") if x)}
     if phenotype == "unknown":
         # "Not determined" alone is a dead end. What follows it is the basis: how
         # many markers of the model were read, which were not, and whether the
@@ -353,10 +448,16 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         # — and carries what would make it certain, in the same sentence.
         flag = {**flag, "note": " ".join(x for x in (flag.get("note") or "",
                                                      ph.get("basis_note") or "") if x)}
+    if unresolved_co:
+        lead = _t("drug.co_gene_not_determined", genes=", ".join(unresolved_co))
+        flag = {**flag,
+                "level": "unknown" if flag.get("level") in ("low", None) else flag["level"],
+                "note": " ".join(x for x in (lead, flag.get("note") or "") if x)}
     return {
         "status": "ok",
         "drug": drug,
         "gene": gene,
+        "unresolved_genes": ([gene] if phenotype in ("unknown", "reported") else []) + unresolved_co,
         "drug_class": match.get("class", ""),
         "why": match.get("why", ""),
         "phenotype": phenotype,
@@ -413,7 +514,7 @@ def _guidance_for(drug: str, gene: str) -> Dict[str, Any]:
         if d.get("gene") != gene:
             continue
         for name in d.get("names", []):
-            if q == name or q in name or name in q:
+            if name_matches(q, name):
                 return d.get("guidance", {}) or {}
     return {}
 
@@ -476,8 +577,14 @@ def _check_drug_online(drug: str) -> Dict[str, Any]:
         # gene-level caution is honest; a specific recommendation borrowed from a
         # different drug is not.
         guidance = _guidance_for(drug, gene)
-        flag = guidance.get(phenotype) or {"level": "unknown" if phenotype == "unknown" else "low",
-                                           "note": _t("drug.nothing_notable_ask")}
+        # With no table of its own, only a NORMAL phenotype may read as low. A poor
+        # CYP2C19 metaboliser asking about pantoprazole was told «nothing notable»
+        # because the table was missing, not because the phenotype was.
+        normal = phenotype in ("NM", "normal_function", "normal_sensitivity")
+        flag = guidance.get(phenotype) or (
+            {"level": "low", "note": _t("drug.nothing_notable_ask")} if normal else
+            {"level": "unknown",
+             "note": _t("drug.no_guidance_for_phenotype", phenotype=phenotype, gene=gene)})
         return {"status": "ok", "drug": disp, "gene": gene,
                 "drug_class": atc_names or (cls or ""), "why": why,
                 "phenotype": phenotype, "phenotype_label": ph.get("label", ""),
@@ -645,10 +752,14 @@ def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any
     genes: Dict[str, Dict[str, Any]] = {}
     q = (drug or "").lower()
     for entry in core.cpic_kb().get("drugs", []):
-        if any(q == n or q in n or n in q for n in entry.get("names", [])):
+        if any(name_matches(q, n) for n in entry.get("names", [])):
             # The level is a VALUE the code compares — format.py and the web page both
             # test it against this exact word to tell the project's own base from CPIC.
             genes.setdefault(entry["gene"], {"level": "куратор", "actionable": True})
+            # The second gene of a two-gene drug (NUDT15 beside TPMT) belongs in the
+            # prescription check as much as the first; it used to be left out here.
+            for g2 in entry.get("also_genes", []):
+                genes.setdefault(g2, {"level": "куратор", "actionable": True})
     # Whether the international database was actually reached. An empty answer and
     # an unreachable source are different facts, and only the first of them
     # licenses «this drug has no meaningful pharmacogenetics» downstream.
@@ -797,7 +908,7 @@ def _dose_context(drug: str, info: Optional[Dict[str, Any]] = None) -> Dict[str,
     hit = None
     for key, spec in ent.items():
         pats = [key] + list(spec.get("match") or [])
-        if any(p and p.lower() in n for n in names for p in pats):
+        if any(p and name_matches(n, p) for n in names for p in pats):
             hit = spec
             break
     if not hit:
@@ -930,7 +1041,7 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
         # very thing the reader could act on.
         if pgx.get("level") in ("high", "moderate"):
             concerns.append(pgx["level"])
-        if (pgx.get("level") == "unknown" or pgx.get("phenotype") == "unknown"
+        if (pgx.get("level") == "unknown" or pgx.get("phenotype") in ("unknown", "reported")
                 or pgx.get("certainty") == "assumed"):
             # The detail names what is missing and what would close it, not just
             # that something is. A verdict raised without an instruction is only
@@ -944,6 +1055,33 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
                                                for m in basis.get("missing", [])),
                                "detail": _t("unresolved.pgx", names=miss)
                                          if miss else (pgx.get("phenotype_label") or "")})
+        for g2 in pgx.get("unresolved_genes") or []:
+            if g2 != pgx.get("gene"):
+                unresolved.append({"what": "pharmacogenetics", "gene": g2, "missing": [],
+                                   "closable": False,
+                                   "detail": _t("drug.co_gene_not_determined", genes=g2)})
+    # Every gene CPIC links to this drug, not only the one the local table names.
+    # A celecoxib asked about by a CYP2C9 poor metaboliser came out «low»: the
+    # genotype was read, printed in the genome section, and never reached the
+    # verdict. A non-normal phenotype with no row here, and an actionable gene
+    # that could not be read (HLA pending), are both unresolved — named, and off
+    # green.
+    _normal = ("NM", "normal_function", "normal_sensitivity")
+    for g in genome_sec.get("genes") or []:
+        if not g.get("actionable") or g.get("gene") == pgx.get("gene"):
+            continue
+        if any(u.get("gene") == g.get("gene") for u in unresolved):
+            continue
+        ph = g.get("phenotype")
+        if g.get("computable") and ph not in _normal and ph not in ("unknown", "reported"):
+            unresolved.append({"what": "pharmacogenetics", "gene": g["gene"], "missing": [],
+                               "closable": False,
+                               "detail": _t("drug.no_guidance_for_phenotype",
+                                            phenotype=ph, gene=g["gene"])})
+        elif not g.get("computable") or ph in ("unknown", "reported"):
+            unresolved.append({"what": "pharmacogenetics", "gene": g["gene"], "missing": [],
+                               "closable": False,
+                               "detail": _t("drug.co_gene_not_determined", genes=g["gene"])})
     for it in inter.get("interactions", []):
         concerns.append(it["severity"])
     if inter.get("status") in ("unknown_class", "no_rules"):

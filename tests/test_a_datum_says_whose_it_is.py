@@ -176,7 +176,9 @@ class TestTheFirstOwnMeasurementTakesTheProfile(unittest.TestCase):
             ["add-lab", "glucose", "2026-08-01", "5.4", "--unit", "mmol/L"],
             profile_dir=p)
         self.assertEqual(0, code, err)
-        self.assertEqual(before, sorted(x.name for x in p.iterdir()),
+        # The write lock is the write's own trace, not the profile's content: the
+        # store takes it for every read-modify-write (0.5.7 added lab points).
+        self.assertEqual(before, sorted(x.name for x in p.iterdir() if x.name != ".write.lock"),
                          "a write into an ordinary profile removed files from it")
         self.assertNotIn("erased", out.lower())
 

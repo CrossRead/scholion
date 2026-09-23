@@ -669,14 +669,19 @@ const _net={started:0,done:0};
 // every finished background job empty the memory, and the answers that
 // describe a running job are never remembered. A reader gets a copy.
 const _apiCache=new Map();
-const NO_CACHE=[/\/api\/update-status/,/\/api\/recompute\/status/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/];
+const NO_CACHE=[/\/api\/update-status/,/\/api\/recompute(\/status)?(\?|$)/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/];
 function forgetAnswers(){_apiCache.clear();}
 async function api(path,opts){
   const isGet=!opts||!opts.method||opts.method==='GET';
   const key=withLang(path);
   if(isGet&&_apiCache.has(key)){_net.started++;_net.done++;return JSON.parse(_apiCache.get(key));}
   _net.started++;
-  try{const r=await fetch(API+key,opts);const j=await r.json();
+  try{const r=await fetch(API+key,opts);
+    // A refusal or a crash is an answer with `error`, never data. A 403 or a 500
+    // whose body was not the JSON the view expected used to throw inside the view
+    // or be drawn as if it were a result.
+    let j; try{ j=await r.json(); }catch(e){ j={}; }
+    if(!r.ok&&(!j||typeof j!=='object'||!j.error)) j={...(j&&typeof j==='object'?j:{}),error:t('web.common.error')+' ('+r.status+')'};
     if(isGet&&r.ok&&!NO_CACHE.some(re=>re.test(path))) _apiCache.set(key,JSON.stringify(j));
     return j;}
   finally{_net.done++;}
@@ -1101,7 +1106,7 @@ function renderFocus(root,f){
     <div class="fch"><h3>${esc(f.title||'')}</h3>
       <span class="muted small">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
     <p class="fcwhy">${esc(f.why||'')}</p>
-    <div class="fcnum"><b>${m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')}</b><span>${esc(m.unit||'')} · ${esc(m.label||'')}</span>
+    <div class="fcnum"><b>${esc(String(m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')))}</b><span>${esc(m.unit||'')} · ${esc(m.label||'')}</span>
       <span>${esc(t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}))}</span></div>
     ${fcTrack(m)}
     <div class="muted" style="font-size:12.5px;margin-top:8px">${esc(m.target_note||'')}</div>
@@ -1641,8 +1646,9 @@ function rxCard(r){
       <div class="meta mt-1">${esc(t('web.rx.class',{name:r.class_display||'—'}))} · ${idLine}</div>
       ${(r.unresolved&&r.unresolved.length)?`<div class="meta mt-2"><b>${esc(t('prescription.unresolved_h'))}</b><ul style="margin:4px 0 0;padding-left:18px">${r.unresolved.map(u=>`<li>${esc(u.gene?t('prescription.unresolved_gene',{detail:u.detail||u.what,gene:u.gene}):(u.detail||u.what))}</li>`).join('')}</ul></div>`:''}
     </div>
+    ${verdictHtml}
     ${flagsHTML(r.safety_flags)}
-    <div class="so-h">${esc(t('web.rx.h_genome'))}</div>${genomeHtml}
+    <div class="so-h">${esc(t('web.rx.h_genome'))}</div>${genomeHtml}${contextHtml(ctx)}
     <div class="so-h">${esc(t('web.rx.h_labs'))}</div>${labsHtml}
     <div class="so-h">${esc(t('web.rx.h_meds'))}</div>${interHtml}
     ${cvSection}
@@ -3130,7 +3136,7 @@ async function viewLifestyle(root){
       html+=`<div class="muted" style="margin-top:14px;font-size:12.5px">${esc(t('web.life.two_devices_settled',{devices:devs,primary:t('web.life.device.'+(d.primary_source||''))}))}</div>`;
     }
     const c=d.conclusions||{good:[],watch:[]};
-    const chip=(x,cls)=>`<span class="badge ${cls}">${esc(x.label)} ${x.arrow} ${x.delta>0?'+':''}${esc(x.delta)}</span>`;
+    const chip=(x,cls)=>`<span class="badge ${cls}">${esc(x.label)} ${esc(x.arrow||'')} ${x.delta>0?'+':''}${esc(x.delta)}</span>`;
     html+=`<h2 class="section">${esc(t('web.life.shifted_h'))}</h2>
       <div class="card mb-3">
       ${c.good&&c.good.length?`<div class="row" style="flex-wrap:wrap;gap:6px"><span class="muted small">${esc(t('web.life.right_way'))}</span>${c.good.map(x=>chip(x,'b-good')).join('')}</div>`:''}
@@ -3481,7 +3487,7 @@ function genomeState(st){
       ? `<div class="meta mt-1">${esc(t('web.genome.chosen_gone',{path:amb.chosen||''}))}</div>` : '';
     const picks = (amb.choices||[]).map(p=>
       `<div class="row" style="gap:8px;margin-top:8px"><code>${esc(p.split('/').pop())}</code>`
-      + `<button class="act" data-pick="${esc(p)}">${esc(t('web.genome.pick_btn'))}</button></div>`).join('');
+      + `<button class="act" data-choose-genome="${esc(p)}">${esc(t('web.genome.pick_btn'))}</button></div>`).join('');
     return `<div class="card warnbox" style="margin-bottom:8px">
         <div class="row">${badge('b-warning',t('web.genome.db_not_connected'))} <b>${esc(t('web.genome.pick_h'))}</b></div>
         ${gone}
@@ -3525,15 +3531,19 @@ function genomeState(st){
 // source it came from and opening the gene it is about.
 function genomeFindings(cv, prs, lng, lip){
   const rows = [];
-  const push = (rail, gene, badgeCls, badgeTxt, said, src) =>
-    rows.push({rail, gene, badgeCls, badgeTxt, said, src});
+  // `rs` is set for a row that names a VARIANT: it opens the variant card. A
+  // ClinVar row used to put the rsID in the gene slot, and a click asked the
+  // gene endpoint about «rs…» — an empty card that looked like a gene with nothing.
+  const push = (rail, gene, badgeCls, badgeTxt, said, src, rs) =>
+    rows.push({rail, gene, badgeCls, badgeTxt, said, src, rs});
   // 1. what a doctor would act on
   (cv && cv.status === 'ok' ? (cv.hits || []) : []).forEach(h => {
     if (h.tier !== 'pathogenic' && h.tier !== 'drug') return;
     const sig = clnsigText(h.clnsig);
     push(h.tier === 'pathogenic' ? 'crit' : 'warn', isRsid(h.rsid) ? h.rsid : [h.chrom, h.pos].filter(Boolean).join(':'),
          h.tier === 'pathogenic' ? 'b-critical' : 'b-warning', sig,
-         diseaseText(h.disease), 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''));
+         diseaseText(h.disease), 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''),
+         isRsid(h.rsid) ? h.rsid : '');
   });
   // 2. the inherited half of the lipid profile
   if (lip && lip.status === 'ok') {
@@ -3568,7 +3578,8 @@ function genomeFindings(cv, prs, lng, lip){
   });
   if (!rows.length)
     return `<div class="card muted">${esc(t('web.genome.findings_none'))}</div>`;
-  const body = rows.map(r => `<div class="list-item"${r.gene && !/:/.test(r.gene) ? ` data-gene-open="${esc(r.gene)}" style="cursor:pointer"` : ''}>
+  const body = rows.map(r => `<div class="list-item"${r.rs ? ` data-rs-open="${esc(r.rs)}" style="cursor:pointer"`
+      : (r.gene && !/:/.test(r.gene) ? ` data-gene-open="${esc(r.gene)}" style="cursor:pointer"` : '')}>
       <div class="row">${badge(r.badgeCls, r.badgeTxt)}${r.gene ? `<b>${esc(r.gene)}</b>` : ''}
         <span class="muted" style="margin-left:auto;font-size:12.5px">${esc(r.src)}</span></div>
       ${r.said ? `<div class="why">${esc(r.said)}</div>` : ''}</div>`).join('');
@@ -3713,11 +3724,16 @@ async function viewGenome(root){
     root.querySelectorAll('.gpane').forEach(p=>{p.hidden=(p.id!=='gp-'+id);});
   };
   root.querySelectorAll('.subnav button').forEach(b=>b.onclick=()=>showPane(b.dataset.pane));
+  // The ACMG class chips: defined above and never wired, so a click did nothing.
+  bindScreen();
 
   // One question about the genome a program may not answer for the person, asked
   // where the names are already on screen.
-  root.querySelectorAll('[data-pick]').forEach(b=>b.onclick=async()=>{
-    const r=await post('/api/choose-genome',{path:b.dataset.pick});
+  // Its own attribute. It used to be `data-pick`, which the page-wide folder
+  // picker also listens for, so one click chose a genome AND opened a folder
+  // dialog for a «domain» that was a file path.
+  root.querySelectorAll('[data-choose-genome]').forEach(b=>b.onclick=async()=>{
+    const r=await post('/api/choose-genome',{path:b.dataset.chooseGenome});
     if(r&&r.error){toast(r.error);return;}
     viewGenome(root);
   });
@@ -3735,11 +3751,13 @@ async function viewGenome(root){
   const genes=['SLCO1B1','CYP2C9','CYP2C19','DPYD','APOE','FOXO3','VKORC1','MTHFR'];
   $('#g-chips',root).innerHTML=genes.map(g=>`<button data-gene="${g}">${g}</button>`).join('');
   $('#g-chips',root).querySelectorAll('button').forEach(b=>b.onclick=()=>openGene(b.dataset.gene));
-  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return;
+  async function openRs(rs){
     const d=await api('/api/genome?rsid='+encodeURIComponent(rs));
     card.innerHTML=genomeCard(d);
     const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
     card.scrollIntoView({block:'nearest'});}
+  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return; return openRs(rs);}
+  root.querySelectorAll('[data-rs-open]').forEach(b=>b.onclick=()=>openRs(b.dataset.rsOpen));
   $('#g-go',root).onclick=go;$('#g-in',root).addEventListener('keydown',e=>{if(e.key==='Enter')go();});
   // updates: the button
   const ub=$('#upd-btn',root); if(ub) ub.onclick=async()=>{

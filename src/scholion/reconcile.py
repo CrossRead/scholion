@@ -116,6 +116,17 @@ def _ym(date: Optional[str]) -> Optional[str]:
     return f"{m.group(1)}-{m.group(2)}" if m else None
 
 
+def same_draw(a: Optional[str], b: Optional[str]) -> bool:
+    """Whether two dates can name one draw: equal, or one a coarser form of the other.
+
+    `2024-03` covers `2024-03-14`, which covers `2024-03-14T08:20`. Two different
+    days, or two different clock times on one day, are two draws.
+    """
+    if not a or not b:
+        return False
+    return a.startswith(b) or b.startswith(a)
+
+
 def _close(a: float, b: float) -> bool:
     return abs(a - b) <= max(0.05, abs(b) * 0.02)
 
@@ -134,10 +145,14 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
                 "candidate_hint": _t("reconcile.candidate_hint", path=hint) if hint else None}
     markers = core.lab_markers().get("markers", {})
     labs = core.labs().get("markers", {})
-    # the profile index: marker -> {ym -> value}
-    prof: Dict[str, Dict[str, float]] = {}
+    # the profile index: marker -> [(date, value)]. The date is whatever the point
+    # carries — a month from older imports, a day, or the draw with its clock time —
+    # and a form's draw is matched to it by resolution, not by string. The index used
+    # to be keyed by the stored date and looked up by MONTH, so once the loader began
+    # storing the full stamp every point of every form read as «not in the profile».
+    prof: Dict[str, List[Any]] = {}
     for k, m in labs.items():
-        prof[k] = {p["date"]: p["value"] for p in m.get("series", []) if "date" in p}
+        prof[k] = [(p["date"], p["value"]) for p in m.get("series", []) if "date" in p]
 
     files = sorted(root.rglob("*.pdf"))
     unreadable: List[Dict[str, Any]] = []
@@ -191,15 +206,17 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
                    "form": _form_of(_rel(f, root), low)}
             if src not in slot["sources"]:
                 slot["sources"].append(src)
+            same = [pv for pd, pv in prof.get(key, []) if same_draw(pd, date or ym)]
+            close = [pv for pv in same if _close(val, pv)]
             if key not in prof:
                 missing.append({"marker": key, "date": ym, "value": val,
                                 "unit": markers[key].get("unit"), "file": _rel(f, root),
                                 "reason": _t("reconcile.marker_absent")})
-            elif ym not in prof[key]:
+            elif not same:
                 missing.append({"marker": key, "date": ym, "value": val,
                                 "unit": markers[key].get("unit"), "file": _rel(f, root),
                                 "reason": _t("reconcile.point_absent")})
-            elif not _close(val, prof[key][ym]):
+            elif not close:
                 # Not a divergence but the second method of the same draw: the marker has a
                 # preferred form declared (prefer_form, e.g. the LC-MS steroid profile), and
                 # the profile holds the value from exactly that one. Otherwise such pairs hang
@@ -207,10 +224,10 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
                 pf = [x.lower() for x in core.marker_rules(markers[key], "prefer_form")]
                 if pf and not any(x in low for x in pf):
                     alt_method.append({"marker": key, "date": ym, "pdf": val,
-                                       "profile": prof[key][ym], "file": _rel(f, root)})
+                                       "profile": same[0], "file": _rel(f, root)})
                 else:
                     mismatch.append({"marker": key, "date": ym, "pdf": val,
-                                     "profile": prof[key][ym], "file": _rel(f, root)})
+                                     "profile": same[0], "file": _rel(f, root)})
             else:
                 covered += 1
 

@@ -17,32 +17,32 @@
         "cholesterol_total": {
           "value": 6.1,
           "ref_low": null,
-          "ref_high": null
+          "ref_high": 5.2
         },
         "ldl": {
           "value": 4.05,
           "ref_low": null,
-          "ref_high": null
+          "ref_high": 3.0
         },
         "hdl": {
           "value": 1.12,
-          "ref_low": null,
+          "ref_low": 1.0,
           "ref_high": null
         },
         "triglycerides": {
           "value": 2.31,
           "ref_low": null,
-          "ref_high": null
+          "ref_high": 1.7
         },
         "alt": {
           "value": 52.0,
           "ref_low": null,
-          "ref_high": null
+          "ref_high": 41.0
         },
         "ast": {
           "value": 31.0,
           "ref_low": null,
-          "ref_high": null
+          "ref_high": 40.0
         },
         "creatinine": {
           "value": 88.0,

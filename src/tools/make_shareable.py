@@ -218,6 +218,30 @@ PRIVATE_DEFAULT = (
     "src/ingest/ingest_cgm_screens.py",
 )
 _PRIVATE_ABS: set = set()          # filled in build(); consulted in _copytree
+_IGNORED_ABS: set = set()          # filled in build(): what git itself refuses to track
+
+
+def load_ignored(repo: Path) -> set:
+    """Absolute paths of files git ignores in this repository.
+
+    The tree copy used to take everything under a source folder that was not on
+    the private list, and the audit reads only what it knows to look for — so a
+    spreadsheet, a screenshot, a log or an `.env` left beside the code, each one
+    ignored by `.gitignore` precisely because it is personal, travelled into the
+    public package unseen (a parser's own output file, `evogen_pdf_rows.json`,
+    was the example). What git will not track does not ship either. Outside a git
+    checkout the set is empty and the private list is the only filter, as before.
+    """
+    try:
+        r = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--others",
+                            "--ignored", "--exclude-standard"],
+                           capture_output=True, timeout=60, stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.SubprocessError):
+        return set()
+    if r.returncode != 0:
+        return set()
+    return {(repo / rel).resolve() for rel in r.stdout.decode("utf-8", "replace").split("\0")
+            if rel}
 
 
 def load_private(repo: Path) -> set:
@@ -253,6 +277,8 @@ def _copytree(src: Path, dst: Path, only_ext=None) -> None:
         if only_ext is not None and p.suffix.lower() not in only_ext:
             continue
         if p.resolve() in _PRIVATE_ABS:      # personal — does not travel in the package
+            continue
+        if p.resolve() in _IGNORED_ABS:      # git will not track it; neither does the package
             continue
         rel = p.relative_to(src)
         out = dst / rel
@@ -417,10 +443,11 @@ def build(repo: Path, out: Path) -> Path:
     share = repo / "share"
     if not share.is_dir():
         sys.exit("✗ Run this from the ORIGINAL repository (there is no share/ folder with the templates).")
-    global _PRIVATE_ABS
+    global _PRIVATE_ABS, _IGNORED_ABS
     _PRIVATE_ABS = load_private(repo)
     if _PRIVATE_ABS:
         print(f"• personal files excluded from the package: {len(_PRIVATE_ABS)}")
+    _IGNORED_ABS = load_ignored(repo)
     # The build root IS the public repository. There is no container level above
     # it any more: two copies of LICENSE, VERSION and CHANGELOG in one tree only
     # raise the question of which one is true, and a `pip install` from GitHub
@@ -945,7 +972,7 @@ def _check_root_fresh(repo: Path, out: Path, shared: Path) -> None:
                 "SHORTCUTS-macOS.md", "LOADING-DATA.md", "PREPARING-THE-GENOME.md",
                 "pyproject.toml", "run_tests.sh",
                 "src", "tests", "docs", "bin", "demo", "profile", "genome",
-                "ouroboros_plugin", *_MIRRORED}
+                "ouroboros_plugin", "agent-plugin", *_MIRRORED}
     extra = sorted(p.name for p in out.iterdir()
                    if p.name not in expected and QUARANTINE_SUFFIX not in p.name)
     if extra:

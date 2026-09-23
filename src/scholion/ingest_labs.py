@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import math
 import re
 import unicodedata
 import shutil
@@ -27,7 +28,18 @@ from . import core, i18n, store
 from .i18n import t as _t
 
 _NUM = r"\d+(?:[.,]\d+)?"
-_CLEAN = re.compile(r"(?<![0-9A-Za-zА-Яа-яЁё])(" + _NUM + r")(?![0-9A-Za-zА-Яа-яЁё])")
+# A «clean» number: not part of a word on either side, and never cut short.
+#
+# The lookahead used to forbid a LETTER after the number, and the regex engine
+# answered by backtracking: «6,5H» (a flag glued to the result) and
+# «6,5ммоль/л» (a unit glued to it) could not match as 6,5, so they matched as
+# «6» — the comma is not a letter — and a glucose of 6.5 was stored as 6.0.
+# Now a digit or «,digit» after the match is what is refused, so the decimals
+# are always taken whole, and a letter after the number is allowed: it is a
+# flag or a unit on real forms. A number glued by a hyphen to a word on either
+# side is part of the NAME, not a value: «ИФР-1», «пиридоксаль-5-фосфат».
+_CLEAN = re.compile(r"(?<![0-9A-Za-zА-Яа-яЁё])(?<![A-Za-zА-Яа-яЁё]-)(?<!\d[.,])"
+                    r"(" + _NUM + r")(?![0-9]|[.,]\d)(?!-[A-Za-zА-Яа-яЁё])")
 _RANGE = re.compile(r"(" + _NUM + r")\s*[-–—]\s*(" + _NUM + r")")
 # A reference range whose thousands digit is separated by a SPACE: «197,0 - 1 500,0»,
 # «560 - 2 500», «3 000,0 - 27 000,0». The former _RANGE cut the number at the space and gave
@@ -38,6 +50,8 @@ _RANGE = re.compile(r"(" + _NUM + r")\s*[-–—]\s*(" + _NUM + r")")
 _NUM_TH = r"\d{1,3}(?:[ \u00A0\u202F\u2009]\d{3})+(?:[.,]\d+)?"
 _NUM_ANY = r"(?:" + _NUM_TH + r"|" + _NUM + r")"
 _RANGE_TH = re.compile(r"(" + _NUM_ANY + r")\s*[-–—]\s*(" + _NUM_ANY + r")")
+# A result with a thousands space, anchored where a clean number starts: «1 250,0».
+_TH_AT = re.compile(r"(" + _NUM_TH + r")(?![0-9]|[.,]\d)")
 _TAIL3 = re.compile(r"\d{3}(?:[.,]\d+)?$")
 # Rows of a multi-line reference block: «Мужчины (старше 18): < 4,20», «Взрослые: < 1,24»,
 # «Новорожденные (до 7 дней): 1,20 - 7,80». The lab prints the block under the result row, and
@@ -77,6 +91,7 @@ _ROW_OVER = re.compile(r"старше\s*(\d{1,2})|>\s*(\d{1,2})\s*(?:лет|го
 _ROW_UNDER = re.compile(r"до\s*(\d{1,2})\s*(?:лет|год\w*)\b", re.IGNORECASE)
 _ROW_UPPER = re.compile(r"(?:<|\bдо\b|\bменее\b)\s*(" + _NUM_ANY + r")", re.IGNORECASE)
 _ROW_LOWER = re.compile(r"(?:>|\bболее\b)\s*(" + _NUM_ANY + r")", re.IGNORECASE)
+_AGE_AFTER = re.compile(r"\s*(?:лет|год|года|мес|дн|нед|years?|months?|days?)", re.IGNORECASE)
 # Different labs label the draw date differently: «Дата взятия биоматериала»
 # (Invitro/Medgorod), «Взятие биоматериала: DD.MM.YYYY HH:MM» (DNKOM/Gemotest).
 # If it goes unrecognised, the form silently drops out of both ingest and reconcile.
@@ -945,6 +960,52 @@ def _drop_ratio_components(low: str, hits: Dict[str, Any]) -> Dict[str, Any]:
     return {k: v for k, v in hits.items() if k not in joined}
 
 
+def _unit_in(sl: str, surface: str) -> bool:
+    """Whether a unit spelling stands in a lower-cased row segment as a unit: not the
+    tail of a longer one («g/dl» inside «mg/dl»)."""
+    u = surface.lower()
+    j = sl.find(u)
+    while j >= 0:
+        if j == 0 or not sl[j - 1].isalpha():
+            return True
+        j = sl.find(u, j + 1)
+    return False
+
+
+def _row_unit(spec: Dict[str, Any], sl: str):
+    """The unit a row segment is printed in, for a marker WITHOUT a `units` map.
+
+    Such a marker used to take its number as written, whatever the row said: a
+    «Glucose 95 mg/dL» row became 95 mmol/L and read as catastrophic hyperglycaemia,
+    and an HbA1c of 48 mmol/mol became 48 %. The dictionary already knows every
+    other unit the marker is printed in (`convert`, `convert_affine`) and the ones
+    it deliberately cannot take (`convert_refused`); the parser now asks it.
+
+    Returns None when the segment names the canonical unit or no known one — the
+    number stands as written, as before — ("convert", surface) when it names a unit
+    the value must be converted from, and ("refused", surface) when the unit cannot
+    be converted into this marker at all.
+    """
+    canon = [spec.get("unit") or ""]
+    labels = ((core._read_knowledge_raw("units.json").get("units", {})
+               .get(spec.get("unit") or "") or {}).get("label") or {})
+    if isinstance(labels, dict):
+        canon += [v for v in labels.values() if isinstance(v, str)]
+    others = []
+    for kind, table in (("refused", spec.get("convert_refused") or {}),
+                        ("convert", spec.get("convert_affine") or {}),
+                        ("convert", spec.get("convert") or {})):
+        others += [(len(u), kind, u) for u in table if _unit_in(sl, u)]
+    if not others:
+        return None
+    best = max(others)
+    # A canonical spelling that is LONGER than the foreign one wins («ммоль/л» and
+    # «мг/дл» cannot both be the unit of one number; the more specific match is).
+    if any(c and _unit_in(sl, c) and len(c) >= best[0] for c in canon):
+        return None
+    return best[1], best[2]
+
+
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                  date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
@@ -1038,11 +1099,38 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
             pos = sp[1]
         return out
 
-    def _pick(masked: str, pl) -> Optional[re.Match]:
+    def _pick(masked: str, pl, raw: str = "") -> Optional[re.Match]:
         """The result number from the row tail. With plausible, the first one falling into the
         physiological range is taken (that is how the «абс.» and «%» columns of same-named rows
-        are separated). Without plausible — the first «clean» number (the previous behaviour)."""
+        are separated). Without plausible — the first «clean» number (the previous behaviour).
+
+        A result printed with a SPACE as the thousands mark («1 250,0») has two readings,
+        1 and 1250, and the first clean number is the wrong one: a ferritin of 1250 was
+        stored as 1. The two are told apart by evidence, never by guessing: the
+        physiological range when the marker has one, otherwise the reference range
+        printed on the same row — the reading nearer to it (on a ratio scale) wins.
+        With neither, the row is not read at all: a refusal, not a plausible number."""
         for mt in _CLEAN.finditer(masked):
+            th = _TH_AT.match(masked, mt.start())
+            if th and th.end() > mt.end():
+                small, big = _to_float(mt.group(1)), _to_float(th.group(1))
+                if pl is not None:
+                    ins, inb = pl[0] <= small <= pl[1], pl[0] <= big <= pl[1]
+                    if inb and not ins:
+                        return th
+                    if ins and not inb:
+                        return mt
+                sp = _range_span(raw) if raw else None
+                if not sp:
+                    return None
+                lo = sp[2] if sp[2] > 0 else sp[3]
+                hi = sp[3] if sp[3] > 0 else sp[2]
+
+                def _far(x: float) -> float:
+                    if x <= 0 or lo <= 0:
+                        return float("inf")
+                    return 0.0 if lo <= x <= hi else abs(math.log(x / (lo if x < lo else hi)))
+                return th if _far(big) < _far(small) else mt
             if pl is None or pl[0] <= _to_float(mt.group(1)) <= pl[1]:
                 return mt
         return None
@@ -1060,7 +1148,16 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         out, j = [], hay.find(needle)
         while j >= 0:
             if not ascii_name:
-                out.append(j)
+                # Cyrillic names need a LEFT boundary too. «Cyrillic names are long» held
+                # for the dictionary and not for the language, which builds new analytes
+                # by prefixing old ones: «преальбумин» and «микроальбумин» were read as
+                # albumin, «макропролактин» as prolactin, and «холестерин не-ЛПВП» as HDL
+                # — a different number stored under a marker it is not. The right side
+                # stays open because Russian declines the name («глюкозы», «ферритина»).
+                before = hay[j - 1] if j > 0 else " "
+                negated = hay[:j].endswith(("не-", "не ", "non-", "non "))
+                if not before.isalpha() and not negated:
+                    out.append(j)
             else:
                 before = hay[j - 1] if j > 0 else " "
                 end = j + len(needle)
@@ -1167,12 +1264,15 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                         continue    # the unit of this marker is not in the segment
                 elif req and not any(x in sl for x in req):
                     continue        # wrong column / wrong unit
+                ru = None if units else _row_unit(spec, sl)
+                if ru and ru[0] == "refused":
+                    continue        # printed in a unit this marker cannot be converted from
                 if _PEDI.search(seg):
                     pedi_hit = True
                     continue        # the segment holds only paediatric/female references
-                nm = _pick(_mask(seg), pl)
+                nm = _pick(_mask(seg), pl, seg)
                 if nm:
-                    got = (nm, seg, fac)
+                    got = (nm, seg, fac, ru[1] if ru else None)
                     break
             if spec.get("value_below"):
                 # The name is broken by a wrap, and the tail of the FIRST row holds numbers
@@ -1180,8 +1280,11 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                 # the usual wrap recovery does not fire: the result is printed separately on
                 # the next row. The only such case is «Индекс омега-3 (ЭПК+ДГК : ЖК)».
                 tail = _wrapped_tail(i)
-                nm = None if _is_legend(tail) else _pick(_mask(tail), pl)
-                got = (nm, tail, 1.0) if nm else None
+                ru = _row_unit(spec, tail.lower())
+                if ru and ru[0] == "refused":
+                    tail = ""
+                nm = None if (not tail or _is_legend(tail)) else _pick(_mask(tail), pl, tail)
+                got = (nm, tail, 1.0, ru[1] if ru else None) if nm else None
             if got is None and (pedi_hit or not any(c.isdigit() for c in segs[0])):
                 # The name is broken by a wrap — the value is printed on the neighbouring row.
                 # This path used to be closed by the condition `not req and not units`, so any
@@ -1204,20 +1307,36 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                     ok = best_u is not None
                 elif ok and req and not any(x in sl for x in req):
                     ok = False
+                ru = None if (units or not ok) else _row_unit(spec, sl)
+                if ru and ru[0] == "refused":
+                    ok = False
                 if ok and (_PEDI.search(tail) or _is_legend(tail)):
                     ok = False
                 if ok:
-                    nm = _pick(_mask(tail), pl)
+                    nm = _pick(_mask(tail), pl, tail)
                     if nm:
-                        got = (nm, tail, fac)
+                        got = (nm, tail, fac, ru[1] if ru else None)
             if got is None:
                 continue
-            nm, tail, fac = got
+            nm, tail, fac, from_unit = got
             rl = rh = None
             rest = _AGERANGE.sub(lambda mm: " " * (mm.end() - mm.start()), tail)[nm.end():]
             sp = _range_span(rest)                      # the range is SOUGHT after the value
             if sp:
                 rl, rh = sp[2] * fac, sp[3] * fac
+            else:
+                # A ONE-SIDED corridor on the result row: «Холестерин 5,6 ммоль/л < 5,2»,
+                # «… до 5,2», «HDL 1,4 > 1,0». The block reader below understood these; the
+                # row itself did not, so the commonest lipid and tumour-marker layout
+                # arrived with no corridor at all and a high cholesterol read as unflagged.
+                # An age («до 18 лет») is a group label, not a bound.
+                one = _ROW_UPPER.search(rest)
+                if one and not _AGE_AFTER.match(rest, one.end()):
+                    rh = _to_float(one.group(1)) * fac
+                else:
+                    one = _ROW_LOWER.search(rest)
+                    if one and not _AGE_AFTER.match(rest, one.end()):
+                        rl = _to_float(one.group(1)) * fac
             # A multi-line reference: when the range on the result row is labelled with the
             # WRONG group (female, paediatric, a foreign age span), the first fitting row of
             # the block below is taken. Example: «17-ОН-прогестерон <value> Новорожденные
@@ -1228,7 +1347,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
             # somebody else, AND ALSO when the row printed no range at all — many
             # forms put the value on one line and the whole reference block under
             # it, and that case used to end with no corridor at any cost.
-            if o_age is not None and (rl is None or not row_fits):
+            if o_age is not None and ((rl is None and rh is None) or not row_fits):
                 rl = rh = None
                 fits = _fitting_rows(lines, i, o_sex, o_age)
                 # «The only applicable row», not «the first row that passed».
@@ -1242,6 +1361,17 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                     rl = rl * fac if rl is not None else None
                     rh = rh * fac if rh is not None else None
             val = _to_float(nm.group(1)) * fac
+            if from_unit:
+                # Value and corridor through the one law that knows factors AND formulas.
+                cv = core.convert_to_canonical(spec, from_unit, val)
+                if not cv.get("ok"):
+                    continue
+                val = cv["value"]
+                bounds = []
+                for b in (rl, rh):
+                    cb = core.convert_to_canonical(spec, from_unit, b) if b is not None else None
+                    bounds.append(cb["value"] if cb and cb.get("ok") else None)
+                rl, rh = bounds
             if fac != 1.0:
                 val = round(val, 2 if abs(val) >= 1 else 4)
                 rl = round(rl, 2 if abs(rl) >= 1 else 4) if rl is not None else None
@@ -1315,13 +1445,6 @@ def _unrecognised_labels(text: str, limit: int = 12):
         if len(out) >= limit:
             break
     return out
-
-
-def _sex_specific_and_sex_unknown(spec) -> bool:
-    """True when this marker's default range is sex-specific and the sex is unknown."""
-    if not spec.get("ref_by_sex"):
-        return False
-    return core.profile_sex() not in ("male", "female")
 
 
 #: What a folder of results actually holds. The walk used to be `rglob("*.pdf")`,
@@ -1742,20 +1865,15 @@ def ingest(folder: str, force: bool = False,
                     # ref_locked=true: the reference comes only from the dictionary, form ignored.
                     rl, rh = spec.get("ref_low"), spec.get("ref_high")
                 else:
+                    # Only what the FORM printed. The dictionary corridor used to be copied in
+                    # here when the form printed none, and the point then carried it as its own:
+                    # the corridor reader took it for the form's range and skipped every check
+                    # it makes before lending the reference base — whose sex the corridor was
+                    # transcribed from, which age band it belongs to. A woman's point was
+                    # judged by a man's ceiling with nothing on screen saying so. A point with
+                    # no printed range now stays without one, and the base is lent — or
+                    # withheld, with its reason — by the one place that knows the rules.
                     rl, rh = v["ref_low"], v["ref_high"]
-                    if rl is None and rh is None and _sex_specific_and_sex_unknown(spec):
-                        # The dictionary default for these six markers IS the male
-                        # range — uric acid, testosterone, creatinine, ferritin,
-                        # haematocrit, haemoglobin. Substituting it for a person whose
-                        # sex nobody asked for is how a woman's normal testosterone
-                        # was flagged against 12.1–34.4. The project's own rule says a
-                        # marker with no range from the form gets no range at all; it
-                        # applies here, and the point is stored without one rather
-                        # than with a plausible wrong one.
-                        pass
-                    else:
-                        rl = rl if rl is not None else spec.get("ref_low")
-                        rh = rh if rh is not None else spec.get("ref_high")
                 # display_name — the printed name of the marker, used when names[] holds only
                 # lower-case search substrings (e.g. the dysbacteriosis panel).
                 name = (existing.get(key) or core.marker_display(spec, i18n.lang())

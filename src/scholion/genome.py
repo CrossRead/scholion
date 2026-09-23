@@ -514,8 +514,9 @@ def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List
     # the empty list this exception exists to keep out of a gene report.
     if engine_pin() == "linear" or not _index_usable(vcf):
         raise RangeNeedsIndex(chrom)
-    pref = _chr_prefix(vcf)
-    name = f"{pref}{chrom}" if not str(chrom).startswith("chr") else str(chrom)
+    name = contig_name(vcf, chrom)
+    if name is None:
+        raise ContigNotInFile(chrom)
     if _have_bcftools():
         out = subprocess.run(["bcftools", "view", "-H", "-r", f"{name}:{start}-{end}", vcf],
                              capture_output=True, text=True, timeout=60).stdout
@@ -525,6 +526,14 @@ def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List
         return rows
     from . import tabixlite
     return tabixlite.query(vcf, name, start, window=end - start)
+
+
+class ContigNotInFile(RangeNeedsIndex):
+    """A region asked on a contig the file does not hold.
+
+    A subclass so that every caller that already refuses a region it cannot
+    answer refuses this one too; the callers that can say WHY catch it first.
+    """
 
 
 #: How a build was established, weakest last. The order is the ranking: a fact
@@ -1388,10 +1397,75 @@ def _region_key(vcf: str, region: str) -> Optional[Tuple[Any, ...]]:
             tuple((i.st_size, i.st_mtime_ns) for i in idx), region)
 
 
+def _file_contigs(vcf: str) -> Optional[Tuple[frozenset, bool]]:
+    """(contig names, declared) for this file, or None when they cannot be read.
+
+    The header's `##contig` lines come first: they declare the reference the file
+    was called against, including a contig that holds no row — and that one is a
+    legitimate «no variants here». The index lists only the contigs that hold
+    rows, so it is used for the SPELLING when the header declares nothing, never
+    to refuse. None is «unknown», never «empty».
+    """
+    try:
+        st = os.stat(vcf)
+        key = (vcf, st.st_size, st.st_mtime_ns)
+    except OSError:
+        return None
+    if key in _CONTIGS_CACHE:
+        return _CONTIGS_CACHE[key]
+    head = _header_text(vcf) or ""
+    names = re.findall(r"^##contig=<ID=([^,>]+)", head, re.MULTILINE)
+    declared = bool(names)
+    if not names:
+        try:
+            from . import tabixlite
+            names = list(tabixlite.contigs(vcf) or [])
+        except Exception:                                            # noqa: BLE001
+            names = []
+    out = (frozenset(names), declared) if names else None
+    _CONTIGS_CACHE[key] = out
+    return out
+
+
+_CONTIGS_CACHE: Dict[Tuple[Any, ...], Optional[Tuple[frozenset, bool]]] = {}
+
+#: The mitochondrion has two names in common use, and the «chr» prefix rule
+#: alone turns `MT` into `chrMT`, a contig no file carries.
+_CONTIG_ALIASES = {"MT": ("MT", "M"), "M": ("M", "MT")}
+
+
+def contig_name(vcf: str, chrom: str) -> Optional[str]:
+    """The name this file uses for `chrom`, or None when the file has no such contig.
+
+    A query for a contig the file does not hold returns no rows, and no rows at a
+    position is read as «the reference» — so a file without chrY, or one that
+    names the mitochondrion `chrM` where the catalogue says `MT`, reported the
+    reference at every locus there. When the file's contigs cannot be listed the
+    old spelling is returned and nothing is claimed either way.
+    """
+    bare = str(chrom)
+    if bare.startswith("chr"):
+        bare = bare[3:]
+    pref = _chr_prefix(vcf)
+    cands = []
+    for b in _CONTIG_ALIASES.get(bare.upper(), (bare,)):
+        for n in (f"{pref}{b}", b, f"chr{b}"):
+            if n not in cands:
+                cands.append(n)
+    known = _file_contigs(vcf)
+    if known is None:
+        return cands[0]
+    have, declared = known
+    hit = next((n for n in cands if n in have), None)
+    if hit is None and not declared:
+        return cands[0]            # an index lists rows, not the reference: no refusal
+    return hit
+
+
 def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
     """VCF rows at the position (bcftools). Empty = the site is not variant (reference)."""
-    pref = _chr_prefix(vcf)
-    name = f"{pref}{chrom}" if not str(chrom).startswith("chr") else str(chrom)
+    name = contig_name(vcf, chrom) or (f"{_chr_prefix(vcf)}{chrom}"
+                                       if not str(chrom).startswith("chr") else str(chrom))
     # No index, or a pin naming the reader that does not use one: the answer comes
     # out of the single pass. Asked first, because the seeking readers below would
     # each return an empty list here and an empty list is read as «reference».
@@ -1929,6 +2003,10 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "note": _t("genome.no_coordinates_for_assembly",
                            assembly=asm or "?", rsid=loc.get("rsid") or "")}
     from . import linear as _lin
+    if contig_name(str(vp), loc["chrom"]) is None:
+        return {"genotype": None, "confidence": "contig_not_in_file", "source": "vcf",
+                "assembly": asm, "read_pos": pos,
+                "note": _t("genome.contig_not_in_file", chrom=loc["chrom"])}
     try:
         lines = _query_region(str(vp), loc["chrom"], pos)
     except _lin.Unreadable as exc:
@@ -2003,9 +2081,12 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             # could NOT read too, with `./.` and a depth of 0 — and this branch
             # looked at the depth and never at the genotype, so an unread
             # stretch was printed `confirmed_ref`, the strongest label there is.
-            bgt = bsample[bfmt.index("GT")] if "GT" in bfmt else (bsample[0] if bsample else "")
-            bidx = [i for i in bgt.replace("|", "/").split("/") if i.isdigit()]
-            if not bidx:
+            bgt = (bsample[bfmt.index("GT")]
+                   if ("GT" in bfmt and bfmt.index("GT") < len(bsample)) else "")
+            bparts = bgt.replace("|", "/").split("/") if bgt else []
+            bidx = [i for i in bparts if i.isdigit()]
+            # A half-read block («./0») is not the reference confirmed either.
+            if not bidx or len(bidx) != len(bparts):
                 return {"genotype": None, "confidence": "no_call_in_vcf", "source": "vcf",
                         "assembly": asm, "read_pos": pos, "filter": block[6], "depth": dp,
                         "note": _t("genome.no_call_in_vcf")}
@@ -2060,8 +2141,16 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             continue
         fmt = f[8].split(":")
         sample = f[9 + col].split(":")
-        gt_raw = sample[fmt.index("GT")] if "GT" in fmt else sample[0]
-        idx = [i for i in gt_raw.replace("|", "/").split("/") if i.isdigit()]
+        # No GT field is no genotype. The first sample field used to stand in for
+        # it, and in a FORMAT that opens with DP that is a depth read as alleles.
+        gt_raw = sample[fmt.index("GT")] if ("GT" in fmt and fmt.index("GT") < len(sample)) else ""
+        parts = gt_raw.replace("|", "/").split("/") if gt_raw else []
+        idx = [i for i in parts if i.isdigit()]
+        # A HALF call («./0», «1/.») is not a call either. It used to keep the one
+        # index it had and come out as a one-letter genotype labelled `called`:
+        # a diploid site with one allele unread, printed as a reading.
+        if len(idx) != len(parts):
+            idx = []
         # `./.` is NOT a call. An empty genotype string used to travel onward
         # labelled `called`, so the refusal head was assembled from the word
         # «called», no key of that name existed in the message catalogue, and the

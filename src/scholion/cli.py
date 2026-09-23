@@ -592,6 +592,10 @@ def _sites_echo(done, total, item=None):
                         if item else _t("sites.progress_merge"))
 
 
+#: Commands whose whole job is one value a person typed; see the exit rule in main().
+_VALUE_WRITES = ("add-lab", "add-med", "remove-med", "add-metric", "target", "lab-draw")
+
+
 def main(argv=None) -> int:
     """The command line, with one class of failure caught before it reaches a person.
 
@@ -1208,6 +1212,14 @@ def _main(argv=None) -> int:
         # tell the two apart without parsing the text (task 124).
         return 1
     if args.cmd in ("genotype-sites", "coverage") and not res.get("ok"):
+        return 1
+    # A value that was REFUSED — a unit not accepted, a marker name unknown, a date
+    # that is not a date — printed its reason and exited 0, so a script adding a
+    # column of values could not tell which of them never arrived. For the commands
+    # that write a value somebody typed, a refusal is a failure of the command.
+    # Folder and ingest commands keep answering 0 on «nothing there»: an absence
+    # of data is an answer, and their reports already say what was not read.
+    if args.cmd in _VALUE_WRITES and isinstance(res, dict) and res.get("ok") is False:
         return 1
     if args.cmd == "limits" and args.bed and not res.get("ok"):
         # `scholion limits --bed > weak.bed` must not leave a refusal sentence

@@ -282,7 +282,14 @@ LINE_BUDGETS = {
     # are: how well the gene was read travels with every gene on the
     # prescription path, and a missing guideline row carries the written reason
     # there is none instead of the generic sentence that there is none.
-    "pgx": 1010,
+    # 1010 → 1160 on 22.09.2026 (0.5.7 review). Five answers that read as
+    # reassuring from missing input now say what is missing: an unread second
+    # gene of a two-gene drug, a called phenotype the table has no word for,
+    # every CPIC gene of the drug reaching the prescription verdict, a genotype
+    # counted only when its letters are the locus's own, and drug names matched
+    # as whole words so a guideline is never printed for a different medicine.
+    # All five are the drug-gene answer itself; none is a domain to split along.
+    "pgx": 1160,
     # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a
     # mark on the figure is about, and the score of the markers made in that
     # one place. It belongs beside `health_radar` because the domain's own

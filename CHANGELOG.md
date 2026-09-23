@@ -40,6 +40,180 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.7 — 22.09.2026
+
+### What you can do now
+
+Nothing new to learn: this release corrects answers. Every item below is a
+wrong answer somebody could have received from 0.5.6, and what they receive now.
+
+### What is fixed
+
+**Laboratory forms**
+
+**A flag or a unit printed against the result cut its decimals off.** «6,5H» and
+«6,5ммоль/л» were stored as 6.0. The whole number is read now.
+
+**A result with a space as the thousands mark was cut at the space.** A ferritin
+of «1 250,0» was stored as 1. The two readings are told apart by the corridor
+printed on the same row (or the marker's physiological range); with neither, the
+row is left unread rather than guessed.
+
+**A digit of the analyte's name was taken for its result.** «ИФР-1» and
+«пиридоксаль-5-фосфат» gave 1 and 5. A number joined by a hyphen to a word is
+part of the name.
+
+**A longer analyte was stored as the shorter one it contains.** Prealbumin and
+microalbumin were read as albumin, macroprolactin as prolactin, non-HDL
+cholesterol as HDL, latent iron-binding capacity as total, folate in red cells
+as serum folate — each a different number filed under a marker it is not.
+
+**The unit printed on the row was ignored for most markers.** «Glucose 95
+mg/dL» became 95 mmol/L, a catastrophic reading; an HbA1c of 48 mmol/mol became
+48 %. The row's unit is now converted, value and corridor together — by the
+formula where the unit needs one — and a unit the marker cannot take (Lp(a) in
+mg/dL) leaves the row unread.
+
+**A one-sided corridor on the result row was not read.** «< 5,2», «до 5,2»,
+«> 1,0» and «более 1,0» — the commonest layout for lipids and liver enzymes —
+arrived with no corridor at all, so a total cholesterol of 6.1 against a printed
+ceiling of 5.2 was not flagged.
+
+**A corridor the form did not print was stored as if it had.** It was filled in
+from the dictionary and then judged as the form's own, skipping the checks made
+before a reference range is lent — whose sex and which age band it belongs to. A
+woman's point could be judged by a man's ceiling with nothing on screen saying
+so. Such a point now carries no corridor of its own, and the reference is lent,
+labelled, or withheld with its reason.
+
+**The reconciliation reported every point as missing, and the provenance audit
+called every point hand-entered,** once points began to carry the day and the
+clock time of the draw. Both now match a draw at the resolution each side has.
+
+**Lab points written at the same moment could be lost.** Two writes from the
+page could each read the history, add their own point and write back the other's
+loss. Writes of a lab point are now serialised.
+
+**A local marker file that could not be read was overwritten.** The next
+proposal replaced it with an empty file holding one entry, and every marker, unit
+and rule the person had confirmed was gone. A write over such a file is now
+refused and the file is kept.
+
+**Pharmacogenetics and prescriptions**
+
+**An unread second gene disappeared from a two-gene drug.** With TPMT normal and
+NUDT15 never read, azathioprine was answered as a normal-dose drug. The unread
+gene is now named, and the answer does not read as reassuring until it is read.
+
+**A called phenotype the engine had no code for was answered as normal.** A
+caller's «Indeterminate», and SLCO1B1's «Poor Function», fell through to «nothing
+notable in the markers». «Indeterminate» is now unknown; SLCO1B1's function
+phenotypes reach the statin table; any other phrase is quoted and not taken for
+normal.
+
+**A genotype that was not a reading of the counted allele was counted as zero
+copies.** A strand-ambiguous chip call, a genotype written on the other strand,
+and a person carrying the other alternative allele of a multi-allelic site all
+produced «normal». Each is now unread.
+
+**A drug name was matched inside other words.** Nystatin was given the statin
+guideline, «Антигриппин» the proton pump inhibitor one, and heparin the omega-3
+dose evidence. Names are now matched as whole words; a dose, a brand word or a
+Russian case ending still matches.
+
+**A non-normal phenotype with no guideline row read as low.** A CYP2C19 poor
+metaboliser asking about pantoprazole, and a CYP2C9 poor metaboliser asking about
+celecoxib, were told «low». Every gene the guideline database links to a drug
+now reaches the prescription verdict: a non-normal phenotype without a row, and
+an actionable gene that could not be read (HLA among them), are named and keep
+the verdict off green.
+
+**Genome files**
+
+**A half call («./0») was read as a call**, and a reference block with one
+allele unread as a confirmed reference. Both are now «no call».
+
+**A missing row on an exome was presumed to be the reference.** Outside an
+exome's targets nobody sequenced the position. The presumption is now made only
+on a file whose breadth shows it is a whole genome.
+
+**A chromosome the file does not hold was read as the reference at every locus
+on it** — a file without chrY, or one that names the mitochondrion `chrM` where
+the catalogue says `MT`. Both names are tried, and a contig the file does not
+declare is said to be absent.
+
+**A multi-sample file read in container form took the first sample as the
+person.** It now needs the sample named, as a multi-sample VCF already did.
+
+**A gene region was asked of a file in another build.** GRCh38 coordinates on a
+GRCh37 file returned the variants of some other stretch — usually none, printed
+as «0 variants in the gene». The region is now refused with the reason.
+
+**The page and the local server**
+
+**Another server on the same machine could write to the profile.** The origin
+check compared the host name and not the port, so a page served on
+`localhost:3000` could add a medication. The whole origin is compared now, and a
+browser's cross-site fetch is refused by its own fetch metadata as well. The
+drug, prescription and genome questions — which reach outside services on the
+caller's behalf — are gated the same way.
+
+**The prescription card never showed its verdict or the genetic context of the
+decision** — both were computed and left out. They are shown now.
+
+**The ACMG class chips did nothing when clicked, a ClinVar finding opened an
+empty gene card, and choosing a genome file also opened a folder dialog.** Each
+now does the one thing it says.
+
+**An error answer was drawn as if it were data**, and the state of a recompute
+was cached by the page. Neither happens now.
+
+**Other doors**
+
+**Under the Ouroboros Hub, `recompute` started work that could never finish.**
+The Hub runs every call in a fresh process, and a rebuild started on a thread
+died with the call. There it now shows the plan and names the command to run in
+a terminal.
+
+**A package registry that did not answer was asked again on every call**, each
+call paying the timeout. The failure is remembered for an hour.
+
+**A long-running process that started offline never mentioned a newer build.**
+The note was closed for the process before anything was said.
+
+**Two recomputes could run at once**, one from the page and one from a terminal,
+and a run that did not start left the job marked as running until the server
+restarted. The job is claimed atomically now, and always ends in a final state.
+
+**The MCP server stopped on one deeply nested message**, ending the session for
+every later call. It answers with a parse error and carries on.
+
+**A refused value exited with success.** `add-lab`, `add-med`, `remove-med`,
+`add-metric`, `target` and `lab-draw` printed the refusal and returned 0, so a
+script could not tell which values never arrived. They return 1 now.
+
+**The public package could carry files git ignores** — a spreadsheet, a log or an
+`.env` left beside the code. What git will not track is no longer copied.
+
+### A series break
+
+Laboratory forms read with this version give different values on unchanged
+input wherever one of the defects above applied: decimals and thousands are read
+whole, a row's unit is converted, a one-sided corridor is kept, a prefixed
+analyte no longer lands on its stem, and a point no longer carries a corridor its
+form did not print. A value stored by an earlier version and the same form read
+again can differ; they should not be charted together without re-reading.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if forms were ingested by an earlier version.**
+Values, units and corridors are read again under the corrected rules; points of the same draw are replaced, not doubled.
+
+
 ## v0.5.6 — 22.09.2026
 
 ### What you can do now
@@ -174,8 +348,6 @@ Their markers were found and dropped for want of a date; they are stored with it
 
 **Run `scholion ingest-studies <folder of studies>` — if the folder holds studies whose header is one line of date, time and kind.**
 They were stored without a date and mostly without a kind.
-
-Nothing.
 
 ## v0.5.4 — 17.09.2026
 

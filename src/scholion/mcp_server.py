@@ -365,6 +365,15 @@ def serve(stdin: Optional[Iterable[str]] = None, stdout=None) -> int:
             continue
         try:
             message = json.loads(line)
+        except RecursionError:
+            # JSON nested deeper than the interpreter's stack is not a message, and
+            # it used to be an uncaught exception that ended the server for every
+            # later call of the session. It is a parse error like any other.
+            out.write(json.dumps({"jsonrpc": "2.0", "id": None,
+                                  "error": {"code": PARSE_ERROR,
+                                            "message": "not JSON: nested too deeply"}}) + "\n")
+            out.flush()
+            continue
         except ValueError as e:
             out.write(json.dumps({"jsonrpc": "2.0", "id": None,
                                   "error": {"code": PARSE_ERROR,

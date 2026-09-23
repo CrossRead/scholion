@@ -37,6 +37,12 @@ reported as a discrepancy with the first. Only the date changed — every marker
 and every parsed record stayed identical, which is what made the refresh safe to
 accept rather than a symptom to investigate.
 
+A SECOND deliberate refresh (0.5.7): six records of `01_biochem` gained the
+one-sided corridor their own rows print («до 5,2», «более 1,0»). The baseline
+had recorded those rows with no corridor at all, which was the defect: a total
+cholesterol of 6.1 against a printed ceiling of 5.2 was stored unflagged. Every
+value and every other record stayed identical; only the missing bound appeared.
+
 """
 from __future__ import annotations
 

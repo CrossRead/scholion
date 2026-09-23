@@ -38,6 +38,8 @@ from . import core, updates
 
 NOTICE_FILE = "update_notice.json"
 MAX_AGE_HOURS = 24
+#: How long a registry that did not answer is left alone before it is asked again.
+UNREACHABLE_HOURS = 1
 PACKAGE = "scholion"
 
 
@@ -89,12 +91,27 @@ def notice(max_age_hours: float = MAX_AGE_HOURS, fetch: Optional[Callable] = Non
     if (cached and cached.get("installed") == installed
             and now - float(cached.get("checked_at") or 0) < max_age_hours * 3600):
         return {**cached, "from_cache": True, "route": route()}
+    # A registry that did not answer is asked again, but not on every call: under
+    # a host that starts a process per call, «again next time» was «again on every
+    # tool call», each paying the request's timeout (OuroborosHub review, 22.09).
+    # The failure is remembered for an hour and never read as «current».
+    missed = (cached or {}).get("unreachable_at")
+    if fetch is None and missed and now - float(missed) < UNREACHABLE_HOURS * 3600:
+        return {"status": "unreachable", "installed": installed, "latest": None,
+                "from_cache": True, "route": route()}
     if fetch is None and net.offline():
         return {"status": "offline", "installed": installed, "latest": None,
                 "from_cache": False, "route": route()}
     r = updates.check_registry(fetch)
     record = {"status": r["status"], "installed": installed, "latest": r.get("latest"),
               "checked_at": now}
+    if r["status"] == "unreachable":
+        try:
+            path = _notice_path()
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps({**(cached or {}), "unreachable_at": now}), encoding="utf-8")
+        except OSError:
+            pass
     if r["status"] in ("newer", "current"):
         try:
             path = _notice_path()
@@ -187,7 +204,6 @@ def session_note(now: Optional[float] = None) -> str:
     global _SAID
     if _SAID:
         return ""
-    _SAID = True
     now = time.time() if now is None else now
     try:
         n = notice(now=now)
@@ -197,8 +213,12 @@ def session_note(now: Optional[float] = None) -> str:
         return ""
     latest = str(n.get("latest") or "")
     if _said_recently(latest, now):
+        _SAID = True
         return ""
     _remember_said(latest, now)
+    # Set only once something was said: set before the check, a long-lived
+    # process that started offline, or before a release, never mentioned one.
+    _SAID = True
     from .i18n import t as _t
     key = "upgrade.session_note_host" if (n.get("route") or {}).get("kind") == "host" else "upgrade.session_note"
     return _t(key, latest=latest or "—", installed=n.get("installed") or "—",

@@ -141,6 +141,31 @@ class TestRequestGuard(unittest.TestCase):
         code, _ = self._call("/api/diag")
         self.assertNotEqual(code, 403, "a request with no Origin at all was blocked")
 
+    def test_another_local_port_is_another_origin(self):
+        """The 0.5.7 review: the Origin check compared the host name and not the
+        port, so a page served by any other local server — a dev server on
+        localhost:3000 — could POST here, and a medication was added that way."""
+        for other in ("http://localhost:3000", f"http://127.0.0.1:{self.port + 1}",
+                      f"http://localhost:{self.port}"):
+            with self.subTest(origin=other):
+                code, _ = self._call("/api/medications", {"name": "x", "dose": "1"},
+                                     {"Origin": other})
+                self.assertEqual(code, 403, f"{other} was taken for this server")
+
+    def test_a_cross_site_fetch_without_origin_is_refused_by_its_fetch_metadata(self):
+        code, _ = self._call("/api/medications", {"name": "x", "dose": "1"},
+                             {"Sec-Fetch-Site": "cross-site"})
+        self.assertEqual(code, 403)
+        code, _ = self._call("/api/ping", headers={"Sec-Fetch-Site": "same-origin"})
+        self.assertEqual(code, 200)
+
+    def test_the_network_reaching_gets_are_gated_too(self):
+        for route in ("/api/drug?name=warfarin", "/api/prescription-check?drug=warfarin",
+                      "/api/genome?rsid=rs1800462"):
+            with self.subTest(route=route):
+                code, _ = self._call(route, headers={"Origin": "http://localhost:3000"})
+                self.assertEqual(code, 403, f"{route} answered a foreign page")
+
     def test_a_request_without_origin_works(self):
         """curl and the CLI do not send an Origin — there is nothing and no reason to break them."""
         code, _ = self._call("/api/assistant/context", {})

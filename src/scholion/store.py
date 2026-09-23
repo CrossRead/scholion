@@ -469,6 +469,7 @@ DATE_SOURCES = {
 DATE_APPROXIMATE = ("ordered", "filename")
 
 
+@_serialized
 def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] = None,
                   unit: Optional[str] = None, ref_low: Optional[float] = None,
                   ref_high: Optional[float] = None, direction: Optional[str] = None,

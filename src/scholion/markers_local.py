@@ -46,14 +46,45 @@ from .i18n import t as _t
 _ALLOWED = ("key", "unit", "direction", "loinc", "labels", "specimen", "note")
 
 
-def _load() -> Dict[str, Any]:
+class _Unreadable(Exception):
+    """The overlay exists and cannot be parsed."""
+
+
+def _load(for_write: bool = False) -> Dict[str, Any]:
+    """The overlay, or an empty one when there is none.
+
+    An overlay that EXISTS and does not parse is not «empty». Read as empty, the
+    next proposal wrote an empty file with one entry over it, and every confirmed
+    marker, unit and row rule the person had vouched for was gone. A reader still
+    gets an empty overlay (nothing unconfirmed takes effect either way); a writer
+    is refused, and the file stays as it is for the person to repair.
+    """
     p = core.markers_overlay_read_path()
     try:
         return json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {"_meta": {"purpose": "locally added marker entries; see markers_local.py",
-                          "source_tier": "user_contributed"},
-                "markers": {}}
+    except FileNotFoundError:
+        pass
+    except (OSError, ValueError) as exc:
+        if for_write:
+            raise _Unreadable(f"{p}: {type(exc).__name__}") from exc
+    return {"_meta": {"purpose": "locally added marker entries; see markers_local.py",
+                      "source_tier": "user_contributed"},
+            "markers": {}}
+
+
+def _mutator(fn):
+    """Hold the profile write-lock for the whole read-modify-write, and refuse to
+    write over an overlay that could not be read."""
+    import functools
+
+    @functools.wraps(fn)
+    def _w(*a, **k):
+        try:
+            with core.profile_write_lock():
+                return fn(*a, **k)
+        except _Unreadable as exc:
+            return {"ok": False, "error": _t("markers.overlay_unreadable", where=str(exc))}
+    return _w
 
 
 def _save(data: Dict[str, Any]) -> None:
@@ -61,6 +92,7 @@ def _save(data: Dict[str, Any]) -> None:
     core.reset_cache()
 
 
+@_mutator
 def propose(key: str, *, unit: str = "", names_ru: Optional[List[str]] = None,
             names_en: Optional[List[str]] = None, direction: str = "",
             loinc: str = "", note: str = "", by: str = "model") -> Dict[str, Any]:
@@ -80,7 +112,7 @@ def propose(key: str, *, unit: str = "", names_ru: Optional[List[str]] = None,
         return {"ok": False, "error": _t("markers.already_shipped", key=key)}
     if not (names_ru or names_en):
         return {"ok": False, "error": _t("markers.need_names")}
-    data = _load()
+    data = _load(for_write=True)
     spec: Dict[str, Any] = {"status": "proposed", "proposed_by": by,
                             "proposed_on": datetime.date.today().isoformat()}
     if unit:
@@ -102,6 +134,7 @@ def propose(key: str, *, unit: str = "", names_ru: Optional[List[str]] = None,
     return {"ok": True, "key": key, "status": "proposed", "spec": spec}
 
 
+@_mutator
 def confirm(key: str) -> Dict[str, Any]:
     """A person vouches for an entry. From here it takes effect.
 
@@ -110,7 +143,7 @@ def confirm(key: str) -> Dict[str, Any]:
     corridor. Until this call none of the three touches a number or makes a
     claim.
     """
-    data = _load()
+    data = _load(for_write=True)
     bucket = _bucket_of(key) or "markers"
     spec = (data.get(bucket) or {}).get(key)
     if not spec:
@@ -121,8 +154,9 @@ def confirm(key: str) -> Dict[str, Any]:
     return {"ok": True, "key": key, "kind": bucket, "status": "confirmed"}
 
 
+@_mutator
 def drop(key: str) -> Dict[str, Any]:
-    data = _load()
+    data = _load(for_write=True)
     bucket = _bucket_of(key)
     if not bucket:
         return {"ok": False, "error": _t("markers.no_such_proposal", key=key)}
@@ -177,6 +211,7 @@ def listing() -> Dict[str, Any]:
 # rule, never a value», applied one layer down.
 # ═══════════════════════════════════════════════════════════════════════════
 
+@_mutator
 def propose_unit(marker: str, surface: str, *, factor: Optional[float] = None,
                  refuse_reason: str = "", note: str = "", by: str = "model") -> Dict[str, Any]:
     """Propose that a printed unit form belongs to a marker.
@@ -193,7 +228,7 @@ def propose_unit(marker: str, surface: str, *, factor: Optional[float] = None,
         return {"ok": False, "error": _t("markers.need_marker_and_unit")}
     if factor is None and not refuse_reason:
         return {"ok": False, "error": _t("markers.need_factor_or_reason")}
-    data = _load()
+    data = _load(for_write=True)
     entry = {"status": "proposed", "proposed_by": by,
              "proposed_on": datetime.date.today().isoformat(), "marker": marker,
              "surface": surface}
@@ -208,6 +243,7 @@ def propose_unit(marker: str, surface: str, *, factor: Optional[float] = None,
     return {"ok": True, "key": f"{marker}|{surface}", "status": "proposed", "spec": entry}
 
 
+@_mutator
 def propose_row_rule(pattern: str, *, kind: str = "alien", note: str = "",
                      example: str = "", by: str = "model") -> Dict[str, Any]:
     """Propose a rule for reading a multi-line reference block.
@@ -234,7 +270,7 @@ def propose_row_rule(pattern: str, *, kind: str = "alien", note: str = "",
         _re.compile(pattern)
     except _re.error as e:
         return {"ok": False, "error": _t("markers.bad_pattern", why=str(e))}
-    data = _load()
+    data = _load(for_write=True)
     data.setdefault("row_rules", {})[pattern] = {
         "status": "proposed", "kind": kind, "note": note, "example": example.strip(),
         "proposed_by": by, "proposed_on": datetime.date.today().isoformat()}
@@ -243,7 +279,7 @@ def propose_row_rule(pattern: str, *, kind: str = "alien", note: str = "",
 
 
 def _bucket_of(key: str) -> Optional[str]:
-    data = _load()
+    data = _load(for_write=True)
     for bucket in ("markers", "units", "row_rules"):
         if key in (data.get(bucket) or {}):
             return bucket

@@ -1899,7 +1899,10 @@ def _pgx_mark(name: str) -> str:
                 # already typed a drug name; here it labels a LIST, and «и» — one
                 # letter of a supplement's name — matched «ипп» and earned a
                 # vitamin the tag «pharmacogenetics: CYP2C19».
-                if q == n or (min(len(q), len(n)) >= 4 and (q in n or n in q)):
+                # Now the same whole-word rule as the lookup itself: «нистатин»
+                # held «статин» and was labelled a statin with an SLCO1B1 note.
+                from .engine.pgx import name_matches
+                if name_matches(q, n):
                     return " " + _t("medications.in_pgx", gene=entry.get("gene") or "—")
     except Exception as exc:                                         # noqa: BLE001
         # An empty mark means «outside the model» — the legend says so under
@@ -3092,6 +3095,9 @@ def recompute_run_report(r: Dict[str, Any]) -> str:
     reason = r.get("reason")
     if reason == "busy":
         return _t("recompute.busy")
+    if reason == "per_call_host":
+        return _t("recompute.per_call_host", host=r.get("host") or "—") + (
+            "\n\n" + recompute_plan_report(r["plan"]) if r.get("plan") else "")
     head = _t("recompute.not_confirmed") if reason == "not_confirmed" else _t("recompute.nothing_ready")
     return head + ("\n\n" + recompute_plan_report(r["plan"]) if r.get("plan") else "")
 

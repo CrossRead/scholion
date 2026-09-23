@@ -157,6 +157,7 @@ from .sources import (
 from .pgx import (
     cpic_snapshot,  # noqa: F401 -- the facade re-exports every name
     compute_phenotype,
+    name_matches,
     check_drug_gene,
     _guidance_for,
     _check_drug_online,

@@ -52,6 +52,18 @@ class TestTheHandshake(unittest.TestCase):
         self.assertEqual(answers[0]["error"]["code"], mcp_server.PARSE_ERROR)
         self.assertEqual(answers[1]["id"], 2, "one bad frame must not take the session with it")
 
+    def test_a_frame_nested_past_the_stack_does_not_end_the_session(self):
+        """The 0.5.7 review: `json.loads` raises RecursionError, not ValueError,
+        on deep nesting, and that one exception ended the server."""
+        deep = "[" * 200000 + "]" * 200000
+        out = io.StringIO()
+        mcp_server.serve(iter([deep + "\n",
+                               json.dumps({"jsonrpc": "2.0", "id": 3, "method": "ping"}) + "\n"]),
+                         out)
+        answers = [json.loads(line) for line in out.getvalue().splitlines()]
+        self.assertEqual(answers[0]["error"]["code"], mcp_server.PARSE_ERROR)
+        self.assertEqual(answers[1]["id"], 3)
+
 
 class TestTheToolListIsDerived(unittest.TestCase):
 

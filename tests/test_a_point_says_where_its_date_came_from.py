@@ -27,6 +27,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from scholion import store  # noqa: E402
+import support  # noqa: E402
 
 
 class TestTheWritersAllDeclareIt(unittest.TestCase):
@@ -59,8 +60,16 @@ class TestTheWritersAllDeclareIt(unittest.TestCase):
         for value in store.DATE_APPROXIMATE:
             self.assertIn(value, store.DATE_SOURCES)
         # A value nobody declared is refused rather than stored and rendered.
-        res = store.add_lab_point("glucose", "2020-01-01", 5.0,
-                                  date_source="off_the_top_of_my_head")
+        # On a profile of its own: the store takes its write lock before it
+        # refuses, and the lock file must not land in the shared fixture.
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            restore = support.pin_profile(d)
+            try:
+                res = store.add_lab_point("glucose", "2020-01-01", 5.0,
+                                          date_source="off_the_top_of_my_head")
+            finally:
+                restore()
         self.assertFalse(res.get("ok"))
         self.assertIn("off_the_top_of_my_head", res.get("error", ""))
 

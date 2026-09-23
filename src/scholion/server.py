@@ -265,7 +265,22 @@ class Handler(BaseHTTPRequestHandler):
             # curl and the CLI have no Origin — they are not a browser, and there is
             # nothing to forge there. If it is present, it must be ours: a cross-site POST
             # from an attacker's page carries that page's own Origin.
-            if origin and not _host_is_local(urlparse(origin).netloc):
+            #
+            # «Ours» is the whole origin, port included. The check used to compare the
+            # host name only, so any other server on this machine — a dev server on
+            # localhost:3000, a page some other tool serves — could POST here and did
+            # (a medication was added that way). The Host header is what the browser
+            # addressed; an Origin of our own page names the same host and port.
+            if origin:
+                host = (self.headers.get("Host") or "").strip().lower()
+                o = urlparse(origin)
+                if o.scheme not in ("http", "https") or o.netloc.lower() != host \
+                        or not _host_is_local(o.netloc):
+                    return _t("server.deny.cross_site")
+            # A browser also says where a request came from without an Origin: a
+            # cross-site GET carries `Sec-Fetch-Site: cross-site` / `same-site`.
+            site = (self.headers.get("Sec-Fetch-Site") or "").strip().lower()
+            if site in ("cross-site", "same-site"):
                 return _t("server.deny.cross_site")
         return None
 
@@ -312,7 +327,13 @@ class Handler(BaseHTTPRequestHandler):
         # the note on _deny. Every other GET here only reads the profile.
         # /api/version/check is the second GET that leaves the machine: one request
         # to the package registry, and only because a person pressed the button.
-        deny = self._deny(state_changing=(p in ("/api/diag", "/api/version/check")))
+        # And three more that were not gated at all: the drug and prescription
+        # questions reach RxNorm and CPIC on the caller's behalf, and the genome
+        # question answers by rsID or gene — a foreign page could not read the
+        # reply, but could make the requests and time them. They take the same
+        # gate as a write.
+        deny = self._deny(state_changing=(p in ("/api/diag", "/api/version/check", "/api/drug",
+                                                "/api/prescription-check", "/api/genome")))
         if deny:
             return self._json({"error": deny}, 403)
         try:

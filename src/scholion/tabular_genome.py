@@ -90,7 +90,8 @@ def _cache_file(path: str, kind: str) -> Optional[Path]:
     except Exception:
         return None
     key = hashlib.sha1(
-        f"{os.path.abspath(path)}|{st.st_size}|{int(st.st_mtime)}|{kind}".encode()).hexdigest()[:16]
+        f"{os.path.abspath(path)}|{st.st_size}|{int(st.st_mtime)}|{kind}"
+        f"|{os.environ.get('SCHOLION_GENOME_SAMPLE', '')}".encode()).hexdigest()[:16]
     return Path(core.cache_dir()) / f"tabular-{key}.json"
 
 
@@ -119,6 +120,18 @@ def _scan_container_vcf(path: str) -> Dict[str, Any]:
         return {"ok": False, "reason": "unreadable"}
     with lines:
         for line in lines:
+            if line.startswith("#CHROM"):
+                # Several samples side by side — a trio, a joint call. The tenth
+                # column is not the person because it comes first; which one is
+                # theirs is chosen the same way as for a VCF, or nothing answers.
+                names = line.rstrip("\r\n").split("\t")[9:]
+                if len(names) > 1:
+                    import os
+                    want = os.environ.get("SCHOLION_GENOME_SAMPLE")
+                    if not want or want not in names:
+                        return {"ok": False, "reason": "several_samples"}
+                    sample_col = 9 + names.index(want)
+                continue
             if line[:1] == "#":
                 continue
             f = line.rstrip("\r\n").split("\t")

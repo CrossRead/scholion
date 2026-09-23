@@ -632,7 +632,10 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
     except Exception:                                             # noqa: BLE001
         pass          # a stamp is never a reason to fail a write of somebody's data
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    # The temporary name is unique per THREAD as well as per process. With the pid
+    # alone, two server threads writing one file raced on one temporary name: the
+    # second O_EXCL failed or, worse, one thread's rename carried the other's bytes.
+    tmp = path.with_name(f".{path.name}.tmp-{os.getpid()}-{_threading.get_ident()}")
     # A new file is created closed (0600). A plain `open()` would give 0644, that
     # is, after every rewrite the lab history would become readable by any user of
     # the machine. For an existing file the mode is preserved: it is not the

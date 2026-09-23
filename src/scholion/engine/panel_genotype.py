@@ -104,6 +104,12 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
             why_not = "alignment_at_hand"
         elif scan.get("input_profile") in NARROW_INPUTS:
             why_not = "narrow_input"
+        elif scan.get("input_profile") != "whole_genome":
+            # The rule says «whole-genome by its own breadth probe»; the check was a
+            # list of what is NOT allowed, so an exome and a file whose breadth was
+            # never classified passed it. Outside an exome's targets a missing row
+            # is a position nobody sequenced, not a reference.
+            why_not = "not_whole_genome"
         elif rsid not in (core.loci().get("loci") or {}):
             why_not = "not_in_catalogue"
         elif (gene_coverage(gene) or {}).get("state") in ("low", "gene_not_in_table"):

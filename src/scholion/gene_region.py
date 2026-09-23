@@ -262,8 +262,25 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
         return out
 
     vcf = str(genome.vcf_path())
+    # The coordinates are GRCh38 (`genes.ASSEMBLY`); a file called against another
+    # build holds different bases at those numbers. Asking it anyway returned the
+    # variants of some other stretch of the chromosome — usually none, printed as
+    # «0 variants in the gene» about a gene that was never looked at.
+    file_asm = st.get("assembly")          # the status frame decides, as above
+    want = loc.get("assembly") or genes.ASSEMBLY
+    if file_asm and want and file_asm != want:
+        out["status"] = "assembly_mismatch"
+        out["reason"] = "assembly_mismatch"
+        out["message"] = _t("gene.assembly_mismatch", gene=loc["gene"],
+                            file=file_asm, coords=want)
+        return out
     try:
         rows = genome._query_region_range(vcf, loc["chrom"], loc["start"], loc["end"])
+    except genome.ContigNotInFile:
+        out["status"] = "contig_not_in_file"
+        out["reason"] = "contig_not_in_file"
+        out["message"] = _t("genome.contig_not_in_file", chrom=loc["chrom"])
+        return out
     except genome.RangeNeedsIndex:
         # The file is being read without an index: one pass collected the
         # catalogue's positions and stopped. A gene is thousands of positions

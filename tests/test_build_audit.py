@@ -870,3 +870,34 @@ class TestThePublicationRunsTheArtefactsOwnTests(unittest.TestCase):
         commit = self.text.find("git commit")
         self.assertTrue(0 < rebuild < commit,
                         "the package is handed over carrying the leavings of its own test run")
+
+
+@unittest.skipIf(ms is None, "make_shareable.py is not part of this build")
+class TestWhatGitIgnoresDoesNotShip(unittest.TestCase):
+    """The 0.5.7 review: the tree copy took every file under a source folder that
+    was not on the private list, gitignored ones included — a spreadsheet, a log,
+    an `.env`, a parser's own output — and the audit does not know to look for
+    them."""
+
+    @unittest.skipUnless(shutil.which("git"), "git is not installed")
+    def test_an_ignored_file_is_not_copied(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as d:
+            repo = Path(d).resolve() / "repo"
+            (repo / "src" / "pkg").mkdir(parents=True)
+            (repo / ".gitignore").write_text("*.xlsx\n.env\n", encoding="utf-8")
+            (repo / "src" / "pkg" / "code.py").write_text("x = 1\n", encoding="utf-8")
+            (repo / "src" / "pkg" / "labs.xlsx").write_text("personal", encoding="utf-8")
+            (repo / "src" / "pkg" / ".env").write_text("TOKEN=1", encoding="utf-8")
+            subprocess.run(["git", "init", "-q", str(repo)], check=True,
+                           stdin=subprocess.DEVNULL, capture_output=True)
+            ignored = ms.load_ignored(repo)
+            self.assertIn((repo / "src" / "pkg" / "labs.xlsx").resolve(), ignored)
+            saved = ms._IGNORED_ABS
+            ms._IGNORED_ABS = ignored
+            try:
+                out = Path(d) / "out"
+                ms._copytree(repo / "src" / "pkg", out)
+            finally:
+                ms._IGNORED_ABS = saved
+            self.assertEqual(["code.py"], sorted(p.name for p in out.iterdir()))

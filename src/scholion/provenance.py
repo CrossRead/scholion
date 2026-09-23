@@ -117,6 +117,11 @@ DERIVED: Dict[str, Dict[str, Any]] = {
 }
 
 
+def _rec_same_draw(a: str, b: str) -> bool:
+    from .reconcile import same_draw
+    return same_draw(a, b)
+
+
 def _close(a: float, b: float, tol: float = 0.02) -> bool:
     return abs(a - b) <= max(0.05, abs(b) * tol)
 
@@ -142,12 +147,14 @@ def audit(refresh: bool = False, lab_dir: Optional[str] = None,
         return {"ok": False, "error": _t("provenance.no_coverage")}
     dictionary = core.lab_markers().get("markers", {})
 
-    # the profile as {month: {marker: value}} for the derived indices
+    # the profile as {draw day: {marker: value}} for the derived indices. By DAY, not
+    # by the stored string: a point stamped with the clock time and its companion
+    # stamped with the day are one draw, and keyed by the string they never met.
     by_month: Dict[str, Dict[str, float]] = {}
     for k, m in labs.items():
         for pt in m.get("series", []):
             if "date" in pt and isinstance(pt.get("value"), (int, float)):
-                by_month.setdefault(pt["date"], {})[k] = float(pt["value"])
+                by_month.setdefault(str(pt["date"])[:10], {})[k] = float(pt["value"])
 
     points: List[Dict[str, Any]] = []
     for k, m in sorted(labs.items()):
@@ -160,8 +167,13 @@ def audit(refresh: bool = False, lab_dir: Optional[str] = None,
                 continue
             rec: Dict[str, Any] = {"marker": k, "date": ym, "value": val,
                                    "unit": m.get("unit"), "verdict": "", "detail": ""}
-            slot = cov.get(k, {}).get(ym)
+            # The coverage is kept by month; a point may carry the day or the clock
+            # time. Look the month up, then keep only the sources of THIS draw —
+            # every stamped point used to miss its month slot and read as «manual».
+            slot = cov.get(k, {}).get(str(ym)[:7])
             srcs = (slot or {}).get("sources") or ([slot] if slot else [])
+            srcs = [s for s in srcs if not s.get("draw_date")
+                    or _rec_same_draw(str(s["draw_date"]), str(ym))]
             hit = next((s for s in srcs if s.get("value") is not None
                         and _close(float(s["value"]), float(val))), None)
             if hit:
@@ -185,7 +197,7 @@ def audit(refresh: bool = False, lab_dir: Optional[str] = None,
             # a printed index is not an independent measurement (see Step 0.6 item 11).
             d = DERIVED.get(k)
             if d:
-                have = by_month.get(ym, {})
+                have = by_month.get(str(ym)[:10], {})
                 comp = {n: have[n] for n in d["needs"] if n in have}
                 if len(comp) == len(d["needs"]):
                     if d.get("skip_if") and d["skip_if"](comp):

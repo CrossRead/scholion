@@ -452,6 +452,20 @@ def run(confirm: bool = False, since: Optional[str] = None, text: Optional[str] 
         return {"ok": False, "started": False, "reason": "busy", "job": p["job"]}
     if not ready:
         return {"ok": False, "started": False, "reason": "nothing_ready", "plan": p}
+    own_claim = None
+    if not claimed:
+        own_claim = _claim()
+        if own_claim is None:
+            return {"ok": False, "started": False, "reason": "busy", "job": status()}
+    try:
+        return _run_steps(p, ready, calls, echo)
+    finally:
+        _release(own_claim)
+
+
+def _run_steps(p: Dict[str, Any], ready: List[Dict[str, Any]], calls: Optional[Dict[str, Callable]],
+               echo: Optional[Callable[[Dict[str, Any], int], None]]) -> Dict[str, Any]:
+    from . import updates
     _clear_stop()
     job: Dict[str, Any] = {
         "status": "running", "pid": os.getpid(), "started": _now(), "since": p["since"],
@@ -521,18 +535,95 @@ def run(confirm: bool = False, since: Optional[str] = None, text: Optional[str] 
     return {"ok": job["status"] == "finished", "started": True, "job": job}
 
 
+CLAIM = ".recompute.claim"
+
+
+def _claim() -> Optional[Path]:
+    """Take the job atomically, or None when somebody else holds it.
+
+    Reading the job file and then writing «running» into it let two starters —
+    the page's button and `recompute --yes` in a terminal — both see «not
+    running» and both run the same steps. The claim is a file created with
+    O_EXCL; a claim whose owner is gone is taken over.
+    """
+    path = _profile() / CLAIM
+    if not path.parent.is_dir():
+        return None
+    for _ in range(2):
+        try:
+            fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        except FileExistsError:
+            try:
+                owner = int(path.read_text(encoding="utf-8").strip() or 0)
+            except (OSError, ValueError):
+                owner = 0
+            if owner and _alive(owner):
+                return None
+            try:
+                path.unlink()
+            except OSError:
+                return None
+            continue
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.write(str(os.getpid()))
+        return path
+    return None
+
+
+def _release(path: Optional[Path]) -> None:
+    if path is None:
+        return
+    try:
+        path.unlink()
+    except OSError:
+        pass
+
+
+def _run_claimed(since: Optional[str], claim: Optional[Path]) -> None:
+    """The thread's body: whatever `run` returns or raises, the job file ends in a
+    terminal state and the claim is released. `run` can return before writing
+    anything — the plan changed between the check and the start — and a job file
+    left at «running» by a process that is still alive (the page's server) was
+    read as busy until the server restarted."""
+    try:
+        res = run(confirm=True, since=since, claimed=True)
+        if not res.get("started"):
+            _write({"status": "failed", "pid": os.getpid(), "finished": _now(),
+                    "reason": res.get("reason") or "not_started", "steps": []}, force=True)
+    except Exception as exc:                                        # noqa: BLE001
+        _write({"status": "failed", "pid": os.getpid(), "finished": _now(),
+                "reason": f"{type(exc).__name__}: {exc}"[:300], "steps": []}, force=True)
+    finally:
+        _release(claim)
+
+
+def per_call_host() -> Optional[str]:
+    """The host that runs this package in a fresh process for every call, if any.
+
+    Under such a host (the Ouroboros Hub) the process ends with the call, and a
+    step started on a thread dies with it: the next call finds the job
+    interrupted, nothing finished (OuroborosHub review, 22.09.2026). The plan is
+    still answered there; the run is not started."""
+    return (os.environ.get("SCHOLION_MANAGED_BY") or "").strip() or None
+
+
 def start_in_background(since: Optional[str] = None) -> Dict[str, Any]:
     """For the page: claim the job, then run it on a thread; the file carries the progress."""
     import threading
+    host = per_call_host()
+    if host:
+        return {"started": False, "reason": "per_call_host", "host": host, "plan": plan(since=since)}
     p = plan(since=since)
     if p["job"].get("status") == "running":
         return {"started": False, "reason": "busy", "job": p["job"]}
     ready = [s for s in p["steps"] if s.get("state") == "ready"]
     if not ready:
         return {"started": False, "reason": "nothing_ready", "plan": p}
+    claim = _claim()
+    if claim is None:
+        return {"started": False, "reason": "busy", "job": status()}
     _write({"status": "running", "pid": os.getpid(), "started": _now(), "current": 0,
             "steps": [{"command": s["command"], "key": s["key"], "state": "waiting",
                        "done": 0, "total": None, "item": None} for s in ready]}, force=True)
-    threading.Thread(target=run, kwargs={"confirm": True, "since": since, "claimed": True},
-                     daemon=True).start()
+    threading.Thread(target=_run_claimed, args=(since, claim), daemon=True).start()
     return {"started": True, "steps": len(ready)}

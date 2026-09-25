@@ -12063,6 +12063,33 @@
       "ref_age": "any",
       "method_note": "Serum zinc by the biochemical method. Entered on 08.09.2026 together with `magnesium_total` and `calcium_total`: the third of one order of biochemical minerals, which the elemental series had been absorbing. The symbol in parentheses is a laboratory's typography, not a method, and since 12.09.2026 it is not excluded here. Today the parser hands a row to the longest matching name first, so a row that prints the symbol AND a molar unit reaches the ICP key, is refused by its unit gate, and is dropped rather than misfiled; it lands here the day the parser falls through on a refused unit.",
       "method": "biochemistry"
+    },
+    "aa_ratio_trp_lnaa": {
+      "unit": "",
+      "plausible": [
+        0.001,
+        1000
+      ],
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "trp/lnaa",
+            "trp:lnaa",
+            "триптофан/lnaa"
+          ],
+          "display": "Триптофан/LNAA"
+        },
+        "en": {
+          "display": "Tryptophan/LNAA ratio",
+          "names": [
+            "trp/lnaa",
+            "trp:lnaa"
+          ]
+        }
+      },
+      "ref_sex": "any",
+      "ref_age": "any"
     }
   }
 }

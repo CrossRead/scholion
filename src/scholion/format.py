@@ -3166,7 +3166,7 @@ def genotype_conclusion_lines(positions: List[Dict[str, Any]]) -> List[str]:
     # A position with no reading at all — no genome, a build nobody could tell —
     # is not read, whatever its state says; «none found» over such a panel
     # would claim a check that never happened.
-    found = [p for p in positions if p.get("read") is True and p.get("state") in ("het", "hom")]
+    found = [p for p in positions if p.get("read") is True and p.get("state") in ("het", "hom", "hemi")]
     absent = [p for p in positions if p.get("read") is True and p.get("state") == "absent"]
     unread = [p for p in positions if p.get("read") is not True]
     name = lambda p: f"{p.get('gene')} {p.get('rsid') or ''}".strip()
@@ -3226,7 +3226,7 @@ def panel_report(r: Dict[str, Any]) -> str:
                     "; " + _t("system.mode." + str(p.get("mode") or "unknown"))
             L.append(head)
             L.append("  " + _t("panel.locus", hgvs=p.get("hgvs") or "—", allele=p.get("risk_allele") or "—"))
-            for state in ("het", "hom"):
+            for state in ("het", "hom", "hemi"):
                 if (p.get("text") or {}).get(state):
                     L.append("  " + _t("panel.state." + state) + ": " + p["text"][state])
             if p.get("classification"):

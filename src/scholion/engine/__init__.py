@@ -77,7 +77,9 @@ from .panel_form import (  # noqa: F401 -- the facade re-exports every name
     gene_row, bases_read,
     verdict as panel_verdict,
     verdict_line as panel_verdict_line,
+    carrier_class,
 )
+from .panel_genotype import on_x, as_hemizygous, hemizygous_ladder  # noqa: F401
 from .routes import ROUTE_CLASSES, ROUTE_ORDER, ROUTE_LEVELS, ROUTE_CONDITIONAL, routes_book, route_refusal, correction_routes_for  # noqa: F401
 from .panel_book import on_demand_panels, positions_by_marker  # noqa: F401
 from .system_panels import (  # noqa: F401 -- the facade re-exports every name

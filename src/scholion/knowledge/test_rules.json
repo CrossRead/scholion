@@ -1,8 +1,8 @@
 {
   "_meta": {
-    "updated": "2026-09-17",
+    "updated": "2026-09-25",
     "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
-    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently; {never_measured:[keys]} — true while none of them was ever measured; {measured:[keys]} — true when any of them was.",
+    "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently; {never_measured:[keys]} — true while none of them was ever measured; {measured:[keys]} — true when any of them was. {flag:{markers:[keys], is:low|high}} — true when any of the markers is outside its corridor that way on its latest point, read exactly as the lab card reads it; {not: condition}.",
     "source_tier": "guideline_compiled",
     "held": "A rule with `held` does not fire: it records a test the reviewer said is not for everyone, until the condition that selects the people it is for is written. The rule's own `when` is kept so the history of what was offered stays readable."
   },
@@ -464,6 +464,47 @@
             "never_measured": [
               "fecal_elastase"
             ]
+          },
+          {
+            "any": [
+              {
+                "flag": {
+                  "markers": [
+                    "albumin",
+                    "total_protein"
+                  ],
+                  "is": "low"
+                }
+              },
+              {
+                "all": [
+                  {
+                    "flag": {
+                      "markers": [
+                        "vitamin_d"
+                      ],
+                      "is": "low"
+                    }
+                  },
+                  {
+                    "flag": {
+                      "markers": [
+                        "aa_leucine",
+                        "aa_isoleucine",
+                        "valine",
+                        "aa_phenylalanine",
+                        "aa_methionine",
+                        "aa_lysine",
+                        "aa_threonine",
+                        "aa_tryptophan",
+                        "aa_histidine"
+                      ],
+                      "is": "low"
+                    }
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
@@ -473,18 +514,17 @@
       },
       "priority": "high",
       "why": {
-        "en": "The first link of the chain is digestion of protein. Without it, low plasma amino acids have nothing to be explained by.",
-        "ru": "Первое звено цепи — переваривание белка. Без него низкие аминокислоты плазмы нечем объяснить."
+        "en": "Offered only when the laboratory half points at digestion: a low albumin or total protein, or a low vitamin D together with a low essential amino acid. Elastase is a functional marker of the pancreas and not the only cause of low amino acids. Tell the doctor as well about weight loss, fatty or hard-to-flush stools, chronic diarrhoea, bloating after meals, chronic pancreatitis, changes of the pancreas on imaging or surgery on it — the program cannot see these.",
+        "ru": "Предлагается только тогда, когда лабораторная половина указывает на переваривание: низкий альбумин или общий белок, либо низкий витамин D вместе с низкой незаменимой аминокислотой. Эластаза — функциональный маркер поджелудочной железы и не единственная причина низких аминокислот. Скажите врачу и о потере веса, жирном или плохо смывающемся стуле, хронической диарее, вздутии после еды, хроническом панкреатите, изменениях поджелудочной на УЗИ, КТ или МРТ, операциях на ней — этого программа не видит."
       },
       "covers": [
         "fecal_elastase"
       ],
       "recheck_months": 12,
       "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
-      "held": {
-        "reason": "the panel author, 21.09.2026: «not always» — elastase is a functional marker of the pancreas and not the only cause of low amino acids; the condition under which it is offered is to be named by her (task 205 G)",
+      "condition_from": {
         "by_role": "panel_author",
-        "on": "2026-09-21"
+        "on": "2026-09-23"
       }
     },
     {
@@ -512,6 +552,29 @@
               "adma",
               "sdma"
             ]
+          },
+          {
+            "any": [
+              {
+                "flag": {
+                  "markers": [
+                    "lpa",
+                    "apob",
+                    "ldl"
+                  ],
+                  "is": "high"
+                }
+              },
+              {
+                "flag": {
+                  "markers": [
+                    "aa_arginine",
+                    "citrulline"
+                  ],
+                  "is": "low"
+                }
+              }
+            ]
           }
         ]
       },
@@ -521,8 +584,8 @@
       },
       "priority": "moderate",
       "why": {
-        "en": "The methylated arginines brake nitric oxide synthesis, and they are what ties the arginine part of the panel to AGXT2 and DDAH1.",
-        "ru": "Метилированные аргинины тормозят синтез оксида азота — через них аргининовая часть панели связана с AGXT2 и DDAH1."
+        "en": "Offered only when the arginine–nitric oxide path or the cardiovascular risk is in question: a raised Lp(a), apoB or LDL, or a low arginine or citrulline. The methylated arginines brake nitric oxide synthesis; endothelial dysfunction itself is a clinical finding the program does not see.",
+        "ru": "Предлагается только тогда, когда под вопросом путь аргинин–оксид азота или сердечно-сосудистый риск: повышены Lp(a), апоB или ЛПНП, либо снижены аргинин или цитруллин. Метилированные аргинины тормозят синтез оксида азота; эндотелиальная дисфункция как клиническая находка программе не видна."
       },
       "covers": [
         "adma",
@@ -530,10 +593,9 @@
       ],
       "recheck_months": 12,
       "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
-      "held": {
-        "reason": "the panel author, 21.09.2026: «in some cases, not for everyone»; the condition is to be named by her (task 205 G)",
+      "condition_from": {
         "by_role": "panel_author",
-        "on": "2026-09-21"
+        "on": "2026-09-23"
       }
     },
     {
@@ -625,9 +687,23 @@
       "when": {
         "all": [
           {
-            "measured": [
-              "homocysteine"
-            ]
+            "flag": {
+              "markers": [
+                "homocysteine"
+              ],
+              "is": "high"
+            }
+          },
+          {
+            "not": {
+              "flag": {
+                "markers": [
+                  "folate",
+                  "vitamin_b12"
+                ],
+                "is": "low"
+              }
+            }
           },
           {
             "measured": [
@@ -653,18 +729,17 @@
       },
       "priority": "moderate",
       "why": {
-        "en": "A fasting corridor excludes nothing here: a partial capacity of transsulfuration shows under a load and is invisible at rest. The whole product reads a person at rest, which is why this one is a test and not a reading.",
-        "ru": "Коридор натощак здесь ничего не исключает: частичная ёмкость транссульфурации видна под нагрузкой и невидима в покое. Весь продукт читает человека в покое — поэтому это проба, а не показание."
+        "en": "Offered only when the ordinary data disagree: homocysteine is high while folate and B12 are not low, which is where a mild pyridoxine-responsive form of CBS deficiency is suspected. A fasting corridor excludes nothing here — a partial capacity of transsulfuration shows under a load and is invisible at rest.",
+        "ru": "Предлагается только тогда, когда стандартные данные противоречат друг другу: гомоцистеин высок при не сниженных фолате и B12 — именно здесь подозревают лёгкую пиридоксин-чувствительную форму дефицита CBS. Коридор натощак здесь ничего не исключает: частичная ёмкость транссульфурации видна под нагрузкой и невидима в покое."
       },
       "covers": [
         "homocysteine"
       ],
       "recheck_months": 24,
       "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)",
-      "held": {
-        "reason": "the panel author, 21.09.2026: «in some cases, not for everyone»; the condition is to be named by her (task 205 G)",
+      "condition_from": {
         "by_role": "panel_author",
-        "on": "2026-09-21"
+        "on": "2026-09-23"
       }
     }
   ]

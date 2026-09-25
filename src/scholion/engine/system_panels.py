@@ -106,6 +106,7 @@ from .. import core
 from ..i18n import CATALOGUES, plural as _plural, t as _t
 from ._helpers import DISCLAIMER, _recent
 from . import panel_form, panel_gate, panel_labs
+from . import panel_genotype as _pg
 from .panel_genotype import _genotype, _has_alignment  # noqa: F401
 from .panel_book import (_attach_local_notes, _groups, _on_demand, _on_demand_card,  # noqa: F401
                          on_demand_panels, positions_by_marker)
@@ -375,6 +376,15 @@ def _finish_base_row(row: Dict[str, Any], scan: Dict[str, Any],
             carrier = True
         else:
             findings += 1
+    # Two different pathogenic variants in a gene whose disease needs two copies
+    # (task 205 B): whether they sit on the two copies or on one cannot be told
+    # from short reads, so the pair is a clinically significant result to be
+    # phased, not two carriers' worth of «nothing to see».
+    het_sites = {(h.get("chrom"), h.get("pos"), h.get("alt")) for h in hits
+                 if row["finding_grade"] and (h.get("zygosity") or "") != "hom"}
+    if row["recessive_only"] and len(het_sites) >= 2:
+        carrier, findings = False, max(findings, 1)
+        row["two_variants_text"] = _t("system.row.two_variants", gene=row["gene"])
     row["findings"], row["carrier"] = findings, carrier
     row["clinvar"] = {"status": ("ok" if through_clinvar and clinvar.get("status") == "acmg_scan"
                                  else clinvar.get("status")),
@@ -524,11 +534,15 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         gene = str(p.get("gene") or "").upper()
         geno = _genotype(str(p["rsid"]), str(p.get("hgvs") or ""), gene,
                          panel_gate.risk_on_plus(p), scan, panel_gate.locus(p), has_bam=has_bam)
+        x_one = _pg.on_x(p)
+        if x_one:
+            # A man's X is one copy: «one copy» there is all of it (task 205 B).
+            geno = _pg.as_hemizygous(geno, core.profile_sex())
         state = geno.get("state")
         texts = p.get("text") if isinstance(p.get("text"), dict) else {}
         text = None
         pending, pending_why = False, None
-        if state in ("het", "hom"):
+        if state in ("het", "hom", "hemi"):
             text = panel_form.one_language(texts.get(state)) or None
             if not text:
                 pending, pending_why = True, "no_text_for_state"
@@ -547,10 +561,10 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         finding = 0
         not_why = None
         presumed = bool(geno.get("presumed"))
-        if presumed and state == "hom":
-            text = _t("system.row.presumed_hom", gene=gene, rsid=p["rsid"])
+        if presumed and state in ("hom", "hemi"):
+            text = _t("system.row.presumed_" + state, gene=gene, rsid=p["rsid"])
         lv = panel_gate.level_of(p, levels)
-        confirm = state in ("het", "hom") and panel_gate.needs_confirmation(p, scan.get("input_profile"))
+        confirm = state in ("het", "hom", "hemi") and panel_gate.needs_confirmation(p, scan.get("input_profile"))
         if confirm:
             # The author's sentence describes a variant that is there; off a chip
             # it most often is not, so the row says what to do first instead.
@@ -561,7 +575,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             # A value the reference implies is not a reading: it is shown, and
             # it is never a finding or a carriership.
             not_why, carrier = "presumed", False
-        elif state in ("het", "hom") and text:
+        elif state in ("het", "hom", "hemi") and text:
             if mode == "monogenic":
                 if cls in NOT_A_FINDING or cls not in FINDING_GRADE:
                     not_why = "classification"
@@ -582,7 +596,11 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                 # or a lower one, keeps its value and loses the verdict (task 199).
                 finding, not_why = 0, "level"
         row = {"unit": "position", "origin": "curated", "gene": gene, "state": state,
-               **lv, "evidence": p.get("evidence"), "ladder": panel_gate.ladder(p),
+               **lv, "evidence": p.get("evidence"),
+               "ladder": (_pg.hemizygous_ladder(panel_gate.ladder(p)) if geno.get("hemizygous")
+                          else panel_gate.ladder(p)),
+               "ladder_refused": p.get("ladder") == "refused",
+               "hemizygous": bool(geno.get("hemizygous")), "on_x": x_one,
                "rsid": p["rsid"], "hgvs": p.get("hgvs"), "strand": p.get("strand") or "+", "protein": p.get("protein"),
                "link": p.get("link"), "link_text": _link_text(p.get("link"), spec.get("links")),
                "under_load": _under_load(p.get("under_load"), spec.get("load_tests")),
@@ -999,6 +1017,10 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             r["read_why_text"] = _read_why_text("separate_method")
             r.pop("file_says", None); r.pop("file_says_text", None)
             r["findings"], r["carrier"] = 0, False
+    classes = (cur_spec or {}).get("carrier_classes")
+    if isinstance(classes, dict):
+        for r in rows:
+            panel_form.carrier_class(r, classes, core.profile_sex(), clinvar.get("by_gene", {}).get(r["gene"]) or [])
     rows += cur["rows"]
     # The panel first — the positions a clinician acts on — and the base list
     # after it; within each, by gene.
@@ -1113,7 +1135,7 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
         ec = r.get("expect_check")
         if ec and ec.get("gap"):
             waiting.setdefault(ec["marker"], []).append(f"{g} {rs}")
-        elif ec and str(r.get("state")) not in ("het", "hom"):
+        elif ec and str(r.get("state")) not in ("het", "hom", "hemi"):
             # «The author expects LDL higher WITH THIS GENOTYPE» was asked of a
             # position read as ABSENT — a question about a genotype the person
             # does not carry. On the owner's lipid card four of the five

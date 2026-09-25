@@ -1,15 +1,14 @@
 {
   "_meta": {
-    "updated": "2026-09-17",
+    "updated": "2026-09-25",
     "purpose": "What a genotype says about the ROUTE of a correction somebody has already decided on — never about whether to correct. A deviation in a panel is a fact; the decision is not ours; the comparison of routes with the genotype in hand is what exists nowhere else. Curated by hand, never derived.",
     "why_a_class_and_not_a_ranking": "Genetics excludes better than it chooses. It almost never says «this route is best», and it regularly says «this route is probably wasted on you». So a rule carries a class — bypasses, against, favours, dose_response_differs, adds_nothing, route_fact — and rules are grouped by that class, never ranked: a ranking implies an optimum, which needs cost, availability, the clinical picture and the person's preference, none of which a genotype knows.",
     "gate": "Printed only at evidence level A or B, only with a named source, only with a recheck, and only in the conditional. Below B the product prints «the genotype adds nothing here» with the reason, because silence on this screen is filled by whoever speaks to the reader next.",
-    "source": "the panel author's table of 17.09.2026 (thirteen rules of response to a supplement or a cofactor), of which the seven starting rules were taken; every PMID below was confirmed against Europe PMC on 17.09.2026, and the rules whose source could not be confirmed are not here.",
+    "source": "the panel author's table of 17.09.2026 (thirteen rules of response to a supplement or a cofactor), of which the seven starting rules were taken; every PMID below was confirmed against Europe PMC on 17.09.2026, and the rules whose source could not be confirmed are not here. Five more on 25.09.2026 from the author's corrections of 23.09.2026, each checked against the chapter or the paper it names; the ones whose reference could not be identified are not cited.",
     "waiting": {
       "otc_carrier_on_the_iv_route": "the statement cites a case of 100 g of protein a day intravenously raising ammonia to 472 µmol/L in an OTC carrier; no such report could be confirmed in Europe PMC, so the rule is not shipped",
       "cndp1_beta_alanine": "the CTG repeat of CNDP1 is not a position short reads genotype here, so the dose-response rule has nothing to stand on yet (Janssen 2005 PMID 16046297, Freedman 2007 PMID 17205963)",
-      "oxalate_reduce_load": "AGXT and HOGA1 are not in the gene–disease base for this system, and urine oxalate is not a marker the product holds",
-      "slc6a19_niacinamide": "Hartnup carriership and nicotinamide: the only source named is a GeneReviews chapter, which Europe PMC does not index as a study with an effect; not shipped until a primary source is named"
+      "agxt_pyridoxine_responsive": "PH1 genotypes that respond to pyridoxine — homozygous p.Phe152Ile, p.Gly170Arg, p.Ile244Thr (GeneReviews NBK1283; Fargue 2013, PMID 23597595): a statement about patients, not carriers, and the three positions are not in the catalogue yet"
     },
     "source_tier": "primary_literature"
   },
@@ -285,6 +284,211 @@
         "scope": "text_and_level"
       },
       "system": "amino_acids"
+    },
+    {
+      "key": "pah_carrier_phenylalanine",
+      "trigger": {
+        "markers": [
+          "aa_phenylalanine"
+        ],
+        "direction": "high"
+      },
+      "depends_on": {
+        "genes": [
+          "PAH"
+        ],
+        "state": "carrier"
+      },
+      "route": "reduce_load",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If a decision to correct has been made: restricting phenylalanine and avoiding aspartame are for people with confirmed PAH deficiency, not for ordinary heterozygous carriers — carriers are asymptomatic and not at risk of the disorder.",
+        "ru": "Если принято решение корректировать: ограничение фенилаланина и исключение аспартама относятся к пациентам с подтверждённым дефицитом PAH, а не к обычным гетерозиготным носителям — носители бессимптомны и заболеванием не рискуют."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "GeneReviews: Phenylalanine Hydroxylase Deficiency (NBK1504, updated 20.11.2025): «Heterozygotes (carriers) are asymptomatic»",
+        "effect_size": "no effect in carriers"
+      },
+      "recheck": {
+        "marker": "aa_phenylalanine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 15%, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 15 %, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "ass1_asl_carrier_citrulline",
+      "trigger": {
+        "medications": [
+          "цитруллин",
+          "citrulline"
+        ]
+      },
+      "depends_on": {
+        "genes": [
+          "ASS1",
+          "ASL"
+        ],
+        "state": "carrier"
+      },
+      "route": "precursor",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If it is being taken anyway: one pathogenic allele of ASS1 or ASL is not a proven predictor of the response to citrulline; the effect is judged by the actual concentrations of citrulline and arginine and the clinical picture, not by the allele.",
+        "ru": "Если это всё равно принимается: одна патогенная аллель ASS1 или ASL не является доказанным предиктором ответа на цитруллин; эффект оценивают по фактическим концентрациям цитруллина и аргинина и по клинической картине, а не по аллели."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "GeneReviews: Citrullinemia Type I (NBK1458); GeneReviews: Argininosuccinate Lyase Deficiency (NBK51784)",
+        "effect_size": "carriers are asymptomatic; no response predicted by one allele"
+      },
+      "recheck": {
+        "marker": "aa_arginine",
+        "after_weeks": 4,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 15%, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 15 %, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "slc6a19_carrier_niacinamide",
+      "trigger": {
+        "markers": [
+          "aa_tryptophan"
+        ],
+        "direction": "low"
+      },
+      "depends_on": {
+        "genes": [
+          "SLC6A19"
+        ],
+        "state": "carrier"
+      },
+      "route": "cofactor",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If a decision to correct has been made: for an asymptomatic heterozygous carrier of SLC6A19 nicotinamide is not indicated as prevention; it is justified with two pathogenic variants and the clinical and biochemical picture of Hartnup disease, after laboratory tests.",
+        "ru": "Если принято решение корректировать: бессимптомному гетерозиготному носителю SLC6A19 никотинамид профилактически не показан; он обоснован при двух патогенных вариантах и клинической и биохимической картине болезни Хартнупа, после лабораторных тестов."
+      },
+      "evidence": {
+        "level": "C",
+        "source": "PMID 15286788 (Seow 2004, Nat Genet: Hartnup disorder is caused by SLC6A19) — it establishes the gene; the statement about carriers is the panel author's",
+        "effect_size": "none measured in carriers"
+      },
+      "recheck": {
+        "marker": "aa_tryptophan",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 15%, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 15 %, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "text_and_level"
+      },
+      "system": "amino_acids"
+    },
+    {
+      "key": "gatm_carrier_creatine",
+      "trigger": {
+        "medications": [
+          "креатин",
+          "creatine"
+        ]
+      },
+      "depends_on": {
+        "genes": [
+          "GATM"
+        ],
+        "state": "carrier"
+      },
+      "route": "precursor",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If it is being taken anyway: for an asymptomatic heterozygous carrier of GATM or GAMT there is no evidence of a higher need for creatine, nor of less arginine left for nitric oxide.",
+        "ru": "Если это всё равно принимается: у бессимптомного гетерозиготного носителя GATM или GAMT нет доказательств повышенной потребности в креатине или уменьшения доступности аргинина для оксида азота."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "GeneReviews: Creatine Deficiency Disorders (NBK3794)",
+        "effect_size": "carriers are asymptomatic"
+      },
+      "recheck": {
+        "marker": "creatinine",
+        "after_weeks": 4,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 10%, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 10 %, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "text_and_level"
+      },
+      "system": "renal"
+    },
+    {
+      "key": "hyperoxaluria_carrier_collagen",
+      "trigger": {
+        "medications": [
+          "коллаген",
+          "collagen",
+          "желатин",
+          "gelatin"
+        ]
+      },
+      "depends_on": {
+        "genes": [
+          "AGXT",
+          "GRHPR",
+          "HOGA1"
+        ],
+        "state": "carrier"
+      },
+      "route": "reduce_load",
+      "says": "adds_nothing",
+      "because": {
+        "en": "If it is being taken anyway: for an asymptomatic heterozygous carrier of AGXT, GRHPR or HOGA1 there is no evidence that collagen or gelatin has to be excluded as prevention, although hydroxyproline does raise urine oxalate in everybody.",
+        "ru": "Если это всё равно принимается: для бессимптомного гетерозиготного носителя AGXT, GRHPR или HOGA1 доказательств необходимости профилактически исключать коллаген или желатин нет, хотя гидроксипролин повышает оксалат мочи у всех."
+      },
+      "evidence": {
+        "level": "B",
+        "source": "GeneReviews: Primary Hyperoxaluria Types 1, 2, 3 (NBK1283, NBK2692, NBK316514); PMID 36604599 (Groothoff 2023, ERKNet/OxalEurope recommendations); PMID 17021603 (Knight 2006: hydroxyproline ingestion and urine oxalate)",
+        "effect_size": "no restriction needed in carriers"
+      },
+      "recheck": {
+        "marker": "creatinine",
+        "after_weeks": 8,
+        "what_counts_as_change": {
+          "en": "a change beyond the scatter of the method — roughly 10%, measured in the same fasting state",
+          "ru": "изменение больше разброса метода — примерно 10 %, в том же состоянии натощак"
+        }
+      },
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "text_and_level"
+      },
+      "system": "renal"
     }
   ],
   "route_classes": {

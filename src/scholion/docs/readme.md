@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.5.7** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.8** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -232,7 +232,7 @@ inheritance, on what date. A weak or refuted assertion travels marked as such
 instead of being quietly dropped or quietly promoted, and one copy of an allele
 in a recessive gene is printed as carriership, never as a risk line.
 
-**In front of that base stands the layer a base cannot supply: 214 positions
+**In front of that base stands the layer a base cannot supply: 217 positions
 across fourteen of the systems, authored rather than generated, each with its
 evidence level.** The unit of a row is
 a position, not a gene — an rsID with its HGVS on a RefSeq accession, the allele

@@ -145,7 +145,8 @@ class TestTheShippedLevels(unittest.TestCase):
     def test_every_common_variant_ladder_tops_at_the_risk_allele(self):
         for p in self.rows():
             lad = G.ladder(p)
-            if p["mode"] == "common_variant" and p.get("risk_allele"):
+            # A refused ladder draws none — that is the refusal (task 205 B).
+            if p["mode"] == "common_variant" and p.get("risk_allele") and p.get("ladder") != "refused":
                 with self.subTest(rsid=p["rsid"]):
                     self.assertEqual(p["risk_allele"].upper() * 2, lad["hom"])
 

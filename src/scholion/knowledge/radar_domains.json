@@ -235,6 +235,7 @@
         "aa_ratio_met_hcy",
         "aa_ratio_aaba_leu",
         "aa_ratio_kyn_trp",
+        "aa_ratio_trp_lnaa",
         "urea_creatinine_ratio",
         "urine_cystine_creatinine_ratio",
         "urine_plasma_cystine_ratio",

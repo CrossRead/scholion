@@ -8,7 +8,7 @@
    "refused": "will not enter; `reason` says why"
   },
   "guarded_by": "tests/test_no_position_of_an_authored_list_falls_out_silently.py",
-  "updated": "2026-09-21",
+  "updated": "2026-09-25",
   "source_tier": "curated_reference"
  },
  "lists": {
@@ -347,8 +347,7 @@
      "row": 53,
      "rsid": "rs1691053",
      "gene": "SRD5A1",
-     "disposition": "waiting",
-     "reason": "the author placed it in the gonads on 17.09.2026 as a value without a conclusion (no replicated ladder); import pending",
+     "disposition": "in_catalogue",
      "task": "205 B"
     },
     {
@@ -547,8 +546,7 @@
      "row": 83,
      "rsid": "rs34424986",
      "gene": "PRKN",
-     "disposition": "waiting",
-     "reason": "the author placed it in the behaviour layer on 17.09.2026 with a sentence; import pending",
+     "disposition": "in_catalogue",
      "task": "205 B"
     },
     {
@@ -560,9 +558,8 @@
     {
      "row": 85,
      "rsid": "rs6356",
-     "gene": "TPH2",
-     "disposition": "waiting",
-     "reason": "the author placed it in the behaviour layer on 17.09.2026 with a sentence; import pending",
+     "gene": "TH",
+     "disposition": "in_catalogue",
      "task": "205 B"
     },
     {
@@ -652,8 +649,7 @@
      "row": 99,
      "rsid": "rs182052",
      "gene": "ADIPOQ",
-     "disposition": "waiting",
-     "reason": "the author placed it in carbohydrate metabolism on 17.09.2026 as a value without a conclusion (direction depends on population); import pending",
+     "disposition": "in_catalogue",
      "task": "205 B"
     },
     {
@@ -769,9 +765,9 @@
     {
      "row": 118,
      "rsid": "rs3816873",
-     "gene": "MC4R",
-     "disposition": "waiting",
-     "reason": "the author placed it in carbohydrate metabolism on 17.09.2026 as a value without a conclusion and named rs17782313 as the stronger marker; import pending",
+     "gene": "MTTP",
+     "disposition": "refused",
+     "reason": "the list names MC4R, but rs3816873 is MTTP p.Ile128Thr on chromosome 4 (Ensembl); the author's sentence was written for MC4R, and for MC4R she named rs17782313, which the catalogue holds with her source (PMID 23049848)",
      "task": "205 B"
     },
     {
@@ -783,9 +779,8 @@
     {
      "row": 120,
      "rsid": "rs5934505",
-     "gene": null,
-     "disposition": "waiting",
-     "reason": "the author placed it in the gonads on 17.09.2026 without a sentence of her own; import pending",
+     "gene": "FAM9B",
+     "disposition": "in_catalogue",
      "task": "205 B"
     },
     {
@@ -1161,8 +1156,8 @@
      "rsid": "rs1799768",
      "gene": "SERPINE1",
      "disposition": "waiting",
-     "reason": "the author placed it in heart and vessels on 17.09.2026 with a sentence; import pending",
-     "task": "205 B"
+     "reason": "an insertion in the SERPINE1 promoter (4G/5G; Ensembl −/A/C), not a single-base change; the build does not read insertions or deletions yet (task 172). The author's sentence of 23.09.2026 waits with it, its sources Eriksson 1995 (PMID 7892190) and PMID 17549286",
+     "task": "206"
     },
     {
      "row": 178,

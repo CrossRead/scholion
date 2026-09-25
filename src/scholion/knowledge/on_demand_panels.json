@@ -634,6 +634,81 @@
             "assigned": "2026-09-18",
             "judged": "a pharmacogenetic study that does not name the gene in its title, and one suicide study"
           }
+        },
+        {
+          "rsid": "rs6356",
+          "gene": "TH",
+          "hgvs": "NC_000011.10:g.2169721C>T",
+          "protein": "p.Val81Met",
+          "risk_allele": "A",
+          "strand": "-",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "TH Val81Met (A), one copy: a functional candidate variant of tyrosine hydroxylase, the enzyme of dopamine synthesis; the associations are nominal. It is not used on its own to conclude «low» or «high» dopamine, and tyrosine, L-DOPA, Mucuna pruriens or other dopaminergic agents are not prescribed on the genotype alone.",
+              "ru": "TH Val81Met (A), одна копия: функциональный кандидатный вариант тирозингидроксилазы — фермента синтеза дофамина; ассоциации номинальные. По нему одному не делают вывод о «низком» или «высоком» дофамине и не назначают тирозин, L-DOPA, Mucuna pruriens или другие дофаминергические средства только на основании генотипа."
+            },
+            "hom": {
+              "en": "TH Val81Met (A), two copies: the same — a candidate variant with nominal associations; no conclusion about dopamine and no dopaminergic prescription on the genotype alone.",
+              "ru": "TH Val81Met (A), две копии: то же — кандидатный вариант с номинальными ассоциациями; ни вывода о дофамине, ни дофаминергических назначений только по генотипу."
+            }
+          },
+          "effect_size": "a nominal association with motor symptom severity in early Parkinson's disease (p = 0.007)",
+          "study": "Greenbaum 2013",
+          "source": "PMID 23596382 (Greenbaum 2013, Front Neurosci: variants associated with dopaminergic compensation in early Parkinson's disease)",
+          "submitter": "panel_2026_09_23",
+          "curated_on": "2026-09-23",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-23",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 23596382",
+            "assigned": "2026-09-25",
+            "judged": "a nominal association in one study"
+          }
+        },
+        {
+          "rsid": "rs34424986",
+          "gene": "PRKN",
+          "hgvs": "NC_000006.12:g.161785820G>A",
+          "protein": "p.Arg275Trp",
+          "risk_allele": "T",
+          "strand": "-",
+          "mode": "monogenic",
+          "kind": "mechanism",
+          "classification": "Definitive",
+          "moi": "AR",
+          "disease": "PRKN-associated Parkinson disease (autosomal recessive)",
+          "text": {
+            "het": {
+              "en": "PRKN p.Arg275Trp, one copy: heterozygous carriership of a pathogenic PRKN variant; on its own it establishes no diagnosis. With the clinical picture of early parkinsonism, a second variant is looked for, deletions and duplications included.",
+              "ru": "PRKN p.Arg275Trp, одна копия: гетерозиготное носительство патогенного варианта PRKN; сам по себе диагноз не устанавливает. Если есть клиника раннего паркинсонизма, ищут второй вариант, включая делеции и дупликации."
+            },
+            "hom": {
+              "en": "PRKN p.Arg275Trp, two copies: a clinically significant result, compatible with PRKN-associated Parkinson disease given the corresponding phenotype.",
+              "ru": "PRKN p.Arg275Trp, две копии: клинически значимый результат, совместимый с PRKN-ассоциированной болезнью Паркинсона при соответствующем фенотипе."
+            }
+          },
+          "source": "ClinVar VCV000007050 (Pathogenic/Likely pathogenic); GenCC: PRKN — Parkinson disease, autosomal recessive, Definitive (ClinGen)",
+          "submitter": "panel_2026_09_23",
+          "curated_on": "2026-09-23",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-23",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "A",
+            "basis": "gencc",
+            "source": "GenCC Definitive (ClinGen); ClinVar 7050",
+            "assigned": "2026-09-25",
+            "by_rule": "GenCC Definitive"
+          }
         }
       ]
     },

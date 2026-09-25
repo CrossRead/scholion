@@ -154,7 +154,7 @@ class TestTheShippedPanelPassesAndSaysItInBothLanguages(unittest.TestCase):
             if reason:
                 refused.append((key, p.get("rsid"), reason))
         self.assertEqual([], refused)
-        self.assertEqual(214, sum(1 for _ in self.positions()),
+        self.assertEqual(217, sum(1 for _ in self.positions()),
                          "the count changed — say so in the shipped pages in the same commit")
 
     def test_no_shipped_row_names_a_person(self):

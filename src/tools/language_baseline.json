@@ -25,7 +25,7 @@
     "src/scholion/import_csv.py": 7,
     "src/scholion/ingest_labs.py": 82,
     "src/scholion/ingest_studies.py": 23,
-    "src/scholion/knowledge/correction_routes.json": 3,
+    "src/scholion/knowledge/correction_routes.json": 7,
     "src/scholion/knowledge/dose_evidence.json": 1,
     "src/scholion/knowledge/drug_gene_context.json": 7,
     "src/scholion/knowledge/test_rules.json": 10,

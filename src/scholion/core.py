@@ -875,6 +875,10 @@ LOCALIZABLE_FIELDS = {
     # fields for that reason, and `_localize_tree` walks into a curated field
     # that turned out to be a container rather than leaving its maps raw.
     "absent", "het", "hom",
+    # `hemi` is the fourth state (a man's single X, task 205 B), and the OTC
+    # wording of the amino acid carrier classes is keyed by sex and by the
+    # variant's class (task 205 F): each leaf is a sentence in both languages.
+    "hemi", "male", "female", "sex_unknown", "pathogenic", "likely_pathogenic",
     # Why a system's genetic list is empty (system_gene_panels.json `_meta`,
     # system_disease_terms.json per system): a sentence the reader sees on the
     # card, so it is written in both languages since 12.09.2026 — the audit

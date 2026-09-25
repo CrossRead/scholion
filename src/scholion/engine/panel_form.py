@@ -302,3 +302,39 @@ def verdict_line(v: Dict[str, Any]) -> str:
     if v.get("carriers"):
         line += "; " + _t("screen.and_carriers", n=v["carriers"])
     return line
+
+
+def carrier_class(row: Dict[str, Any], book: Dict[str, Any], sex: Optional[str],
+                  hits: List[Dict[str, Any]]) -> None:
+    """The class of a gene's result as the panel author named it (task 205 F).
+
+    Carriership of a recessive gene is not one thing: for PAH, CBS or GLDC it is
+    shown apart, with no red flag; for SLC7A9 it may have an effect of its own;
+    and OTC, on the X chromosome, is not carriership at all in a man. The
+    wording follows the person's sex and the variant's class; without a sex the
+    sentence says that the meaning depends on it.
+    """
+    entry = ((book.get("genes") or {}).get(row.get("gene")) or {})
+    cls = entry.get("class")
+    if not cls:
+        return
+    if cls in ("silent", "possible_effect") and row.get("carrier"):
+        row["carrier_class"] = cls
+        row["carrier_class_text"] = _t("system.carrier_class." + cls, gene=row["gene"])
+    elif cls == "clinically_significant" and row.get("findings") and hits:
+        h = hits[0]
+        sig = str(h.get("clnsig") or "").lower()
+        kind = "likely_pathogenic" if ("likely" in sig and "pathogenic/likely" not in sig) else "pathogenic"
+        variant = h.get("hgvs") or (f"{h.get('chrom')}:{h.get('pos')} {h.get('ref')}>{h.get('alt')}"
+                                    if h.get("pos") else (h.get("rsid") or "—"))
+        texts = entry.get("text") or {}
+        word = _t("system.carrier_class.word." + kind)
+        if sex == "male":
+            raw = (texts.get("male") or {}).get(kind)
+        else:
+            raw = texts.get("female" if sex == "female" else "sex_unknown")
+        sentence = one_language(raw) if raw else ""
+        if sentence:
+            row["carrier_class"] = cls
+            row["carrier_class_text"] = sentence.replace("{variant}", str(variant)).replace("{class_word}", word)
+

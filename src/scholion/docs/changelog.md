@@ -40,6 +40,104 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.8 — 25.09.2026
+
+### What you can do now
+
+**Five positions from the panel author's list are read.** Each carries its level
+of evidence, and only A and B print a conclusion.
+
+- **Gonads.** rs5934505 near FAM9B is read on the X chromosome and carries its
+  association with testosterone in men (level B). rs1691053 in SRD5A1 is shown
+  as a value only. Its author declined to grade its genotypes, so no ladder of
+  genotypes is drawn for it and no verdict is printed.
+- **Glucose.** rs182052 in ADIPOQ is read (level C): a genotype and its source,
+  without a conclusion.
+- **Behaviour.** The on-demand panel reads rs6356 in TH, Val81Met (level C), and
+  rs34424986 in PRKN, p.Arg275Trp. The PRKN variant is recessive, and one copy is
+  printed as carriership.
+
+**A position outside the pseudoautosomal regions of X is read by sex.** A man has
+one copy there, and his genotype is shown as one allele (hemizygous), not as two.
+A two-letter heterozygous call for a man is left unread, since it cannot be a real
+genotype. Without a sex in the profile, such a position is not read at all.
+
+**A carrier of a recessive amino acid gene is told what that carriership means.**
+
+- PAH, CBS and GLDC: carriership is silent.
+- SLC7A9: carriership may have an effect.
+- OTC sits on X. A likely pathogenic or pathogenic variant in a man is shown as
+  clinically significant, with the variant named, not as carriership. In a woman
+  it is not reduced to carriership either: following GeneReviews, the picture
+  ranges from no symptoms to episodes of hyperammonaemia.
+
+**Two variants in one recessive gene are a result, not carriership.** With more
+than one heterozygous variant in a gene that needs both copies changed, the row
+no longer says «carrier». It says the result is clinically significant if the two
+lie on different copies, which short reads cannot tell; phasing, or testing the
+parents, settles it.
+
+**Three tests are offered under their author's condition.** They were withheld
+before.
+
+- **Fecal elastase:** when albumin or total protein is low, or when vitamin D is
+  low together with essential amino acids, and it has never been measured.
+- **Methionine load:** when homocysteine is high while folate and B12 are not
+  low.
+- **ADMA/SDMA:** when Lp(a), apoB or LDL is high, or arginine or citrulline is
+  low, and they have never been measured.
+
+**Tryptophan to the large neutral amino acids (Trp:LNAA) is computed** from a
+draw that holds all six components. It is a value; no range is carried for it.
+
+**«If a decision to correct has been made» says outright, in five more
+situations, that carriership changes nothing.** Each statement has its source,
+and in each one heterozygous carriership is no reason for a different route:
+
+- high phenylalanine in a PAH carrier: restricting phenylalanine and aspartame
+  is for confirmed PAH deficiency;
+- citrulline on the medication list of an ASS1 or ASL carrier: the allele does
+  not predict the response, the measured concentrations do;
+- low tryptophan in an SLC6A19 carrier: nicotinamide is not a preventive measure
+  for a carrier. This one is level C, so it is printed as «adds nothing» with
+  the reason;
+- creatine on the medication list of a GATM carrier: there is no evidence of a
+  higher need;
+- collagen or gelatin on the medication list of a carrier of a primary
+  hyperoxaluria gene: there is no evidence they must be excluded.
+
+### What is fixed
+
+**Two genes on the panel author's list were wrong.**
+
+- rs6356 was listed under the wrong gene; it is in TH.
+- rs3816873 was listed as an MC4R variant. It is in MTTP, so it is not taken
+  into the panel it was proposed for.
+
+A SERPINE1 entry is an insertion, which this build cannot yet read from a genome
+file, so it stays waiting rather than being read as a single letter.
+
+### A series break
+
+On unchanged input:
+
+- a man's genotype at an X position outside the pseudoautosomal regions is shown
+  as one allele;
+- a recessive gene with two heterozygous variants is no longer shown as
+  carriership;
+- the three tests above may now be offered.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+**Run `scholion genotype-sites` — if a sites file was made by an earlier version and an alignment is at hand.**
+The five positions added in this version are not in a sites file made before it.
+Until they are read from the alignment, they are shown as not read. They are never
+shown as the reference.
+
 ## v0.5.7 — 22.09.2026
 
 ### What you can do now

@@ -649,7 +649,7 @@ python3 -m scholion system thyroid           # one system as a card, in one bloc
                                              #   clinician — and the next step in three baskets, none silently empty.
                                              #   `--register clinician` adds rsID, genotype, depth, classification
                                              #   and the gate's counts; the verdict is the same in both registers
-                                             #   In front of the base stands a panel somebody wrote: 214 positions
+                                             #   In front of the base stands a panel somebody wrote: 217 positions
                                              #   across the systems, a row being a POSITION and not a gene.
                                              #   A row whose phrase for the state found has not been written prints
                                              #   as pending. Every shipped row is SIGNED BY THE PANEL'S AUTHOR AND BY

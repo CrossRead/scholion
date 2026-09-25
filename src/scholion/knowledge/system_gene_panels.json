@@ -1896,6 +1896,43 @@
             "assigned": "2026-09-18",
             "judged": "a GWAS meta-analysis of type 1 diabetes and an independent replication"
           }
+        },
+        {
+          "rsid": "rs182052",
+          "gene": "ADIPOQ",
+          "hgvs": "NC_000003.12:g.186842993G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "ADIPOQ rs182052 (A), one copy: in a Russian cohort the A allele went with lower adiponectin and more frequent metabolic disorders; the effect is small and depends on other factors. Read only together with BMI and waist, the lipid profile, glucose, HbA1c and, where needed, insulin.",
+              "ru": "ADIPOQ rs182052 (A), одна копия: в российской когорте аллель A связан с более низким адипонектином и более частыми метаболическими нарушениями; эффект небольшой и зависит от других факторов. Читать только вместе с ИМТ и талией, липидограммой, глюкозой, HbA1c и при необходимости инсулином."
+            },
+            "hom": {
+              "en": "ADIPOQ rs182052 (A), two copies: the same, per copy; the effect is small and depends on other factors. Read only together with BMI and waist, the lipid profile, glucose, HbA1c and, where needed, insulin.",
+              "ru": "ADIPOQ rs182052 (A), две копии: то же, на каждую копию; эффект небольшой и зависит от других факторов. Читать только вместе с ИМТ и талией, липидограммой, глюкозой, HbA1c и при необходимости инсулином."
+            }
+          },
+          "effect_size": "per A allele: adiponectin β = −0.11; type 2 diabetes OR 2.29; coronary disease OR 1.55 (one Russian cohort, n = 447)",
+          "study": "Smetnev 2019",
+          "source": "PMID 31561637 (Smetnev 2019, Biomolecules 9:537: ADIPOQ rs182052, adiponectin and cardiometabolic disease in Russian patients)",
+          "submitter": "panel_2026_09_23",
+          "curated_on": "2026-09-23",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-23",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "judged",
+            "source": "PMID 31561637",
+            "assigned": "2026-09-25",
+            "judged": "one cohort; the direction is known to vary between populations"
+          }
         }
       ],
       "groups": [
@@ -4321,6 +4358,85 @@
             "source": "PMID 21533175 (Zhai 2011, PLoS Genet: DHEAS GWAS meta-analysis); PMID 28712091 (Vernerova 2018: genetic factors and lower DHEAS)",
             "assigned": "2026-09-18",
             "judged": "one of the strongest DHEA-S loci in a GWAS meta-analysis of 14,846 people, replicated"
+          }
+        },
+        {
+          "rsid": "rs1691053",
+          "gene": "SRD5A1",
+          "hgvs": "NC_000005.10:g.6677052T>C",
+          "protein": null,
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "ladder": "refused",
+          "text": {
+            "het": {
+              "en": "SRD5A1 rs1691053 (C), one copy: a variant near the gene of type 1 5α-reductase, which turns testosterone into DHT. There are no replicated data to read C or CC as higher enzyme activity, a high DHT or hyperandrogenism, and no ladder of genotypes is established. With clinical signs of hyperandrogenism: testosterone, SHBG, DHEA-S, androstenedione, and DHT where indicated. 5α-reductase inhibitors are not prescribed by a SNP.",
+              "ru": "SRD5A1 rs1691053 (C), одна копия: вариант рядом с геном 5α-редуктазы 1-го типа, превращающей тестостерон в ДГТ. Воспроизведённых данных, чтобы трактовать C или CC как повышенную активность фермента, высокий ДГТ или гиперандрогению, нет, и лестница по генотипам не установлена. При клинических признаках гиперандрогении: тестостерон, SHBG, ДГЭА-S, андростендион, ДГТ — по показаниям. Ингибиторы 5α-редуктазы по SNP не назначаются."
+            },
+            "hom": {
+              "en": "SRD5A1 rs1691053 (C), two copies: the same — no ladder is established, and the value is shown without a verdict. With clinical signs of hyperandrogenism: testosterone, SHBG, DHEA-S, androstenedione, and DHT where indicated.",
+              "ru": "SRD5A1 rs1691053 (C), две копии: то же — лестница не установлена, значение показано без вывода. При клинических признаках гиперандрогении: тестостерон, SHBG, ДГЭА-S, андростендион, ДГТ — по показаниям."
+            }
+          },
+          "effect_size": "no replicated effect for this position",
+          "study": null,
+          "source": "the panel author's review of 17.09.2026: no reproducible PMID or DOI supports a C → CC ladder for rs1691053",
+          "submitter": "panel_2026_09_23",
+          "curated_on": "2026-09-23",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-17",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "D",
+            "basis": "judged",
+            "source": "the panel author's review of 17.09.2026",
+            "assigned": "2026-09-25",
+            "judged": "no reproducible source for a genotype ladder"
+          }
+        },
+        {
+          "rsid": "rs5934505",
+          "gene": "FAM9B",
+          "hgvs": "NC_000023.11:g.8945785T>C",
+          "protein": null,
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "hemi": {
+              "en": "rs5934505 (Xp22, between FAM9A and FAM9B; not the AR gene), allele T: in a large GWAS of men it went with lower total and free testosterone, with no association with SHBG; replicated in an independent GWAS and in Chinese men. Not a diagnosis of hypogonadism and not a reason for testosterone therapy. With symptoms: total testosterone, SHBG and albumin with a calculated free testosterone, LH, FSH, prolactin — read together with age, BMI and medications.",
+              "ru": "rs5934505 (Xp22, между FAM9A и FAM9B; не ген AR), аллель T: в крупном GWAS у мужчин связан с более низким общим и свободным тестостероном, без связи с SHBG; подтверждено в независимом GWAS и у китайских мужчин. Не диагноз гипогонадизма и не основание для терапии тестостероном. При симптомах: общий тестостерон, SHBG и альбумин с расчётом свободного тестостерона, ЛГ, ФСГ, пролактин — вместе с возрастом, ИМТ и препаратами."
+            },
+            "het": {
+              "en": "rs5934505 in a woman: the association with testosterone was established in men; for women a CC → CT → TT ladder is not established, and the value is shown without a verdict.",
+              "ru": "rs5934505 у женщины: связь с тестостероном установлена в исследованиях мужчин; для женщин лестница CC → CT → TT не установлена, значение показано без вывода."
+            },
+            "hom": {
+              "en": "rs5934505 in a woman: the association with testosterone was established in men; for women a CC → CT → TT ladder is not established, and the value is shown without a verdict.",
+              "ru": "rs5934505 у женщины: связь с тестостероном установлена в исследованиях мужчин; для женщин лестница CC → CT → TT не установлена, значение показано без вывода."
+            }
+          },
+          "effect_size": "lower total and free testosterone in men with T than with C; no association with SHBG",
+          "study": "Ohlsson 2011; Chen 2016",
+          "source": "PMID 21998597 (Ohlsson 2011, PLoS Genet: genetic determinants of serum testosterone in men); PMID 26602056 (Chen 2016, Andrology: rs5934505, low testosterone and late-onset hypogonadism in Chinese men)",
+          "submitter": "panel_2026_09_23",
+          "curated_on": "2026-09-23",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-23",
+            "scope": "text_and_level"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "judged",
+            "source": "PMID 21998597; PMID 26602056",
+            "assigned": "2026-09-25",
+            "judged": "a GWAS in men with replication; the level is for men, a woman's value is shown without a verdict"
           }
         }
       ],
@@ -8522,6 +8638,51 @@
         "iv": {
           "en": "intravenously",
           "ru": "внутривенно"
+        }
+      },
+      "carrier_classes": {
+        "source": "the panel author's answers of 21.09.2026 (the classes) and 23.09.2026 (the OTC wording for men); the wording for a heterozygous woman is the product's own, written against GeneReviews OTC deficiency (NBK154378)",
+        "review": {
+          "by_role": "panel_author",
+          "on": "2026-09-23",
+          "scope": "text_and_level"
+        },
+        "genes": {
+          "PAH": {
+            "class": "silent"
+          },
+          "CBS": {
+            "class": "silent"
+          },
+          "GLDC": {
+            "class": "silent"
+          },
+          "SLC7A9": {
+            "class": "possible_effect"
+          },
+          "OTC": {
+            "class": "clinically_significant",
+            "text": {
+              "male": {
+                "likely_pathogenic": {
+                  "en": "A likely pathogenic variant {variant} of the OTC gene was found in the hemizygous state. In a man a hemizygous pathogenic or likely pathogenic OTC variant is regarded as a variant associated with OTC deficiency, not as carriership.",
+                  "ru": "Выявлен вероятно патогенный вариант {variant} гена OTC в гемизиготном состоянии. У мужчин гемизиготный патогенный или вероятно патогенный вариант OTC рассматривается как вариант, ассоциированный с OTC-недостаточностью, а не как носительство."
+                },
+                "pathogenic": {
+                  "en": "A pathogenic variant {variant} of the OTC gene was found in the hemizygous state. Given the X-linked inheritance of the disease, in a man this variant is not carriership and may cause OTC deficiency. Comparison with the clinical and biochemical data is recommended.",
+                  "ru": "Выявлен гемизиготный патогенный вариант {variant} в гене OTC. Учитывая X-сцепленный тип наследования заболевания, у лиц мужского пола данный вариант не является состоянием носительства и может быть причиной OTC-недостаточности. Рекомендуется сопоставление с клиническими и биохимическими данными."
+                }
+              },
+              "female": {
+                "en": "A {class_word} variant {variant} of the OTC gene was found in the heterozygous state. OTC deficiency is inherited X-linked; in women the picture ranges from no symptoms to episodes of hyperammonaemia and depends on X-chromosome inactivation, so the result is not reduced to «carriership». Comparison with the clinical and biochemical data is recommended.",
+                "ru": "Выявлен {class_word} вариант {variant} гена OTC в гетерозиготном состоянии. OTC-недостаточность наследуется X-сцепленно; у женщин проявления варьируют от бессимптомного течения до эпизодов гипераммониемии и зависят от инактивации X-хромосомы, поэтому результат не сводится к «носительству». Рекомендуется сопоставление с клиническими и биохимическими данными."
+              },
+              "sex_unknown": {
+                "en": "A {class_word} variant {variant} of the OTC gene was found. The gene is on the X chromosome, and what the result means depends on sex, which the profile does not record; comparison with the clinical and biochemical data is recommended.",
+                "ru": "Выявлен {class_word} вариант {variant} гена OTC. Ген лежит на X-хромосоме, и значение результата зависит от пола, который в профиле не указан; рекомендуется сопоставление с клиническими и биохимическими данными."
+              }
+            }
+          }
         }
       }
     }

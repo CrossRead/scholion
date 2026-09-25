@@ -122,10 +122,15 @@ class TestTheHeldTests(unittest.TestCase):
             ids = [s["id"] for s in LB.suggest_tests()["suggestions"]]
         self.assertEqual(["free_one"], ids)
 
-    def test_the_three_the_author_declined_are_held_and_say_why(self):
+    def test_the_three_the_author_declined_now_carry_her_condition(self):
+        """Held on 21.09.2026 («not for everyone»), released on 25.09.2026 with the
+        condition she named on 23.09.2026: each fires only under it."""
         rules = {r["id"]: r for r in json.loads((KNOW / "test_rules.json").read_text(encoding="utf-8"))["rules"]}
         for rid in ("amino_fecal_elastase", "amino_methionine_load", "amino_dimethylarginines"):
-            self.assertTrue(rules[rid]["held"]["reason"], rid)
+            with self.subTest(rule=rid):
+                self.assertNotIn("held", rules[rid])
+                self.assertEqual("panel_author", rules[rid]["condition_from"]["by_role"])
+                self.assertIn("flag", json.dumps(rules[rid]["when"]), "the condition is a corridor, not «never measured»")
         self.assertNotIn("held", rules["amino_urine_urea_nitrogen"])
 
 

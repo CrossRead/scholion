@@ -1884,8 +1884,9 @@ function genTableHtml(gen,card,register){
     const id='g:'+g.gene;
     const cells=`<td><b>${esc(g.gene)}</b></td><td class="muted small">${esc((g.classifications||[]).join(', ')||'—')}</td>`
       +`<td>${geneStateBadge(g)}</td><td class="opt muted small">${esc((g.moi_codes||[]).join(', ')||'')}</td>`
-      +`<td>${esc(short(g.text||g.file_says_text||''))}</td>`;
+      +`<td>${esc(short(g.carrier_class_text||g.two_variants_text||g.text||g.file_says_text||''))}</td>`;
     const detail=`<div class="pnl k-c">${g.text?`<div class="pnl-text">${esc(g.text)}</div>`:''}`
+      +[g.carrier_class_text,g.two_variants_text].filter(Boolean).map(x=>`<div class="why">${esc(x)}</div>`).join('')
       +`${g.file_says_text?`<div class="why muted">${esc(g.file_says_text)}</div>`:''}`
       +`${g.read===false?`<div class="why muted">${esc(t('system.row.unread',{why:g.read_why_text||g.read_why||'—'}))}</div>`:''}`
       +`${register==='clinician'?geneRowDetail(g):''}</div>`;
@@ -1940,9 +1941,9 @@ function pnlStateBadge(p){
   const st=p.state||'None';
   // Read from the file, the depth unverified: the state keeps its colour and a
   // second, muted badge says what is not known about it.
-  if(p.depth_note) return badge(st==='hom'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st))
+  if(p.depth_note) return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st))
     +' '+badge('b-unknown',t('system.gen.state.file_only'),p.depth_note);
-  return badge(st==='hom'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st));
+  return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st));
 }
 function pnlExpect(ec,qn){
   if(!ec) return '';
@@ -1966,7 +1967,7 @@ function panelHtml(gen,card,register){
   if(!states.length) return '';
   const rows=(gen.rows||[]).filter(x=>x.unit==='position');
   const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
-  const found=states.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'));
+  const found=states.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
   const absent=states.filter(p=>p.read===true&&p.state==='absent');
   const unread=states.filter(p=>p.read!==true);
   const other=states.filter(p=>!found.includes(p)&&!absent.includes(p)&&!unread.includes(p));
@@ -1998,7 +1999,7 @@ function genSummaryHtml(gen, card){
   }
   const rows=(gen.rows||[]).filter(x=>x.unit==='position');
   const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
-  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'));
+  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
   const absent=st.filter(p=>p.read===true&&p.state==='absent');
   const unread=st.filter(p=>p.read!==true);
   const foundGenes=new Set(found.map(p=>p.gene));
@@ -2086,11 +2087,15 @@ function panelLabsHtml(p){
 }
 // The three genotypes of a common variant, the person's own in bold (task 199).
 function ladderHtml(r){
-  if(!r||!r.ladder) return '';
-  const own=String((r.genotype||{}).genotype||'').replace(/[\/|]/g,'').split('').sort().join('');
+  if(r&&r.ladder_refused) return `<div class="why muted">${esc(t('system.row.ladder_refused'))}</div>`
+    +[r.carrier_class_text,r.two_variants_text].filter(Boolean).map(x=>`<div class="why">${esc(x)}</div>`).join('');
+  const extra=r?[r.carrier_class_text,r.two_variants_text].filter(Boolean).map(x=>`<div class="why">${esc(x)}</div>`).join(''):'';
+  if(!r||!r.ladder) return extra;
+  let own=String((r.genotype||{}).genotype||'').replace(/[\/|]/g,'').split('').sort().join('');
+  if(r.hemizygous&&own&&new Set(own).size===1) own=own[0];
   const rungs=['base','het','hom'].map(k=>r.ladder[k]).filter(Boolean)
     .map(g=>own&&g.split('').sort().join('')===own?`<b>${esc(g)}</b>`:esc(g)).join(' · ');
-  return `<div class="why muted">${esc(t('system.row.ladder',{rungs:'§'})).replace('§',rungs)}</div>`;
+  return `<div class="why muted">${esc(t('system.row.ladder',{rungs:'§'})).replace('§',rungs)}</div>`+extra;
 }
 // The same position on the three routes protein arrives by (task 200): one
 // line, because what a reader needs here is which route makes it moot.
@@ -2248,7 +2253,7 @@ async function viewPanel(key){
   const c=r.counts||{};
   const pos=p=>`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}"><div class="pnl-head"><b>${esc(p.rsid||'—')}</b>${p.protein?` <span>${esc(p.protein)}</span>`:''} ${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}<span class="muted small">${esc(t('system.mode.'+(p.mode||'unknown')))}</span></div>
     <div class="why muted">${esc(t('panel.locus',{hgvs:p.hgvs||'—',allele:p.risk_allele||'—'}))}</div>
-    ${['het','hom'].filter(s=>(p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc(p.text[s])}</div>`).join('')}
+    ${['het','hom','hemi'].filter(s=>(p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc(p.text[s])}</div>`).join('')}
     ${p.classification?`<div class="why">${esc(t('panel.classification',{classification:p.classification,moi:p.moi||'—',disease:p.disease||'—'}))}</div>`:''}
     ${p.expect?`<div class="why">${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</div>`:''}
     ${p.effect_size?`<div class="why">${esc(t('panel.effect',{effect:p.effect_size}))}</div>`:''}
@@ -2280,7 +2285,7 @@ async function viewSystem(key, register){
     return;
   }
   const lab=r.labs||{}, st=(r.genetics||{}).positions||[];
-  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom')).length;
+  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi')).length;
   const facts=[
     lab.score!=null?factHtml(`${lab.score}<small class="muted">/100</small>`,t('web.system.fact_score'),scoreCls(lab.score)):'',
     lab.total?factHtml(`${lab.measured||0}<small class="muted">/${lab.total}</small>`,t('web.system.fact_measured'),''):'',

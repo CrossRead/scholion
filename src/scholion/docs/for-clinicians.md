@@ -111,7 +111,7 @@ rather than averaged. An assertion classified Limited, Disputed or Refuted is
 never presented as a finding, and one copy of an allele in a recessive gene is
 printed as carriership and raised as a question — never as a risk line.
 
-**In front of that base stands what a base cannot supply: 214 authored positions
+**In front of that base stands what a base cannot supply: 217 authored positions
 across fourteen of the systems, each with an evidence level from A to E.** The unit of a row is a position, not a gene: an rsID
 with its HGVS on a RefSeq accession, the allele the author named, the mode of the
 claim — monogenic, common variant, pharmacogenetic — and the phrase for one copy
@@ -158,7 +158,7 @@ drug» — the program does not write it. A curated layer takes such sentences f
 a clinician, prints them only with a named source, counts what it dropped, and
 until a sentence is written says plainly that it is not written. What has changed
 since that arrangement was first offered is that the layer no longer ships empty:
-214 positions are in the build, each with its source, the date it was curated, and
+217 positions are in the build, each with its source, the date it was curated, and
 a signature — the panel author's, not a clinician's, which is what the card says.
 Counter-signing a row, correcting it, or striking it out is the whole of what is
 being asked of a clinician who wants to take part, and it is a smaller ask than
@@ -204,7 +204,7 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-This page ships with the build numbered 0.5.7. **There is still no clinical
+This page ships with the build numbered 0.5.8. **There is still no clinical
 validation study and no benchmark against existing systems.** What there is, is two external runs by
 people who are not the author, and both are worth stating plainly because both
 were useful and neither was flattering.
@@ -235,7 +235,7 @@ the examination says a person is well. Her answers reshaped the product — the
 three entries, the curated gate, and the system card described above came out of
 that exchange. The thing she asked for that the program still does not have is
 a clinician's signature under the curated sentences. The mechanism that holds
-them is no longer empty — 214 positions over fourteen of the systems, each checked by
+them is no longer empty — 217 positions over fourteen of the systems, each checked by
 the panel's author against the source it names — but a signature by the author of
 a panel is not a clinical endorsement, and the card says whose it is rather than
 letting the distinction blur.

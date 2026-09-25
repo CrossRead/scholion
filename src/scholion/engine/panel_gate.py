@@ -220,7 +220,10 @@ def ladder(p: Dict[str, Any]) -> Optional[Dict[str, str]]:
     the card can mark the person's own rung. None for other modes, or when the
     allele is not named.
     """
-    if p.get("mode") != "common_variant":
+    if p.get("mode") != "common_variant" or p.get("ladder") == "refused":
+        # A refused ladder is the author's statement that no grading of the
+        # genotypes is established; drawing the one the locus implies would be
+        # the grading she declined (task 205 B).
         return None
     if isinstance(p.get("ladder"), dict):
         return {k: str(p["ladder"].get(k) or "") for k in ("base", "het", "hom")}

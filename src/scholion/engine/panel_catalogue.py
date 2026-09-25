@@ -31,7 +31,7 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     # or still a {en, ru} pair when read raw — both are taken.
     text = p.get("text") if isinstance(p.get("text"), dict) else {}
     out["text"] = {state: (panel_form.one_language(v) if isinstance(v, dict) else str(v))
-                   for state, v in text.items() if state in ("het", "hom") and v}
+                   for state, v in text.items() if state in ("het", "hom", "hemi") and v}
     exp = p.get("expect") if isinstance(p.get("expect"), dict) else None
     out["expect"] = ({"marker": exp.get("marker"), "direction": exp.get("direction"),
                       "note": panel_form.one_language(exp.get("note"))} if exp else None)

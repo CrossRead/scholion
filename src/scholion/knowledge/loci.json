@@ -4,7 +4,7 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so. The 28 positions added on 2026-09-17 (the three new systems of task 200 and the amino acid panel) carry the coordinate of their HGVS, which was itself verified against Ensembl REST GRCh38 and, for the amino acid positions, against the GWAS Catalog; `ref` is the reference base of that HGVS and `alt` its alternative on the plus strand, so a row whose risk allele is written on the minus strand says so in its note. On 2026-09-17 the two sources agreed on the GRCh37 position of rs111033565 (PRSS1) and rs641738 (MBOAT7/TMC4), which had been held without a second coordinate since they disagreed; both numbers are now carried, written by the same check that compares them. Nine more amino acid positions on 2026-09-18 (ABCG2, SLC16A9, PPM1K rs7678928, GLS2, NAT8, GCKR, GNMT, PSPH region, PRODH): coordinates from Ensembl REST GRCh38 fetched for each rsID, alleles from the GWAS Catalog records; ABCG2 and GCKR are spelled on the plus strand and their notes say what the literature's spelling is.",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so. The 28 positions added on 2026-09-17 (the three new systems of task 200 and the amino acid panel) carry the coordinate of their HGVS, which was itself verified against Ensembl REST GRCh38 and, for the amino acid positions, against the GWAS Catalog; `ref` is the reference base of that HGVS and `alt` its alternative on the plus strand, so a row whose risk allele is written on the minus strand says so in its note. On 2026-09-17 the two sources agreed on the GRCh37 position of rs111033565 (PRSS1) and rs641738 (MBOAT7/TMC4), which had been held without a second coordinate since they disagreed; both numbers are now carried, written by the same check that compares them. Nine more amino acid positions on 2026-09-18 (ABCG2, SLC16A9, PPM1K rs7678928, GLS2, NAT8, GCKR, GNMT, PSPH region, PRODH): coordinates from Ensembl REST GRCh38 fetched for each rsID, alleles from the GWAS Catalog records; ABCG2 and GCKR are spelled on the plus strand and their notes say what the literature's spelling is. Five positions of the panel author's list (rs1691053, rs5934505, rs6356, rs34424986, rs182052) were added on 2026-09-25 from the Ensembl REST endpoints of both builds; for the three sites dbSNP gives three alleles, the alternative is the one the position's own source names (TH Val81Met, PRKN c.823C>T per ClinVar 7050, rs5934505 C/T per Ohlsson 2011), never a guess.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool. CLOSED 13.09.2026 — FADS1 rs174537 and rs174546: the coordinates were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary while the radar-segment panels were composed, and both loci are in `loci` with the omega-3 conversion note the vitamins panel reads.",
@@ -3115,6 +3115,68 @@
         "ru": "FGB: plasma fibrinogen higher per A allele"
       },
       "pos_grch37": 155483708
+    },
+    "rs1691053": {
+      "gene": "SRD5A1",
+      "chrom": "5",
+      "pos": 6677052,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 6677165,
+      "note": {
+        "en": "SRD5A1: downstream of the gene; no replicated effect, shown without a verdict",
+        "ru": "SRD5A1: ниже гена по течению; воспроизведённого эффекта нет, показывается без вывода"
+      }
+    },
+    "rs5934505": {
+      "gene": "FAM9B",
+      "chrom": "X",
+      "pos": 8945785,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 8913826,
+      "note": {
+        "en": "Xp22 between FAM9A and FAM9B, not AR: T (the reference base) with lower total and free testosterone in men; C is the comparison allele of the GWAS",
+        "ru": "Xp22 между FAM9A и FAM9B, не AR: T (референсное основание) — ниже общий и свободный тестостерон у мужчин; C — аллель сравнения в GWAS"
+      }
+    },
+    "rs6356": {
+      "gene": "TH",
+      "chrom": "11",
+      "pos": 2169721,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 2190951,
+      "star": "Val81Met",
+      "note": {
+        "en": "TH p.Val81Met; the site carries three alleles in dbSNP, and the one the studies name is T on the plus strand (A on the transcript)",
+        "ru": "TH p.Val81Met; в dbSNP у позиции три аллеля, и тот, о котором говорят исследования, — T на плюс-нити (A на транскрипте)"
+      }
+    },
+    "rs34424986": {
+      "gene": "PRKN",
+      "chrom": "6",
+      "pos": 161785820,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 162206852,
+      "star": "p.Arg275Trp",
+      "note": {
+        "en": "PRKN c.823C>T p.Arg275Trp (ClinVar 7050, pathogenic/likely pathogenic); the gene is on the minus strand, so the change is G>A in the genome; the site carries three alleles in dbSNP",
+        "ru": "PRKN c.823C>T p.Arg275Trp (ClinVar 7050, патогенный/вероятно патогенный); ген на минус-нити, поэтому в геноме замена G>A; в dbSNP у позиции три аллеля"
+      }
+    },
+    "rs182052": {
+      "gene": "ADIPOQ",
+      "chrom": "3",
+      "pos": 186842993,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 186560782,
+      "note": {
+        "en": "ADIPOQ −10066 G>A, intronic: A with lower adiponectin in a Russian cohort",
+        "ru": "ADIPOQ −10066 G>A, интронный: A — ниже адипонектин в российской когорте"
+      }
     }
   }
 }

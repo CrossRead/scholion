@@ -90,6 +90,15 @@ DERIVED: Dict[str, Dict[str, Any]] = {
         "fn": lambda v: (v["aa_leucine"] + v["aa_isoleucine"] + v["valine"])
         / (v["aa_phenylalanine"] + v["aa_tyrosine"]),
         "expr": "provenance.expr.aa_fischer_ratio", "tol": 0.10, "strict": False},
+    # Tryptophan against the large neutral amino acids competing with it for the
+    # carrier into the brain — the author's denominator (23.09.2026), the classic
+    # one of Fernstrom and Wurtman: leucine, isoleucine, valine, phenylalanine,
+    # tyrosine. A value only; no corridor is carried for it.
+    "aa_ratio_trp_lnaa": {
+        "needs": ["aa_tryptophan", "aa_leucine", "aa_isoleucine", "valine", "aa_phenylalanine", "aa_tyrosine"],
+        "fn": lambda v: v["aa_tryptophan"] / (v["aa_leucine"] + v["aa_isoleucine"] + v["valine"]
+                                             + v["aa_phenylalanine"] + v["aa_tyrosine"]),
+        "expr": "provenance.expr.aa_ratio_trp_lnaa", "tol": 0.10, "strict": False},
     # Urea in mmol/L over creatinine in µmol/L, brought to mmol/L.
     "urea_creatinine_ratio": {
         "needs": ["urea", "creatinine"],

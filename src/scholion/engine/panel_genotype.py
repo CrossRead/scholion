@@ -122,3 +122,45 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
         return {**out, "state": "hom" if same else "absent", "read": False,
                 "presumed": True, "why": "presumed_ref"}
     return {**out, "state": "unread", "read": False, "why": conf or "no_row"}
+
+
+# ---- one copy of X (task 205 B, F) -----------------------------------------
+#: The two pseudoautosomal regions of GRCh38 chrX, where a man has two copies.
+_PAR_X = ((10001, 2781479), (155701383, 156030895))
+
+
+def on_x(p: Dict[str, Any]) -> bool:
+    """The row's position lies on X outside its pseudoautosomal regions,
+    where a man carries one copy and a woman two."""
+    m = _HGVS.match(str(p.get("hgvs") or "").strip())
+    if not m or m.group(1) != "NC_000023":
+        return False
+    pos = int(m.group(2))
+    return not any(lo <= pos <= hi for lo, hi in _PAR_X)
+
+
+def as_hemizygous(geno: Dict[str, Any], sex: Optional[str]) -> Dict[str, Any]:
+    """A reading of an X position, told by the profile's sex.
+
+    A man has one copy there, so «one copy of the named allele» is all of it —
+    state `hemi` — and a heterozygous call is not a reading at all but an
+    artefact of calling his X as two copies. A file writes his single copy
+    either as `T` or as `T/T`; both are the same one allele. With the sex not
+    recorded the two readings cannot be told apart, and the position is not
+    read rather than read as a woman's.
+    """
+    state = geno.get("state")
+    if sex == "female" or state not in ("het", "hom", "absent"):
+        return geno
+    if sex != "male":
+        return {**geno, "state": "unread", "read": False, "why": "sex_unknown_on_x"}
+    if state == "het":
+        return {**geno, "state": "unread", "read": False, "why": "het_on_male_x"}
+    return {**geno, "state": "hemi" if state == "hom" else "absent", "hemizygous": True}
+
+
+def hemizygous_ladder(lad: Optional[Dict[str, str]]) -> Optional[Dict[str, str]]:
+    """The two states of a man's single copy, from the diploid ladder."""
+    if not lad or not lad.get("base") or not lad.get("hom"):
+        return None
+    return {"base": lad["base"][0], "hom": lad["hom"][0]}

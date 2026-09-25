@@ -64,6 +64,9 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
         line += "\n   " + str(r["closes_text"])
     if r.get("file_says_text"):
         line += "\n   " + str(r["file_says_text"])
+    for extra in ("carrier_class_text", "two_variants_text"):
+        if r.get(extra):
+            line += "\n   " + str(r[extra])
     rt = r.get("route") if isinstance(r.get("route"), dict) else None
     if rt and rt.get("routes"):
         line += "\n   " + _t("system.panel.route_head", list=" · ".join(
@@ -73,8 +76,12 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if ul and ul.get("what_it_reveals"):
         line += "\n   " + _t("system.panel.under_load", test=ul.get("test_text") or ul.get("test"),
                              reveals=ul["what_it_reveals"])
+    if r.get("ladder_refused"):
+        line += "\n   " + _t("system.row.ladder_refused")
     if r.get("ladder"):
         own = str((r.get("genotype") or {}).get("genotype") or "").replace("/", "").replace("|", "")
+        if r.get("hemizygous") and own and len(set(own)) == 1:
+            own = own[0]          # a man's single X, written T or T/T by the caller
         rungs = [("**" + g + "**" if own and sorted(own) == sorted(g) else g)
                  for g in (r["ladder"].get(k) for k in ("base", "het", "hom")) if g]
         line += "\n   " + _t("system.row.ladder", rungs=" · ".join(rungs))
@@ -202,7 +209,7 @@ def system_report(r: Dict[str, Any]) -> str:
             if g.get("text"):
                 L.append("      " + str(g["text"]))
             for m in g.get("members") or []:
-                if m.get("state") in ("het", "hom") or m.get("read") is not True:
+                if m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True:
                     L.append("      " + _system_gene_row({**m, "unit": "position"}, reg).replace("\n", "\n      "))
         grouped = {rs for g in gen.get("groups") or [] for rs in g.get("positions") or []}
         for row in gen.get("rows") or []:
@@ -300,7 +307,7 @@ def system_report(r: Dict[str, Any]) -> str:
             st = g.get("states") or {}
             L.append("      " + ", ".join(f"{_t('system.panel.state.' + k)} {v}" for k, v in st.items()))
             for m in g.get("members") or []:
-                if m.get("state") in ("het", "hom") or m.get("read") is not True:
+                if m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True:
                     L.append("      " + _system_gene_row({**m, "unit": "position"}, reg).replace("\n", "\n      "))
         for row in gen.get("rows") or []:
             if row.get("unit") == "position" and row.get("rsid") in grouped:

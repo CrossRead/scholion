@@ -632,6 +632,8 @@ def _eval_condition(cond: Dict[str, Any]) -> bool:
         return all(_eval_condition(c) for c in cond["all"])
     if "any" in cond:
         return any(_eval_condition(c) for c in cond["any"])
+    if "not" in cond:
+        return not _eval_condition(cond["not"])
     if "marker" in cond and "op" in cond:
         val = _latest_value(cond["marker"])
         if val is None:
@@ -661,6 +663,12 @@ def _eval_condition(cond: Dict[str, Any]) -> bool:
     # existing at all, `never_measured` keeps it only until the draw.
     if "never_measured" in cond:
         return all(_latest_value(k) is None for k in cond["never_measured"])
+    # Task 205 G: a test offered «only when» — the author's condition, read off
+    # the corridor of each marker exactly as the lab card reads it.
+    if "flag" in cond:
+        want = str(cond["flag"].get("is") or "")
+        flags = _flags_now()
+        return any(flags.get(k) in (want, "critical_" + want) for k in cond["flag"].get("markers") or [])
     if "measured" in cond:
         return any(_latest_value(k) is not None for k in cond["measured"])
     return False
@@ -683,11 +691,22 @@ def _marker_last_date(keys) -> Optional[str]:
     return max(ds) if ds else None
 
 
+_FLAGS: Dict[str, Any] = {}
+
+
+def _flags_now() -> Dict[str, Any]:
+    """Each marker's flag against its corridor, computed once per suggestion pass."""
+    if "v" not in _FLAGS:
+        _FLAGS["v"] = {m.get("key"): m.get("flag") for m in analyze_labs().get("markers") or []}
+    return _FLAGS["v"]
+
+
 def suggest_tests() -> Dict[str, Any]:
     """What else to take. A rule with a ``covers`` field (the markers it monitors) is marked
     ``done_recently`` if all of them were measured within the last ``recheck_months``
     (3 by default) — then it is not an extra order but routine monitoring: it goes down the list."""
     triggered = []
+    _FLAGS.clear()
     for rule in core.test_rules().get("rules", []):
         # A rule the panel author asked to hold (task 205 G): «not for everyone»
         # is a condition nobody has written yet. Until it is, the rule does not

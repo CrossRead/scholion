@@ -1713,7 +1713,8 @@ def ingest(folder: str, force: bool = False,
     # into the profile, and a refused call writes nothing.
     moved = _manifest_moved("labs")
     manifest = _load_manifest()
-    out = {"ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
+    out: Dict[str, Any] = {
+           "ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
            "points_added": 0, "skipped": 0, "per_file": [], "conflicts": [],
            "repeats": [], "draw_times": {}, "resolution_mixed": [],
            # Points of the same day this run stood in for (task 128), and files

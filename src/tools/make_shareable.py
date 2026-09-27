@@ -579,10 +579,19 @@ def build(repo: Path, out: Path) -> Path:
     # release archive is run, and a shipped test executes it. Both were missed by
     # the import gate below — they are loaded by path, not imported — and found by
     # the package's own suite in the first publication run that had them.
+    #
+    # `check_types.py` and its baseline join for a third reason (0.5.11): a
+    # WORKFLOW that ships runs it. The job that counts type errors travelled to
+    # the public tree and the tool did not, so the job could only fail — and for
+    # one release nobody saw it, because the step before it failed first. No test
+    # imports the tool and nothing loads it by path, so neither gate above could
+    # have found it; `tests/test_a_workflow_runs_only_what_the_package_carries.py`
+    # now reads the workflows themselves.
     for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json",
                   "check_test_reach.py", "test_reach_baseline.json",
                   "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
-                  "check_quiet_excepts.py", "test_the_artefact.sh"):
+                  "check_quiet_excepts.py", "test_the_artefact.sh",
+                  "check_types.py", "types_baseline.json"):
         _src = repo / "src" / "tools" / _name
         if _src.exists():
             shutil.copy2(_src, shared / "src" / "tools" / _name)

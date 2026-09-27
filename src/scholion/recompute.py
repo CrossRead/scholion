@@ -407,11 +407,12 @@ def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, A
     # assistant had a tool that reads the screen and nothing that could produce
     # one. «Not run» is not «clean», and the step that closes it is offered here.
     if "scholion acmg-scan" not in by_key and _acmg_never_run():
-        a: Dict[str, Any] = {"kind": "command", "key": "scholion acmg-scan", "force": False,
-                             "source": "data", "versions": [], "conditions": [], "text": None,
-                             "data": {"status": "missing"}}
-        by_key[a["key"]] = a
-        steps.append(a)
+        screen: Dict[str, Any] = {"kind": "command", "key": "scholion acmg-scan",
+                                  "force": False, "source": "data", "versions": [],
+                                  "conditions": [], "text": None,
+                                  "data": {"status": "missing"}}
+        by_key[screen["key"]] = screen
+        steps.append(screen)
     for s in steps:
         if s.get("key"):
             s["command"] = s["key"] + (" --force" if s.get("force") else "")

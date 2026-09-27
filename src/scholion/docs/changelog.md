@@ -40,6 +40,45 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.11 — 27.09.2026
+
+### What you can do now
+
+Nothing new: the program answers exactly as 0.5.10 does. This release repairs
+the public checks that stand behind it.
+
+### What is fixed
+
+**The public check of types could not run.** Every push to the public
+repository starts a job that counts type errors per module and refuses a push
+that adds one. The job called a tool the published tree did not contain, so it
+failed before it measured anything, on every push since it was introduced. The
+tool and its recorded counts now travel with the package, and the job measures
+what it says it measures. Nothing a person runs was affected: `scholion` and
+every command of it behaved the same with the job red.
+
+### What is checked now that was not
+
+- A workflow that ships names only tools that ship with it. The package's own
+  suite reads the workflows and the test runner, and a tool one of them runs
+  and the package lacks stops the publication before anything goes out.
+- A tool that compares against recorded numbers travels with those numbers.
+- Type errors are counted before a publication and not only after it. The test
+  runner fetches the checker in the version the public job pins, without
+  installing anything into the interpreter, and stops when a module has gained
+  an error; where it cannot fetch the checker it says the count was not
+  measured. The first count found three modules above their recorded number,
+  and they are corrected: the recorded total falls from 258 to 173.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+Nothing has to be recomputed and nothing has to be re-imported. A person who
+runs `scholion version` sees the new number and no step to take.
+
 ## v0.5.10 — 27.09.2026
 
 ### What you can do now

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# The full test run. Installs nothing: the standard library only.
+# The full test run. Installs nothing into your interpreter: the standard library only.
+# Two steps borrow a tool through `uv`, into uv's own cache, and say so when they
+# cannot: the oldest promised Python, and the count of type errors.
 # The tests work on a synthetic fixture (tests/fixtures/profile) — they neither
 # read nor change anyone's real profile.
 set -euo pipefail
@@ -98,6 +100,50 @@ else
   else
     echo "▶ the suite on Python $FLOOR, the oldest this package promises (uv fetches it; SCHOLION_SKIP_OLDEST=1 skips)"
     uv run --python "$FLOOR" --no-project -- python -m unittest discover -s tests -t . < /dev/null || exit 1
+  fi
+fi
+
+# Type errors per module, counted before publication rather than after it.
+#
+# The matrix has a job for this and it answers after a tag: it was red on two
+# published versions in a row, the second time for a count that had grown in
+# work already out. `mypy` is a third-party tool and the package depends on
+# nothing, so nothing is installed into anybody's interpreter: `uv` fetches the
+# tool into its own cache, the same way it fetches the oldest Python above.
+#
+# The version is read from the workflow that pins it. The count depends on the
+# version, and a number typed here as well would be two numbers.
+#
+# Where it cannot run it says so and the run goes on: a check that did not run
+# is not a check that passed, and it is not a failure of the tree either.
+if [ -f src/tools/check_types.py ]; then
+  if [ "$#" -gt 0 ]; then
+    echo "▶ type errors per module — not measured: this run was narrowed to $*"
+  elif [ "${SCHOLION_SKIP_TYPES:-}" = "1" ] || [ "${SCHOLION_SKIP_TYPES:-}" = "true" ]; then
+    echo "▶ type errors per module — skipped by SCHOLION_SKIP_TYPES"
+  elif [ "${CI:-}" = "true" ]; then
+    echo "▶ type errors per module — not here: the matrix has a job of its own for them"
+  else
+    TYPES_PIN=""
+    if [ -f .github/workflows/tests.yml ]; then
+      TYPES_PIN="$(sed -n 's/.*"\(mypy==[0-9][0-9.]*\)".*/\1/p' .github/workflows/tests.yml | head -1)"
+    fi
+    if [ -z "$TYPES_PIN" ]; then
+      echo "⚠ type errors were NOT measured: no workflow here pins a mypy version to measure with."
+    elif ! command -v uv >/dev/null 2>&1; then
+      echo "⚠ type errors were NOT measured: uv is not installed, and there is nothing else here"
+      echo "  to fetch $TYPES_PIN with. The count is unverified until the matrix answers — after a tag."
+    elif ! uv run --no-project --with "$TYPES_PIN" -- python -c "import mypy" >/dev/null 2>&1; then
+      echo "⚠ type errors were NOT measured: uv could not provide $TYPES_PIN — no network, and"
+      echo "  nothing cached. The count is unverified until the matrix answers — after a tag."
+    else
+      echo "▶ no module gained a type error ($TYPES_PIN, fetched by uv; SCHOLION_SKIP_TYPES=1 skips)"
+      uv run --no-project --with "$TYPES_PIN" -- python src/tools/check_types.py --strict > /dev/null 2>&1 || {
+        uv run --no-project --with "$TYPES_PIN" -- python src/tools/check_types.py --strict | tail -4
+        exit 1
+      }
+      echo "  ✓ every module is at or below its recorded count"
+    fi
   fi
 fi
 

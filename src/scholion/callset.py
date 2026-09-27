@@ -159,7 +159,7 @@ def _coding_probes(vcf: str) -> List[Dict[str, int]]:
     return out
 
 
-def _compose(vcf: str) -> Dict[str, int]:
+def _compose(vcf: str) -> Dict[str, Any]:
     """Substitutions against indels among the first rows that carry an allele."""
     import gzip
     snv = indel = seen = 0

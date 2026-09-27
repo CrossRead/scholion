@@ -134,6 +134,12 @@ is a deliberate act: an accepted narrowing must land in `CHANGELOG.md` in the
   Installed by `bash src/tools/install_hooks.sh`.
 - Emergency bypass — `SCHOLION_SKIP_TESTS=1 git push`. Deliberately and rarely: the
   personal-data leak check still runs regardless.
+- Type errors are counted per module by `./run_tests.sh`, against the recorded
+  line: a module may lose errors and may not gain one. The tool is `mypy`, in the
+  version the workflow pins, fetched by `uv` into its own cache — nothing is
+  installed into the interpreter. `SCHOLION_SKIP_TYPES=1` skips the step, a
+  narrowed run skips it on its own, and where `uv` or the network is missing the
+  step says the count was not measured and the run goes on.
 - The reach measurement is the last step of `./run_tests.sh` and runs the suite a
   second time under the coverage hook, which costs about a minute and a half.
   `SCHOLION_SKIP_REACH=1` skips it for a tight edit loop; a run narrowed to one

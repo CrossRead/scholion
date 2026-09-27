@@ -48,7 +48,6 @@ from __future__ import annotations
 
 import json
 import unittest
-from pathlib import Path
 
 import support
 

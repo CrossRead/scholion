@@ -118,7 +118,7 @@ def _head(path: Path, lines: int = 40) -> str:
     try:
         with _open_text(path) as fh:
             return "".join(next(fh, "") for _ in range(lines))
-    except Exception:
+    except Exception:  # quiet: "" = not recognised as an array, and no build declared; nothing is read from it
         return ""
 
 
@@ -173,7 +173,7 @@ def _sniff_vendor_uncached(path: Path) -> Optional[str]:
         if det.source_kind:
             return None          # a real genome file, not an array — not ours to read
     except Exception:
-        pass                     # fall through to the header scan
+        pass                     # quiet: fall through to the header scan, which decides on its own
     head = _head(path)
     if not head:
         return None
@@ -259,7 +259,7 @@ def _delimiter(path: Path) -> str:
                 if not t or t.startswith("#"):
                     continue
                 return "," if t.count(",") > t.count("\t") else "\t"
-    except Exception:
+    except Exception:  # quiet: a wrong guess reads no rows, and index() refuses that as array_unreadable
         pass
     return "\t"
 

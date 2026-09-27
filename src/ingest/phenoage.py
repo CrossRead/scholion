@@ -32,7 +32,7 @@ def main() -> int:
     a = p.parse_args()
 
     if a.panels:
-        res, txt = pa.panels_overview(), None
+        res = pa.panels_overview()
         print(json.dumps(res, ensure_ascii=False, indent=2) if a.json else pa.format_panels(res))
         return 0
     res = pa.compute_panel(a.panel, track=a.track, age=a.age)

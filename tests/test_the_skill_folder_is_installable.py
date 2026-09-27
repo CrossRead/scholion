@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import re
 import unittest
-from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import contract

@@ -15,7 +15,6 @@ import os
 import re
 import shutil
 import subprocess
-import urllib.request
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -45,14 +44,14 @@ def _load_cache() -> Dict[str, Any]:
     f = _cache_file()
     try:
         return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
-    except Exception:
+    except Exception:  # quiet: a cache miss; the rsID is resolved from the catalogue or Ensembl again
         return {}
 
 
 def _save_cache(d: Dict[str, Any]) -> None:
     try:
         core.write_json(_cache_file(), d, indent=1)
-    except Exception:
+    except Exception:  # quiet: a failed cache write loses only the cache, never the answer
         pass
 
 
@@ -72,7 +71,7 @@ def _mark_depth_unverified(out: Dict[str, Any]) -> None:
         if bam_path():
             return
     except Exception:                                                # noqa: BLE001 — no alignment to ask
-        pass
+        pass  # quiet: no alignment found means the row is marked depth-unverified, the cautious side
     out["depth_unverified"] = True
     note = _t("genome.depth_unverified")
     out["note"] = (str(out["note"]).rstrip() + " " + note) if out.get("note") else note
@@ -116,7 +115,7 @@ def resolve_rsid(rsid: str, allow_network: bool = True) -> Optional[Dict[str, An
         cache[rsid] = rec
         _save_cache(cache)
         return {**rec, "rsid": rsid, "source": "ensembl"}
-    except Exception:
+    except Exception:  # quiet: None is refused as unknown_rsid / no genotype, never read at a position
         return None
 
 
@@ -155,7 +154,7 @@ def _header(vcf: str) -> List[str]:
                 if len(out) > 600:                       # a header this long is a file we do not know
                     break
     except Exception:                                    # noqa: BLE001
-        return []
+        return []  # quiet: an unread header excludes no file; it stays a candidate for the person to choose
     return out
 
 
@@ -349,7 +348,7 @@ def samples_of(vcf: str) -> List[str]:
                     return line.rstrip("\n").split("\t")[9:]
                 if not line.startswith("#"):
                     break
-    except Exception:
+    except Exception:  # quiet: no names gives sample_index None: refused as sample_not_chosen, never column 10
         return []
     return []
 
@@ -480,7 +479,7 @@ def _probe_assembly(vcf: str) -> Optional[str]:
         # The probe did not run. «Rows not found» already means nothing here, and
         # «the probe could not be made» means nothing in exactly the same way.
         return None
-    except Exception:                                        # noqa: BLE001
+    except Exception:  # quiet: a failed read (`linear.Unreadable("reader_failed")` included) claims no build; None leaves it unestablished
         return None
     return "GRCh37" if rows else None
 
@@ -517,15 +516,29 @@ def _query_region_range(vcf: str, chrom: str, start: int, end: int) -> List[List
     name = contig_name(vcf, chrom)
     if name is None:
         raise ContigNotInFile(chrom)
+    # A reader that failed raises `linear.Unreadable("reader_failed")`, the same
+    # as `_query_region` does for one position: the exit code of bcftools used
+    # to be ignored here, so «Could not load the index» parsed into no rows and
+    # the gene report printed «0 variants in the gene».
+    from . import linear as _lin
     if _have_bcftools():
-        out = subprocess.run(["bcftools", "view", "-H", "-r", f"{name}:{start}-{end}", vcf],
-                             capture_output=True, text=True, timeout=60).stdout
-        return [ln.split("\t") for ln in out.splitlines() if ln]
+        try:
+            r = subprocess.run(["bcftools", "view", "-H", "-r", f"{name}:{start}-{end}", vcf],
+                               capture_output=True, text=True, timeout=60)
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise _lin.Unreadable("reader_failed", f"bcftools: {type(exc).__name__}: {exc}") from exc
+        if r.returncode != 0:
+            raise _lin.Unreadable("reader_failed",
+                                  f"bcftools exit {r.returncode}: {str(r.stderr or '').strip()[:300]}")
+        return [ln.split("\t") for ln in r.stdout.splitlines() if ln.strip()]
     rows = _query_pysam(vcf, name, start, end)
     if rows is not None:
         return rows
     from . import tabixlite
-    return tabixlite.query(vcf, name, start, window=end - start)
+    try:
+        return tabixlite.query(vcf, name, start, window=end - start)
+    except Exception as exc:
+        raise _lin.Unreadable("reader_failed", f"tabix reader: {type(exc).__name__}: {exc}") from exc
 
 
 class ContigNotInFile(RangeNeedsIndex):
@@ -803,7 +816,7 @@ def _peek_text(path: str, limit: int = 8192) -> str:
                     return fh.read(limit).decode("utf-8", "replace")
         with open(path, "rb") as fh:
             return fh.read(limit).decode("utf-8", "replace")
-    except Exception:
+    except Exception:  # quiet: "" leaves a foreign file named by its extension; nothing is read from it
         return ""
 
 
@@ -1292,7 +1305,9 @@ def available() -> Dict[str, Any]:
                     None) or (
                     (engine_bad or {}).get("reason") if engine_bad else
                     None) or (
-                    "another_person" if foreign_person else
+                    # The conflict names its own reason: a SUBJECT.json that
+                    # could not be read is not one that says «another person».
+                    (foreign_person.get("reason") or "another_person") if foreign_person else
                     "unreadable_file" if near else
                     "assembly_unsupported" if asm_mismatch else
                     "no_engine" if (vp is not None and engine is None) else
@@ -1311,23 +1326,32 @@ REFUSAL_REASONS = (
     "unreadable_file", "assembly_unsupported", "no_engine", "sample_not_chosen",
     "foreign_input", "no_file", "several_files", "several_samples",
     "sample_not_found", "another_person", "engine_unknown", "engine_missing",
+    "subject_unreadable",
 )
 
 
 def _callset_of(vp) -> Optional[Dict[str, Any]]:
-    """Measured contents of the chosen VCF; never raises into a status command."""
+    """Measured contents of the chosen VCF; never raises into a status command.
+
+    A measurement that failed is `unmeasured`, never None. None carried no class,
+    no class is not in `NARROW_INPUTS`, and so a crash here opened ClinVar, the
+    ACMG list and polygenic scores and printed the whole-genome sentence over a
+    file nobody had measured. `unmeasured` closes them and says why.
+    """
+    from . import callset
     try:
-        from . import callset
         return callset.measure(str(vp))
-    except Exception:
-        return None
+    except Exception as exc:                                         # noqa: BLE001
+        out = callset.unmeasured()
+        out["failed"] = f"{type(exc).__name__}: {exc}"[:200]
+        return out
 
 
 def _pysam_importable() -> bool:
     try:
         import pysam  # noqa: F401
         return True
-    except Exception:
+    except Exception:  # quiet: pysam unusable; the next reader answers, or a pin names the engine missing
         return False
 
 
@@ -1345,7 +1369,7 @@ def _chr_prefix(vcf: str) -> str:
         try:
             out = subprocess.run(["bcftools", "view", "-h", vcf], capture_output=True, text=True, timeout=30).stdout
             return "chr" if "##contig=<ID=chr" in out else ""
-        except Exception:
+        except Exception:  # quiet: falls through to the next probe of the same header; contig_name checks
             pass
     if _have_pysam():
         try:
@@ -1354,14 +1378,14 @@ def _chr_prefix(vcf: str) -> str:
                 ctgs = list(vf.header.contigs)
             if ctgs:
                 return "chr" if any(str(c).startswith("chr") for c in ctgs) else ""
-        except Exception:
+        except Exception:  # quiet: falls through to the next probe of the same header; contig_name checks
             pass
     try:
         from . import tabixlite
         ctgs = tabixlite.contigs(vcf)
         if ctgs:
             return "chr" if any(c.startswith("chr") for c in ctgs) else ""
-    except Exception:
+    except Exception:  # quiet: falls through to reading the header itself; contig_name checks
         pass
     # The header itself, read straight out of the gzip stream. It needs no index
     # and no library, so it answers where the two above cannot — which is exactly
@@ -1463,14 +1487,18 @@ def contig_name(vcf: str, chrom: str) -> Optional[str]:
 
 
 def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
-    """VCF rows at the position (bcftools). Empty = the site is not variant (reference)."""
+    """VCF rows at the position (bcftools). Empty = the site is not variant (reference).
+
+    Raises `linear.Unreadable` when no reader could answer: a failed read is
+    never returned as `[]`, because `[]` is read as the reference.
+    """
+    from . import linear as _lin
     name = contig_name(vcf, chrom) or (f"{_chr_prefix(vcf)}{chrom}"
                                        if not str(chrom).startswith("chr") else str(chrom))
     # No index, or a pin naming the reader that does not use one: the answer comes
     # out of the single pass. Asked first, because the seeking readers below would
     # each return an empty list here and an empty list is read as «reference».
     if engine_pin() == "linear" or not _index_usable(vcf):
-        from . import linear as _lin
         # `rows_at` raises `linear.Unreadable` for a file the pass could not
         # read to the end, and that exception is not caught here on purpose: the
         # seeking readers below would answer `[]` for a file with no index, and
@@ -1482,13 +1510,22 @@ def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
         key = _region_key(vcf, region)
         if key is not None and key in _REGION_CACHE:
             return [list(row) for row in _REGION_CACHE[key]]
+        # A reader that failed has said nothing about the person, so it raises
+        # rather than answering `[]` — the empty list is «no row here — the
+        # reference». Both ways bcftools can fail used to come out as exactly
+        # that: an exception (a timeout on a large file included), and a
+        # non-zero exit with an empty stdout («Could not load the index»),
+        # which parsed into no rows. Found by an external review, 25.09.2026.
         try:
             r = subprocess.run(["bcftools", "view", "-H", "-r", region, vcf],
                                capture_output=True, text=True, timeout=60)
-            rows = [ln.split("\t") for ln in r.stdout.splitlines() if ln.strip()]
-        except Exception:
-            return []
-        if key is not None and r.returncode == 0:
+        except (OSError, subprocess.SubprocessError) as exc:
+            raise _lin.Unreadable("reader_failed", f"bcftools: {type(exc).__name__}: {exc}") from exc
+        if r.returncode != 0:
+            raise _lin.Unreadable("reader_failed",
+                                  f"bcftools exit {r.returncode}: {str(r.stderr or '').strip()[:300]}")
+        rows = [ln.split("\t") for ln in r.stdout.splitlines() if ln.strip()]
+        if key is not None:
             if len(_REGION_CACHE) > 20000:
                 _REGION_CACHE.clear()
             _REGION_CACHE[key] = tuple(tuple(row) for row in rows)
@@ -1499,12 +1536,14 @@ def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
     rows = _query_pysam(vcf, name, int(pos), int(pos))
     if rows is not None:
         return rows
-    # without either — our own reader of the tabix index (see tabixlite.py)
+    # without either — our own reader of the tabix index (see tabixlite.py).
+    # A failure here is a failed read, not an empty position: see the bcftools
+    # branch above for why it raises instead of answering `[]`.
+    from . import tabixlite
     try:
-        from . import tabixlite
         return tabixlite.query(vcf, name, int(pos))
-    except Exception:
-        return []
+    except Exception as exc:
+        raise _lin.Unreadable("reader_failed", f"tabix reader: {type(exc).__name__}: {exc}") from exc
 
 
 def _query_pysam(vcf: str, name: str, start: int, end: int) -> Optional[List[List[str]]]:
@@ -1521,7 +1560,7 @@ def _query_pysam(vcf: str, name: str, start: int, end: int) -> Optional[List[Lis
         with pysam.VariantFile(vcf) as vf:
             return [str(rec).rstrip("\n").split("\t")
                     for rec in vf.fetch(name, max(start - 1, 0), end)]
-    except Exception:
+    except Exception:  # quiet: None hands the query on; tabixlite raises, never [], if it cannot read either
         return None
 
 
@@ -1639,7 +1678,7 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             continue
         try:
             rows = _query_region(vcf, loc["chrom"], pos)
-        except Exception:
+        except Exception:  # quiet: an unread sites file only withholds confirmed_ref; the answer stays assumed_ref
             continue
         for f in rows:
             if len(f) < 10 or str(f[1]) != str(pos):
@@ -1890,6 +1929,12 @@ def _linear_refusal(why: str, detail: str = "") -> Dict[str, Any]:
     if why == "too_large":
         return {"genotype": None, "confidence": "needs_index", "source": "vcf",
                 "reason": why, "note": _t("genome.too_large_for_one_pass", mb=_lin.MAX_MB)}
+    if why == "reader_failed":
+        # The file may be fine; the reader that seeks into it failed at this
+        # position. «Not read» is the whole answer — the position says nothing.
+        return {"genotype": None, "confidence": "unreadable_file", "source": "vcf",
+                "reason": why, "detail": detail,
+                "note": _t("genome.unreadable_reader_failed", detail=detail)}
     key = why if why in ("truncated", "pass_failed") else "not_a_vcf"
     return {"genotype": None, "confidence": "unreadable_file", "source": "vcf",
             "reason": why, "detail": detail,
@@ -2043,6 +2088,14 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # the file.
         from . import callset as _cs
         _m = _cs.measure(str(vp))
+        if _m.get("composition_unread"):
+            # What the file carries could not be read, so an absent row cannot
+            # be told from «a variant this file never holds». Not the reference.
+            return {"genotype": None, "confidence": "unreadable_file", "source": "vcf",
+                    "assembly": asm, "read_pos": pos, "reason": "composition_unread",
+                    "detail": _m["composition_unread"],
+                    "note": _t("genome.unreadable_composition_unread",
+                               detail=_m["composition_unread"])}
         if not _cs.answers_variant(_m, ref, loc.get("alt") or ""):
             return {"genotype": None, "confidence": "not_in_this_callset", "source": "vcf",
                     "assembly": asm, "read_pos": pos, "callset_class": _m.get("class"),

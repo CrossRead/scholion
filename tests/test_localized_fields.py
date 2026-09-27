@@ -19,7 +19,6 @@ call sites have to remember.
 from __future__ import annotations
 
 import json
-import re
 import unittest
 
 import support  # noqa: F401

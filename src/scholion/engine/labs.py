@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 from .. import core
-from .targets import outside_target, target_side, target_view  # the target beside the corridor (task 170)
+from .targets import outside_target, target_view  # the target beside the corridor (task 170)
 from ..i18n import t as _t
-from ._helpers import _OPS, _recent, _active_names_by_class, DISCLAIMER
+from ._helpers import _OPS, _recent_or_unknown, _active_names_by_class, DISCLAIMER
 from .corridor import point_corridor, flags_comparable
 
 
@@ -217,14 +217,22 @@ def _decision_limits(key: str, value: float, active_classes: Optional[set] = Non
             continue
         try:
             crossed = value >= t["value"] if t.get("side") == "high" else value <= t["value"]
-        except Exception:
+            distance = (round((value - t["value"]) / abs(t["value"]) * 100, 1)
+                        if t["value"] else None)
+        except (TypeError, ValueError):
+            # A value that cannot be compared (text, or no number at all) leaves
+            # the threshold UNRESOLVED — not «not reached». Skipping the row made
+            # a crossed threshold vanish, and the readers printed the silence as
+            # «below the action threshold».
+            out.append({**t, "crossed": None, "why": "not_comparable", "distance_pct": None})
             continue
-        out.append({**t, "crossed": bool(crossed),
-                    "distance_pct": round((value - t["value"]) / abs(t["value"]) * 100, 1) if t["value"] else None})
-    # order: the crossed ones first; among those not crossed — the ones tied to an active
-    # drug class (for haematocrit on testosterone therapy the relevant threshold is 54, not
-    # the general therapy-start threshold of 50), then the nearest by value
-    out.sort(key=lambda x: (not x["crossed"], not x.get("applies_when_class"), x.get("value", 0)))
+        out.append({**t, "crossed": bool(crossed), "distance_pct": distance})
+    # order: the crossed ones first, then the unresolved (they may be crossed);
+    # among those not crossed — the ones tied to an active drug class (for
+    # haematocrit on testosterone therapy the relevant threshold is 54, not the
+    # general therapy-start threshold of 50), then the nearest by value
+    out.sort(key=lambda x: (x["crossed"] is not True, x["crossed"] is not None,
+                            not x.get("applies_when_class"), x.get("value", 0)))
     return out
 
 
@@ -317,7 +325,7 @@ def _near_limit(m: Dict[str, Any], value: float, flag: str,
                 return {"side": "low", "bound": lo,
                         "margin_pct": round((value - lo) / lo * 100, 1),
                         "corridor_pct": round((value - lo) / width * 100, 1) if width else None}
-    except Exception:
+    except Exception:  # quiet: only the «at the edge» hint is lost; the flag is computed apart
         return None
     return None
 
@@ -610,9 +618,11 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
     abnormal = [r for r in results if r["abnormal"]]
     near = [r for r in results if r.get("near_limit")]
     crossed = [r for r in results if any(d["crossed"] for d in r.get("decisions", []))]
+    unresolved = [r for r in results if any(d["crossed"] is None for d in r.get("decisions", []))]
     outside = [r for r in results if r.get("outside_target")]
     return {"status": "ok", "count": len(results), "abnormal_count": len(abnormal),
             "near_limit_count": len(near), "decision_crossed_count": len(crossed),
+            "decision_unresolved_count": len(unresolved),
             "outside_target_count": len(outside),
             "markers": results, "disclaimer": DISCLAIMER()}
 
@@ -686,7 +696,7 @@ def _marker_last_date(keys) -> Optional[str]:
         if m and m.get("series"):
             try:
                 ds.append(max(p["date"] for p in m["series"] if p.get("date")))
-            except Exception:
+            except Exception:  # quiet: no date keeps the test pending (not done_recently); no date is printed
                 pass
     return max(ds) if ds else None
 
@@ -719,10 +729,16 @@ def suggest_tests() -> Dict[str, Any]:
                 covers = rule.get("covers")
                 if covers:
                     ld = _marker_last_date(covers)
-                    if ld and _recent(ld, rule.get("recheck_months", 3)):
+                    recent = _recent_or_unknown(ld, rule.get("recheck_months", 3)) if ld else False
+                    if recent is True:
                         item["done_recently"] = True
                         item["last_measured"] = ld
                         item["recheck_months"] = rule.get("recheck_months", 3)
+                    elif recent is None:
+                        # A date that cannot be read establishes nothing about when
+                        # the test was last taken: the test stays pending and the
+                        # date is shown as unreadable, never as a last measurement.
+                        item["last_measured_unreadable"] = str(ld)
                 triggered.append(item)
         except Exception as e:  # a rule must not take the whole tool down
             triggered.append({"id": rule.get("id", "?"), "error": str(e)})

@@ -239,7 +239,11 @@ def _curated_state() -> List[Dict[str, Any]]:
                 if item["stale"]:
                     item["note"] = _t("assistant.curated.stale")
             except Exception:                               # noqa: BLE001
-                pass
+                # Not «fresh»: a check that did not run cannot clear the wording.
+                # Marked for review, and the note says the check failed rather
+                # than that newer data appeared.
+                item["stale"] = True
+                item["note"] = _t("assistant.curated.stale_unchecked")
         out.append(item)
     return out
 
@@ -407,7 +411,7 @@ def context_bundle(limit_abnormal: int = 25) -> str:
         f = engine.focus_dashboard()
         if f.get("available", True) and f.get("title"):
             parts.append(_t("assistant.ctx.focus_h", title=f.get('title')))
-    except Exception:                                       # noqa: BLE001
+    except Exception:  # quiet: only the focus title header is left out of the bundle
         pass
 
     parts.append(_t("assistant.ctx.commands"))

@@ -20,7 +20,6 @@ import json
 import re
 import os
 import unittest
-from pathlib import Path
 
 import support
 

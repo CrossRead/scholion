@@ -85,7 +85,6 @@ def build(rows) -> dict:
     col_pop = _pick(headers, "population", "ethnic", "cohort")
     col_assoc = _pick(headers, "association", "significan", "conclusion", "result")
     col_pmid = _pick(headers, "pubmed", "pmid", "reference")
-    col_id = _pick(headers, "id")
     print(f"  columns: gene={col_gene} var={col_var} pop={col_pop} assoc={col_assoc} pmid={col_pmid}")
 
     variants: dict[str, dict] = {}

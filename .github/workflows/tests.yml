@@ -113,6 +113,45 @@ jobs:
       - name: The suite
         run: ./run_tests.sh
 
+  archive:
+    name: The suite in an unpacked archive, without .git
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # WHY. Every other job runs in a checkout, and a checkout has `.git`. A
+      # person who downloads the release archive, or unpacks the sdist, does not.
+      # A test that assumed `.git` passed here for weeks and failed for them —
+      # and so did the product: `scholion update` offered `pip install`, which
+      # updates another copy. The class is «green in CI, broken for the person
+      # who has the archive», and this job is where it goes red instead.
+      - name: Unpack the tree the way a release archive has it
+        run: |
+          mkdir -p /tmp/tree
+          git archive HEAD | tar -x -C /tmp/tree
+          test ! -e /tmp/tree/.git || { echo "the archive carries .git - this job would prove nothing"; exit 1; }
+      - name: The suite
+        run: cd /tmp/tree && ./run_tests.sh
+  lint:
+    name: Lint (ruff F) and types (mypy, never more errors than recorded)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Installed HERE and nowhere else: the package depends on nothing, and the
+      # suite a recipient runs asks nothing of them. Versions are pinned because a
+      # new release of either changes what is counted; moving them is a commit of
+      # its own, with `check_types.py --accept` if the count moves.
+      - name: The tools
+        run: python -m pip install "ruff==0.15.11" "mypy==1.20.2"
+      - name: ruff — rule set F, zero findings
+        run: ruff check src tests
+      - name: mypy — per module, never above the recorded line
+        run: python src/tools/check_types.py --strict
   package:
     name: The package's own suite, inside the package
     runs-on: ubuntu-latest

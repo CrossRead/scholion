@@ -262,14 +262,19 @@ _GOAL_MIN_SPAN_MONTHS = 6     # nor is three readings inside one week
 _GOAL_MIN_GAIN = 0.05         # a «best» within 5 % of now is not a goal, it is noise
 
 
-def _months_between(a: str, b: str) -> int:
-    """Whole months between two 'YYYY-MM…' stamps. Dates here are never times."""
+def _months_between(a: str, b: str) -> Optional[int]:
+    """Whole months between two 'YYYY-MM…' stamps. Dates here are never times.
+
+    None when either stamp does not read as one. It used to be 0, and 0 printed
+    as «every reading falls inside six months» — a statement about the person's
+    own readings made from a date nobody could read.
+    """
     try:
         ya, ma = int(a[:4]), int(a[5:7] or 1)
         yb, mb = int(b[:4]), int(b[5:7] or 1)
         return abs((yb - ya) * 12 + (mb - ma))
-    except Exception:                                        # noqa: BLE001
-        return 0
+    except (TypeError, ValueError):
+        return None
 
 
 def _marker_direction(spec: Dict[str, Any], now: Optional[Dict[str, Any]]) -> str:
@@ -404,6 +409,8 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
             pb_reason = ("no_direction" if direction == "unknown" else "no_series")
         elif len(series) < _GOAL_MIN_POINTS:
             pb_reason = "too_few_points"
+        elif span is None:
+            pb_reason = "dates_unreadable"
         elif span < _GOAL_MIN_SPAN_MONTHS:
             pb_reason = "too_short_a_window"
         elif now and now["value"] and abs(best["value"] - now["value"]) / abs(now["value"]) < _GOAL_MIN_GAIN:

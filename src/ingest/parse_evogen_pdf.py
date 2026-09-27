@@ -73,13 +73,19 @@ def section_of(page):
             break
     return nm
 
-def parse():
+def parse(unread_pages=None):
+    """The report's rows. A page whose words cannot be extracted is appended to
+    `unread_pages` as (page, error) rather than skipped in silence: its rsIDs would
+    otherwise be missing from the output with nothing to tell them from rsIDs the
+    report never had."""
     rows = []
     with pdfplumber.open(PDF) as pdf:
         for pno, page in enumerate(pdf.pages, start=1):
             try:
                 words = page.extract_words(extra_attrs=['non_stroking_color', 'size'])
-            except Exception:
+            except Exception as e:
+                if unread_pages is not None:
+                    unread_pages.append((pno, f"{type(e).__name__}: {e}"))
                 continue
             for w in words:
                 w['color'] = colname(w.get('non_stroking_color'))
@@ -152,10 +158,19 @@ def parse():
     return rows
 
 if __name__ == '__main__':
-    rows = parse()
+    unread = []
+    rows = parse(unread)
     (OUT / 'evogen_pdf_rows.json').write_text(json.dumps(rows, ensure_ascii=False, indent=1),
                                               encoding='utf-8')
     print('rows:', len(rows), '| unique rsIDs:', len({r['rsid'] for r in rows}))
     print('genotype colour:', collections.Counter(r['genotype_color'] for r in rows))
     print('conclusion colour:', collections.Counter(r['conclusion_color'] for r in rows))
     print('without a genotype:', sum(1 for r in rows if not r['genotype']))
+    if unread:
+        # The rows of these pages are NOT in the output: an rsID printed there is
+        # absent from evogen_pdf_rows.json because it was not read, not because the
+        # report lacks it.
+        print(f'⚠ pages NOT read ({len(unread)}) — their rows are missing from the output:')
+        for pno, why in unread:
+            print(f'   · page {pno} ({section_of(pno)}): {why}')
+        raise SystemExit(1)

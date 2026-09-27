@@ -165,6 +165,12 @@ def profile_subjects(pdir: Optional[Path] = None) -> Dict[str, List[str]]:
         try:
             data = json.loads(p.read_text(encoding="utf-8"))
         except Exception:                                        # noqa: BLE001
+            # A file that will not read is still a file in this profile, and
+            # it says nothing — which is `unattributed`, as every silent file
+            # is. Dropped instead, a profile of unreadable files became «holds
+            # nobody's data», and that answer lets a reference genome — a real
+            # other person — be read as this person's (`genome_conflict`).
+            out.setdefault(UNATTRIBUTED, []).append(p.name)
             continue
         for s in subjects_in(data):
             out.setdefault(s, []).append(p.name)
@@ -203,7 +209,7 @@ def erasable(pdir: Path) -> List[Path]:
         try:
             data = json.loads(p.read_text(encoding="utf-8"))
         except Exception:                                        # noqa: BLE001
-            continue
+            continue  # quiet: a file that cannot be read is never erased; it stays for its own reader to refuse
         seen = subjects_in(data)
         if seen and all(s in NOT_THE_OWNER for s in seen):
             out.append(p)
@@ -225,7 +231,7 @@ def _demo_index(pdir: Path) -> Optional[Path]:
         from . import demo as _demo
         return p if p.read_text(encoding="utf-8") == _demo.INDEX_MD else None
     except Exception:                                            # noqa: BLE001
-        return None
+        return None  # quiet: an index.md not proven the demo's own is kept, not erased
 
 
 def claim_for_owner(pdir: Optional[Path] = None) -> Dict[str, Any]:
@@ -267,16 +273,26 @@ def claim_for_owner(pdir: Optional[Path] = None) -> Dict[str, Any]:
 #: is the common case and means «the profile's own subject».
 SIDECAR = "SUBJECT.json"
 
+#: The key `genome_note` answers under when the sidecar is there and will not
+#: read. Not a subject: nobody can say whose the genome is, and that is the fact.
+UNREADABLE_NOTE = "_unreadable"
+
 
 def genome_note(folder: Path) -> Dict[str, Any]:
-    """What the folder says about the person the genome came from."""
+    """What the folder says about the person the genome came from.
+
+    `{}` only when the folder says nothing. A sidecar that exists and cannot be
+    read answers `{UNREADABLE_NOTE: <path>}`: read as `{}`, it made the genome
+    `unattributed` — this profile's — and the sidecar exists precisely beside a
+    genome that is somebody else's.
+    """
     p = Path(folder) / SIDECAR
     if not p.is_file():
         return {}
     try:
         data = json.loads(p.read_text(encoding="utf-8"))
     except Exception:                                            # noqa: BLE001
-        return {}
+        return {UNREADABLE_NOTE: str(p)}
     return data if isinstance(data, dict) else {}
 
 
@@ -303,6 +319,23 @@ def genome_conflict(vcf: Optional[Path], pdir: Optional[Path] = None) -> Optiona
     """
     if vcf is None:
         return None
+    note = genome_note(Path(vcf).parent)
+    if note.get(UNREADABLE_NOTE):
+        mine = profile_subject(pdir)
+        if mine is None or mine == UNATTRIBUTED:
+            # The same rule as below: a profile with nobody's data in it takes
+            # the genome it is given.
+            return None
+        # Whose it is cannot be read, and the sidecar exists only to say it is
+        # not this profile's. Refused, and the reason is the file, by name.
+        return {"reason": "subject_unreadable",
+                "genome_subject": None,
+                "profile_subject": mine,
+                "who": None,
+                "path": str(vcf),
+                "message": _t("subject.genome_note_unreadable",
+                              path=str(vcf), note=note[UNREADABLE_NOTE]),
+                "fix": _t("subject.genome_note_unreadable_fix", note=note[UNREADABLE_NOTE])}
     theirs = of_genome(Path(vcf))
     if theirs == UNATTRIBUTED:
         # The file does not say whose it is, so it is this profile's — which is

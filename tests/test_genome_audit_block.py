@@ -16,7 +16,6 @@ hands a cardiomyopathy finding to a large share of healthy people.
 """
 from __future__ import annotations
 
-import json
 import unittest
 
 import support  # noqa: F401

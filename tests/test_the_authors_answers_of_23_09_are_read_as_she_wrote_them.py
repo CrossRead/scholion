@@ -196,5 +196,77 @@ class TestTheListCarriesTheCorrectedGenes(unittest.TestCase):
         self.assertEqual("TH", _raw("loci.json")["loci"]["rs6356"]["gene"])
 
 
+class TestTheCardPrintsWhatTheRowCarries(unittest.TestCase):
+    """The command line prints the new fields — a row that carries them and a card
+    that drops them is the silent loss this file exists to prevent."""
+
+    ROW = {"unit": "position", "gene": "FAM9B", "rsid": "rs5934505", "mode": "common_variant",
+           "state": "hemi", "level": "B", "text": "t", "ladder": {"base": "C", "hom": "T"},
+           "hemizygous": True, "genotype": {"genotype": "T/T"}}
+
+    def setUp(self):
+        from scholion import format as _fmt  # noqa: F401 — format_system is imported through it
+        from scholion import format_system
+        self.F = format_system
+
+    def test_a_mans_single_x_is_marked_on_the_ladder_of_one_allele(self):
+        out = self.F._system_gene_row(dict(self.ROW), "clinician")
+        self.assertIn("C · **T**", out)
+
+    def test_a_refused_ladder_and_the_class_lines_are_printed(self):
+        out = self.F._system_gene_row({"unit": "position", "gene": "SRD5A1", "rsid": "rs1691053",
+                                       "mode": "common_variant", "state": "het", "ladder_refused": True},
+                                      "patient")
+        self.assertIn(self.F._t("system.row.ladder_refused"), out)
+        out = self.F._system_gene_row({"gene": "PAH", "mode": "monogenic", "carrier": True,
+                                       "carrier_class_text": "CLASS", "two_variants_text": "TWO"}, "patient")
+        self.assertIn("\n   CLASS", out)
+        self.assertIn("\n   TWO", out)
+
+    def test_a_hemizygous_member_of_a_group_is_listed(self):
+        group = {"label": "G", "count": 1, "positions": ["rs5934505"], "states": {"hemi": 1},
+                 "members": [dict(self.ROW)]}
+        for on_demand, genetics in ((True, {"groups": [group], "rows": []}),
+                                    (False, {"status": "composed", "groups": [group], "rows": []})):
+            with self.subTest(on_demand=on_demand):
+                out = self.F.system_report({"status": "ok", "key": "gonads", "label": "Gonads",
+                                            "register": "clinician", "on_demand": on_demand,
+                                            "genetics": genetics})
+                self.assertIn("rs5934505", out)
+
+
+class TestHerApprovalOf27_09(unittest.TestCase):
+    """The decisions reported to the author as taken — levels, the corrected genes,
+    the sources, the OTC wording for a woman — were approved by her on 27.09.2026.
+    The review date says so; a row still dated 23.09 would claim her review of a
+    level that did not exist yet on that day."""
+
+    ON = "2026-09-27"
+
+    def test_every_row_of_the_batch_carries_the_approval(self):
+        rows = [p for s in _raw("system_gene_panels.json")["systems"].values()
+                for p in s.get("positions") or [] if p.get("submitter") == "panel_2026_09_23"]
+        rows += [p for p in _raw("on_demand_panels.json")["panels"]["behaviour"]["positions"]
+                 if p["rsid"] in ("rs6356", "rs34424986")]
+        self.assertEqual(5, len(rows))
+        for p in rows:
+            with self.subTest(rsid=p["rsid"]):
+                self.assertEqual(self.ON, p["review"]["on"])
+                self.assertLessEqual(p["evidence"]["assigned"], p["review"]["on"])
+
+    def test_the_womans_otc_wording_is_no_longer_only_ours(self):
+        book = _raw("system_gene_panels.json")["systems"]["amino_acids"]["carrier_classes"]
+        self.assertEqual(self.ON, book["review"]["on"])
+        self.assertIn("approved by the panel author on 27.09.2026", book["source"])
+
+    def test_the_new_route_rules_carry_it_too(self):
+        keys = ("pah_carrier_phenylalanine", "ass1_asl_carrier_citrulline", "slc6a19_carrier_niacinamide",
+                "gatm_carrier_creatine", "hyperoxaluria_carrier_collagen")
+        rules = {r["key"]: r for r in _raw("correction_routes.json")["rules"]}
+        for k in keys:
+            with self.subTest(rule=k):
+                self.assertEqual(self.ON, rules[k]["review"]["on"])
+
+
 if __name__ == "__main__":
     unittest.main()

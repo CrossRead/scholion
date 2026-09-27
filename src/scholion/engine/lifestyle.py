@@ -594,8 +594,18 @@ def health_radar() -> Dict[str, Any]:
                             "total": len(ls["metrics"]), "measured": len(ls["metrics"]),
                             "missing": [],
                             "ok": sum(1 for m in ls["metrics"] if m.get("status") == "ok"), "abnormal": fab})
-    except Exception:
-        pass
+    except Exception as exc:                                         # noqa: BLE001
+        # The wearable layer did not read. Dropping the domain made the radar
+        # look like a profile with no watch at all, and moved `overall` onto the
+        # remaining systems without a word; a fitness domain that was «critical»
+        # simply vanished. It stays on the radar, unscored and named as unread.
+        domains.append({"key": "fitness", "label": _t("radar.domain.fitness"),
+                        "place": places.get("fitness") or {},
+                        "score": None, "status": "nodata",
+                        "prev_score": None, "compared_score": None, "delta": None,
+                        "prev_date": None, "compared": 0, "moved": [],
+                        "total": 0, "measured": 0, "missing": [], "ok": 0, "abnormal": [],
+                        "unread": type(exc).__name__})
 
     scored = [d for d in domains if d["score"] is not None]
     overall = round(sum(d["score"] for d in scored) / len(scored)) if scored else None
@@ -618,10 +628,14 @@ def health_radar() -> Dict[str, Any]:
 
 
 def _lifestyle_overview() -> Optional[Dict[str, Any]]:
+    """The overview's lifestyle block: the metrics worth watching, None when there
+    are no metrics, and `{"unread": <error>}` when they could not be read — an
+    empty block would read as «nothing worth watching», which a reader that failed
+    has not established (the same shape the radar gives an unread domain)."""
     try:
         ls = lifestyle()
-    except Exception:
-        return None
+    except Exception as exc:                                         # noqa: BLE001
+        return {"unread": type(exc).__name__, "watch": []}
     if not ls.get("metrics"):
         return None
     watch = [{"label": m["label"], "value": m["value"], "unit": m["unit"], "status": m["status"]}

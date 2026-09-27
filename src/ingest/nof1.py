@@ -376,7 +376,7 @@ def _report(name, direction, alpha, a_means, b_means, a_days, b_days, per_block,
         if p <= alpha:
             print(f"  → the difference survives a permutation of the blocks (alpha={alpha})")
         elif floor > alpha:
-            print(f"  → significance is unreachable by design; the conclusion is descriptive only")
+            print("  → significance is unreachable by design; the conclusion is descriptive only")
         else:
             print(f"  → not shown at alpha={alpha}")
 
@@ -384,8 +384,8 @@ def _report(name, direction, alpha, a_means, b_means, a_days, b_days, per_block,
         pn = naive_day_p(a_days, b_days, direction)
         print(f"\n  for comparison — the naive test OVER DAYS: p = {pn:.3f}. "
               f"NOT to be used for a decision:")
-        print(f"  days within a block are autocorrelated, so it understates p and creates "
-              f"confidence out of nothing.")
+        print("  days within a block are autocorrelated, so it understates p and creates "
+              "confidence out of nothing.")
 
     # drift: the difference "first half against second" regardless of the labels
     mids = [row[1] for row in per_block if row[1] is not None]

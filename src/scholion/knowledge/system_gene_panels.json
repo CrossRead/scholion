@@ -1923,7 +1923,7 @@
           "curated_on": "2026-09-23",
           "review": {
             "by_role": "panel_author",
-            "on": "2026-09-23",
+            "on": "2026-09-27",
             "scope": "text_and_level"
           },
           "evidence": {
@@ -4387,7 +4387,7 @@
           "curated_on": "2026-09-23",
           "review": {
             "by_role": "panel_author",
-            "on": "2026-09-17",
+            "on": "2026-09-27",
             "scope": "text_and_level"
           },
           "evidence": {
@@ -4428,7 +4428,7 @@
           "curated_on": "2026-09-23",
           "review": {
             "by_role": "panel_author",
-            "on": "2026-09-23",
+            "on": "2026-09-27",
             "scope": "text_and_level"
           },
           "evidence": {
@@ -8641,10 +8641,10 @@
         }
       },
       "carrier_classes": {
-        "source": "the panel author's answers of 21.09.2026 (the classes) and 23.09.2026 (the OTC wording for men); the wording for a heterozygous woman is the product's own, written against GeneReviews OTC deficiency (NBK154378)",
+        "source": "the panel author's answers of 21.09.2026 (the classes) and 23.09.2026 (the OTC wording for men); the wording for a heterozygous woman was written by the product against GeneReviews OTC deficiency (NBK154378) and approved by the panel author on 27.09.2026",
         "review": {
           "by_role": "panel_author",
-          "on": "2026-09-23",
+          "on": "2026-09-27",
           "scope": "text_and_level"
         },
         "genes": {

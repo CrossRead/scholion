@@ -8,7 +8,7 @@
    "refused": "will not enter; `reason` says why"
   },
   "guarded_by": "tests/test_no_position_of_an_authored_list_falls_out_silently.py",
-  "updated": "2026-09-25",
+  "updated": "2026-09-27",
   "source_tier": "curated_reference"
  },
  "lists": {
@@ -767,7 +767,7 @@
      "rsid": "rs3816873",
      "gene": "MTTP",
      "disposition": "refused",
-     "reason": "the list names MC4R, but rs3816873 is MTTP p.Ile128Thr on chromosome 4 (Ensembl); the author's sentence was written for MC4R, and for MC4R she named rs17782313, which the catalogue holds with her source (PMID 23049848)",
+     "reason": "the list names MC4R, but rs3816873 is MTTP p.Ile128Thr on chromosome 4 (Ensembl); the author's sentence was written for MC4R, and for MC4R she named rs17782313, which the catalogue holds with her source (PMID 23049848); the correction was reported to the author as a decision and approved by her on 27.09.2026",
      "task": "205 B"
     },
     {
@@ -1156,7 +1156,7 @@
      "rsid": "rs1799768",
      "gene": "SERPINE1",
      "disposition": "waiting",
-     "reason": "an insertion in the SERPINE1 promoter (4G/5G; Ensembl −/A/C), not a single-base change; the build does not read insertions or deletions yet (task 172). The author's sentence of 23.09.2026 waits with it, its sources Eriksson 1995 (PMID 7892190) and PMID 17549286",
+     "reason": "an insertion in the SERPINE1 promoter (4G/5G; Ensembl −/A/C), not a single-base change; the build does not read insertions or deletions yet (task 172). The author's sentence of 23.09.2026 waits with it, its sources Eriksson 1995 (PMID 7892190) and PMID 17549286; the replacement of the sources was approved by the author on 27.09.2026",
      "task": "206"
     },
     {

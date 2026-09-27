@@ -572,9 +572,17 @@ def build(repo: Path, out: Path) -> Path:
     # version imports the fetcher and ships; and the shipped GenCC snapshot goes
     # stale on its own — the export is refreshed weekly — so a recipient needs
     # the tool that refreshes it and the check that says when to.
+    #
+    # `check_quiet_excepts.py` and `test_the_artefact.sh` join for both reasons as
+    # well (0.5.9). `run_tests.sh` runs the first as a gate, and a shipped test
+    # loads it by path; the second is how a recipient runs the suite the way a
+    # release archive is run, and a shipped test executes it. Both were missed by
+    # the import gate below — they are loaded by path, not imported — and found by
+    # the package's own suite in the first publication run that had them.
     for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json",
                   "check_test_reach.py", "test_reach_baseline.json",
-                  "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py"):
+                  "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
+                  "check_quiet_excepts.py", "test_the_artefact.sh"):
         _src = repo / "src" / "tools" / _name
         if _src.exists():
             shutil.copy2(_src, shared / "src" / "tools" / _name)
@@ -1009,7 +1017,7 @@ def _declared_synthetic(path: Path) -> bool:
     try:
         import json as _json
         d = _json.loads(path.read_text(encoding="utf-8"))
-    except Exception:                                     # noqa: BLE001
+    except Exception:  # quiet: False = «not declared synthetic», so the audit counts a violation
         return False
     if not isinstance(d, dict):
         return False
@@ -1176,7 +1184,7 @@ def _decoded_texts(raw: str):
         s = m.group(0)
         try:
             blob = base64.b64decode(s + "=" * (-len(s) % 4), validate=True)
-        except Exception:                                         # noqa: BLE001
+        except Exception:  # quiet: not valid base64, so no hidden text; the raw text is scanned anyway
             continue
         if not blob or len(blob) < 4:
             continue
@@ -1286,7 +1294,12 @@ def audit(root: Path) -> int:
             continue
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception as e:                            # noqa: BLE001
+            # Fail closed: a labs.json that cannot be parsed cannot be shown to be
+            # a template, and skipping it let a damaged real profile ship unseen.
+            print(f"  ✗ {f.relative_to(root)}: cannot be read as JSON ({type(e).__name__}) "
+                  f"— a profile file that cannot be checked is not shipped")
+            violations += 1
             continue
         meta = d.get("_meta") or d.get("meta") or {}
         declared = " ".join(str(v) for v in meta.values() if isinstance(v, str)).upper()

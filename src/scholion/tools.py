@@ -42,7 +42,6 @@ What the module offers:
 """
 from __future__ import annotations
 
-import os
 import shlex
 import shutil
 import subprocess
@@ -94,7 +93,7 @@ def _pip_present() -> bool:
     try:
         import importlib.util
         return importlib.util.find_spec("pip") is not None
-    except Exception:                                   # a broken import path is not a crash here
+    except Exception:  # quiet: pip is just not offered as an installer; nothing about the person
         return False
 
 

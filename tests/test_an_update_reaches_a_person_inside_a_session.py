@@ -9,6 +9,7 @@ environment only when a person confirmed it — never inside a source checkout.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -195,13 +196,24 @@ class TestTheFaces(_Cache):
         self.assertIn("update", contract.INSTALLS)
         self.assertEqual("update", contract.PARITY["POST /api/update"])
 
-    def test_the_command_line_answers_offline_and_a_source_tree_is_told_to_pull(self):
+    def test_the_command_line_answers_offline_and_names_how_this_very_copy_updates(self):
+        """The answer depends on what this copy IS, so the test asks the same
+        question the command does instead of assuming a git checkout. It used to
+        expect `pull` unconditionally: green in CI, which checks out with `.git`,
+        and red in an unpacked archive — where the command itself answered
+        wrongly too, offering `pip`, which updates another copy."""
+        from scholion import upgrade
         code, out, err = support.run(["update"])
         self.assertEqual(0, code, err[-600:])
         self.assertIn("SCHOLION_OFFLINE", out)
+        kind = upgrade.route()["kind"]
         code, out, err = support.run(["update", "--yes"])
         self.assertEqual(0, code, err[-600:])
-        self.assertIn("pull", out)
+        # A route that cannot be installed from here says how it is updated,
+        # online or not; an installable one would ask the registry first and,
+        # offline, says it did not.
+        expected = {"source": "pull", "tree": "/releases"}.get(kind, "SCHOLION_OFFLINE")
+        self.assertIn(expected, out, f"route {kind}")
 
     def test_the_reports_name_every_outcome_without_a_hole(self):
         from scholion import format as fmt
@@ -220,6 +232,58 @@ class TestTheFaces(_Cache):
                   {"reason": "failed", "code": None, "route": route}):
             with self.subTest(install=r["reason"]):
                 self.assertNotIn("⟦", fmt.update_install_report(r))
+
+
+class TestWhatThisCopyIs(unittest.TestCase):
+    """`route()` from the files around the package, with no environment in the way."""
+
+    def setUp(self):
+        import tempfile
+        self.root = Path(tempfile.mkdtemp(prefix="route-")).resolve()
+        (self.root / "src" / "scholion").mkdir(parents=True)
+        self.pkg = self.root / "src" / "scholion"
+        self._env = mock.patch.dict(os.environ, {"SCHOLION_MANAGED_BY": ""})
+        self._env.start()
+
+    def tearDown(self):
+        import shutil
+        self._env.stop()
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def route(self):
+        from scholion import upgrade
+        return upgrade.route(prefix="/usr", package_dir=self.pkg, executable="python3")
+
+    def test_a_checkout_is_updated_by_pulling(self):
+        (self.root / "pyproject.toml").write_text("", encoding="utf-8")
+        (self.root / ".git").mkdir()
+        r = self.route()
+        self.assertEqual("source", r["kind"])
+        self.assertIn("pull", r["command"])
+
+    def test_an_unpacked_archive_is_not_updated_by_pip(self):
+        """`pip install --upgrade` here would update the copy in site-packages
+        and leave the one that is running untouched."""
+        (self.root / "pyproject.toml").write_text("", encoding="utf-8")
+        r = self.route()
+        self.assertEqual("tree", r["kind"])
+        self.assertFalse(r["installable"])
+        self.assertEqual([], r["command"])
+
+    def test_an_installed_package_is_updated_by_pip(self):
+        r = self.route()
+        self.assertEqual("pip", r["kind"])
+        self.assertTrue(r["installable"])
+
+    def test_the_archive_route_is_refused_with_its_own_sentence(self):
+        from scholion import upgrade, format as fmt
+        (self.root / "pyproject.toml").write_text("", encoding="utf-8")
+        with mock.patch.object(upgrade, "route", return_value=self.route()):
+            r = upgrade.install(confirm=True)
+        self.assertEqual("unpacked_tree", r["reason"])
+        text = fmt.update_install_report(r)
+        self.assertIn("/releases", text)
+        self.assertNotIn("⟦", text)
 
 
 if __name__ == "__main__":

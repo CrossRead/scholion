@@ -181,8 +181,13 @@ def _compose(vcf: str) -> Dict[str, int]:
                     indel += 1
                 if seen >= SAMPLE_ROWS:
                     break
-    except Exception:
-        return {"snv": 0, "indel": 0, "sampled": 0}
+    except Exception as exc:
+        # A read that failed is not a file with no rows. `sampled: 0` alone used
+        # to leave `only_indels` and `only_snvs` False, and `answers_variant`
+        # then said an SNV could appear in a file nobody had read — an absent row
+        # there was printed as the reference. The failure is carried by name.
+        return {"snv": 0, "indel": 0, "sampled": 0,
+                "composition_unread": f"{type(exc).__name__}: {exc}"[:200]}
     return {"snv": snv, "indel": indel, "sampled": seen}
 
 
@@ -201,6 +206,10 @@ def _exome_shape(m: Dict[str, Any]) -> bool:
 
 
 def _classify(m: Dict[str, Any]) -> str:
+    # A composition that could not be read decides nothing, and nothing after
+    # it may decide either: every class below rests on the file having been read.
+    if m.get("composition_unread"):
+        return "unmeasured"
     # Composition first, and deliberately before `measured`: what a file
     # CONTAINS is read from the file itself and does not need an index, while
     # breadth does. A call set holding no substitutions is a partial call set
@@ -235,7 +244,7 @@ def _cache_path(vcf: str) -> Optional[Path]:
     try:
         from . import core
         base = Path(core.cache_dir())
-    except Exception:
+    except Exception:  # quiet: no cache path only means the file is measured afresh
         return None
     try:
         st = os.stat(vcf)
@@ -256,6 +265,15 @@ def _cache_path(vcf: str) -> Optional[Path]:
     return base / f"callset2-{key}.json"
 
 
+def unmeasured() -> Dict[str, Any]:
+    """The shape of a measurement that was not made — `unmeasured`, which closes paths."""
+    return {"measured": False, "class": "unmeasured", "observed_per_mb": None,
+            "probes": [], "snv": 0, "indel": 0, "sampled": 0,
+            "only_indels": False, "only_snvs": False,
+            "imputed_share": None, "reference_blocks": False,
+            "coding_per_mb": None, "coding_probes": [], "coding_probes_dense": 0}
+
+
 def measure(vcf: Optional[str]) -> Dict[str, Any]:
     """Measure this call set. Cheap enough to run from a status command.
 
@@ -263,11 +281,7 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
     pass over the whole thing, because a status command that takes twelve
     seconds is a status command nobody runs.
     """
-    empty = {"measured": False, "class": "unmeasured", "observed_per_mb": None,
-             "probes": [], "snv": 0, "indel": 0, "sampled": 0,
-             "only_indels": False, "only_snvs": False,
-             "imputed_share": None, "reference_blocks": False,
-             "coding_per_mb": None, "coding_probes": [], "coding_probes_dense": 0}
+    empty = unmeasured()
     if not vcf or not os.path.exists(vcf):
         return empty
 
@@ -275,7 +289,7 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
     if cp is not None and cp.exists():
         try:
             return json.loads(cp.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception:  # quiet: an unreadable cache entry is a miss; the file is measured below
             pass
 
     probes = [_probe(vcf, c, s, w) for c, s, w in PROBES]
@@ -314,7 +328,9 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
         out["coding_probes_dense"] = sum(1 for v in per_rich if v >= EXOME_CODING_PER_MB)
     out["class"] = _classify(out)
 
-    if cp is not None:
+    # A failed read is not cached: the measurement was not made, and a cache
+    # entry would hold `unmeasured` over the file for as long as it lives.
+    if cp is not None and not out.get("composition_unread"):
         try:
             cp.parent.mkdir(parents=True, exist_ok=True)
             # Whole or not at all: two status requests on the web server's
@@ -323,7 +339,7 @@ def measure(vcf: Optional[str]) -> Dict[str, Any]:
             tmp = cp.with_name(f"{cp.name}.{os.getpid()}.tmp")
             tmp.write_text(json.dumps(out), encoding="utf-8")
             os.replace(tmp, cp)
-        except Exception:
+        except Exception:  # quiet: a cache write that failed loses only the cache; `out` is returned whole
             pass
     return out
 
@@ -336,6 +352,10 @@ def answers_variant(m: Dict[str, Any], ref: str, alt: str) -> bool:
     reporting it as reference is a statement about the person made from a
     property of the file.
     """
+    # Whether the file carries variants of any shape was never established:
+    # not «yes». The caller names the failure (`genome._gt_at`).
+    if m.get("composition_unread"):
+        return False
     alts = _real_alts(alt or "")
     if not alts or not ref:
         return True

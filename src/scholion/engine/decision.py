@@ -68,11 +68,13 @@ VERDICTS = ("rule_fires", "rule_silent", "no_rule")
 
 
 def _context() -> Dict[str, Any]:
-    """The curated «prescription → genes» lists, or an empty one."""
-    try:
-        return core._read_knowledge("drug_gene_context.json") or {}
-    except Exception:                                                # noqa: BLE001
-        return {}
+    """The curated «prescription → genes» lists, or an empty one when none ships.
+
+    A file that is there and does not read raises. Answering `{}` for it dropped
+    the clinician's genes and signed exclusions for the drug while the systems
+    half still answered `asked: True` — a shorter list printed as the whole one.
+    """
+    return core._read_knowledge("drug_gene_context.json") or {}
 
 
 def curated_genes(drug: str, classes: Optional[List[str]] = None) -> Dict[str, Any]:
@@ -183,7 +185,7 @@ def variant_state(gene: str) -> Dict[str, Any]:
     for rs in held:
         try:
             res = (genome.lookup(rs) or {}).get("result") or {}
-        except Exception:                                            # noqa: BLE001
+        except Exception:  # quiet: a failed lookup is counted in `unread`, never as called or confirmed_ref
             continue
         conf = res.get("confidence")
         if conf == "called":

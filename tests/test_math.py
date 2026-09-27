@@ -8,7 +8,6 @@ not depend on any particular person's data and survive any interface edits.
 import importlib.util
 import unittest
 from math import comb
-from pathlib import Path
 
 import support
 

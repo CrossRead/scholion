@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import unittest
-from unittest import mock
 
 import support  # noqa: F401
 from scholion import core, format as fmt

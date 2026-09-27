@@ -300,10 +300,15 @@ class Handler(BaseHTTPRequestHandler):
             return None
         if not n:
             return {}
+        # A body that does not parse is refused, not read as `{}`. An empty body
+        # is not an empty request on every route: `/api/goal` with no `keys`
+        # adopts every proposal, and `/api/choose-genome` with nothing in it
+        # clears the genome path — a typo in a request rewrote the profile.
         try:
             return json.loads(self.rfile.read(n).decode("utf-8"))
         except Exception:
-            return {}
+            self._json({"error": _t("server.bad_body")}, 400)
+            return None
 
     def _fail(self, exc: BaseException):
         """An internal error: the details go to the owner's console, a generic one goes out.
@@ -312,6 +317,11 @@ class Handler(BaseHTTPRequestHandler):
         and the user name inside the body of an HTTP response. It should be read by the
         person who started the server, not by the one who sent the request.
         """
+        if isinstance(exc, core.SourcesUnreadable):
+            # Not an internal error: the person's own settings file does not
+            # read, and every answer would otherwise be about the wrong files.
+            # The message names the file relative to the profile, not a path.
+            return self._json({"error": str(exc), "sources_unreadable": True}, 500)
         traceback.print_exc()
         return self._json({"error": _t("server.internal_error")}, 500)
 
@@ -679,7 +689,7 @@ def _already_ours(host: str, port: int) -> bool:
     try:
         with urllib.request.urlopen(f"http://{host}:{port}/api/ping", timeout=1.5) as r:
             return b"Scholion" in r.read()
-    except Exception:
+    except Exception:  # quiet: a failed probe means «not ours»: another port is taken, no data is read
         return False
 
 
@@ -721,6 +731,13 @@ def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, 
     # it — the same shape as SCHOLION_TLS_INSECURE elsewhere.
     if host not in _LOCAL_HOSTS and os.environ.get("SCHOLION_ALLOW_REMOTE", "").strip() not in ("1", "true", "yes"):
         raise SystemExit(_t("server.remote_bind_refused", host=host))
+
+    # A settings file that does not read is said at start-up, before anything
+    # is answered from the wrong files; every API call repeats it (see _fail).
+    try:
+        core.source_config()
+    except core.SourcesUnreadable as e:
+        print(f"⚠️  {e}", flush=True)
 
     # The lab integrity self-check at start-up (in the background, it does not block the server)
     def _selfcheck():

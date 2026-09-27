@@ -39,7 +39,6 @@ import urllib.request
 from pathlib import Path
 
 import support
-from scholion.engine import targets
 from scholion import cli, contract, core, engine, format as fmt, server, store
 from scholion.i18n import t as _t
 

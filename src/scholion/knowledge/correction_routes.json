@@ -320,7 +320,7 @@
       },
       "review": {
         "by_role": "panel_author",
-        "on": "2026-09-23",
+        "on": "2026-09-27",
         "scope": "text_and_level"
       },
       "system": "amino_acids"
@@ -361,7 +361,7 @@
       },
       "review": {
         "by_role": "panel_author",
-        "on": "2026-09-23",
+        "on": "2026-09-27",
         "scope": "text_and_level"
       },
       "system": "amino_acids"
@@ -401,7 +401,7 @@
       },
       "review": {
         "by_role": "panel_author",
-        "on": "2026-09-23",
+        "on": "2026-09-27",
         "scope": "text_and_level"
       },
       "system": "amino_acids"
@@ -441,7 +441,7 @@
       },
       "review": {
         "by_role": "panel_author",
-        "on": "2026-09-23",
+        "on": "2026-09-27",
         "scope": "text_and_level"
       },
       "system": "renal"
@@ -485,7 +485,7 @@
       },
       "review": {
         "by_role": "panel_author",
-        "on": "2026-09-23",
+        "on": "2026-09-27",
         "scope": "text_and_level"
       },
       "system": "renal"

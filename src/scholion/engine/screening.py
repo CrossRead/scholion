@@ -60,7 +60,7 @@ def _panel() -> Dict[str, Any]:
 def _curated() -> Dict[str, Any]:
     try:
         return core._read_knowledge("disease_class_panels.json") or {}
-    except Exception:                                                # noqa: BLE001
+    except Exception:  # quiet: a lost class list answers «not held», verdict not_determined, never clear
         return {}
 
 

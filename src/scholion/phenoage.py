@@ -9,7 +9,6 @@ number. A missing marker → the result «cannot be computed» + the list to ord
 from __future__ import annotations
 import datetime
 import math
-import os
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import core
@@ -199,7 +198,7 @@ def _track(res: Dict[str, Any]) -> bool:
             f.write(f"| {res['panel']} | {res['age']:.1f} | {res['phenoage']:.1f} | "
                     f"{res['delta']:+.1f} | {res['mortality_10y_pct']:.1f}% |\n")
         return True
-    except Exception:
+    except Exception:  # quiet: only the «written to history» line is left out; the result itself is printed
         return False
 
 

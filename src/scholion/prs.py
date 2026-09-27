@@ -170,7 +170,7 @@ class _MCP:
     def close(self):
         try:
             self.p.terminate()
-        except Exception:
+        except Exception:  # quiet: best-effort cleanup of the helper process after the call
             pass
 
 
@@ -528,7 +528,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
 
 
 def _main(argv=None):
-    import argparse, sys
+    import argparse
     ap = argparse.ArgumentParser(prog="scholion.prs")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("selftest")

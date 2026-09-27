@@ -23,7 +23,6 @@ Exit 0 — in sync, 1 — a divergence or broken markers.
 """
 from __future__ import annotations
 
-import shutil
 import sys
 from pathlib import Path
 

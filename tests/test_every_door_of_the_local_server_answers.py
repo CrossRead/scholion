@@ -326,12 +326,14 @@ class TestWhatAMalformedRequestGets(_Live):
     project two places to change when that contract moves.
     """
 
-    def test_a_body_that_is_not_json_is_read_as_an_empty_one(self):
-        """Not a 500. The route then answers about a request with no fields,
-        which is a refusal it already knows how to word."""
+    def test_a_body_that_is_not_json_is_refused_with_a_reason(self):
+        """Not a 500, and no longer read as `{}` (task 209): an empty body is not
+        an empty request on every route — `/api/goal` with no `keys` adopts every
+        proposal, `/api/choose-genome` with nothing clears the genome path. A 400
+        whose body says why, before any route runs."""
         code, body = self.call("/api/medications", raw=b"{not json at all")
-        self.assertEqual(200, code)
-        self.assertIsInstance(json.loads(body), dict)
+        self.assertEqual(400, code)
+        self.assertIn("error", json.loads(body))
 
     def test_a_post_with_no_body_at_all_is_read_as_an_empty_one(self):
         code, body = self.call("/api/medications", raw=b"")

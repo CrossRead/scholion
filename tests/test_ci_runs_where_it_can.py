@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import re
 import unittest
-from pathlib import Path
 
 import support
 

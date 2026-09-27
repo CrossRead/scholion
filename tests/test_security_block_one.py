@@ -8,7 +8,6 @@ is enough to catch a reintroduction of the exact unescaped interpolation.
 from __future__ import annotations
 
 import http.server
-import io
 import os
 import pathlib
 import shutil

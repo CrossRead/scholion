@@ -180,6 +180,19 @@ class TestRequestGuard(unittest.TestCase):
         code, _ = self._call("/api/labs", raw=b"{}", headers={"Content-Length": "not-a-number"})
         self.assertEqual(code, 400)
 
+    def test_a_body_that_does_not_parse_is_refused_not_read_as_empty(self):
+        """Task 209. A body that did not parse was read as `{}`, and `{}` is not
+        an empty request everywhere: `/api/goal` with no `keys` adopts EVERY
+        proposal, `/api/choose-genome` with nothing in it clears the genome path.
+        A typo in a request rewrote the profile and answered 200."""
+        from unittest import mock
+        with mock.patch.object(server.store, "write_goal_targets",
+                               return_value={"ok": True}) as wrote:
+            code, txt = self._call("/api/goal", raw=b"{keys: [not json",
+                                   headers={"Content-Type": "application/json"})
+        self.assertEqual(code, 400, txt[:200])
+        wrote.assert_not_called()
+
     def test_the_details_of_an_error_do_not_leave_outward(self):
         """The `str(e)` of a file error is an absolute path, that is, the user's
         name and the structure of their directories in the body of an HTTP

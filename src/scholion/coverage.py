@@ -35,7 +35,6 @@ import os
 import re
 import shutil
 import subprocess
-import tempfile
 import time
 from datetime import date
 from pathlib import Path
@@ -77,23 +76,23 @@ def genes() -> Dict[str, str]:
     try:
         add(core._read_knowledge("acmg_sf.json").get("genes") or {}, "ACMG")
     except Exception:                                                # noqa: BLE001
-        pass
+        pass  # quiet: a list left out leaves its genes unmeasured; gene_coverage says gene_not_in_table
     try:
         cpic = core._read_knowledge("cpic_drug_gene.json")
         add(cpic.get("genes") or {}, "CPIC")
         add(cpic.get("genes_of_interest") or [], "CPIC")
     except Exception:                                                # noqa: BLE001
-        pass
+        pass  # quiet: a list left out leaves its genes unmeasured; gene_coverage says gene_not_in_table
     try:
         for spec in (core._read_knowledge("gencc_gene_disease.json").get("systems") or {}).values():
             add((spec.get("genes") or {}), "PANEL")
     except Exception:                                                # noqa: BLE001
-        pass
+        pass  # quiet: a list left out leaves its genes unmeasured; gene_coverage says gene_not_in_table
     try:
         for spec in (core._read_knowledge("system_gene_panels.json").get("systems") or {}).values():
             add((p.get("gene") for p in (spec.get("positions") or [])), "PANEL")
     except Exception:                                                # noqa: BLE001
-        pass
+        pass  # quiet: a list left out leaves its genes unmeasured; gene_coverage says gene_not_in_table
     return out
 
 

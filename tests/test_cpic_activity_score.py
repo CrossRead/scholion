@@ -11,7 +11,6 @@ fetched 2026-08-19).
 from __future__ import annotations
 
 import json
-import os
 import pathlib
 import tempfile
 import unittest

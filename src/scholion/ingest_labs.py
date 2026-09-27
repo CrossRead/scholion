@@ -13,16 +13,13 @@ to install pdfplumber via pip. Scanned PDFs (no text layer) are not supported wi
 from __future__ import annotations
 import csv
 import json
-import os
 import math
 import re
 import unicodedata
 import shutil
 import subprocess
-import sys
-import datetime as _dt
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Callable
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import core, i18n, store
 from .i18n import t as _t
@@ -568,8 +565,18 @@ _OWNER_CACHE: Dict[str, Any] = {}
 
 
 def _owner():
-    """(sex, age) of the owner from profile/metrics.json — used to pick the right row of a
+    """(sex, age) of the owner from the metrics file — used to pick the right row of a
     multi-line reference. No profile / no birth date → (None, None), the logic is off.
+
+    Read from `core.source_path("metrics")` — the file where `sources.json`
+    puts it — by the engine's own `profile_sex_of` and `age_from`, not from
+    `profile/metrics.json` with a parser of its own. That read had a broad
+    `except` around it: a metrics file bound to another folder, or one that
+    would not parse, came back as (None, None) — the filter OFF, in silence —
+    and a corridor printed for the other sex was then stored as this person's.
+    A metrics file that exists and will not read now raises, inside the
+    loader's per-file `try`, which names the form as an error and leaves it
+    unread for next time.
 
     Keyed by the profile file and its mtime, like every other reader in the
     project. It used to be a plain `if _OWNER_CACHE: return …`, and the first
@@ -580,7 +587,7 @@ def _owner():
     one that turns the row filter OFF, so the failure is towards silence in a
     place where silence looks like a working filter.
     """
-    mfile = core.profile_dir() / "metrics.json"
+    mfile = core.source_path("metrics")
     try:
         st = mfile.stat()
         # mtime AND size: a profile edited twice inside one filesystem tick has
@@ -593,23 +600,21 @@ def _owner():
     if _OWNER_CACHE.get("_key") == key:
         return _OWNER_CACHE.get("sex"), _OWNER_CACHE.get("age")
     _OWNER_CACHE.clear()
-    sex = age = None
-    try:
+    # Read here rather than through `core.metrics_json()`, whose cache is keyed
+    # by mtime alone — the key above adds the size for the reason it gives.
+    # No `except`: a file that is there and will not parse is the form's error.
+    pr = {}
+    if mfile.exists():
         d = json.loads(mfile.read_text(encoding="utf-8"))
-        pr = d.get("profile") or {}
-        # Read by the same list the rest of the engine reads by (`core.profile_sex_of`):
-        # the profile may spell it «f», «м» or «жен» — the demo profile writes «f» —
-        # and `_row_fits` compares against «male»/«female». Raw, a third spelling
-        # turned the sex half of the row filter off, silently, in the direction that
-        # looks like a working filter.
-        sex = core.profile_sex_of(pr.get("sex"))
-        bd = pr.get("birth_date") or (str(pr["birth_year"]) + "-01-01" if pr.get("birth_year") else None)
-        if bd:
-            y, m, dd = (int(x) for x in bd.split("-")[:3])
-            today = _dt.date.today()
-            age = today.year - y - ((today.month, today.day) < (m, dd))
-    except Exception:
-        pass
+        pr = (d.get("profile") if isinstance(d, dict) else None) or {}
+    # Read by the same list the rest of the engine reads by (`core.profile_sex_of`):
+    # the profile may spell it «f», «м» or «жен» — the demo profile writes «f» —
+    # and `_row_fits` compares against «male»/«female». Raw, a third spelling
+    # turned the sex half of the row filter off, silently, in the direction that
+    # looks like a working filter. The age by `core.age_from`, the one reader the
+    # profile view and the corridor rule share, so the two cannot disagree.
+    sex = core.profile_sex_of(pr.get("sex"))
+    age = core.age_from(pr)
     _OWNER_CACHE.update({"sex": sex, "age": age, "_key": key})
     return sex, age
 
@@ -650,14 +655,14 @@ def _have_extractor() -> Optional[str]:
     try:
         import pdfplumber  # noqa: F401
         return "pdfplumber"
-    except Exception:
+    except Exception:  # quiet: a probe; the next one is tried, and none at all is refused as no_pdf_reader
         pass
     if shutil.which("pdftotext"):
         return "pdftotext"
     try:
         from pdfminer.high_level import extract_text  # noqa: F401
         return "pdfminer"
-    except Exception:
+    except Exception:  # quiet: None is refused by name as no_pdf_reader; no PDF is read or skipped silently
         return None
 
 
@@ -678,27 +683,66 @@ def _ensure_extractor() -> Optional[str]:
     return _have_extractor()
 
 
-def _read_pdf(path: Path) -> Optional[str]:
+class PdfUnreadable(RuntimeError):
+    """Every PDF reader present failed on this file.
+
+    Not the same as a PDF with no text layer. Returned as "", a reader that fell
+    over was reported as «a scan without OCR», the file went into the manifest
+    as read, and the values on it were never stored — later, «never measured».
+    """
+
+
+def _read_pdf_or_raise(path: Path) -> Optional[str]:
+    """The text of a PDF; None when no reader is installed at all.
+
+    A reader that fails hands the file to the next one; when every reader
+    present has failed, `PdfUnreadable` names each failure. An empty string is
+    kept for what it means: the readers worked and the page carries no text.
+    """
+    failed: List[str] = []
     try:
         import pdfplumber
         with pdfplumber.open(str(path)) as pdf:
             return "\n".join((pg.extract_text() or "") for pg in pdf.pages)
     except ImportError:
         pass
-    except Exception:
-        return ""
+    except Exception as e:
+        failed.append(f"pdfplumber: {type(e).__name__}: {e}")
     if shutil.which("pdftotext"):
         try:
             r = subprocess.run(["pdftotext", "-layout", str(path), "-"],
                                capture_output=True, text=True, timeout=90)
-            return r.stdout
-        except Exception:
-            return ""
+            if r.returncode == 0:
+                return r.stdout
+            failed.append(f"pdftotext: exit {r.returncode}: {(r.stderr or '').strip()[:200]}")
+        except Exception as e:
+            failed.append(f"pdftotext: {type(e).__name__}: {e}")
     try:
         from pdfminer.high_level import extract_text
-        return extract_text(str(path))
-    except Exception:
-        return None
+    except ImportError:
+        extract_text = None
+    if extract_text is not None:
+        try:
+            return extract_text(str(path))
+        except Exception as e:
+            failed.append(f"pdfminer: {type(e).__name__}: {e}")
+    if failed:
+        raise PdfUnreadable("; ".join(failed))
+    return None
+
+
+def _read_pdf(path: Path) -> Optional[str]:
+    """`_read_pdf_or_raise`, for the callers that do not tell a failed read apart.
+
+    `reconcile` counts a PDF with no text as unreadable either way. The lab
+    loader and the studies loader do not use this: the first reads through
+    `_read_any` and the second through `_read_pdf_or_raise`, where a failure is
+    the file's error rather than «no text» (task 209).
+    """
+    try:
+        return _read_pdf_or_raise(path)
+    except PdfUnreadable:
+        return ""
 
 
 def _stool_score(tail: str) -> Optional[float]:
@@ -884,7 +928,7 @@ def _local_row_rule(row: str, kind: str) -> bool:
     try:
         from . import markers_local as _ml
         pats = _ml.confirmed_row_rules(kind)
-    except Exception:
+    except Exception:  # quiet: as no confirmed rule, what markers_local answers for an unreadable overlay
         return False
     for p in pats:
         try:
@@ -1464,7 +1508,7 @@ _TEXT_MAX_BYTES = 8 * 1024 * 1024
 def _read_any(path: Path) -> Optional[str]:
     """The text of a result file, whatever kind it is. None = we cannot read it."""
     if path.suffix.lower() == ".pdf":
-        return _read_pdf(path)
+        return _read_pdf_or_raise(path)
     try:
         if path.stat().st_size > _TEXT_MAX_BYTES:
             return None
@@ -1699,7 +1743,15 @@ def ingest(folder: str, force: bool = False,
             progress(n_file, len(files), f.name)
         try:
             mt = f.stat().st_mtime
-        except Exception:
+        except Exception as e:
+            # Listed a moment ago and gone, or refused: named like any other
+            # failure. A `continue` here was a file dropped without a line —
+            # its values absent from the profile, and nothing said why.
+            out["not_ingested"].append(
+                {"file": f.name, "reason": "error",
+                 "detail": _t("ingest_labs.reason_error", type=type(e).__name__,
+                              text=str(e) or "-")})
+            out.setdefault("errors", []).append(f.name)
             continue
         rk, known = core.manifest_lookup(manifest, f)
         if not force and known == mt:

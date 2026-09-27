@@ -69,6 +69,13 @@ def route(prefix: Optional[str] = None, package_dir: Optional[Path] = None,
     root = package_dir.parent.parent
     if (root / ".git").exists() and (root / "pyproject.toml").exists():
         return {"kind": "source", "command": ["git", "-C", str(root), "pull"], "installable": False}
+    if (root / "pyproject.toml").exists() and (root / "src" / "scholion").is_dir():
+        # A source tree with no `.git`: an unpacked release archive or sdist,
+        # run from where it was unpacked. It used to fall through to `pip`, and
+        # `pip install --upgrade` updates the copy in site-packages — not this
+        # one, which keeps running the old code while the answer says «installed».
+        # Only a newer archive, or a clone, updates it.
+        return {"kind": "tree", "command": [], "installable": False, "root": str(root)}
     if "/pipx/venvs/" in prefix:
         return {"kind": "pipx", "command": ["pipx", "upgrade", PACKAGE], "installable": True}
     if "/uv/tools/" in prefix:
@@ -146,7 +153,8 @@ def install(confirm: bool = False, run: Optional[Callable] = None,
     if not confirm:
         return {**base, "ok": False, "reason": "not_confirmed"}
     if not r["installable"]:
-        return {**base, "ok": False, "reason": "host_managed" if r["kind"] == "host" else "source_tree"}
+        reason = {"host": "host_managed", "tree": "unpacked_tree"}.get(r["kind"], "source_tree")
+        return {**base, "ok": False, "reason": reason}
     if net.offline():
         return {**base, "ok": False, "reason": "offline"}
     try:
@@ -207,7 +215,7 @@ def session_note(now: Optional[float] = None) -> str:
     now = time.time() if now is None else now
     try:
         n = notice(now=now)
-    except Exception:                                    # noqa: BLE001 - a notice never breaks an answer
+    except Exception:  # quiet: the once-a-day update note is skipped; no data about the person
         return ""
     if n.get("status") != "newer":
         return ""

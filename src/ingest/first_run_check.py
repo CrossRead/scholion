@@ -35,14 +35,32 @@ except Exception as e:                                     # noqa: BLE001
 OK, WARN, BAD = "✓", "⚠", "✗"
 
 
+#: Profile files that are THERE but could not be read, with the reason. Kept apart
+#: from «absent»: a damaged labs.json read as {} would be reported as «no lab
+#: results — a normal start», a statement about the person's data that is false.
+UNREADABLE = {}
+
+
 def _load(name):
     p = PROFILE / name
     if not p.exists():
         return None
     try:
         return json.loads(p.read_text(encoding="utf-8"))
-    except Exception:                                      # noqa: BLE001
+    except Exception as e:                                 # noqa: BLE001
+        UNREADABLE[name] = f"{type(e).__name__}: {e}"
         return {}
+
+
+def _report_unreadable(name, problems) -> bool:
+    """Say that a profile file could not be read; True when it was the case."""
+    why = UNREADABLE.get(name)
+    if not why:
+        return False
+    print(f"{BAD} profile/{name} exists but cannot be read ({why}) — nothing in it is used")
+    problems.append(f"repair or restore profile/{name}: until it reads, the checks below "
+                    f"it know nothing of its contents")
+    return True
 
 
 def _is_template(obj) -> bool:
@@ -67,7 +85,9 @@ def main() -> int:
     metrics = _load("metrics.json") or {}
     prof = metrics.get("profile", {}) if isinstance(metrics, dict) else {}
     sex, birth = prof.get("sex"), prof.get("birth_date") or prof.get("birth_year")
-    if sex and birth:
+    if _report_unreadable("metrics.json", problems):
+        pass
+    elif sex and birth:
         # The value itself is not printed — a first-run check only needs to confirm
         # demographics were entered, not to put a date of birth on the screen (or
         # in whatever captures this terminal's scrollback).
@@ -80,7 +100,9 @@ def main() -> int:
     # --- 2. lab results and, above all, the reference ranges
     labs = _load("labs.json") or {}
     markers = labs.get("markers", {}) if isinstance(labs, dict) else {}
-    if _is_template(labs) or not markers:
+    if _report_unreadable("labs.json", problems):
+        pass
+    elif _is_template(labs) or not markers:
         print(f"{WARN} no lab results — that is a normal start: load the PDF forms "
               f"(python3 -m scholion ingest-labs \"<folder with PDFs>\")")
         notes.append("while there are no lab results, the laboratory part cannot be analysed — "
@@ -102,12 +124,16 @@ def main() -> int:
     # --- 3. genome
     # detected exactly as the application does — otherwise the check answers another question
     avail = {}
+    genome_error = None
     try:
         from scholion import genome as _g
         avail = _g.available() or {}
-    except Exception:                                      # noqa: BLE001
-        pass
-    if avail.get("ready"):
+    except Exception as e:                                 # noqa: BLE001
+        # Not «no full VCF»: the check itself failed, and that is a different sentence.
+        genome_error = f"{type(e).__name__}: {e}"
+    if genome_error:
+        print(f"{WARN} genome not checked: {genome_error}")
+    elif avail.get("ready"):
         print(f"{OK} genome connected: {Path(str(avail.get('vcf', '?'))).name}")
     elif avail.get("vcf"):
         print(f"{BAD} genome found but not ready to be read "
@@ -120,7 +146,9 @@ def main() -> int:
     # --- 4. prescriptions
     meds = _load("medications.json") or {}
     lst = meds.get("medications", []) if isinstance(meds, dict) else []
-    if _is_template(meds) or not lst:
+    if _report_unreadable("medications.json", problems):
+        pass
+    elif _is_template(meds) or not lst:
         print(f"{WARN} no prescriptions — the check of interactions and control tests "
               f"will be empty until the regimen is entered")
     else:
@@ -192,7 +220,7 @@ def main() -> int:
                          "for the reader. The machine-enforced restriction is only "
                          "`applies_when_class`. Most thresholds are derived from outcomes and "
                          "are the same for adults")
-    except Exception:                                      # noqa: BLE001
+    except Exception:  # quiet: only the package's threshold notes are left out; no line about the person
         pass
 
     print()

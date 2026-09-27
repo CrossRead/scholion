@@ -15,10 +15,8 @@ corridor depends on sex, and the suite refuses one that does not.
 from __future__ import annotations
 
 import json
-import re
 import unittest
 from unittest import mock
-from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import core

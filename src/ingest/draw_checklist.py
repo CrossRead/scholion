@@ -129,7 +129,7 @@ def _classes_for(name: str):
                 return list(res)
             if isinstance(res, str):
                 return [res]
-        except Exception:                                  # noqa: BLE001
+        except Exception:  # quiet: classes are then matched from the same dictionary below (looser, not empty)
             pass
     out = []
     for cls, spec in core.med_classes().get("classes", {}).items():
@@ -171,7 +171,9 @@ def from_phenoage(lookback: int = 3):
     try:
         ov = phenoage.panels_overview()
     except Exception as e:                                 # noqa: BLE001
-        return {"error": str(e)}, []
+        # Reported, not swallowed: main() prints a «NOT checked» section for it,
+        # since an empty list alone would read as «no PhenoAge marker missing».
+        return {"error": f"{type(e).__name__}: {e}"}, []
     panels = ov.get("panels", []) or []
     complete = ov.get("complete", []) or []
     recent = panels[-lookback:] if panels else []
@@ -182,7 +184,7 @@ def from_phenoage(lookback: int = 3):
             if m not in seen:
                 seen.add(m)
                 union.append(m)
-    items = [(phenoage.LABS_KEYS[m][0], f"completeness of the PhenoAge panel (without it biological age is not computed)")
+    items = [(phenoage.LABS_KEYS[m][0], "completeness of the PhenoAge panel (without it biological age is not computed)")
              for m in union]
     info = {
         "panels_total": len(panels),
@@ -214,14 +216,20 @@ def from_planned_labs():
 
 
 def from_thresholds():
-    """Markers whose latest value is already past the clinical action threshold."""
+    """Markers whose latest value is already past the clinical action threshold.
+
+    Returns `(info, items)` like `from_phenoage`. When the threshold map cannot be
+    read, `info["error"]` says so: an empty list alone would read on the form as
+    «no threshold crossed», which is a statement about the person that nothing
+    here checked.
+    """
     th = core.clinical_thresholds().get("markers", {}) if hasattr(core, "clinical_thresholds") else {}
     if not th:
         try:
             th = json.loads((ROOT / "src/scholion/knowledge/clinical_thresholds.json")
                             .read_text(encoding="utf-8")).get("markers", {})
-        except Exception:                                  # noqa: BLE001
-            return []
+        except Exception as e:                             # noqa: BLE001
+            return {"error": f"{type(e).__name__}: {e}"}, []
     out = []
     for key, rules in th.items():
         val, dt = _latest_point(key)
@@ -239,14 +247,14 @@ def from_thresholds():
         worst = max(crossed, key=lambda r: abs(float(r.get("value", 0)) - 0)) if crossed else None
         label = _text(worst.get("label")) if worst else ""
         out.append((key, f"clinical threshold «{label}» crossed (latest value {val} of {dt}) — track the dynamics"))
-    return out
+    return {}, out
 
 
 # --------------------------------------------------------------------------- assembly
 def main() -> int:
     med_items, deferred = from_medications()
     ph_info, ph_items = from_phenoage()
-    thr_items = from_thresholds()
+    thr_info, thr_items = from_thresholds()
     planned = from_planned_labs()
 
     merged: dict[str, dict] = {}
@@ -314,6 +322,7 @@ def main() -> int:
         "deferred_until_prereq": [e["key"] for e in later],
         "computed_not_ordered": computed_dissolved,
         "phenoage": ph_info,
+        "thresholds": thr_info,
         "planned_labs": planned,
         "deferred_meds": [{"name": n, "status": s, "classes": c} for n, s, c in deferred],
     }
@@ -322,6 +331,15 @@ def main() -> int:
     # ---- printable form
     L = [f"# Checklist for the next draw · {date.today()}", "",
          "_Not a prescription and not a diagnosis: a list for discussion with a doctor._", ""]
+    if thr_info.get("error"):
+        L += ["## Clinical thresholds were NOT checked", "",
+              "The threshold map could not be read, so this list says nothing about which "
+              f"latest values are past an action threshold ({thr_info['error']}).", ""]
+    if ph_info.get("error"):
+        L += ["## Biological age (PhenoAge) was NOT checked", "",
+              "The lab panels could not be read for PhenoAge, so this list says nothing about "
+              "which of its markers are missing from the next draw — that is not the same as "
+              f"none missing ({ph_info['error']}).", ""]
     if planned:
         L += ["## Agreed with the doctor", ""]
         for p in planned:
@@ -409,6 +427,10 @@ def main() -> int:
 
     print(f"✓ {OUT_MD}")
     print(f"✓ {OUT_JSON}")
+    if thr_info.get("error"):
+        print(f"⚠ clinical thresholds NOT checked — the map could not be read: {thr_info['error']}")
+    if ph_info.get("error"):
+        print(f"⚠ PhenoAge panel NOT checked — the panels could not be read: {ph_info['error']}")
     for c in computed_dissolved:
         have_v = (f"latest value {c['last_value']} of {c['last_date']} — "
                   f"stored and used" if c["last_value"] is not None

@@ -67,7 +67,6 @@ def _common_day(needs: List[str], rows: List[Dict[str, Any]]):
     them are present is offered — a ratio of two values drawn months apart
     describes no moment, and that rule is what this looks for a day to satisfy.
     """
-    by_day: List[Dict[str, Dict[str, Any]]] = []
     seen: Dict[str, Dict[str, Any]] = {}
     for name, row in zip(needs, rows):
         points = list(row.get("series") or [])

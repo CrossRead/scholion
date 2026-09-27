@@ -29,7 +29,6 @@ import re
 import subprocess
 import sys
 import unittest
-from pathlib import Path
 
 import support
 
@@ -209,7 +208,6 @@ class TestTheVersionOfClinVarSurvivesTheHandover(unittest.TestCase):
 
     def _written_keys(self):
         text = self.WRITER.read_text(encoding="utf-8")
-        line = [l for l in text.splitlines() if "clinvar_meta" in l or '\\"synced\\"' in l]
         return set(re.findall(r'\\\\"([a-z_]+)\\\\":', text)) | set(re.findall(r'"([a-z_]+)":', text))
 
     def _read_keys(self):

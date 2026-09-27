@@ -155,3 +155,19 @@ exclude = [
     "**/*.pyc",
     "**/.DS_Store",
 ]
+
+# Lint — run in CI only (`.github/workflows/tests.yml`, job `lint`); the package
+# itself still depends on nothing, and `run_tests.sh` asks nothing of the person
+# who unpacked it. Rule set F (pyflakes): names used but never defined, imports
+# never used, a name redefined before use. The first of these is the class that
+# `set -u` catches in shell only when the branch runs — here it is caught on
+# every push, whatever branch the name sits in.
+[tool.ruff]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["F"]
+
+[tool.ruff.lint.per-file-ignores]
+# The engine package is a facade: it re-exports the names every face calls it by.
+"src/scholion/engine/__init__.py" = ["F401"]

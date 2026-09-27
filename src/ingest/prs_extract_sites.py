@@ -8,7 +8,7 @@ models (>MAX_VARIANTS), writes a BED (chr notation). stdlib only.
     python3 prs_extract_sites.py [out.bed]
     MAX_VARIANTS=50000 python3 prs_extract_sites.py out.bed
 """
-import csv, glob, gzip, os, sys
+import glob, gzip, os, sys
 
 CACHE = os.path.expanduser("~/Library/Caches/just-prs/scores")
 OUT = sys.argv[1] if len(sys.argv) > 1 else "scoring_sites.bed"

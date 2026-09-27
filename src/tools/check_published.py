@@ -182,7 +182,7 @@ def catalogue_check(version: str, data: dict) -> int:
     print("    Everybody's `loci_sites.vcf.gz` was made for the smaller one, so every position")
     print("    added since will read as «not read» on their profile until they re-run the step —")
     print(f"    and the entry for {version} does not mention `scholion {REGENOTYPE}`.")
-    print(f"    Add it under «What needs recomputing» in CHANGELOG.md, or say there why this")
+    print("    Add it under «What needs recomputing» in CHANGELOG.md, or say there why this")
     print("    growth needs nothing.")
     return 1
 
@@ -201,7 +201,7 @@ def published(name: str, version: str):
             return True
     except urllib.error.HTTPError as e:
         return False if e.code == 404 else None
-    except Exception:                                   # noqa: BLE001 — no network, DNS, proxy
+    except Exception:  # quiet: no network/DNS/proxy; None makes check() refuse unless --allow-unverified
         return None
 
 

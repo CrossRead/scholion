@@ -551,6 +551,9 @@ def _check_drug_online(drug: str) -> Dict[str, Any]:
             return {"status": "not_checked", "drug": drug, "disclaimer": DISCLAIMER(),
                     "reason": "offline",
                     "message": _t("drug.not_checked_offline", drug=drug)}
+        if drugsource.why_unresolved(drug) == "unreachable":  # online, but no answer
+            return {"status": "not_checked", "drug": drug, "disclaimer": DISCLAIMER(),
+                    "reason": "unreachable", "message": _t("drug.not_checked_unreachable", drug=drug)}
         return {"status": "not_found", "drug": drug, "disclaimer": DISCLAIMER(),
                 "reason": "unknown_name",
                 "message": _t("drug.not_found", drug=drug)}
@@ -638,9 +641,10 @@ def check_interactions(drug: str) -> Dict[str, Any]:
             return {"status": "no_rules", "drug": info.get("name", drug), "new_classes": [],
                     "interactions": [], "atc": atc,
                     "message": _t("interactions.no_rules", atc=atc or _t("common.na"))}
-        return {"status": "unknown_class", "drug": drug, "new_classes": [],
-                "interactions": [],
-                "message": _t("interactions.unknown_drug")}
+        why = "unreachable" if drugsource.why_unresolved(drug) == "unreachable" else "unknown_name"
+        return {"status": "unknown_class", "drug": drug, "new_classes": [], "interactions": [],
+                "reason": why, "message": _t("interactions.not_checked_unreachable"
+                                             if why == "unreachable" else "interactions.unknown_drug")}
     hits = []
     names_by_class = _active_names_by_class()
     for rule in core.drug_interactions().get("interactions", []):
@@ -827,7 +831,10 @@ def _labs_for_drug(classes: List[str]) -> Dict[str, Any]:
                       "with_rules": [c for c in classes if c in mon]},
             "watch": [r for r in rows if r["flag"] in ("high", "low")],
             "near": [r for r in rows if r.get("near_limit")],
-            "crossed": [r for r in rows if any(d["crossed"] for d in (r.get("decisions") or []))]}
+            "crossed": [r for r in rows if any(d["crossed"] for d in (r.get("decisions") or []))],
+            # a threshold the value could not be compared with: neither crossed nor not
+            "unresolved": [r for r in rows
+                           if any(d.get("crossed") is None for d in (r.get("decisions") or []))]}
 
 
 def _rsids_for_genes(gene_names) -> Dict[str, str]:
@@ -968,10 +975,11 @@ def _own_safety_flags(drug: str, disp: Optional[str] = None) -> List[Dict[str, A
     stopped. Filtering it by status would delete the reason the drug was stopped
     at the very moment somebody is offered it again.
     """
-    try:
-        meds = (core.medications_json() or {}).get("medications") or []
-    except Exception:
-        return []
+    # Unguarded on purpose. An unreadable prescription file answered `[]`, which
+    # is «no red flag on this drug» — the one negative this function must never
+    # make up. The same file is read unguarded by `check_interactions` a few lines
+    # earlier, so a failure here is the same loud failure, not a new one.
+    meds = (core.medications_json() or {}).get("medications") or []
     q = {core._norm_drug(x) for x in (drug, disp) if x}
     qt = {t for s in q for t in s.split()}
     out = []
@@ -1107,6 +1115,10 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
     if not labs_sec["markers"] and lbasis.get("classes") and not lbasis.get("with_rules"):
         unresolved.append({"what": "monitoring", "gene": None,
                            "detail": _t("unresolved.labs_no_rule", classes=class_display)})
+    if labs_sec.get("unresolved"):
+        unresolved.append({"what": "monitoring", "gene": None,
+                           "detail": _t("unresolved.labs_not_comparable",
+                                        names=", ".join(r["name"] for r in labs_sec["unresolved"]))})
     if labs_sec["watch"]:
         concerns.append("moderate")
     if unresolved:

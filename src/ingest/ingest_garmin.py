@@ -24,6 +24,16 @@ def _month_of(cal):
     return None
 
 
+def _file_label(path: str) -> str:
+    """An export file's name for the report, without the account it belongs to.
+
+    Garmin prefixes some export files with the account's e-mail address; that part
+    says nothing about which file failed and does not belong in a printed line.
+    """
+    parts = os.path.basename(path).split("_")
+    return "_".join("…" if "@" in p else p for p in parts)
+
+
 def _mean(xs):
     xs = [x for x in xs if isinstance(x, (int, float))]
     return round(sum(xs) / len(xs), 1) if xs else None
@@ -111,6 +121,11 @@ def build(gdir: str) -> dict:
     M = os.path.join(C, "DI-Connect-Metrics")
     F = os.path.join(C, "DI-Connect-Fitness")
 
+    #: Export files that could not be read. Skipping one in silence would fold its
+    #: days out of every monthly mean while the series looked complete; the `n` of a
+    #: month would drop with nothing to say why. They are named in `_meta` instead.
+    unreadable = []
+
     rhr = defaultdict(list); steps = defaultdict(list); intens = defaultdict(list)
     stress = defaultdict(list); bbhigh = defaultdict(list); bblow = defaultdict(list)
     resp = defaultdict(list); cals = defaultdict(list)
@@ -119,7 +134,8 @@ def build(gdir: str) -> dict:
     for f in glob.glob(os.path.join(A, "UDSFile_*.json")):
         try:
             recs = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         for r in recs if isinstance(recs, list) else []:
             y = _month_of(r.get("calendarDate"))
@@ -153,7 +169,8 @@ def build(gdir: str) -> dict:
     for f in glob.glob(os.path.join(W, "*healthStatusData.json")):
         try:
             recs = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         for r in recs if isinstance(recs, list) else []:
             y = _month_of(r.get("calendarDate"))
@@ -169,7 +186,8 @@ def build(gdir: str) -> dict:
     for f in vo2_files:
         try:
             recs = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         for r in recs if isinstance(recs, list) else []:
             y = _month_of(r.get("calendarDate"))
@@ -189,7 +207,8 @@ def build(gdir: str) -> dict:
     for f in glob.glob(os.path.join(W, "*sleepData.json")):
         try:
             recs = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         for r in recs if isinstance(recs, list) else []:
             if not isinstance(r, dict):
@@ -238,7 +257,8 @@ def build(gdir: str) -> dict:
     for f in glob.glob(os.path.join(W, "*userBioMetrics.json")):
         try:
             recs = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         for r in recs if isinstance(recs, list) else []:
             y = _month_of((r.get("metaData") or {}).get("calendarDate"))
@@ -261,7 +281,8 @@ def build(gdir: str) -> dict:
     for f in glob.glob(os.path.join(F, "*summarizedActivities.json")):
         try:
             d = json.load(open(f, encoding="utf-8"))
-        except Exception:
+        except Exception as e:                                   # noqa: BLE001
+            unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
         acts = []
         if isinstance(d, list):
@@ -329,6 +350,7 @@ def build(gdir: str) -> dict:
             "granularity": "monthly",
             "replaced": "Apple Health (the primary source earlier)",
             "range": f"{years[0]}–{years[-1]}" if years else "—",
+            "unreadable_files": sorted(unreadable),
             "units": {"RestingHeartRate": "bpm", "HRV": "ms (rMSSD, baseline 23–49)",
                       "Stress": "0–100 (Garmin)", "BodyBattery": "0–100",
                       "Respiration": "breaths/min (at rest)", "VO2Max": "ml/kg/min",
@@ -359,6 +381,11 @@ def main():
     m = data["_meta"]
     print(f"✓ {out}")
     print(f"  range: {m['range']}; metrics: {len(data['metrics'])}; years of workouts: {len(data['workouts'])}")
+    if m.get("unreadable_files"):
+        print(f"  ⚠ {len(m['unreadable_files'])} export file(s) could NOT be read — their days "
+              f"are missing from the monthly means:")
+        for u in m["unreadable_files"]:
+            print(f"     · {u}")
     for k, v in data["metrics"].items():
         yrs = sorted(v)
         print(f"  {k}: {yrs[0]}..{yrs[-1]}  last={v[yrs[-1]]}")

@@ -267,15 +267,27 @@ class TestQueryingWhatTheFixtureCannotShow(_Tree):
         path = self.write("b.vcf.gz", self.rows, {"1": [0], "2": [0]})
         self.assertEqual([], tx.query(path, "1", 150))
 
-    def test_a_vcf_that_is_not_there_answers_empty(self):
-        self.assertEqual([], tx.query(str(self.dir / "nothing.vcf.gz"), "1", 100))
+    def test_a_vcf_that_is_not_there_raises(self):
+        """Not `[]`: an empty answer is «no row here — the reference», and a file
+        that is not there has said nothing. The caller turns the raise into a
+        named refusal (`genome._query_region` → `linear.Unreadable`)."""
+        with self.assertRaises(OSError):
+            tx.query(str(self.dir / "nothing.vcf.gz"), "1", 100)
 
-    def test_a_vcf_present_without_its_index_answers_empty(self):
-        """Not a crash, and not the whole file scanned either: with no index
-        there is nothing to seek by."""
+    def test_a_vcf_present_without_its_index_raises(self):
+        """Not the whole file scanned either: with no index there is nothing to
+        seek by — and nothing read, which is not the same as nothing found."""
         vcf = self.dir / "lonely.vcf.gz"
         vcf.write_bytes(gzip.compress((self.HEADER + "1\t100\trsA\tA\tG\t60\tPASS\t.\n").encode()))
-        self.assertEqual([], tx.query(str(vcf), "1", 100))
+        with self.assertRaises(OSError):
+            tx.query(str(vcf), "1", 100)
+
+    def test_an_index_with_the_wrong_magic_raises(self):
+        path = self.write("m2.vcf.gz", self.rows, {"1": [0], "2": [0]})
+        pathlib.Path(path + ".tbi").write_bytes(gzip.compress(b"NOPE" + b"\x00" * 64))
+        tx._index.cache_clear()
+        with self.assertRaises(ValueError):
+            tx.query(path, "1", 100)
 
     def test_an_index_that_disagrees_with_its_file_does_not_hang(self):
         """A virtual offset points at a byte inside a block. When the index was
@@ -293,15 +305,16 @@ class TestQueryingWhatTheFixtureCannotShow(_Tree):
                           {"1": [offset_inside_a_block_that_is_not_there], "2": [0]})
         self.assertEqual([], tx.query(path, "1", 100))
 
-    def test_a_truncated_body_gives_back_what_was_read(self):
-        """A file cut off mid-stream is not a reason to lose the rows that were
-        already whole — `query` returns them and does not raise."""
+    def test_a_truncated_body_raises(self):
+        """A file cut off mid-stream used to come back as whatever had been read
+        before the cut — here nothing, which is «reference» at both positions
+        that sit in the file. The rows before a break are not the rows at the
+        position asked for, so the break is raised to the caller."""
         path = self.write("t.vcf.gz", self.rows, {"1": [0], "2": [0]})
         data = pathlib.Path(path).read_bytes()
         pathlib.Path(path).write_bytes(data[:len(data) - 5])
-        self.assertEqual([], tx.query(path + ".missing", "1", 100))
-        rows = tx.query(path, "1", 100, 150)
-        self.assertIsInstance(rows, list)
+        with self.assertRaises(EOFError):
+            tx.query(path, "1", 100, 150)
 
 
 if __name__ == "__main__":                                   # pragma: no cover

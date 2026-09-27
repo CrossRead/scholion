@@ -21,7 +21,6 @@ attribution and the change log are ours, the code below them is theirs.
 from __future__ import annotations
 
 import hashlib
-import json
 import pathlib
 import re
 import sys
@@ -56,7 +55,7 @@ def fetch(ref: str, path: str) -> bytes | None:
     try:
         with urllib.request.urlopen(RAW.format(ref=ref, path=path), timeout=20) as r:
             return r.read()
-    except Exception:
+    except Exception:  # quiet: None is printed as «upstream unreachable … says NOTHING», not as unchanged
         return None
 
 

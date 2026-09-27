@@ -20,7 +20,6 @@ disappears from a list silently is the same defect one level down.
 """
 from __future__ import annotations
 
-import gzip
 import os
 import tempfile
 import unittest

@@ -111,7 +111,7 @@ _index.cache_clear = _index_cached.cache_clear                  # type: ignore[a
 def contigs(vcf: str) -> List[str]:
     try:
         return _index(vcf).contigs()
-    except Exception:
+    except Exception:  # quiet: callers read [] as «contigs unknown» and fall back to the header
         return []
 
 
@@ -157,37 +157,40 @@ def query(vcf: str, chrom: str, pos: int, window: int = 0) -> List[List[str]]:
 
     For a VCF produced by `bcftools mpileup | call -mv`, a missing row means a
     homozygote for the reference (coverage has to be kept in mind separately).
+
+    Raises when the index or the file cannot be read. Both failures used to be
+    caught here and answered with `[]` — an index that would not parse, or a
+    block cut short, came out as «no row here», and «no row here» is printed as
+    the reference. The callers already turn an exception into a refusal
+    (`genome._query_region` into `linear.Unreadable`, the call-set probe into
+    an unread window), so the failure is left to reach them.
     """
-    try:
-        idx = _index(vcf)
-    except Exception:
-        return []
+    idx = _index(vcf)
     v = idx.voffset(chrom, pos)
     if v is None:
         return []
     coffset, uoffset = v >> 16, v & 0xFFFF
     out: List[List[str]] = []
-    try:
-        with open(vcf, "rb") as fh:
-            fh.seek(coffset)
-            gz = gzip.GzipFile(fileobj=fh)
-            need = uoffset
-            while need > 0:                       # skip forward inside the block
-                chunk = gz.read(min(need, 1 << 16))
-                if not chunk:
-                    break
-                need -= len(chunk)
-            tail = b""
-            stop = False
-            seen = False
-            while not stop:
-                chunk = gz.read(1 << 20)
-                if not chunk:
-                    break
-                *lines, tail = (tail + chunk).split(b"\n")
-                rows, seen, stop = _scan(lines, chrom, pos, window, seen)
-                out.extend(rows)
-            gz.close()
-    except Exception:
-        return out
+    # No `except` here on purpose: the rows collected before a failure are not
+    # the rows at this position — the one asked for may lie past the break.
+    with open(vcf, "rb") as fh:
+        fh.seek(coffset)
+        gz = gzip.GzipFile(fileobj=fh)
+        need = uoffset
+        while need > 0:                       # skip forward inside the block
+            chunk = gz.read(min(need, 1 << 16))
+            if not chunk:
+                break
+            need -= len(chunk)
+        tail = b""
+        stop = False
+        seen = False
+        while not stop:
+            chunk = gz.read(1 << 20)
+            if not chunk:
+                break
+            *lines, tail = (tail + chunk).split(b"\n")
+            rows, seen, stop = _scan(lines, chrom, pos, window, seen)
+            out.extend(rows)
+        gz.close()
     return out

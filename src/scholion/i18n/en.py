@@ -72,6 +72,15 @@ MESSAGES = {
     "decision.sex_unknown_most_cautious": "sex is not recorded, so the more sensitive of the two published bounds was used for this threshold — a decision limit errs towards asking, unlike a reference interval",
     "decision.crossed": "threshold crossed: {label} ({sign} {value})",
     "decision.not_reached": "action threshold {value} ({label}) — not reached",
+    "decision.not_comparable": "action threshold {value} ({label}) — could not be compared: the value is not a number, so whether it is crossed is unknown",
+    "web.decision.not_comparable": "action threshold {value} ({label}) — could not be compared: the value is not a number, so whether it is crossed is unknown",
+    "labs.thresholds_not_comparable": "action thresholds that could not be compared: {n}",
+    "unresolved.labs_not_comparable": "Lab monitoring: {names} — the value could not be compared with the action threshold, so whether it is crossed is unknown.",
+    "tests.last_date_unreadable": "the date of the last measurement cannot be read («{date}») — not counted as recently done",
+    "web.tests.last_date_unreadable": "the date of the last measurement cannot be read («{date}») — not counted as recently done",
+    "overview.lifestyle_unread": "**Lifestyle:** the wearable data could not be read ({reason}) — nothing is said about it here.",
+    "drug.not_checked_unreachable": "«{drug}» is not in this build's own base, and the international name could not be looked up: the RxNorm request got no answer (network or service failure). Nothing was established about this drug either way — try again later.",
+    "interactions.not_checked_unreachable": "The drug is not in the local base, and the international database did not answer, so its class and interactions could not be looked up. Nothing was established either way — try again later.",
 
     # ── reference corridors, printed next to a value ────────────────────
     "ref.sex_unknown": "⚠ this interval differs by sex and the profile has none recorded — it may be the wrong corridor (`scholion profile --sex …`)",
@@ -133,6 +142,7 @@ MESSAGES = {
     "gene.kind.not_substitution": "an insertion or deletion — the consequence is not computed here",
     "gene.kind.reference_mismatch": "the reference disagrees with the file — not computed",
     "gene.kind.error": "could not be computed",
+    "gene.reader_failed": "{gene} was found in the annotation and the file is connected, but the reader failed on the region ({detail}). Nothing was read, so nothing is counted: this is not «no variants in the gene». Check that the index sits beside the file and matches it (`tabix -p vcf` rebuilds it), then ask again.",
     "gene.no_cds": "the annotation knows no coding exons for {gene}, so coding variants cannot be told apart from the rest of the interval",
     "gene.no_reference": "the reference FASTA is not on this machine, so what each variant does to the protein was not computed",
     "gene.reference_contig": "the reference carries no contig {chrom}",
@@ -868,6 +878,8 @@ MESSAGES = {
     "genome.refused_head.several_files": "there is more than one genome file and none was chosen.",
     "genome.refused_head.several_samples": "the file holds several samples and none was chosen.",
     "genome.refused_head.foreign_input": "there is genomic data in the folder, but no readable VCF.",
+    "genome.refused_head.subject_unreadable": "the file that says whose the genome is cannot be read, so the genome is not read.",
+    "genome.refused_head.composition_unread": "what this file carries could not be read, so an absent row is not the reference.",
     "genome.refused_head.another_person": "the genome in the folder belongs to another person than this profile, so it is not read.",
     "genome.refused_head.engine_unknown": "SCHOLION_GENOME_ENGINE names a reader this project does not have.",
     "genome.refused_head.engine_missing": "the reader named in SCHOLION_GENOME_ENGINE is not installed here.",
@@ -885,6 +897,7 @@ MESSAGES = {
     "genome.refused.several_files": "The coordinate was found. There is more than one genome file in the folder, and which of them is yours is not ours to guess — `SCHOLION_GENOME_VCF` says so in one variable.",
     "genome.refused.several_samples": "The coordinate was found. The file holds several samples — a trio or a joint call — and reading the first column would report somebody else as you. `SCHOLION_GENOME_SAMPLE` says which one is yours.",
     "genome.refused.foreign_input": "The coordinate was found. The folder holds genomic data that is not a readable VCF — `scholion genome-status` names each file and what it needs.",
+    "genome.refused.subject_unreadable": "The coordinate was found, and so is the file — but the SUBJECT.json beside it, the file that says whose the genome is, cannot be read. It is written only beside a genome that is not this profile's, so nothing is read from the genome until it reads again. Repair or restore it; a genome of your own has no such file beside it.",
     "genome.refused.another_person": "The coordinate was found, and so is the file — but the folder's SUBJECT.json says the genome is a published reference sample, and this profile holds another person's data. A genotype of one person beside the laboratory history of another produces conclusions about neither, so nothing is read. Give the reference genome a profile of its own: `scholion init --dir <folder> --subject reference`, then point SCHOLION_PROFILE_DIR and SCHOLION_GENOME_DIR at them.",
     "genome.refused.no_engine": "The coordinate was found and the file is in place, but no reader is installed: bcftools, pysam, or a working `.tbi` index beside the file.",
     "genome.refused_head.truncated": "the genome file ends before its end: it was cut short, and nothing past the cut can be read.",
@@ -894,6 +907,8 @@ MESSAGES = {
     "genome.refused_head.not_sequenced": "the input is a chip, and a region is not a question a chip can answer.",
     "genome.unreadable_truncated": "the file ends without the end-of-file block bgzip always writes last: it was cut short — a copy or a download that did not finish. Nothing is read out of it, because a position past the cut has no row and would have answered «reference». Get a complete copy and compare the sizes.",
     "genome.unreadable_pass_failed": "the pass over the file stopped part-way ({detail}). Nothing is read out of it, because a position past the failure has no row and would have answered «reference». `gzip -t` on the file says where it is damaged.",
+    "genome.unreadable_composition_unread": "the file could not be read to learn which kinds of variant it carries ({detail}). Without that, a missing row cannot be told from a variant this file never holds, so it is not reported as the reference. Check that the file is whole and readable, then ask again.",
+    "genome.unreadable_reader_failed": "the reader failed at this position ({detail}). Nothing is read here: a failed read has said nothing about the person, and answering «reference» would have been a sentence about them made from an error. Check that the index sits beside the file and matches it (`tabix -p vcf` rebuilds it), then ask again.",
     "genome.unreadable_not_a_vcf": "the file does not open as a VCF — its first line is not a VCF header. Nothing is read out of it.",
     "genome.too_large_for_one_pass": "the file has no index, and it is larger than the {mb} MB the one-pass reader will take on: past that, one pass is not a wait but a hang. What closes it: an index — `bgzip` + `tabix -p vcf` — or `SCHOLION_LINEAR_MAX_MB` raised by somebody prepared to wait.",
     "genome.alleles_not_comparable": "the row at this position is {ref}>{alt} and the genotype is «{value}»: it names an allele of another length, or a deletion spanning this base, beside this locus's own. The two cannot be written as one pair of letters, so nothing is read. What closes it: the same variants normalised one per row (`bcftools norm -m-`).",
@@ -1052,6 +1067,8 @@ MESSAGES = {
     "assistant.curated.unreadable": "the file does not read as JSON",
     "assistant.curated.stale": "data newer than the wording has appeared — the blocks are "
                                "marked as needing a review",
+    "assistant.curated.stale_unchecked": "whether data newer than the wording has appeared could not "
+                                         "be checked — review it before relying on it",
     "assistant.ep.skill.title": "Claude skill",
     "assistant.ep.skill.installed": "installed: {path}",
     "assistant.ep.skill.ready": "present in the project, but not installed",
@@ -1984,6 +2001,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "subject.demo_erased": "The demonstration profile has been erased \u2014 it described a fictional person, and this is a measurement of yours: two people in one profile give conclusions about nobody. Removed: {files}. The demonstration is generated, so `scholion init --demo --dir <folder>` builds it again exactly as it was.",
     "subject.genome_not_ours": "the genome in {path} belongs to {who}, while this profile holds the data of {whose}. Nothing is read from it: a genotype of one person beside the laboratory history of another produces conclusions about neither.",
     "subject.genome_fix": "keep it in a profile of its own: `scholion init --dir <folder>`, then `SCHOLION_PROFILE_DIR=<folder> SCHOLION_GENOME_DIR=<genome folder> scholion genome-status`",
+    "subject.genome_note_unreadable": "the genome in {path} lies beside {note}, and that file cannot be read. It is the file that says whose the genome is, and it is written only beside a genome that is not this profile\u2019s, so nothing is read from the genome until it reads again.",
+    "subject.genome_note_unreadable_fix": "repair or restore {note} \u2014 `src/tools/fetch_demo_genome.py` writes it beside a reference genome it fetches; a genome of your own has no such file beside it",
     "subject.profile_holds": "whose data: {who}",
     "genome_status.engine_unknown": "SCHOLION_GENOME_ENGINE is set to «{value}», and the readers this project has are: {accepted}. Nothing was read: a pin that is ignored gives a run through a reader nobody asked for, which is what the pin exists to prevent.",
     "genome_status.engine_missing": "SCHOLION_GENOME_ENGINE names «{value}», which is not installed here. Nothing was read — silently moving to another reader would answer a different question from the one asked.",
@@ -2168,6 +2187,7 @@ will go through them later.
     "web.life.wearable_btn": "Re-read a wearable export",
     "web.life.wearable_note": "Garmin or WHOOP — the export is recognised by what is inside it.",
     "web.life.wearable_done": "{device}: {metrics} metric series, {range}",
+    "web.life.unreadable_files": "Export files that could not be read: {n} — their days are missing from the monthly means: {files}",
     "web.life.unknown_columns": "Columns this does not know, and from which nothing was read: {columns}",
     "wearables.builder_missing": "{path} was not found",
     "wearables.not_an_export": "{path} is not an export this can read. It was opened and looked "
@@ -2187,6 +2207,7 @@ will go through them later.
                                 "`scholion set-folder {device} '{path}'`, or move it into "
                                 "raw/wearables/.",
     "wearables.parse_failed": "The export could not be read: {error}",
+    "wearables.corrections_unreadable": "{path} \u2014 your own corrections to these series \u2014 cannot be read ({error}). Nothing was rebuilt: a rebuild without them would bring back the points you removed or replaced. Repair the file, or move it aside to rebuild with no corrections at all.",
     "wearables.nothing_recognised": "{path} was opened as a {device} export and carried no "
                                     "measurement this knows how to name.",
     "wearables.nightly_note": "Night-by-night values as {device} reported them. Kept apart from the "
@@ -2194,6 +2215,7 @@ will go through them later.
                               "changed after one particular evening.",
     "wearables.done": "{device}: {metrics} metric series, {nights} nights, {preserved} earlier "
                       "points kept.",
+    "wearables.files_unreadable": "⚠ export files that could NOT be read: {n} — their days are missing from the monthly means, not measured as absent: {files}",
     "wearables.columns_unknown": "Columns this does not know, and from which nothing was read: "
                                  "{columns}. If one of them is a measurement you want, name it in "
                                  "profile/wearable_metrics.local.json and read the export again.",
@@ -2297,6 +2319,7 @@ will go through them later.
     "studies.reason_no_text": "the PDF gave up no text at all — a scan without OCR",
     "studies.reason_looks_like_a_lab_form": "a laboratory form: the numbers are taken by `ingest-labs`, not here",
     "studies.reason_conclusion_not_extracted": "reads like a study, but no conclusion could be lifted out of it",
+    "studies.reason_unreadable": "the PDF could not be read — every reader present failed on it ({error}); nothing is known about what it holds, and it will be tried again on the next run",
     "studies.reason_unclassified": "neither a conclusion nor a laboratory form by any sign this loader knows",
     "studies.kind_default": "a study",
     "studies.from_conclusion": "from the conclusion",
@@ -2810,6 +2833,7 @@ will go through them later.
                                  "pointing the wrong way",
     "goalgen.skip.too_few_points": "fewer than three readings — that is not a trend",
     "goalgen.skip.too_short_a_window": "every reading falls inside six months",
+    "goalgen.skip.dates_unreadable": "the dates of the readings do not read as dates, so the span they cover is unknown",
     "goalgen.skip.already_there": "your best is where you are now",
     "goalgen.skip.society_withdrew_the_target": "the society that set the target withdrew it",
     "goalgen.skip.nothing_to_go_on": "no published target, no usable series, no corridor",
@@ -3338,6 +3362,7 @@ will go through them later.
     "server.deny.cross_site": "cross-site request rejected",
     "server.bad_content_length": "malformed Content-Length",
     "server.body_too_large": "the request body is larger than {bytes} bytes",
+    "server.bad_body": "the request body is not valid JSON; nothing was done",
     "server.internal_error": "internal server error; the details are in the console where scholion "
                              "serve is running",
     "server.no_studies_folder": "No folder of studies has been chosen.",
@@ -3348,6 +3373,7 @@ will go through them later.
     "server.update.not_in_this_delivery": 'Refreshing ClinVar is a step of genome preparation, and this delivery does not carry the preparation toolkit. It runs from the source tree — `scholion doc preparing-the-genome` names the step. Updating the program itself is a different thing: `scholion version`.',
     "server.update.no_shell": 'Refreshing ClinVar runs a shell script, and there is no `bash` on this machine. Everything else works; the refresh has to be run where a shell is.',
     "server.selfcheck_skipped": "(the lab self-check was skipped: {error})",
+    "core.sources_unreadable": "profile/sources.json (where your data folders and genome files are recorded) cannot be read: {error}. Nothing was answered from default locations instead — they may hold other files than yours. Fix the file (it is JSON) or move it aside to go back to the defaults.",
     "server.already_running": "Scholion is already running: {url} — opening it in the browser.",
     "server.no_free_port": "Could not take a port in the range {first}–{last}. Close the extra "
                            "application windows and start it again.",
@@ -3709,6 +3735,7 @@ will go through them later.
     "update.current": "This is the newest Scholion: {installed}.",
     "update.cached": "(checked within the last day — the registry is asked at most once a day)",
     "update.how.install": "To install it here, once the person says yes: `scholion update --yes`, which runs `{command}`.",
+    "update.how.tree": "This copy runs from an unpacked source archive, not from an installation or a git checkout. `pip install --upgrade` would update a different copy and leave this one as it is, so nothing is installed from here. To update it, download the newer release from https://github.com/CrossRead/scholion/releases and unpack it in its place, or clone the repository and update it with `git pull`.",
     "update.how.source": "This is a source checkout; it is updated from its repository: `{command}`.",
     "update.installed": "Installed Scholion {after} (was {before}). Restart the assistant, or `scholion serve`, to use it; if a copy of the skill is in use, run `scholion skill --install`.",
     "update.already_current": "Nothing newer to install: {installed} is current.",

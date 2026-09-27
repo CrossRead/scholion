@@ -20,7 +20,6 @@ Run on the Mac (needs the just-prs cache and, for question 3, pyarrow):
 """
 import gzip
 import importlib.util
-import json
 import sys
 from pathlib import Path
 

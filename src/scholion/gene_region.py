@@ -224,6 +224,7 @@ def _protein(loc: Dict[str, Any], variants: List[Dict[str, Any]],
 def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
     """Everything the owner's own data can say about one gene, gaps included."""
     from . import genome
+    from . import linear as _lin
     gaps: List[Dict[str, str]] = []
     loc = genes.resolve(gene, allow_network=allow_network)
     if not loc:
@@ -291,6 +292,17 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
         out["status"] = "needs_index"
         out["reason"] = "needs_index"
         out["message"] = _t("genome.refused.needs_index")
+        return out
+    except _lin.Unreadable as exc:
+        # The reader ran and failed — bcftools exited non-zero, or the index
+        # could not be read. Nothing was read, so nothing is counted: the old
+        # path turned this into an empty list and printed «0 variants in the
+        # gene», a sentence about the person made from an error. The status is
+        # the one a locus answer carries for the same failure (`_linear_refusal`).
+        out["status"] = "unreadable_file"
+        out["reason"] = exc.why
+        out["detail"] = exc.detail
+        out["message"] = _t("gene.reader_failed", gene=loc["gene"], detail=exc.detail)
         return out
     variants = [_parse_row(r) for r in rows if len(r) > 9]
     for v in variants:

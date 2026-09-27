@@ -85,6 +85,15 @@ class TestQuarantinedBuildsAreNotAudited(unittest.TestCase):
         self.assertGreaterEqual(n, 1, "a full lab history in the package went unreported")
         self.assertIn("labs.json", out)
 
+    def test_a_profile_file_that_does_not_parse_is_not_waved_through(self):
+        """A labs.json that fails to parse was skipped, so the audit could not
+        tell it from a template and the package shipped with it. A file the gate
+        cannot read is a file it cannot clear."""
+        self._write("profile/labs.json", '{"markers": {"hgb": {"series": [{"date": "2024-')
+        n, out = _audit(self.root)
+        self.assertGreaterEqual(n, 1, "an unparseable profile file passed the audit:\n" + out)
+        self.assertIn("cannot be read as JSON", out)
+
 
 class TestAShippedToolTakesItsImportsWithIt(unittest.TestCase):
     """A tool in the package that cannot import is worse than one left out.

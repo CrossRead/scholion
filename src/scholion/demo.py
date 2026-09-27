@@ -660,7 +660,7 @@ def occupied_by_real_profile(out: Path) -> bool:
     for p in out.glob("*.json"):
         try:
             d = json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
+        except Exception:  # quiet: unreadable counts as real data, so the demo refuses to overwrite it
             return True
         m = d.get("_meta") or d.get("meta") or {}
         if not (isinstance(m, dict) and m.get("synthetic")):

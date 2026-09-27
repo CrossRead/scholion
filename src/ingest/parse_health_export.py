@@ -52,11 +52,15 @@ rCV=re.compile(r'value="(HKCategoryValueSleepAnalysis\w+)"')
 rS=re.compile(r'startDate="([\d\- :]+)'); rE=re.compile(r'endDate="([\d\- :]+)')
 rC=re.compile(r'sourceName="([^"]+)"'); rW=re.compile(r'workoutActivityType="HKWorkoutActivityType(\w+)"')
 def pdt(s):
+    # None is a distinct answer, «this date did not parse», and the sleep branch
+    # below counts it and says so — before, a segment with a malformed date left
+    # its night shorter and the yearly mean lower with nothing to show why.
     try: return datetime.strptime(s[:19],"%Y-%m-%d %H:%M:%S")
-    except: return None
+    except (TypeError, ValueError): return None
 
 pt=defaultdict(lambda:defaultdict(list)); wt=defaultdict(list)
 day=defaultdict(lambda:defaultdict(dict)); slp=defaultdict(dict); wko=defaultdict(lambda:defaultdict(int))
+sleep_undated=0   # sleep segments whose start or end could not be read
 for ln in _records(SRC):
     if "<Workout " in ln:
         m=rW.search(ln); sd=rS.search(ln)
@@ -70,7 +74,9 @@ for ln in _records(SRC):
         if not v or "Asleep" not in v.group(1): continue
         sd=rS.search(ln); ed=rE.search(ln); sc=rC.search(ln)
         a=pdt(sd.group(1)) if sd else None; b=pdt(ed.group(1)) if ed else None
-        if not(a and b): continue
+        if not(a and b):
+            sleep_undated+=1
+            continue
         h=(b-a).total_seconds()/3600
         # A segment, not a night: since 2022 recording is by phases, and one night is
         # dozens of segments a few minutes long. The upper bound is therefore on a SEGMENT,
@@ -115,12 +121,16 @@ for n,src in slp.items():
 res["Sleep"]={y:round(sum(v)/len(v),1) for y,v in sorted(yr.items())}
 res["SleepNights"]={y:len(v) for y,v in sorted(yr.items())}
 res["Workouts"]={t:dict(sorted(y.items())) for t,y in wko.items()}
+res["SleepSegmentsWithoutADate"]=sleep_undated
 
 yrs=sorted({y for k in ["RestingHeartRate","BodyMass","Sleep","VO2Max"] for y in res[k]})
 print("YEAR|RestHR|HRV|VO2max|Weight|BMI|Fat%|Sleep|Steps*|ActiveMin")
 for y in yrs:
     g=lambda k:res[k].get(y,"—")
     print(f"{y}|{g('RestingHeartRate')}|{g('HeartRateVariabilitySDNN')}|{g('VO2Max')}|{g('BodyMass')}|{g('BodyMassIndex')}|{g('BodyFatPercentage')}|{g('Sleep')}|{g('StepCount')}|{g('AppleExerciseTime')}")
+if sleep_undated:
+    print(f"\n⚠ {sleep_undated} sleep segment(s) had a start or end date that could not be read "
+          f"and are NOT in the Sleep column — their nights are counted short or not at all.")
 print("\nWorkouts (type: year:count):")
 for t,y in sorted(res["Workouts"].items(),key=lambda x:-sum(x[1].values())):
     print(f"  {t}: "+" ".join(f"{a}:{b}" for a,b in y.items()))

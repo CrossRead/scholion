@@ -201,14 +201,14 @@ def _open(url: str, timeout: int, headers: Optional[Dict[str, str]]) -> bytes:
 def get_json(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = None) -> Optional[Any]:
     try:
         return json.loads(_open(url, timeout, headers).decode("utf-8"))
-    except Exception:
+    except Exception:  # quiet: None is the documented «not reached»; callers map it to unreachable/unavailable
         return None
 
 
 def get_text(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = None) -> Optional[str]:
     try:
         return _open(url, timeout, headers).decode("utf-8", "replace")
-    except Exception:
+    except Exception:  # quiet: None is the documented «not reached»; callers map it to unreachable/unavailable
         return None
 
 

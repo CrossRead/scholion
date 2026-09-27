@@ -74,6 +74,7 @@ def orphan_facts():
     # every key the pipeline can put on disk. Discovered by name rather than
     # listed, so a new writer is included the day it is added.
     profile = {}
+    failed = {}
     for name in dir(demo):
         if not name.startswith("build_"):
             continue
@@ -86,9 +87,11 @@ def orphan_facts():
             try:
                 import random
                 out = fn(random.Random(0))
-            except Exception:
+            except Exception as e:                        # noqa: BLE001
+                failed[name] = f"{type(e).__name__}: {e}"
                 continue
-        except Exception:
+        except Exception as e:                            # noqa: BLE001
+            failed[name] = f"{type(e).__name__}: {e}"
             continue
         if isinstance(out, dict):
             profile[name[len("build_"):]] = out
@@ -96,6 +99,13 @@ def orphan_facts():
         raise SystemExit("check_coverage: the demo writers produced nothing — this "
                          "enumerator would silently report zero orphans forever. "
                          "Fix the discovery above rather than trusting the zero.")
+    # Only build_all() is walked below. If it alone failed, the others still fill
+    # `profile`, the walk finds nothing, and the gate reports zero orphans — the same
+    # clean bill of health produced by a bug that the check above exists to refuse.
+    if "all" not in profile:
+        raise SystemExit("check_coverage: demo.build_all() produced no profile ("
+                         + (failed.get("build_all") or "not a dict") + ") — the orphan "
+                         "scan has nothing to walk and would report zero. Fix the writer.")
     out = []
 
     def is_collection(node):

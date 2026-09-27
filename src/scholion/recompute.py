@@ -443,7 +443,6 @@ def run(confirm: bool = False, since: Optional[str] = None, text: Optional[str] 
         echo: Optional[Callable[[Dict[str, Any], int], None]] = None,
         claimed: bool = False) -> Dict[str, Any]:
     """Run every `ready` step in order; nothing starts without `confirm`."""
-    from . import updates
     p = plan(since=since, text=text)
     ready = [s for s in p["steps"] if s.get("state") == "ready"]
     if not confirm:

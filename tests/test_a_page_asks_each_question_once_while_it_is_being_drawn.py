@@ -201,7 +201,11 @@ class TestARegionIsAskedAgainOnceTheFileOrItsIndexChanges(_Folder):
         self.assertEqual(1, n, "a new file is a new answer")
 
     def test_a_failed_run_is_not_remembered(self):
-        self.query(self.answering("", code=1))
+        """A failed run raises — it is a failed read, not an empty position
+        (see test_a_failed_read_is_never_the_reference) — and is not cached."""
+        from scholion import linear
+        with self.assertRaises(linear.Unreadable):
+            self.query(self.answering("", code=1))
         _, n = self.query(self.answering("chr19\t44908684\t.\tT\tC\n"))
         self.assertEqual(1, n)
 

@@ -1045,7 +1045,7 @@ def _genome_readable() -> bool:
     from .. import genome as _g                              # lazy: core does the same
     try:
         return _g.vcf_path() is not None
-    except Exception:                                        # noqa: BLE001
+    except Exception:  # quiet: False picks the «no genome» headline; both headlines say nothing was read
         return False
 
 

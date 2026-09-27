@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from .i18n import plural as _plural, t as _t
-from .format import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines  # noqa: E402
+from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines
 
 
 def _names(rows: Any, key: str = "name") -> str:

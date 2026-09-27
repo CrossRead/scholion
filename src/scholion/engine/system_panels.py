@@ -99,7 +99,6 @@ rows that say something — finding, carrier, pending — and the counts):
 """
 from __future__ import annotations
 
-import re
 from typing import Any, Dict, List, Optional
 
 from .. import core
@@ -161,24 +160,24 @@ def _domain(key: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+# The two files a system's genetic half is composed from raise when they are
+# there and do not read, the way `domains()` above does for its own file. An
+# empty answer for either one composed the card from what was left: the base
+# gone left the clinician's positions alone under a verdict, the curated file
+# gone dropped her positions and exclusions — a shorter list printed as the
+# whole one (task 209).
 def _curated() -> Dict[str, Any]:
-    try:
-        return core._read_knowledge("system_gene_panels.json") or {}
-    except Exception:                                                # noqa: BLE001
-        return {}
+    return core._read_knowledge("system_gene_panels.json") or {}
 
 
 def _base() -> Dict[str, Any]:
-    try:
-        return core._read_knowledge("gencc_gene_disease.json") or {}
-    except Exception:                                                # noqa: BLE001
-        return {}
+    return core._read_knowledge("gencc_gene_disease.json") or {}
 
 
 def _terms() -> Dict[str, Any]:
     try:
         return core._read_knowledge("system_disease_terms.json") or {}
-    except Exception:                                                # noqa: BLE001
+    except Exception:  # quiet: only words the «why empty» line; a card with no panel says so either way
         return {}
 
 

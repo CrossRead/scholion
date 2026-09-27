@@ -54,7 +54,7 @@ command that needs it:
 | Destination | What is sent | Triggered by |
 |---|---|---|
 | `rxnav.nlm.nih.gov`, `mor.nlm.nih.gov` | the drug name | a drug missing from the local knowledge base |
-| `api.mymemory.translated.net`, `translate.googleapis.com` | the drug name, for a Russian brand name | the same lookup |
+| `api.mymemory.translated.net` | the drug name, for a Russian brand name that transliteration did not find in RxNorm | the same lookup |
 | `rest.ensembl.org` | an rsID | an rsID not present locally |
 | `api.cpicpgx.org` | a gene or drug identifier | pharmacogenomic lookup |
 

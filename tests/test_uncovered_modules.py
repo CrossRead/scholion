@@ -17,12 +17,10 @@ paper — that was done by reading, and no test can do it.
 """
 from __future__ import annotations
 
-import json
 import math
 import os
 import tempfile
 import unittest
-from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import ingest_studies, phenoage, prs, provenance

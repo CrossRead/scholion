@@ -72,7 +72,7 @@ def main(argv):
                     chrom = f[ci][3:] if f[ci].startswith("chr") else f[ci]
                     rec = geno.get((chrom, f[pi]))
                     w = float(f[wi])
-                except Exception:
+                except Exception:  # quiet: row stays in `vars`, not matched — printed as lost coverage
                     continue
                 in_mhc = chrom == "6" and MHC[0] <= int(f[pi]) <= MHC[1]
                 if not rec:

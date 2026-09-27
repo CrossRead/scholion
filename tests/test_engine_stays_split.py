@@ -296,7 +296,10 @@ LINE_BUDGETS = {
     # score is computed from the same list two lines above: splitting them
     # would put a panel in one file and that panel's places in another, and
     # the two would drift the way every pair of copies in this project has.
-    "lifestyle": 1010,
+    # 1010 → 1025 on 27.09.2026 (task 209): a wearable layer that fails to read
+    # keeps its fitness domain on the radar, unscored and named as unread,
+    # instead of vanishing and moving `overall` onto the other systems unsaid.
+    "lifestyle": 1025,
     # A domain of its own on 14.09.2026: the review of a brief block — what
     # arrived after its wording was read, and a request built from it. It
     # reads the brief and the labs and writes nothing.

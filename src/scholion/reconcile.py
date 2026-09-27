@@ -18,7 +18,6 @@ What it does:
 Writes NOTHING into labs.json. Run: python -m scholion reconcile [--lab-dir PATH] [--json]
 """
 from __future__ import annotations
-import json
 import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -310,7 +309,7 @@ def _ocr(path: Path) -> Optional[str]:
                                    timeout=120, capture_output=True, text=True)
                 out.append(r.stdout)
             return "\n".join(out)
-    except Exception:
+    except Exception:  # quiet: no OCR text keeps the form below the minimum: listed as unreadable (FAIL)
         return None
 
 

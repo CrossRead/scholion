@@ -11,10 +11,8 @@ The test is skipped if the build has no `demo/` folder.
 """
 import json
 import unittest
-from pathlib import Path
 
 import support
-from scholion import contract
 
 DEMO = support.ROOT / "demo" / "profile"
 

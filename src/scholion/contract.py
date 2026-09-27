@@ -700,7 +700,6 @@ def access() -> Dict[str, Any]:
     from the tool list, the protocol version from the server, the commands from
     the parser — so the answer cannot drift from the build.
     """
-    import os as _os
     from . import mcp_server as _mcp
     from . import ouroboros_tools as _ot
 

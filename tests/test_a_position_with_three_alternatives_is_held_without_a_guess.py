@@ -28,7 +28,7 @@ from unittest import mock
 
 import support  # noqa: F401  — puts src/ on the import path
 
-from scholion import core, format as fmt, genome
+from scholion import format as fmt, genome
 from scholion.i18n import en, ru
 
 ROOT = Path(support.__file__).resolve().parents[1]

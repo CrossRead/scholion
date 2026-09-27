@@ -33,6 +33,17 @@ class TestTheEnumeratorsCanActuallyFire(unittest.TestCase):
                                  "written fact is now read (update the baseline) or the "
                                  "scan has stopped working")
 
+    def test_a_failing_build_all_is_not_a_clean_zero(self):
+        """Only build_all() is walked. When it alone raised, the other writers
+        still filled the inventory, the walk found nothing, and the gate said
+        «0 orphans» — the permanent zero this file was written to refuse."""
+        from unittest import mock
+        from scholion import demo
+        with mock.patch.object(demo, "build_all", side_effect=KeyError("labs")):
+            with self.assertRaises(SystemExit) as cm:
+                cc.orphan_facts()
+        self.assertIn("build_all", str(cm.exception))
+
     def test_the_authority_list_is_not_empty(self):
         delta = cc.authority_delta()
         self.assertGreater(delta["total"], 50,

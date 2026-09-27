@@ -118,14 +118,14 @@ def _load_cache() -> Dict[str, Any]:
     f = _cache_file()
     try:
         return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
-    except Exception:
+    except Exception:  # quiet: a cache miss; the gene is located from the GFF3 or Ensembl again
         return {}
 
 
 def _save_cache(d: Dict[str, Any]) -> None:
     try:
         core.write_json(_cache_file(), d, indent=1)
-    except Exception:
+    except Exception:  # quiet: a failed cache write loses only the cache, never the answer
         pass
 
 
@@ -204,7 +204,13 @@ def from_ensembl(symbol: str) -> Optional[Dict[str, Any]]:
     if canonical:
         seg = net.get_json(f"https://rest.ensembl.org/overlap/id/{canonical}"
                            f"?feature=cds;content-type=application/json")
-        for s in seg or []:
+        if not isinstance(seg, list):
+            # Not reached (None) or not an answer (an error object). Read as an
+            # empty list this became «no coding exons», was cached, and every
+            # later report on the gene said the annotation knows no CDS. A
+            # failed request is handled as the first one is: not resolved.
+            return None
+        for s in seg:
             if str(s.get("Parent", "")).split(".")[0] == canonical:
                 cds.append([chrom, int(s["start"]), int(s["end"])])
     return {"gene": data.get("display_name") or symbol, "gene_id": data.get("id"),
@@ -226,7 +232,12 @@ def resolve(symbol: str, allow_network: bool = True) -> Optional[Dict[str, Any]]
     key = symbol.upper()
     cache = _load_cache()
     hit = cache.get(key)
-    if hit:
+    # An Ensembl entry with a canonical transcript and no coding exons may be the
+    # leftover of a failed second request, written by a build before 0.5.9 (task
+    # 209): not trusted from the cache, asked again. A gene with no canonical
+    # transcript keeps its entry.
+    stale = bool(hit and hit.get("source") == "ensembl" and hit.get("transcript") and not hit.get("cds"))
+    if hit and not stale:
         return {**hit, "source": "cache", "resolved_by": hit.get("source", "cache")}
     for path in gff3_candidates():
         try:

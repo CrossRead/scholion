@@ -37,7 +37,6 @@ from __future__ import annotations
 import csv
 import io
 import json
-import os
 import sys
 import zipfile
 from collections import defaultdict
@@ -206,7 +205,7 @@ def looks_like_export(path: Path) -> bool:
     """
     try:
         tables, _ = _open_csvs(Path(path))
-    except Exception:                                            # noqa: BLE001
+    except Exception:  # quiet: a probe; False ends as «not an export» and nothing is read or written
         return False
     return len(tables) >= 2
 

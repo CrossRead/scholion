@@ -52,8 +52,8 @@ ACCEPTED = {
     # The same opener, in the GenCC fetcher: a HEAD and a GET on an HTTP
     # response — bytes with a header, no text encoding to state. The bytes are
     # decoded once, later, with the encoding named at that call.
-    "src/tools/fetch_gencc.py:162",
-    "src/tools/fetch_gencc.py:180",
+    "src/tools/fetch_gencc.py:161",
+    "src/tools/fetch_gencc.py:179",
     # HTTP openers, not text files: `encoding=` was pasted onto these three on
     # 0.4.9 to satisfy this test, and the fetcher then crashed on its first
     # request (TypeError) — found 13.09.2026, the first time it was run since.

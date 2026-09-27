@@ -19,7 +19,6 @@ and the command is required to survive it AND to write the characters it meant.
 """
 from __future__ import annotations
 
-import os
 import subprocess
 import sys
 import unittest

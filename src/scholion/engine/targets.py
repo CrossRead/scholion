@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from .. import core
-from ..i18n import lang as _lang, t as _t
+from ..i18n import lang as _lang
 
 
 # ---- the target a clinician set (task 170) --------------------------------
@@ -86,7 +86,6 @@ def clinician_targets_view() -> Dict[str, Any]:
     from .labs import analyze_labs                  # lazy: labs imports this module
     analysed = {m["key"]: m for m in analyze_labs(list(targets)).get("markers", [])}
     known = core.lab_markers().get("markers", {})
-    from ..i18n import lang as _lang
     rows = []
     for key, tg in sorted(targets.items()):
         m = analysed.get(key)

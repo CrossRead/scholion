@@ -25,7 +25,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import support
+import support  # noqa: F401  (puts src/ on the path)
 
 from scholion import core, import_csv, store
 

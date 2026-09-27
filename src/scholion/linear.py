@@ -176,7 +176,7 @@ def why_not(vcf: Optional[str]) -> Optional[str]:
     try:
         with _open(vcf) as fh:
             head = fh.readline()
-    except Exception:
+    except Exception:  # quiet: a file that will not open is refused by name (not_a_vcf), never read
         return "not_a_vcf"
     if head.startswith("##fileformat=VCF") or head.startswith("#CHROM"):
         return None
@@ -236,7 +236,7 @@ def _cache_path(vcf: str, signature: str) -> Optional[Path]:
         if not bases or not Path(bases[0]).is_dir():
             return None
         base = Path(bases[0]) / "cache"
-    except Exception:
+    except Exception:  # quiet: no disk cache; the in-process memo still carries the pass
         return None
     try:
         st = os.stat(vcf)
@@ -307,7 +307,7 @@ def _lookup_cache(vcf: str) -> Dict[str, Any]:
     try:
         wanted = _wanted_positions()
         poor, rich = _probe_windows()
-    except Exception:
+    except Exception:  # quiet: {} is «no snapshot yet»; the pass runs and raises on its own if it must
         return {}
     signature = hashlib.sha1(
         ("|".join(sorted(wanted)) + "||" + repr(poor) + repr(rich)).encode()).hexdigest()[:12]
@@ -317,7 +317,7 @@ def _lookup_cache(vcf: str) -> Dict[str, Any]:
             out = json.loads(cp.read_text(encoding="utf-8"))
             _MEMO[stamp] = out
             return out
-        except Exception:
+        except Exception:  # quiet: an unreadable snapshot is a cache miss; the pass is made again
             return {}
     return {}
 
@@ -420,7 +420,7 @@ def _pass(vcf: str) -> Dict[str, Any]:
             tmp = cp.with_name(f"{cp.name}.{os.getpid()}.tmp")
             tmp.write_text(json.dumps(out), encoding="utf-8")
             os.replace(tmp, cp)
-        except Exception:
+        except Exception:  # quiet: a failed snapshot write loses only the disk cache; `out` is whole
             pass
     if stamp:
         _MEMO[stamp] = out

@@ -92,7 +92,7 @@ class TestGuidanceIsKeyedInItsGenesVocabulary(unittest.TestCase):
     def test_the_dpyd_regression_specifically(self):
         """Named, because it shipped. rs3918290 homozygous is complete DPD
         deficiency; fluorouracil at a standard dose can be fatal."""
-        import json, os, pathlib, tempfile
+        import json, pathlib, tempfile
         from scholion.engine import pgx
         d = tempfile.mkdtemp()
         unpin = support.pin_profile(d)

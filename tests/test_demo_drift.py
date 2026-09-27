@@ -13,9 +13,7 @@ whoever compares them finds out. The comparison is exact because the generator i
 deterministic — SEED is fixed for exactly this reason.
 """
 import json
-import tempfile
 import unittest
-from pathlib import Path
 
 import support
 from scholion import demo as _demo

@@ -1243,8 +1243,14 @@ async function viewOverview(root){
 function flagOf(m){ return (m && m.near_limit && m.flag==='ok') ? FLAG.near : (FLAG[m&&m.flag]||FLAG.ok); }
 function decisionNote(m, context){
   const ds=(m&&m.decisions)||[]; const hit=ds.filter(d=>d.crossed);
-  if(hit.length) return hit.map(d=>`<div class="why" style="color:var(--critical)">❗${esc(t('web.decision.crossed',{label:d.label,sign:d.side==='high'?'≥':'≤',value:d.value}))} — ${esc(d.action||'')} <span class="muted">[${esc(d.source||'')}]</span></div>`).join('');
-  if(context && ds.length){const d=ds[0];return `<div class="why muted">${esc(t('web.decision.not_reached',{value:d.value,label:d.label}))}</div>`;}
+  // crossed:null — the value could not be compared; it may be crossed, so it is
+  // shown wherever a crossed one is, and «not reached» is said only of a compared one
+  const open=ds.filter(d=>d.crossed===null);
+  const openHtml=open.map(d=>`<div class="why" style="color:var(--warning)">${esc(t('web.decision.not_comparable',{value:d.value,label:d.label}))}</div>`).join('');
+  if(hit.length) return hit.map(d=>`<div class="why" style="color:var(--critical)">❗${esc(t('web.decision.crossed',{label:d.label,sign:d.side==='high'?'≥':'≤',value:d.value}))} — ${esc(d.action||'')} <span class="muted">[${esc(d.source||'')}]</span></div>`).join('')+openHtml;
+  if(open.length) return openHtml;
+  const done=ds.filter(d=>d.crossed===false);
+  if(context && done.length){const d=done[0];return `<div class="why muted">${esc(t('web.decision.not_reached',{value:d.value,label:d.label}))}</div>`;}
   return '';
 }
 function nearNote(m){
@@ -1714,7 +1720,7 @@ async function viewMedicines(root){
   async function maybeDiag(d){
     // the drug was not found — check whether the network is to blame (SSL/certificates on a Mac)
     const pgx=d.pharmacogenetics||d;
-    if(pgx&&pgx.status==='not_found'){
+    if(pgx&&(pgx.status==='not_found'||pgx.reason==='unreachable')){
       const dg=await api('/api/diag');
       if(dg&&!dg.ok){
         return `<div class="card warnbox"><b>⚠ ${esc(t('web.diag.no_internet'))}</b>
@@ -1776,6 +1782,7 @@ function testItem(s){
   return el(`<div class="list-item">
     <div class="row">${badge(cls,t((LEVEL[s.priority]||LEVEL.unknown).key))}<b>${esc(s.suggest)}</b></div>
     <div class="why">${esc(t('web.tests.why',{text:s.why}))}</div>
+    ${s.last_measured_unreadable?`<div class="why muted">${esc(t('web.tests.last_date_unreadable',{date:s.last_measured_unreadable}))}</div>`:''}
     ${s.specialist&&s.specialist!=='—'?`<div class="spec">${esc(t('web.tests.specialist',{name:s.specialist}))}</div>`:''}
   </div>`);
 }
@@ -3214,6 +3221,8 @@ async function viewLifestyle(root){
         +(r.preserved?', '+t('web.life.garmin_preserved',{n:r.preserved}):'')+' ✓');
       if(r.unrecognised_columns&&r.unrecognised_columns.length)
         toast(t('web.life.unknown_columns',{columns:r.unrecognised_columns.join(', ')}));
+      if(r.unreadable_files&&r.unreadable_files.length)
+        toast(t('web.life.unreadable_files',{n:r.unreadable_files.length,files:r.unreadable_files.join('; ')}));
       viewLifestyle($('#view'));}
     else{gm.textContent=old;toast(t('web.common.failed_prefix')+((r&&r.error)||'—'));}
   };

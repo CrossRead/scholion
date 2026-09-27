@@ -294,11 +294,41 @@ class TestTranslationOfABrandName(unittest.TestCase):
                 "translatedText": "PLEASE SELECT TWO DISTINCT LANGUAGES"}}}, online=True):
             self.assertIsNone(drugsource._translate_ru_en("Глюкофаж"))
 
-    def test_the_second_translator_is_tried_when_the_first_says_nothing(self):
+    def test_a_name_transliteration_reaches_is_not_sent_to_the_translator(self):
+        """метформин transliterates to metformin, which RxNorm knows: the name
+        has no reason to go to one more party. The translator used to be asked
+        first, for every Cyrillic name."""
+        with isolated_cache(), answers({"name=metformin": {"idGroup": {"rxnormId": ["6809"]}}},
+                                       default=None, online=True) as fetched:
+            got = drugsource.resolve_drug("метформин")
+        self.assertEqual("6809", got["rxcui"])
+        self.assertIsNone(got["translated"])
+        urls = [str(c.args[0]) for c in fetched.call_args_list]
+        self.assertFalse(any("mymemory" in u for u in urls), urls)
+
+    def test_a_brand_transliteration_misses_is_translated_last(self):
+        with isolated_cache(), answers({"mymemory": {"responseData": {"translatedText": "Glucophage"}},
+                                        "name=Glucophage": {"idGroup": {"rxnormId": ["151827"]}}},
+                                       default=None, online=True) as fetched:
+            got = drugsource.resolve_drug("Глюкофаж")
+        self.assertEqual("151827", got["rxcui"])
+        self.assertEqual("Glucophage", got["translated"])
+        urls = [str(c.args[0]) for c in fetched.call_args_list]
+        first_translation = next(i for i, u in enumerate(urls) if "mymemory" in u)
+        self.assertTrue(any("rxcui.json" in u for u in urls[:first_translation]),
+                        "the translator was asked before RxNorm was")
+
+    def test_there_is_no_second_translator(self):
+        """The undocumented Google endpoint, asked with a borrowed browser
+        User-Agent, was removed after an external review (25.09.2026). When
+        MyMemory says nothing, nothing else is asked."""
         with answers({"mymemory": {"responseData": {"translatedText": ""}},
                       "translate.googleapis": [[["Glucophage", "Глюкофаж", None, None]]]},
-                     online=True):
-            self.assertEqual("Glucophage", drugsource._translate_ru_en("Глюкофаж"))
+                     online=True) as fetched:
+            self.assertIsNone(drugsource._translate_ru_en("Глюкофаж"))
+        urls = [str(c.args[0]) for c in fetched.call_args_list]
+        self.assertFalse(any("googleapis" in u for u in urls), urls)
+        self.assertFalse(hasattr(drugsource, "_GTX"))
 
     def test_a_translation_that_gives_the_word_back_is_no_translation(self):
         with answers({"mymemory": {"responseData": {"translatedText": "Глюкофаж"}}},

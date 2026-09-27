@@ -8,27 +8,38 @@ them here is what lets labs<->pgx and half of lifestyle<->pgx import one way.
 from __future__ import annotations
 
 import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import t as _t
 
 
-def _recent(date_str: str, months: int = 12) -> bool:
-    """A date (YYYY-MM / YYYY-MM-DD) no older than `months` from today (sliding window).
-    Unrecognised dates are not hidden (True is returned)."""
+def _recent_or_unknown(date_str: str, months: int = 12) -> Optional[bool]:
+    """A date (YYYY-MM / YYYY-MM-DD) no older than `months` from today (sliding window):
+    True / False, and None when the date cannot be read — which is not «recent».
+
+    A caller that DECIDES something on recency (a monitoring test counted as done)
+    must require `is True`: an unreadable date establishes nothing."""
     if not date_str:
         return False
     try:
         parts = str(date_str).split("-")
         y, m = int(parts[0]), int(parts[1]) if len(parts) > 1 else 1
-    except Exception:
-        return True
+    except ValueError:
+        return None
     today = datetime.date.today()
     cy, cm = today.year, today.month - months
     while cm <= 0:
         cm += 12
         cy -= 1
     return (y, m) >= (cy, cm)
+
+
+def _recent(date_str: str, months: int = 12) -> bool:
+    """The display form of `_recent_or_unknown`: an unrecognised date is not hidden
+    (True is returned), so an abnormal value with a garbled date stays in view
+    instead of dropping into «stale». Nothing may be DECIDED on this answer —
+    `suggest_tests` asks `_recent_or_unknown` instead."""
+    return _recent_or_unknown(date_str, months) is not False
 
 
 def DISCLAIMER() -> str:
@@ -128,7 +139,6 @@ def _active_names_by_class() -> Dict[str, List[str]]:
     # `active_medications`, not every row of the file: a stopped prescription used
     # to arrive here and be printed as the thing a new drug interacts WITH.
     names = core.active_medications()
-    classes = core.med_classes().get("classes", {})
     for m in names:
         nm = m.get("name", "")
         for cls in core.classify_drug(nm):

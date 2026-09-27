@@ -12,7 +12,7 @@ Output: a markdown report (which longevity variants the owner carries).
 PERSONAL (holds genotypes) — keep it in profile/, not in the Project docs.
 """
 from __future__ import annotations
-import gzip, json, os, sys
+import gzip, json, sys
 from collections import defaultdict
 from pathlib import Path
 

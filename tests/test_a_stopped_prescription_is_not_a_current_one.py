@@ -248,7 +248,6 @@ class TestAStatusCanBeWrittenAndSurvivesAReAdd(_Profile):
         import shutil
         import tempfile
         from pathlib import Path
-        import support
         with tempfile.TemporaryDirectory() as tmp:
             prof = Path(tmp) / "profile"
             shutil.copytree(support.FIXTURE_PROFILE, prof)

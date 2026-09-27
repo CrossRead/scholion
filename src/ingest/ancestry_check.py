@@ -123,7 +123,6 @@ def main():
         if not freqs or not all(sp in freqs for sp in SUPERPOPS):
             continue
         het = 2.0 if a1 != a2 else 1.0
-        ok = True
         contrib = {}
         for pop, af in freqs.items():
             f1 = min(max(af.get(a1, 0.0), CLAMP), 1 - CLAMP)

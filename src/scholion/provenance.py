@@ -27,7 +27,6 @@ Writes nothing to labs.json. Run with:
 """
 from __future__ import annotations
 import json
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from . import core

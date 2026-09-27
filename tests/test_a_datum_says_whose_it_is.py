@@ -261,7 +261,7 @@ class TestAGenomeSaysWhoseItIs(unittest.TestCase):
         p = _demo_profile()
         self.addCleanup(shutil.rmtree, p.parent, True)
         g = self._reference_folder()
-        import os, subprocess
+        import subprocess
         env = support.env(profile_dir=p)
         env["SCHOLION_GENOME_DIR"] = str(g)
         env.pop("SCHOLION_GENOME_VCF", None)

@@ -99,7 +99,7 @@ def _is_garmin(c: Path) -> bool:
             return True
         return c.is_dir() and any(c.glob("DI-Connect-Aggregator"))
     except Exception:                                            # noqa: BLE001
-        return False
+        return False  # quiet: not taken for Garmin; nothing is read, detect() goes on to the next device
 
 
 def detect(path: Path) -> Optional[str]:
@@ -118,7 +118,7 @@ def detect(path: Path) -> Optional[str]:
         if _builder("ingest_whoop.py").looks_like_export(p):
             return "whoop"
     except Exception:                                            # noqa: BLE001
-        return None
+        return None  # quiet: None is refused as not_an_export / no_export; nothing is imported or claimed
     return None
 
 
@@ -288,15 +288,27 @@ CORRECTIONS = "wearable_corrections.local.json"
 _ACTIONS = ("remove", "replace")
 
 
+class CorrectionsUnreadable(ValueError):
+    """The corrections file is there and will not read.
+
+    Not «no corrections». Read as an empty list, a rebuild brought back every
+    point the person had removed or replaced — the very failure the file exists
+    to prevent — and reported nothing, so they went on believing it fixed.
+    """
+
+
 def corrections() -> List[Dict[str, Any]]:
-    """Read the corrections file, or an empty list when there is none."""
+    """Read the corrections file, or an empty list when there is none.
+
+    Raises `CorrectionsUnreadable` when the file exists and will not read.
+    """
     p = core.profile_dir() / CORRECTIONS
     if not p.exists():
         return []
     try:
         d = json.loads(p.read_text(encoding="utf-8"))
-    except Exception:                                            # noqa: BLE001
-        return []
+    except Exception as e:                                       # noqa: BLE001
+        raise CorrectionsUnreadable(f"{type(e).__name__}: {e}") from e
     items = d.get("corrections") if isinstance(d, dict) else d
     return [c for c in (items or []) if isinstance(c, dict)]
 
@@ -440,6 +452,14 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None,
         return {"ok": False, "error": _t("wearables.parse_failed", error=e)}
     if built.get("ok") is False or not built.get("metrics"):
         return {"ok": False, "error": _t("wearables.nothing_recognised", path=path, device=source)}
+    # The person's corrections are read BEFORE anything is erased or written: a
+    # file of them that will not read stops the rebuild, because a rebuild
+    # without them would restore the points they removed.
+    try:
+        decided = corrections()
+    except CorrectionsUnreadable as e:
+        return {"ok": False, "error": _t("wearables.corrections_unreadable",
+                                         path=core.profile_dir() / CORRECTIONS, error=e)}
 
     # An export off the person's own wrist is a measurement of theirs, so it
     # claims the profile the same way a lab point does: a demonstration lying
@@ -471,7 +491,7 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None,
     # AFTER the merge, or a decision would be overwritten by the very month it is
     # about: the merge restores what the export lacks, the corrections say what a
     # person decided about what it carries.
-    fixed, stale, refused = apply_corrections(built, source)
+    fixed, stale, refused = apply_corrections(built, source, decided)
 
     data = migrate(previous) if previous else {"_meta": {}, "sources": {}}
     data.setdefault("_meta", {})["shape"] = SHAPE
@@ -500,6 +520,9 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None,
             "corrections_applied": fixed, "corrections_stale": stale,
             "corrections_refused": refused,
             "unrecognised_columns": m.get("unrecognised_columns") or [],
+            # Export files the builder could not read: their days are missing
+            # from the monthly means, which is not the same as days not lived.
+            "unreadable_files": m.get("unreadable_files") or [],
             "shared_metrics": sorted(shared),
             "sources_present": sorted(data.get("sources") or {}),
             "out": str(out), "backup": backup, "path": str(path)}

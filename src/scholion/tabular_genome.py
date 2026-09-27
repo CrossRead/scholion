@@ -79,7 +79,7 @@ def _open_text(path: str) -> Optional[Iterator[str]]:
             biggest = max(names, key=lambda n: zf.getinfo(n).file_size)
             return io.TextIOWrapper(zf.open(biggest), encoding="utf-8", errors="replace")
         return open(path, "r", encoding="utf-8", errors="replace")
-    except Exception:
+    except Exception:  # quiet: None is refused as reason «unreadable» (no_tabular), never scanned as empty
         return None
 
 
@@ -87,7 +87,7 @@ def _cache_file(path: str, kind: str) -> Optional[Path]:
     try:
         from . import core
         st = os.stat(path)
-    except Exception:
+    except Exception:  # quiet: no cache path only means the file is scanned afresh
         return None
     key = hashlib.sha1(
         f"{os.path.abspath(path)}|{st.st_size}|{int(st.st_mtime)}|{kind}"
@@ -226,7 +226,7 @@ def index() -> Dict[str, Any]:
             data = json.loads(cache.read_text(encoding="utf-8"))
             data["path"] = path
             return data
-        except Exception:
+        except Exception:  # quiet: an unreadable cache entry is a miss; the file is scanned below
             pass
     data = (_scan_container_vcf(path) if kind == "vcf_compressed"
             else _scan_genotype_table(path))
@@ -235,7 +235,7 @@ def index() -> Dict[str, Any]:
         try:
             cache.parent.mkdir(parents=True, exist_ok=True)
             cache.write_text(json.dumps(data), encoding="utf-8")
-        except Exception:
+        except Exception:  # quiet: a failed cache write loses only the cache; `data` is returned whole
             pass
     return data
 

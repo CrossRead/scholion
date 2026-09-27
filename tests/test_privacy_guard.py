@@ -12,9 +12,7 @@ owner: it works on an invented template, as befits a file that lies in a public
 repository.
 """
 import importlib.util
-import re
 import unittest
-from pathlib import Path
 
 import support
 
@@ -94,7 +92,6 @@ class TestHostList(unittest.TestCase):
                                         # button, on an explicit request only (owner, 13.09.2026)
         "rest.ensembl.org",             # parsing an rsID
         "rxnav.nlm.nih.gov",            # RxNorm — normalising the name
-        "translate.googleapis.com",     # the fallback translation
     }
 
     def test_the_list_matches(self):

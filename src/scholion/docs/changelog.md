@@ -40,6 +40,122 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.9 — 27.09.2026
+
+### What was wrong and is now right
+
+**A failed read of the genome no longer answers «reference».** When the program
+that seeks into an indexed VCF failed at a position — it timed out on a large
+file, it could not load the index, it was missing, or the built-in index reader
+hit a damaged block — the position came back as having no row, and a position
+with no row is read as «the person carries the reference». The answer was
+labelled as assumed, but it was a sentence about the person made from an error.
+Such a position is now reported as not read, with what the reader said, and the
+advice to check that the index sits beside the file and matches it. A clean read
+that finds no row is still the reference, as before.
+
+**`scholion update` from an unpacked archive no longer offers `pip`.** A copy run
+from where a release archive or an sdist was unpacked — a source tree without
+`.git` — was treated as an installation, and the command offered
+`pip install --upgrade`. That updates the copy in site-packages and leaves the one
+that is running as it was. Such a copy now says what it is and how it is updated:
+a newer release unpacked in its place, or a clone updated with `git pull`.
+
+**A drug name typed in Russian goes to a translator only when nothing else found
+it.** The transliteration and the original spelling are looked up in RxNorm first;
+the translator is asked only if both found nothing — before, it was asked first,
+for every Cyrillic name, including the ones transliteration reaches on its own
+(metformin written in Cyrillic, for one). The second, undocumented translation endpoint
+(`translate.googleapis.com`) is gone: the only translator is MyMemory, as listed in
+`THREAT_MODEL.md`.
+
+**`scholion.format_system` imports on its own.** It worked only when
+`scholion.format` had been imported first; imported first itself, it failed with
+a circular import. Nothing in the package imported it that way, so no answer was
+affected; code built on the package could have been.
+
+**A failure is no longer printed as a fact about the person.** Every place where
+the program caught an error and went on in silence was read once, by hand; where
+the silence could reach an answer, the answer now says what could not be read.
+What somebody could have been told before, and is not told now:
+
+- *«Variants in the gene: 0»* — about a gene whose region the reader failed on,
+  a file called against another genome build, or a chromosome the file does not
+  hold. Each is now said by name, and nothing is counted.
+- *The reference at a position* — when the built-in reader of the index failed
+  (index missing or damaged, file cut short), when the file's composition could
+  not be measured, or when the kind of file could not be measured at all (it was
+  then treated as a whole genome, opening ClinVar, ACMG and polygenic scores).
+- *«No coding exons»* for a gene, stored after a failed request to Ensembl. Such
+  stored entries are asked again.
+- *«A published reference sample»* about a genome when the file that says whose
+  genome it is could not be read.
+- *«A scan without OCR»* about a laboratory form or a study every PDF reader
+  failed on; it was also recorded as read and never tried again. It is now
+  reported as unreadable, with the readers' errors, and read again next time.
+- *No clinical threshold at all* for a value that could not be compared with one.
+  It is now «could not be compared», and the prescription check lists it as
+  unresolved instead of letting the verdict fall to «low».
+- *«Done recently»* for a monitoring test whose last date could not be read.
+- *No red flag on this drug*, when the prescriptions file could not be read; *no
+  such drug*, when the drug database did not answer. Both now say so.
+- *The default folders and a different genome file* when the settings file that
+  names the chosen folders and files was damaged. The program now stops with the
+  reason (the command line exits with status 5).
+- *A reference range for the other sex*, when the file with sex and age sat in a
+  chosen folder or could not be read.
+- *Points the person had removed from a wearable series* came back when the file
+  of corrections could not be read; the rebuild now stops instead. Export files
+  that could not be read are listed, instead of months averaged without them.
+- *A radar without its fitness domain*, and an overview without its wearable
+  line, when the wearable data could not be read: both now say it.
+- *A request with a body that is not JSON* was read as an empty one by the local
+  server — for the goal screen that meant adopting every proposal. It is refused.
+
+**The positions and rules added in 0.5.8 now carry the review that covers
+them.** The five positions, the carrier classes and the five «adds nothing»
+correction rules added in 0.5.8 were shown as reviewed on a date before some of
+their levels were assigned. The panel author has since approved them as a whole —
+sentences, levels, the corrected genes and the wording for a woman with an OTC
+variant — and the card shows that review, dated 27.09.2026.
+
+**The list of sources gives the locus catalogue the date it last grew** —
+25.09.2026, not 18.09.2026. A positions file made by 0.5.8 stays current: nothing
+needs to be genotyped again.
+
+### What is checked now that was not
+
+- Every module of the package is imported first, into an interpreter where
+  nothing of the package is loaded yet.
+- The suite also runs in the tree a release archive unpacks into, without
+  `.git`, on every push.
+- Two rules of the rendering are held by tests rather than comments: a value
+  with no reference range never gets a verdict colour, and what the interaction
+  comparison left out is printed whether or not anything was found.
+- Lint (pyflakes rules) runs on every push with zero findings; type errors are
+  counted per module and may not grow.
+- A handler that catches every error and stays silent must say, in the code,
+  why its silence cannot become an answer; the suite and the test runner refuse
+  one that does not.
+- The package's own suite runs before publication in a copy without `.git` —
+  the shape a release archive unpacks into — not in the repository's working
+  tree.
+
+### What needs recomputing
+
+Nothing is recomputed automatically. A genotype stored as «assumed reference»
+from an indexed VCF read before this version is correct when the reader worked;
+if the index was missing or damaged at the time, ask for the position again.
+
+**Run `scholion ingest-labs --force <folder of laboratory forms>` — if a form was reported as a scan without OCR by an earlier version.**
+It may have been a PDF the readers failed on; it is read again, and if it still
+fails the reason is printed.
+
+**Run `scholion ingest-garmin` — if a Garmin export was imported by an earlier version.**
+A file that could not be read was skipped without a word; the rebuild now lists
+such files, and the months are averaged over what was actually read.
+
+
 ## v0.5.8 — 25.09.2026
 
 ### What you can do now

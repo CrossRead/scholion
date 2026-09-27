@@ -12,7 +12,6 @@ with internet), as does live rsID resolution. Offline/error → None (then hones
 """
 from __future__ import annotations
 import json
-import os
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -27,9 +26,16 @@ _RX_NAMEPROP = "https://rxnav.nlm.nih.gov/REST/rxcui/{}/property.json?propName=R
 _RX_ATC = "https://rxnav.nlm.nih.gov/REST/rxclass/class/byRxcui.json?rxcui={}&relaSource=ATC"
 _RXNAV_UI = "https://mor.nlm.nih.gov/RxNav/search?searchBy=RXCUI&searchTerm={}"
 
-# free translators without a key (for Russian names: brands do not transliterate, they must be translated)
+# A translator without a key, for a Russian brand name that transliteration does
+# not reach (the Cyrillic spelling of Glucophage). Asked only after the transliteration and the
+# original spelling found nothing in RxNorm: the name the person typed goes to
+# one more party only when nothing else could answer.
+#
+# There used to be a second one — the undocumented Google endpoint
+# (`translate.googleapis.com`, `client=gtx`), asked with a borrowed browser
+# User-Agent. It is gone: an interface nobody offered, reached by looking like
+# something else, is not a dependency a health tool should send names through.
 _MYMEMORY = "https://api.mymemory.translated.net/get?q={}&langpair=ru|en"
-_GTX = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q={}"
 
 # The transliteration table and the Cyrillic test below are INPUT handling: a drug name
 # typed in Russian is turned into something RxNorm can be asked about. Nothing here is
@@ -105,14 +111,14 @@ def _load_cache() -> Dict[str, Any]:
     f = _cache_file()
     try:
         return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
-    except Exception:
+    except Exception:  # quiet: a cache miss; the drug is asked again, and offline says `offline`, not «none»
         return {}
 
 
 def _save_cache(d: Dict[str, Any]) -> None:
     try:
         core.write_json(_cache_file(), d, indent=1)
-    except Exception:
+    except Exception:  # quiet: a failed cache write loses only the cache; the answer was already returned
         pass
 
 
@@ -120,34 +126,30 @@ def _get(url: str) -> Optional[Any]:
     return net.get_json(url)
 
 
-def _translate_ru_en(text: str) -> Optional[str]:
-    """Translate a Russian drug name into English (INN/brand). Without a key.
+def _translate_ru_en(text: str, unreached: Optional[List[str]] = None) -> Optional[str]:
+    """Translate a Russian drug name into English (INN/brand) through MyMemory. Without a key.
 
     Brands written in Cyrillic (such as Glucophage) are not recovered by transliteration —
-    they have to be translated (MyMemory → Glucophage). We try MyMemory, then the unofficial
-    Google. On a Mac urllib works; in the cloud sandbox the network is closed."""
+    they have to be translated (MyMemory → Glucophage)."""
     q = urllib.parse.quote(text)
-    # 1) MyMemory
     data = _get(_MYMEMORY.format(q))
+    if data is None and unreached is not None:
+        unreached.append("mymemory")
     tr = (((data or {}).get("responseData") or {}).get("translatedText") or "").strip()
     bad = ("PLEASE SELECT", "INVALID", "QUERY LENGTH")
     if tr and tr.lower() != text.lower() and not any(b in tr.upper() for b in bad):
         return tr
-    # 2) Google (gtx) — returns a nested array
-    raw = net.get_json(_GTX.format(q), headers={"User-Agent": "Mozilla/5.0", "Accept": "application/json"})
-    try:
-        seg = raw[0] if isinstance(raw, list) else None
-        if seg:
-            out = "".join(s[0] for s in seg if s and s[0]).strip()
-            if out and out.lower() != text.lower():
-                return out
-    except Exception:
-        pass
     return None
 
 
-def _rxcui_for(term: str, approx: bool = True) -> Optional[str]:
+def _rxcui_for(term: str, approx: bool = True,
+               unreached: Optional[List[str]] = None) -> Optional[str]:
+    """The RxNorm id for a term, or None. `unreached`, when given, collects the
+    requests that got no answer at all — the difference between «RxNorm has no
+    such name» and «RxNorm was not reached», which the None alone cannot carry."""
     data = _get(_RX_BYNAME.format(urllib.parse.quote(term)))
+    if data is None and unreached is not None:
+        unreached.append("rxnorm")
     ids = (((data or {}).get("idGroup") or {}).get("rxnormId")) or []
     if ids:
         return str(ids[0])
@@ -157,6 +159,8 @@ def _rxcui_for(term: str, approx: bool = True) -> Optional[str]:
     if not approx:
         return None
     data = _get(_RX_APPROX.format(urllib.parse.quote(term)))
+    if data is None and unreached is not None:
+        unreached.append("rxnorm")
     cands = (((data or {}).get("approximateGroup") or {}).get("candidate")) or []
     for c in cands:
         if c.get("rxcui"):
@@ -244,34 +248,62 @@ def cpic_lookup(rxcui: str, allow_network: bool = True) -> Dict[str, Any]:
     return {"genes": out, "asked": True, "reason": None}
 
 
+#: Why the latest lookup of a name came back empty: `offline`, `unreachable`
+#: (a request got no answer, so nothing was established) or `not_found` (every
+#: request was answered and none knew the name). Kept beside the result rather
+#: than in it because `resolve_drug` returns None for all three and its callers
+#: rely on that; `why_unresolved` is how the one caller that must tell a network
+#: failure from «no such drug» asks. It explains a miss — it is never a cached
+#: answer: the next `resolve_drug` asks the network again.
+_MISS_REASON: Dict[str, str] = {}
+
+
+def why_unresolved(name: str) -> Optional[str]:
+    """`offline` / `unreachable` / `not_found` for the latest empty `resolve_drug`
+    of this name in this process, or None when there is no such record."""
+    return _MISS_REASON.get((name or "").strip().lower())
+
+
 def resolve_drug(name: str, allow_network: bool = True) -> Optional[Dict[str, Any]]:
     """Find a drug in RxNorm/RxClass. Returns {rxcui, name, atc[], internal_class, url}
-    or None (offline/not found). Cached by the normalised query."""
+    or None (offline/unreachable/not found — `why_unresolved` says which).
+    Cached by the normalised query."""
     q = (name or "").strip()
     if not q:
         return None
     cache = _load_cache()
     key = q.lower()
     if cache.get(key):          # positive entries only (None entries are ignored and the network retried)
+        _MISS_REASON.pop(key, None)
         return cache[key]
     if not allow_network:
+        _MISS_REASON[key] = "offline"
         return None
-    # Order for Russian words: the LATIN variants first (translation → transliteration),
-    # they allow approximate search; the Cyrillic original goes last and only exact.
+    # Order for Russian words: what can be tried without a third party first — the
+    # transliteration (Latin, so approximate search) and the Cyrillic original
+    # (exact only); the translator last, and only if both found nothing. It used to
+    # be asked first, for every Cyrillic name, including the ones transliteration
+    # already reaches (the Cyrillic spelling of metformin).
     translated = None
-    if _has_cyrillic(q):
-        translated = _translate_ru_en(q)
-        terms = ([translated] if translated else []) + [_translit(q), q]
-    else:
-        terms = [q]
+    unreached: List[str] = []
+    terms = [_translit(q), q] if _has_cyrillic(q) else [q]
     rxcui, matched = None, None
     for t in terms:
-        rxcui = _rxcui_for(t, approx=_has_latin(t))
+        rxcui = _rxcui_for(t, approx=_has_latin(t), unreached=unreached)
         if rxcui:
             matched = t
             break
+    if not rxcui and _has_cyrillic(q):
+        translated = _translate_ru_en(q, unreached=unreached)
+        if translated:
+            rxcui = _rxcui_for(translated, approx=_has_latin(translated), unreached=unreached)
+            matched = translated if rxcui else None
     if not rxcui:
-        return None  # do NOT cache a negative result (the network failure may have been temporary)
+        # do NOT cache a negative result (the network failure may have been temporary)
+        _MISS_REASON[key] = ("offline" if net.offline()
+                             else "unreachable" if unreached else "not_found")
+        return None
+    _MISS_REASON.pop(key, None)
     prop = _get(_RX_NAMEPROP.format(rxcui))
     rxname = (((prop or {}).get("propConceptGroup") or {}).get("propConcept") or [{}])[0].get("propValue")
     info = _atc_info(rxcui)

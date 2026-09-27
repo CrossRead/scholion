@@ -13,7 +13,7 @@ def file_date(path: Path) -> Optional[str]:
     """Date the file was last modified (YYYY-MM-DD), or None if there is no file."""
     try:
         return datetime.date.fromtimestamp(path.stat().st_mtime).isoformat()
-    except Exception:
+    except Exception:  # quiet: None is printed as an unknown date beside `present`; no date is invented
         return None
 
 
@@ -23,7 +23,7 @@ def json_updated(path: Path) -> Optional[str]:
         d = _read_json(path)
         meta = d.get("_meta", {}) if isinstance(d, dict) else {}
         return meta.get("updated") or meta.get("catalog_updated")
-    except Exception:
+    except Exception:  # quiet: callers fall back to file_date(); an unknown date is shown as unknown
         return None
 
 _PKG_DIR = Path(__file__).resolve().parent           # .../src/scholion
@@ -295,7 +295,7 @@ def read_ingest_manifest(loader: str) -> Dict[str, float]:
     try:
         return _manifest_files(json.loads(f.read_text(encoding="utf-8"))) if f.exists() else {}
     except Exception:                                                # noqa: BLE001
-        return {}
+        return {}  # quiet: an empty table re-reads the folder (idempotent); nothing is skipped
 
 
 def manifest_lookup(files: Dict[str, float], path: Path) -> Tuple[str, Optional[float]]:
@@ -339,7 +339,7 @@ def write_ingest_manifest(loader: str, files: Dict[str, float]) -> None:
                    {"_meta": {"shape": INGEST_MANIFEST_SHAPE, "loader": loader},
                     "files": files}, indent=1)
     except Exception:                                                # noqa: BLE001
-        pass          # a manifest that could not be written costs one extra read next time
+        pass          # quiet: a manifest not written costs one extra (idempotent) read next time
 
 
 def adopt_ingest_manifest(loader: str) -> Optional[Dict[str, Any]]:
@@ -373,7 +373,7 @@ def adopt_ingest_manifest(loader: str) -> Optional[Dict[str, Any]]:
         # Unreadable where it lies: nothing to carry. The loader starts an
         # empty table and reads the folder once more, which is what it would
         # have done with that file in the old place too.
-        return None
+        return None  # quiet: nothing carried over; the loader re-reads the folder, which is idempotent
     write_ingest_manifest(loader, files)
     if not new.exists():
         return None
@@ -630,7 +630,7 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
         if isinstance(data, dict) and path.parent.resolve() == profile_dir():
             data = stamp_profile_schema(data)
     except Exception:                                             # noqa: BLE001
-        pass          # a stamp is never a reason to fail a write of somebody's data
+        pass          # quiet: an unstamped file reads as schema 1, the current one; the data is written whole
     path.parent.mkdir(parents=True, exist_ok=True)
     # The temporary name is unique per THREAD as well as per process. With the pid
     # alone, two server threads writing one file raced on one temporary name: the
@@ -745,7 +745,12 @@ def profile_is_synthetic() -> bool:
     try:
         return bool(_profile_meta(pharmacogenomics()).get("synthetic"))
     except Exception:                                        # noqa: BLE001
-        return False
+        # That one file would not read. `False` here was «this is your own
+        # data» said of a demonstration whose badge could not be looked up —
+        # the one direction this answer must not fail in. The other files
+        # carry the same mark, and `subject` reads them one by one.
+        from . import subject as _subject
+        return _subject.profile_subject() == "demo"
 
 
 def profile_schema_of(data: Dict[str, Any]) -> int:
@@ -822,7 +827,7 @@ def stamp_profile_schema(data: Dict[str, Any]) -> Dict[str, Any]:
         if _engine:
             meta["engine"] = _engine
     except Exception:                                             # noqa: BLE001
-        pass
+        pass  # quiet: only the build label is left out of _meta; the data itself is written unchanged
     return data
 
 
@@ -1199,7 +1204,7 @@ def loinc_index() -> Dict[str, str]:
         for k, spec in (_ml.confirmed_markers() or {}).items():
             if spec.get("loinc"):
                 out.setdefault(str(spec["loinc"]), k)
-    except Exception:
+    except Exception:  # quiet: an unindexed code is skipped by name as loinc_not_in_catalogue, never stored
         pass
     return out
 
@@ -1373,7 +1378,7 @@ def resolve_unit(spec: Dict[str, Any], given: str) -> Dict[str, Any]:
     try:
         from . import markers_local as _ml
         units.update(_ml.confirmed_units(spec.get("key") or spec.get("_key") or ""))
-    except Exception:
+    except Exception:  # quiet: a unit not loaded is refused (ok False + accepted list), never converted
         pass
     g = _norm_unit(given or "")
     if not g:
@@ -1580,7 +1585,7 @@ def ancestry_check() -> Dict[str, Any]:
     try:
         return read_profile_json(p) or {}
     except Exception:                                            # noqa: BLE001
-        return {}
+        return {}  # quiet: ancestry() then says None, printed as «panel not settled, a default was used»
 
 
 def wearable_primary() -> Optional[str]:
@@ -1826,21 +1831,56 @@ def classify_drug(name: str) -> List[str]:
 _DOMAIN_FILE = {"labs": "labs.json", "medications": "medications.json", "metrics": "metrics.json"}
 
 
+class SourcesUnreadable(ValueError):
+    """`profile/sources.json` is there and cannot be read.
+
+    Absent is a state: every domain lives in the profile by default. Present
+    and unreadable is not the same state, and reading it as absent was how a
+    corrupt settings file used to turn into facts: labs kept in a chosen folder
+    answered as «no labs», the genome file the person had named was replaced by
+    whatever else lay in the genome folder — possibly another build, or another
+    person — and `source_status` reported the defaults as connected. Raised, so
+    that the answer says the settings could not be read instead.
+    """
+
+
+def _sources_file() -> Dict[str, Any]:
+    """The one reader of `profile/sources.json`.
+
+    `{}` ONLY when the file does not exist. A file that does not parse, is not
+    a JSON object, or has a section of the wrong shape raises `SourcesUnreadable`.
+    """
+    p = profile_dir() / "sources.json"
+    if not p.exists():
+        return {}
+    from .i18n import t as _t
+    try:
+        cfg = _read_json(p)
+    except (OSError, ValueError) as exc:
+        # An OSError's str() carries the absolute path; its strerror does not.
+        why = (exc.strerror or type(exc).__name__) if isinstance(exc, OSError) else exc
+        raise SourcesUnreadable(_t("core.sources_unreadable", error=why)) from exc
+    if not isinstance(cfg, dict):
+        raise SourcesUnreadable(_t("core.sources_unreadable",
+                                   error=type(cfg).__name__))
+    for section in ("folders", "external_sources"):
+        if cfg.get(section) is not None and not isinstance(cfg.get(section), dict):
+            raise SourcesUnreadable(_t("core.sources_unreadable",
+                                       error=f"{section}: {type(cfg[section]).__name__}"))
+    return cfg
+
+
 def source_config() -> Dict[str, str]:
     """User folders for the data domains (labs/medications/metrics/genome/…) and for
     personal external sources set under a name of the user's own choosing (see
     store.set_source_folder). Both live in profile/sources.json, under "folders" and
     "external_sources" respectively, and are merged here — the split between the two
     only matters when a folder is being SET, never when one is being read back.
-    Empty = the data lies in the profile by default. Personal (in profile/sources.json)."""
-    p = profile_dir() / "sources.json"
-    if p.exists():
-        try:
-            cfg = _read_json(p)
-            return {**(cfg.get("external_sources") or {}), **(cfg.get("folders") or {})}
-        except Exception:
-            return {}
-    return {}
+    Empty = the data lies in the profile by default (the file is absent). A file
+    that is present and unreadable raises `SourcesUnreadable`. Personal (in
+    profile/sources.json)."""
+    cfg = _sources_file()
+    return {**(cfg.get("external_sources") or {}), **(cfg.get("folders") or {})}
 
 
 def _chosen_genome_path(key: str) -> Optional[str]:
@@ -1850,15 +1890,10 @@ def _chosen_genome_path(key: str) -> Optional[str]:
     alignment they were called from, and the reference they were called against
     — so they sit at the top level of the same file rather than inside
     "folders", where a path that is not a folder is how the next reader gets it
-    wrong.
+    wrong. An unreadable file raises `SourcesUnreadable`: «no choice recorded»
+    would let another file in the genome folder stand in for the person's own.
     """
-    p = profile_dir() / "sources.json"
-    if not p.exists():
-        return None
-    try:
-        return (_read_json(p).get(key) or None)
-    except Exception:                                        # noqa: BLE001
-        return None
+    return _sources_file().get(key) or None
 
 
 def chosen_genome_bam() -> Optional[str]:
@@ -1888,13 +1923,7 @@ def chosen_genome_vcf() -> Optional[str]:
     the same file rather than inside "folders", because a path that is not a
     folder in a map called folders is how the next reader gets it wrong.
     """
-    p = profile_dir() / "sources.json"
-    if not p.exists():
-        return None
-    try:
-        return (_read_json(p).get("genome_vcf") or None)
-    except Exception:                                        # noqa: BLE001
-        return None
+    return _chosen_genome_path("genome_vcf")
 
 
 def source_path(domain: str) -> Path:

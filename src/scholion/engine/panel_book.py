@@ -100,7 +100,7 @@ def _local_notes() -> Dict[str, Dict[str, Any]]:
     try:
         path = core.profile_dir() / "local_notes.json"
         data = core.read_profile_json(path) if path.exists() else {}
-    except Exception:                                                # noqa: BLE001
+    except Exception:  # quiet: a clinician's note only annotates a row; the row's own reading stands
         return {}
     out: Dict[str, Dict[str, Any]] = {}
     for n in (data.get("notes") or []) if isinstance(data, dict) else []:

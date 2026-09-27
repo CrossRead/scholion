@@ -52,7 +52,7 @@ from __future__ import annotations
 
 import unittest
 
-import support
+import support  # noqa: F401  (puts src/ on the path)
 from scholion import contract
 
 

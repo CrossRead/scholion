@@ -17,7 +17,6 @@ because that is a judgement, not an extraction.
 """
 from __future__ import annotations
 import json
-import os
 import re
 import datetime as _dt
 from pathlib import Path
@@ -25,7 +24,8 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import core
 from .i18n import t as _t
-from .ingest_labs import _read_pdf, _ensure_extractor, _manifest_moved
+from . import ingest_labs as _ingest_labs
+from .ingest_labs import PdfUnreadable, _ensure_extractor, _manifest_moved
 
 # Signs of a doctor's conclusion / an instrumental study.
 _CONCL = re.compile(r"ЗАКЛЮЧЕНИЕ|ПРОТОКОЛ\s+(?:УЛЬТРАЗВУКОВОГО\s+)?ИССЛЕДОВАНИЯ|"
@@ -88,9 +88,13 @@ REASON_NO_TEXT = "no_text"
 REASON_LAB_FORM = "looks_like_a_lab_form"
 REASON_NOT_EXTRACTED = "conclusion_not_extracted"
 REASON_UNCLASSIFIED = "unclassified"
+#: Every PDF reader present failed on the file. Not «no study»: nothing about the
+#: file is known, and it is left out of the manifest so the next run tries again.
+REASON_UNREADABLE = "unreadable"
 
 #: The two that mean something was probably lost, as opposed to handed on.
-ALARMING = (REASON_SEVERAL, REASON_PART_NOT_READ, REASON_NO_TEXT, REASON_NOT_EXTRACTED, REASON_UNCLASSIFIED)
+ALARMING = (REASON_SEVERAL, REASON_PART_NOT_READ, REASON_NO_TEXT, REASON_NOT_EXTRACTED, REASON_UNCLASSIFIED,
+            REASON_UNREADABLE)
 
 
 #: A section heading inside a multi-document file: a title, then the date of THAT
@@ -285,6 +289,16 @@ def parse_study(text: str, source: str = "") -> Optional[Dict[str, Any]]:
             "open": [{"what": r, "note": _t("studies.from_conclusion")} for r in recs[:6]]}
 
 
+def _read_pdf(path: Path) -> Optional[str]:
+    """The text of one PDF; raises `ingest_labs.PdfUnreadable` when every reader failed.
+
+    The raising reader, not `ingest_labs._read_pdf`: that one returns "" for a
+    failed read, and here "" means «no study in this file» — a reader that fell
+    over was recorded as a document without a conclusion and never read again.
+    """
+    return _ingest_labs._read_pdf_or_raise(path)
+
+
 def _sid(path: Path, date: Optional[str]) -> str:
     """A stable id out of the file name. Cyrillic is NOT thrown away: Russian names used to
     collapse into an empty string, and different files ended up with one and the same id."""
@@ -325,7 +339,15 @@ def ingest(folder: str, force: bool = False,
         if not force and known == mtime:
             skipped += 1
             continue
-        text = _read_pdf(f) or ""
+        try:
+            text = _read_pdf(f) or ""
+        except PdfUnreadable as e:
+            # A reader that fell over is not a PDF without a study in it. The
+            # file is named with the failure and NOT written to the manifest,
+            # so it is read again next time instead of counting as seen.
+            missed.append({"file": f.name, "reason": REASON_UNREADABLE,
+                           "detail": _t("studies.reason_unreadable", error=str(e) or "-")})
+            continue
         st = parse_study(text, source=f.name)
         manifest[key] = mtime
         # ── a file that holds several studies is read as several ─────────────

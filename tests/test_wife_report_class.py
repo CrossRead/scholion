@@ -14,7 +14,6 @@ made with no genome attached), 71 (the male range lent to whoever asked), 72
 from __future__ import annotations
 
 import json
-import os
 import pathlib
 import tempfile
 import unittest

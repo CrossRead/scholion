@@ -126,6 +126,18 @@ if [ -f src/tools/check_test_reach.py ]; then
   fi
 fi
 
+# A broad `except` that swallows an error must say why that is safe (task 209):
+# the class behind «a failed read of the genome answered reference». Instant —
+# an AST pass over src/ — so it runs on every invocation, narrowed or not.
+if [ -f src/tools/check_quiet_excepts.py ]; then
+  echo "▶ every silent broad except says why its silence is safe"
+  python3 src/tools/check_quiet_excepts.py --strict > /dev/null || {
+    python3 src/tools/check_quiet_excepts.py --strict
+    exit 1
+  }
+  echo "  ✓ none unexplained"
+fi
+
 if [ -f src/tools/check_language.py ]; then
   echo "▶ Russian has not been added to what ships"
   python3 src/tools/check_language.py --strict > /dev/null || {

@@ -70,6 +70,28 @@ Writes are split in two kinds and the split is load-bearing: AUTHORS commands
 invent values into the profile and are never handed to a model as tools;
 TRANSCRIBES commands move the person's own documents and may be.
 
+**A reason is held to the build, not only written down.** An excuse in
+`NO_PLUGIN` is a sentence, and a sentence cannot be checked: «the list is
+already inside overview» stood for months beside an overview that carries a
+count. So every command without a tool also has a KIND in `contract.TOOLLESS`,
+from a closed list, and `contract.check_door_claims()` holds what each kind
+promises:
+
+- `writes` and `person_starts` — the command is in `WRITES`, so the manifest
+  never calls it safe to run for an answer;
+- `reached_through` — the tools are named, and a probe in
+  `tests/test_what_is_said_about_the_tool_door_is_what_the_build_does.py` runs
+  the command and the tools and compares. No probe, no claim;
+- `for_the_person` — it holds no fact about the person a model would otherwise
+  have to guess.
+
+Two more rules ride on the same check. A command the safety canon names must
+have a tool: the canon is handed to a model that holds tools and no shell, and a
+rule naming something it cannot call is a rule it cannot follow. And a reason
+may name a tool only when that tool is listed beside it. When one tool answers
+for two commands, the second is a flag recorded in `PLUGIN_ARGS`; the door is
+kept short on purpose, because a model choosing among many names chooses worse.
+
 ## Language and i18n
 
 - Everything that ships — code, comments, docstrings, test names — is

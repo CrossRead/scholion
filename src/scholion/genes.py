@@ -24,7 +24,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from . import core
 
@@ -260,17 +260,26 @@ def resolve(symbol: str, allow_network: bool = True) -> Optional[Dict[str, Any]]
     return None
 
 
-def match_contig(chrom: str, contigs: List[str]) -> Optional[str]:
+#: The two names of one contig, in the order they are tried.
+_MITOCHONDRION = ("MT", "M")
+
+
+def match_contig(chrom: str, contigs: Iterable[str]) -> Optional[str]:
     """The name THIS file uses for that chromosome — `chr3` and `3` are one contig.
 
     A gene resolved from an annotation that writes `3` and a VCF that writes `chr3`
     would otherwise produce «no variants in the region», which is the single most
     dangerous wrong answer this module can give: it looks exactly like good news.
     """
+    chrom = str(chrom)
     if chrom in contigs:
         return chrom
-    bare = chrom[3:] if chrom.startswith("chr") else chrom
-    for candidate in (bare, "chr" + bare, "CHR" + bare):
-        if candidate in contigs:
-            return candidate
+    bare = chrom[3:] if chrom[:3].lower() == "chr" else chrom
+    # The mitochondrion disagrees about more than the prefix: `MT` in one
+    # convention, `chrM` in the other, and the prefix rule alone builds `chrMT`,
+    # a contig no file carries.
+    for b in _MITOCHONDRION if bare.upper() in _MITOCHONDRION else (bare,):
+        for candidate in (b, "chr" + b, "CHR" + b):
+            if candidate in contigs:
+                return candidate
     return None

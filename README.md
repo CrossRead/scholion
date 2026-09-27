@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.5.9** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.5.10** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -530,7 +530,7 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 35 `sch_*` tools — a body system as one
+`scholion/ouroboros_tools.py` registers 39 `sch_*` tools — a body system as one
 card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
 longevity, goals and more.
 Ouroboros discovers tool modules by scanning its own tools package, so one line

@@ -134,6 +134,12 @@ def references(bam: str | Path) -> Dict[str, int]:
         return names
 
 
+def contig_name(chrom: str, names) -> Optional[str]:
+    """The name THIS header uses for `chrom` — `7` and `chr7` are one contig — or None."""
+    from .genes import match_contig
+    return match_contig(chrom, names)
+
+
 def reference_lengths(bam: str | Path) -> Dict[str, int]:
     """Reference name → length, from the BAM header. The length of chromosome 1
     is what tells GRCh38 from GRCh37 whatever the contigs are called."""
@@ -182,9 +188,15 @@ def depth(bam: str | Path, chrom: str, beg: int, end: int, *,
     bam = str(bam)
     bai = bai or (bam + ".bai")
     refs = references(bam)
-    if chrom not in refs:
-        raise KeyError(f"contig {chrom} is not in the BAM header")
-    ref = refs[chrom]
+    # The header is the authority on how this file spells its contigs. The
+    # coordinate layer says `7`; an alignment against a UCSC or GATK reference
+    # says `chr7`, and looked up by the exact name every gene on such a file was
+    # answered «coverage not measured — the alignment carries no contig 7»: a
+    # defect of the lookup, printed as a property of the person's file.
+    name = contig_name(chrom, refs)
+    if name is None:
+        raise KeyError(f"contig {chrom} is not in the BAM header under either spelling")
+    ref = refs[name]
     idx = BamIndex(bai)
     b0, e0 = beg - 1, end                      # 0-based, half-open
     cov = [0] * (end - beg + 1)

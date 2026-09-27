@@ -67,7 +67,7 @@ def _stubs_run_here() -> bool:
     Windows jobs red on this class alone, ubuntu and macOS green. Try one stub
     and let the answer decide.
     """
-    if not (SCRIPT.exists() and shutil.which("sh") and shutil.which("bash")):
+    if not (SCRIPT.exists() and shutil.which("sh") and support.posix_shell("bash")):
         return False
     tmp = Path(tempfile.mkdtemp(prefix="scholion-stub-"))
     try:
@@ -108,7 +108,7 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
                "SCHOLION_REPO_DIR": str(self.root), "SCHOLION_GENOME_DIR": str(self.genome),
                "SCHOLION_CLINVAR_CACHE": str(self.root / "cache"), "CALLS": str(self.calls),
                "CHR_PREFIX": "1" if chr_prefix else "0", "LC_ALL": "C"}
-        return subprocess.run(["bash", str(SCRIPT)], env=env, capture_output=True, text=True, encoding="utf-8",
+        return subprocess.run([support.posix_shell("bash"), str(SCRIPT)], env=env, capture_output=True, text=True, encoding="utf-8",
                               timeout=60, stdin=subprocess.DEVNULL)
 
     def assert_finished(self, p):
@@ -145,7 +145,7 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
         env = {"PATH": f"{self.bin}{os.pathsep}/usr/bin{os.pathsep}/bin", "HOME": str(self.root),
                "SCHOLION_REPO_DIR": str(self.root), "SCHOLION_GENOME_DIR": str(self.genome),
                "SCHOLION_CLINVAR_CACHE": str(self.root / "cache"), "CHR_PREFIX": "1", "LC_ALL": "C"}
-        p = subprocess.run(["bash", str(broken)], env=env, capture_output=True, text=True, encoding="utf-8",
+        p = subprocess.run([support.posix_shell("bash"), str(broken)], env=env, capture_output=True, text=True, encoding="utf-8",
                            timeout=60, stdin=subprocess.DEVNULL)
         self.assertNotEqual(0, p.returncode)
         self.assertIn("GEN: unbound variable", p.stderr)

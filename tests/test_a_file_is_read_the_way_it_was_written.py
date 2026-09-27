@@ -57,9 +57,9 @@ ACCEPTED = {
     # HTTP openers, not text files: `encoding=` was pasted onto these three on
     # 0.4.9 to satisfy this test, and the fetcher then crashed on its first
     # request (TypeError) — found 13.09.2026, the first time it was run since.
-    "src/tools/fetch_demo_genome.py:135",
-    "src/tools/fetch_demo_genome.py:176",
-    "src/tools/fetch_demo_genome.py:197",
+    "src/tools/fetch_demo_genome.py:134",
+    "src/tools/fetch_demo_genome.py:175",
+    "src/tools/fetch_demo_genome.py:196",
 }
 
 

@@ -147,7 +147,7 @@ MESSAGES = {
     "gene.no_reference": "the reference FASTA is not on this machine, so what each variant does to the protein was not computed",
     "gene.reference_contig": "the reference carries no contig {chrom}",
     "gene.coverage_no_bam": "the alignment (BAM) is not on this machine, so «no such variant» cannot be qualified by how much of the region was actually read",
-    "gene.coverage_contig": "the alignment carries no contig {chrom}",
+    "gene.coverage_contig": "the alignment carries no contig {chrom}, under either spelling of its name",
     "gene.blind_cnv": "short reads do not call large deletions or duplications of whole exons — for some genes those are a real share of the pathogenic alleles",
     "gene.blind_noncoding": "deep intronic and regulatory variants lie inside the interval but are not interpreted here",
     "gene.header": "**{gene}** — {chrom}:{start}–{end} ({strand}), {assembly}, transcript {transcript}",
@@ -532,6 +532,7 @@ MESSAGES = {
     "recompute.why.no_reference": "the reference FASTA with its .fai is not found, and no setting names one: `scholion choose-genome --reference /path/to/reference.fa` records it beside the profile; `SCHOLION_GENOME_REFERENCE=/path/to/reference.fa` names it for one run only",
     "recompute.why.no_bcftools": "bcftools is not installed",
     "recompute.why.no_clinvar": "the published ClinVar VCF is not in the genome folder; `scholion acmg-scan` names the one download it needs",
+    "recompute.why.acmg_missing": "the ACMG secondary-findings screen has never been run on this genome, and «not run» is not «nothing found»",
     "recompute.why.alignment_unreadable": "the alignment could not be read as a BAM",
     "recompute.why.alignment_build_unknown": "the build of the alignment could not be told from its header",
     "recompute.why.no_positions_in_build": "the catalogue has no positions in the build of the alignment",
@@ -688,6 +689,7 @@ MESSAGES = {
     "capabilities.kind.authors": "authors values — never a model's tool",
     "capabilities.kind.transcribes": "transcribes the person's own documents",
     "capabilities.face.web": "in the web interface",
+    "capabilities.face.through": "no tool of its own — reached through {tools}",
     "clinvar.low_confidence": "low-confidence (0-1 stars): the review level does not support this at the strength its class implies",
     "clinvar.low_confidence_note": "{n} of these rest on a 0-1 star ClinVar review — a pathogenic call at that review level is the single most over-reported class for consumer sequencing; treat as a lead to confirm, not a finding.",
     "clinvar.empty": "No significant ClinVar variants were extracted from your VCF.",
@@ -702,7 +704,8 @@ MESSAGES = {
     "acmg.how_to_run": "Run `scholion acmg-scan` — it checks your VCF against the ACMG "
                        "Secondary Findings gene list. It needs the published ClinVar file for "
                        "your build and nothing else, and prints that one download when it is "
-                       "not at hand.",
+                       "not at hand. An assistant starts the same scan through sch_recompute, "
+                       "with the person's yes.",
     "acmg.header": "**Secondary findings — {version}** ({genes} genes, {scanned} checked)",
     "acmg.reportable": "**Worth discussing with a geneticist: {n}**",
     "acmg.coverage_unknown": "coverage of these genes has never been measured on this genome, so «none found» here means «none found in what was read», and how much was read is unknown. `scholion limits` says what closes that.",
@@ -1181,7 +1184,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "tool.sch_analyze_labs.description": "A reading of the owner's lab results: flags for "
                                          "abnormalities, trends over time, links to the "
                                          "genome. markers is an optional comma-separated list "
-                                         "of keys.",
+                                         "of keys; catalogue=true prints those keys — every "
+                                         "marker of the profile with its unit and range.",
     "tool.sch_analyze_labs.param.markers": "marker keys, comma-separated; empty means all of them",
     "tool.sch_suggest_tests.description": "Suggest further tests based on the current lab "
                                           "data, the prescriptions and the gaps in the genome. "
@@ -1275,7 +1279,9 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                           "the pharmacogenetic watch list against the "
                                           "prescriptions on file, and the tests still worth "
                                           "taking. Says of each drug whether the genotype was "
-                                          "read or the general rule is being printed.",
+                                          "read or the general rule is being printed. Use it "
+                                          "when the person is preparing for a visit to a "
+                                          "physician or asks for a summary to take to one.",
     "tool.sch_limits.description": "WHAT THIS DATA CANNOT ANSWER, and what would close each "
                                   "gap. Read it before making any negative statement: «nothing "
                                   "found» is only meaningful next to what was looked at. Names "
@@ -1314,7 +1320,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "tool.sch_acmg.description": "ACMG SF v3.3 secondary findings — the actionable minimum "
                                 "across 84 genes, with the reporting rules applied (recessive "
                                 "genes only when biallelic, and so on). Says plainly when the "
-                                "scan has not been run, which is not the same as a clean result.",
+                                "scan has not been run, which is not the same as a clean result "
+                                "— and sch_recompute then offers the scan as a step.",
     "tool.sch_goal_suggest.description": "Proposes a target for each marker there is enough "
                                         "evidence to propose one for, and says where each number "
                                         "came from: a clinical association with its citation, "
@@ -3728,6 +3735,16 @@ will go through them later.
     "tool.sch_update.param.confirm": "true only after the person explicitly agreed, in this conversation, to install the update",
     "tool.sch_recompute.description": "WHAT THIS BUILD ASKS THE PERSON'S DATA TO RECOMPUTE — and, with their yes, the recompute itself. Without confirm it only reads: the steps every release since the data's version asks for, plus what the genome files themselves lack, each with the reason it can or cannot run. With confirm=true it starts the ready steps in the background; call it that way only after a yes in this conversation. Calling it again without confirm shows how far it is. Under a host that starts a fresh process for every call (the Ouroboros Hub) it only plans and says so.",
     "tool.sch_recompute.param.confirm": "true only after the person explicitly agreed, in this conversation, to start the recompute",
+    "tool.sch_medications.description": "THE CURRENT REGIMEN, as the profile holds it: every prescription on file with its dose, and which of them this build can answer about pharmacogenetically. Read it before saying what the person takes, and whenever sch_check_prescription or sch_second_opinion has compared a drug against «the current prescriptions» — those name the entries they found something about, never the whole list. Do not ask the person to recite the list in its place: a recalled regimen is indistinguishable from a read one. Writes nothing.",
+    "tool.sch_genome_status.description": "THE STATE OF THE GENOME FILE: whether a variant file is connected, in which build and how that was established, whether it is indexed, which questions this input opens and which it refuses, and the target genes with no data. Call it before any statement that depends on the file; when the build is not established, ask the person instead of assuming one. What it refuses is said about the FILE, never about the person. Writes nothing.",
+    "tool.sch_selfcheck.description": "THE INTEGRITY CHECK OF THE LABORATORY ARCHIVE: reads every form in the folder against the profile and says how many forms could not be read, how many values stand on a form and are absent from the profile, and how many disagree. Run it before any NEGATIVE statement about laboratory results — «not found in the profile» is not «never tested», and an unreadable form is unreadable, not missing. It re-reads the forms, so a large archive takes a while; it rebuilds the record of which form each point came from and changes no laboratory value.",
+    "tool.sch_selfcheck.param.full": "true prints the whole audit instead of the banner: which values stand on a form and are absent from the profile, which disagree, which forms could not be read",
+    "tool.sch_genome_status.param.updates": "true prints what the last check against a fresh ClinVar changed for this person — findings that appeared, left or were reclassified — instead of the state of the file",
+    "tool.sch_analyze_labs.param.catalogue": "true prints the catalogue of markers — key, unit and range of each — instead of the reading; the keys are what `markers` takes",
+    "tool.sch_rules.param.levels": "true prints what each evidence level A–E means and which of them permit a conclusion, instead of the rules",
+    "tool.sch_overview.param.snapshot": "true prints the bare snapshot instead of the screen: whose profile this is, the marker keys and the pharmacogenes it holds, the target genes with no data",
+    "rules.through_this_door": "**Through this door.** The rules above name commands. A model that holds tools and no shell runs them as these calls:",
+    "tool.sch_capabilities.description": "WHAT THIS BUILD CAN DO, AND THROUGH WHICH DOOR: every command with what it does, whether it reads or changes something, and the tool that answers to it here — or, where none does, why not and what reaches the same thing. Call it when the person asks for something no tool in this list covers, so that the answer is «this exists, on the command line» and not a guess. Writes nothing.",
     "upgrade.session_note_host": "— Scholion {latest} is out; this skill runs {installed}. Its host ({host}) installs and updates it, so do not call sch_update: tell the person that the host's catalogue brings the newer build.",
     "update.how.host": "This skill is installed and updated by its host ({host}), not by Scholion: it runs in the host's interpreter, and installing from here would change the host's Python rather than the skill's own environment. The host's catalogue brings the newer build.",
     "upgrade.session_note": "— Scholion {latest} is out; this session runs {installed}. Tell the person, and install it only if they say yes: sch_update with confirm=true, or `scholion update --yes`.",

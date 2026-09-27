@@ -40,6 +40,116 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.5.10 — 27.09.2026
+
+### What you can do now
+
+**Read the current regimen through an assistant.** An assistant connected through
+the tool server could check a new prescription against «the current
+prescriptions» and could not read that list: the overview it was given carries
+how many prescriptions there are, not which. The tool `sch_medications` prints
+the regimen as `scholion medications` does, so the assistant can say what the
+new drug was compared against — and no longer has to ask the person to recite
+it, which is an answer from memory and not from the record.
+
+**Ask about the genome file and the laboratory archive before a negative
+answer.** The safety rules tell an assistant to consult `scholion genome-status`
+before a statement that depends on the file, and to run `scholion selfcheck`
+before saying a test was never taken. Both are tools now: `sch_genome_status`
+and `sch_selfcheck`. The rules handed over by `sch_rules` end with a table that
+names, for every command they mention, the call that runs it.
+
+**Start the ACMG screen from an assistant when it has never been run.**
+`scholion recompute` and `sch_recompute` offer the screen as a step whenever a
+genome is connected and no result of the screen exists; it starts, as every
+step does, only after the person's yes. Before, the step was offered only when a
+release asked for a re-run, so a profile that had never been screened was told
+«not run» and given nothing that could run it.
+
+**Reach five more readings through the tools that already cover their
+subject.** `sch_selfcheck` with `full=true` prints the whole audit of forms
+against the profile (`scholion reconcile`); `sch_genome_status` with
+`updates=true` prints what the last check against a fresh ClinVar changed
+(`scholion genome-updates`); `sch_analyze_labs` with `catalogue=true` prints
+the marker keys its own `markers` parameter takes (`scholion markers`);
+`sch_rules` with `levels=true` prints what each evidence level A–E means
+(`scholion evidence-levels`); `sch_overview` with `snapshot=true` prints the
+bare snapshot (`scholion profile`).
+
+**Ask a build what it can do, and through which door.** `sch_capabilities` is
+`scholion capabilities` as a tool. The manifest now prints the call that answers
+for each command and, where no tool does, why not and which tools reach the
+same thing — so an assistant can answer «this exists, on the command line»
+where it used to have nothing to say.
+
+### What is fixed
+
+**Coverage of a gene was never measured on an alignment that names its contigs
+`chr7`.** The depth reader looked a chromosome up by the exact name `7`, which
+is how the coordinate layer spells it. An alignment against a UCSC or GATK
+reference spells it `chr7`, so for every gene on such a file `scholion genome
+--gene` printed «coverage not measured — the alignment carries no contig 7» —
+about a file that holds the contig and was never asked for it under its own
+name. The name is now matched against the file's header in either spelling; the
+mitochondrion is found as `MT`, `M`, `chrM` or `chrMT`. A contig the file really
+does not hold is still refused, and `1` never finds `chr11`.
+
+**A measured coverage was replaced by «not measured» in the answer about a
+gene.** For a gene outside the curated catalogue the depth read from the
+alignment was written into the answer and then overwritten by the entry of the
+coverage table, which for most genes is empty. The report then said that
+coverage «was not computed for this answer» beside an alignment that had just
+been read. The measurement now stays, and the table's answer travels beside it.
+
+**Three commands that write were listed as «reads only — safe to call to answer
+a question».** `scholion capabilities` called `choose-genome`, `brief-reviewed`
+and `acmg-scan` reads. The first records which file is the person's genome, the
+second records the person's statement that a brief still holds, the third
+writes the table the ACMG screen reads. All three are listed as changes now.
+
+**The instruction counted thirty-two tools where the build registers more.**
+The paragraph an assistant reads about the tool server listed thirty-two tools
+and left out `sch_version`, `sch_update` and `sch_recompute`. It lists what the
+build registers.
+
+**An evidence level was a bare letter to an assistant that holds only tools.**
+The laboratory report prints «(B)» beside a genetic note, and the legend — which
+levels permit a conclusion at all — had no tool. See `sch_rules` with
+`levels=true` above.
+
+**A request to prepare for a visit to a physician did not lead to the page
+written for it.** A host that reads tool descriptions and no skill entry saw
+nothing in the description of `sch_second_opinion` that said when to use it. It
+says so now, in both languages.
+
+### What is checked now that was not
+
+- What the build says about its tool door is held to what it does: every
+  command without a tool states a reason of a kind a program can check; a
+  command excused for writing must be listed as a write; a reading said to be
+  reached through another tool is run through both and compared; and a command
+  the safety rules name must be one the tool door answers.
+- A tool and the command it stands for print the same text and the same
+  structure, compared on every run.
+- The alignment reader is tested on files written in both spellings of a contig
+  name.
+- An import nobody reads, and a type named in an annotation and never imported,
+  are found by the suite itself — until now only the public linter looked.
+- A test of a shell script starts the shell a probe found to run, never a bare
+  name: on Windows the two are different programs.
+
+### What is retracted
+
+Nothing.
+
+### What needs recomputing
+
+Nothing has to be recomputed and nothing has to be re-imported. The coverage of
+a gene outside the catalogue is measured when it is asked for and is not stored,
+so the next `scholion genome --gene` on an alignment with `chr` names gives the
+measured answer. A profile whose ACMG screen was never run will see that step in
+`scholion recompute`; whether to run it is the person's decision.
+
 ## v0.5.9 — 27.09.2026
 
 ### What was wrong and is now right

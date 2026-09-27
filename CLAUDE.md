@@ -91,6 +91,15 @@ Three rules these checks enforce so that nobody has to remember them:
 - **Assistant rules live in one file.** The canon is `ASSISTANT-RULES.md`;
   `src/tools/sync_rules.py` copies it into the skill editions. Edit the canon,
   never the copy.
+- **What is said about the tool door is held to what the build does.** A
+  command without a tool carries a reason AND a kind (`contract.TOOLLESS`);
+  «it writes» must agree with `WRITES`, «a model gets this elsewhere» needs a
+  probe that runs both, and a command the canon names must have a tool.
+  `contract.check_door_claims()` and
+  `tests/test_what_is_said_about_the_tool_door_is_what_the_build_does.py`.
+  Written down after an outside report found the canon naming `genome-status`
+  and `selfcheck` with no tool behind either, and a missing regimen tool excused
+  by «already inside overview» — of an overview that prints a count.
 
 Tests run against a synthetic fixture with `SCHOLION_OFFLINE=1` and a stub genome
 directory — they never touch a real profile or a real VCF.

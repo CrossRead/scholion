@@ -808,9 +808,15 @@ The journal is needed where two factors always coincide in time and passive data
 does not separate them.
 
 The Ouroboros tools and the MCP server are the same core through one registry —
-32 tools, one per command that has a tool in the contract; four of them write
-what the person handed over (`sch_ingest_labs`, `sch_focus_log`, `sch_lab_draw`,
-`sch_marker_propose`) and none sets a value: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_sources`, `sch_suggest_tests`, `sch_system`.
+39 tools. One tool may answer for more than one command, the second behind a
+flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
+`updates=true` is `genome-updates`, `sch_analyze_labs` with `catalogue=true` is
+`markers`, `sch_rules` with `levels=true` is `evidence-levels`, `sch_overview` with
+`snapshot=true` is `profile`. Four of them write what the person handed over
+(`sch_ingest_labs`, `sch_focus_log`, `sch_lab_draw`, `sch_marker_propose`) and none
+sets a value; `sch_update` installs the program and `sch_recompute` rebuilds what the
+person's own files already hold, each only with `confirm=true` after the person's
+yes: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
 `scholion capabilities --json` derives the list from the build, and is the one
 to trust when this paragraph and the build disagree.
 

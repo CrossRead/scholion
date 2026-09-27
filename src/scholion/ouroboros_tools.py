@@ -53,11 +53,52 @@ def _reported(data, render):
     return handler
 
 
+def _yes(value) -> bool:
+    """A flag as a host may send it: a boolean, or the word for one."""
+    return value is True or str(value).strip().lower() in ("true", "yes", "1")
+
+
+def _with_second_reading(flag: str, first, second):
+    """One tool, two readings of one subject — the second behind a flag.
+
+    `first` and `second` are (data, render) pairs. The tool door is kept short on
+    purpose: a model choosing among forty names chooses worse than among thirty,
+    so a reading that belongs to a subject a tool already covers is reached
+    through that tool rather than given a name of its own. Which command each
+    reading answers to is written in `contract.PLUGIN` and `contract.PLUGIN_ARGS`,
+    and the manifest prints the call in full.
+    """
+    def pick(kwargs):
+        kwargs = dict(kwargs)
+        chosen = second if _yes(kwargs.pop(flag, False)) else first
+        return chosen, kwargs
+
+    def handler(ctx: "ToolContext", **kwargs) -> str:
+        (data, render), rest = pick(kwargs)
+        return render(data(**rest))
+
+    def both(**kwargs):
+        (data, render), rest = pick(kwargs)
+        r = data(**rest)
+        return render(r), r
+    setattr(handler, "both", both)
+    return handler
+
+
 _h_check_drug = _reported(lambda drug="": engine.check_drug_gene(drug),
                           lambda r: fmt.drug_check(r))
-_h_analyze_labs = _reported(
-    lambda markers="": engine.analyze_labs([m.strip() for m in markers.split(",") if m.strip()] or None),
-    lambda r: fmt.labs_report(r))
+def _marker_catalogue(markers: str = ""):
+    from scholion import core as _core  # noqa: E402
+    return {"markers": _core.marker_catalog()}
+
+
+# `markers` takes KEYS, and nothing a model could call printed them: the labs
+# report names a marker the way a form does. The catalogue is the second reading.
+_h_analyze_labs = _with_second_reading(
+    "catalogue",
+    (lambda markers="": engine.analyze_labs([m.strip() for m in markers.split(",") if m.strip()] or None),
+     lambda r: fmt.labs_report(r)),
+    (_marker_catalogue, lambda r: fmt.markers_report(r)))
 _h_suggest_tests = _reported(lambda: engine.suggest_tests(), lambda r: fmt.tests_report(r))
 
 
@@ -148,7 +189,17 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
 # `limits` is the one that mattered most. It is the answer to «what can this data
 # NOT tell you», the capability the whole project is built around, and the model
 # that most needed it was the one that could not call it.
-_h_overview = _reported(lambda: engine.overview(), lambda r: fmt.overview_report(r))
+def _snapshot_text(r) -> str:
+    import json as _json
+    return _json.dumps(r, ensure_ascii=False, indent=2)
+
+
+# The snapshot is the overview with nothing phrased: whose profile this is, which
+# marker keys and which pharmacogenes it holds, which target genes have no data.
+_h_overview = _with_second_reading(
+    "snapshot",
+    (lambda: engine.overview(), lambda r: fmt.overview_report(r)),
+    (lambda: engine.load_profile(), _snapshot_text))
 _h_second_opinion = _reported(lambda: engine.second_opinion(), lambda r: fmt.second_opinion_report(r))
 
 
@@ -251,11 +302,53 @@ def _h_rules(ctx: "ToolContext") -> str:
     from pathlib import Path as _P
     path = _P(__file__).resolve().parent / "skill" / "ASSISTANT-RULES.md"
     try:
-        return path.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8")
     except OSError:
         # An incomplete build. Saying nothing here would read as «this product has
         # no rules», which is the worst of the available untruths.
         return _t("skill.file_missing", path=str(path))
+    return text.rstrip("\n") + "\n" + _canon_through_this_door(text)
+
+
+def _canon_through_this_door(text: str) -> str:
+    """The commands the canon names, as the calls this door answers them by.
+
+    The canon is written once, for every door, and it names COMMANDS: «run
+    `selfcheck` before any negative conclusion», «`genome-status` prints which
+    paths this input opens». A model that reads it here holds tools, not a
+    shell, and a rule naming something it cannot call is a rule it cannot
+    follow. The table is generated from the contract, so it cannot name a tool
+    that is not there; a command the canon names and no tool answers fails the
+    build (`contract.check_door_claims`).
+    """
+    from scholion import contract as _c  # noqa: E402
+    rows = []
+    for cmd in _c.commands_named_in(text):
+        call = _c.tool_call(cmd)
+        if call:
+            rows.append(f"- `{cmd}` — {call}")
+    if not rows:
+        return ""
+    return "\n---\n\n" + _t("rules.through_this_door") + "\n\n" + "\n".join(rows) + "\n"
+
+
+def _evidence_legend():
+    from scholion.engine import panel_gate as _pg  # noqa: E402
+    return _pg.legend()
+
+
+
+def _h_rules_or_levels(ctx: "ToolContext", levels=False) -> str:
+    """The canon — or, with `levels`, what each evidence level A–E means.
+
+    An answer prints a level as a letter, and the letter decides whether a
+    conclusion may follow at all. The legend was written down as travelling
+    inside every such answer; in the laboratory report it did not.
+    """
+    if _yes(levels):
+        return fmt.evidence_levels_report(_evidence_legend())
+    return _h_rules(ctx)
+
 
 
 def _h_limits(ctx: "ToolContext", bed: bool = False, panel: str = "") -> str:
@@ -352,6 +445,69 @@ def _h_recompute(ctx: "ToolContext", confirm=False) -> str:
     return fmt.recompute_run_report(_rc.start_in_background())
 
 
+
+# --- reads the canon sends a model to, and the door did not carry ----------
+# An outside report against 0.4.11 found the shape: the canon names a command
+# («`genome-status` prints which paths this input opens», «run `selfcheck`
+# before any negative conclusion about labs»), the tool door had no such tool,
+# and the reason written down for the absence — «already inside overview» — was
+# not true: the overview carries a COUNT of prescriptions and the word
+# «connected». A model could run a prescription check against a regimen it
+# could not read, and the only route left to it was to ask the person to recite
+# the list — the recalled answer the canon forbids. All four are reads.
+def _medications():
+    from scholion import store as _st  # noqa: E402
+    return {"medications": _st.list_medications()}
+
+
+def _genome_status():
+    from scholion import core as _core  # noqa: E402
+    return {**engine.genome_status(), "gaps": _core.genome_gaps()}
+
+
+# Neither reading takes a folder. The audit rebuilds the record of which form
+# each point came from, and a model that could point it at a folder of its own
+# choosing could rewrite that record from forms that are not the person's. The
+# folder is the one the profile declares; naming another is the person's command.
+def _selfcheck():
+    from scholion import reconcile as _rec, updates as _upd  # noqa: E402
+    res = _rec.reconcile(None)
+    if isinstance(res, dict):
+        res["skill_copies"] = _upd.skill_copies()
+    return res
+
+
+def _selfcheck_text(r) -> str:
+    from scholion import reconcile as _rec  # noqa: E402
+    return _rec.selfcheck_summary(r) + fmt.skill_copies_lines(r.get("skill_copies"))
+
+
+def _capabilities():
+    from scholion import contract as _c  # noqa: E402
+    return _c.capabilities()
+
+
+def _reconcile():
+    from scholion import reconcile as _rec  # noqa: E402
+    return _rec.reconcile(None)
+
+
+_h_medications = _reported(_medications, lambda r: fmt.medications_report(r))
+# What a fresh ClinVar changed for this person is a fact about the same file the
+# status describes, and it had no door at all.
+_h_genome_status = _with_second_reading(
+    "updates",
+    (_genome_status, lambda r: fmt.genome_status_report(r)),
+    (lambda: engine.genome_updates(), lambda r: fmt.genome_updates_report(r)))
+# The banner is the short reading; the audit behind it — which value is on which
+# form and absent from the profile — is the long one, over the same run.
+_h_selfcheck = _with_second_reading(
+    "full",
+    (_selfcheck, _selfcheck_text),
+    (_reconcile, lambda r: fmt.reconcile_report(r)))
+_h_capabilities = _reported(_capabilities, lambda r: fmt.capabilities_report(r))
+
+
 def _h_system(ctx: "ToolContext", key: str = "", register: str = "") -> str:
     """The third entry. Read-only: the card assembles what the engine already
     holds around one system and writes nothing."""
@@ -366,7 +522,7 @@ def _h_system(ctx: "ToolContext", key: str = "", register: str = "") -> str:
 # at import: the language of a run is not known when the module is loaded.
 _TOOLS = (
     ("sch_check_drug_gene", ("drug",), ["drug"], _h_check_drug),
-    ("sch_analyze_labs", ("markers",), [], _h_analyze_labs),
+    ("sch_analyze_labs", ("markers", "catalogue"), [], _h_analyze_labs),
     ("sch_suggest_tests", (), [], _h_suggest_tests),
     ("sch_genome_lookup", ("rsid", "gene"), [], _h_genome),
     ("sch_check_prescription", ("drug",), ["drug"], _h_prescription),
@@ -379,10 +535,10 @@ _TOOLS = (
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
     ("sch_ingest_labs", ("folder",), ["folder"], _h_ingest_labs),
-    ("sch_overview", (), [], _h_overview),
+    ("sch_overview", ("snapshot",), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", ("bed", "panel"), [], _h_limits),
-    ("sch_rules", (), [], _h_rules),
+    ("sch_rules", ("levels",), [], _h_rules_or_levels),
     ("sch_sources", (), [], _h_sources),
     ("sch_lab_draw", ("day", "reason", "between"), ["day"], _h_lab_draw),
     ("sch_marker_propose", ("key", "names", "unit", "names_en"), ["key", "names"],
@@ -402,12 +558,17 @@ _TOOLS = (
     ("sch_version", (), [], _h_version),
     ("sch_update", ("confirm",), [], _h_update),
     ("sch_recompute", ("confirm",), [], _h_recompute),
+    ("sch_medications", (), [], _h_medications),
+    ("sch_genome_status", ("updates",), [], _h_genome_status),
+    ("sch_selfcheck", ("full",), [], _h_selfcheck),
+    ("sch_capabilities", (), [], _h_capabilities),
 )
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
 _PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
-               "bed": "boolean"}
+               "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
+               "levels": "boolean", "snapshot": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:

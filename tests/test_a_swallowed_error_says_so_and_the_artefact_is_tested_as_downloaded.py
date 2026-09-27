@@ -103,7 +103,8 @@ class TestASilentBroadHandlerMustSayWhy(unittest.TestCase):
         self.assertEqual([], bad)
 
 
-@unittest.skipUnless(shutil.which("bash") and shutil.which("tar"), "needs bash and tar")
+@unittest.skipUnless(support.posix_shell("bash") and shutil.which("tar"),
+                     "needs a bash that runs here and sees the paths Python hands it, and tar")
 class TestTheArtefactIsTestedWithoutGit(unittest.TestCase):
 
     SCRIPT = TOOLS / "test_the_artefact.sh"
@@ -125,7 +126,7 @@ class TestTheArtefactIsTestedWithoutGit(unittest.TestCase):
 
     def _run(self):
         env = dict(os.environ, TMPDIR=str(self.tmp))
-        return subprocess.run(["bash", str(self.SCRIPT), str(self.pkg)], capture_output=True,
+        return subprocess.run([support.posix_shell("bash"), str(self.SCRIPT), str(self.pkg)], capture_output=True,
                               text=True, env=env, timeout=60, stdin=subprocess.DEVNULL)
 
     def test_the_suite_sees_no_git_and_not_the_package_folder(self):

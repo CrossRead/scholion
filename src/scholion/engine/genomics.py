@@ -21,7 +21,14 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     # being read as a statement about the genome.
     # The gene this locus belongs to is known from the answer itself, so a single
     # position can carry the same qualification a gene query gets from its frame.
-    if r.get("gene"):
+    # …unless the answer already carries a coverage of its own. A gene outside
+    # the catalogue is answered by the gene-region reader, which measures depth
+    # from the alignment (or names why it could not); writing the table's answer
+    # over that put «not measured» on the screen beside an alignment that had
+    # just been read. Two producers wrote one key and the later one won. The
+    # table's answer for a gene query travels in `layers.coverage` regardless.
+    own = isinstance(r.get("coverage"), dict) and "source" in r["coverage"]
+    if r.get("gene") and not own:
         try:
             r["coverage"] = gene_coverage(r["gene"])
         except Exception as exc:                                     # noqa: BLE001

@@ -130,6 +130,47 @@ def _close_stdin() -> None:
 
 _close_stdin()
 
+
+# ── Is there a shell here that RUNS, and that sees the paths this process hands it?
+#
+# `shutil.which("bash")` answers a different question. On a Windows runner it
+# finds Git's bash on PATH, while `subprocess.run(["bash", …])` starts the one
+# in System32 — the WSL launcher, which with no distribution installed prints a
+# notice in UTF-16 and returns 1. 0.5.9's matrix went red on exactly that: three
+# tests of a shell script, four Windows jobs, every other job green. And a bash
+# that does run there still names `D:\a\x` as `/d/a/x`, so a script compared
+# against a path written by Python would fail for a reason that is not its own.
+#
+# So the shell is asked, once: run, return the status you were told to, and
+# print the folder you were sent to the way Python spells it. The answer is the
+# full path of that shell — which is what a test then starts, never the bare
+# name — or None, and a test of a shell script skips.
+_POSIX_SHELL: dict = {}
+
+
+def posix_shell(name: str = "bash"):
+    """The full path of a `name` that runs here and agrees with Python about paths, or None."""
+    if name in _POSIX_SHELL:
+        return _POSIX_SHELL[name]
+    import shutil
+    import tempfile
+    found = shutil.which(name)
+    answer = None
+    if found:
+        tmp = Path(tempfile.mkdtemp(prefix="scholion-shell-")).resolve()
+        try:
+            r = subprocess.run([found, "-c", 'cd "$1" && pwd -P && exit 7', "probe", str(tmp)],
+                               capture_output=True, stdin=subprocess.DEVNULL, timeout=30)
+            if r.returncode == 7 and r.stdout.decode("utf-8", "replace").strip() == str(tmp):
+                answer = found
+        except (OSError, subprocess.SubprocessError):
+            answer = None
+        finally:
+            shutil.rmtree(tmp, ignore_errors=True)
+    _POSIX_SHELL[name] = answer
+    return answer
+
+
 def run(args, profile_dir: Path | None = None, timeout: int = 120,
         lang: str | None = None):
     """Run a CLI command. Returns (return code, stdout, stderr).

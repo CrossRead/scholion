@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 PKG = Path(__file__).resolve().parent
 
@@ -308,6 +308,34 @@ PLUGIN: Dict[str, str] = {
     # The one write a model may hold, and the reason is in DICTATED: the person
     # says what happened, the assistant writes it down and invents nothing.
     "focus-log": "sch_focus_log",
+    # Reads the canon sends a model to, and reads whose absence was excused by a
+    # sentence that was not true (an outside report against 0.4.11). «The list is
+    # already inside overview» — the overview carries a count; «already inside
+    # overview» of the genome status — it carries the word «connected»; «the
+    # legend travels inside every answer that carries a level» — the laboratory
+    # report prints the letter alone. Every one of them is a read, so the rule
+    # that exactly the named tools write is untouched. Where a reading belongs to
+    # a subject a tool already covers it is that tool's second reading, behind
+    # the flag PLUGIN_ARGS names, so that the door stays short.
+    "medications": "sch_medications",
+    "genome-status": "sch_genome_status",
+    "genome-updates": "sch_genome_status",
+    "selfcheck": "sch_selfcheck",
+    "reconcile": "sch_selfcheck",
+    "capabilities": "sch_capabilities",
+    "markers": "sch_analyze_labs",
+    "evidence-levels": "sch_rules",
+    "profile": "sch_overview",
+}
+
+#: The arguments that make a tool answer for THIS command, where one tool answers
+#: for more than one. A command absent from here is its tool's plain call.
+PLUGIN_ARGS: Dict[str, Dict[str, Any]] = {
+    "genome-updates": {"updates": True},
+    "reconcile": {"full": True},
+    "markers": {"catalogue": True},
+    "evidence-levels": {"levels": True},
+    "profile": {"snapshot": True},
 }
 
 # Commands with no tool, and why. The bar is deliberately higher than for the web:
@@ -319,36 +347,23 @@ NO_PLUGIN: Dict[str, str] = {
     "genotype-sites": "runs bcftools over an alignment of tens of gigabytes and replaces a file in "
                       "the genome folder; a person starts it, for the same reason as `recompute`",
     "acmg-scan": "writes the table the ACMG screen reads, out of the person's variant file "
-                 "and a reference file they downloaded. Two reasons it is theirs to start and "
-                 "not a model's: it needs a file fetched onto that machine first, and it runs "
-                 "for as long as a pass over both. The model is not left silent about it — "
-                 "`sch_acmg` answers «this has not been run» and names the command, which is "
-                 "the useful half of what a tool here would have given.",
+                 "and a reference file they downloaded, and runs for as long as a pass over "
+                 "both: a job on the person's machine, started with their yes. A model is not "
+                 "left without it — `sch_acmg` answers «this has not been run», which is not a "
+                 "clean result, and `sch_recompute` offers the scan as a step whenever a "
+                 "genome is connected and no table of it exists.",
     "serve": "starts a server; a model has no browser to point at it",
     "init": "creates the profile directory — the person's decision, not a model's",
     "demo": "lays out a fictional profile; a model asking for one is a model about to "
             "confuse it with the person's own",
-    "evidence-levels": "the legend travels inside every answer that carries a level, and "
-                       "`sch_rules` holds the rule to name the level with the statement; a "
-                       "separate tool would be a second copy of words the answers already carry",
     "doc": "prints a document that ships with the package; the model is handed the "
            "instruction directly and does not read the product's manuals",
     "assistant": "describes how to connect a model — addressed to the person doing the "
                  "connecting",
-    "profile": "a snapshot for the skill's own context, assembled before the tools run",
-    "markers": "the catalogue for an entry form; a model writes no forms",
-    "medications": "the list is already inside overview and second-opinion",
-    "genome-status": "already inside overview",
-    "genome-updates": "the result of a background refresh the model does not start",
-    "selfcheck": "an integrity banner printed at the start of a session, before any tool",
-    "reconcile": "a long maintenance audit over every PDF; minutes, not a tool call",
     "redact": "strips identifiers out of text a person is about to publish — the one "
               "command whose entire purpose is that the text reaches FEWER places",
     "tools": "checks for external programs and offers to install them — a package "
              "manager is not a thing a model should be reaching for",
-    "capabilities": "the manifest of the command line, and a model reaching Scholion through "
-                    "the plugin is handed its tool list directly — that list is already the "
-                    "manifest of ITS surface. A tool enumerating tools is a mirror",
     # writes: a model does not change the profile. The canon it is handed says so, and
     # the absence of a tool is what makes that more than a promise.
     "add-lab": "a write", "add-med": "a write", "remove-med": "a write",
@@ -418,6 +433,182 @@ def check_plugin_parity() -> List[str]:
             problems.append(f"tool «{tool}» answers to no command: either it is a capability "
                             f"the other two faces lack, or the map is stale")
     return problems
+
+
+
+# --- why a command has no tool, in a form that can be checked ---------------
+# NO_PLUGIN holds sentences, and a sentence is for a reader: nothing could hold
+# it to what the build does. Two of them were false for months — «the list is
+# already inside overview», of a list the overview only counts — and three more
+# excused a command because it writes while the manifest, computed from another
+# table, called the same command a read. Nobody lied; two statements about one
+# thing were kept in two places and nothing compared them.
+#
+# So beside every sentence stands a KIND, from a closed list, and what each kind
+# promises is checked:
+#
+#   writes            it changes the record, and a model does not hold that pen.
+#                     The command is in WRITES — the manifest says the same.
+#   person_starts     a long job on the person's machine, in WRITES as well. The
+#                     tools named are how a model starts it with the person's
+#                     yes, and the job is one of the steps that tool runs.
+#   reached_through   what it prints reaches a model through the tools named. A
+#                     PROBE runs both on a profile and compares — the claim is
+#                     measured, the way «already inside overview» never was.
+#   for_the_person    about connecting, serving or installing the product, or a
+#                     text addressed to the person. It holds no fact about them
+#                     that a model would otherwise have to guess.
+#
+# A reason may name a tool only when that tool is listed beside it.
+TOOLLESS_KINDS = ("writes", "person_starts", "reached_through", "for_the_person")
+
+TOOLLESS: Dict[str, Any] = {
+    "add-lab": ("writes", ()), "add-med": ("writes", ()), "remove-med": ("writes", ()),
+    "add-metric": ("writes", ()), "set-folder": ("writes", ()), "init": ("writes", ()),
+    "demo": ("writes", ()), "choose-genome": ("writes", ()), "redact": ("writes", ()),
+    "brief-reviewed": ("writes", ()), "import-labs": ("writes", ()),
+    "import-fhir": ("writes", ()), "ingest-studies": ("writes", ()),
+    "ingest-garmin": ("writes", ()), "ingest-wearable": ("writes", ()),
+    # The reading half is a tool: the target stands beside the corridor there.
+    "target": ("writes", ("sch_analyze_labs",)),
+    "coverage": ("person_starts", ("sch_recompute",)),
+    "genotype-sites": ("person_starts", ("sch_recompute",)),
+    "acmg-scan": ("person_starts", ("sch_recompute", "sch_acmg")),
+    "panel": ("reached_through", ("sch_system",)),
+    "brief-review": ("for_the_person", ("sch_brief", "sch_analyze_labs")),
+    "serve": ("for_the_person", ()), "mcp": ("for_the_person", ()),
+    "doc": ("for_the_person", ()), "assistant": ("for_the_person", ()),
+    "tools": ("for_the_person", ()),
+}
+
+#: Where the canon lives inside a build. The source tree keeps the original at
+#: the top; `sync_rules` holds this copy equal to it, and this one ships.
+CANON = "skill/ASSISTANT-RULES.md"
+
+
+def canon_text() -> str:
+    from pathlib import Path as _P
+    return (_P(__file__).resolve().parent / CANON).read_text(encoding="utf-8")
+
+
+def commands_named_in(text: str) -> List[str]:
+    """The commands a text names in code spans, in the order it names them.
+
+    `selfcheck`, `scholion selfcheck` and `python3 -m scholion selfcheck --lab-dir X`
+    all name one command. A word that merely equals a command — «the profile»,
+    «a marker» — is not in a code span and is not a naming.
+    """
+    import re as _re
+    known = set(cli_commands())
+    out: List[str] = []
+    for span in _re.findall(r"`([^`\n]+)`", text or ""):
+        words = span.strip().split()
+        while words and words[0] in ("python3", "python", "-m", "scholion"):
+            words = words[1:]
+        if words and words[0] in known and words[0] not in out:
+            out.append(words[0])
+    return out
+
+
+def tool_call(cmd: str) -> Optional[str]:
+    """The call that answers for a command at the tool door — `sch_x`, or
+    `sch_x with full=true` — or None when no tool does."""
+    tool = PLUGIN.get(cmd)
+    if not tool:
+        return None
+    args = PLUGIN_ARGS.get(cmd) or {}
+    if not args:
+        return tool
+    said = ", ".join(f"{k}={str(v).lower() if isinstance(v, bool) else v}"
+                     for k, v in sorted(args.items()))
+    return f"{tool} with {said}"
+
+
+def check_door_claims() -> List[str]:
+    """What is SAID about the tool door against what the build does. Empty = they agree."""
+    import re as _re
+    from . import ouroboros_tools
+    problems: List[str] = []
+    schemas = {t.name: t.schema for t in ouroboros_tools.get_tools()}
+    # 1. every excuse has a kind, and every kind an excuse
+    for cmd in sorted(set(NO_PLUGIN) | set(TOOLLESS)):
+        if cmd not in TOOLLESS:
+            problems.append(f"«{cmd}» is excused from the tool door by a sentence and no kind: "
+                            f"add it to TOOLLESS, so that what the sentence claims can be held")
+            continue
+        if cmd not in NO_PLUGIN:
+            problems.append(f"«{cmd}» has a kind in TOOLLESS and no sentence in NO_PLUGIN")
+            continue
+        kind, through = TOOLLESS[cmd]
+        if kind not in TOOLLESS_KINDS:
+            problems.append(f"«{cmd}»: «{kind}» is not one of {TOOLLESS_KINDS}")
+        # 2. what is excused as a write is a write in the manifest, and the reverse
+        writes = kind in ("writes", "person_starts")
+        if writes and cmd not in WRITES:
+            problems.append(f"«{cmd}» has no tool because it writes, and WRITES does not list it: "
+                            f"the manifest tells a model it is safe to call to answer a question")
+        if cmd in WRITES and not writes:
+            problems.append(f"«{cmd}» is in WRITES and is excused from the tool door as «{kind}»")
+        # 3. a route that is promised exists
+        for tool in through:
+            if tool not in schemas:
+                problems.append(f"«{cmd}» is said to be reached through «{tool}», and no such "
+                                f"tool is registered")
+        if kind in ("person_starts", "reached_through") and not through:
+            problems.append(f"«{cmd}» is «{kind}» and names no tool it is reached through")
+        # 4. a sentence names only the tools listed beside it
+        for tool in sorted(set(_re.findall(r"\bsch_[a-z_]+", NO_PLUGIN[cmd]))):
+            if tool not in through:
+                problems.append(f"the reason for «{cmd}» names «{tool}», which is not listed "
+                                f"beside it in TOOLLESS — a claim nothing checks")
+    # 5. the steps a model is told it can start are steps the recompute runs
+    runners: Dict[str, Any] = {}
+    try:
+        from . import recompute as _recompute
+        runners = dict(_recompute.RUNNERS)
+    except Exception as exc:                                         # noqa: BLE001
+        problems.append(f"the recompute steps could not be read: {type(exc).__name__}")
+    for cmd, (kind, through) in sorted(TOOLLESS.items()):
+        if kind == "person_starts" and "sch_recompute" in through \
+                and f"scholion {cmd}" not in runners:
+            problems.append(f"«{cmd}» is said to be started through sch_recompute, and the "
+                            f"recompute has no such step")
+    # 6. the arguments of a second reading are parameters of the tool
+    for cmd, args in sorted(PLUGIN_ARGS.items()):
+        tool = PLUGIN.get(cmd)
+        if not tool:
+            problems.append(f"PLUGIN_ARGS names «{cmd}», which has no tool")
+            continue
+        props = ((schemas.get(tool) or {}).get("parameters") or {}).get("properties") or {}
+        for name in args:
+            if name not in props:
+                problems.append(f"«{cmd}» is answered by {tool} with «{name}», and the tool "
+                                f"takes no such parameter")
+    # 7. two commands behind one tool are two different calls
+    calls: Dict[str, str] = {}
+    for cmd in sorted(PLUGIN):
+        call = tool_call(cmd) or ""
+        if call in calls and PLUGIN_ARGS.get(cmd) is None and PLUGIN_ARGS.get(calls[call]) is None \
+                and (cmd, calls[call]) not in _ONE_CALL_TWO_NAMES \
+                and (calls[call], cmd) not in _ONE_CALL_TWO_NAMES:
+            problems.append(f"«{cmd}» and «{calls[call]}» are both answered by the plain call "
+                            f"{call}: one of them needs its arguments in PLUGIN_ARGS")
+        calls.setdefault(call, cmd)
+    # 8. a command the canon names is a command this door answers
+    try:
+        named = commands_named_in(canon_text())
+    except OSError as exc:
+        named = []
+        problems.append(f"the canon could not be read: {type(exc).__name__}")
+    for cmd in named:
+        if cmd not in PLUGIN:
+            problems.append(f"the canon names «{cmd}», and no tool answers for it: a model "
+                            f"that reads the rule through the tool door cannot follow it")
+    return problems
+
+
+#: Commands that really are one call under two names.
+_ONE_CALL_TWO_NAMES: Tuple[Tuple[str, str], ...] = ()
 
 
 # --- the fourth face: what the model is TOLD exists -------------------------
@@ -564,6 +755,13 @@ WRITES = {
     "recompute", "genotype-sites", "coverage",
     # 0.5.2: installs a newer build into the environment — the program, not the data.
     "update",
+    # Found when the reasons for a missing tool became checkable: each of the
+    # three was excused from the tool door BECAUSE it writes, and none was listed
+    # here — so the manifest told a model «reads only, safe to call to answer a
+    # question» about a command that records which file is the person's genome.
+    # `acmg-scan` writes the table the screen reads; `choose-genome` writes the
+    # choice; `brief-reviewed` writes the person's statement that a brief holds.
+    "acmg-scan", "choose-genome", "brief-reviewed",
 }
 
 # Creates a value that came from nobody's document. None of these is a tool, and
@@ -571,6 +769,9 @@ WRITES = {
 AUTHORS = {
     "add-lab", "add-med", "remove-med", "add-metric",
     "init", "demo", "set-folder",
+    # Which file is the genome is a fact only the person holds; the command
+    # records their answer, and no document states it.
+    "choose-genome",
 }
 
 # The third kind, and it was forced by a person rather than by a test. The owner
@@ -606,7 +807,11 @@ AUTHORS = {
 # confirms it; a model may propose (the tool says so in its description) and
 # may not confirm. Both ARE tools, because what they write is what was said
 # and the engine reads a proposal as nothing until it is confirmed.
-DICTATED = {"focus-log", "target", "lab-draw", "marker"}
+#
+# `brief-reviewed` is the fifth: the person says the wording of a brief still
+# holds against the numbers that arrived after it, and that sentence is written
+# down as theirs. Not a tool — a model may not certify its own text.
+DICTATED = {"focus-log", "target", "lab-draw", "marker", "brief-reviewed"}
 
 # Moves the person's own documents into the profile. `ingest-labs` IS a tool, on
 # purpose and recorded here rather than by omission: a model that has just been
@@ -614,7 +819,10 @@ DICTATED = {"focus-log", "target", "lab-draw", "marker"}
 # writes are the laboratory's, read off the form.
 TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearable",
                "import-labs", "import-fhir",
-               "redact", "recompute", "genotype-sites", "coverage"}
+               "redact", "recompute", "genotype-sites", "coverage",
+               # Rebuilds a table out of the person's own variant file, like the
+               # two beside it; decides no value.
+               "acmg-scan"}
 
 # The fourth kind (owner, 14.09.2026): neither data nor testimony — the program
 # itself. `update` installs a newer build into the environment it runs from. A
@@ -667,6 +875,10 @@ def capabilities() -> Dict[str, Any]:
                 "cli": True,
                 "web": routes.get(cmd),
                 "plugin": PLUGIN.get(cmd),
+                "plugin_call": tool_call(cmd),
+                "plugin_absent": ({"kind": TOOLLESS[cmd][0], "through": list(TOOLLESS[cmd][1]),
+                                   "why": NO_PLUGIN.get(cmd, "")}
+                                  if cmd in TOOLLESS and cmd not in PLUGIN else None),
                 "instruction": bool(named and _re.search(
                     r"\bscholion %s\b" % _re.escape(cmd), named)),
             },

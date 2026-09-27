@@ -104,12 +104,21 @@ class TestTheThirdFaceKeepsUp(unittest.TestCase):
         # testimony about two draws in one day, the second a NAME filed as a
         # proposal nobody acts on until a person confirms it. Both stay tools —
         # what they write is what was said, never a value.
-        self.assertEqual(contract.DICTATED, {"focus-log", "target", "lab-draw", "marker"},
+        # `brief-reviewed` was written down as dictated on 27.09.2026, and the
+        # decision about the tool is older than the kind: `contract.NO_PLUGIN`
+        # has said from the start that a model may word a brief and may not
+        # certify its own wording. What changed is that the command is now
+        # LISTED as a write — it was excused from the tool door for writing
+        # while the manifest called it a read.
+        self.assertEqual(contract.DICTATED,
+                         {"focus-log", "target", "lab-draw", "marker", "brief-reviewed"},
                          "a command joined the dictated kind without anybody "
                          "deciding whether it may be a tool")
         self.assertIn("target", contract.NO_PLUGIN,
                       "the pen that writes a clinician's figure was handed to a model "
                       "without the owner's decision being recorded")
+        self.assertIn("brief-reviewed", contract.NO_PLUGIN,
+                      "a model was handed the pen that certifies its own wording")
 
     def test_the_tools_a_model_needs_before_a_negative_statement_are_there(self):
         """Named one by one, because these are the ones whose absence is silent.

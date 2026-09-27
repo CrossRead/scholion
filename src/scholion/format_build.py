@@ -74,7 +74,10 @@ def capabilities_report(r: Dict[str, Any]) -> str:
             if faces.get("web"):
                 marks.append(_t("capabilities.face.web"))
             if faces.get("plugin"):
-                marks.append(faces["plugin"])
+                marks.append(faces.get("plugin_call") or faces["plugin"])
+            elif (faces.get("plugin_absent") or {}).get("through"):
+                marks.append(_t("capabilities.face.through",
+                                tools=", ".join(faces["plugin_absent"]["through"])))
             L.append(f"- `scholion {c['command']}` — {c['does']}"
                      + (f"  _[{', '.join(marks)}]_" if marks else ""))
         L.append("")

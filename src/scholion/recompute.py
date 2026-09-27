@@ -233,6 +233,18 @@ def _engine_of(path: Path) -> Optional[str]:
     return meta.get("engine") if isinstance(meta, dict) else None
 
 
+def _acmg_never_run() -> bool:
+    """A genome is connected and no table of the ACMG screen stands beside it."""
+    from . import core, genome
+    try:
+        if not genome.available().get("ready"):
+            return False
+        table = str(RUNNERS["scholion acmg-scan"]["genome_file"])
+        return not any((b / table).exists() for b in core.genome_bases())
+    except Exception:  # noqa: BLE001  # quiet: a plan that cannot tell offers nothing extra — the screen still says «not run»
+        return False
+
+
 def _judge(step: Dict[str, Any]) -> None:
     from . import core, sites, updates
     spec = RUNNERS[step["key"]]
@@ -281,8 +293,9 @@ def _judge(step: Dict[str, Any]) -> None:
             step["state"], step["why"] = "already_current", "written_by"
             step["detail"]["engine"] = engine
             return
+    never_run = (step.get("data") or {}).get("status") == "missing"
     gf = spec.get("genome_file")
-    if gf and not any((b / gf).exists() for b in core.genome_bases()):
+    if gf and not never_run and not any((b / gf).exists() for b in core.genome_bases()):
         step["state"], step["why"] = "not_applicable", "no_file"
         step["detail"]["file"] = gf
         return
@@ -292,6 +305,9 @@ def _judge(step: Dict[str, Any]) -> None:
         from .coverage import clinvar_path
         if clinvar_path() is None:
             step["state"], step["why"] = "needs_input", "no_clinvar"
+            return
+        if never_run:
+            step["state"], step["why"] = "ready", "acmg_missing"
             return
     domain = spec.get("folder")
     if domain:
@@ -385,6 +401,17 @@ def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, A
             by_key[s["key"]] = s
             steps.append(s)
         s["data"] = st
+    # The ACMG screen, when it has never been run on a connected genome. No
+    # release asks for it and no file of it is out of date — there is no file —
+    # so neither route above offered it, and a person whose only face is an
+    # assistant had a tool that reads the screen and nothing that could produce
+    # one. «Not run» is not «clean», and the step that closes it is offered here.
+    if "scholion acmg-scan" not in by_key and _acmg_never_run():
+        a: Dict[str, Any] = {"kind": "command", "key": "scholion acmg-scan", "force": False,
+                             "source": "data", "versions": [], "conditions": [], "text": None,
+                             "data": {"status": "missing"}}
+        by_key[a["key"]] = a
+        steps.append(a)
     for s in steps:
         if s.get("key"):
             s["command"] = s["key"] + (" --force" if s.get("force") else "")

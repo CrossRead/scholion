@@ -30,7 +30,7 @@ import threading
 import unittest
 import urllib.error
 import urllib.request
-from contextlib import contextmanager, redirect_stdout
+from contextlib import redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock

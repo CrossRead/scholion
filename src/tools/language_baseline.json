@@ -112,6 +112,7 @@
     "tests/test_three_entries_refuse_in_one_voice.py": 2,
     "tests/test_uncovered_modules.py": 5,
     "tests/test_unit_gate.py": 1,
+    "tests/test_what_is_said_about_the_tool_door_is_what_the_build_does.py": 1,
     "tests/test_wife_report_class.py": 8
   }
 }

@@ -239,8 +239,15 @@ class TestAStaleTableCannotAnswer(_Table):
         p = self.current()
         with mock.patch.object(acmg_scan, "source_identity", side_effect=OSError("synthetic unavailable")):
             self.refused("source_unavailable")
-        with mock.patch.object(Path, "stat", return_value=mock.Mock(st_dev=-1, st_ino=-1,
-                                                                   st_size=-1, st_mtime_ns=-1, st_ctime_ns=-1)):
+        stamp = p.stat()
+        changed = mock.Mock(st_dev=-1, st_ino=-1, st_size=-1,
+                            st_mtime_ns=-1, st_ctime_ns=-1)
+        # The reopened path is witnessed through its descriptor on Windows;
+        # changing Path.stat there no longer simulates a replaced source.
+        reopened = (mock.patch.object(acmg_scan.os, "fstat", side_effect=[stamp, stamp, changed])
+                    if acmg_scan.os.name == "nt" else
+                    mock.patch.object(Path, "stat", return_value=changed))
+        with reopened:
             with self.assertRaises(OSError):
                 acmg_scan.source_identity(p)
 

@@ -40,10 +40,7 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
-## v0.6.0 — 27.09.2026
-
-_This entry is open: it lists what has changed since 0.5.11 and grows until the
-release is published._
+## v0.6.0 — 05.10.2026
 
 ### What you can do now
 

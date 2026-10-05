@@ -397,7 +397,28 @@
   .printonly{display:none}
   @media print{
     :root{--ink:#000;--ink-2:#333;--muted:#666;--plane:#fff;--surface:#fff;--surface-2:#fff;
-          --border:#bbb;--grid:#ddd;--baseline:#999}
+          --border:#bbb;--grid:#ddd;--baseline:#999;
+          --accent:#b4531a;--accent-hover:#9a4514;--accent-strong:#9a4514;--accent-soft:#f7e7da;--on-accent:#fff;
+          --good:#1b6f64;--warning:#8a5a00;--critical:#b42340;--near:#2b6cb0;
+          --good-soft:#e0f1ee;--warning-soft:#faefd6;--critical-soft:#fae3e7;--near-soft:#e5eef8;
+          --chart-series:var(--accent);--chart-target:var(--baseline);
+          --chart-band:var(--surface-2);--chart-boundary:var(--baseline);--shadow:none}
+    /* Crossread's application and cards read its tokens directly. The legacy
+       aliases alone left dark paper under black print text. Outrank both an
+       explicit theme and the system theme without changing the screen choice. */
+    :root:root:root{
+      color-scheme:light;
+      --cr-bg:var(--plane);--cr-surface:var(--surface);--cr-surface-sunken:var(--surface-2);
+      --cr-surface-raised:var(--surface);--cr-text:var(--ink);--cr-text-secondary:var(--ink-2);
+      --cr-text-tertiary:var(--muted);--cr-text-disabled:var(--muted);
+      --cr-border:var(--border);--cr-border-strong:var(--baseline);
+      --cr-accent:var(--accent);--cr-accent-hover:var(--accent-hover);--cr-accent-pressed:var(--accent-strong);
+      --cr-accent-strong:var(--accent-strong);--cr-accent-soft:var(--accent-soft);--cr-on-accent:var(--on-accent);
+      --cr-success:var(--good);--cr-warning:var(--warning);--cr-danger:var(--critical);--cr-info:var(--near);
+      --cr-success-soft:var(--good-soft);--cr-warning-soft:var(--warning-soft);
+      --cr-danger-soft:var(--critical-soft);--cr-info-soft:var(--near-soft);
+      --cr-shadow-1:none;--cr-shadow-2:none
+    }
     html,body{background:var(--plane);color:var(--ink)}
     header,nav,#langswitch,#localbadge,#ver,#demobanner,.subnav,.tablink,.menu,
     button,.act,.ghost,.srcbar,.srcfoot,.sources,.actions,.toolbar{display:none !important}

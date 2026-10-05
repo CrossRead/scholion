@@ -355,7 +355,16 @@ def source_identity(path) -> Dict[str, Any]:
             raise OSError("source changed while checking it")
     fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
     witness = {k: getattr(before, k) for k in fields}
-    current = p.stat()
+    if os.name == "nt":
+        # Windows stat(path) and fstat(fd) disagree about ctime in Python 3.12+.
+        # Reopen the path: compare like witnesses without dropping the change
+        # timestamp or the check that the path still names the opened source.
+        with p.open("rb") as current_stream:
+            current = os.fstat(current_stream.fileno())
+            if change != _windows_change_time(current_stream.fileno()):
+                raise OSError("source changed while checking it")
+    else:
+        current = p.stat()
     if witness != {k: getattr(after, k) for k in fields} or witness != {
             k: getattr(current, k) for k in fields}:
         raise OSError("source changed while checking it")

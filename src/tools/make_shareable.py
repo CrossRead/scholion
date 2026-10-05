@@ -262,7 +262,7 @@ def load_private(repo: Path) -> set:
 
 
 def _is_text(p: Path) -> bool:
-    return p.suffix.lower() in TEXT_EXT or p.name == ".gitignore"
+    return p.suffix.lower() in TEXT_EXT or p.name in {".gitignore", ".gitattributes"}
 
 
 def _copytree(src: Path, dst: Path, only_ext=None) -> None:
@@ -763,7 +763,7 @@ def build(repo: Path, out: Path) -> Path:
             if _f.is_file():
                 shutil.copy2(_f, shared / ".github" / "ISSUE_TEMPLATE" / _f.name)
 
-    for _name in ("pyproject.toml",):
+    for _name in ("pyproject.toml", ".gitattributes"):
         if (repo / _name).exists():
             shutil.copy2(repo / _name, shared / _name)
 
@@ -984,7 +984,7 @@ def _check_root_fresh(repo: Path, out: Path, shared: Path) -> None:
     # cannot be deleted, so a file that used to be put at the root and is now put
     # elsewhere stays lying there and travels to the recipient. That is how the
     # delivery root acquired a `pyproject.toml` from which an empty wheel is built.
-    expected = {".git", ".gitignore", ".DS_Store", ".github", "claude-skill", "skills",
+    expected = {".git", ".gitignore", ".gitattributes", ".DS_Store", ".github", "claude-skill", "skills",
                 "README.md", "ASSISTANT-RULES.md", "CLAUDE.md",
                 "SHORTCUTS-macOS.md", "LOADING-DATA.md", "PREPARING-THE-GENOME.md",
                 "pyproject.toml", "run_tests.sh",

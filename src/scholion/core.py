@@ -696,27 +696,29 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
         pass
 
 
-_JSON_CACHE: Dict[str, Any] = {}   # str(path) -> (mtime, data)
+_JSON_CACHE: Dict[str, Any] = {}   # str(path) -> (file witness, data)
 
 
 def _read_json(path: Path) -> Dict[str, Any]:
-    """Read JSON with invalidation by the file modification time.
+    """Read JSON with invalidation by nanosecond timestamps, size and identity.
 
     The cache lives as long as the file has not changed on disk. That way the application
     always returns the ACTUAL data of the source (after edits from the UI, from a parallel
     branch or by hand) — without requiring a restart, without re-reading it on every request.
     """
     try:
-        mt = path.stat().st_mtime
+        stamp = path.stat()
+        witness = (stamp.st_mtime_ns, stamp.st_ctime_ns, stamp.st_size,
+                   stamp.st_dev, stamp.st_ino)
     except (FileNotFoundError, NotADirectoryError):
         return {}
     key = str(path)
     hit = _JSON_CACHE.get(key)
-    if hit is not None and hit[0] == mt:
+    if hit is not None and hit[0] == witness:
         return hit[1]
     with path.open(encoding="utf-8") as f:
         data = json.load(f)
-    _JSON_CACHE[key] = (mt, data)
+    _JSON_CACHE[key] = (witness, data)
     return data
 
 

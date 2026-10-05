@@ -16,3 +16,8 @@ class TestCrossreadVendor(unittest.TestCase):
         self.assertEqual(18, len(manifest['components']))
         css = (web / 'crossread.css').read_bytes()
         self.assertEqual(manifest['sha256'], hashlib.sha256(css).hexdigest())
+
+    def test_checkout_keeps_the_vendor_checksum_bytes_on_windows(self):
+        root = Path(__file__).resolve().parents[1]
+        attributes = (root / '.gitattributes').read_text(encoding='utf-8')
+        self.assertIn('src/scholion/web/crossread.css text eol=lf', attributes)

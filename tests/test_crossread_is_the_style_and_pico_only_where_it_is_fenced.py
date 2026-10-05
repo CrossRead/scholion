@@ -89,6 +89,19 @@ class TestOneSourceOfColour(unittest.TestCase):
         self.assertIn("localStorage.getItem('scholion-theme')", page)
         self.assertIn("web.menu.theme", page)
 
+    def test_print_maps_crossread_and_pico_to_the_same_readable_paper(self):
+        block = _style(_page()).split("@media print{", 1)[1].split("/* Task 217", 1)[0]
+        self.assertIn(":root:root:root{", block)
+        self.assertIn("color-scheme:light", block)
+        for name, target in (("bg", "plane"), ("surface", "surface"), ("surface-sunken", "surface-2"),
+                ("surface-raised", "surface"), ("text", "ink"), ("text-secondary", "ink-2"),
+                ("text-tertiary", "muted"), ("text-disabled", "muted"), ("success", "good"),
+                ("warning", "warning"), ("danger", "critical"), ("info", "near")):
+            with self.subTest(token=name):
+                self.assertIn(f"--cr-{name}:var(--{target})", block)
+                self.assertRegex(block, re.escape("--" + target) + r":#[0-9a-fA-F]+[;}]",
+                                 "a print alias must terminate at the print palette, not loop back to Crossread")
+
 
 class TestPicoIsFenced(unittest.TestCase):
 

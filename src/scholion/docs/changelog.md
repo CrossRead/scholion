@@ -47,6 +47,17 @@ release is published._
 
 ### What you can do now
 
+**Printing stays readable when the screen uses the dark theme.** Printed
+Crossread cards and legacy views share a light paper palette without changing
+the selected screen theme. Regenerate previously saved dark-theme PDFs; stored
+measurements and interpretations are unchanged.
+
+**Windows file checks no longer mistake unchanged genomes for changed inputs.**
+ACMG screening still refuses a replaced or modified source. If an older table
+is refused, rerun the screen; stored findings are not silently revalidated.
+Edits to local notes are also reread even when successive saves share the same
+rounded modification time, instead of retaining the previous note.
+
 **Amino-acid reference contexts are shared, not diagnoses.** Low measured
 values can link to one source-backed explanation of protein intake,
 malabsorption and catabolism, with the limits of each single study. These

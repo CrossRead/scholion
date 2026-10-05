@@ -172,10 +172,12 @@ class TestTheDrawChecklist(_Tmp):
         self.assertIn("error", json.loads(js.read_text(encoding="utf-8"))["thresholds"])
         self.assertIn("NOT checked", buf.getvalue())
 
-    def test_a_readable_map_carries_no_error(self):
+    def test_a_readable_map_does_not_establish_clinical_support(self):
         dc = _load("draw_checklist.py", "_dc_unread2")
         info, _ = dc.from_thresholds()
-        self.assertEqual(info, {})
+        self.assertIn('basis_withheld', info)
+        self.assertIn('interpretation withheld', info['error'])
+        self.assertNotIn('comparison unavailable', info['error'])
 
 
 class TestTheLaboratoryReport(_Tmp):

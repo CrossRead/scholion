@@ -152,6 +152,14 @@ class TestThePersonsOwnPatterns(unittest.TestCase):
         r = redact.redact("sample LX7742001QF")
         self.assertNotIn("LX7742001QF", r["text"])
 
+    def test_warning_patterns_are_still_removed_from_shared_text(self):
+        (self.dir / ".personal_patterns").write_text(
+            "\n# synthetic identifiers\nwarn: ExampleIdentity\n", encoding="utf-8")
+        r = redact.redact("ExampleIdentity submitted this report")
+        self.assertNotIn("ExampleIdentity", r["text"])
+        self.assertEqual(1, r["patterns_loaded"])
+        self.assertEqual(1, r["replaced"]["your own patterns"])
+
     def test_a_broken_pattern_does_not_take_the_run_with_it(self):
         (self.dir / ".personal_patterns").write_text("re:[unclosed\nIvanov\n", encoding="utf-8")
         r = redact.redact("patient Ivanov")

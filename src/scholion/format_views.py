@@ -8,6 +8,9 @@ from typing import Any, Dict, List, Optional  # noqa: F401
 
 from .i18n import plural as _plural, t as _t  # noqa: F401
 from .format_primitives import _PRIO_ICON, _flag_icon, _n
+from .test_proposals import test_basis_text
+from .goal_basis import goal_basis_text
+from .clinical_claims import basis_lines
 
 
 def lifestyle_report(r: Dict[str, Any]) -> str:
@@ -17,7 +20,7 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
         return _t("lifestyle.empty")
     fs = r.get("fitness_score")
     lines = [_t("lifestyle.title")
-             + (" · " + _t("lifestyle.fitness_score", score=fs) if fs is not None else ""), ""]
+             + (" · " + _t("lifestyle.fitness_score", score=fs) if fs is not None else ""), "", _t('clinical.display_limit'), ""]
     icon = {"ok": "🟢", "warn": "🟠", "bad": "🔴", "none": "•"}
     for m in ms:
         t = m.get("trend")
@@ -38,6 +41,7 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
                if cov.get("n") and cov.get("days") and cov["n"] < cov["days"] else "")
         lines.append(f"{icon.get(m.get('status'),'•')} {m['label']}: **{_n(m['value'])} {m['unit']}**".rstrip()
                      + f" ({m['date']}){tr}{improv}{brk}{cvr}")
+        lines.extend(basis_lines(m))
         # A movement the sample cannot tell from its own noise says so, with the
         # size of the difference that WOULD be visible. Printed under the metric
         # rather than folded into the arrow: it is the reason there is no arrow.
@@ -62,6 +66,11 @@ def goal_report(r: Dict[str, Any]) -> str:
     if r.get("headline"):
         lines.append(_t("goal.headline", text=r["headline"]))
         lines.append("")
+    for entity in r.get('entities', []):
+        origin = entity['origin']
+        lines.append(f"• {entity['title']} [{entity['id']}]: "
+                     + _t('goal.origin.line', origin=origin['label'], reason=origin.get('reason') or '—'))
+        lines.append(f"  {entity['record']['file']} · {entity.get('target') if entity.get('target') is not None else '—'}")
     for p in r.get("peaks", []):
         lines.append(f"• {p.get('title')} · {p.get('year')}: {p.get('text')}")
     if r.get("peaks"):
@@ -83,10 +92,11 @@ def tests_report(r: Dict[str, Any]) -> str:
     errs = [s for s in r["suggestions"] if "error" in s]
     lines = [_t("tests.header", n=len(pending)), ""]
     for s in pending:
-        icon = _PRIO_ICON.get(s.get("priority", "low"), "•")
+        icon = _PRIO_ICON.get(s.get("priority"), "•")
         spec = (" · " + _t("tests.specialist", name=s["specialist"])
                 if s.get("specialist") and s["specialist"] != "—" else "")
         lines.append(f"{icon} **{s['suggest']}**{spec}\n   " + _t("tests.why", text=s["why"]))
+        lines.append(test_basis_text(s))
         if s.get("last_measured_unreadable"):
             lines.append("   " + _t("tests.last_date_unreadable",
                                     date=s["last_measured_unreadable"]))
@@ -97,8 +107,9 @@ def tests_report(r: Dict[str, Any]) -> str:
     if done:
         lines.append("\n" + _t("tests.routine_header"))
         for s in done:
-            lm = s.get("last_measured", ""); rm = s.get("recheck_months", 3)
+            lm = s.get("last_measured", ""); rm = s.get("recheck_months")
             lines.append("✓ " + _t("tests.done", name=s["suggest"], date=lm, months=rm))
+            lines.append(test_basis_text(s))
     lines.append(f"\n_{r['disclaimer']}_")
     return "\n".join(lines)
 
@@ -157,6 +168,10 @@ def render_focus(d: Dict[str, Any]) -> str:
     m = d.get("metric") or {}
     out = ["🎯 " + _t("focus.title", title=d.get("title")),
            f"_{_t('focus.since', date=d.get('started'))}_", ""]
+    if d.get('goal_entity'):
+        origin = d['goal_entity']['origin']
+        out.append(_t('goal.origin.line', origin=origin['label'], reason=origin.get('reason') or '—'))
+    out.append(_t('clinical.recorded_focus'))
     if d.get("why"):
         out += [d["why"], ""]
     val = m.get("value") or "—"
@@ -255,7 +270,10 @@ def overview_report(r: Dict[str, Any]) -> str:
                           ago=_plural(int(b.get("days") or 0), "count.days"))
     if r.get("stale_abnormal_count"):
         head += _t("overview.stale_note", n=r["stale_abnormal_count"])
-    out = [head + ".", ""]
+    from .format_prescription import caution_lines, control_lines
+    out = caution_lines(r.get("regimen_cautions") or []) + [head + ".", ""]
+    if r.get("overdue_controls"):
+        out += [_t("treatment.overdue")] + control_lines(r["overdue_controls"]) + [""]
 
     for key, phrase in (("high_flags", "overview.high"), ("watch_flags", "overview.low")):
         items = r.get(key) or []
@@ -266,13 +284,14 @@ def overview_report(r: Dict[str, Any]) -> str:
                            f"{m.get('value')} {m.get('unit', '')} ({m.get('date', '')})")
             out.append("")
 
-    hs = r.get("high_suggestions") or []
+    hs = r.get("pending_suggestions") or r.get("high_suggestions") or []
     line = _t("overview.suggestions", n=r.get("suggestions_count", 0))
-    if hs:
-        line += _t("overview.suggestions_priority", n=len(hs))
+    if r.get("high_suggestions"):
+        line += _t("overview.suggestions_priority", n=len(r["high_suggestions"]))
     out.append(line + ".")
     for s in hs:
         out.append(f"  · {s.get('suggest')} — {s.get('why', '')}")
+        out.append(test_basis_text(s))
 
     g = r.get("genome") or {}
     out.append("")
@@ -296,7 +315,7 @@ def overview_report(r: Dict[str, Any]) -> str:
 
 def radar_report(r: Dict[str, Any]) -> str:
     """Health index by body system (the same radar as in the web UI, but as text)."""
-    out = []
+    out = [_t('clinical.display_limit'), '']
     if r.get("overall") is not None:
         line = _t("radar.overall", score=r["overall"])
         if r.get("prev_overall") is not None:
@@ -329,7 +348,8 @@ def radar_report(r: Dict[str, Any]) -> str:
 
 def second_opinion_report(r: Dict[str, Any]) -> str:
     """The "second look" before a visit to the doctor (the "Second look" tab)."""
-    out = [_t("second_opinion.title"), ""]
+    from .format_prescription import caution_lines
+    out = [_t("second_opinion.title"), ""] + caution_lines(r.get("regimen_cautions") or [])
     red = r.get("red_labs") or []
     out.append(_t("second_opinion.abnormal", n=len(red)) if red
                else _t("second_opinion.no_abnormal"))
@@ -347,6 +367,7 @@ def second_opinion_report(r: Dict[str, Any]) -> str:
     out += ["", _t("second_opinion.tests", n=len(sg)) if sg else _t("second_opinion.tests_none")]
     for s in sg:
         out.append(f"  · {s.get('suggest')} — {s.get('why', '')} [{s.get('priority', '')}]")
+        out.append(test_basis_text(s))
     out.append(f"\n_{_t('second_opinion.note')}_")
     out.append(f"_{r.get('disclaimer', '')}_")
     return "\n".join(out)
@@ -375,6 +396,7 @@ def goal_suggest_report(r: Dict[str, Any]) -> str:
                      if c.get("source") == p.get("proposed")), {})
         if cand.get("why"):
             L.append(f"  {cand['why']}")
+        L.append(goal_basis_text(cand))
         if cand.get("citation"):
             c = cand["citation"]
             L.append(f"  — {c.get('body','')}, {c.get('document','')} ({c.get('year','')})"
@@ -389,10 +411,17 @@ def goal_suggest_report(r: Dict[str, Any]) -> str:
             met = ", ".join(f"{m['comparator']}{m['value']}" for m in a.get("met", []))
             L.append(f"- {a['name']} {(a.get('now') or {}).get('value','—')} "
                      f"{a.get('unit','')} — {met}")
+            L.extend(goal_basis_text(c) for c in a.get('candidates') or [] if c.get('proposal_status') == 'held')
     if r.get("skipped"):
         L += ["", f"**{_t('goalgen.skipped_h')}**"]
         for skp in r["skipped"]:
             L.append(f"- {skp['name']} — {_t('goalgen.skip.' + skp['reason'])}")
+            for cand in skp.get('candidates') or []:
+                L.append('  ' + goal_basis_text(cand))
+                if cand.get('proposal_status') == 'observation':
+                    L.append('  ' + _t('goalgen.observed_value', value=cand.get('value'),
+                                      unit=cand.get('unit') or '',
+                                      date=(cand.get('observed') or {}).get('date') or '—'))
     if r.get("written"):
         w = r["written"]
         L += ["", _t("web.goalgen.saved", n=len(w.get("added") or [])), f"  {w.get('path','')}"]

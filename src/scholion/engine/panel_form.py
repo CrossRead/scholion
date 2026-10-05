@@ -209,9 +209,11 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
     own risk and does not turn the verdict, but it is not nothing either, so its
     count travels beside the others and the sentence names it.
     """
+    withheld = sum((r.get("conclusion_basis") or {}).get("status") == "incomplete" for r in rows)
     if (scan or {}).get("status") != "ok":
         return {"kind": "not_determined",
-                "why": (scan or {}).get("reason") or "scan_not_run"}
+                "why": (scan or {}).get("reason") or "scan_not_run",
+                **({"withheld": withheld} if withheld else {})}
     found = sum(int(r.get("findings") or 0) for r in rows)
     # The list holds genes AND, in the system entry, positions of a curated
     # panel; a row is one entry of it either way. The count below is over the
@@ -240,6 +242,8 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
         out = {"kind": "finding", "n": found, "unread": len(unread),
                "total": len(rows), "why_counts": _unread_counts(rows),
                "genes": sorted({r["gene"] for r in rows if r.get("findings")})}
+    elif withheld:
+        out = {"kind": "not_determined", "why": "conclusion_basis", "total": len(rows)}
     elif unread:
         out = {"kind": "clear_partial", "unread": len(unread),
                "total": len(rows), "genes": sorted(set(unread))[:12],
@@ -259,6 +263,8 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
         out["presumed"] = len(presumed)
     if carriers:
         out["carriers"] = carriers
+    if withheld:
+        out["withheld"] = withheld
     return out
 
 
@@ -295,8 +301,10 @@ def verdict_line(v: Dict[str, Any]) -> str:
         line = _t("screen.clear_partial", unread=_plural(v.get("unread") or 0, "count.rows"),
                   total=v.get("total") or 0)
     else:
-        return _t("screen.not_determined",
+        line = _t("screen.not_determined",
                   why=_why_text((v or {}).get("why") or "scan_not_run"))
+    if v.get("withheld"):
+        line += "; " + _t("conclusion.withheld_count", n=v["withheld"])
     if v.get("depthless") and kind != "clear_file_only":
         line += "; " + _t("screen.and_depth_unmeasured", rows=_plural(v["depthless"], "count.rows"))
     if v.get("carriers"):
@@ -337,4 +345,3 @@ def carrier_class(row: Dict[str, Any], book: Dict[str, Any], sex: Optional[str],
         if sentence:
             row["carrier_class"] = cls
             row["carrier_class_text"] = sentence.replace("{variant}", str(variant)).replace("{class_word}", word)
-

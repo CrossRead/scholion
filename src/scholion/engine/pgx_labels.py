@@ -35,3 +35,9 @@ def phenotype_words(text: str) -> str:
     if label is None:
         return raw
     return _t("phenotype.qualifier." + qualifier, label=label) if qualifier else label
+
+
+def model_phenotype_words(gene: str, code: str, label: str) -> str:
+    """A local CPIC copy must not restore the withdrawn CYP2C19 compensation claim.
+    Name the computed code without rewriting the reference or its source date."""
+    return _t("phenotype.label.IM") if gene == "CYP2C19" and code == "IM" else label

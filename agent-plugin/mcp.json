@@ -3,7 +3,7 @@
   "mcpServers": {
     "scholion": {
       "type": "stdio",
-      "command": "./bin/scholion-mcp"
+      "command": "./scripts/scholion-mcp"
     }
   }
 }

@@ -68,21 +68,27 @@ class TestEveryFieldOfAShippedRowReachesTheRow(unittest.TestCase):
         self.assertEqual([], lost,
                          "a field of the shipped panel reaches no row: " + ", ".join(lost))
 
-    def test_every_shipped_row_is_signed_by_the_author_and_by_no_clinician(self):
+    def test_shipped_rows_keep_their_actual_review_or_explicitly_remain_open(self):
         systems = (_shipped().get("systems") or {})
         signed = {(k, p["rsid"]) for k, spec in systems.items()
                   for p in (spec.get("positions") or []) if p.get("review")}
         self.assertTrue(signed, "no shipped row names a signer")
-        seen, unsigned = set(), []
+        expected_open = {(k, p["rsid"]) for k, spec in systems.items()
+                         for p in (spec.get("positions") or [])
+                         if not p.get("review") and p.get("note_on_review")}
+        seen, opened, invalid = set(), set(), []
         for key in systems:
             for r in SP.system(key, "clinician")["genetics"].get("rows") or []:
                 if r.get("origin") != "curated":
                     continue
                 if r.get("signature") == "author":
                     seen.add((key, r.get("rsid")))
+                elif r.get("signature") == "open":
+                    opened.add((key, r.get("rsid")))
                 else:
-                    unsigned.append((key, r.get("gene"), r.get("signature")))
-        self.assertEqual([], unsigned, "a shipped row carries no signature")
+                    invalid.append((key, r.get("gene"), r.get("signature")))
+        self.assertEqual([], invalid, "a shipped row has neither a review nor an explicit open state")
+        self.assertEqual(expected_open, opened)
         self.assertEqual(signed, seen)
 
     def test_the_count_and_the_date_of_the_signing_reach_both_registers(self):

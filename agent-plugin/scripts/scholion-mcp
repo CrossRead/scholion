@@ -1,0 +1,48 @@
+#!/bin/sh
+# Start the Scholion MCP server for a client that loads this plugin.
+#
+# THIS LAUNCHER INSTALLS NOTHING. A plugin has no install step of its own, and
+# the alternative — putting software on somebody's machine at the moment a model
+# first reaches for a tool — is not a thing this product does quietly. When the
+# engine is missing, the refusal at the end names the one command that fixes it.
+#
+# The script is flat on purpose: no variables, no loops, no command
+# substitution, no calls into other files of the plugin. A plugin that lives in
+# a subfolder of a repository is reviewed under that rule, and a launcher that
+# needs a reviewer to reason about it is held for a human every release. Each
+# place an engine can live is written out as its own line.
+
+command -v scholion >/dev/null 2>&1 && exec scholion mcp
+
+# A desktop client started from the Dock does not inherit the PATH of a terminal:
+# on macOS it gets the system folders only. So the usual places a user-level
+# install leaves the command are named one by one.
+[ -x ~/.local/bin/scholion ] && exec ~/.local/bin/scholion mcp
+[ -x /opt/homebrew/bin/scholion ] && exec /opt/homebrew/bin/scholion mcp
+[ -x /usr/local/bin/scholion ] && exec /usr/local/bin/scholion mcp
+[ -x /Library/Frameworks/Python.framework/Versions/3.14/bin/scholion ] && exec /Library/Frameworks/Python.framework/Versions/3.14/bin/scholion mcp
+[ -x /Library/Frameworks/Python.framework/Versions/3.13/bin/scholion ] && exec /Library/Frameworks/Python.framework/Versions/3.13/bin/scholion mcp
+[ -x /Library/Frameworks/Python.framework/Versions/3.12/bin/scholion ] && exec /Library/Frameworks/Python.framework/Versions/3.12/bin/scholion mcp
+[ -x /Library/Frameworks/Python.framework/Versions/3.11/bin/scholion ] && exec /Library/Frameworks/Python.framework/Versions/3.11/bin/scholion mcp
+[ -x /Library/Frameworks/Python.framework/Versions/3.10/bin/scholion ] && exec /Library/Frameworks/Python.framework/Versions/3.10/bin/scholion mcp
+[ -x ~/Library/Python/3.14/bin/scholion ] && exec ~/Library/Python/3.14/bin/scholion mcp
+[ -x ~/Library/Python/3.13/bin/scholion ] && exec ~/Library/Python/3.13/bin/scholion mcp
+[ -x ~/Library/Python/3.12/bin/scholion ] && exec ~/Library/Python/3.12/bin/scholion mcp
+[ -x ~/Library/Python/3.11/bin/scholion ] && exec ~/Library/Python/3.11/bin/scholion mcp
+[ -x ~/Library/Python/3.10/bin/scholion ] && exec ~/Library/Python/3.10/bin/scholion mcp
+
+# Printed with the shell's own `echo`, not with `cat`: this branch runs exactly
+# when nothing can be found, and a client that hands us a bare environment has no
+# /bin/cat either.
+{
+    echo "scholion: the engine is not installed on this machine, and this plugin does not"
+    echo "install it for you. Install it once, then start the plugin again:"
+    echo ""
+    echo "    pipx install scholion"
+    echo "    (or: python3 -m pip install --user scholion)"
+    echo ""
+    echo "Scholion reads a person's own genome, laboratory forms and prescriptions from"
+    echo "their own disk, and uploads nothing. Software that quietly installed itself to do"
+    echo "that would be the wrong kind of quiet."
+} >&2
+exit 127

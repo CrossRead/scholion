@@ -21,6 +21,7 @@ from __future__ import annotations
 import collections
 import os
 import unittest
+from unittest import mock
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import genome
@@ -121,7 +122,7 @@ class TestReadingAGrch37File(unittest.TestCase):
 
     def a_locus(self, with_grch37=True):
         for rs, l in genome.loci()["loci"].items():
-            if bool(l.get("pos_grch37")) == with_grch37:
+            if bool(l.get("pos_grch37")) == with_grch37 and not genome._indel_event(l):
                 return dict(l, rsid=rs)
         if with_grch37:
             self.skipTest("no such locus in the catalogue")
@@ -144,7 +145,13 @@ class TestReadingAGrch37File(unittest.TestCase):
         original = genome._query_region
         genome._query_region = lambda vcf, chrom, pos: seen.append((chrom, pos)) or []
         try:
-            genome._gt_at(loc)
+            # This probes coordinate dispatch, not the checkout timestamps of
+            # the tiny fixture's index. Index freshness has its own regressions.
+            with mock.patch.object(genome, "_index_usable", return_value=True), \
+                 mock.patch.object(genome, "file_unreadable", return_value=False), \
+                 mock.patch.object(genome, "contig_name", return_value=loc["chrom"]), \
+                 mock.patch.object(genome, "sample_index", return_value=0):
+                genome._gt_at(loc)
         finally:
             genome._query_region = original
         self.assertTrue(seen)

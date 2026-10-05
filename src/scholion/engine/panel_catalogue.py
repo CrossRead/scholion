@@ -4,15 +4,20 @@ The radar shows a person the panel read against their genome; a clinician asked
 for the panel itself: what each position is, why it is in the panel, which
 guideline or study it rests on, what it expects of a marker, and who signed the
 sentence (owner, 14.09.2026). That is a description of knowledge, not of a
-person: nothing here reads the genome or the labs, so the same page is right for
+person: panel_description reads neither genome nor labs, so its page is right for
 anybody and carries no personal data. The radar keeps the reading; this page
-carries the references.
+carries the references. author_readings is a separate, explicitly patient-specific
+supplement: every intake entry with a positive local call or a named refusal.
 """
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
 from ..i18n import t as _t
+from ..panel_notes import author_note
+from .. import core
+from ..conclusion_basis import conclusion_basis, guard_subclaims
+from ..genome_routes import decision_route
 from . import panel_form, panel_gate
 from ._helpers import DISCLAIMER
 from .system_panels import _curated, _labels, domains
@@ -22,11 +27,12 @@ from .system_panels import _curated, _labels, domains
 #: reader's own.
 _FIELDS = ("rsid", "gene", "hgvs", "protein", "risk_allele", "mode", "kind", "source", "study",
            "effect_size", "classification", "moi", "disease", "submitter", "curated_on",
-           "review")
+           "review", "disposition", "reason", "task", "read_refusal", "mechanism")
 
 
 def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     out = {k: p.get(k) for k in _FIELDS}
+    out["mechanism"] = panel_form.one_language(p.get("mechanism")) or None
     # The catalogue is read localised: a phrase is already the reader's string,
     # or still a {en, ru} pair when read raw — both are taken.
     text = p.get("text") if isinstance(p.get("text"), dict) else {}
@@ -38,6 +44,15 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     # Who checked the sentence against its source, by role (task 199).
     out["signature"] = panel_gate.review_state(p) or "open"
     out["signed_on"] = panel_gate.reviewed_on(p)
+    out.update(panel_gate.level_of(p, {x["level"]: x for x in panel_gate.legend().get("levels") or []}))
+    if out.get("level") == "E":
+        out["mechanism"] = None
+    out["conclusion_basis"] = conclusion_basis(p) if out.get("level") in ("A", "B") else None
+    if out["conclusion_basis"] and out["conclusion_basis"]["status"] == "incomplete":
+        out.update(text={}, mechanism=None, effect_size=None, expect=None)
+    out["author_note"] = author_note(str(p.get("rsid") or ""), out.get("level"))
+    out = guard_subclaims(p, out, reference=True)
+    out['decision_route'] = decision_route(out, {}, reference=True)
     return out
 
 
@@ -49,6 +64,18 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
     known = {d["key"] for d in domains()}
     from .system_panels import _on_demand
     on_demand = _on_demand().get("panels") or {}
+    if key == "author_list":
+        # Intake is a reference book, including the positions we cannot read.
+        # Never assign a waiting rsID a coordinate or infer its evidence level.
+        by_rsid: Dict[str, Dict[str, Any]] = {}
+        for system in list(systems.values()) + list(on_demand.values()):
+            for position in system.get("positions") or []:
+                by_rsid.setdefault(position["rsid"], position)
+        intake = core._read_knowledge("panel_intake.json")
+        records = [p for spec in intake.get("lists", {}).values() for p in spec.get("positions", [])]
+        systems = {**systems, key: {"positions": [
+            {**by_rsid.get(p["rsid"], {}), **p} for p in records]}}
+        known.add(key)
     if key in on_demand:
         # A panel without a domain (task 199 F) is described the same way; its
         # label is its own, not a radar domain's.
@@ -59,7 +86,11 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
         return {"status": "ok", "systems": [
             {"key": k, "label": _t("radar.domain." + k), "positions": len((s or {}).get("positions") or []),
              "unreadable": len((s or {}).get("unreadable") or {})}
-            for k, s in systems.items() if k in known]}
+            for k, s in systems.items() if k in known] + [{
+                "key": "author_list", "label": _t("panel.author_list"),
+                "positions": sum(len(s.get("positions", [])) for s in
+                                 core._read_knowledge("panel_intake.json").get("lists", {}).values()),
+                "unreadable": 0}]}
     spec = systems.get(key) if isinstance(systems.get(key), dict) else {}
     positions = [_position(p) for p in spec.get("positions") or [] if isinstance(p, dict)]
     by_gene: Dict[str, List[Dict[str, Any]]] = {}
@@ -72,6 +103,8 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
     # panel's authors — a repository path, a note on how `review` is read.
     # The page for a clinician carries each row's own source and study instead.
     label = (panel_form.one_language(spec.get("label")) if key in on_demand else _t("radar.domain." + key))
+    if key == "author_list":
+        label = _t("panel.author_list")
     return {"status": "ok", "key": key, "label": label, "labels": _labels(key) if key not in on_demand else spec.get("label"),
             "catalogue_updated": meta.get("updated"), "source_tier": meta.get("source_tier"),
             "positions": positions, "genes": [{"gene": g, "positions": v} for g, v in sorted(by_gene.items())],

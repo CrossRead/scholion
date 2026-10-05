@@ -28,8 +28,11 @@ def _serialized(fn):
     parallel CLI cannot lose each other's changes (core.profile_write_lock)."""
     @_functools.wraps(fn)
     def _w(*a, **k):
-        with core.profile_write_lock():
-            return fn(*a, **k)
+        from . import container
+        with container.pinned(), core.profile_write_lock():
+            result = fn(*a, **k)
+            container.gate()
+            return result
     return _w
 
 
@@ -475,7 +478,9 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
                   ref_high: Optional[float] = None, direction: Optional[str] = None,
                   censored: Optional[str] = None, new: bool = False,
                   date_source: Optional[str] = None,
-                  subject: Optional[str] = None) -> Dict[str, Any]:
+                  subject: Optional[str] = None,
+                  reference_context: Optional[Dict[str, Any]] = None,
+                  _data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Add/update a marker point in labs.json.
 
     The date is one of `DATE_SHAPES` — a month, a day, or a day with the clock
@@ -504,7 +509,9 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     walks every call in the tree and requires the argument outright, so the honest
     default is a safety net rather than a habit.
     """
-    err, claimed = _subject_gate(subject)
+    err, claimed = (_subject_gate(subject) if _data is None else
+                    (None, None) if subject is None or _subj.valid(subject) else
+                    (_subj.unknown_error(subject), None))
     if err:
         return err
     if date_source is not None and date_source not in DATE_SOURCES:
@@ -527,7 +534,8 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     except (TypeError, ValueError):
         return {"ok": False, "error": _t("store.value_not_number")}
     p = _path("labs.json")
-    data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"markers": {}}
+    data = _data if _data is not None else (
+        json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"markers": {}})
     markers = data.setdefault("markers", {})
 
     # ── the name gate ────────────────────────────────────────────────────────
@@ -558,6 +566,21 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     # third option — storing it as written and hoping — is the one that produced
     # the defect.
     spec = core.lab_markers().get("markers", {}).get(marker) or {}
+    if spec.get("unit_from_form"):
+        for code, entry in core._read_knowledge_raw("units.json").get("units", {}).items():
+            if any(core._norm_unit(unit or "") == core._norm_unit(surface)
+                   for surface in [code, *(entry.get("label") or {}).values()] if isinstance(surface, str)):
+                unit = code
+                break
+        # Keep the unit the person/form named, never guess one for a new rule.
+        # A later different unit cannot change the meaning of the stored series.
+        if (not unit and not spec.get("unitless")) or (m and core._norm_unit(unit or "")
+                                                       != core._norm_unit(m.get("unit") or "")):
+            return {"ok": False, "reason": "marker_unit_refused", "error": _t("store.unit_not_accepted", marker=marker,
+                                             unit=unit or "-", accepted=(m or {}).get("unit") or "-")}
+        if spec.get("unitless") and unit:
+            return {"ok": False, "reason": "marker_unit_refused", "error": _t("store.unit_not_accepted", marker=marker,
+                                             unit=unit, accepted="-")}
     known = bool(spec.get("unit"))
     if unit:
         res = (core.convert_to_canonical(spec, unit, value) if known
@@ -566,7 +589,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             # The refusal names what would be accepted. Without the list the next
             # attempt is a guess at spelling, and a guess that happens to match a
             # DIFFERENT unit is worse than the original error.
-            return {"ok": False, "error": _t("store.unit_not_accepted", marker=marker,
+            return {"ok": False, "reason": "marker_unit_refused", "error": _t("store.unit_not_accepted", marker=marker,
                                              unit=unit,
                                              accepted=", ".join(res.get("accepted") or []))}
         value = res["value"]
@@ -639,6 +662,9 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     mixed = _mixed_resolution(series, date)
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
+    for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method"):
+        if reference_context and field in reference_context:
+            pt[field] = reference_context[field]
     if subject:
         pt[_subj.FIELD] = subject
     if censored in ("<", ">"):
@@ -665,14 +691,16 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
         for field, kept in old.items():
             # …nor the old point's corridor: a form that printed no range must
             # not be shown as having printed the previous form's.
-            if field not in ("date_source", "censored", "ref_low", "ref_high"):
+            if field not in ("date_source", "censored", "ref_low", "ref_high",
+                             "reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method"):
                 pt.setdefault(field, kept)
     if date_kept_from_old:
         pt["date_source"] = next((old.get("date_source") for old in gone
                                   if str(old.get("date")) == date), None) or pt["date_source"]
     series.append(pt)
     series.sort(key=lambda pt: pt["date"])
-    _write_json(p, data)
+    if _data is None:
+        _write_json(p, data)
     core.reset_cache()
     out = {"ok": True, "marker": marker, "points": len(series)}
     # Every date this write folded into one point that is not the date the point
@@ -693,16 +721,44 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     return out
 
 
+@_serialized
+def add_lab_batch(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Validate a CSV batch in memory and replace its one data file atomically.
+
+    A batch never claims a demonstration: that is a multi-file erase and cannot
+    share the atomicity of replacing labs.json. Choose a personal profile first.
+    """
+    path = _path("labs.json")
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"markers": {}}
+    if _subj.erasable(core.profile_dir()) or any(
+            s in _subj.NOT_THE_OWNER for s in _subj.subjects_in(data)):
+        return {"ok": False, "written": 0, "error": _t("import_csv.personal_profile_required")}
+    for row in rows:
+        result = add_lab_point(row["key"], row["date"], row["value"],
+                               unit=row["unit"] or None, ref_low=row["ref_low"],
+                               ref_high=row["ref_high"], date_source="manual", subject="owner",
+                               _data=data)
+        if not result.get("ok"):
+            return {"ok": False, "written": 0,
+                    "error": _t("import_csv.write_failed", row=row["row"], detail=result.get("error", ""))}
+    if rows:
+        _write_json(path, data)
+        core.reset_cache()
+    return {"ok": True, "written": len(rows)}
+
+
 #: What a re-add keeps from the entry already there unless the caller gives
 #: it. `status` is the one that matters: a stopped drug re-added for its dose
 #: used to come back current, silently, and the interaction check compared
 #: against it again. The other two are history the writers here cannot set.
-MEDICATION_FIELDS_KEPT = ("status", "start_date", "monitoring")
+MEDICATION_FIELDS_KEPT = ("status", "start_date", "monitoring", "monitoring_schedule")
 
 
 @_serialized
 def add_medication(name: str, dose: str = "", note: str = "", *,
                    status: Optional[str] = None,
+                   start_date: Optional[str] = None,
+                   control: Optional[Dict[str, Any]] = None,
                    subject: Optional[str] = None) -> Dict[str, Any]:
     """Add a prescription to medications.json (an editable list).
 
@@ -719,15 +775,30 @@ def add_medication(name: str, dose: str = "", note: str = "", *,
     """
     if not name:
         return {"ok": False, "error": _t("store.need_name")}
+    if start_date is not None and (not isinstance(start_date, str)
+                                   or date_resolution(start_date) not in ("day", "month")):
+        return {"ok": False, "error": _t("treatment.invalid_start")}
+    if control is not None:
+        if (not isinstance(control, dict) or set(control) != {"marker", "from", "due", "source"}
+                or not all(isinstance(v, str) for v in control.values())
+                or control["marker"] not in (core.lab_markers().get("markers") or {})
+                or date_resolution(control["from"]) != "day"
+                or date_resolution(control["due"]) != "day"
+                or control["from"] > control["due"] or not control["source"].strip()):
+            return {"ok": False, "error": _t("treatment.invalid_plan")}
     err, claimed = _subject_gate(subject)
     if err:
         return err
     p = _path("medications.json")
     data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"medications": []}
-    meds: List[Dict[str, str]] = data.setdefault("medications", [])
+    meds: List[Dict[str, Any]] = data.setdefault("medications", [])
     entry: Dict[str, Any] = {"name": name.strip(), "dose": dose.strip(), "note": note.strip()}
     if status is not None and str(status).strip():
         entry["status"] = str(status).strip()
+    if start_date is not None:
+        entry["start_date"] = start_date
+    if control is not None:
+        entry["monitoring_schedule"] = [control]
     if subject:
         entry[_subj.FIELD] = subject
     # dedup by name (case-insensitive): adding again UPDATES the entry rather than
@@ -742,6 +813,14 @@ def add_medication(name: str, dose: str = "", note: str = "", *,
                     merged[field] = entry[field]
             if "status" in entry:
                 merged["status"] = entry["status"]
+            if start_date is not None:
+                merged["start_date"] = start_date
+            if control is not None:
+                schedule = m.get("monitoring_schedule", [])
+                if not isinstance(schedule, list) or any(not isinstance(c, dict) for c in schedule):
+                    return {"ok": False, "error": _t("treatment.invalid_plan")}
+                merged["monitoring_schedule"] = [c for c in schedule if
+                    (c.get("marker"), c.get("from")) != (control["marker"], control["from"])] + [control]
             if subject:
                 merged[_subj.FIELD] = subject
             kept = [f for f in MEDICATION_FIELDS_KEPT if f in m and f not in entry]
@@ -1076,6 +1155,24 @@ def remove_clinician_target(marker: str) -> Dict[str, Any]:
 # ---- initial set-up of the data directory --------------------------------
 
 
+@_serialized
+def set_goal_origin(goal_id: str, origin: str, reason: str) -> Dict[str, Any]:
+    """Record the reason a human names; never change a target or a measurement."""
+    from .goal_entities import origin_edit
+    edit = origin_edit(goal_id, origin, reason)
+    if not edit['ok']:
+        return edit
+    path = core.profile_dir() / edit['file']
+    data = json.loads(json.dumps(core.read_profile_json(path)))
+    row: Any = data
+    for part in edit['pointer']:
+        row = row[part]
+    row['origin'] = {**edit['origin'], 'on': _dt.date.today().isoformat()}
+    _write_json(path, data)
+    core.reset_cache()
+    return {'ok': True, 'goal_id': goal_id, 'origin': row['origin']}
+
+
 def _write_private(path: Path, text: str) -> None:
     """Create a profile file closed (0600).
 
@@ -1264,7 +1361,7 @@ def write_goal_targets(proposals: List[Dict[str, Any]]) -> Dict[str, Any]:
     society publishes», and a bare number cannot say which it is.
     """
     path = core.profile_dir() / "health_goals.json"
-    data = core.read_profile_json(path) if path.exists() else {}
+    data = json.loads(json.dumps(core.read_profile_json(path))) if path.exists() else {}
     existing = {t.get("label") or t.get("key"): t for t in (data.get("targets") or [])}
 
     added, kept = [], []
@@ -1276,14 +1373,19 @@ def write_goal_targets(proposals: List[Dict[str, Any]]) -> Dict[str, Any]:
         tgt = p.get("target") or {}
         cand = next((c for c in (p.get("candidates") or [])
                      if c.get("source") == p.get("proposed")), {})
+        if cand.get('proposal_status') != 'held' or (cand.get('target_basis') or {}).get('status') != 'complete':
+            continue
         entry = {
             "label": label,
+            "origin": {"kind": "lab", "reason": f"lab:{p['key']}",
+                       "on": _dt.date.today().isoformat()},
             "source": f"lab:{p['key']}",
             "target": f"{tgt.get('comparator', '')}{tgt.get('value', '')}",
             "best": (str(cand.get("observed", {}).get("date", "")) if cand.get("observed") else ""),
             # The provenance of the target, kept beside it rather than in a log.
             "_from": {"source": p.get("proposed"), "why": cand.get("why"),
-                      "citation": cand.get("citation"), "caveat": p.get("caveat")},
+                      "citation": cand.get("citation"), "caveat": p.get("caveat"),
+                      "target_basis": cand.get("target_basis"), "applicability": cand.get("applicability")},
         }
         (data.setdefault("targets", [])).append(entry)
         added.append(label)

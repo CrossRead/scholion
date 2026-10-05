@@ -13,6 +13,8 @@ from ._helpers import _recent, DISCLAIMER
 from .labs import _latest, _trend, _flag_value, analyze_labs, suggest_tests
 from .genomics import genome_status
 from .lifestyle import _lifestyle_overview
+from .class_genotype import regimen_cautions as _regimen_cautions
+from .treatment import treatment_timeline
 
 
 # a convenient aggregate — a snapshot of the profile
@@ -52,6 +54,10 @@ def overview() -> Dict[str, Any]:
         # upstream rather than described here.
         "whose": _subject.profile_subject(),
         "flagged": red,
+        # A prescription the person takes against a genotype read (0.6.0): the
+        # first thing on the first screen, before any count.
+        "regimen_cautions": _regimen_cautions(),
+        "overdue_controls": treatment_timeline()["overdue"],
         "high_flags": [m for m in red if m["flag"] == "high"],
         "watch_flags": [m for m in red if m["flag"] == "low"],
         "suggestions_count": tests["count"],
@@ -188,7 +194,10 @@ def metrics_summary() -> Dict[str, Any]:
             cat = _t("bmi.under" if bmi_val < 18.5 else "bmi.normal" if bmi_val < 25
                      else "bmi.over" if bmi_val < 30 else "bmi.obese")
             flag = "ok" if 18.5 <= bmi_val < 25 else ("low" if bmi_val < 18.5 else "high")
-            bmi = {"value": bmi_val, "category": cat, "flag": flag}
+            from ..clinical_claims import guard_fields
+            bmi = guard_fields({}, {"value": bmi_val, "category": cat, "flag": flag}, ('category', 'flag'))
+            bmi.update(flag='unknown', output_kind='derived_measurement',
+                       source='metrics.json:profile.height_cm + latest weight', method='weight_kg / height_m^2')
         except Exception:
             bmi = None
     age = _age_from(prof)

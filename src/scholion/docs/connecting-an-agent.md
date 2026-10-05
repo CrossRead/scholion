@@ -33,7 +33,7 @@ the build — this table is the readable copy of it.
 | **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
 | **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus a **Scholion** tab on the Widgets page, which is where the owner is told what to load and where |
-| **Agent Plugins package** | import the folder agent-plugin/ into a client that reads Agent Plugins | ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot, Kiro — one import brings the tools and the instruction that governs them together |
+| **Agent Plugins package** | import the folder agent-plugin/ into a client that reads Agent Plugins, or install it as a Claude plugin | ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot, Kiro, Claude Code, Cowork — one import brings the tools and the instruction that governs them together |
 
 There is also `scholion serve` — a local web page for a person, bound to
 `127.0.0.1`. It is not an assistant surface and has no API.
@@ -85,20 +85,28 @@ instruction with it**, which is why `sch_rules` has to be a tool at all. In this
 package the instruction sits in the same folder as the functions and cannot be
 installed without them.
 
-**The launcher installs nothing.** The format has no install step, so
-`mcp.json` points at `./bin/scholion-mcp`. The launcher looks for an installed
-engine in this order:
+**The same folder is a Claude plugin.** Beside the portable pair it carries
+`.claude-plugin/plugin.json` and `.mcp.json`, the shape Claude Code, Cowork and
+the Claude plugin directory read. The skill, the launcher and the server are the
+same files; only the manifests are two.
 
-1. A virtual environment the client keeps for this plugin, under `PLUGIN_DATA`.
-2. `scholion` on the search path.
-3. `scholion` in `~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin` and
-   `~/Library/Python/3.*/bin`.
-4. A Python that can import the package.
+**The launcher installs nothing.** Neither format has an install step, so both
+server entries point at `scripts/scholion-mcp`. The launcher looks for an
+installed engine in this order:
+
+1. `scholion` on the search path.
+2. `scholion` in `~/.local/bin`, `/opt/homebrew/bin` and `/usr/local/bin`.
+3. `scholion` in the `bin` folder of a python.org installation of Python 3.10–3.14
+   (`/Library/Frameworks/Python.framework/Versions/3.x/bin`) and in
+   `~/Library/Python/3.x/bin`.
+
+Every place is written out on its own line — no variables, no loops — so that
+whoever reviews the script can read it without running it.
 
 The launcher is a POSIX shell script, so it runs on macOS and Linux. On Windows,
 register the MCP server directly with `scholion mcp` (see below).
 
-The third step exists because a desktop application started from the Dock on
+The second and third steps exist because a desktop application started from the Dock on
 macOS gets only the system search path, where neither pipx nor Homebrew puts
 anything. If no engine is found, the launcher refuses and prints the command
 that installs one. This product does not put software on a machine at the
@@ -135,6 +143,20 @@ packaging plugins.
 Codex reads the same file. For a marketplace kept inside a repository, the
 file goes in `.agents/plugins/` at the repository's root, and `path` is counted
 from there.
+
+**Installing it in Claude.**
+
+1. Install the engine once: `pipx install scholion`.
+2. Claude Code: start it with `claude --plugin-dir ./path/to/scholion/agent-plugin`,
+   or add the folder to a local plugin marketplace.
+3. Cowork and claude.ai: where the app offers to upload a plugin, upload a zip of
+   the `agent-plugin` folder. The server runs on your computer, so this works only
+   where the app can start a local process.
+4. Ask the assistant to call `sch_version`. The answer names the build that runs.
+
+`claude plugin validate --strict agent-plugin` checks the folder the way the
+plugin directory does; `./run_tests.sh` runs it when the `claude` command is
+installed.
 
 **It runs where the data is, and only there.** A client that declares MCP servers
 in a plugin runs them locally; ChatGPT labels such a plugin *Desktop only* and

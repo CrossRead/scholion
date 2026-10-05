@@ -294,7 +294,7 @@ class TestEveryDoorCarriesWhatADoorMustCarry(unittest.TestCase):
         entry = next(e for e in ouroboros_tools.get_tools() if e.name == "sch_rules")
         text = entry.handler(ouroboros_tools.ToolContext())
         self.assertGreater(len(text), 2000, "the rules came back empty or truncated")
-        self.assertIn("precedence", text.lower(),
+        self.assertIn("comes first", text.lower(),
                       "this does not look like the canon")
 
     def test_the_handshake_carries_the_boundary_for_hosts_that_pass_it_on(self):

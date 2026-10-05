@@ -311,6 +311,9 @@ class TestNoAutomaticSearchLeavesTheDataDirectory(unittest.TestCase):
         # `profile` is the data root it belongs to — it is taken only then, and a
         # profile of any other name keeps its overlay inside itself.
         "core.py": 1,
+        # `container.home()` (task 192): container.json lives beside `profile/`,
+        # in the folder the profile slot belongs to — a named file, never a search.
+        "container.py": 1,
     }
 
     def test_no_new_upward_search_appears_in_the_core(self):

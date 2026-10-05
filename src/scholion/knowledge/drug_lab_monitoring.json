@@ -338,6 +338,26 @@
         "en": "the target measures of the effect; an additive lowering of glycaemia is possible",
         "ru": "целевые показатели эффекта; возможно аддитивное снижение гликемии"
       }
+    },
+    "iron_oral": {
+      "labs": [
+        "ferritin",
+        "hemoglobin",
+        "transferrin_sat"
+      ],
+      "why": {
+        "en": "ferritin and haemoglobin 8–12 weeks after the start, to see whether the stores are filling",
+        "ru": "ферритин и гемоглобин через 8–12 недель после начала — пополняются ли запасы"
+      }
+    },
+    "vitamin_b12": {
+      "labs": [
+        "vitamin_b12"
+      ],
+      "why": {
+        "en": "B12 after about 3 months of the supplement, and again if a cause of poor absorption continues",
+        "ru": "B12 примерно через 3 месяца приёма и повторно, если причина плохого всасывания сохраняется"
+      }
     }
   }
 }

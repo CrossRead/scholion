@@ -102,6 +102,8 @@ class TestDiagnoseIsNotAnOpenProxy(unittest.TestCase):
 
         old_hosts, old_targets = net._DIAG_HOSTS, net.DIAG_TARGETS
         old_offline = os.environ.pop("SCHOLION_OFFLINE", None)
+        old_insecure = os.environ.get("SCHOLION_TLS_INSECURE")
+        os.environ["SCHOLION_TLS_INSECURE"] = "1"
         # The probe is named, so the stand-in is added to the table by name —
         # which is also the only way a caller could ever reach it.
         net.DIAG_TARGETS = {**old_targets, "loopback": f"https://127.0.0.1:{port}/"}
@@ -112,6 +114,10 @@ class TestDiagnoseIsNotAnOpenProxy(unittest.TestCase):
             net._DIAG_HOSTS, net.DIAG_TARGETS = old_hosts, old_targets
             if old_offline is not None:
                 os.environ["SCHOLION_OFFLINE"] = old_offline
+            if old_insecure is None:
+                os.environ.pop("SCHOLION_TLS_INSECURE", None)
+            else:
+                os.environ["SCHOLION_TLS_INSECURE"] = old_insecure
             srv.shutdown()
             srv.server_close()
             shutil.rmtree(tmp, ignore_errors=True)

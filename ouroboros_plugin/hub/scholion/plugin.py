@@ -94,7 +94,8 @@ def _data_root() -> Optional[Path]:
 
 
 def _profile_ready(root: Optional[Path]) -> bool:
-    return bool(root) and (root / "profile" / "index.md").exists()
+    from scholion import core
+    return (core.profile_dir() / "index.md").exists()
 
 
 # --- what the tab shows ---------------------------------------------------
@@ -117,6 +118,9 @@ def _state_payload(root: Optional[Path]) -> Dict[str, Any]:
             "nothing that already exists."
         ),
     }
+    from scholion import core
+    out.update(profile_dir=str(core.profile_dir()),
+               labs_dir=str(core.raw_dir("lab")), genome_dir=str(core.genome_dir()))
     if not ready:
         return out
     try:

@@ -17,18 +17,17 @@
    "a": "anticoagulant_vka",
    "b": "nsaid",
    "severity": "high",
+   "drug_scope": {"anticoagulant_vka": {"names": ["warfarin", "варфарин"]}},
+   "source": "PMID:32455439; DOI:10.1055/s-0040-1710592. Warfarin/NSAID bleeding association, not an individual risk estimate or a class-wide management algorithm.",
    "effect": {
-    "en": "sharply ↑ the risk of gastrointestinal and other bleeding",
-    "ru": "резко ↑ риск желудочно-кишечного и другого кровотечения"
+    "en": "Warfarin with an NSAID is associated with increased bleeding. This is an important combination to discuss with the prescriber, not a prediction for an individual.",
+    "ru": "Сочетание варфарина с НПВС связано с повышенной кровоточивостью. Это важный вопрос для назначающего врача, а не прогноз для конкретного человека."
    },
    "mechanism": {
-    "en": "additive antihaemostatic action + the gastrotoxicity of NSAIDs",
-    "ru": "аддитивный антигемостаз + гастротоксичность НПВС"
+    "en": "NSAID-related platelet effects and gastric mucosal injury may add to anticoagulation. The mechanism and effect are not identical for every NSAID.",
+    "ru": "Влияние НПВС на тромбоциты и повреждение слизистой желудка могут добавляться к антикоагуляции. Механизм и эффект неодинаковы для всех НПВС."
    },
-   "manage": {
-    "en": "avoid where possible; if needed — gastroprotection (a PPI), monitoring of the INR and of signs of bleeding",
-    "ru": "по возможности избегать; если нужно — гастропротекция (ИПП), контроль МНО и признаков кровотечения"
-   }
+   "manage": null
   },
   {
    "a": "anticoagulant_vka",
@@ -490,6 +489,54 @@
     "en": "INR monitoring if combined",
     "ru": "контроль МНО при совместном приёме"
    }
+  },
+  {
+   "a": "thyroid_hormone",
+   "b": "iron_oral",
+   "severity": "moderate",
+   "study_context": "simultaneous_ferrous_sulfate_levothyroxine",
+   "effect": {
+    "en": "When ferrous sulfate and levothyroxine are ingested simultaneously, thyroid-hormone efficacy may fall. A small uncontrolled trial found a variable effect, not an inevitable TSH rise in this person.",
+    "ru": "При одновременном приёме сульфата железа и левотироксина эффективность тиреоидного гормона может снижаться. Небольшое неконтролируемое исследование показало вариабельный эффект, а не неизбежный рост ТТГ у этого человека."
+   },
+   "mechanism": {
+    "en": "The study observed a poorly soluble iron/thyroxine complex in vitro. Binding is a proposed explanation for the clinical effect, not a demonstrated in-gut mechanism in every patient.",
+    "ru": "В исследовании in vitro наблюдали малорастворимый комплекс железа и тироксина. Связывание — предложенное объяснение клинического эффекта, а не доказанный кишечный механизм у каждого пациента."
+   },
+   "manage": null,
+   "source": "Campbell NR et al. Ferrous sulfate reduces thyroxine efficacy in patients with hypothyroidism. Ann Intern Med 1992;117:1010–3. PMID 1443969"
+  },
+  {
+   "a": "thyroid_hormone",
+   "b": "combined_oral_contraceptive",
+   "severity": "moderate",
+   "applicability": {"status": "unheld"},
+   "effect": {
+    "en": "The held study examined menopausal estrogen therapy in women receiving thyroxine, not this contraceptive pair.",
+    "ru": "Имеющееся исследование изучало менопаузальную терапию эстрогенами у женщин на тироксине, а не эту пару с контрацептивом."
+   },
+   "mechanism": {
+    "en": "oral oestrogen raises thyroxine-binding globulin, which holds more of the hormone out of circulation",
+    "ru": "пероральный эстроген повышает тироксинсвязывающий глобулин, и больше гормона уходит из свободной фракции"
+   },
+   "manage": null,
+   "source": "Arafah BM. Increased need for thyroxine in women with hypothyroidism during estrogen therapy. N Engl J Med 2001;344:1743–9. doi:10.1056/NEJM200106073442302"
+  },
+  {
+   "a": "ppi",
+   "b": "vitamin_b12",
+   "severity": "low",
+   "applicability": {"status": "unheld"},
+   "effect": {
+    "en": "An observational study associated long-term acid suppression with B12 deficiency. It did not establish a treatment effect of this supplement pair.",
+    "ru": "Наблюдательное исследование связало длительное подавление кислотности с дефицитом B12. Оно не установило лечебный эффект этой пары с добавкой."
+   },
+   "mechanism": {
+    "en": "acid and pepsin release B12 from food proteins; with less of both, less is freed to bind intrinsic factor",
+    "ru": "кислота и пепсин освобождают B12 из белков пищи; при их недостатке меньше витамина доходит до внутреннего фактора"
+   },
+   "manage": null,
+   "source": "Lam JR et al. Proton pump inhibitor and histamine 2 receptor antagonist use and vitamin B12 deficiency. JAMA 2013;310:2435–42. PMID 24327038"
   }
  ]
 }

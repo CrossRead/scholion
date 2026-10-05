@@ -48,6 +48,21 @@ class FhirCase(unittest.TestCase):
 
 class TestReadingTheBundle(FhirCase):
 
+    def test_a_bound_or_conditional_range_is_not_an_exact_unconditional_value(self):
+        observation = {"resourceType": "Observation", "status": "final",
+                       "code": {"coding": [{"system": ingest_fhir.LOINC_SYSTEM, "code": "2345-7"}]},
+                       "effectiveDateTime": "2026-10-01", "valueQuantity": {"value": 5, "unit": "mmol/L"}}
+        import copy
+        for extra in ({"valueQuantity": {"value": 5, "comparator": "<", "unit": "mmol/L"}},
+                      {"referenceRange": [{"low": {"value": 4}, "appliesTo": [{"text": "subset"}]}]}):
+            row = copy.deepcopy(observation)
+            row.update(extra)
+            path = Path(self.tmp.name) / "conditional.json"
+            path.write_text(json.dumps({"resourceType": "Bundle", "entry": [{"resource": row}]}), encoding="utf-8")
+            result = ingest_fhir.plan(path)
+            self.assertEqual([], result["points"])
+            self.assertEqual(1, len(result["skipped"]))
+
     def test_the_fixture_is_a_bundle(self):
         got = ingest_fhir.read_bundle(BUNDLE)
         self.assertTrue(got["ok"])

@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "scholion",
-  "version": "0.5.11",
-  "description": "Local second-opinion layer over one person's own medical data — genome (VCF), laboratory history, prescriptions, wearables. The tools and the instruction that governs them travel together. Not a medical device.",
+  "version": "0.6.0",
+  "description": "Local second-opinion support for individuals and clinicians — genome (VCF), laboratory history, prescriptions and wearables. One person per container and per assistant conversation; the tools use the active container and cannot switch it. Findings carry their evidence level; lower-evidence findings reach the assistant as labelled hypotheses, not conclusions. The engine must be installed locally. Tool answers may reach the host's model provider. Not a medical device.",
   "homepage": "https://github.com/CrossRead/scholion",
   "repository": "https://github.com/CrossRead/scholion",
   "license": "Apache-2.0",

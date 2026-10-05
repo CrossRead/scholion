@@ -46,9 +46,12 @@ means «nothing of this kind was found in what was read».
 from __future__ import annotations
 
 import gzip
+import hashlib
 import json
 import os
 import re
+import stat
+import tempfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Callable
@@ -221,12 +224,28 @@ def _index(clinvar_vcf: str, genes: Dict[str, Any]):
             hit = {p.split(":")[0] for p in _info(info, "GENEINFO").split("|") if p} & genes.keys()
             if not hit:
                 continue
-            idx[(_norm_chrom(f[0]), f[1], f[3], f[4])] = {
+            chrom, pos, ref, alt = _variant_key(f[0], f[1], f[3], f[4])
+            idx[(chrom, pos, ref, alt)] = {
                 "genes": sorted(hit), "clnsig": sig,
                 "review": _info(info, "CLNREVSTAT"),
                 "clndn": _info(info, "CLNDN"),
                 "rsid": ("rs" + _info(info, "RS")) if _info(info, "RS") else ""}
     return idx, scanned
+
+
+def _variant_key(chrom: str, pos: str, ref: str, alt: str) -> tuple:
+    """Trim redundant padding shared by REF and ALT, retaining a VCF anchor.
+
+    This is not left alignment through a repeat: that needs the reference
+    sequence. It handles equivalent padded spellings at the same event only.
+    """
+    ref, alt = ref.strip().upper(), alt.strip().upper()
+    position = int(pos)
+    while len(ref) > 1 and len(alt) > 1 and ref[-1] == alt[-1]:
+        ref, alt = ref[:-1], alt[:-1]
+    while len(ref) > 1 and len(alt) > 1 and ref[0] == alt[0]:
+        ref, alt, position = ref[1:], alt[1:], position + 1
+    return _norm_chrom(chrom), str(position), ref, alt
 
 
 def _decide(rows: List[Dict[str, Any]]) -> None:
@@ -295,6 +314,106 @@ def read_meta(base) -> Optional[Dict[str, Any]]:
     return data if isinstance(data, dict) else None
 
 
+def _windows_change_time(fd: int) -> int:
+    """Windows stat.ctime is creation time; use the actual NT change timestamp."""
+    import ctypes
+    from ctypes import wintypes
+    import msvcrt
+
+    class BasicInfo(ctypes.Structure):
+        _fields_ = [(k, ctypes.c_longlong) for k in
+                    ("CreationTime", "LastAccessTime", "LastWriteTime", "ChangeTime")] + [
+                        ("FileAttributes", wintypes.DWORD)]
+
+    # These names exist only on Windows; non-Windows type stubs omit them.
+    kernel = getattr(ctypes, "WinDLL")("kernel32", use_last_error=True)
+    read = kernel.GetFileInformationByHandleEx
+    read.argtypes = [wintypes.HANDLE, ctypes.c_int, ctypes.c_void_p, wintypes.DWORD]
+    read.restype = wintypes.BOOL
+    info = BasicInfo()
+    if not read(getattr(msvcrt, "get_osfhandle")(fd), 0, ctypes.byref(info), ctypes.sizeof(info)):
+        raise OSError(getattr(ctypes, "get_last_error")(), "cannot establish the source change timestamp")
+    return int(info.ChangeTime)
+
+
+def source_identity(path) -> Dict[str, Any]:
+    """A readable local-file witness, without hashing a multi-gigabyte genome.
+
+    Path, inode, size, mtime and ctime bind the derived table to this input.
+    Restoring mtime after an edit does not restore ctime. Moving or replacing
+    a source deliberately requires a new scan; this is not a content hash.
+    """
+    p = Path(path).resolve(strict=True)
+    with p.open("rb") as stream:
+        before = os.fstat(stream.fileno())
+        change = _windows_change_time(stream.fileno()) if os.name == "nt" else None
+        if not stat.S_ISREG(before.st_mode):
+            raise OSError("not a regular source file")
+        stream.read(1)
+        after = os.fstat(stream.fileno())
+        if os.name == "nt" and change != _windows_change_time(stream.fileno()):
+            raise OSError("source changed while checking it")
+    fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
+    witness = {k: getattr(before, k) for k in fields}
+    current = p.stat()
+    if witness != {k: getattr(after, k) for k in fields} or witness != {
+            k: getattr(current, k) for k in fields}:
+        raise OSError("source changed while checking it")
+    return {"path": str(p), "change_time": change, **witness}
+
+
+def table_refusal(table: Path, meta: Optional[Dict[str, Any]], personal,
+                  content: bytes) -> Optional[str]:
+    """Why this table cannot answer about the currently selected file/sample."""
+    from . import genome
+    if not meta:
+        return "metadata_unverified"
+    if not personal:
+        return "source_unavailable"
+    try:
+        identity = source_identity(personal)
+    except (OSError, ValueError):
+        return "source_unavailable"
+    if not meta.get("personal_identity") or not meta.get("table_sha256"):
+        return "metadata_unverified"
+    if meta.get("personal_path") != identity["path"] or meta["personal_identity"] != identity:
+        return "source_changed"
+    try:
+        current_digest = hashlib.sha256(table.read_bytes()).hexdigest()
+    except OSError:
+        return "table_changed"
+    if (hashlib.sha256(content).hexdigest() != meta["table_sha256"]
+            or current_digest != meta["table_sha256"] or read_meta(table) != meta):
+        return "table_changed"
+    try:
+        column = genome.sample_index(str(personal))
+        samples = genome.samples_of(str(personal))
+        if column is None or samples[column] != meta.get("sample"):
+            return "sample_changed"
+    except (OSError, ValueError, IndexError):
+        return "sample_changed"
+    return None
+
+
+def _atomic_bytes(path: Path, content: bytes) -> None:
+    """Each half is atomic; their digest makes an interrupted pair refuse."""
+    with tempfile.NamedTemporaryFile(dir=path.parent, prefix=".acmg-", delete=False) as stream:
+        tmp = Path(stream.name)
+        try:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        except BaseException:
+            stream.close()
+            tmp.unlink()
+            raise
+    try:
+        os.replace(tmp, path)
+    finally:
+        if tmp.exists():
+            tmp.unlink()
+
+
 def _refuse_sample(genome, personal: str) -> Dict[str, Any]:
     """Why no column of this file can be read as the person.
 
@@ -324,6 +443,10 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
     from . import genome
     personal = personal_vcf or (str(genome.vcf_path()) if genome.vcf_path() else None)
     if not personal or not Path(personal).exists():
+        return {"status": "no_genome", "message": _t("acmg_scan.no_genome")}
+    try:
+        personal_identity = source_identity(personal)
+    except OSError:
         return {"status": "no_genome", "message": _t("acmg_scan.no_genome")}
 
     # Whose column. A trio or a joint call puts several people side by side, and
@@ -398,7 +521,7 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
             # The index of each ALT is what the genotype refers to: `1` is the
             # first ALT, `2` the second. ClinVar records one ALT per row, so a
             # match names the index whose copies are to be counted, not the row.
-            hits = [(k, alt, idx.get((chrom, f[1], f[3], alt)))
+            hits = [(k, alt, idx.get(_variant_key(chrom, f[1], f[3], alt)))
                     for k, alt in enumerate(f[4].split(","), 1)]
             hits = [h for h in hits if h[2]]
             if not hits:
@@ -426,6 +549,14 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
                                  "filter": filt, "passed": filt in _FILTER_PASSED})
     _decide(rows)
 
+    # A source replaced during a scan must not give the old rows a new identity.
+    try:
+        unchanged = source_identity(personal) == personal_identity
+    except OSError:
+        unchanged = False
+    if not unchanged:
+        return {"status": "source_changed", "message": _t("acmg_scan.source_changed")}
+
     # Where the screen looks. `scholion acmg` reads the table out of the genome
     # folder; writing it beside the variant file put it somewhere else the moment
     # the file lived somewhere else — «ok, the table is written» followed by «the
@@ -433,10 +564,11 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
     target = Path(out_dir) if out_dir else core.genome_bases()[0]
     target.mkdir(parents=True, exist_ok=True)
     out = target / OUT_NAME
-    with out.open("w", encoding="utf-8") as fh:
-        fh.write("\t".join(COLS) + "\n")
-        for r in sorted(rows, key=lambda r: (r["reportable"] != "yes", r["gene"])):
-            fh.write("\t".join(str(r.get(c, "")).replace("\t", " ") for c in COLS) + "\n")
+    lines = ["\t".join(COLS)] + [
+        "\t".join(str(r.get(c, "")).replace("\t", " ") for c in COLS)
+        for r in sorted(rows, key=lambda r: (r["reportable"] != "yes", r["gene"]))]
+    table_content = ("\n".join(lines) + "\n").encode("utf-8")
+    _atomic_bytes(out, table_content)
 
     yes = sum(1 for r in rows if r["reportable"] == "yes")
     filtered = sum(1 for r in rows if r["reportable"] == "filtered")
@@ -447,6 +579,8 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
         "clinvar_path": str(Path(clinvar_vcf).resolve()),
         "clinvar_file_date": cv["file_date"],
         "personal_path": str(Path(personal).resolve()),
+        "personal_identity": personal_identity,
+        "table_sha256": hashlib.sha256(table_content).hexdigest(),
         "sample": sample,
         "catalogue_version": (cat.get("_meta") or {}).get("version"),
         "scanned": datetime.now().astimezone().isoformat(timespec="seconds"),
@@ -456,8 +590,8 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
         "no_calls": no_calls,
         "filtered": filtered,
     }
-    (target / META_NAME).write_text(json.dumps(meta, ensure_ascii=False, indent=2) + "\n",
-                                    encoding="utf-8")
+    _atomic_bytes(target / META_NAME,
+                  (json.dumps(meta, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
 
     message = _t("acmg_scan.done", found=len(rows), yes=yes, path=str(out))
     if no_calls:

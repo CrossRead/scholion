@@ -74,6 +74,14 @@ class TestBiologicalAge(unittest.TestCase):
     def _profile_copy(self, tmp):
         prof = Path(tmp) / "profile"
         shutil.copytree(support.FIXTURE_PROFILE, prof)
+        # This test's nine inputs are explicitly one synthetic draw, not an
+        # assertion that an unqualified legacy month proves collection identity.
+        labs = json.loads((prof / "labs.json").read_text(encoding="utf-8"))
+        for marker in labs["markers"].values():
+            for point in marker.get("series", []):
+                if point.get("date") == "2026-07":
+                    point["date"] = "2026-07-15T10:00"
+        (prof / "labs.json").write_text(json.dumps(labs), encoding="utf-8")
         return prof
 
     def _phenoage(self, prof):
@@ -120,7 +128,7 @@ class TestBiologicalAge(unittest.TestCase):
 
             def _set(marker, value):
                 labs = json.loads((prof / "labs.json").read_text(encoding="utf-8"))
-                labs["markers"][marker]["series"] = [{"date": "2026-07", "value": value}]
+                labs["markers"][marker]["series"] = [{"date": "2026-07-15T10:00", "value": value}]
                 (prof / "labs.json").write_text(json.dumps(labs, ensure_ascii=False),
                                                 encoding="utf-8")
 

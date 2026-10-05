@@ -134,6 +134,10 @@ is a deliberate act: an accepted narrowing must land in `CHANGELOG.md` in the
   Installed by `bash src/tools/install_hooks.sh`.
 - Emergency bypass — `SCHOLION_SKIP_TESTS=1 git push`. Deliberately and rarely: the
   personal-data leak check still runs regardless.
+- The linter runs in `./run_tests.sh` with the version and the command the public
+  workflow names, fetched by `uv` into its own cache; zero findings, or the run
+  stops. `SCHOLION_SKIP_LINT=1` skips it, and where `uv` or the network is missing
+  the step says the linter was not run.
 - Type errors are counted per module by `./run_tests.sh`, against the recorded
   line: a module may lose errors and may not gain one. The tool is `mypy`, in the
   version the workflow pins, fetched by `uv` into its own cache — nothing is

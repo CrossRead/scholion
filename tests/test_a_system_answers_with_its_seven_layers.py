@@ -76,11 +76,19 @@ CLINVAR = {"status": "ok", "by_gene": {"LIM": [{"zygosity": "hom"}], "REC": [{"z
 def _pos(rs, gene, **over):
     row = {"rsid": rs, "gene": gene, "hgvs": "NC_000001.11:g.100A>G", "risk_allele": "G",
            "mode": "monogenic", "classification": "Strong", "moi": "AD",
-           "text": {"het": TXT, "hom": TXT}, "source": "the author",
+           "text": {"het": TXT, "hom": TXT}, "source": "Synthetic identifier PMID:1",
+           "mechanism": {"en": "Synthetic mechanism", "ru": "Synthetic mechanism (ru)"},
            # A level that allows a conclusion, so that what these rows test is
            # the classification and the mode; the level has its own test.
            "evidence": {"level": "A", "basis": "gencc", "source": "the author"}}
     row.update(over)
+    # These tests exercise observation and question grouping with a supported
+    # synthetic expectation. Missing support has separate refusal regressions.
+    if isinstance(row.get("expect"), dict):
+        row["expect"] = {"source": "Synthetic identifier PMID:1",
+                         "mechanism": {"en": "Synthetic marker-association mechanism",
+                                       "ru": "Synthetic marker-association mechanism (ru)"},
+                         **row["expect"]}
     return row
 
 

@@ -48,7 +48,7 @@ ACCEPTED = {
     # Not a file at all: `urllib`'s opener, reached through a call rather than a
     # name, so the walk cannot see what it is. `.open(request)` here returns an
     # HTTP response, which has no encoding to state.
-    "src/scholion/net.py:239",
+    "src/scholion/net.py:241",
     # The same opener, in the GenCC fetcher: a HEAD and a GET on an HTTP
     # response — bytes with a header, no text encoding to state. The bytes are
     # decoded once, later, with the encoding named at that call.

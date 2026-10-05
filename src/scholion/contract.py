@@ -71,6 +71,8 @@ PARITY: Dict[str, str] = {
     # a different function, until 12.09.2026).
     "GET /api/sources": "sources",
     "GET /api/assistant": "assistant",
+    # 0.6.0, task 192: which people this workstation holds, and whose data is read.
+    "GET /api/patients": "patients",
     # One command, three doors: `target list`, `target set`, `target remove`.
     # The map names commands, not invocations (see `goal-suggest` below).
     "GET /api/targets": "target",
@@ -98,6 +100,9 @@ PARITY: Dict[str, str] = {
     "POST /api/ingest-studies": "ingest-studies",
     "POST /api/ingest-labs": "ingest-labs",
     "POST /api/assistant/context": "assistant",      # the --context flag
+    "POST /api/use": "use",
+    "POST /api/export": "export",
+    "POST /api/erase": "erase",
 }
 
 # --- routes that have no command and should not have one ------------------
@@ -342,6 +347,8 @@ PLUGIN_ARGS: Dict[str, Dict[str, Any]] = {
 # a model that cannot see a capability does not know it is missing, and will
 # answer from what it has instead of saying it cannot.
 NO_PLUGIN: Dict[str, str] = {
+    "export": "carries a person's entire data outside the container; only a person authorizes it",
+    "erase": "permanently removes a person's originals and derived data; only a person authorizes it",
     "coverage": "runs samtools over an alignment of tens of gigabytes and replaces the coverage "
                 "table beside the profile; a person starts it, for the same reason as `recompute`",
     "genotype-sites": "runs bcftools over an alignment of tens of gigabytes and replaces a file in "
@@ -400,6 +407,12 @@ NO_PLUGIN: Dict[str, str] = {
     "target": "a write of a figure the person relays from their clinician; whether "
               "a model may hold that pen is a decision the owner records, and the "
               "reading half already reaches the model through sch_analyze_labs",
+    # 0.6.0, task 192 (§4.5 of the brief): the workstation is the person's.
+    "patients": "lists the other people this workstation holds; a model working for one of "
+                "them has no use for the others' IDs, and a list of them widens the "
+                "conversation to people who are not in it",
+    "use": "switches whose data every answer after it is about — a person's act, never a "
+           "model's (P4)",
     "mcp": "it IS the tool surface — a tool that starts the tool server would be a loop, and the "
            "model calling it is already talking to the thing this command would start",
 }
@@ -434,6 +447,70 @@ def check_plugin_parity() -> List[str]:
                             f"the other two faces lack, or the map is stale")
     return problems
 
+
+# --- what a client is told about each tool before it calls it ---------------
+# MCP lets a server say, per tool, whether it only reads, whether a write
+# replaces something rather than adding to it, and whether it reaches outside
+# the machine. A client uses the three to decide what to ask the person before a
+# call, and a catalogue reviewer reads them as promises. Written by hand beside
+# 39 tools they would drift from WRITES the way the reasons in NO_PLUGIN drifted
+# from the build, so they are derived:
+#
+#   readOnlyHint      no command answered by the tool is in WRITES.
+#   destructiveHint   the tool replaces what was there. Two do: `sch_update`
+#                     replaces the installed program, `sch_recompute` replaces
+#                     the derived files. Every other write adds a line.
+#   openWorldHint     the tool may send a request off the machine. The hosts are
+#                     named, and a test runs every tool with the network cut at
+#                     `net._open` and compares what was asked for with this map.
+#
+# One network request is outside the map on purpose: the once-a-day question to
+# the package registry about a newer build (`upgrade.session_note`) rides on
+# whichever tool is called first. It is the product's, not the tool's, and the
+# plugin README says so in words instead.
+
+#: Tool → the hosts it may ask, and why. A tool absent from here asks nothing.
+OPEN_WORLD: Dict[str, Dict[str, Any]] = {
+    "sch_check_drug_gene": {
+        "hosts": ("rxnav.nlm.nih.gov", "mor.nlm.nih.gov", "api.cpicpgx.org",
+                  "api.mymemory.translated.net"),
+        "why": "resolves the drug name to its class and the gene–drug pair; only the drug name leaves"},
+    "sch_check_prescription": {
+        "hosts": ("rxnav.nlm.nih.gov", "mor.nlm.nih.gov", "api.cpicpgx.org",
+                  "api.mymemory.translated.net"),
+        "why": "resolves the drug name to its class and the gene–drug pair; only the drug name leaves"},
+    "sch_genome_lookup": {
+        "hosts": ("rest.ensembl.org",),
+        "why": "resolves an rsID to its position; only the rsID leaves"},
+    "sch_version": {
+        "hosts": ("pypi.org",),
+        "why": "asks the package registry for the newest version; nothing about the person leaves"},
+    "sch_update": {
+        "hosts": ("pypi.org",),
+        "why": "fetches the newer build, and only with confirm=true"},
+}
+
+#: The writes that replace rather than add.
+DESTRUCTIVE = frozenset({"sch_update", "sch_recompute"})
+
+
+def tool_commands(tool: str) -> List[str]:
+    """The CLI commands a tool answers for."""
+    return sorted(c for c, t in PLUGIN.items() if t == tool)
+
+
+def tool_writes(tool: str) -> bool:
+    return any(c in WRITES for c in tool_commands(tool))
+
+
+def tool_annotations(tool: str) -> Dict[str, Any]:
+    """The MCP `annotations` of one tool, without its title (that one is a phrase)."""
+    writes = tool_writes(tool)
+    out: Dict[str, Any] = {"readOnlyHint": not writes,
+                           "openWorldHint": tool in OPEN_WORLD}
+    if writes:
+        out["destructiveHint"] = tool in DESTRUCTIVE
+    return out
 
 
 # --- why a command has no tool, in a form that can be checked ---------------
@@ -479,6 +556,8 @@ TOOLLESS: Dict[str, Any] = {
     "serve": ("for_the_person", ()), "mcp": ("for_the_person", ()),
     "doc": ("for_the_person", ()), "assistant": ("for_the_person", ()),
     "tools": ("for_the_person", ()),
+    "patients": ("for_the_person", ()), "use": ("for_the_person", ()),
+    "export": ("writes", ()), "erase": ("writes", ()),
 }
 
 #: Where the canon lives inside a build. The source tree keeps the original at
@@ -601,11 +680,16 @@ def check_door_claims() -> List[str]:
         named = []
         problems.append(f"the canon could not be read: {type(exc).__name__}")
     for cmd in named:
-        if cmd not in PLUGIN:
+        if cmd not in PLUGIN and cmd not in CANON_FORBIDS:
             problems.append(f"the canon names «{cmd}», and no tool answers for it: a model "
                             f"that reads the rule through the tool door cannot follow it")
     return problems
 
+
+#: Commands the canon names only to say when a model may NOT start them (task
+#: 192, rule 18): listing, switching, exporting and erasing containers are
+#: the person's acts, so there are no tools for them on purpose.
+CANON_FORBIDS = frozenset({"use", "patients", "export", "erase"})
 
 #: Commands that really are one call under two names.
 _ONE_CALL_TWO_NAMES: Tuple[Tuple[str, str], ...] = ()
@@ -629,6 +713,14 @@ _ONE_CALL_TWO_NAMES: Tuple[Tuple[str, str], ...] = ()
 INSTRUCTION_DOC = "share/skill/INSTRUCTION.md"
 
 NO_INSTRUCTION: Dict[str, str] = {
+    "export": "exports private records; not offered to a model",
+    "erase": "erases originals and derived files; not offered to a model",
+    # Task 192: which person the workstation reads is chosen by a person (P4).
+    # The canon's one rule about them — act only on an ID the person named in
+    # that turn — travels with the agent faces, not as an invitation here.
+    "patients": "lists the other people on this workstation; a model working for one of them "
+                "has no business with the others",
+    "use": "switches the person every answer is about; that is the person's act (P4)",
     "demo": "lays out a fictional profile — offering it to a model invites the one confusion "
             "this project cannot afford, between the demo and the person",
     # `doc` was excused here on the reasoning that a model is handed its
@@ -740,6 +832,7 @@ def check_i18n_keys() -> List[str]:
 # different act from a model typing a value it settled on itself, and only the
 # second is the one the canon forbids.
 WRITES = {
+    "export", "erase",
     "init", "demo", "add-lab", "add-med", "remove-med", "add-metric", "focus-log",
     "set-folder", "import-labs", "import-fhir", "ingest-labs", "ingest-studies", "ingest-garmin",
     "ingest-wearable",
@@ -767,6 +860,9 @@ WRITES = {
 # Creates a value that came from nobody's document. None of these is a tool, and
 # a test keeps it that way.
 AUTHORS = {
+    # Human-only disposition of records, like remove-med, not transcription
+    # or a model-authored medical fact. Neither has a tool entry point.
+    "export", "erase",
     "add-lab", "add-med", "remove-med", "add-metric",
     "init", "demo", "set-folder",
     # Which file is the genome is a fact only the person holds; the command
@@ -1038,12 +1134,17 @@ def agent_plugin_path():
 def _agent_plugin_door() -> Dict[str, Any]:
     folder = agent_plugin_path()
     door: Dict[str, Any] = {
-        "how": "import the folder " + AGENT_PLUGIN_DIR + " into a client that reads Agent Plugins",
+        "how": "import the folder " + AGENT_PLUGIN_DIR + " into a client that reads Agent Plugins, "
+               "or install it as a Claude plugin",
         "entry": "plugin.json",
-        "format": "Agent Plugins 1.0.0",
+        # One folder, two manifests of the same package: the portable format, and
+        # the one Claude Code, Cowork and the Claude catalogue read. The skill,
+        # the launcher and the server are shared, never copied.
+        "format": "Agent Plugins 1.0.0; Claude plugin (.claude-plugin/plugin.json)",
         "for": "an agent",
         "agent_surface": True,
-        "carries": ["skills/scholion/SKILL.md", "mcp.json"],
+        "carries": ["skills/scholion/SKILL.md", "mcp.json",
+                    ".claude-plugin/plugin.json", ".mcp.json"],
         # The half this door exists for. Through the tool interface a model is
         # handed functions and no instruction — the reason `sch_rules` is a tool
         # at all. Here the instruction arrives in the same folder as the

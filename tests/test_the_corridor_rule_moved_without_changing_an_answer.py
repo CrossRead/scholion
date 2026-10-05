@@ -124,8 +124,18 @@ class TestTheAnswerIsTheSameBeforeAndAfterTheMove(unittest.TestCase):
 
     def _both(self, sex, age, profile, catalogue):
         patches = [mock.patch.object(core, "labs", lambda: profile),
+                   # This is the corridor-extraction proof, not a freeze of the
+                   # independently changed clinical-threshold gate in 0.6.0.
+                   # Threshold arithmetic and supported urgent warnings have
+                   # dedicated regressions; both engines see no threshold here.
+                   mock.patch.object(core, "clinical_thresholds", lambda: {"markers": {}}),
                    mock.patch.object(core, "profile_sex", lambda: sex),
-                   mock.patch.object(core, "profile_age", lambda: age)]
+                   mock.patch.object(core, "profile_age", lambda: age),
+                   # 0.6.0 prints a marker's name in the reader's language — a
+                   # change of its own, not part of the move this file proves;
+                   # the name is held at the profile's so the proof stays one.
+                   mock.patch.object(core, "marker_name",
+                                     lambda m: m.get("name") or m.get("key", ""))]
         if catalogue is not None:
             patches.append(mock.patch.object(core, "lab_markers", lambda: catalogue))
         for p in patches:

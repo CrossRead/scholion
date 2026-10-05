@@ -47,6 +47,28 @@ def _add_setup_commands(sub, common) -> None:
                      help="answer yes to the question about external tools (install them)")
     ini.add_argument("--no-tools", action="store_true",
                      help="do not ask about external tools at all")
+    # 0.6.0, task 192: `init --patient` makes a container for one more person.
+    ini.add_argument("--id", dest="container_id", metavar="ID",
+                     help="with --patient: the clinic's own ID for the new container "
+                          "(3-32 letters, digits, hyphens; p-xxxxxx is made up otherwise)")
+    ini.add_argument("--label", metavar="TEXT",
+                     help="with --patient: a label printed only on this machine, never to a model")
+    ini.add_argument("--root", metavar="DIR",
+                     help="with the first --patient: the folder new containers are made under")
+
+    sub.add_parser("patients", parents=[common],
+                   help="the containers on this workstation, one per person, and the active one")
+    us = sub.add_parser("use", parents=[common],
+                        help="make another container the active one: every later command reads it")
+    us.add_argument("id", metavar="ID", help="the container's ID (`patients` lists them)")
+
+    ex = sub.add_parser("export", parents=[common],
+                        help="export a registered container, including owned external storage")
+    ex.add_argument("--to", required=True, metavar="ARCHIVE", help="new local .tar.gz archive")
+    er = sub.add_parser("erase", parents=[common],
+                        help="preview erasure of an inactive container; nothing removed by default")
+    er.add_argument("--confirm", default="", metavar="ID", help="repeat the exact container ID")
+    er.add_argument("--digest", default="", help="digest printed by the erasure preview")
 
     dm = sub.add_parser("demo", parents=[common],
                         help="build a synthetic demo profile (a fictional person)")
@@ -408,6 +430,11 @@ def _add_records_commands(sub, common) -> None:
                         help="add a drug to the scheme; a name already there is updated, "
                              "keeping its status unless --status says otherwise")
     am.add_argument("name"); am.add_argument("--dose", default=""); am.add_argument("--note", default="")
+    am.add_argument("--start-date", help="recorded start, YYYY-MM-DD or YYYY-MM; never inferred")
+    am.add_argument("--control-marker", help="marker key of an explicitly prescribed control")
+    am.add_argument("--control-from", help="first acceptable draw date, YYYY-MM-DD")
+    am.add_argument("--control-due", help="recorded control deadline, YYYY-MM-DD")
+    am.add_argument("--control-source", help="source of this dated plan; all four control flags are required")
     am.add_argument("--status", default=None,
                     help="active / paused / stopped, or a word of your own; only entries "
                          "whose status begins with `active` or `course` take part in the "
@@ -458,6 +485,11 @@ def _add_records_commands(sub, common) -> None:
     trm = tgs.add_parser("remove", parents=[common],
                          help="withdraw the target recorded for a marker")
     trm.add_argument("marker")
+    torigin = tgs.add_parser("origin", parents=[common], help="record the stated origin of an existing goal")
+    torigin.add_argument("goal_id", help="the ID returned by goal --json")
+    from .goal_entities import ORIGINS
+    torigin.add_argument("--origin", required=True, choices=ORIGINS)
+    torigin.add_argument("--reason", required=True, help="the reason stated by the person, not an inferred diagnosis")
 
     brv = sub.add_parser("brief-review", parents=[common],
                          help="what arrived since a block of the lifestyle brief was last read, and a "
@@ -524,6 +556,12 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument("--sample", metavar="NAME",
                         help="which sample column inside a multi-sample VCF is yours "
                              "(also the SCHOLION_GENOME_SAMPLE variable)")
+    # Task 192 (R3): one command reads another person's container; the active
+    # one stays. On `init` the bare flag means «make a container for one more
+    # person» instead.
+    common.add_argument("--patient", nargs="?", const=True, default=None, metavar="ID",
+                        help="read this container for this one command (`patients` lists them); "
+                             "on init, make a new one")
 
     # prog is taken from whatever the command was called by: through the wrapper it is
     # `crossread`, through the module — `python3 -m scholion`. Otherwise the help teaches
@@ -565,7 +603,7 @@ def _hint_if_empty(cmd) -> None:
     # A hint about an empty profile next to it is misleading — the person decides that the
     # instruction has to be filled with something too.
     # `tools` says nothing about a profile either: it reports on the machine.
-    if cmd in ("init", "demo", "skill", "tools"):
+    if cmd in ("init", "demo", "skill", "tools", "patients", "use", "export", "erase"):
         return
     try:
         d = core.profile_dir()
@@ -642,6 +680,7 @@ def main(argv=None) -> int:
     # a stream that cannot carry them dies halfway through, having already
     # written part of the file. See `console.speak_utf8`.
     from . import console as _console
+    from . import container as _container
     _console.speak_utf8()
     try:
         return _main(argv)
@@ -654,6 +693,11 @@ def main(argv=None) -> int:
         # «this profile cannot be read at all».
         print(f"⚠️  {e}", file=sys.stderr)
         return 4
+    except _container.ContainerError as e:
+        # Which person's data: an unknown ID, a folder that is gone, a patient
+        # who changed while the command ran. Its own code, as above.
+        print(f"⚠️  {e}", file=sys.stderr)
+        return 6
     except _core.SourcesUnreadable as e:
         # profile/sources.json is present and does not read. Every answer after
         # this point would be about the wrong files (labs as «none», another
@@ -673,7 +717,98 @@ def main(argv=None) -> int:
 # the order of the old chain, and it matters where two entries share a command.
 
 
+def _init_patient(args) -> int:
+    """`init --patient`: one more person on this workstation (task 192)."""
+    from . import container as _container, store as _st
+    if isinstance(args.patient, str):
+        print(f"✗ {_t('cli.init_patient_id')}", file=sys.stderr)
+        return 2
+    r = _container.create(args.container_id, args.label, args.root,
+                          surface='cli-tty' if sys.stdin.isatty() else 'cli-script')
+    fields = {k: v for k, v in (("sex", args.sex), ("birth_year", args.birth_year)) if v}
+    # The whole layout of 0.5 — templates, genome/, raw/, work/, archive/ with
+    # their notes — laid into the new container, whichever one is active.
+    _container.for_one_command(r["id"])
+    try:
+        _st.init_profile()
+        if fields:
+            _st.update_metric_profile(fields)
+    finally:
+        _container.for_one_command(None)
+    if args.json:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        return 0
+    if r["first"]:
+        print(_t("init.patient_root", root=Path(r["path"]).parent))
+    if r["adopted"]:
+        print(_t("init.patient_adopted", id=r["adopted"]))
+    print(_t("init.patient_made", id=r["id"], path=r["path"]))
+    if r["own_id"]:
+        print(_t("init.patient_own_id"))
+    print(_t("init.patient_active") if r["active"] == r["id"]
+          else _t("init.patient_next", id=r["id"]))
+    return 0
+
+
+def _cmd_lifecycle(args) -> int:
+    from . import lifecycle
+    if not isinstance(args.patient, str):
+        print(_t('lifecycle.patient_required'), file=sys.stderr)
+        return 2
+    surface = 'cli-tty' if sys.stdin.isatty() else 'cli-script'
+    try:
+        if args.cmd == 'export':
+            result = lifecycle.export(args.patient, args.to, surface=surface)
+        else:
+            result = lifecycle.erase(args.patient, confirm=args.confirm,
+                                     digest=args.digest, surface=surface)
+    except OSError as exc:
+        print(_t('lifecycle.io_error', error=type(exc).__name__), file=sys.stderr)
+        return 1
+    # The inventory is deliberately identical on the CLI and web. It is local
+    # personal information and there is no agent tool for these operations.
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result.get('ok') else 1
+
+
+def _cmd_patients(args) -> int:
+    from . import container as _container
+    r = _container.listing()
+    if args.json:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        return 0
+    rows = r["containers"]
+    if not r["workstation"]:
+        me = rows[0]
+        print(_t("patients.alone", path=me["path"],
+                 id=me["id"] or _t("patients.no_id")))
+        print(_t("patients.add_hint"))
+        return 0
+    print(_t("patients.h", n=len(rows), root=r["root"]))
+    for row in rows:
+        mark = _t("patients.active_mark") if row["active"] else ""
+        label = f" · {row['label']}" if row.get("label") else ""
+        state = row["modified"] or _t("patients.empty")
+        if not row["exists"]:
+            state = _t("patients.gone")
+        print(f"  {row['id']}{label} — {state} · {row['engine'] or '—'}{mark}")
+    return 0
+
+
+def _cmd_use(args) -> int:
+    from . import container as _container
+    r = _container.use(args.id, surface='cli-tty' if sys.stdin.isatty() else 'cli-script')
+    if args.json:
+        print(json.dumps(r, ensure_ascii=False, indent=2))
+        return 0
+    label = f" · {r['label']}" if r.get("label") else ""
+    print(_t("use.done", id=r["id"], label=label))
+    return 0
+
+
 def _cmd_init(args) -> int:
+    if getattr(args, "patient", None):
+        return _init_patient(args)
     from . import store as _st
     r = _st.init_profile(target=args.dir, force=args.force, demo=args.demo,
                          subject=getattr(args, "subject", None))
@@ -917,8 +1052,7 @@ def _cmd_radar(args) -> Any:
 
 
 def _cmd_medications(args) -> Any:
-    from . import store as _st
-    res, render = {"medications": _st.list_medications()}, fmt.medications_report
+    res, render = engine.medications_view(), fmt.medications_report
     return res, render
 
 
@@ -1004,8 +1138,11 @@ def _cmd_add_metric(args) -> Any:
 
 def _cmd_add_med(args) -> Any:
     from . import store as _st
+    fields = (args.control_marker, args.control_from, args.control_due, args.control_source)
+    control = dict(zip(("marker", "from", "due", "source"), fields)) if any(v is not None for v in fields) else None
     res, render = (_st.add_medication(args.name, args.dose, args.note,
-                                      status=args.status, subject="owner"),
+                                      status=args.status, start_date=args.start_date,
+                                      control=control, subject="owner"),
                    fmt.write_result)
     return res, render
 
@@ -1034,6 +1171,8 @@ def _cmd_target(args) -> Any:
         render = fmt.write_result
     elif args.target_cmd == "remove":
         res, render = _st.remove_clinician_target(args.marker), fmt.write_result
+    elif args.target_cmd == "origin":
+        res, render = _st.set_goal_origin(args.goal_id, args.origin, args.reason), fmt.write_result
     else:
         # A bare `target` lists, as a bare `marker` does: the reading form
         # is the safe default and the one a person reaches for first.
@@ -1421,6 +1560,10 @@ def _is(cmd: str):
 
 _ACTIONS = [
     (_is("init"), _cmd_init),
+    (_is("patients"), _cmd_patients),
+    (_is("use"), _cmd_use),
+    (_is("export"), _cmd_lifecycle),
+    (_is("erase"), _cmd_lifecycle),
     (_is("tools"), _cmd_tools),
     (_is("demo"), _cmd_demo),
     (_is("doc"), _cmd_doc),
@@ -1528,6 +1671,28 @@ def _main(argv=None) -> int:
         os.environ["SCHOLION_GENOME_VCF"] = str(args.vcf)
     if getattr(args, "sample", None):
         os.environ["SCHOLION_GENOME_SAMPLE"] = str(args.sample)
+    patient = getattr(args, "patient", None)
+    if patient is True and args.cmd != "init":
+        print(f"✗ {_t('cli.patient_needs_id')}", file=sys.stderr)
+        return 2
+    from . import container as _container
+    if isinstance(patient, str) and args.cmd not in ("init", "export", "erase"):
+        _container.for_one_command(patient)
+    try:
+        if args.cmd in ("use", "export", "erase") or (args.cmd == "init" and patient):
+            # The two commands whose job IS to change which container is read.
+            return _dispatch(p, args)
+        # Whatever this command writes goes into the container it read (task 192).
+        with _container.pinned():
+            from . import lifecycle, contract
+            lifecycle.record_current('write' if args.cmd in contract.WRITES else 'read',
+                                     'cli-tty' if sys.stdin.isatty() else 'cli-script')
+            return _dispatch(p, args)
+    finally:
+        _container.for_one_command(None)
+
+
+def _dispatch(p, args) -> int:
     _hint_if_empty(getattr(args, "cmd", None))
 
     for when, run in _ACTIONS:
@@ -1544,7 +1709,15 @@ def _main(argv=None) -> int:
         p.print_help()
         return 2
 
-    print(json.dumps(res, ensure_ascii=False, indent=2) if args.json else render(res))
+    if args.json and isinstance(res, dict) and "container" not in res:
+        # Whose answer this is (task 192): a skill reading the command line sees
+        # the ID in every answer, as a tool's answer carries it. Never the label.
+        from . import container as _container
+        res = {**res, "container": _container.named()}
+    output = json.dumps(res, ensure_ascii=False, indent=2) if args.json else render(res)
+    from . import container as _container
+    _container.gate()
+    print(output)
     if args.cmd == "ingest-labs" and res.get("errors"):
         # A file that raised inside the reader is named in the report and the
         # rest of the folder was still processed — but a partial result is not

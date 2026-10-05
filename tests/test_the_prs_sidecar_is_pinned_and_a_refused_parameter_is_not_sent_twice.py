@@ -71,16 +71,18 @@ class TestTheLaunchCarriesTheConstraint(unittest.TestCase):
         with mock.patch.object(net, "offline", return_value=False), \
                 mock.patch.object(prs.subprocess, "Popen", _fake_popen(record)):
             m = prs._MCP()
+            pinned = Path(record["env"]["UV_CONSTRAINT"])
+            self.assertTrue(pinned.is_file())
+            lines = [ln.strip() for ln in pinned.read_text(encoding="utf-8").splitlines()
+                     if ln.strip() and not ln.startswith("#")]
+            self.assertEqual(list(prs.PRS_CONSTRAINTS), lines)
             m.close()
         self.assertEqual(["uvx", prs.PKG, "stdio"], record["args"][:3])
         self.assertIn("UV_CONSTRAINT", record["env"],
                       "the sidecar was started with its resolution unpinned — a fresh "
                       "uvx cache will take a fastmcp the server was not written for")
         pinned = Path(record["env"]["UV_CONSTRAINT"])
-        self.assertTrue(pinned.is_file())
-        lines = [ln.strip() for ln in pinned.read_text(encoding="utf-8").splitlines()
-                 if ln.strip() and not ln.startswith("#")]
-        self.assertEqual(list(prs.PRS_CONSTRAINTS), lines)
+        self.assertFalse(pinned.exists(), "the per-process constraint must be cleaned up")
 
     def test_an_owners_own_constraint_file_is_kept(self):
         record = {}
@@ -89,6 +91,31 @@ class TestTheLaunchCarriesTheConstraint(unittest.TestCase):
                 mock.patch.object(prs.subprocess, "Popen", _fake_popen(record)):
             prs._MCP().close()
         self.assertEqual("/somewhere/the-owners-own.txt", record["env"]["UV_CONSTRAINT"])
+
+    def test_constraints_are_removed_when_startup_or_handshake_fails(self):
+        original = prs._constraint_file
+        for failure in ("missing_executable", "spawn_refused", "handshake_failed"):
+            paths = []
+            def create():
+                p = original()
+                paths.append(p)
+                return p
+            process = mock.MagicMock()
+            spawn = FileNotFoundError("synthetic") if failure == "missing_executable" else (
+                OSError("synthetic") if failure == "spawn_refused" else None)
+            expected = prs.PrsUnavailable if failure == "missing_executable" else (
+                OSError if failure == "spawn_refused" else RuntimeError)
+            with self.subTest(failure=failure), \
+                 mock.patch.object(net, "offline", return_value=False), \
+                 mock.patch.object(prs, "_constraint_file", side_effect=create), \
+                 mock.patch.object(prs.subprocess, "Popen", side_effect=spawn, return_value=process), \
+                 mock.patch.object(prs._MCP, "_init", side_effect=RuntimeError("synthetic handshake")):
+                with self.assertRaises(expected):
+                    prs._MCP()
+                self.assertEqual(1, len(paths))
+                self.assertFalse(paths[0].exists())
+                if failure == "handshake_failed":
+                    process.terminate.assert_called_once()
 
 
 class TestTheShellCopyAgreesWithTheCode(unittest.TestCase):

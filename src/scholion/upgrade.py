@@ -44,6 +44,13 @@ PACKAGE = "scholion"
 
 
 def _notice_path() -> Path:
+    """Beside the workstation file when there is one: whether a newer build
+    exists is a fact about the program, not about whichever person is active,
+    and in a container it would be asked again for every patient (task 192).
+    Without a workstation, in the cache as before."""
+    from . import container as _container
+    if not _container.explicit_environment() and _container.workstation():
+        return _container.workstation_path().parent / NOTICE_FILE
     return core.cache_dir() / NOTICE_FILE
 
 

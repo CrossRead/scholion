@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "scholion": {
+      "type": "stdio",
+      "command": "${CLAUDE_PLUGIN_ROOT}/scripts/scholion-mcp",
+      "args": []
+    }
+  }
+}

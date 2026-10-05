@@ -40,6 +40,426 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.0 — 27.09.2026
+
+_This entry is open: it lists what has changed since 0.5.11 and grows until the
+release is published._
+
+### What you can do now
+
+**Amino-acid reference contexts are shared, not diagnoses.** Low measured
+values can link to one source-backed explanation of protein intake,
+malabsorption and catabolism, with the limits of each single study. These
+contexts do not affect scores or establish a cause. Value-only markers and
+censored observations do not trigger them. Urinary urea nitrogen is described
+as part of nutrition assessment, not a direct measurement of absorbed protein;
+an amino-acid panel alone cannot establish an order or a repeat interval.
+
+**A 16-position folate, histamine, redox and choline panel.** Available through
+`scholion panel folate_histamine_redox_choline` and
+`scholion system folate_histamine_redox_choline`, it preserves existing
+interpretations. Thirteen new positions carry literature context, not approved
+genotype-specific clinical conclusions. Coordinates support GRCh38 and GRCh37;
+genotypes must be considered alongside measured phenotype.
+
+**Personal and Visit are explicit display modes.** Visit defaults to the
+professional register and offers a patient selector only when there are several
+local containers. Changing the display mode does not change the patient. The
+technical container ID and engine version remain visible, including in print.
+
+**Recorded goals have a shared view and explicit origins.** Personal targets,
+clinician targets and recorded focus tracks appear together. A person can state
+whether a goal comes from a complaint, a lab result, the genome, history, a
+clinician or prevention, with a reason. Changing that metadata does not change
+the target or its observations. Older records without a stated origin remain
+unspecified rather than acquiring invented provenance.
+
+**Genome positions name their data workflow.** Each position distinguishes
+an available linked measurement, a missing measurement, or no independently
+supported marker link in this build. Unread or unconfirmed genotypes and missing
+claim support keep the route blocked. These routes are not test orders or
+treatment decisions; an undeclared link does not mean that no marker exists.
+
+**Dose and longevity sentences cannot borrow nearby citations.** Effects,
+formulations, alternatives, actions and population statements each need their
+own source and mechanism. Unsupported sentences are explicitly withheld;
+genotypes, recorded doses, laboratory values and their dates remain visible.
+A withheld dose-context assessment cannot produce a reassuring prescribing
+verdict. Lipoprotein(a) uses the dated laboratory comparison, and an inexact or
+unassessed value cannot acquire a green grade.
+
+**Calculations are distinguished from clinical conclusions.** BMI retains its
+calculated value without an unsupported clinical grade. Radar and wearable
+indices state their display-comparison method, not a clinical prediction.
+PhenoAge carries its population-model source and method, not an individual
+prognosis. Recorded focus expectations are labelled as notes, not measured
+treatment effects. Stored observations and previously entered goals are not
+rewritten; regenerate saved reports to see the withdrawn interpretations.
+
+**Clinical thresholds and actions need independent support.** A catalogue
+boundary without held interpretation is shown as unresolved, not safe or below
+an action threshold. The qualified marked-CK warning uses the applicable upper
+reference bound rather than a fixed number; treatment decisions stay with the
+clinician. Measurements and prescribed schedules are not changed.
+
+**Suggested tests need their own grounds.** Test selection, reason, trigger
+applicability, priority, referral and repeat interval no longer borrow one
+another's support. Unsupported candidates stay visible without an order or a
+reassuring low priority. There is no implicit three-month repeat interval;
+one recent result cannot establish completion of a whole monitoring panel.
+Existing measurements and prescribed schedules are unchanged.
+
+**An observed number is not automatically a treatment goal.** Historical
+extrema and reference bounds remain visible as observations. An assumed risk
+category or unconfirmed diagnosis cannot select a clinical target, and a
+guideline citation alone does not support the target or an adjacent quotation.
+Previously entered or accepted goals are kept; review previously generated
+targets with your clinician and regenerate saved proposals to replace the
+unsupported advice. Stored values are not recalculated or erased.
+
+**Laboratory scales are no longer mistaken for normal intervals.** Printed
+grades and conditional rows stay with the measurement; a graded scale is not
+replaced by a dictionary interval. Time-dependent rows use the recorded draw
+time, while an unknown posture leaves the comparison unresolved. Unrecognised
+result labels are named even when other rows in the file were imported.
+An inexact result expressed as a bound is not assigned a unique printed grade.
+
+**Import refuses ambiguous combined forms instead of corrupting results.**
+Documents with several draw dates or mixed blood/stool forms must be split
+before importing. A numeric stool count cannot be truncated onto the worded
+score scale. Decimal results beside thousands-separated ranges, unbracketed
+age bands, a paediatric first reference row, wrapped vitamin B6 and the
+Cyrillic OH spelling are read without the reported losses. Published ClinVar
+and other sites-only resources are not counted as a person's genome.
+Existing stored measurements and dates are not repaired automatically:
+review affected histories against the originals and re-import individual
+forms with forced re-reading, rather than relying on a previous import's
+success message. Printed grading labels are reported as the form's words,
+not as Scholion diagnoses.
+
+**Recorded tests are separate from monitoring advice.** Monitoring reasons and
+the proposed use of each marker require their own support; unsupported reasons
+and timing are withheld and named, rather than printing a validated plan or a
+reassuring prescribing verdict. The selected observations keep their values,
+dates, units and laboratory comparisons. A missing profile row now says "not
+recorded in this profile", not that the test was never done, and uses the marker's
+display name. Recorded tests and prescriber schedules are unchanged; regenerate
+saved prescription checks to replace the unsupported advice.
+
+**An interaction match is not automatically a clinical judgement.** Unsupported
+effects and management statements are withheld independently, with their
+missing basis named beside the matched medicines. Such a gap cannot produce
+"no interactions" or a low prescribing verdict. The supported warfarin/NSAID
+bleeding caution remains prominent without a personal risk estimate or an
+automatic gastroprotection plan; it is not lent to every vitamin K antagonist.
+Mixed partners remain separate. Stored medicines are unchanged; regenerate
+saved prescription checks to replace the withdrawn wording.
+
+**A prescribing statement cannot borrow another statement's support.** Clinical
+notes, gene-role explanations and guideline quotations now require their own
+source and mechanism. A changed quotation loses its recorded support rather
+than inheriting that of the previous text. Missing support is named; the
+phenotype and its observations remain visible without a reassuring assessment.
+Indication-specific tables are withheld when the indication is not established,
+and an omeprazole or citalopram quotation is not lent to another drug.
+The supported DPYD poor-metaboliser toxicity warning remains prominent,
+without supplying an individual dose. Recheck saved drug and prescription
+reports; recorded readings and treatments are not changed.
+
+**Prescribing tables must match the drug and joint phenotype.** A simvastatin
+table is no longer quoted for another statin, or a codeine table for tramadol.
+Two intermediate TPMT/NUDT15 readings no longer receive the held single-IM
+dose recommendation. Both readings remain visible; the missing applicable
+table is named instead of yielding a reassuring verdict. A normal phenotype
+found online also cannot stand in for a prescribing table that is not held.
+Stored readings and prescriptions are unchanged. Regenerate saved drug checks
+to replace these earlier recommendations; treatment decisions remain with the
+prescriber.
+
+**Connection instructions fit long installation paths.** Commands and path
+details wrap on narrow screens without being shortened or changing the text
+to copy.
+
+**A missing route dependency is not a negative genotype.** When a triggered
+rule needs a reading unavailable in the current panel, the gap is named
+instead of being silently omitted or described as no genetic influence.
+The patient's view counts lower-level rules; the clinician's view retains
+their missing dependency. No genotype is inferred from the gap.
+
+**Genotype-linked prescribing cautions carry their own basis.** A caution
+without a primary reference and mechanism, or below evidence level B, no
+longer supplies a prescribing interpretation. The recorded genotype remains
+available. The factor V Leiden warning retains its priority and now cites
+contraceptive eligibility guidance rather than an unqualified risk multiplier;
+that multiplier is withdrawn, not converted into a personal probability.
+Treatment decisions remain the prescriber's. Stored prescriptions and
+genotypes are unchanged; regenerate saved reports to replace the old wording.
+
+**Separate support for separate claims.** A position's source no longer
+automatically supports its marker expectation, intake route, response to a
+load or proposed next step. Each unsupported claim is withheld with a reason,
+including in reference panels and marker links; readings and evidence levels
+remain available. Existing reports should be regenerated.
+
+**Supported next steps retain their explanation.** Laboratory, genome and
+discussion lists carry the step's own mechanism and reference. A genome step
+or low-coverage warning no longer disappears when every listed gene was read,
+or gets attached to the last gene instead of the gene it concerns.
+
+**PCSK9 interpretations no longer exclude other causes of low LDL-C.** R46L
+and C679X descriptions distinguish population associations from personal
+predictions and experimental mechanisms. Cohort estimates are not doubled for
+two copies; the pooled nonsense-variant estimate is not presented as specific
+to C679X. The previous reassuring wording and per-allele estimate are withdrawn.
+Genotypes, laboratory values and prescriptions are unchanged.
+
+**Correction routes distinguish missing support from no effect.** A route and
+its recheck timing and change criterion each need their own reference and
+mechanism. Unsupported advice is withheld with a reason, not presented as a
+negative genetic conclusion. Lower-level evidence no longer transmits the same
+treatment claim under a different heading. Measurements and prescriptions are
+unchanged; regenerate saved reports to replace the withdrawn advice.
+
+**Explicit gaps in curated interpretations.** A curated A/B position or group
+without an identifiable primary reference and a recorded mechanism no longer
+prints a clinical interpretation. Its evidence level and reading status remain
+visible, with the missing basis named. Unsupported positions do not count as
+findings or support a reassuring panel summary; their marker links no longer
+assert a direction. This withdraws earlier unsupported positive and negative
+panel wording. Genotypes, measurements and prescriptions are not rewritten;
+regenerate saved panel reports to see the corrected interpretation status.
+
+**Consistent CYP2C19 labels.** A newer locally cached reference can no longer
+restore the withdrawn compensation claim in the computed IM label. The local
+reference file, its date and the computed phenotype code remain unchanged.
+
+**Clearer limits on genetic predictions.** ABCG2 urate explanations no longer
+promise a response to allopurinol or turn a population odds ratio into a personal
+risk prediction. CYP2C19 panel rows no longer infer a complete metaboliser
+phenotype or select treatment from a single position, and no longer combine
+stroke and coronary-treatment advice. The unsupported claim that `*17` partly
+compensates for a no-function allele is withdrawn; the computed IM code is
+unchanged. Revised explanations carry primary references and mechanisms;
+their human review is open. Stored readings and prescriptions are unchanged.
+
+**Corrected pharmacogenetic-panel explanations.** The lipid panel no longer treats the
+SLCO1B1 c.521 position as a complete `*5` haplotype or places poor-function dose
+advice beside a one-copy ABCG2 result. Those earlier formulations are withdrawn.
+The revised explanations distinguish the reading from prescribing decisions,
+carry a mechanism and primary reference, and explicitly await human review.
+An unrelated urate claim was removed from the statin explanation. Stored
+genotypes and prescriptions are unchanged. Cardiac, inflammatory and renal
+panel explanations also no longer turn a single CYP2C9 position into general
+NSAID dose instructions. Warfarin-related rows explicitly require the complete
+genetic and clinical context and INR, rather than proposing a dose from one position.
+
+**Read chart gaps and goals without implied health judgements.** Missing values
+break observation lines instead of being bridged. Goals and reference windows
+use neutral, labelled marks; calendar years no longer make an observation look
+favourable. Paired series have labels, distinct line patterns and point shapes.
+Chart colours follow the active theme. Stored observations and targets are unchanged.
+
+**Read the complete panel list.** `scholion panel author_list` includes positions
+awaiting inclusion and positions that were refused, with the reason for each.
+Available panel-author explanations retain their Russian original and a labelled
+English translation. They are shown as opinions at the position's evidence
+level, not as additional findings or individual treatment recommendations.
+Existing genotypes, findings and patient-specific clinician notes are unchanged.
+The clinician's view (`scholion system author_list --register clinician`) adds
+local genotype readings and separately labelled values recorded in the profile,
+including positions
+not accepted into a panel. Missing calls and unsupported insertions/deletions
+remain explicit refusals; no remote variant lookup is made by opening the list.
+The web reading list groups compact, keyboard-expandable rows by gene. Each row
+distinguishes a current local-file call, a recorded profile value and an
+unconfirmed value, with evidence level and provenance kept beside the reading.
+Printing includes the folded details without changing which rows stay open afterward.
+
+**Keep hypotheses separate from patient conclusions.** Patient-facing system
+cards and text reports now count C–D hypotheses and E-level values without
+listing their individual positions. Previously, those positions could still
+appear in summaries even when their explanatory text was withheld. Clinician
+views retain the details; JSON and assistant tools still carry all positions,
+their levels and hypothesis passports. No stored genotype is removed or changed.
+
+**Separate local patient containers.** A workstation can hold several people
+without mixing their files. CLI, web and assistant replies name the technical
+container ID; an assistant session refuses a switch until a new session starts.
+Local labels are not sent through the model tools.
+
+**Whole-container export and deliberate erasure.** Local CLI and web controls
+export the owned files and a manifest, or erase an inactive container only after
+an inventory and exact-ID confirmation. Uncertain or shared external ownership
+refuses. Erasure includes raw originals and cannot be undone; it is not forensic
+secure deletion and does not remove separately retained backups.
+
+**Local access journals.** Registered workstations record the technical ID,
+time, action and entry point in the container and a surviving clinic journal,
+without labels or medical content. These are access records, not tamper-proof
+evidence. Export and erasure are not assistant tools.
+
+**Privacy boundaries are available offline.** The installed documentation and
+plugin distinguish the local engine from an assistant host: tool answers can
+reach a remote model provider, and a technical ID is not anonymisation.
+The policy explains network queries, journals, export and erasure limits;
+offline mode blocks the engine's requests, not the host's model requests.
+
+### What is fixed
+
+**Position panels name rows, not genes.** A completed sixteen-position panel
+covering eight genes no longer claims sixteen genes were read. X-linked calls
+retain their single-copy checks even without an assigned risk allele; an
+apparent heterozygous male call is withheld rather than treated as diploid.
+
+**A gene-region report is visible in the genome view.** Missing annotation,
+unselected samples, unreadable inputs and unavailable protein calculations
+remain named gaps, not zero variants. Variant counts use the selected sample
+and exclude reference homozygotes.
+
+**PhenoAge does not assemble a blood draw from a month.** Different collection
+dates and times are kept separate. Legacy records with only a month no longer
+produce a composite result until their draw dates have been recovered.
+
+**An interrupted form import can resume.** Completed files are checkpointed,
+rejected table rows and storage errors are named, and bounded numeric results
+keep their qualifiers. Time-limited tool hosts return a terminal command for
+an unfinished import or an uncached whole-genome pass, not a partial report.
+Resuming preserves the preferred measurement method and reports disagreements
+with later forms instead of silently replacing the selected value. A valid
+English collection date in a table is no longer also reported as rejected.
+The first tool-based import into an unnamed local container no longer invalidates
+the assistant's session after saving the results. Previously overwritten values
+are not repaired automatically: compare the source forms and force a re-import
+of the affected folder.
+
+**Genetic conclusions require confirmed inputs.** APOE epsilon assignment
+requires two confirmed calls. Stale indexes are not used for seeking reads,
+coverage refuses an unknown or mismatched assembly, padded equivalent alleles
+can match secondary-findings records, and unanchored report genotypes are not
+counted as reference-oriented calls. Moderate gene–disease relationships are
+not findings; X-linked recessive findings distinguish sex and single-copy calls.
+
+**A curated repeat is read as repeat alleles, not individual letters.**
+SERPINE1 4G/5G uses rs1799762 and verified reference windows on both genome
+assemblies. rs1799768 remains a distinct insertion, not an alias. A missing
+variant row, unsupported representation or duplicate call cannot establish
+4G/4G. The repeat count does not establish an individual clinical risk.
+AGXT Gly170Arg, Phe152Ile and Ile244Thr are available for coordinate-based
+lookup; their literature context does not establish a treatment response in
+an unaffected carrier.
+
+**Correction routes can observe existing cross-panel dependencies.** Read
+state is preserved without importing another panel's clinical sentence.
+Unobserved inputs remain explicit gaps; an observed genotype cannot bypass
+the independent clinical-support gate. Local clinician notes are labelled
+as opinions, not evidence upgrades.
+
+**Reference comparisons retain their context.** Form age bands use age on the
+collection date, unknown demographics do not select a labelled range, and
+boundary flags use the measurement's own interval. Same-day records with
+incomplete clock precision no longer bypass the recorded method priority.
+Radar rows retain reference origin, and form defaults use the local date.
+
+**Local diagnostics retain their security checks.** TLS verification is not
+silently bypassed, a foreign server's text does not identify it as Scholion,
+and PRS constraints use private unique temporary files. The Hub data view
+honours the configured external profile. Medicine replacement and import
+conflicts/errors are visible in the web interface; CLI exit codes are documented.
+
+**Previously missing laboratory analytes are no longer silently omitted.**
+Recognition includes 31 additional analytes, with English and Russian names.
+These new rules are explicitly proposed: values and dates are retained, while
+norm judgements await the person's confirmation. Units come from the form or
+the table, not an assumed assay; missing or changed units produce a named
+refusal rather than mixing unlike numbers. No reference intervals, standard
+identifiers or conversion factors are invented. Earlier imports are unchanged;
+re-import source forms to recover previously omitted readings.
+
+**Unassessed laboratory readings no longer look reassuring.** A proposed rule
+or a missing corridor produces a neutral label rather than a green in-range
+badge. An unconfirmed rule does not print its corridor as a normal range.
+
+**Existing print views keep the radar together.** Large system cards can flow
+across pages instead of leaving a blank opening page; the on-screen layout is
+unchanged. This does not add a new consultation sheet.
+
+**An interrupted laboratory import could leave only part of a panel.** CSV
+imports now validate dates and prepare the complete panel before saving it.
+A rejected row leaves the previous laboratory file unchanged. Importing into
+a demonstration profile is refused without clearing that profile.
+
+**A bounded laboratory result could become an exact number.** FHIR observations
+such as “less than 5” are now explicitly skipped, rather than stored as exactly
+5. Observations with multiple or conditional reference ranges are also skipped
+until their context can be represented without guessing.
+
+**A failed coverage measurement could look like no reads.** A failing alignment
+reader now stops the measurement without replacing the completed coverage table.
+Interrupted measurements are reused only when their local input identities and
+parameters match; obsolete progress is retained separately, not mixed into the
+new measurement.
+
+**Unresolved threshold comparisons could dilute the reported rate of flags.**
+Unresolved markers are counted separately, not as negative comparisons. A
+text-only result no longer crashes the next-draw checklist.
+
+**A slower tab could replace the screen selected afterwards.** Late tab replies
+and their errors no longer overwrite the current screen. A read started before
+cache invalidation cannot repopulate that cache with its old answer.
+
+**The note beside an assumed reference named two script files instead of a
+command.** When a position has no row in the variant file, `scholion genome`
+answers that this is either the reference or a lack of coverage, and says what
+tells the two apart. It pointed at two scripts inside the source tree, which a
+person who installed the package does not have. It names `scholion recompute`
+now, which reads the catalogue positions from the alignment where one is at
+hand. The answer itself is unchanged.
+
+### What is checked now that was not
+
+- The linter of the public checks runs in the test runner before a publication,
+  with the version and the command the public job names. Until now it answered
+  only after a version was out.
+
+### What is retracted
+
+**A saved secondary-findings table is not necessarily a result for the current
+genome.** A table whose input identity or selected sample cannot be confirmed
+is no longer presented as findings or as a clean negative result. Missing,
+unreadable or replaced input files and altered tables now require a fresh scan.
+
+### What needs recomputing
+
+**Run `scholion genotype-sites` — when the alignment and matching reference are available.**
+The added panel expands the locus catalogue. An older scoring-site file cannot
+establish reference genotypes at its new positions. No laboratory values are
+changed by the catalogue update.
+
+**By hand — previously saved composite and genetic reports.**
+Recover collection
+dates for month-only PhenoAge inputs and regenerate reports assembled across
+draws. Recheck APOE assignments based on assumed references, selected-sample
+region reports, X-linked interpretations and previously accepted Moderate
+gene–disease findings. No stored result is silently corrected.
+
+**By hand — existing ACMG secondary-findings tables.**
+Run `scholion acmg-scan` after confirming the selected VCF and sample. Earlier
+tables do not contain the input-identity witness required to reuse them safely.
+The original VCF and stored table are not removed by a read-only check.
+
+**By hand — if an earlier CSV import failed partway through.**
+Check the original file and
+re-import the corrected complete panel.
+
+**By hand — if an earlier FHIR import contained bounded results or conditional ranges.**
+Imports that contained
+bounded results or conditional reference ranges must be checked against the
+original observations: a qualifier lost during import cannot be recovered from
+the stored number alone.
+
+**Run `scholion coverage` — if an earlier attempt failed or was resumed after changing its inputs.**
+The old table cannot establish whether either happened.
+
 ## v0.5.11 — 27.09.2026
 
 ### What you can do now

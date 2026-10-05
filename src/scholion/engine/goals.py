@@ -10,6 +10,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple
 from .. import core
 from ..i18n import lang as _lang, plural as _plural, t as _t
+from ..goal_basis import guard_goal_candidate
+from ..goal_entities import goal_entities
 from ._helpers import DISCLAIMER
 
 
@@ -161,9 +163,10 @@ def goal_dashboard() -> Dict[str, Any]:
     labs.json and wearable_trends.json (the same sources the rest of the application sees).
     """
     g = core.health_goals()
+    entities = goal_entities()
     if not g or not g.get("targets"):
-        return {"available": False, "disclaimer": DISCLAIMER(),
-                "message": _t("goal.not_set")}
+        return {"available": bool(entities), "disclaimer": DISCLAIMER(), "entities": entities,
+                "targets": [], "charts": {}, "message": _t("goal.not_set")}
 
     targets = []
     for t in g.get("targets", []):
@@ -221,6 +224,7 @@ def goal_dashboard() -> Dict[str, Any]:
                   or g.get("_meta", {}).get("updated")),
         "peaks": g.get("peaks", []),
         "targets": targets,
+        "entities": entities,
         "charts": charts,
         "disclaimer": DISCLAIMER(),
     }
@@ -330,30 +334,30 @@ def _guideline_candidate(key: str, unit: str) -> Optional[Dict[str, Any]]:
     if not entry:
         return None
     src = entry.get("source") or {}
-    base = {"source": "guideline", "unit": entry.get("unit"),
+    base = {"source": "guideline", "unit": entry.get("unit"), "observation_unit": unit,
             "citation": {k: src.get(k) for k in ("body", "document", "year", "url") if src.get(k)},
             "quote": src.get("quote"), "note": entry.get("note")}
     # A society that looked and declined. Carried as a candidate with no number,
     # because the absence is the finding and hiding it would let the personal-best
     # route quietly invent the target the society refused to write.
     if entry.get("no_target"):
-        return {**base, "no_target": True,
+        return guard_goal_candidate(entry, {**base, "no_target": True,
                 "why": _t("goalgen.why.no_target", body=src.get("body", "")),
-                "still_matters_when": entry.get("still_matters_when")}
-    # Risk-stratified targets: the category is a clinical judgement this program
-    # does not make. One is offered, the assumption is stated, the rest are listed.
+                "still_matters_when": entry.get("still_matters_when")})
+    # Risk stratification is not computed here. Keep the old numerical candidate
+    # only as a diagnostic; the guard refuses the assumed category as a target.
     if entry.get("by_category"):
         cats = entry["by_category"]
         default = entry.get("default_category")
         chosen = next((c for c in cats if c["category"] == default), cats[0])
-        return {**base, "comparator": chosen["comparator"], "value": chosen["value"],
+        return guard_goal_candidate(entry, {**base, "comparator": chosen["comparator"], "value": chosen["value"],
                 "assumed": {"field": entry.get("depends_on"), "value": chosen["category"],
                             "note": entry.get("default_note")},
                 "alternatives": [{"category": c["category"], "comparator": c["comparator"],
                                   "value": c["value"], "and_also": c.get("and_also")} for c in cats],
                 "cannot_be_decided_here": entry.get("cannot_be_decided_here"),
                 "why": _t("goalgen.why.guideline", body=src.get("body", ""),
-                          year=src.get("year", ""))}
+                          year=src.get("year", ""))})
     if entry.get("value") is None:
         return None
     out = {**base, "comparator": entry.get("comparator", "<"), "value": entry["value"],
@@ -366,7 +370,7 @@ def _guideline_candidate(key: str, unit: str) -> Optional[Dict[str, Any]]:
         out["applies_when"] = aw["has_condition"]
         out["why"] = _t("goalgen.why.guideline_conditional", body=src.get("body", ""),
                         year=src.get("year", ""), condition=aw["has_condition"])
-    return out
+    return guard_goal_candidate(entry, out)
 
 
 def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, Any]:
@@ -381,7 +385,9 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
     cat = {m["key"]: m for m in core.marker_catalog()}
     known = core.lab_markers().get("markers", {}) or {}
     keys = marker_keys or sorted(labs.keys())
-    proposals, skipped, already_met = [], [], []
+    proposals: List[Dict[str, Any]] = []
+    skipped: List[Dict[str, Any]] = []
+    already_met: List[Dict[str, Any]] = []
 
     for key in keys:
         m = labs.get(key) or {}
@@ -391,7 +397,7 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
                 **{k: m[k] for k in ("unit", "ref_low", "ref_high", "direction") if k in m}}
         name = m.get("name") or (cat.get(key) or {}).get("name") or key
         unit = m.get("unit") or (cat.get(key) or {}).get("unit") or ""
-        series = sorted([{"date": str(p["date"]), "value": float(p["value"])}
+        series = sorted([{"date": str(p["date"]), "value": float(p["value"]), "censored": p.get('censored')}
                          for p in (m.get("series") or []) if p.get("value") is not None
                          and p.get("date")], key=lambda p: p["date"])
         now = series[-1] if series else None
@@ -404,7 +410,7 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
 
         # --- the person's own best -------------------------------------------
         span = _months_between(series[0]["date"], series[-1]["date"]) if len(series) > 1 else 0
-        best = _best_of(series, direction)
+        best = _best_of([p for p in series if not p.get('censored')], direction)
         if best is None:
             pb_reason = ("no_direction" if direction == "unknown" else "no_series")
         elif len(series) < _GOAL_MIN_POINTS:
@@ -420,6 +426,7 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
         if pb_reason is None and best is not None:
             candidates.append({
                 "source": "personal_best",
+                "proposal_status": "observation",
                 "comparator": ">=" if direction == "higher_better" else "<=",
                 "value": best["value"], "unit": unit,
                 "observed": {"date": best["date"], "n": len(series),
@@ -435,13 +442,14 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
         # --- the wall of the corridor ----------------------------------------
         lo, hi = spec.get("ref_low"), spec.get("ref_high")
         if direction == "lower_better" and hi is not None:
-            candidates.append({"source": "reference", "comparator": "<", "value": hi,
+            candidates.append({"source": "reference", "proposal_status": "observation", "comparator": "<", "value": hi,
                                "unit": unit, "why": _t("goalgen.why.reference")})
         elif direction == "higher_better" and lo is not None:
-            candidates.append({"source": "reference", "comparator": ">=", "value": lo,
+            candidates.append({"source": "reference", "proposal_status": "observation", "comparator": ">=", "value": lo,
                                "unit": unit, "why": _t("goalgen.why.reference")})
 
-        usable = [c for c in candidates if not c.get("no_target") and c.get("value") is not None]
+        usable = [c for c in candidates if c.get('proposal_status') == 'held'
+                  and not c.get("no_target") and c.get("value") is not None]
         # A target the person already meets is not a goal. Saying «aim for ALT
         # under 33» to somebody at 19 spends their attention on a problem they do
         # not have, and a screen of such lines makes the two that matter invisible.
@@ -454,9 +462,14 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
         # THE proposal only where the profile can say the condition applies.
         auto = [c for c in reachable if not c.get("applies_when")]
 
+        if now and now.get('censored'):
+            skipped.append({'key': key, 'name': name, 'reason': 'censored', 'candidates': candidates})
+            continue
         if not usable:
             skipped.append({"key": key, "name": name,
-                            "reason": ("society_withdrew_the_target"
+                            "reason": ("target_basis" if any(c.get('proposal_status') == 'withheld' for c in candidates)
+                                       else "observation_only" if any(c.get('proposal_status') == 'observation' for c in candidates)
+                                       else "society_withdrew_the_target"
                                        if any(c.get("no_target") for c in candidates)
                                        else ("inside_the_corridor" if direction == "inside"
                                              else (pb_reason or "nothing_to_go_on"))),
@@ -493,5 +506,6 @@ def suggest_goal_targets(marker_keys: Optional[List[str]] = None) -> Dict[str, A
 
     return {"status": "ok", "proposals": proposals, "skipped": skipped,
             "already_met": already_met, "count": len(proposals),
+            "unresolved_count": sum(any(c.get('proposal_status') == 'withheld' for c in s['candidates']) for s in skipped),
             "how_to_read": _t("goalgen.how_to_read"),
             "disclaimer": DISCLAIMER()}

@@ -1,9 +1,10 @@
 {
   "_meta": {
     "updated": "2026-09-25",
-    "purpose": "The «what else to take» rules — deterministic triggers on lab results / prescriptions / genetic gaps. The engine computes which have fired, the LLM words them. Not a prescription — material for a discussion with the doctor.",
+    "purpose": "Candidate test rules, not validated orders. Deterministic triggers do not support their clinical interpretation. Selection, reason, condition, referral, priority and timing require independent support; unsupported proposals stay visible as unresolved candidates.",
     "conditions": "Supported: {marker,op,value} on the latest point; {trend:{marker,direction}}; {med_contains}; {genome_gap}; the combinators {all:[...]}, {any:[...]} The covers+recheck_months field: marks a rule as done_recently if the monitored markers were taken recently; {never_measured:[keys]} — true while none of them was ever measured; {measured:[keys]} — true when any of them was. {flag:{markers:[keys], is:low|high}} — true when any of the markers is outside its corridor that way on its latest point, read exactly as the lab card reads it; {not: condition}.",
-    "source_tier": "guideline_compiled",
+    "source_tier": "curated_reference",
+    "source_tier_note": "Project-curated candidate triggers, not clinically validated guideline recommendations. Each emitted clinical sentence requires its own independent support; this file-level tier never supplies it.",
     "held": "A rule with `held` does not fire: it records a test the reviewer said is not for everyone, until the condition that selects the people it is for is written. The rule's own `when` is kept so the history of what was offered stays readable."
   },
   "rules": [
@@ -648,7 +649,7 @@
             "measured": [
               "aa_glycine",
               "aa_glutamine",
-              "aa_valine",
+              "valine",
               "aa_leucine",
               "aa_isoleucine",
               "aa_phenylalanine",
@@ -671,16 +672,30 @@
         "en": "Urea nitrogen in a 24-hour urine collection, to discuss",
         "ru": "Азот мочевины суточной мочи — обсудить"
       },
-      "priority": "moderate",
       "why": {
-        "en": "The nitrogen balance: how much protein was actually used against how much was eaten.",
-        "ru": "Азотистый баланс: сколько белка действительно усвоено против съеденного."
+        "en": "Urinary urea nitrogen contributes to estimating nitrogen appearance in nutrition assessment; it does not directly measure absorbed protein or establish nitrogen balance alone.",
+        "ru": "Азот мочевины мочи входит в оценку появления азота при анализе питания; сам по себе он не измеряет усвоенный белок и не устанавливает азотистый баланс."
+      },
+      "suggest_basis": {
+        "source": "PMID: 38033373; DOI: 10.1155/2023/9713045",
+        "mechanism": {"en": "A stage 3–4 CKD study used 24-hour urinary urea nitrogen to estimate nitrogen appearance alongside dietary recall, not to diagnose a cause of low plasma amino acids.", "ru": "Исследование ХБП 3–4 стадии использовало азот мочевины суточной мочи для оценки появления азота вместе с опросом о питании, а не для диагностики причин низких аминокислот плазмы."}
+      },
+      "why_basis": {
+        "source": "PMID: 38033373; DOI: 10.1155/2023/9713045; https://kidneyfoundation.cachefly.net/professionals/KDOQI/guidelines_nutrition/nut_a08.html",
+        "mechanism": {"en": "Nitrogen appearance estimates require complete collection and renal/metabolic context; intake estimates assume steady state. Catabolism or anabolism can invalidate that assumption.", "ru": "Оценка появления азота требует полного сбора и почечного/метаболического контекста; оценка поступления предполагает стабильное состояние. Катаболизм или анаболизм могут нарушить это условие."}
+      },
+      "condition_basis": {
+        "source": "PMID: 38033373",
+        "mechanism": {"en": "The study concerns nutrition assessment in CKD, not an indication established by an amino-acid panel. The catalogue trigger only keeps the discussion candidate visible.", "ru": "Исследование касается оценки питания при ХБП, а не показания, установленного аминокислотной панелью. Условие каталога лишь сохраняет кандидат для обсуждения."}
+      },
+      "applicability": {
+        "status": "unverified",
+        "context": {"en": "A clinician or dietitian must establish the nutrition question, dietary record, collection completeness, renal function and metabolic stability. An amino-acid panel alone is not an indication; no automatic order or repeat interval is supported.", "ru": "Врач или специалист по питанию должен определить клинический вопрос, учёт питания, полноту сбора, функцию почек и стабильность обмена. Одна аминокислотная панель не является показанием; автоматическое назначение или срок повторения не обоснованы."}
       },
       "covers": [
         "urine_urea_nitrogen"
       ],
-      "recheck_months": 12,
-      "source": "reports/Задача_200_система_аминокислот_17.09.2026.md (17.09.2026)"
+      "source": "PMID: 38033373; DOI: 10.1155/2023/9713045"
     },
     {
       "id": "amino_methionine_load",

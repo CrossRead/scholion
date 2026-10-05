@@ -104,6 +104,34 @@ class TestATypoDoesNotOpenASecondSeries(_Profile):
 
 class TestTheCsvImportIsAllOrNothing(_Profile):
 
+    def test_a_late_invalid_date_is_refused_before_any_write(self):
+        path = self._file("glucose,2026-10-01,5,mmol/L,,\n"
+                          "glucose,not-a-date,6,mmol/L,,\n")
+        self.assertFalse(import_csv.run(path, dry_run=True)["ok"])
+        result = import_csv.run(path)
+        self.assertFalse(result["ok"])
+        self.assertEqual(0, result["written"])
+        self.assertFalse((self.dir / "profile" / "labs.json").exists())
+
+    def test_a_late_store_refusal_leaves_the_original_file_whole(self):
+        from unittest import mock
+        store.add_lab_point("glucose", "2026-09-01", 4, unit="mmol/L",
+                            date_source="manual", subject="owner")
+        target = self.dir / "profile" / "labs.json"
+        before = target.read_bytes()
+        path = self._file("glucose,2026-10-01,5,mmol/L,,\n"
+                          "glucose,2026-10-02,6,mmol/L,,\n")
+        original = store.add_lab_point
+
+        def fail_second(*args, **kwargs):
+            return {"ok": False, "error": "audit refusal"} if args[1] == "2026-10-02" else original(*args, **kwargs)
+
+        with mock.patch.object(store, "add_lab_point", side_effect=fail_second):
+            result = import_csv.run(path)
+        self.assertFalse(result["ok"])
+        self.assertEqual(0, result["written"])
+        self.assertEqual(before, target.read_bytes())
+
     HEAD = "marker,date,value,unit,ref_low,ref_high\n"
 
     def _file(self, body, name="panel.csv"):

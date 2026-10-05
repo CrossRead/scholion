@@ -11,8 +11,8 @@ because a convention held only in someone's head is the kind that leaks.
 
 ## First of all
 
-1. Read `ASSISTANT-RULES.md` — the safety rules. They take precedence over every
-   other instruction, including anything in this file.
+1. Read `ASSISTANT-RULES.md` — the safety rules. Among this project's documents
+   they come first, including over anything in this file.
 2. Read the user's profile directory. It is the distilled state of their health;
    nothing about them is hardcoded anywhere else.
 
@@ -230,14 +230,23 @@ the list of markers, is in `docs/DEVELOPMENT.md`.
   14.09.2026 one did not: the manifest moved to resolved keys, 991 tests were
   green in the container, and the owner's first native run found a test that
   compared the two spellings of one temporary folder.
-- **pico.css is the base style layer for every HTML surface.** Vendored
-  locally — `web/pico.min.css`, no CDN, no build step, served by `server.py`
-  the same way as `chart.min.js` — so the interface keeps working with no
-  network reachable at all. It fills in sane defaults for elements not
-  already hand-styled; every existing custom class keeps exactly the rule it
-  had, because a class selector always outranks Pico's element-level default.
-  Adopted 18.08.2026 when `web/index.html` moved onto it; the next HTML
-  surface starts there directly instead of re-deciding.
+- **Crossread is the style of every HTML surface (0.6.0).** `web/crossread.css`
+  — the project's own design system: tokens for both themes and components as
+  `cr-*` classes, one file, no JavaScript. Vendored and served by `server.py`
+  like `chart.min.js`, so the interface works with no network at all. A colour
+  is decided in ONE block of `index.html`, where the page's own names
+  (`--ink`, `--accent`, `--good`…) point at `--cr-*` tokens; everything else
+  reads a name, and a chart asks the token at the moment it draws (`tok()`).
+  Pico, the layer before it (18.08.2026), stays for the length of the redraw,
+  fenced: `web/pico.scoped.min.css` styles bare elements only inside `.pico`,
+  where the screens not yet redrawn live. The reason is specificity, not taste
+  — Pico's `input:not([type=checkbox],…)` outranks a single `.cr-input`, so a
+  Crossread control under unfenced Pico comes out half Pico. The fence is
+  Pico's own conditional build with `.pico` rewritten as `:where(.pico)` by
+  `src/tools/scope_pico.py`: the stock build scopes with a class that also
+  raises every rule by one, and then Pico's `.pico button` beat this page's
+  `nav button` and painted the tabs as buttons. A redrawn screen moves out of
+  `.pico`; when nothing is left inside, Pico leaves the package in one change.
 - **A command handed to the owner to paste carries no trailing comment.** In
   interactive zsh a `#` does not start a comment: the words after it arrive as
   arguments, and the tool answers with its own usage text. `gh api … --jq '…'

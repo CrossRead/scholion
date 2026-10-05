@@ -1,0 +1,45 @@
+{
+ "_meta": {
+  "updated": "2026-10-04",
+  "source_tier": "curated_reference",
+  "purpose": "Restrictions on the applicability of held prescribing tables, independent of mutable CPIC quotations. These are table identity and unsupported joint-input states, not new dose recommendations.",
+  "scope": "Only the restrictions explicitly listed here. This is not certification of the remaining guidance rows."
+ },
+ "scopes": {
+  "fluorouracil": {
+   "names": ["fluorouracil", "5-fluorouracil", "5-fu", "фторурацил", "5-фу", "capecitabine", "капецитабин"],
+   "source": "CPIC 2017 fluoropyrimidine guideline, PMID:29152729; DOI:10.1002/cpt.911. The supported toxicity warning covers 5-fluorouracil and capecitabine; it is not a generic class dosing table."
+  },
+  "clopidogrel": {
+   "requires_indication": true,
+   "source": "CPIC clopidogrel guideline 2022, PMID:35034351; DOI:10.1002/cpt.2526. Cardiovascular and neurovascular indication tables are distinct; a drug name alone does not establish the indication."
+  },
+  "omeprazole": {
+   "names": ["omeprazole", "омепразол"],
+   "source": "CPIC PPI guideline 2020, PMID:32770672; DOI:10.1002/cpt.2015. The held quotation is omeprazole-specific; the guideline makes no dosing recommendation for esomeprazole or rabeprazole."
+  },
+  "citalopram": {
+   "names": ["citalopram", "циталопрам"],
+   "source": "CPIC serotonin reuptake inhibitor guideline 2023, PMID:37032427; DOI:10.1002/cpt.2903. The held citalopram quotation does not establish sertraline or escitalopram table identity."
+  },
+  "amitriptyline": {
+   "names": ["amitriptyline", "амитриптилин"],
+   "requires_indication": true,
+   "source": "CPIC tricyclic guideline 2016 update, PMID:27997040; DOI:10.1002/cpt.597. The held quotation names amitriptyline; joint CYP2D6/CYP2C19 context is separate."
+  },
+  "simvastatin": {
+   "names": ["simvastatin", "симвастатин"],
+   "source": "CPIC statin guideline 2022, PMID:35152405; DOI:10.1002/cpt.2557. Recommendations are drug-specific."
+  },
+  "codeine": {
+   "names": ["codeine", "кодеин"],
+   "source": "CPIC opioid guideline 2021, PMID:33387367; DOI:10.1002/cpt.2149. Codeine and tramadol have separate tables."
+  },
+  "azathioprine": {
+   "names": ["azathioprine", "азатиоприн"],
+   "requires_indication": true,
+   "joint_phenotypes": {"TPMT": "IM", "NUDT15": "IM"},
+   "source": "CPIC thiopurine guideline 2025 update, PMID:41618934; DOI:10.1002/cpt.70209. The held single-IM table does not represent compound IM."
+  }
+ }
+}

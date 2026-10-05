@@ -27,6 +27,16 @@ from scholion import contract, i18n
 from scholion import ouroboros_tools as ot
 
 
+def setUpModule():
+    # These probes are a new conversation on the shared synthetic fixture,
+    # not a continuation of a preceding test's temporary patient container.
+    ot.unpin_session()
+
+
+def tearDownModule():
+    ot.unpin_session()
+
+
 def tools():
     return {t.name: t for t in ot.get_tools()}
 
@@ -46,6 +56,10 @@ class TestTheClaimsHold(unittest.TestCase):
         self.assertTrue(named, "the canon names no command at all — the reader is broken")
         for cmd in named:
             with self.subTest(command=cmd):
+                if cmd in contract.CANON_FORBIDS:
+                    # Named to forbid (rule 18): the absence of a tool IS the rule.
+                    self.assertNotIn(cmd, contract.PLUGIN)
+                    continue
                 self.assertIn(cmd, contract.PLUGIN)
                 self.assertTrue(call(cmd).strip())
 
@@ -55,6 +69,10 @@ class TestTheClaimsHold(unittest.TestCase):
         tail = text[len(contract.canon_text().rstrip("\n")):]
         for cmd in contract.commands_named_in(contract.canon_text()):
             with self.subTest(command=cmd):
+                if cmd in contract.CANON_FORBIDS:
+                    from scholion.i18n import t
+                    self.assertIn(f"`{cmd}` — {t('rules.no_tool_persons_act')}", tail)
+                    continue
                 self.assertIn(f"`{cmd}` — {contract.tool_call(cmd)}", tail)
 
     def test_the_canon_itself_is_not_rewritten_by_the_door(self):

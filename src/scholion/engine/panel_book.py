@@ -11,7 +11,8 @@ from typing import Any, Dict, List
 
 from .. import core
 from ..i18n import t as _t
-from . import panel_form, panel_gate
+from ..conclusion_basis import conclusion_basis, subclaim_bases
+from . import hypothesis, panel_form, panel_gate
 
 
 def _curated() -> Dict[str, Any]:
@@ -81,10 +82,13 @@ def positions_by_marker() -> Dict[str, List[Dict[str, Any]]]:
             if not exp or not exp.get("marker"):
                 continue
             lv = panel_gate.level_of(p, levels)
+            basis = conclusion_basis(p)
+            expectation = subclaim_bases(p, lv.get("level"))["expect"]
             out.setdefault(str(exp["marker"]), []).append({
                 "gene": p.get("gene"), "rsid": p.get("rsid"), "kind": p.get("kind"),
                 "level": lv.get("level"), "level_short": lv.get("level_short"),
-                "direction": exp.get("direction"), "system": key,
+                "direction": exp.get("direction") if expectation["status"] == "complete" else None,
+                "conclusion_basis": basis, "subclaim_basis": {"expect": expectation}, "system": key,
                 "system_label": _t("radar.domain." + key)})
     return out
 
@@ -110,7 +114,8 @@ def _local_notes() -> Dict[str, Dict[str, Any]]:
         if key:
             is_rs = bool(re.fullmatch(r"rs\d+", key, re.I))
             out[key.lower() if is_rs else key.upper()] = {
-                "text": str(n["text"]), "by_role": n.get("by_role") or "clinician", "on": n.get("on")}
+                "text": str(n["text"]), "by_role": n.get("by_role") if n.get("by_role") in ("clinician", "panel_author") else "clinician",
+                "on": n.get("on"), "interpretation": "local_opinion_not_a_conclusion"}
     return out
 
 
@@ -155,8 +160,16 @@ def _groups(key: str, spec: Dict[str, Any], rows: List[Dict[str, Any]]) -> List[
             by_rs[rs]["group"] = g["key"]
             st = by_rs[rs].get("state") or "unread"
             states[st] = states.get(st, 0) + 1
+        # A group below B says a hypothesis about all its positions at once: its
+        # sentence travels in the passport, never as the group's text (U2).
+        said = panel_form.one_language(g.get("text"))
+        pp = hypothesis.hypothesis_passport(g, lv, said)
+        basis = conclusion_basis(g) if lv.get("level") in ("A", "B") else None
+        held = basis and basis["status"] == "incomplete"
         out.append({"key": g["key"], "label": panel_form.one_language(g.get("label")) or g["key"],
-                    "text": panel_form.one_language(g.get("text")), "source": g.get("source"),
+                    "text": None if (held or pp or hypothesis.is_value_only(lv.get("level"))) else said,
+                    "conclusion_basis": basis, "mechanism": basis["mechanism"] if basis and not held else None,
+                    "passport": pp, "source": g.get("source"),
                     "level": lv.get("level"), "level_short": lv.get("level_short"),
                     "positions": members, "count": len(members), "states": states,
                     "members": [_position_state(by_rs[rs]) for rs in members]})

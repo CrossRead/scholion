@@ -192,6 +192,22 @@ sources` is the register; a refresh is a typed command and honours
 **A language:** a new catalogue in `i18n/` key-identical to `en`, and the
 parity test will hold it there.
 
+**A clinical sentence:** its own PMID/DOI and mechanism, with independent
+support for adjacent effects, actions, marker links, timing and scope. A parent
+citation is not a licence for its neighbours. Missing support withholds the
+sentence and names the gap without changing measurements or making the answer
+look safe. The emitted-output acceptance enumerates the read commands and both
+system registers, not just static catalogue rows; family mutation tests hold
+the suppression and the same structures reach renderers and assistant tools.
+An identifier passing the offline gate is not clinical certification.
+
+Observations and genotype bytes, source classification/review tokens, explicitly
+labelled author opinions and recorded goals are different data kinds. Display
+indices carry their comparator/method and are not health or treatment estimates;
+population-model calculations carry their method and limits. These exact kinds
+are not a general exemption for unqualified medical prose. A new emitted basis
+field must join the acceptance inventory.
+
 **An engine domain:** a new module + a budget line in
 `test_engine_stays_split.py` + a facade block — three lines of ceremony,
 which is the point: growth is cheap, silent growth is impossible.

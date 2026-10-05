@@ -114,10 +114,10 @@ def _gap(what: str, fix: str) -> Dict[str, str]:
     return {"what": what, "fix": fix}
 
 
-def _parse_row(row: List[str]) -> Dict[str, Any]:
+def _parse_row(row: List[str], sample: int = 0) -> Dict[str, Any]:
     """One VCF data line into the fields a report quotes, and nothing more."""
     fmt = (row[8].split(":") if len(row) > 8 else [])
-    val = (row[9].strip().split(":") if len(row) > 9 else [])
+    val = (row[9 + sample].strip().split(":") if len(row) > 9 + sample else [])
     call = dict(zip(fmt, val))
     ad = call.get("AD")
     return {"chrom": row[0], "pos": int(row[1]), "ref": row[3], "alt": row[4],
@@ -304,7 +304,32 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
         out["detail"] = exc.detail
         out["message"] = _t("gene.reader_failed", gene=loc["gene"], detail=exc.detail)
         return out
-    variants = [_parse_row(r) for r in rows if len(r) > 9]
+    sample = genome.sample_index(vcf)
+    if sample is None:
+        out.update(status="unreadable_file", reason="sample_not_selected",
+                   message=_t("gene.reader_failed", gene=loc["gene"],
+                              detail="Select the sample with SCHOLION_VCF_SAMPLE."))
+        return out
+    variants = []
+    uncalled = 0
+    for row in rows:
+        try:
+            v = _parse_row(row, sample)
+        except (ValueError, IndexError, TypeError) as exc:
+            out.update(status="unreadable_file", reason="malformed_row",
+                       message=_t("gene.reader_failed", gene=loc["gene"], detail=str(exc)))
+            return out
+        gt = (v.get("genotype") or "").replace("|", "/").split("/")
+        alts = v["alt"].split(",")
+        if not gt or any(not a.isdigit() or int(a) > len(alts) for a in gt):
+            uncalled += 1
+            continue
+        # A reference homozygote is a read position, not a variant. An ALT that
+        # belongs only to another sample must not be translated for this one.
+        for allele in sorted({int(a) for a in gt if int(a) > 0}):
+            variants.append(dict(v, alt=alts[allele - 1]))
+    if uncalled:
+        gaps.append(_gap(_t("gene.uncalled_rows", count=uncalled), ""))
     for v in variants:
         v["coding"] = _in_cds(v["pos"], loc["cds"])
     if loc["cds"]:
@@ -317,7 +342,9 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
     # not run: a count of zero and an uncomputed count look identical on the page
     # and mean opposite things. Without the reference the field is None, and the
     # report prints that it was not computed.
-    computed = all("protein" in v for v in coding)
+    computed = (not uncalled and all((v.get("protein") or {}).get("kind")
+                                    in ("synonymous", "missense", "nonsense", "start_lost", "stop_lost")
+                                    for v in coding))
     consequential = (sum(1 for v in coding
                          if (v.get("protein") or {}).get("kind")
                          not in ("synonymous", "not_coding", "not_substitution",
@@ -325,7 +352,7 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
                      if computed else None)
     out["variants"] = {"total": len(variants), "coding": len(coding),
                        "coding_rows": coding, "consequential": consequential,
-                       "consequence_computed": computed}
+                       "consequence_computed": computed, "uncalled_rows": uncalled}
     out["clinvar"] = _clinvar_in_region(loc["chrom"], loc["start"], loc["end"])
     out["coverage"] = _coverage(loc["chrom"], loc["start"], loc["end"], loc["cds"])
     if out["coverage"].get("source") is None:

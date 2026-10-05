@@ -162,16 +162,48 @@ def _args(ctx: "ToolContext", given: dict) -> dict:
 
 
 def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
-    from scholion import ingest_labs  # noqa: E402
+    import json
+    import os
+    import shlex
+    import subprocess
+    import sys
+    import tempfile
+    from scholion import core, container, ingest_labs
     # An empty folder name is refused HERE as well as in the engine: `Path("")`
     # is the current directory, and a tool called with no folder once
     # transcribed every PDF under the process's working directory into the
     # profile (12.09.2026, in an audit harness — the owner's own reports).
     if not (folder or "").strip():
         return "⚠️ " + _t("ingest_labs.folder_not_named")
-    r = ingest_labs.ingest(folder)
+    inputs = ingest_labs._inputs(folder)
+    if not inputs["ok"]:
+        return "⚠️ " + inputs["error"]
+    # The parent must witness the first naming itself: a child's lazy naming
+    # is indistinguishable from somebody replacing the pinned container.
+    container.gate()
+    if container.capture()["id"] is None:
+        container.ensure()
+    # A worker can be stopped before Hub's hard 120-second limit. The importer
+    # checkpoints completed files; a killed worker never marks its current file.
+    env = dict(os.environ)
+    env["SCHOLION_PROFILE_DIR"] = str(core.profile_dir())
+    env["SCHOLION_REPO_DIR"] = str(core.repo_dir())
+    command = [sys.executable, "-m", "scholion", "ingest-labs", folder, "--json"]
+    try:
+        with tempfile.TemporaryDirectory(prefix="scholion-ingest-worker-") as isolated:
+            env["SCHOLION_WORKSTATION"] = os.path.join(isolated, "no-workstation.json")
+            worker = subprocess.run(command, capture_output=True, text=True, env=env, timeout=105)
+    except subprocess.TimeoutExpired:
+        return "⚠️ " + _t("tool.host_ingest_timeout", command="scholion ingest-labs " + shlex.quote(folder))
+    try:
+        r = json.loads(worker.stdout)
+    except (ValueError, TypeError):
+        return "⚠️ " + (worker.stderr.strip() or _t("web.common.error"))
+    core.reset_cache()
+    if not isinstance(r, dict):
+        return "⚠️ " + _t("web.common.error")
     if not r.get("ok"):
-        return f"⚠️ {r.get('error')}"
+        return fmt.ingest_labs_report(r) if r.get("errors") else f"⚠️ {r.get('error')}"
     # The same report the command line prints — the per-file table used to be
     # a private summary here, and it read a key (`date`) the engine never wrote.
     return fmt.ingest_labs_report(r)
@@ -327,6 +359,9 @@ def _canon_through_this_door(text: str) -> str:
         call = _c.tool_call(cmd)
         if call:
             rows.append(f"- `{cmd}` — {call}")
+        elif cmd in _c.CANON_FORBIDS:
+            # Named by the canon only to say when a model may not start it.
+            rows.append(f"- `{cmd}` — {_t('rules.no_tool_persons_act')}")
     if not rows:
         return ""
     return "\n---\n\n" + _t("rules.through_this_door") + "\n\n" + "\n".join(rows) + "\n"
@@ -456,8 +491,7 @@ def _h_recompute(ctx: "ToolContext", confirm=False) -> str:
 # could not read, and the only route left to it was to ask the person to recite
 # the list — the recalled answer the canon forbids. All four are reads.
 def _medications():
-    from scholion import store as _st  # noqa: E402
-    return {"medications": _st.list_medications()}
+    return engine.medications_view()
 
 
 def _genome_status():
@@ -513,7 +547,18 @@ def _h_system(ctx: "ToolContext", key: str = "", register: str = "") -> str:
     holds around one system and writes nothing."""
     if not (key or "").strip():
         return fmt.systems_report(engine.systems())
-    return fmt.system_report(engine.system(key.strip(), (register or "patient").strip()))
+    reg = (register or "patient").strip()
+    card = engine.system(key.strip(), reg)
+    text = fmt.system_report(card)
+    # An assistant receives every hypothesis with its passport and the rule for
+    # retelling it, in either register (0.6.0, U2): the person's screen shows
+    # their number, the model is told what they rest on and how to say them.
+    from .format_system import hypotheses_lines
+    gen = card.get("genetics") if isinstance(card.get("genetics"), dict) else {}
+    extra = hypotheses_lines(gen, True) if reg != "clinician" else []
+    if extra or hypotheses_lines(gen, False):
+        text = text.rstrip() + "\n" + "\n".join(extra) + "\n\n" + _t("system.hyp.rule") + "\n"
+    return text
 
 
 # --- schemas (OpenAI function-calling) -------------------------------------
@@ -584,29 +629,88 @@ def _schema(name: str, params, required) -> dict:
 
 def get_tools():
     """The entry point for the Ouroboros auto-discovery."""
-    return [ToolEntry(name, _schema(name, params, required), _noted(handler))
+    return [ToolEntry(name, _schema(name, params, required), _noted(handler, name))
             for name, params, required, handler in _TOOLS]
 
 
-def _noted(handler):
-    """The first answer of a session carries the note about a newer build — once.
+#: The container this process's conversation is fixed to (task 192, R2). One
+#: process is one conversation for the MCP server; for Ouroboros, the first call
+#: fixes it. `pin_session()` takes it at the handshake.
+_PIN = None
 
-    A person using the product through an assistant never sees the page's update
-    note (owner, 14.09.2026). Whatever the model calls first, the answer ends with
-    one line saying a newer build is out and that installing it is the person's
-    call. The registry is asked at most once a day and never offline."""
+
+def _pin():
+    global _PIN
+    if _PIN is None:
+        from scholion import container as _container  # noqa: E402
+        _PIN = _container.AgentPin()
+    return _PIN
+
+
+def pin_session() -> None:
+    """The MCP handshake: this conversation reads the container active now."""
+    _pin().take()
+
+
+def unpin_session() -> None:
+    """Tests only: a new conversation."""
+    _pin().reset()
+
+
+def _noted(handler, name):
+    """Every answer names its container, and the first carries the update note.
+
+    The container (task 192): before anything is read, a call is refused if the
+    active container is no longer the one this conversation started with; what
+    the call writes is held to that container; the answer ends with its ID —
+    never its label, since a tool's answer reaches the model's provider.
+
+    The note: a person using the product through an assistant never sees the
+    page's update note (owner, 14.09.2026). Whatever the model calls first, the
+    answer ends with one line saying a newer build is out and that installing it
+    is the person's call. The registry is asked at most once a day and never
+    offline."""
+    from scholion import container as _container  # noqa: E402
+
     def noted(out):
         from scholion import upgrade as _upg  # noqa: E402
         note = _upg.session_note()
-        return f"{out}\n\n{note}" if note else out
+        cid = _container.named()["id"]
+        tail = [x for x in (note, _t("tool.container_line", id=cid) if cid else "") if x]
+        return "\n\n".join([str(out)] + tail)
+
+    def guarded(call, structured=False):
+        with _container.pinned(_pin().check()):
+            from scholion import lifecycle, contract
+            action = 'read' if contract.tool_annotations(name)['readOnlyHint'] else 'write'
+            lifecycle.record_current(action, lifecycle.AGENT_SURFACE.get())
+            from scholion import linear, recompute
+            with linear.host_read(enabled=bool(recompute.per_call_host())) as read:
+                try:
+                    result = call()
+                except linear.Unreadable:
+                    if not read["refused"]:
+                        raise
+                    result = None
+                if read["refused"]:
+                    message = "⚠️ " + _t("genome.refused.host_linear")
+                    result = ((noted(message), {"status": "refused", "reason": "host_linear",
+                               "message": message, "container": _container.named()})
+                              if structured else noted(message))
+            _container.gate()
+            return result
 
     def run(ctx, **kwargs):
-        return noted(handler(ctx, **kwargs))
+        return guarded(lambda: noted(handler(ctx, **kwargs)))
     run.__name__, run.__doc__ = handler.__name__, handler.__doc__
     if hasattr(handler, "both"):
         def both(**kwargs):
-            text, data = handler.both(**kwargs)
-            return noted(text), data
+            def call():
+                text, data = handler.both(**kwargs)
+                if isinstance(data, dict):
+                    data = {**data, "container": _container.named()}
+                return noted(text), data
+            return guarded(call, structured=True)
         run.both = both
     return run
 

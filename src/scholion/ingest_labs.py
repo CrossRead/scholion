@@ -23,6 +23,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 from . import core, i18n, store
 from .i18n import t as _t
+from .reference_tables import printed_context
 
 _NUM = r"\d+(?:[.,]\d+)?"
 # A «clean» number: not part of a word on either side, and never cut short.
@@ -46,7 +47,7 @@ _RANGE = re.compile(r"(" + _NUM + r")\s*[-–—]\s*(" + _NUM + r")")
 # 228200. So the glue is accepted only when it FIXES the order of the bounds (low ≤ high).
 _NUM_TH = r"\d{1,3}(?:[ \u00A0\u202F\u2009]\d{3})+(?:[.,]\d+)?"
 _NUM_ANY = r"(?:" + _NUM_TH + r"|" + _NUM + r")"
-_RANGE_TH = re.compile(r"(" + _NUM_ANY + r")\s*[-–—]\s*(" + _NUM_ANY + r")")
+_RANGE_TH = re.compile(r"(?<![0-9])(?<!\d[.,])(" + _NUM_ANY + r")\s*[-–—]\s*(" + _NUM_ANY + r")")
 # A result with a thousands space, anchored where a clean number starts: «1 250,0».
 _TH_AT = re.compile(r"(" + _NUM_TH + r")(?![0-9]|[.,]\d)")
 _TAIL3 = re.compile(r"\d{3}(?:[.,]\d+)?$")
@@ -83,7 +84,7 @@ _ROW_ALIEN = re.compile(r"новорожд|девочк|мальчик|детс�
                         re.IGNORECASE | re.MULTILINE)
 _BLOCK_HEAD = re.compile(r"^\s*(?:референс|норм[аы]|reference|значени)", re.IGNORECASE)
 _ROW_FEM = re.compile(r"женщин|девушк", re.IGNORECASE)
-_ROW_BAND = re.compile(r"(\d{1,2})\s*[-–—]\s*(\d{1,2})\s*(?:лет\b|год\w*|г\s*[):])", re.IGNORECASE)
+_ROW_BAND = re.compile(r"(\d{1,2})\s*[-–—]\s*(\d{1,2})\s*(?:лет\b|год\w*|г\s*[):]|(?=:))", re.IGNORECASE)
 _ROW_OVER = re.compile(r"старше\s*(\d{1,2})|>\s*(\d{1,2})\s*(?:лет|год\w*)", re.IGNORECASE)
 _ROW_UNDER = re.compile(r"до\s*(\d{1,2})\s*(?:лет|год\w*)\b", re.IGNORECASE)
 _ROW_UPPER = re.compile(r"(?:<|\bдо\b|\bменее\b)\s*(" + _NUM_ANY + r")", re.IGNORECASE)
@@ -105,7 +106,7 @@ _DATE = re.compile(r"(?:Дата\s+взятия|Взятие\s+биоматер�
 # person their data disagrees with itself when in fact it is doing exactly what
 # it should. The time is what tells the two apart, so it is read when the form
 # prints it and the point keeps it.
-_TIME_AFTER = re.compile(r"^[^\d\n]{0,12}(\d{1,2})[:.](\d{2})")
+_TIME_AFTER = re.compile(r"^[^\d\n]{0,12}(\d{1,2})[:.](\d{2})(?!\d|\.\d)")
 
 # A delimited export has no «Дата взятия» line: it has a date COLUMN, and the
 # date sits at the start of every data row. Only ISO order is accepted here for
@@ -377,7 +378,8 @@ _NAMENUM = re.compile(r"\(?\s*1?,?2?5\s*[-–(]?\s*(?:OH|ОН)\s*\)?\s*[-–]?\s
 # An age span inside the reference text: «Взрослые (18-40 лет): 4,60 - 27,00 нмоль/л».
 # Without masking, _RANGE catches «18-40» as the marker's range, and a DHEA result whose
 # true range is 4,60-27,00 would be highlighted as «below 18».
-_AGERANGE = re.compile(r"\(?\s*\d+\s*[-–—]\s*\d+\s*(?:лет|год|года|мес)[^)]*\)?", re.IGNORECASE)
+_AGERANGE = re.compile(r"\(\s*\d+\s*[-–—]\s*\d+\s*(?:лет|год\w*|мес)[^)]*\)|"
+                       r"\b\d+\s*[-–—]\s*\d+\s*(?:лет\b|год\w*|мес\w*|(?=:))", re.IGNORECASE)
 # A LEGEND row rather than a result: «<0.01 МЕ/мл Иммунитет отсутствует, требуется
 # вакцинация.» Such rows come as a list under a marker name that ends with a colon, and by
 # their shape («<number unit …») they are indistinguishable from a wrapped result.
@@ -524,10 +526,8 @@ def _row_fits(t: str, sex: str, age: Optional[float]) -> bool:
     """Whether a reference row fits the profile owner (sex + age).
 
     A row without a group label counts as fitting — that is an ordinary single-line reference.
-    `age` follows `_owner()`'s own contract: no birth year on file means `age is None`, and
-    then the age logic is off — an age-banded row is neither confirmed nor excluded by it,
-    the same way a row with no group label at all counts as fitting. Sex is a separate
-    question and is still enforced with age unknown.
+    Unknown age or sex cannot confirm a labelled interval. Unlabelled rows
+    remain usable; an unavailable demographic never selects a band by default.
     """
     if _ROW_ALIEN.search(t) or _local_row_rule(t, "alien"):
         return False
@@ -535,7 +535,11 @@ def _row_fits(t: str, sex: str, age: Optional[float]) -> bool:
         return False
     if sex == "female" and re.search(r"мужчин|юнош", t, re.IGNORECASE):
         return False
+    if sex not in ("male", "female") and (_ROW_FEM.search(t) or re.search(r"мужчин|юнош", t, re.IGNORECASE)):
+        return False
     b = _ROW_BAND.search(t)
+    if age is None and (b or _ROW_OVER.search(t) or _ROW_UNDER.search(t)):
+        return False
     if age is not None and b and not (float(b.group(1)) <= age <= float(b.group(2))):
         return False
     o = _ROW_OVER.search(t)
@@ -564,7 +568,7 @@ def _row_limits(t: str):
 _OWNER_CACHE: Dict[str, Any] = {}
 
 
-def _owner():
+def _owner(on=None):
     """(sex, age) of the owner from the metrics file — used to pick the right row of a
     multi-line reference. No profile / no birth date → (None, None), the logic is off.
 
@@ -594,9 +598,9 @@ def _owner():
         # the same mtime, and «the timestamp did not move» would then mean «the
         # file did not change» — which is how a stale cache survives the test
         # written to catch it.
-        key = (str(mfile), st.st_mtime_ns, st.st_size)
+        key = (str(mfile), st.st_mtime_ns, st.st_size, on)
     except OSError:
-        key = (str(mfile), None, None)
+        key = (str(mfile), None, None, on)
     if _OWNER_CACHE.get("_key") == key:
         return _OWNER_CACHE.get("sex"), _OWNER_CACHE.get("age")
     _OWNER_CACHE.clear()
@@ -614,7 +618,7 @@ def _owner():
     # looks like a working filter. The age by `core.age_from`, the one reader the
     # profile view and the corridor rule share, so the two cannot disagree.
     sex = core.profile_sex_of(pr.get("sex"))
-    age = core.age_from(pr)
+    age = core.age_from(pr, on=on)
     _OWNER_CACHE.update({"sex": sex, "age": age, "_key": key})
     return sex, age
 
@@ -703,7 +707,7 @@ def _read_pdf_or_raise(path: Path) -> Optional[str]:
     try:
         import pdfplumber
         with pdfplumber.open(str(path)) as pdf:
-            return "\n".join((pg.extract_text() or "") for pg in pdf.pages)
+            return "\f".join((pg.extract_text() or "") for pg in pdf.pages)
     except ImportError:
         pass
     except Exception as e:
@@ -717,10 +721,15 @@ def _read_pdf_or_raise(path: Path) -> Optional[str]:
             failed.append(f"pdftotext: exit {r.returncode}: {(r.stderr or '').strip()[:200]}")
         except Exception as e:
             failed.append(f"pdftotext: {type(e).__name__}: {e}")
+    # Typed as optional before the import: where pdfminer is installed, the
+    # checker knows its signature and read `= None` as a type error, so the
+    # count of type errors depended on the machine that counted (0.6.0).
+    extract_text: Optional[Callable[..., str]] = None
     try:
-        from pdfminer.high_level import extract_text
+        from pdfminer.high_level import extract_text as _pdfminer_text
+        extract_text = _pdfminer_text
     except ImportError:
-        extract_text = None
+        pass
     if extract_text is not None:
         try:
             return extract_text(str(path))
@@ -746,7 +755,10 @@ def _read_pdf(path: Path) -> Optional[str]:
 
 
 def _stool_score(tail: str) -> Optional[float]:
-    """The first meaningful token of a word result → a score of 0–4.
+    """A word result → a score of 0–4; a printed count stays numeric.
+
+    The single-form gate refuses count rows where the catalogue defines only
+    ordinal-score units. This helper never truncates their original number.
 
     The result stands first after the name, the reference follows it (its words are in the
     scale too, which is why the FIRST match is taken and nothing beyond it is looked at). A
@@ -770,11 +782,8 @@ def _stool_score(tail: str) -> Optional[float]:
                 return score
     first = t.split(" ")[0].strip(",.;:")
     if re.fullmatch(_NUM, first):
-        # «Лейкоциты 2 отсутствуют» — some rows of the automated form arrive as a count in the
-        # field of view, not as a word. The count goes onto the same 0–4 axis: the reference
-        # here is still «отсутствуют», what matters is «more than zero», not the exact value.
-        # The ceiling of 4 keeps an outlier from stretching the scale and zeroing word points.
-        return min(_to_float(first) or 0.0, 4.0)
+        # A printed count is a measurement, not a qualitative score. Do not clamp it.
+        return _to_float(first)
     if len(first) >= 3 and first[0].isalpha():
         return 1.0
     return None
@@ -984,6 +993,18 @@ def _against_ratio_sign(low: str, start: int, end: int) -> bool:
 _RATIO_BEFORE = re.compile(r"[^\W\d_][)\]]*(?:\s*/\s*|:(?!\s)|\s+:\s+)[(\[]*$")
 
 
+_NAME_LOOKALIKES = str.maketrans('онсраекмтхв', 'ohcpaekmtxb')
+
+
+def _name_key(text: str) -> str:
+    """Equal-length visual letter folding for matching names ONLY.
+
+    Original strings still supply offsets, boundaries, values, units and form
+    context. This is not transliteration of a report or a unit conversion.
+    """
+    return text.lower().translate(_NAME_LOOKALIKES)
+
+
 def _drop_ratio_components(low: str, hits: Dict[str, Any]) -> Dict[str, Any]:
     """Remove the names that stand against a «/» or «:» in this line.
 
@@ -1010,7 +1031,8 @@ def _unit_in(sl: str, surface: str) -> bool:
     u = surface.lower()
     j = sl.find(u)
     while j >= 0:
-        if j == 0 or not sl[j - 1].isalpha():
+        if ((j == 0 or not sl[j - 1].isalpha())
+                and (j + len(u) == len(sl) or not sl[j + len(u)].isalpha())):
             return True
         j = sl.find(u, j + 1)
     return False
@@ -1030,6 +1052,10 @@ def _row_unit(spec: Dict[str, Any], sl: str):
     the value must be converted from, and ("refused", surface) when the unit cannot
     be converted into this marker at all.
     """
+    # Recognition-only rules have no chosen unit to convert TO. Their adjacent
+    # printed unit is read separately and the writer refuses missing/changed units.
+    if spec.get("unit_from_form"):
+        return None
     canon = [spec.get("unit") or ""]
     labels = ((core._read_knowledge_raw("units.json").get("units", {})
                .get(spec.get("unit") or "") or {}).get("label") or {})
@@ -1041,13 +1067,63 @@ def _row_unit(spec: Dict[str, Any], sl: str):
                         ("convert", spec.get("convert") or {})):
         others += [(len(u), kind, u) for u in table if _unit_in(sl, u)]
     if not others:
-        return None
+        # Even a marker without conversion tables must not accept a clearly
+        # different unit. The shared unit vocabulary is input recognition, not
+        # an authority to invent a conversion.
+        known = core._read_knowledge_raw("units.json").get("units", {})
+        found = []
+        for code, item in known.items():
+            spellings = [code] + list((item.get("label") or {}).values())
+            found += [(len(u), u) for u in spellings if isinstance(u, str)
+                      and u != "1" and _unit_in(sl, u)]
+        if not found:
+            return None
+        length, surface = max(found)
+        if any(c and _unit_in(sl, c) and len(c) >= length for c in canon):
+            return None
+        return "refused", surface
     best = max(others)
     # A canonical spelling that is LONGER than the foreign one wins («ммоль/л» and
     # «мг/дл» cannot both be the unit of one number; the more specific match is).
     if any(c and _unit_in(sl, c) and len(c) >= best[0] for c in canon):
         return None
     return best[1], best[2]
+
+
+def _form_stamps(text: str) -> List[str]:
+    """Distinct printed draw stamps, including repeated draws on one day."""
+    stamps = set()
+    for match in _DATE.finditer(text):
+        stamp = f"{match.group(3)}-{match.group(2)}-{match.group(1)}"
+        clock = _TIME_AFTER.match(text[match.end():match.end() + 24])
+        if clock and 0 <= int(clock.group(1)) <= 23 and 0 <= int(clock.group(2)) <= 59:
+            stamp += f"T{int(clock.group(1)):02d}:{int(clock.group(2)):02d}"
+        stamps.add(stamp)
+    return sorted(stamps)
+
+
+def _single_form_problem(text: str, markers: Dict[str, Any]) -> Optional[str]:
+    """Reasons the single-form reader must not turn an archive into a result."""
+    if len(_form_stamps(text)) > 1:
+        return "several_draw_dates"
+    if not (_STOOL_FORM.search(text) or _OCCULT_FORM.search(text)):
+        return None
+    stool_names = {n for key, spec in markers.items() if key.startswith("stool_")
+                   for n in core.marker_rules(spec, "names")}
+    blood_names = {n for spec in markers.values() if (spec.get("specimen") or "blood") == "blood"
+                   for n in core.marker_rules(spec, "names")} - stool_names
+    if any(_CLEAN.search(line) and any(line.strip().lower().startswith(n) for n in blood_names)
+           for line in text.splitlines()):
+        return "mixed_forms"
+    for key, spec in markers.items():
+        if not key.startswith("stool_") or spec.get("numeric") or spec.get("occult"):
+            continue
+        for line in text.splitlines():
+            low = line.strip().lower()
+            if any(low.startswith(n) and re.match(r"\s*" + _NUM + r"\b", low[len(n):])
+                   for n in core.marker_rules(spec, "names")):
+                return "stool_count_not_a_score"
+    return None
 
 
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
@@ -1058,6 +1134,10 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
     («Антитела к циклическому / <value> / цитруллиновому пептиду (АЦЦП)»),
     the value is taken from the neighbouring row that starts with a number.
     """
+    # The single-form API cannot safely stamp a merged archive with its first date.
+    # Refuse rather than misdate data; ingest reports this reason explicitly.
+    if _single_form_problem(text, markers):
+        return None, {}
     date = None
     m = _DATE.search(text) or _DATE_FALLBACK.search(text)
     if not m and date_hint:
@@ -1188,9 +1268,12 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         trac-HOMA-tis», and an antibody titre row produced a phantom HOMA-IR point.
         Cyrillic names are long and not exposed to this — the rule leaves them alone.
         """
-        ascii_name = needle.isascii()
-        out, j = [], hay.find(needle)
+        ascii_name = (needle.isascii() or needle[-1:].isdigit()
+                      or (len(needle) <= 5 and not any(c.isspace() for c in needle)))
+        matched_hay, matched_needle = _name_key(hay), _name_key(needle)
+        out, j = [], matched_hay.find(matched_needle)
         while j >= 0:
+            negated = matched_hay[:j].endswith(tuple(_name_key(p) for p in ("не-", "не ", "non-", "non ")))
             if not ascii_name:
                 # Cyrillic names need a LEFT boundary too. «Cyrillic names are long» held
                 # for the dictionary and not for the language, which builds new analytes
@@ -1199,7 +1282,6 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                 # — a different number stored under a marker it is not. The right side
                 # stays open because Russian declines the name («глюкозы», «ферритина»).
                 before = hay[j - 1] if j > 0 else " "
-                negated = hay[:j].endswith(("не-", "не ", "non-", "non "))
                 if not before.isalpha() and not negated:
                     out.append(j)
             else:
@@ -1217,9 +1299,9 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                 # follows the s there is a letter.
                 if after == "s" and not (hay[end + 1] if end + 1 < len(hay) else " ").isalnum():
                     after = " "
-                if not (before.isalnum() or after.isalnum()):
+                if not (before.isalnum() or after.isalnum()) and not negated:
                     out.append(j)
-            j = hay.find(needle, j + 1)
+            j = matched_hay.find(matched_needle, j + 1)
         return out
 
     for i, ln in enumerate(lines):
@@ -1231,7 +1313,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         for key, spec in markers.items():
             if key in found:
                 continue
-            if any(x in low for x in core.marker_rules(spec, "exclude")):
+            if any(_name_key(x) in _name_key(low) for x in core.marker_rules(spec, "exclude")):
                 continue
             best = None
             for syn in core.marker_rules(spec, "names"):
@@ -1267,7 +1349,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         #    A tie on one name between a pair of keys (e.g. «нейтрофилы» — % and abs.):
         #    BOTH are taken, the columns are separated by require + plausible.
         for key, (_l, syn, pos) in hits.items():
-            if any(_l < o[0] and syn in o[1] for k2, o in hits.items() if k2 != key):
+            if any(_l < o[0] and _name_key(syn) in _name_key(o[1]) for k2, o in hits.items() if k2 != key):
                 continue
             spec = markers[key]
             # The qualifier window: when the value is already printed on this row, the
@@ -1311,7 +1393,8 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                 ru = None if units else _row_unit(spec, sl)
                 if ru and ru[0] == "refused":
                     continue        # printed in a unit this marker cannot be converted from
-                if _PEDI.search(seg):
+                pediatric = _PEDI.search(seg)
+                if pediatric and not _CLEAN.search(seg[:pediatric.start()]):
                     pedi_hit = True
                     continue        # the segment holds only paediatric/female references
                 nm = _pick(_mask(seg), pl, seg)
@@ -1385,13 +1468,13 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
             # WRONG group (female, paediatric, a foreign age span), the first fitting row of
             # the block below is taken. Example: «17-ОН-прогестерон <value> Новорожденные
             # (до 7 дней): 1,20 - 7,80» → descend to «Мужчины (старше 18): < 4,20».
-            o_sex, o_age = _owner()
+            o_sex, o_age = _owner(on=date or "")
             row_fits = _row_fits(tail[nm.end():], o_sex, o_age)
             # Descend into the block below when the row's own range belongs to
             # somebody else, AND ALSO when the row printed no range at all — many
             # forms put the value on one line and the whole reference block under
             # it, and that case used to end with no corridor at any cost.
-            if o_age is not None and ((rl is None and rh is None) or not row_fits):
+            if (rl is None and rh is None) or not row_fits:
                 rl = rh = None
                 fits = _fitting_rows(lines, i, o_sex, o_age)
                 # «The only applicable row», not «the first row that passed».
@@ -1404,6 +1487,11 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                     rl, rh = fits[0]
                     rl = rl * fac if rl is not None else None
                     rh = rh * fac if rh is not None else None
+            if rl is None and rh is None and i + 1 < len(lines):
+                bare = re.fullmatch(r"\s*" + _NUM_ANY + r"\s*[-–—]\s*" + _NUM_ANY + r"\s*", lines[i + 1])
+                if bare:
+                    limits = _row_limits(lines[i + 1])
+                    rl, rh = (b * fac if b is not None else None for b in limits)
             val = _to_float(nm.group(1)) * fac
             if from_unit:
                 # Value and corridor through the one law that knows factors AND formulas.
@@ -1450,13 +1538,44 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                         ">" if pre.startswith((">", "более")) else None)
             found[key] = {"value": val,
                           "ref_low": rl, "ref_high": rh}
+            if spec.get("unit_from_form"):
+                found[key]["unit"] = _printed_unit(tail, nm.end())
+            context = printed_context(rest, lines[i + 1:i + 10], date or "", _to_float(nm.group(1)), censored=cens)
+            if context:
+                selected = context.pop("selected_range", None)
+                if selected and from_unit:
+                    selected = tuple(core.convert_to_canonical(spec, from_unit, b)["value"]
+                                     if b is not None else None for b in selected)
+                found[key].update(context)
+                found[key]["ref_low"], found[key]["ref_high"] = (
+                    tuple(b * fac if b is not None else None for b in selected) if selected else (None, None))
+                if not selected:
+                    found[key]["reference_withheld"] = True
             if cens:
                 found[key]["censored"] = cens
     return date, found
 
 
-_LABEL_ROW = re.compile(r"^\s*([А-ЯЁA-Z][^\d]{3,60}?)\s{2,}"
-                        r"(?:[<>]?\s*)?\d[\d.,]*\s*([А-Яа-яA-Za-z%/^*]+[^\s]*)?")
+def _printed_unit(tail: str, end: int) -> str:
+    """Only an adjacent unit already named by our unit table, never a default.
+
+    Recognition-only entries have no chosen canonical unit or conversion. A
+    form's spelling resolves through the existing label table, with factor one.
+    A missing/unknown unit remains absent and the writer refuses it explicitly.
+    """
+    candidates = []
+    for code, entry in core._read_knowledge_raw("units.json").get("units", {}).items():
+        for surface in [code, *(entry.get("label") or {}).values()]:
+            if isinstance(surface, str) and surface:
+                candidates.append((surface, code))
+    for surface, code in sorted(candidates, key=lambda item: len(item[0]), reverse=True):
+        if re.match(r"\s*" + re.escape(surface) + r"(?![\w/])", tail[end:], re.IGNORECASE):
+            return code
+    return ""
+
+
+_LABEL_ROW = re.compile(r"^\s*([А-ЯЁA-Z][^\n]{2,90}?)\s+"
+                        r"(?:[<>]?\s*)?\d+(?:[.,]\d+)?\s+([А-Яа-яA-Za-z%/^*]+[^\s]*)")
 
 
 def _unrecognised_labels(text: str, limit: int = 12):
@@ -1471,7 +1590,7 @@ def _unrecognised_labels(text: str, limit: int = 12):
     markers = core.lab_markers().get("markers", {})
     known = []
     for spec in markers.values():
-        known.extend(x.lower() for x in core.marker_rules(spec, "names"))
+        known.extend(_name_key(x) for x in core.marker_rules(spec, "names"))
     out = []
     for ln in text.splitlines():
         m = _LABEL_ROW.match(ln)
@@ -1479,7 +1598,7 @@ def _unrecognised_labels(text: str, limit: int = 12):
             continue
         label = " ".join(m.group(1).split())
         low = label.lower()
-        if any(k in low for k in known):
+        if any(k in _name_key(low) for k in known):
             continue
         if any(low.startswith(x) for x in ("дата", "пациент", "врач", "заказ", "адрес")):
             continue
@@ -1592,8 +1711,14 @@ def _column_map(header: list) -> dict:
 
 
 def _number(raw: str):
+    raw = re.sub(r"\s+[HL]$", "", str(raw).strip(), flags=re.I)
+    # A lone comma before three digits can be a decimal or a thousands
+    # separator. With no locale declared, neither interpretation is safe.
+    if re.fullmatch(r"[<>]?\s*[+-]?\d{1,3},\d{3}", raw):
+        return None
     try:
-        return float(str(raw).strip().replace(",", ".").replace("<", "").replace(">", ""))
+        value = float(raw.replace(",", ".").lstrip("<> "))
+        return value if math.isfinite(value) else None
     except (TypeError, ValueError):
         return None
 
@@ -1616,20 +1741,23 @@ def parse_table(text: str, markers: dict, source: str = "") -> dict:
     cols = _column_map(reader[0])
     if not all(k in cols for k in ("date", "label", "value")):
         return {"ok": False, "reason": "not_a_table", "columns": cols}
-    points, unrecognised = [], []
-    for row in reader[1:]:
+    points, unrecognised, refused = [], [], []
+    for number, row in enumerate(reader[1:], 2):
         if len(row) <= max(cols.values()):
+            refused.append({"row": number, "reason": "incomplete_row"})
             continue
         raw_date = (row[cols["date"]] or "").strip().strip('"')
         label = (row[cols["label"]] or "").strip().strip('"')
         value = _number(row[cols["value"]])
         if not raw_date or not label or value is None:
+            refused.append({"row": number, "reason": "invalid_or_ambiguous_value"})
             continue
         stamp = raw_date[:10] if _DATE_ROW.match(raw_date + ",") else None
         if not stamp:
             iso, _amb = english_date("collected " + raw_date)
             stamp = iso
         if not stamp:
+            refused.append({"row": number, "reason": "invalid_date"})
             continue
         if len(raw_date) >= 16 and raw_date[10] in "T ":
             stamp = f"{stamp}T{raw_date[11:16]}"
@@ -1653,7 +1781,9 @@ def parse_table(text: str, markers: dict, source: str = "") -> dict:
         unit = (row[cols["unit"]].strip().strip('"') if "unit" in cols and len(row) > cols["unit"]
                 else None) or label_unit
         points.append({"key": key, "label": label, "date": stamp, "value": value,
-                       "unit": unit or None, "ref_low": low, "ref_high": high})
+                       "unit": unit or None, "ref_low": low, "ref_high": high,
+                       "censored": (row[cols["value"]].strip()[:1]
+                                    if row[cols["value"]].strip().startswith(("<", ">")) else None)})
     seen, unique = set(), []
     for row in unrecognised:
         mark = (row["label"], row["unit"])
@@ -1661,7 +1791,8 @@ def parse_table(text: str, markers: dict, source: str = "") -> dict:
             seen.add(mark)
             unique.append(row)
     return {"ok": True, "rows": len(reader) - 1, "points": points,
-            "unrecognised": sorted(unique, key=lambda r: r["label"]), "source": source}
+            "unrecognised": sorted(unique, key=lambda r: r["label"]), "source": source,
+            "refused": refused}
 
 
 def _carry_store_flags(out: Dict[str, Any], key: str, date: str, r: Dict[str, Any]) -> None:
@@ -1684,9 +1815,8 @@ def _carry_store_flags(out: Dict[str, Any], key: str, date: str, r: Dict[str, An
             {"marker": key, "date": r.get("date") or date, "replaced": r["replaced"]})
 
 
-def ingest(folder: str, force: bool = False,
-           progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
-    """Walk the folder of results and update labs.json with new markers. Incremental."""
+def _inputs(folder: str) -> Dict[str, Any]:
+    """Validate an import before either a local reader or a worker names a container."""
     # `Path("")` is the current directory. A caller that named no folder is
     # refused by name rather than served whatever the process happens to be
     # standing in — once that was the source tree, and the profile received
@@ -1697,8 +1827,6 @@ def ingest(folder: str, force: bool = False,
     root = Path(folder).expanduser()
     if not root.exists() or not root.is_dir():
         return {"ok": False, "error": _t("ingest_labs.folder_not_found", path=root)}
-    markers = core.lab_markers().get("markers", {})
-    existing = {k: m.get("name") for k, m in core.labs().get("markers", {}).items()}
     files = sorted(f for f in root.rglob("*")
                    if f.is_file()
                    and (f.suffix.lower() == ".pdf" or f.suffix.lower() in _TEXT_SUFFIXES))
@@ -1709,6 +1837,53 @@ def ingest(folder: str, force: bool = False,
         # names the command. But it is no longer a refusal for the whole folder —
         # a CSV next to those PDFs is readable with no extractor at all.
         return {"ok": False, "error": _t("ingest_labs.no_pdf_reader")}
+    return {"ok": True, "engine": ex, "files": files}
+
+
+def _seen_ingest_points(files: List[Path], manifest: Dict[str, float]) -> Dict[tuple, tuple]:
+    """Restore method choices only from unchanged, completed files in this import.
+
+    The witness is saved atomically with the point, not in a second checkpoint
+    that could lag behind it. A manual replacement drops the witness.
+    """
+    unchanged = set()
+    for f in files:
+        try:
+            rk, mt = core.manifest_lookup(manifest, f)
+            if mt is not None and mt == f.stat().st_mtime:
+                unchanged.add((rk, mt))
+        except OSError:
+            continue
+    seen: Dict[tuple, tuple] = {}
+    for key, marker in core.labs().get("markers", {}).items():
+        for pt in marker.get("series", []):
+            origin = pt.get("ingest_method")
+            if not isinstance(origin, dict) or not isinstance(origin.get("path"), str):
+                continue
+            mtime, priority = origin.get("mtime"), origin.get("priority")
+            if (isinstance(mtime, bool) or not isinstance(mtime, (int, float))
+                    or type(priority) is not int or priority not in (1, 2)
+                    or (origin["path"], mtime) not in unchanged):
+                continue
+            stamp, value = pt.get("date"), pt.get("value")
+            if (not isinstance(stamp, str) or store.date_resolution(stamp) is None
+                    or isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value)):
+                continue
+            observation = (value, Path(origin["path"]).name, priority, stamp)
+            seen[(key, stamp)] = observation
+            seen.setdefault((key, stamp[:10]), observation)
+    return seen
+
+
+def ingest(folder: str, force: bool = False,
+           progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
+    """Walk the folder of results and update labs.json with new markers. Incremental."""
+    inputs = _inputs(folder)
+    if not inputs["ok"]:
+        return inputs
+    ex, files = inputs["engine"], inputs["files"]
+    markers = core.lab_markers().get("markers", {})
+    existing = {k: m.get("name") for k, m in core.labs().get("markers", {}).items()}
     # After the LAST refusal: adopting the manifest from the cache is a write
     # into the profile, and a refused call writes nothing.
     moved = _manifest_moved("labs")
@@ -1728,7 +1903,7 @@ def ingest(folder: str, force: bool = False,
            # while three other paths returned without touching any counter at all.
            # A file dropped silently is indistinguishable from a file that was
            # never there — the project's own rule 9, which the code broke.
-           "not_ingested": [],
+           "not_ingested": [], "unrecognised_rows": [],
            # The one run that carried the list of already-read files over from
            # the cache says so (task 133); every other run says None.
            "manifest_moved": moved}
@@ -1736,7 +1911,7 @@ def ingest(folder: str, force: bool = False,
     # forms (different orders from one draw, duplicates in subfolders). The last processed
     # file used to win — silently and non-deterministically. Now the FIRST one in sort order
     # wins, and the discrepancy goes into out["conflicts"] and into the report.
-    seen_pt: Dict[tuple, tuple] = {}
+    seen_pt: Dict[tuple, tuple] = {} if force else _seen_ingest_points(files, manifest)
     for n_file, f in enumerate(files):
         if progress is not None:
             # Outside the per-file `try`: a stop requested here ends the run
@@ -1787,7 +1962,7 @@ def ingest(folder: str, force: bool = False,
             # destruction or refusal.
             if f.suffix.lower() != ".pdf" and text.strip():
                 table = parse_table(text, markers, source=str(f))
-                if table.get("ok") and table["points"]:
+                if table.get("ok"):
                     added_here = []
                     for pt in table["points"]:
                         spec = markers[pt["key"]]
@@ -1797,12 +1972,16 @@ def ingest(folder: str, force: bool = False,
                                                 unit=pt["unit"] or spec.get("unit"),
                                                 ref_low=pt["ref_low"], ref_high=pt["ref_high"],
                                                 direction=spec.get("direction"),
+                                                censored=pt.get("censored"),
                                                 # A delimited export dates every ROW,
                                                 # and that column is the draw.
                                                 date_source="form", subject="owner")
                         if r.get("ok"):
                             added_here.append(pt["key"])
                             _carry_store_flags(out, pt["key"], pt["date"], r)
+                        else:
+                            out["not_ingested"].append({"file": f.name, "reason": r.get("reason") or "point_refused",
+                                                        "marker": pt["key"], "detail": r.get("error")})
                     manifest[rk] = mt
                     if added_here:
                         out["files_processed"] += 1
@@ -1817,6 +1996,8 @@ def ingest(folder: str, force: bool = False,
                             {"file": f.name, "reason": "table_labels_unknown",
                              "detail": _t("ingest_labs.reason_table_labels", n=len(table["unrecognised"])),
                              "unrecognised": table["unrecognised"][:40]})
+                    for refusal in table.get("refused", []):
+                        out["not_ingested"].append(dict(refusal, file=f.name))
                     continue
             if f.suffix.lower() != ".pdf" and text.strip():
                 # Not a table this reader can use — no date column, or none of its
@@ -1835,6 +2016,13 @@ def ingest(folder: str, force: bool = False,
                                       first=dates[0], last=dates[-1])})
                     manifest[rk] = mt
                     continue
+            dates = _form_stamps(text)
+            if len(dates) > 1:
+                out["not_ingested"].append(
+                    {"file": f.name, "reason": "several_draw_dates",
+                     "detail": _t("ingest_labs.reason_several_dates", n=len(dates),
+                                  first=dates[0], last=dates[-1])})
+                continue
             en_date, ambiguous = english_date(text)
             if ambiguous:
                 # A date IS on the page and cannot be read. Saying «no date on this
@@ -1887,6 +2075,14 @@ def ingest(folder: str, force: bool = False,
                 manifest[rk] = mt
                 continue
             date, found = parse_report(text, markers, source=str(f), date_hint=hint)
+            problem = _single_form_problem(text, markers)
+            if problem:
+                out["not_ingested"].append({"file": f.name, "reason": problem,
+                                             "detail": _t("ingest_labs.reason_" + problem)})
+                continue
+            unknown = _unrecognised_labels(text, limit=1000)
+            if unknown:
+                out["unrecognised_rows"].append({"file": f.name, "count": len(unknown), "rows": unknown})
             ftl = text.lower()
             if not date or not found:
                 # Name the lines that were not recognised, not just the file. This is
@@ -1910,7 +2106,7 @@ def ingest(folder: str, force: bool = False,
             day = date[:10]
             for key, v in found.items():
                 spec = markers[key]
-                if spec.get("ref_locked"):
+                if spec.get("ref_locked") and not v.get("reference_table"):
                     # Qualitative panels print in the «Норма» column not a range but a scale of
                     # interpretation: «<15 - не обнаружено; 15-25 сомнительно; >25 - обнаружено».
                     # The parser sees the range 15-25 there and takes the «grey zone» for the
@@ -1937,12 +2133,16 @@ def ingest(folder: str, force: bool = False,
                 # belong in the series. A conflict is two readings claiming to be THE SAME
                 # measurement: the same stamp, a different number.
                 same_day = seen_pt.get((key, day))
-                if same_day is not None and same_day[3] != stamp:
+                mixed_stamp = (same_day is not None and same_day[3] != stamp
+                               and (len(same_day[3]) <= 10 or len(stamp) <= 10))
+                if same_day is not None and same_day[3] != stamp and not mixed_stamp:
                     out.setdefault("repeats", []).append(
                         {"marker": key, "day": day,
                          "first": {"at": same_day[3], "value": same_day[0], "from": same_day[1]},
                          "second": {"at": stamp, "value": v["value"], "from": f.name}})
                 prev = seen_pt.get((key, stamp))
+                if prev is None and mixed_stamp:
+                    prev = same_day
                 if prev is not None:
                     if prev[0] == v["value"]:
                         continue
@@ -1954,15 +2154,20 @@ def ingest(folder: str, force: bool = False,
                     out["conflicts"].append({"marker": key, "date": stamp,   # new method prevails
                                              "kept": v["value"], "kept_from": f.name,
                                              "other": prev[0], "other_from": prev[1]})
-                seen_pt[(key, stamp)] = (v["value"], f.name, prio, stamp)
-                seen_pt.setdefault((key, day), (v["value"], f.name, prio, stamp))
-                r = store.add_lab_point(key, stamp, v["value"], name=name, unit=spec.get("unit"),
+                r = store.add_lab_point(key, stamp, v["value"], name=name, unit=v.get("unit") or spec.get("unit"),
                                         ref_low=rl, ref_high=rh, direction=spec.get("direction"),
                                         censored=v.get("censored"),
-                                        date_source=date_src, subject="owner")
+                                        date_source=date_src, subject="owner", reference_context={**v,
+                                            "ingest_method": {"path": rk, "mtime": mt, "priority": prio}})
                 if r.get("ok"):
+                    seen_pt[(key, stamp)] = (v["value"], f.name, prio, stamp)
+                    if same_day is None or mixed_stamp:
+                        seen_pt[(key, day)] = (v["value"], f.name, prio, stamp)
                     added.append(key)
                     _carry_store_flags(out, key, stamp, r)
+                else:
+                    out["not_ingested"].append({"file": f.name, "reason": r.get("reason") or "point_refused",
+                                                "marker": key, "detail": r.get("error")})
             manifest[rk] = mt
             if added:
                 out["files_processed"] += 1
@@ -1983,6 +2188,10 @@ def ingest(folder: str, force: bool = False,
                  "detail": _t("ingest_labs.reason_error", type=type(e).__name__,
                               text=str(e) or "-")})
             out.setdefault("errors", []).append(f.name)
+        finally:
+            # A host may kill this invocation before the whole folder finishes.
+            # Every completed file is checkpointed; failed files stay retryable.
+            _save_manifest(manifest)
     _save_manifest(manifest)
     core.reset_cache()
     return out

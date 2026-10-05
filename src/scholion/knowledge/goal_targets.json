@@ -1,10 +1,10 @@
 {
   "_meta": {
     "schema": 1,
-    "purpose": "Targets a clinical association has published for a marker, so that a goal can be PROPOSED with a citation instead of assumed. Public reference data. NOT personal.",
+    "purpose": "Candidate guideline targets. A citation alone does not establish support for the sentence or its individual applicability. Unsupported clinical targets are withheld; reference bounds and recorded historical extrema remain observations, not treatment goals. Public, not personal.",
     "what_this_is_not": "Not a reference interval. A reference interval says where most of a population sits; a target says where a body of physicians has argued a value should be brought, for a stated population and a stated reason. The two disagree often — LDL-C sits inside the laboratory range at values every cardiology guideline calls too high — and conflating them is the single most common way a number is misread.",
     "the_hardest_entries_are_the_empty_ones": "Where a society has looked and declined to set a target, that is recorded here as `no_target` with the quote. It is the most useful thing this file can carry: it stops the application from inventing a goal in the one place where the honest answer is that nobody has earned one.",
-    "applies_to": "Every entry names the population it was written for. An entry whose population cannot be checked from the profile is PROPOSED WITH THAT ASSUMPTION STATED, never silently.",
+    "applies_to": "A clinical target requires independent target_basis and held applicability. Assumed risk categories and unconfirmed conditions never select a treatment goal. Existing targets entered by the person or clinician are not rewritten.",
     "updated": "2026-08-18",
     "how_to_extend": "One entry per marker key from lab_markers.json. Required: unit, source{body, document, year, url}, and either `targets` or `no_target`. A target without a citation does not belong here.",
     "source_tier": "guideline_compiled"

@@ -9,10 +9,13 @@ import re
 from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import t as _t
+from ..prescribing_basis import _guard_guidance, _guard_gene_role
+from ..interaction_basis import matched_rows as _interaction_rows
+from ..monitoring_basis import monitoring_for
 from ._helpers import (_active_names_by_class, _basis, _basis_note,
                        _brief_num, _match_count, DISCLAIMER)
 from .labs import analyze_labs
-from .pgx_labels import phenotype_words
+from .pgx_labels import phenotype_words, model_phenotype_words
 
 
 def name_matches(query: str, name: str) -> bool:
@@ -305,7 +308,7 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
         for rule in gdef.get("phenotype_rules", []):
             if rule.get("default") or all(_match_count(func_counts.get(fn, 0), expr)
                                           for fn, expr in rule["when"].items()):
-                phen, label = rule["phenotype"], rule.get("label", "")
+                phen, label = rule["phenotype"], model_phenotype_words(gene, rule["phenotype"], rule.get("label", ""))
                 break
     if certainty == "assumed":
         label = _t("phenotype.assumed", label=label)
@@ -314,6 +317,26 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
     if score is not None:
         result["activity_score"] = score
     return result
+
+
+def _guidance_applicability(drug: str, entry: Dict[str, Any],
+                            phenotypes: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """A restriction on a held table, not a new prescribing interpretation."""
+    table = entry.get("cpic_drug")
+    scope = (core._read_knowledge("cpic_guidance_scope.json").get("scopes") or {}).get(table) or {}
+    status = "applicable"
+    if scope.get("names") and not any(name_matches(drug, n) for n in scope["names"]):
+        status = "drug_table_mismatch"
+    elif scope.get("names") and any(name_matches(drug, n) for n in entry.get("names", [])
+                                   if not any(name_matches(n, exact) for exact in scope["names"])):
+        status = "drug_table_mismatch"
+    joint = scope.get("joint_phenotypes") or {}
+    if joint and phenotypes and all(phenotypes.get(g) == p for g, p in joint.items()):
+        status = "joint_phenotype_unheld"
+    if status == "applicable" and scope.get("requires_indication"):
+        status = "indication_unheld"
+    return {"status": status, "table_drug": table, "source": scope.get("source"),
+            "genes": sorted(joint) if status == "joint_phenotype_unheld" else []}
 
 
 def check_drug_gene(drug: str) -> Dict[str, Any]:
@@ -352,9 +375,9 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # more severe of them. Thiopurines are the case CPIC is explicit about: TPMT
     # AND NUDT15 — a person normal on TPMT but a NUDT15 poor metaboliser is still
     # at high risk, and reporting TPMT alone (as this did) misses it entirely.
-    # The clinical ACTION for a given severity is the same whichever gene caused
-    # it (reduce / avoid), so the single guidance table is applied to the worst
-    # phenotype across the genes, and every gene is reported.
+    # Keep every reading. The severity selects a candidate table; it does not
+    # prove that table applies to a joint phenotype. The independent scope
+    # check below refuses the unsupported compound-IM state.
     _SEVERITY = {"PM": 3, "IM": 2, "RM": 2, "UM": 2, "NM": 1}
     co_genes = []
     worst_gene, worst_ph, worst_rank = gene, phenotype, _SEVERITY.get(phenotype, 0)
@@ -377,6 +400,10 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # The guidance is looked up on the WORST phenotype; note which gene drove it.
     driving_gene = worst_gene
     guidance_phenotype = worst_ph
+    applicability = _guidance_applicability(drug, match, {
+        gene: phenotype, **{g["gene"]: g["phenotype"] for g in co_genes}})
+    if applicability["status"] != "applicable":
+        guidance = {}
 
     # A determined phenotype with no entry of its own must not be answered out of
     # `default`. Voriconazole's table has keys for UM, RM, PM and default — but
@@ -391,12 +418,23 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # gap is machine-readable in `guidance_gap` rather than only in the prose.
     explicit = guidance.get(guidance_phenotype)
     gap = False
-    if explicit:
+    flag: Dict[str, Any]
+    if applicability["status"] != "applicable":
+        gap = True
+        reason = _t("drug.guidance." + applicability["status"],
+                    table=applicability["table_drug"], genes=", ".join(applicability["genes"]))
+        flag = {"level": "unknown", "note": reason, "gap_reason": reason}
+    elif explicit:
         flag = explicit
-    elif guidance_phenotype in ("unknown", "reported") or not guidance:
+    elif not guidance:
+        gap = True
+        flag = {"level": "unknown", "note": _t("drug.no_guidance_for_phenotype",
+                phenotype=guidance_phenotype, gene=driving_gene)}
+    elif guidance_phenotype in ("unknown", "reported"):
+        gap = True
         flag = guidance.get("default") or {
-            "level": "unknown" if phenotype == "unknown" else "low",
-            "note": _t("drug.nothing_notable")}
+            "level": "unknown", "note": _t("drug.no_guidance_for_phenotype",
+                phenotype=guidance_phenotype, gene=driving_gene)}
     else:
         gap = True
         # The generic sentence says THAT there is no row. Where somebody has
@@ -411,6 +449,12 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         if why:
             note += " " + why
         flag = {"level": "unknown", "note": note, "gap_reason": why or None}
+
+    selected = explicit or (guidance.get("default") if guidance_phenotype in ("unknown", "reported") else None)
+    if applicability["status"] == "applicable" and selected:
+        flag = _guard_guidance(flag)
+        gap = gap or flag["interpretation_withheld"]
+    role = _guard_gene_role(match)
 
     # An undetermined phenotype cannot yield a reassuring level, whatever the
     # catalogue's `default` says. Five drugs had `default.level = "low"`, so a
@@ -459,21 +503,29 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         "gene": gene,
         "unresolved_genes": ([gene] if phenotype in ("unknown", "reported") else []) + unresolved_co,
         "drug_class": match.get("class", ""),
-        "why": match.get("why", ""),
+        "why": (role["text"] if applicability["status"] == "applicable"
+                else _t("drug.guidance.context")),
+        "why_basis": role["basis"],
         "phenotype": phenotype,
         "phenotype_label": ph.get("label", ""),
         "certainty": ph.get("certainty"),
         "basis": ph.get("basis"),
         "level": flag["level"],
         "guidance_gap": gap,
+        "guidance_gap_reason": flag.get("gap_reason"),
+        "guidance_applicability": applicability,
+        "conclusion_basis": flag.get("conclusion_basis"),
+        "interpretation_withheld": flag.get("interpretation_withheld", False),
+        "source": flag.get("source"), "mechanism": flag.get("mechanism"),
+        "cpic_basis": flag.get("cpic_basis"),
         "co_genes": co_genes,
-        "driving_gene": driving_gene if co_genes else None,
+        "driving_gene": driving_gene if co_genes and applicability["status"] == "applicable" else None,
         # CPIC's OWN wording for this phenotype, when the catalogue carries it.
         # Kept separate from `recommendation` on purpose: that one is this
         # project's plain-language line for the patient, in their language, and
         # presenting a paraphrase as the guideline's words is the exact defect
         # the audit found. Both are shown, each labelled as what it is.
-        "cpic": (explicit or {}).get("cpic") if isinstance(explicit, dict) else None,
+        "cpic": flag.get("cpic") if explicit else None,
         "recommendation": flag["note"],
         "markers_found": ph.get("found") or core.markers_for_gene(gene),
         "clinvar": clinvar_for_drug(drug, {"genes": [{"gene": gene}]}),
@@ -515,6 +567,8 @@ def _guidance_for(drug: str, gene: str) -> Dict[str, Any]:
             continue
         for name in d.get("names", []):
             if name_matches(q, name):
+                if _guidance_applicability(q, d)["status"] != "applicable":
+                    return {}
                 return d.get("guidance", {}) or {}
     return {}
 
@@ -580,18 +634,24 @@ def _check_drug_online(drug: str) -> Dict[str, Any]:
         # gene-level caution is honest; a specific recommendation borrowed from a
         # different drug is not.
         guidance = _guidance_for(drug, gene)
-        # With no table of its own, only a NORMAL phenotype may read as low. A poor
-        # CYP2C19 metaboliser asking about pantoprazole was told «nothing notable»
-        # because the table was missing, not because the phenotype was.
-        normal = phenotype in ("NM", "normal_function", "normal_sensitivity")
-        flag = guidance.get(phenotype) or (
-            {"level": "low", "note": _t("drug.nothing_notable_ask")} if normal else
-            {"level": "unknown",
-             "note": _t("drug.no_guidance_for_phenotype", phenotype=phenotype, gene=gene)})
+        # A normal reading is not an applicable prescribing table. Retain the
+        # phenotype, but do not make catalogue absence into clinical reassurance.
+        flag = guidance.get(phenotype) or {
+            "level": "unknown",
+            "note": _t("drug.no_guidance_for_phenotype", phenotype=phenotype, gene=gene)}
+        if phenotype in guidance:
+            flag = _guard_guidance(flag)
+        role = _guard_gene_role({})
         return {"status": "ok", "drug": disp, "gene": gene,
-                "drug_class": atc_names or (cls or ""), "why": why,
+                "drug_class": atc_names or (cls or ""), "why": role["text"], "why_basis": role["basis"],
                 "phenotype": phenotype, "phenotype_label": ph.get("label", ""),
                 "level": flag["level"], "recommendation": flag["note"],
+                "guidance_gap": phenotype not in guidance or flag.get("interpretation_withheld", False),
+                "guidance_gap_reason": flag.get("gap_reason") or (flag["note"] if phenotype not in guidance else None),
+                "conclusion_basis": flag.get("conclusion_basis"),
+                "interpretation_withheld": flag.get("interpretation_withheld", False),
+                "source": flag.get("source"), "mechanism": flag.get("mechanism"),
+                "cpic": flag.get("cpic"), "cpic_basis": flag.get("cpic_basis"),
                 "markers_found": ph.get("found") or core.markers_for_gene(gene),
                 "resolved_by": "rxnorm", "reference": info.get("url"),
                 "disclaimer": DISCLAIMER()}
@@ -655,8 +715,8 @@ def check_interactions(drug: str) -> Dict[str, Any]:
         elif b in new_classes and a in active:
             pair = a
         if pair:
-            hits.append({**rule, "with_class": pair,
-                         "with_meds": names_by_class.get(pair, [])})
+            hits.extend(_interaction_rows(rule, drug, new_classes, pair,
+                        names_by_class.get(pair, []), core.med_classes().get("classes", {}), name_matches))
     hits.sort(key=lambda r: _SEV_ORDER.get(r.get("severity"), 3))
     # `baseline` says WHAT the new drug was compared against. Without it an empty
     # `interactions` list is ambiguous, and the ambiguity falls on the most common
@@ -799,42 +859,9 @@ def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any
 
 
 def _labs_for_drug(classes: List[str]) -> Dict[str, Any]:
-    """Which of YOUR lab tests matter with this drug (by class) and their current state."""
-    mon = core.drug_lab_monitoring().get("classes", {})
-    by = {m["key"]: m for m in analyze_labs()["markers"]}
-    rows, whys, seen = [], [], set()
-    for c in classes:
-        spec = mon.get(c)
-        if not spec:
-            continue
-        if spec.get("why"):
-            whys.append(spec["why"])
-        for k in spec.get("labs", []):
-            if k in seen:
-                continue
-            seen.add(k)
-            m = by.get(k)
-            rows.append({"key": k, "present": m is not None,
-                         "name": m["name"] if m else k, "value": m["value"] if m else None,
-                         "unit": m["unit"] if m else "", "flag": m["flag"] if m else "nodata",
-                         "near_limit": m.get("near_limit") if m else None,
-                         "decisions": m.get("decisions") if m else [],
-                         "personal_move": m.get("personal_move") if m else None,
-                         "ref_low": m.get("ref_low") if m else None, "ref_high": m.get("ref_high") if m else None})
-    # Which of the drug's classes the monitoring catalogue actually has a rule for.
-    # An empty `markers` used to print «no lab monitoring is required for this
-    # class» whether the catalogue said so or simply had no entry — nine of the
-    # project's 41 classes have no entry, among them SSRI/SNRI, clopidogrel and
-    # amiodarone, all of which need monitoring in real life.
-    return {"reason": "; ".join(dict.fromkeys(whys)), "markers": rows,
-            "basis": {"classes": list(classes),
-                      "with_rules": [c for c in classes if c in mon]},
-            "watch": [r for r in rows if r["flag"] in ("high", "low")],
-            "near": [r for r in rows if r.get("near_limit")],
-            "crossed": [r for r in rows if any(d["crossed"] for d in (r.get("decisions") or []))],
-            # a threshold the value could not be compared with: neither crossed nor not
-            "unresolved": [r for r in rows
-                           if any(d.get("crossed") is None for d in (r.get("decisions") or []))]}
+    """Catalogue-selected observations and independently supported proposed uses."""
+    return monitoring_for(classes, core.drug_lab_monitoring().get("classes", {}),
+                          analyze_labs()["markers"], core.marker_name)
 
 
 def _rsids_for_genes(gene_names) -> Dict[str, str]:
@@ -928,6 +955,7 @@ def _dose_context(drug: str, info: Optional[Dict[str, Any]] = None) -> Dict[str,
             m = by.get(key)
             if m:
                 pts.append({"name": m["name"], "value": m["value"], "unit": m.get("unit", ""),
+                            "date": m.get('date'), "source": f"labs.json:{key}",
                             "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
                             "flag": m.get("flag"), "measured": True})
                 continue
@@ -939,6 +967,7 @@ def _dose_context(drug: str, info: Optional[Dict[str, Any]] = None) -> Dict[str,
                 if any(ch.isdigit() for ch in unit):   # "0–100" is a scale, not a unit
                     unit = ""
                 pts.append({"name": meta.get("label") or key,
+                            "date": lv.get('date'), "source": f"wearable_trends.json:{key}",
                             "value": _brief_num(lv.get("value")), "unit": unit,
                             "flag": None, "measured": True})
             else:
@@ -946,13 +975,14 @@ def _dose_context(drug: str, info: Optional[Dict[str, Any]] = None) -> Dict[str,
         items.append({**{k: it.get(k) for k in
                          ("claim", "dose_dependent", "effect_size", "low_dose_note", "source")},
                       "patient": pts})
-    return {"matched": True,
+    from ..clinical_claims import guard_dose_context
+    return guard_dose_context(hit, {"matched": True,
             "nutritional_dose": hit.get("nutritional_dose"),
             "pharmacologic_dose": hit.get("pharmacologic_dose"),
             "items": items, "forms": hit.get("forms"),
             "verdict_rule": hit.get("verdict_rule"),
             "alternatives": hit.get("alternatives") or [],
-            "note": hit.get("note")}
+            "note": hit.get("note")})
 
 
 def _own_safety_flags(drug: str, disp: Optional[str] = None) -> List[Dict[str, Any]]:
@@ -1061,8 +1091,8 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
                                "missing": [m["rsid"] for m in basis.get("missing", [])],
                                "closable": any(m.get("obtainable")
                                                for m in basis.get("missing", [])),
-                               "detail": _t("unresolved.pgx", names=miss)
-                                         if miss else (pgx.get("phenotype_label") or "")})
+                               "detail": pgx.get("guidance_gap_reason") or (
+                                   _t("unresolved.pgx", names=miss) if miss else (pgx.get("phenotype_label") or ""))})
         for g2 in pgx.get("unresolved_genes") or []:
             if g2 != pgx.get("gene"):
                 unresolved.append({"what": "pharmacogenetics", "gene": g2, "missing": [],
@@ -1091,7 +1121,15 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
                                "closable": False,
                                "detail": _t("drug.co_gene_not_determined", genes=g["gene"])})
     for it in inter.get("interactions", []):
-        concerns.append(it["severity"])
+        if it.get("interpretation_withheld"):
+            unresolved.append({"what": "interaction_basis", "detail": it["conclusion_basis"]["reason"],
+                               "with_meds": it.get("with_meds", [])})
+        else:
+            concerns.append(it["severity"])
+        mb = it.get("management_basis") or {}
+        if mb.get("status") == "incomplete":
+            unresolved.append({"what": "interaction_management", "detail": mb["reason"],
+                               "with_meds": it.get("with_meds", [])})
     if inter.get("status") in ("unknown_class", "no_rules"):
         unresolved.append({"what": "interactions", "gene": None,
                            "detail": _t("unresolved.drug_not_classified")})
@@ -1112,6 +1150,7 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
                                         why=_t("pgx_unchecked." + (cp.get("reason")
                                                                    or "unreachable")))})
     lbasis = labs_sec.get("basis") or {}
+    unresolved.extend({"what": "monitoring_basis", **gap} for gap in labs_sec.get("gaps", []))
     if not labs_sec["markers"] and lbasis.get("classes") and not lbasis.get("with_rules"):
         unresolved.append({"what": "monitoring", "gene": None,
                            "detail": _t("unresolved.labs_no_rule", classes=class_display)})
@@ -1121,21 +1160,26 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
                                         names=", ".join(r["name"] for r in labs_sec["unresolved"]))})
     if labs_sec["watch"]:
         concerns.append("moderate")
+    dose = _dose_context(drug, info)
+    if dose.get('unresolved_count'):
+        unresolved.append({'what': 'dose_basis', 'gene': None, 'detail': _t('clinical.dose_unresolved')})
     if unresolved:
         concerns.append("moderate")     # not green; the reason travels in `unresolved`
-    # A hand-curated red flag from the owner's own file outranks everything computed
-    # here: it is a documented fact about this patient, not an inference from a rule.
-    own_flags = _own_safety_flags(drug, disp)
+    # A red flag — the owner's own, or a class against a genotype read — outranks the rest.
+    from .class_genotype import cautions as _genotype_cautions
+    own_flags = _own_safety_flags(drug, disp) + _genotype_cautions(classes, disp or drug)
     for f in own_flags:
         concerns.append("high" if f.get("severity") == "red_flag" else "moderate")
     overall = "high" if "high" in concerns else ("moderate" if "moderate" in concerns else "low")
 
-    # The question asked from the other end. Everything above answers «what do
-    # we hold about these genes»; this answers «does any of it bear on the
-    # decision being made», which is the question somebody standing over a
-    # prescription pad actually has.
+    # The question from the other end: does any of it bear on the decision being
+    # made — a class against a genotype read (class_genotype) bears on it by definition.
     from .decision import classify as _classify
     context = _classify(genome_sec, disp or drug, classes)
+    if pgx.get("guidance_gap"):
+        context = {**context, "verdict": {"kind": "no_rule", "why": "guidance_unavailable"}}
+    gflags = [f["gene"] for f in own_flags if f.get("origin") == "genotype" and not f.get("interpretation_withheld")]
+    context = {**context, "verdict": {"kind": "rule_fires", "genes": gflags}} if gflags else context
 
     return {
         "status": "ok",
@@ -1155,6 +1199,6 @@ def check_new_prescription(drug: str) -> Dict[str, Any]:
         "interactions": inter,
         "pharmacogenetics": pgx,
         "clinvar": clinvar_sec,
-        "dose_context": _dose_context(drug, info),
+        "dose_context": dose,
         "disclaimer": DISCLAIMER(),
     }

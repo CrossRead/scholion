@@ -97,6 +97,10 @@ def preview(text: str) -> Dict[str, Any]:
                              "reason": _t("import_csv.value_not_number",
                                           value=row.get("value", ""))})
             continue
+        if store.date_resolution(date) is None:
+            problems.append({"row": i, "reason": _t("store.date_not_a_date", date=date,
+                                                     accepted=", ".join(store.DATE_SHAPES))})
+            continue
         res = core.resolve_marker(marker)
         if not res.get("key"):
             cands = ", ".join(c["key"] for c in res.get("candidates") or [])
@@ -147,17 +151,8 @@ def run(path: str, dry_run: bool = False) -> Dict[str, Any]:
         out["markers"] = sorted({r["key"] for r in res["rows"]})
         return out
 
-    for r in res["rows"]:
-        w = store.add_lab_point(r["key"], r["date"], r["value"], unit=r["unit"] or None,
-                                ref_low=r["ref_low"], ref_high=r["ref_high"],
-                                date_source="manual", subject="owner")
-        if not w.get("ok"):
-            # Should be unreachable — preview ran the same gates. If it happens,
-            # it is a divergence between the check and the write, and saying so is
-            # more useful than a partial success reported as success.
-            out["ok"] = False
-            out["error"] = _t("import_csv.write_failed", row=r["row"], detail=w.get("error", ""))
-            return out
-        out["written"] += 1
+    out.update(store.add_lab_batch(res["rows"]))
+    if not out["ok"]:
+        return out
     out["markers"] = sorted({r["key"] for r in res["rows"]})
     return out

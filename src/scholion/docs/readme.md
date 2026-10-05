@@ -10,9 +10,16 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.5.11** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.6.0** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
+
+**For individuals and clinicians.** One container holds one person's data; a
+clinician can register several containers on the same machine. Personal and
+Visit are display modes, not patient switches. Each agent answer names its
+technical container ID; a conversation refuses after a human switches the
+container. Export and erasure are human-only. See
+[container lifecycle](docs/CONTAINER-LIFECYCLE.md) and [privacy](PRIVACY.md).
 
 ---
 
@@ -480,7 +487,7 @@ entry is short and the model opens the reference when the task calls for it.
 
 The model works through the command line: it asks you to run a command and reads
 the output. It gets no access to your machine, and the safety rules in
-`ASSISTANT-RULES.md` take precedence over every other instruction it is given.
+`ASSISTANT-RULES.md` come first among Scholion's own documents.
 
 **If your assistant reads skills from a folder**, put it where that host looks.
 One file, no registry, no account and nobody's moderation in between:
@@ -593,6 +600,18 @@ handshake (`2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`) are
 served under the revision they ask for. From `2025-06-18` on, thirteen tools
 also return their answer as a structure: the fields their command prints with
 `--json`, plus the rendered report with its qualifications.
+
+### CLI exit codes
+
+`0` means the command completed; a read can still return a named absence or
+refusal, so inspect its JSON `status` rather than interpreting zero as a normal
+medical result. `1` means an action failed (including a rejected write or an
+import with errors); `2` means invalid command-line arguments. `3` refuses a
+profile schema newer than this build, `4` means the profile is busy, `5` means
+the source configuration cannot be read, and `6` means a container-selection
+error. These failures print their explanation to standard error. A failed
+multi-file import may already have imported earlier files; inspect its report
+before retrying. Neither an exit code nor an empty result excludes a condition.
 
 ## Updating
 
@@ -762,8 +781,15 @@ Two lookups do go out, and only when you ask for them by name. Resolving a drug
 missing from the local knowledge base sends **the drug name** — first to a free
 translation service if the name is Russian, then to the NLM RxNorm and RxClass
 APIs, then to the CPIC API for the gene–drug pair. Looking up an rsID queries
-Ensembl. Six hosts, no analytics, nothing in the background, and never anything
-from your profile.
+Ensembl. A drug name can itself be personal information; these lookups are not
+uploads of a complete profile. Separately, the first tool call can check PyPI
+for a new version at most once a day, with no medical data in the request.
+Installing an update requires the person's permission.
+
+Tool answers are handed to the assistant host. If it uses a remote model, an
+answer containing genotypes, values, dates and the technical container ID may
+reach that model's provider. Review the host's policies before using real data;
+Scholion's offline flag does not block the host's own model requests.
 
 Separately, the scripts that **prepare** data — building a genome from raw reads,
 refreshing the knowledge bases — download from nine more: NCBI, Ensembl's FTP,
@@ -778,14 +804,15 @@ it.
 The claim is falsifiable rather than rhetorical: the application scans its own
 source and lists every host it can reach on the Assistant screen, so you check
 the inventory instead of trusting this paragraph. `SCHOLION_OFFLINE=1` disables
-outbound requests entirely.
+Scholion's outbound requests entirely. [PRIVACY.md](PRIVACY.md) also explains
+container identity, journals, exports, erasure and copies outside the application.
 
 ---
 
 ## What is inside
 
 ```
-ASSISTANT-RULES.md        safety rules — precedence over everything else
+ASSISTANT-RULES.md        safety rules — first among Scholion's documents
 CHANGELOG.md              release journal
 docs/                     versioning policy, data layout, tests and compatibility
 
@@ -894,4 +921,4 @@ could not decide for you.
 The assistant supports decisions; it is not a physician. It does not diagnose,
 does not change therapy, cites its sources, and never accepts or enters
 credentials for external services. The full statement lives in
-`ASSISTANT-RULES.md` and takes precedence over every other instruction.
+`ASSISTANT-RULES.md`, first among Scholion's own documents.

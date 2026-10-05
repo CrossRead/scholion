@@ -88,17 +88,15 @@ def _index(vcf: str) -> TabixIndex:
     stale index does not produce an error or a gap — it produces a confident,
     ordinary-looking genotype.
 
-    So the key carries the modification time and the size of the `.tbi` itself.
-    That is one `stat` per query against decompressing a block, and it makes this
-    reader behave the way the rest of them already claim to. An index that cannot
-    be stat'd is looked up under an empty stamp and left to fail where it failed
-    before — a missing index is the caller's `except`, not this function's.
+    The key carries both files' identities. An index older than the source is
+    refused; missing or unreadable files raise rather than become an empty query.
     """
-    try:
-        st = os.stat(vcf + ".tbi")
-        stamp = (st.st_mtime_ns, st.st_size)
-    except OSError:
-        stamp = ()
+    st = os.stat(vcf + ".tbi")
+    source = os.stat(vcf)
+    if st.st_mtime_ns < source.st_mtime_ns:
+        raise ValueError("The tabix index predates the VCF; rebuild it with tabix -p vcf.")
+    stamp = (st.st_mtime_ns, st.st_ctime_ns, st.st_size, st.st_ino,
+             source.st_mtime_ns, source.st_ctime_ns, source.st_size, source.st_ino)
     return _index_cached(vcf, stamp)
 
 

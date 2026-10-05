@@ -60,7 +60,10 @@ class TestAMarkerCarriesItsPositions(unittest.TestCase):
 
     def test_the_index_names_a_position_by_the_marker_its_expectation_names(self):
         book = {"systems": {"thyroid": {"positions": [
-            {"rsid": "rs1", "gene": "G1", "kind": "asked_about", "expect": {"marker": "tsh", "direction": "higher"},
+            {"rsid": "rs1", "gene": "G1", "kind": "asked_about", "expect": {
+                "marker": "tsh", "direction": "higher", "source": "Synthetic identifier PMID:1",
+                "mechanism": "Synthetic marker-association mechanism"},
+             "source": "Synthetic identifier PMID:1", "mechanism": "Synthetic mechanism",
              "evidence": {"level": "B"}},
             {"rsid": "rs2", "gene": "G2", "kind": "asked_about"}]}}}
         with mock.patch.object(SP, "_curated", lambda: book):
@@ -103,6 +106,7 @@ class TestALocalNoteStaysLocal(unittest.TestCase):
                     {"unit": "gene", "gene": "GZ"}]
             SP._attach_local_notes(rows)
         self.assertEqual("seen in clinic", rows[0]["local_note"]["text"])
+        self.assertEqual("local_opinion_not_a_conclusion", rows[0]["local_note"]["interpretation"])
         self.assertEqual("family history", rows[1]["local_note"]["text"])
         self.assertIsNone(rows[2].get("local_note"))
         raw = core.knowledge_path("system_gene_panels.json").read_text(encoding="utf-8")
@@ -112,6 +116,15 @@ class TestALocalNoteStaysLocal(unittest.TestCase):
         tmp = Path(tempfile.mkdtemp())
         with mock.patch.object(core, "profile_dir", lambda: tmp):
             self.assertEqual({}, panel_book._local_notes())
+
+    def test_an_unrecognised_author_is_only_a_role_not_a_named_review(self):
+        tmp = Path(tempfile.mkdtemp())
+        (tmp / "local_notes.json").write_text(json.dumps({"notes": [
+            {"rsid": "rs123", "text": "Synthetic opinion", "by_role": "unknown author"}]}), encoding="utf-8")
+        with mock.patch.object(core, "profile_dir", lambda: tmp):
+            note = panel_book._local_notes()["rs123"]
+        self.assertEqual(note["by_role"], "clinician")
+        self.assertEqual(note["interpretation"], "local_opinion_not_a_conclusion")
         (tmp / "local_notes.json").write_text("{not json", encoding="utf-8")
         with mock.patch.object(core, "profile_dir", lambda: tmp):
             self.assertEqual({}, panel_book._local_notes())

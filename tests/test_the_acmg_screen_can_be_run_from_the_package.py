@@ -33,6 +33,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
@@ -421,6 +422,7 @@ class TestTheTableLandsWhereTheScreenLooks(_Files):
 
     def test_the_screen_then_finds_what_the_scan_wrote(self):
         me = vcf(self.elsewhere / "me.vcf.gz", "GRCh38", [personal_row("17", 43092919, "G", "A")])
+        os.environ["SCHOLION_GENOME_VCF"] = str(me)
         acmg_scan.scan(str(me), str(brca1_clinvar(self.elsewhere)))
         found = genome.acmg_sf_findings()
         self.assertEqual(found["status"], "ok", found.get("message"))
@@ -476,6 +478,21 @@ class TestTheTableCarriesItsProvenance(_Files):
         raw = (self.dir / acmg_scan.META_NAME).read_text(encoding="utf-8")
         self.assertEqual(json.loads(raw)["assembly"], "GRCh38")
         self.assertIn("\n", raw.strip(), "indented, not one line")
+
+    def test_source_replacement_during_scan_does_not_replace_existing_results(self):
+        first = self._scan()
+        table = Path(first["table"]); metadata = Path(first["meta"])
+        before = (table.read_bytes(), metadata.read_bytes())
+        real = acmg_scan._index
+        def changed(*args):
+            result = real(*args)
+            (self.dir / "me.vcf.gz").touch()
+            return result
+        with mock.patch.object(acmg_scan, "_index", side_effect=changed):
+            result = acmg_scan.scan(str(self.dir / "me.vcf.gz"),
+                                    str(self.dir / "clinvar.vcf.gz"), out_dir=str(self.dir))
+        self.assertEqual("source_changed", result["status"])
+        self.assertEqual(before, (table.read_bytes(), metadata.read_bytes()))
 
 
 class TestTheScreenRuns(_Files):

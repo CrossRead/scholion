@@ -56,6 +56,8 @@ NOT_FOR_THE_ASSISTANT = {
     "set-folder", # points at a data folder; the person picks the folder
     "skill",      # prints this very instruction
     "doc",        # prints the documents the instruction already names
+    "patients",   # the other people on the workstation (task 192, P4)
+    "use",        # switches the person; the person's act (task 192, P4)
 }
 
 

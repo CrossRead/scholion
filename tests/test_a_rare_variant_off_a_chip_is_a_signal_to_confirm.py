@@ -34,7 +34,8 @@ CURATED = {"_meta": {}, "systems": {"thyroid": {"source": "s", "positions": [
     {"rsid": "rsRARE", "gene": "RARE", "hgvs": "NC_000001.11:g.100A>G", "risk_allele": "G",
      "mode": "monogenic", "classification": "Definitive", "moi": "AD",
      "evidence": {"level": "A", "basis": "gencc", "source": "s"},
-     "text": {"het": TXT, "hom": TXT}, "source": "s", "review": REVIEW},
+     "text": {"het": TXT, "hom": TXT}, "source": "Synthetic identifier PMID:1",
+     "mechanism": TXT, "review": REVIEW},
     {"rsid": "rsCOMMON", "gene": "COMMON", "hgvs": "NC_000001.11:g.200A>G", "risk_allele": "G",
      "mode": "common_variant", "effect_size": "OR 1.2", "study": "a study",
      "text": {"het": TXT, "hom": TXT}, "source": "s", "review": REVIEW}]}}}

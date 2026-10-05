@@ -61,7 +61,7 @@ FORBIDDEN = (
 #: Binary and vendored assets are read as bytes and skipped: a false positive
 #: inside minified CSS would be noise, and none of these is written by hand.
 SKIP_SUFFIX = (".png", ".ico", ".svg", ".gz", ".bz2", ".zip", ".pyc", ".woff", ".woff2")
-SKIP_NAME = ("pico.min.css", "chart.min.js")
+SKIP_NAME = ("pico.scoped.min.css", "crossread.css", "chart.min.js")
 
 
 def packaged_paths() -> list:

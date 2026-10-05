@@ -56,6 +56,8 @@ def lab_flags() -> Dict[str, Any]:
     with_range = [m for m in markers if m.get("ref_low") is not None
                   or m.get("ref_high") is not None]
     inside = [m for m in with_range if not m.get("abnormal")]
+    checked = [m for m in markers if any(d.get("crossed") is True for d in m.get("decisions", []))
+               or (m.get("decisions") and all(d.get("crossed") is False for d in m["decisions"]))]
     rows = [
         {"flag": "abnormal", "hit": sum(1 for m in with_range if m.get("abnormal")),
          "looked_at": len(with_range), "what": _t("prevalence.flag.abnormal")},
@@ -66,7 +68,9 @@ def lab_flags() -> Dict[str, Any]:
         {"flag": "threshold_crossed",
          "hit": sum(1 for m in markers if m.get("decisions")
                     and any(d.get("crossed") for d in m["decisions"])),
-         "looked_at": len(markers), "what": _t("prevalence.flag.threshold")},
+         "looked_at": len(checked), "unresolved": sum(
+             1 for m in markers if m.get("decisions") and m not in checked),
+         "what": _t("prevalence.flag.threshold")},
     ]
     for row in rows:
         row["rate"] = _rate(row["hit"], row["looked_at"])

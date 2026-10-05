@@ -84,6 +84,13 @@ POST_BODIES = {
     "/api/recompute/stop": {},
     "/api/assistant/context": {},
     "/api/pick-folder": {"domain": "labs_docs", "path": "/tmp"},
+    # The profile is named by the environment here, so containers are off and
+    # the switch is refused with its reason (task 192); nothing is written.
+    "/api/use": {"id": "p-nobody"},
+    # Human-only lifecycle routes also refuse an unregistered ID. Successful
+    # export and erasure have their own two-container HTTP test.
+    "/api/export": {"id": "p-nobody", "to": ""},
+    "/api/erase": {"id": "p-nobody"},
 }
 
 
@@ -176,8 +183,13 @@ class TestEveryRouteAnswers(_Live):
         for path, body in sorted(POST_BODIES.items()):
             with self.subTest(route=path):
                 code, text = self.call(path, body)
-                self.assertEqual(200, code, f"{path} answered {code}: {text[:200]}")
-                self.assertIsInstance(json.loads(text), dict)
+                lifecycle_refusal = path in ('/api/export', '/api/erase')
+                self.assertEqual(409 if lifecycle_refusal else 200, code,
+                                 f"{path} answered {code}: {text[:200]}")
+                result = json.loads(text)
+                self.assertIsInstance(result, dict)
+                if lifecycle_refusal:
+                    self.assertEqual('container.lifecycle_refused', result.get('container'))
 
     def test_an_unknown_route_is_a_404_both_ways(self):
         for method, data in (("GET", None), ("POST", {})):
@@ -267,7 +279,8 @@ class TestWhatThePageItselfIsServed(_Live):
     def test_the_page_and_its_assets_come_back(self):
         for path, kind in (("/", "text/html"), ("/index.html", "text/html"),
                            ("/icon.svg", "image/svg+xml"), ("/dna.svg", "image/svg+xml"),
-                           ("/chart.min.js", "javascript"), ("/pico.min.css", "text/css"),
+                           ("/chart.min.js", "javascript"), ("/crossread.css", "text/css"),
+                           ("/pico.scoped.min.css", "text/css"),
                            # the two silhouettes the Overview draws its figure from
                            ("/body-male.webp", "image/webp"), ("/body-female.webp", "image/webp")):
             with self.subTest(path=path):
@@ -278,9 +291,11 @@ class TestWhatThePageItselfIsServed(_Live):
     def test_the_style_layer_is_served_from_here_and_not_from_the_internet(self):
         """Vendored on purpose: the interface has to keep working with no network
         reachable at all."""
-        code, body = self.call("/pico.min.css")
-        self.assertEqual(200, code)
-        self.assertGreater(len(body), 1000, "pico.min.css is a stub")
+        for path in ("/crossread.css", "/pico.scoped.min.css"):
+            with self.subTest(path=path):
+                code, body = self.call(path)
+                self.assertEqual(200, code)
+                self.assertGreater(len(body), 1000, f"{path} is a stub")
 
     def test_an_asset_that_is_not_there_is_a_404_in_json(self):
         with mock.patch.object(server, "_WEB", Path(self._tmp) / "no-web"):
@@ -477,6 +492,14 @@ class TestTheUpdateWorkerReadsItsScript(unittest.TestCase):
         def wait(self):
             self.returncode = self._code
             return self._code
+
+        # The worker opens the process with `with`, so the pipe is closed when
+        # the script ends (0.6.0: the suite printed a ResourceWarning for it).
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
 
     def _run(self, lines, code):
         proc = self._FakeProc(lines, code)

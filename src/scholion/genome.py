@@ -223,11 +223,31 @@ def vcf_candidates() -> List[Path]:
     return [p for p, _why in _weighed()]
 
 
+def _sites_only(vcf: str) -> bool:
+    """Only a readable, valid eight-column header proves a sites-only resource.
+
+    An unreadable/malformed input stays visible for diagnosis, never disappears.
+    No cache: a header may be repaired at the same path during this process.
+    """
+    import gzip
+    try:
+        with gzip.open(vcf, "rt", encoding="utf-8", errors="replace") as stream:
+            for n, line in enumerate(stream):
+                if line.startswith("#CHROM\t"):
+                    return len(line.rstrip().split("\t")) == 8
+                if not line.startswith("#") or n >= 600:
+                    break
+    except (OSError, EOFError):
+        return False
+    return False
+
+
 def _all_vcfs() -> List[Path]:
     """Every `.vcf.gz` in the first search base that holds one, nothing removed."""
     for base in _search_bases():
         hits = sorted(glob.glob(str(base / "*.vcf.gz")))
-        hits = [h for h in hits if not h.endswith(".clinvar.vcf.gz") and not _is_gvcf(h)]
+        hits = [h for h in hits if Path(h).name not in ("clinvar.vcf.gz", "clinvar.chr.vcf.gz")
+                and not h.endswith(".clinvar.vcf.gz") and not _is_gvcf(h) and not _sites_only(h)]
         if hits:
             return [Path(h) for h in hits]
     return []
@@ -959,6 +979,8 @@ def _tbi_usable(vp, suffix: str = ".tbi") -> bool:
     from pathlib import Path as _P
     tbi = _P(str(vp) + suffix)
     try:
+        if tbi.stat().st_mtime_ns < _P(vp).stat().st_mtime_ns:
+            return False
         with open(tbi, "rb") as fh:
             head = fh.read(2)
     except OSError:
@@ -1968,6 +1990,9 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # and such an event does not stand at that coordinate as one base. Task 172.
     _ev = _indel_event(loc)
     if _ev:
+        if loc.get("repeat_call"):
+            from . import indel_genotype
+            return indel_genotype.read(loc)
         return _indel_refusal(loc, _ev)
     vp = vcf_path()
     if not vp:
@@ -2404,17 +2429,8 @@ def clinvar_normalisation() -> Dict[str, Any]:
 
 
 def _review_confidence(review: str) -> Optional[str]:
-    """The stated meaning of a ClinVar review status, from `penetrance.json`."""
-    mods = ((penetrance_notes().get("confidence_modifiers") or {})
-            .get("review_status") or {})
-    hit = mods.get((review or "").strip())
-    # The map is nested two deep — `confidence_modifiers.review_status.<status>` —
-    # and the tree resolver localises one level of a named container, so the
-    # innermost per-language map arrives raw. Resolved here rather than by
-    # widening the resolver, because widening it would let a two-letter data key
-    # anywhere in the base be mistaken for a language.
-    from .i18n import lang as _lang
-    return core._localized(hit, _lang()) if hit else None
+    """Relay the source review-status token, not a clinical certainty estimate."""
+    return 'ClinVar review_status: ' + review if review else None
 
 
 def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
@@ -2528,6 +2544,15 @@ def _acmg_coverage(cat: Dict[str, Any]) -> Dict[str, Any]:
     return out
 
 
+def _acmg_unverified(reason, meta, prov, source) -> Dict[str, Any]:
+    return {"status": "table_unverified", "version": meta.get("version"),
+            "hits": [], "reportable": [], "carriers": [], "filtered": [],
+            "needs_variant_class": [], "needs_phase": [],
+            "reason": reason, "table_provenance": prov,
+            "table_provenance_missing": prov is None, "source": str(source),
+            "message": _t("genome.acmg_table_unverified", reason=_t("genome.acmg_stale." + reason))}
+
+
 def acmg_sf_findings() -> Dict[str, Any]:
     """ACMG SF secondary findings: a short list of what, once found, calls for action.
 
@@ -2578,7 +2603,11 @@ def acmg_sf_findings() -> Dict[str, Any]:
                 "message": _t("genome.acmg_assembly_crossed_" + kind,
                               table=have, other=want)}
     try:
-        lines = f.read_text(encoding="utf-8").splitlines()
+        content = f.read_bytes()
+        refusal = _acmg.table_refusal(f, prov, vp, content)
+        if refusal:
+            return _acmg_unverified(refusal, meta, prov, f)
+        lines = content.decode("utf-8").splitlines()
     except Exception as e:
         return {"status": "error", "message": str(e), "hits": []}
     header = lines[0].split("\t") if lines else []
@@ -2640,6 +2669,9 @@ def acmg_sf_findings() -> Dict[str, Any]:
     carriers = [r for r in rows
                 if r.get("reportable") not in ("yes", "needs_variant_class", "needs_phase",
                                                "filtered")]
+    refusal = _acmg.table_refusal(f, prov, vp, content)
+    if refusal:
+        return _acmg_unverified(refusal, meta, prov, f)
     return {"status": "ok", "version": meta.get("version"), "published": meta.get("published"),
             # What the table says about itself: which builds it was matched in
             # and when. None for a table written before the sidecar existed —
@@ -2733,6 +2765,10 @@ def apoe_status():
     readings = _APOE_TABLE.get(k)
     base = {"rs429358": g1["genotype"], "rs7412": g2["genotype"],
             "source": g1.get("source"), "note": _t("genome.apoe_note")}
+    base["confidence"] = {"rs429358": g1.get("confidence"),
+                          "rs7412": g2.get("confidence")}
+    if any(g.get("confidence") not in ("called", "confirmed_ref") for g in (g1, g2)):
+        return dict(base, status="unconfirmed", message=_t("genome.apoe_unconfirmed"))
     if not readings:
         return dict(base, status="unexpected_genotypes",
                     message=_t("genome.apoe_unexpected", a=k[0], b=k[1]))

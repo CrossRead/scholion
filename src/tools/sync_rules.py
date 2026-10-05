@@ -90,6 +90,14 @@ MIRROR = (
     (ROOT / "share" / "skill" / "INSTRUCTION.md",
      ROOT / "agent-plugin" / "skills" / "scholion" / "INSTRUCTION.md"),
     (SOURCE, ROOT / "src" / "scholion" / "skill" / "ASSISTANT-RULES.md"),
+    # The plugin's SKILL.md sends a model to `reference/assistant-rules.md`
+    # «where the bundle put it», and until 0.6.0 the plugin folder had no such
+    # file: a link into nothing, in the one place a model reads first. The
+    # public bytes of the canon, laid out beside the skill (task 207).
+    (SOURCE, ROOT / "agent-plugin" / "skills" / "scholion" / "reference" / "assistant-rules.md"),
+    # A plugin directory reviews the folder it installs, not the repository
+    # around it, and a folder without its licence is held for a human (task 207).
+    (ROOT / "LICENSE", ROOT / "agent-plugin" / "LICENSE"),
 )
 HEADER = (
     "_Copied from `ASSISTANT-RULES.md` by `src/tools/sync_rules.py`. "

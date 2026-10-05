@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The full test run. Installs nothing into your interpreter: the standard library only.
-# Two steps borrow a tool through `uv`, into uv's own cache, and say so when they
-# cannot: the oldest promised Python, and the count of type errors.
+# Three steps borrow a tool through `uv`, into uv's own cache, and say so when they
+# cannot: the oldest promised Python, the linter, and the count of type errors.
 # The tests work on a synthetic fixture (tests/fixtures/profile) — they neither
 # read nor change anyone's real profile.
 set -euo pipefail
@@ -21,6 +21,10 @@ export SCHOLION_LANG=en
 # is not connected", which is the same for everybody.
 export SCHOLION_GENOME_VCF="$ROOT/tests/fixtures/no-such-file.vcf.gz"
 export SCHOLION_GENOME_DIR="$ROOT/tests/fixtures/no-genome"
+# The workstation is switched off the same way (task 192). On a clinician's
+# machine the real one names patients' containers, and a test that dropped the
+# profile pin would otherwise be reading whichever patient is active.
+export SCHOLION_WORKSTATION="$ROOT/tests/fixtures/no-workstation.json"
 # Guard against the usual "command + comment on one line" paste: in interactive
 # zsh a `#` does NOT start a comment, and the words after the hash arrive here as
 # arguments. unittest answers with its usage text, which does not look like "the
@@ -54,6 +58,21 @@ fi
 if [ -f src/tools/sync_manifest.py ]; then
   echo "▶ the host manifest matches the build"
   python3 src/tools/sync_manifest.py || exit 1
+fi
+
+# The plugin folder as Claude's own validator reads it — the check the catalogue
+# runs on submission, run here first. It needs the Claude command-line tool,
+# which this project neither installs nor requires; where it is absent the step
+# says so rather than passing in silence.
+if [ -d agent-plugin/.claude-plugin ]; then
+  if [ "${SCHOLION_SKIP_PLUGIN_VALIDATE:-}" = "1" ] || [ "${SCHOLION_SKIP_PLUGIN_VALIDATE:-}" = "true" ]; then
+    echo "▶ the Claude plugin validates — skipped by SCHOLION_SKIP_PLUGIN_VALIDATE"
+  elif command -v claude > /dev/null 2>&1; then
+    echo "▶ the Claude plugin validates (claude plugin validate --strict; SCHOLION_SKIP_PLUGIN_VALIDATE=1 skips)"
+    claude plugin validate --strict agent-plugin || exit 1
+  else
+    echo "▶ the Claude plugin validates — not checked: the claude command is not installed here"
+  fi
 fi
 
 if [ -f src/tools/sync_rules.py ]; then
@@ -100,6 +119,43 @@ else
   else
     echo "▶ the suite on Python $FLOOR, the oldest this package promises (uv fetches it; SCHOLION_SKIP_OLDEST=1 skips)"
     uv run --python "$FLOOR" --no-project -- python -m unittest discover -s tests -t . < /dev/null || exit 1
+  fi
+fi
+
+# The linter of the public matrix, run before a publication rather than after it.
+#
+# The same arrangement as the count of type errors below, for the same reason:
+# the job that runs `ruff` lives in the public repository and answers after a
+# tag, and 0.5.9 went out with two findings it would have named. Two tests hold
+# the classes that cost that release on the standard library alone; this step
+# holds the rest of the rule set, where `uv` can fetch the tool.
+#
+# Both the version and the command are read from the workflow, so that what is
+# checked here is what will be checked there.
+if [ -f .github/workflows/tests.yml ]; then
+  if [ "$#" -gt 0 ]; then
+    echo "▶ the linter — not run: this run was narrowed to $*"
+  elif [ "${SCHOLION_SKIP_LINT:-}" = "1" ] || [ "${SCHOLION_SKIP_LINT:-}" = "true" ]; then
+    echo "▶ the linter — skipped by SCHOLION_SKIP_LINT"
+  elif [ "${CI:-}" = "true" ]; then
+    echo "▶ the linter — not here: the matrix has a job of its own for it"
+  else
+    LINT_PIN="$(sed -n 's/.*"\(ruff==[0-9][0-9.]*\)".*/\1/p' .github/workflows/tests.yml | head -1)"
+    LINT_ARGS="$(sed -n 's/^ *run: ruff \(check [A-Za-z0-9_ ./-]*\)$/\1/p' .github/workflows/tests.yml | head -1)"
+    if [ -z "$LINT_PIN" ] || [ -z "$LINT_ARGS" ]; then
+      echo "⚠ the linter was NOT run: the workflow here pins no ruff version, or names no command for it."
+    elif ! command -v uv >/dev/null 2>&1; then
+      echo "⚠ the linter was NOT run: uv is not installed, and there is nothing else here to fetch"
+      echo "  $LINT_PIN with. Its findings are unknown until the matrix answers — after a tag."
+    elif ! uv run --no-project --with "$LINT_PIN" -- ruff --version >/dev/null 2>&1; then
+      echo "⚠ the linter was NOT run: uv could not provide $LINT_PIN — no network, and nothing"
+      echo "  cached. Its findings are unknown until the matrix answers — after a tag."
+    else
+      echo "▶ the linter finds nothing ($LINT_PIN $LINT_ARGS, fetched by uv; SCHOLION_SKIP_LINT=1 skips)"
+      # shellcheck disable=SC2086  # the arguments are words, read from the workflow
+      uv run --no-project --with "$LINT_PIN" -- ruff $LINT_ARGS --quiet || exit 1
+      echo "  ✓ zero findings"
+    fi
   fi
 fi
 

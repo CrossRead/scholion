@@ -2,9 +2,10 @@
   "_meta": {
     "purpose": "PUBLIC dictionary for recognising lab markers in the text of a report (per-language name substrings → the labs.json key, units, references). Feeds the auto-ingest of a folder of lab PDFs. Holds no patient data, portable.",
     "note": "labels.<lang> holds everything that is a language: names — lower-case substrings to look for in a row of the form; exclude — if one occurs, the row is skipped; require / next_require / form_require and their negatives — the same, scoped to the segment after the name, to the next row, and to the form as a whole; display — the name shown on screen. A language absent from a marker falls back to one that is present.\nLanguage-independent, and deliberately outside labels: unit (a UCUM code — the label for it comes from knowledge/units.json in the output language), units ({unit surface form: multiplier to the canonical unit} — at once a gate and a conversion, populated only where a conversion is genuinely needed), specimen (blood/serum/plasma/urine/stool/saliva), the reference bounds, direction, plausible, loinc.",
-    "updated": "2026-09-17",
+    "updated": "2026-10-05",
     "generated": "2026-07-26: the dictionary was expanded from 57 to 193 markers after the actual names on 176 forms.",
-    "markers": 415,
+    "markers": 473,
+    "recognition_proposals": "Entries marked proposed recognise names and preserve values without a norm claim until a person confirms the exact rule for their profile. unit_from_form takes an adjacent unit from the existing unit-label table, with no default or conversion; a later different unit is refused rather than mixed into a series. unitless is explicit for INR. No reference interval or standard identifier is supplied by a proposal.",
     "schema": 2,
     "languages": [
       "ru",
@@ -18,6 +19,727 @@
     "method": "The assay a series belongs to, for an element that laboratories measure two ways: `icp` (elemental analysis, ICP / ICP-MS, mass per litre) or `biochemistry` (clinical chemistry, molar). A series belongs to a method, not to a substance: a unit conversion is legitimate within a method and not across methods, so the ICP row of such an element accepts no molar unit and the two rows are separate keys. Declared, not inferred — `src/tools/check_method_mixing.py` reads it and refuses an element that mixes."
   },
   "markers": {
+      "ca_15_3": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "CA 15-3",
+            "names": [
+              "ca 15-3",
+              "ca-15-3",
+              "ca 153"
+            ]
+          },
+          "ru": {
+            "display": "CA 15-3",
+            "names": [
+              "са 15-3",
+              "са-15-3",
+              "са 153"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "ca_19_9": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "CA 19-9",
+            "names": [
+              "ca 19-9",
+              "ca-19-9",
+              "ca 199"
+            ]
+          },
+          "ru": {
+            "display": "CA 19-9",
+            "names": [
+              "са 19-9",
+              "са-19-9",
+              "са 199"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "ca_125": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "CA 125",
+            "names": [
+              "ca 125",
+              "ca-125"
+            ]
+          },
+          "ru": {
+            "display": "CA 125",
+            "names": [
+              "са 125",
+              "са-125"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "ca_72_4": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "CA 72-4",
+            "names": [
+              "ca 72-4",
+              "ca-72-4",
+              "ca 724"
+            ]
+          },
+          "ru": {
+            "display": "CA 72-4",
+            "names": [
+              "са 72-4",
+              "са-72-4",
+              "са 724"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "ca_242": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "CA 242",
+            "names": [
+              "ca 242",
+              "ca-242"
+            ]
+          },
+          "ru": {
+            "display": "CA 242",
+            "names": [
+              "са 242",
+              "са-242"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "he4": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "HE4",
+            "names": [
+              "he4",
+              "he-4"
+            ]
+          },
+          "ru": {
+            "display": "HE4",
+            "names": [
+              "he4",
+              "he-4"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "nse": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Neuron-specific enolase (NSE)",
+            "names": [
+              "neuron-specific enolase",
+              "neuron specific enolase",
+              "nse"
+            ]
+          },
+          "ru": {
+            "display": "Нейронспецифическая энолаза (NSE)",
+            "names": [
+              "нейронспецифическая энолаза",
+              "нейрон-специфическая энолаза",
+              "nse"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "s100": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "S-100 protein",
+            "names": [
+              "s-100 protein",
+              "protein s-100",
+              "s-100",
+              "s100"
+            ]
+          },
+          "ru": {
+            "display": "Белок S-100",
+            "names": [
+              "белок s-100",
+              "белок s100",
+              "s-100",
+              "s100"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "tbg": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Thyroxine-binding globulin",
+            "names": [
+              "thyroxine-binding globulin",
+              "thyroxine binding globulin",
+              "tbg"
+            ]
+          },
+          "ru": {
+            "display": "Тироксинсвязывающий глобулин",
+            "names": [
+              "тироксинсвязывающий глобулин",
+              "тироксин-связывающий глобулин",
+              "тсг"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "t4_total": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Total thyroxine (T4)",
+            "names": [
+              "total t4",
+              "t4 total",
+              "total thyroxine",
+              "thyroxine total"
+            ],
+            "exclude": [
+              "free"
+            ]
+          },
+          "ru": {
+            "display": "Тироксин (Т4) общий",
+            "names": [
+              "т4 общий",
+              "тироксин общий",
+              "общий тироксин"
+            ],
+            "exclude": [
+              "свобод"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "t3_reverse": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Reverse triiodothyronine (T3)",
+            "names": [
+              "reverse t3",
+              "reverse triiodothyronine",
+              "rt3"
+            ]
+          },
+          "ru": {
+            "display": "Трийодтиронин (Т3) реверсивный",
+            "names": [
+              "реверсивный т3",
+              "т3 реверсивный",
+              "реверсивный трийодтиронин"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "vitamin_a": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Vitamin A",
+            "names": [
+              "vitamin a",
+              "retinol"
+            ]
+          },
+          "ru": {
+            "display": "Витамин A",
+            "names": [
+              "витамин а",
+              "ретинол"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "vitamin_e": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Vitamin E",
+            "names": [
+              "vitamin e",
+              "alpha-tocopherol"
+            ]
+          },
+          "ru": {
+            "display": "Витамин E",
+            "names": [
+              "витамин е",
+              "альфа-токоферол",
+              "альфа токоферол"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "vitamin_d2": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "25-OH vitamin D2",
+            "names": [
+              "25-oh vitamin d2",
+              "25-hydroxyvitamin d2",
+              "vitamin d2",
+              "25-oh d2"
+            ]
+          },
+          "ru": {
+            "display": "25-ОН витамин D2",
+            "names": [
+              "25-он витамин d2",
+              "витамин d2",
+              "25-он d2",
+              "25-oh d2"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "acid_phosphatase": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Acid phosphatase",
+            "names": [
+              "acid phosphatase"
+            ]
+          },
+          "ru": {
+            "display": "Кислая фосфатаза",
+            "names": [
+              "кислая фосфатаза"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "bone_alp": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Bone-specific alkaline phosphatase (Ostase)",
+            "names": [
+              "bone-specific alkaline phosphatase",
+              "bone alkaline phosphatase",
+              "ostase"
+            ]
+          },
+          "ru": {
+            "display": "Костная щелочная фосфатаза (Остаза)",
+            "names": [
+              "костная щелочная фосфатаза",
+              "щелочная фосфатаза костная",
+              "остаза",
+              "ostase"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "osteoprotegerin": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Osteoprotegerin",
+            "names": [
+              "osteoprotegerin"
+            ]
+          },
+          "ru": {
+            "display": "Остеопротегерин",
+            "names": [
+              "остеопротегерин"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "vegf": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Vascular endothelial growth factor (VEGF)",
+            "names": [
+              "vascular endothelial growth factor",
+              "vegf"
+            ]
+          },
+          "ru": {
+            "display": "Фактор роста эндотелия сосудов (VEGF)",
+            "names": [
+              "фактор роста эндотелия сосудов",
+              "сосудистый эндотелиальный фактор роста",
+              "vegf"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "prothrombin_time": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Prothrombin time",
+            "names": [
+              "prothrombin time",
+              "pt"
+            ]
+          },
+          "ru": {
+            "display": "Протромбиновое время",
+            "names": [
+              "протромбиновое время"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "prothrombin_index": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Prothrombin index",
+            "names": [
+              "prothrombin index"
+            ]
+          },
+          "ru": {
+            "display": "Протромбиновый индекс",
+            "names": [
+              "протромбиновый индекс",
+              "протромбин по квику",
+              "протромбин (по квику)",
+              "пти"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "inr": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "International normalised ratio (INR)",
+            "names": [
+              "international normalized ratio",
+              "international normalised ratio",
+              "inr"
+            ]
+          },
+          "ru": {
+            "display": "Международное нормализованное отношение (МНО)",
+            "names": [
+              "международное нормализованное отношение",
+              "мно"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10",
+        "unitless": true
+      },
+      "thrombin_time": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Thrombin time",
+            "names": [
+              "thrombin time"
+            ]
+          },
+          "ru": {
+            "display": "Тромбиновое время",
+            "names": [
+              "тромбиновое время"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "antithrombin_iii": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Antithrombin III",
+            "names": [
+              "antithrombin iii",
+              "antithrombin 3"
+            ]
+          },
+          "ru": {
+            "display": "Антитромбин III",
+            "names": [
+              "антитромбин iii",
+              "антитромбин 3"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "lupus_anticoagulant": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Lupus anticoagulant",
+            "names": [
+              "lupus anticoagulant"
+            ]
+          },
+          "ru": {
+            "display": "Волчаночный антикоагулянт",
+            "names": [
+              "волчаночный антикоагулянт"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "igg_total": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Total immunoglobulin G",
+            "names": [
+              "total immunoglobulin g",
+              "immunoglobulin g",
+              "total igg",
+              "igg total"
+            ],
+            "exclude": [
+              "antibod",
+              "subclass",
+              "igg1",
+              "igg2",
+              "igg3",
+              "igg4"
+            ]
+          },
+          "ru": {
+            "display": "Иммуноглобулин G общий",
+            "names": [
+              "иммуноглобулин g",
+              "иммуноглобулины g",
+              "иммуноглобулин класса g",
+              "igg общий"
+            ],
+            "exclude": [
+              "антител",
+              "подкласс",
+              "igg1",
+              "igg2",
+              "igg3",
+              "igg4"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "igm_total": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Total immunoglobulin M",
+            "names": [
+              "total immunoglobulin m",
+              "immunoglobulin m",
+              "total igm",
+              "igm total"
+            ],
+            "exclude": [
+              "antibod",
+              "subclass",
+              "igg1",
+              "igg2",
+              "igg3",
+              "igg4"
+            ]
+          },
+          "ru": {
+            "display": "Иммуноглобулин M общий",
+            "names": [
+              "иммуноглобулин m",
+              "иммуноглобулины m",
+              "иммуноглобулин класса m",
+              "igm общий"
+            ],
+            "exclude": [
+              "антител",
+              "подкласс",
+              "igg1",
+              "igg2",
+              "igg3",
+              "igg4"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "serotonin": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Serotonin",
+            "names": [
+              "serotonin"
+            ]
+          },
+          "ru": {
+            "display": "Серотонин",
+            "names": [
+              "серотонин"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "il6": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "Interleukin-6 (IL-6)",
+            "names": [
+              "interleukin-6",
+              "interleukin 6",
+              "il-6",
+              "il6"
+            ]
+          },
+          "ru": {
+            "display": "Интерлейкин-6",
+            "names": [
+              "интерлейкин-6",
+              "интерлейкин 6",
+              "ил-6"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "deoxycortisol_21": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "21-Deoxycortisol",
+            "names": [
+              "21-deoxycortisol"
+            ]
+          },
+          "ru": {
+            "display": "21-Дезоксикортизол",
+            "names": [
+              "21-дезоксикортизол",
+              "21-деоксикортизол"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "deoxycorticosterone_11": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "11-Deoxycorticosterone",
+            "names": [
+              "11-deoxycorticosterone"
+            ]
+          },
+          "ru": {
+            "display": "11-Дезоксикортикостерон",
+            "names": [
+              "11-дезоксикортикостерон",
+              "11-деоксикортикостерон"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
+      "vldl": {
+        "status": "proposed",
+        "unit_from_form": true,
+        "labels": {
+          "en": {
+            "display": "VLDL cholesterol",
+            "names": [
+              "vldl cholesterol",
+              "cholesterol vldl",
+              "vldl-c"
+            ]
+          },
+          "ru": {
+            "display": "Холестерин ЛПОНП",
+            "names": [
+              "холестерин лпонп",
+              "холестерин лпона",
+              "холестерин липопротеинов очень низкой плотности",
+              "лпонп"
+            ]
+          }
+        },
+        "recognition_source": "https://github.com/CrossRead/scholion/issues/10"
+      },
     "aa_aaa": {
       "unit": "umol/L",
       "labels": {
@@ -4805,12 +5527,16 @@
       "labels": {
         "ru": {
           "names": [
-            "фолликулостимулирующий гормон"
+            "фолликулостимулирующий гормон",
+            "фсг"
           ],
+          "exclude": ["антител", "рецептор"],
           "display": "Фолликулостимулирующий гормон (ФСГ)"
         },
         "en": {
-          "display": "Follicle-stimulating hormone (FSH)"
+          "display": "Follicle-stimulating hormone (FSH)",
+          "names": ["follicle-stimulating hormone", "fsh"],
+          "exclude": ["antibod", "receptor"]
         }
       },
       "ref_sex": "male",
@@ -10758,7 +11484,8 @@
           "display": "Т3 общий"
         },
         "en": {
-          "display": "Total T3"
+          "display": "Total T3",
+          "names": ["total t3", "t3 total", "total triiodothyronine"]
         }
       },
       "ref_sex": "any",

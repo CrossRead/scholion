@@ -24,6 +24,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from .. import core
+from ..conclusion_basis import conclusion_basis
 from ..i18n import t as _t
 from . import panel_form
 
@@ -79,13 +80,13 @@ def route_refusal(rule: Dict[str, Any], markers: Dict[str, Any]) -> Optional[str
     for text, openings in pairs:
         if not str(text).startswith(openings):
             return "phrasing_not_conditional"
-    rev = rule.get("review")
-    if not isinstance(rev, dict) or rev.get("by_role") not in ("panel_author", "clinician"):
-        return "no_review"
-    # Last on purpose: a rule below B still prints — as «adds nothing», with its
-    # own sentence as the reason — so everything above must hold for it too.
+    # Review is provenance, not a substitute for support or a release condition.
     if ev.get("level") not in ROUTE_LEVELS:
         return "level_below_b"
+    if conclusion_basis(rule)["status"] != "complete":
+        return "route_basis"
+    if conclusion_basis(rc)["status"] != "complete":
+        return "recheck_basis"
     return None
 
 
@@ -127,6 +128,21 @@ def _genotype_holds(dep: Optional[Dict[str, Any]], rows: List[Dict[str, Any]]) -
     return held
 
 
+def _unobserved_dependencies(dep: Optional[Dict[str, Any]], rows: List[Dict[str, Any]]) -> List[str]:
+    """An alternative dependency that this panel cannot assess, not a negative call."""
+    if not dep:
+        return []
+    missing = []
+    for field, row_field in (("genes", "gene"), ("positions", "rsid")):
+        for name in dep.get(field) or []:
+            observed = any(r.get(row_field) == name and r.get("read") is True and not r.get("presumed")
+                           and (r.get("unit") != "position" if field == "genes"
+                                else r.get("state") in ("het", "hom", "hemi", "absent")) for r in rows)
+            if not observed:
+                missing.append(name)
+    return sorted(set(missing))
+
+
 def _row(rule: Dict[str, Any], routes: Dict[str, Any], classes: Dict[str, Any],
          markers: List[str], held: List[str]) -> Dict[str, Any]:
     rc = rule["recheck"]
@@ -140,7 +156,9 @@ def _row(rule: Dict[str, Any], routes: Dict[str, Any], classes: Dict[str, Any],
         "on": markers,
         "positions": held,
         "evidence": rule["evidence"],
+        "conclusion_basis": conclusion_basis(rule),
         "recheck": {"marker": rc["marker"],
+                    "conclusion_basis": conclusion_basis(rc),
                     "marker_name": _marker_name(rc["marker"]),
                     "after_weeks": rc["after_weeks"],
                     "what_counts_as_change": panel_form.one_language(rc["what_counts_as_change"])},
@@ -158,8 +176,8 @@ def correction_routes_for(key: str, by_key: Dict[str, Any],
 
     `deviating` says whether this system has anything off at all: with nothing
     off there is no decision to answer, and the block does not appear. With
-    something off and no rule matching it, the block appears and says that the
-    genotype adds nothing — with the reason.
+    something off and no supported matching rule, the block says that this
+    build cannot interpret the choice, not that genetics has no effect.
     """
     data = routes_book()
     rules = [r for r in (data.get("rules") or []) if r.get("system") == key]
@@ -171,11 +189,14 @@ def correction_routes_for(key: str, by_key: Dict[str, Any],
     printed: List[Dict[str, Any]] = []
     refused: Dict[str, int] = {}
     quiet: List[Dict[str, Any]] = []
+    withheld: List[Dict[str, Any]] = []
+    unobserved: List[Dict[str, Any]] = []
     for rule in rules:
         why = route_refusal(rule, known)
-        if why and why != "level_below_b":
+        if why:
             refused[why] = refused.get(why, 0) + 1
-            continue
+            if why not in ("level_below_b", "route_basis", "recheck_basis"):
+                continue
         trigger = rule.get("trigger") or {}
         on = _deviating(trigger, by_key)
         if trigger.get("medications"):
@@ -185,33 +206,36 @@ def correction_routes_for(key: str, by_key: Dict[str, Any],
             continue
         held = _genotype_holds(rule.get("depends_on"), rows)
         if rule.get("depends_on") and not held:
+            missing = _unobserved_dependencies(rule["depends_on"], rows)
+            if missing:
+                ev = rule.get("evidence") or {}
+                unobserved.append({"key": rule["key"], "on": on, "dependencies": missing,
+                                   "evidence": {"level": ev.get("level"), "source": ev.get("source")},
+                                   "reason_code": "dependency_not_observed",
+                                   "reason": _t("system.routes.unobserved_reason")})
+            continue
+        if why:
+            ev = rule.get("evidence") or {}
+            withheld.append({"key": rule["key"], "on": on, "positions": held,
+                             "evidence": {"level": ev.get("level"), "source": ev.get("source")},
+                             "reason_code": why, "reason": _t("system.routes.withheld." + why)})
             continue
         row = _row(rule, routes, classes, on, held)
-        if why == "level_below_b":
-            # The statement's rule: at C, D and E the route is not printed —
-            # what is printed is «adds nothing», with the reason. The rule's own
-            # sentence is that reason, so the reader learns WHY the genotype is
-            # silent here instead of meeting a generic line.
-            row["says"] = "adds_nothing"
-            row["says_text"] = panel_form.one_language(classes.get("adds_nothing") or {})
-            row["because"] = _t("system.routes.below_b", level=str((rule.get("evidence") or {}).get("level") or "—"),
-                                because=row["because"])
-            row["route"], row["route_text"] = None, None
-            quiet.append(row)
-            continue
         (quiet if rule["says"] == "adds_nothing" else printed).append(row)
     groups = [{"says": c, "says_text": panel_form.one_language(classes.get(c) or {}),
                "rows": [r for r in printed if r["says"] == c]}
               for c in ROUTE_ORDER if any(r["says"] == c for r in printed)]
-    if not groups and not quiet and deviating:
+    if not groups and not quiet and not withheld and not unobserved and deviating:
         quiet.append({"key": "no_rule", "says": "adds_nothing",
-                      "says_text": panel_form.one_language(classes.get("adds_nothing") or {}),
+                      "says_text": _t("system.routes.unavailable"),
                       "because": _t("system.routes.no_rule"), "on": [], "positions": [],
                       "route": None, "route_text": None, "evidence": None, "recheck": None})
-    if not groups and not quiet:
+    if not groups and not quiet and not withheld and not unobserved:
         return {"status": "nothing_deviates", "groups": [], "adds_nothing": [],
+                "withheld": [], "unobserved": [],
                 "refused": {"total": sum(refused.values()), "by_reason": refused},
                 "head": _t("system.routes.head"), "caveat": _t("system.routes.caveat")}
     return {"status": "ok", "groups": groups, "adds_nothing": quiet,
+            "withheld": withheld, "unobserved": unobserved,
             "refused": {"total": sum(refused.values()), "by_reason": refused},
             "head": _t("system.routes.head"), "caveat": _t("system.routes.caveat")}

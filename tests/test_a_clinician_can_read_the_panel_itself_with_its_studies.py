@@ -43,11 +43,16 @@ class TestTheDescription(unittest.TestCase):
         for p in d["positions"]:
             for personal in ("state", "read", "read_why", "genotype", "value", "findings", "carrier"):
                 self.assertNotIn(personal, p, f"{p['rsid']} carries a person's field «{personal}»")
-        self.assertTrue(all(p["text"].get("het") for p in d["positions"]))
+        for p in d["positions"]:
+            if (p.get("conclusion_basis") or {}).get("status") == "incomplete":
+                self.assertEqual({}, p["text"])
+                self.assertTrue(p["conclusion_basis"]["reason"])
+            else:
+                self.assertTrue(p["text"].get("het"))
 
     def test_the_listing_and_the_refusal(self):
         listing = PC.panel_description()
-        self.assertEqual(sorted(CATALOGUE), sorted(s["key"] for s in listing["systems"]))
+        self.assertEqual(sorted([*CATALOGUE, "author_list"]), sorted(s["key"] for s in listing["systems"]))
         r = PC.panel_description("nope")
         self.assertEqual("unknown_system", r["status"])
         self.assertIn("lipids", r["systems"])
@@ -68,7 +73,7 @@ class TestThePageLinksToIt(unittest.TestCase):
 
     def test_the_radar_block_and_the_card_link_to_the_panel_page(self):
         html = (ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("async function viewPanel(key)", html)
+        self.assertIn("async function viewPanel(key,reading=null)", html)
         self.assertIn("/api/panel?key=", html)
         self.assertEqual(2, html.count('data-panel="${esc('), "the radar block and the card both open it")
         self.assertIn("closest('[data-panel]')", html)

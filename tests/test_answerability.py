@@ -113,21 +113,16 @@ class TestUnknownIsNotGreen(_Base):
         self.assertIn("pharmacogenetics", kinds,
                       "the verdict was raised, but nothing says the genotype is missing")
 
-    def test_a_determined_phenotype_still_gives_a_definite_answer(self):
-        """The reverse test, and the reason it is here.
-
-        A change after which the system refuses more often than it should is as
-        wrong as the state it replaced. A carrier of a CYP2C19 loss-of-function
-        allele on clopidogrel is a case where the catalogue has a real
-        recommendation, and it must come out as one.
-        """
+    def test_a_determined_phenotype_is_kept_without_inventing_the_indication(self):
+        """A valid reading does not establish the indication-specific table."""
         p = self.profile(genotypes=[{"gene": "CYP2C19", "rsid": "rs4244285",
                                      "genotype": "GA"}])
         r = support.run_json(["drug", "clopidogrel"], profile_dir=p)
         self.assertEqual(r.get("phenotype"), "IM")
-        self.assertEqual(r.get("level"), "high",
-                         "a real recommendation for a determined phenotype was lost")
-        self.assertFalse(r.get("guidance_gap"))
+        self.assertEqual(r.get("level"), "unknown")
+        self.assertTrue(r.get("guidance_gap"))
+        self.assertEqual("indication_unheld", r["guidance_applicability"]["status"])
+        self.assertTrue(r["markers_found"])
 
 
 class TestTheCatalogueSilenceIsNotAnAnswer(_Base):
@@ -258,8 +253,9 @@ class TestTheTableBelongsToTheDrug(_Base):
         self.assertNotEqual(
             ppi.get("recommendation"), clopidogrel.get("recommendation"),
             "the proton pump inhibitor is answered out of the clopidogrel table")
-        self.assertEqual(ppi.get("level"), "low",
-                         "the PPI's own table says the standard approach applies at IM")
+        self.assertEqual(ppi.get("level"), "unknown")
+        self.assertTrue(ppi.get("guidance_gap"))
+        self.assertEqual("drug_table_mismatch", ppi["guidance_applicability"]["status"])
 
 
 class TestAnEmptyBaselineSaysSo(_Base):

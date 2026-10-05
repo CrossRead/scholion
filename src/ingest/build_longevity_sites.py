@@ -19,6 +19,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))                      # src/ — for `scholion`
 from scholion import net                                       # noqa: E402
 
+
+def _load_json(path):
+    """A JSON file, read and closed. `json.load(open(...))` left the handle to the
+    garbage collector, and the suite printed a ResourceWarning per export file."""
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
 DEF_CATALOG = os.path.join(HERE, "..", "scholion", "knowledge", "longevitymap.json")
 CATALOG = sys.argv[1] if len(sys.argv) > 1 else DEF_CATALOG
 OUT_BED = sys.argv[2] if len(sys.argv) > 2 else "/tmp/longevity_sites.bed"
@@ -48,7 +55,7 @@ def _post(ids):
 
 
 def main():
-    cat = json.load(open(CATALOG, encoding="utf-8"))
+    cat = _load_json(CATALOG)
     V = cat["variants"]
     rsids = []
     for rs, m in V.items():
@@ -99,7 +106,8 @@ def main():
         for k in rows:
             c, p = k.split(":"); p = int(p)
             o.write(f"{c}\t{p-1}\t{p}\n")
-    json.dump(rsmap, open(OUT_MAP, "w"), ensure_ascii=False, indent=0)
+    with open(OUT_MAP, "w") as _fh:
+        json.dump(rsmap, _fh, ensure_ascii=False, indent=0)
     print(f"✓ resolved {len(rsmap)} positions out of {len(rsids)} rsIDs")
     print(f"BED: {OUT_BED}")
     print(f"rs↔pos map: {OUT_MAP}")

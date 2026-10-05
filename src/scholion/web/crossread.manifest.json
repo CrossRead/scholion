@@ -1,0 +1,28 @@
+{
+  "name": "Crossread",
+  "version": "1.1.0",
+  "sha256": "37d2a824e0c7c0b8cadd55cc4302df0065d716a725215ba8642a5a5ba8280768",
+  "license": "Apache-2.0",
+  "css": "crossread.css",
+  "runtime_dependencies": [],
+  "components": [
+    "btn",
+    "field",
+    "check",
+    "switch",
+    "badge",
+    "tag",
+    "card",
+    "stat",
+    "alert",
+    "source",
+    "table",
+    "tabs",
+    "segmented",
+    "avatar",
+    "progress",
+    "spinner",
+    "dialog",
+    "nav"
+  ]
+}

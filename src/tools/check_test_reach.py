@@ -147,6 +147,7 @@ SUITE_ENV = {
     "SCHOLION_LANG": "en",
     "SCHOLION_GENOME_VCF": str(ROOT / "tests" / "fixtures" / "no-such-file.vcf.gz"),
     "SCHOLION_GENOME_DIR": str(ROOT / "tests" / "fixtures" / "no-genome"),
+    "SCHOLION_WORKSTATION": str(ROOT / "tests" / "fixtures" / "no-workstation.json"),
 }
 
 # The recorder, as source, because it has to run in processes this one never
@@ -301,6 +302,10 @@ def measure(argv=None) -> dict:
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                               text=True, stdin=subprocess.DEVNULL)
         tail = proc.stdout.strip().splitlines()[-3:]
+        if proc.returncode:
+            # Tests may print after unittest's failure summary. The last three
+            # lines alone can hide the failing test and make this gate opaque.
+            print(proc.stdout, file=sys.stderr)
 
         merged = {}
         for f in dumps.glob("*.json"):

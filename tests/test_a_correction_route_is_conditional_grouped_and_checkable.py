@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import copy
 import unittest
+from unittest import mock
 
 import support  # noqa: F401
 from scholion import core, i18n
@@ -33,28 +34,43 @@ def _raw():
 def _rule():
     for r in _raw()["rules"]:
         if r["key"] == "arginine_through_citrulline":
-            return copy.deepcopy(r)
+            return _supported(r)
     raise AssertionError("the starting rule is gone")
+
+
+def _supported(rule):
+    """Synthetic support tests routing mechanics, not the real clinical claim."""
+    rule = copy.deepcopy(rule)
+    rule["mechanism"] = {"en": "Synthetic route mechanism", "ru": "Synthetic route mechanism"}
+    rule["recheck"].update(source="Synthetic PMID: 1", mechanism={
+        "en": "Synthetic recheck mechanism", "ru": "Synthetic recheck mechanism"})
+    return rule
+
+
+def _supported_book():
+    book = _raw()
+    book["rules"] = [_supported(r) for r in book["rules"]]
+    return book
 
 
 class TestTheShippedRulesPassTheirOwnGate(unittest.TestCase):
 
-    def test_every_shipped_rule_is_printable(self):
+    def test_shipped_rules_without_support_are_explicitly_refused(self):
         known = core.lab_markers()["markers"]
         for book in (_raw(), routes.routes_book()):
             refused = [(r.get("key"), routes.route_refusal(r, known)) for r in book["rules"]]
-            # A rule below B is the one refusal a shipped rule may carry: it is
-            # not printed as a route but as «adds nothing», with its own reason.
-            self.assertEqual([], [x for x in refused if x[1] and x[1] != "level_below_b"], refused)
+            self.assertEqual(11, len(refused))
+            self.assertTrue(all(why in ("route_basis", "level_below_b") for _, why in refused), refused)
 
-    def test_a_rule_below_b_that_matches_prints_as_adds_nothing_with_its_reason(self):
+    def test_a_rule_below_b_is_withheld_without_its_clinical_sentence(self):
         by_key = {"homocysteine": {"key": "homocysteine", "flag": "high"}}
         rows = [{"unit": "position", "rsid": "rs1801133", "gene": "MTHFR", "state": "hom", "read": True}]
         block = routes.correction_routes_for("amino_acids", by_key, rows, True)
-        quiet = [q for q in block["adds_nothing"] if q["key"] == "mthfr_folate_form"]
+        quiet = [q for q in block["withheld"] if q["key"] == "mthfr_folate_form"]
         self.assertEqual(1, len(quiet), block)
-        self.assertIn("C", quiet[0]["because"])
-        self.assertIsNone(quiet[0]["route"])
+        self.assertEqual("C", quiet[0]["evidence"]["level"])
+        for field in ("because", "route", "recheck"):
+            self.assertNotIn(field, quiet[0])
         self.assertEqual([], [g for g in block["groups"] if any(r["key"] == "mthfr_folate_form" for r in g["rows"])])
 
     def test_a_class_outside_the_five_and_the_fact_is_refused(self):
@@ -109,10 +125,12 @@ class TestTheShippedRulesPassTheirOwnGate(unittest.TestCase):
             block = routes.correction_routes_for("amino_acids", by_key, rows, True)
             self.assertEqual([], [g for g in block["groups"] if g["says"] in ("against", "favours")], block)
 
-    def test_a_rule_nobody_reviewed_is_refused(self):
+    def test_review_is_not_a_substitute_for_support_or_a_release_condition(self):
         known = core.lab_markers()["markers"]
         r = _rule(); r.pop("review")
-        self.assertEqual("no_review", routes.route_refusal(r, known))
+        self.assertIsNone(routes.route_refusal(r, known))
+        r.pop("mechanism")
+        self.assertEqual("route_basis", routes.route_refusal(r, known))
 
     def test_no_rule_carries_a_dose_or_a_brand(self):
         """Not a style rule: a dose is the line between material and a prescription."""
@@ -129,7 +147,8 @@ class TestTheShippedRulesPassTheirOwnGate(unittest.TestCase):
 class TestTheBlockAnswersADecisionItDidNotMake(unittest.TestCase):
 
     def _block(self, by_key, rows, deviating=True):
-        return routes.correction_routes_for("amino_acids", by_key, rows, deviating)
+        with mock.patch.object(routes, "routes_book", return_value=_supported_book()):
+            return routes.correction_routes_for("amino_acids", by_key, rows, deviating)
 
     def test_a_deviation_with_no_matching_rule_says_the_genotype_adds_nothing(self):
         block = self._block({}, [], True)
@@ -192,7 +211,8 @@ class TestThePrintedReportCarriesTheBlock(unittest.TestCase):
     def _block(self):
         by_key = {"aa_lysine": {"key": "aa_lysine", "flag": "low"}}
         rows = [{"unit": "gene", "gene": "SLC7A9", "carrier": True, "read": True}]
-        return routes.correction_routes_for("amino_acids", by_key, rows, True)
+        with mock.patch.object(routes, "routes_book", return_value=_supported_book()):
+            return routes.correction_routes_for("amino_acids", by_key, rows, True)
 
     def test_the_lines_carry_the_route_the_recheck_and_the_source(self):
         from scholion import format as fmt
@@ -216,7 +236,8 @@ class TestThePrintedReportCarriesTheBlock(unittest.TestCase):
             self.skipTest("the transsulfuration position is not in this build")
         printed = fmt.system_report(SP.system("amino_acids", "clinician"))
         self.assertIn("link:", printed)
-        self.assertIn("intake route:", printed)
+        self.assertIn("Intake route: No interpretation", printed)
+        self.assertIsNone(rows[0]["route"])
 
 
 if __name__ == "__main__":

@@ -162,7 +162,11 @@ class TestTheShippedPanelPassesAndSaysItInBothLanguages(unittest.TestCase):
             with self.subTest(row=(key, p.get("rsid"))):
                 self.assertNotIn("signed_by", p)
                 self.assertRegex(p.get("submitter") or "", G.BATCH)
-                self.assertIn((p.get("review") or {}).get("by_role"), G.REVIEWERS)
+                if p.get("review"):
+                    self.assertIn(p["review"].get("by_role"), G.REVIEWERS)
+                else:
+                    self.assertTrue(p.get("note_on_review"), "an unsigned revision must say so")
+                    self.assertEqual("open", G.review_state(p))
 
 
 if __name__ == "__main__":

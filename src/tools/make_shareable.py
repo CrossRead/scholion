@@ -587,7 +587,7 @@ def build(repo: Path, out: Path) -> Path:
     # imports the tool and nothing loads it by path, so neither gate above could
     # have found it; `tests/test_a_workflow_runs_only_what_the_package_carries.py`
     # now reads the workflows themselves.
-    for _name in ("check_vendor.py", "check_coverage.py", "coverage_baseline.json",
+    for _name in ("scope_pico.py", "check_vendor.py", "check_coverage.py", "coverage_baseline.json",
                   "check_test_reach.py", "test_reach_baseline.json",
                   "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
                   "check_quiet_excepts.py", "test_the_artefact.sh",
@@ -845,7 +845,7 @@ def build(repo: Path, out: Path) -> Path:
         "# Scholion — the skill on its own\n\n"
         "`SKILL.md` is the full instruction for a language model: what the tool can do,\n"
         "which commands to call, and the rules the model must follow. The safety rules\n"
-        "in `ASSISTANT-RULES.md` take precedence over everything else it is told.\n\n"
+        "in `ASSISTANT-RULES.md` come first among Scholion's own documents.\n\n"
         "The model works through the command line — it asks you to run a command and\n"
         "reads the output. It gets no access to your machine.\n\n"
         "`LOADING-DATA.md` describes the profile file formats, so the model can tell you\n"
@@ -971,7 +971,7 @@ def _shipped_tests_can_import(repo: Path, shared: Path) -> None:
 # disappear but stays from the previous version and looks like the real one.
 _MIRRORED = ("VERSION", "CHANGELOG.md", "LICENSE", "LICENSE-DATA", "NOTICE",
              "ATTRIBUTION.md", "DISCLAIMER.md", "CONTRIBUTING.md",
-             "SECURITY.md", "CITATION.cff", "THREAT_MODEL.md")
+             "SECURITY.md", "CITATION.cff", "THREAT_MODEL.md", "PRIVACY.md")
 
 
 def _check_root_fresh(repo: Path, out: Path, shared: Path) -> None:

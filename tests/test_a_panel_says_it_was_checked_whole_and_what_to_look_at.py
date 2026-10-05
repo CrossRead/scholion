@@ -46,7 +46,11 @@ class TestEveryPositionIsAState(unittest.TestCase):
                           "read_state", "presumed", "closes_text", "depth_note",
                           # task 199 G/H: the group a position belongs to, and
                           # the clinician's own note from the profile
-                          "local_note", "group"},
+                          "local_note", "author_note", "group",
+                          # 0.6.0 (U2): the passport of a hypothesis below B, and
+                          # the mark of a value with no statement at E
+                          "passport", "value_only", "mechanism", "source", "conclusion_basis", "subclaim_basis",
+                          "decision_route"},
                              set(p), p)
             self.assertIn(p["state"], ("het", "hom", "absent", "unread", "risk_allele_not_declared", None))
             if p["expect"]:
@@ -103,7 +107,10 @@ class TestThePageDrawsThePanelFromTheStates(unittest.TestCase):
         # and keeps every position's card under «More».
         self.assertIn("more+=genTableHtml(gen,card,card.register);", html,
                       "the radar block draws the genetic table, folded (task 200, owner 17.09.2026)")
-        self.assertIn("h+=genSummaryHtml(gen,card);", html, "and says what was found above it")
+        # Task 217, stage 0: the summary moved inside the block's fold with the
+        # rest — the block leads with its verdict, and the radar page went from
+        # twelve screens to under four.
+        self.assertIn("body+=genSummaryHtml(gen,card);", html, "and says what was found, inside the fold")
         self.assertIn("b+=genTableHtml(gen,r,r.register);", html,
                       "and so does the card page, in its register")
         self.assertNotIn("panel.map(x=>`<div class=\"row-l\">${systemGeneRow(x,'patient')}</div>`)", html,

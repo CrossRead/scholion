@@ -90,6 +90,24 @@ def single_pair(alleles: List[str]) -> Tuple[str, str] | None:
     return None
 
 
+def _valid_curated_repeat(e: Dict[str, Any]) -> bool:
+    """Only an explicit anchored window and two labelled alleles, not any indel."""
+    spec = e.get("repeat_call")
+    if not isinstance(spec, dict) or e.get("alleles_observed"):
+        return False
+    window, labels = spec.get("reference"), spec.get("alleles")
+    ref, alt = e.get("ref"), e.get("alt")
+    if not all(isinstance(x, str) and x and not set(x) - BASES for x in (window, ref, alt)):
+        return False
+    if (not isinstance(labels, dict) or len(labels) != 2 or not window.startswith(ref)
+            or len(ref) == len(alt) or ref[0] != alt[0]):
+        return False
+    altered = alt + window[len(ref):]
+    return (altered != window and set(labels) == {window, altered}
+            and all(isinstance(v, str) and v for v in labels.values())
+            and len(set(labels.values())) == 2)
+
+
 def invariant_problems(cat: Dict[str, Any]) -> List[str]:
     """Every entry holds one nucleotide in `ref` and one in `alt`, or is named here."""
     out: List[str] = []
@@ -98,6 +116,8 @@ def invariant_problems(cat: Dict[str, Any]) -> List[str]:
             out.append(f"{rsid}: the entry is not a record")
             continue
         ref, alt = str(e.get("ref") or ""), str(e.get("alt") or "")
+        if _valid_curated_repeat(e):
+            continue
         if ref.upper() not in BASES:
             out.append(f"{rsid}: ref={e.get('ref')!r}")
             continue
@@ -137,6 +157,12 @@ def main() -> int:
     disagreed: List[str] = []
     multiallelic: List[str] = []
     for rsid in list(loci.keys()) + wanted:
+        if (loci.get(rsid) or {}).get("repeat_call"):
+            # Coordinates and reference window are a single curated witness.
+            # The SNP refresh cannot verify that window at a new coordinate.
+            print(f"  · {rsid}: curated repeat/window — not refreshed automatically")
+            skipped += 1
+            continue
         rec = fetch(rsid)
         time.sleep(0.2)  # polite towards Ensembl
         if not rec:

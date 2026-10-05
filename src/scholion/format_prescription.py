@@ -39,6 +39,12 @@ def drug_check(r: Dict[str, Any]) -> str:
         lines.append(_t("drug.driven_by", gene=r["driving_gene"]))
     lines.append("")
     lines.append(_t("drug.discuss", text=r["recommendation"]))
+    if (r.get("conclusion_basis") or {}).get("status") == "complete":
+        lines.append(_t("system.row.mechanism", text=r.get("mechanism") or ""))
+        lines.append(_t("decision.source", source=r.get("source") or ""))
+    qb = r.get("cpic_basis") or {}
+    if qb.get("status") == "incomplete":
+        lines.append(_t("drug.guidance.quote_withheld", reason=qb.get("reason") or ""))
     cp = r.get("cpic")
     if isinstance(cp, dict) and cp.get("recommendation"):
         # Quoted and attributed. The line above is this project's wording for the
@@ -52,6 +58,8 @@ def drug_check(r: Dict[str, Any]) -> str:
         if cp.get("implication"):
             lines.append("> ")
             lines.append(f"> _{cp['implication']}_")
+        lines.append(_t("system.row.mechanism", text=qb.get("mechanism") or ""))
+        lines.append(_t("decision.source", source=qb.get("source") or ""))
     if r.get("markers_found"):
         lines.append("\n" + _t("drug.markers_header"))
         for m in r["markers_found"]:
@@ -78,23 +86,38 @@ def drug_check(r: Dict[str, Any]) -> str:
 
 def _rx_safety_lines(r: Dict[str, Any]) -> List[str]:
     """Red flags from the person's own file — printed first, above every computed section."""
+    return caution_lines(r.get("safety_flags") or [])
+
+
+def caution_lines(flags: List[Dict[str, Any]]) -> List[str]:
+    """Red flags — the person's own, or a class against a genotype read — printed
+    FIRST wherever they appear: the prescription check, the regimen, the
+    overview. A flag rendered at the bottom of a long answer is a flag not read."""
     lines: List[str] = []
-    # 🔴 Red flags from the owner's own file — printed FIRST, above every computed
-    # section. A documented diagnosis of this patient outranks a rule inferred from a
-    # class, and a flag rendered at the bottom of a long answer is a flag not read.
-    for fl in (r.get("safety_flags") or []):
+    lower = [f for f in flags if f.get("origin") == "genotype" and f.get("level") in ("C", "D", "E")]
+    for fl in (f for f in flags if f not in lower):
         icon = "🔴" if fl.get("severity") == "red_flag" else "🟡"
-        lines.append(icon + " **" + _t("prescription.safety_h") + "**")
+        if fl.get("origin") == "genotype":
+            lines.append(icon + " **" + _t("conclusion.caution_header" if fl.get("interpretation_withheld")
+                                          else "prescription.genotype_h") + "**")
+            lines.append("- " + _t("prescription.genotype_line", drug=fl.get("drug") or "—",
+                                   gene=fl.get("gene") or "—", rsid=fl.get("rsid") or "—",
+                                   genotype=fl.get("genotype") or "—", level=fl.get("level") or "—"))
+        else:
+            lines.append(icon + " **" + _t("prescription.safety_h") + "**")
         if fl.get("factor"):
             lines.append("- " + _t("prescription.safety_factor", text=fl["factor"]))
         for key, field in (("prescription.safety_why", "why_it_matters"),
                            ("prescription.safety_pro", "what_is_known_in_favour"),
                            ("prescription.safety_unknown", "uncertainty"),
                            ("prescription.safety_action", "action"),
+                           ("system.row.mechanism", "mechanism"),
                            ("prescription.safety_source", "source")):
             if fl.get(field):
                 lines.append("- " + _t(key, text=fl[field]))
         lines.append("")
+    if lower:
+        lines.append(_t("conclusion.caution_withheld_count", n=len(lower)))
     return lines
 
 
@@ -104,6 +127,14 @@ def _rx_genome_lines(r: Dict[str, Any]) -> List[str]:
     # 🧬 The patient's genome
     lines.append("**🧬 " + _t("prescription.genome_header") + "**")
     lines += _context_lines(r.get("genetic_context") or {})
+    pg = r.get("pharmacogenetics") or {}
+    if (pg.get("conclusion_basis") or {}).get("status") == "complete":
+        lines += [_t("drug.discuss", text=pg.get("recommendation") or ""),
+                  _t("system.row.mechanism", text=pg.get("mechanism") or ""),
+                  _t("decision.source", source=pg.get("source") or "")]
+    qb = pg.get("cpic_basis") or {}
+    if qb.get("status") == "incomplete":
+        lines.append(_t("drug.guidance.quote_withheld", reason=qb.get("reason") or ""))
     g = r.get("genome", {})
     genes = g.get("genes", [])
     if not genes:
@@ -159,6 +190,21 @@ def _rx_labs_lines(r: Dict[str, Any]) -> List[str]:
     # 🧪 The patient's labs
     lines.append("\n**🧪 " + _t("prescription.labs_header") + "**")
     lb = r.get("labs", {})
+    if lb.get("gaps"):
+        lines.append(_t("monitoring.observations"))
+        lines.extend(g["detail"] for g in lb["gaps"])
+    for p in lb.get("proposals", []):
+        if p.get("reason"):
+            lines.extend([_t("prescription.monitor", text=p["reason"]),
+                          _t("system.row.mechanism", text=p["conclusion_basis"]["mechanism"]),
+                          _t("decision.source", source=p["conclusion_basis"]["source"])])
+        for s in p.get("selections", []):
+            b = s["conclusion_basis"]
+            if b["status"] == "complete":
+                name = next((m["name"] for m in lb.get("markers", []) if m["key"] == s["key"]), s["key"])
+                lines.extend([_t("monitoring.selection_supported", name=name),
+                              _t("system.row.mechanism", text=b["mechanism"]),
+                              _t("decision.source", source=b["source"])])
     if not lb.get("markers"):
         lb_basis = lb.get("basis") or {}
         if not lb_basis.get("classes"):
@@ -166,10 +212,10 @@ def _rx_labs_lines(r: Dict[str, Any]) -> List[str]:
         elif not lb_basis.get("with_rules"):
             lines.append("_" + _t("prescription.labs_no_rule",
                                   classes=r.get("class_display", "—")) + "_")
-        else:
+        elif not lb.get("gaps"):
             lines.append(f"_{_t('prescription.no_lab_control')}_")
     else:
-        if lb.get("reason"):
+        if lb.get("reason") and not lb.get("proposals"):
             lines.append(_t("prescription.monitor", text=lb["reason"]) + ".")
         watch = lb.get("watch", [])
         if watch:
@@ -183,9 +229,12 @@ def _rx_labs_lines(r: Dict[str, Any]) -> List[str]:
                         lines.append("❗" + _t("prescription.threshold_crossed",
                                                name=c["name"], value=c["value"],
                                                threshold=f"{d['value']:g}", label=d["label"])
-                                     + f" {d.get('action','')} ["
+                                     + f" {d.get('action') or ''} ["
                                      + _t("prescription.source_ref",
                                           source=d.get("source", "")) + "]")
+                        for basis in (d.get('threshold_basis'), d.get('action_basis') if d.get('action') else None):
+                            if basis and basis.get('status') == 'complete':
+                                lines.append(f"  {basis['mechanism']} [{basis['source']}]")
         near = lb.get("near", [])
         if near:
             lines.append("🟡 " + _t("prescription.near_edge",
@@ -194,6 +243,8 @@ def _rx_labs_lines(r: Dict[str, Any]) -> List[str]:
             icon = _mark_icon(m) if m.get("present") else "⚪"
             val = (f"{m['value']} {m.get('unit','')}".strip() if m.get("present")
                    else _t("prescription.not_tested"))
+            if m.get("present") and m.get("date"):
+                val += " · " + str(m["date"])
             lines.append(f"{icon} {m['name']}: {val}{_near_suffix(m)}{_decision_suffix(m, context=True)}")
     return lines
 
@@ -209,10 +260,18 @@ def _rx_interactions_lines(r: Dict[str, Any]) -> List[str]:
         for it in hits:
             ic = _SEV_ICON.get(it.get("severity"), "•")
             lines.append(ic + " " + _t(
-                "prescription.interaction",
+                "prescription.interaction" if it.get("mechanism") else "prescription.interaction_unassessed",
                 meds=", ".join(it.get("with_meds", [])) or it.get("with_class", ""),
-                effect=it.get("effect", ""), mechanism=it.get("mechanism", ""))
-                + " " + _t("prescription.what_to_do", text=it.get("manage", "")))
+                effect=it.get("effect", ""), mechanism=it.get("mechanism") or "")
+                + (" " + _t("prescription.what_to_do", text=it["manage"]) if it.get("manage") else ""))
+            if (it.get("conclusion_basis") or {}).get("status") == "complete":
+                lines.append(_t("decision.source", source=it.get("source") or ""))
+            mb = it.get("management_basis") or {}
+            if mb.get("status") == "incomplete":
+                lines.append(_t("interactions.management_withheld", reason=mb.get("reason") or ""))
+            elif mb.get("status") == "complete":
+                lines += [_t("system.row.mechanism", text=mb.get("mechanism") or ""),
+                          _t("decision.source", source=mb.get("source") or "")]
     elif inter.get("status") in ("no_rules", "unknown_class"):
         lines.append(f"_{inter.get('message','')}_")
     else:
@@ -244,15 +303,18 @@ def _rx_dose_lines(r: Dict[str, Any]) -> List[str]:
     # ⚖ Dose and critical-claim context (concrete numbers, not 'in the general direction')
     dc = r.get("dose_context") or {}
     if dc.get("matched"):
+        from .clinical_claims import basis_lines
         lines.append("\n**⚖ " + _t("prescription.dose_header") + "**")
+        lines.extend(basis_lines(dc))
         nd, pd = dc.get("nutritional_dose"), dc.get("pharmacologic_dose")
         if nd or pd:
             lines.append(_t("prescription.doses", nutritional=nd or "—", pharmacologic=pd or "—"))
         for it in dc.get("items", []):
-            head = f"- {it.get('claim')}"
+            head = f"- {it.get('claim') or _t('clinical.withheld')}"
             if it.get("source"):
                 head += f" [{it['source']}]"
             lines.append(head)
+            lines.extend(basis_lines(it))
             if it.get("effect_size"):
                 lines.append("    • " + _t("prescription.effect", text=it["effect_size"]))
             if it.get("low_dose_note"):
@@ -271,7 +333,7 @@ def _rx_dose_lines(r: Dict[str, Any]) -> List[str]:
                         ref = ""
                     fl = {"high": "↑", "low": "↓",
                           "ok": _t("common.in_range")}.get(pt.get("flag"), "")
-                    tail = "; ".join(x for x in (ref, fl) if x)
+                    tail = "; ".join(str(x) for x in (ref, fl, pt.get('date'), pt.get('source')) if x)
                     v = f"{pt['name']} {pt['value']} {pt.get('unit','')}".strip()
                     comps.append(v + (f" ({tail})" if tail else ""))
                 else:
@@ -284,7 +346,8 @@ def _rx_dose_lines(r: Dict[str, Any]) -> List[str]:
         if dc.get("note"):
             lines.append(dc["note"])
         for alt in dc.get("alternatives") or []:
-            lines.append("- " + _t("prescription.alternative", name=alt.get("name")))
+            lines.append("- " + _t("prescription.alternative", name=alt.get("name") or _t('clinical.withheld')))
+            lines.extend(basis_lines(alt))
             for k, lbl_key in (("melatonin", "prescription.alt_melatonin"),
                                ("metabolic", "prescription.alt_metabolic"),
                                ("caveat", "prescription.alt_caveat")):
@@ -314,8 +377,9 @@ def prescription_check(r: Dict[str, Any]) -> str:
     ctx = r.get("genetic_context") or {}
     if ctx.get("verdict"):
         from .engine.decision import verdict_line as _verdict_line
-        lines.append("🧬 " + _verdict_line(ctx["verdict"]))
+        lines.append("🧬 **" + _t("prescription.genome_header") + ":** " + _verdict_line(ctx["verdict"]))
     lines.append("")
+    lines += _rx_safety_lines(r)
 
     # What could not be determined, printed BEFORE the findings rather than after.
     # The engine lifts the verdict off "low" for each of these; if the reason were
@@ -329,8 +393,6 @@ def prescription_check(r: Dict[str, Any]) -> str:
             lines.append("- " + (_t("prescription.unresolved_gene", detail=detail, gene=u["gene"])
                                  if u.get("gene") else detail))
         lines.append("")
-
-    lines += _rx_safety_lines(r)
 
     lines += _rx_genome_lines(r)
 
@@ -387,7 +449,7 @@ def medications_report(r: Dict[str, Any]) -> str:
     meds = r.get("medications") or []
     if not meds:
         return _t("medications.empty")
-    out = [_t("medications.header", n=len(meds))]
+    out = caution_lines(r.get("cautions") or []) + [_t("medications.header", n=len(meds))]
     for m in meds:
         line = (f"  · {m.get('name', '?')}" + _status_mark(m)
                 + _pgx_mark(m.get("name")))
@@ -405,4 +467,26 @@ def medications_report(r: Dict[str, Any]) -> str:
         out.append(line)
     out.append("")
     out.append(_t("medications.pgx_legend"))
+    treatment = r.get("treatment") or {}
+    if treatment:
+        out += ["", _t("treatment.title"), _t("treatment.scope")]
+        for event in treatment.get("events") or []:
+            if event["kind"] == "prescription_start":
+                out.append(f"  · {event['date']} — {_t('treatment.start')}: {event['name']}")
+        for event in treatment.get("undated") or []:
+            out.append(f"  · {event['name']} — {_t('treatment.undated')}")
+        out += control_lines(treatment.get("controls") or [])
     return "\n".join(out)
+
+
+def control_lines(controls: List[Dict[str, Any]]) -> List[str]:
+    """The same dated-plan facts in the regimen and the first screen."""
+    out = []
+    for control in controls:
+        out.append("  · " + _t("treatment.control", name=control.get("name") or "—",
+                              marker=control.get("marker") or "—",
+                              start=control.get("from") or "—", due=control.get("due") or "—")
+                   + " — " + _t("treatment.status." + control["status"]))
+        if control.get("plan_source"):
+            out.append("    " + _t("treatment.plan_source", source=control["plan_source"]))
+    return out

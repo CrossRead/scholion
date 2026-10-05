@@ -31,6 +31,8 @@ ARG = {"drug": "clopidogrel", "folder": "", "day": "2026-01-01",
 class TestEveryToolAnswers(unittest.TestCase):
 
     def setUp(self):
+        ouroboros_tools.unpin_session()
+        self.addCleanup(ouroboros_tools.unpin_session)
         root = Path(tempfile.mkdtemp(prefix="wire_"))
         self.addCleanup(shutil.rmtree, root, True)
         shutil.copytree(support.FIXTURE_PROFILE, root / "profile")

@@ -21,6 +21,13 @@ from scholion import prevalence
 
 
 class TestTheRuleIsActuallyImplemented(unittest.TestCase):
+    def test_an_unresolved_threshold_is_not_a_negative_comparison(self):
+        from unittest import mock
+        from scholion.engine import labs
+        with mock.patch.object(labs, "analyze_labs", return_value={"markers": [
+                {"decisions": [{"crossed": True}]}, {"decisions": [{"crossed": None}]}]}):
+            row = prevalence.lab_flags()["rows"][-1]
+        self.assertEqual((1, 1, 1), (row["hit"], row["looked_at"], row["unresolved"]))
     def test_the_sentence_in_the_readme_now_has_a_function(self):
         import pathlib
         readme = pathlib.Path("README.md").read_text(encoding="utf-8")

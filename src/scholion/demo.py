@@ -121,7 +121,11 @@ def build_labs() -> dict:
         ref_low=20, ref_high=50, direction="lower_worse")
 
     # Vitamin B12 on a vegetarian diet and its trace in the red blood cell.
-    add("b12", "Vitamin B12", "pg/mL",
+    # Keyed `vitamin_b12`, the dictionary's key. Until 0.6.0 it was `b12`, a key
+    # nothing else reads: the radar counted the measured 176 as never drawn
+    # («Vitamins» 60 on two of four instead of 65 on three), and the monitoring
+    # of B12 under omeprazole looked for a value that was sitting under another name.
+    add("vitamin_b12", "Vitamin B12", "pg/mL",
         [("2024-03", 260), ("2025-11", 208), ("2026-06", 176)], ref_low=197, ref_high=1500,
         direction="lower_worse",
         note="Demo: the reference range is very wide (197–1500), so «inside the range» says little — what matters here is the fall from 260 and the crossing of the lower bound.")
@@ -508,7 +512,7 @@ def build_goals() -> dict:
                    "text": "VO2max 46 at a resting pulse of 54 — reached before ferritin went below 20."}],
         "targets": [
             {"label": "Ferritin", "source": "lab:ferritin", "best": "34 (2023)", "target": "≥50"},
-            {"label": "Vitamin B12", "source": "lab:b12", "best": "260 (2024)", "target": "≥400"},
+            {"label": "Vitamin B12", "source": "lab:vitamin_b12", "best": "260 (2024)", "target": "≥400"},
             {"label": "TSH", "source": "lab:tsh", "best": "2.60 (2023)", "target": "≤2.5"},
             {"label": "VO2max", "source": "wear:VO2Max", "best": "46", "target": "≥46"},
         ],

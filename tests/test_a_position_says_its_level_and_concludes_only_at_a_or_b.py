@@ -26,7 +26,8 @@ CALLS = {f"rs{i}": {"genotype": "AG", "confidence": "called", "depth": 30} for i
 def _pos(i, level=None, **over):
     row = {"rsid": f"rs{i}", "gene": f"G{i}", "hgvs": f"NC_000001.11:g.{i}00A>G", "risk_allele": "G",
            "mode": "monogenic", "classification": "Strong", "moi": "AD", "text": {"het": TXT, "hom": TXT},
-           "source": "s", "review": {"by_role": "panel_author", "on": "2026-09-13"}}
+           "source": "Synthetic identifier PMID:1", "mechanism": TXT,
+           "review": {"by_role": "panel_author", "on": "2026-09-13"}}
     if level:
         row["evidence"] = {"level": level, "basis": "gencc", "source": "s"}
     row.update(over)

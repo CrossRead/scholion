@@ -56,12 +56,17 @@ class SexCase(unittest.TestCase):
 
 
 class TestThresholdsFollowTheRuleNotTheProduct(SexCase):
+    # These regressions measure the sex-dependent arithmetic, not the clinical
+    # applicability of a legacy catalogue label. Clinical output has a separate
+    # basis gate; the urgent supported warning is tested in threshold-basis tests.
+    def arithmetic(self, rows):
+        return [{**r, "crossed": r["catalogue_comparison"]["crossed"]} for r in rows]
 
     def alt(self, value):
-        return labs._decision_limits("alt", value)
+        return self.arithmetic(labs._decision_limits("alt", value))
 
     def ck(self, value):
-        return labs._decision_limits("ck", value, active_classes={"statin"})
+        return self.arithmetic(labs._decision_limits("ck", value, active_classes={"statin"}))
 
     def test_a_woman_with_alt_110_on_a_statin_gets_the_signal(self):
         self.set_sex("female")

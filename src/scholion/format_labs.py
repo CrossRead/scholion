@@ -68,6 +68,11 @@ def labs_report(r: Dict[str, Any]) -> str:
             line += " · " + _t("labs.ref_from_reference_base")
         if m.get("corridor_note"):
             line += "\n   " + m["corridor_note"]
+        if m.get("reference_table"):
+            line += "\n   " + _t("labs.printed_reference_table") + ": " + "; ".join(
+                r["raw"] for r in m["reference_table"])
+            if m.get("reference_grade"):
+                line += "\n   " + _t("labs.printed_grade", grade=m["reference_grade"])
         t = m.get("trend")
         if t:
             arrow = {"up": "↑", "down": "↓", "flat": "→"}[t["direction"]]
@@ -88,12 +93,12 @@ def labs_report(r: Dict[str, Any]) -> str:
             line += " · " + (_t("labs.owner_note", text=m["genome_link"])
                              if m.get("genome_link_kind") == "owner_note"
                              else _t("labs.genome_link", text=m["genome_link"]))
-        line += _target_suffix(m)
         line += _near_suffix(m) + _decision_suffix(m)
         for mn in (m.get("method_notes") or []):
             line += "\n   _" + mn + "_"
         if m.get("note"):
             line += f" · _{m['note']}_"
+        line += _target_suffix(m)
         lines.append(line)
     lines.append(f"\n_{r['disclaimer']}_")
     return "\n".join(lines)
@@ -187,8 +192,10 @@ def metrics_report(r: Dict[str, Any]) -> str:
         head.append(_t("metrics.height", value=prof["height_cm"]))
     if r.get("bmi"):
         b = r["bmi"]
-        head.append(_t("metrics.bmi", value=b["value"], category=b["category"]))
+        head.append(_t("metrics.bmi", value=b["value"], category=b.get("category") or _t('clinical.withheld')))
     lines = [_t("metrics.title") + (f" — {', '.join(head)}" if head else ""), ""]
+    from .clinical_claims import basis_lines
+    lines.extend(basis_lines(r.get('bmi') or {}))
     filled = [m for m in r.get("metrics", []) if m.get("value") is not None]
     if not filled:
         lines.append(f"_{_t('metrics.empty')} {_t('metrics.empty_hint')}_")
@@ -439,6 +446,9 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
         return f"⚠️ {r.get('error', '')}"
     L = [_t("ingest.labs_done", files=r.get("files_processed", 0),
             points=r.get("points_added", 0), skipped=r.get("skipped", 0))]
+    for item in r.get("unrecognised_rows") or []:
+        L.append(_t("ingest.unrecognised_rows", file=item["file"], n=item["count"]))
+        L.extend(f"    · {row['label']} [{row.get('unit') or ''}]" for row in item["rows"])
     missed = r.get("not_ingested") or []
     if missed:
         L += ["", _t("ingest.not_ingested_header", n=len(missed))]

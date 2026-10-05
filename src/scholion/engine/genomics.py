@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import lang as _lang, t as _t
+from ..clinical_claims import guard_fields
 from ._helpers import DISCLAIMER
 
 
@@ -560,8 +561,9 @@ def _penetrance_block() -> Dict[str, Any]:
     """Penetrance caveats — what a list of pathogenic findings misleads without."""
     from .. import genome
     pn = genome.penetrance_notes()
-    return {"one_line": pn.get("_meta", {}).get("one_line"),
-            "principles": [{"title": p.get("title"), "text": p.get("text"), "source": p.get("source")}
+    return {"one_line": _t('clinical.penetrance_limit'), 'output_kind': 'product_boundary',
+            "principles": [guard_fields(p, {"id": p.get('id'), "title": p.get("title"),
+                                            "text": p.get("text"), "source": p.get("source")}, ('title', 'text'))
                            for p in pn.get("principles", [])]}
 
 
@@ -939,7 +941,7 @@ def longevity_findings() -> Dict[str, Any]:
     if not data or not data.get("known"):
         return {"available": False, "disclaimer": DISCLAIMER(),
                 "message": _t("longevity.not_built")}
-    known = data.get("known", []) or []
+    known = [dict(k) for k in data.get("known", []) or []]
     # Same rule as the polygenic layer, and one more thing: the page was printing
     # `note`, and these rows carry none. Everything that says what a marker MEANS
     # — what the allele is, what the dose does, what it argues for — is in the
@@ -955,12 +957,7 @@ def longevity_findings() -> Dict[str, Any]:
     # Recomputed from the catalogue where the copies are known: a stored verdict
     # was decided by whatever the catalogue said on the day of the build.
     _dirs = core._read_knowledge("longevity_directions.json").get("directions") or {}
-    # The set of verdicts the CATALOGUE can produce. A stored file may carry
-    # anything — the demo profile holds «🟢 favourable», a sentence somebody
-    # rendered once — and composing a message key out of an unknown token is how
-    # ⟦longevity.verdict.🟢 favourable⟧ reaches a reader. Known token → the
-    # sentence, in both languages; unknown → whatever the file already says,
-    # which is at least prose.
+    # Legacy verdicts may leave only through the own-basis gate.
     _known_verdicts = {v for d in _dirs.values()
                        for v in (d.get("verdict_by_copies") or {}).values()}
     # `see_apoe` is written by our own builder for the two positions the ε-status
@@ -974,11 +971,21 @@ def longevity_findings() -> Dict[str, Any]:
         c = k.get("copies_favorable")
         tok = (by_copies.get(str(c)) if c is not None else None) or k.get("verdict")
         k["verdict_token"] = tok if tok in _known_verdicts else None
-        k["verdict_label"] = (_t("longevity.verdict." + tok) if tok in _known_verdicts
+        k["verdict_label"] = (_t("longevity.verdict." + str(tok)) if tok in _known_verdicts
                               else (k.get("verdict") or None))
         conf = src.get("confidence") or k.get("confidence")
-        k["confidence_label"] = (_t("web.longevity.confidence." + conf)
+        k["confidence_label"] = (_t("web.longevity.confidence." + str(conf))
                                  if conf in _known_conf else None)
+        # This exact pair is a pointer to the computed card, not an effect claim.
+        pointer = tok == 'see_apoe' and k.get('rsid') in ('rs429358', 'rs7412')
+        fields: tuple[str, ...] = ('label', 'action', 'zygosity_note', 'population_note', 'confidence_label', 'confidence', 'note')
+        if not pointer:
+            fields += ('verdict_label', 'verdict_token', 'verdict')
+        guarded = guard_fields({**src, 'verdict_label_basis': src.get('verdict_basis'),
+                                'verdict_token_basis': src.get('verdict_basis'),
+                                'population_note_basis': src.get('population_caveat_basis'),
+                                'confidence_label_basis': src.get('confidence_basis')}, k, fields)
+        k.clear(); k.update(guarded)
     sig = data.get("significant_by_gene", {}) or {}
     # the famous longevity genes come first
     famous = ["FOXO3", "APOE", "SIRT1", "SIRT3", "CETP", "IL6", "TP53", "KL", "IGF1R",
@@ -988,13 +995,13 @@ def longevity_findings() -> Dict[str, Any]:
     meta = data.get("_meta", {})
     return {
         "available": True,
-        "apoe": data.get("apoe"),
+        "apoe": guard_fields(data.get('apoe') or {}, data.get('apoe') or {}, ('note',)) if data.get('apoe') else None,
         "known": known,
         "significant_genes": sig_genes,
         "stats": {"genotyped": meta.get("genotyped"), "carriers": meta.get("carriers"),
                   "significant_carriers": meta.get("significant_carriers"),
                   "significant_genes": len(sig_genes)},
-        "disclaimer": (meta.get("disclaimer") or "") + " " + DISCLAIMER(),
+        "disclaimer": _t('clinical.genome_limit') + " " + DISCLAIMER(),
     }
 
 
@@ -1087,7 +1094,7 @@ def lipid_genetics() -> Dict[str, Any]:
         token = None
         if copies is not None and not unread:
             token = (d.get("verdict_by_copies") or {}).get(str(min(copies, 2)))
-        pcsk9.append({
+        pcsk9.append(guard_fields(d, {
             "rsid": rsid, "gene": "PCSK9",
             "label": core._localized(d.get("label") or {}, _lang()) or "",
             "genotype": None if unread else (gt or None),
@@ -1103,53 +1110,44 @@ def lipid_genetics() -> Dict[str, Any]:
             "action": core._localized(d.get("action") or {}, _lang()) or None,
             "pmids": d.get("pmids") or [],
             "status": "unread" if unread else ("read" if copies is not None else "no_data"),
-        })
+        }, ('label', 'verdict', 'verdict_token', 'population_note', 'action')))
 
-    # --- Lp(a): the measurement, and separately the genetic estimate ---------
-    lab = (core.labs().get("markers") or {}).get("lpa") or {}
-    pts = sorted([p for p in (lab.get("series") or []) if p.get("value") is not None],
-                 key=lambda p: str(p.get("date", "")))
+    # Use the same dated form corridor and censoring rules as the laboratory door.
+    from .labs import analyze_labs
+    rows = analyze_labs(['lpa']).get('markers') or []
     measured = None
-    if pts:
-        last = pts[-1]
-        hi = lab.get("ref_high")
-        measured = {"value": last["value"], "unit": lab.get("unit") or "",
-                    "date": str(last.get("date", "")), "ref_high": hi,
-                    "above": (hi is not None and float(last["value"]) > float(hi))}
+    if rows:
+        last = rows[0]
+        measured = {k: last.get(k) for k in ('value', 'unit', 'date', 'date_source', 'ref_high', 'ref_origin', 'flag')}
+        measured['censored'] = last['series'][-1].get('censored')
+        measured['above'] = last['flag'] == 'high' if last['flag'] in ('ok', 'high', 'low') and not measured['censored'] else None
     estimate = None
     for cat in (prs_findings().get("categories") or []):
         for tr in cat.get("traits") or []:
             if tr.get("pgs_id") == _LPA_PGS:
                 estimate = {"percentile": tr.get("percentile"), "pgs_id": tr.get("pgs_id"),
                             "quality": tr.get("quality_label"), "label": tr.get("label")}
-    lpa = {
+    lpa = guard_fields({}, {
         "measured": measured,
         "estimate": estimate,
         # Printed whenever an estimate is on screen without a measurement — which
         # is precisely when it is most likely to be read as one.
         "estimate_is_not_a_measurement": _t("lipidgen.lpa.estimate_limit"),
         "what_to_do": None if measured else _t("lipidgen.lpa.order_it"),
-    }
+    }, ('what_to_do',))
 
     read = [x for x in pcsk9 if x["status"] == "read"]
     carriers = [x for x in read if x["carrier"]]
     return {
         "status": "ok",
         "pcsk9": pcsk9,
-        "pcsk9_waiting": [{"rsid": r, "gene": "PCSK9",
-                           "why": core._localized(((core.longevity_directions().get("unresolved") or {})
-                                                   .get("variants") or {}).get(r, {}).get("why") or {},
-                                                  _lang())}
+        "pcsk9_waiting": [{"rsid": r, "gene": "PCSK9", 'output_kind': 'product_boundary',
+                           "why": _t('clinical.withheld')}
                           for r in _PCSK9_WAITING if r in loci],
         "lpa": lpa,
-        # Four facts, and until now three sentences. «The positions have not
-        # been read» is a statement about two rows of a file that IS being read;
-        # when no genome is being read at all, saying it sends the reader to look
-        # at their genome instead of at the folder, which is where the answer is.
-        "headline": (_t("lipidgen.headline.carrier") if carriers
-                     else (_t("lipidgen.headline.not_carrier") if read
-                           else (_t("lipidgen.headline.unread") if _genome_readable()
-                                 else _t("lipidgen.headline.no_genome")))),
-        "how_to_read": _t("lipidgen.how_to_read"),
+        # Catalogue counts are not personal risk estimates.
+        "headline": _t('clinical.lipid_counts', read=len(read), carriers=len(carriers)) if read else
+                    _t('lipidgen.headline.unread' if _genome_readable() else 'lipidgen.headline.no_genome'),
+        "how_to_read": _t('clinical.genome_limit'),
         "disclaimer": DISCLAIMER(),
     }

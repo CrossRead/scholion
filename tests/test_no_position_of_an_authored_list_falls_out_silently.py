@@ -86,9 +86,11 @@ class TestTheLedger(unittest.TestCase):
     def test_the_ledger_carries_nothing_but_identifiers(self):
         """rsID, gene, row, disposition and the product's own reason — no phrase, genotype or name
         from the author's file travels in the package through this ledger."""
-        allowed = {"row", "rsid", "gene", "disposition", "reason", "recorded_in", "task"}
+        allowed = {"row", "rsid", "gene", "disposition", "reason", "recorded_in", "task", "read_refusal"}
         extra = {k for _, lst in self.lists() for p in lst["positions"] for k in p} - allowed
         self.assertEqual(set(), extra)
+        self.assertTrue(all(p.get("read_refusal") in (None, "indel_unsupported")
+                            for _, lst in self.lists() for p in lst["positions"]))
 
     def test_the_older_waiting_list_agrees(self):
         """199 D recorded its own waiting list; where the two speak of one position, they agree."""

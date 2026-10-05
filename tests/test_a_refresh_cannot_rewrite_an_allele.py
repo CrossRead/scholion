@@ -150,6 +150,27 @@ class TestARefreshLeavesTheAllelesAlone(unittest.TestCase):
     def tearDown(self):
         self._td.cleanup()
 
+    def test_curated_repeat_coordinates_and_window_do_not_drift_on_snp_refresh(self):
+        from scholion import genome
+        loc = dict(genome.resolve_rsid("rs1799762", allow_network=False))
+        code, out = self._run({"loci": {"rs1799762": loc}},
+                              {"rs1799762": {**TWO, "pos": 1}})
+        self.assertEqual(0, code)
+        self.assertEqual(loc, out["loci"]["rs1799762"])
+
+    def test_repeat_metadata_cannot_exempt_an_arbitrary_invalid_allele(self):
+        import copy
+        from scholion import genome
+        loc = dict(genome.resolve_rsid("rs1799762", allow_network=False))
+        self.assertTrue(UC._valid_curated_repeat(loc))
+        for changed in ({"alt": "T/G"}, {"ref": "C"}, {"alleles_observed": ["T", "A", "G"]},
+                        {"repeat_call": {}}, {"repeat_call": {"reference": "TGGGGA", "alleles": {"TGGGGA": "4G"}}},
+                        {"repeat_call": {"reference": "TGGGGA", "alleles": {"TGGGGA": "4G", "TGGGGGA": "4G"}}}):
+            candidate = copy.deepcopy(loc)
+            candidate.update(changed)
+            self.assertFalse(UC._valid_curated_repeat(candidate), changed)
+            self.assertTrue(UC.invariant_problems({"loci": {"rs1": candidate}}), changed)
+
     def test_a_three_allele_answer_does_not_touch_a_single_letter_alt(self):
         cat = {"loci": {"rs1": {"gene": "G1", "chrom": "1", "pos": 100,
                                 "ref": "C", "alt": "T"}}}

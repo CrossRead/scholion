@@ -33,6 +33,69 @@ FIXTURE_PROFILE = Path(__file__).resolve().parent / "fixtures" / "profile"
 # shared predicate rather than a third bespoke guard.
 IN_SOURCE_REPO = (ROOT / "share").is_dir()
 
+# The workstation file names the patients of a clinician's machine (task 192).
+# `run_tests.sh` points it at a file that does not exist; the same default is
+# set here for a run started any other way, so no test reaches the real one.
+NO_WORKSTATION = Path(__file__).resolve().parent / "fixtures" / "no-workstation.json"
+os.environ.setdefault("SCHOLION_WORKSTATION", str(NO_WORKSTATION))
+
+
+def workstation(base: Path, people: dict, active: str | None = None) -> "callable":
+    """A workstation of its own under `base`: one container per entry of
+    `people` ({id: {file name: data}}), the first one active unless named.
+
+    The profile pin is lifted, because a named profile switches containers off,
+    and put back by the returned call along with everything else. The 0.5 data
+    directory is a folder under `base` too: on the owner's machine the real one
+    is the source tree, and `init --patient` would adopt it as container №1.
+    """
+    import json
+    from unittest import mock
+    from scholion import container, core
+    saved = {k: os.environ.get(k) for k in ("SCHOLION_PROFILE_DIR", "SCHOLION_REPO_DIR",
+                                            "SCHOLION_WORKSTATION")}
+    previous = os.environ.get("SCHOLION_PROFILE_DIR")
+    os.environ.pop("SCHOLION_PROFILE_DIR", None)
+    os.environ.pop("SCHOLION_REPO_DIR", None)
+    os.environ["SCHOLION_WORKSTATION"] = str(base / "workstation.json")
+    legacy = mock.patch.object(container, "legacy_dir", lambda: base / "legacy")
+    legacy.start()
+    (base / "legacy").mkdir(parents=True, exist_ok=True)
+    folders = {}
+    for cid, files in people.items():
+        folder = base / "patients" / cid
+        (folder / "profile").mkdir(parents=True, exist_ok=True)
+        for name, data in files.items():
+            (folder / "profile" / name).write_text(json.dumps(data, ensure_ascii=False),
+                                                  encoding="utf-8")
+        (folder / "container.json").write_text(json.dumps({"id": cid, "engine": "test"}),
+                                               encoding="utf-8")
+        folders[cid] = str(folder)
+    if people:
+        (base / "workstation.json").write_text(json.dumps({
+            "root": str(base / "patients"), "containers": folders,
+            "active": active or next(iter(people))}), encoding="utf-8")
+    core.reset_cache()
+
+    from scholion import ouroboros_tools
+    ouroboros_tools.unpin_session()
+
+    def restore():
+        legacy.stop()
+        container.for_one_command(None)
+        ouroboros_tools.unpin_session()
+        if previous is None:
+            os.environ.pop("SCHOLION_PROFILE_DIR", None)
+        else:
+            os.environ["SCHOLION_PROFILE_DIR"] = previous
+        for k in ("SCHOLION_REPO_DIR", "SCHOLION_WORKSTATION"):
+            if saved[k] is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = saved[k]
+        core.reset_cache()
+    return restore
+
 
 def pin_profile(path) -> "callable":
     """Point SCHOLION_PROFILE_DIR at `path` for an in-process test, and return the
@@ -218,6 +281,12 @@ ARGS_FOR = {
     # the command is covered on a copy by the door test and by
     # tests/test_one_file_one_person.py.
     "choose-genome": None,
+    # Switches the active container in the workstation file (task 192). Covered
+    # on a temporary workstation by tests/test_a_switch_never_answers_with_the_previous_person.py.
+    "use": None,
+    # Human-only lifecycle writes, tested on a temporary two-person workstation.
+    "export": None,
+    "erase": None,
     # Writes into the local dictionary. A smoke sweep must not author knowledge;
     # covered in full by tests/test_marker_proposals.py on a temporary data dir.
     # Reading it (no flags) is what the sweep exercises, so the entry is [] not None.

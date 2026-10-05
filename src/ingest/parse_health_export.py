@@ -135,5 +135,6 @@ print("\nWorkouts (type: year:count):")
 for t,y in sorted(res["Workouts"].items(),key=lambda x:-sum(x[1].values())):
     print(f"  {t}: "+" ".join(f"{a}:{b}" for a,b in y.items()))
 if OUT:
-    json.dump(res,open(OUT,"w",encoding="utf-8"),ensure_ascii=False,indent=1)
+    with open(OUT,"w",encoding="utf-8") as _fh:
+        json.dump(res, _fh, ensure_ascii=False,indent=1)
     print("\n[saved]",OUT)

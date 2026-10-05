@@ -6,7 +6,8 @@
   "match": "It fires on the occurrence of any of the names in the text of the patient's prescriptions (case-insensitively).",
   "note_nutraceutical_layer_20260813": "A nutraceutical layer has been added: classes for the items that were not in the cardio-diabetic frame (UDCA, soluble fibre, berberine, niacin, vitamin D, iodine, sources of B6, GH secretagogues, probiotics, inositol, lipoic acid). A CAVEAT ABOUT SUBSTRING MATCHING: 'niacin' is contained in 'niacinamide', and 'mk-7' (supplement_k2) is contained in 'mk-677' (ibutamoren) — when such items appear, write the name in medications.json explicitly, otherwise the class will be determined wrongly.",
   "note_word_matching_20260813": "Name matching has become word-wise (core.classify_drug): the pattern has to match a whole word, and for Cyrillic patterns up to three letters of inflection are allowed. The consequence: variants with a digit at the end have to be listed explicitly — «vitamin d» no longer catches «Vitamin D3», so both forms have been entered into the list.",
-  "source_tier": "curated_reference"
+  "source_tier": "curated_reference",
+  "note_0_6_0": "28.09.2026 (0.6.0, task 217 stage 1): oral iron, vitamin B12, combined oral contraceptives and vitamin C — the four common entries of a regimen that fell outside the prescription check, so their interactions, monitoring and genotype cautions were never asked."
  },
  "classes": {
   "testosterone_replacement": {
@@ -652,6 +653,100 @@
     "golden root",
     "arctic root",
     "shr-5"
+   ]
+  },
+  "iron_oral": {
+   "label": {
+    "en": "oral iron",
+    "ru": "препарат железа внутрь"
+   },
+   "names": [
+    "ferrous sulfate",
+    "ferrous sulphate",
+    "ferrous fumarate",
+    "ferrous gluconate",
+    "ferrous bisglycinate",
+    "iron bisglycinate",
+    "ferric polymaltose",
+    "iron polymaltose",
+    "сульфат железа",
+    "железа сульфат",
+    "сульфат железа ii",
+    "фумарат железа",
+    "глюконат железа",
+    "бисглицинат железа",
+    "железа гидроксид полимальтозат",
+    "сорбифер",
+    "тардиферон",
+    "ферретаб",
+    "мальтофер",
+    "феррум лек",
+    "актиферрин",
+    "гемофер"
+   ]
+  },
+  "vitamin_b12": {
+   "label": {
+    "en": "vitamin B12",
+    "ru": "витамин B12"
+   },
+   "names": [
+    "vitamin b12",
+    "витамин b12",
+    "витамин в12",
+    "cyanocobalamin",
+    "цианокобаламин",
+    "hydroxocobalamin",
+    "гидроксокобаламин",
+    "methylcobalamin",
+    "метилкобаламин",
+    "cobalamin",
+    "кобаламин"
+   ]
+  },
+  "combined_oral_contraceptive": {
+   "label": {
+    "en": "combined oral contraceptive",
+    "ru": "комбинированный оральный контрацептив"
+   },
+   "names": [
+    "combined oral contraceptive",
+    "combined hormonal contraceptive",
+    "комбинированный оральный контрацептив",
+    "комбинированный гормональный контрацептив",
+    "кок",
+    "ethinylestradiol",
+    "ethinyl estradiol",
+    "этинилэстрадиол",
+    "estradiol valerate dienogest",
+    "эстрадиола валерат диеногест",
+    "nomegestrol estradiol",
+    "номегэстрол эстрадиол",
+    "ярина",
+    "джес",
+    "регулон",
+    "новинет",
+    "линдинет",
+    "мидиана",
+    "белара",
+    "клайра",
+    "зоэли",
+    "жанин"
+   ]
+  },
+  "vitamin_c": {
+   "label": {
+    "en": "vitamin C",
+    "ru": "витамин C"
+   },
+   "names": [
+    "vitamin c",
+    "витамин c",
+    "витамин с",
+    "ascorbic acid",
+    "аскорбиновая кислота",
+    "ascorbate",
+    "аскорбат"
    ]
   }
  }

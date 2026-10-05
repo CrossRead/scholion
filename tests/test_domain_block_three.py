@@ -96,7 +96,7 @@ class TestPhenoAgeRefusesWrongUnitsInsteadOfMisreporting(unittest.TestCase):
         vals = {"albumin": (albumin, "g/L"), "creatinine": (70, "umol/L"),
                 "glucose": (5, "mmol/L"), "crp": (1, "mg/L"), "lymph": (30, "%"),
                 "mcv": (90, "fL"), "rdw": (13, "%"), "alp": (70, "U/L"), "wbc": (6, "10^9/L")}
-        (pd / "labs.json").write_text(json.dumps({"markers": {k: {"name": k, "unit": u, "series": [{"date": "2026-01", "value": v}]} for k, (v, u) in vals.items()}}), encoding="utf-8")
+        (pd / "labs.json").write_text(json.dumps({"markers": {k: {"name": k, "unit": u, "series": [{"date": "2026-01-15", "value": v}]} for k, (v, u) in vals.items()}}), encoding="utf-8")
         core.reset_cache()
         from scholion import phenoage
         r = phenoage.compute_panel("2026-01")

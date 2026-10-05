@@ -19,6 +19,7 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import core
@@ -63,6 +64,22 @@ class _InEnglish(unittest.TestCase):
         os.environ["SCHOLION_PROFILE_DIR"] = str(self.dir)
         os.environ["SCHOLION_LANG"] = "en"
         core.reset_cache()
+        # A synthetic basis lets this test exercise localisation of supported
+        # sentences; it is not an approval of the real catalogue's claims.
+        read = core._read_knowledge
+        def supported(name):
+            raw = read(name)
+            if name != 'longevity_directions.json':
+                return raw
+            raw = json.loads(json.dumps(raw))
+            for direction in raw['directions'].values():
+                for field in ('label', 'action', 'verdict', 'confidence', 'population_caveat', 'zygosity_note'):
+                    direction[field + '_basis'] = {'source': 'Synthetic PMID: 99999999',
+                        'mechanism': {'en': 'Synthetic support', 'ru': 'Синтетическое основание'}}
+            return raw
+        patcher = mock.patch.object(core, '_read_knowledge', side_effect=supported)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def tearDown(self):
         for k, v in self._env.items():
@@ -98,9 +115,11 @@ class TestTheCatalogueNamesThings(_InEnglish):
         self.assertTrue(known[RSID].get("action"))
         self.assertNotIn("ось", known[RSID]["action"])
 
-    def test_a_marker_the_catalogue_does_not_carry_keeps_what_it_had(self):
+    def test_an_uncatalogued_genotype_stays_but_its_unsupported_effect_is_withheld(self):
         known = {k["rsid"]: k for k in genomics.longevity_findings()["known"]}
-        self.assertEqual(known["rs00000000"]["label"], "Своё название")
+        self.assertIsNone(known['rs00000000']['label'])
+        self.assertEqual('A/A', known['rs00000000']['genotype'])
+        self.assertEqual('incomplete', known['rs00000000']['clinical_basis']['label']['status'])
 
     def test_the_verdict_is_recomputed_from_the_catalogue_not_from_the_file(self):
         """One copy of the FOXO3 favourable allele is `plus_partial` in the

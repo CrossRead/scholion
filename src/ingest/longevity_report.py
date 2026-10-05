@@ -16,6 +16,13 @@ import gzip, json, sys
 from collections import defaultdict
 from pathlib import Path
 
+
+def _load_json(path):
+    """A JSON file, read and closed. `json.load(open(...))` left the handle to the
+    garbage collector, and the suite printed a ResourceWarning per export file."""
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
 try:                                   # the sample identifier is not in the code
     from _sample import sample_id
 except ImportError:                     # launched from outside the script's folder
@@ -79,8 +86,8 @@ def load_genotypes(vcf, rsmap):
 
 
 def main():
-    rsmap = json.load(open(RSMAP, encoding="utf-8"))
-    cat = json.load(open(CATALOG, encoding="utf-8"))["variants"]
+    rsmap = _load_json(RSMAP)
+    cat = _load_json(CATALOG)["variants"]
     geno = load_genotypes(VCF, rsmap)
 
     sig = lambda m: any(a.lower() == "significant" for a in (m.get("associations") or []))
@@ -143,8 +150,9 @@ def main():
     L.append("\n---\n_A research layer. The direction of most associations is not encoded; "
              "consult the primary sources (PMID). Not a medical recommendation._\n")
 
-    open(OUT, "w", encoding="utf-8").write("\n".join(L))
+    with open(OUT, "w", encoding="utf-8") as _fh:
 
+        _fh.write("\n".join(L))
     # --- structured JSON alongside the md (for the application/engine) ---
     known_out = []
     for rs, (gene, fav, note) in KNOWN.items():
@@ -193,8 +201,8 @@ def main():
     }
     json_path = OUT[:-3] + ".json" if OUT.endswith(".md") else OUT + ".json"
     import json as _json
-    open(json_path, "w", encoding="utf-8").write(_json.dumps(data, ensure_ascii=False, indent=2))
-
+    with open(json_path, "w", encoding="utf-8") as _fh:
+        _fh.write(_json.dumps(data, ensure_ascii=False, indent=2))
     print(f"✓ {OUT}")
     print(f"✓ {json_path}")
     print(f"  genotyped {genotyped}, carrier at {len(carriers)}, significant-carrier {len(sig_carriers)}"

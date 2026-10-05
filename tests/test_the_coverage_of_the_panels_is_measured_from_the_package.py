@@ -44,7 +44,7 @@ CLINVAR_ROWS = [
 def _clinvar(dirpath: Path) -> str:
     p = dirpath / "clinvar.vcf.gz"
     with gzip.open(p, "wt", encoding="utf-8") as fh:
-        fh.write("##fileformat=VCFv4.2\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n")
+        fh.write("##fileformat=VCFv4.2\n##reference=GRCh38\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n")
         for chrom, pos, gi in CLINVAR_ROWS:
             fh.write(f"{chrom}\t{pos}\t.\tA\tG\t.\t.\tGENEINFO={gi};CLNSIG=x\n")
     return str(p)
@@ -81,6 +81,15 @@ class TestWhereAGeneIs(unittest.TestCase):
 
 class TestTheFractionsCountTheInterval(unittest.TestCase):
 
+    def test_samtools_failure_does_not_become_zero_coverage(self):
+        import io
+        import subprocess
+        process = mock.Mock(stdout=io.BytesIO(b""))
+        process.wait.return_value = 1
+        with mock.patch.object(coverage.subprocess, "Popen", return_value=process):
+            with self.assertRaises(subprocess.CalledProcessError):
+                coverage._depth("synthetic.bam", "chr1:1-10", 10)
+
     def test_a_stretch_no_read_covered_lowers_the_fraction(self):
         # Ten bases of interval, four of them read at 30×: the rest are not
         # missing from the answer, they are zeros.
@@ -96,7 +105,8 @@ class TestTheRun(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.dir.cleanup)
-        self.home = Path(self.dir.name)
+        self.home = Path(self.dir.name).resolve()
+        (self.home / "x.bam").write_bytes(b"synthetic alignment, native reader is stubbed")
         self.clinvar = _clinvar(self.home)
         self.env = mock.patch.dict(os.environ, {"SCHOLION_PROFILE_DIR": str(self.home)})
         self.env.start(); self.addCleanup(self.env.stop)
@@ -110,7 +120,7 @@ class TestTheRun(unittest.TestCase):
             mock.patch.object(coverage, "genes",
                               lambda: {"AAA": "PANEL", "BBB": "ACMG", "MT-TX": "PANEL"}),
             mock.patch("scholion.bamlite.reference_lengths",
-                       lambda bam: {"chr1": 250_000, "chrM": 16_569}),
+                       lambda bam: {"chr1": 248_956_422, "chrM": 16_569}),
             # A genome this profile could have read: without one the step does
             # not apply at all, which is its own rule and has its own test.
             mock.patch("scholion.genome.vcf_path", lambda: Path(self.home / "g.vcf.gz")),
@@ -149,6 +159,17 @@ class TestTheRun(unittest.TestCase):
         self.assertTrue(r["ok"])
         self.assertLess(len(self.seen) - before, 3,
                         "the genes already measured were measured again")
+
+    def test_a_changed_alignment_does_not_reuse_previous_progress(self):
+        calls = iter((False, True))
+        coverage.measure(run=self._run, stop=lambda: next(calls))
+        self.assertTrue((self.home / coverage.PART_NAME).exists())
+        (self.home / "x.bam").write_bytes(b"another synthetic alignment")
+        self.seen.clear()
+        result = coverage.measure(run=self._run)
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(3, len(self.seen))
+        self.assertTrue(list(self.home.glob(coverage.PART_NAME + ".stale-*")))
 
     def test_the_state_moves_from_missing_to_current(self):
         self.assertEqual("missing", coverage.state()["status"])

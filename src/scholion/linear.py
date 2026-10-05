@@ -51,8 +51,23 @@ import hashlib
 import json
 import os
 import threading
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+_HOST_READ: ContextVar[Optional[Dict[str, bool]]] = ContextVar("scholion_host_linear", default=None)
+
+
+@contextmanager
+def host_read(enabled: bool = True):
+    """A timed host may reuse a complete pass, but must not start one."""
+    state = {"refused": False}
+    token = _HOST_READ.set(state if enabled else None)
+    try:
+        yield state
+    finally:
+        _HOST_READ.reset(token)
 
 #: Above this, reading the whole file once stops being a wait and becomes a hang,
 #: and the honest answer is the one this package gave before the pass existed:
@@ -337,6 +352,10 @@ def snapshot(vcf: Optional[str]) -> Dict[str, Any]:
     cached = _lookup_cache(vcf)
     if cached:
         return cached
+    host = _HOST_READ.get()
+    if host is not None:
+        host["refused"] = True
+        raise Unreadable("host_linear", "Run scholion genome-status in a local terminal first, or index the VCF.")
     if not usable(vcf):
         return {}
     with _PASS_LOCK:

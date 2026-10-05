@@ -1,7 +1,7 @@
 """PhenoAge (Levine 2018) — biological age. THE SINGLE source of truth for the formula.
 
 ⚠️ THE RULE, wired into the code: compute from ONE panel ONLY.
-All 9 markers must come from ONE blood draw (one month in labs.json). Substituting a
+All 9 markers must come from ONE blood draw, not merely the same month. Substituting a
 value from an earlier panel when the fresh one lacks it is FORBIDDEN: the formula is
 sensitive to albumin and creatinine, and a substitution yields a pleasant but wrong
 number. A missing marker → the result «cannot be computed» + the list to order next time.
@@ -81,7 +81,7 @@ def formula(v: Dict[str, float]) -> Tuple[float, float]:
 
 
 def age_at(panel: str) -> Optional[float]:
-    """Age at the middle of the panel's month (birth_date / birth_year from metrics.json)."""
+    """Age at the draw; a legacy monthly stamp retains its midpoint approximation."""
     prof = core.metrics_json().get("profile", {})
     born = None
     bd = prof.get("birth_date")
@@ -96,27 +96,54 @@ def age_at(panel: str) -> Optional[float]:
     if born is None:
         return None
     y, m = (int(x) for x in panel.split("-")[:2])
-    return (datetime.date(y, m, 15) - born).days / 365.2425
+    draw = datetime.date.fromisoformat(panel[:10]) if len(panel) >= 10 else datetime.date(y, m, 15)
+    return (draw - born).days / 365.2425
+
+
+def _draws(panel: str) -> Dict[str, Dict[str, Tuple[str, float]]]:
+    """Keep distinct draw stamps separate, including two draws on one day."""
+    markers = core.labs().get("markers", {})
+    draws: Dict[str, Dict[str, Tuple[str, float]]] = {}
+    for marker in REQ:
+        for key in LABS_KEYS[marker]:
+            for point in markers.get(key, {}).get("series", []):
+                stamp = str(point.get("date") or "")
+                if stamp != panel and not (len(panel) == 7 and stamp[:7] == panel):
+                    continue
+                if len(stamp) >= 10:
+                    try:
+                        datetime.datetime.fromisoformat(stamp)
+                    except ValueError:
+                        continue
+                if point.get("date_source") in ("filename", "ordered"):
+                    continue
+                if point.get("censored") or isinstance(point.get("value"), bool):
+                    continue
+                try:
+                    value = float(point["value"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                if math.isfinite(value):
+                    draws.setdefault(stamp, {}).setdefault(marker, (key, value))
+    return draws
+
+
+def _selected_draw(panel: str) -> str:
+    draws = _draws(panel)
+    if not draws:
+        return panel
+    complete = [stamp for stamp, values in draws.items() if len(stamp) >= 10 and len(values) == len(REQ)]
+    return max(complete or draws)
 
 
 def collect_panel(panel: str) -> Tuple[Dict[str, float], List[str], Dict[str, str]]:
-    """Values STRICTLY for the month `panel`. -> (values, missing, used_labs_keys)."""
-    markers = core.labs().get("markers", {})
+    """Values for one draw selected within `panel`, never joined across draws."""
+    selected = _draws(panel).get(_selected_draw(panel), {})
     vals: Dict[str, float] = {}
     used: Dict[str, str] = {}
     missing: List[str] = []
     for m in REQ:
-        hit = None
-        for k in LABS_KEYS[m]:
-            spec = markers.get(k)
-            if not spec:
-                continue
-            for pt in spec.get("series", []):
-                if str(pt.get("date", ""))[:7] == panel:
-                    hit = (k, float(pt["value"]))
-                    break
-            if hit:
-                break
+        hit = selected.get(m)
         if hit:
             used[m], vals[m] = hit[0], hit[1]
         else:
@@ -140,7 +167,10 @@ def panels_overview() -> Dict[str, Any]:
     out = []
     for p in panel_months():
         vals, missing, _ = collect_panel(p)
-        out.append({"panel": p, "have": 9 - len(missing), "complete": not missing,
+        draw = _selected_draw(p)
+        out.append({"panel": p, "draw": draw, "have": 9 - len(missing),
+                    "complete": not missing and len(draw) >= 10,
+                    "reason": "draw_unknown" if len(draw) < 10 else None,
                     "missing": missing, "missing_ru": [marker_name(m) for m in missing]})
     return {"panels": out, "complete": [x["panel"] for x in out if x["complete"]],
             "rule": _t("phenoage.rule")}
@@ -152,9 +182,13 @@ def compute_panel(panel: str = "latest", track: bool = False,
     if not months:
         return {"ok": False, "error": "no_data", "message": _t("phenoage.no_data")}
     if panel in (None, "", "latest"):
-        complete = [p for p in months if not collect_panel(p)[1]]
+        complete = [p for p in months if not collect_panel(p)[1] and len(_selected_draw(p)) >= 10]
         panel = complete[-1] if complete else months[-1]
     vals, missing, used = collect_panel(panel)
+    draw = _selected_draw(panel)
+    if len(draw) < 10:
+        return {"ok": False, "error": "draw_unknown", "panel": panel,
+                "message": _t("phenoage.draw_unknown")}
     if missing:
         return {"ok": False, "error": "incomplete_panel", "panel": panel,
                 "have": {m: vals[m] for m in REQ if m in vals},
@@ -166,7 +200,7 @@ def compute_panel(panel: str = "latest", track: bool = False,
         return {"ok": False, "error": "implausible_units", "panel": panel,
                 "markers": bad, "markers_ru": [marker_name(m) for m in bad],
                 "message": _t("phenoage.implausible", markers=", ".join(marker_name(m) for m in bad))}
-    a = age if age is not None else age_at(panel)
+    a = age if age is not None else age_at(draw)
     if a is None:
         return {"ok": False, "error": "no_age", "panel": panel,
                 "message": _t("phenoage.no_age")}
@@ -178,9 +212,15 @@ def compute_panel(panel: str = "latest", track: bool = False,
         # have caught; refusing is the contract, a traceback is not (finding 32).
         return {"ok": False, "error": "compute_failed", "panel": panel,
                 "message": _t("phenoage.compute_failed")}
-    res = {"ok": True, "panel": panel, "age": round(a, 1), "phenoage": round(pa, 1),
+    res = {"ok": True, "panel": panel, "draw": draw,
+           "draw_precision": "month" if len(draw) == 7 else "time" if "T" in draw else "day",
+           "age": round(a, 1), "phenoage": round(pa, 1),
            "delta": round(pa - a, 1), "mortality_10y_pct": round(M * 100, 1),
-           "values": {m: vals[m] for m in REQ}, "labs_keys": used, "tracked": False}
+           "values": {m: vals[m] for m in REQ}, "labs_keys": used, "tracked": False,
+           'output_kind': 'population_model_calculation',
+           'model_basis': {'source': 'DOI: 10.18632/aging.101414 (Table 1, Supplement 1)',
+                           'method': 'phenoage.formula: nine laboratory inputs + chronological age; Gompertz transformation',
+                           'limitation': _t('clinical.model_limit')}}
     if track:
         res["tracked"] = _track(res)
     return res
@@ -206,7 +246,9 @@ def _track(res: Dict[str, Any]) -> bool:
 def format_panels(r: Dict[str, Any]) -> str:
     lines = [_t("phenoage.panels_title"), "", _t("phenoage.panels_lead"), ""]
     for p in r["panels"]:
-        if p["complete"]:
+        if p.get("reason") == "draw_unknown":
+            lines.append(f"{p['panel']}: " + _t("phenoage.draw_unknown"))
+        elif p["complete"]:
             lines.append(_t("phenoage.panel_complete", panel=p["panel"]))
         else:
             lines.append(_t("phenoage.panel_incomplete", panel=p["panel"], have=p["have"],
@@ -231,12 +273,14 @@ def format_result(r: Dict[str, Any]) -> str:
             return "\n".join(out)
         return f"⚠️ {r.get('message', r.get('error'))}"
     src = ", ".join(f"{marker_name(m)} {r['values'][m]:g} {unit(m)}" for m in REQ)
-    out = [_t("phenoage.title", panel=r["panel"]), "",
+    out = [_t("phenoage.title", panel=r.get("draw") or r["panel"]), "",
            _t("phenoage.chrono_age", value=f"{r['age']:.1f}"),
            _t("phenoage.value", value=f"{r['phenoage']:.1f}", delta=f"{r['delta']:+.1f}"),
            _t("phenoage.mortality", value=f"{r['mortality_10y_pct']:.1f}"), "",
            _t("phenoage.source", items=src), "",
-           _t("phenoage.caveat")]
+           _t("phenoage.caveat"), _t('clinical.model_limit')]
+    if r.get('model_basis'):
+        out += [r['model_basis']['source'], r['model_basis']['method']]
     if r.get("tracked"):
         out += ["", _t("phenoage.tracked")]
     return "\n".join(out)

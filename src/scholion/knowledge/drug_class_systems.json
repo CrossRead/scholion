@@ -32,6 +32,10 @@
     "anticoagulant_vka": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
     "doac": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
     "antiplatelet_p2y12": {"systems": ["cardio"], "source": "the class name; the panel carries the coagulation markers fibrinogen and D-dimer (13.09.2026)"},
-    "antiarrhythmic": {"systems": ["cardio"], "source": "the class name; the rhythm it acts on is the heart's (13.09.2026)"}
+    "antiarrhythmic": {"systems": ["cardio"], "source": "the class name; the rhythm it acts on is the heart's (13.09.2026)"},
+    "iron_oral": {"systems": ["micronutrients"], "source": "the class name; the panel carries ferritin and serum iron (28.09.2026)"},
+    "vitamin_b12": {"systems": ["micronutrients"], "source": "the class name; the panel carries the marker of the same name (28.09.2026)"},
+    "vitamin_c": {"systems": ["micronutrients"], "source": "the class name; a vitamin of the same panel (28.09.2026)"},
+    "combined_oral_contraceptive": {"systems": ["gonads"], "source": "the class name; a hormonal contraceptive acts on the reproductive axis (28.09.2026)"}
   }
 }

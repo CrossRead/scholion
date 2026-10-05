@@ -87,7 +87,7 @@ class TestAnAskedAboutPositionIsPrintedAndIsNotAFinding(unittest.TestCase):
                 self.assertNotEqual("finding", r["verdict"]["kind"])
                 text = fmt.system_report(r)
                 self.assertIn("one copy of the named allele", text)
-                self.assertNotIn("not determined", text.split("**4.")[0])
+                self.assertNotIn("not determined", fmt._system_gene_row(row, reg))
 
 
 if __name__ == "__main__":

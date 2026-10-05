@@ -134,15 +134,28 @@ def repo_dir() -> Path:
     From the source tree — its root (the previous behaviour). From an installed
     package — the user data directory.
     """
+    from . import container as _container
+    bound = _container.bound_path("repo")
+    if bound is not None:
+        return bound
     env = os.environ.get("SCHOLION_REPO_DIR")
     if env:
         return Path(env).expanduser().resolve()
-    src = _source_tree_root()
-    return src if src is not None else user_data_dir()
+    # 0.6.0: on a workstation with several people, the active container (or the
+    # one `--patient` named). Without a workstation this is None and the data
+    # directory is the one it always was (task 192, P1).
+    active = _container.active_dir()
+    if active is not None:
+        return active.resolve()
+    return _container.legacy_dir()
 
 
 def profile_dir() -> Path:
     """Profile directory. Overridden by SCHOLION_PROFILE_DIR."""
+    from . import container as _container
+    bound = _container.bound_path("profile")
+    if bound is not None:
+        return bound
     env = os.environ.get("SCHOLION_PROFILE_DIR")
     if env:
         return Path(env).expanduser().resolve()
@@ -550,6 +563,12 @@ def profile_write_lock():
     process would contend — the depth counter skips re-locking on reentry.
     """
     depth = getattr(_WRITE_DEPTH, "n", 0)
+    if not depth:
+        # The integrity gate (task 192), before anything is touched: a mutator
+        # may clear demonstration files or move a file aside before it writes,
+        # and those are writes into a container too.
+        from . import container as _container
+        _container.gate()
     with _WRITE_TLOCK:
         if depth:
             _WRITE_DEPTH.n = depth + 1
@@ -612,6 +631,8 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
     and failing because an ADDITIONAL guarantee is impossible is not acceptable.
     """
     path = Path(path)
+    from . import container as _container
+    _container.gate()
     # Everything written INTO the profile carries the version of the shape it was
     # written in. Stamped here rather than at each of the dozen call sites: a
     # number applied by half the writers is worse than none, because then its
@@ -627,10 +648,15 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
         # package's own test run on the owner's machine while the same code was
         # green on Linux, which is the third time this project has paid for that
         # difference.
-        if isinstance(data, dict) and path.parent.resolve() == profile_dir():
+        into_profile = path.parent.resolve() == profile_dir()
+        if isinstance(data, dict) and into_profile:
             data = stamp_profile_schema(data)
     except Exception:                                             # noqa: BLE001
-        pass          # quiet: an unstamped file reads as schema 1, the current one; the data is written whole
+        into_profile = False  # quiet: an unstamped file reads as schema 1, the current one; the data is written whole
+    if into_profile:
+        # The integrity gate (task 192): a write lands in the container that was
+        # read, or nowhere. Outside the try on purpose — a refusal must refuse.
+        _container.on_profile_write()
     path.parent.mkdir(parents=True, exist_ok=True)
     # The temporary name is unique per THREAD as well as per process. With the pid
     # alone, two server threads writing one file raced on one temporary name: the
@@ -652,6 +678,7 @@ def write_json(path: Path, data: Any, *, indent: int = 2) -> None:
             os.fsync(f.fileno())
         if keep is not None:
             os.chmod(tmp, keep)
+        _container.gate()
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -867,7 +894,7 @@ LOCALIZABLE_FIELDS = {
     # explanations and verdicts
     "note", "why", "reason", "action", "advice", "caveat", "comment",
     "interpretation", "recommendation", "evidence_note", "validity_note",
-    "meaning", "effect", "mechanism", "manage", "claim", "effect_size",
+    "meaning", "effect", "mechanism", "manage", "claim", "effect_size", "context",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
     "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",
     "would_close", "why_named_not_taken",
@@ -979,8 +1006,17 @@ STRUCTURAL_LANGUAGE_MAPS = {"labels", "guidance_gaps"}
 
 def _localize_tree(node: Any, lang: str) -> Any:
     if isinstance(node, dict):
-        out = {}
+        out: Dict[str, Any] = {}
         for k, v in node.items():
+            # Clinical mechanism support requires both translations; ordinary
+            # labels retain their fallback policy. Check before collapsing the map.
+            supported_prose = (k == "note" and node.get("level") in ("high", "moderate", "low", "unknown")) or (k == "why" and "gene_role_basis" in node)
+            supported_prose = supported_prose or (k == "effect" and "severity" in node) or (k == "manage" and "manage_basis" in node)
+            supported_prose = supported_prose or (k == "why" and "labs" in node)
+            if (k == "mechanism" or supported_prose) and isinstance(v, dict) and any(c in v for c in ("en", "ru")):
+                if not all(isinstance(v.get(c), str) and v[c].strip() for c in ("en", "ru")):
+                    out[k] = None
+                    continue
             if k in LOCALIZABLE_FIELDS:
                 # A curated field that holds a structure rather than a map —
                 # `text` keyed by genotype state — is walked into, so the
@@ -1284,6 +1320,13 @@ def lab_markers() -> Dict[str, Any]:
     markers = dict(base.get("markers") or {})
     for key, spec in (extra.get("markers") or {}).items():
         if key in markers:
+            # A shipped proposal can be confirmed for THIS profile only. No
+            # local names, units or bounds can shadow the shipped rule, and a
+            # changed rule needs a new confirmation after an upgrade.
+            raw = _read_knowledge_raw("lab_markers.json").get("markers", {}).get(key)
+            if (markers[key].get("status") == "proposed" and spec.get("status") == "confirmed"
+                    and spec.get("confirmed_rule") == raw):
+                markers[key] = {**markers[key], "status": "confirmed"}
             # A local entry never overwrites a shipped one. The shipped
             # dictionary is reviewed; silently shadowing it from a file nobody
             # reviewed is how a curated base stops being curated.
@@ -1509,6 +1552,18 @@ def marker_display(spec: Dict[str, Any], lang: str, default: str = "") -> str:
         if isinstance(other, dict) and other.get("display"):
             return other["display"]
     return default
+
+
+def marker_name(m: Dict[str, Any]) -> str:
+    """A measured marker's name in the reader's language: the dictionary's label
+    over the one kept in the profile, the rule `marker_catalog` already follows.
+    The kept name was captured off a form in that form's language; on the demo,
+    whose forms are English, the Russian radar read «TSH» and «Free T4 · Anti-TPO
+    antibodies» (found redrawing the radar, 27.09.2026). The profile's name
+    survives for a marker the dictionary does not know."""
+    from .i18n import lang as _lang
+    known = (lab_markers().get("markers") or {}).get(m.get("key")) or {}
+    return marker_display(known, _lang() or "en") or m.get("name") or m.get("key", "")
 
 
 def drug_lab_monitoring() -> Dict[str, Any]:
@@ -2238,7 +2293,7 @@ def profile_ancestry() -> Optional[str]:
     return ancestry()["value"]
 
 
-def age_from(prof: Dict[str, Any]) -> Optional[int]:
+def age_from(prof: Dict[str, Any], on: Optional[str] = None) -> Optional[int]:
     """Age in whole years, from whichever birth field a profile carries.
 
     Both are real. `birth_year` is what the command line and the page write;
@@ -2248,10 +2303,14 @@ def age_from(prof: Dict[str, Any]) -> Optional[int]:
     """
     from datetime import date
     bd = str((prof or {}).get("birth_date") or "").strip()
-    today = date.today()
+    try:
+        today = date.fromisoformat(on[:10]) if on is not None else date.today()
+    except (ValueError, TypeError):
+        return None
     if bd:
         try:
             y, m, d = (int(x) for x in bd.split("-")[:3])
+            date(y, m, d)
             return today.year - y - ((today.month, today.day) < (m, d))
         except (ValueError, TypeError):
             pass
@@ -2371,8 +2430,12 @@ def genome_gaps() -> List[str]:
     gaps = []
     for gene, meta in targets.items():
         if meta.get("needs_full_diplotype"):
-            gaps.append(gene)                       # e.g. CYP2D6 — PyPGx is needed even with a VCF
-        elif markers_for_gene(gene) or _genotyped_for(gene):
+            # e.g. CYP2D6 — PyPGx is needed even with a VCF; a diplotype the
+            # profile already records (a PGx report) is that answer (0.6.0).
+            if gene not in (pharmacogenomics().get("star_alleles") or {}):
+                gaps.append(gene)
+        elif (markers_for_gene(gene) or _genotyped_for(gene)
+              or gene.upper() in {v["gene"] for v in profile_genotypes().values()}):
             # «Already in the report» OR «the profile carries a genotype at one of
             # this gene's model positions». The second half was missing, and it
             # cost a whole class of test its independence: an entry in
@@ -2388,6 +2451,39 @@ def genome_gaps() -> List[str]:
         else:
             gaps.append(gene)
     return gaps
+
+
+def profile_genotypes() -> Dict[str, Dict[str, Any]]:
+    """Genotypes the profile already RECORDS, by rsID, with the file each came from.
+
+    Two files hold them: `pharmacogenomics.json` (`genotypes[]`, what a PGx
+    report or the owner wrote down) and `longevity_findings.json` (the APOE pair
+    and the curated positions). Until 0.6.0 the system panels read positions
+    only out of a VCF, so on a profile without one F5, CYP2C19, MTHFR and APOE
+    printed «not read» on the radar while the same page showed them two tabs
+    away (the interface review of 25.09.2026). A genotype written in the
+    profile is a reading; it says where it came from, and a VCF that reads the
+    position wins over it.
+    """
+    out: Dict[str, Dict[str, Any]] = {}
+
+    def put(rsid, genotype, gene, source):
+        g = str(genotype or "").strip()
+        r = str(rsid or "").strip()
+        if r.startswith("rs") and g and r not in out:
+            out[r] = {"genotype": g, "gene": str(gene or "").upper(), "source": source}
+
+    for g in pharmacogenomics().get("genotypes") or []:
+        if isinstance(g, dict):
+            put(g.get("rsid"), g.get("genotype"), g.get("gene"), "pharmacogenomics.json")
+    lf = read_profile_json(profile_dir() / "longevity_findings.json")
+    apoe: Dict[str, Any] = lf["apoe"] if isinstance(lf.get("apoe"), dict) else {}
+    for rs in ("rs429358", "rs7412"):
+        put(rs, apoe.get(rs), "APOE", "longevity_findings.json")
+    for k in lf.get("known") or []:
+        if isinstance(k, dict):
+            put(k.get("rsid"), k.get("genotype"), k.get("gene"), "longevity_findings.json")
+    return out
 
 
 def markers_for_gene(gene: str) -> List[Dict[str, str]]:

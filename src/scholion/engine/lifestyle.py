@@ -14,6 +14,7 @@ from ._helpers import _recent, _brief_num, DISCLAIMER
 from .labs import _latest, _flag_value, analyze_labs, suggest_tests
 from .goals import goal_dashboard
 from .pgx import check_drug_gene
+from .class_genotype import regimen_cautions as _regimen_cautions
 
 
 # "watch" drugs for the second look (clinically frequent + relevant to the profile).
@@ -205,7 +206,8 @@ def lifestyle() -> Dict[str, Any]:
             # defect: the arrow was drawn from the noise and read as the person.
             up = rec["direction"] == "up"
             trend_good = up if d == "higher_better" else (not up)
-        return {"key": key, "label": info.get("label", key), "unit": info.get("unit", ""),
+        from ..clinical_claims import guard_fields
+        return guard_fields(info, {"key": key, "label": info.get("label", key), "unit": info.get("unit", ""),
                 "comparable_from": since,
                 "series_full": pts_all if since else None,
                 "direction": d, "group": info.get("group", "activity"), "why": info.get("why", ""),
@@ -214,11 +216,10 @@ def lifestyle() -> Dict[str, Any]:
                 "first": round(first_sm, 1), "first_date": pts[0]["date"],
                 "overall_delta": round(latest_sm - first_sm, 2),
                 "improving": improving, "trend_good": trend_good, "status": st, "score": score,
-                "trend": rec, "series": pts, "smooth": smooth}
+                "trend": rec, "series": pts, "smooth": smooth,
+                'output_kind': 'display_reference_comparison'}, ('why',))
 
-    # The month from which each series is comparable with itself. It lives in the profile
-    # and not in the public metrics reference: the date a device was changed is a fact of
-    # the owner's biography, not a property of the metric. No key — previous behaviour.
+    # Comparability windows are recorded per device, not guessed from its model.
     cmp_from = (data.get("_meta") or {}).get("comparable_from") or {}
     out = []
     for key in meta.get("order", list(mm.keys())):
@@ -321,15 +322,14 @@ def lifestyle() -> Dict[str, Any]:
             watch.append(item)
     conclusions = {"good": good, "watch": watch}
     unresolved = sorted(k for k, srcs in shared.items() if primary not in srcs)
-    return {"metrics": out, "workouts": workouts[:14], "fitness_score": fitness,
+    return {"metrics": out, "workouts": workouts[:14], "fitness_score": fitness, 'output_kind': 'display_index',
             "conclusions": conclusions,
             "sources": [s for s, _ in blocks], "primary_source": primary,
             "shared_metrics": {k: v for k, v in sorted(shared.items())},
-            # Metrics two devices both report while nobody has said which one
-            # answers: they are shown and they are excluded from every
-            # conclusion, and this is the list a caller prints to say so.
+            # Unresolved device duplicates are shown but not scored.
             "shared_unresolved": unresolved,
-            "disclaimer": DISCLAIMER()}
+            'display_basis': {'source': 'wearable_metrics.json', 'method': '_wear_status; mean of scored metrics',
+                              'limitation': _t('clinical.display_limit')}, "disclaimer": DISCLAIMER()}
 
 
 def _prev_point(series) -> Optional[Dict[str, Any]]:
@@ -446,7 +446,7 @@ def _placement(entry: Dict[str, Any], keys: List[str],
             "keys": mine,
             # The mark is labelled with the hormone rather than with the gland:
             # the gland is where the line points, the hormone is what was measured.
-            "label": " · ".join(m["name"] for m in present),
+            "label": " · ".join(core.marker_name(m) for m in present),
             "score": score,
             "status": ("nodata" if score is None else
                        "good" if score >= 80 else
@@ -504,7 +504,7 @@ def health_radar() -> Dict[str, Any]:
             ch = _marker_health(m)
             if ph is None or ch is None:
                 continue
-            comp.append({"key": m["key"], "name": m["name"], "unit": m.get("unit", ""),
+            comp.append({"key": m["key"], "name": core.marker_name(m), "unit": m.get("unit", ""),
                          "cur": ch, "prev": ph,
                          "from_date": pp["date"], "to_date": m.get("date"),
                          "from_value": pp["value"], "to_value": m.get("value")})
@@ -541,8 +541,9 @@ def health_radar() -> Dict[str, Any]:
             "total": len(keys), "measured": len(present), "panel": panel,
             "missing": [k for k in keys if k not in by_key],
             "ok": sum(1 for m in present if m.get("flag") == "ok"),
-            "abnormal": [{"key": m["key"], "name": m["name"], "value": m["value"], "unit": m["unit"],
+            "abnormal": [{"key": m["key"], "name": core.marker_name(m), "value": m["value"], "unit": m["unit"],
                           "flag": m["flag"], "ref_low": m["ref_low"], "ref_high": m["ref_high"],
+                          "ref_origin": m.get("ref_origin"),
                           "date": m.get("date"), "stale": not _recent(m.get("date"), 18),
                           "note": m.get("note"), "genome_link": m.get("genome_link")}
                          for m in abn],
@@ -618,13 +619,13 @@ def health_radar() -> Dict[str, Any]:
         prev_overall = round(sum(d["prev_score"] for d in withprev) / len(withprev))
         prev_date = max(d["prev_date"] for d in withprev if d.get("prev_date"))
     return {"domains": domains,
-            # Sent with the radar rather than fetched separately: the figure is a
-            # rendering of this answer, and the spelling of a sex is recognised in
-            # one place for the whole product.
+            # The body and radar use the same normalised sex and domain data.
             "sex": core.profile_sex(),
             "overall": overall, "prev_overall": prev_overall,
             "overall_delta": overall_delta, "prev_date": prev_date,
-            "disclaimer": DISCLAIMER()}
+            'output_kind': 'display_index', 'display_basis': {'source': 'radar_domains.json + dated marker corridors',
+                'method': '_marker_health / _panel_term / _wear_status; mean over scored domains; deltas use matched subsets',
+                'limitation': _t('clinical.display_limit')}, "disclaimer": DISCLAIMER()}
 
 
 def _lifestyle_overview() -> Optional[Dict[str, Any]]:
@@ -649,13 +650,12 @@ def second_opinion() -> Dict[str, Any]:
     drugs = [check_drug_gene(core._localized(d, _lang())) for d in _WATCHLIST]
     flagged_drugs = [d for d in drugs if d.get("status") == "ok" and d.get("level") in ("high", "moderate", "unknown")]
     tests = suggest_tests()
-    # How much of this section is a statement about the person, and how much is the
-    # general rule printed because there was no genotype to apply. Each entry says so
-    # for itself, but the reader meets the SECTION first, and a section that opens
-    # with seven drug names reads as seven findings. The counts travel with the list
-    # so the output layer can say which it is before the list begins.
+    # How much of this section is about the person and how much is the general rule
+    # printed for want of a genotype: each entry says so, but a section opening with
+    # seven drug names reads as seven findings, so the counts travel with the list.
     return {
         "red_labs": [m for m in labs["markers"] if m["flag"] != "ok"],
+        "regimen_cautions": _regimen_cautions(),
         "drug_flags": flagged_drugs,
         "drugs_checked": len(drugs),
         "drugs_answerable": sum(1 for d in drugs if d.get("status") == "ok"
@@ -1007,8 +1007,10 @@ def focus_dashboard() -> Dict[str, Any]:
                        "evidence": lv.get("evidence") or "",
                        "now": _focus_lever_check(lv.get("check"))})
     jr = f.get("journal") or {}
+    from ..goal_entities import goal_entities
     split = _focus_journal_split(int(jr.get("window") or 120))
-    return {"available": True,
+    return {"available": True, 'output_kind': 'recorded_goal',
+            "goal_entity": next((e for e in goal_entities() if e['kind'] == 'focus'), None),
             "id": f.get("id"), "title": f.get("title"), "started": f.get("started"),
             "why": f.get("why") or "",
             "metric": _focus_metric(f.get("metric") or {}),
@@ -1016,8 +1018,7 @@ def focus_dashboard() -> Dict[str, Any]:
             "journal": {**jr, "state": split, "factors": core.focus_factors()},
             "questions": f.get("questions") or [],
             "evidence": _focus_evidence(),
-            # The owner's four goals (2026-08-14). The main task stays in `focus`,
-            # but the list of goals is wider, and it must not be lost.
+            # Preserve the recorded tracks alongside the current focus.
             "tracks": src.get("tracks") or [],
             "done": f.get("done") or [],
             "updated": (src.get("_meta") or {}).get("updated"),

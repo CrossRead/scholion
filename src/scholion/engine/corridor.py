@@ -67,7 +67,10 @@ def point_corridor(k: str, m: Dict[str, Any], point: Dict[str, Any]) -> Dict[str
     # neither is a statement about this draw. An ionised calcium of 1.09
     # read as deeply low against a range recorded months earlier, while the
     # form that carried it printed 1.10–1.35 and called it a hair under.
-    own = {f: point.get(f) for f in ("ref_low", "ref_high") if point.get(f) is not None}
+    withheld = bool(point.get("reference_withheld"))
+    if withheld:
+        m = {**m, "ref_low": None, "ref_high": None}
+    own = {} if withheld else {f: point.get(f) for f in ("ref_low", "ref_high") if point.get(f) is not None}
     ref_origin: Optional[str] = None
     if own:
         m = {**m, "ref_low": own.get("ref_low"), "ref_high": own.get("ref_high")}
@@ -85,7 +88,7 @@ def point_corridor(k: str, m: Dict[str, Any], point: Dict[str, Any]) -> Dict[str
     sex_other = False
     age_other = age_unknown = age_unbanded = False
     sex_unreviewed = sex_not_applicable = False
-    if m.get("ref_low") is None and m.get("ref_high") is None:
+    if not withheld and m.get("ref_low") is None and m.get("ref_high") is None:
         kb = core.lab_markers().get("markers", {}).get(k) or {}
         # The same rule that stops ingest substituting a sex-specific default
         # applies to borrowing one. Six markers in this base keep the MALE
@@ -143,7 +146,7 @@ def point_corridor(k: str, m: Dict[str, Any], point: Dict[str, Any]) -> Dict[str
             m = {**m, "ref_low": kb.get("ref_low"), "ref_high": kb.get("ref_high")}
             borrowed = True
             ref_origin = "reference_base"
-    _sx = _sex_adjusted_bounds(k, m)
+    _sx = None if withheld else _sex_adjusted_bounds(k, m)
     if _sx and not _sx.get("ref_sex_unknown"):
         m = {**m, "ref_low": _sx["ref_low"], "ref_high": _sx["ref_high"]}
     return {

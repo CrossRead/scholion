@@ -9,7 +9,10 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from .i18n import plural as _plural, t as _t
-from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines
+from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines, subclaim_lines
+from .genome_routes import route_text
+from .panel_notes import note_lines
+from .test_proposals import test_basis_text
 
 
 def _names(rows: Any, key: str = "name") -> str:
@@ -52,8 +55,19 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("link_text"):
         marks.append(_t("system.panel.link", link=r["link_text"]))
     line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
+    if route_text(r):
+        line += '\n   ' + route_text(r)
     if r.get("text"):
         line += "\n   " + str(r["text"])
+    if (r.get("conclusion_basis") or {}).get("status") == "incomplete":
+        line += "\n   " + r["conclusion_basis"]["reason"]
+    for subclaim_detail in subclaim_lines(r):
+        line += "\n   " + subclaim_detail
+    if r.get("mechanism") and r.get("source"):
+        line += "\n   " + _t("system.row.mechanism", text=r["mechanism"])
+        line += "\n   " + _t("decision.source", source=r["source"])
+    if r.get("author_note") and register == "clinician":
+        line += "\n   " + note_lines(r["author_note"]).replace("\n", "\n   ")
     if r.get("local_note"):
         n = r["local_note"]
         line += "\n   " + _t("system.row.local_note", by=_t("system.row.local_note_by." + str(n.get("by_role") or "clinician")),
@@ -104,7 +118,7 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
             # count does not — and buried the one row a clinician had signed.
             detail.append(_t("system.row.signature_clinician",
                              date=r.get("signed_on") or "—"))
-        if r.get("source"):
+        if r.get("source") and not r.get("mechanism"):
             detail.append(_t("decision.source", source=r["source"]))
         line += "".join("\n   _" + d + "_" for d in detail)
     return line
@@ -142,7 +156,7 @@ def _system_polygenic(poly: Any, register: str) -> List[str]:
     return L
 
 
-def _correction_route_lines(cr) -> List[str]:
+def _correction_route_lines(cr, register="clinician") -> List[str]:
     """«If a decision to correct has been made» — grouped by class, never ranked.
 
     Not a numbered layer: the seven layers are the brief's frame, and this block
@@ -169,6 +183,9 @@ def _correction_route_lines(cr) -> List[str]:
             src = (x.get("evidence") or {}).get("source")
             if src:
                 lines.append("      _" + _t("system.routes.source", source=src) + "_")
+            for basis in (x.get("conclusion_basis"), (rc or {}).get("conclusion_basis")):
+                if basis:
+                    lines.append("      " + str(basis.get("mechanism") or "") + " — " + str(basis.get("source") or ""))
         return lines
     for g in cr.get("groups") or []:
         out.append("   " + str(g.get("says_text") or g.get("says")))
@@ -177,7 +194,67 @@ def _correction_route_lines(cr) -> List[str]:
     if quiet:
         out.append("   " + str(quiet[0].get("says_text") or ""))
         out += rows(quiet)
+    held = cr.get("withheld") or []
+    if held:
+        out.append("   " + _t("system.routes.withheld_count", n=len(held)))
+    for x in held:
+        ev = x.get("evidence") or {}
+        if register == "clinician" or ev.get("level") in ("A", "B"):
+            parts = [str(x.get("reason") or ""), _t("panel.intake.level", level=ev.get("level") or "—")]
+            parts += [", ".join(x["positions"])] if x.get("positions") else []
+            parts += [str(ev["source"])] if ev.get("source") else []
+            out.append("   · " + " — ".join(parts))
+    unobserved = cr.get("unobserved") or []
+    if unobserved:
+        out.append("   " + _t("system.routes.unobserved_count", n=len(unobserved)))
+    for x in unobserved:
+        if register == "clinician" or (x.get("evidence") or {}).get("level") in ("A", "B"):
+            out.append("   · " + str(x["reason"]) + " — " + ", ".join(x["dependencies"]))
     return out
+
+
+def hypotheses_lines(gen: Dict[str, Any], full: bool) -> List[str]:
+    """The positions below B and the values at E (0.6.0, U2): the data is the
+    same on every face, the showing is not. `full` prints each passport — for
+    the clinician's register and for an assistant; otherwise one line counts
+    them, as the person's own screen does."""
+    ps = [p for p in gen.get("positions") or [] if p.get("passport")]
+    ps += [{**g, "gene": g.get("label"), "rsid": ""} for g in gen.get("groups") or []
+           if g.get("passport")]
+    es = [p for p in gen.get("positions") or [] if p.get("value_only")]
+    if not ps and not es:
+        return []
+    if not full:
+        return [_t("system.hyp.count", hyp=len(ps), values=len(es))]
+    out = ["", "**" + _t("system.hyp.head") + "**"]
+    for p in ps:
+        pp = p["passport"]
+        said = pp.get("reported") or _t("system.hyp.no_sentence")
+        out.append("· " + _t("system.hyp.row", gene=p.get("gene"), rsid=p.get("rsid") or "",
+                             level=pp.get("level"), short=pp.get("level_short") or "—", said=said))
+        for k in ("why_this_level", "mechanism", "effect", "population", "study", "replication",
+                  "would_confirm", "would_refute", "source"):
+            if pp.get(k):
+                out.append("   " + _t("system.hyp.part." + k, value=pp[k]))
+        if pp.get("missing"):
+            out.append("   _" + _t("system.hyp.missing", parts=", ".join(
+                _t("system.hyp.name." + m) for m in pp["missing"])) + "_")
+    for p in es:
+        g = (p.get("genotype") or {}).get("genotype") or _t("system.state." + str(p.get("state")))
+        out.append("· " + _t("system.hyp.value_e", gene=p.get("gene"), rsid=p.get("rsid") or "",
+                             genotype=g))
+    return out
+
+
+def _shown_genetics(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
+    """Presentation only: patient copies count C–E, while JSON keeps every row."""
+    if register == "clinician":
+        return gen
+    shown = lambda p: p.get("level") not in ("C", "D", "E")
+    return {**gen, "positions": [p for p in gen.get("positions") or [] if shown(p)],
+            "rows": [p for p in gen.get("rows") or [] if shown(p)],
+            "groups": [{**g, "members": [p for p in g.get("members") or [] if shown(p)]}
+                       for g in gen.get("groups") or [] if shown(g)]}
 
 
 def system_report(r: Dict[str, Any]) -> str:
@@ -185,6 +262,9 @@ def system_report(r: Dict[str, Any]) -> str:
     the three baskets. The two registers print the same facts at two densities
     and the verdict is the same line in both (brief §7).
     """
+    if r.get("reference_only") or r.get("patient_readings"):
+        from .format_genome import panel_report
+        return panel_report(r)
     if r.get("status") == "unknown_system":
         return _t("system.unknown", key=r.get("key") or "—", systems=", ".join(r.get("systems") or []))
     if r.get("status") == "unknown_register":
@@ -202,12 +282,16 @@ def system_report(r: Dict[str, Any]) -> str:
         L += ["", "**" + _t("system.on_demand.head") + "**",
               "   " + _t("system.on_demand.why", why=r.get("why_no_domain") or "—"), "",
               "**" + _t("system.layer.on_demand_genetics") + "**"]
-        gen = r.get("genetics") or {}
+        all_gen = r.get("genetics") or {}
+        gen = _shown_genetics(all_gen, reg)
         for g in gen.get("groups") or []:
             L.append("   · **" + str(g.get("label")) + "** — " + _plural(int(g.get("count") or 0), "count.positions")
                      + ((" — " + _t("system.row.level", level=g.get("level"), short=g.get("level_short") or "")) if g.get("level") else ""))
             if g.get("text"):
                 L.append("      " + str(g["text"]))
+            basis = g.get("conclusion_basis") or {}
+            if basis.get("reason") or g.get("mechanism"):
+                L.append("      " + str(basis.get("reason") or g["mechanism"]))
             for m in g.get("members") or []:
                 if m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True:
                     L.append("      " + _system_gene_row({**m, "unit": "position"}, reg).replace("\n", "\n      "))
@@ -218,6 +302,8 @@ def system_report(r: Dict[str, Any]) -> str:
             L.append("   " + _system_gene_row(row, reg).replace("\n", "\n   "))
         if not gen.get("rows"):
             L.append("   " + str((gen.get("curated") or {}).get("why_empty") or ""))
+        L += hypotheses_lines(all_gen, reg == "clinician")
+        L += [f"{p.get('gene')} {p.get('rsid')} — {route_text(p)}" for p in gen.get('positions', []) if route_text(p)]
         return "\n".join(L).rstrip() + "\n"
     if r.get("unread_line"):
         L.append(r["unread_line"])
@@ -262,7 +348,8 @@ def system_report(r: Dict[str, Any]) -> str:
     else:
         L.append("   " + _t("system.dynamics." + str(dyn.get("status") or "absent")))
     # 3 — the genetic half
-    gen = r.get("genetics") or {}
+    all_gen = r.get("genetics") or {}
+    gen = _shown_genetics(all_gen, reg)
     L += ["", "**3. " + _t("system.layer.genetics") + "**"]
     if gen.get("status") == "composed":
         base = gen.get("base") or {}
@@ -304,6 +391,9 @@ def system_report(r: Dict[str, Any]) -> str:
                      + ((" — " + _t("system.row.level", level=g.get("level"), short=g.get("level_short") or "")) if g.get("level") else ""))
             if g.get("text"):
                 L.append("      " + str(g["text"]))
+            basis = g.get("conclusion_basis") or {}
+            if basis.get("reason") or g.get("mechanism"):
+                L.append("      " + str(basis.get("reason") or g["mechanism"]))
             st = g.get("states") or {}
             L.append("      " + ", ".join(f"{_t('system.panel.state.' + k)} {v}" for k, v in st.items()))
             for m in g.get("members") or []:
@@ -321,6 +411,7 @@ def system_report(r: Dict[str, Any]) -> str:
             L.append("   _" + _t("system.row.patient_withheld", n=gen["rows_withheld_as_detail"]) + "_")
         if gen.get("positions"):
             L += ["   " + ln for ln in genotype_conclusion_lines(gen["positions"])]
+        L += ["   " + ln if ln else "" for ln in hypotheses_lines(all_gen, reg == "clinician")]
     elif gen.get("status") == "not_composed":
         L.append("   " + _t("system.genetics.not_composed",
                             why=gen.get("why_empty") or _t("screen.why.no_panel")))
@@ -329,7 +420,7 @@ def system_report(r: Dict[str, Any]) -> str:
     L += _system_polygenic(gen.get("polygenic"), reg)
     # 4 — the prescriptions acting here
     med = r.get("medications") or {}
-    L += _correction_route_lines(r.get("correction_routes"))
+    L += _correction_route_lines(r.get("correction_routes"), reg)
     L += ["", "**4. " + _t("system.layer.medications") + "**"]
     for m in med.get("rows") or []:
         L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
@@ -383,6 +474,8 @@ def system_report(r: Dict[str, Any]) -> str:
             if row.get("closes"):
                 line += " — " + str(row["closes"])
             L.append("   · " + line)
+            if row.get("origin") == "author" and row.get("mechanism"):
+                L.append("      " + str(row["mechanism"]) + " — " + str(row.get("source") or ""))
         if b.get("empty_reason"):
             L.append("   _" + b["empty_reason"] + "_")
         if (b.get("full_genome") or {}).get("text"):
@@ -395,7 +488,9 @@ def system_report(r: Dict[str, Any]) -> str:
 def _test_row(s: Dict[str, Any]) -> str:
     spec = (" · " + _t("tests.specialist", name=s["specialist"])
             if s.get("specialist") and s["specialist"] != "—" else "")
-    return f"**{s.get('suggest')}**{spec} — " + _t("tests.why", text=s.get("why") or "—")
+    if s.get('error'):
+        return _t('tests.rule_error', id=s.get('id'), error=s['error'])
+    return f"**{s.get('suggest')}**{spec} — " + _t("tests.why", text=s.get("why") or "—") + '\n' + test_basis_text(s)
 
 
 def systems_report(r: Dict[str, Any]) -> str:
@@ -440,6 +535,7 @@ def _panel_lines(panel: Optional[Dict[str, Any]]) -> List[str]:
     L = ["   " + _t("system.panel_labs.head", measured=len(panel.get("markers") or []),
                     total=panel.get("total") or 0)]
     by_key = {m["key"]: m for m in panel.get("markers") or []}
+    causes = {c["id"]: c for c in panel.get("cause_dictionary") or []}
 
     def marker(m: Dict[str, Any], pad: str) -> List[str]:
         out = [f"{pad}{_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} {m.get('unit') or ''}"
@@ -450,6 +546,9 @@ def _panel_lines(panel: Optional[Dict[str, Any]]) -> List[str]:
             out.append(pad + "  " + _t("system.panel_labs.companions", list="; ".join(
                 f"{c['name']} {c['value']} {c.get('unit') or ''}".rstrip() if c.get("measured")
                 else _t("system.panel_labs.companion_missing", name=c["name"]) for c in comp)))
+        if m.get("possible_causes"):
+            out.append(pad + "  " + _t("system.panel_labs.possible_causes", list="; ".join(
+                causes[k]["name"] for k in m["possible_causes"] if k in causes)))
         return out
 
     grouped = set()
@@ -483,6 +582,11 @@ def _panel_lines(panel: Optional[Dict[str, Any]]) -> List[str]:
         else:
             L.append("   · " + _t("system.panel_labs.ratio_" + x["origin"], name=x.get("name") or x["key"],
                                   missing=", ".join(x.get("missing_names") or x.get("missing") or []) or "—"))
+    if causes:
+        L.append("   " + _t("system.panel_labs.causes_head"))
+        for c in causes.values():
+            L.append(f"   · {c['name']} [{c.get('level') or '—'}] — {c.get('mechanism') or '—'} "
+                     f"{c.get('caveat') or '—'} ({c.get('source') or '—'})")
     return L
 
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,26 +13,52 @@
      connection at all. It supplies sane defaults for elements this file does
      not already style by hand; every custom class below still wins, because
      a class selector always outranks Pico's element-level default. -->
-<link rel="stylesheet" href="/pico.min.css">
+<link rel="stylesheet" href="/pico.scoped.min.css">
+<link rel="stylesheet" href="/crossread.css">
 <style>
   /* ── Design tokens (task 195) ────────────────────────────────────────────
      One scale for everything on the page. The audit of 14.09.2026 counted
      nineteen font sizes and 303 inline styles: each tab had been drawn on its
      own, so the same kind of thing looked different from tab to tab and every
      new feature added a variant. Five sizes, six spacings, two radii. */
+  /* ── Crossread (0.6.0, task 217) ──────────────────────────────────────
+     The page's own names stay, and each now points at a Crossread token
+     (`crossread.css`, served beside this page). This block is the only place
+     a colour is decided: everything below reads a name, so the whole page
+     follows the theme — the system's, or the one the menu pins — without a
+     second palette. Crossread keeps four statuses and one accent; «serious»,
+     which sits between warning and critical here, is mixed from the two. */
   :root{
-    --plane:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
-    --ink:#ffffff; --ink-2:#c9c8be; --muted:#a09e96;
-    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.10);
-    --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
-    --accent:#3987e5;
+    --plane:var(--cr-bg); --surface:var(--cr-surface); --surface-2:var(--cr-surface-sunken);
+    --raised:var(--cr-surface-raised);
+    --ink:var(--cr-text); --ink-2:var(--cr-text-secondary); --muted:var(--cr-text-tertiary);
+    --grid:var(--cr-border); --baseline:var(--cr-border-strong); --border:var(--cr-border);
+    --good:var(--cr-success); --warning:var(--cr-warning); --critical:var(--cr-danger);
+    --serious:color-mix(in srgb,var(--cr-warning) 50%,var(--cr-danger));
+    --near:var(--cr-info);
+    --good-soft:var(--cr-success-soft); --warning-soft:var(--cr-warning-soft);
+    --critical-soft:var(--cr-danger-soft); --near-soft:var(--cr-info-soft);
+    --accent:var(--cr-accent); --accent-hover:var(--cr-accent-hover);
+    --accent-soft:var(--cr-accent-soft); --accent-strong:var(--cr-accent-strong);
+    --on-accent:var(--cr-on-accent);
+    --chart-series:var(--cr-chart-series); --chart-target:var(--cr-chart-target);
+    --chart-band:var(--cr-chart-band); --chart-boundary:var(--cr-chart-boundary);
+    --hover:color-mix(in srgb,var(--cr-text) 6%,transparent);
+    --shadow:var(--cr-shadow-1);
+    /* The body figure: a silhouette one step darker than the paper, and a glow
+       that adds light on the dark ground and darkens on the light one. */
+    --body-fill:var(--cr-border); --body-edge:var(--cr-border-strong); --blob-blend:multiply;
     --t-xs:12.5px; --t-s:14px; --t-m:16px; --t-l:19px; --t-xl:24px;
     --sp1:4px; --sp2:8px; --sp3:12px; --sp4:16px; --sp5:24px; --sp6:32px;
-    --r:14px; --r-s:10px;
-    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    --r:var(--cr-radius-l); --r-s:var(--cr-radius-m);
+    font-family:var(--font-sans);
 
-    /* Pico reads its own look from these --pico-* variables; mapped onto the
-       tokens above so its defaults for bare elements land in this palette. */
+  }
+  /* Pico reads its own look from its --pico-* variables and sets them itself on
+     `:root:not([data-theme=dark])` — a stronger selector than `:root` — so the
+     mapping onto this page's names is declared stronger again, or Pico's blue
+     wins every button that has not been redrawn yet. */
+  :root:root:root{
     --pico-background-color: var(--plane);
     --pico-color: var(--ink);
     --pico-h1-color: var(--ink); --pico-h2-color: var(--ink); --pico-h3-color: var(--ink);
@@ -52,14 +78,16 @@
     --pico-primary: var(--accent);
     --pico-primary-background: var(--accent);
     --pico-primary-border: var(--accent);
-    --pico-primary-hover: var(--accent);
-    --pico-primary-hover-background: var(--accent);
-    --pico-primary-underline: rgba(57,135,229,.5);
-    --pico-primary-hover-underline: rgba(57,135,229,.7);
-    --pico-primary-focus: rgba(57,135,229,.35);
-    --pico-primary-inverse: #fff;
+    --pico-primary-hover: var(--accent-hover);
+    --pico-primary-hover-background: var(--accent-hover);
+    --pico-primary-underline: color-mix(in srgb,var(--accent) 50%,transparent);
+    --pico-primary-hover-underline: color-mix(in srgb,var(--accent) 70%,transparent);
+    --pico-primary-focus: color-mix(in srgb,var(--accent) 35%,transparent);
+    --pico-primary-inverse: var(--on-accent);
     --pico-border-radius: var(--r);
   }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blob-blend:screen}}
+  :root[data-theme="dark"]{--blob-blend:screen}
   *{box-sizing:border-box}
   body{margin:0;background:var(--plane);color:var(--ink);font-size:var(--t-m);line-height:1.55}
   a{color:var(--accent)}
@@ -74,21 +102,27 @@
   header h1{font-size:var(--t-l);margin:0;font-weight:700;letter-spacing:.2px;white-space:nowrap}
   header .sub{color:var(--muted);font-size:var(--t-s)}
   .hdr-right{margin-left:auto;display:inline-flex;align-items:center;gap:8px}
+  .app-header{flex-wrap:wrap;gap:8px 16px}
+  .app-header .hdr-right{flex-wrap:wrap}
+  #container-stamp{font-size:var(--t-xs);color:var(--ink-2);overflow-wrap:anywhere}
+  #patientpick select{max-width:260px}
+  @media(max-width:600px){.app-header .hdr-right{margin-left:0;width:100%}#patientpick select{max-width:100%}}
   #localbadge{font-size:var(--t-xs);cursor:pointer;border:1px solid var(--border);border-radius:999px;padding:3px 10px;white-space:nowrap;color:var(--ink-2)}
   #langswitch{display:inline-flex;gap:4px}
   .menu{position:relative}
   .menubtn{font-size:var(--t-m);line-height:1;padding:6px 10px}
   .menu-panel{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--border);
-    border-radius:12px;padding:6px;min-width:230px;z-index:40;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+    border-radius:12px;padding:6px;min-width:230px;z-index:40;box-shadow:var(--shadow)}
   .menu-panel button{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--ink);
     padding:9px 12px;border-radius:8px;font-size:var(--t-m);cursor:pointer}
   .menu-panel button:hover,.menu-panel button.active{background:var(--surface-2)}
+  .menu-panel button[hidden]{display:none}
   .menu-panel .mnote{padding:6px 12px 4px;font-size:var(--t-xs);color:var(--muted);border-top:1px solid var(--grid);margin-top:4px}
   .menu-panel #mupd{border-top:0;margin-top:0;color:var(--ink-2);max-width:280px;white-space:normal}
   .ringload{display:inline-flex;align-items:center;gap:8px;margin-left:10px;font-weight:400;color:var(--muted)}
   .ringload .dna-bar{display:inline-block;width:90px;height:5px}
   .ringload .dna-fill{display:block}
-  nav{display:flex;gap:2px;padding:6px 16px;border-bottom:1px solid var(--border);flex-wrap:nowrap;overflow-x:auto;
+  nav{display:flex;justify-content:flex-start;gap:2px;padding:6px 16px;border-bottom:1px solid var(--border);flex-wrap:nowrap;overflow-x:auto;
       position:sticky;top:0;background:var(--plane);z-index:20;scrollbar-width:none}
   nav::-webkit-scrollbar{display:none}
   nav button{background:transparent;border:1px solid transparent;color:var(--ink-2);padding:8px 15px;border-radius:999px;
@@ -99,7 +133,7 @@
   footer.disclaimer{color:var(--muted);font-size:var(--t-xs);padding:14px 24px;background:var(--surface);border-top:1px solid var(--border)}
   footer.disclaimer .sub{margin-left:8px;opacity:.8}
   .notice{margin:8px 16px}
-  #demobanner{background:#3a2a12;border-bottom:1px solid #6b4c19;color:#f3d9a4;padding:9px 18px;font-size:var(--t-s);font-weight:600}
+  #demobanner{background:var(--warning-soft);border-bottom:1px solid color-mix(in srgb,var(--warning) 40%,transparent);color:var(--warning);padding:9px 18px;font-size:var(--t-s);font-weight:600}
 
   /* ── The grammar of a page ───────────────────────────────────────────────
      Every tab in the same order: a title, the one question it answers, a strip
@@ -163,13 +197,14 @@
   .badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--t-xs);font-weight:600;padding:2px 10px;border-radius:999px;border:1px solid transparent;white-space:nowrap;max-width:100%}
   .pnl-exp .badge,.match .badge,.list-item .row .badge{white-space:normal;border-radius:12px}
   .badge .dot{width:7px;height:7px;border-radius:50%}
-  .b-critical{background:rgba(208,59,59,.14);color:#f0908f;border-color:rgba(208,59,59,.35)}
-  .b-warning{background:rgba(250,178,25,.14);color:#f4c65a;border-color:rgba(250,178,25,.30)}
-  .b-good{background:rgba(12,163,12,.13);color:#5ec95e;border-color:rgba(12,163,12,.30)}
-  .b-near{background:rgba(72,133,214,.14);color:#8ab4f8;border-color:rgba(72,133,214,.32)}
-  .b-unknown{background:rgba(137,135,129,.14);color:#bdbbb2;border-color:rgba(137,135,129,.30)}
+  .b-critical{background:var(--critical-soft);color:var(--critical);border-color:color-mix(in srgb,var(--critical) 35%,transparent)}
+  .b-warning{background:var(--warning-soft);color:var(--warning);border-color:color-mix(in srgb,var(--warning) 35%,transparent)}
+  .b-good{background:var(--good-soft);color:var(--good);border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+  .b-near{background:var(--near-soft);color:var(--near);border-color:color-mix(in srgb,var(--near) 35%,transparent)}
+  .b-unknown{background:var(--surface-2);color:var(--ink-2);border-color:var(--border)}
   .c-good{color:var(--good)} .c-warning{color:var(--warning)} .c-critical{color:var(--critical)} .c-muted{color:var(--muted)}
   .warnbox{border-left:3px solid var(--warning)}
+  .caution{margin:0 0 var(--sp4);display:flex;flex-direction:column;gap:6px}
   .errbox{border-left:3px solid var(--critical)}
   /* «Nothing here», in one shape everywhere, with the reason in words. */
   .empty{color:var(--muted);font-size:var(--t-s);padding:10px 14px;border:1px dashed var(--grid);border-radius:var(--r-s)}
@@ -178,15 +213,15 @@
   input,select,button.act{font-family:inherit;font-size:15px}
   input,select{background:var(--surface-2);border:1px solid var(--border);color:var(--ink);border-radius:var(--r-s);padding:8px 12px}
   input::placeholder{color:var(--muted)}
-  button.act{background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:var(--r-s);padding:8px 14px;cursor:pointer;font-weight:600;font-size:var(--t-s)}
-  button.act:hover{filter:brightness(1.08)}
+  button.act{background:var(--accent);color:var(--on-accent);border:1px solid var(--accent);border-radius:var(--r-s);padding:8px 14px;cursor:pointer;font-weight:600;font-size:var(--t-s)}
+  button.act:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
   button.act:disabled,button.ghost:disabled{opacity:.55;cursor:default}
   button.ghost,a.ghost{background:var(--surface-2);border:1px solid var(--border);color:var(--ink);border-radius:var(--r-s);padding:8px 12px;cursor:pointer;font-size:var(--t-s);font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
   button.ghost:hover,a.ghost:hover{border-color:var(--accent)}
   .btn-sm{font-size:13px !important;padding:4px 10px !important}
   .pickbtn{background:var(--surface-2);border:1px solid var(--border);color:var(--ink-2);border-radius:8px;padding:2px 8px;cursor:pointer;font-size:var(--t-xs);line-height:1.4}
   .pickbtn:hover{border-color:var(--accent);color:var(--ink)}
-  .pickbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);background:rgba(57,135,229,.14)}
+  .pickbtn[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
   .drugchips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
   .drugchips button{background:var(--surface-2);border:1px solid var(--border);color:var(--ink-2);padding:6px 12px;border-radius:999px;cursor:pointer;font-size:var(--t-s)}
   .drugchips button:hover{color:var(--ink);border-color:var(--accent)}
@@ -196,7 +231,7 @@
   .tablink{font-size:13px;font-weight:500;color:var(--ink-2);text-decoration:none;white-space:nowrap;margin-left:auto;
            border:1px solid var(--border);border-radius:999px;padding:2px 10px;background:var(--surface-2)}
   .tablink:hover{border-color:var(--accent);color:var(--ink)}
-  .syslink{color:var(--accent);text-decoration:none;cursor:pointer;border-bottom:1px dotted rgba(57,135,229,.6)}
+  .syslink{color:var(--accent);text-decoration:none;cursor:pointer;border-bottom:1px dotted color-mix(in srgb,var(--accent) 60%,transparent)}
   .syslink:hover{border-bottom-style:solid}
   .form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:var(--sp4);margin-top:var(--sp2)}
   .form .fr{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:8px}
@@ -228,11 +263,11 @@
   table.dt td.v{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
   table.dt td.d{color:var(--muted);white-space:nowrap}
   table.dt.gentbl tr.genrow{cursor:pointer}
-  table.dt.gentbl tr.genrow:hover td{background:rgba(127,127,127,.08)}
+  table.dt.gentbl tr.genrow:hover td{background:var(--hover)}
   table.dt.gentbl tr.gengroup td{font-size:var(--t-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding-top:12px}
-  table.dt.gentbl tr.gendet td{background:rgba(127,127,127,.05)}
+  table.dt.gentbl tr.gendet td{background:color-mix(in srgb,var(--ink) 4%,transparent)}
   tr.labgen td{padding-top:2px;padding-bottom:8px;border-bottom:1px solid var(--grid)}
-  .why.localnote{border-left:3px solid var(--warning,#d9a441);padding-left:8px}
+  .why.localnote{border-left:3px solid var(--warning);padding-left:8px}
   table.dt tr:last-child td{border-bottom:0}
   table.dt tr[data-system]{cursor:pointer}
   table.dt tr[data-system]:hover td{background:var(--surface-2)}
@@ -287,7 +322,7 @@
   .fc .fcnum b{font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
   .fc .fcnum span{color:var(--muted);font-size:var(--t-s)}
   .fctrack{position:relative;height:10px;background:var(--surface-2);border-radius:999px;margin:14px 0 6px}
-  .fctrack .zn{position:absolute;top:0;height:100%;border-radius:999px;background:rgba(12,163,12,.20)}
+  .fctrack .zn{position:absolute;top:0;height:100%;border-radius:999px;background:color-mix(in srgb,var(--good) 20%,transparent)}
   .fctrack .mk{position:absolute;top:-3px;width:2px;height:16px;background:var(--ink-2);border-radius:1px;box-shadow:0 0 0 2px var(--surface)}
   .fctrack .dt{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--surface)}
   .fcscale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
@@ -307,7 +342,7 @@
   .blt{display:grid;grid-template-columns:minmax(104px,150px) 1fr minmax(96px,auto);gap:14px;align-items:center;padding:6px 0}
   .blt .l{font-size:13.5px;color:var(--ink-2);overflow-wrap:anywhere}
   .blt .t{position:relative;height:10px;background:var(--surface-2);border-radius:999px;cursor:default}
-  .blt .z{position:absolute;top:0;height:100%;background:rgba(12,163,12,.20);border-radius:999px}
+  .blt .z{position:absolute;top:0;height:100%;background:color-mix(in srgb,var(--good) 20%,transparent);border-radius:999px}
   .blt .d{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--surface)}
   .blt .m{position:absolute;top:-3px;width:2px;height:16px;background:var(--ink-2);border-radius:1px;box-shadow:0 0 0 2px var(--surface)}
   .blt .v{font-size:13.5px;font-variant-numeric:tabular-nums;color:var(--ink);text-align:right;white-space:nowrap}
@@ -318,7 +353,7 @@
   .lsact ol{margin:8px 0 0;padding-left:20px}
   .lsact li{margin-bottom:7px;font-size:var(--t-s);line-height:1.55;color:var(--ink-2)}
   .lsact li::marker{color:var(--accent);font-weight:700}
-  .lsrev{background:var(--surface);border:1px solid rgba(250,178,25,.35);border-left:3px solid var(--warning);border-radius:var(--r);padding:14px 18px}
+  .lsrev{background:var(--surface);border:1px solid color-mix(in srgb,var(--warning) 35%,transparent);border-left:3px solid var(--warning);border-radius:var(--r);padding:14px 18px}
 
   /* ---- the goal dashboard (Overview) ---- */
   .wl{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--muted)}
@@ -335,9 +370,9 @@
   .goalboard table.tgt th,.goalboard table.tgt td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
   .goalboard table.tgt th{background:var(--surface-2);color:var(--muted);font-size:12px;font-weight:600}
   .goalboard td.mk{font-weight:600;color:var(--ink)}
-  .goalboard td.now{color:var(--serious);font-variant-numeric:tabular-nums}
-  .goalboard td.best{color:var(--good);font-variant-numeric:tabular-nums}
-  .goalboard td.tgt{color:var(--warning);font-weight:700;font-variant-numeric:tabular-nums}
+  .goalboard td.now{color:var(--ink);font-variant-numeric:tabular-nums}
+  .goalboard td.best{color:var(--ink-2);font-variant-numeric:tabular-nums}
+  .goalboard td.tgt{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
   .goalboard table.tgt tr:last-child td{border-bottom:none}
   .goalboard .cgrid{display:grid;gap:14px}
   .goalboard .g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
@@ -351,6 +386,9 @@
   .goalboard .glegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0 4px}
   .goalboard .glegend span{display:inline-flex;align-items:center;gap:5px}
   .goalboard .gdot{width:10px;height:3px;border-radius:2px;display:inline-block}
+  .goalboard .gdot-series{background:var(--chart-series)}
+  .goalboard .gdot-target{height:0;border-top:2px dashed var(--chart-target)}
+  .goalboard .gdot-band{height:10px;background:var(--chart-band);border:1px solid var(--chart-boundary)}
   @media(max-width:800px){.goalboard .peaks,.goalboard .g2,.goalboard .g4{grid-template-columns:minmax(0,1fr)}}
 
   /* ---- what gets carried into a consultation ------------------------------
@@ -358,21 +396,27 @@
      top for the two facts the page never had: who this is and when it was made. */
   .printonly{display:none}
   @media print{
-    :root{--ink:#000;--ink-2:#333;--muted:#666;--bg:#fff;--surface:#fff;--surface-2:#fff;
-          --border:#bbb;--grid:#ddd}
-    html,body{background:#fff;color:#000}
+    :root{--ink:#000;--ink-2:#333;--muted:#666;--plane:#fff;--surface:#fff;--surface-2:#fff;
+          --border:#bbb;--grid:#ddd;--baseline:#999}
+    html,body{background:var(--plane);color:var(--ink)}
     header,nav,#langswitch,#localbadge,#ver,#demobanner,.subnav,.tablink,.menu,
     button,.act,.ghost,.srcbar,.srcfoot,.sources,.actions,.toolbar{display:none !important}
     .printonly{display:block}
     #view{padding:0}
-    .card,.list-item,.chartbox{break-inside:avoid;border-color:#bbb}
+    .card,.list-item,.chartbox{break-inside:avoid;border-color:var(--border)}
     a[href]:after{content:""}
-    .printhead{border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:14px}
+    .printhead{border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:14px}
     .printhead h1{font-size:19px;margin:0 0 6px}
-    .printhead .fields{display:flex;gap:26px;font-size:13px;color:#333}
-    .printhead .fields span{border-bottom:1px solid #999;min-width:190px;padding-bottom:2px}
-    .printfoot{margin-top:18px;padding-top:8px;border-top:1px solid #999;font-size:11.5px;color:#333}
-    details>*{display:block}
+    .printhead .fields{display:flex;gap:26px;font-size:13px;color:var(--ink-2)}
+    .printhead .fields span{border-bottom:1px solid var(--baseline);min-width:190px;padding-bottom:2px}
+    .printfoot{margin-top:18px;padding-top:8px;border-top:1px solid var(--baseline);font-size:11.5px;color:var(--ink-2)}
+    /* Task 217, stage 0: the paper carries the verdicts and the measurements
+       that need attention; the folds stay folded — the radar printed on twelve
+       pages with every fold forced open. No silhouette, no hints for a mouse. */
+    details.more{display:none}
+    .sysindex,#sl-systems .syspane:first-child,#ov-systems .syspane:first-child,#sys-note,.syscredit{display:none !important}
+    #sl-systems .sysrow,#ov-systems .sysrow{grid-template-columns:minmax(0,1fr)}
+    .sysrow{break-inside:avoid}
   }
 
   /* ── the body figure, beside the radar on the Overview ─────────────────── */
@@ -385,10 +429,10 @@
   .sysh{font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:600}
   .sysbox{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px;min-width:0}
   .sysbox svg{width:100%;height:auto;max-width:100%;display:block}
-  .bodyfill{fill:#34332e}
-  .bodyedge{fill:#6d6b60}
+  .bodyfill{fill:var(--body-fill)}
+  .bodyedge{fill:var(--body-edge)}
   .organ{cursor:pointer}
-  .organ .blob{mix-blend-mode:screen}
+  .organ .blob{mix-blend-mode:var(--blob-blend)}
   .organ .pick{fill:none;stroke:var(--ink);stroke-width:1;opacity:0}
   .organ:hover .pick,.organ.on .pick{opacity:.5}
   .organ:focus{outline:none}
@@ -420,6 +464,9 @@
   .syscard ol,.sysblock ol{margin:6px 0 0;padding-left:22px}
   .syscard ol li,.sysblock ol li{margin-bottom:6px;line-height:1.5;font-size:15px}
   .sysblock{border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:var(--sp4);background:var(--surface)}
+  .sysblock:not(.needs){padding:10px 18px;margin-bottom:var(--sp2)}
+  .sysblock:not(.needs) .sys-verdict{margin:2px 0 0;font-size:var(--t-s);color:var(--ink-2)}
+  .sysblock:not(.needs) details.fold{margin-top:2px}
   .sys-h{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap}
   .sys-h .name{font-size:var(--t-l);font-weight:700}
   .sys-h .score{font-size:var(--t-l);font-weight:700;font-variant-numeric:tabular-nums}
@@ -442,19 +489,19 @@
   .sysindex button i{width:8px;height:8px;border-radius:50%;display:inline-block}
   .ownernote{color:var(--muted);font-style:italic}
   .ownernote b{font-style:normal;font-weight:600;font-size:12px;color:var(--muted)}
-  @media print{.syscard,.sysblock,.basket{break-inside:avoid}}
+  @media print{.syscard,.sysblock{break-inside:auto}.basket{break-inside:avoid}}
   /* The loading state (owner, 14.09.2026): the project's DNA mark turning, and a bar
      that fills with the share of this view's requests that have come back. */
   .dna-loader{display:flex;flex-direction:column;align-items:center;gap:12px;padding:32px 0}
   .dna-helix{display:flex;flex-direction:column;gap:6px;align-items:center}
   .dna-rung{position:relative;display:block;width:64px;height:4px;border-radius:2px;
-    background:linear-gradient(90deg,var(--accent),#1c5f80);animation:dna-twist 1.6s ease-in-out infinite}
+    background:linear-gradient(90deg,var(--accent),var(--accent-strong));animation:dna-twist 1.6s ease-in-out infinite}
   .dna-rung i{position:absolute;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%}
   .dna-rung i:first-child{left:-6px;background:var(--accent)}
-  .dna-rung i:last-child{right:-6px;background:#5fb3d9}
+  .dna-rung i:last-child{right:-6px;background:var(--accent-hover)}
   @keyframes dna-twist{0%{transform:scaleX(1);opacity:1}25%{opacity:.55}50%{transform:scaleX(-1);opacity:1}75%{opacity:.55}100%{transform:scaleX(1);opacity:1}}
   .dna-bar{width:200px;max-width:70%;height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
-  .dna-fill{height:100%;width:0;background:linear-gradient(90deg,#1c5f80,var(--accent));transition:width .3s ease}
+  .dna-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent-strong),var(--accent));transition:width .3s ease}
   @media (prefers-reduced-motion: reduce){.dna-rung{animation:none}}
   /* The positions of a panel, on the card and in the details of a radar block. */
   .pnl-sum{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 4px;font-size:13px}
@@ -470,6 +517,9 @@
   .pnl.pnl-dim{opacity:.7}
   .pnl-fold .row-l{font-size:13px}
   .assist-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .assist-entry{min-width:0;overflow-wrap:anywhere}
+  .assist-entry code{white-space:pre-wrap;overflow-wrap:anywhere}
+  .assist-entry .row>.muted{min-width:0}
 
   /* ── Phone ───────────────────────────────────────────────────────────── */
   @media(max-width:640px){
@@ -503,27 +553,67 @@
     .prs-lbl{flex-basis:50%}
     h2.section{margin-top:var(--sp5)}
   }
+  .intake-view section{margin:24px 0}
+  .intake-view .cr-h1{margin:20px 0 12px}
+  .intake-view .cr-h2{margin:0 0 8px}
+  .intake-view p{line-height:1.6}
+  .intake-view summary{display:grid;grid-template-columns:150px 90px 100px 1fr;gap:12px;align-items:center;padding:12px 16px;cursor:pointer;list-style:none}
+  .intake-view summary::-webkit-details-marker{display:none}
+  .intake-view summary>span:first-child::before{content:'▸ ';color:var(--muted)}
+  .intake-view details[open]>summary>span:first-child::before{content:'▾ '}
+  .intake-view details+details{border-top:1px solid var(--border)}
+  .intake-view summary:hover{background:var(--hover)}
+  .intake-view summary:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+  .intake-detail{padding:0 16px 12px;overflow-wrap:anywhere}
+  .intake-detail .pnl{margin:0;border:0;padding:0;background:transparent}
+  @media(max-width:600px){
+    .intake-view summary{grid-template-columns:1fr auto;gap:8px;padding:12px}
+    .intake-view .toolbar{flex-wrap:wrap}
+  }
+  @media print{
+    .intake-view .toolbar{display:none}
+    .intake-view details{break-inside:avoid}
+    .intake-view .cr-card--flush{overflow:visible}
+  }
 </style>
+<script>
+/* The theme follows the system unless the menu pinned one. Applied before the
+   first paint, so a pinned light page never flashes dark. */
+try{const th=localStorage.getItem('scholion-theme'); if(th==='light'||th==='dark') document.documentElement.dataset.theme=th;}catch(e){}
+</script>
 <script src="/chart.min.js"></script>
 </head>
-<body>
-<header>
+<body class="cr-app">
+<!-- Pico styles bare elements only inside .pico (web/pico.scoped.min.css), so the
+     screens not yet redrawn keep their shape while a redrawn one, placed outside,
+     is Crossread alone. When nothing is left inside, Pico leaves the package. -->
+<header class="app-header">
   <h1><img src="/dna.svg" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px">Scholion</h1>
   <span class="sub" id="subhead"></span>
+  <span id="container-stamp" aria-live="polite"></span>
   <span class="hdr-right">
+    <span id="display-mode"></span>
+    <span id="patientpick"></span>
     <span id="localbadge"></span>
     <span id="langswitch"></span>
-    <span class="menu"><button class="ghost menubtn" id="menubtn" aria-haspopup="true" aria-expanded="false">☰</button>
+    <span class="menu"><button class="cr-btn cr-btn--ghost cr-btn--s menubtn" id="menubtn" aria-haspopup="true" aria-expanded="false">☰</button>
       <div class="menu-panel" id="menupanel" hidden></div></span>
   </span>
 </header>
+<div class="printonly" id="print-container-stamp"></div>
+<div class="pico" id="legacy">
 <div id="demobanner" hidden></div>
 <div id="updatenote" class="card notice" hidden></div>
 <div id="recomputebox" class="card notice" hidden></div>
 <nav id="nav"></nav>
-<main id="view"></main>
+</div>
+<main class="pico" id="view"></main>
+<div class="pico">
 <footer class="disclaimer"><span id="disclaimer"></span><span class="sub" id="ver"></span></footer>
 <div class="toast" id="toast"></div>
+</div>
+
+<dialog class="cr-dialog" id="container-dialog" aria-labelledby="container-dialog-title" style="width:min(800px,calc(100vw - 32px))"></dialog>
 
 <script>
 const API = "";
@@ -538,6 +628,22 @@ const esc = (s)=>String(s??'').replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','
 // server is told which language to answer in on every call and forgets it as soon as
 // the reply is sent. Two tabs may therefore read the same profile in two languages.
 let LANG='en', LANGS=['en'], MSG={};
+// A register is a browser presentation preference, never a patient switch.
+let DISPLAY_MODE='patient';
+try{if(sessionStorage.getItem('scholion-mode')==='clinician') DISPLAY_MODE='clinician';}catch(e){}
+function firstTabLabel(){return t(DISPLAY_MODE==='clinician'?'web.mode.visit':'web.mode.today');}
+function renderMode(){
+  $('#display-mode').innerHTML=`<span class="cr-segmented" role="group" aria-label="${esc(t('web.mode.label'))}">${['patient','clinician'].map(mode=>`<label><input type="radio" name="display-mode" value="${esc(mode)}"${DISPLAY_MODE===mode?' checked':''}><span>${esc(t('web.mode.'+(mode==='patient'?'personal':'visit')))}</span></label>`).join('')}</span>`;
+  $('#display-mode').querySelectorAll('input').forEach(input=>input.onchange=()=>setDisplayMode(input.value));
+}
+function setDisplayMode(mode,remount=true){
+  if(!['patient','clinician'].includes(mode)||mode===DISPLAY_MODE) return;
+  DISPLAY_MODE=mode;
+  try{sessionStorage.setItem('scholion-mode',mode);}catch(e){}
+  renderMode(); buildNav(); renderPatients();
+  if(!remount) return;
+  return mount(current);
+}
 
 // The same lookup rule as in the Python catalogue: named placeholders only, and a key
 // with no phrase behind it shows up as the identifier in brackets rather than as an
@@ -566,6 +672,9 @@ const fmtNum=v=>LANG==='ru'?String(v).replace('.',','):String(v);
 // ---- The pieces every page is built from (task 195) ----------------------
 // Dates as a person writes them: «3 сент 2026», never «2026-09-03T08:22». The
 // machine form stays in the data and in a tooltip; the page prints this one.
+function localDay(d=new Date()){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 function fmtDate(s){
   if(s==null||s==='') return '';
   const m=String(s).match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/);
@@ -588,6 +697,21 @@ const STATUS_BADGE={critical:'b-critical',warning:'b-warning',good:'b-good',noda
 function statusBadge(st){ const k=STATUS_BADGE[st]?st:'nodata'; return badge(STATUS_BADGE[k],t('web.status.'+k)); }
 // The head of every page: a title, the one question the page answers, and the
 // three or four numbers worth seeing before anything else.
+// A prescription the person takes against a genotype that was read (0.6.0):
+// printed at the top of the overview, the treatment and the genome, before any
+// number — the same flag the prescription check prints first.
+function cautionsHtml(list){
+  const lower=(list||[]).filter(c=>c.origin==='genotype'&&['C','D','E'].includes(c.level));
+  const count=lower.length?`<div class="why" data-caution-count>${esc(t('conclusion.caution_withheld_count',{n:lower.length}))}</div>`:'';
+  return (list||[]).filter(c=>!lower.includes(c)).map(c=>`<div class="card ${c.interpretation_withheld?'':'errbox'} caution" role="alert">
+    <div class="row" style="gap:8px;align-items:center"><span class="badge ${c.interpretation_withheld?'b-unknown':'b-critical'}">${esc(t(c.interpretation_withheld?'conclusion.caution_header':'web.caution.badge'))}</span>
+      <b>${esc(c.factor||'')}</b></div>
+    <div class="why">${esc(c.why_it_matters||'')}</div>
+    ${c.action?`<div class="why"><b>${esc(t('web.caution.action'))}</b> ${esc(c.action)}</div>`:''}
+    ${c.interpretation_withheld?`<div class="why">${esc(c.uncertainty||'')}</div>`:mechanismHtml(c)}
+    <div class="meta">${esc(t('web.caution.basis',{drug:c.drug||'—',gene:c.gene||'—',rsid:c.rsid||'—',genotype:c.genotype||'—',level:c.level||'—'}))}</div>
+    ${c.interpretation_withheld||!c.mechanism||!c.source?`<div class="meta">${esc(t('web.caution.source',{source:c.source||'—'}))}</div>`:''}</div>`).join('')+count;
+}
 function pageHead(title,question,facts){
   const fs=(facts||[]).filter(Boolean);
   return `<h1 class="ptitle">${esc(title)}</h1>`+(question?`<p class="pq">${esc(question)}</p>`:'')
@@ -632,6 +756,7 @@ function markerTable(list){
     return `<tr${m.system?` data-system="${esc(m.system)}" title="${esc(t('system.open'))}"`:''}><td>${esc(m.name)}</td>`
       +`<td class="v">${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit||'')}</span></td>`
       +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`
+      +((m.decisions||[]).some(d=>d.crossed===true||d.crossed===null)?`<tr><td colspan="5">${decisionNote(m,false)}</td></tr>`:'')
       +markerGeneticsRow(m);}).join('');
   return `<div class="tblwrap"><table class="dt"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
     +`<th>${esc(t('web.table.ref'))}</th><th class="opt">${esc(t('web.table.date'))}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -642,7 +767,7 @@ function markerTable(list){
 // and the row is a door to the system card, where the person's state is.
 function markerGeneticsRow(m){
   const ps=m.positions||[]; if(!ps.length) return '';
-  const items=ps.map(p=>`${p.level?levelChip(p.level,p.level_short)+' ':''}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${p.direction?` <span class="muted small">${esc(t('system.panel.dir.'+p.direction))}</span>`:''}`+(p.system?` ${systemLinkHtml(p.system,p.system_label||t('radar.domain.'+p.system))}`:'')).join(' · ');
+  const items=ps.map(p=>`${p.level?levelChip(p.level,p.level_short)+' ':''}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${p.direction?` <span class="muted small">${esc(t('system.panel.dir.'+p.direction))}</span>`:''}`+mechanismHtml(p)+(p.system?` ${systemLinkHtml(p.system,p.system_label||t('radar.domain.'+p.system))}`:'')).join(' · ');
   return `<tr class="labgen"><td colspan="5" class="small"><span class="muted">${esc(t('labs.genetics_of',{n:ps.length}))}:</span> ${items}</td></tr>`;
 }
 function wantedLang(){
@@ -669,9 +794,11 @@ const _net={started:0,done:0};
 // every finished background job empty the memory, and the answers that
 // describe a running job are never remembered. A reader gets a copy.
 const _apiCache=new Map();
+let _answerEpoch=0;
 const NO_CACHE=[/\/api\/update-status/,/\/api\/recompute(\/status)?(\?|$)/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/];
-function forgetAnswers(){_apiCache.clear();}
+function forgetAnswers(){_answerEpoch++;_apiCache.clear();}
 async function api(path,opts){
+  const epoch=_answerEpoch;
   const isGet=!opts||!opts.method||opts.method==='GET';
   const key=withLang(path);
   if(isGet&&_apiCache.has(key)){_net.started++;_net.done++;return JSON.parse(_apiCache.get(key));}
@@ -682,7 +809,7 @@ async function api(path,opts){
     // or be drawn as if it were a result.
     let j; try{ j=await r.json(); }catch(e){ j={}; }
     if(!r.ok&&(!j||typeof j!=='object'||!j.error)) j={...(j&&typeof j==='object'?j:{}),error:t('web.common.error')+' ('+r.status+')'};
-    if(isGet&&r.ok&&!NO_CACHE.some(re=>re.test(path))) _apiCache.set(key,JSON.stringify(j));
+    if(isGet&&r.ok&&epoch===_answerEpoch&&!NO_CACHE.some(re=>re.test(path))) _apiCache.set(key,JSON.stringify(j));
     return j;}
   finally{_net.done++;}
 }
@@ -715,7 +842,7 @@ function tickLoaders(){
     if(txt) txt.textContent=parts&&!parts.startsWith('⟦')?parts:t('web.common.loading');
   });
 }
-function showLoader(el){ if(!el) return; el.innerHTML=loaderHtml(); if(!_loaderTimer) _loaderTimer=setInterval(tickLoaders,150); }
+function showLoader(el){ if(!el) return; if(el.id==='view') el.className='pico'; el.innerHTML=loaderHtml(); if(!_loaderTimer) _loaderTimer=setInterval(tickLoaders,150); }
 async function post(path,body){forgetAnswers();const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;_systems=null;return r;}
 // The systems listing is read once per page state and shared: three tabs join
 // on it (marker → system, gene → systems, prescription → system) and none of
@@ -789,6 +916,8 @@ const FLAG = {
   ok:{cls:'b-good', key:'web.flag.ok'},
   near:{cls:'b-near', key:'web.flag.near'},
   unknown:{cls:'b-unknown', key:'web.flag.unknown'},
+  unconfirmed_rule:{cls:'b-unknown', key:'web.flag.unconfirmed'},
+  norange:{cls:'b-unknown', key:'web.flag.unassessed'},
 };
 const LEVEL = {
   high:{cls:'b-critical', key:'web.level.high'},
@@ -878,41 +1007,81 @@ function targetText(m){
   return ` · <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(m.target)}))}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:m.target.set_by,set_on:m.target.set_on}))})</span>`;
 }
 
+// ---------------- Colours for a canvas ----------------
+// A chart is drawn on a canvas, which cannot read a CSS variable, so the page's
+// token is resolved to a colour at the moment of drawing: a probe element takes
+// the variable as its colour and the browser answers with rgb(). With an alpha,
+// the same colour at that opacity. A theme switch redraws the view, and the
+// charts are asked again (0.6.0: until then they carried the dark palette as
+// literals, and a light page would have drawn them on white).
+function tok(name, alpha){
+  const probe=document.createElement('span');
+  probe.style.color=`var(${name})`; probe.style.display='none';
+  document.body.appendChild(probe);
+  const c=getComputedStyle(probe).color; probe.remove();
+  if(alpha==null) return c;
+  const m=c.match(/rgba?\(([^)]+)\)/); if(!m) return c;
+  const [r,g,b]=m[1].split(',').map(x=>parseFloat(x));
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 // ---------------- The goal dashboard (on the "Overview" tab) ----------------
 let _goalMarksReady=false, _goalCharts=[];
 function goalSetup(){
   if(typeof Chart==='undefined') return false;
+  chartColours();
   if(_goalMarksReady) return true;
   const marks={ id:"marks",
     beforeDraw(chart){ const o=chart.options.plugins.marks; if(!o) return;
       const {ctx,chartArea:a,scales}=chart;
       if(o.band){ const lb=chart.data.labels;
         const fi=lb.findIndex(x=>x>=o.band.from), tiRev=[...lb].reverse().findIndex(x=>x<=o.band.to);
-        if(fi>=0){ const li=tiRev>=0?lb.length-1-tiRev:lb.length-1;
+        if(fi>=0&&tiRev>=0){ const li=lb.length-1-tiRev;
+          if(li<fi) return;
           const x1=scales.x.getPixelForValue(fi), x2=scales.x.getPixelForValue(li);
-          ctx.save();ctx.fillStyle="rgba(84,214,166,.13)";
-          ctx.fillRect(Math.min(x1,x2),a.top,Math.abs(x2-x1),a.bottom-a.top);ctx.restore(); } } },
+          ctx.save();ctx.fillStyle=tok("--chart-band");ctx.strokeStyle=tok("--chart-boundary");ctx.lineWidth=1.5;
+          ctx.fillRect(Math.min(x1,x2),a.top,Math.abs(x2-x1),a.bottom-a.top);
+          ctx.strokeRect(Math.min(x1,x2),a.top,Math.abs(x2-x1),a.bottom-a.top);ctx.restore(); } } },
     afterDraw(chart){ const o=chart.options.plugins.marks; if(!o||!o.targets) return;
       const {ctx,chartArea:a,scales}=chart;
       o.targets.forEach(mk=>{ const sc=scales[mk.axis||"y"]; if(!sc) return;
         const y=sc.getPixelForValue(mk.value);
-        ctx.save();ctx.strokeStyle=mk.color||"#ffd166";ctx.setLineDash([5,4]);ctx.lineWidth=1.4;
+        ctx.save();ctx.strokeStyle=tok("--chart-target");ctx.setLineDash([6,4]);ctx.lineWidth=1.5;
         ctx.beginPath();ctx.moveTo(a.left,y);ctx.lineTo(a.right,y);ctx.stroke();
-        ctx.setLineDash([]);ctx.fillStyle=mk.color||"#ffd166";ctx.font="600 10px system-ui";ctx.textAlign="right";
+        ctx.setLineDash([]);ctx.fillStyle=tok("--ink-2");ctx.font="600 10px system-ui";ctx.textAlign="right";
         ctx.fillText(mk.label,a.right-4,y-4);ctx.restore(); }); } };
   Chart.register(marks);
-  Chart.defaults.color="#898781";
-  Chart.defaults.font.family="system-ui,-apple-system,Segoe UI,sans-serif";
+    Chart.defaults.font.family="system-ui,-apple-system,Segoe UI,sans-serif";
   Chart.defaults.font.size=11;
   _goalMarksReady=true; return true;
 }
-const GGRID={color:"#2c2c2a",drawTicks:false};
+// The chart chrome, asked of the tokens each time charts are drawn (tok above).
+let GGRID={color:"",drawTicks:false}, CT={};
+function chartColours(){
+  CT={muted:tok("--muted"), ink2:tok("--ink-2"), ink:tok("--ink"), grid:tok("--grid"),
+      raised:tok("--raised"), border:tok("--border"), series:tok("--chart-series")};
+  GGRID={color:CT.grid,drawTicks:false};
+  if(typeof Chart!=='undefined') Chart.defaults.color=CT.muted;
+}
+// A series colour at an opacity, whether it came as #rrggbb (a profile's own
+// colour) or as rgb() (a token resolved above).
+function withAlpha(c,a){
+  if(/^#[0-9a-f]{6}$/i.test(c)) return c+Math.round(a*255).toString(16).padStart(2,'0');
+  const m=String(c).match(/rgba?\(([^)]+)\)/); if(!m) return c;
+  const [r,g,b]=m[1].split(',').map(x=>parseFloat(x));
+  return `rgba(${r},${g},${b},${a})`;
+}
 const gbase=(extra={})=>({responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
-  plugins:{legend:{display:false},tooltip:{backgroundColor:"#111",borderColor:"#2c2c2a",borderWidth:1,padding:8}},
-  scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:"#898781"}},
-          y:{grid:GGRID,ticks:{color:"#a9a89f"}}}, ...extra});
-const gline=(v,c,fill=false)=>({data:v,borderColor:c,backgroundColor:fill?c+"22":c,
-  borderWidth:2.2,tension:.3,pointRadius:2.2,pointHoverRadius:5,pointBackgroundColor:c,fill,spanGaps:true});
+  plugins:{legend:{display:false},tooltip:{backgroundColor:CT.raised,borderColor:CT.border,titleColor:CT.ink,bodyColor:CT.ink,borderWidth:1,padding:8}},
+  scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:CT.muted}},
+          y:{grid:GGRID,ticks:{color:CT.ink2}}}, ...extra});
+const gline=(v,c,fill=false)=>({data:v,borderColor:c,backgroundColor:fill?withAlpha(c,.13):c,
+  borderWidth:2.2,tension:0,pointRadius:2.2,pointHoverRadius:5,pointBackgroundColor:c,fill,spanGaps:false});
+// Paired observations share the personal-series role, not a clinical status.
+function gpaired(v,label,axis,secondary=false){
+  return {...gline(v,CT.series),label,yAxisID:axis,
+    borderDash:secondary?[2,3]:[],pointStyle:secondary?'triangle':'circle'};
+}
 function destroyGoalCharts(){ _goalCharts.forEach(c=>{try{c.destroy()}catch(e){}}); _goalCharts=[]; }
 // A chart box is emitted only when there is a series to draw in it. The boxes used
 // to be printed unconditionally and `drawGoalCharts` then skipped the empty ones, so
@@ -938,6 +1107,11 @@ function gsection(heading, grid, boxes){
 // are different kinds of claim and must not look alike.
 const GSRC={guideline:'goalgen.src.guideline',personal_best:'goalgen.src.personal_best',
             reference:'goalgen.src.reference'};
+function goalBasisHtml(c){
+  const b=c.target_basis;
+  const detail=b?t('goalgen.basis',{detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}):t('goalgen.observation_only');
+  return `<div class="why muted">${esc(detail)}</div>${c.proposal_status==='observation'?`<div class="meta">${esc(t('goalgen.observed_value',{value:c.value,unit:c.unit||'',date:(c.observed||{}).date||'—'}))}</div>`:''}`;
+}
 function gsProposal(p){
   const tg=p.target||{}, now=p.now||{};
   const cand=(p.candidates||[]).find(c=>c.source===p.proposed)||{};
@@ -953,6 +1127,7 @@ function gsProposal(p){
       ${p.reached_before?`<span class="muted small">· ${esc(t('web.goalgen.reached'))}</span>`:''}
     </div>
     ${cand.why?`<div class="why">${esc(cand.why)}</div>`:''}
+    ${goalBasisHtml(cand)}
     ${cit?`<div class="meta">${esc([cit.body,cit.document,cit.year].filter(Boolean).join(', '))}${
         cit.url?` · <a href="${esc(cit.url)}" target="_blank" rel="noreferrer noopener">${esc(cit.url)}</a>`:''}</div>`:''}
     ${cand.assumed&&cand.assumed.note?`<div class="why c-warning">⚠ ${esc(cand.assumed.note)}</div>`:''}
@@ -964,10 +1139,10 @@ async function renderGoalProposal(box){
   const d=await api('/api/goal-suggest');
   const list=(d.proposals||[]).map(gsProposal).join('');
   const skipped=(d.skipped||[]).map(x=>`<div class="list-item" style="opacity:.65"><div class="row">
-      <b>${esc(x.name)}</b> <span class="muted">${esc(t('goalgen.skip.'+x.reason))}</span></div></div>`).join('');
+      <b>${esc(x.name)}</b> <span class="muted">${esc(t('goalgen.skip.'+x.reason))}</span></div>${(x.candidates||[]).map(goalBasisHtml).join('')}</div>`).join('');
   const met=(d.already_met||[]).map(x=>`<div class="list-item" style="opacity:.65"><div class="row">
       <b>${esc(x.name)}</b> <span class="muted">${esc(String((x.now||{}).value??''))} ${esc(x.unit||'')} · ${
-      esc((x.met||[]).map(m=>m.comparator+m.value).join(', '))}</span></div></div>`).join('');
+      esc((x.met||[]).map(m=>m.comparator+m.value).join(', '))}</span></div>${(x.candidates||[]).filter(c=>c.proposal_status==='held').map(goalBasisHtml).join('')}</div>`).join('');
   box.innerHTML=`<div class="meta mb-2">${esc(d.how_to_read||'')}</div>
     ${list||`<div class="muted">${esc(t('goalgen.none'))}</div>`}
     ${list?`<div class="row mt-3"><button class="act" id="gs-save">${esc(t('web.goalgen.save'))}</button></div>`:''}
@@ -984,9 +1159,37 @@ async function renderGoalProposal(box){
     mount(TABS.findIndex(x=>x[0]==='web.tab.overview'));
   };
 }
+function goalEntitiesHTML(entities){
+  const origins=['complaint','lab','genome','history','clinician','prevention'];
+  return entities.length?`<section class="card"><h3>${esc(t('goal.origin.heading'))}</h3>${entities.map(e=>{
+    const o=e.origin||{}, value=e.target==null?'—':typeof e.target==='object'?JSON.stringify(e.target):String(e.target);
+    return `<div class="blk" data-goal-entity="${esc(e.id)}"><b>${esc(e.title)}</b> · ${esc(value)}
+      <p class="meta">${esc(t('goal.origin.line',{origin:o.label||t('goal.origin.unspecified'),reason:o.reason||'—'}))}</p>
+      <p class="meta">${esc(e.record.file)} · ${esc(e.id)}</p>
+      <details class="noprint"><summary>${esc(t('goal.origin.edit'))}</summary>
+        <form data-goal-origin="${esc(e.id)}" class="row" style="flex-wrap:wrap">
+          <select name="origin" aria-label="${esc(t('goal.origin.choose'))}" required><option value="">${esc(t('goal.origin.choose'))}</option>
+            ${origins.map(k=>`<option value="${esc(k)}" ${o.kind===k?'selected':''}>${esc(t('goal.origin.'+k))}</option>`).join('')}</select>
+          <input name="reason" required value="${esc(o.reason||'')}" aria-label="${esc(t('goal.origin.reason'))}" placeholder="${esc(t('goal.origin.reason'))}">
+          <button class="act" type="submit">${esc(t('goal.origin.edit'))}</button>
+        </form></details></div>`;
+  }).join('')}</section>`:'';
+}
+function bindGoalOrigins(root){
+  root.querySelectorAll('[data-goal-origin]').forEach(form=>form.onsubmit=async event=>{
+    event.preventDefault();
+    const button=form.querySelector('button'); button.disabled=true;
+    try{
+      const r=await post('/api/targets',{action:'origin',goal_id:form.dataset.goalOrigin,
+        origin:form.elements.origin.value,reason:form.elements.reason.value});
+      if(r.error){toast(r.error);return;}
+      toast(t('goal.origin.saved')); mount(TABS.findIndex(x=>x[0]==='web.tab.overview'));
+    }finally{button.disabled=false;}
+  });
+}
 function renderGoal(root, g){
-  if(!g||!g.available){
-    root.innerHTML=`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>
+  if(!g||!g.available||!(g.targets||[]).length){
+    root.innerHTML=`${goalEntitiesHTML((g&&g.entities)||[])}${g&&g.available?'':`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`}
       <div class="card" style="margin-top:12px">
         <div class="row"><b>${esc(t('web.goalgen.h'))}</b></div>
         <div class="meta" style="margin:6px 0 10px">${esc(t('web.goalgen.intro'))}</div>
@@ -994,6 +1197,7 @@ function renderGoal(root, g){
         <div id="gs-box" style="margin-top:14px"></div>
       </div>`;
     $('#gs-go',root).onclick=()=>renderGoalProposal($('#gs-box',root));
+    bindGoalOrigins(root);
     return;
   }
   // «—» meant three different things: nothing carries this series, two devices
@@ -1009,15 +1213,15 @@ function renderGoal(root, g){
   const peaks=(g.peaks||[]).map(p=>`<div class="peak"><h4>${esc(p.title)} <span class="yr">· ${esc(p.year)}</span></h4><p>${esc(p.text)}</p></div>`).join('');
   const C=g.charts||{};
   root.innerHTML=`<div class="goalboard">
+    ${goalEntitiesHTML(g.entities||[])}
     <div class="gb-headline"><b>${esc(t('web.goal.in_one_phrase'))}</b> ${esc(g.headline)}</div>
     ${peaks?`<div class="peaks">${peaks}</div>`:''}
     <h3 class="gh">${esc(t('web.goal.targets_h'))}</h3>
     <div class="tblscroll"><table class="tgt"><thead><tr><th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="glegend">
-      <span><i class="gdot" style="background:var(--serious)"></i>${esc(t('web.goal.lg_now'))}</span>
-      <span><i class="gdot" style="background:var(--good)"></i>${esc(t('web.goal.lg_best'))}</span>
-      <span><i class="gdot" style="background:var(--warning)"></i>${esc(t('web.goal.lg_target'))}</span>
-      <span><i class="gdot" style="background:rgba(84,214,166,.55)"></i>${esc(t('web.goal.lg_window'))}</span>
+      <span><i class="gdot gdot-series"></i>${esc(t('web.goal.lg_series'))}</span>
+      <span><i class="gdot gdot-target"></i>${esc(t('web.goal.lg_target'))}</span>
+      <span><i class="gdot gdot-band"></i>${esc(t('web.goal.lg_window'))}</span>
     </div>
     ${gsection(t('web.goal.body_h'),'g2',[
       gbox(C.weight,'big',t('web.goal.weight'),'gcW'),
@@ -1033,43 +1237,39 @@ function renderGoal(root, g){
   const gm=$('#gminis',root);
   (C.minis||[]).filter(gdrawn).forEach(m=>gm.appendChild(el(`<div class="chartbox mini"><h4>${esc(m.title)}</h4><p class="cap">${esc(m.cap)}</p><div class="cv"><canvas id="gc_${esc(m.id)}"></canvas></div></div>`)));
   drawGoalCharts(C, root);
+  bindGoalOrigins(root);
 }
 function drawGoalCharts(C, root){
   if(!goalSetup()){ root.appendChild(el(`<div class="muted" style="font-size:12.5px;margin-top:8px">${esc(t('web.goal.charts_unavailable'))}</div>`)); return; }
   destroyGoalCharts();
   if(C.weight&&C.weight.l&&C.weight.l.length){
-    _goalCharts.push(new Chart($('#gcW',root),{type:"line",data:{labels:C.weight.l,datasets:[gline(C.weight.v,"#4ea1ff",true)]},
+    _goalCharts.push(new Chart($('#gcW',root),{type:"line",data:{labels:C.weight.l,datasets:[gline(C.weight.v,CT.series)]},
       options:gbase({plugins:{legend:{display:false},marks:{band:C.weight.band,targets:C.weight.targets}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:8,color:"#898781"}},
-          y:{grid:GGRID,suggestedMin:C.weight.min,suggestedMax:C.weight.max,ticks:{color:"#a9a89f"}}}})}));
+        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:8,color:CT.muted}},
+          y:{grid:GGRID,suggestedMin:C.weight.min,suggestedMax:C.weight.max,ticks:{color:CT.ink2}}}})}));
   }
   if(C.bodycomp&&C.bodycomp.l&&C.bodycomp.l.length){
     _goalCharts.push(new Chart($('#gcBC',root),{type:"line",data:{labels:C.bodycomp.l,datasets:[
-      {...gline(C.bodycomp.fat,"#ff9a6b"),label:t('web.goal.ds_fat'),yAxisID:"y"},
-      {...gline(C.bodycomp.mus,"#54d6a6"),label:t('web.goal.ds_muscle'),yAxisID:"y2"}]},
-      options:gbase({plugins:{legend:{display:false},marks:{targets:C.bodycomp.targets}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:"#898781"}},
-          y:{position:"left",grid:GGRID,suggestedMin:C.bodycomp.ymin,suggestedMax:C.bodycomp.ymax,ticks:{color:"#ff9a6b"}},
-          y2:{position:"right",grid:{drawOnChartArea:false},suggestedMin:C.bodycomp.y2min,suggestedMax:C.bodycomp.y2max,ticks:{color:"#54d6a6"}}}})}));
+      gpaired(C.bodycomp.fat,t('web.goal.ds_fat'),"y"),
+      gpaired(C.bodycomp.mus,t('web.goal.ds_muscle'),"y2",true)]},
+      options:gbase({plugins:{legend:{display:true},marks:{targets:C.bodycomp.targets}},
+        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:CT.muted}},
+          y:{position:"left",grid:GGRID,suggestedMin:C.bodycomp.ymin,suggestedMax:C.bodycomp.ymax,ticks:{color:CT.ink2},title:{display:true,text:t('web.goal.ds_fat')}},
+          y2:{position:"right",grid:{drawOnChartArea:false},suggestedMin:C.bodycomp.y2min,suggestedMax:C.bodycomp.y2max,ticks:{color:CT.ink2},title:{display:true,text:t('web.goal.ds_muscle')}}}})}));
   }
   (C.minis||[]).forEach(m=>{ if(!m.l||!m.l.length) return;
-    const pc=m.l.map(x=>x.startsWith("2021")||x.startsWith("2020")?"#54d6a6":(x===m.l[m.l.length-1]?"#ff6b6b":m.color));
-    const pr=m.l.map(x=>x.startsWith("2021")||x.startsWith("2020")||x===m.l[m.l.length-1]?4:2.2);
-    _goalCharts.push(new Chart($('#gc_'+m.id,root),{type:"line",data:{labels:m.l,datasets:[{data:m.v,borderColor:m.color,backgroundColor:m.color+"1e",
-      borderWidth:2.2,tension:.3,pointRadius:pr,pointHoverRadius:5,pointBackgroundColor:pc,fill:true,spanGaps:true}]},
-      options:gbase({plugins:{legend:{display:false},marks:{targets:[{value:m.tgt,label:m.tlabel,color:"#ffd166"}]}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:4,color:"#898781",font:{size:9}}},
-          y:{grid:GGRID,suggestedMin:m.min,suggestedMax:m.max,ticks:{color:"#a9a89f",maxTicksLimit:4}}}})}));
+    _goalCharts.push(new Chart($('#gc_'+m.id,root),{type:"line",data:{labels:m.l,datasets:[gline(m.v,CT.series)]},
+      options:gbase({plugins:{legend:{display:false},marks:{targets:[{value:m.tgt,label:m.tlabel}]}},
+        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:4,color:CT.muted,font:{size:9}}},
+          y:{grid:GGRID,suggestedMin:m.min,suggestedMax:m.max,ticks:{color:CT.ink2,maxTicksLimit:4}}}})}));
   });
   [['fit','#gcFIT'],['la','#gcLA']].forEach(([k,sel])=>{ const d=C[k]; if(!d||!d.l||!d.l.length) return;
-    const ds=(vals,color,ax,lbl)=>({data:vals,borderColor:color,backgroundColor:color,borderWidth:2.2,tension:.3,
-      pointRadius:2.6,pointHoverRadius:5,pointBackgroundColor:color,spanGaps:true,yAxisID:ax,fill:false,label:lbl});
     _goalCharts.push(new Chart($(sel,root),{type:"line",data:{labels:d.l,datasets:[
-      ds(d.a,d.a_color,"y",d.a_label), ds(d.b,d.b_color,"y2",d.b_label)]},
-      options:gbase({plugins:{legend:{display:false},marks:{band:d.band,targets:d.targets}},
-        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:"#898781"}},
-          y:{position:"left",grid:GGRID,suggestedMin:d.ymin,suggestedMax:d.ymax,ticks:{color:d.a_color}},
-          y2:{position:"right",grid:{drawOnChartArea:false},suggestedMin:d.y2min,suggestedMax:d.y2max,ticks:{color:d.b_color}}}})}));
+      gpaired(d.a,d.a_label,"y"), gpaired(d.b,d.b_label,"y2",true)]},
+      options:gbase({plugins:{legend:{display:true},marks:{band:d.band,targets:d.targets}},
+        scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:7,color:CT.muted}},
+          y:{position:"left",grid:GGRID,suggestedMin:d.ymin,suggestedMax:d.ymax,ticks:{color:CT.ink2},title:{display:true,text:d.a_label}},
+          y2:{position:"right",grid:{drawOnChartArea:false},suggestedMin:d.y2min,suggestedMax:d.y2max,ticks:{color:CT.ink2},title:{display:true,text:d.b_label}}}})}));
   });
 }
 
@@ -1101,11 +1301,12 @@ function renderFocus(root,f){
   const dl=(m.delta!=null)?`<span class="badge ${m.delta>=2?'b-good':(m.delta<=-2?'b-critical':'b-unknown')}">${esc(t('web.focus.vs_baseline',{delta:m.delta_txt||m.delta}))}</span>`:'';
   const levers=(f.levers||[]).slice().sort((x,y)=>({primary:0,secondary:1,hypothesis:2}[x.status]??3)-({primary:0,secondary:1,hypothesis:2}[y.status]??3));
   const j=(f.journal&&f.journal.state)||{};
-  const today=new Date().toISOString().slice(0,10);
+  const today=localDay();
   root.innerHTML=`<div class="fc">
     <div class="fch"><h3>${esc(f.title||'')}</h3>
       <span class="muted small">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
-    <p class="fcwhy">${esc(f.why||'')}</p>
+    <p class="meta">${esc(t('clinical.recorded_focus'))}</p><p class="fcwhy">${esc(f.why||'')}</p>
+    ${f.goal_entity?`<p class="meta">${esc(t('goal.origin.line',{origin:f.goal_entity.origin.label,reason:f.goal_entity.origin.reason||'—'}))}</p>`:''}
     <div class="fcnum"><b>${esc(String(m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')))}</b><span>${esc(m.unit||'')} · ${esc(m.label||'')}</span>
       <span>${esc(t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}))}</span></div>
     ${fcTrack(m)}
@@ -1170,6 +1371,7 @@ async function viewOverview(root){
   if(o.subject_id) parts.push(t('web.header.subject',{subject:o.subject_id}));
   parts.push(plural(o.medications_count,'count.prescriptions'));
   if(o.genome_gaps.length) parts.push(plural(o.genome_gaps.length,'count.genes_unread'));
+  if(!root.isConnected) return;
   $('#subhead').textContent = parts.join(' · ');
   const doms=(radar.domains||[]).filter(d=>d.score!=null);
   const attention=doms.filter(d=>d.status==='warning'||d.status==='critical');
@@ -1193,7 +1395,7 @@ async function viewOverview(root){
   // worked on, the goal — and the person's own profile and measurements last.
   // A precondition the profile lacks is the exception: it is said at the top,
   // because every number below it may depend on it.
-  root.innerHTML = `${pageHead(t('web.tab.overview'),t('web.page.overview.q'),facts)}
+  root.innerHTML = `${pageHead(firstTabLabel(),t('web.page.overview.q'),facts)}${cautionsHtml(o.regimen_cautions)}${controlsHtml(o.overdue_controls,true)}
     <div id="ov-missing"></div>
     <h2 class="section mt-0">${esc(t('web.body.title'))}</h2>
     <div id="ov-systems"></div>
@@ -1246,11 +1448,12 @@ function decisionNote(m, context){
   // crossed:null — the value could not be compared; it may be crossed, so it is
   // shown wherever a crossed one is, and «not reached» is said only of a compared one
   const open=ds.filter(d=>d.crossed===null);
-  const openHtml=open.map(d=>`<div class="why" style="color:var(--warning)">${esc(t('web.decision.not_comparable',{value:d.value,label:d.label}))}</div>`).join('');
-  if(hit.length) return hit.map(d=>`<div class="why" style="color:var(--critical)">❗${esc(t('web.decision.crossed',{label:d.label,sign:d.side==='high'?'≥':'≤',value:d.value}))} — ${esc(d.action||'')} <span class="muted">[${esc(d.source||'')}]</span></div>`).join('')+openHtml;
+  const grounds=d=>[d.threshold_basis,d.action?d.action_basis:null].filter(b=>b?.status==='complete').map(b=>`<div class="small muted">${esc(b.mechanism)} [${esc(b.source)}]</div>`).join('');
+  const openHtml=open.map(d=>`<div class="why" style="color:var(--warning)">${esc(d.why==='threshold_basis'?t('decision.withheld',{value:d.value??'—',reason:d.threshold_basis.reason}):t(d.why==='censored'||d.value==null?'decision.censored':'web.decision.not_comparable',{value:d.value??'—',label:d.label}))}</div>`).join('');
+  if(hit.length) return hit.map(d=>`<div class="why" style="color:var(--critical)">❗${esc(t('web.decision.crossed',{label:d.label,sign:{gt:'>',lt:'<'}[d.comparison]||(d.side==='high'?'≥':'≤'),value:d.value}))} — ${esc(d.action||'')}</div>${grounds(d)}${!d.action&&d.action_basis?.status==='incomplete'?`<div class="why muted">${esc(t('decision.action_gap',{reason:d.action_basis.reason}))}</div>`:''}`).join('')+openHtml;
   if(open.length) return openHtml;
   const done=ds.filter(d=>d.crossed===false);
-  if(context && done.length){const d=done[0];return `<div class="why muted">${esc(t('web.decision.not_reached',{value:d.value,label:d.label}))}</div>`;}
+  if(context && done.length){const d=done[0];return `<div class="why muted">${esc(t('web.decision.not_reached',{value:d.value,label:d.label}))}</div>${grounds(d)}`;}
   return '';
 }
 function nearNote(m){
@@ -1261,6 +1464,8 @@ function nearNote(m){
   return `<span class="trend">${esc(t('web.near.margin',{pct:nl.margin_pct,side:side,bound:nl.bound}))}${esc(cp)}${mv}</span>`;
 }
 function refText(m){
+  if(m.proposed_rule) return t('markers.proposed_no_flag',{key:m.key});
+  if(m.reference_table&&m.reference_table.length) return t('labs.printed_reference_table')+': '+m.reference_table.map(r=>r.raw).join('; ')+(m.reference_grade?' · '+t('labs.printed_grade',{grade:m.reference_grade}):'');
   const base=(m.ref_low!=null&&m.ref_high!=null)?t('ref.range',{low:m.ref_low,high:m.ref_high})
     :(m.ref_high!=null?t('ref.max',{high:m.ref_high})
     :(m.ref_low!=null?t('ref.min',{low:m.ref_low}):''));
@@ -1293,12 +1498,13 @@ function markerCard(m){
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted small" title="${esc(m.date)}">${esc(fmtDate(m.date))}</span>`:''}${tr}</div>
     ${m.series&&m.series.length>1?sparkline(m.series,undefined,m.target?{ref_low:m.ref_low,ref_high:m.ref_high,target:m.target}:null):''}
     <div class="meta">${esc(refText(m))}${targetText(m)}${m.genome_link?` · ${ownerNoteHtml(m)}`:''}${m.system?` · ${systemLinkHtml(m.system)}`:''}</div>
+    ${decisionNote(m,false)}
     ${noteHtml(notes,'meta')}
     ${targetAsk(m)}
   </div>`);
 }
 async function viewLabs(root){
-  const [d,catR,sb,cfgR]=await Promise.all([api('/api/labs'),api('/api/markers'),sourceBar(['labs']),api('/api/source-config')]);
+  const [d,catR,sb,cfgR,meds]=await Promise.all([api('/api/labs'),api('/api/markers'),sourceBar(['labs']),api('/api/source-config'),api('/api/medications')]);
   // the series for the sparklines are pulled from the catalogue
   const cat=catR.markers;
   const docs=(cfgR.folders||{}).labs_docs;
@@ -1319,13 +1525,15 @@ async function viewLabs(root){
   const rest=d.markers.filter(m=>!(m.flag in OUT));
   const latest=d.markers.map(m=>String(m.date||'')).sort().pop()||'';
   const facts=[
-    factHtml(`${d.abnormal_count}<small class="muted">/${d.count}</small>`,t('web.labs.fact_abnormal'),d.abnormal_count?'c-critical':'c-good'),
-    factHtml(String(rest.length),t('web.labs.fact_within'),'c-good'),
+    factHtml(`${d.abnormal_count}<small class="muted">/${d.count}</small>`,t('web.labs.fact_abnormal'),d.abnormal_count?'c-critical':(d.markers.some(m=>m.flag==='ok')?'c-good':'')),
+    factHtml(String(d.markers.filter(m=>m.flag==='ok').length),t('web.labs.fact_within'),d.markers.some(m=>m.flag==='ok')?'c-good':''),
+    d.markers.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?factHtml(String(d.markers.filter(m=>['norange','unconfirmed_rule'].includes(m.flag)).length),t('web.labs.fact_uncompared'),''):'',
+    d.decision_unresolved_count?factHtml(String(d.decision_unresolved_count),t('web.labs.fact_threshold_unresolved'),'c-warning'):'',
     latest?factHtml(esc(fmtDate(latest)),t('web.labs.fact_latest'),''):'',
   ];
   // The folder by its name; the whole path is in the tooltip, not in the text.
   const folder=docs?String(docs).split('/').filter(Boolean).pop():'';
-  root.innerHTML = `${pageHead(t('web.tab.labs'),t('web.page.labs.q'),facts)}
+  root.innerHTML = `${pageHead(t('web.tab.labs'),t('web.page.labs.q'),facts)}${treatmentHtml(meds.treatment)}
     <div class="toolbar">
       <button class="act" id="ingest-run">${esc(t('web.labs.reingest'))}</button>
       <button class="ghost" id="pick-docs">${esc(t('web.labs.pick_docs'))}</button>
@@ -1337,12 +1545,12 @@ async function viewLabs(root){
     <div id="targets-box"></div>
     <h2 class="section">${esc(t('web.labs.out_h'))} <span class="muted">· ${flagged.length}</span></h2>
     <div class="grid" id="labgrid"></div>
-    ${rest.length?`<details class="fold mt-4" id="labrest"><summary>${esc(t('web.labs.within_h',{n:rest.length}))}</summary><div class="grid mt-2" id="labrestgrid"></div></details>`:''}
+    ${rest.length?`<details class="fold mt-4" id="labrest"><summary>${esc(t(rest.some(m=>m.flag!=='ok')?'web.labs.other_h':'web.labs.within_h',{n:rest.length}))}</summary><div class="grid mt-2" id="labrestgrid"></div></details>`:''}
     ${sb}`;
   renderTargets($('#targets-box',root), cat);
   const g = $('#labgrid',root);
   flagged.forEach(m=>g.appendChild(markerCard(m)));
-  if(!flagged.length) g.innerHTML=emptyHtml(d.count?t('web.labs.none_out'):t('web.overview.no_red_nodata'));
+  if(!flagged.length) g.innerHTML=emptyHtml(d.count?t(d.markers.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?'web.labs.none_out_unassessed':'web.labs.none_out'):t('web.overview.no_red_nodata'));
   // Drawn when opened: the cards inside the corridor are built on the first open.
   const rd=$('#labrest',root);
   if(rd) rd.addEventListener('toggle',()=>{ const rg=$('#labrestgrid',root); if(rd.open&&!rg.childElementCount) rest.forEach(m=>rg.appendChild(markerCard(m))); });
@@ -1363,10 +1571,15 @@ async function viewLabs(root){
     const r=await post('/api/ingest-labs',{});
     if(!r.ok){box.innerHTML=errorHtml(r.error||t('web.common.error'));return;}
     const files=(r.per_file||[]).map(f=>`<li>${esc(f.file)} <span class="muted">(${esc(fmtDate(f.date))}): ${esc(plural(f.markers.length,'count.markers'))}</span></li>`).join('');
-    box.innerHTML=`<div class="card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))}
-      ${files?`<ul class="meta">${files}</ul>`:`<div class="meta">${esc(t('web.labs.ingest_nothing_new'))}</div>`}</div>`;
+    const refused=(r.not_ingested||[]).map(f=>`<li>${esc(f.file)} — ${esc(f.detail||f.reason)}</li>`).join('');
+    const conflicts=(r.conflicts||[]).map(c=>`<li>${esc(t('ingest.conflict',c))}</li>`).join('');
+    const errors=(r.errors||[]).map(f=>`<li>${esc(t('web.common.error_prefix'))}${esc(f)}</li>`).join('');
+    const unknown=(r.unrecognised_rows||[]).map(f=>`<li>${esc(t('ingest.unrecognised_rows',{file:f.file,n:f.count}))}<ul>${f.rows.map(row=>`<li>${esc(row.label)} [${esc(row.unit||'')}]</li>`).join('')}</ul></li>`).join('');
+    const report=`<div class="card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))}
+      ${files?`<ul class="meta">${files}</ul>`:`<div class="meta">${esc(t('web.labs.ingest_nothing_new'))}</div>`}${refused||unknown||conflicts||errors?`<ul>${refused}${unknown}${conflicts}${errors}</ul>`:''}</div>`;
+    box.innerHTML=report;
     toast(r.points_added>0?t('web.labs.points_added',{n:r.points_added}):t('web.labs.no_new_data'));
-    if(r.points_added>0){_sources=null; viewLabs($('#view'));}
+    if(r.points_added>0){_sources=null; await viewLabs($('#view')); const target=$('#ingest-res');if(target)target.innerHTML=report;}
   };
 }
 function renderAddLab(box, cat){
@@ -1491,6 +1704,10 @@ function variantStateLine(v){
   if(v.state==='not_read')return t('decision.variant.not_read',{n:v.positions||0});
   return t('decision.variant.no_positions');
 }
+function ctxCount(ctx){
+  const b=(ctx&&ctx.blocks)||{};
+  return ['mechanism','asked_about','no_variant'].reduce((n,k)=>n+(b[k]||[]).length,0)+((ctx&&ctx.named)||[]).length;
+}
 function contextHtml(ctx){
   if(!ctx||!ctx.blocks)return '';
   let out='';
@@ -1525,17 +1742,22 @@ function pgxCard(d){
   const online=d.resolved_by==='rxnorm';
   const markers=(d.markers_found||[]).map(m=>m.copies!=null
     ? `<li><code>${esc(m.rsid)}</code>${m.star?' ('+esc(m.star)+')':''} ${esc(m.genotype)} — ${esc(t('drug.marker_computed',{copies:m.copies,function:m.function}))}</li>`
-    : `<li><code>${esc(m.rsid)}</code> ${esc(m.genotype)} — ${esc(m.interpretation||'')}</li>`).join('');
+    : m.diplotype?`<li data-called-diplotype><b>${esc(m.diplotype)}</b> — ${esc(m.phenotype_text||'')}${m.source?' ('+esc(m.source)+')':''}</li>`
+    : m.rsid?`<li><code>${esc(m.rsid)}</code> ${esc(m.genotype)} — ${esc(m.interpretation||'')}</li>`:'').join('');
   return `<div class="card">
     <div class="row"><b style="font-size:18px">${esc(d.drug)}</b> → ${esc(t('web.drug.gene'))} <b>${esc(d.gene)}</b> <span class="muted">(${esc(d.drug_class)})</span> ${badge(lv.cls,t(lv.key))}${online?' '+badge('b-unknown',t('web.drug.resolved_online')):''}</div>
     <div class="meta mt-2">${esc(t('drug.why_gene',{text:d.why}))}</div>
     <div style="margin-top:6px">${esc(t('web.drug.phenotype_label'))} <b>${esc(d.phenotype)}</b> — <span class="muted">${esc(d.phenotype_label)}</span></div>
+    ${(d.co_genes||[]).map(g=>`<div class="meta mt-2" data-co-phenotype>${esc(t('drug.co_phenotype',{gene:g.gene,phenotype:g.phenotype,label:g.phenotype_label||''}))}</div>`).join('')}
     <div style="margin-top:12px"><b>${esc(t('web.drug.discuss'))}</b> ${esc(d.recommendation)}</div>
+    ${d.conclusion_basis?.status==='complete'?mechanismHtml(d):''}
+    ${d.cpic_basis?.status==='incomplete'?`<div class="why muted" data-quote-withheld>${esc(t('drug.guidance.quote_withheld',{reason:d.cpic_basis.reason||''}))}</div>`:''}
+    ${d.cpic?.recommendation?`<div class="why" data-cpic-quote><b>CPIC</b><blockquote>${esc(d.cpic.recommendation)}${d.cpic.implication?`<p>${esc(d.cpic.implication)}</p>`:''}</blockquote>${mechanismHtml({conclusion_basis:d.cpic_basis,source:d.cpic_basis?.source,mechanism:d.cpic_basis?.mechanism})}</div>`:''}
     ${markers?`<ul class="meta" style="margin-top:10px">${markers}</ul>`:''}
     ${online?`<div class="meta mt-2">${esc(t('web.drug.rxnorm_source'))}${refLink(d)}</div>`:''}
   </div>`;
 }
-const SEV={high:{cls:'b-critical',key:'web.severity.high'},moderate:{cls:'b-warning',key:'web.severity.moderate'},low:{cls:'b-good',key:'web.severity.low'}};
+const SEV={high:{cls:'b-critical',key:'web.severity.high'},moderate:{cls:'b-warning',key:'web.severity.moderate'},low:{cls:'b-good',key:'web.severity.low'},unknown:{cls:'b-unknown',key:'web.severity.unassessed'}};
 function doseHTML(dc){
   // The dose and critical layer: the dose, the effect size with a reference, the forms —
   // and a comparison against the owner's OWN numbers. Without it the discussion slides
@@ -1545,19 +1767,19 @@ function doseHTML(dc){
     ? `<div class="muted" style="font-size:13.5px;margin-bottom:8px">${esc(t('web.dose.doses',{nutritional:dc.nutritional_dose||'—',pharmacologic:dc.pharmacologic_dose||'—'}))}</div>`:'';
   const items=(dc.items||[]).map(it=>{
     const pts=(it.patient||[]).map(p=>p.measured
-      ? `${esc(p.name)} <b>${esc(String(p.value))}</b> ${esc(p.unit||'')}${p.flag==='high'?' ↑':p.flag==='low'?' ↓':''}`
+      ? `${esc(p.name)} <b>${esc(String(p.value))}</b> ${esc(p.unit||'')}${p.flag==='high'?' ↑':p.flag==='low'?' ↓':''} · ${esc(p.date||'—')} · ${esc(p.source||'—')}`
       : `${esc(p.name)}: ${esc(t('web.dose.not_measured'))}`).join(' · ');
     return `<div class="list-item"><div><b>${esc(it.claim||'')}</b></div>
       ${it.effect_size?`<div class="why">${esc(t('web.dose.effect',{text:it.effect_size}))}</div>`:''}
       ${it.low_dose_note?`<div class="why">${esc(t('web.dose.by_dose',{text:it.low_dose_note}))}</div>`:''}
       ${pts?`<div class="why">${esc(t('web.dose.your_numbers'))} ${pts}</div>`:''}
-      ${it.source?`<div class="muted small">${esc(it.source)}</div>`:''}</div>`;}).join('');
+      ${clinicalBasisHTML(it)}</div>`;}).join('');
   const alts=(dc.alternatives||[]).map(a=>`<div class="list-item"><div><b>${esc(a.name||'')}</b></div>
       ${a.melatonin?`<div class="why">${esc(t('web.dose.melatonin',{text:a.melatonin}))}</div>`:''}
       ${a.metabolic?`<div class="why">${esc(t('web.dose.metabolic',{text:a.metabolic}))}</div>`:''}
-      ${a.caveat?`<div class="why c-warning">${esc(t('web.dose.caveat',{text:a.caveat}))}</div>`:''}</div>`).join('');
+      ${a.caveat?`<div class="why c-warning">${esc(t('web.dose.caveat',{text:a.caveat}))}</div>`:''}${clinicalBasisHTML(a)}</div>`).join('');
   return `<div class="so-h">${esc(t('web.dose.title'))} <span class="muted">· ${esc(t('web.dose.subtitle'))}</span></div>
-    ${dose}${items}
+    ${clinicalBasisHTML(dc)}${dose}${items}
     ${dc.forms?`<div class="why mt-2">${esc(t('web.dose.forms',{text:dc.forms}))}</div>`:''}
     ${dc.note?`<div class="why">${esc(dc.note)}</div>`:''}
     ${alts?`<div class="so-h" style="font-size:15px;margin-top:14px">${esc(t('web.dose.alternatives_h'))}</div>${alts}`:''}
@@ -1565,14 +1787,14 @@ function doseHTML(dc){
 }
 function rxCard(r){
   if(r.status!=='ok')return `<div class="card muted">${esc(r.message||t('web.common.error'))}</div>`;
-  const ov=SEV[r.overall]||SEV.low;
+  const ov=SEV[r.overall]||SEV.unknown;
   const id=r.identified||{};
   const idLine=id.source==='none'?`<span class="muted">${esc(t('web.rx.not_identified'))}</span>`
     :`${id.source==='rxnorm'?'RxNorm':esc(t('web.rx.local_db'))}${id.atc?' · '+esc(id.atc):''}${id.reference?' · <a href="'+esc(id.reference)+'" target="_blank" rel="noopener">RxNav ↗</a>':''}`;
   // The judgement about the decision, above the sections that make it — the
   // same sentence the command line prints, from the same field.
   const ctx=r.genetic_context||{};
-  const verdictHtml=ctx.verdict?`<div class="lsact" style="margin:10px 0">${esc(verdictLine(ctx.verdict))}</div>`:'';
+  const verdictHtml=ctx.verdict?`<div class="lsact" style="margin:10px 0"><b>${esc(t('web.rx.h_genome'))}:</b> ${esc(verdictLine(ctx.verdict))}</div>`:'';
   // 🧬 the patient's genome
   const g=r.genome||{};
   let genomeHtml;
@@ -1584,7 +1806,7 @@ function rxCard(r){
       ?`<div class="muted">${esc(t('web.rx.no_pgx',{date:cp.snapshot||t('common.unknown_date')}))}</div>`
       :`<div class="muted">${esc(t('web.rx.pgx_unchecked',{why:t('pgx_unchecked.'+(cp.reason||'unreachable'))}))}</div>`;
   }else{
-    genomeHtml=g.genes.map(ge=>{
+    const geneHtml=ge=>{
       const lvl=ge.cpic_level===t('web.rx.curated_value')?esc(t('source.local')):('CPIC '+esc(ge.cpic_level));
       let body;
       if(ge.computable){
@@ -1598,9 +1820,16 @@ function rxCard(r){
       // same claim as «enough», which depends on a question we do not have.
       const cv=ge.coverage||{}, cvTxt=(cv.state&&cv.state!=='fine')?coverageLine(cv):'';
       return `<div class="list-item"><div class="row"><b>${esc(ge.gene)}</b> <span class="badge b-unknown">${lvl}</span>${ge.actionable?' '+badge('b-warning',t('web.rx.actionable')):''}</div><div class="why">${body}</div>${cvTxt?`<div class="why muted">${esc(cvTxt)}</div>`:''}</div>`;
-    }).join('');
+    };
+    // Refusals by count, findings in full (task 217, stage 0): the genes that
+    // bear on the drug open, every other gene the source links behind one line.
+    const bear=g.genes.filter(ge=>ge.actionable), rest=g.genes.filter(ge=>!ge.actionable);
+    genomeHtml=bear.map(geneHtml).join('')+rxFold(t('web.rx.more_genes'),rest.length,rest.map(geneHtml).join(''));
   }
   // 🧪 the patient's labs
+  const pg=r.pharmacogenetics||{};
+  if(pg.conclusion_basis?.status==='complete')genomeHtml=`<div class="why" data-prescribing-guidance>${esc(pg.recommendation||'')}${mechanismHtml(pg)}</div>`+genomeHtml;
+  if(pg.cpic_basis?.status==='incomplete')genomeHtml+=`<div class="why muted" data-quote-withheld>${esc(t('drug.guidance.quote_withheld',{reason:pg.cpic_basis.reason||''}))}</div>`;
   const lb=r.labs||{};
   let labsHtml;
   if(!lb.markers||!lb.markers.length){
@@ -1609,23 +1838,31 @@ function rxCard(r){
       ?`<div class="muted">${esc(t('web.rx.labs_class_unknown'))}</div>`
       :(!(lbb.with_rules||[]).length
         ?`<div class="muted">${esc(t('web.rx.labs_no_rule',{classes:r.class_display||'—'}))}</div>`
-        :`<div class="muted">${esc(t('web.rx.no_lab_control'))}</div>`);
+        :(lb.gaps||[]).length?'':`<div class="muted">${esc(t('web.rx.no_lab_control'))}</div>`);
   }else{
     labsHtml=lb.markers.map(m=>{const f=m.present?flagOf(m):FLAG.unknown;
-      const val=m.present?`${m.value} ${esc(m.unit)}`:esc(t('web.rx.not_taken_yet'));
+      const val=m.present?`${m.value} ${esc(m.unit)}${m.date?' · '+esc(m.date):''}`:esc(t('web.rx.not_taken_yet'));
       return `<div class="list-item"><div class="row">${badge(f.cls,t(f.key))}<b>${esc(m.name)}</b> <span class="muted">${val}</span></div>${m.present?nearNote(m)+decisionNote(m,true):''}</div>`;}).join('');
-    if(lb.reason)labsHtml=`<div class="meta mb-2">${esc(t('web.rx.monitor_while',{text:lb.reason}))}</div>`+labsHtml;
+    if(lb.reason&&!(lb.proposals||[]).length)labsHtml=`<div class="meta mb-2">${esc(t('web.rx.monitor_while',{text:lb.reason}))}</div>`+labsHtml;
     if(lb.near&&lb.near.length)labsHtml=`<div class="why" style="margin-bottom:8px">🔵 ${t('web.rx.near_note',{names:'<b>'+esc(lb.near.map(w=>w.name).join(', '))+'</b>'})}</div>`+labsHtml;
     if(lb.watch&&lb.watch.length)labsHtml=`<div class="why" style="margin-bottom:8px;color:var(--warning)">⚠ ${t('web.rx.watch_note',{names:'<b>'+esc(lb.watch.map(w=>w.name).join(', '))+'</b>'})}</div>`+labsHtml;
   }
+  const monitoringSupport=(lb.proposals||[]).map(p=>
+    (p.reason?`<div class="why">${esc(t('web.rx.monitor_while',{text:p.reason}))}${mechanismHtml(p.conclusion_basis)}</div>`:'')+(p.selections||[]).map(s=>
+      s.conclusion_basis.status==='complete'?`<div class="why">${esc(t('monitoring.selection_supported',{name:(lb.markers||[]).find(m=>m.key===s.key)?.name||s.key}))}${mechanismHtml(s.conclusion_basis)}</div>`:'').join('')).join('');
+  const monitoringGaps=(lb.gaps||[]).map(g=>`<div class="why muted" data-monitoring-withheld>${esc(g.detail)}</div>`).join('');
+  labsHtml=((lb.gaps||[]).length?`<div class="meta">${esc(t('monitoring.observations'))}</div>`:'')+labsHtml+monitoringSupport+rxFold(t('monitoring.gaps'),(lb.gaps||[]).length,monitoringGaps);
   // 🔗 interactions with the current prescriptions
   const inter=(r.interactions&&r.interactions.interactions)||[];
   let interHtml;
   if(inter.length){
-    interHtml=inter.map(it=>{const s=SEV[it.severity]||SEV.low;
+    interHtml=inter.map(it=>{const s=SEV[it.severity]||SEV.unknown;
       return `<div class="list-item"><div class="row">${badge(s.cls,t(s.key))}<b>${esc(it.effect)}</b></div>
-        <div class="why">${esc(t('web.rx.with_yours'))} <b>${esc((it.with_meds||[]).join(', ')||it.with_class)}</b> · ${esc(t('web.rx.mechanism',{text:it.mechanism||''}))}</div>
-        <div class="spec">${esc(t('web.rx.what_to_do',{text:it.manage||''}))}</div></div>`;}).join('');
+        <div class="why">${esc(t('web.rx.with_yours'))} <b>${esc((it.with_meds||[]).join(', ')||it.with_class)}</b></div>
+        ${it.conclusion_basis?.status==='complete'?mechanismHtml(it):''}
+        ${it.manage?`<div class="spec">${esc(t('web.rx.what_to_do',{text:it.manage}))}</div>`:''}
+        ${it.management_basis?.status==='incomplete'?`<div class="why muted">${esc(t('interactions.management_withheld',{reason:it.management_basis.reason||''}))}</div>`:''}
+        ${it.management_basis?.status==='complete'?mechanismHtml({conclusion_basis:it.management_basis,source:it.management_basis.source,mechanism:it.management_basis.mechanism}):''}</div>`;}).join('');
   }else if(r.interactions&&(r.interactions.status==='no_rules'||r.interactions.status==='unknown_class')){
     interHtml=`<div class="muted">${esc(r.interactions.message||'')}</div>`;
   }else{
@@ -1646,38 +1883,46 @@ function rxCard(r){
       return `<div class="list-item"><div class="row"><code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> ${badge(h.tier==='pathogenic'?'b-critical':'b-warning',sig)} <span class="muted">${esc(t('web.rx.genotype',{genotype:h.genotype||'?'}))} · ${esc(via)}</span></div>${h.disease?`<div class="why">${esc(diseaseText(h.disease))}</div>`:''}</div>`;
     }).join('');
   }
-  const cvSection=cvHtml?`<div class="so-h">${esc(t('web.rx.clinvar_h'))} <span class="muted">· ${esc(t('web.rx.clinvar_note'))}</span></div>${cvHtml}`:'';
+  if(cvHtml) cvHtml=`<div class="meta">${esc(t('web.rx.clinvar_note'))}</div>`+cvHtml;
   return `<div class="card mb-3">
       <div class="row"><b style="font-size:18px">${esc(t('web.rx.title',{drug:r.drug}))}</b> ${badge(ov.cls,t('web.rx.overall',{level:t(ov.key)}))}</div>
       <div class="meta mt-1">${esc(t('web.rx.class',{name:r.class_display||'—'}))} · ${idLine}</div>
-      ${(r.unresolved&&r.unresolved.length)?`<div class="meta mt-2"><b>${esc(t('prescription.unresolved_h'))}</b><ul style="margin:4px 0 0;padding-left:18px">${r.unresolved.map(u=>`<li>${esc(u.gene?t('prescription.unresolved_gene',{detail:u.detail||u.what,gene:u.gene}):(u.detail||u.what))}</li>`).join('')}</ul></div>`:''}
+      ${rxFold(t('prescription.unresolved_h'),(r.unresolved||[]).length,(r.unresolved&&r.unresolved.length)?`<ul class="meta" style="margin:4px 0 0;padding-left:18px">${r.unresolved.map(u=>`<li>${esc(u.gene?t('prescription.unresolved_gene',{detail:u.detail||u.what,gene:u.gene}):(u.detail||u.what))}</li>`).join('')}</ul>`:'')}
     </div>
     ${verdictHtml}
     ${flagsHTML(r.safety_flags)}
-    <div class="so-h">${esc(t('web.rx.h_genome'))}</div>${genomeHtml}${contextHtml(ctx)}
     <div class="so-h">${esc(t('web.rx.h_labs'))}</div>${labsHtml}
     <div class="so-h">${esc(t('web.rx.h_meds'))}</div>${interHtml}
-    ${cvSection}
+    <div class="so-h">${esc(t('web.rx.h_genome'))}</div>${genomeHtml}${rxFold(t('web.rx.context_h'),ctxCount(ctx),contextHtml(ctx))}
+    ${rxFold(t('web.rx.clinvar_h'),cv.length,cvHtml)}
     ${doseHTML(r.dose_context)}
     <div class="meta mt-3">${esc(r.disclaimer||'')}</div>`;
 }
+// One line with a count and the rest behind it: the honest detail stays, and
+// the first screen carries the answer (task 217, stage 0 — «refusals by count»).
+function rxFold(title,count,inner){
+  return (count&&inner)?`<details class="fold"><summary>${esc(title)} <span class="muted">· ${count}</span></summary>${inner}</details>`:'';
+}
 function flagsHTML(flags){
   if(!flags||!flags.length) return '';
+  const lower=flags.filter(f=>f.origin==='genotype'&&['C','D','E'].includes(f.level));
+  const count=lower.length?`<div class="why" data-caution-count>${esc(t('conclusion.caution_withheld_count',{n:lower.length}))}</div>`:'';
   const bold=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-  return flags.map(f=>{
+  return flags.filter(f=>!lower.includes(f)).map(f=>{
     const red=f.severity==='red_flag';
     const rows=[['prescription.safety_factor',f.factor],
                 ['prescription.safety_why',f.why_it_matters],
                 ['prescription.safety_pro',f.what_is_known_in_favour],
                 ['prescription.safety_unknown',f.uncertainty],
                 ['prescription.safety_action',f.action],
+                ['system.row.mechanism',f.mechanism],
                 ['prescription.safety_source',f.source]]
       .filter(x=>x[1]).map(x=>`<li style="margin:3px 0">${bold(t(x[0],{text:x[1]}))}</li>`).join('');
     return `<div class="card" style="margin-bottom:14px;border-left:4px solid var(--${red?'critical':'warning'})">
-      <div class="row"><b>${esc(t('prescription.safety_h'))}</b>${f.medication?` <span class="muted">· ${esc(f.medication)}</span>`:''}</div>
+      <div class="row"><b>${esc(t(f.interpretation_withheld?'conclusion.caution_header':f.origin==='genotype'?'prescription.genotype_h':'prescription.safety_h'))}</b>${f.medication?` <span class="muted">· ${esc(f.medication)}</span>`:''}${f.origin==='genotype'?` <span class="muted">· ${esc(t('prescription.genotype_line',{drug:f.drug||'—',gene:f.gene||'—',rsid:f.rsid||'—',genotype:f.genotype||'—',level:f.level||'—'}))}</span>`:''}</div>
       <ul style="margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.5">${rows}</ul>
     </div>`;
-  }).join('');
+  }).join('')+count;
 }
 // Medicines, one tab (task 195, owner 14.09.2026): what is prescribed now, what
 // was stopped, and the check of a new drug against the genome, the labs and the
@@ -1689,7 +1934,7 @@ async function viewMedicines(root){
   const facts=[factHtml(String(cur.length),t('web.meds.fact_current'),''),
                past.length?factHtml(String(past.length),t('web.meds.fact_stopped'),'c-muted'):''];
   const listHtml=(list,s)=>list.map(m=>medItem(m,s)).join('');
-  root.innerHTML=`${pageHead(t('web.tab.medicines'),t('web.page.medicines.q'),facts)}
+  root.innerHTML=`${pageHead(t('web.tab.medicines'),t('web.page.medicines.q'),facts)}${cautionsHtml(d.cautions)}<div id="med-treatment">${treatmentHtml(d.treatment)}</div>
     <h2 class="section mt-0">${esc(t('web.drug.title'))}</h2>
     <div class="why mb-2">${esc(t('web.drug.intro'))}</div>
     <div class="row"><input id="drug-in" placeholder="${esc(t('web.drug.placeholder'))}" style="flex:1 1 280px"><button class="act" id="drug-go">${esc(t('web.drug.full_check'))}</button><button class="ghost" id="drug-pgx">${esc(t('web.drug.pgx_only'))}</button></div>
@@ -1701,13 +1946,19 @@ async function viewMedicines(root){
       <label>${esc(t('web.meds.drug'))}<input id="m-name" placeholder="${esc(t('web.meds.drug_placeholder'))}"></label>
       <label>${esc(t('web.meds.dose'))}<input id="m-dose" placeholder="${esc(t('web.meds.dose_placeholder'))}" size="10"></label>
       <label>${esc(t('web.meds.comment'))}<input id="m-note" placeholder="${esc(t('web.meds.comment_placeholder'))}" size="18"></label>
+      <label>${esc(t('treatment.start'))}<input id="m-start" type="date"></label>
       <label>${esc(t('web.meds.status'))}<select id="m-status">
         <option value="active">${esc(t('web.meds.status_active'))}</option>
         <option value="paused">${esc(t('web.meds.status_paused'))}</option>
         <option value="stopped">${esc(t('web.meds.status_stopped'))}</option>
       </select></label>
       <button class="act" id="m-add">${esc(t('web.meds.add'))}</button>
-    </div><div class="muted small">${esc(t('web.meds.note'))}</div></div></div>
+    </div><details><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.plan_hint'))}</p><div class="fr">
+      <label>${esc(t('treatment.marker'))}<input id="m-control-marker"></label>
+      <label>${esc(t('treatment.from'))}<input id="m-control-from" type="date"></label>
+      <label>${esc(t('treatment.due'))}<input id="m-control-due" type="date"></label>
+      <label>${esc(t('treatment.source'))}<input id="m-control-source"></label>
+    </div></details><div class="muted small">${esc(t('web.meds.note'))}</div></div></div>
     <div id="m-check" class="mt-3"></div>
     <div id="mlist">${listHtml(cur,sys)||emptyHtml(t('web.meds.empty'))}</div>
     ${past.length?`<details class="fold mt-4"><summary>${esc(t('web.meds.past_h'))} · ${past.length}</summary><div class="mt-2">${listHtml(past,sys)}</div></details>`:''}
@@ -1748,16 +1999,22 @@ async function viewMedicines(root){
   $('#m-add',root).onclick=async()=>{
     const name=$('#m-name',root).value.trim();if(!name){toast(t('web.meds.enter_name'));return;}
     const chk=await api('/api/prescription-check?name='+encodeURIComponent(name));
-    const r=await post('/api/medications',{name,dose:$('#m-dose',root).value,note:$('#m-note',root).value,status:$('#m-status',root).value});
+    const control={marker:$('#m-control-marker',root).value,from:$('#m-control-from',root).value,due:$('#m-control-due',root).value,source:$('#m-control-source',root).value};
+    const r=await post('/api/medications',{name,dose:$('#m-dose',root).value,note:$('#m-note',root).value,status:$('#m-status',root).value,
+      start_date:$('#m-start',root).value||null,control:Object.values(control).some(Boolean)?control:null});
     if(!r.ok){toast(t('web.common.error_prefix')+(r.error||''));return;}
     toast(chk.overall&&chk.overall!=='low'?t('web.meds.added_attention'):t('web.common.added'));
     claimNotice(r);
+    if(r.replaced){
+      $('#m-check',root).innerHTML=`<div class="card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`;
+    }
     // refresh the list without losing the check that is on screen
     const [d2,sys2]=await Promise.all([api('/api/medications'), systemsIndex().catch(()=>null)]);
     $('#mlist',root).innerHTML=listHtml(d2.medications.filter(m=>m.current!==false),sys2)||emptyHtml(t('web.meds.empty'));
+    $('#med-treatment',root).innerHTML=treatmentHtml(d2.treatment);
     bindRemove();
-    $('#m-name',root).value='';$('#m-dose',root).value='';$('#m-note',root).value='';
-    if(chk.status==='ok'){$('#m-check',root).innerHTML=rxCard(chk);$('#m-check',root).scrollIntoView({behavior:'smooth',block:'nearest'});}
+    ['m-name','m-dose','m-note','m-start','m-control-marker','m-control-from','m-control-due','m-control-source'].forEach(id=>$('#'+id,root).value='');
+    if(chk.status==='ok'){$('#m-check',root).innerHTML=(r.replaced?`<div class="card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`:'')+rxCard(chk);$('#m-check',root).scrollIntoView({behavior:'smooth',block:'nearest'});}
   };
   function bindRemove(){root.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{
     const r=await post('/api/medications/remove',{name:b.getAttribute('data-rm')});
@@ -1770,18 +2027,22 @@ async function viewMedicines(root){
 
 // ---------------- What to test ----------------
 function testItem(s){
+  if(s.error)return el(`<div class="list-item">${esc(t('tests.rule_error',{id:s.id,error:s.error}))}</div>`);
+  const bases=Object.entries(s.proposal_basis||{}).map(([claim,b])=>`<div class="why muted">${esc(t('tests.basis',{claim:t('tests.claim.'+claim),detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
   if(s.done_recently){
-    const lm=s.last_measured||'', rm=s.recheck_months||3;
+    const lm=s.last_measured||'', rm=s.recheck_months;
     return el(`<div class="list-item" style="opacity:.6">
     <div class="row">${badge('b-good','✓ '+t('web.tests.done'))}<b>${esc(s.suggest)}</b></div>
     <div class="why">${esc(t('web.tests.done_why',{date:lm,months:rm}))}</div>
+    ${bases}
     ${s.specialist&&s.specialist!=='—'?`<div class="spec">${esc(t('web.tests.specialist',{name:s.specialist}))}</div>`:''}
   </div>`);
   }
-  const cls=PRIO[s.priority]||'b-good';
+  const cls=PRIO[s.priority]||'b-unknown';
   return el(`<div class="list-item">
     <div class="row">${badge(cls,t((LEVEL[s.priority]||LEVEL.unknown).key))}<b>${esc(s.suggest)}</b></div>
     <div class="why">${esc(t('web.tests.why',{text:s.why}))}</div>
+    ${bases}
     ${s.last_measured_unreadable?`<div class="why muted">${esc(t('web.tests.last_date_unreadable',{date:s.last_measured_unreadable}))}</div>`:''}
     ${s.specialist&&s.specialist!=='—'?`<div class="spec">${esc(t('web.tests.specialist',{name:s.specialist}))}</div>`:''}
   </div>`);
@@ -1860,7 +2121,31 @@ function genTableRow(id,cells,detail){
   return `<tr class="genrow" data-genrow="${esc(id)}">${cells}</tr>`
     +`<tr class="gendet" data-gendet="${esc(id)}" hidden><td colspan="5">${detail}</td></tr>`;
 }
+function shownGenetics(gen,register){
+  if(register==='clinician') return gen;
+  const shown=p=>!['C','D','E'].includes(p.level);
+  return {...gen,positions:(gen.positions||[]).filter(shown),rows:(gen.rows||[]).filter(shown),
+    groups:(gen.groups||[]).filter(shown).map(g=>({...g,members:(g.members||[]).filter(shown)}))};
+}
+function hypothesisCountHtml(gen,register){
+  if(register==='clinician') return '';
+  const hyp=[...(gen.positions||[]),...(gen.groups||[])].filter(p=>p.passport).length;
+  const values=(gen.positions||[]).filter(p=>p.value_only).length;
+  return hyp||values?`<div class="why muted" data-hypothesis-count>${esc(t('system.hyp.count',{hyp,values}))}</div>`:'';
+}
+function clinicalBasisHTML(p){
+  return Object.entries(p.clinical_basis||{}).map(([field,b])=>`<div class="why muted" data-clinical-basis="${esc(field)}">${esc(t('clinical.basis',{field,detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
+}
+function mechanismHtml(p){
+  const r=p.decision_route,workflow=r?`<div class="why muted" data-decision-route="${esc(r.kind)}">${esc(t('genome.route.line',{label:r.label,reason:r.reason}))}<div>${esc(r.notice)}</div></div>`:'';
+  const sub=Object.entries(p.subclaim_basis||{}).map(([name,b])=>`<div class="why muted" data-subclaim-basis>${esc(t('conclusion.subclaim.'+name))}: ${esc(b.status==='incomplete'?b.reason:b.mechanism+' — '+b.source)}</div>`).join('');
+  if(p.conclusion_basis?.status==='incomplete') return `<div class="why muted" data-conclusion-withheld>${esc(p.conclusion_basis.reason)}</div>`+sub+workflow;
+  if(!p.mechanism||!p.source) return sub+workflow;
+  return `<div class="why" data-mechanism>${esc(t('system.row.mechanism',{text:p.mechanism}))}</div>`
+    +`<div class="why muted">${esc(t('decision.source',{source:p.source}))}</div>`+sub+workflow;
+}
 function genTableHtml(gen,card,register){
+  gen=shownGenetics(gen,register);
   const states=gen.positions||[];
   const rows=(gen.rows||[]).filter(x=>x.unit==='position');
   const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
@@ -1877,13 +2162,13 @@ function genTableHtml(gen,card,register){
       +`<td>${p.level?levelChip(p.level,p.level_short):`<span class="muted small">${esc(t('system.row.level_none'))}</span>`}</td>`
       +`<td>${pnlStateBadge(p)}</td>`
       +`<td class="opt muted small">${esc(p.link_text||'')}</td>`
-      +`<td>${esc(short(p.text||r.text||''))}</td>`;
+      +`<td>${esc(short(p.text||r.text||p.conclusion_basis?.reason||''))}${p.decision_route?`<div class="why muted">${esc(p.decision_route.label)}</div>`:''}</td>`;
     const detail=`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}">`
       +`${p.local_note?`<div class="why localnote">${esc(t('system.row.local_note',{by:t('system.row.local_note_by.'+(p.local_note.by_role||'clinician')),on:fmtDate(p.local_note.on)||'—'}))}: ${esc(p.local_note.text)}</div>`:''}`
       +`${p.depth_note?`<div class="why muted">${esc(p.depth_note)}</div>`:''}`
       +`${p.presumed&&p.closes_text?`<div class="why muted">${esc(p.closes_text)}</div>`:''}`
       +`${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}`
-      +`${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}`
+      +`${mechanismHtml(p)}${authorNoteHtml(p,register)}${passportHtml(p,register)}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}`
       +`${register==='clinician'?geneRowDetail(r):''}</div>`;
     return genTableRow(id,cells,detail);
   };
@@ -1908,10 +2193,11 @@ function genTableHtml(gen,card,register){
     const id='grp:'+g.key;
     const st=g.states||{}; const stTxt=Object.keys(st).map(k=>`${t('system.panel.state.'+k)} ${st[k]}`).join(', ');
     const cells=`<td><b>${esc(g.label)}</b> <span class="muted small">${esc(plural(g.count||0,'count.positions'))}</span></td>`
-      +`<td>${g.level?levelChip(g.level,g.level_short):''}</td><td class="muted small">${esc(stTxt)}</td><td class="opt"></td><td>${esc(short(g.text||''))}</td>`;
+      +`<td>${g.level?levelChip(g.level,g.level_short):''}</td><td class="muted small">${esc(stTxt)}</td><td class="opt"></td><td>${esc(short(g.text||g.conclusion_basis?.reason||''))}</td>`;
     const detail=`<div class="pnl k-b"><div class="pnl-text">${esc(g.text||'')}</div>`
+      +mechanismHtml(g)+passportHtml(g,register)
       +(g.source?`<div class="why muted">${esc(t('decision.source',{source:g.source}))}</div>`:'')
-      +`<table class="dt">${(g.members||[]).map(p=>`<tr><td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td><td>${p.level?levelChip(p.level,p.level_short):''}</td><td>${pnlStateBadge(p)}</td><td>${esc(short(p.text||''))}${ladderHtml(p)}</td></tr>`).join('')}</table></div>`;
+      +`<table class="dt">${(g.members||[]).map(p=>`<tr><td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td><td>${p.level?levelChip(p.level,p.level_short):''}</td><td>${pnlStateBadge(p)}</td><td>${esc(short(p.text||p.conclusion_basis?.reason||''))}${ladderHtml(p)}</td></tr>`).join('')}</table></div>`;
     body+=genTableRow(id,cells,detail);
   });
   const linked=states.filter(p=>p.link_text&&!grouped.has(p.rsid)), plain=states.filter(p=>!p.link_text&&!grouped.has(p.rsid));
@@ -1946,6 +2232,7 @@ function pnlStateBadge(p){
   if(p.presumed) return badge('b-unknown',t('system.gen.state.presumed'),p.read_why_text||'');
   if(p.read!==true) return badge('b-unknown',t('system.panel.state.unread'),p.read_why_text||p.read_why||'');
   const st=p.state||'None';
+  if(p.conclusion_basis?.status==='incomplete') return badge('b-unknown',p.genotype?.genotype||t('system.panel.state.'+st),p.conclusion_basis.reason);
   // Read from the file, the depth unverified: the state keeps its colour and a
   // second, muted badge says what is not known about it.
   if(p.depth_note) return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st))
@@ -1965,6 +2252,7 @@ function pnlExpect(ec,qn){
   return `<div class="pnl-exp">${badge(pos,s)}${qn?`<span class="muted">${esc(t('system.panel.question_ref',{n:qn}))}</span>`:''}</div>`;
 }
 function panelHtml(gen,card,register){
+  gen=shownGenetics(gen,register);
   // Every position of the panel as a card, by gene: found ones bright, the rest
   // muted with the sentence that says what «not found» means for this one — and
   // the scores of the system, folded. The conclusion, the comparison with the
@@ -1981,7 +2269,7 @@ function panelHtml(gen,card,register){
   let h=`<div class="sys-sec">${esc(t('system.panel.h'))} <span class="muted small">· ${esc(t('system.panel.checked',{positions:plural(states.length,'count.positions')}))}</span></div>`;
   const cardOf=(p,dim)=>{const r=byId[p.gene+'|'+p.rsid]||{};
     return `<div class="pnl ${PNL_KIND[p.kind]||'k-c'}${dim?' pnl-dim':''}"><div class="pnl-head">${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${pnlStateBadge(p)}<span class="muted small">${esc(t('system.panel.kind.'+(p.kind||'unassigned')))}</span>${p.link_text?`<span class="muted small">· ${esc(t('system.panel.link',{link:p.link_text}))}</span>`:''}${r.signature==='open'?`<span class="muted small">· ${esc(t('system.row.signature_open'))}</span>`:''}</div>
-      ${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}${register==='clinician'?geneRowDetail(r):''}</div>`;};
+      ${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}${mechanismHtml(p)}${passportHtml(p,register)}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}${register==='clinician'?geneRowDetail(r):''}</div>`;};
   const byGene=list=>{const g={}; list.forEach(p=>{(g[p.gene]=g[p.gene]||[]).push(p);}); return Object.keys(g).sort().flatMap(k=>g[k]);};
   h+=byGene(found).map(p=>cardOf(p,false)).join('')+byGene(other).map(p=>cardOf(p,false)).join('')+byGene(absent).map(p=>cardOf(p,true)).join('')+byGene(unread).map(p=>cardOf(p,true)).join('');
   // the polygenic scores of the system, folded (owner, 14.09.2026)
@@ -1996,26 +2284,32 @@ function panelHtml(gen,card,register){
 // measurements tell the same story — a question, never a verdict. The cards of
 // every position, the composed list and the scores sit under it, folded.
 function genSummaryHtml(gen, card){
+  const countNote=hypothesisCountHtml(gen,card.register),hadPositions=(gen.positions||[]).length;
+  gen=shownGenetics(gen,card.register);
   const st=gen.positions||[];
   if(!st.length){
+    if(hadPositions) return countNote;
     let why;
     if(gen.status==='composed') why=t('web.second.gen_list',{read:gen.read_genes||0,total:(gen.base||{}).genes||0,findings:gen.finding_count||0});
     else if(gen.status==='not_composed') why=t('system.genetics.not_composed',{why:gen.why_empty||t('screen.why.no_panel')});
     else why=t('screen.why.no_genetic_half');
-    return `<div class="sys-sec">${esc(t('system.layer.genetics'))}</div><div class="gen-rest">${esc(why)}</div>`;
+    return countNote+`<div class="sys-sec">${esc(t('system.layer.genetics'))}</div><div class="gen-rest">${esc(why)}</div>`;
   }
   const rows=(gen.rows||[]).filter(x=>x.unit==='position');
   const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
-  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
-  const absent=st.filter(p=>p.read===true&&p.state==='absent');
+  const held=st.filter(p=>p.conclusion_basis?.status==='incomplete');
+  const found=st.filter(p=>p.conclusion_basis?.status!=='incomplete'&&p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
+  const absent=st.filter(p=>p.conclusion_basis?.status!=='incomplete'&&p.read===true&&p.state==='absent');
   const unread=st.filter(p=>p.read!==true);
   const foundGenes=new Set(found.map(p=>p.gene));
   const names=list=>{const c={}; list.forEach(p=>{const k=foundGenes.has(p.gene)?p.gene+' '+(p.rsid||''):p.gene; c[k]=(c[k]||0)+1;});
     return Object.keys(c).sort().map(g=>c[g]>1?g+' ×'+c[g]:g).join(', ');};
-  let h=`<div class="sys-sec">${esc(t('system.panel.conclusion_h'))} <span class="muted small">· ${esc(t('web.second.gen_h',{found:found.length,positions:plural(st.length,'count.positions')}))}</span></div>`;
-  h+=found.map(p=>{const r=byId[p.gene+'|'+p.rsid]||{}; const txt=String(p.text||r.text||'');
-    return `<div class="gen-find">${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b>${pnlStateBadge(p)}<span class="txt${txt.length>160?' clamp':''}">${esc(txt)}</span>${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}</div>`;}).join('');
+  const observed=st.filter(p=>p.read===true&&['het','hom','hemi'].includes(p.state)).length;
+  let h=countNote+`<div class="sys-sec">${esc(t('system.panel.conclusion_h'))} <span class="muted small">· ${esc(t('web.second.gen_h',{found:observed,read:st.length-unread.length,positions:plural(st.length,'count.positions')}))}</span></div>`;
+  h+=found.map(p=>{const r=byId[p.gene+'|'+p.rsid]||{}; const txt=String(p.text||r.text||(p.passport?t('web.hyp.short',{level:p.level}):p.value_only?t('web.hyp.value_e'):''));
+    return `<div class="gen-find">${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b>${pnlStateBadge(p)}<span class="txt${txt.length>160?' clamp':''}">${esc(txt)}</span>${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}</div>${mechanismHtml(p)}`;}).join('');
   if(absent.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_absent',{genes:names(absent)}))}</div>`;
+  h+=held.map(p=>`<div class="gen-rest"><b>${esc(p.gene)}</b> ${esc(p.rsid||'')} ${pnlStateBadge(p)}${mechanismHtml(p)}</div>`).join('');
   if(unread.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_unread',{genes:names(unread)}))}</div>`;
   // Positions read as «not read» only because the catalogue positions were never
   // genotyped from the alignment: the step that closes it, where the gap is seen.
@@ -2067,10 +2361,12 @@ function systemGeneRow(r, register){
 // with no published range is a value — no arrow, no colour.
 function panelLabsHtml(p){
   if(!p) return '';
+  const causesById={}; (p.cause_dictionary||[]).forEach(c=>causesById[c.id]=c);
+  const context=m=>(m.possible_causes||[]).length?`<div class="muted small">${esc(t('system.panel_labs.possible_causes',{list:m.possible_causes.filter(k=>causesById[k]).map(k=>causesById[k].name).join('; ')}))}</div>`:'';
   // Task 205 D, E: the author's pathways first, a value-only marker says so, and
   // the markers to read beside one are listed under it — measured or not.
   const comp=m=>(m.companions||[]).length?`<div class="muted small" style="margin-left:1.2em">${esc(t('system.panel_labs.companions',{list:m.companions.map(c=>c.measured?`${c.name} ${fmtNum(c.value)} ${c.unit||''}`.trim():t('system.panel_labs.companion_missing',{name:c.name})).join('; ')}))}</div>`:'';
-  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m);
+  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m)+context(m);
   const byKey={}; (p.markers||[]).forEach(m=>byKey[m.key]=m);
   const grouped=new Set();
   let gs='';
@@ -2090,7 +2386,8 @@ function panelLabsHtml(p){
     const txt=got?t(KEY[x.origin],{name:x.name||x.key,value:fmtNum(x.value),date:fmtDate(x.date)||'—'})+(x.has_range?'':' — '+t('system.panel_labs.no_range'))
                :t(KEY[x.origin]||KEY.not_computable,{name:x.name||x.key,missing:(x.missing_names||x.missing||[]).join(', ')||'—'});
     return `<div class="row-l${got?'':' muted'}">· ${esc(txt)}</div>`;}).join('');
-  return `<details class="pnl-fold"><summary>${esc(t('system.panel_labs.head',{measured:(p.markers||[]).length,total:p.total||0}))}</summary>${gs}${ms}${rs}</details>`;
+  const causes=(p.cause_dictionary||[]).length?`<div class="sysblock"><div class="muted small">${esc(t('system.panel_labs.causes_head'))}</div>${p.cause_dictionary.map(c=>`<div class="why"><b>${esc(c.name)} [${esc(c.level||'—')}]</b> — ${esc(c.mechanism||'—')} ${esc(c.caveat||'—')} <span class="muted">${esc(c.source||'—')}</span></div>`).join('')}</div>`:'';
+  return `<details class="pnl-fold"><summary>${esc(t('system.panel_labs.head',{measured:(p.markers||[]).length,total:p.total||0}))}</summary>${gs}${ms}${rs}${causes}</details>`;
 }
 // The three genotypes of a common variant, the person's own in bold (task 199).
 function ladderHtml(r){
@@ -2137,18 +2434,19 @@ function geneRowDetail(r){
 }
 function basketRowHtml(row){
   if(row.origin==='rule') return testItem(row).outerHTML;
-  return `<div class="row-l">· ${esc(row.text||'')}${row.closes?` — ${esc(row.closes)}`:''}${row.source?` <span class="muted">(${esc(row.source)})</span>`:''}</div>`;
+  return `<div class="row-l">· ${esc(row.text||'')}${row.closes?` — ${esc(row.closes)}`:''}${row.source?` <span class="muted">(${esc(row.source)})</span>`:''}${mechanismHtml(row)}</div>`;
 }
 // «If a decision to correct has been made» (task 200). Grouped by what the
 // genotype says, never ranked; every printed line carries what to recheck, and
 // `adds_nothing` is printed rather than left as silence.
-function correctionRoutesHtml(cr){
+function correctionRoutesHtml(cr,register='patient'){
   if(!cr||cr.status!=='ok') return '';
   const line=x=>`<div class="row-l">· <b>${esc(x.route_text||'')}</b> — ${esc(x.because||'')}`
     +(x.on&&x.on.length?`<div class="why muted">${esc(t('system.routes.on',{markers:x.on.join(', ')}))}</div>`:'')
     +(x.positions&&x.positions.length?`<div class="why muted">${esc(t('system.routes.positions',{positions:x.positions.join(', ')}))}</div>`:'')
     +(x.recheck?`<div class="why">${esc(t('system.routes.recheck',{marker:x.recheck.marker_name||x.recheck.marker,weeks:plural(x.recheck.after_weeks,'count.weeks'),change:x.recheck.what_counts_as_change}))}</div>`:'')
     +((x.evidence&&x.evidence.source)?`<div class="why muted">${esc(t('system.routes.source',{source:x.evidence.source}))}</div>`:'')
+    +[x.conclusion_basis,x.recheck?.conclusion_basis].filter(Boolean).map(b=>`<div class="why">${esc(b.mechanism)} — ${esc(b.source)}</div>`).join('')
     +`</div>`;
   let h=`<div class="row-l"><b>${esc(cr.head)}</b></div><div class="why muted">${esc(cr.caveat)}</div>`;
   (cr.groups||[]).forEach(g=>{
@@ -2158,6 +2456,17 @@ function correctionRoutesHtml(cr){
     h+=`<div class="sys-sec">${esc((cr.adds_nothing[0]||{}).says_text||'')}</div>`
       +cr.adds_nothing.map(line).join('');
   }
+  const held=cr.withheld||[];
+  if(held.length) h+=`<div class="why" data-routes-withheld>${esc(t('system.routes.withheld_count',{n:held.length}))}</div>`;
+  held.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).forEach(x=>{
+    const parts=[x.reason,t('panel.intake.level',{level:x.evidence?.level||'—'}),(x.positions||[]).join(', '),x.evidence?.source].filter(Boolean);
+    h+=`<div class="why">${parts.map(esc).join(' — ')}</div>`;
+  });
+  const unobserved=cr.unobserved||[];
+  if(unobserved.length) h+=`<div class="why" data-routes-unobserved>${esc(t('system.routes.unobserved_count',{n:unobserved.length}))}</div>`;
+  unobserved.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).forEach(x=>{
+    h+=`<div class="why">${esc(x.reason)} — ${esc((x.dependencies||[]).join(', '))}</div>`;
+  });
   return h;
 }
 // The seven layers in the order of the brief, every one of them present — with
@@ -2217,7 +2526,7 @@ function systemCardHtml(r){
   if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
   b=summary+(b?`<details class="fold"${r.register==='clinician'?' open':''}><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
   layer(3,'system.layer.genetics',b);
-  b=correctionRoutesHtml(r.correction_routes);
+  b=correctionRoutesHtml(r.correction_routes,r.register);
   // Not a numbered layer: the seven layers are the brief's own frame, and this
   // block answers a decision that is not the product's to make.
   if(b) L.push(`<div class="layer"><h3>${esc(t('system.routes.layer'))}</h3>${b}</div>`);
@@ -2253,26 +2562,44 @@ function systemCardHtml(r){
 // every position with its sentence per genotype, the guideline or study it
 // rests on, what it expects of a marker, who signed it. Knowledge, not a person:
 // nothing here reads the genome or the labs (owner, 14.09.2026).
-async function viewPanel(key){
-  const v=$('#view'); showLoader(v);
-  const r=await api('/api/panel?key='+encodeURIComponent(key));
+async function viewPanel(key,reading=null){
+  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);showLoader(v);
+  const r=reading||await api('/api/panel?key='+encodeURIComponent(key));
+  if(!v.isConnected) return;
   if(r.status!=='ok'){ v.innerHTML=errorHtml(t('system.unknown',{key:key,systems:(r.systems||[]).join(', ')})); return; }
   const c=r.counts||{};
   const pos=p=>`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}"><div class="pnl-head"><b>${esc(p.rsid||'—')}</b>${p.protein?` <span>${esc(p.protein)}</span>`:''} ${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}<span class="muted small">${esc(t('system.mode.'+(p.mode||'unknown')))}</span></div>
+    ${p.reading?`<div class="why" data-intake-reading="${esc(p.rsid)}">${esc(p.reading.message)}${p.value_only?' · '+esc(t('panel.value_only')):''}</div>${Object.keys(p.reading.quality||{}).length?`<div class="why muted">${esc(t('panel.reading.quality'))}: ${esc(JSON.stringify(p.reading.quality))}</div>`:''}`:''}
     <div class="why muted">${esc(t('panel.locus',{hgvs:p.hgvs||'—',allele:p.risk_allele||'—'}))}</div>
+    ${p.disposition?`<div class="why">${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}${p.task?' ('+esc(t('panel.intake.task',{task:p.task}))+')':''}</div>`:''}
     ${['het','hom','hemi'].filter(s=>(p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc(p.text[s])}</div>`).join('')}
+    ${mechanismHtml(p)}
     ${p.classification?`<div class="why">${esc(t('panel.classification',{classification:p.classification,moi:p.moi||'—',disease:p.disease||'—'}))}</div>`:''}
     ${p.expect?`<div class="why">${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</div>`:''}
     ${p.effect_size?`<div class="why">${esc(t('panel.effect',{effect:p.effect_size}))}</div>`:''}
+    ${authorNoteHtml(p,'clinician')}
     <div class="why muted">${esc(t('panel.source_row',{source:p.source||'—',study:p.study||'—'}))}</div>
     <div class="why muted">${esc(t('panel.signed.'+(p.signature||'open'),{on:fmtDate(p.signed_on)||'—',curated:fmtDate(p.curated_on)||'—'}))}</div></div>`;
   const facts=[factHtml(String(c.positions||0),t('web.panel.fact_positions')),factHtml(String(c.genes||0),t('web.panel.fact_genes')),
                factHtml(String(c.with_study||0),t('web.panel.fact_studies')),factHtml(String(c.signed_by_clinician||0),t('web.panel.fact_signed'))];
+  if(r.patient_readings){
+    v.className='intake-view';
+    v.innerHTML=`<div class="toolbar"><button class="cr-btn cr-btn--ghost" id="pnl-back">← ${esc(t('web.common.close'))}</button><button class="cr-btn" id="intake-reference">${esc(t('panel.intake.reference'))}</button><button class="cr-btn" onclick="window.print()">${esc(t('system.print'))}</button></div>
+      <h1 class="cr-h1">${esc(t('panel.intake.title'))}</h1><p>${esc(r.reading_note)}</p>
+      <p class="cr-caption">${esc(t('panel.intake.counts',{total:c.positions||0,read:c.read||0}))}</p>
+      ${(r.genes||[]).map(g=>`<section><h2 class="cr-h2">${esc(g.gene)}</h2><div class="cr-card cr-card--flush">${(g.positions||[]).map(p=>`<details data-intake-detail><summary><span>${esc(p.rsid)}</span><strong>${esc(p.reading?.genotype||'—')}</strong><span class="cr-badge cr-badge--plain">${esc(t('panel.intake.level',{level:p.level||'—'}))}</span><span class="cr-caption">${esc(t('panel.intake.'+(p.reading?.read?(p.reading.confidence==='profile'?'recorded':'called'):'unread')))}</span></summary><div class="intake-detail">${pos(p)}</div></details>`).join('')}</div></section>`).join('')}
+      <p class="cr-caption">${esc(r.disclaimer||'')}</p>`;
+    $('#pnl-back',v).onclick=()=>mount(current);
+    $('#intake-reference',v).onclick=()=>viewPanel(key);
+    window.scrollTo({top:0});
+    return;
+  }
   v.innerHTML=`<div class="syscard">
     <div class="toolbar"><button class="ghost" id="pnl-back">← ${esc(t('web.common.close'))}</button>
-      <button class="ghost" data-system="${esc(key)}">${esc(t('web.second.open_card'))}</button>
+      <button class="ghost" data-system="${esc(key)}"${key==='author_list'?' data-register="clinician"':''}>${esc(t(key==='author_list'?'panel.patient_readings':'web.second.open_card'))}</button>
       <button class="ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>
-    ${pageHead(t('panel.title',{label:r.label||key}),t('panel.for_clinician_note'),facts)}
+    ${pageHead(t('panel.title',{label:r.label||key}),r.reading_note||t('panel.for_clinician_note'),facts)}
+    ${key!=='author_list'?`<button class="ghost" data-panel="author_list">${esc(t('panel.author_list'))}</button>`:''}
     <div class="meta">${esc(t('panel.source',{updated:fmtDate(r.catalogue_updated)||'—'}))}</div>
     ${(r.genes||[]).map(g=>`<h2 class="section">${esc(g.gene)}</h2>${(g.positions||[]).map(pos).join('')}`).join('')}
     ${(r.unreadable||[]).map(u=>`<h2 class="section">${esc(u.gene)}</h2><div class="why">${esc(t('panel.unreadable',{reason:u.reason||'—',source:u.source||'—'}))}</div>`).join('')}
@@ -2280,10 +2607,26 @@ async function viewPanel(key){
   $('#pnl-back').onclick=()=>mount(current);
   window.scrollTo({top:0});
 }
+// Printing must not silently omit the folded provenance. Restore only nodes
+// that printing opened; the reader's own expanded rows stay expanded.
+let intakePrintOpened=[];
+window.addEventListener('beforeprint',()=>{
+  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open])'));
+  intakePrintOpened.forEach(d=>d.open=true);
+});
+window.addEventListener('afterprint',()=>{
+  intakePrintOpened.forEach(d=>d.open=false);intakePrintOpened=[];
+});
 async function viewSystem(key, register){
-  const v=$('#view'); register=register||'patient';
+  // An explicit professional reading also changes the visible global mode;
+  // the header must not say Personal while this card is in the clinician register.
+  if(['patient','clinician'].includes(register)&&register!==DISPLAY_MODE) setDisplayMode(register,false);
+  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);register=register||DISPLAY_MODE;
   showLoader(v);
   const r=await api('/api/system?key='+encodeURIComponent(key)+'&register='+encodeURIComponent(register));
+  if(!v.isConnected) return;
+  if(r.patient_readings) return viewPanel(key,r);
+  if(r.reference_only) return viewPanel(key);
   if(r.status!=='ok'){
     const why=r.status==='unknown_register'
       ? t('system.unknown_register',{register:r.register||register,registers:(r.registers||[]).join(', ')})
@@ -2342,6 +2685,13 @@ const ORGAN_SPOT = {pituitary:[[0.470,0.095]], thyroid:[[0.500,0.250]],
                     kidneys:[[0.392,0.665],[0.608,0.665]],
                     gonads:[[0.500,0.800]]};
 
+function wrapWords(text, width){
+  const out=[]; let cur='';
+  String(text).split(' ').forEach(w=>{
+    if(cur && (cur+' '+w).length>width){ out.push(cur); cur=w; } else cur=cur?cur+' '+w:w; });
+  if(cur) out.push(cur);
+  return out.length?out:[''];
+}
 function bodySVG(domains, sex){
   const im = SILHOUETTE[sex];
   // No third silhouette exists and the profile may not say. Refusing to draw is
@@ -2372,11 +2722,11 @@ function bodySVG(domains, sex){
   domains.forEach(d=>{
     const pl=d.place||{};
     if(pl.parts) pl.parts.forEach(p=>{
-      if(p.score!=null&&ORGAN_SPOT[p.place])
-        marks.push({dom:d, place:p.place, label:p.label, score:p.score, status:p.status,
+      if(ORGAN_SPOT[p.place])
+        marks.push({dom:d, place:p.place, label:p.label||d.label, score:p.score, status:p.status,
                     measured:p.measured, total:p.total, part:true});
     });
-    else if(pl.place&&d.score!=null&&ORGAN_SPOT[pl.place])
+    else if(pl.place&&ORGAN_SPOT[pl.place])
       marks.push({dom:d, place:pl.place, label:d.label, score:d.score, status:d.status,
                   measured:d.measured, total:d.total, part:false});
   });
@@ -2395,20 +2745,23 @@ function bodySVG(domains, sex){
     const right = P[P.length-1][0] >= x0+im.w/2;
     const [rx,ry] = right ? P[P.length-1] : P[0];
     byPlace[place].forEach((m,i)=>{
-      placed.push(Object.assign({}, m, {P:P, right:right, rx:rx, ry:ry,
+      // One line per marker, and a long name wrapped at a space: 200 px is all
+      // the room between the figure and the edge of the picture.
+      const lines=String(m.label||'').split(' · ').flatMap(x=>wrapWords(x,24));
+      placed.push(Object.assign({}, m, {P:P, right:right, rx:rx, ry:ry, lines:lines,
         r:R0+i*STEP, blobr:(P.length>1?22:32)+i*STEP, want:ry-12+i*GAP}));
     });
   });
   [true,false].forEach(side=>{
     const col=placed.filter(m=>m.right===side).sort((a,b)=>a.want-b.want);
     let prev=-1e9;
-    col.forEach(m=>{ m.ly=Math.max(m.want, prev+GAP); prev=m.ly; });
+    col.forEach(m=>{ m.ly=Math.max(m.want, prev+GAP+(m.lines.length-1)*14); prev=m.ly; });
   });
   placed.forEach(m=>{
     const d=m.dom, r=m.r, C=2*Math.PI*r, right=m.right, rx=m.rx, ry=m.ry, ly=m.ly;
     const frac = m.total ? Math.max(0,Math.min(1,m.measured/m.total)) : 0;
     const col = DSTAT[m.status]||DSTAT.nodata;
-    const tip = (m.part
+    const tip = (m.score==null ? t('common.no_data') : m.part
       ? t('web.body.tip_part',{dom:d.label, label:m.label, place:t('web.body.place.'+m.place),
                                score:m.score, measured:m.measured, total:m.total})
       : (m.measured!=null && m.measured<m.total
@@ -2418,7 +2771,7 @@ function bodySVG(domains, sex){
       +'\n'+genRingTip(d.genetics)+'\n'+t('system.open');
     let g=`<g class="organ" data-dom="${esc(d.key)}" tabindex="0" role="button"`
       +` aria-label="${esc(m.label)}"><title>${esc(tip)}</title>`;
-    m.P.forEach(([x,y])=>{g+=`<circle class="blob" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"`
+    if(m.score!=null)m.P.forEach(([x,y])=>{g+=`<circle class="blob" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}"`
       +` r="${m.blobr}" fill="url(#gl-${m.status})" filter="url(#silhsoft)"/>`;});
     g+=`<circle class="ringbg" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}"/>`
       +`<circle class="ringfg" cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}" stroke="${col}"`
@@ -2431,10 +2784,12 @@ function bodySVG(domains, sex){
     g+=`<path class="organlead" d="M${(rx+(right?r:-r)).toFixed(1)} ${ry.toFixed(1)}`
       +` L${ex.toFixed(1)} ${ly.toFixed(1)} L${(right?ex+4:ex-4).toFixed(1)} ${ly.toFixed(1)}"/>`
       +`<circle fill="var(--baseline)" cx="${(right?ex+4:ex-4).toFixed(1)}" cy="${ly.toFixed(1)}" r="2"/>`
-      +`<text x="${lx.toFixed(1)}" y="${(ly-5).toFixed(1)}"${an} fill="var(--ink)" font-size="13"`
-      +` font-weight="600">${esc(m.label)}</text>`
+      // A part named by two markers is two lines, one per marker: on one line
+      // «Free T4 · Anti-TPO antibodies» ran past the edge of the picture.
+      +`<text x="${lx.toFixed(1)}" y="${(ly-5-(m.lines.length-1)*14).toFixed(1)}"${an} fill="var(--ink)" font-size="13"`
+      +` font-weight="600">${m.lines.map((l,k)=>`<tspan x="${lx.toFixed(1)}" dy="${k?14:0}">${esc(l)}</tspan>`).join('')}</text>`
       +`<text x="${lx.toFixed(1)}" y="${(ly+12).toFixed(1)}"${an} fill="${col}" font-size="12.5">`
-      +`${esc(m.score+'/100 · '+t('web.body.of',{measured:m.measured,total:m.total}))}</text></g>`;
+      +`${esc(m.score==null?t('common.no_data'):m.score+'/100 · '+t('web.body.of',{measured:m.measured,total:m.total}))}</text></g>`;
     s+=g;
   });
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t('web.body.figure_h'))}">${s}</svg>`;
@@ -2472,7 +2827,7 @@ function wireSystems(box, domains){
       : (pl.place ? t('web.body.where_organ')
          : (pl.whole_body ? t('web.body.where_whole') : t('web.body.where_blood')));
     note.textContent = t('web.body.picked',
-      {label:d.label, score:d.score, measured:d.measured, total:d.total, where:where});
+      {label:d.label, score:d.score??t('common.no_data'), measured:d.measured, total:d.total, where:where});
   };
   const open = k => { pick(k); viewSystem(k); };
   box.querySelectorAll('[data-dom]').forEach(el=>{
@@ -2485,7 +2840,8 @@ function wireSystems(box, domains){
 }
 
 async function renderSystems(box, radar){
-  const doms = (radar.domains||[]).filter(d=>d.score!=null);
+  box.insertAdjacentHTML('beforebegin',`<div class="why muted" data-display-limit>${esc(t('clinical.display_limit'))}</div>`);
+  const doms = (radar.domains||[]);
   if(doms.length<3){ box.innerHTML=emptyHtml(t('web.radar.not_enough')); return; }
   // `radar.sex` is already normalised by the engine — 'male', 'female' or null.
   const sex = radar.sex || '';
@@ -2536,7 +2892,7 @@ function radarLabelLines(label){
   return [s.slice(0,best),s.slice(best+1)];
 }
 function radarSVG(domains){
-  const d=domains.filter(x=>x.score!=null);
+  const d=domains;
   if(d.length<3)return `<div class="muted">${esc(t('web.radar.not_enough'))}</div>`;
   const W=600,H=430,cx=300,cy=200,R=130,N=d.length;
   const ang=i=>(-90+i*360/N)*Math.PI/180;
@@ -2547,7 +2903,7 @@ function radarSVG(domains){
   d.forEach((dom,i)=>{
     const [x,y]=pt(i,R);
     axes+=`<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--grid)" stroke-width="1"/>`;
-    const [lx,ly]=pt(i,R+20);
+    let [lx,ly]=pt(i,R+20);
     const anchor=Math.abs(lx-cx)<12?'middle':(lx>cx?'start':'end');
     const a=dArrow(dom.delta);
     // The label is a door too (owner, 14.09.2026): the dot's hit area was
@@ -2558,23 +2914,32 @@ function radarSVG(domains){
     // its middle, so it does not run off the edge of the picture.
     const lines=radarLabelLines(dom.label);
     const extra=(lines.length-1)*15;
+    // The axis straight up put its score under the name — on the dot itself when
+    // the score is 100. There both lines go above the end of the axis (0.6.0).
+    const up=(anchor==='middle'&&ly<cy)?16+extra+6:0; ly=ly-up;
     labels+=`<g class="rlabel" data-dom="${esc(dom.key)}" tabindex="0" role="button" aria-label="${esc(dom.label)}" style="cursor:pointer"><title>${esc(t('system.open'))}</title>`
       +`<rect x="${padX.toFixed(1)}" y="${(ly-12).toFixed(1)}" width="120" height="${38+extra}" fill="transparent"/>`
       +`<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="var(--ink-2)" font-size="13" text-anchor="${anchor}" dominant-baseline="middle">${lines.map((l,k)=>`<tspan x="${lx.toFixed(1)}" dy="${k?15:0}">${esc(l)}</tspan>`).join('')}</text>`
       +`<text x="${lx.toFixed(1)}" y="${(ly+16+extra).toFixed(1)}" font-size="12.5" font-weight="700" text-anchor="${anchor}" dominant-baseline="middle">`
-      +`<tspan fill="${DSTAT[dom.status]}">${dom.score}</tspan>`
+      +`<tspan fill="${DSTAT[dom.status]||DSTAT.nodata}">${dom.score??esc(t('common.no_data'))}</tspan>`
       +(a.txt?`<tspan fill="${a.col}" font-size="11.5"> ${a.txt}</tspan>`:'')+`</text></g>`;
   });
   // the previous measurement — a dashed outline behind
   const withPrev=d.filter(x=>x.prev_score!=null);
   let prevPoly='';
-  if(withPrev.length){
-    const ppts=d.map((dom,i)=>pt(i,R*(dom.prev_score!=null?dom.prev_score:dom.score)/100).map(n=>n.toFixed(1)).join(',')).join(' ');
-    prevPoly=`<polygon points="${ppts}" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4" opacity=".75"/>`;
-  }
-  const dpts=d.map((dom,i)=>pt(i,R*dom.score/100).map(n=>n.toFixed(1)).join(',')).join(' ');
+  // A missing axis stays visible but breaks the trace. Never substitute zero
+  // or today's value for an observation which was not made.
+  const trace=(field,style)=>d.map((dom,i)=>{
+    const j=(i+1)%N;
+    if(dom[field]==null||d[j][field]==null)return '';
+    const [x1,y1]=pt(i,R*dom[field]/100),[x2,y2]=pt(j,R*d[j][field]/100);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" ${style}/>`;
+  }).join('');
+  if(withPrev.length)prevPoly=trace('prev_score','stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4" opacity=".75"');
+  const currentTrace=trace('score','stroke="var(--accent)" stroke-width="2.5"');
   const dots=d.map((dom,i)=>{
-    const [x,y]=pt(i,R*dom.score/100);
+    const [x,y]=pt(i,dom.score==null?R:R*dom.score/100);
+    if(dom.score==null)return `<g class="rdot rdot-empty" data-dom="${esc(dom.key)}" tabindex="0" role="button" aria-label="${esc(dom.label+': '+t('common.no_data'))}"><title>${esc(t('common.no_data'))}</title><circle class="rdotc" cx="${x}" cy="${y}" r="4.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/></g>`;
     const a=dArrow(dom.delta);
     const mv=(dom.moved||[]).map(m=>`\n  · ${m.name}: ${m.from_value} → ${m.to_value} ${m.unit||''}`).join('');
     const dyn=dom.prev_score!=null?'\n'+t('web.radar.was',{score:dom.prev_score,compared:dom.compared,date:dom.prev_date||t('web.radar.prev_measurement'),word:a.word})+mv:'\n'+t('web.radar.no_previous');
@@ -2596,7 +2961,7 @@ function radarSVG(domains){
     <line x1="288" y1="404" x2="316" y2="404" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>
     <text x="322" y="404" fill="var(--ink-2)">${esc(t('web.radar.previous'))}</text></g>`;
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:600px">${rings}${axes}${prevPoly}
-    <polygon points="${dpts}" fill="rgba(57,135,229,.18)" stroke="var(--accent)" stroke-width="2.5"/>${dots}${labels}${withPrev.length?legend:''}</svg>`;
+    ${currentTrace}${dots}${labels}${withPrev.length?legend:''}</svg>`;
 }
 async function viewSecond(root){
   const [radar,d,sug,sys,labs,sb]=await Promise.all([api('/api/radar'),api('/api/second-opinion'),
@@ -2667,10 +3032,11 @@ async function viewSecond(root){
   showLoader($('#sl-tests',root));
   // The same address the card page asks for, register included: one answer
   // in the session's memory, so a click from the radar opens the card at once.
-  const cards=await Promise.all(chosen.map(s=>api('/api/system?key='+encodeURIComponent(s.key)+'&register=patient').catch(()=>null)));
+  const register=DISPLAY_MODE;
+  const cards=await Promise.all(chosen.map(s=>api('/api/system?key='+encodeURIComponent(s.key)+'&register='+encodeURIComponent(register)).catch(()=>null)));
   // «What to test» stays owned by its route: the rows printed here are the
   // suggestions as that route returns them, filtered to the ids the card names.
-  const usedTests=new Set(); let questions=0;
+  const usedTests=new Set(); let questions=0; const quietRows=[];
   let blocks=chosen.map((s,i)=>{
     const dom=byKey[s.key]||{}, card=cards[i];
     const recent=(dom.abnormal||[]).filter(m=>!m.stale), stale=(dom.abnormal||[]).filter(m=>m.stale);
@@ -2680,25 +3046,31 @@ async function viewSecond(root){
     // A block reads top to bottom as a conclusion and its grounds (task 195):
     // the verdict in one sentence, the measurements as a table, the genotype as
     // findings, the questions — and everything else under «More».
-    let h=`<div class="sysblock" data-sysblock="${esc(s.key)}"><div class="sys-h"><span class="name">${esc(s.label)}</span>${dom.score!=null?`<span class="score ${scoreCls(dom.score)}">${dom.score}<span class="muted small">/100</span></span>`:''}${delta}${statusBadge(dom.status)}</div>`;
+    let h=`<div class="sysblock${['critical','warning'].includes(dom.status)?' needs':''}" data-sysblock="${esc(s.key)}"><div class="sys-h"><span class="name">${esc(s.label)}</span>${dom.score!=null?`<span class="score ${scoreCls(dom.score)}">${dom.score}<span class="muted small">/100</span></span>`:''}${delta}${statusBadge(dom.status)}</div>`;
     const verdict=recent.length?t('web.second.verdict_out',{out:recent.length,measured:dom.measured??'—',total:dom.total??'—'})
       :(dom.score==null?t('web.second.verdict_nodata'):t('web.second.verdict_in',{measured:dom.measured??'—',total:dom.total??'—'}));
     h+=`<div class="sys-verdict">${esc(verdict)}</div>`;
-    h+=markerTable(recent);
-    if(stale.length) h+=`<details class="fold"><summary>${esc(t('web.second.stale_lead'))} · ${stale.length}</summary>${markerTable(stale)}</details>`;
+    // Task 217, stage 0: a system that needs attention shows its measurements
+    // and its prescriptions; every other block is its verdict and one fold. The
+    // radar page was twelve screens, each block printed in full whatever it said.
+    const needs=['critical','warning'].includes(dom.status);
+    let lead=markerTable(recent);
+    if(stale.length) lead+=`<details class="fold"><summary>${esc(t('web.second.stale_lead'))} · ${stale.length}</summary>${markerTable(stale)}</details>`;
     if((acting[s.key]||[]).length)
-      h+=`<div class="sys-sec">${esc(t('system.layer.medications'))}</div><div class="row-l">${acting[s.key].map(p=>esc(p.name+(p.dose?' '+p.dose:''))).join('; ')}</div>`;
+      lead+=`<div class="sys-sec">${esc(t('system.layer.medications'))}</div><div class="row-l">${acting[s.key].map(p=>esc(p.name+(p.dose?' '+p.dose:''))).join('; ')}</div>`;
+    let body='';
+    if(needs) h+=lead; else body+=lead;
     let more=recent.map(m=>{
       const bits=[m.genome_link?ownerNoteHtml(m):'',m.note?esc(m.note):'',m.corridor_note?esc(m.corridor_note):''].filter(Boolean);
       return bits.length?`<div class="why"><b>${esc(m.name)}:</b> ${bits.join(' · ')}</div>`:'';}).join('');
     if(card&&card.status==='ok'){
       const gen=card.genetics||{}, base=gen.base||{};
-      h+=genSummaryHtml(gen,card);
+      body+=genSummaryHtml(gen,card);
       const ids=new Set(((card.tests||{}).rows||[]).map(x=>x.id));
       const rows=pending.filter(x=>ids.has(x.id)); rows.forEach(x=>usedTests.add(x.id));
-      if(rows.length) h+=`<div class="sys-sec">${esc(t('system.layer.tests'))}</div>`+rows.map(x=>testItem(x).outerHTML).join('');
+      if(rows.length) body+=`<div class="sys-sec">${esc(t('system.layer.tests'))}</div>`+rows.map(x=>testItem(x).outerHTML).join('');
       const qs=(card.questions||{}).rows||[]; questions+=qs.length;
-      h+=`<div class="sys-sec">${esc(t('system.layer.questions'))}</div>`
+      body+=`<div class="sys-sec">${esc(t('system.layer.questions'))}</div>`
         +(qs.length?`<ol>${qs.map(q=>`<li>${esc(q.text)}</li>`).join('')}</ol>`
                    :`<div class="gen-rest">${esc(t('system.why.'+(card.questions||{}).empty_why))}</div>`);
       let gl='';
@@ -2716,12 +3088,25 @@ async function viewSecond(root){
       if(card.verdict_line) more+=`<div class="why muted mt-2">${esc(card.verdict_line)}</div>`;
       if(card.unread_line) more+=`<div class="why muted">${esc(card.unread_line)}</div>`;
     }
-    if(more) h+=`<details class="fold more"><summary>${esc(t('web.second.more'))}</summary>${more}</details>`;
     // Two doors out of the block, after it has been read: the card of the
-    // system, and the panel with its studies for the clinician.
-    h+=`<div class="actions"><button class="act" data-system="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}">${esc(t('web.second.open_card'))}</button>${hasPanel?`<button class="ghost" data-panel="${esc(s.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}</div>`;
+    // system, and the panel with its studies for the clinician. A quiet block
+    // keeps them inside its fold, so it takes two lines on the page.
+    const doors=`<div class="actions"><button class="act" data-system="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}">${esc(t('web.second.open_card'))}</button>${hasPanel?`<button class="ghost" data-panel="${esc(s.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}</div>`;
+    if(needs){
+      if(body||more) h+=`<details class="fold more"><summary>${esc(t('web.second.more'))}</summary>${body}${more}</details>`;
+      h+=doors;
+    }else{
+      // A quiet system is one row of one table: its name, its score, its
+      // verdict; the row opens the card, where the rest of it lives.
+      quietRows.push(`<tr data-system="${esc(s.key)}" data-sysblock="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}"><td><b>${esc(s.label)}</b></td>`
+        +`<td class="v">${dom.score!=null?`<span class="${scoreCls(dom.score)}">${dom.score}</span>`:'—'}</td>`
+        +`<td class="d">${esc(verdict)}</td></tr>`);
+      return '';
+    }
     return h+`</div>`;
   }).join('');
+  if(quietRows.length) blocks+=`<div class="sysblock quiet"><div class="sys-h"><span class="name">${esc(t('web.second.quiet_h'))}</span> <span class="muted">· ${quietRows.length}</span></div>`
+    +`<div class="tblwrap"><table class="dt">${quietRows.join('')}</table></div></div>`;
   const onDemand=(sys.on_demand||[]);
   // `h` is the accumulator INSIDE the map above and does not exist out here:
   // the tab threw «h is not defined» before it painted anything (owner, 18.09.2026).
@@ -2751,7 +3136,9 @@ async function viewSecond(root){
   slb.innerHTML=(blocks||emptyHtml((radar.domains||[]).some(x=>x.status!=='nodata')
       ? t('web.second.no_domain_issues',{n:(radar.domains||[]).filter(x=>x.status!=='nodata').length})
       : t('web.second.no_domain_data')))+silentLine;
-  $('#sl-pgx',root).innerHTML=drugsBasis+(drugs||drugsEmpty);
+  // Folded to one line with its count (task 217, stage 0): the watchlist is the
+  // general rule for drugs not taken, and it printed as a page of findings.
+  $('#sl-pgx',root).innerHTML=drugs?rxFold(t('web.second.pgx_fold'),d.drug_flags.length,drugsBasis+drugs):drugsBasis+drugsEmpty;
   $('#sl-tests',root).innerHTML=(tests||testsEmpty)+testsRoutine;
   const qf=$('#sl-qfact b',root); if(qf) qf.textContent=String(questions);
   bindTabLinks(root);
@@ -2777,11 +3164,19 @@ function medStatusText(s){
   const w=(!word||word.startsWith('⟦'))?String(m[1]||'').replace(/_/g,' '):word;
   return [w,m[2]?fmtDate(m[2]):''].filter(Boolean).join(' ')||'—';
 }
+function controlsHtml(controls, overdueOnly=false){
+  if(!(controls||[]).length)return '';
+  return `<section class="card ${overdueOnly?'warnbox':''}" data-treatment-controls><b>${esc(t(overdueOnly?'treatment.overdue':'treatment.title'))}</b>${controls.map(c=>`<div class="list-item"><div>${esc(t('treatment.control',{name:c.name||'—',marker:c.marker||'—',start:c.from||'—',due:c.due||'—'}))}</div><b>${esc(t('treatment.status.'+c.status))}</b>${c.plan_source?`<div class="meta">${esc(t('treatment.plan_source',{source:c.plan_source}))}</div>`:`<div class="meta">${esc(t('treatment.unresolved'))}</div>`}</div>`).join('')}</section>`;
+}
+function treatmentHtml(data){
+  if(!data)return '';
+  return `${controlsHtml(data.controls)}<details class="fold" data-treatment-timeline><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.scope'))}</p><ol>${(data.events||[]).map(e=>`<li><time>${esc(e.date)}</time> · ${e.kind==='prescription_start'?`<b>${esc(t('treatment.start'))}: ${esc(e.name)}</b> ${esc(e.dose||'')}`:`${esc(e.name)}: ${esc(e.comparator||'')}${esc(e.value??'—')} ${esc(e.unit||'')}`}</li>`).join('')}</ol>${(data.undated||[]).map(e=>`<div class="meta">${esc(e.name)} · ${esc(t('treatment.undated'))}</div>`).join('')}</details>`;
+}
 function medItem(m, sys){
   // `current` is the server's verdict by the one rule in core — the page does not
   // re-decide which words mean «taking it».
   const st=m.current===false?` ${badge('b-unknown',medStatusText(m.status))}`:'';
-  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost btn-sm ml-auto" data-rm="${esc(m.name)}">${esc(t('web.meds.remove'))}</button></div>${noteHtml(m.note)}${actsOnHtml(m,sys)}</div>`;
+  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost btn-sm ml-auto" data-rm="${esc(m.name)}">${esc(t('web.meds.remove'))}</button></div><div class="meta">${esc(m.start_date||t('treatment.undated'))}</div>${noteHtml(m.note)}${actsOnHtml(m,sys)}</div>`;
 }
 
 // ---------------- Personal health metrics ----------------
@@ -2836,12 +3231,14 @@ async function renderPerson(root, given){
   else { try{ missing=((await api('/api/limits')).items||[]).filter(i=>i.kind==='profile'); }catch(e){} }
   const p=d.profile||{};
   const bmi=d.bmi;
+  // One BMI on the page (task 217, stage 0): the tile only when no card below carries it.
+  const bmiCard=(d.metrics||[]).some(m=>m.key==='bmi');
   root.innerHTML=`
     <div class="stat">
       <div class="s"><b>${p.sex==='male'?esc(t('web.metrics.male')):p.sex==='female'?esc(t('web.metrics.female')):'—'}</b><span>${esc(t('web.metrics.sex'))}</span></div>
       <div class="s"><b>${d.age??'—'}</b><span>${esc(t('web.metrics.age'))}</span></div>
       <div class="s"><b>${p.height_cm??'—'}</b><span>${esc(t('web.metrics.height'))}</span></div>
-      <div class="s"><b style="color:${bmi?(bmi.flag==='ok'?'var(--good)':'var(--warning)'):'var(--muted)'}">${bmi?bmi.value:'—'}</b><span>${esc(t('web.metrics.bmi'))}${bmi?' · '+esc(bmi.category):''}</span></div>
+      ${bmiCard?'':`<div class="s"><b>${bmi?bmi.value:'—'}</b><span>${esc(t('web.metrics.bmi'))}${bmi&&bmi.category?' · '+esc(bmi.category):''}</span>${bmi?clinicalBasisHTML(bmi):''}</div>`}
       <div class="s"><b>${esc((d.ancestry&&d.ancestry.value)||'—')}</b><span>${esc(t('web.metrics.panel_label'))}</span></div>
     </div>
     <div class="toolbar">
@@ -3000,7 +3397,7 @@ function bulletBoard(snap){
   const lgd=['good','warn','crit'].map(k=>`<span><i style="background:${BLTCOL[k]};border-radius:50%"></i>${esc(t(BLTTXT[k]))}</span>`).join('');
   return `<h2 class="section">${esc(t('web.bullet.title'))}</h2>
     <div class="bltbox">${out}
-      <div class="bltlgd">${lgd}<span><i style="background:var(--ink-2);width:2px;height:12px;border-radius:1px"></i>${esc(t('web.bullet.legend_notch'))}</span><span><i style="background:rgba(12,163,12,.20)"></i>${esc(t('web.bullet.legend_zone'))}</span></div>
+      <div class="bltlgd">${lgd}<span><i style="background:var(--ink-2);width:2px;height:12px;border-radius:1px"></i>${esc(t('web.bullet.legend_notch'))}</span><span><i style="background:color-mix(in srgb,var(--good) 20%,transparent)"></i>${esc(t('web.bullet.legend_zone'))}</span></div>
     </div>`;
 }
 
@@ -3040,7 +3437,7 @@ function lifeCard(m){
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
     ${m.series&&m.series.length>1?sparkline(m.series,false):''}
     ${srcTag(m)}
-    <div class="meta">${esc(t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>
+    <div class="meta">${esc(t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>${clinicalBasisHTML(m)}
   </div>`);
 }
 
@@ -3125,7 +3522,7 @@ async function viewLifestyle(root){
       <span class="muted small" id="gmsg">${esc(t('web.life.wearable_note'))}</span>
     </div>
     ${briefActions(brief)}
-    ${bulletBoard(snap)}`;
+    ${bulletBoard(snap)}<div class="why muted" data-display-limit>${esc(t('clinical.display_limit'))}</div>`;
 
   if(!hasM){
     html+=`<div class="muted" style="margin:16px 0">${esc(t('web.life.no_wearable'))}</div>`;
@@ -3154,7 +3551,7 @@ async function viewLifestyle(root){
       ${c.good&&c.good.length?`<div class="row" style="flex-wrap:wrap;gap:6px"><span class="muted small">${esc(t('web.life.right_way'))}</span>${c.good.map(x=>chip(x,'b-good')).join('')}</div>`:''}
       ${c.watch&&c.watch.length?`<div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><span class="muted small">${esc(t('web.life.needs_attention'))}</span>${c.watch.map(x=>chip(x,'b-critical')).join('')}</div>`:''}
       ${(!c.good||!c.good.length)&&(!c.watch||!c.watch.length)?`<div class="muted">${esc(t('web.life.no_trends'))}</div>`:''}</div>`;
-    const today=new Date().toISOString().slice(0,10);
+    const today=localDay();
     const waistBar=`<div class="row" style="gap:8px;margin:2px 0 12px;align-items:flex-end;flex-wrap:wrap">
         <label class="wl">${esc(t('web.life.waist'))}<input id="w-val" size="5" placeholder="${esc(t('web.life.waist_placeholder'))}"></label>
         <label class="wl">${esc(t('web.life.date'))}<input id="w-date" size="10" value="${esc(today)}" placeholder="${esc(t('web.life.date_placeholder'))}"></label>
@@ -3226,7 +3623,7 @@ async function viewLifestyle(root){
       viewLifestyle($('#view'));}
     else{gm.textContent=old;toast(t('web.common.failed_prefix')+((r&&r.error)||'—'));}
   };
-  const today=new Date().toISOString().slice(0,10);
+  const today=localDay();
   const wsave=$('#w-save',root);
   if(wsave)wsave.onclick=async()=>{
     const v=num($('#w-val',root).value); const dt=($('#w-date',root).value||'').trim()||today;
@@ -3337,26 +3734,22 @@ function longevityRow(k){
     ${k.label?`<div class="why">${esc(k.label)}</div>`:''}
     ${k.zygosity_note?`<div class="why muted">${esc(k.zygosity_note)}</div>`:''}
     ${k.population_note?`<div class="why c-warning">⚠ ${esc(k.population_note)}</div>`:''}
-    <div class="why muted">${esc(t('web.longevity.action_h'))}: ${esc(k.action||t('web.longevity.no_action'))}</div>
-    ${conf}${pm}</div>`;
+    ${k.action?`<div class="why muted">${esc(t('web.longevity.action_h'))}: ${esc(k.action)}</div>`:''}
+    ${clinicalBasisHTML(k)}${conf}${pm}</div>`;
 }
 function renderLongevity(d){
   if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
   const ap=d.apoe;
-  const e4=!!(ap&&ap.epsilon&&ap.epsilon.indexOf('ε4')>=0);
-  const apNote=!ap?'':((ap.epsilon==='ε2/ε3'||ap.epsilon==='ε2/ε2')?t('web.longevity.apoe_favourable')
-    :(e4?t('web.longevity.apoe_e4'):t('web.longevity.apoe_generic')));
   // The card led with «APOE — status» over two rsIDs, which tells a reader
   // nothing about what APOE is or what their own combination means. The
   // combination is the answer; the two positions it is computed from are the
   // working, and working belongs underneath.
-  const apCard=ap?`<div class="card" style="border-color:${e4?'var(--warning)':'var(--good)'}">
+  const apCard=ap?`<div class="card">
     <div class="row"><b style="font-size:17px">APOE</b>
-      ${badge(e4?'b-warning':'b-good',ap.epsilon||'—')}</div>
-    <div class="why mt-1">${esc(t('web.longevity.what_is_apoe'))}</div>
-    <div class="why">${esc(apNote)}</div>
+      ${badge('b-unknown',ap.epsilon||ap.genotype||'—')}</div>
+    <div class="why">${esc(t('clinical.genome_limit'))}</div>${clinicalBasisHTML(ap)}
     <details class="fold"><summary>${esc(t('web.longevity.technical'))}</summary>
-      <div class="meta mt-1">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b> — ${esc(t('web.longevity.apoe_generic'))}</div>
+      <div class="meta mt-1">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b></div>
       ${ap.note?`<div class="meta mt-1">${esc(t('web.longevity.stored_note'))}: ${esc(ap.note)}</div>`:''}
     </details>
   </div>`:'';
@@ -3367,10 +3760,12 @@ function renderLongevity(d){
   // more findings under it. They are shown there, inside «how this is computed»,
   // so nothing is lost by not listing them twice.
   const listed=rows.filter(k=>k.verdict_token!=='see_apoe');
-  const found=listed.filter(k=>k.verdict_token!=='neutral');
+  const unresolved=listed.filter(k=>k.unresolved_count);
+  const found=listed.filter(k=>!k.unresolved_count&&k.verdict_token&&k.verdict_token!=='neutral');
   const quiet=listed.filter(k=>k.verdict_token==='neutral');
   const known=`${found.length?`<div class="so-h">${esc(t('web.longevity.found_h'))} · ${found.length}</div>`+found.map(longevityRow).join('')
-      :`<div class="muted" style="margin-top:12px">${esc(t('web.longevity.nothing_found'))}</div>`}
+      :`<div class="muted" style="margin-top:12px">${esc(t('clinical.genome_limit'))}</div>`}
+    ${unresolved.length?`<div class="so-h">${esc(t('clinical.withheld'))} · ${unresolved.length}</div>${unresolved.map(longevityRow).join('')}`:''}
     ${quiet.length?`<details class="fold"><summary>${esc(t('web.longevity.quiet_h'))} · ${quiet.length}</summary>${quiet.map(longevityRow).join('')}</details>`:''}`;
   const genes=d.significant_genes.slice(0,24).map(g=>`<button style="cursor:default" title="${esc(g.variants.map(v=>v.rsid+' '+v.genotype).join(', '))}">${esc(g.gene)}: ${g.variants.length}</button>`).join('');
   const st=d.stats;
@@ -3395,7 +3790,7 @@ function renderLipidGenetics(d){
   if(!d||d.status!=='ok') return '';
   const rows=(d.pcsk9||[]).map(x=>{
     const badgeFor = x.status==='read'
-      ? (x.carrier?badge('b-good',t('lipidgen.carrier')):badge('b-unknown',t('lipidgen.not_carrier')))
+      ? (x.carrier?badge('b-unknown',t('lipidgen.carrier')):badge('b-unknown',t('lipidgen.not_carrier')))
       : badge('b-unknown',t('lipidgen.unread'));
     return `<div class="list-item"><div class="row">${badgeFor}<b>${esc(x.gene)}</b>
         <code>${esc(x.rsid)}</code>
@@ -3404,6 +3799,7 @@ function renderLipidGenetics(d){
       ${x.verdict?`<div class="why">${esc(x.verdict)}</div>`:''}
       ${x.population_note?`<div class="why c-warning">⚠ ${esc(x.population_note)}</div>`:''}
       ${x.action?`<div class="why muted">${esc(x.action)}</div>`:''}
+      ${clinicalBasisHTML(x)}
       ${(x.pmids||[]).length?`<div class="meta">PMID: ${(x.pmids||[]).map(pm=>
         `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(pm)}/" target="_blank" rel="noreferrer noopener">${esc(pm)}</a>`).join(', ')}</div>`:''}
     </div>`;}).join('');
@@ -3412,9 +3808,9 @@ function renderLipidGenetics(d){
       <div class="why">${esc(w.why||'')}</div></div>`).join('');
   const l=d.lpa||{}; const m=l.measured;
   const lpa = m
-    ? `<div class="list-item"><div class="row">${m.above?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):badge('b-good',t('web.flag.ok'))}
-         <b>${esc(String(m.value))} ${esc(m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
-    : `<div class="card muted">${esc(l.what_to_do||'')}</div>`;
+    ? `<div class="list-item"><div class="row">${m.above===true?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):m.above===false?badge('b-good',t('web.flag.ok')):badge('b-unknown',t('web.severity.unassessed'))}
+         <b>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
+    : `<div class="card muted">${esc(l.what_to_do||t('clinical.withheld'))}${clinicalBasisHTML(l)}</div>`;
   const est = l.estimate
     ? `<div class="list-item"><div class="row"><b>${esc(l.estimate.label||'')}</b>
          <span class="muted">${esc(String(l.estimate.percentile))} · ${esc(l.estimate.pgs_id||'')} · ${esc(l.estimate.quality||'')}</span></div>
@@ -3603,7 +3999,33 @@ function genomeFindings(cv, prs, lng, lip){
 // Everything the tab knows about ONE gene, in one card. The four sections answer
 // by source; nobody answers by gene, so «what do I have on APOE» meant reading
 // four of them and joining by eye.
+function geneRegionCard(d){
+  const loc=d.location||{}, v=d.variants||{}, cov=d.coverage||{};
+  const head=`<div class="row"><b>${esc(d.gene||'')}</b><button class="ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>`;
+  const list=rows=>rows.map(x=>`<div class="why">${esc(x)}</div>`).join('');
+  if(d.status && d.status!=='ok'){
+    return `<div class="card" style="margin-bottom:14px">${head}${list([d.message||'',...(d.searched||[]),d.fix||''].filter(Boolean))}</div>`;
+  }
+  const coverage=cov.source==='bam'
+    ? ['gene','cds'].filter(k=>cov[k]).map(k=>t('gene.coverage_line',{what:t(k==='gene'?'gene.whole':'gene.cds'),
+        mean:cov[k].mean,min:cov[k].min,pct10:cov[k].pct_10x,pct20:cov[k].pct_20x}))
+    : [t('gene.coverage_missing',{why:cov.why||t('gene.coverage_not_computed')})];
+  const rows=(v.coding_rows||[]).map(r=>{
+    const p=r.protein||{};
+    return `${r.chrom}:${r.pos} ${r.ref}>${r.alt} ${r.genotype||'?'}${r.depth!=null?' · '+r.depth+'×':''} — ${p.hgvs_p|| (p.kind?t('gene.kind.'+p.kind):t('gene.not_computed'))}`;
+  });
+  const hits=d.clinvar||[];
+  return `<div class="card" style="margin-bottom:14px">${head}
+    ${list([`${loc.chrom}:${loc.start}–${loc.end} (${loc.strand}) · ${loc.assembly} · ${loc.transcript||'—'}`,
+      t('gene.coords_from',{source:loc.source_file||loc.source||'—'}),...coverage,
+      t('gene.counts',{total:v.total??'—',coding:v.coding??'—',consequential:v.consequential??t('gene.not_computed')})])}
+    ${list(rows.length?rows:[t('gene.coding_none')])}
+    ${list(hits.length?[t('gene.flagged'),...hits.map(h=>`${h.chrom}:${h.pos} ${h.rsid||''} ${h.genotype||''} — ${h.clnsig||''}`)]:[t('gene.no_flagged')])}
+    ${list((d.gaps||[]).map(g=>`${g.what}${g.fix?' · '+g.fix:''}`))}
+    ${list(d.blind_spots||[])}</div>`;
+}
 function geneCard(d, cv, lng, lip, sys){
+  if(d && (d.region || d.status==='unresolved_gene')) return geneRegionCard(d);
   if (!d || !d.gene) return genomeCard(d);
   // The honest entry from the genome's side: not «what this gene means» —
   // the product does not answer that — but «in which systems' genetic half it
@@ -3686,10 +4108,11 @@ function weakBedHtml(r){
   return '';
 }
 async function viewGenome(root){
-  const [st,cv,prs,lng,upd,lip,scr,wb]=await Promise.all([
+  const [st,cv,prs,lng,upd,lip,scr,wb,meds]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
     api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null),
-    api('/api/screen').catch(()=>null),api('/api/limits/bed').catch(()=>null)]);
+    api('/api/screen').catch(()=>null),api('/api/limits/bed').catch(()=>null),
+    api('/api/medications').catch(()=>null)]);
   const sb=await sourceBar(['genome_vcf','catalog','ensembl','clinvar']);
   // Seven headings on one scroll, all open, was the tab. The reader met the
   // maintenance block («update the databases») before any finding, and the same
@@ -3725,7 +4148,7 @@ async function viewGenome(root){
     prs&&prs.available?factHtml(String((prs.stats||{}).high||0),t('web.genome.fact_prs_high'),''):'',
     lng&&lng.available?factHtml(String((lng.stats||{}).significant_genes??'—'),t('web.genome.fact_long'),''):'',
   ];
-  root.innerHTML=`${pageHead(t('web.tab.genome'),t('web.page.genome.q'),gfacts)}
+  root.innerHTML=`${pageHead(t('web.tab.genome'),t('web.page.genome.q'),gfacts)}${cautionsHtml(meds&&meds.cautions)}
     ${genomeState(st)}
     <div class="subnav" role="tablist">${panes.map(([id,label,cnt],i)=>
       `<button role="tab" data-pane="${id}" aria-selected="${i===0}">${esc(label)}${cnt}</button>`).join('')}</div>
@@ -3753,10 +4176,13 @@ async function viewGenome(root){
   });
 
   const card=$('#g-card',root);
+  let lookup=0;
   async function openGene(gene){
+    const ticket=++lookup;
     const [d,sys]=await Promise.all([api('/api/genome?gene='+encodeURIComponent(gene)), systemsIndex().catch(()=>null)]);
+    if(ticket!==lookup || !card.isConnected)return;
     card.innerHTML=geneCard(d,cv,lng,lip,sys);
-    const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
+    const x=$('#gc-close',root); if(x)x.onclick=()=>{++lookup;card.innerHTML='';};
     card.scrollIntoView({block:'nearest'});
   }
   root.querySelectorAll('[data-gene-open]').forEach(b=>b.onclick=()=>openGene(b.dataset.geneOpen));
@@ -3766,11 +4192,13 @@ async function viewGenome(root){
   $('#g-chips',root).innerHTML=genes.map(g=>`<button data-gene="${g}">${g}</button>`).join('');
   $('#g-chips',root).querySelectorAll('button').forEach(b=>b.onclick=()=>openGene(b.dataset.gene));
   async function openRs(rs){
+    const ticket=++lookup;
     const d=await api('/api/genome?rsid='+encodeURIComponent(rs));
+    if(ticket!==lookup || !card.isConnected)return;
     card.innerHTML=genomeCard(d);
-    const x=$('#gc-close',root); if(x)x.onclick=()=>{card.innerHTML='';};
+    const x=$('#gc-close',root); if(x)x.onclick=()=>{++lookup;card.innerHTML='';};
     card.scrollIntoView({block:'nearest'});}
-  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return; return openRs(rs);}
+  async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return; return /^rs\d+$/i.test(rs)?openRs(rs):openGene(rs);}
   root.querySelectorAll('[data-rs-open]').forEach(b=>b.onclick=()=>openRs(b.dataset.rsOpen));
   $('#g-go',root).onclick=go;$('#g-in',root).addEventListener('keydown',e=>{if(e.key==='Enter')go();});
   // updates: the button
@@ -3798,7 +4226,7 @@ async function viewAssistant(root){
   const a=d.audit||{};
   const col={ok:'b-good',ready:'b-near',missing:'b-unknown'};
   const mark={ok:'web.assistant.connected',ready:'web.assistant.ready',missing:'web.assistant.missing'};
-  const eps=(d.entrypoints||[]).map(e=>`<div class="list-item">
+  const eps=(d.entrypoints||[]).map(e=>`<div class="list-item assist-entry">
       <div class="row">${badge(col[e.state]||'b-unknown',mark[e.state]?t(mark[e.state]):e.state)}<b>${esc(e.title)}</b>
         <span class="muted">${esc(e.detail)}</span></div>
       <div class="why">${esc(e.what)}</div>
@@ -3809,7 +4237,7 @@ async function viewAssistant(root){
   const cur=(d.curated||[]).map(c=>{
       const st=!c.exists?['b-unknown','web.assistant.absent']:(c.stale?['b-warning','web.assistant.stale']:['b-good','web.assistant.fresh']);
       const flag=c.stale&&c.id==='brief'?`<button class="ghost" data-open-brief>⚠ ${esc(t('web.assistant.stale'))} · ${esc(t('web.brief.review_btn'))}</button>`:badge(st[0],t(st[1]));
-      return `<div class="list-item"><div class="row">${flag}<b>${esc(c.title)}</b>
+      return `<div class="list-item assist-entry"><div class="row">${flag}<b>${esc(c.title)}</b>
         <span class="muted">${esc(c.updated?t('web.assistant.updated',{date:c.updated}):t('web.assistant.no_date'))} · ${esc(t('web.assistant.tab_of',{tab:c.tab}))}</span></div>
         ${c.note?`<div class="why">${esc(c.note)}</div>`:''}
         ${(c.stale_blocks||[]).length?`<div class="why">${esc(t('web.assistant.review_blocks',{blocks:c.stale_blocks.join(', ')}))}</div>`:''}
@@ -3947,17 +4375,21 @@ const TABS=[
   ['web.tab.guide',viewGuide],['web.tab.assistant',viewAssistant],
 ];
 const MENU_KEYS=['web.tab.guide','web.tab.assistant'];
+const NAV_ORDER=[0,1,2,4,3,5];
 let current=0;
 function buildNav(){
-  $('#nav').innerHTML=TABS.map(([key],i)=>MENU_KEYS.includes(key)?'':`<button data-tab="${i}">${esc(t(key))}</button>`).join('');
+  $('#nav').innerHTML=NAV_ORDER.map(i=>`<button data-tab="${i}">${esc(i===0?firstTabLabel():t(TABS[i][0]))}</button>`).join('');
   $('#nav').querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>mount(+b.dataset.tab));
   const mp=$('#menupanel');
   mp.innerHTML=TABS.map(([key],i)=>MENU_KEYS.includes(key)?`<button data-tab="${i}">${esc(t(key))}</button>`:'').join('')
+    +`<button data-menu="containers" id="patient-manage"${canManagePatients()?'':' hidden'}>${esc(t('web.lifecycle.manage'))}</button>`
     +`<button data-menu="check">${esc(t('web.menu.check_update'))}</button>`
     +`<button data-menu="recompute">${esc(t('web.menu.recompute'))}</button>`
+    +`<button data-menu="theme" id="mtheme">${esc(themeLabel())}</button>`
     +`<div class="mnote">${esc(_version?t('web.header.build',{version:_version}):'')}</div>`
     +`<div class="mnote" id="mupd" hidden></div>`;
   mp.querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>{closeMenu();mount(+b.dataset.tab);});
+  $('#patient-manage',mp).onclick=()=>openContainerManager(_patients);
   // An update is found and installed outside the page — the app does not rewrite
   // itself — so the menu asks the registry on request and says the command; the
   // recompute an update may ask for is one click from the same place.
@@ -3981,13 +4413,37 @@ function buildNav(){
     }
   };
   $('[data-menu="recompute"]',mp).onclick=()=>{closeMenu(); openRecompute();};
+  $('[data-menu="theme"]',mp).onclick=e=>{e.stopPropagation(); cycleTheme(); $('#mtheme').textContent=themeLabel();};
+  markCurrentTab(current);
+}
+// Three states and one click: the system's, light, dark. The choice is this
+// browser's and nothing else's; the page redraws so the charts are asked again.
+function themeNow(){ return document.documentElement.dataset.theme||'system'; }
+function themeLabel(){ return t('web.menu.theme',{theme:t('web.theme.'+themeNow())}); }
+function cycleTheme(){
+  const next={system:'light',light:'dark',dark:'system'}[themeNow()];
+  if(next==='system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme=next;
+  try{ if(next==='system') localStorage.removeItem('scholion-theme'); else localStorage.setItem('scholion-theme',next); }catch(e){}
+  mount(current);
 }
 function closeMenu(){const mp=$('#menupanel'),mb=$('#menubtn'); if(mp) mp.hidden=true; if(mb) mb.setAttribute('aria-expanded','false');}
+function markCurrentTab(i){
+  document.querySelectorAll('#nav button[data-tab],#menupanel button[data-tab]').forEach(b=>{
+    const active=+b.dataset.tab===i;
+    b.classList.toggle('active',active);
+    if(active) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
+  });
+}
 function mount(i){
   current=i;
-  document.querySelectorAll('#nav button[data-tab],#menupanel button[data-tab]').forEach(b=>b.classList.toggle('active',+b.dataset.tab===i));
-  const v=$('#view');showLoader(v);
-  return TABS[i][1](v).catch(e=>v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message));
+  markCurrentTab(i);
+  // Each render owns its node. A late response from the previous tab (or
+  // language/theme) can only fill a detached node, never the current screen.
+  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);showLoader(v);
+  return Promise.resolve().then(()=>TABS[i][1](v)).catch(e=>{
+    if(v.isConnected) v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message);
+  });
 }
 
 // The parts of the page that live outside the tabs. Redrawn on a language switch, so
@@ -4131,6 +4587,7 @@ document.addEventListener('click',e=>{
   if(det){ det.hidden=!det.hidden; tr.classList.toggle('open',!det.hidden); }
 });
 function renderChrome(){
+  renderMode(); renderContainerStamp();
   renderDemoBanner();
   renderUpdateNote();
   $('#subhead').textContent=t('web.header.subtitle');
@@ -4140,7 +4597,7 @@ function renderChrome(){
   $('#disclaimer').textContent=t('web.header.disclaimer');
   $('#ver').textContent=_version?t('web.header.build',{version:_version}):'';
   $('#langswitch').innerHTML=LANGS.map(c=>
-    `<button class="pickbtn" data-lang="${esc(c)}" title="${esc(t('web.lang.'+c))}" aria-pressed="${c===LANG}">${esc(c.toUpperCase())}</button>`).join('');
+    `<button class="cr-btn cr-btn--ghost cr-btn--s" data-lang="${esc(c)}" title="${esc(t('web.lang.'+c))}" aria-pressed="${c===LANG}">${esc(c.toUpperCase())}</button>`).join('');
   $('#menubtn').title=t('web.header.menu');
   $('#menubtn').setAttribute('aria-label',t('web.header.menu'));
 }
@@ -4152,7 +4609,7 @@ async function switchLang(code){
   forgetAnswers();                    // the answers were worded in the other language
   _sources=null;                      // the source chips are worded from the catalogue too
   _systems=null;                      // and so are the systems' labels
-  renderChrome(); buildNav(); mount(current);
+  renderChrome(); buildNav(); mount(current); loadPatients();
 }
 
 // picking a source folder from disk (the native macOS dialog) — a delegated handler
@@ -4168,7 +4625,7 @@ document.addEventListener('click',async e=>{
   if(lng){ switchLang(lng.getAttribute('data-lang')); return; }
   // «system: X →» anywhere on the page — a marker card, a gene card, a
   // prescription — opens the system's card; one handler, every face of it.
-  if(sysl){ e.preventDefault(); viewSystem(sysl.getAttribute('data-system')); return; }
+  if(sysl){ e.preventDefault(); viewSystem(sysl.getAttribute('data-system'),sysl.getAttribute('data-register')); return; }
   if(pick){
     const domain=pick.getAttribute('data-pick');
     pick.disabled=true;toast(t('web.common.opening_picker'));
@@ -4199,13 +4656,98 @@ document.addEventListener('click',async e=>{
   mount(0);
   api('/api/ping').then(p=>{
     if(!p)return;
-    if(p.version){_version=p.version;$('#ver').textContent=t('web.header.build',{version:_version});
+    if(p.version){_version=p.version;renderContainerStamp();$('#ver').textContent=t('web.header.build',{version:_version});
       const mn=$('#menupanel .mnote:not(#mupd)'); if(mn) mn.textContent=t('web.header.build',{version:_version});}
     _synthetic=!!p.synthetic; renderDemoBanner();
   }).catch(()=>{});
   api('/api/version').then(u=>{_update=u; renderUpdateNote();}).catch(()=>{});
   loadRecompute();
+  loadPatients();
 })();
+
+// 0.6.0 (U2): a position below B is a hypothesis with its passport. The
+// clinician's register shows the passport; the person's own shows that it is a
+// hypothesis and where its passport is. At E: a value, no sentence.
+function authorNoteHtml(p,register){
+  const n=p.author_note;
+  if(!n||register!=='clinician') return '';
+  return `<div class="why author-note"><b>${esc(n.label)}</b>${n.translation_label?' — '+esc(n.translation_label):''}`
+    +`<p>${esc(n.text).replace(/\n/g,'<br>')}</p><div class="muted">${esc(n.caveat)}</div></div>`;
+}
+function passportHtml(p, register){
+  const pp=p.passport;
+  if(!pp) return p.value_only?`<div class="why muted">${esc(t('web.hyp.value_e'))}</div>`:'';
+  if(register!=='clinician') return `<div class="why muted">${esc(t('web.hyp.short',{level:pp.level}))}</div>`;
+  const parts=['why_this_level','mechanism','effect','population','study','replication','would_confirm','would_refute','source']
+    .filter(k=>pp[k]).map(k=>`<div class="small">${esc(t('system.hyp.part.'+k,{value:pp[k]}))}</div>`).join('');
+  const miss=(pp.missing||[]).length?`<div class="small muted">${esc(t('system.hyp.missing',{parts:pp.missing.map(m=>t('system.hyp.name.'+m)).join(', ')}))}</div>`:'';
+  return `<div class="why"><b>${esc(t('web.hyp.head',{level:pp.level}))}</b> ${esc(pp.reported||t('system.hyp.no_sentence'))}${parts}${miss}</div>`;
+}
+
+// Only Visit offers a patient choice, and only if there is a choice to make.
+// Labels stay in this local UI; the persistent stamp uses the technical ID.
+let _patients=[], _hasWorkstation=false, _patientsGeneration=0;
+function canManagePatients(){return _hasWorkstation||_patients.length>1;}
+function renderContainerStamp(){
+  const active=_patients.find(c=>c.active);
+  const stamp=t('web.header.container_stamp',{id:active&&active.id?active.id:'—',version:_version||'—'});
+  $('#container-stamp').textContent=stamp;
+  $('#print-container-stamp').textContent=stamp;
+}
+async function loadPatients(){
+  const generation=++_patientsGeneration;
+  let r=null; try{ r=await api('/api/patients'); }catch(e){ return; }
+  if(generation!==_patientsGeneration) return;
+  _patients=(r&&r.containers)||[]; _hasWorkstation=!!(r&&r.workstation);
+  renderContainerStamp(); renderPatients();
+}
+function renderPatients(){
+  const box=$('#patientpick'); if(!box) return;
+  const manager=$('#patient-manage'); if(manager) manager.hidden=!canManagePatients();
+  const rows=_patients;
+  if(DISPLAY_MODE!=='clinician'||rows.length<2){ box.innerHTML=''; return; }
+  const opt=c=>`<option value="${esc(c.id)}"${c.active?' selected':''}>${esc(c.id)}${c.label?' · '+esc(c.label):''}</option>`;
+  box.innerHTML=`<label class="cr-label">${esc(t('web.patient.pick'))} <select class="cr-input" id="patientsel" aria-label="${esc(t('web.patient.pick'))}">${rows.map(opt).join('')}</select></label>`;
+  const selector=$('#patientsel'); if(selector) selector.onchange=async e=>{
+    const res=await post('/api/use',{id:e.target.value});
+    if(res&&res.ok) location.reload(); else { toast((res&&res.error)||t('web.patient.not_switched')); loadPatients(); }
+  };
+}
+
+</script>
+<script id="container-ui">
+// This renderer targets the native dialog outside the legacy Pico subtree.
+let containerDialogGeneration=0;
+function openContainerManager(rows){
+  const dialog=$('#container-dialog'), generation=++containerDialogGeneration;
+  closeMenu();
+  dialog.innerHTML=`<div class="cr-dialog__body"><h2 class="cr-dialog__title" id="container-dialog-title">${esc(t('web.lifecycle.manage'))}</h2>
+    <div class="cr-field"><label class="cr-label" for="lifecycle-id">${esc(t('web.patient.pick'))}</label><select class="cr-input" id="lifecycle-id">${rows.map(c=>`<option value="${esc(c.id)}">${esc(c.id)}${c.active?' · '+esc(t('patients.active_mark')):''}</option>`).join('')}</select></div>
+    <div class="cr-field" style="margin-top:16px"><label class="cr-label" for="lifecycle-to">${esc(t('web.lifecycle.destination'))}</label><input class="cr-input" id="lifecycle-to" autocomplete="off"><span class="cr-hint">${esc(t('lifecycle.destination'))}</span></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin:16px 0"><button class="cr-btn" id="lifecycle-export">${esc(t('web.lifecycle.export'))}</button><button class="cr-btn" id="lifecycle-preview">${esc(t('web.lifecycle.preview'))}</button></div>
+    <div class="cr-alert cr-alert--warning"><div><strong class="cr-alert__title">${esc(t('web.lifecycle.warning'))}</strong>${esc(t('lifecycle.erase_warning'))}</div></div>
+    <div class="cr-field" style="margin-top:16px"><label class="cr-label" for="lifecycle-confirm">${esc(t('web.lifecycle.confirm'))}</label><input class="cr-input" id="lifecycle-confirm" autocomplete="off"></div>
+    <pre id="lifecycle-result" role="status" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto"></pre></div>
+    <div class="cr-dialog__foot"><button class="cr-btn" id="lifecycle-close">${esc(t('web.lifecycle.close'))}</button><button class="cr-btn cr-btn--danger" id="lifecycle-erase" disabled>${esc(t('web.lifecycle.erase'))}</button></div>`;
+  let plan=null,busy=false;
+  const controls=[...dialog.querySelectorAll('input,select,button')];
+  function state(){if(generation!==containerDialogGeneration)return;controls.forEach(c=>c.disabled=busy);$('#lifecycle-erase').disabled=busy||!plan||$('#lifecycle-confirm').value!==plan.container.id;}
+  function output(r){$('#lifecycle-result').textContent=JSON.stringify(r,null,2);}
+  async function request(route,body){
+    busy=true;state();
+    try{const r=await post(route,body);if(generation!==containerDialogGeneration||!dialog.open)return null;output(r);return r;}
+    catch(e){if(generation===containerDialogGeneration&&dialog.open)$('#lifecycle-result').textContent=e.message;return null;}
+    finally{if(generation===containerDialogGeneration){busy=false;state();}}
+  }
+  $('#lifecycle-id').onchange=()=>{plan=null;$('#lifecycle-confirm').value='';$('#lifecycle-result').textContent='';state();};
+  $('#lifecycle-confirm').oninput=state;
+  $('#lifecycle-export').onclick=async()=>{plan=null;state();await request('/api/export',{id:$('#lifecycle-id').value,to:$('#lifecycle-to').value});};
+  $('#lifecycle-preview').onclick=async()=>{plan=null;state();const r=await request('/api/erase',{id:$('#lifecycle-id').value});if(r&&r.preview&&r.ok)plan=r;state();};
+  $('#lifecycle-erase').onclick=async()=>{if(!plan)return;const approved=plan;plan=null;const r=await request('/api/erase',{id:approved.container.id,confirm:$('#lifecycle-confirm').value,digest:approved.digest});if(r&&r.ok)await loadPatients();state();};
+  $('#lifecycle-close').onclick=()=>dialog.close();
+  dialog.oncancel=e=>{if(busy)e.preventDefault();};
+  dialog.showModal();state();
+}
 </script>
 </body>
 </html>

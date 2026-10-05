@@ -230,24 +230,25 @@ def from_thresholds():
                             .read_text(encoding="utf-8")).get("markers", {})
         except Exception as e:                             # noqa: BLE001
             return {"error": f"{type(e).__name__}: {e}"}, []
-    out = []
-    for key, rules in th.items():
-        val, dt = _latest_point(key)
-        if val is None:
-            continue
-        crossed = []
-        for r in rules or []:
-            thr, side = r.get("value"), r.get("side", "high")
-            if thr is None:
-                continue
-            if (side == "high" and val >= thr) or (side == "low" and val <= thr):
-                crossed.append(r)
-        if not crossed:
-            continue
-        worst = max(crossed, key=lambda r: abs(float(r.get("value", 0)) - 0)) if crossed else None
-        label = _text(worst.get("label")) if worst else ""
-        out.append((key, f"clinical threshold «{label}» crossed (latest value {val} of {dt}) — track the dynamics"))
-    return {}, out
+    from scholion.engine import labs as lab_engine
+    out, unresolved, basis_gaps = [], [], []
+    for marker in lab_engine.analyze_labs().get("markers", []):
+        key = marker["key"]
+        decisions = marker.get("decisions", [])
+        if any(d.get("crossed") is None and d.get('why') == 'threshold_basis' for d in decisions):
+            basis_gaps.append(key)
+        if any(d.get("crossed") is None and d.get('why') != 'threshold_basis' for d in decisions):
+            unresolved.append(key)
+        crossed = [d for d in decisions if d.get("crossed") is True]
+        if crossed:
+            label = _text(crossed[0].get("label"))
+            val, dt = marker.get("value"), marker.get("date")
+            out.append((key, f"clinical threshold «{label}» crossed (latest value {val} of {dt}) — track the dynamics"))
+    info = {"error": "threshold comparison unavailable: " + ", ".join(unresolved)} if unresolved else {}
+    if basis_gaps:
+        info['basis_withheld'] = basis_gaps
+        info['error'] = (info.get('error', '') + '; clinical threshold interpretation withheld: ' + ', '.join(basis_gaps)).lstrip('; ')
+    return info, out
 
 
 # --------------------------------------------------------------------------- assembly

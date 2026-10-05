@@ -66,7 +66,8 @@ class TestOneCopyOfX(unittest.TestCase):
         self.assertEqual("hemi", row["state"])
         self.assertTrue(row["hemizygous"])
         self.assertEqual({"base": "C", "hom": "T"}, row["ladder"])
-        self.assertIn("testosterone", row["text"].lower() + json.dumps(row["text"]))
+        self.assertIsNone(row["text"])
+        self.assertIn("mechanism", row["conclusion_basis"]["missing"])
 
 
 class TestARefusedLadder(unittest.TestCase):
@@ -176,15 +177,15 @@ class TestTrpLnaa(unittest.TestCase):
 
 class TestTheNewCorrectionRules(unittest.TestCase):
 
-    def test_each_passes_the_gate(self):
+    def test_review_does_not_replace_each_routes_own_basis(self):
         known = core.lab_markers().get("markers") or {}
         rules = {r["key"]: r for r in _raw("correction_routes.json")["rules"]}
         for key in ("pah_carrier_phenylalanine", "ass1_asl_carrier_citrulline", "gatm_carrier_creatine",
                     "hyperoxaluria_carrier_collagen"):
             with self.subTest(rule=key):
-                self.assertIsNone(routes.route_refusal(rules[key], known))
+                self.assertEqual("route_basis", routes.route_refusal(rules[key], known))
         self.assertEqual("level_below_b", routes.route_refusal(rules["slc6a19_carrier_niacinamide"], known),
-                         "a carrier statement resting on a gene paper prints as «adds nothing» with its reason")
+                         "a level-C carrier statement must not leak as prescribing text under adds_nothing")
 
 
 class TestTheListCarriesTheCorrectedGenes(unittest.TestCase):

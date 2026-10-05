@@ -107,7 +107,8 @@ def panel_view(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
         if r and r.get("value") is not None:
             measured.append({"key": k, "name": r.get("name") or _marker_name(k), "value": r.get("value"),
                              "unit": r.get("unit"), "date": r.get("date"), "ref_low": r.get("ref_low"),
-                             "ref_high": r.get("ref_high"), "flag": r.get("flag")})
+                             "ref_high": r.get("ref_high"), "flag": r.get("flag"),
+                             "censored": r.get("censored")})
     ratios = []
     for k in derived:
         x = _ratio(k, by_key)
@@ -121,16 +122,42 @@ def panel_view(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
     for m in measured:
         m["display_only"] = m["key"] in only
         m["companions"] = _companions(m, (dom.get("interpret_with") or {}).get(m["key"]), by_key, ratio_by_key)
-    return {"markers": measured,
+    causes = _cause_context(measured)
+    return {"markers": measured, "cause_dictionary": causes,
             "unmeasured": [_marker_name(k) for k in keys if k not in {m["key"] for m in measured}],
             "total": len(keys), "ratios": ratios, "scored": False,
             "display_only": sorted(only),
             "groups": _groups(dom, by_key, ratio_by_key)}
 
 
+def _cause_context(measured: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """One shared reference legend; low values never establish any of its causes."""
+    from .. import core
+    from ..conclusion_basis import conclusion_basis
+    from ..i18n import t
+    book = core._read_knowledge("amino_acid_causes.json")
+    eligible = [m for m in measured if m["key"] in book.get("markers", [])
+                and _direction(m) == "low" and not m.get("display_only") and not m.get("censored")]
+    if not eligible:
+        return []
+    out = []
+    for key, raw in (book.get("causes") or {}).items():
+        basis = conclusion_basis(raw.get("basis"))
+        supported = basis["status"] == "complete" and raw.get("level") in ("C", "D") and bool(raw.get("caveat"))
+        out.append({"id": key, "name": raw.get("name") or key,
+                    "level": raw.get("level") if raw.get("level") in ("C", "D") else None,
+                    "source": basis["source"], "mechanism": basis["mechanism"] if supported else None,
+                    "caveat": raw.get("caveat") if supported else basis["reason"] or t("clinical.display_limit"),
+                    "status": "reference_only" if supported else "withheld",
+                    "interpretation": "possible_context_not_established"})
+    for m in eligible:
+        m["possible_causes"] = [c["id"] for c in out]
+    return out
+
+
 def _direction(row: Dict[str, Any]) -> str:
     flag = str(row.get("flag") or "").lower()
-    return "high" if flag.startswith("h") else "low" if flag.startswith("l") else "in"
+    return "high" if flag.startswith("h") or flag == "critical_high" else "low" if flag.startswith("l") or flag == "critical_low" else "in"
 
 
 def _companions(m: Dict[str, Any], rule: Any, by_key: Dict[str, Any],

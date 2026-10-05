@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "updated": "2026-10-05",
+    "source_tier": "primary_literature",
+    "purpose": "Shared reference contexts for low amino-acid observations, not diagnosed causes, a ranking or a treatment indication. Single studies are level C. Never score these hypotheses."
+  },
+  "markers": ["aa_histidine", "aa_isoleucine", "aa_leucine", "valine", "aa_lysine", "aa_phenylalanine", "aa_threonine", "aa_tyrosine", "aa_asparagine"],
+  "causes": {
+    "protein_intake": {
+      "level": "C",
+      "name": {"en": "Protein intake", "ru": "Поступление белка"},
+      "basis": {
+        "source": "PMID: 32717986",
+        "mechanism": {"en": "Short-term protein restriction lowered several meal-fed amino acids in young men; few fasting concentrations changed.", "ru": "Краткое ограничение белка снижало ряд аминокислот после еды у молодых мужчин; натощак изменились немногие концентрации."}
+      },
+      "caveat": {"en": "A low fasting value does not establish insufficient intake. Meal timing and dietary history matter.", "ru": "Низкое значение натощак не доказывает недостаточное поступление. Важны время еды и сведения о питании."}
+    },
+    "malabsorption": {
+      "level": "C",
+      "name": {"en": "Malabsorption", "ru": "Мальабсорбция"},
+      "basis": {
+        "source": "PMID: 1116672",
+        "mechanism": {"en": "A small tropical-sprue study directly measured reduced intestinal absorption of several essential amino acids.", "ru": "В небольшом исследовании тропической спру непосредственно измерено снижение кишечного всасывания ряда незаменимых аминокислот."}
+      },
+      "caveat": {"en": "Disease-specific absorption measurements do not make a low plasma value a diagnostic test for malabsorption.", "ru": "Измерение всасывания при конкретной болезни не делает низкую концентрацию в плазме диагностическим тестом мальабсорбции."}
+    },
+    "catabolism": {
+      "level": "C",
+      "name": {"en": "Catabolism", "ru": "Катаболизм"},
+      "basis": {
+        "source": "PMID: 9005983; DOI: 10.1172/JCI119143",
+        "mechanism": {"en": "A small sepsis study observed muscle proteolysis signals alongside lower total plasma amino acids.", "ru": "Небольшое исследование сепсиса выявило признаки мышечного протеолиза вместе со снижением суммарных аминокислот плазмы."}
+      },
+      "caveat": {"en": "This sepsis context cannot establish catabolism from an isolated low amino-acid result.", "ru": "Этот контекст сепсиса не позволяет установить катаболизм по отдельному низкому значению аминокислоты."}
+    }
+  }
+}

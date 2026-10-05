@@ -4,12 +4,12 @@
     "usage": "The catalogue only says «what this position means». The genotypes themselves are always taken from the user's personal VCF (genome/*.vcf.gz), which stays on their machine.",
     "extensible": "The list is extended by adding new rsID→coordinate entries (verify them against Ensembl GRCh38). The application works with the full VCF; the catalogue defines which loci it is able to interpret.",
     "assembly": "GRCh38",
-    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so. The 28 positions added on 2026-09-17 (the three new systems of task 200 and the amino acid panel) carry the coordinate of their HGVS, which was itself verified against Ensembl REST GRCh38 and, for the amino acid positions, against the GWAS Catalog; `ref` is the reference base of that HGVS and `alt` its alternative on the plus strand, so a row whose risk allele is written on the minus strand says so in its note. On 2026-09-17 the two sources agreed on the GRCh37 position of rs111033565 (PRSS1) and rs641738 (MBOAT7/TMC4), which had been held without a second coordinate since they disagreed; both numbers are now carried, written by the same check that compares them. Nine more amino acid positions on 2026-09-18 (ABCG2, SLC16A9, PPM1K rs7678928, GLS2, NAT8, GCKR, GNMT, PSPH region, PRODH): coordinates from Ensembl REST GRCh38 fetched for each rsID, alleles from the GWAS Catalog records; ABCG2 and GCKR are spelled on the plus strand and their notes say what the literature's spelling is. Five positions of the panel author's list (rs1691053, rs5934505, rs6356, rs34424986, rs182052) were added on 2026-09-25 from the Ensembl REST endpoints of both builds; for the three sites dbSNP gives three alleles, the alternative is the one the position's own source names (TH Val81Met, PRKN c.823C>T per ClinVar 7050, rs5934505 C/T per Ohlsson 2011), never a guess.",
+    "source": "The coordinates were verified against primary sources (assembly GRCh38), not from memory: the original 17 loci — Ensembl REST; the loci added on 2026-08-13 — from the NCBI ClinVar VCF (fileDate 2026-07-20, reference GRCh38), the fields RS/GENEINFO/CLNSIG. ref = the reference allele, alt = the alternative one (the forward strand of the genome). The second build (`pos_grch37`) was added on 2026-08-19 from NCBI dbSNP and the Ensembl GRCh37 REST endpoint, cross-checked against real GRCh37 corpus files where those carried the locus — see `assembly_secondary_note`. rs4680 (COMT Val158Met) was added on 2026-09-12 from the Ensembl REST endpoints of both builds and from NCBI dbSNP esummary (`chrpos`, `chrpos_prev_assm`); the two agreed on both numbers, and the dbSNP SPDI `NC_000022.11:19963747:G:A` confirms the reference base. The loci added on 2026-09-13 (the radar-segment panels, task 179) were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary (chrpos), which agreed on every position; `ref` is the first allele of Ensembl's allele string; `alt` is the allele the note is about, chosen on the plus strand with the gene's strand in mind. Where the two sources disagreed on GRCh37, `pos_grch37` is null and the note says so. The 28 positions added on 2026-09-17 (the three new systems of task 200 and the amino acid panel) carry the coordinate of their HGVS, which was itself verified against Ensembl REST GRCh38 and, for the amino acid positions, against the GWAS Catalog; `ref` is the reference base of that HGVS and `alt` its alternative on the plus strand, so a row whose risk allele is written on the minus strand says so in its note. On 2026-09-17 the two sources agreed on the GRCh37 position of rs111033565 (PRSS1) and rs641738 (MBOAT7/TMC4), which had been held without a second coordinate since they disagreed; both numbers are now carried, written by the same check that compares them. Nine more amino acid positions on 2026-09-18 (ABCG2, SLC16A9, PPM1K rs7678928, GLS2, NAT8, GCKR, GNMT, PSPH region, PRODH): coordinates from Ensembl REST GRCh38 fetched for each rsID, alleles from the GWAS Catalog records; ABCG2 and GCKR are spelled on the plus strand and their notes say what the literature's spelling is. Five positions of the panel author's list (rs1691053, rs5934505, rs6356, rs34424986, rs182052) were added on 2026-09-25 from the Ensembl REST endpoints of both builds; for the three sites dbSNP gives three alleles, the alternative is the one the position's own source names (TH Val81Met, PRKN c.823C>T per ClinVar 7050, rs5934505 C/T per Ohlsson 2011), never a guess. Thirteen positions of the folate/histamine/redox/choline list were added on 2026-10-05: both assembly coordinates agree between Ensembl REST and NCBI dbSNP esummary; the alternative names the submitted change, never a risk assignment. Multiallelic sites retain the selected submitted allele.",
     "chrom_note": "chrom without a prefix; when the VCF is queried the 'chr' prefix is determined from the VCF contigs.",
     "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
     "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool. CLOSED 13.09.2026 — FADS1 rs174537 and rs174546: the coordinates were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary while the radar-segment panels were composed, and both loci are in `loci` with the omega-3 conversion note the vitamins panel reads.",
     "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-    "updated": "2026-09-25",
+    "updated": "2026-10-05",
     "source_tier": "primary_literature",
     "assembly_secondary": "GRCh37",
     "assembly_secondary_note": {
@@ -20,7 +20,7 @@
       "en": "The position question is closed — every locus answers in both builds. Two things are not. (1) Allele orientation: rs6025, rs1065852 and rs762551 appear in a corpus GRCh37 file with REF/ALT the reverse of this catalogue's (file T>C vs catalogue C>T; G>A vs A>G; C>A vs A>C). Their GRCh37 positions here come from NCBI and Ensembl, not from that file, so the coordinates are unaffected; what is unresolved is which strand that exporter reports on, and it is left open rather than settled from one caller's output. (2) The same run also compared every GRCh38 position in this catalogue against dbSNP. It reported to the console and the console was not kept, so that comparison is not on record here — the script now writes a report file beside its output, and the next run will leave one.",
       "ru": "Вопрос о позициях закрыт — каждый локус отвечает в обеих сборках. Незакрытых два. (1) Ориентация аллелей: rs6025, rs1065852 и rs762551 встречаются в файле GRCh37 из корпуса с REF/ALT, обратными нашим (в файле T>C против C>T в каталоге; G>A против A>G; C>A против A>C). Координаты GRCh37 у них взяты из NCBI и Ensembl, а не из этого файла, так что на позиции это не влияет; неразрешено то, с какой цепи отчитывается этот экспортёр, и вопрос оставлен открытым, а не решён по выводу одного вызывателя. (2) Тот же прогон сверил и все координаты GRCh38 этого каталога с dbSNP. Он отчитался в консоль, консоль не сохранена — значит, этой сверки здесь нет на бумаге. Теперь скрипт пишет отчёт рядом с выходным файлом, и следующий прогон его оставит."
     },
-    "catalog_updated": "2026-09-18",
+    "catalog_updated": "2026-10-05",
     "grch37_unresolved": {},
     "grch37_unresolved_note": "A locus here answers in GRCh38 only, and says so: `pos_grch37` is null and the reason is above. `fill_grch37.py` cannot close it — the sources disagree, and the next attempt needs a third one, not another run. Recorded 13.09.2026 with the radar-segment panels.",
     "grch37_same_as_grch38": {
@@ -39,6 +39,34 @@
     }
   },
   "loci": {
+    "rs121908529": {
+      "gene": "AGXT", "chrom": "2", "pos": 240871433, "pos_grch37": 241810850,
+      "ref": "G", "alt": "A",
+      "coordinate_source": "NCBI ClinVar variation/40166 and Ensembl variation/human/rs121908529 in GRCh38/37, verified 2026-10-05",
+      "note": {"en": "p.Gly170Arg. Pyridoxine response literature concerns confirmed primary hyperoxaluria type 1, not an isolated carrier call or an amino-acid panel. No dose or personal response is inferred (PMID 24385516, PMID 15849466).", "ru": "p.Gly170Arg. Литература об ответе на пиридоксин относится к подтверждённой первичной гипероксалурии типа 1, не к отдельному носительству или панели аминокислот. Доза и индивидуальный ответ не выводятся (PMID 24385516, PMID 15849466)."}
+    },
+    "rs121908524": {
+      "gene": "AGXT", "chrom": "2", "pos": 240871379, "pos_grch37": 241810796,
+      "ref": "T", "alt": "A",
+      "coordinate_source": "NCBI ClinVar RCV000779687 and Ensembl variation/human/rs121908524 in GRCh38/37, verified 2026-10-05",
+      "note": {"en": "p.Phe152Ile. Response associations were studied in patients with primary hyperoxaluria type 1 and cellular models; a carrier genotype does not establish treatment eligibility or response (PMID 15849466, PMID 23597595).", "ru": "p.Phe152Ile. Ассоциации ответа изучены у пациентов с первичной гипероксалурией типа 1 и в клеточных моделях; генотип носителя не устанавливает показание к лечению или ответ (PMID 15849466, PMID 23597595)."}
+    },
+    "rs121908525": {
+      "gene": "AGXT", "chrom": "2", "pos": 240875159, "pos_grch37": 241814576,
+      "ref": "T", "alt": "C",
+      "coordinate_source": "NCBI ClinVar RCV000586265 and Ensembl variation/human/rs121908525 in GRCh38/37, verified 2026-10-05",
+      "note": {"en": "p.Ile244Thr. Partial pyridoxine effects were reported in a cellular AGT model. This is not a measured personal response or a carrier treatment rule (PMID 23597595).", "ru": "p.Ile244Thr. Частичные эффекты пиридоксина описаны в клеточной модели AGT. Это не измеренный индивидуальный ответ и не правило лечения носителя (PMID 23597595)."}
+    },
+    "rs1799762": {
+      "gene": "SERPINE1", "chrom": "7", "pos": 101126425,
+      "pos_grch37": 100769706, "ref": "T", "alt": "TG",
+      "coordinate_source": "NCBI dbSNP RefSNP 1799762 SPDI placements and Ensembl variation/sequence GRCh38 and GRCh37, verified 2026-10-05. Left-anchored VCF representation of GGGG/GGGGG; distinct from rs1799768 and rs1799889.",
+      "repeat_call": {"reference": "TGGGGA", "alleles": {"TGGGGA": "4G", "TGGGGGA": "5G"}},
+      "note": {
+        "en": "SERPINE1 promoter 4G/5G repeat. Verified allele identity only; no clinical risk direction is assigned. Literature aliases do not make rs1799768 (insertion A/C) or rs1799889 (A/G substitution) equivalent genomic calls.",
+        "ru": "Повтор 4G/5G промотора SERPINE1. Подтверждена только идентичность аллелей; направление клинического риска не назначено. Литературные обозначения не делают rs1799768 (вставка A/C) или rs1799889 (замена A/G) эквивалентными геномными чтениями."
+      }
+    },
     "rs429358": {
       "gene": "APOE",
       "chrom": "19",
@@ -3176,6 +3204,175 @@
       "note": {
         "en": "ADIPOQ −10066 G>A, intronic: A with lower adiponectin in a Russian cohort",
         "ru": "ADIPOQ −10066 G>A, интронный: A — ниже адипонектин в российской когорте"
+      }
+    },
+    "rs10156191": {
+      "gene": "AOC1",
+      "chrom": "7",
+      "pos": 150856517,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 150553605,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs10156191",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1049742": {
+      "gene": "AOC1",
+      "chrom": "7",
+      "pos": 150857465,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 150554553,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1049742",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1049793": {
+      "gene": "AOC1",
+      "chrom": "7",
+      "pos": 150860577,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 150557665,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1049793",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs2052129": {
+      "gene": "AOC1",
+      "chrom": "7",
+      "pos": 150851884,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 150548972,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs2052129",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs6323": {
+      "gene": "MAOA",
+      "chrom": "X",
+      "pos": 43731789,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 43591036,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs6323",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1137070": {
+      "gene": "MAOA",
+      "chrom": "X",
+      "pos": 43744144,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 43603391,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1137070",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1695": {
+      "gene": "GSTP1",
+      "chrom": "11",
+      "pos": 67585218,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 67352689,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1695",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1138272": {
+      "gene": "GSTP1",
+      "chrom": "11",
+      "pos": 67586108,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 67353579,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1138272",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1050450": {
+      "gene": "GPX1",
+      "chrom": "3",
+      "pos": 49357401,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 49394834,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1050450",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs1799983": {
+      "gene": "NOS3",
+      "chrom": "7",
+      "pos": 150999023,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 150696111,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs1799983",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs2070744": {
+      "gene": "NOS3",
+      "chrom": "7",
+      "pos": 150992991,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 150690079,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs2070744",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs7946": {
+      "gene": "PEMT",
+      "chrom": "17",
+      "pos": 17506246,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 17409560,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs7946",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
+      }
+    },
+    "rs12325817": {
+      "gene": "PEMT",
+      "chrom": "17",
+      "pos": 17583205,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 17486519,
+      "coordinate_source": "Ensembl REST GRCh38/GRCh37 and NCBI dbSNP esummary, verified 2026-10-05 for rs12325817",
+      "note": {
+        "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
+        "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
       }
     }
   }

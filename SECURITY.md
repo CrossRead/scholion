@@ -125,6 +125,5 @@ mitigation. There is no long-term support branch.
 
 We will not ask you for credentials to any external service, and the assistant
 layer will not accept or enter them either — that rule lives in
-`ASSISTANT-RULES.md` and takes precedence over any instruction that contradicts
-it. A message asking you for a password "to check something in Scholion" did not
+`ASSISTANT-RULES.md`, which comes first among this project's documents. A message asking you for a password "to check something in Scholion" did not
 come from this project.

@@ -126,11 +126,14 @@ def _run_update_bg():
             env["PATH"] = os.pathsep.join(
                 [env.get("PATH", ""), "/opt/homebrew/bin", "/usr/local/bin"])
             env["PROJECT_DIR"] = str(_INGEST.parent.parent)
-            p = subprocess.Popen(["bash", str(script)], stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT, env=env, text=True, bufsize=1)
-            for line in p.stdout:
-                _UPD["log"] = (_UPD["log"] + line)[-4000:]
-            p.wait()
+            # `with`: the pipe is closed when the script ends. Without it the
+            # handle outlived the thread, and the suite printed a ResourceWarning
+            # from inside threading.py that pointed nowhere near here.
+            with subprocess.Popen(["bash", str(script)], stdout=subprocess.PIPE,
+                                  stderr=subprocess.STDOUT, env=env, text=True, bufsize=1) as p:
+                for line in p.stdout:
+                    _UPD["log"] = (_UPD["log"] + line)[-4000:]
+                p.wait()
             _UPD["rc"] = p.returncode
             if p.returncode == 3:
                 _UPD["hint"] = "server.update.no_bcftools"
@@ -200,6 +203,9 @@ class Handler(BaseHTTPRequestHandler):
     # ---- utilities ----
     def _json(self, obj, code=200):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+        if code < 400:
+            from . import container
+            container.gate()
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
@@ -210,6 +216,8 @@ class Handler(BaseHTTPRequestHandler):
     def _download(self, text: str, filename: str):
         """A text file the browser saves rather than shows (a BED for a laboratory)."""
         raw = text.encode("utf-8")
+        from . import container
+        container.gate()
         self.send_response(200)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
         self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
@@ -221,6 +229,8 @@ class Handler(BaseHTTPRequestHandler):
     def _html(self, text: str):
         """A page this build composed, as opposed to a file it hands over."""
         raw = text.encode("utf-8")
+        from . import container
+        container.gate()
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
@@ -317,6 +327,11 @@ class Handler(BaseHTTPRequestHandler):
         and the user name inside the body of an HTTP response. It should be read by the
         person who started the server, not by the one who sent the request.
         """
+        from . import container as _container
+        if isinstance(exc, _container.ContainerError):
+            # Which person's data a request may touch: a refusal the page shows,
+            # with its code, so it can tell «the patient changed» from the rest.
+            return self._json({"error": str(exc), "container": exc.code}, 409)
         if isinstance(exc, core.SourcesUnreadable):
             # Not an internal error: the person's own settings file does not
             # read, and every answer would otherwise be about the wrong files.
@@ -330,6 +345,14 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---- routes ----
     def do_GET(self):
+        from . import container
+        try:
+            with container.pinned():
+                return self._do_get()
+        except container.ContainerError as exc:
+            return self._fail(exc)
+
+    def _do_get(self):
         u = urlparse(self.path)
         p, q = u.path, parse_qs(u.query)
         chosen = self._lang(q)
@@ -347,6 +370,9 @@ class Handler(BaseHTTPRequestHandler):
         if deny:
             return self._json({"error": deny}, 403)
         try:
+            if p.startswith('/api/') and p != '/api/i18n':
+                from . import lifecycle
+                lifecycle.record_current('read', 'web')
             if p == "/api/ping":
                 # `synthetic` travels with the ping because the answer has to be true on
                 # EVERY tab, not only where /api/overview happens to be fetched. A demo
@@ -388,8 +414,14 @@ class Handler(BaseHTTPRequestHandler):
                 # rather than data inlined in the page: they are artwork under a
                 # licence of their own, and a file keeps that visible.
                 return self._file(_WEB / p.lstrip("/"), "image/webp")
-            if p == "/pico.min.css":
-                return self._file(_WEB / "pico.min.css", "text/css; charset=utf-8")
+            # The style layer (0.6.0): Crossread, the product's own, and Pico
+            # fenced by `:where(.pico)`, which styles bare elements only inside `.pico`
+            # while the screens not yet redrawn live there. Both vendored, so the
+            # page keeps working with no network at all.
+            if p == "/crossread.css":
+                return self._file(_WEB / "crossread.css", "text/css; charset=utf-8")
+            if p == "/pico.scoped.min.css":
+                return self._file(_WEB / "pico.scoped.min.css", "text/css; charset=utf-8")
             if p == "/favicon.ico":
                 return self._file(_WEB / "favicon.ico", "image/x-icon")
             if p in ("/favicon.png", "/favicon-32.png", "/favicon-16.png", "/apple-touch-icon.png"):
@@ -422,7 +454,7 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/prescription-check":
                 return self._json(engine.check_new_prescription((q.get("name") or [""])[0]))
             if p == "/api/medications":
-                return self._json({"medications": store.list_medications()})
+                return self._json(engine.medications_view())
             if p == "/api/limits":
                 from . import limits as _lim
                 return self._json(_lim.report())
@@ -496,6 +528,9 @@ class Handler(BaseHTTPRequestHandler):
                                    "hint": _t(_UPD["hint"]) if _UPD["hint"] else ""})
             if p == "/api/sources":
                 return self._json(engine.provenance())
+            if p == "/api/patients":
+                from . import container as _container
+                return self._json(_container.listing())
             if p == "/api/source-config":
                 return self._json({"folders": core.source_config()})
             if p == "/api/assistant":
@@ -506,6 +541,18 @@ class Handler(BaseHTTPRequestHandler):
             return self._fail(e)
 
     def do_POST(self):
+        # The integrity gate (task 192): whatever this request writes goes into
+        # the container that was active when it arrived, or is refused.
+        from . import container as _container
+        try:
+            if urlparse(self.path).path in ("/api/use", "/api/export", "/api/erase"):
+                return self._do_post()  # selection itself intentionally changes the context
+            with _container.pinned():
+                return self._do_post()
+        except _container.ContainerError as e:
+            return self._fail(e)
+
+    def _do_post(self):
         u = urlparse(self.path)
         self._lang(parse_qs(u.query))
         deny = self._deny(state_changing=True)
@@ -515,6 +562,18 @@ class Handler(BaseHTTPRequestHandler):
         if body is None:
             return None
         try:
+            if u.path not in ('/api/export', '/api/erase', '/api/use'):
+                from . import lifecycle
+                lifecycle.record_current('write', 'web')
+            if u.path == "/api/export":
+                from . import lifecycle
+                return self._json(lifecycle.export(str(body.get("id") or ""),
+                                                   str(body.get("to") or ""), surface="web"))
+            if u.path == "/api/erase":
+                from . import lifecycle
+                return self._json(lifecycle.erase(str(body.get("id") or ""),
+                                                  confirm=str(body.get("confirm") or ""),
+                                                  digest=str(body.get("digest") or ""), surface="web"))
             if u.path == "/api/labs":
                 return self._json(store.add_lab_point(
                     body.get("marker", ""), body.get("date", ""), body.get("value"),
@@ -522,6 +581,16 @@ class Handler(BaseHTTPRequestHandler):
                     ref_low=body.get("ref_low"), ref_high=body.get("ref_high"),
                     direction=body.get("direction"), date_source="manual",
                     subject="owner"))
+            if u.path == "/api/use":
+                # A person picked another patient. The server keeps no copy of
+                # the old one: every path is resolved again on the next request.
+                from . import container as _container
+                try:
+                    return self._json(_container.use(str(body.get("id") or ""), surface='web'))
+                except _container.ContainerError as e:
+                    # A refusal the person can act on — an unknown ID, one
+                    # machine with one person — in the shape of every write.
+                    return self._json({"ok": False, "error": str(e), "container": e.code})
             if u.path == "/api/version/seen":
                 # A person pressed «Understood» under the update note: the data is
                 # now used with this build. The only write, and it is a marker.
@@ -536,6 +605,8 @@ class Handler(BaseHTTPRequestHandler):
                 res = _upg.install(confirm=body.get("confirm") is True)
                 return self._json({**res, "report": _fmt.update_install_report(res)})
             if u.path == "/api/targets":
+                if body.get('action') == 'origin':
+                    return self._json(store.set_goal_origin(body.get('goal_id'), body.get('origin'), body.get('reason')))
                 # Entered, never derived: the body carries who set it and when,
                 # and the store refuses a target without either.
                 return self._json(store.set_clinician_target(
@@ -577,7 +648,8 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == "/api/medications":
                 return self._json(store.add_medication(
                     body.get("name", ""), body.get("dose", ""), body.get("note", ""),
-                    status=body.get("status"), subject="owner"))
+                    status=body.get("status"), start_date=body.get("start_date"),
+                    control=body.get("control"), subject="owner"))
             if u.path == "/api/medications/remove":
                 return self._json(store.remove_medication(body.get("name", "")))
             if u.path == "/api/metrics":
@@ -688,7 +760,15 @@ def _already_ours(host: str, port: int) -> bool:
     import urllib.request
     try:
         with urllib.request.urlopen(f"http://{host}:{port}/api/ping", timeout=1.5) as r:
-            return b"Scholion" in r.read()
+            if (r.headers.get("Content-Type", "").split(";", 1)[0] != "application/json"
+                    or not r.headers.get("Server", "").startswith("Scholion/")):
+                return False
+            body = r.read(4097)
+            if len(body) > 4096:
+                return False
+            data = json.loads(body)
+            return (isinstance(data, dict) and data.get("app") == "Scholion"
+                    and data.get("ok") is True and data.get("version") == VERSION)
     except Exception:  # quiet: a failed probe means «not ours»: another port is taken, no data is read
         return False
 

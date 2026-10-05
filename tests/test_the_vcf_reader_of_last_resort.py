@@ -313,6 +313,10 @@ class TestQueryingWhatTheFixtureCannotShow(_Tree):
         path = self.write("t.vcf.gz", self.rows, {"1": [0], "2": [0]})
         data = pathlib.Path(path).read_bytes()
         pathlib.Path(path).write_bytes(data[:len(data) - 5])
+        # A fresh index permits reaching the decompressor. A stale index is
+        # independently refused before any body read.
+        import os
+        os.utime(path + ".tbi", ns=(pathlib.Path(path).stat().st_mtime_ns,) * 2)
         with self.assertRaises(EOFError):
             tx.query(path, "1", 100, 150)
 

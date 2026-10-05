@@ -3,8 +3,9 @@
 A key detail on macOS: Python.framework often does NOT have the root certificates installed
 («Install Certificates.command» has to be run once), because of which any HTTPS through
 urllib fails with CERTIFICATE_VERIFY_FAILED — and then «nothing can be found». That is why a
-certificate verification error is retried here with a non-strict SSL context. These are public
-read-only APIs (no patient data is transmitted), so it is acceptable for a local tool.
+certificate verification error is reported, not silently bypassed. An unverified
+retry requires the person's explicit SCHOLION_TLS_INSECURE opt-in, including
+for the connectivity diagnostic. Diagnostic targets are fixed public endpoints.
 """
 from __future__ import annotations
 import json
@@ -234,7 +235,8 @@ def diagnose(target: str = "default") -> Dict[str, Any]:
                 "hint": _t("net.offline_hint")}
     req = urllib.request.Request(url, headers={"User-Agent": "scholion"})
     last = ""
-    for label, ctx in (("verified", None), ("unverified", _unverified())):
+    for label in ("verified", "unverified"):
+        ctx = None if label == "verified" else _unverified()
         try:
             resp = _diag_opener(ctx).open(req, timeout=10)
             return {"ok": True, "mode": label, "status": getattr(resp, "status", 200), "url": url}
@@ -243,8 +245,11 @@ def diagnose(target: str = "default") -> Dict[str, Any]:
                 last = f"redirect refused ({e.code} → {e.headers.get('Location', '?')})"
             else:
                 last = f"{type(e).__name__}: {e}"
+            break
         except Exception as e:
             last = f"{type(e).__name__}: {e}"
+            if label != "verified" or not _is_cert_error(e) or not insecure_allowed():
+                break
     hint = ""
     if "CERTIFICATE" in last.upper() or "SSL" in last.upper():
         hint = _t("net.certificates_hint")

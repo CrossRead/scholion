@@ -62,14 +62,15 @@ def _constraint_file() -> Path:
     """The file `uv` reads through UV_CONSTRAINT — written from PRS_CONSTRAINTS.
 
     An installed copy has no `src/ingest` beside it (the wheel carries only this
-    package), so the file is not looked for but written: a small, stable path
-    under the temporary directory, rewritten on every launch so it can never be
-    stale. The tree's own copy is not read either — one source of truth, and the
+    package), so the file is written into a private, uniquely named temporary
+    file and removed when the sidecar closes. The tree's own copy is not read — one source of truth, and the
     test is what keeps the shell copy in step with it.
     """
     import tempfile
-    p = Path(tempfile.gettempdir()) / "scholion-prs-constraints.txt"
-    p.write_text("".join(f"{c}\n" for c in PRS_CONSTRAINTS), encoding="utf-8")
+    fd, name = tempfile.mkstemp(prefix="scholion-prs-constraints-", suffix=".txt")
+    p = Path(name)
+    with os.fdopen(fd, "w", encoding="utf-8") as out:
+        out.write("".join(f"{c}\n" for c in PRS_CONSTRAINTS))
     return p
 
 
@@ -92,7 +93,10 @@ class _MCP:
         env.setdefault("PRS_MCP_MODE", mode)
         # setdefault, not assignment: an owner who has pointed UV_CONSTRAINT at
         # their own file (a newer sidecar, a local build) is not overruled.
-        env.setdefault("UV_CONSTRAINT", str(_constraint_file()))
+        self._owned_constraint = None
+        if "UV_CONSTRAINT" not in env:
+            self._owned_constraint = _constraint_file()
+            env["UV_CONSTRAINT"] = str(self._owned_constraint)
         self._constraint = env["UV_CONSTRAINT"]
         try:
             # stderr is inherited → the server's logs/progress are visible live (it does not «hang silently»)
@@ -102,9 +106,17 @@ class _MCP:
                 env=env, text=True, bufsize=1,
             )
         except FileNotFoundError as e:
+            self.close()
             raise PrsUnavailable(_t("prs.no_uvx")) from e
+        except Exception:
+            self.close()
+            raise
         self._id = 0
-        self._init()
+        try:
+            self._init()
+        except Exception:
+            self.close()
+            raise
 
     def _send(self, obj):
         self.p.stdin.write(json.dumps(obj) + "\n")
@@ -172,6 +184,9 @@ class _MCP:
             self.p.terminate()
         except Exception:  # quiet: best-effort cleanup of the helper process after the call
             pass
+        if self._owned_constraint is not None:
+            self._owned_constraint.unlink(missing_ok=True)
+            self._owned_constraint = None
 
 
 def selftest() -> dict:

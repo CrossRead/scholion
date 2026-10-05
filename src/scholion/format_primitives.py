@@ -17,6 +17,14 @@ from .i18n import plural as _plural, t as _t  # noqa: F401
 _PRIO_ICON = {"high": "🔴", "moderate": "🟠", "low": "🟢"}
 
 
+def subclaim_lines(row: Dict[str, Any]) -> List[str]:
+    """Print an adjacent claim's own basis, or the reason it was withheld."""
+    return [_t("conclusion.subclaim." + name) + ": " +
+            (str(basis.get("reason")) if basis.get("status") == "incomplete" else
+             str(basis.get("mechanism") or "") + " — " + str(basis.get("source") or ""))
+            for name, basis in (row.get("subclaim_basis") or {}).items()]
+
+
 def _flag_icon(flag: str) -> str:
     return {"high": "🔴", "low": "🔵", "ok": "🟢"}.get(flag, "•")
 
@@ -33,21 +41,29 @@ def genotype_conclusion_lines(positions: List[Dict[str, Any]]) -> List[str]:
     # A position with no reading at all — no genome, a build nobody could tell —
     # is not read, whatever its state says; «none found» over such a panel
     # would claim a check that never happened.
-    found = [p for p in positions if p.get("read") is True and p.get("state") in ("het", "hom", "hemi")]
-    absent = [p for p in positions if p.get("read") is True and p.get("state") == "absent"]
+    held = [p for p in positions if (p.get("conclusion_basis") or {}).get("status") == "incomplete"]
+    available = [p for p in positions if (p.get("conclusion_basis") or {}).get("status") != "incomplete"]
+    observed = [p for p in positions if p.get("read") is True and p.get("state") in ("het", "hom", "hemi")]
+    found = [p for p in available if p.get("read") is True and p.get("state") in ("het", "hom", "hemi")]
+    absent = [p for p in available if p.get("read") is True and p.get("state") == "absent"]
     unread = [p for p in positions if p.get("read") is not True]
     name = lambda p: f"{p.get('gene')} {p.get('rsid') or ''}".strip()
     L = ["**" + _t("system.panel.conclusion_h") + "**"]
-    if found:
-        L.append(_t("system.panel.conclusion_found", found=len(found),
+    if observed:
+        L.append(_t("system.panel.conclusion_found", found=len(observed),
                     positions=_plural(len(positions), "count.positions"),
-                    genes=", ".join(name(p) for p in found)))
+                    genes=", ".join(name(p) for p in observed)))
         L += ["  · " + (p.get("text") or name(p)) for p in found]
-    elif len(unread) < len(positions):
+    elif not held and len(unread) < len(positions):
         L.append(_t("system.panel.conclusion_none_found",
                     positions=_plural(len(positions) - len(unread), "count.positions")))
     if absent:
         L.append(_t("system.panel.conclusion_absent", genes=", ".join(name(p) for p in absent)))
+    L += [name(p) + " — " + str((p.get("genotype") or {}).get("genotype") or "—") + "; " +
+          p["conclusion_basis"]["reason"] for p in held]
+    L += [name(p) + " — " + detail for p in positions for detail in subclaim_lines(p)]
+    from .genome_routes import route_text
+    L += [name(p) + ' — ' + route_text(p) for p in positions if route_text(p)]
     if unread:
         L.append(_t("system.panel.conclusion_unread",
                     positions=_plural(len(unread), "count.positions"),
@@ -56,7 +72,7 @@ def genotype_conclusion_lines(positions: List[Dict[str, Any]]) -> List[str]:
     # found position that names a marker is a question (printed among the
     # questions); none found says so; the alleles not carried say what did not apply.
     L.append("**" + _t("system.panel.compare_h") + "**")
-    if not any(p.get("expect") for p in found):
+    if not held and not any(p.get("expect") for p in found):
         L.append(_t("system.panel.compare_none"))
     na: Dict[str, List[str]] = {}
     for p in absent:
@@ -106,15 +122,28 @@ def _decision_suffix(m, context=False) -> str:
     out = []
     for d in hit:
         out.append(" · ❗" + _t("decision.crossed", label=d["label"],
-                               sign="≥" if d.get("side") == "high" else "≤",
+                               sign={"gt": ">", "lt": "<"}.get(d.get("comparison"), "≥" if d.get("side") == "high" else "≤"),
                                value=f"{d['value']:g}"))
     for d in open_:
-        out.append(" · " + _t("decision.not_comparable", value=f"{d['value']:g}",
-                              label=d["label"]))
+        value = f"{d['value']:g}" if isinstance(d.get('value'), (int, float)) else '—'
+        if d.get('why') == 'threshold_basis':
+            out.append(' · ' + _t('decision.withheld', value=value, reason=d['threshold_basis']['reason']))
+        else:
+            out.append(" · " + _t("decision.censored" if d.get('why') == 'censored' or d.get('value') is None else "decision.not_comparable", value=value,
+                                  label=d["label"]))
     resolved = [d for d in ds if d.get("crossed") is False]
     if context and not hit and not open_ and resolved:
         d = resolved[0]
         out.append(" · " + _t("decision.not_reached", value=f"{d['value']:g}", label=d["label"]))
+    for d in hit + (resolved[:1] if context and not hit and not open_ else []):
+        basis = d.get('threshold_basis') or {}
+        if basis.get('status') == 'complete':
+            out.append(f" · {basis['mechanism']} [{basis['source']}]")
+        action_basis = d.get('action_basis') or {}
+        if d.get('action'):
+            out.append(f" · {d['action']} · {action_basis.get('mechanism', '')} [{action_basis.get('source', '')}]")
+        elif d.get('crossed') is True and action_basis.get('status') == 'incomplete':
+            out.append(' · ' + _t('decision.action_gap', reason=action_basis['reason']))
     return "".join(out)
 
 
@@ -146,6 +175,8 @@ def _fmt_ref(m: Dict[str, Any]) -> str:
     woman's normal testosterone was printed against a male corridor. A safety
     signal that nothing renders is not a safety signal.
     """
+    if m.get("proposed_rule"):
+        return ""
     lo, hi = m.get("ref_low"), m.get("ref_high")
     warn = f" {_t('ref.sex_unknown')}" if m.get("ref_sex_unknown") and (
         lo is not None or hi is not None) else ""

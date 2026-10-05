@@ -1,8 +1,8 @@
 ---
 name: scholion
 description: >-
-  Personal assistant for one person's own medical data — genome, laboratory
-  history, prescriptions, wearables. It reads them against each other locally
+  Second-opinion support for individuals and clinicians, one person's data at
+  a time — genome, laboratory history, prescriptions, wearables. It reads them locally
   and states what the data cannot support. No data is baked into the skill:
   everyone supplies their own. Use it when you need to check a physician's
   prescription as a second opinion (pharmacogenetics + interactions with the
@@ -18,14 +18,20 @@ description: >-
 
 # Scholion — the short instruction
 
-Scholion brings one person's own medical data — a full genome, laboratory forms,
-prescriptions, wearable exports — into a single profile and shows the links
-between them. It is exploratory and educational, and it is **not a medical
-device**: it does not diagnose, and it neither starts nor stops therapy.
+Scholion links one person's genome, laboratory forms, prescriptions and wearable
+exports. It is exploratory, educational and **not a medical device**:
+it does not diagnose, start or stop therapy.
+
+An individual can use one container; a clinician can have several. Work with
+only the explicitly selected person. Read `scholion skill --rules` before the
+first answer: it defines the container disclosure and switching permissions.
+Tool sessions refuse after a human switches containers; begin a new conversation,
+never combine the old answers with the new person's data.
 
 You work through the command line: you ask the person to run a command and you
-read its output. You get no access to their machine, and their profile never
-leaves it.
+read its output, or use the tools when the host provides them. Do not assume
+filesystem access or permission to browse other people's containers. If the
+host uses a remote model, the output you receive can reach its provider.
 
 ---
 
@@ -58,10 +64,8 @@ facts this product cannot derive and will not invent — sex, year of birth,
 height, reference population, which wearable answers. Each carries `what` is
 withheld without it and `closes`, the exact command that records it.
 
-**Ask from that list, not from this page.** The list is computed from the
-profile, so it holds only what is actually absent, and it shrinks as they answer.
-A list written into an instruction goes stale the day a sixth precondition is
-added, and then a model asks for five things for ever.
+**Ask from that list, not from this page.** It is computed from the profile
+and shrinks as the person answers.
 
 Ask in ONE message rather than one question at a time, and add the two that are
 measurements rather than fixed facts:
@@ -74,14 +78,9 @@ measurements rather than fixed facts:
 
 Then record what they said, with the commands the items name.
 
-Three things not to do. Do not guess a value: a sex applied to the wrong person
-prints false anaemia, and the product withholding a corridor is the correct
-behaviour, not a gap to paper over. Do not ask twice — if an item is gone from
-the list it has been answered, and `--wearable none` is an ANSWER, not an empty
-field. And do not hold the answers up: what a person tells you now stands until a
-laboratory form, a wearable export or the genome says otherwise, and when one of
-those does, it is offered to them for confirmation rather than applied behind
-their back.
+Do not guess missing facts or replace a withheld corridor. Do not ask twice:
+`--wearable none` is an answer. Record the person's answers; if later evidence
+contradicts them, ask for confirmation instead of changing them silently.
 
 ---
 
@@ -131,8 +130,8 @@ which is the only kind of failure that matters here.
    why this one fails silently.
 
 The full canon is `reference/assistant-rules.md` where the bundle put it, and
-`scholion skill --rules` everywhere else. Read it before the first command; it
-takes precedence over everything else, and the eight rules above are its short
+`scholion skill --rules` everywhere else. Read it before the first command; among
+Scholion's documents it comes first, and the eight rules above are its short
 form.
 
 ---
@@ -157,8 +156,8 @@ form.
 | "Am I at risk for X" (a class of disease) | `scholion screen X` — gene by gene, never «clear» where a gene is unread |
 | "My doctor wants my TSH between 1 and 2" | `scholion target set tsh --low 1 --high 2 --set-by … --set-on …` — entered from the clinician's word, never proposed |
 
-`scholion --help` lists everything — 62 commands, of which this table names
-fifteen. Every command takes `--json`.
+`scholion --help` lists the commands; `scholion assistant` describes their
+permissions and prerequisites. Data commands accept `--json`.
 
 **Some of them write.** `add-lab`, `add-metric`, `add-med`, `remove-med`,
 `focus-log` and `target set|remove` change the profile on disk, and a person asking you to "note that down"
@@ -180,16 +179,12 @@ other doors exist:
   its own.
 - **A Python entry point.** `import scholion.ouroboros_tools` → `get_tools()`.
 
-Four tools write, and each records what the person handed over, never what a
-model concluded: `sch_ingest_labs` transcribes the person's own laboratory PDFs
-from a folder they named; `sch_focus_log` records what the person said happened
-on a day — a glass of wine, a late meal, an as-needed dose — into the journal of
-the current focus; `sch_lab_draw` records why one day holds two draws;
-`sch_marker_propose` files a marker name as a proposal a person still confirms.
-No tool sets a value, a sex or a therapy — the absence is what makes the rule
-more than a promise. Write the event, never what it did: an entry that already
-holds the conclusion makes the later analysis circular. For every other write,
-ask, and let the person type the command or press the button.
+Six tools write: `sch_ingest_labs` transcribes forms, `sch_focus_log` records an
+event, `sch_lab_draw` records why one day has two draws, `sch_marker_propose`
+records a name awaiting confirmation. `sch_recompute` rebuilds derived files
+and `sch_update` installs an update, only with explicit confirmation.
+Never record a model's inference as a measurement or prescribe therapy.
+For other writes, let the person type the command or press the button.
 
 `scholion doc connecting-an-agent` explains each.
 
@@ -205,7 +200,7 @@ copied this one file without its references.
 | What | In the bundle | Otherwise |
 |---|---|---|
 | The full instruction: every step and scenario, the classes of extraction defect, callability and negative results, diplotype-level pharmacogenetics, polygenic scores, n-of-1 experiments, keeping coverage current | `reference/instruction.md` | `scholion skill --full` |
-| The canon of safety rules — precedence over everything; read first | `reference/assistant-rules.md` | `scholion skill --rules` |
+| The canon of safety rules — first among Scholion's documents; read first | `reference/assistant-rules.md` | `scholion skill --rules` |
 | Profile file formats: what to put where | `reference/loading-data.md` | `scholion doc loading-data` |
 | The path from raw reads to a VCF | `reference/preparing-the-genome.md` | `scholion doc preparing-the-genome` |
 
@@ -213,9 +208,13 @@ copied this one file without its references.
 
 ## Two things to say out loud early
 
-**Nothing is sent anywhere.** The profile is a folder of files on that person's
-machine and the analysis is local. Two lookups can go out when asked for by
-name — a drug name and an rsID — and nothing else, ever.
+**The engine is local; the host may not be.** Scholion does not upload source
+medical files for analysis. Optional named lookups send a drug name or locus
+query; tools can also check the public package version. A tool answer or pasted
+report can reach a remote model provider under the host's policies.
+`SCHOLION_OFFLINE=1` blocks the engine's requests, not the host's model requests.
+Never promise that nothing leaves the machine. `scholion doc privacy` explains
+this boundary, technical IDs, journals, export and erasure.
 
 **This is not a diagnosis.** Everything produced here is material for that
 person's own decisions and for a conversation with their physician.

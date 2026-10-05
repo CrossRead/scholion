@@ -126,15 +126,18 @@ class TestThiopurinesConsiderNudt15(unittest.TestCase):
             {"rsid": "rs1142345", "genotype": "TT", "confidence": "called"},   # TPMT *3C ref
             {"rsid": "rs116855232", "genotype": "CT", "confidence": "called"}])  # NUDT15 *3 het
         self.assertNotEqual(r["level"], "low")
-        self.assertEqual(r["driving_gene"], "NUDT15")
+        self.assertIsNone(r["driving_gene"])
         self.assertIn(("NUDT15", "IM"), [(c["gene"], c["phenotype"]) for c in r["co_genes"]])
 
-    def test_both_normal_is_low(self):
+    def test_both_normal_without_held_treatment_context_is_not_clearance(self):
         r = self._aza([
             {"rsid": "rs1800462", "genotype": "CC", "confidence": "called"},
             {"rsid": "rs1142345", "genotype": "TT", "confidence": "called"},
             {"rsid": "rs116855232", "genotype": "CC", "confidence": "called"}])
-        self.assertEqual(r["level"], "low")
+        self.assertEqual(r["phenotype"], "NM")
+        self.assertEqual(r["co_genes"][0]["phenotype"], "NM")
+        self.assertEqual(r["level"], "unknown")
+        self.assertEqual("indication_unheld", r["guidance_applicability"]["status"])
 
     def test_nudt15_is_a_gene_of_interest_with_its_tag_snp(self):
         kb = core.cpic_kb()
@@ -194,14 +197,16 @@ class TestVerbatimRecommendationsReachTheReport(unittest.TestCase):
         core.reset_cache()
         return r, out
 
-    def test_the_quote_is_printed_and_attributed(self):
+    def test_the_unsupported_joint_quote_is_not_printed(self):
         r, out = self._report("azathioprine", [
             {"rsid": "rs1800462", "genotype": "CC", "confidence": "called"},
             {"rsid": "rs1142345", "genotype": "TT", "confidence": "called"},
             {"rsid": "rs116855232", "genotype": "CT", "confidence": "called"}])
-        self.assertIn("CPIC", out)
-        self.assertIn("reduced starting doses (30-80%", out)
-        self.assertEqual(r["cpic"]["classification"], "Strong")
+        self.assertNotIn("reduced starting doses (30-80%", out)
+        self.assertIsNone(r["cpic"])
+        self.assertEqual("NM", r["phenotype"])
+        self.assertEqual("IM", r["co_genes"][0]["phenotype"])
+        self.assertIn(r["guidance_gap_reason"], out)
 
     def test_codeine_has_real_phenotype_guidance_now_that_diplotypes_are_read(self):
         """Before findings 35/57 codeine could only say «the diplotype is unknown»:

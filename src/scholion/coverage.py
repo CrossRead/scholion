@@ -35,7 +35,9 @@ import os
 import re
 import shutil
 import subprocess
+import tempfile
 import time
+import uuid
 from datetime import date
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -43,6 +45,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 OUT_NAME = "callability.tsv"
 RECORD_NAME = "callability.json"
 PART_NAME = ".callability.part"
+PART_META = ".callability.part.json"
 #: The padding around the span of a gene's ClinVar variants. The span is not the
 #: gene: it is where the variants somebody reported in it lie, which is narrower
 #: than the gene at one end and, for a gene with a distant regulatory entry,
@@ -256,7 +259,9 @@ def _depth(bam: str, region: str, length: int,
                 at[t] += 1
     if run is None:
         proc.stdout.close()                                          # type: ignore[union-attr]
-        proc.wait()
+        rc = proc.wait()
+        if rc:
+            raise subprocess.CalledProcessError(rc, argv)
     n = max(1, length)
     return {"mean": total / n, **{f"p{t}": 100.0 * at[t] / n for t in THRESHOLDS}}
 
@@ -271,6 +276,45 @@ def _measured(part: Path) -> Dict[str, str]:
     return out
 
 
+def _input_identity(path: str) -> Dict[str, Any]:
+    """Local file identity, not a claim to a full content hash of a large BAM."""
+    source = Path(path).resolve()
+    stat = source.stat()
+    with source.open("rb") as stream:
+        stream.read(1)  # a placeholder or unreadable file must refuse, not resume
+    return {"path": str(source), "size": stat.st_size, "mtime_ns": stat.st_mtime_ns,
+            "ctime_ns": stat.st_ctime_ns, "device": stat.st_dev, "inode": stat.st_ino}
+
+
+def _resume(part: Path, context: Dict[str, Any]) -> Dict[str, str]:
+    """Keep obsolete progress recoverable, but never reuse it for another input."""
+    from . import container
+    meta = part.parent / PART_META
+    saved = None
+    try:
+        saved = json.loads(meta.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        pass  # quiet: progress without a readable identity is quarantined below, never reused
+    if part.exists() and (not isinstance(saved, dict) or saved.get("inputs") != context):
+        suffix = ".stale-" + uuid.uuid4().hex
+        part.rename(part.with_name(part.name + suffix))
+        if meta.exists():
+            meta.rename(meta.with_name(meta.name + suffix))
+    container.gate()
+    # Progress is derived state, not a profile edit that lazily assigns an ID.
+    # The unique temporary file is private even with a permissive umask.
+    with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=meta.parent,
+                                     prefix=meta.name + ".", delete=False) as stream:
+        temporary = Path(stream.name)
+        json.dump({"inputs": context}, stream)
+    try:
+        container.gate()
+        os.replace(temporary, meta)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return _measured(part)
+
+
 def measure(progress: Optional[Progress] = None, stop: Optional[Callable[[], bool]] = None,
             run: Optional[Callable[[List[str]], Any]] = None) -> Dict[str, Any]:
     """Measure every panel gene from the alignment into `callability.tsv`.
@@ -280,7 +324,7 @@ def measure(progress: Optional[Progress] = None, stop: Optional[Callable[[], boo
     measured stays in a part file beside the profile until the whole run
     finishes, and the table is replaced only then.
     """
-    from . import __version__, bamlite
+    from . import __version__, bamlite, genome, acmg_scan
     req = requirements()
     why = refusal(req)
     if why:
@@ -291,6 +335,13 @@ def measure(progress: Optional[Progress] = None, stop: Optional[Callable[[], boo
     except (OSError, ValueError) as exc:
         return {"ok": False, "status": "refused", "reason": "alignment_unreadable",
                 "error": type(exc).__name__}
+    builds = {genome._LENGTH_TO_ASSEMBLY[n] for chrom, n in lengths.items()
+              if chrom.removeprefix("chr") in ("1", "2", "X") and n in genome._LENGTH_TO_ASSEMBLY}
+    alignment_build = next(iter(builds)) if len(builds) == 1 else None
+    reference_build = acmg_scan._clinvar_header(clinvar).get("assembly")
+    if not alignment_build or not reference_build or alignment_build != reference_build:
+        return {"ok": False, "status": "refused", "reason": "assembly_mismatch",
+                "alignment_assembly": alignment_build, "clinvar_assembly": reference_build}
     prefix = "chr" if "chr1" in lengths else ""
     wanted = genes()
     if not wanted:
@@ -299,8 +350,16 @@ def measure(progress: Optional[Progress] = None, stop: Optional[Callable[[], boo
     target = out_path()
     target.parent.mkdir(parents=True, exist_ok=True)
     part = target.parent / PART_NAME
-    done = _measured(part)
     where, without = spans(wanted, clinvar, prefix)
+    try:
+        inputs = {"bam": _input_identity(bam), "clinvar": _input_identity(clinvar),
+                  "intervals": {g: list(span) for g, span in where.items()},
+                  "genes": wanted, "lengths": lengths, "mapq": MIN_MAPQ,
+                  "thresholds": list(THRESHOLDS), "form": 1}
+    except OSError as exc:
+        return {"ok": False, "status": "refused", "reason": "alignment_unreadable",
+                "error": type(exc).__name__}
+    done = _resume(part, inputs)
     order = [g for g in sorted(where) if where[g][0] in lengths]
     outside = sorted(g for g in where if where[g][0] not in lengths)
     total = len(order)
@@ -327,22 +386,31 @@ def measure(progress: Optional[Progress] = None, stop: Optional[Callable[[], boo
         if not rows:
             return {"ok": False, "status": "failed", "step": "depth", "rc": 0,
                     "error": "no interval produced a row"}
+        if _input_identity(bam) != inputs["bam"] or _input_identity(clinvar) != inputs["clinvar"]:
+            return {"ok": False, "status": "failed", "step": "depth", "rc": 0,
+                    "error": "an input changed during measurement; no completed table was written"}
+        from . import container
+        container.gate()
         _write_table(target, rows)
         record = {"engine": __version__, "genes_requested": len(wanted),
                   "genes_measured": len(rows), "genes_without_clinvar": len(without),
                   "alignment": Path(bam).name, "min_mapq": MIN_MAPQ,
-                  "written": date.today().isoformat()}
+                  "written": date.today().isoformat(), "inputs": inputs}
         tmp = target.parent / f".{RECORD_NAME}.tmp-{os.getpid()}"
         tmp.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         os.replace(tmp, target.parent / RECORD_NAME)
         try:
             part.unlink(missing_ok=True)
+            (target.parent / PART_META).unlink(missing_ok=True)
         except OSError:
             # A part file that cannot be removed is not a failed measurement:
             # the table and its record are already written, and the next run
             # reads the part only to skip what it holds. Raising here would
             # report a finished step as broken.
             pass
+    except subprocess.CalledProcessError as exc:
+        return {"ok": False, "status": "failed", "step": "depth", "rc": exc.returncode,
+                "error": "samtools depth failed; no completed coverage table was written"}
     except Stopped:
         return {"ok": False, "status": "stopped", "measured": len(_measured(part)),
                 "genes": total}

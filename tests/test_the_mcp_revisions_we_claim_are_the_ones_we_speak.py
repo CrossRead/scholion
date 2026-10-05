@@ -175,7 +175,10 @@ class TestTheOutputSchemaIsTheContract(unittest.TestCase):
                           .read_text(encoding="utf-8"))["json_fields"]
         for tool, command in mcp_server.OUTPUT_FIELDS.items():
             with self.subTest(tool=tool):
-                listed = set(mcp_server.output_schema(tool)["properties"]) - {mcp_server.REPORT_FIELD}
+                # The report and the container (task 192) are carried by every
+                # structured answer; neither is a field of the command's own.
+                listed = set(mcp_server.output_schema(tool)["properties"]) - {
+                    mcp_server.REPORT_FIELD, mcp_server.CONTAINER_FIELD}
                 self.assertEqual(sorted(base[command]), sorted(listed))
                 self.assertNotIn(mcp_server.REPORT_FIELD, base[command], "the report field would hide a real one")
 

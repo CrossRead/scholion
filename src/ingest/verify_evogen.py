@@ -55,7 +55,8 @@ def resolve(rsids, cache_path, sleep=0.12, insecure=False, tries=3):
               file=sys.stderr)
     cache = {}
     if os.path.exists(cache_path):
-        cache = json.load(open(cache_path, encoding='utf-8'))
+        with open(cache_path, encoding='utf-8') as _fh:
+            cache = json.load(_fh)
     todo = [r for r in rsids if r not in cache]
     print(f"coordinates: {len(rsids) - len(todo)} in the cache, requesting {len(todo)}", file=sys.stderr)
     net_fail = 0
@@ -89,7 +90,8 @@ def resolve(rsids, cache_path, sleep=0.12, insecure=False, tries=3):
             net_fail += 1
             print(f"  ! {rs}: {last}", file=sys.stderr)
             if net_fail == 5:
-                json.dump(cache, open(cache_path, 'w', encoding='utf-8'), ensure_ascii=False)
+                with open(cache_path, 'w', encoding='utf-8') as _fh:
+                    json.dump(cache, _fh, ensure_ascii=False)
                 sys.exit("\nFive network failures in a row — aborting rather than spinning.\n"
                          "If this is a TLS certificate error: first try\n"
                          "  /Applications/Python*/Install\\ Certificates.command\n"
@@ -100,10 +102,12 @@ def resolve(rsids, cache_path, sleep=0.12, insecure=False, tries=3):
         else:
             net_fail = 0
         if i % 25 == 0:
-            json.dump(cache, open(cache_path, 'w', encoding='utf-8'), ensure_ascii=False)
+            with open(cache_path, 'w', encoding='utf-8') as _fh:
+                json.dump(cache, _fh, ensure_ascii=False)
             print(f"  ... {i}/{len(todo)}", file=sys.stderr)
         time.sleep(sleep)
-    json.dump(cache, open(cache_path, 'w', encoding='utf-8'), ensure_ascii=False)
+    with open(cache_path, 'w', encoding='utf-8') as _fh:
+        json.dump(cache, _fh, ensure_ascii=False)
     return cache
 
 
@@ -141,7 +145,8 @@ def main():
     a = ap.parse_args()
     cache_path = a.cache or os.path.join(os.path.dirname(a.vcf), 'rs_coords_cache.json')
 
-    rsids = [l.strip() for l in open(a.rsids, encoding='utf-8') if l.strip()]
+    with open(a.rsids, encoding='utf-8') as _fh:
+        rsids = [l.strip() for l in _fh if l.strip()]
     coords = resolve(rsids, cache_path, insecure=a.insecure)
 
     # report: rsID → (genotype, page, trait, gene, colour)

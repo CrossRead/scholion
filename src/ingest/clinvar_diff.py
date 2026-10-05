@@ -42,7 +42,8 @@ def disease(clndn):
 def load(path):
     out = {}
     try:
-        rows = list(csv.DictReader(open(path, encoding="utf-8"), delimiter="\t"))
+        with open(path, encoding="utf-8") as _fh:
+            rows = list(csv.DictReader(_fh, delimiter="\t"))
     except FileNotFoundError:
         return out
     for r in rows:
@@ -87,7 +88,8 @@ def main():
         "counts": {"new": len(new_hits), "changed": len(changed),
                    "removed": len([k for k in prev if k not in new]),
                    "prev_total": len(prev), "new_total": len(new)}}}
-    json.dump(data, open(out_path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    with open(out_path, "w", encoding="utf-8") as _fh:
+        json.dump(data, _fh, ensure_ascii=False, indent=2)
     removed_n = len([k for k in prev if k not in new])
     print(f"✓ {out_path}: new actionable {len(new_hits)}, changed {len(changed)}, "
           f"gone {removed_n} (was {len(prev)} → now {len(new)})")

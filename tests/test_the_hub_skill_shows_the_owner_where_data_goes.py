@@ -123,7 +123,8 @@ class HubSkillCase(unittest.TestCase):
         self.state = Path(tempfile.mkdtemp()).resolve() / "skills" / "scholion"
         self.state.mkdir(parents=True)
         self._env = dict(os.environ)
-        for key in ("SCHOLION_REPO_DIR", "SCHOLION_PROFILE_DIR"):
+        for key in ("SCHOLION_REPO_DIR", "SCHOLION_PROFILE_DIR", "SCHOLION_GENOME_DIR",
+                    "SCHOLION_RAW_DIR", "SCHOLION_WORK_DIR"):
             os.environ.pop(key, None)
         os.environ["SCHOLION_OFFLINE"] = "1"
         os.environ["SCHOLION_LANG"] = "en"

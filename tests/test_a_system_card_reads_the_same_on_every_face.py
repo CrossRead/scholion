@@ -274,11 +274,19 @@ class TestTheToolFace(unittest.TestCase):
 
     def test_the_tool_answers_with_the_card_the_command_line_prints(self):
         from scholion import engine, ouroboros_tools as OT
+        from scholion.i18n import t
         ctx = OT.ToolContext()
-        self.assertEqual(fmt.system_report(engine.system("thyroid", "clinician")),
-                         OT._h_system(ctx, key=" thyroid ", register="clinician"))
-        self.assertEqual(fmt.system_report(engine.system("thyroid", "patient")),
-                         OT._h_system(ctx, key="thyroid"), "no register means the patient's")
+        # The card the command line prints, and after it — only for the tool —
+        # the passports of the hypotheses and the rule for retelling them
+        # (0.6.0, U2): the person's register counts them, the model is told them.
+        for reg, tool in (("clinician", OT._h_system(ctx, key=" thyroid ", register="clinician")),
+                          ("patient", OT._h_system(ctx, key="thyroid"))):
+            with self.subTest(register=reg):
+                card = fmt.system_report(engine.system("thyroid", reg)).rstrip()
+                self.assertTrue(tool.startswith(card), "no register means the patient's")
+                tail = tool[len(card):]
+                if tail.strip():
+                    self.assertIn(t("system.hyp.rule"), tail)
 
     def test_without_a_key_the_tool_lists_the_systems(self):
         from scholion import engine, ouroboros_tools as OT

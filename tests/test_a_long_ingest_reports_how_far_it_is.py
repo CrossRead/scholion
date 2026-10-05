@@ -5,10 +5,8 @@ so a person looking at it could not tell working from hung. The loaders now call
 a progress function once per file — outside the per-file `try`, so a stop raised
 from it ends the run rather than being recorded as «this file failed».
 
-What a stop leaves is held as it is: the points of the forms already read are in
-the profile (the loader writes as it reads), and the list of forms read is saved
-only at the end, so no form is remembered and the next run reads the whole
-folder again.
+Each completed file is checkpointed. A stop preserves that checkpoint but
+never records the next, unread file as complete.
 """
 from __future__ import annotations
 
@@ -58,7 +56,7 @@ class TestTheLabsLoaderReportsProgress(unittest.TestCase):
         self.assertTrue(r["ok"], r)
         self.assertEqual([(0, 3, "a.csv"), (1, 3, "b.csv"), (2, 3, "c.csv")], calls)
 
-    def test_a_stop_from_the_progress_remembers_no_form_and_the_next_run_reads_them_all(self):
+    def test_a_stop_remembers_completed_files_and_resumes_at_the_next(self):
         from scholion import ingest_labs
 
         def tick(done, total, item=None):
@@ -68,14 +66,15 @@ class TestTheLabsLoaderReportsProgress(unittest.TestCase):
         with self.assertRaises(Stop):
             ingest_labs.ingest(str(self.forms), force=True, progress=tick)
         remembered = set(ingest_labs._load_manifest())
-        for name in ("a.csv", "b.csv", "c.csv"):
+        self.assertIn(str((self.forms / "a.csv").resolve()), remembered)
+        for name in ("b.csv", "c.csv"):
             self.assertNotIn(str(self.forms / name), remembered,
                              "a stopped run recorded a form as read")
         calls = []
         r = ingest_labs.ingest(str(self.forms), progress=lambda d, n, item=None: calls.append(item))
         self.assertTrue(r["ok"], r)
         self.assertEqual(["a.csv", "b.csv", "c.csv"], calls)
-        self.assertEqual(0, r["skipped"], "the run after a stop skipped a form as unchanged")
+        self.assertEqual(1, r["skipped"], "the completed file was not resumed from its checkpoint")
 
 
 if __name__ == "__main__":

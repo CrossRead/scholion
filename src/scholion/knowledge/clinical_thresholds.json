@@ -1,10 +1,11 @@
 {
   "_meta": {
-    "purpose": "A PUBLIC map of CLINICAL ACTION THRESHOLDS. These are NOT reference intervals. A reference interval is the central 95 % of the values of a healthy population, that is, statistics; an action threshold is derived from outcomes and decisions, and it regularly lies INSIDE the reference corridor (prediabetes at HbA1c 5.7 with a laboratory norm up to 6.0) or far BEYOND it (haematocrit 54 % on testosterone therapy with a laboratory ceiling of 49). That is exactly why a position inside the corridor is almost uninterpretable, while a threshold is interpretable.",
-    "schema": "marker → a list of thresholds. value — the value in the units of labs.json; side — which side the threshold is on (high: value ≥ value; low: value ≤ value); label — what it means; source — where it comes from; action — what is done clinically; applies_when_class — the threshold applies only if the regimen contains a drug of that class (otherwise the threshold is a general one).",
-    "updated": "2026-08-13",
+    "purpose": "Public catalogue of candidate clinical thresholds, distinct from a form's reference interval. A number and a historical label do not establish a clinical statement. The output gate requires the threshold's own evidence and applicability, and independent evidence for any proposed action. Missing support is unresolved, never a safety finding.",
+    "schema": "marker → a list of candidates. value is in the marker's canonical units; multiple_of_ref_high instead uses the applicable point corridor. side selects high (inclusive >=) or low (inclusive <=); comparison gt/lt explicitly selects a strict boundary. threshold_basis and applicability support the interpretation; action_basis independently supports action. applies_when_class additionally requires an active drug class.",
+    "updated": "2026-10-04",
+    "basis_contract": "A catalogue number is not a validated action threshold. Emitted interpretation requires its own threshold_basis {source, mechanism} and applicability {status: held, context}; a proposed action separately requires action_basis. Without these the reading and arithmetic diagnostic remain, but the clinical label, crossed verdict and action are withheld. PMID/DOI syntax is not clinical validation. Relative thresholds use the applicable corridor of the observed point, not a fixed product.",
     "disclaimer": "The thresholds are a reason for a question to the doctor, not a command. The assistant does not change therapy.",
-    "applies_to": "THE MECHANISM FOR LIMITING THRESHOLDS. The machine field is `applies_when_class`: the engine skips such a threshold if the user has no active drug of that class (this is how haematocrit 54 % is counted only on testosterone therapy). The `applies_to` field is a HUMAN-READABLE mark for the cases a drug class does not express; the engine does NOT execute it, and it must not be put in place of `applies_when_class`. If a limitation by sex is ever needed, an `applies_when_sex` field is added together with two lines in `_thresholds_for` next to the class check — otherwise the field is decoration rather than a rule. The absence of any of these fields means «the threshold applies to adults in general»: most of them are derived from outcomes and do not depend on sex or age.",
+    "applies_to": "applies_when_class is an executable drug-class restriction. Legacy applies_to prose is not an executable condition and its absence does not establish applicability to every adult. Curated applicability must describe the qualified statement actually emitted; diagnosis, fasting state, assay validity, symptoms and treatment intent cannot be inferred from a marker number.",
     "source_tier": "guideline_compiled"
   },
   "markers": {
@@ -267,16 +268,38 @@
         "multiple_of_ref_high": 3
       },
       {
-        "value": 1900.0,
+        "multiple_of_ref_high": 10,
+        "comparison": "gt",
         "side": "high",
         "label": {
-          "en": "10× the upper bound — immediate withdrawal of the statin",
-          "ru": "10× верхней границы — немедленная отмена статина"
+          "en": "CK above 10× the applicable upper bound during statin use; this alone does not establish its cause",
+          "ru": "КФК выше 10× применимой верхней границы при приёме статина; одно значение не устанавливает причину"
         },
-        "source": "Medsafe NZ: «discontinue immediately if CK >10 x upper limit of normal»",
+        "source": "EAS consensus 2015; PMID:25694464; DOI:10.1093/eurheartj/ehv043",
+        "threshold_basis": {
+          "source": "EAS consensus 2015; PMID:25694464; DOI:10.1093/eurheartj/ehv043",
+          "mechanism": {
+            "en": "Damaged muscle releases CK; a marked elevation during statin use warrants assessment, but CK alone does not attribute injury to the statin.",
+            "ru": "Повреждённая мышца выделяет КФК; выраженное повышение при приёме статина требует оценки, но сама КФК не доказывает связь повреждения со статином."
+          }
+        },
+        "applicability": {
+          "status": "held",
+          "context": {
+            "en": "A measured CK with an applicable upper reference bound and active statin use. Symptoms, exercise and other causes must be assessed by the clinician; none is inferred here.",
+            "ru": "Измеренная КФК с применимой верхней референсной границей и активный приём статина. Симптомы, нагрузку и другие причины оценивает врач; здесь они не предполагаются."
+          }
+        },
         "action": {
-          "en": "urgently to the doctor",
-          "ru": "срочно к врачу"
+          "en": "Seek urgent clinician assessment of muscle injury and secondary causes. If no secondary cause is found, the consensus discusses stopping the statin; that decision belongs to the clinician, not this tool.",
+          "ru": "Срочно обратиться к врачу для оценки повреждения мышц и вторичных причин. Если вторичная причина не найдена, консенсус рассматривает отмену статина; решение принимает врач, не этот инструмент."
+        },
+        "action_basis": {
+          "source": "EAS consensus 2015; PMID:25694464; DOI:10.1093/eurheartj/ehv043",
+          "mechanism": {
+            "en": "The consensus links CK above ten times the upper bound without another cause to potential rhabdomyolysis and a clinician-led treatment decision.",
+            "ru": "Консенсус связывает КФК выше десяти верхних границ без другой причины с возможным рабдомиолизом и решением врача о лечении."
+          }
         },
         "applies_when_class": "statin"
       }

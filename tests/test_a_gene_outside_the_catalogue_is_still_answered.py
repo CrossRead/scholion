@@ -156,15 +156,16 @@ class GeneOutsideTheCatalogue(unittest.TestCase):
         all rather than skipping there, which is where the regression would live.
         """
         saved = (genome_mod._query_region_range, genome_mod.available,
-                 genome_mod.vcf_path)
+                 genome_mod.vcf_path, genome_mod.sample_index)
         genome_mod._query_region_range = lambda *a, **k: rows
         genome_mod.available = lambda: {"ready": True}
         genome_mod.vcf_path = lambda: Path(self.dir / "nonexistent.vcf.gz")
+        genome_mod.sample_index = lambda path: 0
         try:
             return gene_region.report("TESTGENE", allow_network=False)
         finally:
             (genome_mod._query_region_range, genome_mod.available,
-             genome_mod.vcf_path) = saved
+             genome_mod.vcf_path, genome_mod.sample_index) = saved
 
     @unittest.skipUnless(support.IN_SOURCE_REPO, "needs the source tree")
     def test_coding_and_non_coding_variants_are_told_apart(self):

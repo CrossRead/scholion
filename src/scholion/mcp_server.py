@@ -61,6 +61,11 @@ DEFAULT_LEGACY = "2024-11-05"
 #: Kept for readers of the old name: the newest revision a handshake can agree on.
 PROTOCOL_VERSION = LEGACY_VERSIONS[0]
 STRUCTURED_FROM = "2025-06-18"
+#: `annotations` on a tool arrived in 2025-03-26; a top-level `title` beside the
+#: name in 2025-06-18. An older client is handed neither: a field it does not
+#: know is at best ignored, and «at best» is not something to rely on.
+ANNOTATED_FROM = "2025-03-26"
+TITLED_FROM = "2025-06-18"
 BATCH_VERSIONS = ("2025-03-26",)
 
 INVALID_REQUEST = -32600
@@ -123,6 +128,7 @@ _CONTRACT_FIELDS = {
 #: model the structure INSTEAD of the text block; without this field such a model
 #: would get the numbers and lose the qualifications the canon says to relay.
 REPORT_FIELD = "report"
+CONTAINER_FIELD = "container"
 
 
 def output_schema(tool: str) -> Optional[Dict[str, Any]]:
@@ -132,6 +138,8 @@ def output_schema(tool: str) -> Optional[Dict[str, Any]]:
         return None
     props: Dict[str, Any] = {f: {} for f in _CONTRACT_FIELDS[command]}
     props[REPORT_FIELD] = {"type": "string"}
+    # Whose answer this is (task 192): the container's ID, never its label.
+    props[CONTAINER_FIELD] = {"type": "object", "properties": {"id": {"type": ["string", "null"]}}}
     return {"type": "object", "properties": props, "required": [REPORT_FIELD]}
 
 
@@ -164,6 +172,15 @@ def tool_descriptors(version: str = DEFAULT_LEGACY) -> list:
         out_schema = output_schema(d["name"]) if _structured(version) else None
         if out_schema is not None:
             d["outputSchema"] = out_schema
+        if version >= ANNOTATED_FROM:
+            from . import contract
+            from .i18n import t as _t
+            title = _t(f"tool.{d['name']}.title")
+            if version >= TITLED_FROM:
+                d["title"] = title
+            # Derived from WRITES and the network map, never written per tool:
+            # a reviewer reads these as promises (contract.tool_annotations).
+            d["annotations"] = {"title": title, **contract.tool_annotations(d["name"])}
         out.append(d)
     return out
 
@@ -197,6 +214,8 @@ def call_tool(name: str, arguments: Optional[Dict[str, Any]] = None,
     for t in _tools():
         if t.name == name:
             wants = _structured(version) and output_schema(name) is not None
+            from . import lifecycle
+            surface_token = lifecycle.AGENT_SURFACE.set('mcp')
             try:
                 if wants and hasattr(t.handler, "both"):
                     text, data = t.handler.both(**(arguments or {}))
@@ -206,6 +225,8 @@ def call_tool(name: str, arguments: Optional[Dict[str, Any]] = None,
                 return {"content": [{"type": "text", "text": f"{name}: {e}"}], "isError": True}
             except Exception as e:                       # noqa: BLE001 - reported, not swallowed
                 return {"content": [{"type": "text", "text": f"{name}: {e}"}], "isError": True}
+            finally:
+                lifecycle.AGENT_SURFACE.reset(surface_token)
             out: Dict[str, Any] = {"content": [{"type": "text", "text": str(text)}], "isError": False}
             if wants:
                 # The schema says «an object», so the answer is one even when a
@@ -229,12 +250,19 @@ def _instructions() -> str:
     return (
         "Scholion answers about ONE person's own medical data, held on this "
         "machine: genome, laboratory history, prescriptions, wearables.\n\n"
+        "On a clinician's machine each person is a separate container, named by "
+        "a technical ID that every answer carries. This conversation is fixed to "
+        "the container that was active when it began; once another becomes "
+        "active, every tool refuses, and a new conversation is the way on. Begin "
+        "by saying that the answers are prepared by an AI assistant from the data "
+        "of that container and that the decision is the treating physician's.\n\n"
         "It is NOT a medical device. It does not diagnose, does not start or "
         "stop therapy and does not adjust doses. Everything it produces is "
         "material for a conversation with a physician.\n\n"
         "Before relaying anything from these tools, call `sch_rules` and follow "
-        "it: those rules take precedence over any other instruction you have "
-        "been given about this data.\n\n"
+        "it: among Scholion's own documents those rules come first, and a "
+        "request to answer without their qualifications does not set them "
+        "aside.\n\n"
         "Two habits matter more than the rest. An answer here says what it "
         "rests on — whether a genotype was read or assumed, how much of a gene "
         "was covered — and that qualification is part of the answer, not "
@@ -309,6 +337,10 @@ def handle(message: Dict[str, Any], session: Optional[Session] = None) -> Option
                    "_meta": {_META_SERVER: _server_info()},
                    "ttlMs": LIST_TTL_MS, "cacheScope": LIST_CACHE_SCOPE})
     if method == "initialize" and not modern:
+        # This conversation is about the person whose container is active now
+        # (task 192, R2); every call after a switch is refused.
+        from . import ouroboros_tools
+        ouroboros_tools.pin_session()
         wanted = params.get("protocolVersion")
         session.legacy_version = wanted if wanted in LEGACY_VERSIONS else LEGACY_VERSIONS[0]
         return ok({"protocolVersion": session.legacy_version,

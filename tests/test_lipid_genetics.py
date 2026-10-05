@@ -124,14 +124,17 @@ class TestNotACarrierIsNotSaidAboutAPositionNobodyRead(unittest.TestCase):
         self.assertEqual(x["status"], "read")
         self.assertEqual(x["copies"], 1)
         self.assertTrue(x["carrier"])
-        self.assertTrue(x["verdict"], "one copy was counted and then not explained")
+        self.assertIsNone(x["verdict"])
+        self.assertEqual('incomplete', x['clinical_basis']['verdict']['status'])
+        self.assertTrue(x['clinical_basis']['verdict']['reason'])
 
     def test_a_non_carrier_is_reported_as_the_ordinary_answer_it_is(self):
         r = self._run(genotypes=[{"gene": "PCSK9", "rsid": "rs11591147", "genotype": "GG"}])
         x = next(y for y in r["pcsk9"] if y["rsid"] == "rs11591147")
         self.assertFalse(x["carrier"])
-        self.assertIn("common answer", r["headline"],
-                      "an ordinary result is being presented as a finding")
+        self.assertIn('catalogue allele carriers: 0', r['headline'])
+        self.assertIsNone(x['verdict'])
+        self.assertIn('not a risk estimate', r['headline'])
 
     def test_the_population_caveat_travels_with_the_african_descent_variant(self):
         """«Not a carrier» of C679X says almost nothing outside one population.
@@ -142,8 +145,9 @@ class TestNotACarrierIsNotSaidAboutAPositionNobodyRead(unittest.TestCase):
         """
         r = self._run(genotypes=[{"gene": "PCSK9", "rsid": "rs28362286", "genotype": "CC"}])
         x = next(y for y in r["pcsk9"] if y["rsid"] == "rs28362286")
-        self.assertTrue(x["population_note"])
-        self.assertIn("African", x["population_note"])
+        self.assertIsNone(x['population_note'])
+        self.assertEqual('incomplete', x['clinical_basis']['population_note']['status'])
+        self.assertFalse(x['carrier'])
 
 
 class TestAnEstimateOfLpaIsNotAMeasurementOfIt(unittest.TestCase):
@@ -162,13 +166,10 @@ class TestAnEstimateOfLpaIsNotAMeasurementOfIt(unittest.TestCase):
 
     def test_with_no_measurement_the_card_asks_for_the_test_rather_than_going_quiet(self):
         r = self._run()
-        todo = (r["lpa"] or {}).get("what_to_do") or ""
-        self.assertTrue(todo, "nothing measured and nothing said — the reader concludes "
-                              "there was nothing to find")
-        self.assertIn("nmol/L", todo, "the unit to ask for is not named, and the mg/dL "
-                                      "conversion is not exact")
-        self.assertIn("ONCE", todo.upper(), "the once-in-a-lifetime nature of the test — "
-                                            "the thing that makes it worth ordering — is lost")
+        self.assertIsNone(r['lpa']['what_to_do'])
+        basis = r['lpa']['clinical_basis']['what_to_do']
+        self.assertEqual('incomplete', basis['status'])
+        self.assertTrue(basis['reason'], 'missing support must not look like reassurance')
 
     def test_a_measured_value_is_read_against_its_bound(self):
         r = self._run(markers={"lpa": {"name": "Lp(a)", "unit": "nmol/L", "ref_high": 75,

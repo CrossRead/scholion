@@ -282,7 +282,7 @@ def _judge(step: Dict[str, Any]) -> None:
         return
     pf = spec.get("profile_file")
     if pf:
-        path = core.profile_dir() / pf
+        path = core.source_path("labs") if pf == "labs.json" else core.profile_dir() / pf
         step["detail"]["file"] = pf
         if not path.is_file():
             step["state"], step["why"] = "not_applicable", "no_file"
@@ -434,7 +434,8 @@ def _backup(step: Dict[str, Any], folder: Optional[Path]) -> Optional[Path]:
     spec = RUNNERS[step["key"]]
     sources = []
     if spec.get("profile_file"):
-        sources.append(core.profile_dir() / spec["profile_file"])
+        pf = spec["profile_file"]
+        sources.append(core.source_path("labs") if pf == "labs.json" else core.profile_dir() / pf)
     if spec.get("genome_file"):
         sources += [b / spec["genome_file"] for b in core.genome_bases()]
     sources = [p for p in sources if p.is_file()]
@@ -512,6 +513,8 @@ def _run_steps(p: Dict[str, Any], ready: List[Dict[str, Any]], calls: Optional[D
         _write(job, force=True)
 
         def tick(done, total, item=None, _js=js, _t0=t0, _i=i):
+            from . import container
+            container.gate()
             if _stop_requested():
                 raise Stopped()
             elapsed = time.monotonic() - _t0
@@ -606,13 +609,22 @@ def _release(path: Optional[Path]) -> None:
         pass
 
 
-def _run_claimed(since: Optional[str], claim: Optional[Path]) -> None:
+def _run_claimed(since: Optional[str], claim: Optional[Path],
+                 context: Optional[Dict[str, Any]] = None) -> None:
+    from . import container
+    with container.pinned(context):
+        _run_bound(since, claim)
+
+
+def _run_bound(since: Optional[str], claim: Optional[Path]) -> None:
     """The thread's body: whatever `run` returns or raises, the job file ends in a
     terminal state and the claim is released. `run` can return before writing
     anything — the plan changed between the check and the start — and a job file
     left at «running» by a process that is still alive (the page's server) was
     read as busy until the server restarted."""
     try:
+        from . import container
+        container.gate()
         res = run(confirm=True, since=since, claimed=True)
         if not res.get("started"):
             _write({"status": "failed", "pid": os.getpid(), "finished": _now(),
@@ -637,6 +649,8 @@ def per_call_host() -> Optional[str]:
 def start_in_background(since: Optional[str] = None) -> Dict[str, Any]:
     """For the page: claim the job, then run it on a thread; the file carries the progress."""
     import threading
+    from . import container
+    context = container.capture()
     host = per_call_host()
     if host:
         return {"started": False, "reason": "per_call_host", "host": host, "plan": plan(since=since)}
@@ -652,5 +666,5 @@ def start_in_background(since: Optional[str] = None) -> Dict[str, Any]:
     _write({"status": "running", "pid": os.getpid(), "started": _now(), "current": 0,
             "steps": [{"command": s["command"], "key": s["key"], "state": "waiting",
                        "done": 0, "total": None, "item": None} for s in ready]}, force=True)
-    threading.Thread(target=_run_claimed, args=(since, claim), daemon=True).start()
+    threading.Thread(target=_run_claimed, args=(since, claim, context), daemon=True).start()
     return {"started": True, "steps": len(ready)}

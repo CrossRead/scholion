@@ -134,7 +134,8 @@ installs. It travels to every recipient, so its licence travels with it.
 
 | What | Where | Author | Licence |
 |---|---|---|---|
-| Pico CSS v2.1.1 | `src/scholion/web/pico.min.css` | Pico CSS contributors, 2019–2025 | MIT |
+| Pico CSS v2.1.1, conditional build, its `.pico` scope rewritten as `:where(.pico)` by `src/tools/scope_pico.py` | `src/scholion/web/pico.scoped.min.css` | Pico CSS contributors, 2019–2025 | MIT |
+| Crossread 1.1 | `src/scholion/web/crossread.css` | the owner's reusable design system, vendored with its version and digest; its spacing, control-height and type-step scales follow Consta (consta-design-system/uikit), no code taken | Apache-2.0, as the rest of the code |
 
 The minified file keeps its own banner comment — `/*! Pico CSS ✨ v2.1.1 …
 Licensed under MIT */` — and that comment is what satisfies the licence's

@@ -41,7 +41,7 @@ import json
 from typing import Any, Dict, List, Optional
 
 from . import core
-from .i18n import t as _t
+from .i18n import lang as _lang, t as _t
 
 _ALLOWED = ("key", "unit", "direction", "loinc", "labels", "specimen", "note")
 
@@ -146,6 +146,10 @@ def confirm(key: str) -> Dict[str, Any]:
     data = _load(for_write=True)
     bucket = _bucket_of(key) or "markers"
     spec = (data.get(bucket) or {}).get(key)
+    shipped = core._read_knowledge_raw("lab_markers.json").get("markers", {}).get(key) or {}
+    if bucket == "markers" and shipped.get("status") == "proposed":
+        spec = {"confirmed_rule": shipped}
+        data.setdefault("markers", {})[key] = spec
     if not spec:
         return {"ok": False, "error": _t("markers.no_such_proposal", key=key)}
     spec["status"] = "confirmed"
@@ -168,11 +172,16 @@ def drop(key: str) -> Dict[str, Any]:
 def listing() -> Dict[str, Any]:
     data = _load()
     out = []
-    for key, spec in sorted((data.get("markers") or {}).items()):
+    entries = {**core.proposed_markers(), **(data.get("markers") or {})}
+    for key, spec in sorted(entries.items()):
+        if spec.get("confirmed_rule"):
+            spec = {**spec, **(core.lab_markers().get("markers", {}).get(key) or {})}
         out.append({"kind": "marker", "key": key, "status": spec.get("status", "proposed"),
                     "unit": spec.get("unit", ""), "by": spec.get("proposed_by", ""),
                     "on": spec.get("proposed_on", ""),
-                    "names": core.marker_rules(spec, "names")})
+                    "names": ((spec.get("labels", {}).get(_lang()) or {}).get("names")
+                              or [core.marker_display(spec, _lang(), key)]) if spec.get("unit_from_form")
+                             else core.marker_rules(spec, "names")})
     for key, spec in sorted((data.get("units") or {}).items()):
         what = (f"× {spec['factor']}" if spec.get("factor") is not None
                 else "refuse: " + str(spec.get("refuse_reason", ""))[:40])

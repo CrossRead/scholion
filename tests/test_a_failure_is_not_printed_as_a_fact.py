@@ -30,7 +30,10 @@ from scholion.format_primitives import _decision_suffix
 LS = importlib.import_module("scholion.engine.lifestyle")
 
 _THRESHOLD = {"markers": {"hct": [{"value": 54.0, "side": "high", "label": "therapy pause",
-                                    "action": "pause", "source": "guideline"}]}}
+                                    "action": "pause", "source": "synthetic fixture",
+                                    "threshold_basis": {"source": "Synthetic PMID:1", "mechanism": "Synthetic numerical boundary"},
+                                    "action_basis": {"source": "Synthetic PMID:2", "mechanism": "Synthetic proposal"},
+                                    "applicability": {"status": "held", "context": "Synthetic test only"}}]}}
 
 
 class TestAValueThatCannotBeComparedLeavesTheThresholdOpen(unittest.TestCase):
@@ -102,6 +105,12 @@ class TestAnUnreadableDateIsNotARecentOne(unittest.TestCase):
         rules = {"rules": [{"id": "r1", "suggest": "Creatinine", "why": "w", "priority": "high",
                             "when": {"measured": ["creatinine"]}, "covers": ["creatinine"],
                             "recheck_months": 3}]}
+        # This date regression needs an explicitly supported synthetic proposal,
+        # not an accidental licence to use an unsupported real catalogue rule.
+        rule = rules['rules'][0]
+        rule['applicability'] = {'status': 'held', 'context': 'Synthetic date fixture only'}
+        for name in ('suggest', 'why', 'condition', 'priority', 'recheck'):
+            rule[name + '_basis'] = {'source': 'PMID: 99999999', 'mechanism': 'Synthetic fixture only'}
         with mock.patch.object(core, "test_rules", return_value=rules), \
                 mock.patch.object(LB, "_eval_condition", return_value=True), \
                 mock.patch.object(LB, "_marker_last_date", return_value=last_date):
@@ -119,8 +128,17 @@ class TestAnUnreadableDateIsNotARecentOne(unittest.TestCase):
 
     def test_a_readable_recent_date_is_still_done(self):
         import datetime
-        (s,) = self.suggest(datetime.date.today().strftime("%Y-%m-%d"))["suggestions"]
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        result = self.suggest(today)
+        (s,) = result["suggestions"]
         self.assertTrue(s.get("done_recently"))
+        text = fmt.tests_report(result)
+        self.assertIn("Creatinine", text)
+        self.assertIn(today, text)
+        self.assertIn("repeat in ~3 months", text)
+        self.assertIn("No pending catalogue candidates", text)
+        self.assertIn("not a complete assessment", text)
+        self.assertNotIn("cannot be read", text)
 
 
 class TestUnreadWearablesAreSaidOnTheOverview(unittest.TestCase):

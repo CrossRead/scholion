@@ -1,9 +1,16 @@
-"""The Agent Plugins package says what it is, and the launcher installs nothing.
+"""The plugin folder says what it is, and the launcher installs nothing.
 
 `agent-plugin/` is this product in the portable package format five vendors
 agreed on in August 2026: `plugin.json`, a `skills/` folder of Agent Skills, and
 `mcp.json` describing MCP servers. Nothing in it is new — it is the skill folder
 and the tool server in one directory a client imports in a single step.
+
+Since 0.6.0 the same folder is also a Claude plugin: `.claude-plugin/plugin.json`
+and `.mcp.json` beside the portable pair, one skill, one launcher. The launcher
+moved from `bin/` to `scripts/`, because a Claude plugin with a `bin/` folder is
+refused by Chat and Cowork, and it became flat — no variables, no loops, no
+command substitution — because the catalogue's review holds a launcher it has to
+reason about for a human, every release.
 
 Two properties are worth a guard rather than a reading.
 
@@ -67,6 +74,46 @@ class TestTheManifestAgreesWithTheBuild(Package):
         self.assertEqual(set(), set(self.manifest()) - allowed)
 
 
+class TestTheClaudeManifestIsTheSamePackage(Package):
+    """Two manifests of one package. What they share is compared, not re-typed."""
+
+    def claude(self) -> dict:
+        return json.loads((PLUGIN / ".claude-plugin" / "plugin.json").read_text(encoding="utf-8"))
+
+    def claude_mcp(self) -> dict:
+        return json.loads((PLUGIN / ".mcp.json").read_text(encoding="utf-8"))
+
+    def test_the_shared_fields_agree(self):
+        for field in ("name", "version", "description", "homepage", "repository",
+                      "license", "keywords"):
+            with self.subTest(field=field):
+                self.assertEqual(self.manifest().get(field), self.claude().get(field))
+
+    def test_it_names_an_author_a_catalogue_can_reach(self):
+        author = self.claude().get("author") or {}
+        self.assertTrue(author.get("name"))
+        self.assertIn("@", author.get("email", ""))
+
+    def test_it_carries_only_fields_claude_reads(self):
+        allowed = {"name", "version", "description", "author", "homepage", "repository",
+                   "license", "keywords", "commands", "agents", "skills", "hooks",
+                   "mcpServers", "outputStyles", "lspServers"}
+        self.assertEqual(set(), set(self.claude()) - allowed)
+
+    def test_the_server_is_the_same_launcher_from_the_plugin_root(self):
+        portable = next(iter(self.mcp()["mcpServers"].values()))
+        claude = next(iter(self.claude_mcp()["mcpServers"].values()))
+        self.assertEqual("stdio", claude["type"])
+        self.assertEqual("${CLAUDE_PLUGIN_ROOT}/" + portable["command"][2:], claude["command"])
+
+    def test_there_is_no_bin_folder(self):
+        """A `bin/` folder in a Claude plugin keeps it out of Chat and Cowork."""
+        self.assertFalse((PLUGIN / "bin").exists())
+
+    def test_the_licence_travels_with_it(self):
+        self.assertEqual((ROOT / "LICENSE").read_bytes(), (PLUGIN / "LICENSE").read_bytes())
+
+
 class TestTheSkillIsTheSameSkill(Package):
     """One edition, laid out mechanically. A second hand-kept copy is how the
     hub's entry lost a field nobody was comparing."""
@@ -101,6 +148,30 @@ class TestTheServerEntry(Package):
 
     def test_it_speaks_over_stdio(self):
         self.assertEqual("stdio", self.server()["type"])
+
+
+class TestThePrivacyPolicyReachesEveryPackage(Package):
+
+    def test_the_plugin_and_installed_policy_are_the_canonical_bytes(self):
+        source = (ROOT / "PRIVACY.md").read_bytes()
+        self.assertGreater(len(source), 1000)
+        for path in (PLUGIN / "PRIVACY.md", ROOT / "src/scholion/docs/privacy.md"):
+            with self.subTest(path=path):
+                self.assertEqual(source, path.read_bytes())
+
+    def test_a_pip_user_can_read_the_policy_without_the_repository(self):
+        from scholion import docs
+        path = docs.path_of("privacy")
+        self.assertIsNotNone(path)
+        self.assertEqual((ROOT / "PRIVACY.md").read_bytes(), path.read_bytes())
+
+    def test_the_source_archive_includes_the_canonical_policy(self):
+        self.assertIn('"/PRIVACY.md"', (ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    def test_the_portable_readme_link_resolves_inside_the_plugin(self):
+        text = (PLUGIN / "README.md").read_text(encoding="utf-8")
+        self.assertIn("[PRIVACY.md](PRIVACY.md)", text)
+        self.assertTrue((PLUGIN / "PRIVACY.md").is_file())
 
 
 class TestTheLauncherRefusesRatherThanInstalls(Package):
@@ -150,6 +221,20 @@ class TestTheLauncherRefusesRatherThanInstalls(Package):
                            env={"PATH": "/nonexistent-for-this-test", "HOME": str(home)},
                            capture_output=True, text=True, timeout=30, stdin=subprocess.DEVNULL)
         self.assertEqual((0, "started mcp"), (r.returncode, r.stdout.strip()), r.stderr)
+
+    def test_the_script_is_flat(self):
+        """Nothing a reviewer has to reason about: no variable, no substitution,
+        no loop, no call into another file of the plugin."""
+        text = (PLUGIN / self.server_command()[2:]).read_text(encoding="utf-8")
+        code = [ln for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+        for ln in code:
+            with self.subTest(line=ln):
+                self.assertNotIn("$", ln)
+                self.assertNotIn("`", ln)
+                if ln.lstrip().startswith("echo "):
+                    continue                     # the refusal's words, not code
+                for word in ("for ", "while ", "source ", ". ./", "python"):
+                    self.assertNotIn(word, ln)
 
     def test_the_script_runs_no_installer_itself(self):
         """The property, not the wording: outside the message it prints, the

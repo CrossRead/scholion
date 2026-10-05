@@ -90,8 +90,7 @@ class TestGuidanceIsKeyedInItsGenesVocabulary(unittest.TestCase):
                                          "declared as a gap while a row exists — one of the two is wrong")
 
     def test_the_dpyd_regression_specifically(self):
-        """Named, because it shipped. rs3918290 homozygous is complete DPD
-        deficiency; fluorouracil at a standard dose can be fatal."""
+        """A predicted poor metaboliser retains the supported toxicity warning."""
         import json, pathlib, tempfile
         from scholion.engine import pgx
         d = tempfile.mkdtemp()
@@ -103,9 +102,12 @@ class TestGuidanceIsKeyedInItsGenesVocabulary(unittest.TestCase):
             r = pgx.check_drug_gene("5-fu")
             self.assertEqual(r["phenotype"], "PM")
             self.assertFalse(r.get("guidance_gap"),
-                             "complete DPD deficiency fell through to the gap branch")
+                             "the supported toxicity warning fell through to the gap branch")
             self.assertEqual(r["level"], "high")
-            self.assertIn("Avoid", r["cpic"]["recommendation"])
+            self.assertEqual("complete", r["conclusion_basis"]["status"])
+            self.assertIn("29152729", r["source"])
+            self.assertTrue(r["mechanism"])
+            self.assertIsNone(r["cpic"], "a quote cannot borrow the warning's basis")
         finally:
             unpin()
             core.reset_cache()

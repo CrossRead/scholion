@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 from .. import core
+from ..threshold_basis import compare_threshold, guard_threshold, upper_bound_known
+from ..test_proposals import guard_test_proposal
 from .targets import outside_target, target_view  # the target beside the corridor (task 170)
 from ..i18n import t as _t
 from ._helpers import _OPS, _recent_or_unknown, _active_names_by_class, DISCLAIMER
@@ -154,7 +156,7 @@ def _personal_move(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
             "direction": "up" if v > base else ("down" if v < base else "flat")}
 
 
-def _threshold_value(key: str, t: Dict[str, Any]) -> Dict[str, Any]:
+def _threshold_value(key: str, t: Dict[str, Any], reference_high: Optional[float] = None) -> Dict[str, Any]:
     """A threshold stated as a multiple of the reference bound is computed here.
 
     «3× the upper limit of normal» is a RULE, and the upper limit of normal is
@@ -176,6 +178,11 @@ def _threshold_value(key: str, t: Dict[str, Any]) -> Dict[str, Any]:
     """
     if not t.get("multiple_of_ref_high"):
         return t
+    if reference_high is not None:
+        if not upper_bound_known(reference_high):
+            return {**t, "value": None}
+        return {**t, "value": round(float(reference_high) * float(t["multiple_of_ref_high"]), 2),
+                "ref_high_used": reference_high, "from_rule": f"{t['multiple_of_ref_high']:g}× ref_high"}
     spec = (core.lab_markers().get("markers") or {}).get(key) or {}
     by_sex = spec.get("ref_by_sex") or {}
     sex = core.profile_sex()
@@ -200,7 +207,8 @@ def _threshold_value(key: str, t: Dict[str, Any]) -> Dict[str, Any]:
     return out
 
 
-def _decision_limits(key: str, value: float, active_classes: Optional[set] = None) -> List[Dict[str, Any]]:
+def _decision_limits(key: str, value: float, active_classes: Optional[set] = None, *,
+                     reference_high: Optional[float] = None, censored: Optional[str] = None) -> List[Dict[str, Any]]:
     """Clinical action thresholds for a marker: which are crossed and which are not.
 
     This is a DIFFERENT object from the reference interval: a threshold is derived from
@@ -212,27 +220,20 @@ def _decision_limits(key: str, value: float, active_classes: Optional[set] = Non
         need = t.get("applies_when_class")
         if need and (active_classes is None or need not in active_classes):
             continue
-        t = _threshold_value(key, t)
-        if t.get("value") is None:
-            continue
-        try:
-            crossed = value >= t["value"] if t.get("side") == "high" else value <= t["value"]
-            distance = (round((value - t["value"]) / abs(t["value"]) * 100, 1)
-                        if t["value"] else None)
-        except (TypeError, ValueError):
-            # A value that cannot be compared (text, or no number at all) leaves
-            # the threshold UNRESOLVED — not «not reached». Skipping the row made
-            # a crossed threshold vanish, and the readers printed the silence as
-            # «below the action threshold».
-            out.append({**t, "crossed": None, "why": "not_comparable", "distance_pct": None})
-            continue
-        out.append({**t, "crossed": bool(crossed), "distance_pct": distance})
+        rule = t
+        t = _threshold_value(key, t, reference_high)
+        compared = {**t, "reference_high_known": upper_bound_known(reference_high),
+                    **compare_threshold(value, t, censored=censored)}
+        # This field is explicitly arithmetic, not a clinical conclusion. The
+        # gate can withhold the latter without hiding how a rule was evaluated.
+        compared['catalogue_comparison'] = {k: compared.get(k) for k in ('crossed', 'distance_pct', 'why')}
+        out.append(guard_threshold(rule, compared))
     # order: the crossed ones first, then the unresolved (they may be crossed);
     # among those not crossed — the ones tied to an active drug class (for
     # haematocrit on testosterone therapy the relevant threshold is 54, not the
     # general therapy-start threshold of 50), then the nearest by value
     out.sort(key=lambda x: (x["crossed"] is not True, x["crossed"] is not None,
-                            not x.get("applies_when_class"), x.get("value", 0)))
+                            not x.get("applies_when_class"), x.get("value") or 0))
     return out
 
 
@@ -480,6 +481,7 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         if not m or not m.get("series"):
             continue
         latest = _latest(m["series"])
+        assert latest is not None  # the nonempty-series precondition above holds
         # Which corridor this point is judged by, and why — the form that carried
         # it, the marker's recorded range, or the reference base — is one
         # question with its own module (`corridor`); this only places the answer.
@@ -504,7 +506,7 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         # false, and the person has no way to tell which of the two it means.
         abnormal = flag not in ("ok", "norange", "unconfirmed_rule")
         results.append({
-            "key": k, "name": m["name"], "unit": m.get("unit", ""),
+            "key": k, "name": core.marker_name({"key": k, "name": m["name"]}), "unit": m.get("unit", ""),
             # What the number is a measurement OF — the method behind the
             # interval and the code behind the analyte. Both were written and
             # verified in the knowledge files and read by nothing: `units_note`
@@ -513,7 +515,7 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             # LDL or the direct one. A qualification nobody renders qualifies
             # nothing.
             "method_notes": _method_notes(k, _spec),
-            "value": latest["value"], "date": latest["date"],
+            "value": latest["value"], "date": latest["date"], "censored": latest.get("censored"),
             # Task 100. Where this point's DATE came from. Carried beside the
             # date rather than left in the file, because a field the report never
             # reads is a field that does not exist — `ref_sex_unknown` was
@@ -544,6 +546,9 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             # renderers read, computed in `corridor.point_corridor`.
             "ref_reference_base": c["ref_reference_base"],
             "ref_origin": c["ref_origin"],
+            "reference_table": (latest or {}).get("reference_table"),
+            "reference_grade": (latest or {}).get("reference_grade"),
+            "reference_withheld": (latest or {}).get("reference_withheld", False),
             "flags_comparable": rulers["flags_comparable"],
             "corridor_note": rulers["corridor_note"],
             "ref_sex": c["ref_sex"],
@@ -556,7 +561,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             "ref_age_unbanded": c["ref_age_unbanded"],
             "near_limit": None,   # set below, after the personal shift has been assessed
             "personal_move": None,
-            "decisions": _decision_limits(k, latest["value"], active_classes),
+            "decisions": _decision_limits(k, latest["value"], active_classes,
+                                          reference_high=c["ref_high"], censored=latest.get("censored")),
             "trend": _trend(m["series"]),
             "series": sorted(m["series"], key=lambda p: p["date"]),
             "genome_link": m.get("genome_link"), "note": m.get("note"),
@@ -595,7 +601,7 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         for p in raw.get("series", []):
             if p.get("date") == r["date"]:
                 cens = p.get("censored")
-        nl = _near_limit(raw, latest_v, r["flag"], cens)
+        nl = _near_limit(r, latest_v, r["flag"], cens)
         if not nl:
             continue
         mv = _personal_move(raw.get("series", []))
@@ -688,7 +694,7 @@ _PRIORITY_ORDER = {"high": 0, "moderate": 1, "low": 2}
 
 
 def _marker_last_date(keys) -> Optional[str]:
-    """The most recent measurement date among the given markers (or None)."""
+    """The oldest latest draw, only when every covered marker has a date."""
     mk = core.labs().get("markers", {})
     ds = []
     for k in keys or []:
@@ -698,7 +704,8 @@ def _marker_last_date(keys) -> Optional[str]:
                 ds.append(max(p["date"] for p in m["series"] if p.get("date")))
             except Exception:  # quiet: no date keeps the test pending (not done_recently); no date is printed
                 pass
-    return max(ds) if ds else None
+    unreadable = next((d for d in ds if _recent_or_unknown(d) is None), None)
+    return unreadable or (min(ds) if ds and len(ds) == len(keys) else None)
 
 
 _FLAGS: Dict[str, Any] = {}
@@ -706,15 +713,18 @@ _FLAGS: Dict[str, Any] = {}
 
 def _flags_now() -> Dict[str, Any]:
     """Each marker's flag against its corridor, computed once per suggestion pass."""
-    if "v" not in _FLAGS:
+    # Keyed by the profile it was computed from (task 192): a suggestion pass
+    # for one person must never read another person's flags.
+    where = str(core.profile_dir())
+    if _FLAGS.get("path") != where:
+        _FLAGS.clear()
+        _FLAGS["path"] = where
         _FLAGS["v"] = {m.get("key"): m.get("flag") for m in analyze_labs().get("markers") or []}
     return _FLAGS["v"]
 
 
 def suggest_tests() -> Dict[str, Any]:
-    """What else to take. A rule with a ``covers`` field (the markers it monitors) is marked
-    ``done_recently`` if all of them were measured within the last ``recheck_months``
-    (3 by default) — then it is not an extra order but routine monitoring: it goes down the list."""
+    """Supported proposals and explicitly withheld candidates, not automatic orders."""
     triggered = []
     _FLAGS.clear()
     for rule in core.test_rules().get("rules", []):
@@ -725,26 +735,25 @@ def suggest_tests() -> Dict[str, Any]:
             continue
         try:
             if _eval_condition(rule["when"]):
-                item = {k: rule[k] for k in ("id", "suggest", "why", "priority", "specialist") if k in rule}
+                item = guard_test_proposal(rule)
                 covers = rule.get("covers")
                 if covers:
                     ld = _marker_last_date(covers)
-                    recent = _recent_or_unknown(ld, rule.get("recheck_months", 3)) if ld else False
+                    months = item.get("recheck_months")
+                    recent = _recent_or_unknown(ld, months) if ld and months else False
+                    if ld and _recent_or_unknown(ld) is None:
+                        item["last_measured_unreadable"] = str(ld)
+                    elif ld:
+                        item["last_measured"] = ld
                     if recent is True:
                         item["done_recently"] = True
-                        item["last_measured"] = ld
-                        item["recheck_months"] = rule.get("recheck_months", 3)
-                    elif recent is None:
-                        # A date that cannot be read establishes nothing about when
-                        # the test was last taken: the test stays pending and the
-                        # date is shown as unreadable, never as a last measurement.
-                        item["last_measured_unreadable"] = str(ld)
                 triggered.append(item)
         except Exception as e:  # a rule must not take the whole tool down
             triggered.append({"id": rule.get("id", "?"), "error": str(e)})
     # recently done monitoring goes to the end; inside the groups — by priority
     triggered.sort(key=lambda r: (bool(r.get("done_recently")),
-                                  _PRIORITY_ORDER.get(r.get("priority", "low"), 3)))
+                                  _PRIORITY_ORDER.get(r.get("priority"), 3)))
     pending = [r for r in triggered if not r.get("done_recently")]
     return {"status": "ok", "count": len(pending), "total": len(triggered),
+            "unresolved_count": sum(bool(r.get("proposal_gaps") or r.get("error")) for r in triggered),
             "suggestions": triggered, "disclaimer": DISCLAIMER()}

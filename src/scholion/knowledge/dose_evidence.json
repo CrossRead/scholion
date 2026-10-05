@@ -71,8 +71,8 @@
     "ru": "никотиновая кислота (флаш + метаболич. эффекты) vs никотинамид/NR (мягче по глюкозе/урату)"
    },
    "verdict_rule": {
-    "en": "At the nutraceutical dose the risk is small — not 'remove it', but compare it with the patient's markers (urate, HOMA-IR); if they are borderline — monitoring, withdrawal only if they rise.",
-    "ru": "На нутрицевтической дозе риск мал — не 'убрать', а сравнить с маркёрами пациента (урат, HOMA-IR); при пограничных — контроль, отмена только при росте."
+    "en": "No individual dose, monitoring interval or withdrawal criterion is established by this catalogue entry; prescribing decisions remain with the treating clinician.",
+    "ru": "Эта запись каталога не устанавливает индивидуальную дозу, срок контроля или критерий отмены; решение о назначении остаётся за лечащим врачом."
    }
   },
   "iodine": {
@@ -241,8 +241,8 @@
     "ru": "IR vs XR (переносимость ЖКТ)"
    },
    "verdict_rule": {
-    "en": "Do not call it 'raises IR' — it is a sensitiser. Separately true: ↓B12 and the blunting of the training effect.",
-    "ru": "Не называть 'повышает ИР' — он сенситайзер. Отдельно верны: ↓B12 и притупление тренировочного эффекта."
+    "en": "The entry does not determine whether this medicine is appropriate for the individual or establish a treatment change; its clinical claims require independent support.",
+    "ru": "Запись не определяет, подходит ли препарат конкретному человеку, и не устанавливает изменение лечения; клинические утверждения требуют независимых оснований."
    }
   },
   "vitamin_d": {
@@ -350,8 +350,8 @@
     "ru": "селенометионин vs селенит"
    },
    "verdict_rule": {
-    "en": "Add it to the dietary intake; raise a flag only when approaching 400 µg.",
-    "ru": "Складывать с пищевым; флаг только при приближении к 400 мкг."
+    "en": "The recorded supplement dose alone does not establish total dietary intake or an individual action threshold.",
+    "ru": "Одна записанная доза добавки не устанавливает суммарное поступление с пищей или индивидуальный порог действия."
    }
   },
   "zinc": {
@@ -525,8 +525,8 @@
     "ru": "рацемат (R+S). β-блокирующая активность целиком у (S)-энантиомера; гидрофильный, плохо проникает через ГЭБ — но эпифиз лежит ВНЕ гематоэнцефалического барьера, поэтому гидрофильность от подавления мелатонина не защищает."
    },
    "verdict_rule": {
-    "en": "Not a reason to stop it. If the drug is taken for the sake of recovery after a stressful or alcoholic evening — name the conflict of goals and take it to the cardiologist; compare it with the options without β1-blockade.",
-    "ru": "Не повод к отмене. Если препарат принимается ради восстановления после стрессового или алкогольного вечера — назвать конфликт целей и вынести кардиологу; сравнить с вариантами без β1-блокады."
+    "en": "The catalogue does not select a replacement medicine or decide whether to stop treatment; this remains a question for the treating clinician.",
+    "ru": "Каталог не выбирает замену препарата и не решает вопрос отмены лечения; это остаётся вопросом для лечащего врача."
    },
    "alternatives": [
     {
@@ -535,8 +535,8 @@
       "ru": "карведилол"
      },
      "melatonin": {
-      "en": "25 mg — night-time melatonin 23 µg against 26 on placebo (−10 %, not significant); the class effect is not avoided",
-      "ru": "25 мг — ночной мелатонин 23 мкг против 26 на плацебо (−10 %, нз) в том же исследовании Stoschitzky 1999: единственный β-блокатор без подавления"
+      "en": "In 15 healthy volunteers, a single 25 mg dose gave nocturnal urinary aMT6s of 23 µg versus 26 on placebo; the difference was not significant (PMID 10335905). This does not establish an individual sleep outcome or preferred replacement medicine.",
+      "ru": "У 15 здоровых добровольцев после разовой дозы 25 мг ночная экскреция aMT6s составила 23 мкг против 26 на плацебо; различие незначимо (PMID 10335905). Это не устанавливает индивидуальный эффект на сон или предпочтительную замену препарата."
      },
      "metabolic": {
       "en": "GEMINI (JAMA 2004, n=1235): HOMA-IR −9.1 % against −2.0 % on metoprolol",
@@ -565,8 +565,8 @@
       "ru": "Единственный довод «за» — опросник PSQI (субъективный), открытый дизайн, n=39, шесть недель ЕЖЕДНЕВНОГО приёма у гипертоников. Перенести этот результат на разовую таблетку нельзя. Фармакокинетика против «ситуативности»: Tmax 1,5–4 ч, T½ 12 ч у нормальных метаболизаторов CYP2D6 (19–32 ч у медленных) — ночь перекрывается целиком. Из четырёх вариантов именно у небиволола нужное свойство обосновано ХУЖЕ всего."
      },
      "pk": {
-      "en": "Tmax 1.5–4 h; T½ 12 h in CYP2D6 normal metabolisers / 19–32 h in poor metabolisers; titrate in 2-week steps",
-      "ru": "Tmax 1,5–4 ч; T½ 12 ч (CYP2D6 EM) / 19–32 ч (PM); титрование с шагом 2 недели"
+      "en": "Tmax 1.5–4 h; T½ 12 h in CYP2D6 normal metabolisers / 19–32 h in poor metabolisers; no individual titration schedule is supplied",
+      "ru": "Tmax 1,5–4 ч; T½ 12 ч (CYP2D6 EM) / 19–32 ч (PM); индивидуальная схема титрования не задана"
      }
     },
     {

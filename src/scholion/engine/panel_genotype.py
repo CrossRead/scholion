@@ -38,7 +38,10 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
     chosen for it; everything else is `unread`, with the reader's own reason,
     because a position with no row in the file is not a reference call.
     """
+    recorded = core.profile_genotypes().get(rsid)
     if scan.get("status") != "ok":
+        if recorded:
+            return _from_profile(recorded, risk_allele, at)
         return {"state": None, "read": None, "why": scan.get("reason")}
     from .. import genome
     try:
@@ -121,7 +124,34 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
         same = bool(ref) and ref.upper() == str(risk_allele).upper()
         return {**out, "state": "hom" if same else "absent", "read": False,
                 "presumed": True, "why": "presumed_ref"}
+    if recorded:
+        # The file did not read it and the profile has it written down (0.6.0).
+        return _from_profile(recorded, risk_allele, at)
     return {**out, "state": "unread", "read": False, "why": conf or "no_row"}
+
+
+def _from_profile(rec: Dict[str, Any], risk_allele: Optional[str], at=None) -> Dict[str, Any]:
+    """A genotype the profile records (`core.profile_genotypes`), as a state.
+    It is a reading with a named source rather than a call with a depth."""
+    out = {"genotype": rec["genotype"], "confidence": "profile", "depth": None,
+           "from_profile": rec.get("source")}
+    if not risk_allele:
+        return {**out, "state": "risk_allele_not_declared", "read": True}
+    if not at:
+        return {**out, "state": "unread", "read": False, "why": "genotype_not_comparable"}
+    copies = panel_gate.copies(rec["genotype"], risk_allele, at)
+    pair = set(at or ())
+    if copies is None and pair and pair not in ({"A", "T"}, {"C", "G"}):
+        # A report writes a gene on the minus strand in the gene's letters: F5
+        # rs6025 is G/A there and C/T in the file. Complemented once, and never
+        # at an A/T or C/G position, where both strands spell the same pair.
+        flip = "".join(panel_gate._COMPLEMENT.get(c, c) for c in str(rec["genotype"]).upper())
+        copies = panel_gate.copies(flip, risk_allele, at)
+        if copies is not None:
+            out["strand_of_record"] = "-"
+    if copies is None:
+        return {**out, "state": "unread", "read": False, "why": "genotype_not_comparable"}
+    return {**out, "state": ("absent", "het", "hom")[min(copies, 2)], "read": True}
 
 
 # ---- one copy of X (task 205 B, F) -----------------------------------------
@@ -150,6 +180,16 @@ def as_hemizygous(geno: Dict[str, Any], sex: Optional[str]) -> Dict[str, Any]:
     read rather than read as a woman's.
     """
     state = geno.get("state")
+    if state == "risk_allele_not_declared" and sex != "female":
+        if sex != "male":
+            return {**geno, "state": "unread", "read": False, "why": "sex_unknown_on_x"}
+        bases = set(str(geno.get("genotype") or "").replace("/", "").replace("|", ""))
+        if len(bases) > 1:
+            return {**geno, "state": "unread", "read": False, "why": "het_on_male_x"}
+        if not bases or bases - set("ACGT"):
+            return {**geno, "state": "unread", "read": False, "why": "genotype_not_comparable"}
+        # Ploidy is known even while the clinical allele direction is open.
+        return {**geno, "hemizygous": True}
     if sex == "female" or state not in ("het", "hom", "absent"):
         return geno
     if sex != "male":

@@ -82,6 +82,10 @@ from .panel_form import (  # noqa: F401 -- the facade re-exports every name
 from .panel_genotype import on_x, as_hemizygous, hemizygous_ladder  # noqa: F401
 from .routes import ROUTE_CLASSES, ROUTE_ORDER, ROUTE_LEVELS, ROUTE_CONDITIONAL, routes_book, route_refusal, correction_routes_for  # noqa: F401
 from .panel_book import on_demand_panels, positions_by_marker  # noqa: F401
+from .class_genotype import cautions, regimen_cautions, medications_view  # noqa: F401
+from .treatment import treatment_timeline  # noqa: F401
+from .panel_intake import author_readings  # noqa: F401
+from .hypothesis import hypothesis_passport, is_value_only  # noqa: F401
 from .system_panels import (  # noqa: F401 -- the facade re-exports every name
     MODES,
     FINDING_GRADE,
@@ -212,7 +216,7 @@ from .panel_catalogue import (  # noqa: F401 -- the facade re-exports every name
 from .panel_gate import LINKS  # noqa: F401
 from .panel_gate import HGVS, BATCH, REVIEWERS, CONFIRM_BELOW_AF, locus, risk_on_plus, refusal, review_state, reviewed_on, copies, needs_confirmation, legend, ladder, level_of  # noqa: F401,E501
 from .panel_labs import panel_view  # noqa: F401 -- a system's long panel, shown not scored
-from .pgx_labels import phenotype_words  # noqa: F401 -- the facade re-exports every name
+from .pgx_labels import phenotype_words, model_phenotype_words  # noqa: F401 -- the facade re-exports every name
 from .profile_view import (  # noqa: F401 -- the facade re-exports every name
     load_profile,
     overview,

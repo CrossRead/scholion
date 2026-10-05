@@ -1,0 +1,41 @@
+{
+ "_meta": {
+  "updated": "2026-09-28",
+  "purpose": "A PUBLIC table: a class of prescription against a genotype that changes whether it may be given. Read by engine/class_genotype.py for the prescription check (a new drug) and for the regimen the person already takes. Portable, without patient data.",
+  "who_writes_this": "The project, from a named source: a guideline or a study, cited in `source`. Each row is a statement about a class and an allele, never about a person; the person's genotype is read at run time — from the file when one reads the position, otherwise as the profile records it.",
+  "why": "Until 0.6.0 the one combination on the demo that a clinician must not miss — factor V Leiden under a combined oral contraceptive — lived only as a sentence in the profile's own notes, and no screen printed it (the interface review of 25.09.2026).",
+  "fields": "class — a key of med_classes.json; gene, rsid, risk_allele (on the plus strand, as the file writes it), states — which reading of it the caution needs; severity: red_flag is printed first and above everything computed; level — the evidence level of the statement; summary, why, action — bilingual; source — the citation.",
+  "source_tier": "guideline_compiled"
+ },
+ "cautions": [
+  {
+   "class": "combined_oral_contraceptive",
+   "gene": "F5",
+   "rsid": "rs6025",
+   "risk_allele": "T",
+   "states": [
+    "het",
+    "hom"
+   ],
+   "severity": "red_flag",
+   "level": "A",
+   "why": {
+    "en": "Known factor V Leiden is included among the thrombophilias for which U.S. MEC 2024 places combined hormonal contraception in category 4 (unacceptable health risk). This does not quantify the person's absolute risk, and a raw reading requires appropriate clinical confirmation.",
+    "ru": "Известный фактор V Лейден включён в перечень тромбофилий, при которых U.S. MEC 2024 относит комбинированную гормональную контрацепцию к категории 4 (неприемлемый риск для здоровья). Это не оценка личного абсолютного риска; первичное чтение требует соответствующего клинического подтверждения."
+   },
+   "action": {
+    "en": "Discuss the recorded result and contraceptive eligibility with the prescribing clinician; selection or change of contraception is the clinician's decision.",
+    "ru": "Обсудить записанный результат и допустимость контрацепции с назначившим врачом; выбор или изменение контрацепции — решение врача."
+   },
+   "source": "Bertina 1994, PMID 8164741 (factor V resistance to activated protein C); U.S. Medical Eligibility Criteria for Contraceptive Use 2024, PMID 39106314, DOI 10.15585/mmwr.rr7304a1 (known thrombophilia and combined hormonal contraception, category 4).",
+   "mechanism": {
+    "en": "Factor V Leiden is less susceptible to inactivation by activated protein C, reducing this anticoagulant control of factor V. The eligibility classification for combined hormonal contraception in known thrombophilia comes from the guideline; it is not an individual's probability of thrombosis.",
+    "ru": "Фактор V Лейден менее чувствителен к инактивации активированным протеином C, что ослабляет этот антикоагулянтный контроль фактора V. Категория допустимости комбинированной гормональной контрацепции при известной тромбофилии взята из рекомендаций; она не является личной вероятностью тромбоза."
+   },
+   "summary": {
+    "en": "factor V Leiden (F5 rs6025) under a combined oral contraceptive",
+    "ru": "лейденская мутация F5 (rs6025) на фоне комбинированного орального контрацептива"
+   }
+  }
+ ]
+}

@@ -65,12 +65,13 @@ class TestEveryProposedNumberSaysWhereItCameFrom(unittest.TestCase):
                                     "ref_high": 150,
                                     "series": _series(("2023-01", 34), ("2024-06", 22),
                                                       ("2025-06", 18), ("2026-06", 13))}})
-        self.assertTrue(r["proposals"], "nothing was proposed for a four-year decline")
-        for p in r["proposals"]:
-            with self.subTest(marker=p["key"]):
-                self.assertIn(p["proposed"], ("guideline", "personal_best", "reference"))
-                cand = next(c for c in p["candidates"] if c["source"] == p["proposed"])
-                self.assertTrue(cand.get("why"), "a number with no account of itself")
+        self.assertFalse(r['proposals'], 'an observed extreme became an automatic treatment target')
+        (accounted,) = r['skipped']
+        self.assertEqual('observation_only', accounted['reason'])
+        self.assertTrue(accounted['candidates'], 'the observations were silently discarded')
+        for cand in accounted['candidates']:
+            self.assertIn(cand['source'], ('personal_best', 'reference'))
+            self.assertTrue(cand.get('why'), 'a number with no account of itself')
 
     def test_a_personal_best_carries_the_date_and_the_count_behind_it(self):
         """«Where you have been» is only a fact if it says when, and out of how many."""
@@ -78,9 +79,8 @@ class TestEveryProposedNumberSaysWhereItCameFrom(unittest.TestCase):
                                     "ref_high": 150,
                                     "series": _series(("2023-01", 34), ("2024-06", 22),
                                                       ("2025-06", 18), ("2026-06", 13))}})
-        p = next(x for x in r["proposals"] if x["key"] == "ferritin")
-        self.assertEqual(p["proposed"], "personal_best",
-                         "a corridor bound was preferred to the person's own best")
+        p = next(x for x in r['skipped'] if x['key'] == 'ferritin')
+        self.assertFalse(r['proposals'], 'a historical value was recommended as a clinical goal')
         cand = next(c for c in p["candidates"] if c["source"] == "personal_best")
         self.assertEqual(cand["value"], 34)
         obs = cand["observed"]
@@ -122,7 +122,10 @@ class TestEveryProposedNumberSaysWhereItCameFrom(unittest.TestCase):
             self.assertTrue(p.get("caveat"), "the withdrawal did not travel with the number")
             self.assertIn("Endocrine Society", p["caveat"])
         else:
-            self.assertTrue(any(c.get("no_target") for c in carrier.get("candidates", [])))
+            self.assertTrue(any(c.get('no_target') or (c.get('catalogue_comparison') or {}).get('no_target')
+                                for c in carrier.get('candidates', [])))
+            self.assertEqual('target_basis', carrier['reason'],
+                             'a general society statement became an individually applicable refusal')
 
     def test_a_target_for_a_condition_is_not_chosen_on_an_unconfirmed_condition(self):
         """ADA's «under 7 %» is a goal for somebody who HAS diabetes.
@@ -206,11 +209,10 @@ class TestWritingAGoalDoesNotOverwriteOne(unittest.TestCase):
         code, out, err = support.run(["goal-suggest", "--write"], profile_dir=self.dir)
         self.assertEqual(code, 0, err)
         after = json.loads((self.dir / "health_goals.json").read_text(encoding="utf-8"))
-        for t in after["targets"]:
-            with self.subTest(target=t.get("label")):
-                self.assertIn("_from", t, "a number in the file with no account of itself")
-                self.assertIn(t["_from"]["source"],
-                              ("guideline", "personal_best", "reference"))
+        self.assertFalse(after.get('targets'),
+                         'an observation-only candidate was written as a clinical goal')
+        # A supported positive write, including its exact independent support,
+        # is exercised in test_proposed_targets_need_their_own_support.
 
     def test_nothing_is_written_without_being_asked(self):
         support.run(["goal-suggest"], profile_dir=self.dir)

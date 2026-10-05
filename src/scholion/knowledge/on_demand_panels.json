@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-09-18",
+    "updated": "2026-10-05",
     "source_tier": "primary_literature",
     "what": "Panels WITHOUT a radar domain (task 199 F). The radar has two halves, laboratory and genetic; these panels have no laboratory half and will not get one — an empty half on the main picture teaches the reader that the picture lies. So they are a separate view: the same rows as a system's genetic half, the same gate, the same levels, no score and no figure.",
     "rows": "Every position follows the schema of system_gene_panels.json and goes through panel_gate.refusal with an empty marker list. The product's own sentence in both languages, a level from the legend, a review by role.",
@@ -723,6 +723,463 @@
       },
       "source": "the statement of task 199 names seven dental positions; none has arrived in the panel author's files",
       "positions": []
+    },
+    "folate_histamine_redox_choline": {
+      "label": {
+        "en": "Folate, histamine, redox and choline",
+        "ru": "Фолат, гистамин, окислительно-восстановительные процессы и холин"
+      },
+      "why_no_domain": {
+        "en": "This cross-system position list has no single laboratory score. Existing curated interpretations are retained; newly entered positions have literature references, but genotype-specific wording and allele direction await clinical review. Inclusion does not diagnose a deficiency or assign supplements. Genotypes must be checked against phenotype: symptoms, measured laboratory values, diet, exposures and treatment history; absence of an allele does not demonstrate normal enzyme activity.",
+        "ru": "Межсистемный список позиций не имеет единой лабораторной оценки. Существующие курируемые трактовки сохранены; новые позиции снабжены литературными источниками, но формулировки по генотипам и направление аллелей ожидают клинической проверки. Включение в панель не устанавливает дефицит и не назначает добавки. Генотипы необходимо сопоставлять с фенотипом: симптомами, измеренными анализами, рационом, воздействиями и историей лечения; отсутствие аллеля не доказывает нормальную активность фермента."
+      },
+      "source": "Position-list intake 2026-10-05; coordinates verified independently against Ensembl and NCBI dbSNP; clinical sources belong to each row.",
+      "positions": [
+        {
+          "rsid": "rs1801133",
+          "gene": "MTHFR",
+          "hgvs": "NC_000001.11:g.11796321G>A",
+          "protein": null,
+          "risk_allele": "A",
+          "mode": "common_variant",
+          "kind": "mechanism",
+          "text": {
+            "het": {
+              "en": "MTHFR 677T, one copy: homocysteine slightly higher when folate is low; folate and B12 status is what to check — the genotype itself is not a diagnosis and does not call for treatment.",
+              "ru": "MTHFR 677T, одна копия: гомоцистеин чуть выше при низком фолате; проверять статус фолата и B12 — сам генотип не диагноз и лечения не требует."
+            },
+            "hom": {
+              "en": "MTHFR 677TT: homocysteine about 20–25 % higher when folate is low — check folate and B12; with them replete the difference largely disappears.",
+              "ru": "MTHFR 677TT: гомоцистеин на ~20–25 % выше при низком фолате — проверить фолат и B12; при их достатке разница почти исчезает."
+            }
+          },
+          "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)",
+          "submitter": "panel_2026_09_13",
+          "curated_on": "2026-09-13",
+          "effect_size": "homocysteine about +20–25 % in TT with low folate",
+          "study": "Klerk 2002 JAMA",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-13",
+            "scope": "sentence_against_source"
+          },
+          "evidence": {
+            "level": "B",
+            "basis": "gwas",
+            "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)",
+            "assigned": "2026-09-17",
+            "judged": "the effect on homocysteine is replicated in meta-analyses (Klerk 2002)"
+          }
+        },
+        {
+          "rsid": "rs1801131",
+          "gene": "MTHFR",
+          "hgvs": "NC_000001.11:g.11794419T>G",
+          "protein": null,
+          "risk_allele": "G",
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
+              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+            },
+            "hom": {
+              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
+              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+            }
+          },
+          "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
+          "submitter": "panel_2026_09_13",
+          "curated_on": "2026-09-13",
+          "effect_size": "no reproducible effect on homocysteine alone",
+          "study": "Weisberg 1998",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-13",
+            "scope": "sentence_against_source"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
+            "assigned": "2026-09-17",
+            "judged": "no reproducible effect on homocysteine; studies disagree"
+          }
+        },
+        {
+          "rsid": "rs4680",
+          "gene": "COMT",
+          "hgvs": "NC_000022.11:g.19963748G>A",
+          "protein": "p.Val158Met",
+          "risk_allele": "A",
+          "mode": "pgx",
+          "kind": "asked_about",
+          "text": {
+            "het": {
+              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
+              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+            },
+            "hom": {
+              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
+              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+            }
+          },
+          "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+          "submitter": "panel_2026_09_13",
+          "curated_on": "2026-09-13",
+          "review": {
+            "by_role": "panel_author",
+            "on": "2026-09-13",
+            "scope": "sentence_against_source"
+          },
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+            "assigned": "2026-09-17",
+            "judged": "many studies of Val158Met, and they disagree"
+          }
+        },
+        {
+          "rsid": "rs10156191",
+          "gene": "AOC1",
+          "hgvs": "NC_000007.14:g.150856517C>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
+          "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1049742",
+          "gene": "AOC1",
+          "hgvs": "NC_000007.14:g.150857465C>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
+          "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1049793",
+          "gene": "AOC1",
+          "hgvs": "NC_000007.14:g.150860577C>G",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
+          "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs2052129",
+          "gene": "AOC1",
+          "hgvs": "NC_000007.14:g.150851884G>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
+          "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs6323",
+          "gene": "MAOA",
+          "hgvs": "NC_000023.11:g.43731789G>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+          "population": "859 patients with schizophrenia and 826 controls; sex-specific haplotype analysis",
+          "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+          "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "D",
+            "basis": "candidate",
+            "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1137070",
+          "gene": "MAOA",
+          "hgvs": "NC_000023.11:g.43744144T>C",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+          "population": "859 patients with schizophrenia and 826 controls; sex-specific haplotype analysis",
+          "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+          "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "D",
+            "basis": "candidate",
+            "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1695",
+          "gene": "GSTP1",
+          "hgvs": "NC_000011.10:g.67585218A>G",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+          "population": "Recombinant GSTP1 enzymes in vitro",
+          "study": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+          "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "D",
+            "basis": "candidate",
+            "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1138272",
+          "gene": "GSTP1",
+          "hgvs": "NC_000011.10:g.67586108C>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+          "population": "Recombinant GSTP1 enzymes in vitro",
+          "study": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+          "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "D",
+            "basis": "candidate",
+            "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1050450",
+          "gene": "GPX1",
+          "hgvs": "NC_000003.12:g.49357401G>A",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Treatment-by-genotype interaction P=0.165; subgroup results do not establish a genotype-based selenium regimen.",
+          "population": "255 coronary artery disease patients in New Zealand; two randomized supplementation trials",
+          "study": "PMID 22952184; DOI 10.3945/ajcn.112.043125",
+          "source": "PMID 22952184; DOI 10.3945/ajcn.112.043125",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 22952184; DOI 10.3945/ajcn.112.043125",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs1799983",
+          "gene": "NOS3",
+          "hgvs": "NC_000007.14:g.150999023T>G",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+          "population": "Recombinant enzyme and cellular experiments; INVEST-GENES hypertensive coronary artery disease cohort",
+          "study": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+          "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs2070744",
+          "gene": "NOS3",
+          "hgvs": "NC_000007.14:g.150992991C>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+          "population": "Recombinant enzyme and cellular experiments; INVEST-GENES hypertensive coronary artery disease cohort",
+          "study": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+          "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs7946",
+          "gene": "PEMT",
+          "hgvs": "NC_000017.11:g.17506246C>T",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+          "population": "Older patients with metabolic disorders; 57 adults in a controlled choline-depletion study",
+          "study": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+          "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        },
+        {
+          "rsid": "rs12325817",
+          "gene": "PEMT",
+          "hgvs": "NC_000017.11:g.17583205C>G",
+          "strand": "+",
+          "risk_allele": null,
+          "mode": "common_variant",
+          "kind": "asked_about",
+          "text": {},
+          "effect_size": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+          "population": "Older patients with metabolic disorders; 57 adults in a controlled choline-depletion study",
+          "study": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+          "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+          "submitter": "panel_2026_10_05",
+          "curated_on": "2026-10-05",
+          "review": null,
+          "evidence": {
+            "level": "C",
+            "basis": "candidate",
+            "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
+            "assigned": "2026-10-05",
+            "judged": "Research context only; genotype-specific direction and clinical wording await review."
+          },
+          "interpretation_status": "awaiting_clinical_review",
+          "action": "No clinical action is assigned by this row; discuss interpretation with a clinician."
+        }
+      ]
     }
   }
 }

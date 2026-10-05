@@ -33,6 +33,9 @@ if str(support.SRC) not in sys.path:
 
 class FocusLogCase(unittest.TestCase):
     def setUp(self):
+        from scholion import ouroboros_tools
+        ouroboros_tools.unpin_session()
+        self.addCleanup(ouroboros_tools.unpin_session)
         # Resolved: on macOS TMPDIR is under a symlink and the code returns the
         # resolved form, so an unresolved path here fails only on this platform.
         self.root = Path(tempfile.mkdtemp()).resolve() / "data"

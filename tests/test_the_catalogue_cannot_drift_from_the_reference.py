@@ -49,6 +49,10 @@ class TestEveryEntryHasAlleles(unittest.TestCase):
         for rs, loc in catalogue().items():
             with self.subTest(rs=rs):
                 ref, alt = loc.get("ref"), loc.get("alt")
+                if loc.get("repeat_call"):
+                    from test_a_refresh_cannot_rewrite_an_allele import UC
+                    self.assertTrue(UC._valid_curated_repeat(loc), rs)
+                    continue
                 self.assertIn(ref, COMPLEMENT, f"{rs}: reference base")
                 observed = loc.get("alleles_observed")
                 if observed:

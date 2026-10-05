@@ -146,6 +146,7 @@ include = [
     "/DISCLAIMER.md",
     "/SECURITY.md",
     "/THREAT_MODEL.md",
+    "/PRIVACY.md",
     "/CITATION.cff",
     "/ASSISTANT-RULES.md",
     "/VERSION",

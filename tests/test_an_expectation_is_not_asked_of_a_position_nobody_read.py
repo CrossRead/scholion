@@ -38,8 +38,10 @@ def _lookup(rsid=None, gene=None):
 def _pos(rs, gene, marker="glucose"):
     return {"rsid": rs, "gene": gene, "hgvs": "NC_000001.11:g.100A>G", "risk_allele": "G",
             "mode": "monogenic", "classification": "Strong", "moi": "AD", "kind": "mechanism",
-            "text": {"het": TXT, "hom": TXT}, "source": "the author",
-            "expect": {"marker": marker, "direction": "higher"}}
+            "text": {"het": TXT, "hom": TXT}, "source": "Synthetic identifier PMID:1", "mechanism": TXT,
+            "evidence": {"level": "B", "source": "Synthetic identifier PMID:1", "basis": "replicated"},
+            "expect": {"marker": marker, "direction": "higher",
+                       "source": "Synthetic identifier PMID:1", "mechanism": TXT}}
 
 
 CURATED = {"_meta": {"why_empty": "nobody wrote a row"},

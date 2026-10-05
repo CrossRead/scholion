@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "purpose": "Verbatim author wording and labelled translations, separate from conclusions and patient-local notes.",
+    "source_tier": "curated_reference",
+    "source_tier_note": "Author opinion only; inclusion does not validate its clinical claims or change evidence levels.",
+    "updated": "2026-10-04",
+    "mapping_note": "Source row 13 replaces the old rs3816873 label with rs17782313 in C13. The intake ledger records the approved correction. D13 is attached only to rs17782313."
+  },
+  "notes": {
+    "rs6356": {
+      "ru": "функциональный кандидатный полиморфизм, не использовать отдельно для вывода о «низком/высоком дофамине» и не назначать тирозин, L-DOPA, Mucuna pruriens или другие дофаминергические средства только на основании генотипа.",
+      "en": "A functional candidate polymorphism; do not use it alone to conclude that dopamine is low or high, and do not prescribe tyrosine, L-DOPA, Mucuna pruriens or other dopaminergic agents solely on the basis of the genotype.",
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "author_wording"
+      },
+      "provenance": {
+        "document_id": "panel_author_reply_2026_09_23",
+        "sha256": "710fe39dd4eb04a16c5a5d9470f13e542871bd97c416e4d6706ba08d4dc97a0d",
+        "cells": [
+          "E9"
+        ]
+      }
+    },
+    "rs182052": {
+      "ru": "A-аллель в отдельных исследованиях ассоциирован с более низкой концентрацией адипонектина и неблагоприятными метаболическими фенотипами; клинический эффект небольшой и зависит от других факторов». Интерпретировать только вместе с ИМТ/талией, липидограммой, глюкозой, HbA1c ± инсулином.",
+      "en": "In individual studies, the A allele is associated with a lower adiponectin concentration and unfavourable metabolic phenotypes; the clinical effect is small and depends on other factors. Interpret only alongside BMI/waist circumference, the lipid profile, glucose and HbA1c, with or without insulin.",
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "author_wording"
+      },
+      "provenance": {
+        "document_id": "panel_author_reply_2026_09_23",
+        "sha256": "710fe39dd4eb04a16c5a5d9470f13e542871bd97c416e4d6706ba08d4dc97a0d",
+        "cells": [
+          "D12"
+        ]
+      }
+    },
+    "rs17782313": {
+      "ru": "C-аллель действительно связан с небольшим повышением BMI/риска ожирения",
+      "en": "The C allele is indeed associated with a small increase in BMI/obesity risk.",
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "author_wording"
+      },
+      "provenance": {
+        "document_id": "panel_author_reply_2026_09_23",
+        "sha256": "710fe39dd4eb04a16c5a5d9470f13e542871bd97c416e4d6706ba08d4dc97a0d",
+        "cells": [
+          "D13"
+        ]
+      }
+    },
+    "rs1799768": {
+      "ru": "Генотип 4G/4G ассоциирован с более высокой транскрипционной активностью SERPINE1 и повышенной продукцией PAI-1. Повышенная активность PAI-1 подавляет тканевой и урокиназный активаторы плазминогена, что может приводить к снижению фибринолитической активности. Клиническое значение особенно зависит от метаболических и воспалительных факторов.",
+      "en": "The 4G/4G genotype is associated with higher SERPINE1 transcriptional activity and increased PAI-1 production. Increased PAI-1 activity inhibits tissue-type and urokinase-type plasminogen activators, which may reduce fibrinolytic activity. Clinical significance depends particularly on metabolic and inflammatory factors.",
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "author_wording"
+      },
+      "provenance": {
+        "document_id": "panel_author_reply_2026_09_23",
+        "sha256": "710fe39dd4eb04a16c5a5d9470f13e542871bd97c416e4d6706ba08d4dc97a0d",
+        "cells": [
+          "D14"
+        ]
+      }
+    },
+    "rs5934505": {
+      "ru": "Локус: Xp22, область FAM9B/FAM9A. Полиморфизм находится между FAM9A и FAM9B и не является функциональным вариантом гена AR. В крупном GWAS у мужчин rs5934505 был достоверно связан с концентрацией общего и расчетного свободного тестостерона. У носителей варианта T уровни общего и свободного тестостерона были ниже, чем при варианте C. Значимой связи с концентрацией SHBG в исходном GWAS не обнаружено. (PubMed Central (PMC)) Ассоциация была подтверждена в независимом GWAS и в исследовании китайских мужчин. (PubMed)\n\nРеференсный/сравниваемый аллель: C. Эффектный аллель: T — ассоциация со снижением тестостерона. У мужчин, поскольку имеется одна X-хромосома: C — относительно более высокий/базовый уровень тестостерона; T — ассоциация с более низким общим и свободным тестостероном. У женщин возможны CC / CT / TT, однако достоверная клиническая «лестница» CC → CT → TT для концентрации тестостерона не установлена, поскольку основные исследования rs5934505 проводились у мужчин.\n\nСам SNP не является диагнозом гипогонадизма и не требует самостоятельной «коррекции». При варианте T, особенно при соответствующих симптомах, целесообразна оценка гормонального профиля: общий тестостерон, SHBG, альбумин → расчет свободного тестостерона, а у мужчин дополнительно ЛГ, ФСГ, пролактин. Результат интерпретировать совместно с возрастом, ИМТ, лекарственными препаратами и клинической картиной. Генотип сам по себе не является основанием для назначения тестостерона или препаратов, влияющих на андрогенный обмен.",
+      "en": "Locus: Xp22, the FAM9B/FAM9A region. The polymorphism lies between FAM9A and FAM9B and is not a functional variant of AR. In a large GWAS of men, rs5934505 was significantly associated with total and calculated free testosterone concentrations. Carriers of T had lower total and free testosterone than carriers of C. The original GWAS found no significant association with SHBG concentration. (PubMed Central (PMC)) The association was replicated in an independent GWAS and in a study of Chinese men. (PubMed)\n\nReference/comparator allele: C. Effect allele: T, associated with lower testosterone. Men have one X chromosome: C corresponds to a relatively higher/baseline testosterone level; T is associated with lower total and free testosterone. Women may have CC / CT / TT, but a reliable clinical CC → CT → TT ladder for testosterone concentration has not been established, because the principal studies of rs5934505 were conducted in men.\n\nThe SNP itself does not diagnose hypogonadism or require independent correction. With T, particularly when relevant symptoms are present, assessment of the hormone profile is appropriate: total testosterone, SHBG and albumin to calculate free testosterone; in men, also LH, FSH and prolactin. Interpret the result together with age, BMI, medications and the clinical picture. The genotype alone is not grounds for prescribing testosterone or drugs affecting androgen metabolism.",
+      "review": {
+        "by_role": "panel_author",
+        "on": "2026-09-23",
+        "scope": "author_wording"
+      },
+      "provenance": {
+        "document_id": "panel_author_reply_2026_09_23",
+        "sha256": "710fe39dd4eb04a16c5a5d9470f13e542871bd97c416e4d6706ba08d4dc97a0d",
+        "cells": [
+          "C15",
+          "D15",
+          "E15"
+        ]
+      }
+    }
+  }
+}

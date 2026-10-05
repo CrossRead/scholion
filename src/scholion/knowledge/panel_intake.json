@@ -8,7 +8,7 @@
    "refused": "will not enter; `reason` says why"
   },
   "guarded_by": "tests/test_no_position_of_an_authored_list_falls_out_silently.py",
-  "updated": "2026-09-27",
+  "updated": "2026-10-05",
   "source_tier": "curated_reference"
  },
  "lists": {
@@ -828,6 +828,7 @@
     {
      "row": 128,
      "rsid": "rs1587874400",
+     "read_refusal": "indel_unsupported",
      "gene": "SECISBP2",
      "disposition": "refused",
      "reason": "a deletion (NC_000009.12:g.89328754del, p.Pro224LeufsTer32): the build refuses an insertion or deletion by name instead of reading it, because the base a VCF anchors it on is neither on the form nor in the catalogue (task 172)",
@@ -836,6 +837,7 @@
     {
      "row": 129,
      "rsid": "rs1587875298",
+     "read_refusal": "indel_unsupported",
      "gene": "SECISBP2",
      "disposition": "refused",
      "reason": "a duplication (NC_000009.12:g.89328885dup, p.Gly268_Glu269insTer): the build refuses an insertion or deletion by name instead of reading it, because the base a VCF anchors it on is neither on the form nor in the catalogue (task 172)",
@@ -961,6 +963,7 @@
     {
      "row": 148,
      "rsid": "rs587776856",
+     "read_refusal": "indel_unsupported",
      "gene": "IFNGR1",
      "disposition": "waiting",
      "reason": "immune: not a single-base variant (ATTAATT/ATT)",
@@ -1154,9 +1157,10 @@
     {
      "row": 177,
      "rsid": "rs1799768",
+     "read_refusal": "indel_unsupported",
      "gene": "SERPINE1",
      "disposition": "waiting",
-     "reason": "an insertion in the SERPINE1 promoter (4G/5G; Ensembl −/A/C), not a single-base change; the build does not read insertions or deletions yet (task 172). The author's sentence of 23.09.2026 waits with it, its sources Eriksson 1995 (PMID 7892190) and PMID 17549286; the replacement of the sources was approved by the author on 27.09.2026",
+     "reason": "The original position identifier is retained, but NCBI RefSNP and Ensembl distinguish rs1799768 (insertion A/C), rs1799889 (A/G), and rs1799762 (GGGG/GGGGG, the 4G/5G repeat), verified 2026-10-05. Read the confirmed repeat separately with scholion genome rs1799762; its genotype must not be labelled rs1799768. The original author opinion remains an opinion, not an independently supported clinical conclusion.",
      "task": "206"
     },
     {
@@ -1169,6 +1173,109 @@
      "row": 179,
      "rsid": "rs2287845",
      "gene": "C3",
+     "disposition": "in_catalogue"
+    }
+   ]
+  },
+  "panel_2026_10_05": {
+   "label": "Folate, histamine, redox and choline position list",
+   "rows": 16,
+   "distinct_positions": 16,
+   "positions": [
+    {
+     "row": 1,
+     "rsid": "rs1801133",
+     "gene": "MTHFR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 2,
+     "rsid": "rs1801131",
+     "gene": "MTHFR",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 3,
+     "rsid": "rs4680",
+     "gene": "COMT",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 4,
+     "rsid": "rs10156191",
+     "gene": "AOC1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 5,
+     "rsid": "rs1049742",
+     "gene": "AOC1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 6,
+     "rsid": "rs1049793",
+     "gene": "AOC1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 7,
+     "rsid": "rs2052129",
+     "gene": "AOC1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 8,
+     "rsid": "rs6323",
+     "gene": "MAOA",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 9,
+     "rsid": "rs1137070",
+     "gene": "MAOA",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 10,
+     "rsid": "rs1695",
+     "gene": "GSTP1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 11,
+     "rsid": "rs1138272",
+     "gene": "GSTP1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 12,
+     "rsid": "rs1050450",
+     "gene": "GPX1",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 13,
+     "rsid": "rs1799983",
+     "gene": "NOS3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 14,
+     "rsid": "rs2070744",
+     "gene": "NOS3",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 15,
+     "rsid": "rs7946",
+     "gene": "PEMT",
+     "disposition": "in_catalogue"
+    },
+    {
+     "row": 16,
+     "rsid": "rs12325817",
+     "gene": "PEMT",
      "disposition": "in_catalogue"
     }
    ]

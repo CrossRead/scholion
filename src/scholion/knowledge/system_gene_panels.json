@@ -1,7 +1,7 @@
 {
   "_meta": {
     "purpose": "Curated genetic panels of the body systems, keyed by the radar domains of radar_domains.json. Read by engine/system_panels.py as the CURATED layer of a system's genetic half — the author's positions, phrases, expectations and next steps — on top of the base-generated monogenic composition that gencc_gene_disease.json supplies. The two are merged into one list per system; this file never replaces the base and the base never replaces this file.",
-    "who_writes_this": "A clinician. Which positions bear on the working of a system, which allele is the risk allele, and what follows from a genotype state are medical statements, and so is the sentence saying that nothing follows. This program applies the rows it was given, records their source, and derives none; the composition of the monogenic half comes from a base with a version (see gencc_gene_disease.json), and the clinician SIGNS EXCEPTIONS to it here rather than writing the list. The base composition of a system (system_disease_terms.json → gencc_gene_disease.json) needs no signature since 13.09.2026, by the owner's decision; this file stays the clinician's. Signed by the owner on 13.09.2026 (see `signature`): the responsibility for every phrase in this build is the panel author's, and a clinician's counter-signature — correcting a row, striking one out, or adding one — remains open and is what is being asked of clinicians.",
+    "who_writes_this": "Curated source-based explanations, not statements generated from a patient record. A revision may be written against a primary reference in both languages without a human review. The engine applies the recorded rows; it does not author clinical statements. A human review applies only to the wording actually reviewed, never automatically to a later revision.",
     "unit_is_a_position": "The unit of a row is a POSITION, not a gene. The panel a clinician sent on 12.09.2026 held six rows for DIO1 alone, each with a different consequence; a schema of «gene → one phrase» cannot express such a panel at all. A position is addressed by rsID plus HGVS with a RefSeq accession (NC_000001.11:g.53909897C>A), never by the genotype letters of a report — those are not always on the same strand as the HGVS, are sometimes protein letters and sometimes conventions, and cannot be parsed.",
     "risk_allele_is_hers": "`risk_allele` is set by the author and may be null. It is not always the alternate allele, and deriving it from somebody's genotype is not the same as reading it. A row whose risk allele is null is still read — the genotype is printed to the clinician — but no phrase can be chosen for it, and the row is shown as waiting for the author to name the allele.",
     "text_is_keyed_by_genotype_state": "A phrase is bound to the STATE of the genotype, not to the gene: `text.het` and `text.hom` are the author's, each in both languages or null. This is a second axis, distinct from the kind of link: the kind says what claim may be made, the state says which genotype it is about.",
@@ -35,9 +35,9 @@
       "ru": "Ни один список ещё не написан. Пустой файл — намеренный, а не заглушка под заполнение из общих знаний: пока врач не напишет строку, честный ответ — что в этой сборке нет курируемой панели для системы; там, где база собрала моногенную половину (см. gencc_gene_disease.json), эта половина печатается с версией, а курируемый слой назван отсутствующим. Черновик панели щитовидной железы в этой схеме существует вне репозитория и ждёт подписи врача; её собственные генотипы ни в одном файле проекта нет."
     },
     "source_tier": "curated_reference",
-    "updated": "2026-09-17",
+    "updated": "2026-10-04",
     "unreadable": "`systems.<key>.unreadable` names a gene or an allele of this system that short-read sequencing cannot read — a gene beside its pseudogene (CYP21A2), a repeat (the AR CAG repeat, UGT1A1*28) — with the reason and a source. The engine prints such a gene as «requires a separate method» and never as read or as clear (owner's decision of 13.09.2026, task 179).",
-    "signature": "`review` says who compared a row's sentence with the source it names, by ROLE and never by name: `{by_role, on, scope}`, where `by_role` is `panel_author` or `clinician`. Every row shipped in this build was reviewed by the panel's author on 13.09.2026 and by no clinician; the card prints that as authorship, never as a clinical endorsement. Until task 199 the field was `signed_by`/`signed_on` and could hold a name; a name under a sentence can be neither updated nor withdrawn, and the people who read this build have a clinician of their own. A clinician's note about one person lives in that person's profile and never ships. `submitter` names a batch (`panel_2026_09_13`), not a person.",
+    "signature": "review records a human comparison of the current sentence with its source, by role and date. Rows without that review carry note_on_review and are shown as open. Revising a sentence removes its former review; the source and evidence level do not imply human endorsement. Personal clinician notes remain in the private profile.",
     "evidence": "`evidence {level, basis, source, assigned, by_rule | judged}` is the judgement of the source a row names, with the letter of the legend in evidence_levels.json (task 199). A conclusion is printed only at A and B. On 17.09.2026 every row got its letter: 32 where the row's own fields decide it (`by_rule`: a CPIC guideline row, a monogenic row GenCC rates Definitive or Strong), 60 by a judgement of the strength of the evidence for the link the row states (`judged` says what it rests on), on the owner's instruction. The letter grades the link, not the sentence: a row whose kind of link concludes nothing still prints no conclusion at A or B.",
     "waiting_199d": {
       "rs2228570": "musculoskeletal: the list names no single base as the allele (A / G)",
@@ -50,7 +50,8 @@
       "rs373740199": "immune: RTEL1 has no GenCC assertion in the base",
       "rs770066110": "immune: TERT has no GenCC assertion in the base",
       "rs769471844": "immune: TMC6 has no GenCC assertion in the base"
-    }
+    },
+    "mechanism": "A bilingual explanation of the biological link, with the primary reference in source. A mechanism is context, not a patient-specific treatment response or a dose instruction."
   },
   "systems": {
     "lipids": {
@@ -66,29 +67,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "SLCO1B1 *5, one copy (decreased function): higher simvastatin and atorvastatin exposure and a higher risk of statin myopathy. CPIC: prefer a statin and dose the guideline lists for decreased function (avoid simvastatin above 20 mg); with muscle symptoms on a statin, this is the first thing to check.",
-              "ru": "SLCO1B1 *5, одна копия (сниженная функция): выше экспозиция симвастатина и аторвастатина, выше риск статиновой миопатии. CPIC: выбирать статин и дозу из руководства для сниженной функции (симвастатин не выше 20 мг); при мышечных симптомах на статине — проверять первым."
+              "en": "One c.521C copy can reduce transport. A single position does not identify the complete SLCO1B1 haplotypes. Discuss the specific statin and phenotype with the prescriber.",
+              "ru": "Одна копия c.521C может снижать транспорт. Одна позиция не определяет полные гаплотипы SLCO1B1. Обсудите конкретный статин и фенотип с назначающим врачом."
             },
             "hom": {
-              "en": "SLCO1B1 *5 in two copies (poor function): the highest statin myopathy risk. CPIC: avoid simvastatin, keep atorvastatin at or below 20 mg, prefer rosuvastatin/pravastatin/fluvastatin at guideline doses.",
-              "ru": "SLCO1B1 *5 в двух копиях (нарушенная функция): наибольший риск статиновой миопатии. CPIC: симвастатин не назначать, аторвастатин не выше 20 мг, предпочесть розувастатин/правастатин/флувастатин в дозах руководства."
+              "en": "Two c.521C copies can reduce transport. Discuss the specific statin, full phenotype and clinical context with the prescriber; this row does not select a dose.",
+              "ru": "Две копии c.521C могут снижать транспорт. Обсудите конкретный статин, полный фенотип и клинический контекст с назначающим врачом; эта строка не выбирает дозу."
             }
           },
-          "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+          "source": "CPIC 2022; PMID:35152405; DOI:10.1002/cpt.2557",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+            "source": "CPIC 2022; PMID:35152405; DOI:10.1002/cpt.2557",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "OATP1B1 transports statins into liver cells; reduced transport can increase systemic exposure.",
+            "ru": "OATP1B1 переносит статины в клетки печени; снижение транспорта может повышать системную экспозицию."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs2231142",
@@ -100,29 +101,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "ABCG2 Q141K, one copy: rosuvastatin exposure higher; CPIC: rosuvastatin at or below 20 mg for poor function, and this genotype also raises serum urate.",
-              "ru": "ABCG2 Q141K, одна копия: выше экспозиция розувастатина; CPIC: розувастатин не выше 20 мг при нарушенной функции; этот же генотип повышает урат."
+              "en": "One Q141K copy corresponds to decreased, not poor, ABCG2 function. Discuss rosuvastatin exposure and the complete clinical context with the prescriber.",
+              "ru": "Одна копия Q141K соответствует сниженной, а не резко сниженной функции ABCG2. Обсудите экспозицию розувастатина и полный клинический контекст с назначающим врачом."
             },
             "hom": {
-              "en": "ABCG2 Q141K in two copies (poor function): CPIC — rosuvastatin at or below 20 mg; urate is raised by the same genotype.",
-              "ru": "ABCG2 Q141K в двух копиях (нарушенная функция): CPIC — розувастатин не выше 20 мг; тот же генотип повышает урат."
+              "en": "Two Q141K copies correspond to poor ABCG2 function. Discuss rosuvastatin exposure and the complete clinical context with the prescriber; this row does not select a dose.",
+              "ru": "Две копии Q141K соответствуют резко сниженной функции ABCG2. Обсудите экспозицию розувастатина и полный клинический контекст с назначающим врачом; эта строка не выбирает дозу."
             }
           },
-          "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+          "source": "CPIC 2022; PMID:35152405; DOI:10.1002/cpt.2557",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for statins (Cooper-DeHoff 2022, Clin Pharmacol Ther)",
+            "source": "CPIC 2022; PMID:35152405; DOI:10.1002/cpt.2557",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "ABCG2 exports substrates and affects rosuvastatin absorption and disposition.",
+            "ru": "ABCG2 выводит субстраты и влияет на всасывание и распределение розувастатина."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs11591147",
@@ -134,18 +135,21 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "PCSK9 R46L, one copy: a lifelong lower LDL-C — a low value here is inherited, not a sign of undernutrition or a missed disease; the coronary risk that goes with it is lower.",
-              "ru": "PCSK9 R46L, одна копия: пожизненно более низкий ЛПНП — низкое значение здесь наследственное, а не признак недоедания или пропущенной болезни; коронарный риск при этом ниже."
+              "en": "PCSK9 R46L, one copy: associated with lower LDL-C and fewer coronary events in studied populations. It does not establish why this person's LDL-C is low, exclude other causes or predict an individual coronary outcome.",
+              "ru": "PCSK9 R46L, одна копия: в изученных популяциях связан с более низким ЛПНП и меньшим числом коронарных событий. Он не устанавливает причину низкого ЛПНП у конкретного человека, не исключает другие причины и не предсказывает индивидуальный коронарный исход."
             },
             "hom": {
-              "en": "PCSK9 R46L in two copies: a markedly lower lifelong LDL-C; the same reading as one copy, stronger.",
-              "ru": "PCSK9 R46L в двух копиях: заметно ниже пожизненный ЛПНП; чтение то же, что при одной копии, только сильнее."
+              "en": "PCSK9 R46L, two copies: the allele is associated with lower LDL-C in population studies. Do not double a cohort estimate or infer this person's LDL-C or coronary outcome from the copy count.",
+              "ru": "PCSK9 R46L, две копии: аллель связан с более низким ЛПНП в популяционных исследованиях. Нельзя удваивать когортную оценку или выводить из числа копий уровень ЛПНП и коронарный исход у конкретного человека."
             }
           },
-          "source": "Cohen 2006 NEJM (PCSK9 R46L: LDL-C about 15 % lower, coronary events about 47 % fewer)",
+          "source": "Cohen 2006; PMID:16554528; DOI:10.1056/NEJMoa054013. Lagace 2006; PMID:17080197; DOI:10.1172/JCI29383. Zhao 2006; PMID:16909389; DOI:10.1086/507488.",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "LDL-C about −15 % per allele; coronary events about −47 %",
+          "effect_size": {
+            "en": "ARIC white participants: the R46L carrier group had approximately 15% lower LDL-C. This is a cohort comparison, not a per-copy or personal prediction.",
+            "ru": "У белых участников ARIC группа носителей R46L имела примерно на 15% более низкий ЛПНП. Это сравнение групп в когорте, а не оценка на копию аллели или индивидуальный прогноз."
+          },
           "study": "Cohen 2006 NEJM",
           "expect": {
             "marker": "ldl",
@@ -155,15 +159,15 @@
               "ru": "аллель PCSK9 с потерей функции: ЛПНП ожидается ниже нелеченой нормы"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
+          "mechanism": {
+            "en": "PCSK9 reduces hepatic LDL-receptor abundance. However, R46L did not measurably alter processing or secretion in the cited cell experiments; this pathway is not proof of that specific mechanism for R46L or a measurement of this person's receptor function.",
+            "ru": "PCSK9 уменьшает количество рецепторов ЛПНП в печени. Однако R46L не изменял измеримо процессинг или секрецию в приведённых клеточных экспериментах; описание пути не доказывает именно такой механизм для R46L и не измеряет функцию рецепторов у конкретного человека."
           },
+          "note_on_review": "Source-based revision; human review of this wording is open.",
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "Cohen 2006 NEJM (PCSK9 R46L: LDL-C about 15 % lower, coronary events about 47 % fewer)",
+            "source": "Cohen 2006; PMID:16554528; DOI:10.1056/NEJMoa054013",
             "assigned": "2026-09-17",
             "judged": "replicated: Cohen 2006 and later cohort and Mendelian-randomisation studies"
           }
@@ -178,18 +182,21 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "PCSK9 C679X, one copy: a stop in PCSK9 — a lifelong lower LDL-C and lower coronary risk; an inherited low LDL-C.",
-              "ru": "PCSK9 C679X, одна копия: стоп-кодон в PCSK9 — пожизненно более низкий ЛПНП и ниже коронарный риск; наследственно низкий ЛПНП."
+              "en": "PCSK9 C679X, one copy: this truncating variant was studied among PCSK9 nonsense variants associated with lower LDL-C. The pooled association does not determine this person's LDL-C or coronary risk and does not exclude other causes of a low measurement.",
+              "ru": "PCSK9 C679X, одна копия: этот укорачивающий вариант изучался среди нонсенс-вариантов PCSK9, связанных с более низким ЛПНП. Объединённая ассоциация не определяет ЛПНП или коронарный риск у конкретного человека и не исключает другие причины низкого измеренного значения."
             },
             "hom": {
-              "en": "PCSK9 C679X, two copies: a stop in PCSK9 — a lifelong lower LDL-C and lower coronary risk; an inherited low LDL-C.",
-              "ru": "PCSK9 C679X, две копии: стоп-кодон в PCSK9 — пожизненно более низкий ЛПНП и ниже коронарный риск; наследственно низкий ЛПНП."
+              "en": "PCSK9 C679X, two copies: the cited pooled nonsense-variant association is not a two-copy effect estimate. The genotype alone does not determine this person's LDL-C or coronary outcome.",
+              "ru": "PCSK9 C679X, две копии: приведённая объединённая ассоциация нонсенс-вариантов не является оценкой эффекта двух копий. Один генотип не определяет ЛПНП или коронарный исход у конкретного человека."
             }
           },
-          "source": "Cohen 2006 NEJM (PCSK9 C679X)",
+          "source": "Cohen 2006; PMID:16554528; DOI:10.1056/NEJMoa054013. Lagace 2006; PMID:17080197; DOI:10.1172/JCI29383. Zhao 2006; PMID:16909389; DOI:10.1086/507488.",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "LDL-C about −28 % (Cohen 2006, African-American carriers)",
+          "effect_size": {
+            "en": "ARIC Black participants: carriers of pooled PCSK9 nonsense variants had approximately 28% lower mean LDL-C. This is not a C679X-specific or per-copy estimate.",
+            "ru": "У чернокожих участников ARIC носители объединённых нонсенс-вариантов PCSK9 имели примерно на 28% более низкий средний ЛПНП. Это не отдельная оценка для C679X и не эффект на копию аллели."
+          },
           "study": "Cohen 2006 NEJM",
           "expect": {
             "marker": "ldl",
@@ -199,15 +206,15 @@
               "ru": "аллель PCSK9 с потерей функции: ЛПНП ожидается ниже нелеченой нормы"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
+          "mechanism": {
+            "en": "In transfected cells, C679X underwent cleavage but the mature protein remained intracellular and was not detected in the medium. Impaired secretion limits extracellular PCSK9, which otherwise reduces hepatic LDL-receptor abundance; this experiment does not quantify an individual's LDL-C response.",
+            "ru": "В трансфицированных клетках C679X подвергался расщеплению, но зрелый белок оставался внутри клеток и не обнаруживался в среде. Нарушенная секреция ограничивает внеклеточный PCSK9, который иначе уменьшает количество рецепторов ЛПНП в печени; эксперимент не определяет индивидуальное изменение ЛПНП."
           },
+          "note_on_review": "Source-based revision; human review of this wording is open.",
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "Cohen 2006 NEJM (PCSK9 C679X)",
+            "source": "Cohen 2006; PMID:16554528; DOI:10.1056/NEJMoa054013",
             "assigned": "2026-09-17",
             "judged": "replicated in independent African-American cohorts (ARIC, Dallas Heart Study)"
           }
@@ -360,29 +367,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "VKORC1 −1639 A, one copy: higher warfarin sensitivity — the CPIC dosing algorithm gives a lower starting dose; INR reaches range on less drug.",
-              "ru": "VKORC1 −1639 A, одна копия: выше чувствительность к варфарину — алгоритм CPIC даёт меньшую стартовую дозу; МНО выходит в диапазон на меньшей дозе."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             },
             "hom": {
-              "en": "VKORC1 −1639 A in two copies: the most warfarin-sensitive genotype; a markedly lower starting dose by the CPIC algorithm and closer INR control.",
-              "ru": "VKORC1 −1639 A в двух копиях: самый чувствительный к варфарину генотип; заметно меньшая стартовая доза по алгоритму CPIC и более частый контроль МНО."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for warfarin (Johnson 2017)",
+          "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for warfarin (Johnson 2017)",
+            "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "VKORC1 recycles vitamin K and is inhibited by warfarin.",
+            "ru": "VKORC1 восстанавливает витамин K; варфарин ингибирует этот фермент."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1799853",
@@ -394,29 +401,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *2, one copy: slower warfarin clearance — a lower dose by the CPIC algorithm; also relevant to NSAIDs and fluvastatin.",
-              "ru": "CYP2C9 *2, одна копия: медленнее выведение варфарина — ниже доза по алгоритму CPIC; касается также НПВС и флувастатина."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *2, two copies: slower warfarin clearance — a lower dose by the CPIC algorithm; also relevant to NSAIDs and fluvastatin.",
-              "ru": "CYP2C9 *2, две копии: медленнее выведение варфарина — ниже доза по алгоритму CPIC; касается также НПВС и флувастатина."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+          "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+            "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises S-warfarin; altered activity can change its clearance.",
+            "ru": "CYP2C9 метаболизирует S-варфарин; изменение активности может менять его клиренс."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1057910",
@@ -428,29 +435,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *3, one copy: markedly slower warfarin clearance — a lower dose by the CPIC algorithm; NSAIDs at the lowest dose with monitoring.",
-              "ru": "CYP2C9 *3, одна копия: заметно медленнее выведение варфарина — ниже доза по алгоритму CPIC; НПВС в минимальной дозе с контролем."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *3 in two copies (poor metaboliser): warfarin at a small fraction of the usual dose; CPIC advises avoiding NSAIDs cleared by CYP2C9 or a quarter of the dose.",
-              "ru": "CYP2C9 *3 в двух копиях (медленный метаболизатор): варфарин в малой доле обычной дозы; CPIC советует избегать НПВС, выводимых CYP2C9, или четверть дозы."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+          "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for warfarin (Johnson 2017); CPIC NSAIDs 2020",
+            "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises S-warfarin; altered activity can change its clearance.",
+            "ru": "CYP2C9 метаболизирует S-варфарин; изменение активности может менять его клиренс."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs2108622",
@@ -462,29 +469,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP4F2 V433M, one copy: slightly higher warfarin requirement — a small upward adjustment in the CPIC algorithm.",
-              "ru": "CYP4F2 V433M, одна копия: чуть выше потребность в варфарине — небольшая поправка вверх в алгоритме CPIC."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             },
             "hom": {
-              "en": "CYP4F2 V433M, two copies: slightly higher warfarin requirement — a small upward adjustment in the CPIC algorithm.",
-              "ru": "CYP4F2 V433M, две копии: чуть выше потребность в варфарине — небольшая поправка вверх в алгоритме CPIC."
+              "en": "This position is one input to warfarin assessment, not a dose. Discuss the complete genetic and clinical context and INR with the prescriber.",
+              "ru": "Эта позиция — один из факторов оценки варфарина, а не доза. Обсудите полный генетический и клинический контекст и МНО с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for warfarin (Johnson 2017)",
+          "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for warfarin (Johnson 2017)",
+            "source": "CPIC warfarin guideline 2017; PMID:28198005; DOI:10.1002/cpt.668",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP4F2 metabolises vitamin K, removing it from the vitamin K cycle.",
+            "ru": "CYP4F2 метаболизирует витамин K, выводя его из цикла витамина K."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs4244285",
@@ -496,29 +503,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C19 *2, one copy (intermediate metaboliser): less active clopidogrel — CPIC: after a coronary stent or stroke prefer prasugrel or ticagrelor where not contraindicated.",
-              "ru": "CYP2C19 *2, одна копия (промежуточный метаболизатор): меньше активного клопидогрела — CPIC: после стента или инсульта предпочесть прасугрел или тикагрелор, если нет противопоказаний."
+              "en": "This position tags the no-function CYP2C19*2 allele. Discuss the complete phenotype, treatment indication and contraindications with the prescriber; this row does not select antiplatelet therapy.",
+              "ru": "Эта позиция — маркёр нефункционального аллеля CYP2C19*2. Обсудите полный фенотип, показание к лечению и противопоказания с назначающим врачом; эта строка не выбирает антитромбоцитарную терапию."
             },
             "hom": {
-              "en": "CYP2C19 *2 in two copies (poor metaboliser): clopidogrel largely ineffective — CPIC: prasugrel or ticagrelor.",
-              "ru": "CYP2C19 *2 в двух копиях (медленный метаболизатор): клопидогрел практически не работает — CPIC: прасугрел или тикагрелор."
+              "en": "This position tags the no-function CYP2C19*2 allele. Discuss the complete phenotype, treatment indication and contraindications with the prescriber; this row does not select antiplatelet therapy.",
+              "ru": "Эта позиция — маркёр нефункционального аллеля CYP2C19*2. Обсудите полный фенотип, показание к лечению и противопоказания с назначающим врачом; эта строка не выбирает антитромбоцитарную терапию."
             }
           },
-          "source": "CPIC guideline for clopidogrel (Lee 2022)",
+          "source": "CPIC clopidogrel guideline 2022; PMID:35034351; DOI:10.1002/cpt.2526",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for clopidogrel (Lee 2022)",
+            "source": "CPIC clopidogrel guideline 2022; PMID:35034351; DOI:10.1002/cpt.2526",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C19 contributes to clopidogrel activation; reduced function can reduce formation of its active metabolite.",
+            "ru": "CYP2C19 участвует в активации клопидогрела; снижение функции может уменьшать образование активного метаболита."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs12248560",
@@ -530,29 +537,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C19 *17, one copy (rapid metaboliser): clopidogrel works normally; proton-pump inhibitors are cleared faster — CPIC suggests a higher PPI dose if acid is not controlled.",
-              "ru": "CYP2C19 *17, одна копия (быстрый метаболизатор): клопидогрел работает нормально; ингибиторы протонной помпы выводятся быстрее — CPIC предлагает большую дозу ИПП, если кислотность не контролируется."
+              "en": "This position tags the increased-function CYP2C19*17 allele. It does not by itself establish a rapid-metaboliser phenotype or guarantee response to clopidogrel; the full phenotype and treatment indication matter.",
+              "ru": "Эта позиция — маркёр аллеля повышенной функции CYP2C19*17. Сама по себе она не устанавливает фенотип быстрого метаболизатора и не гарантирует ответ на клопидогрел; важны полный фенотип и показание к лечению."
             },
             "hom": {
-              "en": "CYP2C19 *17 in two copies (ultrarapid): PPIs may need a higher dose; clopidogrel works.",
-              "ru": "CYP2C19 *17 в двух копиях (ультрабыстрый): ИПП может понадобиться большая доза; клопидогрел работает."
+              "en": "This position tags the increased-function CYP2C19*17 allele. It does not by itself establish a rapid-metaboliser phenotype or guarantee response to clopidogrel; the full phenotype and treatment indication matter.",
+              "ru": "Эта позиция — маркёр аллеля повышенной функции CYP2C19*17. Сама по себе она не устанавливает фенотип быстрого метаболизатора и не гарантирует ответ на клопидогрел; важны полный фенотип и показание к лечению."
             }
           },
-          "source": "CPIC guideline for clopidogrel (Lee 2022); CPIC PPIs 2020",
+          "source": "CPIC clopidogrel guideline 2022; PMID:35034351; DOI:10.1002/cpt.2526",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for clopidogrel (Lee 2022); CPIC PPIs 2020",
+            "source": "CPIC clopidogrel guideline 2022; PMID:35034351; DOI:10.1002/cpt.2526",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C19 contributes to clopidogrel activation; reduced function can reduce formation of its active metabolite.",
+            "ru": "CYP2C19 участвует в активации клопидогрела; снижение функции может уменьшать образование активного метаболита."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs6025",
@@ -2277,29 +2284,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *2, one copy: NSAIDs cleared by CYP2C9 (celecoxib, ibuprofen, meloxicam, piroxicam) at the lowest effective dose; the same allele matters for warfarin.",
-              "ru": "CYP2C9 *2, одна копия: НПВС, выводимые CYP2C9 (целекоксиб, ибупрофен, мелоксикам, пироксикам), в минимальной эффективной дозе; тот же аллель значим для варфарина."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *2, two copies: NSAIDs cleared by CYP2C9 (celecoxib, ibuprofen, meloxicam, piroxicam) at the lowest effective dose; the same allele matters for warfarin.",
-              "ru": "CYP2C9 *2, две копии: НПВС, выводимые CYP2C9 (целекоксиб, ибупрофен, мелоксикам, пироксикам), в минимальной эффективной дозе; тот же аллель значим для варфарина."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for NSAIDs (Theken 2020)",
+            "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises several NSAIDs; altered activity can change drug exposure.",
+            "ru": "CYP2C9 метаболизирует ряд НПВС; изменение активности может менять экспозицию препарата."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1057910",
@@ -2311,29 +2318,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *3, one copy: CPIC — start CYP2C9-cleared NSAIDs at the lowest dose and titrate; for meloxicam and piroxicam consider another drug.",
-              "ru": "CYP2C9 *3, одна копия: CPIC — начинать НПВС, выводимые CYP2C9, с минимальной дозы и титровать; для мелоксикама и пироксикама подумать о другом препарате."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *3 in two copies: CPIC — avoid CYP2C9-cleared NSAIDs or use a quarter of the lowest dose; warfarin at a small fraction of the usual dose.",
-              "ru": "CYP2C9 *3 в двух копиях: CPIC — избегать НПВС, выводимых CYP2C9, или четверть минимальной дозы; варфарин в малой доле обычной дозы."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for NSAIDs (Theken 2020)",
+            "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises several NSAIDs; altered activity can change drug exposure.",
+            "ru": "CYP2C9 метаболизирует ряд НПВС; изменение активности может менять экспозицию препарата."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs4349859",
@@ -5585,19 +5592,22 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "ABCG2 Q141K, one copy: less urate excreted through the gut — serum urate higher and gout earlier; allopurinol works on this genotype, and rosuvastatin exposure is higher (CPIC).",
-              "ru": "ABCG2 Q141K, одна копия: меньше урата выводится через кишечник — урат выше и подагра раньше; аллопуринол на этом генотипе работает, а экспозиция розувастатина выше (CPIC)."
+              "en": "ABCG2 Q141K, one copy: associated with higher serum urate and gout in population studies. This does not establish an individual's urate concentration, diagnose gout or select a medicine.",
+              "ru": "ABCG2 Q141K, одна копия: в популяционных исследованиях связан с более высоким уратом крови и подагрой. Это не определяет уровень урата у конкретного человека, не устанавливает диагноз подагры и не выбирает лекарство."
             },
             "hom": {
-              "en": "ABCG2 Q141K in two copies: urate markedly higher; the same reading, stronger.",
-              "ru": "ABCG2 Q141K в двух копиях: урат заметно выше; то же чтение, сильнее."
+              "en": "ABCG2 Q141K, two copies: associated with higher serum urate and gout in population studies. A per-allele population association is not an individual prediction or a treatment decision.",
+              "ru": "ABCG2 Q141K, две копии: в популяционных исследованиях связан с более высоким уратом крови и подагрой. Популяционная связь на аллель — не индивидуальный прогноз и не решение о лечении."
             }
           },
-          "source": "Dehghan 2008 Lancet (ABCG2 and urate); Woodward 2009 PNAS",
+          "source": "Woodward 2009; PMID:19506252; DOI:10.1073/pnas.0901249106. Kottgen 2013; PMID:23263486; Table 1.",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "effect_size": "serum urate about +0.2–0.3 mg/dL per K allele; gout OR about 1.7",
-          "study": "Dehghan 2008 Lancet",
+          "curated_on": "2026-10-04",
+          "effect_size": {
+            "en": "Kottgen 2013, European-ancestry meta-analysis: serum urate +0.217 mg/dL per T allele; gout odds ratio 1.73. These are population estimates, not an individual's probability or measured value.",
+            "ru": "Метаанализ Kottgen 2013, участники европейского происхождения: урат крови +0,217 мг/дл на аллель T; отношение шансов подагры 1,73. Это популяционные оценки, а не вероятность или измеренное значение у конкретного человека."
+          },
+          "study": "Kottgen 2013, Nature Genetics, Table 1; Woodward 2009, PNAS, functional assays",
           "expect": {
             "marker": "uric_acid",
             "direction": "higher",
@@ -5606,18 +5616,18 @@
               "ru": "аллель ABCG2 141K: урат склонен быть выше"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "Dehghan 2008 Lancet (ABCG2 and urate); Woodward 2009 PNAS",
+            "source": "Woodward 2009; PMID:19506252; DOI:10.1073/pnas.0901249106. Kottgen 2013; PMID:23263486; Table 1.",
             "assigned": "2026-09-17",
-            "judged": "the urate and gout association is replicated in GWAS"
-          }
+            "judged": "Replicated population association; quantitative estimates from Kottgen 2013, Table 1, not individual prediction."
+          },
+          "mechanism": {
+            "en": "ABCG2 transports urate out of cells. Q141K reduced urate transport in functional assays; this is not a measurement of an individual's excretion.",
+            "ru": "ABCG2 выводит урат из клеток. В функциональных экспериментах Q141K снижал транспорт урата; это не измерение выведения урата у конкретного человека."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs16890979",
@@ -5815,29 +5825,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *2, one copy: NSAIDs cleared by CYP2C9 stay longer — for the kidney that means the lowest dose for the shortest time.",
-              "ru": "CYP2C9 *2, одна копия: НПВС, выводимые CYP2C9, задерживаются дольше — для почек это минимальная доза на минимальный срок."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *2, two copies: NSAIDs cleared by CYP2C9 stay longer — for the kidney that means the lowest dose for the shortest time.",
-              "ru": "CYP2C9 *2, две копии: НПВС, выводимые CYP2C9, задерживаются дольше — для почек это минимальная доза на минимальный срок."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for NSAIDs (Theken 2020) — NSAIDs and the kidney",
+          "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for NSAIDs (Theken 2020) — NSAIDs and the kidney",
+            "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises several NSAIDs; altered activity can change drug exposure.",
+            "ru": "CYP2C9 метаболизирует ряд НПВС; изменение активности может менять экспозицию препарата."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1057910",
@@ -5849,29 +5859,29 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "CYP2C9 *3, one copy: CPIC — CYP2C9-cleared NSAIDs at the lowest dose, titrated; the kidney is the organ that pays for a high dose.",
-              "ru": "CYP2C9 *3, одна копия: CPIC — НПВС, выводимые CYP2C9, в минимальной дозе с титрованием; почки — орган, который платит за высокую дозу."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             },
             "hom": {
-              "en": "CYP2C9 *3 in two copies: CPIC — avoid CYP2C9-cleared NSAIDs or a quarter of the lowest dose.",
-              "ru": "CYP2C9 *3 в двух копиях: CPIC — избегать НПВС, выводимых CYP2C9, или четверть минимальной дозы."
+              "en": "This position alone does not select an NSAID dose. Discuss the specific drug and complete CYP2C9 diplotype with the prescriber.",
+              "ru": "Одна эта позиция не определяет дозу НПВС. Обсудите конкретный препарат и полный диплотип CYP2C9 с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for NSAIDs (Theken 2020)",
+          "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-04",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for NSAIDs (Theken 2020)",
+            "source": "CPIC NSAID guideline 2020; PMID:32189324; DOI:10.1002/cpt.1830",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "CYP2C9 metabolises several NSAIDs; altered activity can change drug exposure.",
+            "ru": "CYP2C9 метаболизирует ряд НПВС; изменение активности может менять экспозицию препарата."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs759330",
@@ -8200,30 +8210,28 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "ABCG2 Q141K (T), one copy: uric acid tends to be higher by about 0.2 mg/dL, because the gut and the kidney excrete less of it; the risk of gout is about 1.7 times higher per allele; a difference in a blood level, not a disease.",
-              "ru": "ABCG2 Q141K (T), одна копия: мочевая кислота склонна быть выше примерно на 0,2 мг/дл — кишечник и почка выводят её меньше; риск подагры примерно в 1,7 раза выше на аллель; это разница в уровне в крови, а не болезнь."
+              "en": "ABCG2 Q141K, one copy: associated with higher serum urate and gout in population studies. This does not establish an individual's urate concentration, diagnose gout or select a medicine.",
+              "ru": "ABCG2 Q141K, одна копия: в популяционных исследованиях связан с более высоким уратом крови и подагрой. Это не определяет уровень урата у конкретного человека, не устанавливает диагноз подагры и не выбирает лекарство."
             },
             "hom": {
-              "en": "ABCG2 Q141K (T), two copies: uric acid higher than with one copy, and the gout association is stronger; a difference in a blood level, not a disease.",
-              "ru": "ABCG2 Q141K (T), две копии: мочевая кислота выше, чем при одной копии, и связь с подагрой сильнее; это разница в уровне в крови, а не болезнь."
+              "en": "ABCG2 Q141K, two copies: associated with higher serum urate and gout in population studies. A per-allele population association is not an individual prediction or a treatment decision.",
+              "ru": "ABCG2 Q141K, две копии: в популяционных исследованиях связан с более высоким уратом крови и подагрой. Популяционная связь на аллель — не индивидуальный прогноз и не решение о лечении."
             }
           },
-          "source": "PMID 23263486 (Köttgen 2012, Nat Genet: +0.217 mg/dL urate per T); PMID 18834626 (Dehghan 2008, Lancet: gout OR 1.74)",
+          "source": "Woodward 2009; PMID:19506252; DOI:10.1073/pnas.0901249106. Kottgen 2013; PMID:23263486; Table 1.",
           "submitter": "clinical_review_2026_09",
-          "curated_on": "2026-09-17",
-          "effect_size": "serum urate about +0.22 mg/dL per T allele; gout OR about 1.74 per allele",
-          "study": "Köttgen 2012 Nat Genet; Dehghan 2008 Lancet",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-17",
-            "scope": "sentence_against_source"
+          "curated_on": "2026-10-04",
+          "effect_size": {
+            "en": "Kottgen 2013, European-ancestry meta-analysis: serum urate +0.217 mg/dL per T allele; gout odds ratio 1.73. These are population estimates, not an individual's probability or measured value.",
+            "ru": "Метаанализ Kottgen 2013, участники европейского происхождения: урат крови +0,217 мг/дл на аллель T; отношение шансов подагры 1,73. Это популяционные оценки, а не вероятность или измеренное значение у конкретного человека."
           },
+          "study": "Kottgen 2013, Nature Genetics, Table 1; Woodward 2009, PNAS, functional assays",
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "PMID 23263486 (Köttgen 2012, Nat Genet: +0.217 mg/dL urate per T); PMID 18834626 (Dehghan 2008, Lancet: gout OR 1.74)",
+            "source": "Woodward 2009; PMID:19506252; DOI:10.1073/pnas.0901249106. Kottgen 2013; PMID:23263486; Table 1.",
             "assigned": "2026-09-17",
-            "judged": "the urate association of ABCG2 Q141K is replicated in nine GWAS with a measured effect; gout OR 1.74 (Dehghan 2008)"
+            "judged": "Replicated population association; quantitative estimates from Kottgen 2013, Table 1, not individual prediction."
           },
           "link": "renal",
           "route": {
@@ -8232,7 +8240,12 @@
             "iv": "sharper",
             "basis": "mechanism",
             "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
-          }
+          },
+          "mechanism": {
+            "en": "ABCG2 transports urate out of cells. Q141K reduced urate transport in functional assays; this is not a measurement of an individual's excretion.",
+            "ru": "ABCG2 выводит урат из клеток. В функциональных экспериментах Q141K снижал транспорт урата; это не измерение выведения урата у конкретного человека."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs12356193",

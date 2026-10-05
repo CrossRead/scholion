@@ -30,6 +30,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "ouroboros_plugin" / "hub" / "scholion" / "SKILL.md"
+#: The plugin folder carries two manifests of one package — the Agent Plugins
+#: format and the one Claude's catalogue reads. Each has a `version`, and 0.6.0
+#: is the first release with two to forget. Only the version is written; the
+#: description is prose and stays a person's.
+PLUGIN_MANIFESTS = (ROOT / "agent-plugin" / "plugin.json",
+                    ROOT / "agent-plugin" / ".claude-plugin" / "plugin.json")
 
 
 def _tool_count() -> int:
@@ -46,8 +52,41 @@ def render(text: str, version: str, tools: int) -> str:
     return out
 
 
+def render_plugin(text: str, version: str) -> str:
+    """The version line of a plugin manifest, rewritten in place.
+
+    A substitution rather than load-and-dump, so the key order and the
+    indentation a reviewer sees in a diff are the ones a person wrote."""
+    return re.sub(r'^(\s*"version"\s*:\s*)"[^"]*"', lambda m: f'{m.group(1)}"{version}"',
+                  text, count=1, flags=re.M)
+
+
+def sync_plugins(version: str, write: bool) -> int:
+    stale = 0
+    for path in PLUGIN_MANIFESTS:
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        fresh = render_plugin(text, version)
+        if fresh == text:
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if write:
+            path.write_text(fresh, encoding="utf-8")
+            print(f"✓ {rel} written from the build: v{version}")
+        else:
+            print(f"✗ {rel} does not carry v{version}")
+            stale += 1
+    return stale
+
+
 def main(argv=None) -> int:
     argv = argv if argv is not None else sys.argv[1:]
+    stale = sync_plugins((ROOT / "VERSION").read_text(encoding="utf-8").strip(),
+                         "--write" in argv)
+    if stale:
+        print("   python3 src/tools/sync_manifest.py --write")
+        return 1
     if not MANIFEST.exists():
         print("· no Hub manifest in this build — nothing to do")
         return 0

@@ -7,7 +7,9 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional  # noqa: F401
 
 from .i18n import plural as _plural, t as _t  # noqa: F401
-from .format_primitives import _coverage_line, recompute_why
+from .format_primitives import _coverage_line, recompute_why, subclaim_lines
+from .genome_routes import route_text
+from .clinical_claims import basis_lines
 
 
 def _refused_head(value: Optional[str]) -> str:
@@ -543,7 +545,8 @@ def clinvar_report(r: Dict[str, Any]) -> str:
     if pen.get("one_line"):
         lines.append("\n" + _t("clinvar.how_to_read") + f" {pen['one_line']}")
         for p in (pen.get("principles") or [])[:3]:
-            lines.append(f"- {p.get('title')}: {p.get('text')}")
+            lines.append(f"- {p.get('title') or p.get('id')}: {p.get('text') or _t('clinical.withheld')}")
+            lines.extend(basis_lines(p))
     lines.append(f"\n_{r.get('disclaimer','')}_")
     return "\n".join(lines)
 
@@ -727,11 +730,16 @@ def longevity_report(r: Dict[str, Any]) -> str:
                         rs429358=ap.get("rs429358"), rs7412=ap.get("rs7412")))
         if ap.get("status") == "ambiguous_without_phase":
             lines.append("  ⚠ " + str(ap.get("message") or ""))
+        lines.extend(basis_lines(ap))
         lines.append("")
     lines.append(_t("longevity.key_markers"))
     for k in r.get("known", []):
         mk = " ✔" + _t("longevity.carries") if k.get("carries_named_allele") is True else ""
-        lines.append(f"  {k['gene']} {k['rsid']}: {k.get('genotype') or '—'}{mk} — {k.get('note','')}")
+        lines.append(f"  {k['gene']} {k['rsid']}: {k.get('genotype') or '—'}{mk} — {k.get('note') or ''}")
+        for field in ('label', 'verdict_label', 'action', 'zygosity_note', 'population_note'):
+            if k.get(field):
+                lines.append('  ' + str(k[field]))
+        lines.extend(basis_lines(k))
     st = r.get("stats", {})
     genes = ", ".join(g["gene"] for g in r.get("significant_genes", [])[:16])
     lines.append("\n" + _t("longevity.significant",
@@ -1038,6 +1046,7 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
                 L.append(f"  {x['verdict']}")
         if x.get("population_note"):
             L.append(f"  ⚠ {x['population_note']}")
+        L.extend(basis_lines(x))
         if x.get("pmids"):
             L.append("  PMID: " + ", ".join(x["pmids"]))
     if r.get("pcsk9_waiting"):
@@ -1053,7 +1062,9 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         if m.get("above"):
             L.append("  ⚠ " + _t("lipidgen.lpa.above", ref=m.get("ref_high")))
     else:
-        L.append("- " + (lpa.get("what_to_do") or ""))
+        if lpa.get('what_to_do'):
+            L.append('- ' + lpa['what_to_do'])
+        L.extend(basis_lines(lpa))
     if lpa.get("estimate"):
         e = lpa["estimate"]
         L.append(f"- {e.get('label','')}: {e.get('percentile')} ({e.get('pgs_id')}, "
@@ -1106,6 +1117,8 @@ def coverage_report(r: Dict[str, Any]) -> str:
         return _t("coverage.stopped", measured=r.get("measured") or 0, genes=r.get("genes") or 0)
     if st == "failed":
         return _t("coverage.failed", error=(r.get("error") or "").strip() or "—")
+    if r.get("reason") == "assembly_mismatch":
+        return "✗ " + _t("coverage.why.assembly_mismatch")
     return "✗ " + recompute_why({"why": r.get("reason") or "no_bam", "detail": {}})
 
 
@@ -1127,6 +1140,7 @@ def genotype_sites_report(r: Dict[str, Any]) -> str:
 
 def panel_report(r: Dict[str, Any]) -> str:
     """The panel as the catalogue describes it — for a clinician, with the references."""
+    from .panel_notes import note_lines
     if r.get("status") == "unknown_system":
         return "✗ " + _t("system.unknown", key=r.get("key"), systems=", ".join(r.get("systems") or []))
     if "systems" in r and "positions" not in r:
@@ -1142,6 +1156,8 @@ def panel_report(r: Dict[str, Any]) -> str:
             genes=_plural(int(c.get("genes") or 0), "count.genes"), with_study=c.get("with_study") or 0,
             with_expectation=c.get("with_expectation") or 0, signed=c.get("signed_by_clinician") or 0),
          _t("panel.source", updated=r.get("catalogue_updated") or "—")]
+    if r.get("reading_note"):
+        L.append(r["reading_note"])
     for g in r.get("genes") or []:
         L += ["", "**" + str(g.get("gene")) + "**"]
         for p in g.get("positions") or []:
@@ -1151,10 +1167,30 @@ def panel_report(r: Dict[str, Any]) -> str:
             head += " — " + _t("system.kind." + str(p.get("kind") or "unassigned")) + \
                     "; " + _t("system.mode." + str(p.get("mode") or "unknown"))
             L.append(head)
+            if route_text(p):
+                L.append('  ' + route_text(p))
+            if p.get("reading"):
+                L.append("  " + p["reading"]["message"])
+                if p.get("value_only"):
+                    L.append("  " + _t("panel.value_only"))
+                if p["reading"].get("quality"):
+                    L.append("  " + _t("panel.reading.quality") + ": " +
+                             str(p["reading"]["quality"]))
+            if p.get("disposition"):
+                L.append("  " + _t("panel.intake." + p["disposition"]) +
+                         (" — " + str(p["reason"]) if p.get("reason") else "") +
+                         (" (" + _t("panel.intake.task", task=p["task"]) + ")" if p.get("task") else ""))
             L.append("  " + _t("panel.locus", hgvs=p.get("hgvs") or "—", allele=p.get("risk_allele") or "—"))
+            if p.get("author_note"):
+                L.append("  " + note_lines(p["author_note"]).replace("\n", "\n  "))
             for state in ("het", "hom", "hemi"):
                 if (p.get("text") or {}).get(state):
                     L.append("  " + _t("panel.state." + state) + ": " + p["text"][state])
+            if p.get("mechanism") and p.get("source"):
+                L.append("  " + _t("system.row.mechanism", text=p["mechanism"]))
+            if (p.get("conclusion_basis") or {}).get("status") == "incomplete":
+                L.append("  " + p["conclusion_basis"]["reason"])
+            L += ["  " + detail for detail in subclaim_lines(p)]
             if p.get("classification"):
                 L.append("  " + _t("panel.classification", classification=p["classification"],
                                    moi=p.get("moi") or "—", disease=p.get("disease") or "—"))

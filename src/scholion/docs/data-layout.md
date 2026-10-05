@@ -25,6 +25,20 @@ own.
 
 ## The data directory
 
+Recorded goals retain their established files: `health_goals.json`,
+`clinician_targets.json`, and `focus.json`. `scholion goal --json` reads them
+as one `entities` list, also used by the web dashboard and `sch_goal`.
+Each entity carries its record, measurement source, target and stated origin:
+complaint, lab, genome, history, clinician or prevention. A measurement source
+does not establish why a goal was chosen. Legacy missing origins are shown as
+unspecified; reading does not rewrite them or replace their targets.
+
+A person can record that reason in the goal card or with
+`scholion target origin <goal-id> --origin <kind> --reason <stated-reason>`.
+This only edits origin metadata. If the record changed since it was displayed,
+refresh before editing. These files remain in the container and its export;
+no new storage location or renamed agent tool is needed.
+
 ```
 <data>/
   profile/                  what the application reads and the assistant edits
@@ -38,6 +52,8 @@ own.
   archive/                  retired versions of profile files
   reports/                  what was made for a person to read: summaries,
                             briefs for a doctor, generated documents
+  container.json            the technical ID of this data directory as a
+                            container (0.6.0), written at the first save
 ```
 
 Where it lives:
@@ -51,6 +67,31 @@ Where it lives:
 Individual directories are overridden one by one: `SCHOLION_PROFILE_DIR`,
 `SCHOLION_GENOME_DIR`, `SCHOLION_CACHE_DIR`. They exist for tests and for someone
 else's profile; in ordinary work a single root is enough.
+
+### Several people on one machine (0.6.0)
+
+A data directory is one person's **container**. On a clinician's machine there
+are several, each a data directory of the shape above, and the machine keeps a
+**workstation file**, `workstation.json` in the user data directory: the
+folder new containers are made under, the containers by ID, and the active one.
+
+| Command | What it does |
+|---|---|
+| `scholion init --patient [--id ID] [--label TEXT] [--root DIR]` | a new container; the first call makes the workstation, and the data directory used until then becomes container №1 where it lies |
+| `scholion patients` | the containers and which one is active |
+| `scholion use ID` | another container becomes the active one |
+| `--patient ID` on any command | that command reads another container; the active one stays |
+
+A container is named by a technical ID (`p-` and six characters, or the
+clinic's own number); the table «ID ↔ person» is kept by the clinic, outside
+the product. A label, if given, is printed only by the command line and the
+local page. Without a workstation nothing changes: the data directory is the
+one container and nothing talks about choosing. `SCHOLION_REPO_DIR` and
+`SCHOLION_PROFILE_DIR` still override everything, the workstation included.
+
+Every write checks that the container it writes to is the one the command
+read at its start; if `use` switched the person meanwhile, the write is
+refused and nothing is written.
 
 ---
 
@@ -168,6 +209,22 @@ places at 185 MB each. After the move one copy remains — in `genome/`.
 ---
 
 ## What is already fixed in the code
+
+### Proposed marker recognition
+
+The shipped dictionary may carry name-recognition proposals. They preserve a
+deterministically read value without a norm judgement until a person confirms
+the exact rule with `scholion marker --confirm <key>`. `scholion marker --list`
+shows these proposals alongside local entries. Confirmation is stored only in
+the active profile's marker overlay; an upgrade that changes the proposed rule
+requires confirmation again and cannot borrow an old approval.
+
+`unit_from_form` proposals have no assumed assay unit or conversion: recognised
+unit spellings come from the existing unit-label table, with factor one. A
+missing unit is refused, except for explicitly dimensionless INR. A later
+different unit is refused rather than mixed into the marker's existing series.
+Delimited exports use the same write gate. No standard code or reference range
+is supplied by these proposals; a confirmed row uses the form's own corridor.
 
 - **The data directory is separated from the code** — `core.repo_dir()`
   distinguishes a source tree from an installed package, and

@@ -41,6 +41,8 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 # small enough that a module heading back toward monolith trips the wire while
 # the diff is still one review long. Raising a number is allowed and visible.
 LINE_BUDGETS = {
+    # Recorded treatment events and dated controls, independent of genotype cautions.
+    "treatment": 125,
     # task 200 put a domain of its own (routes) and the gate's LINKS on the facade
     "__init__": 250,     # imports only -- claim 1 keeps it honest anyway
     "_helpers": 250,
@@ -289,7 +291,12 @@ LINE_BUDGETS = {
     # counted only when its letters are the locus's own, and drug names matched
     # as whole words so a guideline is never printed for a different medicine.
     # All five are the drug-gene answer itself; none is a domain to split along.
-    "pgx": 1160,
+    # 1160 -> 1220: table identity and joint-phenotype applicability are
+    # checked beside guidance selection. A single-drug quote or single-IM
+    # row must not answer another drug or two intermediate genes.
+    # 1220 -> 1240: selection applies the independent note/quote guard on
+    # both local and online paths; the guard itself lives outside the engine.
+    "pgx": 1240,
     # 980 → 1010 on 08.09.2026. `_placement` — which of a system's markers a
     # mark on the figure is about, and the score of the markers made in that
     # one place. It belongs beside `health_radar` because the domain's own
@@ -307,6 +314,8 @@ LINE_BUDGETS = {
     # 14.09.2026: the panel of a system as the catalogue describes it, for the
     # clinician — references and sentences, no genome, no labs.
     "panel_catalogue": 120,
+    # Patient readings of the intake ledger do not belong to the reference book.
+    "panel_intake": 110,
     "pgx_labels": 60,
     # The gate a curated panel row passes (task 199): the locus rule, the
     # impersonal review, the evidence legend — split out of system_panels.
@@ -316,14 +325,33 @@ LINE_BUDGETS = {
     # value-only markers and companion markers. A split was tried and undone: a
     # new module has no accepted reach number until the suite is measured on the
     # machine the baseline belongs to, and this is one reading of one panel.
-    "panel_labs": 190,
+    # Shared cause references belong beside the panel view, never in its score.
+    "panel_labs": 230,
     # task 200: the correction-route block — a curated object, its gate and its
     # grouping; the rules themselves live in knowledge/, not here
-    "routes": 230,
+    # 230 -> 260: triggered correction rules distinguish an unobserved
+    # alternative dependency from a measured non-carrier. This is route
+    # applicability, beside trigger/genotype checks, not a new interpretation
+    # domain; its explicit gap list prevents a falsely negative route answer.
+    "routes": 260,
+    # Cross-panel route inputs keep genotype/read state, never the other
+    # panel's clinical sentence. Lazy reads avoid a recursive system card.
+    "route_dependencies": 60,
     # tasks 175/201/203: what «read» means and why a row was not read — out of panel_form
     "panel_reading": 200,
-    # tasks 199/201: a person's state at one position — out of system_panels
-    "panel_genotype": 170,
+    # tasks 199/201: a person's state at one position — out of system_panels.
+    # 170 → 200 on 28.09.2026 (0.6.0, task 217 stage 1): a genotype the profile
+    # records is read when no file reads the position — F5, CYP2C19, MTHFR and
+    # APOE printed «not read» on the radar of a profile that holds them.
+    # X ploidy is also checked when the clinical allele direction is unset.
+    "panel_genotype": 210,
+    # 0.6.0 (task 217 stage 1): a class of prescription against a genotype read —
+    # the table in knowledge/class_genotype_cautions.json, asked for a new
+    # prescription and for the regimen already taken.
+    "class_genotype": 110,
+    # 0.6.0 (U2): a position below B travels with its passport, a value at E
+    # with no sentence — one data layer for every face.
+    "hypothesis": 80,
     # task 199: what the book holds beyond its rows — groups, panels on demand,
     # the local note, the marker index; lifted out of system_panels on 18.09.2026
     "panel_book": 260,

@@ -19,6 +19,7 @@ import json
 import os
 import tempfile
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
@@ -39,7 +40,7 @@ class TableCase(unittest.TestCase):
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.root = Path(self.tmp.name)
+        self.root = Path(self.tmp.name).resolve()
         self.forms = self.root / "forms"
         self.forms.mkdir()
         self.profile = self.root / "profile"
@@ -68,7 +69,132 @@ class TableCase(unittest.TestCase):
         return ingest_labs.ingest(str(self.forms), force=True)
 
 
+class TestMethodPriorityWithPartialClockPrecision(TableCase):
+    def test_only_unchanged_completed_sources_restore_a_method(self):
+        from scholion import core, ingest_labs
+        source = self.forms / "a.pdf"
+        source.write_bytes(b"Synthetic extraction fixture")
+        rk, mt = str(source.resolve()), source.stat().st_mtime
+        origin = {"path": rk, "mtime": mt, "priority": 2}
+        pt = {"date": "2018-05-22T10:00", "value": 20, "ingest_method": origin}
+        with mock.patch.object(core, "labs", return_value={"markers": {"synthetic": {"series": [pt]}}}):
+            self.assertEqual(ingest_labs._seen_ingest_points([source], {rk: mt})[("synthetic", pt["date"])][2], 2)
+            self.assertEqual(ingest_labs._seen_ingest_points([source], {}), {})
+            self.assertEqual(ingest_labs._seen_ingest_points([source], {rk: mt - 1}), {})
+            self.assertEqual(ingest_labs._seen_ingest_points([], {rk: mt}), {})
+            for changes in ({"mtime": []}, {"priority": True}, {"priority": 3}, {"path": None}):
+                with self.subTest(changes=changes):
+                    pt["ingest_method"] = {**origin, **changes}
+                    self.assertEqual(ingest_labs._seen_ingest_points([source], {rk: mt}), {})
+            pt["ingest_method"] = origin
+            for changes in ({"date": "bad"}, {"value": True}, {"value": float("nan")}):
+                with self.subTest(changes=changes), mock.patch.object(core, "labs", return_value={
+                        "markers": {"synthetic": {"series": [{**pt, **changes}]}}}):
+                    self.assertEqual(ingest_labs._seen_ingest_points([source], {rk: mt}), {})
+
+    def test_manual_replacement_drops_the_old_method_witness(self):
+        from scholion import core, store
+        origin = {"path": str(self.forms / "a.pdf"), "mtime": 1, "priority": 2}
+        first = store.add_lab_point("ferritin", "2018-05-22T10:00", 20, unit="ng/mL",
+                                   reference_context={"ingest_method": origin})
+        self.assertTrue(first["ok"])
+        self.assertEqual(core.labs()["markers"]["ferritin"]["series"][0]["ingest_method"], origin)
+        self.assertTrue(store.add_lab_point("ferritin", "2018-05-22", 30, unit="ng/mL")["ok"])
+        point = core.labs()["markers"]["ferritin"]["series"][0]
+        self.assertNotIn("ingest_method", point)
+        self.assertEqual((point["date"], point["value"]), ("2018-05-22T10:00", 30))
+
+    def test_resume_preserves_method_priority_and_reports_the_conflict(self):
+        from scholion import core, ingest_labs
+        class Stop(Exception):
+            pass
+        for preferred_first in (True, False):
+            for ordinary_stamp in ("2018-05-22", "2018-05-22T10:00"):
+                with self.subTest(preferred_first=preferred_first, ordinary_stamp=ordinary_stamp):
+                    (self.profile / "labs.json").write_text('{"markers":{}}', encoding="utf-8")
+                    core.reset_cache()
+                    ingest_labs._save_manifest({})
+                    paths = [self.forms / "a.pdf", self.forms / "b.pdf"]
+                    for path in paths:
+                        path.write_bytes(b"Synthetic extraction fixture")
+                    texts = ["Collected 2018-05-22 preferred", "Collected 2018-05-22 ordinary"]
+                    if not preferred_first:
+                        texts.reverse()
+                    def parse(text, *args, **kwargs):
+                        preferred = "preferred" in text
+                        return ("2018-05-22T10:00" if preferred else ordinary_stamp, {"synthetic": {
+                            "value": 20 if preferred else 10, "unit": "mg/L", "ref_low": 0, "ref_high": 100}})
+                    def stop(done, *args):
+                        if done == 1:
+                            raise Stop()
+                    spec = {"unit": "mg/L", "labels": {"en": {
+                        "prefer_form": ["preferred"], "names": ["synthetic"]}}}
+                    by_file = dict(zip(paths, texts))
+                    with mock.patch.object(core, "lab_markers", return_value={"markers": {"synthetic": spec}}), \
+                            mock.patch.object(ingest_labs, "_ensure_extractor", return_value="synthetic"), \
+                            mock.patch.object(ingest_labs, "_read_any", side_effect=lambda p: by_file[p]) as read, \
+                            mock.patch.object(ingest_labs, "parse_report", side_effect=parse), \
+                            mock.patch.object(ingest_labs, "_single_form_problem", return_value=None):
+                        with self.assertRaises(Stop):
+                            ingest_labs.ingest(str(self.forms), progress=stop)
+                        read.reset_mock()
+                        result = ingest_labs.ingest(str(self.forms))
+                        self.assertEqual(result["skipped"], 1)
+                        read.assert_called_once_with(paths[1])
+                        self.assertEqual(len(result["conflicts"]), 1, result)
+                        self.assertEqual(result["conflicts"][0]["kept"], 20)
+                    series = json.loads((self.profile / "labs.json").read_text(encoding="utf-8"))["markers"]["synthetic"]["series"]
+                    self.assertEqual([(p["date"], p["value"]) for p in series], [("2018-05-22T10:00", 20)])
+
+    def test_partial_precision_keeps_the_preferred_method_in_both_orders(self):
+        from scholion import core, ingest_labs
+        for preferred_first in (False, True):
+            with self.subTest(preferred_first=preferred_first):
+                (self.profile / "labs.json").write_text('{"markers":{}}', encoding="utf-8")
+                core.reset_cache()
+                paths = [self.forms / "a.pdf", self.forms / "b.pdf"]
+                for path in paths:
+                    path.write_bytes(b"Synthetic extraction fixture")
+                texts = ["Дата взятия: 22.05.2018 preferred", "Дата взятия: 22.05.2018 ordinary"]
+                if not preferred_first:
+                    texts.reverse()
+                def parse(text, *args, **kwargs):
+                    preferred = "preferred" in text
+                    return ("2018-05-22T10:00" if preferred else "2018-05-22", {"synthetic": {
+                        "value": 20 if preferred else 10, "unit": "mg/L", "ref_low": 0, "ref_high": 100}})
+                spec = {"unit": "mg/L", "direction": "high", "labels": {"en": {
+                    "prefer_form": ["preferred"], "names": ["synthetic"]}}}
+                with mock.patch.object(core, "lab_markers", return_value={"markers": {"synthetic": spec}}), \
+                        mock.patch.object(ingest_labs, "_ensure_extractor", return_value="synthetic"), \
+                        mock.patch.object(ingest_labs, "_read_any", side_effect=texts), \
+                        mock.patch.object(ingest_labs, "parse_report", side_effect=parse), \
+                        mock.patch.object(ingest_labs, "_single_form_problem", return_value=None):
+                    result = self.run_ingest()
+                self.assertTrue(result["ok"], result)
+                self.assertEqual(len(result["conflicts"]), 1, result)
+                series = json.loads((self.profile / "labs.json").read_text(encoding="utf-8"))["markers"]["synthetic"]["series"]
+                self.assertEqual([(p["date"], p["value"]) for p in series], [("2018-05-22T10:00", 20)])
+
+
 class TestADelimitedExportIsRead(TableCase):
+
+    def test_a_valid_english_date_is_not_also_reported_as_refused(self):
+        from scholion import core, ingest_labs
+        text = "Date,Test,Result,Units\nMay 22 2018,Ferritin,20,ng/mL\n"
+        parsed = ingest_labs.parse_table(text, core.lab_markers()["markers"])
+        self.assertEqual(parsed["points"][0]["date"], "2018-05-22")
+        self.assertEqual(parsed["refused"], [])
+        (self.forms / "english.csv").write_text(text, encoding="utf-8")
+        result = self.run_ingest()
+        self.assertEqual(result["points_added"], 1)
+        self.assertEqual(result["not_ingested"], [])
+
+    def test_an_unrecognised_date_is_reported_once_and_not_written(self):
+        from scholion import core, ingest_labs
+        parsed = ingest_labs.parse_table(
+            "Date,Test,Result,Units\nnot-a-date,Ferritin,20,ng/mL\n", core.lab_markers()["markers"])
+        self.assertEqual(parsed["points"], [])
+        self.assertEqual(parsed["refused"], [{"row": 2, "reason": "invalid_date"}])
 
     def test_the_values_reach_the_profile(self):
         (self.forms / "phenotypes.csv").write_text(TABLE, encoding="utf-8")

@@ -11,7 +11,8 @@
     },
     "source_tier": "guideline_mixed",
     "source_tier_note": "The phenotype models and the quoted recommendations are verbatim; the patient-facing notes, the severity levels, and the pairs still without a quote are compiled. One tier word would be a claim about the whole file that is false of part of it.",
-    "emits_contract": "Every gene declares `emits`: the phenotype vocabulary its model can produce. A drug's guidance table must be keyed in the vocabulary of ITS gene — a gate enforces the correspondence. Without it, changing a model's vocabulary (DPYD moved from deficient/intermediate/normal to NM/IM/PM when it became activity-score) silently orphans every row of the table keyed in the old one, and the answer falls through to the gap branch while nothing fails."
+    "emits_contract": "Every gene declares `emits`: the phenotype vocabulary its model can produce. A drug's guidance table must be keyed in the vocabulary of ITS gene — a gate enforces the correspondence. Without it, changing a model's vocabulary (DPYD moved from deficient/intermediate/normal to NM/IM/PM when it became activity-score) silently orphans every row of the table keyed in the old one, and the answer falls through to the gap branch while nothing fails.",
+    "phenotype_label_revision": "2026-10-04: withdrew the unsupported CYP2C19 compensation and drug-dependent phenotype wording; IM code unchanged. CPIC 2022, PMID:35034351; DOI:10.1002/cpt.2526. This is not a source refresh."
   },
   "genes_of_interest": [
     "CYP2C19",
@@ -102,8 +103,8 @@
           },
           "phenotype": "IM",
           "label": {
-            "en": "intermediate metaboliser (the presence of *17 partly compensates for the loss of function — the CPIC phenotype depends on the drug)",
-            "ru": "промежуточный метаболизатор (наличие *17 частично компенсирует потерю функции — фенотип по CPIC зависит от препарата)"
+            "en": "intermediate metaboliser",
+            "ru": "промежуточный метаболизатор"
           }
         },
         {
@@ -1139,7 +1140,8 @@
         "rosuvastatin",
         "симвастатин",
         "simvastatin",
-        "правастатин"
+        "правастатин",
+        "pravastatin"
       ],
       "gene": "SLCO1B1",
       "class": {
@@ -1290,6 +1292,8 @@
     {
       "names": [
         "фторурацил",
+        "fluorouracil",
+        "5-fluorouracil",
         "5-фу",
         "5-fu",
         "капецитабин",
@@ -1309,8 +1313,13 @@
         "PM": {
           "level": "high",
           "note": {
-            "en": "A DPYD loss-of-function variant has been found → a high risk of severe fluoropyrimidine toxicity. Before prescribing, discuss with the oncologist a substantial dose reduction/an alternative.",
-            "ru": "Найден вариант потери функции DPYD → высокий риск тяжёлой токсичности фторпиримидинов. Перед назначением обсудить с онкологом существенное снижение дозы/альтернативу."
+            "en": "Predicted DPYD poor metabolism is a serious fluoropyrimidine-toxicity warning. Ask the prescribing clinician to assess it before a dosing decision; do not change treatment yourself.",
+            "ru": "Предсказанный медленный метаболизм DPYD — серьёзное предупреждение о токсичности фторпиримидинов. До решения о дозе обратитесь к назначившему врачу; самостоятельно лечение не меняйте."
+          },
+          "source": "CPIC 2017 fluoropyrimidine guideline, PMID:29152729; DOI:10.1002/cpt.911. Applies to 5-fluorouracil and capecitabine; not a patient-specific dose algorithm.",
+          "mechanism": {
+            "en": "DPD, encoded by DPYD, catabolises 5-fluorouracil. Reduced enzyme activity lowers clearance and increases exposure; capecitabine is converted to 5-fluorouracil.",
+            "ru": "Кодируемый DPYD фермент DPD расщепляет 5-фторурацил. Снижение активности уменьшает клиренс и увеличивает экспозицию; капецитабин превращается в 5-фторурацил."
           },
           "cpic": {
             "phenotype": "Poor Metabolizer",

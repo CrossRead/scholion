@@ -156,6 +156,14 @@ def plan(path: Path) -> Dict[str, Any]:
             skipped.append({"label": label, "reason": "no_quantity",
                             "detail": next((k for k in res if k.startswith("value")), "none")})
             continue
+        if qty.get("comparator"):
+            skipped.append({"label": label, "reason": "quantity_is_a_bound_not_an_exact_value",
+                            "detail": str(qty["comparator"])})
+            continue
+        ranges = res.get("referenceRange") or []
+        if len(ranges) > 1 or any(rr.get("appliesTo") or rr.get("age") for rr in ranges):
+            skipped.append({"label": label, "reason": "reference_range_requires_context"})
+            continue
         codes = _loinc_codes(res)
         if not codes:
             skipped.append({"label": label, "reason": "no_loinc"})

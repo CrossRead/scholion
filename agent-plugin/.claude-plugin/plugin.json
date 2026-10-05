@@ -1,0 +1,20 @@
+{
+  "name": "scholion",
+  "version": "0.6.0",
+  "description": "Local second-opinion support for individuals and clinicians — genome (VCF), laboratory history, prescriptions and wearables. One person per container and per assistant conversation; the tools use the active container and cannot switch it. Findings carry their evidence level; lower-evidence findings reach the assistant as labelled hypotheses, not conclusions. The engine must be installed locally. Tool answers may reach the host's model provider. Not a medical device.",
+  "author": {
+    "name": "Scholion contributors",
+    "email": "scholion.dev@proton.me",
+    "url": "https://github.com/CrossRead/scholion"
+  },
+  "homepage": "https://github.com/CrossRead/scholion",
+  "repository": "https://github.com/CrossRead/scholion",
+  "license": "Apache-2.0",
+  "keywords": [
+    "health",
+    "genome",
+    "pharmacogenetics",
+    "laboratory",
+    "local-first"
+  ]
+}

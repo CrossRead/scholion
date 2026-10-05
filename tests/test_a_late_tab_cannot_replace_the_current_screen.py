@@ -7,6 +7,9 @@ import unittest
 
 import support
 
+# These check correctness, not process-startup latency on hosted Windows runners.
+NODE_TIMEOUT = 60
+
 
 @unittest.skipUnless(shutil.which("node"), "needs node for the page's JavaScript")
 class TestLateResponses(unittest.TestCase):
@@ -29,7 +32,7 @@ for(let i=0;i<2;i++){
 }
 """
         result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
-                                stdin=subprocess.DEVNULL, timeout=10)
+                                stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_late_system_cannot_reopen_a_reference_or_patient_list(self):
@@ -57,7 +60,7 @@ const viewPanel=()=>{opened++;visible.innerHTML='OLD LIST';};
 })().catch(e=>{console.error(e);process.exitCode=1;});
 """
         result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
-                                stdin=subprocess.DEVNULL, timeout=10)
+                                stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_panel_subviews_also_own_their_nodes(self):
@@ -81,7 +84,7 @@ const t=(key,args)=>args.key,errorHtml=x=>x;
 })().catch(e=>{console.error(e);process.exitCode=1;});
 """
         result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
-                                stdin=subprocess.DEVNULL, timeout=10)
+                                stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
         self.assertEqual(0, result.returncode, result.stderr)
 
     def test_old_success_and_error_cannot_replace_a_new_render(self):

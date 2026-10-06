@@ -255,7 +255,9 @@ LINE_BUDGETS = {
     # +20: a system's long panel beside its score, and markers in two systems (task 200).
     # task 200: the chain link, the intake route, the load a fasting corridor
     # cannot stand in for, and the block that answers a decision to correct
-    "system_panels": 1600,
+    # GenCC reference assembly and the shared validity/inheritance projection;
+    # gene descriptions and display-label logic stay in panel_reference.py.
+    "system_panels": 1610,
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its

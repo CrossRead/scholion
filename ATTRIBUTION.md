@@ -211,10 +211,22 @@ upstream and reports drift in either direction.
 
 ## NCBI Gene reference biology
 
-`src/scholion/knowledge/panel_reference_context.json` includes gene-function
+`panel_reference_context.json` and `gencc_reference_context.json` include gene-function
 reference descriptions from NCBI Gene / RefSeq summaries retrieved on
-2026-10-06, with bilingual functional paraphrases. Each gene carries its
-NCBI Gene URL. The NLM content policy is at
+2026-10-06, with Russian functional paraphrases and the original English source
+summaries or separately sourced corrections. HGNC identifiers bind the GenCC
+genes to their NCBI entries. The complete HGNC set is available at
+https://www.genenames.org/download/. Each gene carries its
+NCBI Gene URL; retained English summaries carry their source attribution.
+The NLM content policy is at
 https://www.ncbi.nlm.nih.gov/home/about/policies/. Variant context is separately
 paraphrased from the sources held by the curated panels; it does not derive
 allele direction or personal effects from a gene annotation.
+
+Alliance of Genome Resources summaries retained through NCBI carry their original
+attribution. Alliance data are available under CC0 or CC BY 4.0; see
+https://www.alliancegenome.org/terms-of-use and
+https://github.com/alliance-genome/agr_open_data/blob/main/DATA_DOCUMENTATION.md.
+Descriptions credited to an individual contributor are independently paraphrased.
+GenCC relationships retain the original contributing organisations and statuses;
+their Russian labels do not constitute a new validity assessment.

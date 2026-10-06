@@ -903,6 +903,8 @@ LOCALIZABLE_FIELDS = {
     "assembly_secondary_note", "assembly_secondary_open", "applies_to_sex_note",
     "zygosity_note", "loinc_note", "common_pitfalls", "hypothesis", "evidence",
     "text", "rule", "summary", "description",
+    # Separate reference catalogue fields, never personal readings or findings.
+    "reading", "possible_influence",
     # A phrase keyed by GENOTYPE STATE (system_gene_panels.json): `text` there is
     # not one language map but three — `text.absent`, `text.het`, `text.hom` —
     # each an author's sentence in both languages. The state names are curated

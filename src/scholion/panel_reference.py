@@ -9,7 +9,38 @@ from __future__ import annotations
 from typing import Any, Dict, List
 
 from . import core
-from .i18n import lang, t
+from .i18n import CATALOGUES, lang, t
+
+
+def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Gene biology and each GenCC assertion; neither supplies a variant effect."""
+    book = core._read_knowledge("gencc_reference_context.json")
+    genes = book.get("genes") or {}
+    entry = genes.get(gene) or genes.get(gene.upper()) or {}
+    diseases = entry.get("diseases") or {}
+    associations = []
+    for assertion in assertions:
+        disease = assertion.get("disease") or "—"
+        label = (diseases.get(disease) or {}).get("label")
+        classification = assertion.get("classification") or "—"
+        class_key = "gencc.class." + classification
+        moi = str(assertion.get("moi") or "Unknown")
+        moi_key = "gencc.moi." + moi
+        associations.append({**assertion,
+            "disease_label": core._localized(label, lang()) or disease,
+            "classification_label": t(class_key) if class_key in CATALOGUES[lang()] else classification,
+            "moi_label": t(moi_key) if moi_key in CATALOGUES[lang()] else moi})
+    return {"scope": "reference_only", "level": None,
+            "gene_function": entry.get("description") or t("reference.gene_unknown"),
+            "gene_source": entry.get("source"), "gene_source_scope": "gene_function",
+            "retrieved": entry.get("retrieved"),
+            "variant_context": t("reference.variant_not_supplied"),
+            "variant_source": None, "variant_status": "not_supplied",
+            "limitations": entry.get("caveat"),
+            "gencc_assertions": associations,
+            "gencc_source": "https://thegencc.org/",
+            "gencc_version": book.get("_meta", {}).get("gencc_export_version"),
+            "notice": t("reference.notice")}
 
 
 def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
@@ -21,6 +52,12 @@ def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
     if variant.get("gene") != gene:
         variant = {}
     description = variant.get("description")
+    # Structured reference prose also feeds the shared report. Its combined
+    # wording is identical to the catalogue description, with a legacy fallback.
+    parts = [variant.get("reading"), variant.get("mechanism"),
+             variant.get("possible_influence")]
+    if all(isinstance(part, str) and part for part in parts):
+        description = " ".join(part for part in parts if isinstance(part, str))
     source = variant.get("source")
     # An explicitly held molecular mechanism may be shared as reference
     # context, even when the personalised sentence fails its clinical guard.
@@ -44,9 +81,20 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     context = row.get("reference_context")
     if not isinstance(context, dict):
         return []
-    lines = [t("reference.level", level=context.get("level") or "—"),
+    lines = [t("reference.gene_level") if context.get("variant_status") == "not_supplied"
+             else t("reference.level", level=context.get("level") or "—"),
              t("reference.gene", text=context.get("gene_function")),
              t("reference.variant", text=context.get("variant_context"))]
+    if context.get("limitations"):
+        lines.append(context["limitations"])
+    for assertion in context.get("gencc_assertions") or []:
+        lines.append(t("gencc.assertion", disease=assertion["disease_label"],
+                       classification=assertion["classification_label"],
+                       moi=assertion["moi_label"], submitter=assertion.get("submitter") or "—",
+                       date=assertion.get("curated_on") or "—"))
+    if context.get("gencc_assertions"):
+        lines.append(t("gencc.source", version=context.get("gencc_version") or "—",
+                       source=context.get("gencc_source")))
     if context.get("gene_source"):
         lines.append(t("reference.gene_source", source=context["gene_source"]))
     if context.get("variant_source"):

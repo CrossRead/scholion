@@ -102,7 +102,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from .. import core
-from ..panel_reference import reference_context
+from ..panel_reference import gene_reference_context, reference_context
 from ..conclusion_basis import guard_position
 from ..genome_routes import decision_route
 from ..i18n import CATALOGUES, plural as _plural, t as _t
@@ -290,11 +290,13 @@ def _base_rows(key: str) -> Dict[str, Any]:
         grade = [a for a in assertions if a["classification"] in FINDING_GRADE]
         weaker = sum(1 for a in assertions if a["classification"] in NOT_A_FINDING)
         codes = sorted({a["moi_code"] for a in (grade or assertions)})
+        context = gene_reference_context(gene, assertions)
         rows.append({"unit": "gene", "origin": "base", "gene": gene.upper(),
                      "mode": "monogenic", "kind": None,
                      "source": f"GenCC {version['version'] or ''}".strip(),
                      "text": None, "pending": False,
-                     "assertions": assertions,
+                     "assertions": context["gencc_assertions"],
+                     "reference_context": context if context.get("gene_source") else None,
                      "classifications": sorted({a["classification"] for a in assertions
                                                 if a["classification"]}),
                      "finding_grade": bool(grade),
@@ -1392,6 +1394,7 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
 
 # ---- registers --------------------------------------------------------------
 _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification", "state", "kind",
+                "classifications", "moi_codes",
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",

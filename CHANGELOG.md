@@ -40,6 +40,53 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.3 — 07.10.2026
+
+### What you can do now
+
+**Read more precise reference explanations across genetic panels.** Molecular
+mechanisms and bounded implications for 38 existing positions now identify
+primary studies, experimental models, negative findings and variant nomenclature.
+Gene function remains visible when a variant's influence is uncurated. Open a
+genetic panel in the application or use `scholion system` to read the same context.
+
+**Read gene biology throughout the GenCC system panels.** All 1,469 existing
+GenCC genes now carry source-bound reference descriptions. Russian views also
+translate the disease names, inheritance and validity labels. Each gene–disease
+assertion retains its organisation, date and original classification; conflicting
+assessments remain visible side by side. GenCC validity and Scholion A–E variant
+confidence are labelled separately, and a whole gene receives no variant grade.
+When a gene's reading status is unknown, its row shows an unread state instead
+of appearing to be a negative finding.
+
+**Distinguish variants and the tests they represent.** CYP2C19*17 has its own
+increased-transcription explanation, separate from the splice defect associated
+with *2. ADRB1 context includes the current beta-blocker guideline and its lack
+of an ADRB1-based recommendation. HLA tags remain distinct from direct typing;
+historical protein names and reference-strand changes are explained explicitly.
+
+### What this changes in the conclusions
+
+Reference wording is more specific about the studied tissue, population and
+endpoint. Clinical grades, personal interpretation checks, allele readings and
+calculated results are unchanged. A molecular experiment or biomarker association
+does not establish an individual diagnosis, supplement response or treatment.
+
+### What is retracted
+
+The generic reduced-function explanation beside CYP2C19*17 and the assertion
+that ADRB1 has no CPIC guideline are replaced. Vitamin D, selenium, iron,
+fatty-acid and thyroid explanations distinguish associations from unproven
+universal treatment effects. Reference and alternate alleles do not mean
+beneficial and adverse, respectively.
+
+### What needs recomputing
+
+Nothing. Reopen or regenerate panel reports to obtain the new reference wording.
+Stored genotypes, locus coordinates, measurements and clinical conclusions are
+unchanged; no alignment rescan or genome re-indexing is required. Earlier exported
+reports retain their previous wording.
+
 ## v0.6.2 — 06.10.2026
 
 ### What you can do now

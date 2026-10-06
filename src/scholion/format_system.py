@@ -31,7 +31,8 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
                   mode=mode, state=_t("system.state." + str(st)))
     else:
         head = _t("system.row.gene", gene=r.get("gene"), mode=mode,
-                  classifications=", ".join(r.get("classifications") or []) or "—",
+                  classifications="GenCC: " + (", ".join(_t("gencc.class." + value)
+                                               for value in r.get("classifications") or []) or "—"),
                   moi=", ".join(r.get("moi_codes") or [r.get("moi") or "—"]))
     marks = []
     if r.get("findings"):
@@ -113,9 +114,9 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
                              confidence=g.get("confidence") or "—",
                              depth=g.get("depth") if g.get("depth") is not None else "—"))
         for a in r.get("assertions") or []:
-            detail.append(_t("system.row.assertion", disease=a.get("disease") or "—",
-                             classification=a.get("classification") or "—",
-                             moi=a.get("moi") or "—", submitter=a.get("submitter") or "—",
+            detail.append(_t("system.row.assertion", disease=a.get("disease_label") or a.get("disease") or "—",
+                             classification=a.get("classification_label") or a.get("classification") or "—",
+                             moi=a.get("moi_label") or a.get("moi") or "—", submitter=a.get("submitter") or "—",
                              date=a.get("curated_on") or "—"))
         if r.get("signature") == "clinician":
             # The exception is marked on the row; the rule is counted in the

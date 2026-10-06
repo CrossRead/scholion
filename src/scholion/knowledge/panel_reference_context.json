@@ -4,7 +4,8 @@
     "purpose": "Reference gene biology and variant context, separate from personalised conclusions. Gene function does not establish an allele effect. Evidence levels remain those of the curated position; this file grants no analytical permission.",
     "sources": [
       "NCBI Gene / RefSeq gene summaries, retrieved 2026-10-06; bilingual functional paraphrases",
-      "Variant context paraphrased from the sources held by the curated panels; no individual risk coefficients or treatment instructions"
+      "Variant context paraphrased from the sources held by the curated panels; no individual risk coefficients or treatment instructions",
+      "Primary molecular and human studies checked 2026-10-06; variant-level references record DOI/PMID and access scope. This reference update does not change clinical grades or permissions."
     ],
     "source_tier": "curated_reference"
   },
@@ -50,8 +51,8 @@
       "retrieved": "2026-10-06",
       "scope": "gene_function",
       "description": {
-        "en": "The protein encoded by this gene, pre-angiotensinogen or angiotensinogen precursor, is expressed in the liver and is cleaved by the enzyme renin in response to lowered blood pressure. The resulting product, angiotensin I, is then cleaved by angiotensin converting enzyme (ACE) to generate the physiologically active peptide angiotensin II. The protein is involved in maintaining blood pressure, body fluid and electrolyte homeostasis, and in the pathogenesis of essential hypertension and preeclampsia.",
-        "ru": "Кодирует ангиотензиноген — предшественник пептидов ренин-ангиотензиновой системы."
+        "en": "Angiotensinogen is the renin substrate in the renin-angiotensin system; gene function does not establish an effect of a particular variant.",
+        "ru": "Ангиотензиноген служит субстратом ренина в ренин-ангиотензиновой системе; функция гена не устанавливает влияние конкретного варианта."
       }
     },
     "AGXT2": {
@@ -1454,8 +1455,8 @@
       "retrieved": "2026-10-06",
       "scope": "gene_function",
       "description": {
-        "en": "This gene encodes a member of the WD repeat protein family. WD repeats are minimally conserved regions of approximately 40 amino acids typically bracketed by gly-his and trp-asp (GH-WD), which may facilitate formation of heterotrimeric or multiprotein complexes. Members of this family are involved in a variety of cellular processes, including cell cycle progression, signal transduction, apoptosis, and gene regulation.",
-        "ru": "Белок с WD-повторами связан с белковыми взаимодействиями и клеточными процессами."
+        "en": "WDR12 is a component of the nucleolar PeBoW complex involved in ribosome maturation; gene experiments do not establish an effect of a particular SNP.",
+        "ru": "WDR12 — компонент ядрышкового комплекса PeBoW, участвующего в созревании рибосом; эксперимент с геном не устанавливает эффект отдельного SNP."
       }
     },
     "WNT4": {
@@ -1519,60 +1520,256 @@
       "source": "Bennet 2007 JAMA; Mahley 2009 (type III hyperlipoproteinaemia in ε2/ε2)"
     },
     "rs10455872": {
-      "description": {
-        "en": "The curated literature links the G allele to higher lipoprotein(a). The association does not measure Lp(a), identify all causal variation or determine an individual's cardiovascular risk.",
-        "ru": "Курируемая литература связывает аллель G с более высоким липопротеином(а). Ассоциация не измеряет Лп(а), не определяет все причинные варианты или индивидуальный сердечно-сосудистый риск."
-      },
       "gene": "LPA",
-      "source": "Clarke 2009 NEJM"
+      "source": "PMID:20032323 https://pubmed.ncbi.nlm.nih.gov/20032323/?dopt=Abstract; PMID:32681934 https://pubmed.ncbi.nlm.nih.gov/32681934/",
+      "description": {
+        "en": "A>G; intronic LPA marker. G is associated with smaller apo(a) isoforms, fewer KIV-2 repeats and higher Lp(a). Linkage to LPA architecture is not proof of an independent catalytic effect of the SNP. Associations with Lp(a) and coronary disease were studied mainly in European-ancestry populations. The SNP does not replace an Lp(a) measurement.",
+        "ru": "A>G; интронный маркер, не аминокислотная замена. G связан с меньшим числом KIV-2-повторов, меньшим размером apo(a) и более высоким Lp(a). Это маркер генетической архитектуры LPA, а не доказанная самостоятельная каталитическая замена. В изученных преимущественно европейских популяциях вариант связан с повышенным Lp(a) и коронарной болезнью. SNP не заменяет измеренный Lp(a); экспериментальный эффект не равен тромбозу человека."
+      },
+      "reading": {
+        "en": "A>G; intronic LPA marker.",
+        "ru": "A>G; интронный маркер, не аминокислотная замена."
+      },
+      "mechanism": {
+        "en": "G is associated with smaller apo(a) isoforms, fewer KIV-2 repeats and higher Lp(a). Linkage to LPA architecture is not proof of an independent catalytic effect of the SNP.",
+        "ru": "G связан с меньшим числом KIV-2-повторов, меньшим размером apo(a) и более высоким Lp(a). Это маркер генетической архитектуры LPA, а не доказанная самостоятельная каталитическая замена."
+      },
+      "possible_influence": {
+        "en": "Associations with Lp(a) and coronary disease were studied mainly in European-ancestry populations. The SNP does not replace an Lp(a) measurement.",
+        "ru": "В изученных преимущественно европейских популяциях вариант связан с повышенным Lp(a) и коронарной болезнью. SNP не заменяет измеренный Lp(a); экспериментальный эффект не равен тромбозу человека."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20032323/?dopt=Abstract",
+          "pmid": "20032323",
+          "access": "Opened primary PubMed record"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32681934/",
+          "pmid": "32681934",
+          "access": "Primary indexed abstract read; not opened separately"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs3798220": {
-      "description": {
-        "en": "LPA I4399M (C) is linked to higher lipoprotein(a) in the curated literature; a measured Lp(a) concentration cannot be inferred from this position.",
-        "ru": "LPA I4399M (C) связан с более высоким липопротеином(а) в курируемой литературе; измеренную концентрацию Лп(а) по этой позиции получить нельзя."
-      },
       "gene": "LPA",
-      "source": "Clarke 2009 NEJM"
+      "source": "PMID:20032323 https://pubmed.ncbi.nlm.nih.gov/20032323/?dopt=Abstract; PMID:28632940 DOI:10.1111/jth.13759 https://onlinelibrary.wiley.com/doi/full/10.1111/jth.13759; PMID:32681934 https://pubmed.ncbi.nlm.nih.gov/32681934/; https://www.ncbi.nlm.nih.gov/clinvar/RCV001251437/",
+      "description": {
+        "en": "GRCh38 g.160540105T>C; MANE NM_005577.4:c.5673A>G, p.Ile1891Met; historical I4399M is an official alias. Recombinant apo(a) I4399M altered fibrin structure and clot lysis in experiments; inhibition of plasminogen activation did not differ between forms. Human associations concern Lp(a) and coronary disease in the studied populations. Experimental clot effects are not a personal thrombosis prediction.",
+        "ru": "GRCh38 NC_000006.12:g.160540105T>C; MANE Select NM_005577.4:c.5673A>G; NP_005568.2:p.Ile1891Met. ClinVar связывает с этим же вариантом историческое имя I4399M; плюс-аллель C соответствует кодирующему G/Met. Рекомбинантный apo(a) I4399M изменял архитектуру фибрина и время лизиса в эксперименте; ингибирование активации плазминогена между формами не различалось. В изученных преимущественно европейских популяциях вариант связан с повышенным Lp(a) и коронарной болезнью. SNP не заменяет измеренный Lp(a); экспериментальный эффект не равен тромбозу человека."
+      },
+      "reading": {
+        "en": "GRCh38 g.160540105T>C; MANE NM_005577.4:c.5673A>G, p.Ile1891Met; historical I4399M is an official alias.",
+        "ru": "GRCh38 NC_000006.12:g.160540105T>C; MANE Select NM_005577.4:c.5673A>G; NP_005568.2:p.Ile1891Met. ClinVar связывает с этим же вариантом историческое имя I4399M; плюс-аллель C соответствует кодирующему G/Met."
+      },
+      "mechanism": {
+        "en": "Recombinant apo(a) I4399M altered fibrin structure and clot lysis in experiments; inhibition of plasminogen activation did not differ between forms.",
+        "ru": "Рекомбинантный apo(a) I4399M изменял архитектуру фибрина и время лизиса в эксперименте; ингибирование активации плазминогена между формами не различалось."
+      },
+      "possible_influence": {
+        "en": "Human associations concern Lp(a) and coronary disease in the studied populations. Experimental clot effects are not a personal thrombosis prediction.",
+        "ru": "В изученных преимущественно европейских популяциях вариант связан с повышенным Lp(a) и коронарной болезнью. SNP не заменяет измеренный Lp(a); экспериментальный эффект не равен тромбозу человека."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20032323/?dopt=Abstract",
+          "pmid": "20032323",
+          "access": "Opened primary PubMed record"
+        },
+        {
+          "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/jth.13759",
+          "pmid": "28632940",
+          "doi": "10.1111/jth.13759",
+          "access": "Opened full primary article"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/32681934/",
+          "pmid": "32681934",
+          "access": "Primary indexed abstract read; not opened separately"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV001251437/",
+          "access": "Opened official record and obtained direct HTML; exact HGVS confirmed"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1801253": {
-      "description": {
-        "en": "ADRB1 Arg389/Gly389 concerns beta-1 adrenergic receptor signalling. Functional and beta-blocker response studies do not establish a genotype-based treatment rule.",
-        "ru": "ADRB1 Arg389/Gly389 относится к передаче сигнала бета-1-адренорецептором. Функциональные исследования и исследования ответа на бета-блокаторы не устанавливают правило лечения по генотипу."
-      },
       "gene": "ADRB1",
-      "source": "the locus catalogue; no CPIC/DPWG guideline for beta-blockers"
+      "source": "PMID:16844790 DOI:10.1073/pnas.0509937103 https://pubmed.ncbi.nlm.nih.gov/16844790/; PMID:38951961 DOI:10.1002/cpt.3351 https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961.pdf",
+      "description": {
+        "en": "G>C; Gly389Arg, C encodes Arg389. Arg389 showed stronger agonist-dependent coupling in studied cells and isolated human ventricles. Pharmacological effects depend on the drug and model. The CPIC 2024 beta-blocker guideline includes ADRB1 but gives no ADRB1-based recommendation (CPIC level C, a different scale from Scholion). A universal blood-pressure or pulse response is not established.",
+        "ru": "G>C; p.Gly389Arg; C кодирует Arg389. Arg389 показывает более сильное агонист-зависимое сопряжение в исследованных клетках и изолированных желудочках; фармакологический эффект зависит от препарата и модели. Руководство CPIC 2024 существует, но для ADRB1 указывает недостаточность данных и отсутствие рекомендации по бета-блокаторам (CPIC C). Универсальный ответ давления/пульса по SNP не установлен."
+      },
+      "reading": {
+        "en": "G>C; Gly389Arg, C encodes Arg389.",
+        "ru": "G>C; p.Gly389Arg; C кодирует Arg389."
+      },
+      "mechanism": {
+        "en": "Arg389 showed stronger agonist-dependent coupling in studied cells and isolated human ventricles. Pharmacological effects depend on the drug and model.",
+        "ru": "Arg389 показывает более сильное агонист-зависимое сопряжение в исследованных клетках и изолированных желудочках; фармакологический эффект зависит от препарата и модели."
+      },
+      "possible_influence": {
+        "en": "The CPIC 2024 beta-blocker guideline includes ADRB1 but gives no ADRB1-based recommendation (CPIC level C, a different scale from Scholion). A universal blood-pressure or pulse response is not established.",
+        "ru": "Руководство CPIC 2024 существует, но для ADRB1 указывает недостаточность данных и отсутствие рекомендации по бета-блокаторам (CPIC C). Универсальный ответ давления/пульса по SNP не установлен."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16844790/",
+          "pmid": "16844790",
+          "doi": "10.1073/pnas.0509937103",
+          "access": "Primary indexed abstract read; direct opening blocked"
+        },
+        {
+          "url": "https://files.cpicpgx.org/data/guideline/publication/beta_blockers/2024/38951961.pdf",
+          "pmid": "38951961",
+          "doi": "10.1002/cpt.3351",
+          "access": "Opened full official guideline"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs5985": {
-      "description": {
-        "en": "F13A1 Val34Leu is linked to faster factor XIII activation and altered clot structure. The curated literature reports a venous thrombosis association; it is not a personal protective guarantee.",
-        "ru": "F13A1 Val34Leu связан с более быстрой активацией фактора XIII и изменением структуры сгустка. Курируемая литература описывает ассоциацию с венозным тромбозом; это не гарантия защиты человека."
-      },
       "gene": "F13A1",
-      "source": "PMID 16740590 (Wells 2006: factor XIII Val34Leu is protective against VTE, HuGE review and meta-analysis); PMID 12358922 (Van Hylckama Vlieg 2002)"
+      "source": "PMID:10910914 https://pubmed.ncbi.nlm.nih.gov/10910914/; PMID:31989767 DOI:10.1111/jth.14744 https://onlinelibrary.wiley.com/doi/full/10.1111/jth.14744; https://www.ncbi.nlm.nih.gov/clinvar/variation/16532/",
+      "description": {
+        "en": "GRCh38 C>A; coding c.103G>T; historical Val34Leu, MANE Val35Leu. The Leu form accelerates thrombin activation of factor XIII and the start of fibrin cross-linking, rather than necessarily increasing activity of fully activated enzyme. Clot structure and mass depend on fibrinogen concentration. A population association does not guarantee personal protection from thrombosis.",
+        "ru": "GRCh38 C>A; кодирующая цепь c.103G>T; историческое Val34Leu, MANE p.Val35Leu. Leu-вариант ускоряет активацию тромбином и начало сшивки фибрина. Это не равнозначно повышению активности уже полностью активированного фермента. Изменение структуры и массы сгустка зависит от концентрации фибриногена. Популяционная защитная ассоциация не гарантирует индивидуальную защиту."
+      },
+      "reading": {
+        "en": "GRCh38 C>A; coding c.103G>T; historical Val34Leu, MANE Val35Leu.",
+        "ru": "GRCh38 C>A; кодирующая цепь c.103G>T; историческое Val34Leu, MANE p.Val35Leu."
+      },
+      "mechanism": {
+        "en": "The Leu form accelerates thrombin activation of factor XIII and the start of fibrin cross-linking, rather than necessarily increasing activity of fully activated enzyme.",
+        "ru": "Leu-вариант ускоряет активацию тромбином и начало сшивки фибрина. Это не равнозначно повышению активности уже полностью активированного фермента."
+      },
+      "possible_influence": {
+        "en": "Clot structure and mass depend on fibrinogen concentration. A population association does not guarantee personal protection from thrombosis.",
+        "ru": "Изменение структуры и массы сгустка зависит от концентрации фибриногена. Популяционная защитная ассоциация не гарантирует индивидуальную защиту."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10910914/",
+          "pmid": "10910914",
+          "access": "Primary indexed abstract read; open returned an empty/challenge page"
+        },
+        {
+          "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/jth.14744",
+          "pmid": "31989767",
+          "doi": "10.1111/jth.14744",
+          "access": "Opened full primary article"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/16532/",
+          "access": "Opened official variant record"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1126643": {
-      "description": {
-        "en": "ITGA2 C807T is linked to platelet collagen-receptor expression and an ischaemic stroke association in the curated literature. Receptor biology is not an individual event prediction.",
-        "ru": "ITGA2 C807T связан с экспрессией рецептора коллагена на тромбоцитах и ассоциацией с ишемическим инсультом в курируемой литературе. Биология рецептора не предсказывает событие у человека."
-      },
       "gene": "ITGA2",
-      "source": "PMID 16820192 (Nikolopoulos 2007: ITGA2 C807T and ischemic stroke, meta-analysis); PMID 26556301 (Nissinen 2016: platelet response and α2β1 integrin)"
+      "source": "PMID:10942388 https://pubmed.ncbi.nlm.nih.gov/10942388/; PMID:14967411 DOI:10.1016/j.thromres.2003.12.006 https://pubmed.ncbi.nlm.nih.gov/14967411/",
+      "description": {
+        "en": "C807T; a synonymous marker, not an amino-acid substitution. T-containing haplotypes were associated with greater platelet alpha2beta1 receptor density. Collagen adhesion also depends on von Willebrand factor and flow; causality of this synonymous SNP is unproven. Receptor-density associations do not establish a personal stroke risk or a universal stronger effect with two T copies.",
+        "ru": "C>T, историческое C807T; синонимический маркер, не аминокислотная замена. T-содержащие гаплотипы связаны с большей плотностью α2β1; адгезия к коллагену зависит также от vWF и условий потока. Прямая причинность самого синонимического SNP не установлена. Есть функциональная ассоциация рецепторной плотности. Предсказание инсульта или универсального усиления эффекта при TT из этого не следует."
+      },
+      "reading": {
+        "en": "C807T; a synonymous marker, not an amino-acid substitution.",
+        "ru": "C>T, историческое C807T; синонимический маркер, не аминокислотная замена."
+      },
+      "mechanism": {
+        "en": "T-containing haplotypes were associated with greater platelet alpha2beta1 receptor density. Collagen adhesion also depends on von Willebrand factor and flow; causality of this synonymous SNP is unproven.",
+        "ru": "T-содержащие гаплотипы связаны с большей плотностью α2β1; адгезия к коллагену зависит также от vWF и условий потока. Прямая причинность самого синонимического SNP не установлена."
+      },
+      "possible_influence": {
+        "en": "Receptor-density associations do not establish a personal stroke risk or a universal stronger effect with two T copies.",
+        "ru": "Есть функциональная ассоциация рецепторной плотности. Предсказание инсульта или универсального усиления эффекта при TT из этого не следует."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10942388/",
+          "pmid": "10942388",
+          "access": "Primary abstract, title and author metadata verified through NCBI EFetch XML; indexed publisher content read. Full primary article not obtained."
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14967411/",
+          "pmid": "14967411",
+          "doi": "10.1016/j.thromres.2003.12.006",
+          "access": "Abstract, authors, title and DOI verified through NCBI EFetch XML; journal record PubDate 2003. Full primary article not obtained."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs5918": {
-      "description": {
-        "en": "ITGB3 PlA1/PlA2 concerns platelet integrin GPIIIa; the curated literature reports associations with arterial events. A consistent personal effect or treatment rule is not established by this row.",
-        "ru": "ITGB3 PlA1/PlA2 относится к тромбоцитарному интегрину GPIIIa; курируемая литература описывает ассоциации с артериальными событиями. Эта строка не устанавливает устойчивый индивидуальный эффект или правило лечения."
-      },
       "gene": "ITGB3",
-      "source": "PMID 11341496 (Di Castelnuovo 2001: PlA1/PlA2 and coronary risk, meta-analysis); PMID 38920993 (Coadă 2024: PlA1/A2 and stroke, updated meta-analysis); PMID 23834376"
+      "source": "DOI:10.1182/blood.v97.10.3093 https://www.sciencedirect.com/science/article/pii/S0006497120556292",
+      "description": {
+        "en": "T>C; precursor Leu59Pro, historical mature-protein Leu33Pro; HPA-1b/PlA2. This substitution specifies the HPA-1b alloantigen. Platelet functional results differ; one primary experiment found no general increase in reactivity or fibrinogen binding. These functional data do not establish an individual event risk or antiplatelet response. Clinical-event claims need their own primary evidence.",
+        "ru": "T>C; p.Leu59Pro предшественника, историческое Leu33Pro зрелого белка; HPA-1b/PlA2. Замена определяет аллоантиген HPA-1b. Опыты с тромбоцитами дали неодинаковые результаты; в одном первичном исследовании общей гиперреактивности и усиленного связывания фибриногена не обнаружено. Функциональные результаты неодинаковы. Клинические события требуют отдельной первичной проверки; по одному варианту не определяются личный риск и ответ на антиагрегант."
+      },
+      "reading": {
+        "en": "T>C; precursor Leu59Pro, historical mature-protein Leu33Pro; HPA-1b/PlA2.",
+        "ru": "T>C; p.Leu59Pro предшественника, историческое Leu33Pro зрелого белка; HPA-1b/PlA2."
+      },
+      "mechanism": {
+        "en": "This substitution specifies the HPA-1b alloantigen. Platelet functional results differ; one primary experiment found no general increase in reactivity or fibrinogen binding.",
+        "ru": "Замена определяет аллоантиген HPA-1b. Опыты с тромбоцитами дали неодинаковые результаты; в одном первичном исследовании общей гиперреактивности и усиленного связывания фибриногена не обнаружено."
+      },
+      "possible_influence": {
+        "en": "These functional data do not establish an individual event risk or antiplatelet response. Clinical-event claims need their own primary evidence.",
+        "ru": "Функциональные результаты неодинаковы. Клинические события требуют отдельной первичной проверки; по одному варианту не определяются личный риск и ответ на антиагрегант."
+      },
+      "references": [
+        {
+          "url": "https://www.sciencedirect.com/science/article/pii/S0006497120556292",
+          "doi": "10.1182/blood.v97.10.3093",
+          "access": "Extensive primary publisher indexed full content read; direct opening failed"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1800790": {
-      "description": {
-        "en": "FGB −455G/A is a promoter variant linked to fibrinogen beta-chain synthesis and circulating fibrinogen. The association is not a measurement of this person's fibrinogen.",
-        "ru": "FGB −455G/A — промоторный вариант, связанный с синтезом бета-цепи фибриногена и циркулирующим фибриногеном. Ассоциация не измеряет фибриноген этого человека."
-      },
       "gene": "FGB",
-      "source": "PMID 22388766 (Ken-Dror 2012: a genetic instrument for Mendelian randomization of fibrinogen); PMID 39674435 (Ken-Dror 2025)"
+      "source": "PMID:10591688 DOI:10.1161/01.atv.19.12.3063 https://pubmed.ncbi.nlm.nih.gov/10591688/; DOI:10.1172/JCI119499 https://www.jci.org/articles/view/119499",
+      "description": {
+        "en": "Historical promoter -455G>A. The -455A promoter increased basal transcription in HepG2 experiments. Human associations concern fibrinogen concentration; linked variants and inflammation also matter. Higher fibrinogen in studied populations is not a measurement in the person or proof of independently increased coronary risk; a population study did not find the genotype predictive of ischaemic heart disease.",
+        "ru": "GRCh38 G>A; промоторное историческое -455G>A. В HepG2 промотор с -455A показал повышенную базальную транскрипцию; в людях аллель связан с уровнем фибриногена. Другие сцепленные варианты и воспаление также влияют. В исследованных популяциях A связан с более высоким фибриногеном, но это не измерение концентрации и не доказательство самостоятельного повышения риска ишемической болезни."
+      },
+      "reading": {
+        "en": "Historical promoter -455G>A.",
+        "ru": "GRCh38 G>A; промоторное историческое -455G>A."
+      },
+      "mechanism": {
+        "en": "The -455A promoter increased basal transcription in HepG2 experiments. Human associations concern fibrinogen concentration; linked variants and inflammation also matter.",
+        "ru": "В HepG2 промотор с -455A показал повышенную базальную транскрипцию; в людях аллель связан с уровнем фибриногена. Другие сцепленные варианты и воспаление также влияют."
+      },
+      "possible_influence": {
+        "en": "Higher fibrinogen in studied populations is not a measurement in the person or proof of independently increased coronary risk; a population study did not find the genotype predictive of ischaemic heart disease.",
+        "ru": "В исследованных популяциях A связан с более высоким фибриногеном, но это не измерение концентрации и не доказательство самостоятельного повышения риска ишемической болезни."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/10591688/",
+          "pmid": "10591688",
+          "doi": "10.1161/01.atv.19.12.3063",
+          "access": "Primary indexed abstract read; direct full opening blocked"
+        },
+        {
+          "url": "https://www.jci.org/articles/view/119499",
+          "doi": "10.1172/JCI119499",
+          "access": "Opened primary article"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1050828": {
       "gene": "G6PD",
@@ -1775,20 +1972,94 @@
       "source": "PMID 18978792 (Cooper 2008: GWAS meta-analysis of type 1 diabetes loci); PMID 25661663 (Kiani 2015: 32 type 1 diabetes loci in Pakistani patients)"
     },
     "rs1801133": {
-      "description": {
-        "en": "MTHFR C677T concerns folate-dependent one-carbon metabolism; the curated literature links T to higher homocysteine especially with low folate. Genotype does not measure folate or homocysteine.",
-        "ru": "MTHFR C677T относится к фолат-зависимому одноуглеродному обмену; курируемая литература связывает T с более высоким гомоцистеином особенно при низком фолате. Генотип не измеряет фолат или гомоцистеин."
-      },
       "gene": "MTHFR",
-      "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)"
+      "source": "PMID:11742092 DOI:10.1073/pnas.261469998 https://pubmed.ncbi.nlm.nih.gov/11742092/; PMID:9719624 DOI:10.1006/mgme.1998.2714 https://pubmed.ncbi.nlm.nih.gov/9719624/; DOI:10.1016/j.gim.2025.101466 https://www.sciencedirect.com/science/article/pii/S1098360025001133; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801133",
+      "description": {
+        "en": "GRCh38 g.11796321G>A; NM_005957.5:c.665C>T, Ala222Val; historical C677T. Ala222Val increases the tendency of purified MTHFR to lose its FAD cofactor. This is folate-pathway context, not a thrombophilia diagnosis or a treatment rule.",
+        "ru": "NC_000001.11:g.11796321G>A; NM_005957.5:c.665C>T; p.Ala222Val. Историческое C677T. Геномный эффект-аллель A. Ala222Val повышает склонность очищенного фермента терять FAD. Контекст фолатного обмена; не тромбофилия и не правило терапии."
+      },
+      "reading": {
+        "en": "GRCh38 g.11796321G>A; NM_005957.5:c.665C>T, Ala222Val; historical C677T.",
+        "ru": "NC_000001.11:g.11796321G>A; NM_005957.5:c.665C>T; p.Ala222Val. Историческое C677T. Геномный эффект-аллель A."
+      },
+      "mechanism": {
+        "en": "Ala222Val increases the tendency of purified MTHFR to lose its FAD cofactor.",
+        "ru": "Ala222Val повышает склонность очищенного фермента терять FAD."
+      },
+      "possible_influence": {
+        "en": "This is folate-pathway context, not a thrombophilia diagnosis or a treatment rule.",
+        "ru": "Контекст фолатного обмена; не тромбофилия и не правило терапии."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11742092/",
+          "pmid": "11742092",
+          "doi": "10.1073/pnas.261469998",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9719624/",
+          "pmid": "9719624",
+          "doi": "10.1006/mgme.1998.2714",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://www.sciencedirect.com/science/article/pii/S1098360025001133",
+          "doi": "10.1016/j.gim.2025.101466",
+          "access": "Publisher indexed full-text section; direct fetch returned internal error"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801133",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1801131": {
-      "description": {
-        "en": "MTHFR A1298C is described as affecting enzyme activity; a reproducible independent effect on homocysteine is not established by the curated evidence.",
-        "ru": "MTHFR A1298C описан как влияющий на активность фермента; курируемые данные не устанавливают воспроизводимый независимый эффект на гомоцистеин."
-      },
       "gene": "MTHFR",
-      "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)"
+      "source": "PMID:9719624 DOI:10.1006/mgme.1998.2714 https://pubmed.ncbi.nlm.nih.gov/9719624/; PMID:11742092 DOI:10.1073/pnas.261469998 https://pubmed.ncbi.nlm.nih.gov/11742092/; DOI:10.1016/j.gim.2025.101466 https://www.sciencedirect.com/science/article/pii/S1098360025001133; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801131",
+      "description": {
+        "en": "GRCh38 g.11794419T>G; NM_005957.5:c.1286A>C, Glu429Ala; historical A1298C. Glu429Ala was associated with lower activity in lymphocytes, whereas purified recombinant protein did not differ from wild type. The result depends on the experimental model and is not equivalent to Ala222Val or a single universal percentage of enzyme loss.",
+        "ru": "NC_000001.11:g.11794419T>G; NM_005957.5:c.1286A>C; p.Glu429Ala. Историческое A1298C. Геномный эффект-аллель G. Glu429Ala: снижение в лимфоцитах, но очищенный рекомбинантный белок не отличался от WT. Механизм зависит от модели; не равнозначен Ala222Val."
+      },
+      "reading": {
+        "en": "GRCh38 g.11794419T>G; NM_005957.5:c.1286A>C, Glu429Ala; historical A1298C.",
+        "ru": "NC_000001.11:g.11794419T>G; NM_005957.5:c.1286A>C; p.Glu429Ala. Историческое A1298C. Геномный эффект-аллель G."
+      },
+      "mechanism": {
+        "en": "Glu429Ala was associated with lower activity in lymphocytes, whereas purified recombinant protein did not differ from wild type.",
+        "ru": "Glu429Ala: снижение в лимфоцитах, но очищенный рекомбинантный белок не отличался от WT."
+      },
+      "possible_influence": {
+        "en": "The result depends on the experimental model and is not equivalent to Ala222Val or a single universal percentage of enzyme loss.",
+        "ru": "Механизм зависит от модели; не равнозначен Ala222Val."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9719624/",
+          "pmid": "9719624",
+          "doi": "10.1006/mgme.1998.2714",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11742092/",
+          "pmid": "11742092",
+          "doi": "10.1073/pnas.261469998",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://www.sciencedirect.com/science/article/pii/S1098360025001133",
+          "doi": "10.1016/j.gim.2025.101466",
+          "access": "Publisher indexed full-text section; direct fetch returned internal error"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801131",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1800462": {
       "gene": "TPMT",
@@ -1815,36 +2086,139 @@
       "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
     },
     "rs4349859": {
-      "description": {
-        "en": "This is a tag for HLA-B*27, not direct HLA typing. The tag's performance depends on population and cannot establish the allele or an inflammatory diagnosis on its own.",
-        "ru": "Это маркер HLA-B*27, а не прямое HLA-типирование. Надёжность маркера зависит от популяции; сам он не устанавливает аллель или воспалительный диагноз."
-      },
       "gene": "HLA-B",
-      "source": "Evans 2011 Nat Genet (HLA-B27 tag SNP)"
+      "source": "PMID:31902620 DOI:10.1016/j.pathol.2019.09.013 https://pubmed.ncbi.nlm.nih.gov/31902620/; DOI:10.1038/ng.873 https://www.nature.com/articles/ng.873",
+      "description": {
+        "en": "GRCh38 chr6:31398010 G>A; HLA-B*27 tag. This is a linked MICA/HLA-B-region marker, not direct typing of the HLA-B*27 allele. In 543 heterogeneous samples the tag had 78.6% sensitivity and 98.7% specificity. Performance depends on population and subtype; a negative tag does not universally exclude HLA-B*27 and a positive tag is not a diagnosis.",
+        "ru": "GRCh38 chr6:31398010 G>A. rs4349859 -сцепленный маркер региона MICA/HLA-B, а не непосредственно аллель HLA-B*27; белок HLA-B этим SNP не заменяется. Может быть информативен как тег в валидированных популяциях. В 543 разнородных образцах NSW чувствительность составила 78,6%; отрицательный тег не исключает HLA-B*27, положительный не устанавливает диагноз."
+      },
+      "reading": {
+        "en": "GRCh38 chr6:31398010 G>A; HLA-B*27 tag.",
+        "ru": "GRCh38 chr6:31398010 G>A."
+      },
+      "mechanism": {
+        "en": "This is a linked MICA/HLA-B-region marker, not direct typing of the HLA-B*27 allele.",
+        "ru": "rs4349859 -сцепленный маркер региона MICA/HLA-B, а не непосредственно аллель HLA-B*27; белок HLA-B этим SNP не заменяется."
+      },
+      "possible_influence": {
+        "en": "In 543 heterogeneous samples the tag had 78.6% sensitivity and 98.7% specificity. Performance depends on population and subtype; a negative tag does not universally exclude HLA-B*27 and a positive tag is not a diagnosis.",
+        "ru": "Может быть информативен как тег в валидированных популяциях. В 543 разнородных образцах NSW чувствительность составила 78,6%; отрицательный тег не исключает HLA-B*27, положительный не устанавливает диагноз."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31902620/",
+          "pmid": "31902620",
+          "doi": "10.1016/j.pathol.2019.09.013",
+          "access": "opened primary page; full/abstract text obtained"
+        },
+        {
+          "url": "https://www.nature.com/articles/ng.873",
+          "doi": "10.1038/ng.873",
+          "access": "Primary publisher indexed metadata fetched; direct openfailed; no exactperformancequoted from this source"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1205": {
-      "description": {
-        "en": "The curated literature relates this CRP position to baseline CRP; allele direction is unresolved in this catalogue. Gene biology cannot supply that missing direction.",
-        "ru": "Курируемая литература связывает эту позицию CRP с исходным СРБ; направление эффекта аллеля в каталоге не разрешено. Биология гена не заменяет отсутствующее направление."
-      },
       "gene": "CRP",
-      "source": "Kathiresan 2006 Circulation (CRP gene variants and CRP level)"
+      "source": "PMID:40100756 DOI:10.1093/rheumatology/keaf069 https://pubmed.ncbi.nlm.nih.gov/40100756/; DOI:10.1371/journal.pmed.1000341 https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1000341",
+      "description": {
+        "en": "Catalogue C>T; T corresponds to A in opposite-strand G>A publications. The marker is associated with variation in measured CRP concentration; its independent causal molecular mechanism is not established. Lower CRP in studied UK Biobank and rheumatoid-arthritis cohorts does not necessarily mean lower disease activity. It does not provide a personal CRP or DAS28 correction.",
+        "ru": "Каталог C>T, T соответствует противоположно-цепочечному A в публикациях G>A; соблюдать явную цепь. rs1205 маркирует генетическую вариабельность концентрации CRP; точный самостоятельный молекулярный механизм не установлен. Он не является измерением общей силы воспаления. В UKB и исследованных регистрах ревматоидного артрита T связан с более низким CRP. Это может влиять на CRP-содержащие оценки активности, без обязательного снижения самой активности болезни."
+      },
+      "reading": {
+        "en": "Catalogue C>T; T corresponds to A in opposite-strand G>A publications.",
+        "ru": "Каталог C>T, T соответствует противоположно-цепочечному A в публикациях G>A; соблюдать явную цепь."
+      },
+      "mechanism": {
+        "en": "The marker is associated with variation in measured CRP concentration; its independent causal molecular mechanism is not established.",
+        "ru": "rs1205 маркирует генетическую вариабельность концентрации CRP; точный самостоятельный молекулярный механизм не установлен. Он не является измерением общей силы воспаления."
+      },
+      "possible_influence": {
+        "en": "Lower CRP in studied UK Biobank and rheumatoid-arthritis cohorts does not necessarily mean lower disease activity. It does not provide a personal CRP or DAS28 correction.",
+        "ru": "В UKB и исследованных регистрах ревматоидного артрита T связан с более низким CRP. Это может влиять на CRP-содержащие оценки активности, без обязательного снижения самой активности болезни."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40100756/",
+          "pmid": "40100756",
+          "doi": "10.1093/rheumatology/keaf069",
+          "access": "Abstract and metadata verified directly through NCBI EFetch XML and Europe PMC API; DOI/title/publication dates independently matched to publisher-deposited Crossref metadata. Full primary article not re-opened in final round."
+        },
+        {
+          "url": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1000341",
+          "doi": "10.1371/journal.pmed.1000341",
+          "access": "Opened full primary article"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs2228145": {
-      "description": {
-        "en": "IL6R Asp358Ala is linked to soluble IL-6 receptor and CRP levels; these are pathway and population associations, not an individual's inflammatory state.",
-        "ru": "IL6R Asp358Ala связан с растворимым рецептором IL-6 и уровнем СРБ; это связи пути и популяционные ассоциации, а не воспалительное состояние человека."
-      },
       "gene": "IL6R",
-      "source": "Ferreira 2013 PLoS Genet (IL6R Asp358Ala)"
+      "source": "DOI:10.1371/journal.pgen.1003444 https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003444",
+      "description": {
+        "en": "A>C; Asp358Ala, C encodes Ala358. Ala358 was associated with more soluble and less cell-surface IL-6 receptor and weaker classical STAT1/STAT3 responses in the studied immune cells. Classical signalling and trans-signalling differ. This is not a universal anti-inflammatory genotype or proof of absent inflammation.",
+        "ru": "A>C; Asp358Ala; C кодирует Ala358. Ala358 связан с меньшим поверхностным IL-6R и большей растворимой формой; в проверенных иммунных клетках ослаблен классический ответ STAT1/STAT3 на IL-6. Направление изменения зависит от компонента пути и заболевания: нельзя называть этот генотип универсально «противовоспалительным». Более низкий CRP не означает отсутствия воспаления."
+      },
+      "reading": {
+        "en": "A>C; Asp358Ala, C encodes Ala358.",
+        "ru": "A>C; Asp358Ala; C кодирует Ala358."
+      },
+      "mechanism": {
+        "en": "Ala358 was associated with more soluble and less cell-surface IL-6 receptor and weaker classical STAT1/STAT3 responses in the studied immune cells.",
+        "ru": "Ala358 связан с меньшим поверхностным IL-6R и большей растворимой формой; в проверенных иммунных клетках ослаблен классический ответ STAT1/STAT3 на IL-6."
+      },
+      "possible_influence": {
+        "en": "Classical signalling and trans-signalling differ. This is not a universal anti-inflammatory genotype or proof of absent inflammation.",
+        "ru": "Направление изменения зависит от компонента пути и заболевания: нельзя называть этот генотип универсально «противовоспалительным». Более низкий CRP не означает отсутствия воспаления."
+      },
+      "references": [
+        {
+          "url": "https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003444",
+          "doi": "10.1371/journal.pgen.1003444",
+          "access": "Opened full primary article"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs225014": {
-      "description": {
-        "en": "DIO2 Thr92Ala concerns type-2 deiodinase and thyroid-hormone activation. Clinical associations and response to thyroid therapy are inconsistent; genotype alone does not determine T3 supply.",
-        "ru": "DIO2 Thr92Ala относится к дейодиназе 2 типа и активации тиреоидных гормонов. Клинические ассоциации и ответ на тиреоидную терапию неоднородны; генотип сам не определяет обеспечение T3."
-      },
       "gene": "DIO2",
-      "source": "Panicker 2009 JCEM (DIO2 Thr92Ala and LT4/LT3 response); ETA 2012 guideline"
+      "source": "PMID:19190113 DOI:10.1210/jc.2008-1301 https://pubmed.ncbi.nlm.nih.gov/19190113/; PMID:37740545 DOI:10.1210/clinem/dgad556 https://academic.oup.com/jcem/article/109/2/e613/7280922",
+      "description": {
+        "en": "GRCh38 chr14:80203237 T>C; historical DIO2 Thr92Ala. Reported cellular localisation and tissue effects do not establish a universal reduction in tissue T3 availability. An early secondary treatment analysis suggested an association, whereas later UK Biobank work did not support persistent symptoms on LT4. The latter did not test LT3 response; genotype does not determine treatment.",
+        "ru": "GRCh38 chr14:80203237 T>C. Историческое Thr92Ala; точный транскриптный HGVS требует отдельного закрепления. Thr92Ala -аминокислотная замена; эффекты на клеточную локализацию и тканевые пути не равнозначны доказанному уменьшению общего обеспечения T3. Вторичный анализ 552 пациентов 2009 дал сигнал самочувствия/ответа на T4+T3; последующее исследование UKBiobank не поддержало роль варианта в симптомах на LT4. Клинические данные неоднородны; генотип не определяет терапию."
+      },
+      "reading": {
+        "en": "GRCh38 chr14:80203237 T>C; historical DIO2 Thr92Ala.",
+        "ru": "GRCh38 chr14:80203237 T>C. Историческое Thr92Ala; точный транскриптный HGVS требует отдельного закрепления."
+      },
+      "mechanism": {
+        "en": "Reported cellular localisation and tissue effects do not establish a universal reduction in tissue T3 availability.",
+        "ru": "Thr92Ala -аминокислотная замена; эффекты на клеточную локализацию и тканевые пути не равнозначны доказанному уменьшению общего обеспечения T3."
+      },
+      "possible_influence": {
+        "en": "An early secondary treatment analysis suggested an association, whereas later UK Biobank work did not support persistent symptoms on LT4. The latter did not test LT3 response; genotype does not determine treatment.",
+        "ru": "Вторичный анализ 552 пациентов 2009 дал сигнал самочувствия/ответа на T4+T3; последующее исследование UKBiobank не поддержало роль варианта в симптомах на LT4. Клинические данные неоднородны; генотип не определяет терапию."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19190113/",
+          "pmid": "19190113",
+          "doi": "10.1210/jc.2008-1301",
+          "access": "opened primary page; full/abstract text obtained"
+        },
+        {
+          "url": "https://academic.oup.com/jcem/article/109/2/e613/7280922",
+          "pmid": "37740545",
+          "doi": "10.1210/clinem/dgad556",
+          "access": "Official publisher indexed discussion fetched; directopen redirectedinaccessible; do not repeat unverifiedsamplecounts"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs2235544": {
       "description": {
@@ -1895,12 +2269,44 @@
       "source": "PMID 24722205 (Kwak 2014: GWAS on thyroid function and anti-TPO antibodies in Koreans); PMID 28845025 (Tomari 2017: TPO polymorphisms and AITD); PMID 38542286 (Lacka 2024)"
     },
     "rs4680": {
+      "gene": "COMT",
+      "source": "PMID:15457404 DOI:10.1086/425589 https://pubmed.ncbi.nlm.nih.gov/15457404/; PMID:33387367 DOI:10.1002/cpt.2149 https://pubmed.ncbi.nlm.nih.gov/33387367/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4680",
       "description": {
-        "en": "COMT Val158Met concerns enzyme thermolability and catecholamine methylation. Clinical and behavioural associations are inconsistent; CPIC gives no opioid dosing recommendation from COMT genotype.",
-        "ru": "COMT Val158Met относится к термолабильности фермента и метилированию катехоламинов. Клинические и поведенческие ассоциации неоднородны; CPIC не даёт рекомендаций по дозированию опиоидов по генотипу COMT."
+        "en": "GRCh38 g.19963748G>A; NM_000754.4:c.472G>A, Val158Met; Val108Met is the soluble isoform. Met158/Met108 is associated with lower protein stability or activity in studied tissues. A molecular effect does not measure personal neurotransmitter concentrations or establish opioid response; CPIC supplies no COMT-based opioid dosing recommendation.",
+        "ru": "NC_000022.11:g.19963748G>A; NM_000754.4:c.472G>A; p.Val158Met; Val108Met относится к растворимой изоформе. Met158/Met108 связан с меньшей стабильностью/активностью белка в тканевых исследованиях. Молекулярный эффект установлен; индивидуальные нейромедиаторы и ответ на опиоид не определяются."
       },
-      "source": "CPIC opioid guideline 2021; PMID:33387367; DOI:10.1002/cpt.2149",
-      "gene": "COMT"
+      "reading": {
+        "en": "GRCh38 g.19963748G>A; NM_000754.4:c.472G>A, Val158Met; Val108Met is the soluble isoform.",
+        "ru": "NC_000022.11:g.19963748G>A; NM_000754.4:c.472G>A; p.Val158Met; Val108Met относится к растворимой изоформе."
+      },
+      "mechanism": {
+        "en": "Met158/Met108 is associated with lower protein stability or activity in studied tissues.",
+        "ru": "Met158/Met108 связан с меньшей стабильностью/активностью белка в тканевых исследованиях."
+      },
+      "possible_influence": {
+        "en": "A molecular effect does not measure personal neurotransmitter concentrations or establish opioid response; CPIC supplies no COMT-based opioid dosing recommendation.",
+        "ru": "Молекулярный эффект установлен; индивидуальные нейромедиаторы и ответ на опиоид не определяются."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15457404/",
+          "pmid": "15457404",
+          "doi": "10.1086/425589",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33387367/",
+          "pmid": "33387367",
+          "doi": "10.1002/cpt.2149",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4680",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs1799941": {
       "description": {
@@ -2143,68 +2549,275 @@
       "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature"
     },
     "rs2282679": {
-      "description": {
-        "en": "The GC locus is associated with circulating 25-OH vitamin D; GC transports vitamin D metabolites. This SNP does not measure deficiency or determine a supplement dose.",
-        "ru": "Локус GC связан с циркулирующим 25-OH витамином D; GC переносит метаболиты витамина D. Этот SNP не измеряет дефицит и не определяет дозу добавки."
-      },
       "gene": "GC",
-      "source": "Wang 2010 Lancet (GWAS of 25-hydroxyvitamin D)"
+      "source": "PMID:20541252 DOI:10.1016/S0140-6736(10)60588-0 https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/; PMID:36579074 DOI:10.3389/fnut.2022.1061496 https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2022.1061496/full",
+      "description": {
+        "en": "GRCh38 chr4:71742666 T>G. An intronic GC marker is associated with total 25(OH)D; it does not measure free vitamin D or tissue action. A one-year analysis in 300 children found no overall genotype-by-time-by-dose interaction. Population association does not define supplement response, deficiency or dose.",
+        "ru": "GRCh38 chr4:71742666 T>G. Интронный маркер GC связан с общим 25(OH)D; это не измерение свободной фракции или тканевого действия. В GWASG связан с более низким общим 25(OH)D. Связь с приростом после добавки неоднородна и зависит от исследования; SNP не определяет дефицит или дозу."
+      },
+      "reading": {
+        "en": "GRCh38 chr4:71742666 T>G.",
+        "ru": "GRCh38 chr4:71742666 T>G."
+      },
+      "mechanism": {
+        "en": "An intronic GC marker is associated with total 25(OH)D; it does not measure free vitamin D or tissue action.",
+        "ru": "Интронный маркер GC связан с общим 25(OH)D; это не измерение свободной фракции или тканевого действия."
+      },
+      "possible_influence": {
+        "en": "A one-year analysis in 300 children found no overall genotype-by-time-by-dose interaction. Population association does not define supplement response, deficiency or dose.",
+        "ru": "В GWASG связан с более низким общим 25(OH)D. Связь с приростом после добавки неоднородна и зависит от исследования; SNP не определяет дефицит или дозу."
+      },
+      "references": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/",
+          "pmid": "20541252",
+          "doi": "10.1016/S0140-6736(10)60588-0",
+          "access": "Primary indexed abstract fetched; direct PMC open challenged"
+        },
+        {
+          "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2022.1061496/full",
+          "pmid": "36579074",
+          "doi": "10.3389/fnut.2022.1061496",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs10741657": {
-      "description": {
-        "en": "The CYP2R1 locus is associated with 25-OH vitamin D; vitamin D 25-hydroxylation is the gene pathway. An individual's enzyme activity is not measured by this association.",
-        "ru": "Локус CYP2R1 связан с 25-OH витамином D; путь гена — 25-гидроксилирование витамина D. Ассоциация не измеряет активность фермента человека."
-      },
       "gene": "CYP2R1",
-      "source": "Wang 2010 Lancet"
+      "source": "PMID:20541252 DOI:10.1016/S0140-6736(10)60588-0 https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/",
+      "description": {
+        "en": "GRCh38 chr11:14893332 A>G. This noncoding CYP2R1-region marker is associated with total 25(OH)D in GWAS; that design does not prove the causal molecular chain of the index SNP. The studied G association concerns lower total 25(OH)D in populations, not a measured personal effect or supplement response.",
+        "ru": "GRCh38 chr11:14893332 A>G. Некодирующий маркер области CYP2R1; связь с общим 25(OH)D описана в GWAS, конкретная причинная цепочка этого SNP не доказана использованным источником. В исследованных популяциях аллель G связан с более низким 25(OH)D; величина личного эффекта и ответ на добавку этим не измеряются."
+      },
+      "reading": {
+        "en": "GRCh38 chr11:14893332 A>G.",
+        "ru": "GRCh38 chr11:14893332 A>G."
+      },
+      "mechanism": {
+        "en": "This noncoding CYP2R1-region marker is associated with total 25(OH)D in GWAS; that design does not prove the causal molecular chain of the index SNP.",
+        "ru": "Некодирующий маркер области CYP2R1; связь с общим 25(OH)D описана в GWAS, конкретная причинная цепочка этого SNP не доказана использованным источником."
+      },
+      "possible_influence": {
+        "en": "The studied G association concerns lower total 25(OH)D in populations, not a measured personal effect or supplement response.",
+        "ru": "В исследованных популяциях аллель G связан с более низким 25(OH)D; величина личного эффекта и ответ на добавку этим не измеряются."
+      },
+      "references": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/",
+          "pmid": "20541252",
+          "doi": "10.1016/S0140-6736(10)60588-0",
+          "access": "Primary indexed abstract fetched; direct PMC open challenged"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs12785878": {
-      "description": {
-        "en": "The DHCR7 region is associated with 25-OH vitamin D; the pathway concerns sterol precursors. The association does not establish this SNP's causal mechanism or a personal concentration.",
-        "ru": "Область DHCR7 связана с 25-OH витамином D; путь относится к предшественникам стеролов. Ассоциация не устанавливает причинный механизм SNP или личную концентрацию."
-      },
       "gene": "DHCR7",
-      "source": "Wang 2010 Lancet"
+      "source": "PMID:20541252 DOI:10.1016/S0140-6736(10)60588-0 https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/",
+      "description": {
+        "en": "GRCh38 chr11:71456403 G>T. This marks the NADSYN1/DHCR7 region; association does not establish that this SNP changes DHCR7 activity. The studied G association concerns lower total 25(OH)D and does not measure individual sunlight exposure or dietary intake.",
+        "ru": "GRCh38 chr11:71456403 G>T. Маркер региона NADSYN1/DHCR7; ассоциация не доказывает, что именно этот SNP изменяет активность DHCR7. Аллель G в используемой ориентации связан с более низким общим 25(OH)D на уровне популяции."
+      },
+      "reading": {
+        "en": "GRCh38 chr11:71456403 G>T.",
+        "ru": "GRCh38 chr11:71456403 G>T."
+      },
+      "mechanism": {
+        "en": "This marks the NADSYN1/DHCR7 region; association does not establish that this SNP changes DHCR7 activity.",
+        "ru": "Маркер региона NADSYN1/DHCR7; ассоциация не доказывает, что именно этот SNP изменяет активность DHCR7."
+      },
+      "possible_influence": {
+        "en": "The studied G association concerns lower total 25(OH)D and does not measure individual sunlight exposure or dietary intake.",
+        "ru": "Аллель G в используемой ориентации связан с более низким общим 25(OH)D на уровне популяции."
+      },
+      "references": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3086761/",
+          "pmid": "20541252",
+          "doi": "10.1016/S0140-6736(10)60588-0",
+          "access": "Primary indexed abstract fetched; direct PMC open challenged"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs601338": {
-      "description": {
-        "en": "FUT2 W154X is a non-secretor allele context. Secretor status depends on both alleles and population; a single allele does not establish a B12 phenotype.",
-        "ru": "FUT2 W154X относится к аллелю несекреторного статуса. Статус зависит от обоих аллелей и популяции; один аллель не устанавливает фенотип B12."
-      },
       "gene": "FUT2",
-      "source": "Hazra 2008 Nat Genet (FUT2 and vitamin B12)"
+      "source": "PMID:18776911 DOI:10.1038/ng.210 https://pubmed.ncbi.nlm.nih.gov/18776911/; https://www.ncbi.nlm.nih.gov/clinvar/variation/12945/",
+      "description": {
+        "en": "GRCh38 chr19:48703417 G>A; LRG_811t1:c.461G>A, Trp154Ter; historical W143* is an alias. G>A introduces a stop codon. Secretor status depends on both gene copies and other FUT2 variants. Plasma B12 associations do not establish intracellular deficiency, supplement need, universal norovirus resistance or zero effect in every heterozygote.",
+        "ru": "GRCh38 chr19:48703417 G>A. LRG_811t1:c.461G>A; p.Trp154Ter; W143* - исторический синоним. G>A создаёт стоп-кодон Trp154Ter; W143* - историческое обозначение. Секреторный статус зависит от обеих копий и других вариантов FUT2. Несекреторный контекст связан с отличиями плазменного B12 и взаимодействий со слизистыми. Это не доказательство внутриклеточного дефицита, устойчивости ко всем норовирусам или отсутствия эффекта у любого гетерозиготного носителя."
+      },
+      "reading": {
+        "en": "GRCh38 chr19:48703417 G>A; LRG_811t1:c.461G>A, Trp154Ter; historical W143* is an alias.",
+        "ru": "GRCh38 chr19:48703417 G>A. LRG_811t1:c.461G>A; p.Trp154Ter; W143* - исторический синоним."
+      },
+      "mechanism": {
+        "en": "G>A introduces a stop codon. Secretor status depends on both gene copies and other FUT2 variants.",
+        "ru": "G>A создаёт стоп-кодон Trp154Ter; W143* - историческое обозначение. Секреторный статус зависит от обеих копий и других вариантов FUT2."
+      },
+      "possible_influence": {
+        "en": "Plasma B12 associations do not establish intracellular deficiency, supplement need, universal norovirus resistance or zero effect in every heterozygote.",
+        "ru": "Несекреторный контекст связан с отличиями плазменного B12 и взаимодействий со слизистыми. Это не доказательство внутриклеточного дефицита, устойчивости ко всем норовирусам или отсутствия эффекта у любого гетерозиготного носителя."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18776911/",
+          "pmid": "18776911",
+          "doi": "10.1038/ng.210",
+          "access": "opened primary page; full/abstract text obtained"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/12945/",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs855791": {
-      "description": {
-        "en": "TMPRSS6 Ala736Val concerns hepcidin regulation and has iron-trait associations in the curated literature; this does not measure hepcidin or ferritin in a person.",
-        "ru": "TMPRSS6 Ala736Val относится к регуляции гепсидина и имеет ассоциации с показателями железа в курируемой литературе; это не измеряет гепсидин или ферритин человека."
-      },
       "gene": "TMPRSS6",
-      "source": "Benyamin 2009 Nat Genet (TMPRSS6 A736V and iron)"
+      "source": "PMID:21873547 DOI:10.1182/blood-2011-06-364034 https://pubmed.ncbi.nlm.nih.gov/21873547/; PMID:33054130 DOI:10.3324/haematol.2020.264556 https://haematologica.org/article/view/10038; https://www.ncbi.nlm.nih.gov/clinvar/RCV001723861.11/",
+      "description": {
+        "en": "GRCh38 chr22:37066896 A>G; NM_001374504.1:c.2180T>C, Val727Ala; historical Val736Ala. The Ala form suppressed hepcidin more efficiently in experiments. Human iron effects depend on iron status and the endpoint. A stable-isotope study in 79 non-anaemic Taiwanese women found absorption differences. This common SNP is not IRIDA and does not select oral versus intravenous treatment.",
+        "ru": "GRCh38 chr22:37066896 A>G. NM_001374504.1:c.2180T>C; p.Val727Ala; историческое Val736Ala. Val727Ala в актуальном транскрипте соответствует историческому Val736Ala. В экспериментах Ala сильнее подавлял гепсидин; наблюдаемые эффекты зависят от статуса железа и измеряемого показателя. Общий вариант связан с железными показателями; в 79 тайваньских женщинах без анемии наблюдались различия всасывания меченого железа. Это не диагноз IRIDA и не правило выбора пути лечения."
+      },
+      "reading": {
+        "en": "GRCh38 chr22:37066896 A>G; NM_001374504.1:c.2180T>C, Val727Ala; historical Val736Ala.",
+        "ru": "GRCh38 chr22:37066896 A>G. NM_001374504.1:c.2180T>C; p.Val727Ala; историческое Val736Ala."
+      },
+      "mechanism": {
+        "en": "The Ala form suppressed hepcidin more efficiently in experiments. Human iron effects depend on iron status and the endpoint.",
+        "ru": "Val727Ala в актуальном транскрипте соответствует историческому Val736Ala. В экспериментах Ala сильнее подавлял гепсидин; наблюдаемые эффекты зависят от статуса железа и измеряемого показателя."
+      },
+      "possible_influence": {
+        "en": "A stable-isotope study in 79 non-anaemic Taiwanese women found absorption differences. This common SNP is not IRIDA and does not select oral versus intravenous treatment.",
+        "ru": "Общий вариант связан с железными показателями; в 79 тайваньских женщинах без анемии наблюдались различия всасывания меченого железа. Это не диагноз IRIDA и не правило выбора пути лечения."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21873547/",
+          "pmid": "21873547",
+          "doi": "10.1182/blood-2011-06-364034",
+          "access": "Primary indexed abstract fully fetched; direct PubMed and publisher open failed/challenged"
+        },
+        {
+          "url": "https://haematologica.org/article/view/10038",
+          "pmid": "33054130",
+          "doi": "10.3324/haematol.2020.264556",
+          "access": "opened primary page; full/abstract text obtained"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV001723861.11/",
+          "access": "Official indexed record fetched; direct alternative ClinVar open failed"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs174546": {
-      "description": {
-        "en": "The FADS1 locus is associated with long-chain fatty-acid synthesis. Linked positions and diet matter; this SNP does not measure an individual's conversion or omega-3 index.",
-        "ru": "Локус FADS1 связан с синтезом длинноцепочечных жирных кислот. Важны сцепленные позиции и питание; этот SNP не измеряет индивидуальную конверсию или омега-3 индекс."
-      },
       "gene": "FADS1",
-      "source": "Lemaitre 2011 PLoS Genet (FADS and long-chain omega-3)"
+      "source": "PMID:21829377 DOI:10.1371/journal.pgen.1002193 https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1002193",
+      "description": {
+        "en": "GRCh38 chr11:61802358 C>T. This noncoding marker tags the linked FADS locus; observed fatty-acid patterns are compatible with altered desaturase activity. Reported plasma phospholipid associations concern ALA, EPA and DPA. They do not calculate personal conversion, red-cell omega-3 index or guaranteed supplement response.",
+        "ru": "GRCh38 chr11:61802358 C>T. Некодирующий маркер сцепленного локуса FADS; в человеческих исследованиях T связан с соотношениями жирных кислот, совместимыми с меньшейΔ5-десатурацией. Более высокая ALA и более низкие EPA/DPA в плазменных фосфолипидах описаны для FADS вариации. Из этого не вычисляются личная скорость конверсии, эритроцитарный омега 3 индекс или эффект добавки."
+      },
+      "reading": {
+        "en": "GRCh38 chr11:61802358 C>T.",
+        "ru": "GRCh38 chr11:61802358 C>T."
+      },
+      "mechanism": {
+        "en": "This noncoding marker tags the linked FADS locus; observed fatty-acid patterns are compatible with altered desaturase activity.",
+        "ru": "Некодирующий маркер сцепленного локуса FADS; в человеческих исследованиях T связан с соотношениями жирных кислот, совместимыми с меньшейΔ5-десатурацией."
+      },
+      "possible_influence": {
+        "en": "Reported plasma phospholipid associations concern ALA, EPA and DPA. They do not calculate personal conversion, red-cell omega-3 index or guaranteed supplement response.",
+        "ru": "Более высокая ALA и более низкие EPA/DPA в плазменных фосфолипидах описаны для FADS вариации. Из этого не вычисляются личная скорость конверсии, эритроцитарный омега 3 индекс или эффект добавки."
+      },
+      "references": [
+        {
+          "url": "https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1002193",
+          "pmid": "21829377",
+          "doi": "10.1371/journal.pgen.1002193",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs174537": {
-      "description": {
-        "en": "This is another position in the fatty-acid desaturase locus; linked positions must not be counted as independent conversion effects.",
-        "ru": "Это ещё одна позиция локуса десатураз жирных кислот; сцепленные позиции нельзя считать независимыми эффектами конверсии."
-      },
       "gene": "FADS1",
-      "source": "Lemaitre 2011 PLoS Genet"
+      "source": "PMID:24842322 DOI:10.1371/journal.pone.0097510 https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0097510",
+      "description": {
+        "en": "GRCh38 chr11:61785208 G>T; MYRF/FADS region. In 144 liver samples the marker was associated with regulatory methylation and an AA/DGLA surrogate index; a causal SNP-to-methylation chain remains a hypothesis. T was associated with higher methylation and lower surrogate desaturase activity in that tissue. Linked markers are not independent additive effects.",
+        "ru": "GRCh38 chr11:61785208 G>T. В 144 образцах печениrs174537 связан с метилированием регуляторной области FADS и суррогатным индексом AA/DGLA; причинность SNP→метилирование→эффект остаётся гипотезой. T связан с более высоким метилированием и меньшим индексомΔ5-десатурации в изученной ткани. Это дополнительный контекст механизма, не отдельный суммируемый эффект рядом сrs174546."
+      },
+      "reading": {
+        "en": "GRCh38 chr11:61785208 G>T; MYRF/FADS region.",
+        "ru": "GRCh38 chr11:61785208 G>T."
+      },
+      "mechanism": {
+        "en": "In 144 liver samples the marker was associated with regulatory methylation and an AA/DGLA surrogate index; a causal SNP-to-methylation chain remains a hypothesis.",
+        "ru": "В 144 образцах печениrs174537 связан с метилированием регуляторной области FADS и суррогатным индексом AA/DGLA; причинность SNP→метилирование→эффект остаётся гипотезой."
+      },
+      "possible_influence": {
+        "en": "T was associated with higher methylation and lower surrogate desaturase activity in that tissue. Linked markers are not independent additive effects.",
+        "ru": "T связан с более высоким метилированием и меньшим индексомΔ5-десатурации в изученной ткани. Это дополнительный контекст механизма, не отдельный суммируемый эффект рядом сrs174546."
+      },
+      "references": [
+        {
+          "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0097510",
+          "pmid": "24842322",
+          "doi": "10.1371/journal.pone.0097510",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs4988235": {
-      "description": {
-        "en": "This MCM6-region regulatory position is linked to adult lactase persistence in some populations. It is not a direct measurement of lactose tolerance or calcium status.",
-        "ru": "Эта регуляторная позиция области MCM6 связана с сохранением лактазы во взрослом возрасте в некоторых популяциях. Это не прямое измерение переносимости лактозы или статуса кальция."
-      },
       "gene": "MCM6",
-      "source": "Enattah 2002 Nat Genet (MCM6 and lactase persistence)"
+      "source": "PMID:11788828 DOI:10.1038/ng826 https://pubmed.ncbi.nlm.nih.gov/11788828/; DOI:10.1053/j.gastro.2003.09.031 https://els-jbs-prod-cdn.jbs.elsevierhealth.com/article/S0016-5085%2803%2901526-9/fulltext; PMID:17159977 DOI:10.1038/ng1946 https://pubmed.ncbi.nlm.nih.gov/17159977/",
+      "description": {
+        "en": "GRCh38 chr2:135851076 G>A; genomic A corresponds to historical LCT-enhancer -13910T. The regulatory sequence within MCM6 affects neighbouring LCT expression; -13910T increases enhancer activity and is associated with adult lactase persistence. Persistence is not a guarantee of tolerance of all dairy food. Other persistence alleles occur in other populations; absence of this allele does not exclude them.",
+        "ru": "GRCh38 chr2:135851076 G>A. Геномный A соответствует историческому -13910T энхансера LCT. -13910T усиливает энхансерную активность и сохранение экспрессии LCT; на плюсовой геномной цепи каталога соответствующий аллель A. Связан с сохранением лактазы во взрослом возрасте в ряде популяций, особенно европейских. Переносимость пищи зависит и от других факторов; отсутствие A не исключает другие аллели персистенции."
+      },
+      "reading": {
+        "en": "GRCh38 chr2:135851076 G>A; genomic A corresponds to historical LCT-enhancer -13910T.",
+        "ru": "GRCh38 chr2:135851076 G>A. Геномный A соответствует историческому -13910T энхансера LCT."
+      },
+      "mechanism": {
+        "en": "The regulatory sequence within MCM6 affects neighbouring LCT expression; -13910T increases enhancer activity and is associated with adult lactase persistence.",
+        "ru": "-13910T усиливает энхансерную активность и сохранение экспрессии LCT; на плюсовой геномной цепи каталога соответствующий аллель A."
+      },
+      "possible_influence": {
+        "en": "Persistence is not a guarantee of tolerance of all dairy food. Other persistence alleles occur in other populations; absence of this allele does not exclude them.",
+        "ru": "Связан с сохранением лактазы во взрослом возрасте в ряде популяций, особенно европейских. Переносимость пищи зависит и от других факторов; отсутствие A не исключает другие аллели персистенции."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11788828/",
+          "pmid": "11788828",
+          "doi": "10.1038/ng826",
+          "access": "Primary PubMed indexed record fetched; direct publisher open failed"
+        },
+        {
+          "url": "https://els-jbs-prod-cdn.jbs.elsevierhealth.com/article/S0016-5085%2803%2901526-9/fulltext",
+          "doi": "10.1053/j.gastro.2003.09.031",
+          "access": "Primary publisher indexed abstract fetched; full-page open not independently obtained"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17159977/",
+          "pmid": "17159977",
+          "doi": "10.1038/ng1946",
+          "access": "Primary indexed abstract/record fetched; direct Nature open failed"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs16890979": {
       "description": {
@@ -2215,12 +2828,33 @@
       "source": "Vitart 2008 Nat Genet (SLC2A9 and urate)"
     },
     "rs9263726": {
-      "description": {
-        "en": "This is a tag for HLA-B*58:01, not direct HLA typing. A tag cannot select or contraindicate a medicine without confirmed typing and the complete clinical context.",
-        "ru": "Это маркер HLA-B*58:01, а не прямое HLA-типирование. Маркер не выбирает и не запрещает препарат без подтверждённого типирования и полного клинического контекста."
-      },
       "gene": "HLA-B",
-      "source": "CPIC guideline for allopurinol (Saito 2016) — HLA-B*58:01, read here through a tag SNP"
+      "source": "DOI:10.1590/1678-4685-GMB-2017-0258 https://pmc.ncbi.nlm.nih.gov/articles/PMC6136375/",
+      "description": {
+        "en": "GRCh38 chr6:31138722 G>A; PSORS1C1-region HLA-B*58:01 tag. Linkage to HLA-B*58:01 differs between populations. The SNP is a tag rather than the typed HLA allele. Drug rules concern confirmed HLA typing in clinical context. The tag alone neither universally confirms nor excludes HLA-B*58:01 and does not select a medicine.",
+        "ru": "GRCh38 chr6:31138722 G>A. rs9263726 находится в PSORS1C1 и используется как сцепленный тег; сцепление и предсказательная точность неодинаковы между популяциями. Вариант не подтверждает и не исключает HLA-B*58:01 универсально. Лекарственное правило относится к результату прямого типирования с клиническим контекстом; SNP сам не выбирает препарат."
+      },
+      "reading": {
+        "en": "GRCh38 chr6:31138722 G>A; PSORS1C1-region HLA-B*58:01 tag.",
+        "ru": "GRCh38 chr6:31138722 G>A."
+      },
+      "mechanism": {
+        "en": "Linkage to HLA-B*58:01 differs between populations. The SNP is a tag rather than the typed HLA allele.",
+        "ru": "rs9263726 находится в PSORS1C1 и используется как сцепленный тег; сцепление и предсказательная точность неодинаковы между популяциями."
+      },
+      "possible_influence": {
+        "en": "Drug rules concern confirmed HLA typing in clinical context. The tag alone neither universally confirms nor excludes HLA-B*58:01 and does not select a medicine.",
+        "ru": "Вариант не подтверждает и не исключает HLA-B*58:01 универсально. Лекарственное правило относится к результату прямого типирования с клиническим контекстом; SNP сам не выбирает препарат."
+      },
+      "references": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6136375/",
+          "doi": "10.1590/1678-4685-GMB-2017-0258",
+          "access": "Primary indexed full abstract fetched; directPMC/publisher challenged"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     },
     "rs12917707": {
       "description": {
@@ -2661,6 +3295,577 @@
         "ru": "Каталожный вариант c.86A>C — N29T, а не N29I. N29T устойчив к CTRC-зависимой деградации и повышает автоактивацию трипсиногена."
       },
       "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366"
+    },
+    "rs10156191": {
+      "gene": "AOC1",
+      "source": "PMID:21488903 DOI:10.1111/j.1398-9995.2011.02548.x https://pubmed.ncbi.nlm.nih.gov/21488903/; PMID:25612138 DOI:10.1111/head.12493 https://pubmed.ncbi.nlm.nih.gov/25612138/; PMID:38674832 DOI:10.3390/nu16081142 https://pubmed.ncbi.nlm.nih.gov/38674832/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10156191",
+      "description": {
+        "en": "GRCh38 g.150856517C>T; NM_001091.4:c.47C>T, Thr16Met. An association with serum diamine oxidase activity has been reported; independent causality of this substitution is not established. A candidate histamine-metabolism association does not diagnose histamine intolerance or measure intestinal DAO.",
+        "ru": "NC_000007.14:g.150856517C>T; NM_001091.4:c.47C>T; p.Thr16Met. Thr16Met: ассоциация с сывороточной активностью DAO; самостоятельная причинность замены не доказана. Кандидатный контекст обмена гистамина; не диагностирует непереносимость."
+      },
+      "reading": {
+        "en": "GRCh38 g.150856517C>T; NM_001091.4:c.47C>T, Thr16Met.",
+        "ru": "NC_000007.14:g.150856517C>T; NM_001091.4:c.47C>T; p.Thr16Met."
+      },
+      "mechanism": {
+        "en": "An association with serum diamine oxidase activity has been reported; independent causality of this substitution is not established.",
+        "ru": "Thr16Met: ассоциация с сывороточной активностью DAO; самостоятельная причинность замены не доказана."
+      },
+      "possible_influence": {
+        "en": "A candidate histamine-metabolism association does not diagnose histamine intolerance or measure intestinal DAO.",
+        "ru": "Кандидатный контекст обмена гистамина; не диагностирует непереносимость."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21488903/",
+          "pmid": "21488903",
+          "doi": "10.1111/j.1398-9995.2011.02548.x",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25612138/",
+          "pmid": "25612138",
+          "doi": "10.1111/head.12493",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38674832/",
+          "pmid": "38674832",
+          "doi": "10.3390/nu16081142",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10156191",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1049742": {
+      "gene": "AOC1",
+      "source": "PMID:21488903 DOI:10.1111/j.1398-9995.2011.02548.x https://pubmed.ncbi.nlm.nih.gov/21488903/; PMID:38674832 DOI:10.3390/nu16081142 https://pubmed.ncbi.nlm.nih.gov/38674832/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1049742",
+      "description": {
+        "en": "GRCh38 g.150857465C>T; NM_001091.4:c.995C>T, Ser332Phe. Ser332Phe was associated with serum DAO in an association study. A single SNP does not establish a clinical DAO deficiency or histamine-intolerance phenotype.",
+        "ru": "NC_000007.14:g.150857465C>T; NM_001091.4:c.995C>T; p.Ser332Phe. Ser332Phe: связь с сывороточной DAO в одной ассоциационной работе. Отдельный SNP не подтверждает клинический дефицит DAO."
+      },
+      "reading": {
+        "en": "GRCh38 g.150857465C>T; NM_001091.4:c.995C>T, Ser332Phe.",
+        "ru": "NC_000007.14:g.150857465C>T; NM_001091.4:c.995C>T; p.Ser332Phe."
+      },
+      "mechanism": {
+        "en": "Ser332Phe was associated with serum DAO in an association study.",
+        "ru": "Ser332Phe: связь с сывороточной DAO в одной ассоциационной работе."
+      },
+      "possible_influence": {
+        "en": "A single SNP does not establish a clinical DAO deficiency or histamine-intolerance phenotype.",
+        "ru": "Отдельный SNP не подтверждает клинический дефицит DAO."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21488903/",
+          "pmid": "21488903",
+          "doi": "10.1111/j.1398-9995.2011.02548.x",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38674832/",
+          "pmid": "38674832",
+          "doi": "10.3390/nu16081142",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1049742",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1049793": {
+      "gene": "AOC1",
+      "source": "PMID:38674832 DOI:10.3390/nu16081142 https://pubmed.ncbi.nlm.nih.gov/38674832/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1049793",
+      "description": {
+        "en": "GRCh38 g.150860577C>G; MANE NM_001091.4:c.1933C>G, His645Asp; His664Asp is another isoform. C>T/His645Tyr is a different allele. The studied His645Asp substitution is distinct from other alternate alleles sharing the rsID; its independent effect on personal DAO activity remains unresolved. Presence of this variant does not diagnose histamine intolerance.",
+        "ru": "NC_000007.14:g.150860577C>G; NM_001091.4:c.1933C>G; p.His645Asp (MANE); His664Asp - NM_001272072.2. Не смешивать с C>T/His645Tyr. His645Asp по MANE; влияние на индивидуальную активность не определено. Наличие варианта не является диагнозом."
+      },
+      "reading": {
+        "en": "GRCh38 g.150860577C>G; MANE NM_001091.4:c.1933C>G, His645Asp; His664Asp is another isoform. C>T/His645Tyr is a different allele.",
+        "ru": "NC_000007.14:g.150860577C>G; NM_001091.4:c.1933C>G; p.His645Asp (MANE); His664Asp - NM_001272072.2. Не смешивать с C>T/His645Tyr."
+      },
+      "mechanism": {
+        "en": "The studied His645Asp substitution is distinct from other alternate alleles sharing the rsID; its independent effect on personal DAO activity remains unresolved.",
+        "ru": "His645Asp по MANE; влияние на индивидуальную активность не определено."
+      },
+      "possible_influence": {
+        "en": "Presence of this variant does not diagnose histamine intolerance.",
+        "ru": "Наличие варианта не является диагнозом."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38674832/",
+          "pmid": "38674832",
+          "doi": "10.3390/nu16081142",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1049793",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs2052129": {
+      "gene": "AOC1",
+      "source": "PMID:21488903 DOI:10.1111/j.1398-9995.2011.02548.x https://pubmed.ncbi.nlm.nih.gov/21488903/; PMID:38674832 DOI:10.3390/nu16081142 https://pubmed.ncbi.nlm.nih.gov/38674832/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2052129",
+      "description": {
+        "en": "GRCh38 g.150851884G>T; promoter variant. The minor promoter allele reduced reporter activity in the studied experimental construct. Possible effects on expression or serum DAO do not establish intestinal enzyme activity or a diagnosis.",
+        "ru": "NC_000007.14:g.150851884G>T; Промоторный G>T; отдельный транскриптный HGVS не установлен в этой работе. Промоторный вариант: минорный аллель снижал активность репортера. Возможная связь с экспрессией/сывороточной DAO; не диагноз."
+      },
+      "reading": {
+        "en": "GRCh38 g.150851884G>T; promoter variant.",
+        "ru": "NC_000007.14:g.150851884G>T; Промоторный G>T; отдельный транскриптный HGVS не установлен в этой работе."
+      },
+      "mechanism": {
+        "en": "The minor promoter allele reduced reporter activity in the studied experimental construct.",
+        "ru": "Промоторный вариант: минорный аллель снижал активность репортера."
+      },
+      "possible_influence": {
+        "en": "Possible effects on expression or serum DAO do not establish intestinal enzyme activity or a diagnosis.",
+        "ru": "Возможная связь с экспрессией/сывороточной DAO; не диагноз."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21488903/",
+          "pmid": "21488903",
+          "doi": "10.1111/j.1398-9995.2011.02548.x",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38674832/",
+          "pmid": "38674832",
+          "doi": "10.3390/nu16081142",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2052129",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs6323": {
+      "gene": "MAOA",
+      "source": "PMID:1678250 https://pubmed.ncbi.nlm.nih.gov/1678250/; PMID:34795483 DOI:10.2147/NDT.S338854 https://pubmed.ncbi.nlm.nih.gov/34795483/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6323",
+      "description": {
+        "en": "GRCh38 g.43731789G>T; NM_000240.4:c.891G>T, Arg297=; historical 941T>G uses different numbering. A synonymous SNP may tag a regulatory haplotype. Older activity associations used cultured skin fibroblasts. This SNP does not measure brain MAOA activity or establish behaviour; it does not replace promoter VNTR typing.",
+        "ru": "NC_000023.11:g.43731789G>T; NM_000240.4:c.891G>T; p.Arg297=; историческое 941T>G - другая нумерация. Синонимический Arg297; возможный маркер регуляторного гаплотипа. Не определяет «быструю/медленную MAOA» мозга или поведение."
+      },
+      "reading": {
+        "en": "GRCh38 g.43731789G>T; NM_000240.4:c.891G>T, Arg297=; historical 941T>G uses different numbering.",
+        "ru": "NC_000023.11:g.43731789G>T; NM_000240.4:c.891G>T; p.Arg297=; историческое 941T>G - другая нумерация."
+      },
+      "mechanism": {
+        "en": "A synonymous SNP may tag a regulatory haplotype. Older activity associations used cultured skin fibroblasts.",
+        "ru": "Синонимический Arg297; возможный маркер регуляторного гаплотипа."
+      },
+      "possible_influence": {
+        "en": "This SNP does not measure brain MAOA activity or establish behaviour; it does not replace promoter VNTR typing.",
+        "ru": "Не определяет «быструю/медленную MAOA» мозга или поведение."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/1678250/",
+          "pmid": "1678250",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34795483/",
+          "pmid": "34795483",
+          "doi": "10.2147/NDT.S338854",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6323",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1137070": {
+      "gene": "MAOA",
+      "source": "PMID:1678250 https://pubmed.ncbi.nlm.nih.gov/1678250/; PMID:34795483 DOI:10.2147/NDT.S338854 https://pubmed.ncbi.nlm.nih.gov/34795483/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1137070",
+      "description": {
+        "en": "GRCh38 g.43744144T>C; NM_000240.4:c.1410T>C, Asp470=. This is a synonymous marker; older activity associations involved fibroblasts and later studies considered haplotypes. It does not establish a brain enzyme phenotype or a clinical behavioural prediction.",
+        "ru": "NC_000023.11:g.43744144T>C; NM_000240.4:c.1410T>C; p.Asp470=. Синонимический Asp470; старые ассоциации в фибробластах. Не измеряет активность мозга и не устанавливает клинический фенотип."
+      },
+      "reading": {
+        "en": "GRCh38 g.43744144T>C; NM_000240.4:c.1410T>C, Asp470=.",
+        "ru": "NC_000023.11:g.43744144T>C; NM_000240.4:c.1410T>C; p.Asp470=."
+      },
+      "mechanism": {
+        "en": "This is a synonymous marker; older activity associations involved fibroblasts and later studies considered haplotypes.",
+        "ru": "Синонимический Asp470; старые ассоциации в фибробластах."
+      },
+      "possible_influence": {
+        "en": "It does not establish a brain enzyme phenotype or a clinical behavioural prediction.",
+        "ru": "Не измеряет активность мозга и не устанавливает клинический фенотип."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/1678250/",
+          "pmid": "1678250",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/34795483/",
+          "pmid": "34795483",
+          "doi": "10.2147/NDT.S338854",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1137070",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1695": {
+      "gene": "GSTP1",
+      "source": "PMID:22401947 DOI:10.1016/j.tiv.2012.02.005 https://pubmed.ncbi.nlm.nih.gov/22401947/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1695",
+      "description": {
+        "en": "GRCh38 g.67585218A>G; NM_000852.4:c.313A>G, Ile105Val. Other ALT alleles were not studied here. Ile105Val changes substrate-dependent kinetic properties of purified GSTP1. The experiments concern specific reactions, not a global detoxification rate.",
+        "ru": "NC_000011.10:g.67585218A>G; NM_000852.4:c.313A>G; p.Ile105Val. Другие ALT этого rsID не исследовались здесь. Ile105Val меняет субстрат-зависимые кинетические свойства очищенного фермента. Контекст конкретных реакций; не «общая детоксикация»."
+      },
+      "reading": {
+        "en": "GRCh38 g.67585218A>G; NM_000852.4:c.313A>G, Ile105Val. Other ALT alleles were not studied here.",
+        "ru": "NC_000011.10:g.67585218A>G; NM_000852.4:c.313A>G; p.Ile105Val. Другие ALT этого rsID не исследовались здесь."
+      },
+      "mechanism": {
+        "en": "Ile105Val changes substrate-dependent kinetic properties of purified GSTP1.",
+        "ru": "Ile105Val меняет субстрат-зависимые кинетические свойства очищенного фермента."
+      },
+      "possible_influence": {
+        "en": "The experiments concern specific reactions, not a global detoxification rate.",
+        "ru": "Контекст конкретных реакций; не «общая детоксикация»."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22401947/",
+          "pmid": "22401947",
+          "doi": "10.1016/j.tiv.2012.02.005",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1695",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1138272": {
+      "gene": "GSTP1",
+      "source": "PMID:22401947 DOI:10.1016/j.tiv.2012.02.005 https://pubmed.ncbi.nlm.nih.gov/22401947/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1138272",
+      "description": {
+        "en": "GRCh38 g.67586108C>T; NM_000852.4:c.341C>T, Ala114Val. Ala114Val was studied with position 105 in four recombinant allozymes. Effects depend on substrate and haplotype; they do not establish a universal detoxification deficit.",
+        "ru": "NC_000011.10:g.67586108C>T; NM_000852.4:c.341C>T; p.Ala114Val. Ala114Val изучен вместе с положением 105 в четырех аллозимах. Эффект относится гаплотипу и субстрату."
+      },
+      "reading": {
+        "en": "GRCh38 g.67586108C>T; NM_000852.4:c.341C>T, Ala114Val.",
+        "ru": "NC_000011.10:g.67586108C>T; NM_000852.4:c.341C>T; p.Ala114Val."
+      },
+      "mechanism": {
+        "en": "Ala114Val was studied with position 105 in four recombinant allozymes.",
+        "ru": "Ala114Val изучен вместе с положением 105 в четырех аллозимах."
+      },
+      "possible_influence": {
+        "en": "Effects depend on substrate and haplotype; they do not establish a universal detoxification deficit.",
+        "ru": "Эффект относится гаплотипу и субстрату."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22401947/",
+          "pmid": "22401947",
+          "doi": "10.1016/j.tiv.2012.02.005",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1138272",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1050450": {
+      "gene": "GPX1",
+      "source": "PMID:22952184 DOI:10.3945/ajcn.112.043125 https://pubmed.ncbi.nlm.nih.gov/22952184/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1050450",
+      "description": {
+        "en": "GRCh38 g.49357401G>A; MANE NM_000581.4:c.599C>T, Pro200Leu. Historical Pro198/197 require an isoform identifier. The supplementation analysis found no overall genotype-by-intervention interaction. A baseline-selenium subgroup signal was exploratory. The SNP does not determine a selenium intervention or prove a clinical benefit.",
+        "ru": "NC_000003.12:g.49357401G>A; NM_000581.4:c.599C>T; p.Pro200Leu (MANE). Исторические Pro198/197 требуют указания изоформы. В анализе испытаний не подтверждено общее взаимодействие генотипа с вмешательством; сигнал зависимости от исходного селена найден в исследовательской подгруппе. Общего взаимодействия генотип×вмешательство в RCT не подтверждено."
+      },
+      "reading": {
+        "en": "GRCh38 g.49357401G>A; MANE NM_000581.4:c.599C>T, Pro200Leu. Historical Pro198/197 require an isoform identifier.",
+        "ru": "NC_000003.12:g.49357401G>A; NM_000581.4:c.599C>T; p.Pro200Leu (MANE). Исторические Pro198/197 требуют указания изоформы."
+      },
+      "mechanism": {
+        "en": "The supplementation analysis found no overall genotype-by-intervention interaction. A baseline-selenium subgroup signal was exploratory.",
+        "ru": "В анализе испытаний не подтверждено общее взаимодействие генотипа с вмешательством; сигнал зависимости от исходного селена найден в исследовательской подгруппе."
+      },
+      "possible_influence": {
+        "en": "The SNP does not determine a selenium intervention or prove a clinical benefit.",
+        "ru": "Общего взаимодействия генотип×вмешательство в RCT не подтверждено."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22952184/",
+          "pmid": "22952184",
+          "doi": "10.3945/ajcn.112.043125",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1050450",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs1799983": {
+      "gene": "NOS3",
+      "source": "PMID:11331296 DOI:10.1074/jbc.M103647200 https://pubmed.ncbi.nlm.nih.gov/11331296/; PMID:17449720 DOI:10.1096/fj.06-7088com https://pubmed.ncbi.nlm.nih.gov/17449720/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1799983",
+      "description": {
+        "en": "GRCh38 g.150999023T>G; NM_000603.5:c.894T>G, Asp298Glu. Reference T already encodes historical Asp298; the old G894T label runs in the opposite direction. The proposed Asp298 cleavage was explained by acidic sample preparation. Another endothelial-cell study found differences in caveolar localisation and response to shear. Model-dependent functional observations do not measure personal NO production or a calibrated disease risk. ALT does not mean adverse.",
+        "ru": "NC_000007.14:g.150999023T>G; NM_000603.5:c.894T>G; p.Asp298Glu. Референс GRCh38 T уже кодирует исторический Asp298; историческое G894T имеет обратное направление. Asp298: кислотное расщепление - артефакт; возможны различия кавеолярной локализации. Функциональная гипотеза; не измерение NO или риска заболевания."
+      },
+      "reading": {
+        "en": "GRCh38 g.150999023T>G; NM_000603.5:c.894T>G, Asp298Glu. Reference T already encodes historical Asp298; the old G894T label runs in the opposite direction.",
+        "ru": "NC_000007.14:g.150999023T>G; NM_000603.5:c.894T>G; p.Asp298Glu. Референс GRCh38 T уже кодирует исторический Asp298; историческое G894T имеет обратное направление."
+      },
+      "mechanism": {
+        "en": "The proposed Asp298 cleavage was explained by acidic sample preparation. Another endothelial-cell study found differences in caveolar localisation and response to shear.",
+        "ru": "Asp298: кислотное расщепление - артефакт; возможны различия кавеолярной локализации."
+      },
+      "possible_influence": {
+        "en": "Model-dependent functional observations do not measure personal NO production or a calibrated disease risk. ALT does not mean adverse.",
+        "ru": "Функциональная гипотеза; не измерение NO или риска заболевания."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11331296/",
+          "pmid": "11331296",
+          "doi": "10.1074/jbc.M103647200",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17449720/",
+          "pmid": "17449720",
+          "doi": "10.1096/fj.06-7088com",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1799983",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs2070744": {
+      "gene": "NOS3",
+      "source": "PMID:11063722 DOI:10.1093/hmg/9.18.2629 https://pubmed.ncbi.nlm.nih.gov/11063722/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2070744",
+      "description": {
+        "en": "GRCh38 g.150992991C>T. Reference C already corresponds to historical -786C; ALT T does not add C. Historical -786C increased RPA1-dependent repression of transcription in studied models. This promoter mechanism does not measure a personal NO concentration or establish treatment.",
+        "ru": "NC_000007.14:g.150992991C>T; Каталог C>T; GRCh38-референс C уже соответствует историческому -786C. ALT T не означает добавление C. Исторический -786C усиливал RPA1-зависимое подавление транскрипции в исследованных моделях. Регуляторный механизм; не индивидуальный уровень NO."
+      },
+      "reading": {
+        "en": "GRCh38 g.150992991C>T. Reference C already corresponds to historical -786C; ALT T does not add C.",
+        "ru": "NC_000007.14:g.150992991C>T; Каталог C>T; GRCh38-референс C уже соответствует историческому -786C. ALT T не означает добавление C."
+      },
+      "mechanism": {
+        "en": "Historical -786C increased RPA1-dependent repression of transcription in studied models.",
+        "ru": "Исторический -786C усиливал RPA1-зависимое подавление транскрипции в исследованных моделях."
+      },
+      "possible_influence": {
+        "en": "This promoter mechanism does not measure a personal NO concentration or establish treatment.",
+        "ru": "Регуляторный механизм; не индивидуальный уровень NO."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11063722/",
+          "pmid": "11063722",
+          "doi": "10.1093/hmg/9.18.2629",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2070744",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs7946": {
+      "gene": "PEMT",
+      "source": "PMID:16051693 DOI:10.1096/fj.04-3580com https://pubmed.ncbi.nlm.nih.gov/16051693/; PMID:17012264 DOI:10.1096/fj.06-1004ufm https://pubmed.ncbi.nlm.nih.gov/17012264/; PMID:37513629 DOI:10.3390/nu15143211 https://pubmed.ncbi.nlm.nih.gov/37513629/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7946",
+      "description": {
+        "en": "GRCh38 g.17506246C>T; MANE NM_148172.3:c.634G>A, Val212Met; historical Val175Met is NM_007169.3:c.523G>A. Historical Val175Met reduced activity of expressed PEMT in an experimental model. Clinical liver-fat associations differ between samples, sex and dietary contexts. The SNP cannot calculate personal choline requirements.",
+        "ru": "NC_000017.11:g.17506246C>T; NM_148172.3:c.634G>A; p.Val212Met (MANE). Историческое Val175Met: NM_007169.3:c.523G>A. Исторический Val175Met снижал активность экспрессированного белка; MANE Val212Met. Клинические ассоциации зависят от выборки и контекста; направление противоречиво."
+      },
+      "reading": {
+        "en": "GRCh38 g.17506246C>T; MANE NM_148172.3:c.634G>A, Val212Met; historical Val175Met is NM_007169.3:c.523G>A.",
+        "ru": "NC_000017.11:g.17506246C>T; NM_148172.3:c.634G>A; p.Val212Met (MANE). Историческое Val175Met: NM_007169.3:c.523G>A."
+      },
+      "mechanism": {
+        "en": "Historical Val175Met reduced activity of expressed PEMT in an experimental model.",
+        "ru": "Исторический Val175Met снижал активность экспрессированного белка; MANE Val212Met."
+      },
+      "possible_influence": {
+        "en": "Clinical liver-fat associations differ between samples, sex and dietary contexts. The SNP cannot calculate personal choline requirements.",
+        "ru": "Клинические ассоциации зависят от выборки и контекста; направление противоречиво."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16051693/",
+          "pmid": "16051693",
+          "doi": "10.1096/fj.04-3580com",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17012264/",
+          "pmid": "17012264",
+          "doi": "10.1096/fj.06-1004ufm",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/37513629/",
+          "pmid": "37513629",
+          "doi": "10.3390/nu15143211",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7946",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs12325817": {
+      "gene": "PEMT",
+      "source": "PMID:21059658 DOI:10.1074/jbc.M110.106922 https://pubmed.ncbi.nlm.nih.gov/21059658/; PMID:20861172 DOI:10.3945/ajcn.2010.30064 https://pubmed.ncbi.nlm.nih.gov/20861172/; https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12325817",
+      "description": {
+        "en": "GRCh38 g.17583205C>G. The literature promoter allele has not been assigned a genomic direction automatically. This tags a haplotype with altered oestrogen-dependent activation; an independent causal effect of this single base is not established. Associations with experimental choline depletion in women depend on hormonal and haplotype context; they do not define a universal requirement.",
+        "ru": "NC_000017.11:g.17583205C>G; Каталог C>G. Сопоставление литературного промоторного аллеля не назначено автоматически. Маркер гаплоблока с нарушением эстрогенной активации; не доказан самостоятельный эффект единственной базы. Связь с переносимостью экспериментального ограничения холина у женщин."
+      },
+      "reading": {
+        "en": "GRCh38 g.17583205C>G. The literature promoter allele has not been assigned a genomic direction automatically.",
+        "ru": "NC_000017.11:g.17583205C>G; Каталог C>G. Сопоставление литературного промоторного аллеля не назначено автоматически."
+      },
+      "mechanism": {
+        "en": "This tags a haplotype with altered oestrogen-dependent activation; an independent causal effect of this single base is not established.",
+        "ru": "Маркер гаплоблока с нарушением эстрогенной активации; не доказан самостоятельный эффект единственной базы."
+      },
+      "possible_influence": {
+        "en": "Associations with experimental choline depletion in women depend on hormonal and haplotype context; they do not define a universal requirement.",
+        "ru": "Связь с переносимостью экспериментального ограничения холина у женщин."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21059658/",
+          "pmid": "21059658",
+          "doi": "10.1074/jbc.M110.106922",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20861172/",
+          "pmid": "20861172",
+          "doi": "10.3945/ajcn.2010.30064",
+          "access": "NCBI EFetch primary PubMed XML; HTML directly opened where accessible"
+        },
+        {
+          "url": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12325817",
+          "access": "NCBI Variation API JSON directly read 06.10.2026; all alternate alleles retained only in raw research, not treated as studied effects."
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs12248560": {
+      "gene": "CYP2C19",
+      "source": "PMID:16413245 DOI:10.1016/j.clpt.2005.10.002 https://pubmed.ncbi.nlm.nih.gov/16413245/; PMID:35034351 DOI:10.1002/cpt.2526 https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf",
+      "description": {
+        "en": "GRCh38 chr10:94761900 C>T; historical -806C>T, CYP2C19*17 context. One SNP does not define the complete star allele. The regulatory -806C>T variant is associated with increased CYP2C19 transcription in the *17 context. The drug phenotype depends on the full diplotype and substrate. *2/*17 is an intermediate-metaboliser diplotype; *17 alone does not guarantee clopidogrel benefit or determine bleeding risk.",
+        "ru": "GRCh38 chr10:94761900 C>T. Историческое -806C>T, контекст *17; один SNP не определяет полный star-аллель. Регуляторный -806C>T связан с повышенной транскрипцией CYP2C19 в контексте*17. Аллель повышенной функции; лекарственный фенотип зависит от полного диплотипа, субстрата и сопутствующих факторов. *17 не гарантирует эффект клопидогрела и не задаёт самостоятельно риск кровотечения."
+      },
+      "reading": {
+        "en": "GRCh38 chr10:94761900 C>T; historical -806C>T, CYP2C19*17 context. One SNP does not define the complete star allele.",
+        "ru": "GRCh38 chr10:94761900 C>T. Историческое -806C>T, контекст *17; один SNP не определяет полный star-аллель."
+      },
+      "mechanism": {
+        "en": "The regulatory -806C>T variant is associated with increased CYP2C19 transcription in the *17 context.",
+        "ru": "Регуляторный -806C>T связан с повышенной транскрипцией CYP2C19 в контексте*17."
+      },
+      "possible_influence": {
+        "en": "The drug phenotype depends on the full diplotype and substrate. *2/*17 is an intermediate-metaboliser diplotype; *17 alone does not guarantee clopidogrel benefit or determine bleeding risk.",
+        "ru": "Аллель повышенной функции; лекарственный фенотип зависит от полного диплотипа, субстрата и сопутствующих факторов. *17 не гарантирует эффект клопидогрела и не задаёт самостоятельно риск кровотечения."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/16413245/",
+          "pmid": "16413245",
+          "doi": "10.1016/j.clpt.2005.10.002",
+          "access": "Primary PubMed indexed abstract fetched in search; direct open challenged/empty; full article unavailable"
+        },
+        {
+          "url": "https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf",
+          "pmid": "35034351",
+          "doi": "10.1002/cpt.2526",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
+    },
+    "rs4244285": {
+      "gene": "CYP2C19",
+      "source": "PMID:8195181 https://pubmed.ncbi.nlm.nih.gov/8195181/; PMID:35034351 DOI:10.1002/cpt.2526 https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf",
+      "description": {
+        "en": "GRCh38 chr10:94781859 G>A; historical c.681G>A, CYP2C19*2 context. c.681G>A creates an abnormal splice site in exon 5 and is associated with the no-function *2 allele. Reduced clopidogrel activation is interpreted with the complete diplotype and treatment indication, not from one isolated SNP.",
+        "ru": "GRCh38 chr10:94781859 G>A. Историческое c.681G>A, контекст *2; номер транскрипта следует закрепить при курации. c.681G>A создаёт аномальный сайт сплайсинга в экзоне 5; относится к нефункциональному*2. Может снижать образование активного метаболита клопидогрела; клинический смысл определяется полным диплотипом и показанием."
+      },
+      "reading": {
+        "en": "GRCh38 chr10:94781859 G>A; historical c.681G>A, CYP2C19*2 context.",
+        "ru": "GRCh38 chr10:94781859 G>A. Историческое c.681G>A, контекст *2; номер транскрипта следует закрепить при курации."
+      },
+      "mechanism": {
+        "en": "c.681G>A creates an abnormal splice site in exon 5 and is associated with the no-function *2 allele.",
+        "ru": "c.681G>A создаёт аномальный сайт сплайсинга в экзоне 5; относится к нефункциональному*2."
+      },
+      "possible_influence": {
+        "en": "Reduced clopidogrel activation is interpreted with the complete diplotype and treatment indication, not from one isolated SNP.",
+        "ru": "Может снижать образование активного метаболита клопидогрела; клинический смысл определяется полным диплотипом и показанием."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/8195181/",
+          "pmid": "8195181",
+          "access": "opened primary page; full/abstract text obtained"
+        },
+        {
+          "url": "https://files.cpicpgx.org/data/guideline/publication/clopidogrel/2022/35034351.pdf",
+          "pmid": "35034351",
+          "doi": "10.1002/cpt.2526",
+          "access": "opened primary page; full/abstract text obtained"
+        }
+      ],
+      "curated_on": "2026-10-06",
+      "scope": "reference_only"
     }
   }
 }

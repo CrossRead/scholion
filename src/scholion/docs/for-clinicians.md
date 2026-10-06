@@ -128,6 +128,14 @@ reads cannot read a gene at all — a gene beside its pseudogene, a triplet repe
 the panel names it as needing a separate method, and it is never counted as read
 and never as clear.
 
+The existing GenCC layer contains 1,469 distinct genes across fifteen system
+panels. Each gene has source-bound biological context, alongside every
+gene–disease assertion with its own GenCC validity, organisation and date.
+Russian output translates disease names, validity and inheritance without
+changing the stored classifications. GenCC validity applies to a relationship;
+Scholion A–E applies to a variant statement. Neither gene biology nor a strong
+relationship establishes the effect of an unspecified variant or a diagnosis.
+
 A position the genome file does not list is the reference only when the alignment
 says so: until the catalogue positions have been genotyped from the aligned reads,
 such a position prints as not read, and the panel where the gap shows names the
@@ -204,7 +212,7 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-This page ships with the build numbered 0.6.2. **There is still no clinical
+This page ships with the build numbered 0.6.3. **There is still no clinical
 validation study and no benchmark against existing systems.** What there is, is two external runs by
 people who are not the author, and both are worth stating plainly because both
 were useful and neither was flattering.

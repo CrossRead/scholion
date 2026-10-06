@@ -26,6 +26,7 @@ import tempfile
 import textwrap
 import time
 import unittest
+from unittest import mock
 from pathlib import Path
 
 import support
@@ -114,6 +115,33 @@ class TestTheLockIsTakenEvenWithoutFlock(unittest.TestCase):
         self.assertEqual(calls, [],
                          "core.py signals a process to test whether it is alive — "
                          "on Windows that terminates it")
+
+    def test_an_inaccessible_lock_never_allows_an_unlocked_write(self):
+        was = core._LOCK_WAIT
+        core._LOCK_WAIT = 0
+        self.addCleanup(lambda: setattr(core, "_LOCK_WAIT", was))
+        with mock.patch.object(core.os, "open", side_effect=PermissionError("lock access denied")):
+            with self.assertRaises(core.ProfileBusy):
+                with core.profile_write_lock():
+                    self.fail("a failed lock acquisition allowed an unprotected write")
+
+    def test_transient_lock_access_is_retried_before_the_write(self):
+        original = os.open
+        attempts = []
+        lock = Path(self.tmp).resolve() / ".write.lock"
+
+        def transient(path, *args, **kwargs):
+            if Path(path) == lock:
+                attempts.append(path)
+                if len(attempts) == 1:
+                    raise PermissionError("Windows lock pending deletion")
+            return original(path, *args, **kwargs)
+
+        with mock.patch.object(core.os, "open", side_effect=transient):
+            with core.profile_write_lock():
+                self.assertTrue(lock.exists(), "the write ran without acquiring the lock")
+        self.assertEqual(2, len(attempts))
+        self.assertFalse(lock.exists())
 
     def test_a_nested_write_does_not_deadlock(self):
         """A mutator that calls another mutator is ordinary here. Without the

@@ -59,6 +59,10 @@ confidence are labelled separately, and a whole gene receives no variant grade.
 When a gene's reading status is unknown, its row shows an unread state instead
 of appearing to be a negative finding.
 
+**Keep concurrent profile changes on Windows.** A temporarily inaccessible write
+lock is retried; if it remains unavailable, the write is refused explicitly.
+Separate processes no longer proceed without the lock and silently lose a change.
+
 **Distinguish variants and the tests they represent.** CYP2C19*17 has its own
 increased-transcription explanation, separate from the splice defect associated
 with *2. ADRB1 context includes the current beta-blocker guideline and its lack

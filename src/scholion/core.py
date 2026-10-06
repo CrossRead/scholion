@@ -522,12 +522,15 @@ def _exclusive_lockfile(path: Path):
                     "nothing else is running, remove " + str(path) + "."
                 )
             _time.sleep(0.05)
-        except OSError:
-            # The lock cannot be made at all (a read-only directory, say). The
-            # thread lock still holds inside this process, and refusing to write
-            # somebody's data over a lockfile would be the wrong trade.
-            yield
-            return
+        except OSError as exc:
+            # Windows can deny access while another holder deletes the file.
+            # Retry within the same deadline; never enter the write unlocked.
+            if _time.monotonic() >= deadline:
+                raise ProfileBusy(
+                    f"cannot acquire profile write lock {path}: {exc}. "
+                    "Nothing was changed."
+                ) from exc
+            _time.sleep(0.05)
     try:
         try:
             os.write(fd, f"pid {os.getpid()}".encode("utf-8"))

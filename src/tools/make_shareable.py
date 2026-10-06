@@ -55,44 +55,22 @@ RASTER_MAX_B64 = 30_000  # base64 characters (~22 KB) — above the threshold it
 # image fails the audit: a text audit cannot look inside a JPEG, and a new screenshot
 # may hold real lab results and genotypes. Add a hash here only after viewing the image.
 APPROVED_RASTER_SHA256 = {
-    # Replaced wholesale on 14.09.2026 for 0.5.1, as every edition of this list has
-    # been: the interface was redesigned (six tabs, one grammar of a page) and the
-    # presentation's screenshots were retaken. A hash kept past its picture would
-    # let a page with last season's screens pass the audit next to the current one.
-    #
-    # WHAT WAS LOOKED AT. Twenty images — ten views in each language — captured by a
-    # headless Chrome over `scholion serve` 0.5.1 started from a clean `git archive`
-    # of the release commit, whose profile is the SYNTHETIC demo that
-    # `make_demo_profile.py` generates (subject DEMO-0001, a woman of 33 who belongs
-    # to nobody), with an empty genome folder and the network off. Every image
-    # carries «subject DEMO-0001» in its header and the demo banner in its own
-    # language, and every one was opened and read before its hash was written here.
-    # The copy held no personal material: no `profile/`, no genome, no lab forms.
-    # The drug view was captured with a check actually run (omeprazole).
-    #
-    # Russian edition (share/presentation.ru.html), in the order they appear:
-    "d8a79e9e9644f2ab941f1da721571f0c86980bab9fe80eb98d3461719dca159d": "presentation (ru) · Assistant (menu): works without a model, how it is checked, what code computes and what a model adds",
-    "62f804c806e789cc49a60aba16191a14b5ad1e5293c13922062653acde20a71d": "presentation (ru) · Guide (menu): where a number comes from, and what every colour and badge means",
-    "89cdd37f567e3cc51a9a60fa4dbf06bdfdcda5921a69f19adab666d816e80b62": "presentation (ru) · Overview: the four numbers, the missing-profile note, the body figure beside the radar",
-    "01f60aa45b60f42de402bd467f4f6dcdf1b204ecbceee893b9a7e100d4f2f918": "presentation (ru) · Labs: out of range, in range and the latest result; the toolbar; the clinician's targets; the first flagged cards",
-    "d6ea19ee637da4dadda365abd05b00cec6fe51d7c9d2243728be77a0f6726293": "presentation (ru) · Lifestyle: the fitness score, what moved over three months, anthropometry",
-    "75f08251ff3d34935471191feb49d04df4c8a6f7d2caa8617d956cf0ab9c6d6d": "presentation (ru) · Medicines: omeprazole checked — the verdict, CYP2C19 from the project database, the labs to watch",
-    "a0d0bb44aa9cba30be267d773a82749b9b20979d41267fe9fc543d3d4932ad6c": "presentation (ru) · Radar: the Thyroid block — verdict, measurements table, genotype not read, genotype against the measurements, questions",
-    "ed0ca9b547d3eb1e2bbfe2374f332bc0373cf46e1bccd2041eb66a16754d501a": "presentation (ru) · Genome: what the tab answers while no VCF is connected, and the findings list",
-    "b0401833ecf9de8b1cae2f56189e657835fa8a3a43dac815a9e5f3b30979c31e": "presentation (ru) · Radar: what is worth taking, with the routine control folded and the sources line",
-    "afefc0e7ce6844f4c7587e375575e2675e764061e5fa99d3d83c30bc03096c4f": "presentation (ru) · Medicines: the list taken now, with what each acts on",
-    #
-    # English edition (share/presentation.html), in the order they appear:
-    "1761595593c03b22293f06a386dc9e79fed951592a953e906801f8621561f3a1": "presentation (en) · Assistant (menu): works without a model, how it is checked, what code computes and what a model adds",
-    "0a1f1662e494a7cc7e79981c3bfab55167c08e8f0e0fab3628b841d1d405bc79": "presentation (en) · Guide (menu): where a number comes from, and what every colour and badge means",
-    "a8c1949d3f06443d80459e3ec17a21c6fafe96a6228ec62e39377cbd01b9bc63": "presentation (en) · Overview: the four numbers, the missing-profile note, the body figure beside the radar",
-    "29646361117afda8b8c8547e4e5295663cae72fd171e1af87fe35d495f0fd16b": "presentation (en) · Labs: out of range, in range and the latest result; the toolbar; the clinician's targets; the first flagged cards",
-    "ebb8890806f4a97c1e08bac68541ca280e2d2c83c1a1e9835d0cf798ce80aec7": "presentation (en) · Lifestyle: the fitness score, what moved over three months, anthropometry",
-    "2f05fdc6de8ae45f98c960747d0096daa77676b9a925cc470b83f42ff7b82380": "presentation (en) · Medicines: omeprazole checked — the verdict, CYP2C19 from the project database, the labs to watch",
-    "8f070c90fb8e1f7afa347403d70e3eed51879d28a35baceb1bff9fe8ec79b96b": "presentation (en) · Radar: the Thyroid block — verdict, measurements table, genotype not read, genotype against the measurements, questions",
-    "e946657ce98772455aacecc593b83fc76aff00231f6c9532dd745e50086051f6": "presentation (en) · Genome: what the tab answers while no VCF is connected, and the findings list",
-    "506c62deb016b3c7c277bbcb7bef27e2ef2e779ba2e408e0df5aa678cf948525": "presentation (en) · Radar: what is worth taking, with the routine control folded and the sources line",
-    "dbbaf7e911380a2e6f59f0107d728865496d926c0921f74ce9e5de33ad0b35bf": "presentation (en) · Medicines: the list taken now, with what each acts on",
+    # Viewed on 2026-10-05: twelve 0.6.0 screenshots, EN/RU, recovered from
+    # the final isolated browser acceptance. Every image retains DEMO-0001,
+    # its fictional-profile banner, demo container and engine version.
+    # Cropped to the first 1050 pixels; no personal profile or real genome.
+    "20b6364d9c768fe40a36a70682199888fa411949e9f39a9b3411fb88cc84f668": "presentation 0.6.0 synthetic en-guide",
+    "723df2de1fbca2da304741c9c2cc626fc68b19408ab65b3d06bcb3c3aaba5b72": "presentation 0.6.0 synthetic en-labs",
+    "64768d17bb6117e4bd1ebfca0f35c66261c260e0199baa7b666adc6f4c973ef1": "presentation 0.6.0 synthetic en-medicines",
+    "26fbb0048ddc72a8c7e4c7a92a4cbb6a6a9101c5da0c519ba4e332d16a0bf395": "presentation 0.6.0 synthetic en-overview",
+    "d873120fc9c2fe820f88549903cb0bb1db2efb78708fac164b5743b5e5db7c85": "presentation 0.6.0 synthetic en-panel",
+    "5cc2e9f02fe8571f2e866078f9f89734ba70e012a221983000d3b329b6bc80db": "presentation 0.6.0 synthetic en-visit",
+    "caa57d9ff03c7eda6a33e343ee3135973f122ed28eb4150e0be7aa0942b45804": "presentation 0.6.0 synthetic ru-guide",
+    "5af2842665aa2cac656ff27b359178047843260002450c3b0b3452a49ab4d3b3": "presentation 0.6.0 synthetic ru-labs",
+    "07f57d749b0ad8b5e5ebaef35528cacd8265c97fb47e8bf80df354471ced7a2e": "presentation 0.6.0 synthetic ru-medicines",
+    "0097d579698dbe3a91205bdd696e7f1cbdc654f3cc7f4f403ace377db0b88a4f": "presentation 0.6.0 synthetic ru-overview",
+    "fce5afd62119b46bca4ff579bc831fcf421527c381075751709f5aec1cde3e6d": "presentation 0.6.0 synthetic ru-panel",
+    "c6aa7db1584d229f1bcc56050dc4ed0b2bf662c7ec8a3cb5c45c98b0dada7901": "presentation 0.6.0 synthetic ru-visit",
 }
 
 

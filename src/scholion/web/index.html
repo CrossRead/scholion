@@ -568,6 +568,13 @@
     .bltbox{padding:12px 14px}
     .fc{padding:14px 15px} .fc .fcnum b{font-size:28px}
     table.dt td.d.opt,table.dt th.opt{display:none}
+    table.dt.gentbl thead{display:none}
+    table.dt.gentbl tr.genrow{display:grid;grid-template-columns:1fr auto auto;border-bottom:1px solid var(--grid)}
+    table.dt.gentbl tr.genrow td{border:0}
+    table.dt.gentbl tr.genrow td.opt{display:none}
+    table.dt.gentbl tr.genrow td:last-child{grid-column:1/-1;padding-top:0}
+    table.dt.gentbl tr.gendet:not([hidden]),table.dt.gentbl tr.gengroup{display:block}
+    table.dt.gentbl tr.gendet td,table.dt.gentbl tr.gengroup td{display:block;overflow-wrap:anywhere}
     .sysindex{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
     .sysindex button{flex:0 0 auto}
     .gen-find>b{min-width:0}
@@ -2144,7 +2151,7 @@ function genTableRow(id,cells,detail){
 }
 function shownGenetics(gen,register){
   if(register==='clinician') return gen;
-  const shown=p=>!['C','D','E'].includes(p.level);
+  const shown=p=>p.reference_context||!['C','D','E'].includes(p.level);
   return {...gen,positions:(gen.positions||[]).filter(shown),rows:(gen.rows||[]).filter(shown),
     groups:(gen.groups||[]).filter(shown).map(g=>({...g,members:(g.members||[]).filter(shown)}))};
 }
@@ -2157,14 +2164,26 @@ function hypothesisCountHtml(gen,register){
 function clinicalBasisHTML(p){
   return Object.entries(p.clinical_basis||{}).map(([field,b])=>`<div class="why muted" data-clinical-basis="${esc(field)}">${esc(t('clinical.basis',{field,detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
 }
+function referenceContextHtml(p){
+  const c=p.reference_context;
+  if(!c) return '';
+  return `<div class="why" data-reference-context><div class="cr-caption">${esc(t('reference.level',{level:c.level||'—'}))}</div>`
+    +`<div>${esc(t('reference.gene',{text:c.gene_function}))}</div>`
+    +`<div>${esc(t('reference.variant',{text:c.variant_context}))}</div>`
+    +`${c.gene_source?`<div class="why muted">${esc(t('reference.gene_source',{source:c.gene_source}))}</div>`:''}`
+    +`${c.variant_source?`<div class="why muted">${esc(t('reference.variant_source',{source:c.variant_source}))}</div>`:''}</div>`;
+}
 function mechanismHtml(p){
+  const reference=referenceContextHtml(p);
   const r=p.decision_route,workflow=r?`<div class="why muted" data-decision-route="${esc(r.kind)}">${esc(t('genome.route.line',{label:r.label,reason:r.reason}))}<div>${esc(r.notice)}</div></div>`:'';
   const sub=Object.entries(p.subclaim_basis||{}).map(([name,b])=>`<div class="why muted" data-subclaim-basis>${esc(t('conclusion.subclaim.'+name))}: ${esc(b.status==='incomplete'?b.reason:b.mechanism+' — '+b.source)}</div>`).join('');
-  if(p.conclusion_basis?.status==='incomplete') return `<div class="why muted" data-conclusion-withheld>${esc(p.conclusion_basis.reason)}</div>`+sub+workflow;
-  if(!p.mechanism||!p.source) return sub+workflow;
-  return `<div class="why" data-mechanism>${esc(t('system.row.mechanism',{text:p.mechanism}))}</div>`
-    +`<div class="why muted">${esc(t('decision.source',{source:p.source}))}</div>`+sub+workflow;
+  let clinical=sub+workflow;
+  if(p.conclusion_basis?.status==='incomplete') clinical=`<div class="why muted" data-conclusion-withheld>${esc(p.conclusion_basis.reason)}</div>`+clinical;
+  else if(p.mechanism&&p.source&&!reference) clinical=`<div class="why" data-mechanism>${esc(t('system.row.mechanism',{text:p.mechanism}))}</div>`
+    +`<div class="why muted">${esc(t('decision.source',{source:p.source}))}</div>`+clinical;
+  return reference+(reference&&clinical?`<details data-clinical-checks><summary>${esc(t('reference.analytics'))}</summary>${clinical}</details>`:clinical);
 }
+
 function genTableHtml(gen,card,register){
   gen=shownGenetics(gen,register);
   const states=gen.positions||[];
@@ -2183,7 +2202,7 @@ function genTableHtml(gen,card,register){
       +`<td>${p.level?levelChip(p.level,p.level_short):`<span class="muted small">${esc(t('system.row.level_none'))}</span>`}</td>`
       +`<td>${pnlStateBadge(p)}</td>`
       +`<td class="opt muted small">${esc(p.link_text||'')}</td>`
-      +`<td>${esc(short(p.text||r.text||p.conclusion_basis?.reason||''))}${p.decision_route?`<div class="why muted">${esc(p.decision_route.label)}</div>`:''}</td>`;
+      +`<td>${p.reference_context?`<div>${esc(short(p.reference_context.gene_function))}</div><div class="why">${esc(short(p.reference_context.variant_context))}</div>`:esc(short(p.text||r.text||p.conclusion_basis?.reason||''))}${!p.reference_context&&p.decision_route?`<div class="why muted">${esc(p.decision_route.label)}</div>`:''}</td>`;
     const detail=`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}">`
       +`${p.local_note?`<div class="why localnote">${esc(t('system.row.local_note',{by:t('system.row.local_note_by.'+(p.local_note.by_role||'clinician')),on:fmtDate(p.local_note.on)||'—'}))}: ${esc(p.local_note.text)}</div>`:''}`
       +`${p.depth_note?`<div class="why muted">${esc(p.depth_note)}</div>`:''}`
@@ -2210,7 +2229,7 @@ function genTableHtml(gen,card,register){
   // sentence — opening into the members' own rows.
   const grouped=new Set();
   (gen.groups||[]).forEach(g=>{
-    (g.positions||[]).forEach(rs=>grouped.add(rs));
+    (g.members||[]).filter(p=>!p.reference_context).forEach(p=>grouped.add(p.rsid));
     const id='grp:'+g.key;
     const st=g.states||{}; const stTxt=Object.keys(st).map(k=>`${t('system.panel.state.'+k)} ${st[k]}`).join(', ');
     const cells=`<td><b>${esc(g.label)}</b> <span class="muted small">${esc(plural(g.count||0,'count.positions'))}</span></td>`
@@ -2374,7 +2393,7 @@ function systemGeneRow(r, register){
     + (marks.length?` <span class="muted">· ${esc(marks.join(' · '))}</span>`:'')+`</div>`;
   if(r.text) out+=`<div class="why">${esc(r.text)}</div>`;
   if(r.file_says_text) out+=`<div class="why muted">${esc(r.file_says_text)}</div>`;
-  out+=ladderHtml(r);
+  out+=mechanismHtml(r)+ladderHtml(r);
   if(register==='clinician') out+=geneRowDetail(r);
   return out+`</div>`;
 }
@@ -2545,7 +2564,7 @@ function systemCardHtml(r){
     if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
   }
   if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
-  b=summary+(b?`<details class="fold"${r.register==='clinician'?' open':''}><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
+  b=summary+(b?`<details class="fold"${r.register==='clinician'||(gen.positions||[]).some(p=>p.reference_context)?' open':''}><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
   layer(3,'system.layer.genetics',b);
   b=correctionRoutesHtml(r.correction_routes,r.register);
   // Not a numbered layer: the seven layers are the brief's own frame, and this
@@ -2590,7 +2609,8 @@ async function viewPanel(key,reading=null){
   if(r.status!=='ok'){ v.innerHTML=errorHtml(t('system.unknown',{key:key,systems:(r.systems||[]).join(', ')})); return; }
   const c=r.counts||{};
   const pos=p=>`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}"><div class="pnl-head"><b>${esc(p.rsid||'—')}</b>${p.protein?` <span>${esc(p.protein)}</span>`:''} ${badge(PNL_KIND_BADGE[p.kind]||'b-unknown',t('system.panel.kind.'+(p.kind||'unassigned')))}<span class="muted small">${esc(t('system.mode.'+(p.mode||'unknown')))}</span></div>
-    ${p.reading?`<div class="why" data-intake-reading="${esc(p.rsid)}">${esc(p.reading.message)}${p.value_only?' · '+esc(t('panel.value_only')):''}</div>${Object.keys(p.reading.quality||{}).length?`<div class="why muted">${esc(t('panel.reading.quality'))}: ${esc(JSON.stringify(p.reading.quality))}</div>`:''}`:''}
+    ${p.level?levelChip(p.level,p.level_short):''}
+    ${p.reading?`<div class="why" data-intake-reading="${esc(p.rsid)}">${esc(p.reading.message)}</div>${Object.keys(p.reading.quality||{}).length?`<div class="why muted">${esc(t('panel.reading.quality'))}: ${esc(JSON.stringify(p.reading.quality))}</div>`:''}`:''}
     <div class="why muted">${esc(t('panel.locus',{hgvs:p.hgvs||'—',allele:p.risk_allele||'—'}))}</div>
     ${p.disposition?`<div class="why">${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}${p.task?' ('+esc(t('panel.intake.task',{task:p.task}))+')':''}</div>`:''}
     ${['het','hom','hemi'].filter(s=>(p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc(p.text[s])}</div>`).join('')}
@@ -2620,6 +2640,7 @@ async function viewPanel(key,reading=null){
       <button class="ghost" data-system="${esc(key)}"${key==='author_list'?' data-register="clinician"':''}>${esc(t(key==='author_list'?'panel.patient_readings':'web.second.open_card'))}</button>
       <button class="ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>
     ${pageHead(t('panel.title',{label:r.label||key}),r.reading_note||t('panel.for_clinician_note'),facts)}
+    <p class="cr-caption" data-reference-notice>${esc(t('reference.notice'))}</p>
     ${key!=='author_list'?`<button class="ghost" data-panel="author_list">${esc(t('panel.author_list'))}</button>`:''}
     <div class="meta">${esc(t('panel.source',{updated:fmtDate(r.catalogue_updated)||'—'}))}</div>
     ${(r.genes||[]).map(g=>`<h2 class="section">${esc(g.gene)}</h2>${(g.positions||[]).map(pos).join('')}`).join('')}
@@ -2632,7 +2653,7 @@ async function viewPanel(key,reading=null){
 // that printing opened; the reader's own expanded rows stay expanded.
 let intakePrintOpened=[];
 window.addEventListener('beforeprint',()=>{
-  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open])'));
+  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open])'));
   intakePrintOpened.forEach(d=>d.open=true);
 });
 window.addEventListener('afterprint',()=>{

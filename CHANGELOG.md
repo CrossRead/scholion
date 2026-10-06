@@ -40,6 +40,45 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.1 — 06.10.2026
+
+### What you can do now
+
+**Gene panels explain the biology beside the reading at every evidence level.**
+Both personal and clinician views show gene function, known variant mechanisms
+or literature associations, the Scholion A–E confidence level and separate
+sources. Use `scholion panel cardio` for the reference catalogue or
+`scholion system cardio` for readings beside it. Reference panels also work
+without a connected genome. Unknown variant
+influence is named explicitly, even when the gene's function is known.
+
+**Missing clinical support no longer hides useful reference knowledge.**
+The coagulation panel again explains prothrombin and Factor V Leiden, with
+primary sources. Research contexts below A/B remain visible as reference
+knowledge. Reading quality and an unread or unconfirmed position remain visible;
+a gene description does not imply that a variant was found.
+
+### What this changes in the conclusions
+
+Reference biology is separate from personalised analysis. It grants no finding,
+carrier status, individual risk estimate, treatment rule or laboratory proposal.
+Personal conclusions still require their own evidence, applicability and reading
+checks; an unsupported conclusion remains withheld.
+
+### What is retracted
+
+The display policy that reduced lower-confidence positions to counts or hid
+gene explanations together with unsupported clinical sentences is replaced by
+visible reference context. Previously withheld clinical claims are not restored
+by this change.
+
+### What needs recomputing
+
+Nothing. Stored measurements, genotypes and analytical results are unchanged.
+Reopen or regenerate panels to see their reference explanations. No genome
+re-indexing or alignment rescan is required.
+
+
 ## v0.6.0 — 05.10.2026
 
 ### What you can do now

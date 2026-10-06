@@ -148,11 +148,11 @@ class TestC21AHypothesisTravelsWithItsPassport(_Read):
         self.assertIn("Arg389", text, "the model was not told what the hypothesis says")
         self.assertIn(t("system.hyp.rule"), text)
 
-    def test_the_persons_register_counts_and_the_clinicians_shows(self):
+    def test_both_registers_show_reference_context_without_personal_hypothesis_claims(self):
         from scholion import format as fmt
         patient = fmt.system_report(engine.system("cardio", "patient"))
         clinician = fmt.system_report(engine.system("cardio", "clinician"))
-        self.assertNotIn("Arg389", patient, "the person's screen printed a hypothesis")
+        self.assertIn("Arg389", patient, "the person's screen lost reference context")
         self.assertIn("Arg389", clinician)
         for key in SYSTEMS:
             original = engine.system(key, "patient")
@@ -161,7 +161,7 @@ class TestC21AHypothesisTravelsWithItsPassport(_Read):
             lower = [p for p in original["genetics"]["positions"] if p.get("level") in ("C", "D", "E")]
             self.assertTrue(lower)
             for position in lower:
-                self.assertNotIn(position["rsid"], rendered, "patient output must count, not enumerate lower levels")
+                self.assertIn(position["rsid"], rendered, "reference panels retain lower-level positions")
             self.assertEqual(before, json.dumps(original, sort_keys=True), "presentation changed the data contract")
 
     def test_the_retelling_rule_is_in_the_canon_the_tool_hands_out(self):

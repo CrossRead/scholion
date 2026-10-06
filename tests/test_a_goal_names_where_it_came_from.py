@@ -11,7 +11,7 @@ from pathlib import Path
 from unittest import mock
 
 import support
-from scholion import cli, core, engine, format as fmt, i18n, store
+from scholion import __version__, cli, core, engine, format as fmt, i18n, store
 from scholion.goal_entities import ORIGINS, entity_id, goal_entities, origin_edit, origin_view
 
 
@@ -35,7 +35,7 @@ class TestGoalOrigins(unittest.TestCase):
 
     def write_files(self):
         for filename, data in self.data.items():
-            data.setdefault('_meta', {'schema': 1, 'synthetic': True, 'engine': '0.6.0'})
+            data.setdefault('_meta', {'schema': 1, 'synthetic': True, 'engine': __version__})
             (self.profile / filename).write_text(json.dumps(data), encoding='utf-8')
         core.reset_cache()
 

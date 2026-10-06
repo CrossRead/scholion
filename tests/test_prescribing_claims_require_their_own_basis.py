@@ -254,7 +254,7 @@ class TestPrescribingOutput(_Demo):
         held = _guard_guidance({**_supported(), "source": None, "cpic": {"recommendation": "NEVER_PRINT"}})
         page = (Path(support.SRC) / "scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
-        for name in ("pgxCard", "mechanismHtml"):
+        for name in ("pgxCard", "referenceContextHtml", "mechanismHtml"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])
         data = [{**r, "status": "ok", "drug": "Synthetic", "gene": "GENE", "phenotype": "NM",

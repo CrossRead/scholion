@@ -50,7 +50,7 @@ class TestEveryPositionIsAState(unittest.TestCase):
                           # 0.6.0 (U2): the passport of a hypothesis below B, and
                           # the mark of a value with no statement at E
                           "passport", "value_only", "mechanism", "source", "conclusion_basis", "subclaim_basis",
-                          "decision_route"},
+                          "decision_route", "reference_context"},
                              set(p), p)
             self.assertIn(p["state"], ("het", "hom", "absent", "unread", "risk_allele_not_declared", None))
             if p["expect"]:

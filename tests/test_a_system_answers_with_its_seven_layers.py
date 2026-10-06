@@ -209,7 +209,9 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         pl = self.rows()["PL"]
         self.assertEqual(0, pl["findings"])
         self.assertEqual("classification", pl["not_a_finding_why"])
-        self.assertNotIn("PL", self.rows("patient"))
+        self.assertIn("PL", self.rows("patient"))
+        self.assertEqual(0, self.rows("patient")["PL"]["findings"])
+        self.assertEqual(pl["reference_context"], self.rows("patient")["PL"]["reference_context"])
 
     def test_a_recessive_position_with_one_copy_is_a_carrier_not_a_finding(self):
         par = self.rows()["PAR"]

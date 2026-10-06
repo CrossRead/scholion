@@ -1,0 +1,2658 @@
+{
+  "_meta": {
+    "updated": "2026-10-06",
+    "purpose": "Reference gene biology and variant context, separate from personalised conclusions. Gene function does not establish an allele effect. Evidence levels remain those of the curated position; this file grants no analytical permission.",
+    "sources": [
+      "NCBI Gene / RefSeq gene summaries, retrieved 2026-10-06; bilingual functional paraphrases",
+      "Variant context paraphrased from the sources held by the curated panels; no individual risk coefficients or treatment instructions"
+    ],
+    "source_tier": "curated_reference"
+  },
+  "genes": {
+    "ABCB4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5244",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The membrane-associated protein encoded by this gene is a member of the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White).",
+        "ru": "АТФ-зависимый мембранный транспортёр семейства ABC; участвует в переносе фосфолипидов в желчь."
+      }
+    },
+    "ABCG2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/9429",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The membrane-associated protein encoded by this gene is included in the superfamily of ATP-binding cassette (ABC) transporters. ABC proteins transport various molecules across extra- and intra-cellular membranes. ABC genes are divided into seven distinct subfamilies (ABC1, MDR/TAP, MRP, ALD, OABP, GCN20, White).",
+        "ru": "Мембранный транспортёр семейства ABC, выводящий различные молекулы из клетки."
+      }
+    },
+    "ADIPOQ": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/9370",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is expressed in adipose tissue exclusively. It encodes a protein with similarity to collagens X and VIII and complement factor C1q. The encoded protein circulates in the plasma and is involved with metabolic and hormonal processes.",
+        "ru": "Кодирует адипонектин — секретируемый жировой тканью белок, связанный с обменом глюкозы и липидов."
+      }
+    },
+    "ADRB1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/153",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The adrenergic receptors (subtypes alpha 1, alpha 2, beta 1, and beta 2) are a prototypic family of guanine nucleotide binding regulatory protein-coupled receptors that mediate the physiological effects of the hormone epinephrine and the neurotransmitter norepinephrine. Beta-1 adrenoceptors are predominately located in the heart.",
+        "ru": "Бета-1-адренорецептор передаёт клетке сигналы адренергической системы."
+      }
+    },
+    "AGT": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/183",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene, pre-angiotensinogen or angiotensinogen precursor, is expressed in the liver and is cleaved by the enzyme renin in response to lowered blood pressure. The resulting product, angiotensin I, is then cleaved by angiotensin converting enzyme (ACE) to generate the physiologically active peptide angiotensin II. The protein is involved in maintaining blood pressure, body fluid and electrolyte homeostasis, and in the pathogenesis of essential hypertension and preeclampsia.",
+        "ru": "Кодирует ангиотензиноген — предшественник пептидов ренин-ангиотензиновой системы."
+      }
+    },
+    "AGXT2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/64902",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a class III pyridoxal-phosphate-dependent mitochondrial aminotransferase. It catalyzes the conversion of glyoxylate to glycine using L-alanine as the amino donor. It is an important regulator of methylarginines and is involved in the control of blood pressure in kidney.",
+        "ru": "Митохондриальная аминотрансфераза; участвует в превращениях глиоксилата и аминокислот."
+      }
+    },
+    "ALDH2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/217",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This protein belongs to the aldehyde dehydrogenase family of proteins. Aldehyde dehydrogenase is the second enzyme of the major oxidative pathway of alcohol metabolism. Two major liver isoforms of aldehyde dehydrogenase, cytosolic and mitochondrial, can be distinguished by their electrophoretic mobilities, kinetic properties, and subcellular localizations.",
+        "ru": "Альдегиддегидрогеназа участвует в окислении альдегидов, включая ацетальдегид в обмене алкоголя."
+      }
+    },
+    "ALPL": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/249",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the alkaline phosphatase family of proteins. There are at least four distinct but related alkaline phosphatases: intestinal, placental, placental-like, and liver/bone/kidney (tissue non-specific). The first three are located together on chromosome 2, while the tissue non-specific form is located on chromosome 1.",
+        "ru": "Тканенеспецифическая щелочная фосфатаза участвует в процессах минерализации."
+      }
+    },
+    "AOC1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/26",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a metal-binding membrane glycoprotein that oxidatively deaminates putrescine, histamine, and related compounds. The encoded protein is inhibited by amiloride, a diuretic that acts by closing epithelial sodium ion channels.",
+        "ru": "Медьсодержащая аминоксидаза катализирует окислительное дезаминирование гистамина и родственных аминов."
+      }
+    },
+    "APOB": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/338",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene product is the main apolipoprotein of chylomicrons and low density lipoproteins (LDL), and is the ligand for the LDL receptor. It occurs in plasma as two main isoforms, apoB-48 and apoB-100: the former is synthesized exclusively in the gut and the latter in the liver. The intestinal and the hepatic forms of apoB are encoded by a single gene from a single, very long mRNA.",
+        "ru": "Аполипопротеин B — структурный компонент липопротеинов и лиганд рецептора ЛПНП."
+      }
+    },
+    "APOE": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/348",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a major apoprotein of the chylomicron. It binds to a specific liver and peripheral cell receptor, and is essential for the normal catabolism of triglyceride-rich lipoprotein constituents. This gene maps to chromosome 19 in a cluster with the related apolipoprotein C1 and C2 genes.",
+        "ru": "Аполипопротеин E участвует в рецепторном захвате и обмене липопротеиновых частиц."
+      }
+    },
+    "APOL1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/8542",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a secreted high density lipoprotein which binds to apolipoprotein A-I. Apolipoprotein A-I is a relatively abundant plasma protein and is the major apoprotein of HDL. It is involved in the formation of most cholesteryl esters in plasma and also promotes efflux of cholesterol from cells.",
+        "ru": "Аполипопротеин L1 — белок, связанный с липопротеинами и мембранными процессами."
+      }
+    },
+    "AR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/367",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The androgen receptor gene is more than 90 kb long and codes for a protein that has 3 major functional domains: the N-terminal domain, DNA-binding domain, and androgen-binding domain. The protein functions as a steroid-hormone activated transcription factor. Upon binding the hormone ligand, the receptor dissociates from accessory proteins, translocates into the nucleus, dimerizes, and then stimulates transcription of androgen responsive genes.",
+        "ru": "Андрогенный рецептор связывает андрогены и регулирует транскрипцию генов."
+      }
+    },
+    "ASPG": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/374569",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Predicted to enable acyltransferase activity, transferring groups other than amino-acyl groups; asparaginase activity; and phosphatidylcholine lysophospholipase A1 activity. Predicted to be involved in asparagine metabolic process and phospholipid metabolic process. Predicted to be located in cytosol.",
+        "ru": "Для белка предполагается аспарагиназная и другая ферментативная активность; источник обозначает часть функций как предсказанные."
+      }
+    },
+    "AVPR1A": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/552",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene acts as receptor for arginine vasopressin. This receptor belongs to the subfamily of G-protein coupled receptors which includes AVPR1B, V2R and OXT receptors. Its activity is mediated by G proteins which stimulate a phosphatidylinositol-calcium second messenger system.",
+        "ru": "Рецептор вазопрессина передаёт сигнал через G-белки."
+      }
+    },
+    "BCL2L11": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10018",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the BCL-2 protein family. BCL-2 family members form hetero- or homodimers and act as anti- or pro-apoptotic regulators that are involved in a wide variety of cellular activities. The protein encoded by this gene contains a Bcl-2 homology domain 3 (BH3).",
+        "ru": "Белок семейства BCL2 участвует в регуляции программируемой гибели клеток."
+      }
+    },
+    "BDNF": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/627",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the nerve growth factor family of proteins. Binding of this protein to its cognate receptor promotes neuronal survival in the adult brain.",
+        "ru": "Нейротрофический фактор участвует в поддержании и развитии нейронов."
+      }
+    },
+    "BMF": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/90427",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the BCL2 protein family. BCL2 family members form hetero- or homodimers and act as anti- or pro-apoptotic regulators that are involved in a wide variety of cellular activities. This protein contains a single BCL2 homology domain 3 (BH3), and has been shown to bind BCL2 proteins and function as an apoptotic activator.",
+        "ru": "Белок семейства BCL2 участвует в регуляции апоптоза."
+      }
+    },
+    "C3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/718",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Complement component C3 plays a central role in the activation of complement system. Its activation is required for both classical and alternative complement activation pathways. The encoded preproprotein is proteolytically processed to generate alpha and beta subunits that form the mature protein, which is then further processed to generate numerous peptide products.",
+        "ru": "Компонент комплемента C3 участвует в активации классического и альтернативного путей комплемента."
+      }
+    },
+    "CBS": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/875",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene acts as a homotetramer to catalyze the conversion of homocysteine to cystathionine, the first step in the transsulfuration pathway. The encoded protein is allosterically activated by adenosyl-methionine and uses pyridoxal phosphate as a cofactor. This gene is a major contributor to cellular hydrogen sulfide production.",
+        "ru": "Цистатионин-бета-синтаза превращает гомоцистеин в цистатионин в пути транссульфурации."
+      }
+    },
+    "CDKAL1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/54901",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the methylthiotransferase family. The function of this gene is not known.",
+        "ru": "Белок семейства метилтиотрансфераз; в справочной записи точная функция обозначена как не полностью установленная."
+      }
+    },
+    "COL1A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1277",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the pro-alpha1 chains of type I collagen whose triple helix comprises two alpha1 chains and one alpha2 chain. Type I is a fibril-forming collagen found in most connective tissues and is abundant in bone, cornea, dermis and tendon. Two transcripts, resulting from the use of alternate polyadenylation signals, have been identified for this gene.",
+        "ru": "Кодирует альфа-1-цепь коллагена I — компонента соединительной ткани."
+      }
+    },
+    "COL6A4P1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/344875",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This transcribed pseudogene represents the 5' end of a presumed ortholog to a mouse gene which encodes a collagen VI alpha 4 chain protein (GeneID 68553). No complete ORF of comparable size to the mouse protein is found in this gene. The predicted protein lacks a signal peptide; however, this truncated collagen polypeptide may have achieved a different function as suggested by PubMed ID: 18622395.",
+        "ru": "Транскрибируемый псевдоген, связанный с фрагментом предполагаемого ортолога коллагена VI; доказательства трансляции неполны."
+      }
+    },
+    "COMT": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1312",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Catechol-O-methyltransferase catalyzes the transfer of a methyl group from S-adenosylmethionine to catecholamines, including the neurotransmitters dopamine, epinephrine, and norepinephrine. This O-methylation results in one of the major degradative pathways of the catecholamine transmitters. COMT is found in two forms in tissues, a soluble form (S-COMT) and a membrane-bound form (MB-COMT).",
+        "ru": "Катехол-О-метилтрансфераза переносит метильную группу на катехоламины, включая дофамин и норадреналин."
+      }
+    },
+    "COPA": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1314",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "In eukaryotic cells, protein transport between the endoplasmic reticulum and Golgi compartments is mediated in part by non-clathrin-coated vesicular coat proteins (COPs). Seven coat proteins have been identified, and they represent subunits of a complex known as coatomer. The subunits are designated alpha-COP, beta-COP, beta-prime-COP, gamma-COP, delta-COP, epsilon-COP, and zeta-COP.",
+        "ru": "Субъединица комплекса COPI участвует в везикулярном транспорте между эндоплазматическим ретикулумом и аппаратом Гольджи."
+      }
+    },
+    "CPS1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1373",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The mitochondrial enzyme encoded by this gene catalyzes synthesis of carbamoyl phosphate from ammonia and bicarbonate. This reaction is the first committed step of the urea cycle, which is important in the removal of excess urea from cells. The encoded protein may also represent a core mitochondrial nucleoid protein.",
+        "ru": "Митохондриальная карбамоилфосфатсинтетаза катализирует первый обязательный этап цикла мочевины."
+      }
+    },
+    "CRHR1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1394",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a G-protein coupled receptor that binds neuropeptides of the corticotropin releasing hormone family that are major regulators of the hypothalamic-pituitary-adrenal pathway. The encoded protein is essential for the activation of signal transduction pathways that regulate diverse physiological processes including stress, reproduction, immune response and obesity. Naturally-occurring readthrough transcription between this gene and upstream GeneID:147081 results in transcripts that encode isoforms that share similarity with the products of this gene.",
+        "ru": "Рецептор кортикотропин-рилизинг-гормона участвует в передаче сигналов гипоталамо-гипофизарно-надпочечниковой системы."
+      }
+    },
+    "CRP": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1401",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the pentraxin family which also includes serum amyloid P component protein and pentraxin 3. Pentraxins are involved in complement activation and amplification via communication with complement initiation pattern recognition molecules, but also complement regulation via recruitment of complement regulators. The encoded protein has a calcium dependent ligand binding domain with a distinctive flattened beta-jellyroll structure.",
+        "ru": "С-реактивный белок относится к пентраксинам, связанным с врождённым иммунитетом и комплементом."
+      }
+    },
+    "CTLA4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1493",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is a member of the immunoglobulin superfamily and encodes a protein which transmits an inhibitory signal to T cells. The protein contains a V domain, a transmembrane domain, and a cytoplasmic tail. The membrane-bound isoform functions as a homodimer interconnected by a disulfide bond, while the soluble isoform functions as a monomer.",
+        "ru": "Передаёт тормозящий сигнал T-лимфоцитам и участвует в регуляции иммунного ответа."
+      }
+    },
+    "CYP17A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1586",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This protein localizes to the endoplasmic reticulum.",
+        "ru": "Фермент цитохрома P450 участвует в гидроксилировании и расщеплении стероидных предшественников."
+      }
+    },
+    "CYP19A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1588",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This protein localizes to the endoplasmic reticulum and catalyzes the last steps of estrogen biosynthesis.",
+        "ru": "Ароматаза семейства цитохрома P450 участвует в превращении андрогенных предшественников в эстрогены."
+      }
+    },
+    "CYP2C19": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1557",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This protein localizes to the endoplasmic reticulum and is known to metabolize many xenobiotics, including the anticonvulsive drug mephenytoin, omeprazole, diazepam and some barbiturates.",
+        "ru": "Фермент цитохрома P450 участвует в метаболизме лекарств и других соединений; функция гена не определяет полный диплотип."
+      }
+    },
+    "CYP2C9": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1559",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This protein localizes to the endoplasmic reticulum and its expression is induced by rifampin.",
+        "ru": "Фермент цитохрома P450 участвует в окислительном метаболизме различных соединений."
+      }
+    },
+    "CYP2R1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/120227",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This enzyme is a microsomal vitamin D hydroxylase that converts vitamin D into the active ligand for the vitamin D receptor.",
+        "ru": "Фермент цитохрома P450 участвует в 25-гидроксилировании витамина D."
+      }
+    },
+    "CYP4F2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/8529",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the cytochrome P450 superfamily of enzymes. The cytochrome P450 proteins are monooxygenases which catalyze many reactions involved in drug metabolism and synthesis of cholesterol, steroids and other lipids. This protein localizes to the endoplasmic reticulum.",
+        "ru": "Фермент цитохрома P450 участвует в окислении жирных кислот и других липидных субстратов."
+      }
+    },
+    "DHCR7": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1717",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an enzyme that removes the C(7-8) double bond in the B ring of sterols and catalyzes the conversion of 7-dehydrocholesterol to cholesterol. This gene is ubiquitously expressed and its transmembrane protein localizes to the endoplasmic reticulum membrane and nuclear outer membrane.",
+        "ru": "Восстанавливает 7-дегидрохолестерин до холестерина."
+      }
+    },
+    "DIO1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1733",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the iodothyronine deiodinase family. It catalyzes the activation, as well as the inactivation of thyroid hormone by outer and inner ring deiodination, respectively. The activation reaction involves the conversion of the prohormone thyroxine (3,5,3',5'-tetraiodothyronine, T4), secreted by the thyroid gland, to the bioactive thyroid hormone (3,5,3'-triiodothyronine, T3) by 5'-deiodination.",
+        "ru": "Дейодиназа участвует в активации и инактивации тиреоидных гормонов."
+      }
+    },
+    "DIO2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1734",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the iodothyronine deiodinase family. It catalyzes the conversion of prohormone thyroxine (3,5,3',5'-tetraiodothyronine, T4) to the bioactive thyroid hormone (3,5,3'-triiodothyronine, T3) by outer ring 5'-deiodination. This gene is widely expressed, including in thyroid and brain.",
+        "ru": "Дейодиназа превращает тироксин T4 в активный трийодтиронин T3."
+      }
+    },
+    "DRD1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1812",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the D1 subtype of the dopamine receptor. The D1 subtype is the most abundant dopamine receptor in the central nervous system. This G-protein coupled receptor stimulates adenylyl cyclase and activates cyclic AMP-dependent protein kinases.",
+        "ru": "Дофаминовый рецептор D1 передаёт сигнал через G-белки и стимулирует аденилатциклазу."
+      }
+    },
+    "DRD2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1813",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the D2 subtype of the dopamine receptor. This G-protein coupled receptor inhibits adenylyl cyclase activity.",
+        "ru": "Дофаминовый рецептор D2 передаёт сигнал через G-белки и тормозит аденилатциклазу."
+      }
+    },
+    "DRD4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/1815",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the D4 subtype of the dopamine receptor. The D4 subtype is a G-protein coupled receptor which inhibits adenylyl cyclase. This gene contains a polymorphic number (2-10 copies) of tandem 48 nt repeats; the sequence shown contains four repeats.",
+        "ru": "Дофаминовый рецептор D4 передаёт сигнал через G-белки."
+      }
+    },
+    "DUOX2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/50506",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a glycoprotein and a member of the NADPH oxidase family. The synthesis of thyroid hormone is catalyzed by a protein complex located at the apical membrane of thyroid follicular cells. This complex contains an iodide transporter, thyroperoxidase, and a peroxide generating system that includes this encoded protein and DUOX1.",
+        "ru": "Фермент семейства NADPH-оксидаз участвует в образовании перекиси водорода для синтеза тиреоидных гормонов."
+      }
+    },
+    "EPDR1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/54749",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a type II transmembrane protein that is similar to two families of cell adhesion molecules, the protocadherins and ependymins. This protein may play a role in calcium-dependent cell adhesion. This protein is glycosylated, and the orthologous mouse protein is localized to the lysosome.",
+        "ru": "Белок, сходный с молекулами клеточной адгезии; справочник описывает отдельные функции предположительно."
+      }
+    },
+    "ERAP1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/51752",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is an aminopeptidase involved in trimming HLA class I-binding precursors so that they can be presented on MHC class I molecules. The encoded protein acts as a monomer or as a heterodimer with ERAP2. This protein may also be involved in blood pressure regulation by inactivation of angiotensin II.",
+        "ru": "Аминопептидаза подрезает пептиды для представления молекулами MHC класса I."
+      }
+    },
+    "ESR1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2099",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an estrogen receptor and ligand-activated transcription factor. The canonical protein contains an N-terminal ligand-independent transactivation domain, a central DNA binding domain, a hinge domain, and a C-terminal ligand-dependent transactivation domain. The protein localizes to the nucleus where it may form either a homodimer or a heterodimer with estrogen receptor 2.",
+        "ru": "Эстрогенный рецептор — активируемый лигандом транскрипционный фактор."
+      }
+    },
+    "ESR2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2100",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the family of estrogen receptors and superfamily of nuclear receptor transcription factors. The gene product contains an N-terminal DNA binding domain and C-terminal ligand binding domain and is localized to the nucleus, cytoplasm, and mitochondria. Upon binding to 17beta-estradiol or related ligands, the encoded protein forms homo- or hetero-dimers that interact with specific DNA sequences to activate transcription.",
+        "ru": "Эстрогенный рецептор семейства ядерных рецепторов регулирует транскрипцию."
+      }
+    },
+    "F13A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2162",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the coagulation factor XIII A subunit. Coagulation factor XIII is the last zymogen to become activated in the blood coagulation cascade. Plasma factor XIII is a heterotetramer composed of 2 A subunits and 2 B subunits.",
+        "ru": "Кодирует субъединицу A фактора XIII, участвующего в стабилизации фибринового сгустка."
+      }
+    },
+    "F2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2147",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the prothrombin protein (also known as coagulation factor II). This protein is proteolytically cleaved in multiple steps to form the activated serine protease thrombin. The activated thrombin enzyme plays an important role in thrombosis and hemostasis by converting fibrinogen to fibrin during blood clot formation, by stimulating platelet aggregation, and by activating additional coagulation factors.",
+        "ru": "Кодирует протромбин, из которого образуется тромбин — протеаза каскада свёртывания крови."
+      }
+    },
+    "F5": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2153",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an essential cofactor of the blood coagulation cascade. This factor circulates in plasma, and is converted to the active form by the release of the activation peptide by thrombin during coagulation. This generates a heavy chain and a light chain which are held together by calcium ions.",
+        "ru": "Кодирует фактор V — кофактор каскада свёртывания крови."
+      }
+    },
+    "FADS1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3992",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the fatty acid desaturase (FADS) gene family. Desaturase enzymes regulate unsaturation of fatty acids through the introduction of double bonds between defined carbons of the fatty acyl chain. FADS family members are considered fusion products composed of an N-terminal cytochrome b5-like domain and a C-terminal multiple membrane-spanning desaturase portion, both of which are characterized by conserved histidine motifs.",
+        "ru": "Десатураза вводит двойные связи в жирные кислоты."
+      }
+    },
+    "FAM9B": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/171483",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is a member of a gene family which arose through duplication on the X chromosome. The encoded protein may be localized to the nucleus as the protein contains several nuclear localization signals, and has similarity to a synaptonemal complex protein.",
+        "ru": "Белок семейства FAM9 может локализоваться в ядре; точная функция в справочной записи не установлена."
+      }
+    },
+    "FAS": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/355",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the TNF-receptor superfamily. This receptor contains a death domain. The interaction of this receptor with its ligand allows the formation of a death-inducing signaling complex that includes Fas-associated death domain protein (FADD), caspase 8, and caspase 10.",
+        "ru": "Рецептор семейства TNF участвует в передаче сигналов программируемой гибели клеток."
+      }
+    },
+    "FGB": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2244",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is the beta component of fibrinogen, a blood-borne glycoprotein comprised of three pairs of nonidentical polypeptide chains. Following vascular injury, fibrinogen is cleaved by thrombin to form fibrin which is the most abundant component of blood clots. In addition, various cleavage products of fibrinogen and fibrin regulate cell adhesion and spreading, display vasoconstrictor and chemotactic activities, and are mitogens for several cell types.",
+        "ru": "Кодирует бета-цепь фибриногена, из которого образуется фибрин сгустка."
+      }
+    },
+    "FOXE1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2304",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This intronless gene encodes a protein that belongs to the forkhead family of transcription factors. Members of this family contain a conserved 100-amino acid DNA-binding 'forkhead' domain. The encoded protein functions as a thyroid transcription factor that plays a role in thyroid morphogenesis.",
+        "ru": "Транскрипционный фактор семейства forkhead участвует в развитии щитовидной железы."
+      }
+    },
+    "FTO": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/79068",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is a nuclear protein of the AlkB related non-haem iron and 2-oxoglutarate-dependent oxygenase superfamily but the exact physiological function of this gene is not known. Other non-heme iron enzymes function to reverse alkylated DNA and RNA damage by oxidative demethylation. Studies in mice and humans indicate a role in nervous and cardiovascular systems and a strong association with body mass index, obesity risk, and type 2 diabetes.",
+        "ru": "Кодирует фермент, связанный с модификацией нуклеиновых кислот; функции и ассоциации вариантов различаются."
+      }
+    },
+    "FUT2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2524",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is one of two encoding the galactoside 2-L-fucosyltransferase enzyme. The encoded protein is important for the final step in the soluble ABO blood group antigen synthesis pathway. It is also involved in cell-cell interaction, cell surface expression, and cell proliferation.",
+        "ru": "Фукозилтрансфераза участвует в образовании углеводных антигенов в секретах."
+      }
+    },
+    "G6PD": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2539",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes glucose-6-phosphate dehydrogenase. This protein is a cytosolic enzyme encoded by a housekeeping X-linked gene whose main function is to produce NADPH, a key electron donor in the defense against oxidizing agents and in reductive biosynthetic reactions. G6PD is remarkable for its genetic diversity.",
+        "ru": "Глюкозо-6-фосфатдегидрогеназа образует NADPH в пентозофосфатном пути."
+      }
+    },
+    "GC": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2638",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the albumin gene family. It is a multifunctional protein found in plasma, ascitic fluid, cerebrospinal fluid and on the surface of many cell types. It binds to vitamin D and its plasma metabolites and transports them to target tissues.",
+        "ru": "Кодирует белок, связывающий и переносящий витамин D и его метаболиты."
+      }
+    },
+    "GCKR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2646",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a protein belonging to the GCKR subfamily of the SIS (Sugar ISomerase) family of proteins. The gene product is a regulatory protein that inhibits glucokinase in liver and pancreatic islet cells by binding non-covalently to form an inactive complex with the enzyme.",
+        "ru": "Регуляторный белок глюкокиназы участвует в контроле её активности."
+      }
+    },
+    "GLS2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/27165",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a mitochondrial phosphate-activated glutaminase that catalyzes the hydrolysis of glutamine to stoichiometric amounts of glutamate and ammonia. Originally thought to be liver-specific, this protein has been found in other tissues as well.",
+        "ru": "Глутаминаза катализирует превращение глутамина в глутамат."
+      }
+    },
+    "GNMT": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/27232",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is an enzyme that catalyzes the conversion of S-adenosyl-L-methionine (along with glycine) to S-adenosyl-L-homocysteine and sarcosine. This protein is found in the cytoplasm and acts as a homotetramer. Naturally occurring readthrough transcription occurs between the upstream CNPY3 (canopy FGF signaling regulator 3) gene and this gene and is represented with GeneID:107080644.",
+        "ru": "Глицин-N-метилтрансфераза участвует в обмене метильных групп."
+      }
+    },
+    "GPX1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2876",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the glutathione peroxidase family, members of which catalyze the reduction of organic hydroperoxides and hydrogen peroxide (H2O2) by glutathione, and thereby protect cells against oxidative damage. Other studies indicate that H2O2 is also essential for growth-factor mediated signal transduction, mitochondrial function, and maintenance of thiol redox-balance; therefore, by limiting H2O2 accumulation, glutathione peroxidases are also involved in modulating these processes. Several isozymes of this gene family exist in vertebrates, which vary in cellular location and substrate specificity.",
+        "ru": "Глутатионпероксидаза восстанавливает перекиси с использованием глутатиона."
+      }
+    },
+    "GREB1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/9687",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is an estrogen-responsive gene that is an early response gene in the estrogen receptor-regulated pathway.",
+        "ru": "Эстроген-регулируемый ген; его продукт связан с ответом клеток на эстрогенные сигналы."
+      }
+    },
+    "GSDMB": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/55876",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the gasdermin-domain containing protein family.",
+        "ru": "Белок семейства газдерминов, связанного с образованием мембранных пор."
+      }
+    },
+    "GSTP1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2950",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Glutathione S-transferases (GSTs) are a family of enzymes that play an important role in detoxification by catalyzing the conjugation of many hydrophobic and electrophilic compounds with reduced glutathione. Based on their biochemical, immunologic, and structural properties, the soluble GSTs are categorized into 4 main classes: alpha, mu, pi, and theta.",
+        "ru": "Глутатион-S-трансфераза участвует в конъюгации соединений с глутатионом."
+      }
+    },
+    "HFE": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3077",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a membrane protein that is similar to MHC class I-type proteins and associates with beta2-microglobulin (beta2M). It is thought that this protein functions to regulate iron absorption by regulating the interaction of the transferrin receptor with transferrin.",
+        "ru": "Мембранный белок участвует в регуляции обмена железа."
+      }
+    },
+    "HHEX": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3087",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the homeobox family of transcription factors, many of which are involved in developmental processes. Expression in specific hematopoietic lineages suggests that this protein may play a role in hematopoietic differentiation.",
+        "ru": "Гомеобоксный транскрипционный фактор участвует в развитии тканей."
+      }
+    },
+    "HLA-B": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3106",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "HLA-B belongs to the HLA class I heavy chain paralogues. This class I molecule is a heterodimer consisting of a heavy chain and a light chain (beta-2 microglobulin). The heavy chain is anchored in the membrane.",
+        "ru": "Молекула MHC класса I представляет пептиды иммунным клеткам."
+      }
+    },
+    "HLA-DQA1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3117",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "HLA-DQA1 belongs to the HLA class II alpha chain paralogues. The class II molecule is a heterodimer consisting of an alpha (DQA) and a beta chain (DQB), both anchored in the membrane. It plays a central role in the immune system by presenting peptides derived from extracellular proteins.",
+        "ru": "Альфа-цепь молекулы MHC класса II участвует в представлении пептидов."
+      }
+    },
+    "HTR1A": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3350",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a G protein-coupled receptor for 5-hydroxytryptamine (serotonin), and belongs to the 5-hydroxytryptamine receptor subfamily. Serotonin has been implicated in a number of physiologic processes and pathologic conditions. Inactivation of this gene in mice results in behavior consistent with an increased anxiety and stress response.",
+        "ru": "Серотониновый рецептор передаёт сигнал через G-белки."
+      }
+    },
+    "HTR2A": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3356",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes one of the receptors for serotonin, a neurotransmitter with many roles.",
+        "ru": "Серотониновый рецептор передаёт сигнал через G-белки."
+      }
+    },
+    "IFIH1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/64135",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "IFIH1 encodes MDA5 which is an intracellular sensor of viral RNA that triggers the innate immune response. Sensing RNA length and secondary structure, MDA5 binds dsRNA oligonucleotides with a modified DExD/H-box helicase core and a C-terminal domain, thus leading to a proinflammatory response that includes interferons. It has been shown that Coronaviruses (CoVs) as well as various other virus families, are capable of evading the MDA5-dependent interferon response, thus impeding the activation of the innate immune response to infection.",
+        "ru": "Рецептор распознавания вирусной РНК участвует во врождённом противовирусном ответе."
+      }
+    },
+    "IFNGR1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3459",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene (IFNGR1) encodes the ligand-binding chain (alpha) of the gamma interferon receptor. Human interferon-gamma receptor is a heterodimer of IFNGR1 and IFNGR2.",
+        "ru": "Субъединица рецептора интерферона-гамма участвует в передаче его сигнала."
+      }
+    },
+    "IKZF1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10320",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The expression of this protein is restricted to the fetal and adult hemo-lymphopoietic system, and it functions as a regulator of lymphocyte differentiation. Most isoforms share a common C-terminal domain, which contains two zinc finger motifs that are required for hetero- or homo-dimerization, and for interactions with other proteins. The isoforms, however, differ in the number of N-terminal zinc finger motifs that bind DNA and in nuclear localization signal presence, resulting in members with and without DNA-binding properties.",
+        "ru": "Транскрипционный фактор Ikaros участвует в развитии и регуляции лимфоидных клеток."
+      }
+    },
+    "IL13": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3596",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an immunoregulatory cytokine produced primarily by activated Th2 cells. This cytokine is involved in several stages of B-cell maturation and differentiation. It up-regulates CD23 and MHC class II expression, and promotes IgE isotype switching of B cells.",
+        "ru": "Цитокин участвует в регуляции иммунных и воспалительных ответов."
+      }
+    },
+    "IL2RA": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3559",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The interleukin 2 (IL2) receptor alpha (IL2RA) and beta (IL2RB) chains, together with the common gamma chain (IL2RG), constitute the high-affinity IL2 receptor. Homodimeric alpha chains (IL2RA) result in low-affinity receptor, while homodimeric beta (IL2RB) chains produce a medium-affinity receptor. Normally an integral-membrane protein, soluble IL2RA has been isolated and determined to result from extracellular proteolyisis.",
+        "ru": "Альфа-цепь рецептора интерлейкина-2 участвует в иммунной сигнализации."
+      }
+    },
+    "IL36RN": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/26525",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the interleukin 1 cytokine family. This cytokine was shown to specifically inhibit the activation of NF-kappaB induced by interleukin 1 family, member 6 (IL1F6). This gene and eight other interleukin 1 family genes form a cytokine gene cluster on chromosome 2.",
+        "ru": "Антагонист рецептора интерлейкина-36 регулирует воспалительную сигнализацию."
+      }
+    },
+    "IL6R": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3570",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a subunit of the interleukin 6 (IL6) receptor complex. Interleukin 6 is a potent pleiotropic cytokine that regulates cell growth and differentiation and plays an important role in the immune response. The IL6 receptor is a protein complex consisting of this protein and interleukin 6 signal transducer (IL6ST/GP130/IL6-beta), a receptor subunit also shared by many other cytokines.",
+        "ru": "Субъединица рецептора интерлейкина-6 участвует в передаче его сигнала."
+      }
+    },
+    "IRF5": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3663",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the interferon regulatory factor (IRF) family, a group of transcription factors with diverse roles, including virus-mediated activation of interferon, and modulation of cell growth, differentiation, apoptosis, and immune system activity. Members of the IRF family are characterized by a conserved N-terminal DNA-binding domain containing tryptophan (W) repeats.",
+        "ru": "Транскрипционный фактор участвует в регуляции интерфероновых и иммунных ответов."
+      }
+    },
+    "ITGA2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3673",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the alpha subunit of a transmembrane receptor for collagens and related proteins. The encoded protein forms a heterodimer with a beta subunit and mediates the adhesion of platelets and other cell types to the extracellular matrix. This gene is located adjacent to a related alpha subunit gene.",
+        "ru": "Альфа-2-субъединица интегрина участвует в взаимодействии клеток с коллагеном."
+      }
+    },
+    "ITGB3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3690",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The ITGB3 protein product is the integrin beta chain beta 3. Integrins are integral cell-surface proteins composed of an alpha chain and a beta chain. A given chain may combine with multiple partners resulting in different integrins.",
+        "ru": "Бета-3-субъединица интегрина участвует в клеточной адгезии; входит в тромбоцитарный рецепторный комплекс."
+      }
+    },
+    "KCNJ11": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3767",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Potassium channels are present in most mammalian cells, where they participate in a wide range of physiologic responses. The protein encoded by this gene is an integral membrane protein and inward-rectifier type potassium channel. Defects in this gene may also contribute to autosomal dominant non-insulin-dependent diabetes mellitus type II (NIDDM), transient neonatal diabetes mellitus type 3 (TNDM3), and permanent neonatal diabetes mellitus (PNDM).",
+        "ru": "Субъединица калиевого канала участвует в связи энергетического состояния клетки с электрической активностью."
+      }
+    },
+    "KCNQ1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/3784",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a voltage-gated potassium channel required for repolarization phase of the cardiac action potential. This protein can form heteromultimers with two other potassium channel proteins, KCNE1 and KCNE3. This gene exhibits tissue-specific imprinting, with preferential expression from the maternal allele in some tissues, and biallelic expression in others.",
+        "ru": "Субъединица потенциал-зависимого калиевого канала участвует в регуляции мембранного потенциала."
+      }
+    },
+    "LPA": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4018",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a serine proteinase that inhibits the activity of tissue-type plasminogen activator I. The encoded protein constitutes a substantial portion of lipoprotein(a) and is proteolytically cleaved, resulting in fragments that attach to atherosclerotic lesions and promote thrombogenesis. Elevated plasma levels of this protein are linked to atherosclerosis.",
+        "ru": "Кодирует аполипопротеин(a), компонент частицы липопротеина(a)."
+      }
+    },
+    "LRP5": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4041",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a transmembrane low-density lipoprotein receptor that binds and internalizes ligands in the process of receptor-mediated endocytosis. This protein also acts as a co-receptor with Frizzled protein family members for transducing signals by Wnt proteins and was originally cloned on the basis of its association with type 1 diabetes mellitus in humans.",
+        "ru": "Мембранный рецептор участвует в передаче Wnt-сигнала."
+      }
+    },
+    "MAOA": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4128",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is one of two neighboring gene family members that encode mitochondrial enzymes which catalyze the oxidative deamination of amines, such as dopamine, norepinephrine, and serotonin.",
+        "ru": "Моноаминоксидаза катализирует окислительное дезаминирование моноаминов."
+      }
+    },
+    "MAOB": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4129",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the flavin monoamine oxidase family. It is a enzyme located in the mitochondrial outer membrane. It catalyzes the oxidative deamination of biogenic and xenobiotic amines and plays an important role in the metabolism of neuroactive and vasoactive amines in the central nervous sysytem and peripheral tissues.",
+        "ru": "Моноаминоксидаза катализирует окислительное дезаминирование моноаминов."
+      }
+    },
+    "MC4R": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4160",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a membrane-bound receptor and member of the melanocortin receptor family. The encoded protein interacts with adrenocorticotropic and MSH hormones and is mediated by G proteins. This is an intronless gene.",
+        "ru": "Меланокортиновый рецептор участвует в регуляции энергетического баланса."
+      }
+    },
+    "MCM6": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4175",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is one of the highly conserved mini-chromosome maintenance proteins (MCM) that are essential for the initiation of eukaryotic genome replication. The hexameric protein complex formed by the MCM proteins is a key component of the pre-replication complex (pre_RC) and may be involved in the formation of replication forks and in the recruitment of other DNA replication related proteins. The MCM complex consisting of this protein and MCM2, 4 and 7 proteins possesses DNA helicase activity, and may act as a DNA unwinding enzyme.",
+        "ru": "Белок комплекса MCM участвует в репликации ДНК; функция белка не равнозначна эффекту соседнего регуляторного варианта."
+      }
+    },
+    "MEFV": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4210",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a protein, also known as pyrin or marenostrin, that is an important modulator of innate immunity.",
+        "ru": "Кодирует пирин — белок, участвующий в регуляции врождённого иммунитета и воспаления."
+      }
+    },
+    "MTHFR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4524",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene catalyzes the conversion of 5,10-methylenetetrahydrofolate to 5-methyltetrahydrofolate, a co-substrate for homocysteine remethylation to methionine.",
+        "ru": "Метилентетрагидрофолатредуктаза участвует в образовании 5-метилтетрагидрофолата."
+      }
+    },
+    "MTNR1B": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4544",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes one of two high affinity forms of a receptor for melatonin, the primary hormone secreted by the pineal gland. This gene product is an integral membrane protein that is a G-protein coupled, 7-transmembrane receptor. It is found primarily in the retina and brain although this detection requires RT-PCR.",
+        "ru": "Мелатониновый рецептор передаёт сигнал через G-белки."
+      }
+    },
+    "MTR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4548",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the 5-methyltetrahydrofolate-homocysteine methyltransferase. This enzyme, also known as cobalamin-dependent methionine synthase, catalyzes the final step in methionine biosynthesis.",
+        "ru": "Метионинсинтаза участвует в превращении гомоцистеина в метионин."
+      }
+    },
+    "MTRR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4552",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the ferredoxin-NADP(+) reductase (FNR) family of electron transferases. This protein functions in the synthesis of methionine by regenerating methionine synthase to a functional state. Because methionine synthesis requires methyl-group transfer by a folate donor, activity of the encoded enzyme is important for folate metabolism and cellular methylation.",
+        "ru": "Редуктаза метионинсинтазы участвует в поддержании её активности."
+      }
+    },
+    "NAT2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an enzyme that functions to both activate and deactivate arylamine and hydrazine drugs and carcinogens. A second polymorphic arylamine N-acetyltransferase gene (NAT1), is located near this gene (NAT2).",
+        "ru": "N-ацетилтрансфераза участвует в ацетилировании различных соединений."
+      }
+    },
+    "NAT8": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/9027",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene, isolated using the differential display method to detect tissue-specific genes, is specifically expressed in kidney and liver. The encoded protein shows amino acid sequence similarity to N-acetyltransferases. A similar protein in Xenopus affects cell adhesion and gastrulation movements, and may be localized in the secretory pathway.",
+        "ru": "N-ацетилтрансфераза связана с ацетилированием цистеиновых конъюгатов."
+      }
+    },
+    "NFKB2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4791",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a subunit of the transcription factor complex nuclear factor-kappa-B (NFkB). The NFkB complex is expressed in numerous cell types and functions as a central activator of genes involved in inflammation and immune function. The protein encoded by this gene can function as both a transcriptional activator or repressor depending on its dimerization partner.",
+        "ru": "Компонент транскрипционного комплекса NF-kappaB участвует в регуляции иммунных сигналов."
+      }
+    },
+    "NLRC4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/58484",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the caspase recruitment domain-containing NLR family. Family members play essential roles in innate immune response to a wide range of pathogenic organisms, tissue damage and other cellular stresses.",
+        "ru": "Белок врождённого иммунитета участвует в образовании инфламмасомы."
+      }
+    },
+    "NLRP12": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/91662",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the CATERPILLER family of cytoplasmic proteins. The encoded protein, which contains an N-terminal pyrin domain, a NACHT domain, a NACHT-associated domain, and a C-terminus leucine-rich repeat region, functions as an attenuating factor of inflammation by suppressing inflammatory responses in activated monocytes.",
+        "ru": "Белок семейства NLR участвует в регуляции врождённого иммунитета."
+      }
+    },
+    "NLRP3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/114548",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a pyrin-like protein containing a pyrin domain, a nucleotide-binding site (NBS) domain, and a leucine-rich repeat (LRR) motif. This protein interacts with the apoptosis-associated speck-like protein PYCARD/ASC, which contains a caspase recruitment domain, and is a member of the NLRP3 inflammasome complex. This complex functions as an upstream activator of NF-kappaB signaling, and it plays a role in the regulation of inflammation, the immune response, and apoptosis.",
+        "ru": "Компонент инфламмасомы участвует в активации воспалительного ответа."
+      }
+    },
+    "NOD2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/64127",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is a member of the Nod1/Apaf-1 family and encodes a protein with two caspase recruitment (CARD) domains and six leucine-rich repeats (LRRs). The protein is primarily expressed in the peripheral blood leukocytes. It plays a role in the immune response to intracellular bacterial lipopolysaccharides (LPS) by recognizing the muramyl dipeptide (MDP) derived from them and activating the NFKB protein.",
+        "ru": "Внутриклеточный рецептор распознаёт бактериальные компоненты и участвует во врождённом иммунитете."
+      }
+    },
+    "NOS3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4846",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Nitric oxide is a reactive free radical which acts as a biologic mediator in several processes, including neurotransmission and antimicrobial and antitumoral activities. Nitric oxide is synthesized from L-arginine by nitric oxide synthases.",
+        "ru": "Эндотелиальная NO-синтаза образует оксид азота."
+      }
+    },
+    "NR3C1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2908",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes glucocorticoid receptor, which can function both as a transcription factor that binds to glucocorticoid response elements in the promoters of glucocorticoid responsive genes to activate their transcription, and as a regulator of other transcription factors. This receptor is typically found in the cytoplasm, but upon ligand binding, is transported into the nucleus. It is involved in inflammatory responses, cellular proliferation, and differentiation in target tissues.",
+        "ru": "Глюкокортикоидный рецептор участвует в регуляции транскрипции в ответ на глюкокортикоиды."
+      }
+    },
+    "NUDT15": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/55270",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes an enzyme that belongs to the Nudix hydrolase superfamily. Members of this superfamily catalyze the hydrolysis of nucleoside diphosphates, including substrates like 8-oxo-dGTP, which are a result of oxidative damage, and can induce base mispairing during DNA replication, causing transversions. The encoded enzyme is a negative regulator of thiopurine activation and toxicity.",
+        "ru": "Фермент гидролизует нуклеозидные трифосфаты и ограничивает включение некоторых модифицированных нуклеотидов."
+      }
+    },
+    "OPTN": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10133",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the coiled-coil containing protein optineurin. Optineurin may play a role in normal-tension glaucoma and adult-onset primary open angle glaucoma. Optineurin interacts with adenovirus E3-14.7K protein and may utilize tumor necrosis factor-alpha or Fas-ligand pathways to mediate apoptosis, inflammation or vasoconstriction.",
+        "ru": "Оптинейрин участвует во внутриклеточном транспорте и клеточных сигнальных процессах."
+      }
+    },
+    "OXTR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5021",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to the G-protein coupled receptor family and acts as a receptor for oxytocin. Its activity is mediated by G proteins which activate a phosphatidylinositol-calcium second messenger system. The oxytocin-oxytocin receptor system plays an important role in the uterus during parturition.",
+        "ru": "Окситоциновый рецептор передаёт сигнал через G-белки."
+      }
+    },
+    "PADI4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/23569",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is a member of a gene family which encodes enzymes responsible for the conversion of arginine residues to citrulline residues. This gene may play a role in granulocyte and macrophage development leading to inflammation and immune response.",
+        "ru": "Пептидиларгинин-деиминаза катализирует цитруллинирование белков."
+      }
+    },
+    "PAQR6": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/79957",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Predicted to enable signaling receptor activity. Predicted to be located in plasma membrane.",
+        "ru": "Белок семейства рецепторов адипонектина/прогестина; часть функциональных характеристик остаётся предположительной."
+      }
+    },
+    "PCSK9": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/255738",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the subtilisin-like proprotein convertase family, which includes proteases that process protein and peptide precursors trafficking through regulated or constitutive branches of the secretory pathway. The encoded protein undergoes an autocatalytic processing event with its prosegment in the ER and is constitutively secreted as an inactive protease into the extracellular matrix and trans-Golgi network. It is expressed in liver, intestine and kidney tissues and escorts specific receptors for lysosomal degradation.",
+        "ru": "Белок участвует в регуляции количества рецепторов ЛПНП."
+      }
+    },
+    "PEMT": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10400",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Phosphatidylcholine (PC) is the most abundant mammalian phospholipid. This gene encodes an enzyme which converts phosphatidylethanolamine to phosphatidylcholine by sequential methylation in the liver. Another distinct synthetic pathway in nucleated cells converts intracellular choline to phosphatidylcholine by a three-step process.",
+        "ru": "Фосфатидилэтаноламин-N-метилтрансфераза участвует в синтезе фосфатидилхолина."
+      }
+    },
+    "PGR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5241",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the steroid receptor superfamily. Two of the isoforms (A and B) are identical except for an additional 165 amino acids found in the N-terminus of isoform B and mediate their own response genes and physiologic effects with little overlap.",
+        "ru": "Прогестероновый рецептор регулирует транскрипцию в ответ на прогестерон."
+      }
+    },
+    "PIK3CD": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5293",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Phosphoinositide 3-kinases (PI3Ks) phosphorylate inositol lipids and are involved in the immune response. The protein encoded by this gene is a class I PI3K found primarily in leukocytes. Like other class I PI3Ks (p110-alpha p110-beta, and p110-gamma), the encoded protein binds p85 adapter proteins and GTP-bound RAS.",
+        "ru": "Каталитическая субъединица PI3K участвует в фосфоинозитидной сигнализации, в том числе в иммунных клетках."
+      }
+    },
+    "PIK3R1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5295",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Phosphatidylinositol 3-kinase phosphorylates the inositol ring of phosphatidylinositol at the 3-prime position. The enzyme comprises a 110 kD catalytic subunit and a regulatory subunit of either 85, 55, or 50 kD. This gene encodes the 85 kD regulatory subunit.",
+        "ru": "Регуляторная субъединица PI3K участвует в фосфоинозитидной сигнализации."
+      }
+    },
+    "PNPLA3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/80339",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a triacylglycerol lipase that mediates triacylglycerol hydrolysis in adipocytes. The encoded protein, which appears to be membrane bound, may be involved in the balance of energy usage/storage in adipocytes.",
+        "ru": "Белок связан с обменом липидов; описана липазная активность."
+      }
+    },
+    "PPARG": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5468",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the peroxisome proliferator-activated receptor (PPAR) subfamily of nuclear receptors. PPARs form heterodimers with retinoid X receptors (RXRs) and these heterodimers regulate transcription of various genes. Three subtypes of PPARs are known: PPAR-alpha, PPAR-delta, and PPAR-gamma.",
+        "ru": "Ядерный рецептор участвует в регуляции транскрипции и липидного обмена."
+      }
+    },
+    "PPM1K": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/152926",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the PPM family of Mn2+/Mg2+-dependent protein phosphatases. The encoded protein, essential for cell survival and development, is targeted to the mitochondria where it plays a key role in regulation of the mitochondrial permeability transition pore.",
+        "ru": "Митохондриальная протеинфосфатаза участвует в регуляции белков."
+      }
+    },
+    "PRKN": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5071",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The precise function of this gene is unknown; however, the encoded protein is a component of a multiprotein E3 ubiquitin ligase complex that mediates the targeting of substrate proteins for proteasomal degradation.",
+        "ru": "E3-убиквитинлигаза паркин участвует в убиквитинировании белков и клеточном контроле качества."
+      }
+    },
+    "PRODH": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5625",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a mitochondrial protein that catalyzes the first step in proline degradation.",
+        "ru": "Митохондриальный фермент катализирует первый этап распада пролина."
+      }
+    },
+    "PRSS1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5644",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a trypsinogen, which is a member of the trypsin family of serine proteases. This enzyme is secreted by the pancreas and cleaved to its active form in the small intestine. It is active on peptide linkages involving the carboxyl group of lysine or arginine.",
+        "ru": "Кодирует трипсиноген — предшественник пищеварительной протеазы трипсина."
+      }
+    },
+    "PSPH": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5723",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene belongs to a subfamily of the phosphotransferases. This encoded enzyme is responsible for the third and last step in L-serine formation. It catalyzes magnesium-dependent hydrolysis of L-phosphoserine and is also involved in an exchange reaction between L-serine and L-phosphoserine.",
+        "ru": "Фосфосеринфосфатаза катализирует заключительный этап синтеза L-серина."
+      }
+    },
+    "PSTPIP1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/9051",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a cytoskeletal protein that is highly expressed in hemopoietic tissues. This protein functions via its interaction with several different proteins involved in cytoskeletal organization and inflammatory processes. It binds to the cytoplasmic tail of CD2, an effector of T cell activation and adhesion, downregulating CD2-triggered adhesion.",
+        "ru": "Цитоскелетный белок взаимодействует с белками организации цитоскелета и клеточной сигнализации."
+      }
+    },
+    "PTPN22": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/26191",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes of member of the non-receptor class 4 subfamily of the protein-tyrosine phosphatase family. The encoded protein is a lymphoid-specific intracellular phosphatase that associates with the molecular adapter protein CBL and may be involved in regulating CBL function in the T-cell receptor signaling pathway.",
+        "ru": "Внутриклеточная тирозинфосфатаза участвует в регуляции сигналов лимфоцитов."
+      }
+    },
+    "SECISBP2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/79048",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is one of the essential components of the machinery involved in co-translational insertion of selenocysteine (Sec) into selenoproteins. Sec is encoded by the UGA codon, which normally signals translation termination. The recoding of UGA as Sec codon requires a Sec insertion sequence (SECIS) element; present in the 3' untranslated regions of eukaryotic selenoprotein mRNAs.",
+        "ru": "Участвует во включении селеноцистеина в селенопротеины."
+      }
+    },
+    "SERPINA1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/5265",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a serine protease inhibitor belonging to the serpin superfamily whose targets include elastase, plasmin, thrombin, trypsin, chymotrypsin, and plasminogen activator. This protein is produced in the liver, the bone marrow, by lymphocytic and monocytic cells in lymphoid tissue, and by the Paneth cells of the gut.",
+        "ru": "Альфа-1-антитрипсин ингибирует сериновые протеазы."
+      }
+    },
+    "SHBG": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6462",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a steroid binding protein that was first described as a plasma protein secreted by the liver but is now thought to participate in the regulation of steroid responses. The encoded protein transports androgens and estrogens in the blood, binding each steroid molecule as a dimer formed from identical or nearly identical monomers.",
+        "ru": "Белок связывает половые стероиды и участвует в их переносе и доступности."
+      }
+    },
+    "SHMT1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6470",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the cytosolic form of serine hydroxymethyltransferase, a pyridoxal phosphate-containing enzyme that catalyzes the reversible conversion of serine and tetrahydrofolate to glycine and 5,10-methylene tetrahydrofolate. This reaction provides one-carbon units for synthesis of methionine, thymidylate, and purines in the cytoplasm. A pseudogene of this gene is located on the short arm of chromosome 1.",
+        "ru": "Серин-гидроксиметилтрансфераза участвует в обмене серина, глицина и одноуглеродных групп."
+      }
+    },
+    "SLC10A2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6555",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a sodium/bile acid cotransporter. This transporter is the primary mechanism for uptake of intestinal bile acids by apical cells in the distal ileum. Bile acids are the catabolic product of cholesterol metabolism, so this protein is also critical for cholesterol homeostasis.",
+        "ru": "Натрий-зависимый транспортёр желчных кислот обеспечивает их захват в кишечнике."
+      }
+    },
+    "SLC16A9": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/220963",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Enables carnitine transmembrane transporter activity and creatine transmembrane transporter activity. Involved in carnitine transmembrane transport; creatine transmembrane transport; and urate metabolic process. Located in plasma membrane.",
+        "ru": "Транспортёр связан с переносом карнитина и креатина."
+      }
+    },
+    "SLC22A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6580",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Polyspecific organic cation transporters in the liver, kidney, intestine, and other organs are critical for elimination of many endogenous small organic cations as well as a wide array of drugs and environmental toxins. This gene is one of three similar cation transporter genes located in a cluster on chromosome 6. The encoded protein contains twelve putative transmembrane domains and is a plasma integral membrane protein.",
+        "ru": "Транспортёр органических катионов участвует в захвате и выведении различных соединений."
+      }
+    },
+    "SLC22A12": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/116085",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the organic anion transporter (OAT) family, and it acts as a urate transporter to regulate urate levels in blood. This protein is an integral membrane protein primarily found in epithelial cells of the proximal tubule of the kidney.",
+        "ru": "Транспортёр урата участвует в регуляции его переноса в почках."
+      }
+    },
+    "SLC2A9": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/56606",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the SLC2A facilitative glucose transporter family. Members of this family play a significant role in maintaining glucose homeostasis. The encoded protein may play a role in the development and survival of chondrocytes in cartilage matrices.",
+        "ru": "Мембранный транспортёр семейства SLC2 участвует в переносе малых молекул, включая урат."
+      }
+    },
+    "SLC30A8": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/169026",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a zinc efflux transporter involved in the accumulation of zinc in intracellular vesicles. This gene is expressed at a high level only in the pancreas, particularly in islets of Langerhans. The encoded protein colocalizes with insulin in the secretory pathway granules of the insulin-secreting INS-1 cells.",
+        "ru": "Цинковый транспортёр участвует в накоплении цинка во внутриклеточных везикулах."
+      }
+    },
+    "SLC6A2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6530",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the sodium:neurotransmitter symporter family. This member is a multi-pass membrane protein, which is responsible for reuptake of norepinephrine into presynaptic nerve terminals and is a regulator of norepinephrine homeostasis.",
+        "ru": "Транспортёр обеспечивает обратный захват норадреналина."
+      }
+    },
+    "SLC7A2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6542",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a cationic amino acid transporter and a member of the APC (amino acid-polyamine-organocation) family of transporters. The encoded membrane protein is responsible for the cellular uptake of arginine, lysine and ornithine.",
+        "ru": "Мембранный транспортёр участвует в переносе катионных аминокислот."
+      }
+    },
+    "SLCO1B1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10599",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a liver-specific member of the organic anion transporter family. The encoded protein is a transmembrane receptor that mediates the sodium-independent uptake of numerous endogenous compounds including bilirubin, 17-beta-glucuronosyl estradiol and leukotriene C4. This protein is also involved in the removal of drug compounds such as statins, bromosulfophthalein and rifampin from the blood into the hepatocytes.",
+        "ru": "Печёночный транспортёр органических анионов участвует в захвате эндогенных соединений и лекарств."
+      }
+    },
+    "SPINK1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6690",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a trypsin inhibitor, which is secreted from pancreatic acinar cells into pancreatic juice. It is thought to function in the prevention of trypsin-catalyzed premature activation of zymogens within the pancreas and the pancreatic duct.",
+        "ru": "Ингибитор трипсина участвует в защите поджелудочной железы от преждевременной протеолитической активности."
+      }
+    },
+    "SRD5A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6715",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Steroid 5-alpha-reductase (EC 1.3.99.5) catalyzes the conversion of testosterone into the more potent androgen, dihydrotestosterone (DHT). Also see SRD5A2 (MIM 607306).[supplied by OMIM, Mar 2008]",
+        "ru": "Стероид-5-альфа-редуктаза превращает тестостерон в дигидротестостерон."
+      }
+    },
+    "STAT1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6772",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the STAT protein family. In response to cytokines and growth factors, STAT family members are phosphorylated by the receptor associated kinases, and then form homo- or heterodimers that translocate to the cell nucleus where they act as transcription activators. The protein encoded by this gene can be activated by various ligands including interferon-alpha, interferon-gamma, EGF, PDGF and IL6.",
+        "ru": "Транскрипционный фактор передаёт сигналы цитокинов и факторов роста."
+      }
+    },
+    "STAT3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6774",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the STAT protein family. In response to cytokines and growth factors, STAT family members are phosphorylated by the receptor associated kinases, and then form homo- or heterodimers that translocate to the cell nucleus where they act as transcription activators. This protein is activated through phosphorylation in response to various cytokines and growth factors including IFNs, EGF, IL5, IL6, HGF, LIF and BMP2.",
+        "ru": "Транскрипционный фактор передаёт сигналы цитокинов и факторов роста."
+      }
+    },
+    "STAT4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6775",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the STAT family of transcription factors. In response to cytokines and growth factors, STAT family members are phosphorylated by the receptor associated kinases, and then form homo- or heterodimers that translocate to the cell nucleus where they act as transcription activators. This protein is essential for mediating responses to IL12 in lymphocytes, and regulating the differentiation of T helper cells.",
+        "ru": "Транскрипционный фактор передаёт сигналы цитокинов."
+      }
+    },
+    "SULT2A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6822",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the sulfotransferase family. Sulfotransferases aid in the metabolism of drugs and endogenous compounds by converting these substances into more hydrophilic water-soluble sulfate conjugates that can be easily excreted.",
+        "ru": "Сульфотрансфераза участвует в конъюгации стероидов и других соединений с сульфатом."
+      }
+    },
+    "TCF7L2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6934",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a high mobility group (HMG) box-containing transcription factor that plays a key role in the Wnt signaling pathway. The protein has been implicated in blood glucose homeostasis.",
+        "ru": "Транскрипционный фактор участвует в Wnt-сигнализации."
+      }
+    },
+    "TG": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7038",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Thyroglobulin (Tg) is a glycoprotein homodimer produced predominantly by the thryroid gland. It acts as a substrate for the synthesis of thyroxine and triiodothyronine as well as the storage of the inactive forms of thyroid hormone and iodine. Thyroglobulin is secreted from the endoplasmic reticulum to its site of iodination, and subsequent thyroxine biosynthesis, in the follicular lumen.",
+        "ru": "Тиреоглобулин служит субстратом для синтеза тиреоидных гормонов."
+      }
+    },
+    "TH": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7054",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is involved in the conversion of tyrosine to dopamine. It is the rate-limiting enzyme in the synthesis of catecholamines, hence plays a key role in the physiology of adrenergic neurons.",
+        "ru": "Тирозингидроксилаза участвует в синтезе катехоламинов."
+      }
+    },
+    "THADA": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/63892",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene is the target of 2p21 choromosomal aberrations in benign thyroid adenomas. The encoded protein is likely involved in the death receptor pathway and apoptosis.",
+        "ru": "Справочник описывает ассоциации гена, но не устанавливает точный биохимический механизм его продукта."
+      }
+    },
+    "TM6SF2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/53345",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "Enables identical protein binding activity. Involved in regulation of lipid metabolic process. Located in endoplasmic reticulum membrane and endoplasmic reticulum-Golgi intermediate compartment membrane.",
+        "ru": "Белок связан с регуляцией липидного обмена и мембранами эндоплазматического ретикулума."
+      }
+    },
+    "TMPRSS6": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/164656",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a type II transmembrane serine proteinase that is found attached to the cell surface. The encoded protein may be involved in matrix remodeling processes in the liver.",
+        "ru": "Мембранная сериновая протеаза; изменения функции связаны с регуляцией обмена железа."
+      }
+    },
+    "TNF": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7124",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a multifunctional proinflammatory cytokine that belongs to the tumor necrosis factor (TNF) superfamily. This cytokine is mainly secreted by macrophages. It can bind to, and thus functions through its receptors TNFRSF1A/TNFR1 and TNFRSF1B/TNFBR.",
+        "ru": "Провоспалительный цитокин участвует в иммунной сигнализации."
+      }
+    },
+    "TNFAIP3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7128",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene was identified as a gene whose expression is rapidly induced by the tumor necrosis factor (TNF). The protein encoded by this gene is a zinc finger protein and ubiqitin-editing enzyme, and has been shown to inhibit NF-kappa B activation as well as TNF-mediated apoptosis. The encoded protein, which has both ubiquitin ligase and deubiquitinase activities, is involved in the cytokine-mediated immune and inflammatory responses.",
+        "ru": "Белок A20 участвует в регуляции убиквитинирования и воспалительных сигналов."
+      }
+    },
+    "TNFRSF11B": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/4982",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a member of the TNF-receptor superfamily. This protein is an osteoblast-secreted decoy receptor that functions as a negative regulator of bone resorption. This protein specifically binds to its ligand, osteoprotegerin ligand, both of which are key extracellular regulators of osteoclast development.",
+        "ru": "Остеопротегерин — секретируемый рецептор-ловушка, участвующий в регуляции резорбции кости."
+      }
+    },
+    "TNFRSF1A": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7132",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the TNF receptor superfamily of proteins. The encoded receptor is found in membrane-bound and soluble forms that interact with membrane-bound and soluble forms, respectively, of its ligand, tumor necrosis factor alpha. Binding of membrane-bound tumor necrosis factor alpha to the membrane-bound receptor induces receptor trimerization and activation, which plays a role in cell survival, apoptosis, and inflammation.",
+        "ru": "Рецептор TNF участвует в передаче его сигнала."
+      }
+    },
+    "TNPO3": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/23534",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a nuclear import receptor for serine/arginine-rich (SR) proteins such as the splicing factors SFRS1 and SFRS2. The encoded protein has also been shown to be involved in HIV-1 infection, apparently through interaction with the HIV-1 capsid protein.",
+        "ru": "Транспортин-3 участвует в ядерном импорте белков, богатых серином и аргинином."
+      }
+    },
+    "TPMT": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7172",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the enzyme that metabolizes thiopurine drugs via S-adenosyl-L-methionine as the S-methyl donor and S-adenosyl-L-homocysteine as a byproduct. Thiopurine drugs such as 6-mercaptopurine are used as chemotherapeutic agents. Related pseudogenes have been identified on chromosomes 3, 18 and X.",
+        "ru": "Тиопурин-S-метилтрансфераза участвует в метаболизме тиопуриновых соединений."
+      }
+    },
+    "TPO": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7173",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a membrane-bound glycoprotein. The encoded protein acts as an enzyme and plays a central role in thyroid gland function. The protein functions in the iodination of tyrosine residues in thyroglobulin and phenoxy-ester formation between pairs of iodinated tyrosines to generate the thyroid hormones, thyroxine and triiodothyronine.",
+        "ru": "Тиреопероксидаза участвует в йодировании субстратов и синтезе тиреоидных гормонов."
+      }
+    },
+    "TRAF3IP2": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/10758",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a protein involved in regulating responses to cytokines by members of the Rel/NF-kappaB transcription factor family. These factors play a central role in innate immunity in response to pathogens, inflammatory signals and stress. This gene product interacts with TRAF proteins (tumor necrosis factor receptor-associated factors) and either I-kappaB kinase or MAP kinase to activate either NF-kappaB or Jun kinase.",
+        "ru": "Адаптерный белок участвует в регуляции цитокиновых сигналов через NF-kappaB."
+      }
+    },
+    "TSHR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7253",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is a membrane protein and a major controller of thyroid cell metabolism. The encoded protein is a receptor for thyrothropin and thyrostimulin, and its activity is mediated by adenylate cyclase. Defects in this gene are a cause of several types of hyperthyroidism.",
+        "ru": "Рецептор тиреотропного гормона участвует в регуляции функции клеток щитовидной железы."
+      }
+    },
+    "UGT1A1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/54658",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a UDP-glucuronosyltransferase, an enzyme of the glucuronidation pathway that transforms small lipophilic molecules, such as steroids, bilirubin, hormones, and drugs, into water-soluble, excretable metabolites. This gene is part of a complex locus that encodes several UDP-glucuronosyltransferases. The locus includes thirteen unique alternate first exons followed by four common exons.",
+        "ru": "Глюкуронозилтрансфераза участвует в конъюгации билирубина и других малых молекул."
+      }
+    },
+    "UMOD": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7369",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The protein encoded by this gene is the most abundant protein in mammalian urine under physiological conditions. Its excretion in urine follows proteolytic cleavage of the ectodomain of its glycosyl phosphatidylinosital-anchored counterpart that is situated on the luminal cell surface of the loop of Henle. This protein may act as a constitutive inhibitor of calcium crystallization in renal fluids.",
+        "ru": "Уромодулин — белок, секретируемый в мочу клетками почек."
+      }
+    },
+    "VDR": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7421",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes vitamin D3 receptor, which is a member of the nuclear hormone receptor superfamily of ligand-inducible transcription factors. This receptor also functions as a receptor for the secondary bile acid, lithocholic acid. A recent study provided evidence for translational readthrough in this gene, and expression of an additional C-terminally extended isoform via the use of an alternative in-frame translation termination codon.",
+        "ru": "Рецептор витамина D регулирует транскрипцию в ответ на его активный метаболит."
+      }
+    },
+    "VKORC1": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/79001",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes the catalytic subunit of the vitamin K epoxide reductase complex, which is responsible for the reduction of inactive vitamin K 2,3-epoxide to active vitamin K in the endoplasmic reticulum membrane. Vitamin K is a required co-factor for carboxylation of glutamic acid residues by vitamin K-dependent gamma-carboxylase in blood-clotting enzymes. Pseudogenes of this gene are located on chromosomes 1 and X.",
+        "ru": "Витамин-K-эпоксидредуктаза участвует в восстановлении витамина K."
+      }
+    },
+    "WDR12": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/55759",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a member of the WD repeat protein family. WD repeats are minimally conserved regions of approximately 40 amino acids typically bracketed by gly-his and trp-asp (GH-WD), which may facilitate formation of heterotrimeric or multiprotein complexes. Members of this family are involved in a variety of cellular processes, including cell cycle progression, signal transduction, apoptosis, and gene regulation.",
+        "ru": "Белок с WD-повторами связан с белковыми взаимодействиями и клеточными процессами."
+      }
+    },
+    "WNT4": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/54361",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "The WNT gene family consists of structurally related genes which encode secreted signaling proteins. These proteins have been implicated in oncogenesis and in several developmental processes, including regulation of cell fate and patterning during embryogenesis. This gene is a member of the WNT gene family, and is the first signaling molecule shown to influence the sex-determination cascade.",
+        "ru": "Секретируемый сигнальный белок участвует в развитии тканей через Wnt-сигнализацию."
+      }
+    },
+    "ZKSCAN5": {
+      "source": "https://www.ncbi.nlm.nih.gov/gene/23660",
+      "retrieved": "2026-10-06",
+      "scope": "gene_function",
+      "description": {
+        "en": "This gene encodes a zinc finger protein of the Kruppel family. The protein contains a SCAN box and a KRAB A domain and may be involved in transcriptional regulation. A similar protein in mouse is differentially expressed in spermatogenesis.",
+        "ru": "Белок с цинковыми пальцами; участие в регуляции транскрипции описано предположительно."
+      }
+    }
+  },
+  "variants": {
+    "rs6025": {
+      "description": {
+        "en": "Factor V Leiden changes an activated protein C cleavage site: factor Va is inactivated less efficiently, favouring coagulation. The association concerns venous thrombosis; a molecular mechanism is not an individual risk estimate.",
+        "ru": "Factor V Leiden меняет участок расщепления активированным протеином C: фактор Va инактивируется менее эффективно, что способствует свёртыванию. Ассоциация относится к венозному тромбозу; молекулярный механизм не определяет индивидуальный риск."
+      },
+      "source": "PMID:8164741; DOI:10.1038/369064a0",
+      "gene": "F5"
+    },
+    "rs1799963": {
+      "description": {
+        "en": "G20210A is in the prothrombin gene's 3′ untranslated region. The A allele was associated with higher plasma prothrombin and venous thrombosis in the cited study; this does not predict a person's prothrombin concentration or outcome.",
+        "ru": "G20210A находится в 3′-нетранслируемой области гена протромбина. В указанном исследовании аллель A был связан с более высоким протромбином плазмы и венозным тромбозом; это не предсказывает концентрацию протромбина или исход у человека."
+      },
+      "source": "PMID:8916933",
+      "gene": "F2"
+    },
+    "rs5742904": {
+      "description": {
+        "en": "APOB R3527Q affects the LDL-receptor binding region of apolipoprotein B; impaired LDL clearance is the relevant pathway. A variant description does not establish a diagnosis.",
+        "ru": "APOB R3527Q затрагивает область связывания аполипопротеина B с рецептором ЛПНП; значимый путь — нарушение удаления ЛПНП. Описание варианта не устанавливает диагноз."
+      },
+      "gene": "APOB",
+      "source": "GenCC Definitive (APOB — familial hypercholesterolaemia); ClinVar pathogenic"
+    },
+    "rs429358": {
+      "description": {
+        "en": "Together with rs7412 this position distinguishes APOE isoforms involved in lipoprotein transport. A single SNP does not determine the complete ε genotype or an individual lipid profile.",
+        "ru": "Вместе с rs7412 эта позиция различает изоформы APOE, участвующие в транспорте липопротеинов. Один SNP не определяет полный ε-генотип или индивидуальный липидный профиль."
+      },
+      "gene": "APOE",
+      "source": "Bennet 2007 JAMA (APOE and lipids/CHD meta-analysis)"
+    },
+    "rs7412": {
+      "description": {
+        "en": "Together with rs429358 this position distinguishes APOE isoforms. ε2-related lipid associations depend on the complete genotype and other factors; this row alone cannot establish them for a person.",
+        "ru": "Вместе с rs429358 эта позиция различает изоформы APOE. Связанные с ε2 липидные ассоциации зависят от полного генотипа и других факторов; одна строка их у человека не устанавливает."
+      },
+      "gene": "APOE",
+      "source": "Bennet 2007 JAMA; Mahley 2009 (type III hyperlipoproteinaemia in ε2/ε2)"
+    },
+    "rs10455872": {
+      "description": {
+        "en": "The curated literature links the G allele to higher lipoprotein(a). The association does not measure Lp(a), identify all causal variation or determine an individual's cardiovascular risk.",
+        "ru": "Курируемая литература связывает аллель G с более высоким липопротеином(а). Ассоциация не измеряет Лп(а), не определяет все причинные варианты или индивидуальный сердечно-сосудистый риск."
+      },
+      "gene": "LPA",
+      "source": "Clarke 2009 NEJM"
+    },
+    "rs3798220": {
+      "description": {
+        "en": "LPA I4399M (C) is linked to higher lipoprotein(a) in the curated literature; a measured Lp(a) concentration cannot be inferred from this position.",
+        "ru": "LPA I4399M (C) связан с более высоким липопротеином(а) в курируемой литературе; измеренную концентрацию Лп(а) по этой позиции получить нельзя."
+      },
+      "gene": "LPA",
+      "source": "Clarke 2009 NEJM"
+    },
+    "rs1801253": {
+      "description": {
+        "en": "ADRB1 Arg389/Gly389 concerns beta-1 adrenergic receptor signalling. Functional and beta-blocker response studies do not establish a genotype-based treatment rule.",
+        "ru": "ADRB1 Arg389/Gly389 относится к передаче сигнала бета-1-адренорецептором. Функциональные исследования и исследования ответа на бета-блокаторы не устанавливают правило лечения по генотипу."
+      },
+      "gene": "ADRB1",
+      "source": "the locus catalogue; no CPIC/DPWG guideline for beta-blockers"
+    },
+    "rs5985": {
+      "description": {
+        "en": "F13A1 Val34Leu is linked to faster factor XIII activation and altered clot structure. The curated literature reports a venous thrombosis association; it is not a personal protective guarantee.",
+        "ru": "F13A1 Val34Leu связан с более быстрой активацией фактора XIII и изменением структуры сгустка. Курируемая литература описывает ассоциацию с венозным тромбозом; это не гарантия защиты человека."
+      },
+      "gene": "F13A1",
+      "source": "PMID 16740590 (Wells 2006: factor XIII Val34Leu is protective against VTE, HuGE review and meta-analysis); PMID 12358922 (Van Hylckama Vlieg 2002)"
+    },
+    "rs1126643": {
+      "description": {
+        "en": "ITGA2 C807T is linked to platelet collagen-receptor expression and an ischaemic stroke association in the curated literature. Receptor biology is not an individual event prediction.",
+        "ru": "ITGA2 C807T связан с экспрессией рецептора коллагена на тромбоцитах и ассоциацией с ишемическим инсультом в курируемой литературе. Биология рецептора не предсказывает событие у человека."
+      },
+      "gene": "ITGA2",
+      "source": "PMID 16820192 (Nikolopoulos 2007: ITGA2 C807T and ischemic stroke, meta-analysis); PMID 26556301 (Nissinen 2016: platelet response and α2β1 integrin)"
+    },
+    "rs5918": {
+      "description": {
+        "en": "ITGB3 PlA1/PlA2 concerns platelet integrin GPIIIa; the curated literature reports associations with arterial events. A consistent personal effect or treatment rule is not established by this row.",
+        "ru": "ITGB3 PlA1/PlA2 относится к тромбоцитарному интегрину GPIIIa; курируемая литература описывает ассоциации с артериальными событиями. Эта строка не устанавливает устойчивый индивидуальный эффект или правило лечения."
+      },
+      "gene": "ITGB3",
+      "source": "PMID 11341496 (Di Castelnuovo 2001: PlA1/PlA2 and coronary risk, meta-analysis); PMID 38920993 (Coadă 2024: PlA1/A2 and stroke, updated meta-analysis); PMID 23834376"
+    },
+    "rs1800790": {
+      "description": {
+        "en": "FGB −455G/A is a promoter variant linked to fibrinogen beta-chain synthesis and circulating fibrinogen. The association is not a measurement of this person's fibrinogen.",
+        "ru": "FGB −455G/A — промоторный вариант, связанный с синтезом бета-цепи фибриногена и циркулирующим фибриногеном. Ассоциация не измеряет фибриноген этого человека."
+      },
+      "gene": "FGB",
+      "source": "PMID 22388766 (Ken-Dror 2012: a genetic instrument for Mendelian randomization of fibrinogen); PMID 39674435 (Ken-Dror 2025)"
+    },
+    "rs1050828": {
+      "description": {
+        "en": "G6PD V68M is part of the A− allele context. Reduced red-cell G6PD activity can affect oxidative stress tolerance and red-cell survival; a single position does not establish enzyme activity or a complete haplotype.",
+        "ru": "G6PD V68M входит в контекст аллеля A−. Снижение активности G6PD эритроцитов может менять устойчивость к окислительному стрессу и срок жизни клеток; одна позиция не определяет активность фермента или полный гаплотип."
+      },
+      "gene": "G6PD",
+      "source": "CPIC G6PD (Gammal 2023); Wheeler 2017 PLoS Med (HbA1c underestimates glycaemia in G6PD deficiency)"
+    },
+    "rs5030868": {
+      "description": {
+        "en": "G6PD S188F is the Mediterranean variant associated with reduced enzyme function. Red-cell survival and oxidative stress are the relevant pathways; sex and the actual enzyme phenotype matter.",
+        "ru": "G6PD S188F — средиземноморский вариант, связанный со сниженной функцией фермента. Значимые пути — срок жизни эритроцитов и окислительный стресс; важны пол и фактический ферментный фенотип."
+      },
+      "gene": "G6PD",
+      "source": "CPIC G6PD (Gammal 2023)"
+    },
+    "rs7903146": {
+      "description": {
+        "en": "The T allele is associated with type 2 diabetes in the curated literature. TCF7L2 regulates transcription in glucose and incretin-related pathways; the association does not establish an individual's insulin secretion.",
+        "ru": "Аллель T связан с диабетом 2 типа в курируемой литературе. TCF7L2 регулирует транскрипцию в путях глюкозы и инкретинов; ассоциация не устанавливает секрецию инсулина у человека."
+      },
+      "gene": "TCF7L2",
+      "source": "Grant 2006 Nat Genet"
+    },
+    "rs1260326": {
+      "description": {
+        "en": "GCKR P446L concerns hepatic glucokinase regulation. The curated literature links L446 to lower fasting glucose and higher triglycerides; these are population associations, not predicted laboratory values.",
+        "ru": "GCKR P446L относится к регуляции глюкокиназы печени. Курируемая литература связывает L446 с более низкой глюкозой натощак и более высокими триглицеридами; это популяционные ассоциации, а не предсказанные результаты анализов."
+      },
+      "gene": "GCKR",
+      "source": "Orho-Melander 2008 Diabetes"
+    },
+    "rs1801282": {
+      "description": {
+        "en": "PPARG Pro12Ala concerns a regulator of adipocyte differentiation and metabolism; Ala12 is linked to a modestly lower type 2 diabetes association in the curated literature.",
+        "ru": "PPARG Pro12Ala относится к регулятору дифференцировки адипоцитов и обмена; Ala12 связан с умеренно более низкой ассоциацией с диабетом 2 типа в курируемой литературе."
+      },
+      "gene": "PPARG",
+      "source": "Altshuler 2000 Nat Genet (PPARG Pro12Ala)"
+    },
+    "rs12208357": {
+      "description": {
+        "en": "SLC22A1 R61C is described as a reduced-function OCT1 allele. Studies disagree on the clinical metformin response; transporter function alone does not select a medicine or dose.",
+        "ru": "SLC22A1 R61C описан как аллель со сниженной функцией OCT1. Исследования клинического ответа на метформин расходятся; функция транспортёра сама не выбирает препарат или дозу."
+      },
+      "gene": "SLC22A1",
+      "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline"
+    },
+    "rs34130495": {
+      "description": {
+        "en": "SLC22A1 G401S is described as a reduced-function OCT1 allele. A reproducible clinical effect on metformin response has not been established by the curated evidence.",
+        "ru": "SLC22A1 G401S описан как аллель со сниженной функцией OCT1. Курируемые данные не устанавливают воспроизводимый клинический эффект на ответ на метформин."
+      },
+      "gene": "SLC22A1",
+      "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline"
+    },
+    "rs1501299": {
+      "description": {
+        "en": "ADIPOQ +276G/T concerns a locus associated with adiponectin and lipid traits in a meta-analysis; the specific causal mechanism is not established here.",
+        "ru": "ADIPOQ +276G/T относится к локусу, связанному с адипонектином и липидными показателями в метаанализе; конкретный причинный механизм здесь не установлен."
+      },
+      "gene": "ADIPOQ",
+      "source": "PMID 34384110 (Su 2021: ADIPOQ polymorphisms, adiponectin and lipids, meta-analysis); PMID 27915341 (de Luis 2016); PMID 39290095 (Tang 2024)"
+    },
+    "rs2241766": {
+      "description": {
+        "en": "ADIPOQ +45T/G is linked to adiponectin and obesity-related traits in the curated meta-analyses; this is an association, not an individual's adiponectin measurement.",
+        "ru": "ADIPOQ +45T/G связан с адипонектином и связанными с ожирением признаками в курируемых метаанализах; это ассоциация, а не измерение адипонектина человека."
+      },
+      "gene": "ADIPOQ",
+      "source": "PMID 24740426 (Wu 2014: rs2241766 and obesity in adults, meta-analysis); PMID 27554120 (Zhou 2016: rs2241766 and metabolic syndrome)"
+    },
+    "rs182052": {
+      "description": {
+        "en": "ADIPOQ rs182052 was linked to lower adiponectin and metabolic traits in a Russian cohort. Population and other metabolic factors limit its interpretation.",
+        "ru": "ADIPOQ rs182052 был связан с более низким адипонектином и метаболическими признаками в российской когорте. Популяция и другие метаболические факторы ограничивают интерпретацию."
+      },
+      "gene": "ADIPOQ",
+      "source": "PMID 31561637 (Smetnev 2019, Biomolecules 9:537: ADIPOQ rs182052, adiponectin and cardiometabolic disease in Russian patients)"
+    },
+    "rs7754840": {
+      "description": {
+        "en": "The CDKAL1 locus is associated with glucose-stimulated insulin secretion and type 2 diabetes in the curated literature; a locus association does not establish this variant's molecular mechanism.",
+        "ru": "Локус CDKAL1 связан с секрецией инсулина в ответ на глюкозу и диабетом 2 типа в курируемой литературе; ассоциация локуса не устанавливает молекулярный механизм этого варианта."
+      },
+      "gene": "CDKAL1",
+      "source": "PMID 18285412 (Stancáková 2008: rs7754840 and impaired insulin secretion); PMID 26770330 (Tuerxunyiming 2015: rs7754840 and T2D, meta-analysis of 70,141 subjects)"
+    },
+    "rs9465871": {
+      "description": {
+        "en": "The curated literature links this CDKAL1 position to type 2 diabetes; it does not establish an independent molecular effect distinct from other linked positions.",
+        "ru": "Курируемая литература связывает эту позицию CDKAL1 с диабетом 2 типа; она не устанавливает независимый молекулярный эффект, отдельный от других сцепленных позиций."
+      },
+      "gene": "CDKAL1",
+      "source": "PMID 20847106 (Miyaki 2010: a CDKAL1 polymorphism); PMID 18633108 (Wu 2008: CDKAL1, CDKN2A/B, IGF2BP2, SLC30A8 and HHEX/IDE and T2D); PMID 29372795"
+    },
+    "rs7756992": {
+      "description": {
+        "en": "The curated meta-analyses link this CDKAL1 position to type 2 diabetes. Insulin secretion is the pathway under study, not a measurement inferred for the person.",
+        "ru": "Курируемые метаанализы связывают эту позицию CDKAL1 с диабетом 2 типа. Секреция инсулина — исследуемый путь, а не измерение, полученное для человека."
+      },
+      "gene": "CDKAL1",
+      "source": "PMID 24185407 (Li 2013: rs7756992 and T2D, meta-analysis of 62,567 subjects); PMID 20568056 (Dehwah 2010: CDKAL1 and T2D, global meta-analysis)"
+    },
+    "rs1121980": {
+      "description": {
+        "en": "The FTO locus is associated with BMI and obesity in the curated meta-analysis; this does not identify a causal effect of this SNP alone.",
+        "ru": "Локус FTO связан с ИМТ и ожирением в курируемом метаанализе; это не определяет причинный эффект одного этого SNP."
+      },
+      "gene": "FTO",
+      "source": "PMID 21651756 (Peng 2011: FTO gene polymorphisms and obesity risk, meta-analysis)"
+    },
+    "rs1421085": {
+      "description": {
+        "en": "Functional work at the FTO locus links this variant to reduced thermogenic browning of adipocytes. A cellular pathway does not determine an individual's body weight.",
+        "ru": "Функциональная работа в локусе FTO связывает этот вариант со снижением термогенного превращения адипоцитов. Клеточный путь не определяет массу тела человека."
+      },
+      "gene": "FTO",
+      "source": "PMID 21651756 (Peng 2011: FTO and obesity, meta-analysis); PMID 26287746 (Claussnitzer 2015, NEJM: FTO obesity variant circuitry and adipocyte browning)"
+    },
+    "rs17817449": {
+      "description": {
+        "en": "The curated literature links this FTO-region position to obesity; linked loci and environmental factors prevent a personal weight prediction from this row.",
+        "ru": "Курируемая литература связывает эту позицию области FTO с ожирением; сцепленные локусы и факторы среды не позволяют предсказать массу тела по этой строке."
+      },
+      "gene": "FTO",
+      "source": "PMID 21651756 (Peng 2011: FTO and obesity, meta-analysis); PMID 41862896 (Eghbali 2026: FTO variants and adult obesity)"
+    },
+    "rs9939609": {
+      "description": {
+        "en": "This FTO-region position is associated with BMI and fat mass in the curated literature; the association is not an individual outcome or an established mechanism for this SNP.",
+        "ru": "Эта позиция области FTO связана с ИМТ и жировой массой в курируемой литературе; ассоциация не является индивидуальным исходом или установленным механизмом этого SNP."
+      },
+      "gene": "FTO",
+      "source": "PMID 21651756 (Peng 2011: FTO gene polymorphisms and obesity risk, meta-analysis)"
+    },
+    "rs5215": {
+      "description": {
+        "en": "KCNJ11 encodes the Kir6.2 component of the beta-cell ATP-sensitive potassium channel; this position has a type 2 diabetes association in the curated literature.",
+        "ru": "KCNJ11 кодирует компонент Kir6.2 АТФ-чувствительного калиевого канала бета-клетки; для этой позиции в курируемой литературе описана ассоциация с диабетом 2 типа."
+      },
+      "gene": "KCNJ11",
+      "source": "PMID 24065655 (Qin 2013: common variants in the KCNJ11-ABCC8 region and T2D, meta-analysis)"
+    },
+    "rs5219": {
+      "description": {
+        "en": "KCNJ11 E23K concerns glucose-dependent potassium-channel closure and insulin release. The curated meta-analyses report a type 2 diabetes association, not a measured insulin phenotype.",
+        "ru": "KCNJ11 E23K относится к закрытию калиевого канала в ответ на глюкозу и выделению инсулина. Курируемые метаанализы описывают ассоциацию с диабетом 2 типа, а не измеренный инсулиновый фенотип."
+      },
+      "gene": "KCNJ11",
+      "source": "PMID 22082043 (Gong 2012: KCNJ11 polymorphism and T2D, global meta-analysis); PMID 29685723 (Wang 2018: Kir6.2 rs5219 and T2D, meta-analysis)"
+    },
+    "rs17782313": {
+      "description": {
+        "en": "This position is near MC4R, a receptor in appetite regulation; the curated literature links the locus to obesity. Location near a gene does not prove this variant's causal mechanism.",
+        "ru": "Эта позиция находится рядом с MC4R, рецептором регуляции аппетита; курируемая литература связывает локус с ожирением. Близость к гену не доказывает причинный механизм варианта."
+      },
+      "gene": "MC4R",
+      "source": "PMID 23049848 (Xi 2012: the common polymorphism near MC4R and obesity, systematic review); PMID 31954858 (Yu 2020: rs17782313 and obesity, meta-analysis); PMID 37621650"
+    },
+    "rs10830963": {
+      "description": {
+        "en": "The MTNR1B locus connects melatonin signalling with beta-cell function; the curated literature links G to higher fasting glucose. This does not determine a person's glucose value.",
+        "ru": "Локус MTNR1B связывает мелатониновый сигнал с функцией бета-клеток; курируемая литература связывает G с более высокой глюкозой натощак. Это не определяет значение глюкозы человека."
+      },
+      "gene": "MTNR1B",
+      "source": "PMID 19060907 (Prokopenko 2009: variants in MTNR1B influence fasting glucose); PMID 19324940 (Sparsø 2009: the G allele of rs10830963 and IFG/T2D)"
+    },
+    "rs13266634": {
+      "description": {
+        "en": "SLC30A8 encodes the zinc transporter of insulin granules; the R325W position has a type 2 diabetes association in the curated literature.",
+        "ru": "SLC30A8 кодирует транспортёр цинка инсулиновых гранул; для позиции R325W в курируемой литературе описана ассоциация с диабетом 2 типа."
+      },
+      "gene": "SLC30A8",
+      "source": "PMID 21131091 (Xu 2011: rs13266634 of SLC30A8 and T2D); PMID 26214053 (Cheng 2015: rs13266634 and T2D, meta-analysis); PMID 36827808"
+    },
+    "rs12255372": {
+      "description": {
+        "en": "The curated literature links this TCF7L2 position to insulin secretion after glucose and type 2 diabetes; a causal allele mechanism is not established by the locus association.",
+        "ru": "Курируемая литература связывает эту позицию TCF7L2 с секрецией инсулина после глюкозы и диабетом 2 типа; ассоциация локуса не устанавливает причинный механизм аллеля."
+      },
+      "gene": "TCF7L2",
+      "source": "PMID 23579632 (Wang 2013: rs12255372 of TCF7L2 and T2D, meta-analysis); PMID 17130514 (Munoz 2006: TCF7L2 and reduced insulin secretion)"
+    },
+    "rs7901695": {
+      "description": {
+        "en": "This is another position in the TCF7L2 diabetes-associated locus; linked positions must not be treated as independent additive effects.",
+        "ru": "Это ещё одна позиция локуса TCF7L2, связанного с диабетом; сцепленные позиции нельзя считать независимыми складываемыми эффектами."
+      },
+      "gene": "TCF7L2",
+      "source": "PMID 23188737 (Peng 2013: TCF7L2 polymorphisms and T2D, updated meta-analysis); PMID 19228405 (Tong 2009: TCF7L2 and T2D, HuGE review)"
+    },
+    "rs9272346": {
+      "description": {
+        "en": "This HLA-region marker has a type 1 diabetes association in the curated literature. It does not identify a complete HLA haplotype or establish a causal allele.",
+        "ru": "Для этого маркера области HLA в курируемой литературе описана ассоциация с диабетом 1 типа. Он не определяет полный HLA-гаплотип или причинный аллель."
+      },
+      "gene": "HLA-DQA1",
+      "source": "PMID 18978792 (Cooper 2008: GWAS meta-analysis of type 1 diabetes loci); PMID 25661663 (Kiani 2015: 32 type 1 diabetes loci in Pakistani patients)"
+    },
+    "rs1801133": {
+      "description": {
+        "en": "MTHFR C677T concerns folate-dependent one-carbon metabolism; the curated literature links T to higher homocysteine especially with low folate. Genotype does not measure folate or homocysteine.",
+        "ru": "MTHFR C677T относится к фолат-зависимому одноуглеродному обмену; курируемая литература связывает T с более высоким гомоцистеином особенно при низком фолате. Генотип не измеряет фолат или гомоцистеин."
+      },
+      "gene": "MTHFR",
+      "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)"
+    },
+    "rs1801131": {
+      "description": {
+        "en": "MTHFR A1298C is described as affecting enzyme activity; a reproducible independent effect on homocysteine is not established by the curated evidence.",
+        "ru": "MTHFR A1298C описан как влияющий на активность фермента; курируемые данные не устанавливают воспроизводимый независимый эффект на гомоцистеин."
+      },
+      "gene": "MTHFR",
+      "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)"
+    },
+    "rs1800462": {
+      "description": {
+        "en": "TPMT *2 concerns thiopurine methylation. A single position does not identify the complete diplotype or determine an individual drug dose.",
+        "ru": "TPMT *2 относится к метилированию тиопуринов. Одна позиция не определяет полный диплотип или индивидуальную дозу препарата."
+      },
+      "gene": "TPMT",
+      "source": "CPIC guideline for thiopurines (Relling 2019)"
+    },
+    "rs1142345": {
+      "description": {
+        "en": "TPMT *3C concerns thiopurine methylation. Other variants and haplotype phase are needed for the complete TPMT phenotype.",
+        "ru": "TPMT *3C относится к метилированию тиопуринов. Для полного фенотипа TPMT нужны другие варианты и фаза гаплотипов."
+      },
+      "gene": "TPMT",
+      "source": "CPIC guideline for thiopurines (Relling 2019)"
+    },
+    "rs116855232": {
+      "description": {
+        "en": "NUDT15 *3 concerns the breakdown of active thiopurine metabolites; reduced function can increase cellular exposure. This position alone does not establish a complete phenotype or dose.",
+        "ru": "NUDT15 *3 относится к расщеплению активных метаболитов тиопуринов; снижение функции может повышать клеточную экспозицию. Эта позиция сама не устанавливает полный фенотип или дозу."
+      },
+      "gene": "NUDT15",
+      "source": "CPIC guideline for thiopurines (Relling 2019)"
+    },
+    "rs4349859": {
+      "description": {
+        "en": "This is a tag for HLA-B*27, not direct HLA typing. The tag's performance depends on population and cannot establish the allele or an inflammatory diagnosis on its own.",
+        "ru": "Это маркер HLA-B*27, а не прямое HLA-типирование. Надёжность маркера зависит от популяции; сам он не устанавливает аллель или воспалительный диагноз."
+      },
+      "gene": "HLA-B",
+      "source": "Evans 2011 Nat Genet (HLA-B27 tag SNP)"
+    },
+    "rs1205": {
+      "description": {
+        "en": "The curated literature relates this CRP position to baseline CRP; allele direction is unresolved in this catalogue. Gene biology cannot supply that missing direction.",
+        "ru": "Курируемая литература связывает эту позицию CRP с исходным СРБ; направление эффекта аллеля в каталоге не разрешено. Биология гена не заменяет отсутствующее направление."
+      },
+      "gene": "CRP",
+      "source": "Kathiresan 2006 Circulation (CRP gene variants and CRP level)"
+    },
+    "rs2228145": {
+      "description": {
+        "en": "IL6R Asp358Ala is linked to soluble IL-6 receptor and CRP levels; these are pathway and population associations, not an individual's inflammatory state.",
+        "ru": "IL6R Asp358Ala связан с растворимым рецептором IL-6 и уровнем СРБ; это связи пути и популяционные ассоциации, а не воспалительное состояние человека."
+      },
+      "gene": "IL6R",
+      "source": "Ferreira 2013 PLoS Genet (IL6R Asp358Ala)"
+    },
+    "rs225014": {
+      "description": {
+        "en": "DIO2 Thr92Ala concerns type-2 deiodinase and thyroid-hormone activation. Clinical associations and response to thyroid therapy are inconsistent; genotype alone does not determine T3 supply.",
+        "ru": "DIO2 Thr92Ala относится к дейодиназе 2 типа и активации тиреоидных гормонов. Клинические ассоциации и ответ на тиреоидную терапию неоднородны; генотип сам не определяет обеспечение T3."
+      },
+      "gene": "DIO2",
+      "source": "Panicker 2009 JCEM (DIO2 Thr92Ala and LT4/LT3 response); ETA 2012 guideline"
+    },
+    "rs2235544": {
+      "description": {
+        "en": "The curated literature links this DIO1 position to the free T3/free T4 ratio; this is not a thyroid-function diagnosis or a measured hormone ratio for a person.",
+        "ru": "Курируемая литература связывает эту позицию DIO1 с отношением свободных T3/T4; это не диагноз функции щитовидной железы или измеренное отношение гормонов человека."
+      },
+      "gene": "DIO1",
+      "source": "Panicker 2008 JCEM (DIO1 variants and the fT3/fT4 ratio)"
+    },
+    "rs11206244": {
+      "description": {
+        "en": "The curated literature reports an association of this DIO1 position with T4, reverse T3 and T3; evidence is inconsistent and the specific mechanism is not established here.",
+        "ru": "Курируемая литература описывает ассоциацию этой позиции DIO1 с T4, реверсивным T3 и T3; данные неоднородны, конкретный механизм здесь не установлен."
+      },
+      "gene": "DIO1",
+      "source": "Peeters 2003 JCEM (DIO1 C785T and thyroid hormone levels)"
+    },
+    "rs121908876": {
+      "description": {
+        "en": "The panel describes TSHR S505N as an activating receptor variant. Receptor activation is a molecular description; a personal diagnosis requires its own complete clinical basis.",
+        "ru": "Панель описывает TSHR S505N как активирующий вариант рецептора. Активация рецептора — молекулярное описание; персональный диагноз требует собственного полного клинического основания."
+      },
+      "gene": "TSHR",
+      "source": "GenCC Definitive (TSHR — hyperthyroidism, AD); ClinVar pathogenic"
+    },
+    "rs189261858": {
+      "description": {
+        "en": "The panel links TSHR R450H to reduced TSH responsiveness; inheritance, zygosity and thyroid measurements determine whether the association applies clinically.",
+        "ru": "Панель связывает TSHR R450H со сниженной чувствительностью к ТТГ; наследование, зиготность и тиреоидные измерения определяют клиническую применимость связи."
+      },
+      "gene": "TSHR",
+      "source": "GenCC Definitive (TSHR — congenital hypothyroidism / TSH resistance); ClinVar"
+    },
+    "rs179247": {
+      "description": {
+        "en": "The curated literature links this TSHR locus to Graves' disease; this does not establish a receptor-function effect or a diagnosis from this SNP.",
+        "ru": "Курируемая литература связывает этот локус TSHR с болезнью Грейвса; это не устанавливает эффект на функцию рецептора или диагноз по этому SNP."
+      },
+      "gene": "TSHR",
+      "source": "Brand 2009 Hum Mol Genet (TSHR intron 1 and Graves' disease)"
+    },
+    "rs2071403": {
+      "description": {
+        "en": "The curated literature links this TPO position to thyroid peroxidase antibodies and autoimmune thyroid traits. A causal effect on peroxidase activity is not established here.",
+        "ru": "Курируемая литература связывает эту позицию TPO с антителами к тиреопероксидазе и аутоиммунными тиреоидными признаками. Причинный эффект на активность пероксидазы здесь не установлен."
+      },
+      "gene": "TPO",
+      "source": "PMID 24722205 (Kwak 2014: GWAS on thyroid function and anti-TPO antibodies in Koreans); PMID 28845025 (Tomari 2017: TPO polymorphisms and AITD); PMID 38542286 (Lacka 2024)"
+    },
+    "rs4680": {
+      "description": {
+        "en": "COMT Val158Met concerns enzyme thermolability and catecholamine methylation. Clinical and behavioural associations are inconsistent; CPIC gives no opioid dosing recommendation from COMT genotype.",
+        "ru": "COMT Val158Met относится к термолабильности фермента и метилированию катехоламинов. Клинические и поведенческие ассоциации неоднородны; CPIC не даёт рекомендаций по дозированию опиоидов по генотипу COMT."
+      },
+      "source": "CPIC opioid guideline 2021; PMID:33387367; DOI:10.1002/cpt.2149",
+      "gene": "COMT"
+    },
+    "rs1799941": {
+      "description": {
+        "en": "This SHBG position is linked to SHBG and total testosterone concentrations in the curated literature. Total concentration and free hormone are different quantities; no personal value follows from this SNP.",
+        "ru": "Эта позиция SHBG связана с концентрациями ГСПГ и общего тестостерона в курируемой литературе. Общая концентрация и свободный гормон — разные величины; личное значение из SNP не следует."
+      },
+      "gene": "SHBG",
+      "source": "Ohlsson 2011 PLoS Genet (SHBG variants and testosterone)"
+    },
+    "rs6258": {
+      "description": {
+        "en": "SHBG P156L concerns testosterone binding affinity; the curated literature describes altered binding. A binding property does not measure an individual's free hormone concentration.",
+        "ru": "SHBG P156L относится к сродству связывания тестостерона; курируемая литература описывает изменение связывания. Свойство связывания не измеряет свободный гормон человека."
+      },
+      "gene": "SHBG",
+      "source": "Ohlsson 2011 PLoS Genet"
+    },
+    "rs7521902": {
+      "description": {
+        "en": "The WNT4 region has an endometriosis association in the curated literature; a locus association does not establish this SNP's molecular mechanism.",
+        "ru": "Для области WNT4 в курируемой литературе описана ассоциация с эндометриозом; ассоциация локуса не устанавливает молекулярный механизм этого SNP."
+      },
+      "gene": "WNT4",
+      "source": "PMID 38354602 (Eur J Obstet Gynecol Reprod Biol 2024); Nyholt 2012 Nat Genet"
+    },
+    "rs13394619": {
+      "description": {
+        "en": "The GREB1 locus has an endometriosis association in the curated literature; its hormone-responsive biology does not establish a personal diagnosis.",
+        "ru": "Для локуса GREB1 в курируемой литературе описана ассоциация с эндометриозом; его гормон-зависимая биология не устанавливает личный диагноз."
+      },
+      "gene": "GREB1",
+      "source": "PMID 23104006 (Nyholt 2012, Nat Genet)"
+    },
+    "rs13429458": {
+      "description": {
+        "en": "The THADA locus has a polycystic ovary syndrome association in some populations and not others. A specific causal pathway for this SNP is not established here.",
+        "ru": "Для локуса THADA описана ассоциация с синдромом поликистозных яичников в одних популяциях и её отсутствие в других. Конкретный причинный путь этого SNP здесь не установлен."
+      },
+      "gene": "THADA",
+      "source": "PMID 31487746 (Geburtshilfe Frauenheilkd 2019)"
+    },
+    "rs1204038": {
+      "description": {
+        "en": "The cited AR study concerns PSA, not measured androgen sensitivity; it cannot establish increased or reduced androgen action from this SNP.",
+        "ru": "Указанное исследование AR относится к ПСА, а не к измеренной чувствительности к андрогенам; оно не устанавливает усиленное или сниженное действие андрогенов по этому SNP."
+      },
+      "gene": "AR",
+      "source": "PMID 25012998 (Bentmar Holgersson 2014: androgen receptor polymorphism and PSA in European men)"
+    },
+    "rs6152": {
+      "description": {
+        "en": "The curated meta-analysis concerns androgenetic alopecia. It does not measure general androgen sensitivity or establish androgen-dependent hormone levels.",
+        "ru": "Курируемый метаанализ относится к андрогенетической алопеции. Он не измеряет общую чувствительность к андрогенам или уровни андроген-зависимых гормонов."
+      },
+      "gene": "AR",
+      "source": "PMID 21981665 (Zhuo 2012: AR polymorphisms and androgenetic alopecia, meta-analysis); PMID 17256155 (Ellis 2007: the polyglycine repeat does not confer susceptibility)"
+    },
+    "rs743572": {
+      "description": {
+        "en": "This CYP17A1 promoter position has a polycystic ovary syndrome association in the curated literature; the gene participates in androgen synthesis, but the SNP does not measure synthesis in a person.",
+        "ru": "Для этой промоторной позиции CYP17A1 описана ассоциация с синдромом поликистозных яичников; ген участвует в синтезе андрогенов, но SNP не измеряет синтез у человека."
+      },
+      "gene": "CYP17A1",
+      "source": "PMID 34538754 (Xu 2021: rs743572 of CYP17A1 and PCOS); PMID 34788226 (Liu 2021: CYP17 T/C and PCOS susceptibility); PMID 17986287 (2008)"
+    },
+    "rs2470152": {
+      "description": {
+        "en": "The CYP19A1 locus has an estradiol association in men in the curated literature. Aromatase converts androgens to estrogens; this SNP does not determine a person's enzyme activity.",
+        "ru": "Для локуса CYP19A1 описана ассоциация с эстрадиолом у мужчин. Ароматаза превращает андрогены в эстрогены; этот SNP не определяет активность фермента человека."
+      },
+      "gene": "CYP19A1",
+      "source": "PMID 19116238 (Eriksson 2009: sex-steroid genes and serum estrogen in men); PMID 21972004 (Zhang 2012: rs2470152 and aromatase activity); PMID 19818337"
+    },
+    "rs9340799": {
+      "description": {
+        "en": "The curated meta-analysis links ESR1 XbaI to endometriosis-related traits; the association does not demonstrate this variant's receptor mechanism.",
+        "ru": "Курируемый метаанализ связывает ESR1 XbaI с признаками, относящимися к эндометриозу; ассоциация не доказывает рецепторный механизм этого варианта."
+      },
+      "gene": "ESR1",
+      "source": "PMID 24427778 (Paskulin 2013: rs9340799, endometriosis-related infertility); PMID 27373811 (Zhao 2016: ESR1 polymorphisms and endometriosis, meta-analysis); PMID 32776754"
+    },
+    "rs1042838": {
+      "description": {
+        "en": "PGR PROGINS has an endometriosis association in the curated meta-analysis; this is not a diagnosis of progesterone resistance.",
+        "ru": "Для PGR PROGINS описана ассоциация с эндометриозом в курируемом метаанализе; это не диагноз резистентности к прогестерону."
+      },
+      "gene": "PGR",
+      "source": "PMID 11821088 (Wieser 2002: PROGINS and endometriosis); PMID 24943061 (Pabalan 2014: PROGINS and endometriosis, meta-analysis); PMID 20719308"
+    },
+    "rs10895068": {
+      "description": {
+        "en": "The PGR +331G/A promoter variant is described as favouring the PR-B isoform and has an endometriosis association; this does not predict an individual's disease outcome.",
+        "ru": "Промоторный вариант PGR +331G/A описан как способствующий изоформе PR-B и имеет ассоциацию с эндометриозом; это не предсказывает исход заболевания человека."
+      },
+      "gene": "PGR",
+      "source": "PMID 16920727 (van Kaam 2007: PR +331G/A and a decreased risk of deep infiltrating endometriosis); PMID 20719308 (Near 2011); PMID 31435600"
+    },
+    "rs12150660": {
+      "description": {
+        "en": "The curated literature links this SHBG locus to SHBG and total testosterone, without the same association for free testosterone.",
+        "ru": "Курируемая литература связывает этот локус SHBG с ГСПГ и общим тестостероном без такой же ассоциации со свободным тестостероном."
+      },
+      "gene": "SHBG",
+      "source": "PMID 22829776 (Coviello 2012, PLoS Genet: GWAS meta-analysis of circulating SHBG); PMID 21998597 (Ohlsson 2011: genetic determinants of serum testosterone in men)"
+    },
+    "rs2637125": {
+      "description": {
+        "en": "The SULT2A1 locus is associated with DHEA-S; DHEA sulfation is the relevant gene pathway, not a measured enzyme activity from this SNP.",
+        "ru": "Локус SULT2A1 связан с ДГЭА-С; значимый путь гена — сульфатирование ДГЭА, а не измеренная по SNP активность фермента."
+      },
+      "gene": "SULT2A1",
+      "source": "PMID 21533175 (Zhai 2011, PLoS Genet: eight common variants and serum DHEAS); PMID 23132913 (Haring 2013: the SULT2A1 variant and DHEAS)"
+    },
+    "rs11761528": {
+      "description": {
+        "en": "This ZKSCAN5-region position is associated with DHEA-S in the curated literature; a specific causal mechanism is not established here.",
+        "ru": "Эта позиция области ZKSCAN5 связана с ДГЭА-С в курируемой литературе; конкретный причинный механизм здесь не установлен."
+      },
+      "gene": "ZKSCAN5",
+      "source": "PMID 21533175 (Zhai 2011, PLoS Genet: DHEAS GWAS meta-analysis); PMID 28712091 (Vernerova 2018: genetic factors and lower DHEAS)"
+    },
+    "rs1691053": {
+      "description": {
+        "en": "This position is near SRD5A1, which converts testosterone to DHT. Replicated evidence that C or CC increases enzyme activity or DHT is absent from the curated evidence.",
+        "ru": "Эта позиция находится рядом с SRD5A1, превращающим тестостерон в ДГТ. В курируемых данных нет воспроизведённых доказательств, что C или CC повышает активность фермента или ДГТ."
+      },
+      "gene": "SRD5A1",
+      "source": "the panel author's review of 17.09.2026: no reproducible PMID or DOI supports a C → CC ladder for rs1691053"
+    },
+    "rs5934505": {
+      "description": {
+        "en": "This Xp22 position lies between FAM9A and FAM9B, not in AR. The curated GWAS link T to lower total and free testosterone in men, without a SHBG association; the mechanism is not established.",
+        "ru": "Эта позиция Xp22 лежит между FAM9A и FAM9B, а не в AR. Курируемые GWAS связывают T с более низким общим и свободным тестостероном у мужчин без ассоциации с ГСПГ; механизм не установлен."
+      },
+      "gene": "FAM9B",
+      "source": "PMID 21998597 (Ohlsson 2011, PLoS Genet: genetic determinants of serum testosterone in men); PMID 26602056 (Chen 2016, Andrology: rs5934505, low testosterone and late-onset hypogonadism in Chinese men)"
+    },
+    "rs17107315": {
+      "description": {
+        "en": "SPINK1 N34S is associated with chronic pancreatitis in the curated literature. SPINK1 inhibits pancreatic trypsin; that gene function does not prove the specific N34S mechanism.",
+        "ru": "SPINK1 N34S связан с хроническим панкреатитом в курируемой литературе. SPINK1 ингибирует трипсин поджелудочной железы; эта функция гена не доказывает конкретный механизм N34S."
+      },
+      "gene": "SPINK1",
+      "source": "Witt 2000 Nat Genet (SPINK1 N34S and chronic pancreatitis)"
+    },
+    "rs111033565": {
+      "description": {
+        "en": "PRSS1 R122H concerns regulation of trypsin activity and is linked to hereditary pancreatitis in the curated sources; a variant description does not establish a personal diagnosis.",
+        "ru": "PRSS1 R122H относится к регуляции активности трипсина и связан с наследственным панкреатитом в курируемых источниках; описание варианта не устанавливает личный диагноз."
+      },
+      "gene": "PRSS1",
+      "source": "GenCC Definitive (PRSS1 — hereditary pancreatitis, AD); ClinVar pathogenic"
+    },
+    "rs671": {
+      "description": {
+        "en": "ALDH2 *2 concerns reduced acetaldehyde breakdown after alcohol metabolism. The molecular pathway does not quantify individual alcohol-related harm.",
+        "ru": "ALDH2 *2 относится к сниженному расщеплению ацетальдегида после метаболизма алкоголя. Молекулярный путь не определяет величину вреда от алкоголя у человека."
+      },
+      "gene": "ALDH2",
+      "source": "Brooks 2009 PLoS Med (ALDH2*2 and alcohol)"
+    },
+    "rs738409": {
+      "description": {
+        "en": "PNPLA3 I148M concerns hepatic lipid handling and has liver-fat associations in the curated literature. It does not establish current fibrosis or explain a particular ALT result.",
+        "ru": "PNPLA3 I148M относится к переработке липидов печени и имеет ассоциации с жиром печени в курируемой литературе. Он не устанавливает текущий фиброз или причину конкретного АЛТ."
+      },
+      "gene": "PNPLA3",
+      "source": "Romeo 2008 Nat Genet (PNPLA3 I148M and hepatic fat)"
+    },
+    "rs58542926": {
+      "description": {
+        "en": "TM6SF2 E167K is linked to hepatic fat retention and lower circulating lipids in the curated literature. A low LDL-C cannot be read as a measure of liver fat from this SNP.",
+        "ru": "TM6SF2 E167K связан с удержанием жира в печени и более низкими циркулирующими липидами в курируемой литературе. Низкий ЛПНП нельзя считать измерением жира печени по этому SNP."
+      },
+      "gene": "TM6SF2",
+      "source": "Kozlitina 2014 Nat Genet (TM6SF2 E167K)"
+    },
+    "rs1800562": {
+      "description": {
+        "en": "HFE C282Y concerns iron regulation. Clinical expression depends on zygosity, other variants and iron measurements; a single allele does not establish iron overload.",
+        "ru": "HFE C282Y относится к регуляции железа. Клиническое проявление зависит от зиготности, других вариантов и измерений железа; один аллель не устанавливает перегрузку железом."
+      },
+      "gene": "HFE",
+      "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM (penetrance)"
+    },
+    "rs1799945": {
+      "description": {
+        "en": "HFE H63D concerns iron regulation; effects depend on the complete genotype, including C282Y, and the clinical iron phenotype.",
+        "ru": "HFE H63D относится к регуляции железа; эффекты зависят от полного генотипа, включая C282Y, и клинического фенотипа обмена железа."
+      },
+      "gene": "HFE",
+      "source": "GenCC (HFE); Gochee 2002 (H63D alone is not a disease allele)"
+    },
+    "rs28929474": {
+      "description": {
+        "en": "SERPINA1 Pi*Z concerns alpha-1-antitrypsin folding and availability. Liver and lung effects depend on the complete genotype and exposures; a single position is not a diagnosis.",
+        "ru": "SERPINA1 Pi*Z относится к сворачиванию и доступности альфа-1-антитрипсина. Эффекты на печень и лёгкие зависят от полного генотипа и воздействий; одна позиция не является диагнозом."
+      },
+      "gene": "SERPINA1",
+      "source": "GenCC Definitive (SERPINA1 — alpha-1-antitrypsin deficiency); ClinVar pathogenic"
+    },
+    "rs17580": {
+      "description": {
+        "en": "SERPINA1 Pi*S is a reduced-function alpha-1-antitrypsin allele; the clinical context depends on other alleles, particularly Pi*Z.",
+        "ru": "SERPINA1 Pi*S — аллель со сниженной функцией альфа-1-антитрипсина; клинический контекст зависит от других аллелей, особенно Pi*Z."
+      },
+      "gene": "SERPINA1",
+      "source": "GenCC (SERPINA1); Pi*S is a mild allele"
+    },
+    "rs4148323": {
+      "description": {
+        "en": "UGT1A1 *6 concerns bilirubin glucuronidation. Reduced conjugation is a pathway description, not a diagnosis or a complete drug-metabolism phenotype from one SNP.",
+        "ru": "UGT1A1 *6 относится к глюкуронированию билирубина. Снижение конъюгации — описание пути, а не диагноз или полный фенотип метаболизма лекарств по одному SNP."
+      },
+      "gene": "UGT1A1",
+      "source": "CPIC guideline for irinotecan / atazanavir (UGT1A1); Gilbert syndrome"
+    },
+    "rs1801280": {
+      "description": {
+        "en": "NAT2 *5 is a slow-acetylation allele context; acetylator phenotype requires the complete pair of haplotypes, not one position.",
+        "ru": "NAT2 *5 относится к аллелям медленного ацетилирования; фенотип ацетилятора требует полной пары гаплотипов, а не одной позиции."
+      },
+      "gene": "NAT2",
+      "source": "no CPIC/DPWG guideline; isoniazid hepatotoxicity literature (NAT2 slow acetylators)"
+    },
+    "rs1799930": {
+      "description": {
+        "en": "NAT2 *6 is a slow-acetylation allele context; other NAT2 positions and haplotype phase are needed for the phenotype.",
+        "ru": "NAT2 *6 относится к аллелям медленного ацетилирования; для фенотипа нужны другие позиции NAT2 и фаза гаплотипов."
+      },
+      "gene": "NAT2",
+      "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature"
+    },
+    "rs1799931": {
+      "description": {
+        "en": "NAT2 *7 is a slow-acetylation allele context; other NAT2 positions and haplotype phase are needed for the phenotype.",
+        "ru": "NAT2 *7 относится к аллелям медленного ацетилирования; для фенотипа нужны другие позиции NAT2 и фаза гаплотипов."
+      },
+      "gene": "NAT2",
+      "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature"
+    },
+    "rs2282679": {
+      "description": {
+        "en": "The GC locus is associated with circulating 25-OH vitamin D; GC transports vitamin D metabolites. This SNP does not measure deficiency or determine a supplement dose.",
+        "ru": "Локус GC связан с циркулирующим 25-OH витамином D; GC переносит метаболиты витамина D. Этот SNP не измеряет дефицит и не определяет дозу добавки."
+      },
+      "gene": "GC",
+      "source": "Wang 2010 Lancet (GWAS of 25-hydroxyvitamin D)"
+    },
+    "rs10741657": {
+      "description": {
+        "en": "The CYP2R1 locus is associated with 25-OH vitamin D; vitamin D 25-hydroxylation is the gene pathway. An individual's enzyme activity is not measured by this association.",
+        "ru": "Локус CYP2R1 связан с 25-OH витамином D; путь гена — 25-гидроксилирование витамина D. Ассоциация не измеряет активность фермента человека."
+      },
+      "gene": "CYP2R1",
+      "source": "Wang 2010 Lancet"
+    },
+    "rs12785878": {
+      "description": {
+        "en": "The DHCR7 region is associated with 25-OH vitamin D; the pathway concerns sterol precursors. The association does not establish this SNP's causal mechanism or a personal concentration.",
+        "ru": "Область DHCR7 связана с 25-OH витамином D; путь относится к предшественникам стеролов. Ассоциация не устанавливает причинный механизм SNP или личную концентрацию."
+      },
+      "gene": "DHCR7",
+      "source": "Wang 2010 Lancet"
+    },
+    "rs601338": {
+      "description": {
+        "en": "FUT2 W154X is a non-secretor allele context. Secretor status depends on both alleles and population; a single allele does not establish a B12 phenotype.",
+        "ru": "FUT2 W154X относится к аллелю несекреторного статуса. Статус зависит от обоих аллелей и популяции; один аллель не устанавливает фенотип B12."
+      },
+      "gene": "FUT2",
+      "source": "Hazra 2008 Nat Genet (FUT2 and vitamin B12)"
+    },
+    "rs855791": {
+      "description": {
+        "en": "TMPRSS6 Ala736Val concerns hepcidin regulation and has iron-trait associations in the curated literature; this does not measure hepcidin or ferritin in a person.",
+        "ru": "TMPRSS6 Ala736Val относится к регуляции гепсидина и имеет ассоциации с показателями железа в курируемой литературе; это не измеряет гепсидин или ферритин человека."
+      },
+      "gene": "TMPRSS6",
+      "source": "Benyamin 2009 Nat Genet (TMPRSS6 A736V and iron)"
+    },
+    "rs174546": {
+      "description": {
+        "en": "The FADS1 locus is associated with long-chain fatty-acid synthesis. Linked positions and diet matter; this SNP does not measure an individual's conversion or omega-3 index.",
+        "ru": "Локус FADS1 связан с синтезом длинноцепочечных жирных кислот. Важны сцепленные позиции и питание; этот SNP не измеряет индивидуальную конверсию или омега-3 индекс."
+      },
+      "gene": "FADS1",
+      "source": "Lemaitre 2011 PLoS Genet (FADS and long-chain omega-3)"
+    },
+    "rs174537": {
+      "description": {
+        "en": "This is another position in the fatty-acid desaturase locus; linked positions must not be counted as independent conversion effects.",
+        "ru": "Это ещё одна позиция локуса десатураз жирных кислот; сцепленные позиции нельзя считать независимыми эффектами конверсии."
+      },
+      "gene": "FADS1",
+      "source": "Lemaitre 2011 PLoS Genet"
+    },
+    "rs4988235": {
+      "description": {
+        "en": "This MCM6-region regulatory position is linked to adult lactase persistence in some populations. It is not a direct measurement of lactose tolerance or calcium status.",
+        "ru": "Эта регуляторная позиция области MCM6 связана с сохранением лактазы во взрослом возрасте в некоторых популяциях. Это не прямое измерение переносимости лактозы или статуса кальция."
+      },
+      "gene": "MCM6",
+      "source": "Enattah 2002 Nat Genet (MCM6 and lactase persistence)"
+    },
+    "rs16890979": {
+      "description": {
+        "en": "The SLC2A9 locus is associated with urate handling and serum urate in the curated literature; effect depends on sex and other factors.",
+        "ru": "Локус SLC2A9 связан с транспортом урата и уратом сыворотки в курируемой литературе; эффект зависит от пола и других факторов."
+      },
+      "gene": "SLC2A9",
+      "source": "Vitart 2008 Nat Genet (SLC2A9 and urate)"
+    },
+    "rs9263726": {
+      "description": {
+        "en": "This is a tag for HLA-B*58:01, not direct HLA typing. A tag cannot select or contraindicate a medicine without confirmed typing and the complete clinical context.",
+        "ru": "Это маркер HLA-B*58:01, а не прямое HLA-типирование. Маркер не выбирает и не запрещает препарат без подтверждённого типирования и полного клинического контекста."
+      },
+      "gene": "HLA-B",
+      "source": "CPIC guideline for allopurinol (Saito 2016) — HLA-B*58:01, read here through a tag SNP"
+    },
+    "rs12917707": {
+      "description": {
+        "en": "The UMOD locus is associated with kidney-function traits in the curated literature; this association does not establish an individual's renal function.",
+        "ru": "Локус UMOD связан с признаками функции почек в курируемой литературе; ассоциация не устанавливает функцию почек человека."
+      },
+      "gene": "UMOD",
+      "source": "Köttgen 2009 Nat Genet (UMOD and CKD)"
+    },
+    "rs73885319": {
+      "description": {
+        "en": "This position is part of the APOL1 G1 haplotype. Kidney associations depend on the complete combination of G1/G2 alleles and ancestry; one SNP is not a risk estimate.",
+        "ru": "Эта позиция входит в гаплотип APOL1 G1. Почечные ассоциации зависят от полной комбинации аллелей G1/G2 и происхождения; один SNP не является оценкой риска."
+      },
+      "gene": "APOL1",
+      "source": "Genovese 2010 Science (APOL1 G1/G2 and kidney disease)"
+    },
+    "rs60910145": {
+      "description": {
+        "en": "This is the second linked position of APOL1 G1; it is not an independent second risk allele.",
+        "ru": "Это вторая сцепленная позиция APOL1 G1; она не является независимым вторым аллелем риска."
+      },
+      "gene": "APOL1",
+      "source": "Genovese 2010 Science"
+    },
+    "rs2476601": {
+      "description": {
+        "en": "PTPN22 R620W concerns immune signalling and has autoimmune-disease associations in the curated literature. A molecular candidate does not diagnose autoimmunity.",
+        "ru": "PTPN22 R620W относится к иммунному сигналингу и имеет ассоциации с аутоиммунными заболеваниями в курируемой литературе. Молекулярный кандидат не диагностирует аутоиммунность."
+      },
+      "gene": "PTPN22",
+      "source": "PMID 32333475 (meta-analysis, J Gene Med 2020); Begovich 2004 Am J Hum Genet"
+    },
+    "rs7574865": {
+      "description": {
+        "en": "The STAT4 locus has rheumatoid arthritis and lupus associations in the curated literature; the gene mediates cytokine signalling, without an established personal effect from this SNP.",
+        "ru": "Для локуса STAT4 описаны ассоциации с ревматоидным артритом и волчанкой; ген передаёт цитокиновый сигнал, но SNP не устанавливает персональный эффект."
+      },
+      "gene": "STAT4",
+      "source": "PMID 17804842 (Remmers 2007, N Engl J Med)"
+    },
+    "rs2230926": {
+      "description": {
+        "en": "TNFAIP3 F127C concerns the A20 regulator of inflammatory signalling and has autoimmune-disease associations; these do not measure inflammation in a person.",
+        "ru": "TNFAIP3 F127C относится к регулятору воспалительного сигнала A20 и имеет аутоиммунные ассоциации; они не измеряют воспаление человека."
+      },
+      "gene": "TNFAIP3",
+      "source": "PMID 20112363 (Shimane 2010, Arthritis Rheum)"
+    },
+    "rs30187": {
+      "description": {
+        "en": "ERAP1 K528R concerns peptide processing for antigen presentation; the curated ankylosing-spondylitis association depends on HLA-B27 context.",
+        "ru": "ERAP1 K528R относится к обработке пептидов для презентации антигена; курируемая ассоциация с анкилозирующим спондилитом зависит от контекста HLA-B27."
+      },
+      "gene": "ERAP1",
+      "source": "PMID 27108589 (meta-analysis, Clin Rheumatol 2016); Evans 2011 Nat Genet"
+    },
+    "rs33980500": {
+      "description": {
+        "en": "TRAF3IP2 D10N concerns immune signalling and has psoriasis-related associations in the curated literature; this does not establish a personal disease outcome.",
+        "ru": "TRAF3IP2 D10N относится к иммунному сигналингу и имеет связанные с псориазом ассоциации в курируемой литературе; это не устанавливает исход заболевания человека."
+      },
+      "gene": "TRAF3IP2",
+      "source": "PMID 20953188 (Hüffmeier 2010, Nat Genet)"
+    },
+    "rs2004640": {
+      "description": {
+        "en": "The IRF5 locus has lupus associations in the curated literature; interferon-related transcription is the gene pathway, not an inferred personal immune phenotype.",
+        "ru": "Локус IRF5 имеет ассоциации с волчанкой в курируемой литературе; путь гена — интерферон-зависимая транскрипция, а не полученный персональный иммунный фенотип."
+      },
+      "gene": "IRF5",
+      "source": "PMID 31347288 (meta-analysis, Int J Rheum Dis 2019)"
+    },
+    "rs2240340": {
+      "description": {
+        "en": "PADI4 is involved in protein citrullination. The rheumatoid-arthritis association for this position differs between East Asian and European populations.",
+        "ru": "PADI4 участвует в цитруллинировании белков. Ассоциация этой позиции с ревматоидным артритом различается между восточноазиатскими и европейскими популяциями."
+      },
+      "gene": "PADI4",
+      "source": "PMID 28653215 (meta-analysis); PMID 18087673; PMID 19470526 (European population)"
+    },
+    "rs1561570": {
+      "description": {
+        "en": "The OPTN locus has a Paget-disease association in the curated literature; the exact causal mechanism of this SNP is not established here.",
+        "ru": "Локус OPTN имеет ассоциацию с болезнью Педжета в курируемой литературе; точный причинный механизм этого SNP здесь не установлен."
+      },
+      "gene": "OPTN",
+      "source": "PMID 20436471 (Albagha 2010, Nat Genet); PMID 29782529"
+    },
+    "rs1256328": {
+      "description": {
+        "en": "The ALPL locus has alkaline-phosphatase and bone-trait associations; their clinical meaning and this variant's specific mechanism are unresolved in the curated evidence.",
+        "ru": "Локус ALPL имеет ассоциации со щелочной фосфатазой и костными признаками; клиническое значение и конкретный механизм варианта в курируемых данных не разрешены."
+      },
+      "gene": "ALPL",
+      "source": "PMID 26272126 (Oddsson 2015, Nat Commun); PMID 31754202"
+    },
+    "rs1800012": {
+      "description": {
+        "en": "COL1A1 Sp1 concerns regulation of collagen expression. The curated population studies do not establish a useful personal fracture-risk prediction from this position.",
+        "ru": "COL1A1 Sp1 относится к регуляции экспрессии коллагена. Курируемые популяционные исследования не устанавливают полезное персональное предсказание риска переломов по этой позиции."
+      },
+      "gene": "COL1A1",
+      "source": "PMID 20798928 (meta-analysis); PMID 12810179"
+    },
+    "rs1107946": {
+      "description": {
+        "en": "The COL1A1 −1997 position has inconsistent bone-density associations in the curated studies; a specific individual effect is not established.",
+        "ru": "Позиция COL1A1 −1997 имеет неоднородные ассоциации с плотностью костей в курируемых исследованиях; конкретный индивидуальный эффект не установлен."
+      },
+      "gene": "COL1A1",
+      "source": "PMID 20798928; PMID 37086417"
+    },
+    "rs2412298": {
+      "description": {
+        "en": "The curated literature reports inconsistent bone-density associations for this COL1A1 position; the collagen pathway does not resolve the missing allele effect.",
+        "ru": "Курируемая литература описывает неоднородные ассоциации этой позиции COL1A1 с плотностью костей; путь коллагена не разрешает отсутствующий эффект аллеля."
+      },
+      "gene": "COL1A1",
+      "source": "PMID 20798928; PMID 19016596"
+    },
+    "rs3736228": {
+      "description": {
+        "en": "LRP5 A1330V concerns Wnt signalling in bone biology and has bone-density associations in the curated literature; this is not a densitometry result.",
+        "ru": "LRP5 A1330V относится к Wnt-сигналингу в биологии кости и имеет ассоциации с плотностью костей в курируемой литературе; это не результат денситометрии."
+      },
+      "gene": "LRP5",
+      "source": "PMID 18588671; PMID 25580429; PMID 25664010"
+    },
+    "rs715": {
+      "description": {
+        "en": "The CPS1 locus is associated with plasma glycine in the curated literature; CPS1 participates in the urea cycle. The locus association does not establish a specific causal allele mechanism.",
+        "ru": "Локус CPS1 связан с глицином плазмы в курируемой литературе; CPS1 участвует в цикле мочевины. Ассоциация локуса не устанавливает конкретный причинный механизм аллеля."
+      },
+      "gene": "CPS1",
+      "source": "PMID 33414548 (Lotta 2021, Nat Genet); PMID 24816252 (Shin 2014, Nat Genet)"
+    },
+    "rs1440581": {
+      "description": {
+        "en": "The PPM1K locus is associated with branched-chain amino acids; PPM1K regulates their breakdown. An association does not measure an individual's concentrations.",
+        "ru": "Локус PPM1K связан с аминокислотами с разветвлённой цепью; PPM1K регулирует их расщепление. Ассоциация не измеряет концентрации человека."
+      },
+      "gene": "PPM1K",
+      "source": "PMID 33414548 (Lotta 2021, Nat Genet); Lotta 2016 PLoS Med"
+    },
+    "rs1744297": {
+      "description": {
+        "en": "The ASPG locus is associated with plasma asparagine in the curated literature. A proposed asparaginase function does not prove the SNP's causal mechanism.",
+        "ru": "Локус ASPG связан с аспарагином плазмы в курируемой литературе. Предполагаемая функция аспарагиназы не доказывает причинный механизм SNP."
+      },
+      "gene": "ASPG",
+      "source": "PMID 30659259 (Imaizumi 2019, Eur J Hum Genet)"
+    },
+    "rs37369": {
+      "description": {
+        "en": "AGXT2 V140I is associated with β-aminoisobutyric acid; the gene participates in its metabolism. This does not measure the person's amino-acid balance.",
+        "ru": "AGXT2 V140I связан с β-аминоизомасляной кислотой; ген участвует в её метаболизме. Это не измеряет аминокислотный баланс человека."
+      },
+      "gene": "AGXT2",
+      "source": "PMID 37277652 (Schlosser 2023, Nat Genet)"
+    },
+    "rs56335308": {
+      "description": {
+        "en": "The SLC7A2 locus has arginine associations, but the curated studies disagree on direction; transporter biology cannot supply the missing direction.",
+        "ru": "Локус SLC7A2 имеет ассоциации с аргинином, но курируемые исследования расходятся в направлении; биология транспортёра не заменяет отсутствующее направление."
+      },
+      "gene": "SLC7A2",
+      "source": "PMID 30659259 (Imaizumi 2019); PMID 33414548 (Lotta 2021); PMID 36357675 (Surendran 2022)"
+    },
+    "rs505802": {
+      "description": {
+        "en": "The SLC22A12 locus is associated with serum urate; URAT1 handles renal urate reabsorption. A locus association does not measure transporter activity from this SNP.",
+        "ru": "Локус SLC22A12 связан с уратом сыворотки; URAT1 обеспечивает почечную реабсорбцию урата. Ассоциация локуса не измеряет активность транспортёра по SNP."
+      },
+      "gene": "SLC22A12",
+      "source": "PMID 19503597 (Kolz 2009, PLoS Genet); PMID 30993211 (Nakatochi 2019, Commun Biol)"
+    },
+    "rs734553": {
+      "description": {
+        "en": "The SLC2A9 locus is associated with serum urate in the curated literature; the direction and magnitude cannot be converted into a personal laboratory value.",
+        "ru": "Локус SLC2A9 связан с уратом сыворотки в курируемой литературе; направление и величину нельзя превратить в личное значение анализа."
+      },
+      "gene": "SLC2A9",
+      "source": "PMID 19503597 (Kolz 2009, PLoS Genet); PMID 21983786 (Sulem 2011, Nat Genet)"
+    },
+    "rs10934753": {
+      "description": {
+        "en": "The SHMT1 locus is associated with plasma glycine; the gene interconverts serine and glycine in one-carbon metabolism. This does not establish this SNP's causal mechanism.",
+        "ru": "Локус SHMT1 связан с глицином плазмы; ген обеспечивает взаимопревращение серина и глицина в одноуглеродном обмене. Это не устанавливает причинный механизм SNP."
+      },
+      "gene": "SHMT1",
+      "source": "PMID 36357675 (Surendran 2022, Nat Med); PMID 41044249 (Zoodsma 2025, a genetic map of human metabolism)"
+    },
+    "rs10273639": {
+      "description": {
+        "en": "The PRSS1 region has a chronic-pancreatitis association in the curated literature; the region's digestive-enzyme function is separate from a personal disease prediction.",
+        "ru": "Область PRSS1 имеет ассоциацию с хроническим панкреатитом; функция пищеварительного фермента области отделена от персонального предсказания заболевания."
+      },
+      "gene": "PRSS1",
+      "source": "Whitcomb 2012 Nat Genet (PRSS1–PRSS2 and chronic pancreatitis)"
+    },
+    "rs1805087": {
+      "description": {
+        "en": "MTR A2756G concerns methionine synthase in one-carbon metabolism. Studies disagree on a reproducible homocysteine effect.",
+        "ru": "MTR A2756G относится к метионинсинтазе в одноуглеродном обмене. Исследования расходятся в отношении воспроизводимого эффекта на гомоцистеин."
+      },
+      "gene": "MTR",
+      "source": "PMID 23824729 (van Meurs 2013, Am J Clin Nutr: the MTR and MTRR loci, with other lead variants)"
+    },
+    "rs1801394": {
+      "description": {
+        "en": "MTRR A66G concerns regeneration of methionine synthase. The curated studies disagree on its homocysteine association.",
+        "ru": "MTRR A66G относится к восстановлению метионинсинтазы. Курируемые исследования расходятся в ассоциации с гомоцистеином."
+      },
+      "gene": "MTRR",
+      "source": "PMID 23824729 (van Meurs 2013, Am J Clin Nutr: the MTR and MTRR loci, with other lead variants); PMID 29340279 (Wang 2017, MTRR A66G)"
+    },
+    "rs5742905": {
+      "description": {
+        "en": "CBS I278T concerns homocysteine transsulfuration and is linked to recessive homocystinuria in the curated sources; gene function is not a carrier or disease conclusion.",
+        "ru": "CBS I278T относится к транссульфурации гомоцистеина и связан с рецессивной гомоцистинурией в курируемых источниках; функция гена не является выводом о носительстве или болезни."
+      },
+      "gene": "CBS",
+      "source": "ClinVar RCV000000141 (CBS c.833T>C); GenCC (CBS, classic homocystinuria, Definitive)"
+    },
+    "rs12356193": {
+      "description": {
+        "en": "The SLC16A9 locus is associated with urate and carnitine in the curated literature; a locus association does not establish an independent transport effect for this SNP.",
+        "ru": "Локус SLC16A9 связан с уратом и карнитином в курируемой литературе; ассоциация локуса не устанавливает независимый транспортный эффект SNP."
+      },
+      "gene": "SLC16A9",
+      "source": "PMID 19503597 (Kolz 2009, PLoS Genet: urate +0.08 mg/dL per A); PMID 39406924 (Major 2024: gout OR 1.09); PMID 24816252 (Shin 2014: carnitine)"
+    },
+    "rs7678928": {
+      "description": {
+        "en": "This upstream PPM1K position has a branched-chain amino-acid association; regulation of breakdown is the gene pathway, not a proven SNP-specific mechanism.",
+        "ru": "Эта позиция выше PPM1K имеет ассоциацию с аминокислотами с разветвлённой цепью; регуляция расщепления — путь гена, а не доказанный механизм отдельного SNP."
+      },
+      "gene": "PPM1K",
+      "source": "PMID 33414548 (Lotta 2021: valine, leucine); PMID 36357675 (Surendran 2022); PMID 38448586 (2024, multi-ancestry: valine); PMID 27898682 (Lotta 2016: 21 kb upstream of PPM1K)"
+    },
+    "rs7302925": {
+      "description": {
+        "en": "The GLS2 region has a plasma-glutamine association in the curated literature. Glutaminase biology does not establish that this SNP causally regulates the enzyme.",
+        "ru": "Область GLS2 имеет ассоциацию с глутамином плазмы. Биология глутаминазы не устанавливает, что этот SNP причинно регулирует фермент."
+      },
+      "gene": "GLS2",
+      "source": "PMID 38448586 (2024, multi-ancestry: glutamine −0.24 SD per A); PMID 30659259 (Imaizumi 2019: glutamine −0.41)"
+    },
+    "rs13538": {
+      "description": {
+        "en": "The NAT8 locus is associated with circulating N-acetylated amino-acid metabolites; the gene's acetylation pathway does not establish this SNP's causal effect.",
+        "ru": "Локус NAT8 связан с циркулирующими N-ацетилированными метаболитами аминокислот; путь ацетилирования гена не устанавливает причинный эффект SNP."
+      },
+      "gene": "NAT8",
+      "source": "PMID 36635386 (Chen 2023: N-acetyl amino acids); PMID 37277652 (Schlosser 2023); PMID 20383146 (Köttgen 2010: eGFR); PMID 26831199 (Pattaro 2016)"
+    },
+    "rs9296404": {
+      "description": {
+        "en": "The GNMT region was linked to homocysteine after methionine loading in one study; a resting effect or replicated genotype rule is not established.",
+        "ru": "Область GNMT была связана с гомоцистеином после метиониновой нагрузки в одном исследовании; эффект в покое или воспроизведённое правило по генотипу не установлены."
+      },
+      "gene": "GNMT",
+      "source": "PMID 24651765 (Williams 2014, PLoS Genet: post-load homocysteine +0.36 per T)"
+    },
+    "rs13244654": {
+      "description": {
+        "en": "The PSPH region was linked to plasma serine in one study; the gene's serine-synthesis function does not prove this SNP's mechanism.",
+        "ru": "Область PSPH была связана с серином плазмы в одном исследовании; функция гена в синтезе серина не доказывает механизм SNP."
+      },
+      "gene": "PSPH",
+      "source": "PMID 30659259 (Imaizumi 2019: serine −0.28 SD per T)"
+    },
+    "rs2238732": {
+      "description": {
+        "en": "The PRODH locus has proline associations, but the curated studies disagree on the allele direction; the missing direction must not be inferred from gene function.",
+        "ru": "Локус PRODH имеет ассоциации с пролином, но курируемые исследования расходятся в направлении эффекта аллеля; отсутствующее направление нельзя вывести из функции гена."
+      },
+      "gene": "PRODH",
+      "source": "PMID 30659259 (Imaizumi 2019: C raises proline); PMID 26068415 (Draisma 2015: T raises proline)"
+    },
+    "rs11174811": {
+      "description": {
+        "en": "AVPR1A concerns vasopressin signalling. The curated studies cover substance use and a microRNA target-site effect on different traits; these do not establish a personal behavioural outcome.",
+        "ru": "AVPR1A относится к вазопрессиновому сигналу. Курируемые исследования охватывают употребление веществ и эффект сайта микроРНК на разные признаки; они не устанавливают поведенческий исход человека."
+      },
+      "gene": "AVPR1A",
+      "source": "PMID 21514569 (Maher 2011: AVPR1A and substance use disorders); PMID 31053625 (Zhang 2019: miRNA target site polymorphisms in AVPR1A)"
+    },
+    "rs6265": {
+      "description": {
+        "en": "BDNF Val66Met is linked to activity-dependent BDNF secretion and memory-related traits in the curated literature; an association is not a person's cognitive or mood characteristic.",
+        "ru": "BDNF Val66Met связан с активность-зависимой секрецией BDNF и связанными с памятью признаками; ассоциация не является когнитивной характеристикой или настроением человека."
+      },
+      "gene": "BDNF",
+      "source": "PMID 22813992 (Kambeitz 2012: BDNF Val66Met and declarative memory, meta-analysis); PMID 24433458 (Hosang 2014: stress and BDNF Val66Met in depression, meta-analysis)"
+    },
+    "rs242941": {
+      "description": {
+        "en": "The curated literature reports a depression association for the CRHR1 locus in one study; the receptor's stress-response function does not establish this variant's mechanism.",
+        "ru": "Курируемая литература описывает ассоциацию локуса CRHR1 с депрессией в одном исследовании; функция рецептора в ответе на стресс не устанавливает механизм варианта."
+      },
+      "gene": "CRHR1",
+      "source": "PMID 34279801 (Hernández-Díaz 2021: rs242941, rs1876828, rs242939 and rs110402 of CRHR1 and depression)"
+    },
+    "rs686": {
+      "description": {
+        "en": "A functional study relates the DRD1 3′UTR variant to microRNA regulation of expression. It did not establish a clinical or behavioural outcome.",
+        "ru": "Функциональное исследование связывает вариант 3′UTR DRD1 с регуляцией экспрессии микроРНК. Оно не устанавливает клинический или поведенческий исход."
+      },
+      "gene": "DRD1",
+      "source": "PMID 19135651 (Huang 2009: differential allelic expression of DRD1 modulated by miR-504)"
+    },
+    "rs1800497": {
+      "description": {
+        "en": "Taq1A lies in ANKK1 near DRD2, not in DRD2 itself; the curated studies concern striatal D2/3 receptor binding. This is not a measure of a person's dopamine or behaviour.",
+        "ru": "Taq1A лежит в ANKK1 рядом с DRD2, а не в самом DRD2; курируемые исследования относятся к связыванию рецепторов D2/3 в стриатуме. Это не измерение дофамина или поведения человека."
+      },
+      "gene": "DRD2",
+      "source": "PMID 23683269 (Savitz 2013: DRD2/ANKK1 Taq1A and D2/3 receptor binding); PMID 15146457 (Neville 2004: ANKK1, a kinase gene closely linked to DRD2)"
+    },
+    "rs6277": {
+      "description": {
+        "en": "One imaging study links DRD2 C957T to extrastriatal receptor availability; receptor binding is not a behavioural or treatment conclusion.",
+        "ru": "Одно исследование визуализации связывает DRD2 C957T с доступностью рецепторов вне стриатума; рецепторное связывание не является поведенческим выводом или выводом о лечении."
+      },
+      "gene": "DRD2",
+      "source": "PMID 19285111 (Hirvonen 2009: C957T of DRD2 predicts extrastriatal dopamine receptor availability)"
+    },
+    "rs1800955": {
+      "description": {
+        "en": "One curated study concerns the DRD4 promoter position and smoking; replication and a causal mechanism are not established here.",
+        "ru": "Одно курируемое исследование относится к промоторной позиции DRD4 и курению; воспроизведение и причинный механизм здесь не установлены."
+      },
+      "gene": "DRD4",
+      "source": "PMID 28103253 (Pérez-Rubio 2017: HTR2A and DRD4 polymorphisms and smoking)"
+    },
+    "rs6295": {
+      "description": {
+        "en": "The curated meta-analyses concern HTR1A −1019C/G, mood-related traits and antidepressant response; they do not select a treatment or define a person's mood.",
+        "ru": "Курируемые метаанализы относятся к HTR1A −1019C/G, признакам настроения и ответу на антидепрессанты; они не выбирают лечение или настроение человека."
+      },
+      "gene": "HTR1A",
+      "source": "PMID 22752684 (Kishi 2013: the serotonin 1A receptor gene and mood disorders, extended meta-analysis); PMID 22890315 (Zhao 2012: rs6295 and antidepressants, meta-analysis)"
+    },
+    "rs594242": {
+      "description": {
+        "en": "The curated sources describe HTR2A-related temperament traits without establishing a specific mechanism or outcome for this variant.",
+        "ru": "Курируемые источники описывают связанные с HTR2A признаки темперамента без установленного конкретного механизма или исхода этого варианта."
+      },
+      "gene": "HTR2A",
+      "source": "PMID 16814396 (Giegling 2006: anger- and aggression-related traits and the 5-HT2A gene); PMID 17590256 (Serretti 2007: 5-HT2A SNPs and the Temperament and Character Inventory)"
+    },
+    "rs6311": {
+      "description": {
+        "en": "This HTR2A promoter position has associations in the curated meta-analysis; the association does not establish a personal serotonin phenotype.",
+        "ru": "Для этой промоторной позиции HTR2A описаны ассоциации в курируемом метаанализе; ассоциация не устанавливает персональный серотониновый фенотип."
+      },
+      "gene": "HTR2A",
+      "source": "PMID 23317793 (Jin 2013: the −1438A/G (rs6311) polymorphism of HTR2A, meta-analysis)"
+    },
+    "rs6314": {
+      "description": {
+        "en": "HTR2A His452Tyr concerns receptor signalling; the curated literature also reports an antidepressant-response association. The row does not select a medicine.",
+        "ru": "HTR2A His452Tyr относится к передаче сигнала рецептором; курируемая литература также описывает ассоциацию с ответом на антидепрессанты. Строка не выбирает препарат."
+      },
+      "gene": "HTR2A",
+      "source": "PMID 18611292 (Wagner 2008: the His452Tyr variant of the 5-HT2A receptor); PMID 32819202 (Du 2020: genetic polymorphism and antidepressants, network meta-analysis)"
+    },
+    "rs1799836": {
+      "description": {
+        "en": "MAOB intron 13 has conflicting associations in the curated studies; monoamine breakdown is the gene pathway, not a proven effect of this SNP.",
+        "ru": "Для интрона 13 MAOB курируемые исследования описывают противоречивые ассоциации; расщепление моноаминов — путь гена, а не доказанный эффект SNP."
+      },
+      "gene": "MAOB",
+      "source": "PMID 21978760 (Wei 2011: MAOA/B genes and schizophrenia in Han Chinese); PMID 31275445 (Perfilyeva 2019: no association of rs1799836 with autism)"
+    },
+    "rs6198": {
+      "description": {
+        "en": "The source held for this NR3C1 position describes a different variant; a mechanism or effect for rs6198 cannot be borrowed from it.",
+        "ru": "Источник, сохранённый для этой позиции NR3C1, описывает другой вариант; механизм или эффект rs6198 нельзя заимствовать из него."
+      },
+      "gene": "NR3C1",
+      "source": "PMID 18663733 (Kumsta 2009: a glucocorticoid receptor promoter polymorphism — not the 3'UTR variant this position is)"
+    },
+    "rs1042778": {
+      "description": {
+        "en": "One curated OXTR study concerns interaction with family environment; this does not establish a personal social or behavioural characteristic.",
+        "ru": "Одно курируемое исследование OXTR относится к взаимодействию с семейной средой; это не устанавливает социальную или поведенческую характеристику человека."
+      },
+      "gene": "OXTR",
+      "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)"
+    },
+    "rs2254298": {
+      "description": {
+        "en": "The curated OXTR meta-analysis finds small social-behaviour associations at most; the gene's oxytocin pathway does not turn these into a personal trait.",
+        "ru": "Курируемый метаанализ OXTR описывает не более чем малые ассоциации с социальным поведением; окситоциновый путь гена не превращает их в свойство человека."
+      },
+      "gene": "OXTR",
+      "source": "PMID 23921259 (Bakermans-Kranenburg 2014: a sociability gene? meta-analysis of oxytocin receptor genotype effects)"
+    },
+    "rs53576": {
+      "description": {
+        "en": "The curated OXTR meta-analyses concern small sociality-related effects; a genotype does not determine empathy, personality or social behaviour.",
+        "ru": "Курируемые метаанализы OXTR относятся к малым связанным с социальностью эффектам; генотип не определяет эмпатию, личность или социальное поведение."
+      },
+      "gene": "OXTR",
+      "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)"
+    },
+    "rs5569": {
+      "description": {
+        "en": "The curated SLC6A2 studies address different traits without replication of a shared effect; noradrenaline transport is the gene pathway, not a measured SNP effect.",
+        "ru": "Курируемые исследования SLC6A2 относятся к разным признакам без воспроизведения общего эффекта; транспорт норадреналина — путь гена, а не измеренный эффект SNP."
+      },
+      "gene": "SLC6A2",
+      "source": "PMID 29230023 (Myer 2018: pharmacogenetic predictors of methylphenidate efficacy); PMID 24655776 (Kim 2014: SLC6A2 polymorphisms and suicide in MDD)"
+    },
+    "rs6356": {
+      "description": {
+        "en": "TH Val81Met is a functional candidate in tyrosine hydroxylase; associations are nominal. It does not establish high or low dopamine or select a dopaminergic agent.",
+        "ru": "TH Val81Met — функциональный кандидат тирозингидроксилазы; ассоциации номинальные. Он не устанавливает высокий или низкий дофамин и не выбирает дофаминергический препарат."
+      },
+      "gene": "TH",
+      "source": "PMID 23596382 (Greenbaum 2013, Front Neurosci: variants associated with dopaminergic compensation in early Parkinson's disease)"
+    },
+    "rs34424986": {
+      "description": {
+        "en": "PRKN p.Arg275Trp is held as a pathogenic variant in a recessive gene context. Its molecular classification is separate from whether a complete disease genotype is present.",
+        "ru": "PRKN p.Arg275Trp сохранён как патогенный вариант в контексте рецессивного гена. Молекулярная классификация отделена от наличия полного генотипа заболевания."
+      },
+      "gene": "PRKN",
+      "source": "ClinVar VCV000007050 (Pathogenic/Likely pathogenic); GenCC: PRKN — Parkinson disease, autosomal recessive, Definitive (ClinGen)"
+    }
+  }
+}

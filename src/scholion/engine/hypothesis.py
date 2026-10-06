@@ -7,14 +7,14 @@ level beside it was the only difference, and a level is the first thing a
 retelling drops.
 
 From 0.6.0 (owner, 27.09.2026) the data layer is one for every face and the
-difference is only in the showing: the person's own screen shows how many
-hypotheses there are, the clinician's shows the passport, and an assistant
+personalised hypotheses remain separate from reference context; every screen
+may show reference biology at any level, and an assistant
 receives the passport with the rule for retelling it. So the sentence leaves
 `text` and moves here, beside what the hypothesis rests on and — named, not
 silently absent — what it still lacks.
 
-E is not a hypothesis: no source is named, so there is a value and nothing
-else. `value_only` says so, and no face prints a sentence for it.
+E is not a variant-effect hypothesis. `value_only` excludes a personalised
+sentence, while the independent reference card can still describe gene biology.
 """
 from __future__ import annotations
 
@@ -63,5 +63,5 @@ def hypothesis_passport(spec: Dict[str, Any], lv: Dict[str, Any],
 
 
 def is_value_only(level: Optional[str]) -> bool:
-    """E: a value without a statement — no source is named at all."""
+    """E: a value without a personalised variant-effect statement."""
     return level == "E"

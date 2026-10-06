@@ -13,7 +13,7 @@ class TestPatientPresentation(unittest.TestCase):
     def test_all_three_renderers_hide_rows_without_mutating_the_reply(self):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
-        for name in ("shownGenetics", "hypothesisCountHtml", "mechanismHtml", "genTableRow", "genTableHtml",
+        for name in ("shownGenetics", "hypothesisCountHtml", "referenceContextHtml", "mechanismHtml", "genTableRow", "genTableHtml",
                      "panelHtml", "genSummaryHtml", "markerGeneticsRow", "basketRowHtml"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])
@@ -51,6 +51,23 @@ const onlyLower={...gen,positions:positions.slice(1),rows:positions.slice(1)};
 assert.ok(genSummaryHtml(onlyLower,{register:'patient'}).includes('data-hypothesis-count'));
 assert.equal(JSON.stringify(gen),before);
 assert.equal(shownGenetics(gen,'clinician'),gen);
+const referenceGen={...gen,positions:positions.map(p=>({...p,text:null,mechanism:null,
+  reference_context:{level:p.level,gene_function:'FUNCTION_'+p.level,
+  variant_context:'REFERENCE_'+p.level,gene_source:'GENE_SOURCE_'+p.level,
+  variant_source:p.level==='E'?null:'VARIANT_SOURCE_'+p.level}}))};
+referenceGen.rows=referenceGen.positions;
+const referenceBefore=JSON.stringify(referenceGen);
+for(const render of [genTableHtml,panelHtml,genSummaryHtml]){
+  const html=render(referenceGen,{register:'patient'},'patient');
+  for(const level of ['A','C','D','E']){
+    assert.ok(html.includes('GENE_'+level),html);
+    assert.ok(html.includes('FUNCTION_'+level),html);
+    assert.ok(html.includes('REFERENCE_'+level),html);
+    assert.ok(!html.includes('TEXT_'+level),html);
+  }
+}
+assert.equal(JSON.stringify(referenceGen),referenceBefore);
+
 const grouped={...gen,groups:[{level:'C',members:positions},{level:'A',members:positions}]};
 const displayed=shownGenetics(grouped,'patient');
 assert.equal(displayed.groups.length,1);assert.equal(displayed.groups[0].members.length,1);

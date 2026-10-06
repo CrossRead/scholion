@@ -87,7 +87,7 @@ class TestCautionBasis(_Demo):
         lower = {**held, "level": "C", "gene": "LOWER_GENE", "rsid": "rsLOWER"}
         page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
-        for name in ("mechanismHtml", "cautionsHtml", "flagsHTML"):
+        for name in ("referenceContextHtml", "mechanismHtml", "cautionsHtml", "flagsHTML"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])
         script = "const assert=require('node:assert/strict'),esc=x=>String(x??''),t=(k,a)=>k+JSON.stringify(a||{});\n"

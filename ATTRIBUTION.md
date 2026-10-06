@@ -208,3 +208,13 @@ The files carry attribution headers, every modification is marked in place, and
 `src/scholion/vendor/genomi/UPSTREAM.md` records what was taken, what changed and
 how to update. `python3 src/tools/check_vendor.py` compares our copy with
 upstream and reports drift in either direction.
+
+## NCBI Gene reference biology
+
+`src/scholion/knowledge/panel_reference_context.json` includes gene-function
+reference descriptions from NCBI Gene / RefSeq summaries retrieved on
+2026-10-06, with bilingual functional paraphrases. Each gene carries its
+NCBI Gene URL. The NLM content policy is at
+https://www.ncbi.nlm.nih.gov/home/about/policies/. Variant context is separately
+paraphrased from the sources held by the curated panels; it does not derive
+allele direction or personal effects from a gene annotation.

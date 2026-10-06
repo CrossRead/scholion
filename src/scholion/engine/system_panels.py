@@ -102,6 +102,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from .. import core
+from ..panel_reference import reference_context
 from ..conclusion_basis import guard_position
 from ..genome_routes import decision_route
 from ..i18n import CATALOGUES, plural as _plural, t as _t
@@ -650,6 +651,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             # No source, so no phrase is owed: «waiting for the author's
             # phrase» promised a statement E never gets (C22).
             row["pending"], row["pending_why"] = False, None
+        row["reference_context"] = reference_context(p, lv.get("level"))
         row = panel_form.gene_row(gene, guard_position(p, row), scan)
         row["read"] = geno.get("read")          # the position's own reading, not the gene's
         row["read_state"] = panel_form.read_state(bool(row["read"]), row.get("read_why"))
@@ -987,6 +989,7 @@ def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
             "local_note": r.get("local_note"), "author_note": r.get("author_note"), "group": r.get("group"),
             "route": r.get("route"), "mechanism": r.get("mechanism"), "source": r.get("source"),
             "conclusion_basis": r.get("conclusion_basis"),
+            "reference_context": r.get("reference_context"),
             "decision_route": r.get("decision_route"),
             "subclaim_basis": r.get("subclaim_basis"),
             "not_a_finding_why": r.get("not_a_finding_why"), "needs_confirmation": r.get("needs_confirmation"),
@@ -1382,7 +1385,8 @@ _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",
-                "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route")
+                "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route",
+                "reference_context", "genotype", "passport", "value_only", "author_note")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
@@ -1400,7 +1404,7 @@ def _project(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
     # of link says about it: the sentence was written to be read.
     out["rows"] = [{k: r.get(k) for k in _PATIENT_ROW if k in r}
                    for r in gen.get("rows") or []
-                   if r.get("findings") or r.get("carrier") or r.get("pending")
+                   if r.get("reference_context") or r.get("findings") or r.get("carrier") or r.get("pending")
                    or r.get("needs_confirmation")
                    or (r.get("unit") == "position" and r.get("text")
                        and r.get("not_a_finding_why") == "kind")]

@@ -12,6 +12,7 @@ from .i18n import plural as _plural, t as _t
 from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines, subclaim_lines
 from .genome_routes import route_text
 from .panel_notes import note_lines
+from .panel_reference import reference_lines
 from .test_proposals import test_basis_text
 
 
@@ -55,6 +56,8 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("link_text"):
         marks.append(_t("system.panel.link", link=r["link_text"]))
     line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
+    for reference_detail in reference_lines(r):
+        line += "\n   " + reference_detail
     if route_text(r):
         line += '\n   ' + route_text(r)
     if r.get("text"):
@@ -247,10 +250,10 @@ def hypotheses_lines(gen: Dict[str, Any], full: bool) -> List[str]:
 
 
 def _shown_genetics(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
-    """Presentation only: patient copies count C–E, while JSON keeps every row."""
+    """Reference cards remain visible at every level; hypotheses stay separate."""
     if register == "clinician":
         return gen
-    shown = lambda p: p.get("level") not in ("C", "D", "E")
+    shown = lambda p: p.get("reference_context") or p.get("level") not in ("C", "D", "E")
     return {**gen, "positions": [p for p in gen.get("positions") or [] if shown(p)],
             "rows": [p for p in gen.get("rows") or [] if shown(p)],
             "groups": [{**g, "members": [p for p in g.get("members") or [] if shown(p)]}
@@ -293,9 +296,10 @@ def system_report(r: Dict[str, Any]) -> str:
             if basis.get("reason") or g.get("mechanism"):
                 L.append("      " + str(basis.get("reason") or g["mechanism"]))
             for m in g.get("members") or []:
-                if m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True:
+                if not m.get("reference_context") and (m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True):
                     L.append("      " + _system_gene_row({**m, "unit": "position"}, reg).replace("\n", "\n      "))
-        grouped = {rs for g in gen.get("groups") or [] for rs in g.get("positions") or []}
+        grouped = {m.get("rsid") for g in gen.get("groups") or []
+                   for m in g.get("members") or [] if not m.get("reference_context")}
         for row in gen.get("rows") or []:
             if row.get("rsid") in grouped:
                 continue
@@ -386,7 +390,7 @@ def system_report(r: Dict[str, Any]) -> str:
         # positions the groups do not hold, then the genes of the base.
         grouped = set()
         for g in gen.get("groups") or []:
-            grouped.update(g.get("positions") or [])
+            grouped.update(m.get("rsid") for m in g.get("members") or [] if not m.get("reference_context"))
             L.append("   · **" + str(g.get("label")) + "** — " + _plural(int(g.get("count") or 0), "count.positions")
                      + ((" — " + _t("system.row.level", level=g.get("level"), short=g.get("level_short") or "")) if g.get("level") else ""))
             if g.get("text"):
@@ -397,7 +401,7 @@ def system_report(r: Dict[str, Any]) -> str:
             st = g.get("states") or {}
             L.append("      " + ", ".join(f"{_t('system.panel.state.' + k)} {v}" for k, v in st.items()))
             for m in g.get("members") or []:
-                if m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True:
+                if not m.get("reference_context") and (m.get("state") in ("het", "hom", "hemi") or m.get("read") is not True):
                     L.append("      " + _system_gene_row({**m, "unit": "position"}, reg).replace("\n", "\n      "))
         for row in gen.get("rows") or []:
             if row.get("unit") == "position" and row.get("rsid") in grouped:

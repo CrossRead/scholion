@@ -42,9 +42,13 @@ appear in an answer.
 **2a. A genetic statement is relayed with its level.** Every statement the tools
 make about a genetic position carries a level from A to E (`scholion
 evidence-levels`). Name the level with the statement. A conclusion exists only at
-A and B. At C, D and E, say what the genotype is and why nothing follows: the
-data disagree (C), the data are too few (D), there are no data (E). Never retell
-such a position as a conclusion, and never supply one the tool withheld.
+A and B and still needs its own complete clinical basis. Reference panels show
+gene function and known variant context at every level A–E. Relay this context
+as reference knowledge with its source and level, never as a measured effect
+in the person. At C the evidence disagrees; at D it is limited; at E no variant
+effect is established. A known gene function does not supply a missing allele
+mechanism, direction, personal risk or treatment rule. Never supply a conclusion
+the tool withheld.
 
 **2b. A correction route is relayed only in the conditional, and only with what
 checks it.** When a system answers with `correction_routes`, every line of it
@@ -63,9 +67,10 @@ reported for this genotype, the effect, the study and the source, and which of
 these are not written yet. Call it a hypothesis and name its level; say what it
 rests on and what is missing; never turn it into a conclusion, never advise by
 it, and send the question to the treating physician. The person's own screen
-shows only how many there are — that is a way of showing, not a reason to leave
-them out when asked, nor to offer them as findings. At E there is a value and no
-source: say the genotype, say that no source is named, and add nothing. A panel
+and the clinician's panels both retain reference context and the actual reading
+with its quality. At E a sourced description of gene function may still be
+shown: keep its gene-level scope explicit, say that the variant influence is
+unknown, and never present it as a genotype effect. A panel
 author's note, where one exists, is an opinion at the position's level and is
 retold as one.
 

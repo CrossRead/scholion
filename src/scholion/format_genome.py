@@ -1141,6 +1141,7 @@ def genotype_sites_report(r: Dict[str, Any]) -> str:
 def panel_report(r: Dict[str, Any]) -> str:
     """The panel as the catalogue describes it — for a clinician, with the references."""
     from .panel_notes import note_lines
+    from .panel_reference import reference_lines
     if r.get("status") == "unknown_system":
         return "✗ " + _t("system.unknown", key=r.get("key"), systems=", ".join(r.get("systems") or []))
     if "systems" in r and "positions" not in r:
@@ -1167,6 +1168,7 @@ def panel_report(r: Dict[str, Any]) -> str:
             head += " — " + _t("system.kind." + str(p.get("kind") or "unassigned")) + \
                     "; " + _t("system.mode." + str(p.get("mode") or "unknown"))
             L.append(head)
+            L += ["  " + detail for detail in reference_lines(p)]
             if route_text(p):
                 L.append('  ' + route_text(p))
             if p.get("reading"):

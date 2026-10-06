@@ -69,3 +69,8 @@ This product includes software developed by Exon Research as part of Genomi
 Version 2.0. The vendored files live in src/scholion/vendor/genomi/, carry their
 own attribution headers, and have been modified; the modifications are listed in
 src/scholion/vendor/genomi/UPSTREAM.md.
+
+Gene reference biology in the panels includes bilingual functional paraphrases
+of NCBI Gene / RefSeq summaries retrieved on 2026-10-06. Each description carries
+its NCBI Gene URL. These describe gene function, not individual variant effects.
+NCBI / NLM content policy: https://www.ncbi.nlm.nih.gov/home/about/policies/

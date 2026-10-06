@@ -17,6 +17,7 @@ from ..i18n import t as _t
 from ..panel_notes import author_note
 from .. import core
 from ..conclusion_basis import conclusion_basis, guard_subclaims
+from ..panel_reference import reference_context
 from ..genome_routes import decision_route
 from . import panel_form, panel_gate
 from ._helpers import DISCLAIMER
@@ -41,12 +42,15 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     exp = p.get("expect") if isinstance(p.get("expect"), dict) else None
     out["expect"] = ({"marker": exp.get("marker"), "direction": exp.get("direction"),
                       "note": panel_form.one_language(exp.get("note"))} if exp else None)
-    # Who checked the sentence against its source, by role (task 199).
     out["signature"] = panel_gate.review_state(p) or "open"
     out["signed_on"] = panel_gate.reviewed_on(p)
     out.update(panel_gate.level_of(p, {x["level"]: x for x in panel_gate.legend().get("levels") or []}))
-    if out.get("level") == "E":
-        out["mechanism"] = None
+    out["reference_context"] = reference_context(p, out.get("level"))
+    if out.get("level") in ("C", "D", "E"):
+        # Reference descriptions replace genotype-specific unvalidated wording.
+        out["text"] = {}
+        if out.get("level") == "E":
+            out["mechanism"] = None
     out["conclusion_basis"] = conclusion_basis(p) if out.get("level") in ("A", "B") else None
     if out["conclusion_basis"] and out["conclusion_basis"]["status"] == "incomplete":
         out.update(text={}, mechanism=None, effect_size=None, expect=None)

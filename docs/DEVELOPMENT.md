@@ -55,6 +55,19 @@ repeat these rules at the moment they are broken.
 5. Shared leaves live in `_helpers`; a helper two domains need is moved
    there, not imported across.
 
+## Reference gene panels and personalised interpretation
+
+Panels carry an independent `reference_context` at every A–E evidence level.
+Gene-function annotation names its gene-level source; variant descriptions name
+separate literature support. They remain visible with unread positions and
+incomplete clinical support, without implying that an allele is present.
+An unknown variant effect remains unknown even when gene biology is sourced.
+Reference context never grants a finding, carrier status, marker expectation or
+action. The personalised interpretation and each adjacent clinical claim retain
+their own support and applicability checks. Patient and clinician registers
+share these facts; presentation may condense detail without removing the
+reference positions. Catalogue panels need no connected genome.
+
 ## The four faces — one capability, one tick
 
 A capability that lands in one face and not the others is the project's

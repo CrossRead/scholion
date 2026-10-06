@@ -366,3 +366,15 @@ somebody holding the previous one — while nothing has been published, work
 belongs inside the current entry rather than in a new number. And a tag may
 legitimately move, most often because the notes were corrected; when it does, the
 version is already in the registry, and republishing it is not a failure.
+
+
+### Named-allele presence and clinical carriership
+
+A curated position's `carrier` is a qualified reading: true for a read named
+allele, false for its read absence, and null for an unread, presumed, unconfirmed
+or undefined allele. It is not a diagnosis. `clinical_carrier` separately records
+the recessive carrier interpretation after its evidence and applicability checks;
+clinical carrier counts, inheritance questions and verdicts use that field.
+Gene-level rows retain their existing clinical carrier meaning. Withholding a
+sentence preserves the reading and identifies `pending_why: conclusion_basis`;
+`no_text_for_state` means the sentence itself has not been written.

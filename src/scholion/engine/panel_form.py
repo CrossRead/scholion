@@ -233,7 +233,7 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
     # Read by the file, with the depth unmeasured: not a gap in the list and not
     # a measured «nothing here» either, so it is counted on its own and said.
     depthless = [r["gene"] for r in rows if r.get("read_state") == "file_only"]
-    carriers = sum(1 for r in rows if r.get("carrier"))
+    carriers = sum(1 for r in rows if r.get("clinical_carrier", r.get("carrier")))
     out: Dict[str, Any]
     if found:
         # A finding does not cancel the gap. A list can hold both, and a
@@ -326,7 +326,7 @@ def carrier_class(row: Dict[str, Any], book: Dict[str, Any], sex: Optional[str],
     cls = entry.get("class")
     if not cls:
         return
-    if cls in ("silent", "possible_effect") and row.get("carrier"):
+    if cls in ("silent", "possible_effect") and row.get("clinical_carrier", row.get("carrier")):
         row["carrier_class"] = cls
         row["carrier_class_text"] = _t("system.carrier_class." + cls, gene=row["gene"])
     elif cls == "clinically_significant" and row.get("findings") and hits:

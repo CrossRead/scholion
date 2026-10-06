@@ -1479,28 +1479,28 @@
   },
   "variants": {
     "rs6025": {
+      "gene": "F5",
       "description": {
-        "en": "Factor V Leiden changes an activated protein C cleavage site: factor Va is inactivated less efficiently, favouring coagulation. The association concerns venous thrombosis; a molecular mechanism is not an individual risk estimate.",
-        "ru": "Factor V Leiden меняет участок расщепления активированным протеином C: фактор Va инактивируется менее эффективно, что способствует свёртыванию. Ассоциация относится к венозному тромбозу; молекулярный механизм не определяет индивидуальный риск."
+        "en": "Factor V Leiden changes an activated protein C cleavage site, reducing factor Va inactivation.",
+        "ru": "Factor V Leiden меняет участок расщепления активированным протеином C, снижая инактивацию фактора Va."
       },
-      "source": "PMID:8164741; DOI:10.1038/369064a0",
-      "gene": "F5"
+      "source": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0"
     },
     "rs1799963": {
+      "gene": "F2",
       "description": {
-        "en": "G20210A is in the prothrombin gene's 3′ untranslated region. The A allele was associated with higher plasma prothrombin and venous thrombosis in the cited study; this does not predict a person's prothrombin concentration or outcome.",
-        "ru": "G20210A находится в 3′-нетранслируемой области гена протромбина. В указанном исследовании аллель A был связан с более высоким протромбином плазмы и венозным тромбозом; это не предсказывает концентрацию протромбина или исход у человека."
+        "en": "G20210A lies in the prothrombin 3′ untranslated region and is associated with higher circulating prothrombin.",
+        "ru": "G20210A находится в 3′ нетранслируемой области гена протромбина и связан с более высоким уровнем протромбина в крови."
       },
-      "source": "PMID:8916933",
-      "gene": "F2"
+      "source": "Poort 1996; PMID:8916933"
     },
     "rs5742904": {
-      "description": {
-        "en": "APOB R3527Q affects the LDL-receptor binding region of apolipoprotein B; impaired LDL clearance is the relevant pathway. A variant description does not establish a diagnosis.",
-        "ru": "APOB R3527Q затрагивает область связывания аполипопротеина B с рецептором ЛПНП; значимый путь — нарушение удаления ЛПНП. Описание варианта не устанавливает диагноз."
-      },
       "gene": "APOB",
-      "source": "GenCC Definitive (APOB — familial hypercholesterolaemia); ClinVar pathogenic"
+      "description": {
+        "en": "R3527Q (R3500Q in mature apoB-100) disrupts LDL receptor binding, reducing receptor-mediated clearance of LDL.",
+        "ru": "R3527Q (R3500Q зрелого apoB-100) нарушает связывание с рецептором ЛПНП, снижая рецепторный клиренс ЛПНП."
+      },
+      "source": "LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847"
     },
     "rs429358": {
       "description": {
@@ -1575,20 +1575,20 @@
       "source": "PMID 22388766 (Ken-Dror 2012: a genetic instrument for Mendelian randomization of fibrinogen); PMID 39674435 (Ken-Dror 2025)"
     },
     "rs1050828": {
-      "description": {
-        "en": "G6PD V68M is part of the A− allele context. Reduced red-cell G6PD activity can affect oxidative stress tolerance and red-cell survival; a single position does not establish enzyme activity or a complete haplotype.",
-        "ru": "G6PD V68M входит в контекст аллеля A−. Снижение активности G6PD эритроцитов может менять устойчивость к окислительному стрессу и срок жизни клеток; одна позиция не определяет активность фермента или полный гаплотип."
-      },
       "gene": "G6PD",
-      "source": "CPIC G6PD (Gammal 2023); Wheeler 2017 PLoS Med (HbA1c underestimates glycaemia in G6PD deficiency)"
+      "description": {
+        "en": "V68M occurs in decreased-function G6PD A− haplotypes. G6PD supplies NADPH for red-cell antioxidant defence; full allele definition matters.",
+        "ru": "V68M входит в гаплотипы G6PD A− со сниженной функцией. G6PD обеспечивает NADPH для антиоксидантной защиты эритроцитов; важен полный состав аллеля."
+      },
+      "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735"
     },
     "rs5030868": {
-      "description": {
-        "en": "G6PD S188F is the Mediterranean variant associated with reduced enzyme function. Red-cell survival and oxidative stress are the relevant pathways; sex and the actual enzyme phenotype matter.",
-        "ru": "G6PD S188F — средиземноморский вариант, связанный со сниженной функцией фермента. Значимые пути — срок жизни эритроцитов и окислительный стресс; важны пол и фактический ферментный фенотип."
-      },
       "gene": "G6PD",
-      "source": "CPIC G6PD (Gammal 2023)"
+      "description": {
+        "en": "S188F is the decreased-function G6PD Mediterranean variant; reduced NADPH production weakens red-cell protection against oxidative stress.",
+        "ru": "S188F — вариант G6PD Mediterranean со сниженной функцией; снижение продукции NADPH ослабляет защиту эритроцитов от окислительного стресса."
+      },
+      "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735"
     },
     "rs7903146": {
       "description": {
@@ -1791,28 +1791,28 @@
       "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)"
     },
     "rs1800462": {
-      "description": {
-        "en": "TPMT *2 concerns thiopurine methylation. A single position does not identify the complete diplotype or determine an individual drug dose.",
-        "ru": "TPMT *2 относится к метилированию тиопуринов. Одна позиция не определяет полный диплотип или индивидуальную дозу препарата."
-      },
       "gene": "TPMT",
-      "source": "CPIC guideline for thiopurines (Relling 2019)"
+      "description": {
+        "en": "TPMT*2 reduces thiopurine methylation; no-function TPMT alleles can increase exposure to active thiopurine metabolites.",
+        "ru": "TPMT*2 снижает метилирование тиопуринов; аллели TPMT без функции могут повышать воздействие активных метаболитов тиопуринов."
+      },
+      "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
     },
     "rs1142345": {
-      "description": {
-        "en": "TPMT *3C concerns thiopurine methylation. Other variants and haplotype phase are needed for the complete TPMT phenotype.",
-        "ru": "TPMT *3C относится к метилированию тиопуринов. Для полного фенотипа TPMT нужны другие варианты и фаза гаплотипов."
-      },
       "gene": "TPMT",
-      "source": "CPIC guideline for thiopurines (Relling 2019)"
+      "description": {
+        "en": "p.Tyr240Cys occurs in no-function TPMT alleles including *3A and *3C; reduced methylation affects thiopurine inactivation.",
+        "ru": "p.Tyr240Cys входит в аллели TPMT без функции, включая *3A и *3C; снижение метилирования влияет на инактивацию тиопуринов."
+      },
+      "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
     },
     "rs116855232": {
-      "description": {
-        "en": "NUDT15 *3 concerns the breakdown of active thiopurine metabolites; reduced function can increase cellular exposure. This position alone does not establish a complete phenotype or dose.",
-        "ru": "NUDT15 *3 относится к расщеплению активных метаболитов тиопуринов; снижение функции может повышать клеточную экспозицию. Эта позиция сама не устанавливает полный фенотип или дозу."
-      },
       "gene": "NUDT15",
-      "source": "CPIC guideline for thiopurines (Relling 2019)"
+      "description": {
+        "en": "R139C occurs in no-function NUDT15 alleles. Reduced hydrolysis of active thioguanine nucleotides increases their availability for DNA incorporation.",
+        "ru": "R139C входит в аллели NUDT15 без функции. Снижение гидролиза активных тиогуаниновых нуклеотидов повышает их доступность для включения в ДНК."
+      },
+      "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
     },
     "rs4349859": {
       "description": {
@@ -2047,12 +2047,12 @@
       "source": "Witt 2000 Nat Genet (SPINK1 N34S and chronic pancreatitis)"
     },
     "rs111033565": {
-      "description": {
-        "en": "PRSS1 R122H concerns regulation of trypsin activity and is linked to hereditary pancreatitis in the curated sources; a variant description does not establish a personal diagnosis.",
-        "ru": "PRSS1 R122H относится к регуляции активности трипсина и связан с наследственным панкреатитом в курируемых источниках; описание варианта не устанавливает личный диагноз."
-      },
       "gene": "PRSS1",
-      "source": "GenCC Definitive (PRSS1 — hereditary pancreatitis, AD); ClinVar pathogenic"
+      "description": {
+        "en": "R122H impairs CTRC-dependent trypsinogen degradation and increases autoactivation, favouring excess active trypsin.",
+        "ru": "R122H нарушает CTRC-зависимую деградацию трипсиногена и повышает автоактивацию, способствуя избытку активного трипсина."
+      },
+      "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065"
     },
     "rs671": {
       "description": {
@@ -2079,12 +2079,12 @@
       "source": "Kozlitina 2014 Nat Genet (TM6SF2 E167K)"
     },
     "rs1800562": {
-      "description": {
-        "en": "HFE C282Y concerns iron regulation. Clinical expression depends on zygosity, other variants and iron measurements; a single allele does not establish iron overload.",
-        "ru": "HFE C282Y относится к регуляции железа. Клиническое проявление зависит от зиготности, других вариантов и измерений железа; один аллель не устанавливает перегрузку железом."
-      },
       "gene": "HFE",
-      "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM (penetrance)"
+      "description": {
+        "en": "C282Y disrupts HFE binding to beta-2-microglobulin and cell-surface expression, impairing normal iron regulation.",
+        "ru": "C282Y нарушает связывание HFE с бета-2-микроглобулином и выход белка на поверхность клетки, влияя на регуляцию железа."
+      },
+      "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286"
     },
     "rs1799945": {
       "description": {
@@ -2095,12 +2095,12 @@
       "source": "GenCC (HFE); Gochee 2002 (H63D alone is not a disease allele)"
     },
     "rs28929474": {
-      "description": {
-        "en": "SERPINA1 Pi*Z concerns alpha-1-antitrypsin folding and availability. Liver and lung effects depend on the complete genotype and exposures; a single position is not a diagnosis.",
-        "ru": "SERPINA1 Pi*Z относится к сворачиванию и доступности альфа-1-антитрипсина. Эффекты на печень и лёгкие зависят от полного генотипа и воздействий; одна позиция не является диагнозом."
-      },
       "gene": "SERPINA1",
-      "source": "GenCC Definitive (SERPINA1 — alpha-1-antitrypsin deficiency); ClinVar pathogenic"
+      "description": {
+        "en": "The Z variant (E342K in the mature protein, E366K in the precursor) promotes alpha-1-antitrypsin polymerization and retention in liver cells, reducing secretion.",
+        "ru": "Z-вариант (E342K зрелого белка, E366K предшественника) способствует полимеризации альфа-1-антитрипсина и удержанию в клетках печени, снижая секрецию."
+      },
+      "source": "Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014"
     },
     "rs17580": {
       "description": {
@@ -2111,12 +2111,12 @@
       "source": "GenCC (SERPINA1); Pi*S is a mild allele"
     },
     "rs4148323": {
-      "description": {
-        "en": "UGT1A1 *6 concerns bilirubin glucuronidation. Reduced conjugation is a pathway description, not a diagnosis or a complete drug-metabolism phenotype from one SNP.",
-        "ru": "UGT1A1 *6 относится к глюкуронированию билирубина. Снижение конъюгации — описание пути, а не диагноз или полный фенотип метаболизма лекарств по одному SNP."
-      },
       "gene": "UGT1A1",
-      "source": "CPIC guideline for irinotecan / atazanavir (UGT1A1); Gilbert syndrome"
+      "description": {
+        "en": "UGT1A1*6 (G71R) reduces bilirubin glucuronidation in functional studies.",
+        "ru": "UGT1A1*6 (G71R) снижает глюкуронирование билирубина в функциональных исследованиях."
+      },
+      "source": "G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269"
     },
     "rs1801280": {
       "description": {
@@ -2653,6 +2653,14 @@
       },
       "gene": "PRKN",
       "source": "ClinVar VCV000007050 (Pathogenic/Likely pathogenic); GenCC: PRKN — Parkinson disease, autosomal recessive, Definitive (ClinGen)"
+    },
+    "rs111033566": {
+      "gene": "PRSS1",
+      "description": {
+        "en": "The catalogued c.86A>C variant is N29T, not N29I. N29T resists CTRC-dependent degradation and increases trypsinogen autoactivation.",
+        "ru": "Каталожный вариант c.86A>C — N29T, а не N29I. N29T устойчив к CTRC-зависимой деградации и повышает автоактивацию трипсиногена."
+      },
+      "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366"
     }
   }
 }

@@ -40,6 +40,56 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.2 — 06.10.2026
+
+### What you can do now
+
+**Read allele presence separately from clinical interpretation.** A positively
+read named allele stays present even if its interpretation is withheld. An
+unread, presumed or unconfirmed position is unknown, rather than a negative
+result. Clinical carrier counts and findings retain their independent checks.
+
+**Understand why a sentence is missing.** System cards, reports and clinician
+questions distinguish incomplete clinical support from a phrase that has never
+been written. Reference panels show the number of withheld A/B interpretations;
+gene biology and reading quality remain visible at every A–E level. Use
+`scholion panel cardio` for the reference panel, `scholion system cardio` for
+readings and `scholion longevity` for the literature catalogue.
+
+**Use restored, sourced explanations for key clinical positions.** F2, F5, HFE,
+G6PD, TPMT, NUDT15, UGT1A1, SERPINA1, APOB and two PRSS1 variants have their own
+identifiable references and mechanisms. Single positions do not establish a
+complete pharmacogenetic phenotype, a diagnosis or a drug dose. Source curation
+remains incomplete for 119 of 151 A/B system-panel rows (117 of 140 distinct
+positions) and all nine A/B on-demand rows. Their personal interpretations stay
+withheld; this is a knowledge gap, not loss of genome data.
+
+**Read concise longevity support notices.** Each variant lists its unsupported
+fields together once, while structured output retains support for every field.
+A supported field is still shown with its own provenance.
+
+### What this changes in the conclusions
+
+Supported explanations return only within the scope of their own sources.
+Presence of an allele grants neither a finding nor a treatment decision.
+Reference gene lookups and panel explanations use consistent neutral context
+for the revised positions. Other unsupported clinical claims remain withheld.
+
+### What is retracted
+
+A withheld interpretation no longer reports a read heterozygote as lacking the
+named allele or promises an unwritten phrase. Unsourced personal risk multipliers,
+hormone-route and haematocrit advice, single-SNP dose instructions and diagnoses
+are removed from the revised explanations and lookup notes. The catalogued PRSS1
+A>C change is identified as N29T, distinct from the A>T variant sharing its rsID.
+
+### What needs recomputing
+
+Nothing. Reopen or regenerate panel and longevity reports. Stored genotypes, coordinates,
+alignment data and laboratory measurements are unchanged; no genome re-indexing
+or alignment rescan is required. Previously exported wording is not rewritten.
+
+
 ## v0.6.1 — 06.10.2026
 
 ### What you can do now

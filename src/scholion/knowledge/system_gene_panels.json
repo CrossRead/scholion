@@ -229,17 +229,17 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "APOB R3527Q, one copy: familial hypercholesterolaemia of the APOB kind — LDL-C is high from birth, treatment starts early and the family is screened; one copy is enough, the disease is dominant.",
-              "ru": "APOB R3527Q, одна копия: семейная гиперхолестеринемия формы APOB — ЛПНП высокий с рождения, лечение начинают рано, семью обследуют; одной копии достаточно, болезнь доминантная."
+              "en": "This APOB variant is associated with familial defective apoB-100 and hypercholesterolaemia. The reading is relevant to lipid assessment; it does not establish the individual LDL value, disease severity or a treatment regimen.",
+              "ru": "Этот вариант APOB связан с семейным дефектом apoB-100 и гиперхолестеринемией. Результат чтения важен для оценки липидов; он не устанавливает индивидуальный уровень ЛПНП, тяжесть заболевания или схему лечения."
             },
             "hom": {
-              "en": "APOB R3527Q in two copies: a severe form; a lipid specialist from the start.",
-              "ru": "APOB R3527Q в двух копиях: тяжёлая форма; липидолог с самого начала."
+              "en": "This APOB variant is associated with familial defective apoB-100 and hypercholesterolaemia. The reading is relevant to lipid assessment; it does not establish the individual LDL value, disease severity or a treatment regimen.",
+              "ru": "Этот вариант APOB связан с семейным дефектом apoB-100 и гиперхолестеринемией. Результат чтения важен для оценки липидов; он не устанавливает индивидуальный уровень ЛПНП, тяжесть заболевания или схему лечения."
             }
           },
-          "source": "GenCC Definitive (APOB — familial hypercholesterolaemia); ClinVar pathogenic",
+          "source": "LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AD",
           "disease": "familial hypercholesterolaemia (APOB)",
@@ -251,18 +251,19 @@
               "ru": "семейная гиперхолестеринемия: ЛПНП ожидается заметно выше коридора"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (APOB — familial hypercholesterolaemia); ClinVar pathogenic",
+            "source": "LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "R3527Q (R3500Q in mature apoB-100) disrupts LDL receptor binding, reducing receptor-mediated clearance of LDL.",
+            "ru": "R3527Q (R3500Q зрелого apoB-100) нарушает связывание с рецептором ЛПНП, снижая рецепторный клиренс ЛПНП."
+          },
+          "study": "LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs429358",
@@ -571,30 +572,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "Factor V Leiden, one copy: venous thrombosis risk about 5-fold; under oestrogen or testosterone therapy the risk multiplies — a reason to prefer transdermal routes and to watch the haematocrit, not a contraindication by itself.",
-              "ru": "Фактор V Лейден, одна копия: риск венозного тромбоза примерно в 5 раз; на терапии эстрогенами или тестостероном риск умножается — повод предпочесть трансдермальные формы и следить за гематокритом, сама по себе не противопоказание."
+              "en": "Factor V Leiden is associated with activated protein C resistance and venous thrombosis susceptibility. This position does not estimate individual risk or choose hormonal therapy.",
+              "ru": "Factor V Leiden связан с устойчивостью к активированному протеину C и предрасположенностью к венозному тромбозу. Эта позиция не оценивает индивидуальный риск и не выбирает гормональную терапию."
             },
             "hom": {
-              "en": "Factor V Leiden in two copies: venous thrombosis risk tens-fold; a haematologist before any hormonal therapy or long immobilisation.",
-              "ru": "Фактор V Лейден в двух копиях: риск венозного тромбоза в десятки раз; гематолог до любой гормональной терапии или длительной иммобилизации."
+              "en": "Factor V Leiden is associated with activated protein C resistance and venous thrombosis susceptibility. This position does not estimate individual risk or choose hormonal therapy.",
+              "ru": "Factor V Leiden связан с устойчивостью к активированному протеину C и предрасположенностью к венозному тромбозу. Эта позиция не оценивает индивидуальный риск и не выбирает гормональную терапию."
             }
           },
-          "source": "ACOG/ESHRE guidance on thrombophilia and hormonal therapy; Rosendaal 1995 Lancet",
+          "source": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "effect_size": "VTE OR about 5 (heterozygote), about 50 (homozygote)",
-          "study": "Rosendaal 1995 Lancet",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
+          "study": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "ACOG/ESHRE guidance on thrombophilia and hormonal therapy; Rosendaal 1995 Lancet",
+            "source": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
             "assigned": "2026-09-17",
             "judged": "named in obstetric and gynaecological guidance on inherited thrombophilia"
+          },
+          "mechanism": {
+            "en": "Factor V Leiden changes an activated protein C cleavage site, reducing factor Va inactivation.",
+            "ru": "Factor V Leiden меняет участок расщепления активированным протеином C, снижая инактивацию фактора Va."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open.",
+          "effect_size": {
+            "en": "No individual risk magnitude is inferred from this position.",
+            "ru": "Величина индивидуального риска по этой позиции не выводится."
           }
         },
         {
@@ -607,30 +611,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "Prothrombin G20210A, one copy: venous thrombosis risk about 2–3-fold; with Factor V Leiden the two add up — hormonal therapy and long immobilisation are the moments to remember it.",
-              "ru": "Протромбин G20210A, одна копия: риск венозного тромбоза примерно в 2–3 раза; вместе с фактором V Лейден риски складываются — гормональная терапия и длительная иммобилизация — моменты, когда об этом помнят."
+              "en": "Prothrombin G20210A is associated with venous thrombosis susceptibility. The study does not establish a personal risk multiplier for two copies or an additive risk with F5. Treatment decisions require clinical context.",
+              "ru": "Протромбин G20210A связан с предрасположенностью к венозному тромбозу. Исследование не определяет личный множитель риска для двух копий или сумму рисков с F5. Решения о лечении требуют клинического контекста."
             },
             "hom": {
-              "en": "Prothrombin G20210A, two copies: venous thrombosis risk about 2–3-fold; with Factor V Leiden the two add up — hormonal therapy and long immobilisation are the moments to remember it.",
-              "ru": "Протромбин G20210A, две копии: риск венозного тромбоза примерно в 2–3 раза; вместе с фактором V Лейден риски складываются — гормональная терапия и длительная иммобилизация — моменты, когда об этом помнят."
+              "en": "Prothrombin G20210A is associated with venous thrombosis susceptibility. The study does not establish a personal risk multiplier for two copies or an additive risk with F5. Treatment decisions require clinical context.",
+              "ru": "Протромбин G20210A связан с предрасположенностью к венозному тромбозу. Исследование не определяет личный множитель риска для двух копий или сумму рисков с F5. Решения о лечении требуют клинического контекста."
             }
           },
-          "source": "Poort 1996 Blood; ACOG/ESHRE guidance",
+          "source": "Poort 1996; PMID:8916933",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "effect_size": "VTE OR about 2–3 (heterozygote)",
-          "study": "Poort 1996 Blood",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
+          "study": "Poort 1996; PMID:8916933",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "Poort 1996 Blood; ACOG/ESHRE guidance",
+            "source": "Poort 1996; PMID:8916933",
             "assigned": "2026-09-17",
             "judged": "named in obstetric and gynaecological guidance on inherited thrombophilia"
+          },
+          "mechanism": {
+            "en": "G20210A lies in the prothrombin 3′ untranslated region and is associated with higher circulating prothrombin.",
+            "ru": "G20210A находится в 3′ нетранслируемой области гена протромбина и связан с более высоким уровнем протромбина в крови."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open.",
+          "effect_size": {
+            "en": "No individual risk magnitude is inferred from this position.",
+            "ru": "Величина индивидуального риска по этой позиции не выводится."
           }
         },
         {
@@ -974,17 +981,17 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "G6PD A− (V68M), one copy: in a woman a partial deficiency, in a man (X-linked) a deficiency — HbA1c reads LOWER than the true glycaemia because red cells live shorter; judge diabetes control by glucose or fructosamine. Dapsone, primaquine, rasburicase, nitrofurantoin are the drugs CPIC restricts.",
-              "ru": "G6PD A− (V68M), одна копия: у женщины частичный дефицит, у мужчины (X-сцепленный) — дефицит; HbA1c показывает НИЖЕ истинной гликемии, потому что эритроциты живут меньше; контроль диабета — по глюкозе или фруктозамину. Дапсон, примахин, расбуриказа, нитрофурантоин — препараты, которые CPIC ограничивает."
+              "en": "This G6PD position is relevant to drug-related haemolysis assessment. Heterozygous activity can range from normal to deficient because of X inactivation; one SNP does not define the complete allele or an individual drug restriction.",
+              "ru": "Эта позиция G6PD важна для оценки лекарственного гемолиза. При гетерозиготности активность может быть от нормальной до дефицитной из-за инактивации X; один SNP не определяет полный аллель или индивидуальное ограничение препарата."
             },
             "hom": {
-              "en": "G6PD A− in two copies: deficiency — HbA1c is not a reliable measure of control; the CPIC drug list applies in full.",
-              "ru": "G6PD A− в двух копиях: дефицит — HbA1c не надёжная мера контроля; список препаратов CPIC действует полностью."
+              "en": "This G6PD position is relevant to drug-related haemolysis assessment. Heterozygous activity can range from normal to deficient because of X inactivation; one SNP does not define the complete allele or an individual drug restriction.",
+              "ru": "Эта позиция G6PD важна для оценки лекарственного гемолиза. При гетерозиготности активность может быть от нормальной до дефицитной из-за инактивации X; один SNP не определяет полный аллель или индивидуальное ограничение препарата."
             }
           },
-          "source": "CPIC G6PD (Gammal 2023); Wheeler 2017 PLoS Med (HbA1c underestimates glycaemia in G6PD deficiency)",
+          "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "expect": {
             "marker": "hba1c",
             "direction": "lower",
@@ -993,18 +1000,19 @@
               "ru": "при дефиците G6PD HbA1c занижает гликемию"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC G6PD (Gammal 2023); Wheeler 2017 PLoS Med (HbA1c underestimates glycaemia in G6PD deficiency)",
+            "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "V68M occurs in decreased-function G6PD A− haplotypes. G6PD supplies NADPH for red-cell antioxidant defence; full allele definition matters.",
+            "ru": "V68M входит в гаплотипы G6PD A− со сниженной функцией. G6PD обеспечивает NADPH для антиоксидантной защиты эритроцитов; важен полный состав аллеля."
+          },
+          "study": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs5030868",
@@ -1016,17 +1024,17 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "G6PD Mediterranean (S188F), one copy: as the A− allele but more severe — HbA1c underestimates glycaemia; the CPIC-restricted drugs apply.",
-              "ru": "G6PD Mediterranean (S188F), одна копия: как аллель A−, но тяжелее — HbA1c занижает гликемию; действует список ограниченных CPIC препаратов."
+              "en": "G6PD Mediterranean is relevant to drug-related haemolysis assessment. Heterozygous enzyme activity is variable; the complete genotype and measured activity determine the phenotype used in CPIC guidance. This row does not select a drug or dose.",
+              "ru": "G6PD Mediterranean важен для оценки лекарственного гемолиза. Активность фермента при гетерозиготности изменчива; полный генотип и измеренная активность определяют фенотип для рекомендаций CPIC. Эта строка не выбирает препарат или дозу."
             },
             "hom": {
-              "en": "G6PD Mediterranean (S188F), two copies: as the A− allele but more severe — HbA1c underestimates glycaemia; the CPIC-restricted drugs apply.",
-              "ru": "G6PD Mediterranean (S188F), две копии: как аллель A−, но тяжелее — HbA1c занижает гликемию; действует список ограниченных CPIC препаратов."
+              "en": "G6PD Mediterranean is relevant to drug-related haemolysis assessment. Heterozygous enzyme activity is variable; the complete genotype and measured activity determine the phenotype used in CPIC guidance. This row does not select a drug or dose.",
+              "ru": "G6PD Mediterranean важен для оценки лекарственного гемолиза. Активность фермента при гетерозиготности изменчива; полный генотип и измеренная активность определяют фенотип для рекомендаций CPIC. Эта строка не выбирает препарат или дозу."
             }
           },
-          "source": "CPIC G6PD (Gammal 2023)",
+          "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "expect": {
             "marker": "hba1c",
             "direction": "lower",
@@ -1035,18 +1043,19 @@
               "ru": "при дефиците G6PD HbA1c занижает гликемию"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC G6PD (Gammal 2023)",
+            "source": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "S188F is the decreased-function G6PD Mediterranean variant; reduced NADPH production weakens red-cell protection against oxidative stress.",
+            "ru": "S188F — вариант G6PD Mediterranean со сниженной функцией; снижение продукции NADPH ослабляет защиту эритроцитов от окислительного стресса."
+          },
+          "study": "CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs7903146",
@@ -2182,29 +2191,30 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "TPMT *2, one copy (intermediate metaboliser): azathioprine and mercaptopurine at a reduced starting dose (CPIC: 30–80 % of normal) with blood-count monitoring.",
-              "ru": "TPMT *2, одна копия (промежуточный метаболизатор): азатиоприн и меркаптопурин со сниженной стартовой дозы (CPIC: 30–80 % обычной) с контролем крови."
+              "en": "This position occurs in a no-function TPMT allele and is relevant to thiopurine myelosuppression. A single position does not establish the complete TPMT/NUDT15 phenotype or a starting dose. Discuss the full genotype and treatment context with the prescriber.",
+              "ru": "Эта позиция входит в аллель TPMT без функции и важна для миелосупрессии при тиопуринах. Одна позиция не устанавливает полный фенотип TPMT/NUDT15 или стартовую дозу. Полный генотип и контекст лечения обсуждают с назначающим врачом."
             },
             "hom": {
-              "en": "TPMT *2 in two copies (poor metaboliser): CPIC — a drastic dose reduction or another drug; standard doses cause severe myelosuppression.",
-              "ru": "TPMT *2 в двух копиях (медленный метаболизатор): CPIC — резкое снижение дозы или другой препарат; стандартные дозы дают тяжёлую миелосупрессию."
+              "en": "This position occurs in a no-function TPMT allele and is relevant to thiopurine myelosuppression. A single position does not establish the complete TPMT/NUDT15 phenotype or a starting dose. Discuss the full genotype and treatment context with the prescriber.",
+              "ru": "Эта позиция входит в аллель TPMT без функции и важна для миелосупрессии при тиопуринах. Одна позиция не устанавливает полный фенотип TPMT/NUDT15 или стартовую дозу. Полный генотип и контекст лечения обсуждают с назначающим врачом."
             }
           },
-          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for thiopurines (Relling 2019)",
+            "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "TPMT*2 reduces thiopurine methylation; no-function TPMT alleles can increase exposure to active thiopurine metabolites.",
+            "ru": "TPMT*2 снижает метилирование тиопуринов; аллели TPMT без функции могут повышать воздействие активных метаболитов тиопуринов."
+          },
+          "study": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1142345",
@@ -2216,29 +2226,30 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "TPMT *3C, one copy (intermediate metaboliser): thiopurines at a reduced starting dose with monitoring (CPIC).",
-              "ru": "TPMT *3C, одна копия (промежуточный метаболизатор): тиопурины со сниженной стартовой дозы с контролем (CPIC)."
+              "en": "This position is relevant to thiopurine myelosuppression. Other positions and phase distinguish TPMT haplotypes; a single SNP does not establish the complete TPMT/NUDT15 phenotype or a starting dose.",
+              "ru": "Эта позиция важна для миелосупрессии при тиопуринах. Другие позиции и фаза различают гаплотипы TPMT; один SNP не устанавливает полный фенотип TPMT/NUDT15 или стартовую дозу."
             },
             "hom": {
-              "en": "TPMT *3C in two copies (poor metaboliser): CPIC — a drastic dose reduction or another drug.",
-              "ru": "TPMT *3C в двух копиях (медленный метаболизатор): CPIC — резкое снижение дозы или другой препарат."
+              "en": "This position is relevant to thiopurine myelosuppression. Other positions and phase distinguish TPMT haplotypes; a single SNP does not establish the complete TPMT/NUDT15 phenotype or a starting dose.",
+              "ru": "Эта позиция важна для миелосупрессии при тиопуринах. Другие позиции и фаза различают гаплотипы TPMT; один SNP не устанавливает полный фенотип TPMT/NUDT15 или стартовую дозу."
             }
           },
-          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for thiopurines (Relling 2019)",
+            "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "p.Tyr240Cys occurs in no-function TPMT alleles including *3A and *3C; reduced methylation affects thiopurine inactivation.",
+            "ru": "p.Tyr240Cys входит в аллели TPMT без функции, включая *3A и *3C; снижение метилирования влияет на инактивацию тиопуринов."
+          },
+          "study": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs116855232",
@@ -2250,29 +2261,30 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "NUDT15 *3, one copy (intermediate metaboliser): thiopurines at a reduced starting dose (CPIC), especially relevant in East-Asian ancestry.",
-              "ru": "NUDT15 *3, одна копия (промежуточный метаболизатор): тиопурины со сниженной стартовой дозы (CPIC), особенно значимо при восточноазиатском происхождении."
+              "en": "This position is relevant to thiopurine myelosuppression. The full NUDT15 and TPMT genotype, including phase where needed, determines the phenotype used in CPIC guidance. A single SNP does not select a starting dose.",
+              "ru": "Эта позиция важна для миелосупрессии при тиопуринах. Полный генотип NUDT15 и TPMT, включая фазу при необходимости, определяет фенотип для рекомендаций CPIC. Один SNP не выбирает стартовую дозу."
             },
             "hom": {
-              "en": "NUDT15 *3 in two copies (poor metaboliser): CPIC — a drastic reduction or another drug.",
-              "ru": "NUDT15 *3 в двух копиях (медленный метаболизатор): CPIC — резкое снижение или другой препарат."
+              "en": "This position is relevant to thiopurine myelosuppression. The full NUDT15 and TPMT genotype, including phase where needed, determines the phenotype used in CPIC guidance. A single SNP does not select a starting dose.",
+              "ru": "Эта позиция важна для миелосупрессии при тиопуринах. Полный генотип NUDT15 и TPMT, включая фазу при необходимости, определяет фенотип для рекомендаций CPIC. Один SNP не выбирает стартовую дозу."
             }
           },
-          "source": "CPIC guideline for thiopurines (Relling 2019)",
+          "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for thiopurines (Relling 2019)",
+            "source": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "R139C occurs in no-function NUDT15 alleles. Reduced hydrolysis of active thioguanine nucleotides increases their availability for DNA incorporation.",
+            "ru": "R139C входит в аллели NUDT15 без функции. Снижение гидролиза активных тиогуаниновых нуклеотидов повышает их доступность для включения в ДНК."
+          },
+          "study": "CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1799853",
@@ -3631,30 +3643,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "Factor V Leiden, one copy: under testosterone or oestrogen therapy the venous thrombosis risk multiplies — prefer transdermal routes, watch the haematocrit; not a contraindication by itself.",
-              "ru": "Фактор V Лейден, одна копия: на терапии тестостероном или эстрогенами риск венозного тромбоза умножается — предпочесть трансдермальные формы, следить за гематокритом; само по себе не противопоказание."
+              "en": "Factor V Leiden is associated with activated protein C resistance and venous thrombosis susceptibility. This position does not estimate individual risk or choose hormonal therapy.",
+              "ru": "Factor V Leiden связан с устойчивостью к активированному протеину C и предрасположенностью к венозному тромбозу. Эта позиция не оценивает индивидуальный риск и не выбирает гормональную терапию."
             },
             "hom": {
-              "en": "Factor V Leiden in two copies: a haematologist before any hormonal therapy.",
-              "ru": "Фактор V Лейден в двух копиях: гематолог до любой гормональной терапии."
+              "en": "Factor V Leiden is associated with activated protein C resistance and venous thrombosis susceptibility. This position does not estimate individual risk or choose hormonal therapy.",
+              "ru": "Factor V Leiden связан с устойчивостью к активированному протеину C и предрасположенностью к венозному тромбозу. Эта позиция не оценивает индивидуальный риск и не выбирает гормональную терапию."
             }
           },
-          "source": "ACOG/ESHRE guidance; Rosendaal 1995",
+          "source": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "effect_size": "VTE OR about 5 (heterozygote)",
-          "study": "Rosendaal 1995 Lancet",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
+          "study": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "ACOG/ESHRE guidance; Rosendaal 1995",
+            "source": "Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
             "assigned": "2026-09-17",
             "judged": "named in obstetric and gynaecological guidance on inherited thrombophilia"
+          },
+          "mechanism": {
+            "en": "Factor V Leiden changes an activated protein C cleavage site, reducing factor Va inactivation.",
+            "ru": "Factor V Leiden меняет участок расщепления активированным протеином C, снижая инактивацию фактора Va."
+          },
+          "note_on_review": "Source-based revision; human review of this wording is open.",
+          "effect_size": {
+            "en": "No individual risk magnitude is inferred from this position.",
+            "ru": "Величина индивидуального риска по этой позиции не выводится."
           }
         },
         {
@@ -3667,32 +3682,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "HFE C282Y, one copy: carriership — iron overload is unlikely on one copy; a low testosterone is not explained by it.",
-              "ru": "HFE C282Y, одна копия: носительство — перегрузка железом на одной копии маловероятна; низкий тестостерон этим не объясняется."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             },
             "hom": {
-              "en": "HFE C282Y in two copies: haemochromatosis genotype — iron settles in the pituitary and testes, and hypogonadism is one of its faces; ferritin and transferrin saturation are the next measurement.",
-              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — железо откладывается в гипофизе и яичках, гипогонадизм — одно из его лиц; следующий анализ — ферритин и насыщение трансферрина."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             }
           },
-          "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM (penetrance)",
+          "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AR",
           "disease": "haemochromatosis type 1 (HFE)",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM (penetrance)",
+            "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "C282Y disrupts HFE binding to beta-2-microglobulin and cell-surface expression, impairing normal iron regulation.",
+            "ru": "C282Y нарушает связывание HFE с бета-2-микроглобулином и выход белка на поверхность клетки, влияя на регуляцию железа."
+          },
+          "study": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs7521902",
@@ -4627,32 +4643,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "PRSS1 R122H, one copy: hereditary pancreatitis — dominant with high penetrance; recurrent pancreatitis from youth and a raised pancreatic cancer risk later, which is why surveillance is discussed.",
-              "ru": "PRSS1 R122H, одна копия: наследственный панкреатит — доминантно, с высокой пенетрантностью; рецидивирующий панкреатит с молодости и повышенный риск рака поджелудочной позже, поэтому обсуждают наблюдение."
+              "en": "R122H is associated with hereditary pancreatitis. The variant has a documented molecular effect; its detection does not itself diagnose pancreatitis or determine an individual prognosis.",
+              "ru": "R122H связан с наследственным панкреатитом. Молекулярный эффект варианта описан; его обнаружение само по себе не диагностирует панкреатит и не определяет индивидуальный прогноз."
             },
             "hom": {
-              "en": "PRSS1 R122H in two copies: the same, from earlier.",
-              "ru": "PRSS1 R122H в двух копиях: то же, с более раннего возраста."
+              "en": "R122H is associated with hereditary pancreatitis. The variant has a documented molecular effect; its detection does not itself diagnose pancreatitis or determine an individual prognosis.",
+              "ru": "R122H связан с наследственным панкреатитом. Молекулярный эффект варианта описан; его обнаружение само по себе не диагностирует панкреатит и не определяет индивидуальный прогноз."
             }
           },
-          "source": "GenCC Definitive (PRSS1 — hereditary pancreatitis, AD); ClinVar pathogenic",
+          "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AD",
           "disease": "hereditary pancreatitis (PRSS1)",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (PRSS1 — hereditary pancreatitis, AD); ClinVar pathogenic",
+            "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "R122H impairs CTRC-dependent trypsinogen degradation and increases autoactivation, favouring excess active trypsin.",
+            "ru": "R122H нарушает CTRC-зависимую деградацию трипсиногена и повышает автоактивацию, способствуя избытку активного трипсина."
+          },
+          "study": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs671",
@@ -4703,29 +4720,31 @@
           "disease": "hereditary chronic pancreatitis",
           "text": {
             "het": {
-              "en": "PRSS1 rs111033566, one copy: a variant GenCC links to hereditary chronic pancreatitis (Definitive, AD); one copy can be enough for the condition, and a clinical assessment is what follows — not a diagnosis.",
-              "ru": "PRSS1 rs111033566, одна копия: вариант, который GenCC связывает с «hereditary chronic pancreatitis» (Definitive, AD); одной копии может быть достаточно для состояния, и следом идёт клиническая оценка — не диагноз."
+              "en": "N29T is associated with hereditary pancreatitis. The same rsID also includes other alternate alleles: this statement applies only to the catalogued A>C change. Detection alone is not a diagnosis.",
+              "ru": "N29T связан с наследственным панкреатитом. Тот же rsID включает другие альтернативные аллели: это пояснение относится только к каталожной замене A>C. Обнаружение само по себе не является диагнозом."
             },
             "hom": {
-              "en": "PRSS1 rs111033566, two copies: the genotype GenCC links to hereditary chronic pancreatitis (Definitive, AD); a clinical assessment is what follows — not a diagnosis.",
-              "ru": "PRSS1 rs111033566, две копии: генотип, который GenCC связывает с «hereditary chronic pancreatitis» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
+              "en": "N29T is associated with hereditary pancreatitis. The same rsID also includes other alternate alleles: this statement applies only to the catalogued A>C change. Detection alone is not a diagnosis.",
+              "ru": "N29T связан с наследственным панкреатитом. Тот же rsID включает другие альтернативные аллели: это пояснение относится только к каталожной замене A>C. Обнаружение само по себе не является диагнозом."
             }
           },
-          "source": "GenCC (PRSS1, hereditary chronic pancreatitis, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366",
           "submitter": "panel_2026_09_18",
-          "curated_on": "2026-09-18",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-18",
-            "scope": "level_and_placement"
-          },
+          "curated_on": "2026-10-06",
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC (PRSS1, hereditary chronic pancreatitis, Definitive)",
+            "source": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366",
             "assigned": "2026-09-18",
             "by_rule": "GenCC Definitive/Strong"
-          }
+          },
+          "mechanism": {
+            "en": "The catalogued c.86A>C variant is N29T, not N29I. N29T resists CTRC-dependent degradation and increases trypsinogen autoactivation.",
+            "ru": "Каталожный вариант c.86A>C — N29T, а не N29I. N29T устойчив к CTRC-зависимой деградации и повышает автоактивацию трипсиногена."
+          },
+          "study": "CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366",
+          "note_on_review": "Source-based revision; human review of this wording is open.",
+          "protein": "p.Asn29Thr"
         }
       ]
     },
@@ -4822,32 +4841,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "HFE C282Y, one copy: carriership — a mildly raised ferritin is more often inflammation or fat than iron; one copy rarely overloads.",
-              "ru": "HFE C282Y, одна копия: носительство — слегка повышенный ферритин чаще воспаление или жир, чем железо; одна копия редко даёт перегрузку."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             },
             "hom": {
-              "en": "HFE C282Y in two copies: the haemochromatosis genotype — ferritin and transferrin saturation decide whether iron is accumulating; phlebotomy treats it, and the liver is protected by starting early.",
-              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — ферритин и насыщение трансферрина решают, накапливается ли железо; лечит флеботомия, печень защищает раннее начало."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             }
           },
-          "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM",
+          "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AR",
           "disease": "haemochromatosis type 1 (HFE)",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (HFE — haemochromatosis, AR); Allen 2008 NEJM",
+            "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "C282Y disrupts HFE binding to beta-2-microglobulin and cell-surface expression, impairing normal iron regulation.",
+            "ru": "C282Y нарушает связывание HFE с бета-2-микроглобулином и выход белка на поверхность клетки, влияя на регуляцию железа."
+          },
+          "study": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1799945",
@@ -4896,32 +4916,33 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "SERPINA1 Pi*Z, one copy (MZ): a modest liver and lung risk that alcohol, fatty liver and smoking amplify — the reading is «protect this liver more than average».",
-              "ru": "SERPINA1 Pi*Z, одна копия (MZ): умеренный риск для печени и лёгких, который усиливают алкоголь, стеатоз и курение — чтение: «беречь эту печень больше обычного»."
+              "en": "The Z variant is relevant to alpha-1-antitrypsin deficiency. One Z copy does not establish Pi*MZ because the other allele may differ; the complete genotype, protein measurements and clinical context are needed. This row does not diagnose lung or liver disease.",
+              "ru": "Z-вариант важен для дефицита альфа-1-антитрипсина. Одна копия Z не устанавливает Pi*MZ: другой аллель может быть иным; нужны полный генотип, показатели белка и клинический контекст. Строка не диагностирует заболевание лёгких или печени."
             },
             "hom": {
-              "en": "SERPINA1 Pi*Z in two copies (ZZ): alpha-1-antitrypsin deficiency — liver disease and early emphysema; a specialist, no smoking, alpha-1-antitrypsin level measured.",
-              "ru": "SERPINA1 Pi*Z в двух копиях (ZZ): дефицит альфа-1-антитрипсина — болезнь печени и ранняя эмфизема; специалист, никакого курения, измерить уровень альфа-1-антитрипсина."
+              "en": "The Z variant is relevant to alpha-1-antitrypsin deficiency. One Z copy does not establish Pi*MZ because the other allele may differ; the complete genotype, protein measurements and clinical context are needed. This row does not diagnose lung or liver disease.",
+              "ru": "Z-вариант важен для дефицита альфа-1-антитрипсина. Одна копия Z не устанавливает Pi*MZ: другой аллель может быть иным; нужны полный генотип, показатели белка и клинический контекст. Строка не диагностирует заболевание лёгких или печени."
             }
           },
-          "source": "GenCC Definitive (SERPINA1 — alpha-1-antitrypsin deficiency); ClinVar pathogenic",
+          "source": "Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AR",
           "disease": "alpha-1-antitrypsin deficiency (SERPINA1)",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (SERPINA1 — alpha-1-antitrypsin deficiency); ClinVar pathogenic",
+            "source": "Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "The Z variant (E342K in the mature protein, E366K in the precursor) promotes alpha-1-antitrypsin polymerization and retention in liver cells, reducing secretion.",
+            "ru": "Z-вариант (E342K зрелого белка, E366K предшественника) способствует полимеризации альфа-1-антитрипсина и удержанию в клетках печени, снижая секрецию."
+          },
+          "study": "Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs17580",
@@ -4970,29 +4991,30 @@
           "kind": "guideline",
           "text": {
             "het": {
-              "en": "UGT1A1 *6, one copy: reduced bilirubin conjugation — an isolated mildly raised unconjugated bilirubin is Gilbert's, not liver disease; irinotecan and atazanavir are the drugs CPIC adjusts.",
-              "ru": "UGT1A1 *6, одна копия: сниженная конъюгация билирубина — изолированно слегка повышенный непрямой билирубин это Жильбер, а не болезнь печени; иринотекан и атазанавир — препараты, которые корректирует CPIC."
+              "en": "G71R is a decreased-function UGT1A1 variant relevant to bilirubin handling and atazanavir assessment. The complete genotype matters, including promoter repeats not identified by this SNP. This position alone does not diagnose Gilbert syndrome or choose a drug dose.",
+              "ru": "G71R — вариант UGT1A1 со сниженной функцией, важный для обмена билирубина и оценки атазанавира. Важен полный генотип, включая повторы промотора, которые этот SNP не определяет. Одна позиция не диагностирует синдром Жильбера и не выбирает дозу препарата."
             },
             "hom": {
-              "en": "UGT1A1 *6 in two copies: Gilbert's syndrome genotype; CPIC — a reduced irinotecan starting dose.",
-              "ru": "UGT1A1 *6 в двух копиях: генотип синдрома Жильбера; CPIC — сниженная стартовая доза иринотекана."
+              "en": "G71R is a decreased-function UGT1A1 variant relevant to bilirubin handling and atazanavir assessment. The complete genotype matters, including promoter repeats not identified by this SNP. This position alone does not diagnose Gilbert syndrome or choose a drug dose.",
+              "ru": "G71R — вариант UGT1A1 со сниженной функцией, важный для обмена билирубина и оценки атазанавира. Важен полный генотип, включая повторы промотора, которые этот SNP не определяет. Одна позиция не диагностирует синдром Жильбера и не выбирает дозу препарата."
             }
           },
-          "source": "CPIC guideline for irinotecan / atazanavir (UGT1A1); Gilbert syndrome",
+          "source": "G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
+          "curated_on": "2026-10-06",
           "evidence": {
             "level": "A",
             "basis": "guideline",
-            "source": "CPIC guideline for irinotecan / atazanavir (UGT1A1); Gilbert syndrome",
+            "source": "G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269",
             "assigned": "2026-09-17",
             "by_rule": "a CPIC guideline row"
-          }
+          },
+          "mechanism": {
+            "en": "UGT1A1*6 (G71R) reduces bilirubin glucuronidation in functional studies.",
+            "ru": "UGT1A1*6 (G71R) снижает глюкуронирование билирубина в функциональных исследованиях."
+          },
+          "study": "G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs1801280",
@@ -5382,17 +5404,17 @@
           "kind": "mechanism",
           "text": {
             "het": {
-              "en": "HFE C282Y, one copy: carriership — a high ferritin is not explained by it; look at inflammation and the liver first.",
-              "ru": "HFE C282Y, одна копия: носительство — высокий ферритин этим не объясняется; сначала смотреть воспаление и печень."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             },
             "hom": {
-              "en": "HFE C282Y in two copies: the haemochromatosis genotype — a high ferritin here IS iron; transferrin saturation next, phlebotomy if confirmed.",
-              "ru": "HFE C282Y в двух копиях: генотип гемохроматоза — высокий ферритин здесь ЭТО железо; следующим — насыщение трансферрина, при подтверждении флеботомия."
+              "en": "C282Y homozygosity is associated with iron overload, with incomplete clinical penetrance. One copy does not establish haemochromatosis; other alleles and iron measurements remain relevant. Genotype alone is not a diagnosis.",
+              "ru": "Гомозиготность C282Y связана с перегрузкой железом при неполной клинической пенетрантности. Одна копия не устанавливает гемохроматоз; важны другие аллели и показатели обмена железа. Генотип сам по себе не является диагнозом."
             }
           },
-          "source": "GenCC Definitive (HFE, AR); Allen 2008 NEJM",
+          "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-06",
           "classification": "Definitive",
           "moi": "AR",
           "disease": "haemochromatosis type 1 (HFE)",
@@ -5404,18 +5426,19 @@
               "ru": "две копии C282Y: ферритин ожидается растущим с возрастом"
             }
           },
-          "review": {
-            "by_role": "panel_author",
-            "on": "2026-09-13",
-            "scope": "sentence_against_source"
-          },
           "evidence": {
             "level": "A",
             "basis": "gencc",
-            "source": "GenCC Definitive (HFE, AR); Allen 2008 NEJM",
+            "source": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
             "assigned": "2026-09-17",
             "by_rule": "GenCC Definitive"
-          }
+          },
+          "mechanism": {
+            "en": "C282Y disrupts HFE binding to beta-2-microglobulin and cell-surface expression, impairing normal iron regulation.",
+            "ru": "C282Y нарушает связывание HFE с бета-2-микроглобулином и выход белка на поверхность клетки, влияя на регуляцию железа."
+          },
+          "study": "Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
+          "note_on_review": "Source-based revision; human review of this wording is open."
         },
         {
           "rsid": "rs855791",

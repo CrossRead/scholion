@@ -2141,7 +2141,7 @@ function systemPolygenicHtml(poly, register){
 // a row opens into, so nothing was removed — it stopped being the default.
 function geneStateBadge(r){
   if(r.findings) return badge('b-warning',t('system.gen.state.finding'));
-  if(r.carrier) return badge('b-near',t('system.gen.state.carrier'));
+  if(r.clinical_carrier??r.carrier) return badge('b-near',t('system.gen.state.carrier'));
   if(r.read===false) return badge('b-unknown',t('system.gen.state.unread'),r.read_why_text||r.read_why||'');
   return badge('b-good',t('system.gen.state.clear'));
 }
@@ -2161,8 +2161,11 @@ function hypothesisCountHtml(gen,register){
   const values=(gen.positions||[]).filter(p=>p.value_only).length;
   return hyp||values?`<div class="why muted" data-hypothesis-count>${esc(t('system.hyp.count',{hyp,values}))}</div>`:'';
 }
-function clinicalBasisHTML(p){
-  return Object.entries(p.clinical_basis||{}).map(([field,b])=>`<div class="why muted" data-clinical-basis="${esc(field)}">${esc(t('clinical.basis',{field,detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
+function clinicalBasisHTML(p,compact=false){
+  const bases=Object.entries(p.clinical_basis||{}),held=compact?bases.filter(([,b])=>b.status!=='complete'):[];
+  const missing=[...new Set(held.flatMap(([,b])=>b.missing||[]))].map(k=>t('conclusion.missing.'+k)).join(', ');
+  const summary=held.length?`<div class="why muted" data-clinical-summary>${esc(t('clinical.summary',{fields:held.map(([name])=>name).join(', '),missing}))}</div>`:'';
+  return summary+bases.filter(([name])=>!held.some(([h])=>h===name)).map(([field,b])=>`<div class="why muted" data-clinical-basis="${esc(field)}">${esc(t('clinical.basis',{field,detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
 }
 function referenceContextHtml(p){
   const c=p.reference_context;
@@ -2381,8 +2384,9 @@ function systemGeneRow(r, register){
                            moi:(r.moi_codes||[r.moi||'—']).join(', ')});
   const marks=[];
   if(r.findings) marks.push(t('system.row.finding',{n:r.findings}));
-  if(r.carrier) marks.push(t('system.row.carrier'));
-  if(r.pending) marks.push(t('system.row.pending'));
+  if(r.clinical_carrier??r.carrier) marks.push(t('system.row.carrier'));
+  else if(r.unit==='position'&&r.carrier===true) marks.push(t('system.row.allele_present'));
+  if(r.pending) marks.push(t(r.pending_why==='conclusion_basis'?'system.row.withheld':'system.row.pending'));
   if(r.signature==='open') marks.push(t('system.row.signature_open'));
   if(r.read===false) marks.push(t('system.row.unread',{why:r.read_why_text||r.read_why||'—'}));
   if(r.unit==='position'&&!r.level) marks.unshift(t('system.row.level_none'));
@@ -2641,6 +2645,7 @@ async function viewPanel(key,reading=null){
       <button class="ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>
     ${pageHead(t('panel.title',{label:r.label||key}),r.reading_note||t('panel.for_clinician_note'),facts)}
     <p class="cr-caption" data-reference-notice>${esc(t('reference.notice'))}</p>
+    <p class="cr-caption" data-withheld-count>${esc(t('panel.withheld_count',{n:c.withheld_interpretations||0}))}</p>
     ${key!=='author_list'?`<button class="ghost" data-panel="author_list">${esc(t('panel.author_list'))}</button>`:''}
     <div class="meta">${esc(t('panel.source',{updated:fmtDate(r.catalogue_updated)||'—'}))}</div>
     ${(r.genes||[]).map(g=>`<h2 class="section">${esc(g.gene)}</h2>${(g.positions||[]).map(pos).join('')}`).join('')}
@@ -3777,7 +3782,7 @@ function longevityRow(k){
     ${k.zygosity_note?`<div class="why muted">${esc(k.zygosity_note)}</div>`:''}
     ${k.population_note?`<div class="why c-warning">⚠ ${esc(k.population_note)}</div>`:''}
     ${k.action?`<div class="why muted">${esc(t('web.longevity.action_h'))}: ${esc(k.action)}</div>`:''}
-    ${clinicalBasisHTML(k)}${conf}${pm}</div>`;
+    ${clinicalBasisHTML(k,true)}${conf}${pm}</div>`;
 }
 function renderLongevity(d){
   if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
@@ -3789,7 +3794,7 @@ function renderLongevity(d){
   const apCard=ap?`<div class="card">
     <div class="row"><b style="font-size:17px">APOE</b>
       ${badge('b-unknown',ap.epsilon||ap.genotype||'—')}</div>
-    <div class="why">${esc(t('clinical.genome_limit'))}</div>${clinicalBasisHTML(ap)}
+    <div class="why">${esc(t('clinical.genome_limit'))}</div>${clinicalBasisHTML(ap,true)}
     <details class="fold"><summary>${esc(t('web.longevity.technical'))}</summary>
       <div class="meta mt-1">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b></div>
       ${ap.note?`<div class="meta mt-1">${esc(t('web.longevity.stored_note'))}: ${esc(ap.note)}</div>`:''}

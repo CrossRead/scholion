@@ -62,7 +62,8 @@ class TestBasis(unittest.TestCase):
             for key in ("text", "mechanism", "effect_size", "expect_check", "next_step", "route", "under_load"):
                 self.assertIsNone(out[key])
             self.assertEqual(0, out["findings"])
-            self.assertFalse(out["carrier"])
+            self.assertEqual(row["carrier"], out["carrier"])
+            self.assertFalse(out["clinical_carrier"])
             self.assertTrue(out["pending"])
             self.assertEqual("conclusion_basis", out["pending_why"])
             self.assertEqual(before, row)

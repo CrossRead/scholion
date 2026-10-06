@@ -48,7 +48,8 @@ class TestReferencePanels(unittest.TestCase):
         cardio = core._read_knowledge("system_gene_panels.json")["systems"]["cardio"]
         for rsid, word, pmid in (("rs6025", "protein C", "8164741"),
                                  ("rs1799963", "prothrombin", "8916933")):
-            p = next(p for p in cardio["positions"] if p["rsid"] == rsid)
+            p = {**next(p for p in cardio["positions"] if p["rsid"] == rsid), "source": "unresolved primary reference",
+                 "evidence": {"level": "A", "basis": "guideline"}, "mechanism": None}
             for state in ("het", "hom", "absent", "unread"):
                 geno = {"state": state, "read": state != "unread", "genotype": "GA" if state == "het" else None}
                 with mock.patch.object(SP, "_genotype", return_value=geno), \
@@ -61,7 +62,7 @@ class TestReferencePanels(unittest.TestCase):
                 self.assertIn(pmid, row["reference_context"]["variant_source"])
                 self.assertIsNone(row["text"])
                 self.assertEqual(0, row["findings"])
-                self.assertFalse(row["carrier"])
+                self.assertEqual(state != "absent" if geno["read"] else None, row["carrier"])
                 self.assertEqual("incomplete", row["conclusion_basis"]["status"])
                 self.assertEqual(row["reference_context"], SP._position_state(row)["reference_context"])
                 for register in ("patient", "clinician"):

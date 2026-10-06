@@ -61,7 +61,7 @@ def guard_position(spec: Dict[str, Any], row: Dict[str, Any]) -> Dict[str, Any]:
     if basis["status"] != "complete":
         out.update(text=None, mechanism=None, effect_size=None, expect_check=None,
                    next_step=None, route=None, under_load=None, findings=0,
-                   carrier=False, pending=True,
+                   clinical_carrier=False, pending=True,
                    pending_why=row.get("pending_why") or "conclusion_basis",
                    not_a_finding_why=row.get("not_a_finding_why") or "basis")
     return out

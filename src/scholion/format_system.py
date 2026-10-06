@@ -36,8 +36,10 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     marks = []
     if r.get("findings"):
         marks.append(_t("system.row.finding", n=r["findings"]))
-    if r.get("carrier"):
+    if r.get("clinical_carrier", r.get("carrier")):
         marks.append(_t("system.row.carrier"))
+    elif r.get("unit") == "position" and r.get("carrier") is True:
+        marks.append(_t("system.row.allele_present"))
     if r.get("unit") == "position":
         marks.insert(0, _t("system.row.level", level=r["level"], short=r.get("level_short") or "—")
                      if r.get("level") else _t("system.row.level_none"))
@@ -48,7 +50,8 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("not_a_finding_why") == "kind":
         marks.append(_t("system.row.not_finding_kind", kind=_t("system.kind." + str(r.get("kind") or "unassigned"))))
     if r.get("pending"):
-        marks.append(_t("system.row.pending"))
+        marks.append(_t("system.row.withheld" if r.get("pending_why") == "conclusion_basis"
+                        else "system.row.pending"))
     if r.get("signature") == "open":
         marks.append(_t("system.row.signature_open"))
     if r.get("read") is False:

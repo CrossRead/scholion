@@ -1,5 +1,4 @@
 """The third entry: a body system of the radar, read as one subject.
-
 The radar already computes the laboratory half of a system — score, deviations,
 how much of the panel was measured, how it moved. What it did not hold was the
 other half of the same subject: what in the genome bears on the working of this
@@ -87,7 +86,8 @@ A row of `genetics.rows` (clinician register; the patient register keeps the
 rows that say something — finding, carrier, pending — and the counts):
 
     unit "gene"|"position", origin "base"|"curated", gene, mode, kind?, source,
-    text|null, pending, pending_why?, findings (int), carrier (bool), read,
+    text|null, pending, pending_why?, findings (int), carrier (bool|null; named allele),
+                    clinical_carrier (bool; recessive interpretation), read,
     read_why?, variant_state, coverage,
     base rows:      assertions[] {disease, disease_id, classification, moi,
                     moi_code, submitter, curated_on}, classifications[],
@@ -630,7 +630,9 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                "signed_on": panel_gate.reviewed_on(p),
                "review": p.get("review"),
                "text": text, "pending": pending, "pending_why": pending_why,
-               "findings": finding, "not_a_finding_why": not_why, "carrier": carrier and not confirm,
+               "findings": finding, "not_a_finding_why": not_why, "clinical_carrier": carrier and not confirm,
+               "carrier": (state in ("het", "hom", "hemi")) if geno.get("read") is True
+               and not presumed and not confirm and state in ("het", "hom", "hemi", "absent") else None,
                "needs_confirmation": confirm,
                "caveat": "moderate" if (finding and cls == "Moderate") else None,
                "genotype": geno, "read": geno.get("read"),
@@ -994,6 +996,8 @@ def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
             "subclaim_basis": r.get("subclaim_basis"),
             "not_a_finding_why": r.get("not_a_finding_why"), "needs_confirmation": r.get("needs_confirmation"),
             "genotype": r.get("genotype"), "unit": "position",
+            "carrier": r.get("carrier"), "clinical_carrier": r.get("clinical_carrier"),
+            "pending": r.get("pending"), "pending_why": r.get("pending_why"),
             "passport": r.get("passport"), "value_only": r.get("value_only"),
             "expect": {k: ec.get(k) for k in ("marker", "name", "direction", "gap", "position")} if ec else None}
 
@@ -1047,7 +1051,8 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             r["read_state"] = "unread"
             r["read_why_text"] = _read_why_text("separate_method")
             r.pop("file_says", None); r.pop("file_says_text", None)
-            r["findings"], r["carrier"] = 0, False
+            r["findings"], r["clinical_carrier"] = 0, False
+            r["carrier"] = None if r.get("unit") == "position" else False
     classes = (cur_spec or {}).get("carrier_classes")
     if isinstance(classes, dict):
         for r in rows:
@@ -1076,7 +1081,7 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             "read_count": sum(1 for r in rows if r.get("read") is True),
             "unread_count": sum(1 for r in rows if r.get("read") is False),
             "finding_count": sum(int(r.get("findings") or 0) for r in rows),
-            "carrier_count": sum(1 for r in rows if r.get("carrier")),
+            "carrier_count": sum(1 for r in rows if r.get("clinical_carrier", r.get("carrier"))),
             "pending_count": sum(1 for r in rows if r.get("pending")),
             "read_genes": sum(1 for r in rows if r.get("unit") != "position" and r.get("read") is True),
             "depthless_genes": sum(1 for r in rows if r.get("unit") != "position" and r.get("read_state") == "file_only"),
@@ -1199,12 +1204,17 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
         if r.get("pending") and r.get("pending_why") == "risk_allele":
             rows.append({"origin": "risk_allele", "gene": g, "rsid": rs,
                          "text": _t("system.q.risk_allele", gene=g, rsid=rs), "data": None})
+        elif r.get("pending") and r.get("pending_why") == "conclusion_basis":
+            rows.append({"origin": "conclusion_basis", "gene": g, "rsid": rs,
+                         "text": _t("system.q.withheld", gene=g, rsid=rs,
+                                    reason=(r.get("conclusion_basis") or {}).get("reason") or ""),
+                         "data": r.get("conclusion_basis")})
         elif r.get("pending") and r.get("unit") == "position":
             st = (r.get("genotype") or {}).get("state")
             rows.append({"origin": "pending", "gene": g, "rsid": rs,
                          "text": _t("system.q.pending", gene=g, rsid=rs,
                                     state=_t("system.state." + str(st))), "data": None})
-        if r.get("carrier"):
+        if r.get("clinical_carrier", r.get("carrier")):
             moi = r.get("moi") or ", ".join(r.get("moi_codes") or []) or "AR"
             rows.append({"origin": "moi", "gene": g, "rsid": rs,
                          "text": _t("system.q.moi", gene=g, rsid=rs or "—", moi=moi),
@@ -1383,7 +1393,7 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
 # ---- registers --------------------------------------------------------------
 _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification", "state", "kind",
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
-                "needs_confirmation", "level", "level_short", "ladder", "carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
+                "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",
                 "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route",
                 "reference_context", "genotype", "passport", "value_only", "author_note")

@@ -730,7 +730,7 @@ def longevity_report(r: Dict[str, Any]) -> str:
                         rs429358=ap.get("rs429358"), rs7412=ap.get("rs7412")))
         if ap.get("status") == "ambiguous_without_phase":
             lines.append("  ⚠ " + str(ap.get("message") or ""))
-        lines.extend(basis_lines(ap))
+        lines.extend(basis_lines(ap, compact=True))
         lines.append("")
     lines.append(_t("longevity.key_markers"))
     for k in r.get("known", []):
@@ -739,7 +739,7 @@ def longevity_report(r: Dict[str, Any]) -> str:
         for field in ('label', 'verdict_label', 'action', 'zygosity_note', 'population_note'):
             if k.get(field):
                 lines.append('  ' + str(k[field]))
-        lines.extend(basis_lines(k))
+        lines.extend(basis_lines(k, compact=True))
     st = r.get("stats", {})
     genes = ", ".join(g["gene"] for g in r.get("significant_genes", [])[:16])
     lines.append("\n" + _t("longevity.significant",
@@ -1157,6 +1157,7 @@ def panel_report(r: Dict[str, Any]) -> str:
             genes=_plural(int(c.get("genes") or 0), "count.genes"), with_study=c.get("with_study") or 0,
             with_expectation=c.get("with_expectation") or 0, signed=c.get("signed_by_clinician") or 0),
          _t("panel.source", updated=r.get("catalogue_updated") or "—")]
+    L.append(_t("panel.withheld_count", n=c.get("withheld_interpretations") or 0))
     if r.get("reading_note"):
         L.append(r["reading_note"])
     for g in r.get("genes") or []:

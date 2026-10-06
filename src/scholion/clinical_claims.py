@@ -30,10 +30,18 @@ def guard_fields(spec: Dict[str, Any], row: Dict[str, Any], fields: Iterable[str
     return out
 
 
-def basis_lines(row: Dict[str, Any]) -> list[str]:
-    return [t('clinical.basis', field=name, detail=b['reason'] if b['status'] != 'complete'
-              else str(b['source']) + ' · ' + str(b['mechanism']))
-            for name, b in (row.get('clinical_basis') or {}).items()]
+def basis_lines(row: Dict[str, Any], *, compact: bool = False) -> list[str]:
+    bases = row.get('clinical_basis') or {}
+    held = {name: b for name, b in bases.items() if b['status'] != 'complete'} if compact else {}
+    lines = []
+    if held:
+        missing = dict.fromkeys(k for b in held.values() for k in b['missing'])
+        lines.append(t('clinical.summary', fields=', '.join(held), missing=', '.join(
+            t('conclusion.missing.' + k) for k in missing)))
+    lines.extend(t('clinical.basis', field=name, detail=b['reason'] if b['status'] != 'complete'
+                 else str(b['source']) + ' · ' + str(b['mechanism']))
+                 for name, b in bases.items() if name not in held)
+    return lines
 
 
 def guard_dose_context(spec: Dict[str, Any], row: Dict[str, Any]) -> Dict[str, Any]:

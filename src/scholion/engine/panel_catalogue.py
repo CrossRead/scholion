@@ -30,7 +30,6 @@ _FIELDS = ("rsid", "gene", "hgvs", "protein", "risk_allele", "mode", "kind", "so
            "effect_size", "classification", "moi", "disease", "submitter", "curated_on",
            "review", "disposition", "reason", "task", "read_refusal", "mechanism")
 
-
 def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     out = {k: p.get(k) for k in _FIELDS}
     out["mechanism"] = panel_form.one_language(p.get("mechanism")) or None
@@ -58,7 +57,6 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     out = guard_subclaims(p, out, reference=True)
     out['decision_route'] = decision_route(out, {}, reference=True)
     return out
-
 
 def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
     """One system's panel as the catalogue holds it; with no key, every system that has one."""
@@ -115,6 +113,8 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
             "unreadable": unreadable,
             "counts": {"positions": len(positions), "genes": len(by_gene),
                        "signed_by_clinician": sum(1 for p in positions if p["signature"] == "clinician"),
+                       "withheld_interpretations": sum(1 for p in positions if
+                           (p.get("conclusion_basis") or {}).get("status") == "incomplete"),
                        "with_study": sum(1 for p in positions if p.get("study")),
                        "with_expectation": sum(1 for p in positions if p.get("expect"))},
             "disclaimer": DISCLAIMER()}

@@ -40,28 +40,59 @@
   },
   "loci": {
     "rs121908529": {
-      "gene": "AGXT", "chrom": "2", "pos": 240871433, "pos_grch37": 241810850,
-      "ref": "G", "alt": "A",
+      "gene": "AGXT",
+      "chrom": "2",
+      "pos": 240871433,
+      "pos_grch37": 241810850,
+      "ref": "G",
+      "alt": "A",
       "coordinate_source": "NCBI ClinVar variation/40166 and Ensembl variation/human/rs121908529 in GRCh38/37, verified 2026-10-05",
-      "note": {"en": "p.Gly170Arg. Pyridoxine response literature concerns confirmed primary hyperoxaluria type 1, not an isolated carrier call or an amino-acid panel. No dose or personal response is inferred (PMID 24385516, PMID 15849466).", "ru": "p.Gly170Arg. Литература об ответе на пиридоксин относится к подтверждённой первичной гипероксалурии типа 1, не к отдельному носительству или панели аминокислот. Доза и индивидуальный ответ не выводятся (PMID 24385516, PMID 15849466)."}
+      "note": {
+        "en": "p.Gly170Arg. Pyridoxine response literature concerns confirmed primary hyperoxaluria type 1, not an isolated carrier call or an amino-acid panel. No dose or personal response is inferred (PMID 24385516, PMID 15849466).",
+        "ru": "p.Gly170Arg. Литература об ответе на пиридоксин относится к подтверждённой первичной гипероксалурии типа 1, не к отдельному носительству или панели аминокислот. Доза и индивидуальный ответ не выводятся (PMID 24385516, PMID 15849466)."
+      }
     },
     "rs121908524": {
-      "gene": "AGXT", "chrom": "2", "pos": 240871379, "pos_grch37": 241810796,
-      "ref": "T", "alt": "A",
+      "gene": "AGXT",
+      "chrom": "2",
+      "pos": 240871379,
+      "pos_grch37": 241810796,
+      "ref": "T",
+      "alt": "A",
       "coordinate_source": "NCBI ClinVar RCV000779687 and Ensembl variation/human/rs121908524 in GRCh38/37, verified 2026-10-05",
-      "note": {"en": "p.Phe152Ile. Response associations were studied in patients with primary hyperoxaluria type 1 and cellular models; a carrier genotype does not establish treatment eligibility or response (PMID 15849466, PMID 23597595).", "ru": "p.Phe152Ile. Ассоциации ответа изучены у пациентов с первичной гипероксалурией типа 1 и в клеточных моделях; генотип носителя не устанавливает показание к лечению или ответ (PMID 15849466, PMID 23597595)."}
+      "note": {
+        "en": "p.Phe152Ile. Response associations were studied in patients with primary hyperoxaluria type 1 and cellular models; a carrier genotype does not establish treatment eligibility or response (PMID 15849466, PMID 23597595).",
+        "ru": "p.Phe152Ile. Ассоциации ответа изучены у пациентов с первичной гипероксалурией типа 1 и в клеточных моделях; генотип носителя не устанавливает показание к лечению или ответ (PMID 15849466, PMID 23597595)."
+      }
     },
     "rs121908525": {
-      "gene": "AGXT", "chrom": "2", "pos": 240875159, "pos_grch37": 241814576,
-      "ref": "T", "alt": "C",
+      "gene": "AGXT",
+      "chrom": "2",
+      "pos": 240875159,
+      "pos_grch37": 241814576,
+      "ref": "T",
+      "alt": "C",
       "coordinate_source": "NCBI ClinVar RCV000586265 and Ensembl variation/human/rs121908525 in GRCh38/37, verified 2026-10-05",
-      "note": {"en": "p.Ile244Thr. Partial pyridoxine effects were reported in a cellular AGT model. This is not a measured personal response or a carrier treatment rule (PMID 23597595).", "ru": "p.Ile244Thr. Частичные эффекты пиридоксина описаны в клеточной модели AGT. Это не измеренный индивидуальный ответ и не правило лечения носителя (PMID 23597595)."}
+      "note": {
+        "en": "p.Ile244Thr. Partial pyridoxine effects were reported in a cellular AGT model. This is not a measured personal response or a carrier treatment rule (PMID 23597595).",
+        "ru": "p.Ile244Thr. Частичные эффекты пиридоксина описаны в клеточной модели AGT. Это не измеренный индивидуальный ответ и не правило лечения носителя (PMID 23597595)."
+      }
     },
     "rs1799762": {
-      "gene": "SERPINE1", "chrom": "7", "pos": 101126425,
-      "pos_grch37": 100769706, "ref": "T", "alt": "TG",
+      "gene": "SERPINE1",
+      "chrom": "7",
+      "pos": 101126425,
+      "pos_grch37": 100769706,
+      "ref": "T",
+      "alt": "TG",
       "coordinate_source": "NCBI dbSNP RefSNP 1799762 SPDI placements and Ensembl variation/sequence GRCh38 and GRCh37, verified 2026-10-05. Left-anchored VCF representation of GGGG/GGGGG; distinct from rs1799768 and rs1799889.",
-      "repeat_call": {"reference": "TGGGGA", "alleles": {"TGGGGA": "4G", "TGGGGGA": "5G"}},
+      "repeat_call": {
+        "reference": "TGGGGA",
+        "alleles": {
+          "TGGGGA": "4G",
+          "TGGGGGA": "5G"
+        }
+      },
       "note": {
         "en": "SERPINE1 promoter 4G/5G repeat. Verified allele identity only; no clinical risk direction is assigned. Literature aliases do not make rs1799768 (insertion A/C) or rs1799889 (A/G substitution) equivalent genomic calls.",
         "ru": "Повтор 4G/5G промотора SERPINE1. Подтверждена только идентичность аллелей; направление клинического риска не назначено. Литературные обозначения не делают rs1799768 (вставка A/C) или rs1799889 (замена A/G) эквивалентными геномными чтениями."
@@ -177,7 +208,11 @@
       "ref": "C",
       "alt": "G",
       "star": "*2",
-      "pos_grch37": 18143955
+      "pos_grch37": 18143955,
+      "note": {
+        "en": "TPMT*2 reduces thiopurine methylation; no-function TPMT alleles can increase exposure to active thiopurine metabolites. Reference context only. Source: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+        "ru": "TPMT*2 снижает метилирование тиопуринов; аллели TPMT без функции могут повышать воздействие активных метаболитов тиопуринов. Только справочный контекст. Источник: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
+      }
     },
     "rs1142345": {
       "gene": "TPMT",
@@ -186,7 +221,11 @@
       "ref": "T",
       "alt": "C",
       "star": "*3C",
-      "pos_grch37": 18130918
+      "pos_grch37": 18130918,
+      "note": {
+        "en": "p.Tyr240Cys occurs in no-function TPMT alleles including *3A and *3C; reduced methylation affects thiopurine inactivation. Reference context only. Source: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+        "ru": "p.Tyr240Cys входит в аллели TPMT без функции, включая *3A и *3C; снижение метилирования влияет на инактивацию тиопуринов. Только справочный контекст. Источник: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
+      }
     },
     "rs3892097": {
       "gene": "CYP2D6",
@@ -334,8 +373,8 @@
       "alt": "T",
       "star": "Leiden (R506Q)",
       "note": {
-        "en": "factor V Leiden. The gene is on the minus strand: the genetic 1691G>A = the genomic C>T. A heterozygote raises the risk of VTE; it is not a contraindication to TRT, but it is a reason for more frequent monitoring of the haematocrit; a homozygote/a combination with F2 — a consultation with a haematologist",
-        "ru": "фактор V Лейден. Ген на минус-цепи: генетический 1691G>A = геномный C>T. Гетерозигота повышает риск ВТЭ, не противопоказание к ТРТ, но повод к более частому контролю гематокрита; гомозигота/сочетание с F2 — консультация гематолога"
+        "en": "Factor V Leiden changes an activated protein C cleavage site, reducing factor Va inactivation. Reference context only. Source: Bertina 1994; PMID:8164741; DOI:10.1038/369064a0",
+        "ru": "Factor V Leiden меняет участок расщепления активированным протеином C, снижая инактивацию фактора Va. Только справочный контекст. Источник: Bertina 1994; PMID:8164741; DOI:10.1038/369064a0"
       },
       "pos_grch37": 169519049
     },
@@ -347,8 +386,8 @@
       "alt": "A",
       "star": "G20210A",
       "note": {
-        "en": "prothrombin G20210A. The same context as F5: a risk of VTE, a matter of monitoring tactics, not a ban on therapy",
-        "ru": "протромбин G20210A. Тот же контекст, что F5: риск ВТЭ, тактика мониторинга, не запрет терапии"
+        "en": "G20210A lies in the prothrombin 3′ untranslated region and is associated with higher circulating prothrombin. Reference context only. Source: Poort 1996; PMID:8916933",
+        "ru": "G20210A находится в 3′ нетранслируемой области гена протромбина и связан с более высоким уровнем протромбина в крови. Только справочный контекст. Источник: Poort 1996; PMID:8916933"
       },
       "pos_grch37": 46761055
     },
@@ -360,8 +399,8 @@
       "alt": "A",
       "star": "C282Y",
       "note": {
-        "en": "hereditary haemochromatosis. The penetrance is LOW — what decides is not the genotype but ferritin and transferrin saturation; a C282Y homozygote = a reason for regular monitoring of iron",
-        "ru": "наследственный гемохроматоз. Пенетрантность НИЗКАЯ — решает не генотип, а ферритин и сатурация трансферрина; гомозигота C282Y = повод к регулярному контролю железа"
+        "en": "C282Y disrupts HFE binding to beta-2-microglobulin and cell-surface expression, impairing normal iron regulation. Reference context only. Source: Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286",
+        "ru": "C282Y нарушает связывание HFE с бета-2-микроглобулином и выход белка на поверхность клетки, влияя на регуляцию железа. Только справочный контекст. Источник: Feder 1997; PMID:9162021; DOI:10.1074/jbc.272.22.14025; Allen 2008; PMID:18199861; DOI:10.1056/NEJMoa073286"
       },
       "pos_grch37": 26093141
     },
@@ -386,8 +425,8 @@
       "alt": "T",
       "star": "Pi*Z (E366K)",
       "note": {
-        "en": "alpha-1 antitrypsin deficiency. A Pi*ZZ homozygote — a risk of emphysema and liver disease; a Pi*MZ heterozygote — a moderate modifier in the presence of smoking and of other liver damage. Look at it together with the liver markers and elastography",
-        "ru": "дефицит альфа-1-антитрипсина. Гомозигота Pi*ZZ — риск эмфиземы и болезни печени; гетерозигота Pi*MZ — умеренный модификатор при курении и других поражениях печени. Смотреть вместе с печёночными маркёрами и эластографией"
+        "en": "The Z variant (E342K in the mature protein, E366K in the precursor) promotes alpha-1-antitrypsin polymerization and retention in liver cells, reducing secretion. Reference context only. Source: Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014",
+        "ru": "Z-вариант (E342K зрелого белка, E366K предшественника) способствует полимеризации альфа-1-антитрипсина и удержанию в клетках печени, снижая секрецию. Только справочный контекст. Источник: Z alpha-1-antitrypsin functional studies; PMID:1608473; PMID:8422359; DOI:10.1021/bi00053a014"
       },
       "pos_grch37": 94844947
     },
@@ -412,8 +451,8 @@
       "alt": "A",
       "star": "*6",
       "note": {
-        "en": "reduced activity of UGT1A1 (predominantly in East Asians). The main European variant is *28 (a TA repeat in the promoter), it is NOT a SNP and is reliably determined only by PyPGx/a targeted indel call",
-        "ru": "снижение активности UGT1A1 (преимущественно у восточноазиатов). Основной европейский вариант — *28 (TA-повтор промотора), он НЕ SNP и надёжно определяется только PyPGx/адресным индел-вызовом"
+        "en": "UGT1A1*6 (G71R) reduces bilirubin glucuronidation in functional studies. Reference context only. Source: G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269",
+        "ru": "UGT1A1*6 (G71R) снижает глюкуронирование билирубина в функциональных исследованиях. Только справочный контекст. Источник: G71R functional study 2022; PMID:35415244; CPIC UGT1A1/atazanavir 2015; PMID:26417955; DOI:10.1002/cpt.269"
       },
       "pos_grch37": 234669144
     },
@@ -438,8 +477,8 @@
       "alt": "T",
       "star": "*3 (R139C)",
       "note": {
-        "en": "CPIC level A: myelotoxicity of the thiopurines (azathioprine, mercaptopurine)",
-        "ru": "CPIC уровень A: миелотоксичность тиопуринов (азатиоприн, меркаптопурин)"
+        "en": "R139C occurs in no-function NUDT15 alleles. Reduced hydrolysis of active thioguanine nucleotides increases their availability for DNA incorporation. Reference context only. Source: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374",
+        "ru": "R139C входит в аллели NUDT15 без функции. Снижение гидролиза активных тиогуаниновых нуклеотидов повышает их доступность для включения в ДНК. Только справочный контекст. Источник: CPIC thiopurines 2025 update (published 2026); PMID:41618934; DOI:10.1002/cpt.70209; correction PMID:42050374"
       },
       "pos_grch37": 48619855
     },
@@ -490,8 +529,8 @@
       "alt": "T",
       "star": "A- (V68M)",
       "note": {
-        "en": "G6PD deficiency. The X chromosome: in men there is hemizygosity, and the interpretation is unambiguous. In case of deficiency — avoid oxidants (primaquine, rasburicase, a number of sulfonamides, high doses of intravenous vitamin C)",
-        "ru": "дефицит Г6ФД. X-хромосома: у мужчин гемизиготность, интерпретация однозначна. При дефиците — избегать окислителей (примахин, расбуриказа, ряд сульфаниламидов, высокие дозы витамина C в/в)"
+        "en": "V68M occurs in decreased-function G6PD A− haplotypes. G6PD supplies NADPH for red-cell antioxidant defence; full allele definition matters. Reference context only. Source: CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
+        "ru": "V68M входит в гаплотипы G6PD A− со сниженной функцией. G6PD обеспечивает NADPH для антиоксидантной защиты эритроцитов; важен полный состав аллеля. Только справочный контекст. Источник: CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735"
       },
       "pos_grch37": 153764217
     },
@@ -503,8 +542,8 @@
       "alt": "A",
       "star": "Mediterranean (S188F)",
       "note": {
-        "en": "the Mediterranean variant, a more severe deficiency; the same list of restrictions",
-        "ru": "средиземноморский вариант, более тяжёлый дефицит; тот же список ограничений"
+        "en": "S188F is the decreased-function G6PD Mediterranean variant; reduced NADPH production weakens red-cell protection against oxidative stress. Reference context only. Source: CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735",
+        "ru": "S188F — вариант G6PD Mediterranean со сниженной функцией; снижение продукции NADPH ослабляет защиту эритроцитов от окислительного стресса. Только справочный контекст. Источник: CPIC G6PD 2022 (published 2023); PMID:36049896; DOI:10.1002/cpt.2735"
       },
       "pos_grch37": 153762634
     },
@@ -821,8 +860,8 @@
       "alt": "T",
       "star": "p.Arg3527Gln",
       "note": {
-        "en": "familial hypercholesterolaemia, the APOB form (ligand-defective apoB-100): LDL-C markedly high from birth; the gene is on the minus strand, c.10580G>A is the genomic C>T",
-        "ru": "семейная гиперхолестеринемия, форма APOB (дефект лиганда апоВ-100): ЛПНП высокий с рождения; ген на минус-цепи, c.10580G>A — геномное C>T"
+        "en": "R3527Q (R3500Q in mature apoB-100) disrupts LDL receptor binding, reducing receptor-mediated clearance of LDL. Reference context only. Source: LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847",
+        "ru": "R3527Q (R3500Q зрелого apoB-100) нарушает связывание с рецептором ЛПНП, снижая рецепторный клиренс ЛПНП. Только справочный контекст. Источник: LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847"
       },
       "pos_grch37": 21229160
     },
@@ -1250,8 +1289,8 @@
       "alt": "A",
       "star": "p.Arg122His",
       "note": {
-        "en": "hereditary pancreatitis, autosomal dominant with high penetrance (GenCC Definitive); GRCh37 position not recorded — the two sources disagree in this misassembled region",
-        "ru": "наследственный панкреатит, аутосомно-доминантно с высокой пенетрантностью (GenCC Definitive); позиция GRCh37 не записана — два источника расходятся в этом плохо собранном регионе"
+        "en": "R122H impairs CTRC-dependent trypsinogen degradation and increases autoactivation, favouring excess active trypsin. Reference context only. Source: CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065",
+        "ru": "R122H нарушает CTRC-зависимую деградацию трипсиногена и повышает автоактивацию, способствуя избытку активного трипсина. Только справочный контекст. Источник: CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065"
       },
       "pos_grch37": 142459789
     },
@@ -2515,8 +2554,8 @@
       "ref": "A",
       "alt": "C",
       "note": {
-        "en": "PRSS1: a variant of the panel author's list; GenCC links the gene to hereditary chronic pancreatitis (Definitive)",
-        "ru": "PRSS1: вариант из списка автора панели; GenCC связывает ген с «hereditary chronic pancreatitis» (Definitive)"
+        "en": "The catalogued c.86A>C variant is N29T, not N29I. N29T resists CTRC-dependent degradation and increases trypsinogen autoactivation. Reference context only. Source: CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366",
+        "ru": "Каталожный вариант c.86A>C — N29T, а не N29I. N29T устойчив к CTRC-зависимой деградации и повышает автоактивацию трипсиногена. Только справочный контекст. Источник: CTRC/trypsinogen functional study 2012; PMID:22539344; DOI:10.1074/jbc.M112.360065; ClinVar VCV000038366"
       },
       "pos_grch37": 142458451
     },

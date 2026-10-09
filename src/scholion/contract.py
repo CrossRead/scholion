@@ -30,6 +30,7 @@ PKG = Path(__file__).resolve().parent
 PARITY: Dict[str, str] = {
     # reading
     "GET /api/overview": "overview",
+    "GET /api/visit-sheet": "overview",
     "GET /api/goal": "goal",
     "GET /api/goal-suggest": "goal-suggest",
     "GET /api/labs": "labs",

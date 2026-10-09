@@ -17,7 +17,9 @@ file still matches its recorded hash, copy the new CSS and manifest, and run the
 Scholion tests and browser checks in both themes. A modified vendor file requires
 reconciliation, not a forced overwrite. No automatic network update is used.
 
-Keep legacy Pico rules scoped to `.pico`; Crossread controls live outside it.
+All application surfaces use Crossread controls, cards, tables and typography.
+The former scoped Pico layer is removed. Local layout rules do not modify the
+independent vendor stylesheet.
 Product color names map to `--cr-*` tokens in one block. Charts read tokens when
 they draw. Printing explicitly uses the light palette and retains sources,
 container identity and engine version.

@@ -48,6 +48,8 @@ def _without_token_blocks(page: str) -> str:
     Pico mapping (`:root:root:root{…}`) and the print palette."""
     out = page
     for opener in ("  :root{\n    --plane:var(--cr-bg);", "  :root:root:root{", "    :root{--ink:#000;"):
+        if opener not in out:
+            continue
         i = out.index(opener)
         j = out.index("}", i) + 1
         out = out[:i] + out[j:]
@@ -89,7 +91,7 @@ class TestOneSourceOfColour(unittest.TestCase):
         self.assertIn("localStorage.getItem('scholion-theme')", page)
         self.assertIn("web.menu.theme", page)
 
-    def test_print_maps_crossread_and_pico_to_the_same_readable_paper(self):
+    def test_print_maps_crossread_to_readable_paper(self):
         block = _style(_page()).split("@media print{", 1)[1].split("/* Task 217", 1)[0]
         self.assertIn(":root:root:root{", block)
         self.assertIn("color-scheme:light", block)
@@ -108,7 +110,7 @@ class TestPicoIsFenced(unittest.TestCase):
     def test_the_page_carries_crossread_and_only_the_fenced_pico(self):
         links = re.findall(r'<link rel="stylesheet" href="([^"]+)">', _page())
         self.assertIn("/crossread.css", links)
-        self.assertTrue(set(links) <= {"/crossread.css", "/pico.scoped.min.css"}, links)
+        self.assertEqual({"/crossread.css"}, set(links))
         self.assertFalse((WEB / "pico.min.css").exists(), "the unfenced Pico is still packaged")
         server = (support.SRC / "scholion" / "server.py").read_text(encoding="utf-8")
         self.assertNotIn('"/pico.min.css"', server)
@@ -118,23 +120,14 @@ class TestPicoIsFenced(unittest.TestCase):
         self.assertIsNone(re.search(r"https?://", style))
         self.assertIsNone(re.search(r"@import\s+url\(\s*['\"]?https?:", CROSSREAD.read_text(encoding="utf-8")))
 
-    def test_the_fence_adds_no_specificity(self):
-        text = PICO.read_text(encoding="utf-8")
-        body = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
-        self.assertIsNone(re.search(r"(?<!:where\()\.pico(?![\w-])", body),
-                          "a `.pico` scope that raises specificity: run src/tools/scope_pico.py")
-        self.assertIn(":where(.pico)", body)
-        self.assertIn("Licensed under MIT", text[:300], "Pico's licence banner must travel with it")
-
-    def test_every_pico_variable_the_page_sets_reads_a_name(self):
-        style = _style(_page())
-        block = style[style.index(":root:root:root{"):]
-        block = block[:block.index("}")]
-        decls = re.findall(r"(--pico-[\w-]+)\s*:\s*([^;]+);", block)
-        self.assertTrue(decls)
-        for name, value in decls:
-            with self.subTest(name=name):
-                self.assertIn("var(--", value, f"{name} is set to a literal")
+    def test_the_finished_migration_carries_no_pico_layer(self):
+        self.assertFalse(PICO.exists())
+        self.assertNotIn("--pico-", _style(_page()))
+        self.assertNotIn('class="pico"', _page())
+        self.assertNotIn("className='pico'", _page())
+        self.assertNotIn('/pico.scoped.min.css', _page())
+        server = (support.SRC / "scholion" / "server.py").read_text(encoding="utf-8")
+        self.assertNotIn('"/pico.scoped.min.css"', server)
 
     def test_no_crossread_component_is_drawn_inside_the_fence(self):
         """The dynamic view can leave Pico without inheriting a parent's fence."""
@@ -162,7 +155,7 @@ class TestPicoIsFenced(unittest.TestCase):
         parser.feed(page)
         self.assertIsNotNone(parser.parents)
         self.assertFalse(any('pico' in classes.split() for _, classes in parser.parents))
-        self.assertIn("if(el.id==='view') el.className='pico'", page)
+        self.assertIn("if(el.id==='view') el.className='application-view'", page)
         self.assertIn("v.className='intake-view'", page)
 
     def test_container_controls_are_rendered_only_outside_legacy_pico(self):

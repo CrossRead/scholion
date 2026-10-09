@@ -339,6 +339,10 @@ def system_report(r: Dict[str, Any]) -> str:
         pt = lab["panel_term"]
         L.append("   " + _t("system.panel_labs.term", outside=pt["outside"], judged=pt["judged"], score=pt["score"]))
     L += _panel_lines(lab.get("panel"))
+    if r.get("validated_indices"):
+        from .format_views import fib4_report
+        for index in r["validated_indices"]:
+            L += ["   " + line for line in fib4_report(index).splitlines()]
     # 2 — the dynamics
     dyn = r.get("dynamics") or {}
     L += ["", "**2. " + _t("system.layer.dynamics") + "**"]

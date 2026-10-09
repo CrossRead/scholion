@@ -56,6 +56,8 @@
     "src/scholion/engine/system_panels.py": 95.8,
     "src/scholion/engine/targets.py": 93.8,
     "src/scholion/engine/treatment.py": 98.7,
+    "src/scholion/engine/validated.py": 96.3,
+    "src/scholion/engine/visit.py": 94.1,
     "src/scholion/fastalite.py": 93.2,
     "src/scholion/format.py": 100.0,
     "src/scholion/format_build.py": 79.5,
@@ -65,6 +67,7 @@
     "src/scholion/format_primitives.py": 93.2,
     "src/scholion/format_system.py": 90.2,
     "src/scholion/format_views.py": 82.0,
+    "src/scholion/format_visit.py": 54.0,
     "src/scholion/garmin.py": 100.0,
     "src/scholion/gene_region.py": 75.6,
     "src/scholion/genes.py": 84.7,
@@ -81,6 +84,7 @@
     "src/scholion/ingest_labs.py": 83.5,
     "src/scholion/ingest_studies.py": 99.2,
     "src/scholion/interaction_basis.py": 100.0,
+    "src/scholion/lab_archive.py": 92.8,
     "src/scholion/lifecycle.py": 88.3,
     "src/scholion/limits.py": 83.2,
     "src/scholion/linear.py": 85.4,
@@ -90,6 +94,7 @@
     "src/scholion/net.py": 90.8,
     "src/scholion/ouroboros_tools.py": 95.9,
     "src/scholion/panel_notes.py": 100.0,
+    "src/scholion/panel_reference.py": 100.0,
     "src/scholion/phenoage.py": 81.9,
     "src/scholion/prescribing_basis.py": 100.0,
     "src/scholion/prevalence.py": 100.0,
@@ -114,7 +119,6 @@
     "src/scholion/vendor/genomi/alignment_helpers.py": 91.3,
     "src/scholion/vendor/genomi/detection.py": 91.1,
     "src/scholion/vendor/genomi/text_io.py": 72.4,
-    "src/scholion/wearables.py": 90.8,
-    "src/scholion/panel_reference.py": 100.0
+    "src/scholion/wearables.py": 90.8
   }
 }

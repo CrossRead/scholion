@@ -462,6 +462,7 @@ def _placement(entry: Dict[str, Any], keys: List[str],
 def health_radar() -> Dict[str, Any]:
     """Assessment by body system (for the radar): 0–100 as the MEAN health score of the
     system's markers, accounting for the degree of deviation (and not for the share within range)."""
+    from .validated import fib4
     labs = analyze_labs()
     by_key = {m["key"]: m for m in labs["markers"]}
     # Attached to every domain below rather than looked up in the page: the page
@@ -619,6 +620,7 @@ def health_radar() -> Dict[str, Any]:
         prev_overall = round(sum(d["prev_score"] for d in withprev) / len(withprev))
         prev_date = max(d["prev_date"] for d in withprev if d.get("prev_date"))
     return {"domains": domains,
+            "validated_indices": [fib4()], "heuristic_note": _t("radar.heuristic"),
             # The body and radar use the same normalised sex and domain data.
             "sex": core.profile_sex(),
             "overall": overall, "prev_overall": prev_overall,

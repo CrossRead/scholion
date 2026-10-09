@@ -13,7 +13,6 @@
      connection at all. It supplies sane defaults for elements this file does
      not already style by hand; every custom class below still wins, because
      a class selector always outranks Pico's element-level default. -->
-<link rel="stylesheet" href="/pico.scoped.min.css">
 <link rel="stylesheet" href="/crossread.css">
 <style>
   /* ── Design tokens (task 195) ────────────────────────────────────────────
@@ -54,42 +53,26 @@
     font-family:var(--font-sans);
 
   }
-  /* Pico reads its own look from its --pico-* variables and sets them itself on
-     `:root:not([data-theme=dark])` — a stronger selector than `:root` — so the
-     mapping onto this page's names is declared stronger again, or Pico's blue
-     wins every button that has not been redrawn yet. */
-  :root:root:root{
-    --pico-background-color: var(--plane);
-    --pico-color: var(--ink);
-    --pico-h1-color: var(--ink); --pico-h2-color: var(--ink); --pico-h3-color: var(--ink);
-    --pico-h4-color: var(--ink); --pico-h5-color: var(--ink); --pico-h6-color: var(--ink);
-    --pico-muted-color: var(--muted);
-    --pico-muted-border-color: var(--grid);
-    --pico-card-background-color: var(--surface);
-    --pico-card-border-color: var(--border);
-    --pico-card-sectioning-background-color: var(--surface-2);
-    --pico-table-border-color: var(--grid);
-    --pico-code-background-color: var(--surface-2);
-    --pico-code-color: var(--ink-2);
-    --pico-form-element-background-color: var(--surface-2);
-    --pico-form-element-border-color: var(--border);
-    --pico-form-element-color: var(--ink);
-    --pico-form-element-placeholder-color: var(--muted);
-    --pico-primary: var(--accent);
-    --pico-primary-background: var(--accent);
-    --pico-primary-border: var(--accent);
-    --pico-primary-hover: var(--accent-hover);
-    --pico-primary-hover-background: var(--accent-hover);
-    --pico-primary-underline: color-mix(in srgb,var(--accent) 50%,transparent);
-    --pico-primary-hover-underline: color-mix(in srgb,var(--accent) 70%,transparent);
-    --pico-primary-focus: color-mix(in srgb,var(--accent) 35%,transparent);
-    --pico-primary-inverse: var(--on-accent);
-    --pico-border-radius: var(--r);
-  }
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blob-blend:screen}}
   :root[data-theme="dark"]{--blob-blend:screen}
   *{box-sizing:border-box}
   body{margin:0;background:var(--plane);color:var(--ink);font-size:var(--t-m);line-height:1.55}
+  button,input,select,textarea{font:inherit;margin:0}
+  p,ul,ol,dl,pre,blockquote,table{margin:0 0 var(--sp4)}
+  h1,h2,h3,h4{color:var(--ink);line-height:1.3}
+  h1,h2,h3{margin:var(--sp5) 0 var(--sp3)}
+  h4{margin:var(--sp3) 0 var(--sp2);font-size:var(--t-m)}
+  input.cr-input,select.cr-input{min-width:0}
+  textarea.cr-input{width:100%}
+  label.cr-label{display:block;margin-bottom:var(--sp1)}
+  label.cr-check{display:inline-flex;align-items:center}
+  label.cr-check input{margin:0;min-width:18px}
+  pre{padding:var(--sp3);background:var(--surface-2);border-radius:var(--r-s);overflow:auto}
+  code{font-family:var(--font-mono);font-size:.9em;overflow-wrap:anywhere}
+  summary{cursor:pointer}
+  .cr-btn.btn-sm{height:var(--cr-control-s)}
+  .cr-btn.fact{height:auto;display:block}
+  a.ghost{display:inline-flex;align-items:center;text-decoration:none}
   a{color:var(--accent)}
 
   /* ── The frame: header, tabs, page, footer ───────────────────────────────
@@ -210,14 +193,7 @@
   .empty{color:var(--muted);font-size:var(--t-s);padding:10px 14px;border:1px dashed var(--grid);border-radius:var(--r-s)}
 
   /* ── Controls ────────────────────────────────────────────────────────── */
-  input,select,button.act{font-family:inherit;font-size:15px}
-  input,select{background:var(--surface-2);border:1px solid var(--border);color:var(--ink);border-radius:var(--r-s);padding:8px 12px}
-  input::placeholder{color:var(--muted)}
-  button.act{background:var(--accent);color:var(--on-accent);border:1px solid var(--accent);border-radius:var(--r-s);padding:8px 14px;cursor:pointer;font-weight:600;font-size:var(--t-s)}
-  button.act:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
-  button.act:disabled,button.ghost:disabled{opacity:.55;cursor:default}
-  button.ghost,a.ghost{background:var(--surface-2);border:1px solid var(--border);color:var(--ink);border-radius:var(--r-s);padding:8px 12px;cursor:pointer;font-size:var(--t-s);font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
-  button.ghost:hover,a.ghost:hover{border-color:var(--accent)}
+
   .btn-sm{font-size:13px !important;padding:4px 10px !important}
   .pickbtn{background:var(--surface-2);border:1px solid var(--border);color:var(--ink-2);border-radius:8px;padding:2px 8px;cursor:pointer;font-size:var(--t-xs);line-height:1.4}
   .pickbtn:hover{border-color:var(--accent);color:var(--ink)}
@@ -603,6 +579,33 @@
     .intake-view details{break-inside:avoid}
     .intake-view .cr-card--flush{overflow:visible}
   }
+  .visit-sheet{max-width:1100px}
+  .visit-sheet .cr-table th,.visit-sheet .cr-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}
+  .visit-sheet .cr-table{table-layout:fixed}
+  .visit-sheet .cr-card{margin:12px 0;overflow-wrap:anywhere}
+  .visit-sheet .cr-source{overflow-wrap:anywhere;white-space:normal}
+  @media screen and (max-width:640px){
+    .visit-sheet .cr-table,.visit-sheet .cr-table tbody{display:block}
+    .visit-sheet .cr-table thead{display:none}
+    .visit-sheet .cr-table tr{display:block;border-bottom:1px solid var(--border);padding:8px}
+    .visit-sheet .cr-table th{display:block;background:transparent;border:0;padding:4px}
+    .visit-sheet .cr-table td{display:grid;grid-template-columns:100px minmax(0,1fr);gap:8px;border:0;padding:4px}
+    .visit-sheet .cr-table td::before{content:attr(data-label);font-size:var(--t-xs);color:var(--muted)}
+    .visit-sheet .cr-table td[data-label]{white-space:normal}
+  }
+  @media print{
+    .visit-sheet{font-size:10pt;line-height:1.35}
+    .visit-sheet p,.visit-sheet ul{margin-bottom:8px}
+    .visit-sheet h2,.visit-sheet h3{break-after:avoid;margin:14px 0 8px;font-size:14pt}
+    .visit-sheet .card,.visit-sheet .cr-card{padding:10px;margin:8px 0}
+    .visit-sheet .why{font-size:9pt;line-height:1.35}
+    .visit-sheet .visit-actions{display:none!important}
+    .visit-sheet .cr-table-wrap{overflow:visible;border:0}
+    .visit-sheet .cr-table{font-size:9pt}
+    .visit-sheet .cr-table tr{break-inside:avoid}
+    .visit-sheet .visit-reference{break-before:page}
+    .visit-sheet .cr-card{break-inside:avoid}
+  }
 </style>
 <script>
 /* The theme follows the system unless the menu pinned one. Applied before the
@@ -612,11 +615,9 @@ try{const th=localStorage.getItem('scholion-theme'); if(th==='light'||th==='dark
 <script src="/chart.min.js"></script>
 </head>
 <body class="cr-app">
-<!-- Pico styles bare elements only inside .pico (web/pico.scoped.min.css), so the
-     screens not yet redrawn keep their shape while a redrawn one, placed outside,
-     is Crossread alone. When nothing is left inside, Pico leaves the package. -->
+<!-- All application surfaces use Crossread components and local layout rules. -->
 <header class="app-header">
-  <h1><img src="/dna.svg" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px">Scholion</h1>
+  <h1 class="cr-h1"><img src="/dna.svg" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px">Scholion</h1>
   <span class="sub" id="subhead"></span>
   <span id="container-stamp" aria-live="polite"></span>
   <span class="hdr-right">
@@ -629,14 +630,14 @@ try{const th=localStorage.getItem('scholion-theme'); if(th==='light'||th==='dark
   </span>
 </header>
 <div class="printonly" id="print-container-stamp"></div>
-<div class="pico" id="legacy">
+<div class="application-view" id="legacy">
 <div id="demobanner" hidden></div>
-<div id="updatenote" class="card notice" hidden></div>
-<div id="recomputebox" class="card notice" hidden></div>
+<div id="updatenote" class="cr-card card notice" hidden></div>
+<div id="recomputebox" class="cr-card card notice" hidden></div>
 <nav id="nav"></nav>
 </div>
-<main class="pico" id="view"></main>
-<div class="pico">
+<main class="application-view" id="view"></main>
+<div class="application-view">
 <footer class="disclaimer"><span id="disclaimer"></span><span class="sub" id="ver"></span></footer>
 <div class="toast" id="toast"></div>
 </div>
@@ -661,7 +662,7 @@ let DISPLAY_MODE='patient';
 try{if(sessionStorage.getItem('scholion-mode')==='clinician') DISPLAY_MODE='clinician';}catch(e){}
 function firstTabLabel(){return t(DISPLAY_MODE==='clinician'?'web.mode.visit':'web.mode.today');}
 function renderMode(){
-  $('#display-mode').innerHTML=`<span class="cr-segmented" role="group" aria-label="${esc(t('web.mode.label'))}">${['patient','clinician'].map(mode=>`<label><input type="radio" name="display-mode" value="${esc(mode)}"${DISPLAY_MODE===mode?' checked':''}><span>${esc(t('web.mode.'+(mode==='patient'?'personal':'visit')))}</span></label>`).join('')}</span>`;
+  $('#display-mode').innerHTML=`<span class="cr-segmented" role="group" aria-label="${esc(t('web.mode.label'))}">${['patient','clinician'].map(mode=>`<label class="cr-label"><input type="radio" name="display-mode" value="${esc(mode)}"${DISPLAY_MODE===mode?' checked':''}><span>${esc(t('web.mode.'+(mode==='patient'?'personal':'visit')))}</span></label>`).join('')}</span>`;
   $('#display-mode').querySelectorAll('input').forEach(input=>input.onchange=()=>setDisplayMode(input.value));
 }
 function setDisplayMode(mode,remount=true){
@@ -718,7 +719,7 @@ function fmtDate(s){
 }
 // «Nothing here» and «this failed», each in one shape everywhere.
 function emptyHtml(text){ return `<div class="empty">${esc(text)}</div>`; }
-function errorHtml(text){ return `<div class="card errbox">${esc(text)}</div>`; }
+function errorHtml(text){ return `<div class="cr-card card errbox">${esc(text)}</div>`; }
 // One threshold for a score, wherever a score is coloured.
 function scoreCls(v){ return v==null?'c-muted':v>=80?'c-good':v>=50?'c-warning':'c-critical'; }
 const STATUS_BADGE={critical:'b-critical',warning:'b-warning',good:'b-good',nodata:'b-unknown'};
@@ -731,7 +732,7 @@ function statusBadge(st){ const k=STATUS_BADGE[st]?st:'nodata'; return badge(STA
 function cautionsHtml(list){
   const lower=(list||[]).filter(c=>c.origin==='genotype'&&['C','D','E'].includes(c.level));
   const count=lower.length?`<div class="why" data-caution-count>${esc(t('conclusion.caution_withheld_count',{n:lower.length}))}</div>`:'';
-  return (list||[]).filter(c=>!lower.includes(c)).map(c=>`<div class="card ${c.interpretation_withheld?'':'errbox'} caution" role="alert">
+  return (list||[]).filter(c=>!lower.includes(c)).map(c=>`<div class="cr-card card ${c.interpretation_withheld?'':'errbox'} caution" role="alert">
     <div class="row" style="gap:8px;align-items:center"><span class="badge ${c.interpretation_withheld?'b-unknown':'b-critical'}">${esc(t(c.interpretation_withheld?'conclusion.caution_header':'web.caution.badge'))}</span>
       <b>${esc(c.factor||'')}</b></div>
     <div class="why">${esc(c.why_it_matters||'')}</div>
@@ -742,13 +743,13 @@ function cautionsHtml(list){
 }
 function pageHead(title,question,facts){
   const fs=(facts||[]).filter(Boolean);
-  return `<h1 class="ptitle">${esc(title)}</h1>`+(question?`<p class="pq">${esc(question)}</p>`:'')
+  return `<h1 class="cr-h1 ptitle">${esc(title)}</h1>`+(question?`<p class="pq">${esc(question)}</p>`:'')
     +(fs.length?`<div class="summary">${fs.join('')}</div>`:'');
 }
 // `value` is markup the caller built from numbers; `goto` makes the tile a door.
 function factHtml(value,label,cls,goto){
   const tag=goto?'button':'div';
-  return `<${tag} class="fact"${goto?` data-goto="${esc(goto)}"`:''}><b class="${cls||''}">${value}</b><span>${esc(label)}</span></${tag}>`;
+  return `<${tag} class="cr-card cr-stat fact"${goto?` data-goto="${esc(goto)}"`:''}><b class="${cls||''}">${value}</b><span>${esc(label)}</span></${tag}>`;
 }
 // ClinVar's significance tokens in the reader's language; a token the catalogue
 // does not name is printed as it came, with its underscores opened.
@@ -786,7 +787,7 @@ function markerTable(list){
       +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`
       +((m.decisions||[]).some(d=>d.crossed===true||d.crossed===null)?`<tr><td colspan="5">${decisionNote(m,false)}</td></tr>`:'')
       +markerGeneticsRow(m);}).join('');
-  return `<div class="tblwrap"><table class="dt"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
+  return `<div class="tblwrap"><table class="cr-table cr-table--compact dt"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
     +`<th>${esc(t('web.table.ref'))}</th><th class="opt">${esc(t('web.table.date'))}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -870,7 +871,7 @@ function tickLoaders(){
     if(txt) txt.textContent=parts&&!parts.startsWith('⟦')?parts:t('web.common.loading');
   });
 }
-function showLoader(el){ if(!el) return; if(el.id==='view') el.className='pico'; el.innerHTML=loaderHtml(); if(!_loaderTimer) _loaderTimer=setInterval(tickLoaders,150); }
+function showLoader(el){ if(!el) return; if(el.id==='view') el.className='application-view'; el.innerHTML=loaderHtml(); if(!_loaderTimer) _loaderTimer=setInterval(tickLoaders,150); }
 async function post(path,body){forgetAnswers();const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;_systems=null;return r;}
 // The systems listing is read once per page state and shared: three tabs join
 // on it (marker → system, gene → systems, prescription → system) and none of
@@ -908,8 +909,8 @@ function srcChip(s,key){
   const dom=PICKABLE[key];
   let pick='';
   if(s.kind==='local'&&dom){
-    pick=` <button class="pickbtn" data-pick="${dom}" title="${esc(t('web.source.pick_title'))}">📁 ${esc(t('web.source.pick_btn'))}</button>`;
-    if(s.custom)pick+=`<button class="pickbtn" data-clear="${dom}" title="${esc(t('web.source.reset_title'))}">↺</button>`;
+    pick=` <button class="cr-btn cr-btn--ghost cr-btn--s pickbtn" data-pick="${dom}" title="${esc(t('web.source.pick_title'))}">📁 ${esc(t('web.source.pick_btn'))}</button>`;
+    if(s.custom)pick+=`<button class="cr-btn cr-btn--ghost cr-btn--s pickbtn" data-clear="${dom}" title="${esc(t('web.source.reset_title'))}">↺</button>`;
   }
   return `<span class="srcchip ${s.kind}">${icon} ${esc(s.label)}: <b>${esc(s.origin)}</b>${tail}${pick}</span>`;
 }
@@ -1123,7 +1124,7 @@ function gbox(c, size, fallbackTitle, canvasId){
 }
 function gsection(heading, grid, boxes){
   const drawn = boxes.filter(Boolean);
-  return `<h3 class="gh">${esc(heading)}</h3>`
+  return `<h3 class="cr-h3 gh">${esc(heading)}</h3>`
        + (drawn.length ? `<div class="cgrid ${grid}">${drawn.join('')}</div>`
                        : `<div class="muted small">${esc(t('web.goal.chart_nodata'))}</div>`);
 }
@@ -1145,7 +1146,7 @@ function gsProposal(p){
   const cand=(p.candidates||[]).find(c=>c.source===p.proposed)||{};
   const cit=cand.citation||null;
   return `<div class="list-item">
-    <div class="row"><label style="display:flex;gap:8px;align-items:baseline;cursor:pointer">
+    <div class="row"><label class="cr-label cr-check" style="display:flex;gap:8px;align-items:baseline;cursor:pointer">
       <input type="checkbox" data-gskey="${esc(p.key)}" checked>
       <b>${esc(p.name)}</b></label>
       <span class="muted">${esc(t('web.goalgen.now'))} ${esc(String(now.value??'—'))} ${esc(p.unit||'')}</span>
@@ -1173,7 +1174,7 @@ async function renderGoalProposal(box){
       esc((x.met||[]).map(m=>m.comparator+m.value).join(', '))}</span></div>${(x.candidates||[]).filter(c=>c.proposal_status==='held').map(goalBasisHtml).join('')}</div>`).join('');
   box.innerHTML=`<div class="meta mb-2">${esc(d.how_to_read||'')}</div>
     ${list||`<div class="muted">${esc(t('goalgen.none'))}</div>`}
-    ${list?`<div class="row mt-3"><button class="act" id="gs-save">${esc(t('web.goalgen.save'))}</button></div>`:''}
+    ${list?`<div class="row mt-3"><button class="cr-btn act" id="gs-save">${esc(t('web.goalgen.save'))}</button></div>`:''}
     ${met?`<div class="so-h">${esc(t('web.goalgen.reached'))}</div>${met}`:''}
     ${skipped?`<div class="so-h">${esc(t('goalgen.skipped_h'))}</div>${skipped}`:''}`;
   const save=$('#gs-save',box);
@@ -1189,17 +1190,17 @@ async function renderGoalProposal(box){
 }
 function goalEntitiesHTML(entities){
   const origins=['complaint','lab','genome','history','clinician','prevention'];
-  return entities.length?`<section class="card"><h3>${esc(t('goal.origin.heading'))}</h3>${entities.map(e=>{
+  return entities.length?`<section class="cr-card card"><h3 class="cr-h3">${esc(t('goal.origin.heading'))}</h3>${entities.map(e=>{
     const o=e.origin||{}, value=e.target==null?'—':typeof e.target==='object'?JSON.stringify(e.target):String(e.target);
     return `<div class="blk" data-goal-entity="${esc(e.id)}"><b>${esc(e.title)}</b> · ${esc(value)}
       <p class="meta">${esc(t('goal.origin.line',{origin:o.label||t('goal.origin.unspecified'),reason:o.reason||'—'}))}</p>
       <p class="meta">${esc(e.record.file)} · ${esc(e.id)}</p>
       <details class="noprint"><summary>${esc(t('goal.origin.edit'))}</summary>
         <form data-goal-origin="${esc(e.id)}" class="row" style="flex-wrap:wrap">
-          <select name="origin" aria-label="${esc(t('goal.origin.choose'))}" required><option value="">${esc(t('goal.origin.choose'))}</option>
+          <select class="cr-input" name="origin" aria-label="${esc(t('goal.origin.choose'))}" required><option value="">${esc(t('goal.origin.choose'))}</option>
             ${origins.map(k=>`<option value="${esc(k)}" ${o.kind===k?'selected':''}>${esc(t('goal.origin.'+k))}</option>`).join('')}</select>
-          <input name="reason" required value="${esc(o.reason||'')}" aria-label="${esc(t('goal.origin.reason'))}" placeholder="${esc(t('goal.origin.reason'))}">
-          <button class="act" type="submit">${esc(t('goal.origin.edit'))}</button>
+          <input class="cr-input" name="reason" required value="${esc(o.reason||'')}" aria-label="${esc(t('goal.origin.reason'))}" placeholder="${esc(t('goal.origin.reason'))}">
+          <button class="cr-btn act" type="submit">${esc(t('goal.origin.edit'))}</button>
         </form></details></div>`;
   }).join('')}</section>`:'';
 }
@@ -1218,10 +1219,10 @@ function bindGoalOrigins(root){
 function renderGoal(root, g){
   if(!g||!g.available||!(g.targets||[]).length){
     root.innerHTML=`${goalEntitiesHTML((g&&g.entities)||[])}${g&&g.available?'':`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`}
-      <div class="card" style="margin-top:12px">
+      <div class="cr-card card" style="margin-top:12px">
         <div class="row"><b>${esc(t('web.goalgen.h'))}</b></div>
         <div class="meta" style="margin:6px 0 10px">${esc(t('web.goalgen.intro'))}</div>
-        <button class="act" id="gs-go">${esc(t('web.goalgen.btn'))}</button>
+        <button class="cr-btn act" id="gs-go">${esc(t('web.goalgen.btn'))}</button>
         <div id="gs-box" style="margin-top:14px"></div>
       </div>`;
     $('#gs-go',root).onclick=()=>renderGoalProposal($('#gs-box',root));
@@ -1244,8 +1245,8 @@ function renderGoal(root, g){
     ${goalEntitiesHTML(g.entities||[])}
     <div class="gb-headline"><b>${esc(t('web.goal.in_one_phrase'))}</b> ${esc(g.headline)}</div>
     ${peaks?`<div class="peaks">${peaks}</div>`:''}
-    <h3 class="gh">${esc(t('web.goal.targets_h'))}</h3>
-    <div class="tblscroll"><table class="tgt"><thead><tr><th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <h3 class="cr-h3 gh">${esc(t('web.goal.targets_h'))}</h3>
+    <div class="tblscroll"><table class="cr-table cr-table--compact tgt"><thead><tr><th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>${rows}</tbody></table></div>
     <div class="glegend">
       <span><i class="gdot gdot-series"></i>${esc(t('web.goal.lg_series'))}</span>
       <span><i class="gdot gdot-target"></i>${esc(t('web.goal.lg_target'))}</span>
@@ -1254,7 +1255,7 @@ function renderGoal(root, g){
     ${gsection(t('web.goal.body_h'),'g2',[
       gbox(C.weight,'big',t('web.goal.weight'),'gcW'),
       gbox(C.bodycomp,'big',t('web.goal.bodycomp'),'gcBC')])}
-    <h3 class="gh">${esc(t('web.goal.metabolism_h'))}</h3>
+    <h3 class="cr-h3 gh">${esc(t('web.goal.metabolism_h'))}</h3>
     ${(C.minis||[]).some(gdrawn)?'<div class="cgrid g4" id="gminis"></div>'
       :`<div class="muted small">${esc(t('web.goal.chart_nodata'))}</div><div id="gminis"></div>`}
     ${gsection(t('web.goal.fitness_h'),'g2',[
@@ -1331,7 +1332,7 @@ function renderFocus(root,f){
   const j=(f.journal&&f.journal.state)||{};
   const today=localDay();
   root.innerHTML=`<div class="fc">
-    <div class="fch"><h3>${esc(f.title||'')}</h3>
+    <div class="fch"><h3 class="cr-h3">${esc(f.title||'')}</h3>
       <span class="muted small">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
     <p class="meta">${esc(t('clinical.recorded_focus'))}</p><p class="fcwhy">${esc(f.why||'')}</p>
     ${f.goal_entity?`<p class="meta">${esc(t('goal.origin.line',{origin:f.goal_entity.origin.label,reason:f.goal_entity.origin.reason||'—'}))}</p>`:''}
@@ -1350,12 +1351,12 @@ function renderFocus(root,f){
       <summary>${esc(t('web.focus.journal_h'))} ${esc(j.logged_nights?t('web.focus.journal_count',{entries:plural(j.logged_nights,'count.entries')}):t('web.focus.journal_empty'))}</summary>
       <div class="blk"><p>${esc((f.journal&&f.journal.why)||'')}</p>
         <div class="fcform">
-          <input type="date" id="fc-date" value="${esc(today)}">
-          <select id="fc-alc"><option value="">${esc(t('web.focus.alcohol_none'))}</option>
+          <input class="cr-input" type="date" id="fc-date" value="${esc(today)}">
+          <select class="cr-input" id="fc-alc"><option value="">${esc(t('web.focus.alcohol_none'))}</option>
             <option value="light">${esc(t('web.focus.alcohol_light'))}</option><option value="heavy">${esc(t('web.focus.alcohol_heavy'))}</option></select>
-          ${((f.journal&&f.journal.factors)||[]).map(x=>`<label><input type="checkbox" class="fc-factor" data-key="${esc(x.key)}"> ${esc(x.label||x.key)}</label>`).join('')}
-          <input id="fc-note" placeholder="${esc(t('web.focus.note_placeholder'))}" style="flex:1;min-width:150px">
-          <button class="act" id="fc-save">${esc(t('web.focus.save'))}</button>
+          ${((f.journal&&f.journal.factors)||[]).map(x=>`<label class="cr-label cr-check"><input type="checkbox" class="fc-factor" data-key="${esc(x.key)}"> ${esc(x.label||x.key)}</label>`).join('')}
+          <input class="cr-input" id="fc-note" placeholder="${esc(t('web.focus.note_placeholder'))}" style="flex:1;min-width:150px">
+          <button class="cr-btn act" id="fc-save">${esc(t('web.focus.save'))}</button>
         </div>
         <div class="muted" style="font-size:12.5px;margin-top:9px">${esc(j.text||'')}</div>
       </div>
@@ -1423,26 +1424,27 @@ async function viewOverview(root){
   // worked on, the goal — and the person's own profile and measurements last.
   // A precondition the profile lacks is the exception: it is said at the top,
   // because every number below it may depend on it.
-  root.innerHTML = `${pageHead(firstTabLabel(),t('web.page.overview.q'),facts)}${cautionsHtml(o.regimen_cautions)}${controlsHtml(o.overdue_controls,true)}
+  root.innerHTML = `${pageHead(firstTabLabel(),t('web.page.overview.q'),facts)}<div class="toolbar"><button class="cr-btn cr-btn--ghost" id="visit-sheet-open">${esc(t('visit.title'))}</button></div>${cautionsHtml(o.regimen_cautions)}${controlsHtml(o.overdue_controls,true)}
     <div id="ov-missing"></div>
-    <h2 class="section mt-0">${esc(t('web.body.title'))}</h2>
+    <h2 class="cr-h2 section mt-0">${esc(t('web.body.title'))}</h2>
     <div id="ov-systems"></div>
-    <h2 class="section">${esc(t('web.overview.red_h'))} <span class="muted">· ${esc(t('web.overview.red_window'))}</span>${tabLink('web.tab.labs')}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.overview.red_h'))} <span class="muted">· ${esc(t('web.overview.red_window'))}</span>${tabLink('web.tab.labs')}</h2>
     ${o.stale_abnormal_count?`<div class="meta mb-2">${esc(t('web.overview.stale_hidden',{count:plural(o.stale_abnormal_count,'count.abnormal')}))}</div>`:''}
     <div id="ov-red"></div>
-    <h2 class="section">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.second_opinion')}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.second_opinion')}</h2>
     <div id="ov-tests"></div>
-    ${f&&f.available?`<h2 class="section">${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus"></div>`:''}
-    <h2 class="section">${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted">· ${esc(t('web.goal.as_of',{date:fmtDate(g.as_of)}))}</span>`:''}</h2>
+    ${f&&f.available?`<h2 class="cr-h2 section">${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus"></div>`:''}
+    <h2 class="cr-h2 section">${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted">· ${esc(t('web.goal.as_of',{date:fmtDate(g.as_of)}))}</span>`:''}</h2>
     <div id="ov-goal"></div>
-    <h2 class="section">${esc(t('web.overview.person_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.overview.person_h'))}</h2>
     <div id="ov-person"></div>
-    <h2 class="section">${esc(t('web.overview.metrics_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.overview.metrics_h'))}</h2>
     <div class="grid" id="ov-metrics"></div>
     ${sb}`;
+  $('#visit-sheet-open',root).onclick=()=>viewVisitSheet(root);
   if(missing.length){
-    $('#ov-missing',root).innerHTML=`<div class="card warnbox mb-4"><div class="row"><b>${esc(t('web.metrics.missing_head'))}</b>
-      <button class="ghost btn-sm ml-auto" id="ov-fill">${esc(t('web.metrics.profile_btn'))}</button></div>
+    $('#ov-missing',root).innerHTML=`<div class="cr-card card warnbox mb-4"><div class="row"><b>${esc(t('web.metrics.missing_head'))}</b>
+      <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm ml-auto" id="ov-fill">${esc(t('web.metrics.profile_btn'))}</button></div>
       ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}</div>`;
   }
   renderSystems($('#ov-systems',root), radar);
@@ -1520,7 +1522,7 @@ function markerCard(m){
   // The free-text notes under the corridor line, cut at three lines: a note of
   // twelve lines inside a card made the number the card is about hard to find.
   const notes=[m.note,m.corridor_note].filter(Boolean).join(' · ');
-  return el(`<div class="card">
+  return el(`<div class="cr-card card">
     <div class="label">${esc(m.name)}</div>
     <div class="value">${esc(fmtNum(m.value))} <small>${esc(m.unit)}</small></div>
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted small" title="${esc(m.date)}">${esc(fmtDate(m.date))}</span>`:''}${tr}</div>
@@ -1531,6 +1533,52 @@ function markerCard(m){
     ${targetAsk(m)}
   </div>`);
 }
+// A source link is optional; a missing source never becomes a fabricated URL.
+function visitSourceLinks(value){
+  const text=String(value||'');
+  const links=[...text.matchAll(/https:\/\/[^\s;<>]+/g)].map(x=>x[0]);
+  for(const pm of text.matchAll(/PMID\s*:?\s*(\d+)/g))links.push('https://pubmed.ncbi.nlm.nih.gov/'+pm[1]+'/');
+  for(const doi of text.matchAll(/DOI\s*:?\s*(10\.\d{4,9}\/[^\s;<>]+)/g))links.push('https://doi.org/'+doi[1]);
+  return `${esc(text)} ${[...new Set(links)].map(url=>`<a class="cr-source" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`).join(' ')}`;
+}
+async function viewVisitSheet(root, reference=false){
+  showLoader(root);
+  const r=await api('/api/visit-sheet'+(reference?'?reference=1':''));
+  if(!root.isConnected)return;
+  root.className='visit-sheet';
+  const rows=r.measurements||[],held=r.held_measurements||[],meds=(r.medications||[]).filter(m=>m.current);
+  let cautionMarkup=cautionsHtml(r.regimen_cautions);
+  for(const c of r.regimen_cautions||[])if(c.source)cautionMarkup=cautionMarkup.replace(esc(c.source),visitSourceLinks(c.source));
+  const empty=`<p class="cr-muted">${esc(t('visit.empty'))}</p>`;
+  root.innerHTML=`<div class="toolbar visit-actions"><button class="cr-btn cr-btn--ghost" id="visit-back">← ${esc(t('visit.back'))}</button>
+    ${!reference?`<button class="cr-btn cr-btn--ghost" id="visit-reference">${esc(t('visit.include_reference'))}</button>`:''}
+    <button class="cr-btn" id="visit-print">${esc(t('visit.print'))}</button></div>
+    <h1 class="cr-h1">${esc(r.title)}</h1>
+    <p class="cr-caption">${esc(t('visit.stamp',{id:r.container.id||'—',version:r.version,date:r.as_of}))}</p>
+    ${r.synthetic?`<p class="cr-alert cr-alert--warning">${esc(t('web.header.demo_banner'))}</p>`:''}
+    <p class="cr-body-s">${esc(r.scope_note)}</p>
+    <h2 class="cr-h2">${esc(t('visit.goals'))}</h2>
+    ${(r.goals||[]).length?`<ul>${r.goals.map(g=>`<li><b>${esc(g.title)}</b> · ${esc(g.origin.label)} · ${esc(g.record.file)}</li>`).join('')}</ul>`:empty}
+    ${cautionMarkup}
+    <h2 class="cr-h2">${esc(t('visit.measurements'))}</h2><p class="cr-caption">${esc(t('visit.range_note'))}</p>
+    ${rows.length?`<div class="cr-table-wrap"><table class="cr-table--compact cr-table"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.form.value'))}</th><th>${esc(t('visit.reference_bounds'))}</th><th>${esc(t('visit.sources'))}</th></tr></thead>
+    <tbody>${rows.map(m=>`<tr><th scope="row">${esc(m.name)}<br><time>${esc(m.date||'—')}</time></th>
+    <td data-label="${esc(t('web.form.value'))}"><span>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit||'')}</span></td><td data-label="${esc(t('visit.reference_bounds'))}"><span>${esc(m.ref_low??'—')}–${esc(m.ref_high??'—')}${targetText(m)}</span></td>
+    <td data-label="${esc(t('visit.sources'))}"><span>${esc(m.source_label)}<br>${esc(m.date_basis_label)}</span></td></tr>`).join('')}</tbody></table></div>`:empty}
+    <h2 class="cr-h2">${esc(t('visit.medications'))}</h2>
+    ${meds.length?`<ul>${meds.map(m=>`<li><b>${esc(m.name)}</b> · ${esc(m.dose||'—')} · ${esc(m.start_date||t('treatment.undated'))}</li>`).join('')}</ul>`:empty}
+    ${controlsHtml(r.treatment.controls)}
+    <details class="visit-held" data-index-provenance><summary>${esc(t('visit.held',{n:held.length}))}</summary><ul>${held.map(m=>`<li>${esc(m.name)} · ${esc(m.date||'—')} · ${esc(m.corridor_note||t('visit.no_corridor'))}</li>`).join('')}</ul></details>
+    <h2 class="cr-h2">${esc(t('visit.sources'))}</h2><div class="cr-body-s">${['labs','medications','metrics','genome_vcf'].map(k=>r.sources[k]?`<p><b>${esc(r.sources[k].label)}</b>: ${esc(r.sources[k].origin)} · ${esc(r.sources[k].updated||'—')}</p>`:'').join('')}</div>
+    ${r.reference_appendix.included?`<section class="visit-reference"><h2 class="cr-h2">${esc(t('visit.appendix'))}</h2><p>${esc(r.appendix_note)}</p>
+    ${r.reference_appendix.panels.map(p=>`<section><h3 class="cr-h3">${esc(p.label)}</h3>${p.positions.map(x=>`<article class="cr-card"><b>${esc(x.gene)} ${esc(x.rsid)}</b> · ${esc(t('reference.level',{level:x.level}))}<p>${esc(t('visit.reading',{reading:x.reading_label||'—'}))}</p>
+    ${referenceContextHtml(x)}${passportHtml(x,'clinician')}<p class="cr-caption">${visitSourceLinks(x.reference_context?.variant_source||x.source)}</p></article>`).join('')}</section>`).join('')}</section>`:''}
+    <p class="cr-caption">${esc(r.disclaimer)}</p>`;
+  $('#visit-back',root).onclick=()=>mount(current);
+  $('#visit-print',root).onclick=()=>window.print();
+  const add=$('#visit-reference',root);if(add)add.onclick=()=>viewVisitSheet(root,true);
+}
+
 async function viewLabs(root){
   const [d,catR,sb,cfgR,meds]=await Promise.all([api('/api/labs'),api('/api/markers'),sourceBar(['labs']),api('/api/source-config'),api('/api/medications')]);
   // the series for the sparklines are pulled from the catalogue
@@ -1563,15 +1611,16 @@ async function viewLabs(root){
   const folder=docs?String(docs).split('/').filter(Boolean).pop():'';
   root.innerHTML = `${pageHead(t('web.tab.labs'),t('web.page.labs.q'),facts)}${treatmentHtml(meds.treatment)}
     <div class="toolbar">
-      <button class="act" id="ingest-run">${esc(t('web.labs.reingest'))}</button>
-      <button class="ghost" id="pick-docs">${esc(t('web.labs.pick_docs'))}</button>
-      <button class="ghost" id="toggle-add">+ ${esc(t('web.labs.add_manually'))}</button>
+      <button class="cr-btn act" id="ingest-run">${esc(t('web.labs.reingest'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="archive-preview">${esc(t('archive.preview'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="pick-docs">${esc(t('web.labs.pick_docs'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="toggle-add">+ ${esc(t('web.labs.add_manually'))}</button>
     </div>
     <div class="meta mb-3"${docs?` title="${esc(docs)}"`:''}>${docs?t('web.labs.docs_folder_set',{path:'<b>'+esc(folder)+'</b>'}):esc(t('web.labs.docs_folder_unset'))}</div>
     <div id="ingest-res" class="mb-3"></div>
     <div id="add-lab" class="hidden"></div>
     <div id="targets-box"></div>
-    <h2 class="section">${esc(t('web.labs.out_h'))} <span class="muted">· ${flagged.length}</span></h2>
+    <h2 class="cr-h2 section">${esc(t('web.labs.out_h'))} <span class="muted">· ${flagged.length}</span></h2>
     <div class="grid" id="labgrid"></div>
     ${rest.length?`<details class="fold mt-4" id="labrest"><summary>${esc(t(rest.some(m=>m.flag!=='ok')?'web.labs.other_h':'web.labs.within_h',{n:rest.length}))}</summary><div class="grid mt-2" id="labrestgrid"></div></details>`:''}
     ${sb}`;
@@ -1592,6 +1641,7 @@ async function viewLabs(root){
     if(r&&r.ok){toast(t('web.common.folder_chosen'));viewLabs($('#view'));}
     else toast(t('web.common.error_prefix')+((r&&r.error)||t('web.common.failed')));
   };
+  $('#archive-preview',root).onclick=()=>previewLabArchive($('#ingest-res',root));
   // ingest PDF -> labs.json
   $('#ingest-run',root).onclick=async()=>{
     const box=$('#ingest-res',root);
@@ -1603,28 +1653,45 @@ async function viewLabs(root){
     const conflicts=(r.conflicts||[]).map(c=>`<li>${esc(t('ingest.conflict',c))}</li>`).join('');
     const errors=(r.errors||[]).map(f=>`<li>${esc(t('web.common.error_prefix'))}${esc(f)}</li>`).join('');
     const unknown=(r.unrecognised_rows||[]).map(f=>`<li>${esc(t('ingest.unrecognised_rows',{file:f.file,n:f.count}))}<ul>${f.rows.map(row=>`<li>${esc(row.label)} [${esc(row.unit||'')}]</li>`).join('')}</ul></li>`).join('');
-    const report=`<div class="card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))}
+    const report=`<div class="cr-card card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))}
       ${files?`<ul class="meta">${files}</ul>`:`<div class="meta">${esc(t('web.labs.ingest_nothing_new'))}</div>`}${refused||unknown||conflicts||errors?`<ul>${refused}${unknown}${conflicts}${errors}</ul>`:''}</div>`;
     box.innerHTML=report;
     toast(r.points_added>0?t('web.labs.points_added',{n:r.points_added}):t('web.labs.no_new_data'));
     if(r.points_added>0){_sources=null; await viewLabs($('#view')); const target=$('#ingest-res');if(target)target.innerHTML=report;}
   };
 }
+async function previewLabArchive(box, approval=''){
+  showLoader(box);
+  const r=await post('/api/ingest-labs',approval?{approve_archive:approval}:{archive_preview:true});
+  if(!r.preview){
+    box.innerHTML=r.ok?`<div class="cr-card card">${esc(t('web.labs.points_added',{n:r.points_added}))}</div>`:errorHtml(r.error||t('web.common.failed'));
+    if(r.ok&&r.points_added>0){_sources=null;await viewLabs($('#view'));}
+    return;
+  }
+  const forms=(r.forms||[]).map(f=>`<article class="cr-card card"><b>${esc(f.file)}</b> · ${esc(f.date)} · ${esc(t('archive.specimen.'+f.specimen))}
+    <div class="meta">${esc(t('archive.pages',{pages:f.pages.join(', ')}))}</div>
+    <ul>${f.readings.map(p=>`<li>${esc(p.name)}: ${esc(p.censored||'')}${esc(String(p.value))} ${esc(p.unit||'')}</li>`).join('')}</ul></article>`).join('');
+  const refused=(r.not_ingested||[]).map(f=>`<li>${esc(f.file)}: ${esc(t('archive.reason.'+f.reason))}</li>`).join('');
+  box.innerHTML=`<p>${esc(r.message||r.error||'')}</p>${r.error?errorHtml(r.error):''}${forms}${refused?`<ul>${refused}</ul>`:''}
+    ${r.approval_token?`<button class="cr-btn act" id="archive-apply">${esc(t('archive.apply'))}</button>`:''}`;
+  const button=$('#archive-apply',box);
+  if(button)button.onclick=()=>{button.disabled=true;previewLabArchive(box,r.approval_token);};
+}
 function renderAddLab(box, cat){
   const opts = cat.map(c=>`<option value="${esc(c.key)}">${esc(c.name)} (${esc(c.unit)})</option>`).join('');
   box.innerHTML = `<div class="form">
     <div class="fr">
-      <label>${esc(t('web.form.marker'))}<select id="al-marker">${opts}<option value="__new">${esc(t('web.form.new_option'))}</option></select></label>
-      <label>${esc(t('web.form.date_month'))}<input id="al-date" placeholder="2026-06" size="9"></label>
-      <label>${esc(t('web.form.value'))}<input id="al-val" placeholder="4.30" size="8"></label>
-      <button class="act" id="al-save">${esc(t('web.form.save'))}</button>
+      <label class="cr-label">${esc(t('web.form.marker'))}<select class="cr-input" id="al-marker">${opts}<option value="__new">${esc(t('web.form.new_option'))}</option></select></label>
+      <label class="cr-label">${esc(t('web.form.date_month'))}<input class="cr-input" id="al-date" placeholder="2026-06" size="9"></label>
+      <label class="cr-label">${esc(t('web.form.value'))}<input class="cr-input" id="al-val" placeholder="4.30" size="8"></label>
+      <button class="cr-btn act" id="al-save">${esc(t('web.form.save'))}</button>
     </div>
     <div id="al-new" class="fr hidden">
-      <label>${esc(t('web.form.key'))}<input id="al-key" placeholder="my_marker" size="12"></label>
-      <label>${esc(t('web.form.name'))}<input id="al-name" placeholder="${esc(t('web.form.name_placeholder'))}" size="14"></label>
-      <label>${esc(t('web.form.unit'))}<input id="al-unit" size="7"></label>
-      <label>${esc(t('web.form.ref_from'))}<input id="al-lo" size="6"></label>
-      <label>${esc(t('web.form.ref_to'))}<input id="al-hi" size="6"></label>
+      <label class="cr-label">${esc(t('web.form.key'))}<input class="cr-input" id="al-key" placeholder="my_marker" size="12"></label>
+      <label class="cr-label">${esc(t('web.form.name'))}<input class="cr-input" id="al-name" placeholder="${esc(t('web.form.name_placeholder'))}" size="14"></label>
+      <label class="cr-label">${esc(t('web.form.unit'))}<input class="cr-input" id="al-unit" size="7"></label>
+      <label class="cr-label">${esc(t('web.form.ref_from'))}<input class="cr-input" id="al-lo" size="6"></label>
+      <label class="cr-label">${esc(t('web.form.ref_to'))}<input class="cr-input" id="al-hi" size="6"></label>
     </div>
     <div class="muted small">${esc(t('web.labs.add_note'))}</div>
   </div>`;
@@ -1655,14 +1722,14 @@ async function renderTargets(box, cat){
       now+=' — '+(tg.in_corridor?t('web.target.discuss',{side}):t('web.target.outside_and_flagged',{side}));
     }else if(cur&&tg.outside_target===false){now+=' — '+t('web.target.within');}
     return `<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(tg)}))}${tg.unit?' '+esc(tg.unit):''}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span>
-      <button class="ghost tg-rm" data-marker="${esc(tg.marker)}" style="margin-left:auto">✕ ${esc(t('web.target.remove'))}</button></div>
+      <button class="cr-btn cr-btn--ghost ghost tg-rm" data-marker="${esc(tg.marker)}" style="margin-left:auto">✕ ${esc(t('web.target.remove'))}</button></div>
       <div class="why">${esc(now)}${tg.note?` · ${esc(tg.note)}`:''}</div></div>`;
   }).join('');
   const ask=(d.targets||[]).filter(tg=>d.to_discuss.includes(tg.marker));
   const askList=ask.length?ask.map(tg=>`<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: ${tg.current.value} ${esc(tg.unit||'')} <span class="muted">${esc(refText(tg.current))}</span></div><div class="why tgt-ask">${esc(t('web.target.discuss',{side:t(tg.side==='above'?'web.target.side_above':'web.target.side_below')}))} <span class="muted">(${esc(t('web.target.beside',{spec:targetSpec(tg)}))}, ${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span></div></div>`).join('')
     :`<div class="muted">${esc(t('web.target.discuss_none'))}</div>`;
-  box.innerHTML=`<div class="card mb-3">
-    <div class="row"><div class="so-h" style="margin:0">${esc(t('web.target.h'))}</div><button class="ghost" id="tg-toggle" style="margin-left:auto">+ ${esc(t('web.target.add_toggle'))}</button></div>
+  box.innerHTML=`<div class="cr-card card mb-3">
+    <div class="row"><div class="so-h" style="margin:0">${esc(t('web.target.h'))}</div><button class="cr-btn cr-btn--ghost ghost" id="tg-toggle" style="margin-left:auto">+ ${esc(t('web.target.add_toggle'))}</button></div>
     <div id="tg-form" class="hidden"></div>
     ${rows||`<div class="muted">${esc(t('web.target.none'))}</div>`}
     ${(d.targets||[]).length?`<div class="so-h">${esc(t('web.target.discuss_h'))}</div>${askList}`:''}
@@ -1680,17 +1747,17 @@ function renderTargetForm(box, cat){
   box.innerHTML=`<div class="form">
     <div class="so-h" style="margin:0 0 6px">${esc(t('web.target.form_h'))}</div>
     <div class="fr">
-      <label>${esc(t('web.target.marker'))}<select id="tg-marker">${opts}</select></label>
-      <label>${esc(t('web.target.low'))}<input id="tg-lo" size="6"></label>
-      <label>${esc(t('web.target.high'))}<input id="tg-hi" size="6"></label>
-      <label>${esc(t('web.target.value'))}<input id="tg-val" size="6"></label>
-      <label>${esc(t('web.target.unit'))}<input id="tg-unit" size="8"></label>
+      <label class="cr-label">${esc(t('web.target.marker'))}<select class="cr-input" id="tg-marker">${opts}</select></label>
+      <label class="cr-label">${esc(t('web.target.low'))}<input class="cr-input" id="tg-lo" size="6"></label>
+      <label class="cr-label">${esc(t('web.target.high'))}<input class="cr-input" id="tg-hi" size="6"></label>
+      <label class="cr-label">${esc(t('web.target.value'))}<input class="cr-input" id="tg-val" size="6"></label>
+      <label class="cr-label">${esc(t('web.target.unit'))}<input class="cr-input" id="tg-unit" size="8"></label>
     </div>
     <div class="fr">
-      <label>${esc(t('web.target.set_by'))}<input id="tg-by" size="18"></label>
-      <label>${esc(t('web.target.set_on'))}<input id="tg-on" placeholder="2026-09-12" size="10"></label>
-      <label>${esc(t('web.target.note'))}<input id="tg-note" size="24"></label>
-      <button class="act" id="tg-save">${esc(t('web.target.save'))}</button>
+      <label class="cr-label">${esc(t('web.target.set_by'))}<input class="cr-input" id="tg-by" size="18"></label>
+      <label class="cr-label">${esc(t('web.target.set_on'))}<input class="cr-input" id="tg-on" placeholder="2026-09-12" size="10"></label>
+      <label class="cr-label">${esc(t('web.target.note'))}<input class="cr-input" id="tg-note" size="24"></label>
+      <button class="cr-btn act" id="tg-save">${esc(t('web.target.save'))}</button>
     </div>
   </div>`;
   const sel=$('#tg-marker',box), unit=$('#tg-unit',box);
@@ -1761,18 +1828,18 @@ function coverageLine(c){
   return t('gene.layer.coverage_no');
 }
 function pgxCard(d){
-  if(d.status==='not_found'||d.status==='not_in_panel')return `<div class="card"><div class="muted">${esc(d.message)}${refLink(d)}</div></div>`;
-  if(d.status==='found_online')return `<div class="card">
+  if(d.status==='not_found'||d.status==='not_in_panel')return `<div class="cr-card card"><div class="muted">${esc(d.message)}${refLink(d)}</div></div>`;
+  if(d.status==='found_online')return `<div class="cr-card card">
     <div class="row"><b style="font-size:18px">${esc(d.drug)}</b> <span class="muted">${esc(d.drug_class||'')}</span> ${badge('b-unknown',t('web.drug.found_online'))}</div>
     <div class="meta mt-2">${esc(d.message)}${refLink(d)}</div></div>`;
-  if(d.status!=='ok')return `<div class="card muted">${esc(d.message||t('web.common.error'))}</div>`;
+  if(d.status!=='ok')return `<div class="cr-card card muted">${esc(d.message||t('web.common.error'))}</div>`;
   const lv=LEVEL[d.level]||LEVEL.unknown;
   const online=d.resolved_by==='rxnorm';
   const markers=(d.markers_found||[]).map(m=>m.copies!=null
     ? `<li><code>${esc(m.rsid)}</code>${m.star?' ('+esc(m.star)+')':''} ${esc(m.genotype)} — ${esc(t('drug.marker_computed',{copies:m.copies,function:m.function}))}</li>`
     : m.diplotype?`<li data-called-diplotype><b>${esc(m.diplotype)}</b> — ${esc(m.phenotype_text||'')}${m.source?' ('+esc(m.source)+')':''}</li>`
     : m.rsid?`<li><code>${esc(m.rsid)}</code> ${esc(m.genotype)} — ${esc(m.interpretation||'')}</li>`:'').join('');
-  return `<div class="card">
+  return `<div class="cr-card card">
     <div class="row"><b style="font-size:18px">${esc(d.drug)}</b> → ${esc(t('web.drug.gene'))} <b>${esc(d.gene)}</b> <span class="muted">(${esc(d.drug_class)})</span> ${badge(lv.cls,t(lv.key))}${online?' '+badge('b-unknown',t('web.drug.resolved_online')):''}</div>
     <div class="meta mt-2">${esc(t('drug.why_gene',{text:d.why}))}</div>
     <div style="margin-top:6px">${esc(t('web.drug.phenotype_label'))} <b>${esc(d.phenotype)}</b> — <span class="muted">${esc(d.phenotype_label)}</span></div>
@@ -1814,7 +1881,7 @@ function doseHTML(dc){
     ${dc.verdict_rule?`<div class="lsact" style="margin-top:12px">${esc(dc.verdict_rule)}</div>`:''}`;
 }
 function rxCard(r){
-  if(r.status!=='ok')return `<div class="card muted">${esc(r.message||t('web.common.error'))}</div>`;
+  if(r.status!=='ok')return `<div class="cr-card card muted">${esc(r.message||t('web.common.error'))}</div>`;
   const ov=SEV[r.overall]||SEV.unknown;
   const id=r.identified||{};
   const idLine=id.source==='none'?`<span class="muted">${esc(t('web.rx.not_identified'))}</span>`
@@ -1912,7 +1979,7 @@ function rxCard(r){
     }).join('');
   }
   if(cvHtml) cvHtml=`<div class="meta">${esc(t('web.rx.clinvar_note'))}</div>`+cvHtml;
-  return `<div class="card mb-3">
+  return `<div class="cr-card card mb-3">
       <div class="row"><b style="font-size:18px">${esc(t('web.rx.title',{drug:r.drug}))}</b> ${badge(ov.cls,t('web.rx.overall',{level:t(ov.key)}))}</div>
       <div class="meta mt-1">${esc(t('web.rx.class',{name:r.class_display||'—'}))} · ${idLine}</div>
       ${rxFold(t('prescription.unresolved_h'),(r.unresolved||[]).length,(r.unresolved&&r.unresolved.length)?`<ul class="meta" style="margin:4px 0 0;padding-left:18px">${r.unresolved.map(u=>`<li>${esc(u.gene?t('prescription.unresolved_gene',{detail:u.detail||u.what,gene:u.gene}):(u.detail||u.what))}</li>`).join('')}</ul>`:'')}
@@ -1946,7 +2013,7 @@ function flagsHTML(flags){
                 ['system.row.mechanism',f.mechanism],
                 ['prescription.safety_source',f.source]]
       .filter(x=>x[1]).map(x=>`<li style="margin:3px 0">${bold(t(x[0],{text:x[1]}))}</li>`).join('');
-    return `<div class="card" style="margin-bottom:14px;border-left:4px solid var(--${red?'critical':'warning'})">
+    return `<div class="cr-card card" style="margin-bottom:14px;border-left:4px solid var(--${red?'critical':'warning'})">
       <div class="row"><b>${esc(t(f.interpretation_withheld?'conclusion.caution_header':f.origin==='genotype'?'prescription.genotype_h':'prescription.safety_h'))}</b>${f.medication?` <span class="muted">· ${esc(f.medication)}</span>`:''}${f.origin==='genotype'?` <span class="muted">· ${esc(t('prescription.genotype_line',{drug:f.drug||'—',gene:f.gene||'—',rsid:f.rsid||'—',genotype:f.genotype||'—',level:f.level||'—'}))}</span>`:''}</div>
       <ul style="margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.5">${rows}</ul>
     </div>`;
@@ -1963,29 +2030,29 @@ async function viewMedicines(root){
                past.length?factHtml(String(past.length),t('web.meds.fact_stopped'),'c-muted'):''];
   const listHtml=(list,s)=>list.map(m=>medItem(m,s)).join('');
   root.innerHTML=`${pageHead(t('web.tab.medicines'),t('web.page.medicines.q'),facts)}${cautionsHtml(d.cautions)}<div id="med-treatment">${treatmentHtml(d.treatment)}</div>
-    <h2 class="section mt-0">${esc(t('web.drug.title'))}</h2>
+    <h2 class="cr-h2 section mt-0">${esc(t('web.drug.title'))}</h2>
     <div class="why mb-2">${esc(t('web.drug.intro'))}</div>
-    <div class="row"><input id="drug-in" placeholder="${esc(t('web.drug.placeholder'))}" style="flex:1 1 280px"><button class="act" id="drug-go">${esc(t('web.drug.full_check'))}</button><button class="ghost" id="drug-pgx">${esc(t('web.drug.pgx_only'))}</button></div>
+    <div class="row"><input class="cr-input" id="drug-in" placeholder="${esc(t('web.drug.placeholder'))}" style="flex:1 1 280px"><button class="cr-btn act" id="drug-go">${esc(t('web.drug.full_check'))}</button><button class="cr-btn cr-btn--ghost ghost" id="drug-pgx">${esc(t('web.drug.pgx_only'))}</button></div>
     <details class="fold"><summary>${esc(t('web.drug.names_h'))}</summary><div class="meta">${esc(t('web.drug.names_note'))}</div></details>
     <div id="drug-res" class="mt-3"></div>
-    <h2 class="section">${esc(t('web.meds.current_h'))} <span class="muted">· ${cur.length}</span></h2>
-    <div class="toolbar"><button class="ghost" id="m-toggle">+ ${esc(t('web.meds.add'))}</button></div>
+    <h2 class="cr-h2 section">${esc(t('web.meds.current_h'))} <span class="muted">· ${cur.length}</span></h2>
+    <div class="toolbar"><button class="cr-btn cr-btn--ghost ghost" id="m-toggle">+ ${esc(t('web.meds.add'))}</button></div>
     <div id="m-form" class="hidden"><div class="form mb-3"><div class="fr">
-      <label>${esc(t('web.meds.drug'))}<input id="m-name" placeholder="${esc(t('web.meds.drug_placeholder'))}"></label>
-      <label>${esc(t('web.meds.dose'))}<input id="m-dose" placeholder="${esc(t('web.meds.dose_placeholder'))}" size="10"></label>
-      <label>${esc(t('web.meds.comment'))}<input id="m-note" placeholder="${esc(t('web.meds.comment_placeholder'))}" size="18"></label>
-      <label>${esc(t('treatment.start'))}<input id="m-start" type="date"></label>
-      <label>${esc(t('web.meds.status'))}<select id="m-status">
+      <label class="cr-label">${esc(t('web.meds.drug'))}<input class="cr-input" id="m-name" placeholder="${esc(t('web.meds.drug_placeholder'))}"></label>
+      <label class="cr-label">${esc(t('web.meds.dose'))}<input class="cr-input" id="m-dose" placeholder="${esc(t('web.meds.dose_placeholder'))}" size="10"></label>
+      <label class="cr-label">${esc(t('web.meds.comment'))}<input class="cr-input" id="m-note" placeholder="${esc(t('web.meds.comment_placeholder'))}" size="18"></label>
+      <label class="cr-label">${esc(t('treatment.start'))}<input class="cr-input" id="m-start" type="date"></label>
+      <label class="cr-label">${esc(t('web.meds.status'))}<select class="cr-input" id="m-status">
         <option value="active">${esc(t('web.meds.status_active'))}</option>
         <option value="paused">${esc(t('web.meds.status_paused'))}</option>
         <option value="stopped">${esc(t('web.meds.status_stopped'))}</option>
       </select></label>
-      <button class="act" id="m-add">${esc(t('web.meds.add'))}</button>
+      <button class="cr-btn act" id="m-add">${esc(t('web.meds.add'))}</button>
     </div><details><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.plan_hint'))}</p><div class="fr">
-      <label>${esc(t('treatment.marker'))}<input id="m-control-marker"></label>
-      <label>${esc(t('treatment.from'))}<input id="m-control-from" type="date"></label>
-      <label>${esc(t('treatment.due'))}<input id="m-control-due" type="date"></label>
-      <label>${esc(t('treatment.source'))}<input id="m-control-source"></label>
+      <label class="cr-label">${esc(t('treatment.marker'))}<input class="cr-input" id="m-control-marker"></label>
+      <label class="cr-label">${esc(t('treatment.from'))}<input class="cr-input" id="m-control-from" type="date"></label>
+      <label class="cr-label">${esc(t('treatment.due'))}<input class="cr-input" id="m-control-due" type="date"></label>
+      <label class="cr-label">${esc(t('treatment.source'))}<input class="cr-input" id="m-control-source"></label>
     </div></details><div class="muted small">${esc(t('web.meds.note'))}</div></div></div>
     <div id="m-check" class="mt-3"></div>
     <div id="mlist">${listHtml(cur,sys)||emptyHtml(t('web.meds.empty'))}</div>
@@ -2002,7 +2069,7 @@ async function viewMedicines(root){
     if(pgx&&(pgx.status==='not_found'||pgx.reason==='unreachable')){
       const dg=await api('/api/diag');
       if(dg&&!dg.ok){
-        return `<div class="card warnbox"><b>⚠ ${esc(t('web.diag.no_internet'))}</b>
+        return `<div class="cr-card card warnbox"><b>⚠ ${esc(t('web.diag.no_internet'))}</b>
           <div class="meta mt-2">${esc(t('web.diag.online_search_off'))} <code>${esc(dg.error||'')}</code></div>
           ${dg.hint?`<div class="meta mt-2">${esc(dg.hint)}</div>`:''}</div>`;
       }
@@ -2034,7 +2101,7 @@ async function viewMedicines(root){
     toast(chk.overall&&chk.overall!=='low'?t('web.meds.added_attention'):t('web.common.added'));
     claimNotice(r);
     if(r.replaced){
-      $('#m-check',root).innerHTML=`<div class="card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`;
+      $('#m-check',root).innerHTML=`<div class="cr-card card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`;
     }
     // refresh the list without losing the check that is on screen
     const [d2,sys2]=await Promise.all([api('/api/medications'), systemsIndex().catch(()=>null)]);
@@ -2042,7 +2109,7 @@ async function viewMedicines(root){
     $('#med-treatment',root).innerHTML=treatmentHtml(d2.treatment);
     bindRemove();
     ['m-name','m-dose','m-note','m-start','m-control-marker','m-control-from','m-control-due','m-control-source'].forEach(id=>$('#'+id,root).value='');
-    if(chk.status==='ok'){$('#m-check',root).innerHTML=(r.replaced?`<div class="card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`:'')+rxCard(chk);$('#m-check',root).scrollIntoView({behavior:'smooth',block:'nearest'});}
+    if(chk.status==='ok'){$('#m-check',root).innerHTML=(r.replaced?`<div class="cr-card card">${esc(t('web.meds.replaced',{name:r.replaced,kept:r.kept||'—'}))}</div>`:'')+rxCard(chk);$('#m-check',root).scrollIntoView({behavior:'smooth',block:'nearest'});}
   };
   function bindRemove(){root.querySelectorAll('[data-rm]').forEach(b=>b.onclick=async()=>{
     const r=await post('/api/medications/remove',{name:b.getAttribute('data-rm')});
@@ -2243,7 +2310,7 @@ function genTableHtml(gen,card,register){
     const detail=`<div class="pnl k-b"><div class="pnl-text">${esc(g.text||'')}</div>`
       +mechanismHtml(g)+passportHtml(g,register)
       +(g.source?`<div class="why muted">${esc(t('decision.source',{source:g.source}))}</div>`:'')
-      +`<table class="dt">${(g.members||[]).map(p=>`<tr><td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td><td>${p.level?levelChip(p.level,p.level_short):''}</td><td>${pnlStateBadge(p)}</td><td>${esc(short(p.text||p.conclusion_basis?.reason||''))}${ladderHtml(p)}</td></tr>`).join('')}</table></div>`;
+      +`<table class="cr-table cr-table--compact dt">${(g.members||[]).map(p=>`<tr><td><b>${esc(p.gene)}</b> <span class="muted small">${esc(p.rsid||'')}</span></td><td>${p.level?levelChip(p.level,p.level_short):''}</td><td>${pnlStateBadge(p)}</td><td>${esc(short(p.text||p.conclusion_basis?.reason||''))}${ladderHtml(p)}</td></tr>`).join('')}</table></div>`;
     body+=genTableRow(id,cells,detail);
   });
   const linked=states.filter(p=>p.link_text&&!grouped.has(p.rsid)), plain=states.filter(p=>!p.link_text&&!grouped.has(p.rsid));
@@ -2260,7 +2327,7 @@ function genTableHtml(gen,card,register){
     body+=`<tr class="gengroup"><td colspan="5">${esc(t('web.gen.group_base',{n:genes.length}))}</td></tr>`
       +genes.map(geneRow).join('');
   }
-  return `<div class="tblwrap"><table class="dt gentbl">${head}<tbody>${body}</tbody></table></div>`
+  return `<div class="tblwrap"><table class="cr-table cr-table--compact dt gentbl">${head}<tbody>${body}</tbody></table></div>`
     +`<div class="why muted">${esc(t('web.gen.table_hint'))}</div>`;
 }
 // The panel of a segment as a picture rather than a paragraph: a summary of
@@ -2360,7 +2427,7 @@ function genSummaryHtml(gen, card){
   // Positions read as «not read» only because the catalogue positions were never
   // genotyped from the alignment: the step that closes it, where the gap is seen.
   const assumed=st.filter(x=>x.read===false&&x.read_why==='assumed_ref').length;
-  if(assumed) h+=`<div class="gen-rest">${esc(t('system.genetics.assumed_ref_hint',{positions:plural(assumed,'count.positions')}))} <button class="ghost btn-sm" data-recompute-open>${esc(t('web.recompute.open'))}</button></div>`;
+  if(assumed) h+=`<div class="gen-rest">${esc(t('system.genetics.assumed_ref_hint',{positions:plural(assumed,'count.positions')}))} <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" data-recompute-open>${esc(t('web.recompute.open'))}</button></div>`;
   const qs=(card.questions||{}).rows||[];
   const qnum=Object.fromEntries(qs.map((q,i)=>[(q.gene||'')+'|'+(q.rsid||''),i+1]));
   const cmp=found.filter(p=>(byId[p.gene+'|'+p.rsid]||{}).expect_check);
@@ -2519,16 +2586,16 @@ function correctionRoutesHtml(cr,register='patient'){
 // The seven layers in the order of the brief, every one of them present — with
 // its rows or with the reason it is empty — and the three baskets after them.
 function systemCardHtml(r){
-  const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3>${n}. ${esc(t(key))}</h3>${body}</div>`);
+  const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3 class="cr-h3">${n}. ${esc(t(key))}</h3>${body}</div>`);
   if(r.on_demand){
     // A panel without a radar domain (task 199 F): no score, no figure, the
     // same rows through the same gate — and the reason at the top. The
     // laboratory layers do not exist for it and are not drawn.
-    L.push(`<div class="layer"><h3>${esc(t('system.on_demand.head'))}</h3><div class="why">${esc(t('system.on_demand.why',{why:r.why_no_domain||'—'}))}</div>`
+    L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.on_demand.head'))}</h3><div class="why">${esc(t('system.on_demand.why',{why:r.why_no_domain||'—'}))}</div>`
       +(r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:'')+`</div>`);
     const gen=r.genetics||{};
     let b=genSummaryHtml(gen,r)+genTableHtml(gen,r,r.register);
-    L.push(`<div class="layer"><h3>${esc(t('system.layer.on_demand_genetics'))}</h3>${b}</div>`);
+    L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.layer.on_demand_genetics'))}</h3>${b}</div>`);
     return L.join('');
   }
   const lab=r.labs||{};
@@ -2543,6 +2610,7 @@ function systemCardHtml(r){
   if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
   if(lab.panel_term) b+=`<div class="row-l">${esc(t('system.panel_labs.term',{outside:lab.panel_term.outside,judged:lab.panel_term.judged,score:lab.panel_term.score}))}</div>`;
   b+=panelLabsHtml(lab.panel);
+  b+=(r.validated_indices||[]).map(fib4Html).join('');
   layer(1,'system.layer.labs',b);
   const dyn=r.dynamics||{};
   if(dyn.status==='ok'){
@@ -2576,7 +2644,7 @@ function systemCardHtml(r){
   b=correctionRoutesHtml(r.correction_routes,r.register);
   // Not a numbered layer: the seven layers are the brief's own frame, and this
   // block answers a decision that is not the product's to make.
-  if(b) L.push(`<div class="layer"><h3>${esc(t('system.routes.layer'))}</h3>${b}</div>`);
+  if(b) L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.routes.layer'))}</h3>${b}</div>`);
   const med=r.medications||{};
   b=(med.rows||[]).map(m=>`<div class="row-l">· ${esc(t('system.meds.row',{name:m.name,dose:m.dose||'',classes:(m.via||[]).join(', ')}))}</div>`).join('');
   if(med.empty_reason) b+=`<div class="row-l muted">${esc(med.empty_reason)}</div>`;
@@ -2602,7 +2670,7 @@ function systemCardHtml(r){
   const nxt=r.next||{};
   b=['lab','genome','ask'].map(k=>{const bk=nxt[k]||{};
     return `<div class="basket"><h4>${esc(t('system.next.'+k))}</h4>${(bk.rows||[]).map(basketRowHtml).join('')}${bk.empty_reason?`<div class="row-l muted"><i>${esc(bk.empty_reason)}</i></div>`:''}${(bk.full_genome&&bk.full_genome.text)?`<div class="row-l">${esc(bk.full_genome.text)}</div>`:''}</div>`;}).join('');
-  L.push(`<div class="layer"><h3>${esc(t('web.system.next_h'))}</h3>${b}</div>`);
+  L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('web.system.next_h'))}</h3>${b}</div>`);
   return L.join('');
 }
 // The panel of a system as the catalogue describes it — the clinician's page:
@@ -2643,16 +2711,16 @@ async function viewPanel(key,reading=null){
     return;
   }
   v.innerHTML=`<div class="syscard">
-    <div class="toolbar"><button class="ghost" id="pnl-back">← ${esc(t('web.common.close'))}</button>
-      <button class="ghost" data-system="${esc(key)}"${key==='author_list'?' data-register="clinician"':''}>${esc(t(key==='author_list'?'panel.patient_readings':'web.second.open_card'))}</button>
-      <button class="ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>
+    <div class="toolbar"><button class="cr-btn cr-btn--ghost ghost" id="pnl-back">← ${esc(t('web.common.close'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" data-system="${esc(key)}"${key==='author_list'?' data-register="clinician"':''}>${esc(t(key==='author_list'?'panel.patient_readings':'web.second.open_card'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>
     ${pageHead(t('panel.title',{label:r.label||key}),r.reading_note||t('panel.for_clinician_note'),facts)}
     <p class="cr-caption" data-reference-notice>${esc(t('reference.notice'))}</p>
     <p class="cr-caption" data-withheld-count>${esc(t('panel.withheld_count',{n:c.withheld_interpretations||0}))}</p>
-    ${key!=='author_list'?`<button class="ghost" data-panel="author_list">${esc(t('panel.author_list'))}</button>`:''}
+    ${key!=='author_list'?`<button class="cr-btn cr-btn--ghost ghost" data-panel="author_list">${esc(t('panel.author_list'))}</button>`:''}
     <div class="meta">${esc(t('panel.source',{updated:fmtDate(r.catalogue_updated)||'—'}))}</div>
-    ${(r.genes||[]).map(g=>`<h2 class="section">${esc(g.gene)}</h2>${(g.positions||[]).map(pos).join('')}`).join('')}
-    ${(r.unreadable||[]).map(u=>`<h2 class="section">${esc(u.gene)}</h2><div class="why">${esc(t('panel.unreadable',{reason:u.reason||'—',source:u.source||'—'}))}</div>`).join('')}
+    ${(r.genes||[]).map(g=>`<h2 class="cr-h2 section">${esc(g.gene)}</h2>${(g.positions||[]).map(pos).join('')}`).join('')}
+    ${(r.unreadable||[]).map(u=>`<h2 class="cr-h2 section">${esc(u.gene)}</h2><div class="why">${esc(t('panel.unreadable',{reason:u.reason||'—',source:u.source||'—'}))}</div>`).join('')}
     <div class="meta mt-4">${esc(r.disclaimer||'')}</div></div>`;
   $('#pnl-back').onclick=()=>mount(current);
   window.scrollTo({top:0});
@@ -2661,7 +2729,7 @@ async function viewPanel(key,reading=null){
 // that printing opened; the reader's own expanded rows stay expanded.
 let intakePrintOpened=[];
 window.addEventListener('beforeprint',()=>{
-  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open])'));
+  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])'));
   intakePrintOpened.forEach(d=>d.open=true);
 });
 window.addEventListener('afterprint',()=>{
@@ -2694,12 +2762,12 @@ async function viewSystem(key, register){
   ];
   v.innerHTML=`<div class="syscard">
     <div class="toolbar">
-      <button class="ghost" id="sys-back">← ${esc(t('web.common.close'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="sys-back">← ${esc(t('web.common.close'))}</button>
       <span class="regtoggle row" style="gap:4px">
-        <button class="pickbtn" data-reg="patient" aria-pressed="${register==='patient'}">${esc(t('web.system.for_patient'))}</button>
-        <button class="pickbtn" data-reg="clinician" aria-pressed="${register==='clinician'}">${esc(t('web.system.for_clinician'))}</button></span>
-      <button class="ghost" onclick="window.print()">${esc(t('system.print'))}</button>
-      ${st.length?`<button class="ghost" data-panel="${esc(r.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}
+        <button class="cr-btn cr-btn--ghost cr-btn--s pickbtn" data-reg="patient" aria-pressed="${register==='patient'}">${esc(t('web.system.for_patient'))}</button>
+        <button class="cr-btn cr-btn--ghost cr-btn--s pickbtn" data-reg="clinician" aria-pressed="${register==='clinician'}">${esc(t('web.system.for_clinician'))}</button></span>
+      <button class="cr-btn cr-btn--ghost ghost" onclick="window.print()">${esc(t('system.print'))}</button>
+      ${st.length?`<button class="cr-btn cr-btn--ghost ghost" data-panel="${esc(r.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}
     </div>
     ${pageHead(r.label||key,'',facts)}
     <div class="verdict">${esc(r.verdict_line||'')}</div>${r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:''}
@@ -2889,8 +2957,23 @@ function wireSystems(box, domains){
   });
 }
 
+function fib4Html(index){
+  const known={ast:t('fib4.input.ast'),alt:t('fib4.input.alt'),platelets:t('fib4.input.platelets'),age:t('fib4.input_age')};
+  return `<details class="row-l" data-validated-index="fib4" data-index-provenance><summary><b>${esc(t('fib4.heading'))}</b> — ${index.value!=null?esc(fmtNum(index.value)):esc(t('fib4.short.'+index.status))}${index.date?` · <span class="muted">${esc(fmtDate(index.date))}</span>`:''}</summary>
+    <p class="cr-body-s">${esc(t('fib4.meaning'))}</p>
+    <p class="cr-body-s">${esc(t('fib4.status.'+index.status))}</p>
+    ${index.age!=null?`<p>${esc(t('fib4.age',{age:index.age}))}</p>`:''}
+    ${index.missing.length?`<p>${esc(t('fib4.missing',{items:index.missing.map(k=>known[k]||k).join(', ')}))}</p>`:''}
+    ${(index.issues||[]).map(issue=>`<p class="cr-body-s">${esc(issue)}</p>`).join('')}
+    <p class="cr-body-s">${esc(index.scope_note)}</p>
+    <div class="cr-body-s">${esc(t('fib4.inputs'))}</div><ul>${index.inputs.map(p=>`<li>${esc(p.name)}: ${esc(String(p.value))} ${esc(p.unit||'—')} · ${esc(p.date)}${p.canonical_value!=null&&p.unit!==p.canonical_unit?` = ${esc(String(p.canonical_value))} ${esc(p.canonical_unit)}`:''}</li>`).join('')}</ul>
+    <p class="cr-caption">${esc(index.population)}</p><p class="cr-caption">${esc(index.endpoint)} ${esc(index.horizon)}</p>
+    <p class="cr-caption">${esc(index.interpretation.reason)}</p>
+    <p class="cr-body-s">${esc(t('fib4.formula',{formula:index.formula}))}</p>${index.sources.map(x=>`<p class="cr-body-s">${visitSourceLinks(x.citation+' '+x.url)}</p>`).join('')}</details>`;
+}
+
 async function renderSystems(box, radar){
-  box.insertAdjacentHTML('beforebegin',`<div class="why muted" data-display-limit>${esc(t('clinical.display_limit'))}</div>`);
+  box.insertAdjacentHTML('beforebegin',`<p class="cr-body-s" data-radar-heuristic>${esc(radar.heuristic_note||t('radar.heuristic'))}</p><div class="why muted" data-display-limit>${esc(t('clinical.display_limit'))}</div>`);
   const doms = (radar.domains||[]);
   if(doms.length<3){ box.innerHTML=emptyHtml(t('web.radar.not_enough')); return; }
   // `radar.sex` is already normalised by the engine — 'male', 'female' or null.
@@ -3040,31 +3123,31 @@ async function viewSecond(root){
     radar.overall!=null?factHtml(`${radar.overall}${radar.prev_overall!=null&&oa.txt?`<small style="color:${oa.col}">${esc(oa.txt)}</small>`:''}`,
       radar.prev_overall!=null?t('web.second.fact_index_since',{date:fmtDate(radar.prev_date),score:radar.prev_overall}):t('web.overview.fact_index'),scoreCls(radar.overall)):'',
     factHtml(String(attention.length),t('web.overview.fact_systems'),attention.length?'c-warning':'c-good'),
-    `<div class="fact" id="sl-qfact"><b>…</b><span>${esc(t('web.second.fact_questions'))}</span></div>`,
+    `<div class="cr-card cr-stat fact" id="sl-qfact"><b>…</b><span>${esc(t('web.second.fact_questions'))}</span></div>`,
     factHtml(String(pending.length),t('web.overview.fact_tests'),''),
   ];
   // An index of the blocks below, under the figure and the radar.
   const index=chosen.map(s=>{const dm=byKey[s.key]||{};
-    return `<button data-jump="${esc(s.key)}"><i style="background:${DSTAT[dm.status]||DSTAT.nodata}"></i>${esc(s.label)}${dm.score!=null?` <b class="${scoreCls(dm.score)}">${dm.score}</b>`:''}</button>`;}).join('');
+    return `<button class="cr-btn cr-btn--ghost" data-jump="${esc(s.key)}"><i style="background:${DSTAT[dm.status]||DSTAT.nodata}"></i>${esc(s.label)}${dm.score!=null?` <b class="${scoreCls(dm.score)}">${dm.score}</b>`:''}</button>`;}).join('');
   // Drawn in two steps (owner, 14.09.2026): the head comes from the fast
   // answers and is shown at once; the blocks wait for the cards.
   root.innerHTML=`<div class="printonly printhead">
-      <h1>${esc(t('web.second.print_title'))}</h1>
+      <h1 class="cr-h1">${esc(t('web.second.print_title'))}</h1>
       <div class="fields"><b>${esc(t('web.second.print_name'))}</b> <span></span>
         <b>${esc(t('web.second.print_dob'))}</b> <span></span>
         <b>${esc(t('web.second.print_date'))}</b> <span></span></div>
     </div>
     ${pageHead(t('web.tab.second_opinion'),t('web.page.radar.q'),facts)}
     <div class="toolbar">
-      <button class="ghost" onclick="window.print()">${esc(t('web.second.print'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" onclick="window.print()">${esc(t('web.second.print'))}</button>
       <a class="ghost" href="/doc/for-clinicians" target="_blank" rel="noopener" title="${esc(t('web.second.for_clinician_note'))}">${esc(t('web.second.for_clinician'))}</a>
     </div>
     <div id="sl-systems" class="mb-4"></div>
     <div class="sysindex">${index}</div>
     <details class="fold mb-3"><summary>${esc(t('web.second.how_to_read'))}</summary><div class="meta">${esc(t('web.second.genetics_lead'))}</div></details>
     <div id="sl-blocks"></div>
-    <h2 class="section">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.medicines')}</h2><div id="sl-pgx"></div>
-    <h2 class="section">${esc(t('web.second.tests_h'))}</h2><div id="sl-tests"></div>
+    <h2 class="cr-h2 section">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.medicines')}</h2><div id="sl-pgx"></div>
+    <h2 class="cr-h2 section">${esc(t('web.second.tests_h'))}</h2><div id="sl-tests"></div>
     <div class="printonly meta mt-4">${esc(d.disclaimer)}</div>
     ${sb}
     <div class="printonly printfoot">${esc(t('web.second.print_foot'))}</div>`;
@@ -3141,7 +3224,7 @@ async function viewSecond(root){
     // Two doors out of the block, after it has been read: the card of the
     // system, and the panel with its studies for the clinician. A quiet block
     // keeps them inside its fold, so it takes two lines on the page.
-    const doors=`<div class="actions"><button class="act" data-system="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}">${esc(t('web.second.open_card'))}</button>${hasPanel?`<button class="ghost" data-panel="${esc(s.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}</div>`;
+    const doors=`<div class="actions"><button class="cr-btn act" data-system="${esc(s.key)}" title="${esc(t('web.second.open_card_hint'))}">${esc(t('web.second.open_card'))}</button>${hasPanel?`<button class="cr-btn cr-btn--ghost ghost" data-panel="${esc(s.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}</div>`;
     if(needs){
       if(body||more) h+=`<details class="fold more"><summary>${esc(t('web.second.more'))}</summary>${body}${more}</details>`;
       h+=doors;
@@ -3156,12 +3239,12 @@ async function viewSecond(root){
     return h+`</div>`;
   }).join('');
   if(quietRows.length) blocks+=`<div class="sysblock quiet"><div class="sys-h"><span class="name">${esc(t('web.second.quiet_h'))}</span> <span class="muted">· ${quietRows.length}</span></div>`
-    +`<div class="tblwrap"><table class="dt">${quietRows.join('')}</table></div></div>`;
+    +`<div class="tblwrap"><table class="cr-table cr-table--compact dt">${quietRows.join('')}</table></div></div>`;
   const onDemand=(sys.on_demand||[]);
   // `h` is the accumulator INSIDE the map above and does not exist out here:
   // the tab threw «h is not defined» before it painted anything (owner, 18.09.2026).
   if(onDemand.length) blocks+=`<div class="sysblock"><div class="sys-h"><span class="name">${esc(t('web.panels.on_demand'))}</span></div>`
-    +onDemand.map(p=>`<div class="row-l">· <b>${esc(p.label)}</b> <span class="muted small">${esc(plural(p.positions||0,'count.positions'))}</span> — <span class="muted">${esc(p.why_no_domain||'')}</span> <button class="ghost btn-sm" data-system="${esc(p.key)}">${esc(t('web.second.open_card'))}</button></div>`).join('')
+    +onDemand.map(p=>`<div class="row-l">· <b>${esc(p.label)}</b> <span class="muted small">${esc(plural(p.positions||0,'count.positions'))}</span> — <span class="muted">${esc(p.why_no_domain||'')}</span> <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" data-system="${esc(p.key)}">${esc(t('web.second.open_card'))}</button></div>`).join('')
     +`</div>`;
   const silent=(sys.systems||[]).filter(s=>!speaks(s));
   const silentLine=silent.length?`<div class="meta mb-3">${esc(t('web.second.systems_silent',{systems:silent.map(s=>s.label).join(', ')}))}</div>`:'';
@@ -3216,7 +3299,7 @@ function medStatusText(s){
 }
 function controlsHtml(controls, overdueOnly=false){
   if(!(controls||[]).length)return '';
-  return `<section class="card ${overdueOnly?'warnbox':''}" data-treatment-controls><b>${esc(t(overdueOnly?'treatment.overdue':'treatment.title'))}</b>${controls.map(c=>`<div class="list-item"><div>${esc(t('treatment.control',{name:c.name||'—',marker:c.marker||'—',start:c.from||'—',due:c.due||'—'}))}</div><b>${esc(t('treatment.status.'+c.status))}</b>${c.plan_source?`<div class="meta">${esc(t('treatment.plan_source',{source:c.plan_source}))}</div>`:`<div class="meta">${esc(t('treatment.unresolved'))}</div>`}</div>`).join('')}</section>`;
+  return `<section class="cr-card card ${overdueOnly?'warnbox':''}" data-treatment-controls><b>${esc(t(overdueOnly?'treatment.overdue':'treatment.title'))}</b>${controls.map(c=>`<div class="list-item"><div>${esc(t('treatment.control',{name:c.name||'—',marker:c.marker||'—',start:c.from||'—',due:c.due||'—'}))}</div><b>${esc(t('treatment.status.'+c.status))}</b>${c.plan_source?`<div class="meta">${esc(t('treatment.plan_source',{source:c.plan_source}))}</div>`:`<div class="meta">${esc(t('treatment.unresolved'))}</div>`}</div>`).join('')}</section>`;
 }
 function treatmentHtml(data){
   if(!data)return '';
@@ -3226,7 +3309,7 @@ function medItem(m, sys){
   // `current` is the server's verdict by the one rule in core — the page does not
   // re-decide which words mean «taking it».
   const st=m.current===false?` ${badge('b-unknown',medStatusText(m.status))}`:'';
-  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="ghost btn-sm ml-auto" data-rm="${esc(m.name)}">${esc(t('web.meds.remove'))}</button></div><div class="meta">${esc(m.start_date||t('treatment.undated'))}</div>${noteHtml(m.note)}${actsOnHtml(m,sys)}</div>`;
+  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm ml-auto" data-rm="${esc(m.name)}">${esc(t('web.meds.remove'))}</button></div><div class="meta">${esc(m.start_date||t('treatment.undated'))}</div>${noteHtml(m.note)}${actsOnHtml(m,sys)}</div>`;
 }
 
 // ---------------- Personal health metrics ----------------
@@ -3251,7 +3334,7 @@ function metricCard(m){
   const has = m.value!=null;
   let tr='';
   if(m.trend){const a={up:'↑',down:'↓',flat:'→'}[m.trend.direction];const pct=m.trend.pct!=null?` ${m.trend.pct>0?'+':''}${m.trend.pct}%`:'';tr=`<span class="trend">${a}${pct}</span>`;}
-  return el(`<div class="card">
+  return el(`<div class="cr-card card">
     <div class="label">${esc(m.name)}</div>
     <div class="value">${has?esc(m.value):'—'} <small>${esc(m.unit)}</small></div>
     <div class="row">${has?badge(f.cls==='b-good'||f.cls==='b-critical'||f.cls==='b-warning'?f.cls:'b-good', t(f.key)):badge('b-unknown',t('web.flag.unknown'))}${tr}</div>
@@ -3292,10 +3375,10 @@ async function renderPerson(root, given){
       <div class="s"><b>${esc((d.ancestry&&d.ancestry.value)||'—')}</b><span>${esc(t('web.metrics.panel_label'))}</span></div>
     </div>
     <div class="toolbar">
-      <button class="ghost" id="toggle-mprof">${esc(t('web.metrics.profile_btn'))}</button>
-      <button class="ghost" id="toggle-madd">+ ${esc(t('web.metrics.add_btn'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="toggle-mprof">${esc(t('web.metrics.profile_btn'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="toggle-madd">+ ${esc(t('web.metrics.add_btn'))}</button>
     </div>
-    ${missing.length?`<div class="card warnbox mb-4">
+    ${missing.length?`<div class="cr-card card warnbox mb-4">
       <div class="row"><b>${esc(t('web.metrics.missing_head'))}</b></div>
       ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}
     </div>`:''}
@@ -3320,11 +3403,11 @@ async function renderPerson(root, given){
     : anc.source==='stated' ? t('web.metrics.panel_stated',{value:anc.value})
     : t('web.metrics.panel_unknown');
   pf.innerHTML=`<div class="form"><div class="fr">
-    <label>${esc(t('web.metrics.sex_label'))}<select id="mp-sex"><option value="">—</option><option value="male"${p.sex==='male'?' selected':''}>${esc(t('web.metrics.male'))}</option><option value="female"${p.sex==='female'?' selected':''}>${esc(t('web.metrics.female'))}</option></select></label>
-    <label>${esc(t('web.metrics.birth_year'))}<input id="mp-year" value="${esc(byear)}" size="6" placeholder="1985"></label>
-    <label>${esc(t('web.metrics.height_label'))}<input id="mp-height" value="${esc(p.height_cm??'')}" size="5" placeholder="178"></label>
-    <label>${esc(t('web.metrics.device_label'))}<select id="mp-dev"><option value="">—</option>${devs.map(s=>`<option value="${esc(s)}"${p.wearable_primary===s?' selected':''}>${esc(t('web.life.device.'+s))}</option>`).join('')}<option value="none"${p.wearable_primary==='none'?' selected':''}>${esc(t('web.metrics.device_none'))}</option></select></label>
-    <button class="act" id="mp-save">${esc(t('web.form.save'))}</button>
+    <label class="cr-label">${esc(t('web.metrics.sex_label'))}<select class="cr-input" id="mp-sex"><option value="">—</option><option value="male"${p.sex==='male'?' selected':''}>${esc(t('web.metrics.male'))}</option><option value="female"${p.sex==='female'?' selected':''}>${esc(t('web.metrics.female'))}</option></select></label>
+    <label class="cr-label">${esc(t('web.metrics.birth_year'))}<input class="cr-input" id="mp-year" value="${esc(byear)}" size="6" placeholder="1985"></label>
+    <label class="cr-label">${esc(t('web.metrics.height_label'))}<input class="cr-input" id="mp-height" value="${esc(p.height_cm??'')}" size="5" placeholder="178"></label>
+    <label class="cr-label">${esc(t('web.metrics.device_label'))}<select class="cr-input" id="mp-dev"><option value="">—</option>${devs.map(s=>`<option value="${esc(s)}"${p.wearable_primary===s?' selected':''}>${esc(t('web.life.device.'+s))}</option>`).join('')}<option value="none"${p.wearable_primary==='none'?' selected':''}>${esc(t('web.metrics.device_none'))}</option></select></label>
+    <button class="cr-btn act" id="mp-save">${esc(t('web.form.save'))}</button>
   </div>
   <div class="why mt-2"><b>${esc(t('web.metrics.panel_label'))}:</b> ${esc(panel)}</div>
   <div class="muted small">${esc(t('web.metrics.profile_note2'))}</div></div>`;
@@ -3338,15 +3421,15 @@ async function renderPerson(root, given){
   const ab=$('#madd',root);
   const opts=d.metrics.map(m=>`<option value="${esc(m.key)}">${esc(m.name)} (${esc(m.unit)})</option>`).join('');
   ab.innerHTML=`<div class="form"><div class="fr">
-    <label>${esc(t('web.form.marker'))}<select id="mm-key">${opts}<option value="__new">${esc(t('web.form.new_option'))}</option></select></label>
-    <label>${esc(t('web.form.date_day'))}<input id="mm-date" placeholder="2026-07-11" size="11"></label>
-    <label>${esc(t('web.form.value'))}<input id="mm-val" placeholder="82" size="7"></label>
-    <button class="act" id="mm-save">${esc(t('web.form.save'))}</button>
+    <label class="cr-label">${esc(t('web.form.marker'))}<select class="cr-input" id="mm-key">${opts}<option value="__new">${esc(t('web.form.new_option'))}</option></select></label>
+    <label class="cr-label">${esc(t('web.form.date_day'))}<input class="cr-input" id="mm-date" placeholder="2026-07-11" size="11"></label>
+    <label class="cr-label">${esc(t('web.form.value'))}<input class="cr-input" id="mm-val" placeholder="82" size="7"></label>
+    <button class="cr-btn act" id="mm-save">${esc(t('web.form.save'))}</button>
   </div>
   <div id="mm-new" class="fr hidden">
-    <label>${esc(t('web.form.key'))}<input id="mm-nkey" placeholder="hrv" size="10"></label>
-    <label>${esc(t('web.form.name'))}<input id="mm-name" placeholder="${esc(t('web.metrics.name_placeholder'))}" size="12"></label>
-    <label>${esc(t('web.form.unit'))}<input id="mm-unit" size="6"></label>
+    <label class="cr-label">${esc(t('web.form.key'))}<input class="cr-input" id="mm-nkey" placeholder="hrv" size="10"></label>
+    <label class="cr-label">${esc(t('web.form.name'))}<input class="cr-input" id="mm-name" placeholder="${esc(t('web.metrics.name_placeholder'))}" size="12"></label>
+    <label class="cr-label">${esc(t('web.form.unit'))}<input class="cr-input" id="mm-unit" size="6"></label>
   </div>
   <div class="muted small">${esc(t('web.metrics.add_note'))}</div></div>`;
   $('#toggle-madd',root).onclick=()=>ab.classList.toggle('hidden');
@@ -3445,7 +3528,7 @@ function bulletBoard(snap){
   const rest=snap.filter(s=>!grouped.some(([,ls])=>ls.includes(s.label)));
   if(rest.length) out+=`<div class="bltgrp">${esc(t('web.bullet.group.other'))}</div>`+rest.map(bulletRow).join('');
   const lgd=['good','warn','crit'].map(k=>`<span><i style="background:${BLTCOL[k]};border-radius:50%"></i>${esc(t(BLTTXT[k]))}</span>`).join('');
-  return `<h2 class="section">${esc(t('web.bullet.title'))}</h2>
+  return `<h2 class="cr-h2 section">${esc(t('web.bullet.title'))}</h2>
     <div class="bltbox">${out}
       <div class="bltlgd">${lgd}<span><i style="background:var(--ink-2);width:2px;height:12px;border-radius:1px"></i>${esc(t('web.bullet.legend_notch'))}</span><span><i style="background:color-mix(in srgb,var(--good) 20%,transparent)"></i>${esc(t('web.bullet.legend_zone'))}</span></div>
     </div>`;
@@ -3481,7 +3564,7 @@ function lifeCard(m){
     tcol=m.trend_good===true?'var(--good)':(m.trend_good===false?'var(--critical)':'var(--ink-2)');
   }
   const statusBadge=(m.status&&m.status!=='none')?badge(s.cls,t(s.key)):'';
-  return el(`<div class="card">
+  return el(`<div class="cr-card card">
     <div class="label">${esc(m.label)}</div>
     <div class="value">${esc(m.value)} <small>${esc(m.unit)}</small></div>
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
@@ -3494,7 +3577,7 @@ function lifeCard(m){
 // --- the sections of the brief ----------------------------------------------
 function briefSections(b){
   if(!b||!b.available||!b.sections||!b.sections.length) return '';
-  return `<h2 class="section">${esc(t('web.brief.sections_h'))}</h2>`+
+  return `<h2 class="cr-h2 section">${esc(t('web.brief.sections_h'))}</h2>`+
     b.sections.map((s,i)=>`<details class="lsec"${i===0?' open':''}>
       <summary>${esc(s.title)}${s.blocks.some(x=>x.stale)?` <span class="badge b-warning" style="margin-left:6px">${esc(t('web.brief.review_badge'))}</span>`:''}</summary>
       ${s.lead?`<div class="muted" style="font-size:13.5px;margin-top:6px">${esc(s.lead)}</div>`:''}
@@ -3506,7 +3589,7 @@ function briefSections(b){
 }
 function briefActions(b){
   if(!b||!b.actions||!b.actions.length) return '';
-  return `<h2 class="section">${esc(t('web.brief.actions_h'))}</h2>
+  return `<h2 class="cr-h2 section">${esc(t('web.brief.actions_h'))}</h2>
     <div class="lsact"><ol>${b.actions.map(a=>`<li>${esc(a)}</li>`).join('')}</ol></div>`;
 }
 // The flag, beside the wording it is about, and with the one control that can
@@ -3521,14 +3604,14 @@ function briefReview(b){
   // block due, what arrived after its wording was read — the one thing a
   // review has to look at — beside the two ways to answer it.
   return `<div class="lsrev" id="brief-review" style="margin:10px 0 16px">
-    <div class="row"><button class="act" data-brv-all>⚠ ${esc(t('web.brief.needs_review'))} · ${esc(t('web.brief.review_all'))}</button>
+    <div class="row"><button class="cr-btn act" data-brv-all>⚠ ${esc(t('web.brief.needs_review'))} · ${esc(t('web.brief.review_all'))}</button>
       <span class="muted small">${esc(t('web.brief.new_data'))}</span></div>
     <div style="margin-top:8px">${b.stale_blocks.map(s=>
       `<div class="list-item" style="margin-bottom:8px"><div class="row"><b>${esc(s.title)}</b>
          <span class="muted small">${esc(t('web.brief.block_dates',{reviewed:fmtDate(s.reviewed),newest:fmtDate(s.newest_data)}))}</span></div>
        ${s.review_hint?`<div class="why">${esc(s.review_hint)}</div>`:''}
-       <div class="row mt-2"><button class="ghost" data-brv="${esc(s.id)}">${esc(t('web.brief.review_btn'))}</button>
-         <button class="ghost" data-reviewed="${esc(s.id)}">${esc(t('web.brief.still_true'))}</button></div>
+       <div class="row mt-2"><button class="cr-btn cr-btn--ghost ghost" data-brv="${esc(s.id)}">${esc(t('web.brief.review_btn'))}</button>
+         <button class="cr-btn cr-btn--ghost ghost" data-reviewed="${esc(s.id)}">${esc(t('web.brief.still_true'))}</button></div>
        <div class="brv" data-brv-box="${esc(s.id)}" hidden></div></div>`).join('')}</div>
     <div class="muted small">${esc(t('web.brief.numbers_note'))}</div>
   </div>`;
@@ -3543,8 +3626,8 @@ function briefReviewHtml(r){
   return `<div class="why mt-2"><b>${esc(t('web.brief.review_h',{reviewed:r.reviewed||'—'}))}</b></div>
     ${rows||`<div class="muted">${esc(t('brief.review.no_changes'))}</div>`}
     <div class="why">${esc(t('web.brief.review_explain'))}</div>
-    <div class="row mt-2"><button class="ghost" data-brq>${esc(t('web.brief.review_copy'))}</button><span class="muted" data-brq-info></span></div>
-    <textarea data-brq-text hidden readonly style="width:100%;min-height:160px;margin-top:6px">${esc(r.request||'')}</textarea>`;
+    <div class="row mt-2"><button class="cr-btn cr-btn--ghost ghost" data-brq>${esc(t('web.brief.review_copy'))}</button><span class="muted" data-brq-info></span></div>
+    <textarea class="cr-input" data-brq-text hidden readonly style="width:100%;min-height:160px;margin-top:6px">${esc(r.request||'')}</textarea>`;
 }
 function briefDropped(b){
   if(!b||!b.dropped||!b.dropped.length) return '';
@@ -3562,13 +3645,13 @@ async function viewLifestyle(root){
   const fs=hasM?d.fitness_score:null;
   const snap=(brief&&brief.snapshot)||[];
   const hero=s=>{const x=snap.find(y=>y.label===s);return x&&x.raw!=null
-    ?`<div class="fact"><b style="color:${BLTCOL[bulletStatus(x)]}">${esc(fmtNum(x.raw))}</b><span>${esc(t('web.life.hero',{label:x.label.toLowerCase(),target:fmtNum(x.target_value)}))}</span></div>`:''};
+    ?`<div class="cr-card cr-stat fact"><b style="color:${BLTCOL[bulletStatus(x)]}">${esc(fmtNum(x.raw))}</b><span>${esc(t('web.life.hero',{label:x.label.toLowerCase(),target:fmtNum(x.target_value)}))}</span></div>`:''};
 
   let html=`${pageHead(t('web.tab.lifestyle'),t('web.page.lifestyle.q'),[
       fs!=null?factHtml(String(fs),t('web.life.fitness_score'),scoreCls(fs)):'',
       ...t('web.bullet.match.hero').split('|').map(hero)])}
     <div class="toolbar">
-      <button class="ghost" id="grefresh">${esc(t('web.life.wearable_btn'))}</button>
+      <button class="cr-btn cr-btn--ghost ghost" id="grefresh">${esc(t('web.life.wearable_btn'))}</button>
       <span class="muted small" id="gmsg">${esc(t('web.life.wearable_note'))}</span>
     </div>
     ${briefActions(brief)}
@@ -3584,11 +3667,11 @@ async function viewLifestyle(root){
     if(un.length){
       const names=un.map(k=>{const m=d.metrics.find(x=>x.key===k);return esc(m?m.label:k);}).join(', ');
       const devs=(d.sources||[]).map(s=>esc(t('web.life.device.'+s))).join(', ');
-      html+=`<div class="card warnbox" style="margin-top:18px">
+      html+=`<div class="cr-card card warnbox" style="margin-top:18px">
         <b>${esc(t('web.life.two_devices_h'))}</b>
         <div style="margin-top:6px">${esc(t('web.life.two_devices_body',{devices:devs,metrics:names}))}</div>
         <div class="row" style="margin-top:10px;gap:6px;flex-wrap:wrap">
-          ${(d.sources||[]).map(s=>`<button class="act" data-primary="${esc(s)}">${esc(t('web.life.pick_device',{device:t('web.life.device.'+s)}))}</button>`).join('')}
+          ${(d.sources||[]).map(s=>`<button class="cr-btn act" data-primary="${esc(s)}">${esc(t('web.life.pick_device',{device:t('web.life.device.'+s)}))}</button>`).join('')}
         </div></div>`;
     }else if((d.sources||[]).length>1){
       const devs=(d.sources||[]).map(s=>esc(t('web.life.device.'+s))).join(', ');
@@ -3596,27 +3679,27 @@ async function viewLifestyle(root){
     }
     const c=d.conclusions||{good:[],watch:[]};
     const chip=(x,cls)=>`<span class="badge ${cls}">${esc(x.label)} ${esc(x.arrow||'')} ${x.delta>0?'+':''}${esc(x.delta)}</span>`;
-    html+=`<h2 class="section">${esc(t('web.life.shifted_h'))}</h2>
-      <div class="card mb-3">
+    html+=`<h2 class="cr-h2 section">${esc(t('web.life.shifted_h'))}</h2>
+      <div class="cr-card card mb-3">
       ${c.good&&c.good.length?`<div class="row" style="flex-wrap:wrap;gap:6px"><span class="muted small">${esc(t('web.life.right_way'))}</span>${c.good.map(x=>chip(x,'b-good')).join('')}</div>`:''}
       ${c.watch&&c.watch.length?`<div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><span class="muted small">${esc(t('web.life.needs_attention'))}</span>${c.watch.map(x=>chip(x,'b-critical')).join('')}</div>`:''}
       ${(!c.good||!c.good.length)&&(!c.watch||!c.watch.length)?`<div class="muted">${esc(t('web.life.no_trends'))}</div>`:''}</div>`;
     const today=localDay();
     const waistBar=`<div class="row" style="gap:8px;margin:2px 0 12px;align-items:flex-end;flex-wrap:wrap">
-        <label class="wl">${esc(t('web.life.waist'))}<input id="w-val" size="5" placeholder="${esc(t('web.life.waist_placeholder'))}"></label>
-        <label class="wl">${esc(t('web.life.date'))}<input id="w-date" size="10" value="${esc(today)}" placeholder="${esc(t('web.life.date_placeholder'))}"></label>
-        <button class="act" id="w-save">${esc(t('web.life.waist_save'))}</button>
+        <label class="cr-label wl">${esc(t('web.life.waist'))}<input class="cr-input" id="w-val" size="5" placeholder="${esc(t('web.life.waist_placeholder'))}"></label>
+        <label class="cr-label wl">${esc(t('web.life.date'))}<input class="cr-input" id="w-date" size="10" value="${esc(today)}" placeholder="${esc(t('web.life.date_placeholder'))}"></label>
+        <button class="cr-btn act" id="w-save">${esc(t('web.life.waist_save'))}</button>
         <span class="muted small">${esc(t('web.life.waist_note'))}</span></div>`;
     const GROUPS=[['anthro','web.life.group_anthro'],['activity','web.life.group_activity'],['recovery','web.life.group_recovery']];
     GROUPS.forEach(([g,titleKey])=>{
       if(d.metrics.some(m=>m.group===g)||g==='anthro')
-        html+=`<h2 class="section">${esc(t(titleKey))}</h2>${g==='anthro'?waistBar:''}<div class="grid" id="lg-${g}"></div>`;
+        html+=`<h2 class="cr-h2 section">${esc(t(titleKey))}</h2>${g==='anthro'?waistBar:''}<div class="grid" id="lg-${g}"></div>`;
     });
   }
   html+=`<div style="margin-top:26px">${briefReview(brief)}${briefSections(brief)}${briefDropped(brief)}</div>`;
   if(brief&&brief.available)
     html+=`<div class="muted" style="font-size:12.5px;margin:10px 0 4px">${esc(brief.disclaimer||'')} ${esc(t('web.brief.compiled',{date:brief.compiled||'—'}))}</div>`;
-  html+=`<h2 class="section">${esc(t('web.life.workouts_h'))}</h2><div id="lwk"></div>${sb}`;
+  html+=`<h2 class="cr-h2 section">${esc(t('web.life.workouts_h'))}</h2><div id="lwk"></div>${sb}`;
   root.innerHTML=html;
 
   if(hasM){
@@ -3683,15 +3766,15 @@ async function viewLifestyle(root){
   };
   const wk=$('#lwk',root);
   if(wk)wk.innerHTML=(d.workouts&&d.workouts.length)
-    ? '<div class="drugchips">'+d.workouts.map(w=>`<button style="cursor:default" title="${esc(t('web.life.wk_last_year',{year:w.last_year})+(w.hours?' · '+t('web.life.wk_hours_total',{hours:w.hours}):''))}">${esc(wkName(w.type))}: ${w.total}${w.hours?' · '+esc(t('web.life.wk_hours',{hours:w.hours})):''}</button>`).join('')+'</div>'
+    ? '<div class="drugchips">'+d.workouts.map(w=>`<button class="cr-btn cr-btn--ghost" style="cursor:default" title="${esc(t('web.life.wk_last_year',{year:w.last_year})+(w.hours?' · '+t('web.life.wk_hours_total',{hours:w.hours}):''))}">${esc(wkName(w.type))}: ${w.total}${w.hours?' · '+esc(t('web.life.wk_hours',{hours:w.hours})):''}</button>`).join('')+'</div>'
     : emptyHtml(t('web.life.no_workouts'));
 }
 // ---------------- Genome ----------------
 function genomeCard(r){
-  if(r.status==='unknown_rsid') return `<div class="card muted">${esc(r.message)}</div>`;
-  if(r.status==='unknown_gene') return `<div class="card muted">${esc(t('web.genome.unknown_gene'))}</div>`;
-  if(r.status==='no_genome'){const l=r.locus||{};return `<div class="card"><div class="row">⚪ <b>${esc(r.rsid)}</b> <span class="muted">${esc(l.gene||'')} · ${esc(l.chrom)}:${esc(l.pos)}</span></div><div class="meta">${esc(r.message||'')}</div></div>`;}
-  if(r.gene&&r.loci){return `<div class="card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}<ul class="meta">${r.loci.map(x=>{const rs=x.result||{};const g=rs.confidence==='assumed_ref'?null:rs.genotype;return `<li><code>${esc(x.rsid)}</code>${x.star?' '+esc(x.star):''} ${x.chrom?esc(x.chrom)+':'+esc(x.pos):''} — ${g?esc(t('web.genome.genotype'))+' <b>'+esc(g)+'</b>':'—'}</li>`;}).join('')}</ul></div>`;}
+  if(r.status==='unknown_rsid') return `<div class="cr-card card muted">${esc(r.message)}</div>`;
+  if(r.status==='unknown_gene') return `<div class="cr-card card muted">${esc(t('web.genome.unknown_gene'))}</div>`;
+  if(r.status==='no_genome'){const l=r.locus||{};return `<div class="cr-card card"><div class="row">⚪ <b>${esc(r.rsid)}</b> <span class="muted">${esc(l.gene||'')} · ${esc(l.chrom)}:${esc(l.pos)}</span></div><div class="meta">${esc(r.message||'')}</div></div>`;}
+  if(r.gene&&r.loci){return `<div class="cr-card card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}<ul class="meta">${r.loci.map(x=>{const rs=x.result||{};const g=rs.confidence==='assumed_ref'?null:rs.genotype;return `<li><code>${esc(x.rsid)}</code>${x.star?' '+esc(x.star):''} ${x.chrom?esc(x.chrom)+':'+esc(x.pos):''} — ${g?esc(t('web.genome.genotype'))+' <b>'+esc(g)+'</b>':'—'}</li>`;}).join('')}</ul></div>`;}
   const res=r.result||{};
   // All three confidence levels are named, and the note about THIS read is shown.
   // `res.note` ("depth is low (4 reads) — the call is unreliable") reached no
@@ -3706,7 +3789,7 @@ function genomeCard(r){
   // large answer slot with the caveat in small type beside it. The CLI already
   // refuses that shape; the page did not. No row, no genotype.
   const gt=res.confidence==='assumed_ref'?'—':(res.genotype||'?');
-  return `<div class="card">
+  return `<div class="cr-card card">
     <div class="row">🧬 <b style="font-size:17px">${esc(r.rsid)}</b>${r.star?' <span class="muted">'+esc(r.star)+'</span>':''} → ${esc(t('web.drug.gene'))} <b>${esc(r.gene)}</b> <span class="muted">${esc(r.chrom)}:${esc(r.pos)}</span></div>
     <div class="value" style="margin:10px 0">${esc(gt)} <small title="${esc(t('web.guide.term_confidence_body'))}">${esc(conf)}${esc(dp)}</small></div>
     ${res.conflict?`<div class="meta" style="color:var(--critical)">⚠ ${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</div>`:''}
@@ -3723,21 +3806,21 @@ function pctBar(p,reliable){
 }
 // ---- render helpers (they return HTML) for the combined "Genome" tab ----
 function renderPRS(d){
-  if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.prs.not_ready'))}</div>`;
+  if(!d||!d.available)return `<div class="cr-card card muted">${esc((d&&d.message)||t('web.prs.not_ready'))}</div>`;
   const s=d.stats;
   // Twelve percentiles a centimetre below «Full genome (VCF): no data» read as a
   // contradiction. Both are true — a polygenic score is a stored result, computed
   // once from a file that need not still be attached — and the reader has no way
   // to tell which to believe unless the block says so itself.
   const prov=(d.provenance&&d.provenance.note)
-    ?`<div class="card muted" style="margin-bottom:10px">⚠ ${esc(d.provenance.note)}</div>`:'';
+    ?`<div class="cr-card card muted" style="margin-bottom:10px">⚠ ${esc(d.provenance.note)}</div>`:'';
   // The panel these numbers are a position inside. Printed here, beside them,
   // because a percentile computed against another population is not this
   // person's position — and the sentence that says so was reaching the command
   // line and the assistant while the page, where most people meet the number,
   // showed nothing at all.
   const panelNote=(d.method_caveats||[]).filter(c=>String(c.key||'').indexOf('panel_')===0)
-    .map(c=>`<div class="card" style="margin-bottom:10px;border-color:var(--warning)">⚠ ${esc(c.note)}</div>`).join('');
+    .map(c=>`<div class="cr-card card" style="margin-bottom:10px;border-color:var(--warning)">⚠ ${esc(c.note)}</div>`).join('');
   // «P94» is the Guide's material, and the Guide is a tab away. A reader meeting
   // the badge for the first time has to leave the page to learn that it is a
   // position in a population and not a probability — so the badge says it where
@@ -3788,13 +3871,13 @@ function longevityRow(k){
     ${clinicalBasisHTML(k,true)}${conf}${pm}</div>`;
 }
 function renderLongevity(d){
-  if(!d||!d.available)return `<div class="card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
+  if(!d||!d.available)return `<div class="cr-card card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
   const ap=d.apoe;
   // The card led with «APOE — status» over two rsIDs, which tells a reader
   // nothing about what APOE is or what their own combination means. The
   // combination is the answer; the two positions it is computed from are the
   // working, and working belongs underneath.
-  const apCard=ap?`<div class="card">
+  const apCard=ap?`<div class="cr-card card">
     <div class="row"><b style="font-size:17px">APOE</b>
       ${badge('b-unknown',ap.epsilon||ap.genotype||'—')}</div>
     <div class="why">${esc(t('clinical.genome_limit'))}</div>${clinicalBasisHTML(ap,true)}
@@ -3817,7 +3900,7 @@ function renderLongevity(d){
       :`<div class="muted" style="margin-top:12px">${esc(t('clinical.genome_limit'))}</div>`}
     ${unresolved.length?`<div class="so-h">${esc(t('clinical.withheld'))} · ${unresolved.length}</div>${unresolved.map(longevityRow).join('')}`:''}
     ${quiet.length?`<details class="fold"><summary>${esc(t('web.longevity.quiet_h'))} · ${quiet.length}</summary>${quiet.map(longevityRow).join('')}</details>`:''}`;
-  const genes=d.significant_genes.slice(0,24).map(g=>`<button style="cursor:default" title="${esc(g.variants.map(v=>v.rsid+' '+v.genotype).join(', '))}">${esc(g.gene)}: ${g.variants.length}</button>`).join('');
+  const genes=d.significant_genes.slice(0,24).map(g=>`<button class="cr-btn cr-btn--ghost" style="cursor:default" title="${esc(g.variants.map(v=>v.rsid+' '+v.genotype).join(', '))}">${esc(g.gene)}: ${g.variants.length}</button>`).join('');
   const st=d.stats;
   return `<div class="stat">
       <div class="s"><b>${st.genotyped??'—'}</b><span>${esc(t('web.longevity.stat_checked'))}</span></div>
@@ -3860,13 +3943,13 @@ function renderLipidGenetics(d){
   const lpa = m
     ? `<div class="list-item"><div class="row">${m.above===true?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):m.above===false?badge('b-good',t('web.flag.ok')):badge('b-unknown',t('web.severity.unassessed'))}
          <b>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
-    : `<div class="card muted">${esc(l.what_to_do||t('clinical.withheld'))}${clinicalBasisHTML(l)}</div>`;
+    : `<div class="cr-card card muted">${esc(l.what_to_do||t('clinical.withheld'))}${clinicalBasisHTML(l)}</div>`;
   const est = l.estimate
     ? `<div class="list-item"><div class="row"><b>${esc(l.estimate.label||'')}</b>
          <span class="muted">${esc(String(l.estimate.percentile))} · ${esc(l.estimate.pgs_id||'')} · ${esc(l.estimate.quality||'')}</span></div>
        <div class="why c-warning">⚠ ${esc(l.estimate_is_not_a_measurement||'')}</div></div>`
     : '';
-  return `<div class="card mb-2"><b>${esc(d.headline||'')}</b>
+  return `<div class="cr-card card mb-2"><b>${esc(d.headline||'')}</b>
       <div class="meta mt-1">${esc(d.how_to_read||'')}</div></div>
     ${rows}
     ${waiting?`<div class="so-h">${esc(t('lipidgen.waiting_h'))}</div>${waiting}`:''}
@@ -3876,8 +3959,8 @@ function renderClinvar(cv){
   // The message from the engine already says what has not been run and where the
   // route is written down. The old second sentence repeated it and named a script
   // that does not exist in an installed package.
-  if(!cv||cv.status==='not_run')return `<div class="card muted">${esc((cv&&cv.message)||t('web.clinvar.not_run'))}</div>`;
-  if(cv.status!=='ok'||!cv.count)return `<div class="card muted">${esc(t('web.clinvar.nothing'))}${cv.message?': '+esc(cv.message):''}.</div>`;
+  if(!cv||cv.status==='not_run')return `<div class="cr-card card muted">${esc((cv&&cv.message)||t('web.clinvar.not_run'))}</div>`;
+  if(cv.status!=='ok'||!cv.count)return `<div class="cr-card card muted">${esc(t('web.clinvar.nothing'))}${cv.message?': '+esc(cv.message):''}.</div>`;
   const TCLS={pathogenic:'b-critical',drug:'b-warning',risk:'b-warning',protective:'b-good',association:'b-unknown',uncertain:'b-unknown'};
   const byTier={};(cv.hits||[]).forEach(h=>{(byTier[h.tier]=byTier[h.tier]||[]).push(h);});
   const hitHTML=h=>{
@@ -3889,7 +3972,7 @@ function renderClinvar(cv){
   };
   const tmeta={};(cv.tiers||[]).forEach(x=>tmeta[x.key]=x);
   const noiseN=(cv.counts.association||0)+(cv.counts.uncertain||0);
-  let html=`<div class="card mb-3"><div class="row"><b>${cv.actionable}</b> <span class="muted">${esc(t('web.clinvar.actionable_of',{total:cv.count}))}</span></div>
+  let html=`<div class="cr-card card mb-3"><div class="row"><b>${cv.actionable}</b> <span class="muted">${esc(t('web.clinvar.actionable_of',{total:cv.count}))}</span></div>
     <div class="meta mt-1">${t('web.clinvar.intro',{pathogenic:'<b>'+esc(t('web.clinvar.w_pathogenic'))+'</b>',pgx:'<b>'+esc(t('web.clinvar.w_pgx'))+'</b>',risk:'<b>'+esc(t('web.clinvar.w_risk'))+'</b>',n:noiseN})}</div></div>`;
   ['pathogenic','drug','risk','protective'].forEach(k=>{
     const items=byTier[k];if(!items||!items.length)return;const m=tmeta[k]||{};
@@ -3919,7 +4002,7 @@ async function pollUpdate(root){
   }else{
     forgetAnswers();                  // a finished refresh changes what the genome tab shows
     btn.disabled=false;btn.textContent=t('web.updates.check_btn');
-    if(s.rc!=null&&s.rc!==0){box.innerHTML=`<div class="card muted">${esc(t('web.updates.failed',{code:s.rc}))} ${s.hint?esc(s.hint):''}<pre class="log">${esc((s.tail||'').slice(-800))}</pre></div>`;return;}
+    if(s.rc!=null&&s.rc!==0){box.innerHTML=`<div class="cr-card card muted">${esc(t('web.updates.failed',{code:s.rc}))} ${s.hint?esc(s.hint):''}<pre class="log">${esc((s.tail||'').slice(-800))}</pre></div>`;return;}
     const u=await api('/api/genome-updates');box.innerHTML=renderUpdates(u);
   }
 }
@@ -3939,7 +4022,7 @@ function genomeState(st){
       + `${esc(t('web.genome.why.'+(x.why||'')))}</span>`).join(', ') + `</div></details>`
     : '';
   if(st.not_ours){
-    return `<div class="card warnbox" style="margin-bottom:8px"><div>${esc(st.not_ours.message||'')}</div>`
+    return `<div class="cr-card card warnbox" style="margin-bottom:8px"><div>${esc(st.not_ours.message||'')}</div>`
       + `<div class="meta mt-1">${esc(st.not_ours.fix||'')}</div></div>`;
   }
   if(amb && (amb.reason==='several_files'||amb.reason==='chosen_missing')){
@@ -3947,8 +4030,8 @@ function genomeState(st){
       ? `<div class="meta mt-1">${esc(t('web.genome.chosen_gone',{path:amb.chosen||''}))}</div>` : '';
     const picks = (amb.choices||[]).map(p=>
       `<div class="row" style="gap:8px;margin-top:8px"><code>${esc(p.split('/').pop())}</code>`
-      + `<button class="act" data-choose-genome="${esc(p)}">${esc(t('web.genome.pick_btn'))}</button></div>`).join('');
-    return `<div class="card warnbox" style="margin-bottom:8px">
+      + `<button class="cr-btn act" data-choose-genome="${esc(p)}">${esc(t('web.genome.pick_btn'))}</button></div>`).join('');
+    return `<div class="cr-card card warnbox" style="margin-bottom:8px">
         <div class="row">${badge('b-warning',t('web.genome.db_not_connected'))} <b>${esc(t('web.genome.pick_h'))}</b></div>
         ${gone}
         <div class="meta mt-1">${esc(t('web.genome.pick_why'))}</div>
@@ -3979,7 +4062,7 @@ function genomeState(st){
     ? `<details class="fold"><summary>${esc(t('genome_status.paths_head'))}</summary>`
       + `<ul class="meta" style="margin:4px 0 0 18px;padding:0">${rows}</ul></details>`
     : '';
-  return `<div class="card mb-2"><div class="row">${badgeEl}
+  return `<div class="cr-card card mb-2"><div class="row">${badgeEl}
       <span class="muted">${st.ready?esc((st.vcf||'').split('/').pop()):esc(t('web.genome.db_after_script'))}</span></div>
     ${facts.length?`<div class="meta mt-1">${facts.join(' · ')}</div>`:''}
     <div class="meta mt-1">${esc(t('web.genome.intro'))}</div>${frame}${aside}</div>`;
@@ -4037,7 +4120,7 @@ function genomeFindings(cv, prs, lng, lip){
          tr.label + (tr.category ? ' · ' + tr.category : ''), 'PGS');
   });
   if (!rows.length)
-    return `<div class="card muted">${esc(t('web.genome.findings_none'))}</div>`;
+    return `<div class="cr-card card muted">${esc(t('web.genome.findings_none'))}</div>`;
   const body = rows.map(r => `<div class="list-item"${r.rs ? ` data-rs-open="${esc(r.rs)}" style="cursor:pointer"`
       : (r.gene && !/:/.test(r.gene) ? ` data-gene-open="${esc(r.gene)}" style="cursor:pointer"` : '')}>
       <div class="row">${badge(r.badgeCls, r.badgeTxt)}${r.gene ? `<b>${esc(r.gene)}</b>` : ''}
@@ -4051,10 +4134,10 @@ function genomeFindings(cv, prs, lng, lip){
 // four of them and joining by eye.
 function geneRegionCard(d){
   const loc=d.location||{}, v=d.variants||{}, cov=d.coverage||{};
-  const head=`<div class="row"><b>${esc(d.gene||'')}</b><button class="ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>`;
+  const head=`<div class="row"><b>${esc(d.gene||'')}</b><button class="cr-btn cr-btn--ghost ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>`;
   const list=rows=>rows.map(x=>`<div class="why">${esc(x)}</div>`).join('');
   if(d.status && d.status!=='ok'){
-    return `<div class="card" style="margin-bottom:14px">${head}${list([d.message||'',...(d.searched||[]),d.fix||''].filter(Boolean))}</div>`;
+    return `<div class="cr-card card" style="margin-bottom:14px">${head}${list([d.message||'',...(d.searched||[]),d.fix||''].filter(Boolean))}</div>`;
   }
   const coverage=cov.source==='bam'
     ? ['gene','cds'].filter(k=>cov[k]).map(k=>t('gene.coverage_line',{what:t(k==='gene'?'gene.whole':'gene.cds'),
@@ -4065,7 +4148,7 @@ function geneRegionCard(d){
     return `${r.chrom}:${r.pos} ${r.ref}>${r.alt} ${r.genotype||'?'}${r.depth!=null?' · '+r.depth+'×':''} — ${p.hgvs_p|| (p.kind?t('gene.kind.'+p.kind):t('gene.not_computed'))}`;
   });
   const hits=d.clinvar||[];
-  return `<div class="card" style="margin-bottom:14px">${head}
+  return `<div class="cr-card card" style="margin-bottom:14px">${head}
     ${list([`${loc.chrom}:${loc.start}–${loc.end} (${loc.strand}) · ${loc.assembly} · ${loc.transcript||'—'}`,
       t('gene.coords_from',{source:loc.source_file||loc.source||'—'}),...coverage,
       t('gene.counts',{total:v.total??'—',coding:v.coding??'—',consequential:v.consequential??t('gene.not_computed')})])}
@@ -4096,10 +4179,10 @@ function geneCard(d, cv, lng, lip, sys){
     return `<div><code>${esc(x.rsid)}</code> ${g ? '<b>' + esc(g) + '</b>' : '—'}`
       + `${dp != null ? ` <span class="muted">${esc(t('web.genome.coverage', {value: dp}))}</span>` : ''}</div>`;
   }).join('') || '—';
-  return `<div class="card" style="border-color:var(--accent);margin-bottom:14px">
+  return `<div class="cr-card card" style="border-color:var(--accent);margin-bottom:14px">
     <div class="row"><b style="font-size:17px">${esc(d.gene)}</b>
       <span class="muted">${esc(t('web.genome.loci'))} ${loci.length}</span>
-      <button class="ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>
+      <button class="cr-btn cr-btn--ghost ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>
     <div class="row4">
       ${cell(t('web.genome.genotype'), lociHTML)}
       ${cell('ClinVar', cvRows.length ? cvRows.map(h =>
@@ -4126,12 +4209,12 @@ function screenVerdictLine(v){
   return t('screen.not_determined',{why:t('screen.why.'+(v.why||'scan_not_run'))});
 }
 function renderScreen(scr){
-  if(!scr)return `<div class="card muted">${esc(t('web.common.error'))}</div>`;
+  if(!scr)return `<div class="cr-card card muted">${esc(t('web.common.error'))}</div>`;
   const c=scr.classes||scr;
-  const chips=(c.held||[]).map(r=>`<button class="ghost sc-cls" data-cls="${esc(r.key)}">${esc(r.label||r.key)} · ${r.count}</button>`).join(' ');
+  const chips=(c.held||[]).map(r=>`<button class="cr-btn cr-btn--ghost ghost sc-cls" data-cls="${esc(r.key)}">${esc(r.label||r.key)} · ${r.count}</button>`).join(' ');
   const named=(c.named||[]).map(r=>`<div class="list-item"><b>${esc(r.label||r.key)}</b> · ${r.count} — <span class="muted">${esc(r.source||'')}</span></div>`).join('')
     || `<div class="why muted">${esc(t('screen.no_named'))}</div>`;
-  return `<div class="card"><div class="row"><b>${esc(t('screen.title'))}</b></div>
+  return `<div class="cr-card card"><div class="row"><b>${esc(t('screen.title'))}</b></div>
     <div class="meta" style="margin:8px 0">${esc(t('screen.classes_header'))}</div>
     <div class="drugchips">${chips}</div>
     <div id="sc-box" style="margin-top:14px"></div>
@@ -4150,11 +4233,11 @@ function screenClassHtml(r){
 }
 function weakBedHtml(r){
   if(!r) return '';
-  if(r.ok && r.regions) return `<div class="card" style="margin-top:10px">
+  if(r.ok && r.regions) return `<div class="cr-card card" style="margin-top:10px">
       <div>${esc(t('web.genome.weak_bed',{n:r.regions}))}</div>
       <div class="meta" style="margin-top:6px"><a href="/api/limits/bed?download=1" download>${esc(t('web.genome.weak_bed_link'))}</a>
         <span class="muted">· ${esc((r.genes||[]).slice(0,8).join(', '))}${(r.genes||[]).length>8?' …':''}</span></div></div>`;
-  if(!r.ok && r.note) return `<div class="card muted" style="margin-top:10px">${esc(r.note)}</div>`;
+  if(!r.ok && r.note) return `<div class="cr-card card muted" style="margin-top:10px">${esc(r.note)}</div>`;
   return '';
 }
 async function viewGenome(root){
@@ -4175,14 +4258,14 @@ async function viewGenome(root){
     ['long', t('web.genome.nav_longevity'), n(lng&&lng.available?lng.stats.genotyped:null), ()=>renderLongevity(lng)],
     ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
     ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)+weakBedHtml(wb)],
-    ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="card muted">${esc(t('web.genome.db_after_script'))}</div>`],
-    ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="flex:1 1 240px"><button class="act" id="g-go">${esc(t('web.genome.find'))}</button></div>
+    ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="cr-card card muted">${esc(t('web.genome.db_after_script'))}</div>`],
+    ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input class="cr-input" id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="flex:1 1 240px"><button class="cr-btn act" id="g-go">${esc(t('web.genome.find'))}</button></div>
       <div class="drugchips" id="g-chips"></div>`],
     ['src',  t('web.genome.nav_sources'), '', ()=>`${sb.replace('<details class="srcfoot">','<details class="srcfoot" open>')}
       <div class="so-h">${esc(t('web.genome.updates_h'))}</div>
       ${upd&&upd.can_refresh===false
-        ? `<div class="card muted" style="margin-bottom:8px">${esc(upd.refresh_refusal||'')}</div>`
-        : `<div class="row" style="margin-bottom:8px"><button class="act" id="upd-btn">${esc(t('web.updates.check_btn'))}</button>
+        ? `<div class="cr-card card muted" style="margin-bottom:8px">${esc(upd.refresh_refusal||'')}</div>`
+        : `<div class="row" style="margin-bottom:8px"><button class="cr-btn act" id="upd-btn">${esc(t('web.updates.check_btn'))}</button>
         <span class="muted small">${esc(t('web.genome.updates_note'))}</span></div>`}
       <div id="upd-box">${renderUpdates(upd)}</div>`],
   ];
@@ -4201,7 +4284,7 @@ async function viewGenome(root){
   root.innerHTML=`${pageHead(t('web.tab.genome'),t('web.page.genome.q'),gfacts)}${cautionsHtml(meds&&meds.cautions)}
     ${genomeState(st)}
     <div class="subnav" role="tablist">${panes.map(([id,label,cnt],i)=>
-      `<button role="tab" data-pane="${id}" aria-selected="${i===0}">${esc(label)}${cnt}</button>`).join('')}</div>
+      `<button class="cr-btn cr-btn--ghost" role="tab" data-pane="${id}" aria-selected="${i===0}">${esc(label)}${cnt}</button>`).join('')}</div>
     <div id="g-card"></div>
     ${panes.map(([id,_l,_c,body],i)=>`<div class="gpane" id="gp-${id}"${i?' hidden':''}>${body()}</div>`).join('')}
     ${sb}`;
@@ -4239,7 +4322,7 @@ async function viewGenome(root){
 
   // locus lookup
   const genes=['SLCO1B1','CYP2C9','CYP2C19','DPYD','APOE','FOXO3','VKORC1','MTHFR'];
-  $('#g-chips',root).innerHTML=genes.map(g=>`<button data-gene="${g}">${g}</button>`).join('');
+  $('#g-chips',root).innerHTML=genes.map(g=>`<button class="cr-btn cr-btn--ghost" data-gene="${g}">${g}</button>`).join('');
   $('#g-chips',root).querySelectorAll('button').forEach(b=>b.onclick=()=>openGene(b.dataset.gene));
   async function openRs(rs){
     const ticket=++lookup;
@@ -4281,19 +4364,19 @@ async function viewAssistant(root){
         <span class="muted">${esc(e.detail)}</span></div>
       <div class="why">${esc(e.what)}</div>
       ${e.how?`<div class="why"><code>${esc(e.how)}</code></div>`:''}
-      ${e.id==='any'?`<div class="row mt-2"><button class="ghost" id="ctxbtn">${esc(t('web.assistant.collect_btn'))}</button><span class="muted" id="ctxinfo"></span></div>
+      ${e.id==='any'?`<div class="row mt-2"><button class="cr-btn cr-btn--ghost ghost" id="ctxbtn">${esc(t('web.assistant.collect_btn'))}</button><span class="muted" id="ctxinfo"></span></div>
         <div class="why">${esc(t('web.assistant.context_warning'))}</div>`:''}
     </div>`).join('');
   const cur=(d.curated||[]).map(c=>{
       const st=!c.exists?['b-unknown','web.assistant.absent']:(c.stale?['b-warning','web.assistant.stale']:['b-good','web.assistant.fresh']);
-      const flag=c.stale&&c.id==='brief'?`<button class="ghost" data-open-brief>⚠ ${esc(t('web.assistant.stale'))} · ${esc(t('web.brief.review_btn'))}</button>`:badge(st[0],t(st[1]));
+      const flag=c.stale&&c.id==='brief'?`<button class="cr-btn cr-btn--ghost ghost" data-open-brief>⚠ ${esc(t('web.assistant.stale'))} · ${esc(t('web.brief.review_btn'))}</button>`:badge(st[0],t(st[1]));
       return `<div class="list-item assist-entry"><div class="row">${flag}<b>${esc(c.title)}</b>
         <span class="muted">${esc(c.updated?t('web.assistant.updated',{date:c.updated}):t('web.assistant.no_date'))} · ${esc(t('web.assistant.tab_of',{tab:c.tab}))}</span></div>
         ${c.note?`<div class="why">${esc(c.note)}</div>`:''}
         ${(c.stale_blocks||[]).length?`<div class="why">${esc(t('web.assistant.review_blocks',{blocks:c.stale_blocks.join(', ')}))}</div>`:''}
         <div class="why"><code>${esc(c.cmd)}</code></div></div>`;}).join('');
   root.innerHTML=`${pageHead(t('web.tab.assistant'),t('web.page.assistant.q'))}
-    <div class="card">
+    <div class="cr-card card">
       <div class="row">${badge('b-good',t('web.assistant.works_without'))}</div>
       <p style="margin:10px 0 0">${esc(t('web.assistant.everything_local'))}</p>
       <details class="fold"><summary>${esc(t('web.assistant.how_checked'))}</summary><div class="why">${esc(t('web.assistant.scan_lead'))}
@@ -4303,13 +4386,13 @@ async function viewAssistant(root){
       ${(a.ingest_hosts||[]).length?`<br>${esc(t('web.assistant.ingest_hosts',{hosts:(a.ingest_hosts||[]).join(', ')}))}`:''}</div></details>
     </div>
     <div class="assist-grid">
-      <div class="card"><b>${esc(t('web.assistant.engine_does'))}</b><div class="wl" style="margin-top:8px;font-size:13.5px">${(d.engine_does||[]).map(x=>`<div>· ${esc(x)}</div>`).join('')}</div></div>
-      <div class="card"><b>${esc(t('web.assistant.adds'))}</b><div class="wl" style="margin-top:8px;font-size:13.5px">${(d.assistant_adds||[]).map(x=>`<div>· ${esc(x)}</div>`).join('')}</div></div>
+      <div class="cr-card card"><b>${esc(t('web.assistant.engine_does'))}</b><div class="wl" style="margin-top:8px;font-size:13.5px">${(d.engine_does||[]).map(x=>`<div>· ${esc(x)}</div>`).join('')}</div></div>
+      <div class="cr-card card"><b>${esc(t('web.assistant.adds'))}</b><div class="wl" style="margin-top:8px;font-size:13.5px">${(d.assistant_adds||[]).map(x=>`<div>· ${esc(x)}</div>`).join('')}</div></div>
     </div>
-    <h2 class="section">${esc(t('web.assistant.curated_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.assistant.curated_h'))}</h2>
     <div class="muted" style="margin-bottom:8px">${esc(t('web.assistant.curated_note'))}</div>
     ${cur||emptyHtml(t('web.assistant.no_curated'))}
-    <h2 class="section">${esc(t('web.assistant.connect_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.assistant.connect_h'))}</h2>
     ${eps}
     <div class="meta mt-3">${esc(d.planned||'')}</div>
     <div class="meta">${esc(d.disclaimer||'')}</div>`;
@@ -4382,13 +4465,13 @@ async function viewGuide(root){
   ];
   root.innerHTML=`${pageHead(t('web.tab.guide'),t('web.guide.intro'))}
 
-    <h2 class="section">${esc(t('web.guide.sources_h'))}</h2>
-    <div class="card">${esc(t('web.guide.sources_body'))}</div>
+    <h2 class="cr-h2 section">${esc(t('web.guide.sources_h'))}</h2>
+    <div class="cr-card card">${esc(t('web.guide.sources_body'))}</div>
 
-    <h2 class="section" id="gd-levels">${esc(t('evidence.title'))}</h2>
+    <h2 class="cr-h2 section" id="gd-levels">${esc(t('evidence.title'))}</h2>
     <div id="gd-levels-body" class="muted">…</div>
 
-    <h2 class="section">${esc(t('web.guide.status_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.guide.status_h'))}</h2>
     <div class="muted small mb-3">${esc(t('web.guide.status_intro'))}</div>
     ${guideStatusRow('b-good','web.guide.status_good_label','web.guide.status_good_why')}
     ${guideStatusRow('b-warning','web.guide.status_warning_label','web.guide.status_warning_why')}
@@ -4397,16 +4480,16 @@ async function viewGuide(root){
     ${guideStatusRow('b-unknown','web.guide.status_unknown_label','web.guide.status_unknown_why')}
     <div class="meta mt-2">${esc(t('web.guide.status_three_note'))}</div>
 
-    <h2 class="section">${esc(t('web.guide.tour_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.guide.tour_h'))}</h2>
     <div id="gd-tour">${TOUR.map(([tk,bk])=>guideTourItem(tk,bk)).join('')}</div>
 
-    <h2 class="section">${esc(t('web.guide.terms_h'))}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.guide.terms_h'))}</h2>
     ${TERMS.map(([lk,bk],i)=>guideTerm(lk,bk,i===0)).join('')}
 
     <div class="meta mt-4">${esc(t('web.guide.footer'))}</div>`;
   root.querySelectorAll('[data-tabkey]').forEach(el=>el.onclick=()=>mount(TABS.findIndex(x=>x[0]===el.getAttribute('data-tabkey'))));
   const lg=await evidenceLegend(), box=$('#gd-levels-body',root);
-  if(box) box.outerHTML=lg.status!=='ok'?`<div class="card">${esc(t('evidence.unavailable'))}</div>`
+  if(box) box.outerHTML=lg.status!=='ok'?`<div class="cr-card card">${esc(t('evidence.unavailable'))}</div>`
     :'<div id="gd-levels-list">'+lg.levels.map(x=>`<div class="list-item"><div class="row">${levelChip(x.level,x.short)} <b>${esc(x.short)}</b></div><div class="why">${esc(x.full)} ${esc(x.says)}</div></div>`).join('')+'</div>'
      +`<div class="meta mt-2">${esc(t('evidence.boundary',{levels:(lg.verdict_levels||[]).join(', ')}))}</div>`;
 }
@@ -4428,14 +4511,14 @@ const MENU_KEYS=['web.tab.guide','web.tab.assistant'];
 const NAV_ORDER=[0,1,2,4,3,5];
 let current=0;
 function buildNav(){
-  $('#nav').innerHTML=NAV_ORDER.map(i=>`<button data-tab="${i}">${esc(i===0?firstTabLabel():t(TABS[i][0]))}</button>`).join('');
+  $('#nav').innerHTML=NAV_ORDER.map(i=>`<button class="cr-btn cr-btn--ghost" data-tab="${i}">${esc(i===0?firstTabLabel():t(TABS[i][0]))}</button>`).join('');
   $('#nav').querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>mount(+b.dataset.tab));
   const mp=$('#menupanel');
-  mp.innerHTML=TABS.map(([key],i)=>MENU_KEYS.includes(key)?`<button data-tab="${i}">${esc(t(key))}</button>`:'').join('')
-    +`<button data-menu="containers" id="patient-manage"${canManagePatients()?'':' hidden'}>${esc(t('web.lifecycle.manage'))}</button>`
-    +`<button data-menu="check">${esc(t('web.menu.check_update'))}</button>`
-    +`<button data-menu="recompute">${esc(t('web.menu.recompute'))}</button>`
-    +`<button data-menu="theme" id="mtheme">${esc(themeLabel())}</button>`
+  mp.innerHTML=TABS.map(([key],i)=>MENU_KEYS.includes(key)?`<button class="cr-btn cr-btn--ghost" data-tab="${i}">${esc(t(key))}</button>`:'').join('')
+    +`<button class="cr-btn cr-btn--ghost" data-menu="containers" id="patient-manage"${canManagePatients()?'':' hidden'}>${esc(t('web.lifecycle.manage'))}</button>`
+    +`<button class="cr-btn cr-btn--ghost" data-menu="check">${esc(t('web.menu.check_update'))}</button>`
+    +`<button class="cr-btn cr-btn--ghost" data-menu="recompute">${esc(t('web.menu.recompute'))}</button>`
+    +`<button class="cr-btn cr-btn--ghost" data-menu="theme" id="mtheme">${esc(themeLabel())}</button>`
     +`<div class="mnote">${esc(_version?t('web.header.build',{version:_version}):'')}</div>`
     +`<div class="mnote" id="mupd" hidden></div>`;
   mp.querySelectorAll('button[data-tab]').forEach(b=>b.onclick=()=>{closeMenu();mount(+b.dataset.tab);});
@@ -4451,7 +4534,7 @@ function buildNav(){
     // A newer build found here can be installed from here — after a confirmation,
     // into the environment this server runs from; the server says what it did.
     if(r.newer){
-      const b=document.createElement('button'); b.className='act btn-sm mt-2'; b.textContent=t('web.menu.install');
+      const b=document.createElement('button'); b.className='cr-btn cr-btn--s act btn-sm mt-2'; b.textContent=t('web.menu.install');
       b.onclick=async ev=>{
         ev.stopPropagation();
         if(!confirm(t('web.menu.install_confirm',{latest:r.latest}))) return;
@@ -4528,10 +4611,10 @@ function renderUpdateNote(){
     (e.actions||[]).map(a=>`<div class="row-l">· ${a.manual?esc(t('version.by_hand',{condition:a.condition})):esc(t('version.run',{commands:(a.commands||[]).map(c=>'`'+c+'`').join(', '),condition:a.condition}))}</div>${a.text?`<div class="why muted">${esc(a.text)}</div>`:''}`).join('')).join('');
   box.hidden=false;
   box.innerHTML=`<div class="row"><b>${esc(t('web.update.note',{from:u.last_used,to:u.installed}))}</b> <span>${esc(count)}</span>
-    ${pend.length?`<button class="ghost" id="upd-show">${esc(t('web.update.show'))}</button>`:''}
-    <button class="act" id="upd-seen">${esc(t('web.update.seen'))}</button>
-    <button class="ghost" id="upd-check">${esc(t('web.update.check'))}</button>
-    <button class="ghost" id="upd-recompute">${esc(t('web.recompute.open'))}</button></div>
+    ${pend.length?`<button class="cr-btn cr-btn--ghost ghost" id="upd-show">${esc(t('web.update.show'))}</button>`:''}
+    <button class="cr-btn act" id="upd-seen">${esc(t('web.update.seen'))}</button>
+    <button class="cr-btn cr-btn--ghost ghost" id="upd-check">${esc(t('web.update.check'))}</button>
+    <button class="cr-btn cr-btn--ghost ghost" id="upd-recompute">${esc(t('web.recompute.open'))}</button></div>
     <div id="upd-items" hidden>${items}</div><div id="upd-check-out" class="why"></div>`;
   const sh=$('#upd-show'); if(sh) sh.onclick=()=>{const it=$('#upd-items'); it.hidden=!it.hidden;};
   $('#upd-recompute').onclick=()=>openRecompute();
@@ -4595,18 +4678,18 @@ function renderRecompute(){
   if(!_rcOpen&&!running&&j.status!=='interrupted'){
     box.hidden=false;
     box.innerHTML=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span>${esc(t('web.recompute.pending',{steps:plural(p.ready||0,'count.steps')}))}</span>`
-      +`<button class="ghost btn-sm" id="rc-open">${esc(t('web.recompute.open'))}</button>`
-      +`<button class="ghost btn-sm" id="rc-later">${esc(t('web.recompute.later'))}</button></div>`;
+      +`<button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" id="rc-open">${esc(t('web.recompute.open'))}</button>`
+      +`<button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" id="rc-later">${esc(t('web.recompute.later'))}</button></div>`;
     $('#rc-open').onclick=()=>{_rcOpen=true; renderRecompute();};
     $('#rc-later').onclick=()=>{rcRemember(p); _rcDismissed=true; box.hidden=true; box.innerHTML='';};
     return;
   }
   let h=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span class="muted">${esc(t('web.recompute.cli'))}</span></div>`;
   if(j.status&&j.status!=='none') h+=rcJob(j);
-  if(running) h+=`<div class="row"><button class="ghost" id="rc-stop">${esc(t('web.recompute.stop'))}</button></div>`;
+  if(running) h+=`<div class="row"><button class="cr-btn cr-btn--ghost ghost" id="rc-stop">${esc(t('web.recompute.stop'))}</button></div>`;
   else{
     h+=steps.length?steps.map(rcStep).join(''):`<div class="why">${esc(t('recompute.nothing'))}</div>`;
-    h+=`<div class="row">${p.ready?`<button class="act" id="rc-start">${esc(t('web.recompute.start'))}</button>`:''}<button class="ghost" id="rc-close">${esc(t('web.recompute.close'))}</button></div><div id="rc-out" class="why"></div>`;
+    h+=`<div class="row">${p.ready?`<button class="cr-btn act" id="rc-start">${esc(t('web.recompute.start'))}</button>`:''}<button class="cr-btn cr-btn--ghost ghost" id="rc-close">${esc(t('web.recompute.close'))}</button></div><div id="rc-out" class="why"></div>`;
   }
   box.hidden=false; box.innerHTML=h;
   const st=$('#rc-start'); if(st) st.onclick=async()=>{
@@ -4771,7 +4854,7 @@ let containerDialogGeneration=0;
 function openContainerManager(rows){
   const dialog=$('#container-dialog'), generation=++containerDialogGeneration;
   closeMenu();
-  dialog.innerHTML=`<div class="cr-dialog__body"><h2 class="cr-dialog__title" id="container-dialog-title">${esc(t('web.lifecycle.manage'))}</h2>
+  dialog.innerHTML=`<div class="cr-dialog__body"><h2 class="cr-h2 cr-dialog__title" id="container-dialog-title">${esc(t('web.lifecycle.manage'))}</h2>
     <div class="cr-field"><label class="cr-label" for="lifecycle-id">${esc(t('web.patient.pick'))}</label><select class="cr-input" id="lifecycle-id">${rows.map(c=>`<option value="${esc(c.id)}">${esc(c.id)}${c.active?' · '+esc(t('patients.active_mark')):''}</option>`).join('')}</select></div>
     <div class="cr-field" style="margin-top:16px"><label class="cr-label" for="lifecycle-to">${esc(t('web.lifecycle.destination'))}</label><input class="cr-input" id="lifecycle-to" autocomplete="off"><span class="cr-hint">${esc(t('lifecycle.destination'))}</span></div>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin:16px 0"><button class="cr-btn" id="lifecycle-export">${esc(t('web.lifecycle.export'))}</button><button class="cr-btn" id="lifecycle-preview">${esc(t('web.lifecycle.preview'))}</button></div>

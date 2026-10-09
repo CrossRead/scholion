@@ -442,6 +442,23 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
     says which file, why, and — when the reason is that no row matched the
     dictionary — which printed labels nobody could place.
     """
+    if r.get("preview"):
+        import shlex
+        lines = [r.get("message", "")]
+        if r.get("error"):
+            lines.append(r["error"])
+        for form in r.get("forms", []):
+            lines.append(f"{form['file']} · {form['date']} · "
+                         + _t("archive.pages", pages=", ".join(map(str, form["pages"])))
+                         + " · " + _t("archive.specimen." + form["specimen"]))
+            for row in form["readings"]:
+                lines.append(f"  {row['name']}: {row.get('censored') or ''}{row['value']} {row['unit'] or ''}")
+        for refusal in r.get("not_ingested", []):
+            lines.append(f"⚠️ {refusal['file']}: " + _t("archive.reason." + refusal["reason"]))
+        if r.get("approval_token"):
+            lines.append("scholion ingest-labs " + shlex.quote(r["folder"])
+                         + " --approve-archive " + r["approval_token"])
+        return "\n".join(lines)
     if not r.get("ok"):
         return f"⚠️ {r.get('error', '')}"
     L = [_t("ingest.labs_done", files=r.get("files_processed", 0),

@@ -22,7 +22,7 @@ const assert=require('node:assert/strict');
 const handlers={},window={addEventListener:(name,fn)=>handlers[name]=fn};
 const rows=[{open:true},{open:false},{open:false}];
 const document={querySelectorAll:selector=>{
-  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open])');
+  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])');
   return rows.filter(r=>!r.open);
 }};
 """ + functions + r"""

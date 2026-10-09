@@ -161,7 +161,8 @@ def _args(ctx: "ToolContext", given: dict) -> dict:
     return dict(old) if isinstance(old, dict) and old else given
 
 
-def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
+def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool = False,
+                   approve_archive: str = "") -> str:
     import json
     import os
     import shlex
@@ -175,6 +176,9 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "") -> str:
     # profile (12.09.2026, in an audit harness — the owner's own reports).
     if not (folder or "").strip():
         return "⚠️ " + _t("ingest_labs.folder_not_named")
+    if archive_preview or approve_archive:
+        from scholion import lab_archive
+        return fmt.ingest_labs_report(lab_archive.run(folder, approval=approve_archive))
     inputs = ingest_labs._inputs(folder)
     if not inputs["ok"]:
         return "⚠️ " + inputs["error"]
@@ -228,10 +232,22 @@ def _snapshot_text(r) -> str:
 
 # The snapshot is the overview with nothing phrased: whose profile this is, which
 # marker keys and which pharmacogenes it holds, which target genes have no data.
-_h_overview = _with_second_reading(
-    "snapshot",
-    (lambda: engine.overview(), lambda r: fmt.overview_report(r)),
-    (lambda: engine.load_profile(), _snapshot_text))
+def _overview_data(snapshot: bool = False, visit_sheet: bool = False,
+                   include_reference: bool = False):
+    if _yes(visit_sheet) or _yes(include_reference):
+        return engine.visit_sheet(_yes(include_reference))
+    return engine.load_profile() if _yes(snapshot) else engine.overview()
+
+
+def _overview_render(result):
+    if not isinstance(result, dict):
+        return fmt.overview_report(result)
+    if result.get("kind") == "visit_sheet":
+        return fmt.visit_report(result)
+    return fmt.overview_report(result) if "abnormal_count" in result else _snapshot_text(result)
+
+
+_h_overview = _reported(_overview_data, _overview_render)
 _h_second_opinion = _reported(lambda: engine.second_opinion(), lambda r: fmt.second_opinion_report(r))
 
 
@@ -579,8 +595,8 @@ _TOOLS = (
     ("sch_goal", (), [], _h_goal),
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
-    ("sch_ingest_labs", ("folder",), ["folder"], _h_ingest_labs),
-    ("sch_overview", ("snapshot",), [], _h_overview),
+    ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive"), ["folder"], _h_ingest_labs),
+    ("sch_overview", ("snapshot", "visit_sheet", "include_reference"), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", ("bed", "panel"), [], _h_limits),
     ("sch_rules", ("levels",), [], _h_rules_or_levels),
@@ -611,9 +627,9 @@ _TOOLS = (
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
+_PARAM_TYPE = {"archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
-               "levels": "boolean", "snapshot": "boolean"}
+               "levels": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:

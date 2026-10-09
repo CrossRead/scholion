@@ -5,6 +5,7 @@ knowledge base are left untouched. After a write it resets the core cache.
 """
 from __future__ import annotations
 import datetime as _dt
+import hashlib
 import json
 import os
 import re
@@ -662,7 +663,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     mixed = _mixed_resolution(series, date)
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
-    for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method"):
+    for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method", "source"):
         if reference_context and field in reference_context:
             pt[field] = reference_context[field]
     if subject:
@@ -722,13 +723,17 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
 
 
 @_serialized
-def add_lab_batch(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Validate a CSV batch in memory and replace its one data file atomically.
+def add_lab_batch(rows: List[Dict[str, Any]], *, from_forms: bool = False,
+                  expected_profile_hash: Optional[str] = None) -> Dict[str, Any]:
+    """Validate a laboratory batch in memory and replace its data file atomically.
 
     A batch never claims a demonstration: that is a multi-file erase and cannot
     share the atomicity of replacing labs.json. Choose a personal profile first.
     """
     path = _path("labs.json")
+    current_hash = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else "absent"
+    if expected_profile_hash is not None and expected_profile_hash != current_hash:
+        return {"ok": False, "written": 0, "error": _t("archive.changed")}
     data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"markers": {}}
     if _subj.erasable(core.profile_dir()) or any(
             s in _subj.NOT_THE_OWNER for s in _subj.subjects_in(data)):
@@ -736,11 +741,15 @@ def add_lab_batch(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     for row in rows:
         result = add_lab_point(row["key"], row["date"], row["value"],
                                unit=row["unit"] or None, ref_low=row["ref_low"],
-                               ref_high=row["ref_high"], date_source="manual", subject="owner",
+                               ref_high=row["ref_high"], date_source="form" if from_forms else "manual",
+                               subject="owner", name=row.get("name") if from_forms else None,
+                               direction=row.get("direction") if from_forms else None,
+                               censored=row.get("censored") if from_forms else None,
+                               reference_context=row.get("reference_context") if from_forms else None,
                                _data=data)
         if not result.get("ok"):
             return {"ok": False, "written": 0,
-                    "error": _t("import_csv.write_failed", row=row["row"], detail=result.get("error", ""))}
+                    "error": _t("import_csv.write_failed", row=row.get("row", row["key"]), detail=result.get("error", ""))}
     if rows:
         _write_json(path, data)
         core.reset_cache()

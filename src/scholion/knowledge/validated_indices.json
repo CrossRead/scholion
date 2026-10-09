@@ -1,0 +1,41 @@
+{
+  "_meta": {
+    "updated": "2026-10-09",
+    "scope": "Authored factual descriptions and formula provenance; no copied guideline prose, decision table or diagnostic recommendation.",
+    "source_tier": "primary_literature",
+    "source": "Sterling et al. 2006, PMID 16729309; applicability references are named per index. Formula facts and authored summaries only; no copied guideline tables."
+  },
+  "fib4": {
+    "formula": "age_years * AST_U_L / (platelets_10e9_L * sqrt(ALT_U_L))",
+    "units": {
+      "ast": "U/L",
+      "alt": "U/L",
+      "platelets": "10*9/L"
+    },
+    "minimum_age_for_display": 35,
+    "minimum_age_basis": "Low diagnostic accuracy below age 35: AASLD 2023 and EASL-EASD-EASO 2024. Scholion conservatively withholds the index in this age group.",
+    "sources": [
+      {
+        "role": "original_formula",
+        "citation": "Sterling et al., Hepatology 2006;43:1317-1325",
+        "pmid": "16729309",
+        "doi": "10.1002/hep.21178",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/16729309/"
+      },
+      {
+        "role": "applicability",
+        "citation": "EASL-EASD-EASO Clinical Practice Guidelines on MASLD, 2024",
+        "doi": "10.1016/j.jhep.2024.04.031",
+        "url": "https://easlcampus.eu/sites/default/files/2024-06/EASL_CPGs_on_MASLD.pdf"
+      },
+      {
+        "role": "applicability",
+        "citation": "AASLD Practice Guidance on NAFLD, 2023",
+        "doi": "10.1097/HEP.0000000000000323",
+        "url": "https://doi.org/10.1097/HEP.0000000000000323"
+      }
+    ],
+    "retrieved": "2026-10-09",
+    "interpretation": "No automatic diagnostic category or cut-off: clinical context and acute illness cannot be established from these inputs."
+  }
+}

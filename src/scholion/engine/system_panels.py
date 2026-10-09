@@ -1529,6 +1529,7 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
         return {"status": "unknown_register", "key": dom["key"], "register": register,
                 "registers": list(REGISTERS)}
     from .labs import analyze_labs
+    from .validated import fib4
     by_key = {m["key"]: m for m in (analyze_labs().get("markers") or [])}
     rd = _radar_domain(dom["key"])
     labs = _labs_layer(dom, rd, by_key)
@@ -1550,6 +1551,7 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
             "source": dom["source"], "genetic_half": dom["genetic_half"],
             "markers": dom["markers"],
             "labs": labs, "dynamics": _dynamics_layer(rd),
+            "validated_indices": [fib4()] if dom["key"] == "liver" else [],
             "genetics": _project(gen, register),
             "medications": _medications_layer(dom["key"]),
             "target": target,

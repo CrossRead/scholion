@@ -420,7 +420,7 @@ class TestBundledThirdPartyCodeIsRecorded(unittest.TestCase):
     #: A file authored here has no copyright line naming somebody else. That is
     #: a coarse signal and deliberately so — it costs a line to satisfy honestly
     #: and it fires on the next vendored asset, which is the point.
-    FOREIGN = re.compile(r"(?i)copyright\s+(?:\(c\)\s*)?\d{4}")
+    FOREIGN = re.compile(r"(?i)(?:copyright\s+(?:\(c\)\s*)?|\(c\)\s*)\d{4}")
 
     def setUp(self):
         if not self.WEB.is_dir():

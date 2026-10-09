@@ -40,6 +40,58 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.4 — 09.10.2026
+
+### What you can do now
+
+**Review several laboratory forms inside one PDF before importing them.** Each
+self-contained form keeps its collection date and time, specimen and source
+pages. The application, command line and assistant tools show a preview; an
+explicit approval imports it only while the source files and destination still
+match. Numbered continuation pages require the same order identifier and
+consecutive pagination. Ambiguous boundaries and contradictory observations
+prevent the archive from being written. Start with
+`scholion ingest-labs "<folder>" --archive-preview`; the preview supplies the
+matching approval command.
+
+**Prepare a visit sheet with traceable facts.** The sheet names the data
+container, software version and preparation date, retains measurement dates and
+sources, and separates unassessed measurements from assessed findings. A separate
+optional appendix keeps reference genetics and hypothesis passports with their
+evidence levels. The same sheet is available through the application, command
+line and assistant tools, in English and Russian.
+
+**Read the liver fibrosis index (FIB-4) in the liver panel.** A compact row opens
+to show its meaning and calculation details. It uses
+AST, ALT and platelets from one recorded draw and age at that draw. Inputs,
+units, missing data, population, purpose and primary sources accompany the
+number. Invalid inputs and insufficiently established dates withhold calculation;
+no diagnostic category is assigned automatically. The body-system radar is
+explicitly labelled a Scholion heuristic rather than a validated risk score.
+
+**Use a consistent interface throughout.** Remaining application screens now use
+the same controls and visual system as the main views. The visit sheet adapts
+its measurement rows for narrow screens and has a dedicated print layout.
+
+### What this changes in the conclusions
+
+Laboratory forms from different draws remain separate observations. An English
+ISO collection header also retains its time, so two draws on the same day do
+not silently become one measurement.
+
+### What is retracted
+
+No existing stored observation is reclassified automatically.
+
+### What needs recomputing
+
+Nothing needs automatic recomputing. No profile migration is required.
+Preview an archive explicitly to import forms that the single-form importer
+previously refused. Previously saved observations remain unchanged until the
+user imports or edits them.
+
+---
+
 ## v0.6.3 — 07.10.2026
 
 ### What you can do now

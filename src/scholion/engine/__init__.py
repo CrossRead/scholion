@@ -84,6 +84,8 @@ from .routes import ROUTE_CLASSES, ROUTE_ORDER, ROUTE_LEVELS, ROUTE_CONDITIONAL,
 from .panel_book import on_demand_panels, positions_by_marker  # noqa: F401
 from .class_genotype import cautions, regimen_cautions, medications_view  # noqa: F401
 from .treatment import treatment_timeline  # noqa: F401
+from .visit import visit_sheet  # noqa: F401
+from .validated import fib4  # noqa: F401
 from .panel_intake import author_readings  # noqa: F401
 from .hypothesis import hypothesis_passport, is_value_only  # noqa: F401
 from .system_panels import (  # noqa: F401 -- the facade re-exports every name

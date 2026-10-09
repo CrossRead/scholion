@@ -308,7 +308,7 @@ LINE_BUDGETS = {
     # 1010 → 1025 on 27.09.2026 (task 209): a wearable layer that fails to read
     # keeps its fitness domain on the radar, unscored and named as unread,
     # instead of vanishing and moving `overall` onto the other systems unsaid.
-    "lifestyle": 1025,
+    "lifestyle": 1030,  # Two lines attach the separate, sourced FIB-4 readout.
     # A domain of its own on 14.09.2026: the review of a brief block — what
     # arrived after its wording was read, and a request built from it. It
     # reads the brief and the labs and writes nothing.
@@ -360,6 +360,10 @@ LINE_BUDGETS = {
     # 220 → 240 on 12.09.2026: the overview's age line names why it could not
     # be computed rather than answering «unknown» with nothing beside it.
     "profile_view": 240,
+    # The printable visit structure owns no new clinical inference.
+    "visit": 150,
+    # One source-bound calculator, separate from display indices and rendering.
+    "validated": 200,
 }
 
 

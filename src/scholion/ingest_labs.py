@@ -1152,7 +1152,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         found, _ambiguous = english_date(text)
         if found:
             date = found
-            m = None            # no anchor to read a clock time from
+            m = _DATE_EN.search(text)  # an ISO collection header anchors its own clock time
     if date and m:
         # Only a time printed IMMEDIATELY after the date is taken. A clock time
         # found anywhere else on the form may belong to the report, the printing

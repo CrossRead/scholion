@@ -106,6 +106,7 @@ from .format_views import (  # noqa: F401
     render_focus,
     overview_report,
     radar_report,
+    fib4_report,
     second_opinion_report,
     goal_suggest_report,
     prevalence_report,
@@ -132,3 +133,5 @@ from .format_build import (  # noqa: F401
     recompute_run_report,
     recompute_stop_report,
 )
+
+from .format_visit import visit_report  # noqa: F401

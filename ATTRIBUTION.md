@@ -134,15 +134,7 @@ installs. It travels to every recipient, so its licence travels with it.
 
 | What | Where | Author | Licence |
 |---|---|---|---|
-| Pico CSS v2.1.1, conditional build, its `.pico` scope rewritten as `:where(.pico)` by `src/tools/scope_pico.py` | `src/scholion/web/pico.scoped.min.css` | Pico CSS contributors, 2019–2025 | MIT |
 | Crossread 1.1 | `src/scholion/web/crossread.css` | the owner's reusable design system, vendored with its version and digest; its spacing, control-height and type-step scales follow Consta (consta-design-system/uikit), no code taken | Apache-2.0, as the rest of the code |
-
-The minified file keeps its own banner comment — `/*! Pico CSS ✨ v2.1.1 …
-Licensed under MIT */` — and that comment is what satisfies the licence's
-requirement that the notice travel with the copy. It is recorded here as well
-because a person should be able to learn what is bundled without opening eighty
-kilobytes of minified CSS, and because this table is where the question «what did
-I just install» gets answered.
 
 Vendored rather than loaded from a CDN deliberately: the web interface binds to
 `127.0.0.1` and the product's claim is that using it sends nothing anywhere. A
@@ -230,3 +222,10 @@ https://github.com/alliance-genome/agr_open_data/blob/main/DATA_DOCUMENTATION.md
 Descriptions credited to an individual contributor are independently paraphrased.
 GenCC relationships retain the original contributing organisations and statuses;
 their Russian labels do not constitute a new validity assessment.
+
+### Chart.js and its bundled colour helper
+
+* File: `src/scholion/web/chart.min.js` — Chart.js 4.4.1 and @kurkle/color 0.3.2.
+* Sources: https://www.chartjs.org/ and https://github.com/kurkle/color.
+* Licence: **MIT** for both. The upstream copyright and licence banners are
+  retained verbatim in the bundled file.

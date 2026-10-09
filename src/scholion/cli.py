@@ -200,6 +200,11 @@ def _add_ingest_commands(sub, common) -> None:
     ig = sub.add_parser("ingest-labs", parents=[common], help="extract markers from the PDFs in a folder → labs.json")
     ig.add_argument("folder", help="the folder with the laboratory PDFs")
     ig.add_argument("--force", action="store_true", help="reprocess every file (ignore the manifest)")
+    archive = ig.add_mutually_exclusive_group()
+    archive.add_argument("--archive-preview", action="store_true",
+                         help="preview self-contained forms in a PDF archive without writing")
+    archive.add_argument("--approve-archive", default="", metavar="TOKEN",
+                         help="apply only the still-matching reviewed archive preview")
 
     ist = sub.add_parser("ingest-studies", parents=[common],
                          help="extract doctors' CONCLUSIONS and instrumental studies "
@@ -349,8 +354,11 @@ def _add_maintenance_commands(sub, common) -> None:
     # No new computations appear here: these are entry points to the same engine functions
     # that the web calls. The project's rule — a capability lands in the engine, the CLI and
     # the web at the same time; a divergence is caught by tests/test_parity.py.
-    sub.add_parser("overview", parents=[common],
-                   help="the main screen summary: red flags, gaps, counters")
+    ov = sub.add_parser("overview", parents=[common],
+                        help="the main screen summary: red flags, gaps, counters")
+    ov.add_argument("--visit-sheet", action="store_true", help="prepare a source-bound visit handout")
+    ov.add_argument("--reference-appendix", action="store_true",
+                    help="include a separate reference appendix with the visit handout")
     sub.add_parser("second-opinion", parents=[common],
                    help="a second look before a visit: deviations + the PGx watchlist + what to take")
     sub.add_parser("radar", parents=[common],
@@ -1037,6 +1045,8 @@ def _cmd_assistant(args) -> Any:
 
 
 def _cmd_overview(args) -> Any:
+    if args.visit_sheet or args.reference_appendix:
+        return engine.visit_sheet(args.reference_appendix), fmt.visit_report
     res, render = engine.overview(), fmt.overview_report
     return res, render
 
@@ -1463,7 +1473,11 @@ def _cmd_lipid_genetics(args) -> Any:
 
 def _cmd_ingest_labs(args) -> Any:
     from . import ingest_labs
-    res = ingest_labs.ingest(args.folder, force=args.force)
+    if getattr(args, "archive_preview", False) or getattr(args, "approve_archive", ""):
+        from . import lab_archive
+        res = lab_archive.run(args.folder, approval=getattr(args, "approve_archive", ""))
+    else:
+        res = ingest_labs.ingest(args.folder, force=args.force)
     render = fmt.ingest_labs_report
     return res, render
 

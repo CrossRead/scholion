@@ -420,14 +420,14 @@ class Handler(BaseHTTPRequestHandler):
             # page keeps working with no network at all.
             if p == "/crossread.css":
                 return self._file(_WEB / "crossread.css", "text/css; charset=utf-8")
-            if p == "/pico.scoped.min.css":
-                return self._file(_WEB / "pico.scoped.min.css", "text/css; charset=utf-8")
             if p == "/favicon.ico":
                 return self._file(_WEB / "favicon.ico", "image/x-icon")
             if p in ("/favicon.png", "/favicon-32.png", "/favicon-16.png", "/apple-touch-icon.png"):
                 return self._file(_WEB / p.lstrip("/"), "image/png")
             if p == "/api/overview":
                 return self._json(engine.overview())
+            if p == "/api/visit-sheet":
+                return self._json(engine.visit_sheet(q.get("reference", [""])[0] == "1"))
             if p == "/api/goal":
                 return self._json(engine.goal_dashboard())
             if p == "/api/goal-suggest":
@@ -728,6 +728,9 @@ class Handler(BaseHTTPRequestHandler):
                 if not folder:
                     return self._json({"ok": False, "error": _t("server.no_labs_folder")})
                 from . import ingest_labs
+                if body.get("archive_preview") or body.get("approve_archive"):
+                    from . import lab_archive
+                    return self._json(lab_archive.run(folder, approval=body.get("approve_archive") or ""))
                 return self._json(ingest_labs.ingest(folder, force=bool(body.get("force"))))
             if u.path == "/api/assistant/context":
                 # POST, not GET: the reply contains personal data, and a method that

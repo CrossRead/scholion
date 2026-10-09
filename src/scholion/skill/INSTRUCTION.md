@@ -655,6 +655,8 @@ python3 -m scholion labs KEY KEY             # the same for a selection of marke
 python3 -m scholion suggest-tests            # which tests it makes sense to take
 python3 -m scholion second-opinion           # a second look before a visit to the physician
 python3 -m scholion overview                 # summary: red flags, gaps, counters
+python3 -m scholion overview --visit-sheet
+python3 -m scholion overview --visit-sheet --reference-appendix
 python3 -m scholion radar                    # health index by system (0–100) and its dynamics
 
 # Genome
@@ -732,6 +734,8 @@ python3 -m scholion profile                  # profile snapshot: what is loaded,
 
 # Loading data
 python3 -m scholion ingest-labs "<PDF folder>"     # lab results → labs.json, incrementally
+python3 -m scholion ingest-labs "<archive folder>" --archive-preview
+python3 -m scholion ingest-labs "<archive folder>" --approve-archive "<preview token>"
 python3 -m scholion ingest-studies "<folder>"      # physicians' conclusions and imaging studies
 python3 -m scholion ingest-wearable ["<folder-or-zip>"]  # read a wearable export — Garmin or WHOOP,
                                                    # recognised by what is inside it (with a backup)
@@ -928,6 +932,13 @@ standard and silently breaks exchange.
 
 The application reads JSON with invalidation by file modification time: after a
 file is updated it returns fresh data without a restart.
+
+For multiple self-contained laboratory forms in one PDF, use the read-only
+`--archive-preview` first. Review the forms, collection times, specimens and
+source pages with the person before applying its token through `--approve-archive`.
+The equivalent `sch_ingest_labs` parameters are `archive_preview=true` and
+`approve_archive="<token>"`. An ambiguous archive or changed source/destination
+writes nothing; preview again rather than inventing boundaries or dates.
 
 - **Lab results.** New PDFs into the studies folder → `ingest-labs "<folder>"` or
   the button on the Labs tab. Incremental, idempotent. Scans without a text layer
@@ -1433,3 +1444,24 @@ Calm, to the point, with a reference to the source of every statement. Neither
 frighten nor reassure beyond measure. Name red flags directly and recommend an
 in-person consultation. Retract a withdrawn conclusion explicitly. Answer in the
 user's language.
+
+
+### Visit preparation and source-bound indices
+
+`overview --visit-sheet` prepares a read-only, printable sheet naming the data
+container and software version. Keep its measurement dates and sources, and
+relay unassessed values as unassessed. `--reference-appendix` adds a separate
+reference appendix: gene biology and C–E hypotheses retain their levels and
+passports; they do not become clinical findings. The corresponding tool is
+`sch_overview` with `visit_sheet=true` and optional `include_reference=true`.
+
+`radar` / `sch_radar` retain the body-system display and return
+`validated_indices` separately. The liver panel also returns the same index
+through `system liver` / `sch_system`; its web view shows a compact, expandable
+Liver fibrosis index (FIB-4) row in the laboratory layer. FIB-4 uses AST, ALT and platelets from one
+collection stamp and age at collection. Relay its inputs, dates, units, scope,
+sources and missing/invalid reasons. Clinical categories are withheld because
+these observations cannot establish applicability or absence of acute illness.
+Below age 35 Scholion conservatively withholds the formula value; an age derived
+only from birth year is explicitly approximate. The radar itself is a project
+heuristic, never a validated probability or a composite clinical risk score.

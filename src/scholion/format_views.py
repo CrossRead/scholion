@@ -315,7 +315,8 @@ def overview_report(r: Dict[str, Any]) -> str:
 
 def radar_report(r: Dict[str, Any]) -> str:
     """Health index by body system (the same radar as in the web UI, but as text)."""
-    out = [_t('clinical.display_limit'), '']
+    out = [r.get('heuristic_note') or _t('radar.heuristic'), _t('clinical.display_limit'), '']
+    out += [fib4_report(index) for index in r.get('validated_indices', [])]
     if r.get("overall") is not None:
         line = _t("radar.overall", score=r["overall"])
         if r.get("prev_overall") is not None:
@@ -461,3 +462,26 @@ def brief_review_report(r: Dict[str, Any]) -> str:
             L.append("  " + b["review_hint"])
         L += ["", _t("brief.review.request_h"), b.get("request") or "", ""]
     return "\n".join(L).rstrip()
+
+
+def fib4_report(index: Dict[str, Any]) -> str:
+    from . import core, i18n
+    known = core.lab_markers()["markers"]
+    lines = [_t("fib4.heading"), _t("fib4.meaning"), _t("fib4.status." + index["status"])]
+    if index.get("value") is not None:
+        lines.append("FIB-4: " + str(index["value"]) + " · " + str(index["date"]))
+    if index.get("age") is not None:
+        lines.append(_t("fib4.age", age=index["age"]))
+    for item in index["inputs"]:
+        lines.append(f"• {item['name']}: {item['value']} {item.get('unit') or '—'} · {item['date']}")
+        if item.get("canonical_value") is not None and item.get("unit") != item["canonical_unit"]:
+            lines.append(f"  = {item['canonical_value']} {item['canonical_unit']}")
+    if index["missing"]:
+        names = [_t("fib4.input_age") if key == "age" else core.marker_display(known[key], i18n.lang())
+                 for key in index["missing"]]
+        lines.append(_t("fib4.missing", items=", ".join(names)))
+    lines.extend(index["issues"])
+    lines += [index["scope_note"], index["population"], index["endpoint"], index["horizon"],
+              index["interpretation"]["reason"], _t("fib4.formula", formula=index["formula"])]
+    lines.extend(source["citation"] + " · " + source["url"] for source in index["sources"])
+    return "\n".join(lines)

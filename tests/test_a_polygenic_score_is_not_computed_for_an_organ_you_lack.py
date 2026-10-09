@@ -43,6 +43,7 @@ from unittest import mock
 
 import support  # noqa: F401  — puts src/ on the import path
 from scholion import prs
+from pgs_support import calibrated
 
 
 class FakePipe:
@@ -194,9 +195,9 @@ class TestEveryShapeAnAnswerCanTake(unittest.TestCase):
 class TestChoosingWhichModelSpeaks(unittest.TestCase):
 
     @staticmethod
-    def row(rate, reliable=False, quality="High", mass=0.5, name="x"):
-        return {"pgs_id": name, "match_rate": rate, "percentile_reliable": reliable,
-                "quality_label": quality, "weight_mass_coverage": mass}
+    def row(rate, reliable=False, quality="High", mass=1.0, name="x"):
+        return calibrated({"pgs_id": name, "percentile": 50.0, "match_rate": rate, "percentile_reliable": reliable,
+                "quality_label": quality, "weight_mass_coverage": mass})
 
     def test_nothing_computed_is_nothing_chosen(self):
         self.assertIsNone(prs._pick_covered([]))
@@ -331,9 +332,12 @@ class TestTheReportItself(unittest.TestCase):
         self.vcf.write_bytes(b"\x1f\x8b")
         self._male = mock.patch("scholion.core.profile_sex", return_value="male")
         self._male.start()
+        self._assembly = mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"})
+        self._assembly.start()
 
     def tearDown(self):
         self._male.stop()
+        self._assembly.stop()
         import shutil
         shutil.rmtree(self.tmp, ignore_errors=True)
 
@@ -342,7 +346,8 @@ class TestTheReportItself(unittest.TestCase):
         genome takes minutes and a silent one looks hung. Here it is swallowed:
         a test suite is not the console it was written for."""
         fake = FakeMCP(answers)
-        with mock.patch.object(prs, "_MCP", return_value=fake), quiet():
+        with mock.patch.object(prs, "_MCP", return_value=fake), \
+             mock.patch.object(prs, "_model_build", return_value={"model_harmonized_build": "GRCh38"}), quiet():
             got = prs.report(str(self.vcf), traits=list(self.TRAIT), **kw)
         return got, fake
 
@@ -449,7 +454,8 @@ class TestTheReportItself(unittest.TestCase):
             {"normalize_vcf": {"path": "/tmp/g.parquet"},
              "compute_prs_by_trait": {"rows": [{"pgs_id": "poor", "match_rate": 0.3}]},
              "search_scores": {"scores": [{"pgs_id": "PGS999", "variants_number": 4000}]},
-             "compute_prs": {"match_rate": 0.92}}, fallback=True)
+             "compute_prs": calibrated({"pgs_id": "PGS999", "percentile": 50.0, "match_rate": 0.92}),
+             "percentile": dict(calibrated({"percentile": 50.0}), method="reference_panel", reliable=True)}, fallback=True)
         self.assertEqual("ok_fallback", got["traits"][0]["status"])
         self.assertEqual("PGS999", got["traits"][0]["fallback"]["pgs_id"])
 

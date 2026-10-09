@@ -11,8 +11,9 @@ reliable score, EXACTLY their positions are re-genotyped from merged.bam (includ
 stdlib only. Reads the cache ~/Library/Caches/just-prs/scores/*_hmPOS_GRCh38.txt.gz.
 """
 import glob, gzip, os, sys
+from _pgs_build import requested_build, model_header, bed_metadata, check_bed
 
-CACHE = os.path.expanduser("~/Library/Caches/just-prs/scores")
+CACHE = os.path.expanduser(os.environ.get("SCHOLION_PRS_CACHE", "~/Library/Caches/just-prs/scores"))
 CANON = {str(i) for i in range(1, 23)} | {"X", "Y", "M"}
 
 
@@ -31,9 +32,11 @@ def _canon(chrom):
 
 def _positions_of(pgs):
     """All positions of model pgs taken from its scoring file in the cache."""
-    hits = glob.glob(os.path.join(CACHE, f"{pgs}_*hmPOS_GRCh38.txt.gz"))
+    build = requested_build()
+    hits = glob.glob(os.path.join(CACHE, f"{pgs}_*hmPOS_{build}.txt.gz"))
     if not hits:
         return None
+    model_header(hits[0], build)
     out = set()
     with gzip.open(hits[0], "rt") as fh:
         header = None
@@ -82,8 +85,11 @@ def main():
     out_bed = sys.argv[1]
     pgs_ids = sys.argv[2:]
     positions = set()
+    build = requested_build()
+    models = []
     merge = os.environ.get("MERGE_BED")
     if merge and os.path.exists(merge):
+        models.extend(check_bed(merge, build)["models"])
         base = _read_bed(merge)
         positions |= base
         print(f"merged from {merge}: {len(base)} positions")
@@ -93,11 +99,13 @@ def main():
             print(f"  ⚠ {pgs}: the scoring file was not found in the cache — skipped")
             continue
         print(f"  {pgs}: {len(pos)} positions")
+        models.extend(model_header(path, build) for path in sorted(glob.glob(os.path.join(CACHE, f"{pgs}_*hmPOS_{build}.txt.gz"))))
         positions |= pos
     rows = sorted(positions, key=key)
     with open(out_bed, "w") as o:
         for c, p in rows:
             o.write(f"{c}\t{p-1}\t{p}\n")
+    bed_metadata(out_bed, build, models)
     print(f"✓ unique positions in the union: {len(rows)}")
     print(f"BED: {out_bed}")
     print(f"Next: OUT=<project>/genome/scoring_sites_ext.vcf.gz caffeinate -imsu bash prs_genotype_sites.sh {out_bed}")

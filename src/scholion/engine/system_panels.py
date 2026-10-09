@@ -101,6 +101,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from ..pgs_validation import percentile_label
 from .. import core
 from ..panel_reference import gene_reference_context, reference_context
 from ..conclusion_basis import guard_position
@@ -768,7 +769,7 @@ def _polygenic_block(key: str, findings: Optional[Dict[str, Any]] = None) -> Dic
             continue
         m = models.get(name) or {}
         p = t_.get("percentile")
-        p = (int(p) if float(p).is_integer() else round(float(p), 1)) \
+        p = (int(p) if float(p).is_integer() else round(float(p), 2)) \
             if isinstance(p, (int, float)) else None
         row = {"trait": name,
                "label": t_.get("label") or panel_form.one_language(m.get("label")) or name,
@@ -776,7 +777,8 @@ def _polygenic_block(key: str, findings: Optional[Dict[str, Any]] = None) -> Dic
                "evidence": t_.get("evidence"), "evidence_label": t_.get("evidence_label"),
                "reliable": bool(t_.get("reliable"))}
         for k in ("validity_note", "integrity_note", "weight_mass_note", "evidence_note",
-                  "model_changed_from"):
+                  "model_changed_from", "calibration_note", "calibration", "reading",
+                  "build_validation", "percentile_method", "reference_validation"):
             if t_.get(k):
                 row[k] = t_[k]
         rows.append(row)
@@ -1230,7 +1232,7 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
             if r.get("trait") in (poly.get("high") or []):
                 rows.append({"origin": "polygenic", "trait": r["trait"], "pgs_id": r.get("pgs_id"),
                              "text": _t("system.q.polygenic", label=r.get("label"),
-                                        percentile=r.get("percentile"),
+                                        percentile=percentile_label(r.get("percentile")),
                                         pgs_id=r.get("pgs_id") or "—"),
                              "data": r})
     fired = set()
@@ -1403,7 +1405,7 @@ _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
-_PATIENT_POLY_ROW = ("trait", "label", "percentile", "reliable")
+_PATIENT_POLY_ROW = ("trait", "label", "percentile", "reliable", "calibration_note")
 
 
 def _project(gen: Dict[str, Any], register: str) -> Dict[str, Any]:

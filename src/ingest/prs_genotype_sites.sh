@@ -14,6 +14,7 @@ OUTDIR="$(cd "$(dirname "$0")/../.." && pwd)/genome"
 OUT="${OUT:-$OUTDIR/scoring_sites.vcf.gz}"
 for t in bcftools samtools; do command -v "$t" >/dev/null || { echo "$t is missing"; exit 1; }; done
 [ -f "$BAM" ] || { echo "❌ no BAM: $BAM"; exit 1; }
+python3 "$(dirname "$0")/_pgs_build.py" "$BED" "$BAM" "$REF"
 [ -f "$BAM.bai" ] || { echo "→ indexing the BAM…"; samtools index "$BAM"; }
 mkdir -p "$OUTDIR"
 N=$(wc -l < "$BED" | tr -d ' ')

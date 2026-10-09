@@ -12,7 +12,9 @@ Validation rules (identical for all traits):
     positions in the input VCF have been counted twice (see prs_verify.py --all);
   · the percentile is absent (the model has no 1000G reference distribution) —
     the value is unusable: there is a score but no position in the population;
-  · reliable = the percentile exists AND percentile_reliable AND 0.9 ≤ match_rate ≤ 1.
+  · reliable requires checked reference calibration, matching effective genome
+    builds, sufficient position and weight coverage, and no recorded withdrawal.
+    AUROC/theoretical fallbacks and legacy rows without provenance are diagnostic.
 
 Merging with the old file (when there is one):
   · the new value is usable AND the model matches the one pinned in
@@ -25,7 +27,7 @@ Merging with the old file (when there is one):
     With the flag the change is accepted and the registry is updated with a date;
   · the new value is unusable, the old one usable → the old one stays, with a note;
   · the trait is absent from the raw output (a run with --only) → the old record
-    is kept as it is.
+    is retained with its calibration and build validity rechecked.
 The old file moves to prs_results.json.bak-<date>, and decisions are printed as a table.
 
     PYTHONPATH=src python3 -m scholion.prs report --vcf genome/scoring_sites.vcf.gz \\
@@ -39,6 +41,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT / "src") not in sys.path:
+    sys.path.insert(0, str(ROOT / "src"))
+from scholion.pgs_validation import validate  # noqa: E402
+
 RESULTS = ROOT / "profile" / "prs_results.json"
 REGISTRY = ROOT / "src" / "scholion" / "knowledge" / "prs_models.json"
 KEEP = ("percentile", "quality_label", "match_rate", "weight_mass_coverage",
@@ -46,11 +52,16 @@ KEEP = ("percentile", "quality_label", "match_rate", "weight_mass_coverage",
         # The model's own discrimination, as the server estimates it — the one
         # informativeness figure on a common scale for a disease trait (task 132).
         "auroc_estimate")
+KEEP += ("score", "percentile_method", "percentile_caveat", "reference_panel",
+         "reference_panel_ancestry", "reference_mean", "reference_std", "z_score",
+         "reference_validation", "genome_build", "detected_genome_build", "build_mismatch",
+         "model_original_build", "model_harmonized_build", "model_format_version",
+         "diagnostic_percentile", "diagnostic_validity_note", "calibration_error")
 #: What travels from the report's per-trait `models` block into the stored row:
 #: how many candidates there were, how many were scored and by what rule the
 #: rest were not, and the spread of the percentile across the scored models.
 #: The spread is the stability figure a bare percentile lacks (tasks 131b, 132).
-MODELS_KEEP = ("candidates", "scored", "not_scored", "not_scored_rule",
+MODELS_KEEP = ("validated", "candidates", "scored", "not_scored", "not_scored_rule",
                "pgs_ids", "percentiles", "spread_pp")
 
 
@@ -60,7 +71,7 @@ def _num(x):
 
 def _chosen(t):
     ch = t.get("chosen")
-    if not ch and t.get("status") == "ok_fallback":
+    if t.get("status") == "ok_fallback":
         fb = t.get("fallback") or {}
         ch = fb.get("result") or fb.get("chosen")
     return ch or {}
@@ -111,12 +122,12 @@ def build_row(t, today):
         problems.append("no percentile (the model has no reference distribution)")
     if mr is not None and mr > 1.0001:
         problems.append("coverage >1 — positions double-counted in the input VCF")
-    row["reliable"] = (not problems and row.get("percentile_reliable") is True
-                       and mr is not None and 0.9 <= mr <= 1.0001)
+    row = validate(row)
+    row["reliable"] = not problems and row["reliable"]
     if problems:
         row["integrity_note"] = "; ".join(problems)
     row["source"] = f"rebuild-{today}"
-    return row, (p is not None and not any("coverage" in x or "status" in x for x in problems))
+    return row, row["reliable"]
 
 
 def main(argv):
@@ -140,7 +151,7 @@ def main(argv):
     registry = json.loads(REGISTRY.read_text(encoding="utf-8")) if REGISTRY.exists() else {}
     pinned = registry.get("models", {})
     old_doc = json.loads(RESULTS.read_text(encoding="utf-8")) if RESULTS.exists() else {}
-    old_by_term = {t.get("term"): t for t in old_doc.get("traits", [])}
+    old_by_term = {t.get("term"): validate(t) for t in old_doc.get("traits", [])}
     order = [t.get("term") for t in old_doc.get("traits", [])] or [t.get("term") for t in new_traits]
 
     decisions, merged = [], {}
@@ -148,7 +159,7 @@ def main(argv):
         term = t.get("term")
         row, usable = build_row(t, today)
         old = old_by_term.get(term)
-        old_usable = old is not None and _num(old.get("percentile")) is not None
+        old_usable = old is not None and old.get("reliable") is True
         pin = pinned.get(term)
         model_changed = (pin and row.get("pgs_id") and row["pgs_id"] != pin.get("pgs_id"))
         accepted_here = accept_changes or any(a in (term or "").lower() for a in accept_terms)
@@ -190,6 +201,8 @@ def main(argv):
             d = "kept the old one: " + (row.get("integrity_note") or "?")
         else:
             merged[term] = row
+            if old and old.get("diagnostic_percentile") is not None:
+                merged[term]["previous_result"] = old
             d = "new, but unreliable: " + (row.get("integrity_note") or "?")
         decisions.append((row.get("label") or term or "?", d))
     for term, old in old_by_term.items():
@@ -214,8 +227,8 @@ def main(argv):
         "reliable_count": rel, "total": len(traits),
         "built_by": "src/ingest/prs_results_build.py",
         "input_vcf": raw.get("vcf"),
-        "validation": ("match_rate>1 → unreliable (the input was double-counted); a percentile must "
-                       "exist; if the new value is unusable, the old one is kept with a note"),
+        "validation": ("Calibration, coordinate build, variant and weight coverage are checked independently. "
+                       "Unknown or unsupported calibration is withdrawn; only a previously validated result may be kept."),
     })
     meta.setdefault("purpose", "Computed polygenic scores (PGS Catalog) — read by the application. PERSONAL.")
     meta.setdefault("disclaimer", "A polygenic score is a statistical proxy, not a diagnosis. The models are "

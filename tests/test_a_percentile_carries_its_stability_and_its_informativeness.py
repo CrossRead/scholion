@@ -22,6 +22,7 @@ from pathlib import Path
 from unittest import mock
 
 import support
+from pgs_support import calibrated
 from scholion import format as fmt
 from scholion import prs
 from scholion.engine import prs_quality
@@ -148,6 +149,7 @@ class TestEveryScoredModelComesBackAndTheRuleTravels(unittest.TestCase):
                "rows": [{"pgs_id": "PGS1", "percentile": 58.0, "percentile_reliable": True},
                         {"pgs_id": "PGS2", "percentile": 71.0, "percentile_reliable": True},
                         {"pgs_id": "PGS3", "percentile": 99.0, "percentile_reliable": False}]}
+        rep["rows"] = [calibrated(r) for r in rep["rows"]]
         m = prs._models_summary(rep, 3)
         self.assertEqual(88, m["candidates"])
         self.assertEqual(85, m["not_scored"])
@@ -171,9 +173,12 @@ class TestEveryScoredModelComesBackAndTheRuleTravels(unittest.TestCase):
 
             def call(self, name, args):
                 calls.append((name, dict(args)))
+                if name == "percentile":
+                    r = calibrated({"percentile": 40.0 if args["pgs_id"] == "A" else 52.0})
+                    return dict(r, method="reference_panel", reliable=True)
                 return {"n_scored": 2, "n_returned": 2, "n_skipped": 4, "n_failed": 0,
-                        "rows": [{"pgs_id": "A", "percentile": 40.0, "percentile_reliable": True},
-                                 {"pgs_id": "B", "percentile": 52.0, "percentile_reliable": True}]}
+                        "rows": [calibrated({"pgs_id": "A", "percentile": 40.0}),
+                                 calibrated({"pgs_id": "B", "percentile": 52.0})]}
 
             def close(self):
                 pass
@@ -181,7 +186,9 @@ class TestEveryScoredModelComesBackAndTheRuleTravels(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             vcf = Path(d) / "g.vcf.gz"
             vcf.write_bytes(b"")
-            with mock.patch.object(prs, "_MCP", FakeMCP):
+            with mock.patch.object(prs, "_MCP", FakeMCP), \
+                 mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}), \
+                 mock.patch.object(prs, "_model_build", return_value={"model_harmonized_build": "GRCh38"}):
                 res = prs.report(str(vcf), traits=[{"label": "T", "term": "t", "efo_id": "EFO_1"}],
                                  normalize=False, models_per_trait=5, superpopulation="EUR")
         compute = [a for n, a in calls if n == "compute_prs_by_trait"][0]
@@ -208,6 +215,7 @@ class TestTheStoredPanelCarriesWhatTheReportLearned(unittest.TestCase):
              "models": {"scored": 3, "spread_pp": 17.0, "percentiles": [58.0, 71.0, 75.0],
                         "candidates": 88, "not_scored": 85, "not_scored_rule": "limit",
                         "pgs_ids": ["PGS000010", "PGS2", "PGS3"], "returned": 3}}
+        t["chosen"] = calibrated(t["chosen"])
         row, usable = mod.build_row(t, "2026-09-08")
         self.assertTrue(usable)
         self.assertEqual(0.62, row["auroc_estimate"])

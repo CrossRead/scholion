@@ -411,6 +411,15 @@ def main() -> int:
     vcf = Path(a.vcf) if a.vcf else (ROOT / "genome" / "scoring_sites_ext.vcf.gz")
     if not vcf.exists():
         sys.exit(f"no target VCF: {vcf}")
+    sys.path.insert(0, str(ROOT / "src"))
+    from scholion import genome
+    from _pgs_build import model_header
+    build = genome.assembly_evidence(str(vcf)).get("assembly")
+    if build not in ("GRCh37", "GRCh38"):
+        sys.exit("PGS verification refused: target VCF build is unknown.")
+    files = {p.name.split("_")[0]: p for p in sorted(CACHE.glob(f"*_hmPOS_{build}.txt.gz"))}
+    for path in files.values():
+        model_header(path, build)
     if a.emit_fixed:
         missing = [pid for pid in ids if pid not in files]
         if missing:

@@ -2191,7 +2191,8 @@ function systemPolygenicHtml(poly, register){
   if(poly.status!=='ok') return b+`<div class="row-l muted">${esc(poly.why||'')}</div>`;
   b+=`<div class="row-l">${esc(t('system.polygenic.line',{mapped:poly.mapped||0,scored:poly.scored||0,high:(poly.high||[]).length}))}</div>`;
   (poly.rows||[]).forEach(r=>{
-    b+=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div>${esc(t('system.polygenic.row',{label:r.label,percentile:r.percentile!=null?r.percentile:'—',reliable:t(r.reliable?'system.polygenic.reliable':'system.polygenic.unreliable')}))}</div>`;
+    b+=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div>${esc(t('system.polygenic.row',{label:r.label,percentile:prsPercentile(r.percentile),reliable:t(r.reliable?'system.polygenic.reliable':'system.polygenic.unreliable')}))}</div>`;
+    if(r.calibration_note) b+=`<div class="why muted">${esc(r.calibration_note)}</div>`;
     if(register==='clinician'){
       b+=`<div class="why muted">${esc(t('system.polygenic.detail',{pgs_id:r.pgs_id||'—',evidence:r.evidence_label||r.evidence||'—'}))}</div>`;
       ['validity_note','integrity_note','weight_mass_note','evidence_note'].forEach(k=>{ if(r[k]) b+=`<div class="why muted">${esc(r[k])}</div>`; });
@@ -3798,6 +3799,7 @@ function genomeCard(r){
     ${r.note?`<div class="meta">${esc(r.note)}</div>`:''}
   </div>`;
 }
+function prsPercentile(p){return p==null?'—':Number(p.toFixed(2))>=100?'≥P99.99':Number(p.toFixed(2))<=0?'≤P0.01':'P'+String(Number(p.toFixed(2)));}
 function pctBar(p,reliable){
   if(p==null)return `<div class="muted small">${esc(t('web.prs.no_model'))}</div>`;
   const col=p>=80?'var(--warning)':(p<=20?'var(--good)':'var(--accent)');
@@ -3825,13 +3827,13 @@ function renderPRS(d){
   // the badge for the first time has to leave the page to learn that it is a
   // position in a population and not a probability — so the badge says it where
   // it stands. The wording is the Guide's own, not a second one written here.
-  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning','P'+Math.round(tr.percentile),t('web.guide.term_prs_body'))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div></div>`).join('');
+  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning',prsPercentile(tr.percentile),t('web.guide.term_prs_body'))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div></div>`).join('');
   let cats='';
   d.categories.forEach(c=>{
     const rows=c.traits.map(tr=>{
-      const rel=tr.reliable;const pv=(tr.percentile!=null)?Math.round(tr.percentile):null;
+      const rel=tr.reliable;const pv=prsPercentile(tr.percentile);
       const warn=(!rel&&tr.percentile!=null)?` <span class="muted" title="${esc(t('web.prs.low_coverage'))}">⚠</span>`:'';
-      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}</div><div class="prs-bar">${pctBar(tr.percentile,rel)}</div><div class="prs-num" title="${esc(t('web.guide.term_prs_body'))}">${pv!=null?('P'+pv):'—'}</div></div>`;
+      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}${tr.calibration_note?`<div class="why muted">${esc(tr.calibration_note)}</div>`:''}</div><div class="prs-bar">${pctBar(tr.percentile,rel)}</div><div class="prs-num" title="${esc(t('web.guide.term_prs_body'))}">${esc(pv)}</div></div>`;
     }).join('');
     cats+=`<div class="prs-cat"><div class="prs-cat-h">${esc(c.category)}</div>${rows}</div>`;
   });
@@ -4116,7 +4118,7 @@ function genomeFindings(cv, prs, lng, lip){
   });
   // 4. a position in a population, last, because that is what it is
   ((prs && prs.available ? (prs.high || []) : [])).forEach(tr => {
-    push('info', '', 'b-warning', 'P' + Math.round(tr.percentile),
+    push('info', '', 'b-warning', prsPercentile(tr.percentile),
          tr.label + (tr.category ? ' · ' + tr.category : ''), 'PGS');
   });
   if (!rows.length)

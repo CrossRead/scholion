@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from .i18n import plural as _plural, t as _t
 from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genotype_conclusion_lines, subclaim_lines
 from .genome_routes import route_text
+from .pgs_validation import percentile_label
 from .panel_notes import note_lines
 from .panel_reference import reference_lines
 from .test_proposals import test_basis_text
@@ -145,9 +146,11 @@ def _system_polygenic(poly: Any, register: str) -> List[str]:
                         scored=poly.get("scored") or 0, high=len(poly.get("high") or [])))
     for r in poly.get("rows") or []:
         line = "   · " + _t("system.polygenic.row", label=r.get("label"),
-                            percentile=r.get("percentile") if r.get("percentile") is not None else "—",
+                            percentile=percentile_label(r.get("percentile")),
                             reliable=_t("system.polygenic.reliable" if r.get("reliable")
                                         else "system.polygenic.unreliable"))
+        if r.get("calibration_note"):
+            line += "\n     " + str(r["calibration_note"])
         if register == "clinician":
             detail = [_t("system.polygenic.detail", pgs_id=r.get("pgs_id") or "—",
                          evidence=r.get("evidence_label") or r.get("evidence") or "—")]

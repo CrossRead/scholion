@@ -21,6 +21,7 @@ import re
 from pathlib import Path
 
 from .i18n import plural as _plural, t as _t
+from .pgs_validation import number, reference_snapshot, validate
 
 _DEFAULT_PKG = "just-prs-mcp@0.1.3"
 
@@ -55,7 +56,7 @@ _TRAITS = Path(__file__).resolve().parent / "knowledge" / "prs_traits.json"
 #: and the control trait reproduces the August number exactly (task 129).
 #: `src/ingest/prs_constraints.txt` carries the same lines with the full account,
 #: for the shell path; a test holds the two copies together.
-PRS_CONSTRAINTS = ("fastmcp<4",)
+PRS_CONSTRAINTS = ("fastmcp<4", "just-prs==0.4.12")
 
 
 def _constraint_file() -> Path:
@@ -91,6 +92,8 @@ class _MCP:
             raise PrsUnavailable(_t("prs.offline"))
         env = dict(os.environ)
         env.setdefault("PRS_MCP_MODE", mode)
+        # The model header read here must be the file the sidecar actually uses.
+        env["PRS_MCP_CACHE_DIR"] = str(_cache_root())
         # setdefault, not assignment: an owner who has pointed UV_CONSTRAINT at
         # their own file (a newer sidecar, a local build) is not overruled.
         self._owned_constraint = None
@@ -98,6 +101,14 @@ class _MCP:
             self._owned_constraint = _constraint_file()
             env["UV_CONSTRAINT"] = str(self._owned_constraint)
         self._constraint = env["UV_CONSTRAINT"]
+        # Only the audited reference-quality contract can establish provenance.
+        # A custom dependency resolution remains usable for diagnostic scores.
+        try:
+            pins = {line.strip() for line in Path(self._constraint).read_text(encoding="utf-8").splitlines()
+                    if line.strip() and not line.lstrip().startswith("#")}
+        except (OSError, UnicodeError):
+            pins = set()
+        self.reference_contract_verified = PKG == _DEFAULT_PKG and "just-prs==0.4.12" in pins
         try:
             # stderr is inherited → the server's logs/progress are visible live (it does not «hang silently»)
             self.p = subprocess.Popen(
@@ -241,6 +252,73 @@ def _rows_of(rep):
 _QRANK = {"High": 3, "Moderate": 2, "Low": 1, "Very Low": 0}
 
 
+def _cache_root() -> Path:
+    import sys
+    configured = os.environ.get("PRS_MCP_CACHE_DIR") or os.environ.get("PRS_CACHE_DIR")
+    if configured:
+        return Path(configured).expanduser()
+    if sys.platform == "darwin":
+        return Path.home() / "Library" / "Caches" / "just-prs"
+    if sys.platform == "win32":
+        return Path(os.environ.get("LOCALAPPDATA", str(Path.home() / "AppData" / "Local"))) / "just-prs" / "Cache"
+    return Path(os.environ.get("XDG_CACHE_HOME", str(Path.home() / ".cache"))) / "just-prs"
+
+
+def _model_build(pgs_id: str, build: str) -> dict:
+    """Read public header metadata only; model weights never enter the profile."""
+    import gzip
+    if not re.fullmatch(r"PGS\d+", str(pgs_id)) or build not in ("GRCh37", "GRCh38"):
+        return {}
+    path = _cache_root() / "scores" / f"{pgs_id}_hmPOS_{build}.txt.gz"
+    header = {}
+    try:
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            for line in handle:
+                if not line.startswith("#"):
+                    break
+                if "=" in line:
+                    key, value = line.lstrip("#").strip().split("=", 1)
+                    header[key] = value
+    except (OSError, EOFError, UnicodeError):
+        return {}
+    return {"model_original_build": header.get("genome_build"),
+            "model_harmonized_build": header.get("HmPOS_build"),
+            "model_format_version": header.get("format_version")}
+
+
+def _verify_row(m, row: dict, context: dict, build: str, population: str) -> dict:
+    """Ask for the actual calibration, then apply Scholion's independent gate."""
+    got = dict(row)
+    got.update(_model_build(str(got.get("pgs_id") or ""), build))
+    got["genome_build"] = context.get("genome_build") or build
+    got["detected_genome_build"] = context.get("detected_genome_build") or build
+    got["build_mismatch"] = bool(context.get("build_mismatch") or row.get("build_mismatch"))
+    if number(got.get("score")) is not None and got.get("pgs_id"):
+        try:
+            calibration = m.call("percentile", {
+                "pgs_id": got["pgs_id"], "prs_score": got["score"],
+                "superpopulation": population, "weight_mass_coverage": got.get("weight_mass_coverage")})
+            # Do not silently replace a number obtained with a different cache.
+            # The consistency gate below compares the original percentile with
+            # the current reference parameters and withdraws stale results.
+            for key in ("z_score", "reference_mean", "reference_std",
+                        "reference_panel", "reference_panel_ancestry"):
+                got[key] = calibration.get(key)
+            got["percentile_method"] = calibration.get("method")
+            got["percentile_caveat"] = calibration.get("caveat")
+            got["percentile_reliable"] = calibration.get("reliable") is True
+            got["reference_validation"] = {
+                "checked": PKG == _DEFAULT_PKG and getattr(m, "reference_contract_verified", True)
+                and calibration.get("method") == "reference_panel",
+                "quality": "passed" if calibration.get("method") == "reference_panel" else "unavailable",
+                "source": "just-prs.percentile (quality-filtered reference)",
+                "sidecar": PKG, "library": "just-prs==0.4.12",
+                "snapshot_sha256": reference_snapshot(got)}
+        except (RuntimeError, TypeError, ValueError, AttributeError) as error:
+            got["calibration_error"] = str(error)
+    return validate(got, expected_build=build, expected_ancestry=population)
+
+
 def _pick_covered(rows):
     """Choose from the computed models the best COVERED and HIGH-QUALITY one (rather than
     the server's top, which ranks a «reliable percentile» above coverage and sometimes
@@ -253,14 +331,15 @@ def _pick_covered(rows):
     good = [r for r in rows if _num(r.get("match_rate")) >= 0.9]
     pool = good or rows
     return max(pool, key=lambda r: (
-        r.get("percentile_reliable") is True,
+        validate(r).get("reliable") is True,
         _QRANK.get(r.get("quality_label"), -1),
         _num(r.get("weight_mass_coverage")),
         _num(r.get("match_rate")),
     ))
 
 
-def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lambda s: None):
+def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lambda s: None,
+                            genome_build=None, population="EUR"):
     """A fallback path for traits where the trait did not resolve or all models are
     genome-wide: we search for models by text, take the best COVERABLE one (≤max_variants)
     and compute it directly via compute_prs."""
@@ -285,10 +364,12 @@ def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lam
     cand.sort(reverse=True)
     vn, pid, meta = cand[0]
     args = {"pgs_id": pid, "vcf_path": vcf_path, "attach_performance": True}
+    args["genome_build"] = genome_build
     if geno:
         args["genotypes_path"] = geno
     try:
         pr = m.call("compute_prs", args)
+        pr = _verify_row(m, pr, pr, genome_build, population)
     except Exception as e:  # noqa
         return None, f"compute_prs({pid}): {e}"
     log(_t("prs.fallback_chosen", pgs_id=pid, variants=int(vn),
@@ -367,14 +448,14 @@ def _models_summary(rep: dict, requested: int) -> dict:
     """
     rows = _rows_of(rep)
     pct = [float(r["percentile"]) for r in rows
-           if r.get("percentile_reliable") is True
+           if validate(r).get("reliable") is True
            and isinstance(r.get("percentile"), (int, float))]
     n = {k: rep.get(k) for k in ("n_scored", "n_returned", "n_skipped", "n_failed")} \
         if isinstance(rep, dict) else {}
     scored = n.get("n_scored") if isinstance(n.get("n_scored"), int) else len(rows)
     not_scored = n.get("n_skipped") if isinstance(n.get("n_skipped"), int) else 0
     failed = n.get("n_failed") if isinstance(n.get("n_failed"), int) else 0
-    return {"requested": requested, "scored": scored,
+    return {"validated": True, "requested": requested, "scored": scored,
             "returned": n.get("n_returned") if isinstance(n.get("n_returned"), int) else len(rows),
             "failed": failed, "not_scored": not_scored,
             # The one rule: candidates beyond `--models` are not scored. Stored as
@@ -427,6 +508,12 @@ def report(vcf_path: str, traits=None, superpopulation=None,
         return {"ok": False, "error": _t("prs.no_traits")}
     if not Path(vcf_path).exists():
         return {"ok": False, "error": _t("prs.vcf_not_found", path=vcf_path)}
+    from . import genome
+    assembly = genome.assembly_evidence(vcf_path)
+    build = assembly.get("assembly")
+    if build not in ("GRCh37", "GRCh38"):
+        return {"ok": False, "status": "build_unknown", "assembly": assembly,
+                "error": _t("prs.validation.build_unknown")}
     def _log(msg):
         import sys as _s
         print(msg, file=_s.stderr, flush=True)
@@ -446,7 +533,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
         if normalize:
             _log(_t("prs.normalising"))
             try:
-                nz = m.call("normalize_vcf", {"vcf_path": vcf_path})
+                nz = m.call("normalize_vcf", {"vcf_path": vcf_path, "genome_build": build})
                 geno = _extract_path(nz)
                 _log(_t("prs.normalised", path=geno))
             except Exception as e:  # noqa
@@ -466,6 +553,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 if efo:
                     # base parameters — guaranteed to be supported by 0.1.3
                     base = {"trait_id": efo, "vcf_path": vcf_path, "interpret": True,
+                            "genome_build": build,
                             "superpopulation": superpopulation,
                             "limit": models_per_trait,
                             # Every model the server SCORES comes back. `top_n=1`
@@ -498,8 +586,12 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                                                      if k not in gone}})
                         else:
                             raise
-                    rows = _rows_of(rep)
-                    chosen = _pick_covered(rows) if pick == "covered" else (rows[0] if rows else None)
+                    rows = [_verify_row(m, r, rep, build, superpopulation) for r in _rows_of(rep)]
+                    rep["rows"] = rows
+                    # An uncalibrated model must not win by its spurious P100.
+                    usable = [r for r in rows if r.get("reliable")]
+                    pool = usable or rows
+                    chosen = _pick_covered(pool) if pick == "covered" else (pool[0] if pool else None)
                     row["efo_id"] = efo
                     row["result"] = rep
                     row["chosen"] = chosen
@@ -514,13 +606,15 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 # the fallback path: no trait, or the chosen model is poorly covered
                 need_fb = fallback and (not efo or _num((row.get("chosen") or {}).get("match_rate")) < 0.9)
                 if need_fb:
-                    fb, err = _search_scores_fallback(m, t["term"], geno, vcf_path, log=_log)
+                    fb, err = _search_scores_fallback(m, t["term"], geno, vcf_path, log=_log,
+                                                    genome_build=build, population=superpopulation)
                     if fb:
                         prev = _num((row.get("chosen") or {}).get("match_rate"))
                         new = _num((fb.get("result") or {}).get("match_rate"))
                         # take the fallback only if it is better covered
-                        if new > prev:
+                        if new > prev and (fb.get("result") or {}).get("reliable"):
                             row["fallback"] = fb
+                            row["chosen"] = fb["result"]
                             row["status"] = "ok_fallback"
                     else:
                         row.setdefault("fallback_error", err)
@@ -528,6 +622,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 row["status"] = "error"; row["error"] = str(e)
             out.append(row)
         return {"ok": True, "vcf": vcf_path, "genotypes_path": geno,
+                "genome_build": build, "assembly_evidence": assembly,
                 "superpopulation": superpopulation,
                 # Travels with the number for the rest of its life: everything
                 # downstream prints the panel, and «EUR» chosen by a default and

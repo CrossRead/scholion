@@ -36,6 +36,9 @@ import json
 import random
 import sys
 from pathlib import Path
+from statistics import NormalDist
+
+from .pgs_validation import reference_snapshot
 
 SEED = 20260815
 GENERATED = "2026-08-15"
@@ -299,6 +302,16 @@ def build_prs() -> dict:
             "percentile_reliable": ok, "effect_size": level, "pgs_id": pgs,
             "reliable": ok, "source": "demo", "validity_note": note,
         }
+        # Entirely synthetic calibration, explicitly identified as such.
+        z = NormalDist().inv_cdf(float(pct) / 100)
+        rec.update(score=z, z_score=z, reference_mean=0.0, reference_std=1.0,
+                   percentile_method="reference_panel", reference_panel="synthetic-demo",
+                   reference_panel_ancestry="EUR", genome_build="GRCh38",
+                   detected_genome_build="GRCh38", model_original_build="GRCh38",
+                   model_harmonized_build="GRCh38", build_mismatch=False)
+        rec["reference_validation"] = {"checked": True, "quality": "passed",
+                                       "source": "synthetic demo, not a population measurement",
+                                       "snapshot_sha256": reference_snapshot(rec)}
         if label in BECAUSE:
             rec["withdrawn_because"] = BECAUSE[label]
         traits.append(rec)

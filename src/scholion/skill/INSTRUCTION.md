@@ -111,7 +111,13 @@ crossed clinical threshold.
 depends on the model, the reference population and which variants were actually
 called; the model is pinned in a registry, and swapping it breaks the series and
 requires an explicit note. A catalogue of published longevity associations is
-navigation, not risk. A hypothesis is not presented as a fact.
+navigation, not risk. A hypothesis is not presented as a fact. A percentile is
+relayed only with verified calibration and matching genome/model coordinate
+builds. Coverage and a sidecar reliability flag alone do not establish either.
+AUROC-only fallbacks, rejected references and legacy results without provenance
+are diagnostic values, not population positions; do not turn them into high-risk
+flags, reassurance or clinical questions. Relay the explicit reason for withholding
+a percentile. A high calibrated percentile is still not a disease probability.
 
 **9. A threshold that fires on almost everything gets fixed, not explained.** A
 cheap check before any interpretation: what fraction of objects did the flag hit?

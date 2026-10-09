@@ -656,6 +656,7 @@ def _prs_measurement_line(t: Dict[str, Any]) -> str:
 
 def prs_report(r: Dict[str, Any]) -> str:
     """Polygenic risks (PGS): statistics + "above average" + by category."""
+    from .pgs_validation import percentile_label
     if not r.get("available"):
         return r.get("message", _t("prs.not_ready"))
     s = r.get("stats", {})
@@ -680,7 +681,7 @@ def prs_report(r: Dict[str, Any]) -> str:
         lines.append(_t("prs.above_average"))
         for t in high:
             p = t.get("percentile")
-            lines.append(f"  🔶 {t['label']}: P{round(p) if isinstance(p,(int,float)) else '—'}"
+            lines.append(f"  🔶 {t['label']}: {percentile_label(p)}"
                          + (f" · {t['effect_size']}" if t.get("effect_size") else "")
                          + (f" · {t['evidence_label']}" if t.get("evidence_label") else ""))
             if t.get("evidence_note"):
@@ -700,10 +701,12 @@ def prs_report(r: Dict[str, Any]) -> str:
         lines.append(f"__{c['category']}__")
         for t in c.get("traits", []):
             p = t.get("percentile")
-            ps = f"P{round(p)}" if isinstance(p, (int, float)) else _t("prs.no_model")
+            ps = percentile_label(p) if isinstance(p, (int, float)) else _t("prs.no_model")
             warn = "" if t.get("reliable") else " ⚠"
             ev = {"clinical": " ✚", "supportive": " ·"}.get(t.get("evidence"), "")
             lines.append(f"  {t['label']}: {ps}{warn}{ev}")
+            if t.get("calibration_note"):
+                lines.append("    " + t["calibration_note"])
             lines.append("    ↳ " + _prs_measurement_line(t))
         lines.append("")
     lines.append(f"_{r.get('disclaimer','')}_")

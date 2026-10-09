@@ -71,6 +71,8 @@ def annotate_measurement(traits: List[Dict[str, Any]]) -> None:
         if s and t.get("pgs_id") and s.get("pgs_id") and s["pgs_id"] != t["pgs_id"]:
             s = None
         models = t.get("models") if isinstance(t.get("models"), dict) else {}
+        if t.get("calibration", {}).get("valid") is False:
+            s, models = None, {}
         mr, wm = _num(t.get("match_rate")), _num(t.get("weight_mass_coverage"))
         stab: Dict[str, Any] = {
             "ancestry_spread_pp": _num(s.get("spread")) if s else None,

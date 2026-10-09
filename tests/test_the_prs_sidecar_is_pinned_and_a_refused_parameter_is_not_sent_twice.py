@@ -181,7 +181,8 @@ class TestARefusedParameterIsNotOfferedAgain(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             vcf = Path(d) / "g.vcf.gz"
             vcf.write_bytes(b"")
-            with mock.patch.object(prs, "_MCP", FakeMCP):
+            with mock.patch.object(prs, "_MCP", FakeMCP), \
+                 mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}):
                 res = prs.report(str(vcf), traits=traits, normalize=False,
                                  profile="all", superpopulation="EUR")
         self.assertTrue(res["ok"], res)

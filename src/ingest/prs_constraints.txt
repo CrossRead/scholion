@@ -20,3 +20,6 @@
 # without `[tasks]`) — and then the run has to be re-verified against the control
 # trait, because just-prs there is 0.9.x rather than 0.4.12.
 fastmcp<4
+
+# Reference-quality filtering audited for the calibration gate (0.6.5).
+just-prs==0.4.12

@@ -9,8 +9,9 @@ models (>MAX_VARIANTS), writes a BED (chr notation). stdlib only.
     MAX_VARIANTS=50000 python3 prs_extract_sites.py out.bed
 """
 import glob, gzip, os, sys
+from _pgs_build import requested_build, model_header, bed_metadata
 
-CACHE = os.path.expanduser("~/Library/Caches/just-prs/scores")
+CACHE = os.path.expanduser(os.environ.get("SCHOLION_PRS_CACHE", "~/Library/Caches/just-prs/scores"))
 OUT = sys.argv[1] if len(sys.argv) > 1 else "scoring_sites.bed"
 MAX_VARIANTS = int(os.environ.get("MAX_VARIANTS", "50000"))
 
@@ -37,13 +38,16 @@ def _cols(header):
 
 
 def main():
-    files = sorted(glob.glob(os.path.join(CACHE, "*_hmPOS_GRCh38.txt.gz")))
+    build = requested_build()
+    files = sorted(glob.glob(os.path.join(CACHE, f"*_hmPOS_{build}.txt.gz")))
+    models = []
     positions = set()
     skipped = []
     used = 0
     noncanon = 0  # positions dropped as belonging to non-canonical contigs
     for f in files:
         pgs = os.path.basename(f).split("_")[0]
+        metadata = model_header(f, build)
         try:
             fh = gzip.open(f, "rt")
         except Exception as e:
@@ -71,6 +75,7 @@ def main():
         if len(local) > MAX_VARIANTS:
             skipped.append((pgs, f"genome-wide ({len(local)} variants)")); continue
         used += 1
+        models.append(metadata)
         for chrom, pos in local:
             c = _canon(chrom)
             if c is None:
@@ -91,6 +96,7 @@ def main():
     with open(OUT, "w") as o:
         for c, pos in rows:
             o.write(f"{c}\t{pos - 1}\t{pos}\n")
+    bed_metadata(OUT, build, models)
     print(f"scoring files: {len(files)}; models used: {used}; "
           f"unique positions: {len(rows)}")
     if noncanon:

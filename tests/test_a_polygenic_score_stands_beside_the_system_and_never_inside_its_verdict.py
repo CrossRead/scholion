@@ -181,7 +181,7 @@ class TestTheScoresOnTheCard(unittest.TestCase):
         self.assertEqual([r["trait"] for r in pt["rows"]], [r["trait"] for r in cl["rows"]],
                          "both registers carry the same rows")
         for r in pt["rows"]:
-            self.assertEqual({"trait", "label", "percentile", "reliable"}, set(r))
+            self.assertEqual({"trait", "label", "percentile", "reliable"}, set(r) - {"calibration_note"})
         for r in cl["rows"]:
             self.assertEqual("PGS000001", r["pgs_id"])
             self.assertEqual("clinical", r["evidence"])

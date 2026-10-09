@@ -838,7 +838,9 @@ def prs_findings() -> Dict[str, Any]:
     if closed:
         return closed
     data = core.prs_results()
-    traits = data.get("traits", []) if isinstance(data, dict) else []
+    from ..pgs_validation import validate as validate_pgs
+    traits = [validate_pgs(t, expected_ancestry=(data.get("_meta") or {}).get("superpopulation"))
+              for t in data.get("traits", [])] if isinstance(data, dict) else []
     if not traits:
         return {"available": False, "disclaimer": PRS_DISCLAIMER(),
                 "message": _t("prs.not_computed")}
@@ -853,6 +855,10 @@ def prs_findings() -> Dict[str, Any]:
     _computed = _pm.get("generated") or _pm.get("updated")
     _connected = bool(genome_status().get("ready"))
     for tr in traits:                      # a guard layer: double counting of the input shows at once
+        reasons = tr["calibration"]["reasons"]
+        if reasons:
+            tr["calibration_note"] = _t("prs.validation.withdrawn") + " " + "; ".join(
+                _t("prs.validation." + reason) for reason in reasons)
         _mr = tr.get("match_rate")
         if isinstance(_mr, (int, float)) and _mr > 1.0001:
             tr["reliable"] = False

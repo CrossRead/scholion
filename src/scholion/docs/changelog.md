@@ -40,6 +40,59 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.5 — 09.10.2026
+
+### What you can do now
+
+**Read polygenic results with their calibration and coordinate provenance.**
+Use `scholion prs --json` to inspect the result and its provenance.
+Raw scores, calculation methods, reference populations, reference parameters and
+coordinate builds travel with each result. Variant coverage, weight coverage,
+calibration and model informativeness are separate facts. Displayed percentiles
+retain fractional values; rounded endpoints are shown as bounds rather than an
+exact P100 or P0. A percentile remains a population position, not a probability
+of developing a disease.
+
+### What is fixed
+
+A fully covered genome could receive a seemingly reliable P100 when the score
+had no suitable reference distribution. Such approximations are now withheld
+from ordinary percentile results, high findings and clinical questions. A missing
+or rejected reference, an unsupported calibration method, inconsistent reference
+parameters, and unknown or mismatched coordinate builds cannot be repaired by a
+coverage flag. Model selection and the reported spread use the same validation.
+
+Models originally published on one genome build can still be used through their
+matching harmonized coordinates. The scoring request carries the verified input
+build. Preparing scoring sites from BAM refuses inconsistent position lists,
+BAM headers or reference sequences before genotyping starts.
+
+### What this changes in the conclusions
+
+A stored reliability flag alone no longer establishes a valid percentile. A
+verified high percentile can remain high; no disease-specific exclusion or cap
+is applied. The application, command line, assistant tools, body-system panels
+and visit sheets use the same validation and explain why a value was withheld.
+
+### What is retracted
+
+Percentiles without verifiable calibration or coordinate provenance, including
+AUROC-only approximations, are withdrawn as population positions. Previous
+values and explanations remain available as diagnostic history rather than
+ordinary findings. They are not replaced with percentiles from rejected
+reference data. These checks apply to low values as well as high ones.
+
+### What needs recomputing
+
+**By hand — if polygenic results were saved before this release.**
+Rebuild saved polygenic results from a report with verified calibration and
+coordinate provenance. Retain the original report and backup. A result without
+that provenance stays withheld until a verified scoring report is available;
+re-genotyping BAM is required only if the scoring-site input itself is missing
+or inconsistent. Existing laboratory and curated-gene results do not require
+recomputation for this correction.
+
+
 ## v0.6.4 — 09.10.2026
 
 ### What you can do now

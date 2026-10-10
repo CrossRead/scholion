@@ -100,7 +100,11 @@ def set_source_folder(domain: str, folder: str) -> Dict[str, Any]:
             if src.exists():
                 target.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
         core.reset_cache()
-    return {"ok": True, "domain": domain, "folder": str(fp), "section": section}
+    result = {"ok": True, "domain": domain, "folder": str(fp), "section": section}
+    if domain == "genome":
+        from . import population_preparation
+        result["population_assignment"] = population_preparation.prepare()
+    return result
 
 
 @_serialized
@@ -134,7 +138,7 @@ def mark_brief_reviewed(block: str) -> Dict[str, Any]:
 
 
 @_serialized
-def set_genome_vcf(path: str) -> Dict[str, Any]:
+def set_genome_vcf(path: str, *, prepare_population: bool = True) -> Dict[str, Any]:
     """Record WHICH file in the genome folder is the person's own reads.
 
     Only ever asked when the folder holds more than one candidate, and only the
@@ -169,7 +173,11 @@ def set_genome_vcf(path: str) -> Dict[str, Any]:
     cfg["genome_vcf"] = str(fp)
     _write_json(cfgp, cfg)
     core.reset_cache()
-    return {"ok": True, "genome_vcf": str(fp)}
+    result = {"ok": True, "genome_vcf": str(fp)}
+    if prepare_population:
+        from . import population_preparation
+        result["population_assignment"] = population_preparation.prepare(fp.resolve())
+    return result
 
 
 def _set_genome_path(key: str, path: str, check) -> Dict[str, Any]:
@@ -199,7 +207,7 @@ def _set_genome_path(key: str, path: str, check) -> Dict[str, Any]:
 
 
 @_serialized
-def set_genome_bam(path: str) -> Dict[str, Any]:
+def set_genome_bam(path: str, *, prepare_population: bool = True) -> Dict[str, Any]:
     """Record WHICH alignment the person's reads were called from.
 
     The index is not required here: a BAM without one is refused later, by name,
@@ -211,11 +219,15 @@ def set_genome_bam(path: str) -> Dict[str, Any]:
         if fp.suffix.lower() not in (".bam", ".cram"):
             return _t("store.genome_not_a_bam", path=fp.name)
         return None
-    return _set_genome_path("genome_bam", path, _check)
+    result = _set_genome_path("genome_bam", path, _check)
+    if result.get("ok") and path and prepare_population:
+        from . import population_preparation
+        result["population_assignment"] = population_preparation.prepare()
+    return result
 
 
 @_serialized
-def set_genome_reference(path: str) -> Dict[str, Any]:
+def set_genome_reference(path: str, *, prepare_population: bool = True) -> Dict[str, Any]:
     """Record the reference FASTA the reads were called against.
 
     The `.fai` IS required, and that is not pedantry: every reader of this path
@@ -227,7 +239,11 @@ def set_genome_reference(path: str) -> Dict[str, Any]:
         if not Path(str(fp) + ".fai").exists():
             return _t("store.reference_not_indexed", path=fp.name)
         return None
-    return _set_genome_path("genome_reference", path, _check)
+    result = _set_genome_path("genome_reference", path, _check)
+    if result.get("ok") and path and prepare_population:
+        from . import population_preparation
+        result["population_assignment"] = population_preparation.prepare()
+    return result
 
 
 @_serialized
@@ -1404,3 +1420,18 @@ def write_goal_targets(proposals: List[Dict[str, Any]]) -> Dict[str, Any]:
     meta["written_by"] = "scholion goal-suggest"
     _write_private(path, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
     return {"path": str(path), "added": added, "kept": kept}
+
+
+@_serialized
+def connect_genome(path: Optional[str] = None, *, bam: Optional[str] = None,
+                   reference: Optional[str] = None) -> Dict[str, Any]:
+    """Connect all named inputs before preparing their shared population."""
+    result: Dict[str, Any] = {"ok": True}
+    for setter, value in ((set_genome_bam, bam), (set_genome_reference, reference), (set_genome_vcf, path)):
+        if value is not None:
+            result.update(setter(value, prepare_population=False))
+            if not result.get("ok"):
+                return result
+    from . import population_preparation
+    result["population_assignment"] = population_preparation.prepare()
+    return result

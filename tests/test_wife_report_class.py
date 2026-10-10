@@ -158,8 +158,9 @@ class TestTask81ThePopulationIsNotASilentDefault(unittest.TestCase):
     def test_an_unstated_population_is_declared_in_the_report(self):
         out = fmt.prs_report({"available": True, "stats": {
             "superpopulation": "EUR", "ancestry_stated": False,
-            "reliable": 0, "total": 0}, "by_category": {}})
-        self.assertRegex(out, r"(?i)(default|дефолт)")
+            "reliable": 0, "total": 0}, "by_category": {},
+            "method_caveats": [{"note": "DEFAULT reference selection is not verified"}]})
+        self.assertIn("DEFAULT reference selection is not verified", out)
 
     def test_a_stated_population_carries_no_caveat(self):
         out = fmt.prs_report({"available": True, "stats": {

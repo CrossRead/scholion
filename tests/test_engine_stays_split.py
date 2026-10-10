@@ -268,7 +268,9 @@ LINE_BUDGETS = {
     # copies are measured from the coverage table itself rather than asked of
     # a profile, and the reference point is the median of the same kind of
     # locus (1100 → 1160; 1148 lines when raised).
-    "genomics": 1160,
+    # 10.10.2026: the saved PGS panel, current assignment and selection-source
+    # provenance are separate facts with a truthful shared note (1175 lines).
+    "genomics": 1200,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.

@@ -90,6 +90,7 @@ class TestHostList(unittest.TestCase):
         "mor.nlm.nih.gov",              # RxClass — the drug class
         "pypi.org",                     # the version check: `scholion version --check` and its
                                         # button, on an explicit request only (owner, 13.09.2026)
+        "grch37.rest.ensembl.org",      # genome preparation in verified GRCh37 coordinates
         "rest.ensembl.org",             # parsing an rsID
         "rxnav.nlm.nih.gov",            # RxNorm — normalising the name
     }

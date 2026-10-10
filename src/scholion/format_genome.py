@@ -663,15 +663,8 @@ def prs_report(r: Dict[str, Any]) -> str:
     lines = [_t("prs.title") + " · "
              + _t("prs.reliable", reliable=s.get("reliable"), total=s.get("total")) + " · "
              + _t("prs.reference", population=s.get("superpopulation", "EUR")), ""]
-    # EUR is a DEFAULT, not a finding. A percentile is a position within a
-    # reference population; computing it against one the person does not belong
-    # to and printing it as an ordinary number is the same silent substitution
-    # that gave a woman a male testosterone range — a plausible stand-in for a
-    # missing precondition, delivered with the confidence of a measured fact.
-    if not s.get("ancestry_stated"):
-        lines.append(_t("prs.population_not_stated",
-                        population=s.get("superpopulation", "EUR")))
-        lines.append("")
+    if s.get("population_note"):
+        lines += [s["population_note"], ""]
     for w in (r.get("withheld_by_sex") or []):
         lines.append("· " + str(w.get("label")) + " — " + str(w.get("note")))
     if r.get("withheld_by_sex"):
@@ -771,6 +764,12 @@ def _catalogue_size() -> int:
 
 
 def genome_status_report(r: Dict[str, Any]) -> str:
+    text = _genome_status_body(r)
+    pop = r.get("population") or {}
+    return text + ("\n\n" + pop["note"] + "\n" + pop.get("scope", "") if pop.get("note") else "")
+
+
+def _genome_status_body(r: Dict[str, Any]) -> str:
     # The build comes first, before «connected» and before «no index». A file in
     # the wrong assembly is neither broken nor missing: it is fine, and it is the
     # wrong coordinate system for our catalogue. Reported as «no index» it would

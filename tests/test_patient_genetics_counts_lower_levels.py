@@ -13,7 +13,7 @@ class TestPatientPresentation(unittest.TestCase):
     def test_all_three_renderers_hide_rows_without_mutating_the_reply(self):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
-        for name in ("shownGenetics", "hypothesisCountHtml", "referenceContextHtml", "mechanismHtml", "genTableRow", "genTableHtml",
+        for name in ("systemGeneLink", "shownGenetics", "hypothesisCountHtml", "referenceContextHtml", "mechanismHtml", "genTableRow", "genTableHtml",
                      "panelHtml", "genSummaryHtml", "markerGeneticsRow", "basketRowHtml"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])

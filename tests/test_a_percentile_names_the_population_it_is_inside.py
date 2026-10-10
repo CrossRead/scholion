@@ -25,11 +25,14 @@ import os
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 from contextlib import contextmanager
 from pathlib import Path
 
 import support  # noqa: F401  — puts src/ on the import path
-from scholion import core, engine, prs
+from scholion import core, engine, format as fmt, i18n, prs
+from scholion.pgs_validation import reference_snapshot
+from pgs_support import calibrated
 from scholion.engine import genomics
 
 
@@ -85,6 +88,35 @@ class TestThePanelIsResolvedRatherThanDefaulted(unittest.TestCase):
         with profile(genome_verdict="SAS"):
             got = prs.resolve_superpopulation()
         self.assertEqual({"value": "SAS", "source": "genome"}, got)
+
+    def test_scoring_automatically_uses_and_records_the_genome_population(self):
+        calls = []
+        row = calibrated({"pgs_id": "PGS000001", "percentile": 71})
+        row["reference_panel_ancestry"] = "SAS"
+        row["reference_validation"]["snapshot_sha256"] = reference_snapshot(row)
+
+        class Sidecar:
+            def call(self, name, args):
+                calls.append((name, args))
+                if name == "compute_prs_by_trait":
+                    return {"rows": [dict(row)]}
+                return dict(row, method="reference_panel", reliable=True)
+
+            def close(self):
+                pass
+
+        with profile(genome_verdict="SAS") as tmp:
+            vcf = tmp / "sites.vcf"
+            vcf.write_text("##fileformat=VCFv4.2\n", encoding="utf-8")
+            with mock.patch.object(prs, "_MCP", return_value=Sidecar()), \
+                 mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}):
+                report = prs.report(str(vcf), normalize=False,
+                                    traits=[{"term": "diabetes", "label": "Diabetes", "efo_id": "EFO_TEST"}])
+        self.assertTrue(report["ok"])
+        self.assertEqual("SAS", report["superpopulation"])
+        self.assertEqual("genome", report["superpopulation_source"])
+        self.assertTrue(report["traits"][0]["chosen"]["reliable"])
+        self.assertEqual("SAS", next(args for name, args in calls if name == "compute_prs_by_trait")["superpopulation"])
 
     def test_a_caller_that_names_one_wins(self):
         with profile(genome_verdict="SAS"):
@@ -146,6 +178,42 @@ class TestTheStoredNumbersSayWhatTheyWereScoredAgainst(unittest.TestCase):
         self.assertFalse(stats["ancestry_stated"])
         self.assertFalse(stats["panel_out_of_date"],
                          "the same letters are not a disagreement")
+        self.assertTrue(stats["panel_matches_ancestry"])
+
+    def test_a_matching_genome_determination_is_visible_without_rewriting_old_results(self):
+        previous_lang = i18n.lang()
+        try:
+            for lang in ("en", "ru"):
+                i18n.set_lang(lang)
+                with profile(stored_panel="EUR", genome_verdict="EUR") as tmp:
+                    path = tmp / "prs_results.json"
+                    before = path.read_bytes()
+                    report = engine.prs_findings()
+                    rendered = fmt.prs_report(report)
+                    self.assertEqual(before, path.read_bytes())
+                self.assertEqual([], panel_caveats(report))
+                self.assertIn(report["stats"]["population_note"], rendered)
+                self.assertEqual("genome", report["stats"]["ancestry_source"])
+                self.assertFalse(report["stats"]["ancestry_stated"])
+                self.assertFalse(report["categories"][0]["traits"][0]["reliable"],
+                                 "Population agreement must not repair missing calibration")
+                self.assertNotIn("nobody chose", rendered)
+        finally:
+            i18n.set_lang(previous_lang)
+
+    def test_missing_calculation_population_is_not_invented_from_current_dna(self):
+        with profile(genome_verdict="EUR"):
+            report = engine.prs_findings()
+        self.assertEqual(["panel_missing"], panel_caveats(report))
+        self.assertFalse(report["stats"]["panel_matches_ancestry"])
+        self.assertFalse(report["stats"]["panel_recorded"])
+
+    def test_an_explicit_default_can_now_match_a_genome_determination(self):
+        with profile(stored_panel="EUR", stored_source="default", genome_verdict="EUR"):
+            report = engine.prs_findings()
+        self.assertEqual([], panel_caveats(report))
+        self.assertEqual("default", report["stats"]["superpopulation_source"])
+        self.assertTrue(report["stats"]["panel_matches_ancestry"])
 
 
 class TestTheFactsAreOneFunction(unittest.TestCase):

@@ -135,9 +135,9 @@ def _add_answers_commands(sub, common) -> None:
                           "and without it nothing that needs a height is shown. The page has "
                           "always had this field; the command had not.")
     prf.add_argument("--ancestry", choices=list(_core.ANCESTRIES), default=None,
-                     help="the reference superpopulation for polygenic scores; without it a "
-                          "percentile is printed with the caveat that it was computed against "
-                          "a population that may not be yours")
+                     help="explicit override of the reference superpopulation for polygenic "
+                          "scores; otherwise the population determined from the genome is "
+                          "used automatically when available")
 
     g = sub.add_parser("genome", parents=[common], help="look a locus up in the full VCF (rsID or --gene)")
     g.add_argument("rsid", nargs="?", help="rsID (e.g. rs4149056)")
@@ -1204,16 +1204,8 @@ def _cmd_brief_reviewed(args) -> Any:
 
 def _cmd_choose_genome(args) -> Any:
     from . import store as _st
-    # Three files, one command: the reads, the alignment they were called
-    # from, and the reference they were called against. Each is set only
-    # when it was named, so `--bam` alone does not clear the other two.
-    res = {"ok": True}
-    if args.bam is not None:
-        res = {**res, **_st.set_genome_bam(args.bam)}
-    if args.reference is not None and res.get("ok"):
-        res = {**res, **_st.set_genome_reference(args.reference)}
-    if res.get("ok") and (args.path or (args.bam is None and args.reference is None)):
-        res = {**res, **_st.set_genome_vcf(args.path)}
+    path = args.path if args.path or (args.bam is None and args.reference is None) else None
+    res = _st.connect_genome(path, bam=args.bam, reference=args.reference)
     render = fmt.write_result
     return res, render
 

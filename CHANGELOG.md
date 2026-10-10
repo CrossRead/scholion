@@ -40,6 +40,32 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+
+## v0.6.6 — 10.10.2026
+
+### What you can do now
+
+**Population assignment is part of connecting a genome.** Connecting genomic inputs prepares a coarse reference-panel assignment automatically when depth-checked genotypes or a usable BAM and indexed reference are available. Missing or ambiguous input leaves the population unresolved, and PGS scoring stops instead of silently assuming EUR. The determination is bound to its input files and active profile. See the reference population determined automatically from the genome beside saved polygenic results, including whether the calculation used the same panel. Inspect these facts with `scholion prs --json`. New PGS calculations use the available genome-derived population automatically unless explicitly overridden, and retain the source of that choice.
+
+**Read lower-level context directly on genetic panels.** Both patient and clinician views show sourced C/D descriptions immediately, labelled as hypotheses. Genetic summaries have a dedicated A–E evidence column; its letter opens the reference guide. Click a gene name in a system card to open its detailed panel reference.
+
+### What is fixed
+
+A missing selection-source field in older results could produce a warning that no population had been determined, even when genome analysis had established the same population used for scoring. The application, command line and assistant reports now distinguish the current determination from the historical selection source. Different or unrecorded calculation populations remain explicit warnings.
+
+### What this changes in the conclusions
+
+Matching panel labels establish agreement with the current population assignment, not valid PGS calibration. Calibration, coordinate and coverage checks continue to apply independently.
+
+### What is retracted
+
+The statement that population analysis had not been performed solely because an older result lacked its panel-selection source.
+
+### What needs recomputing
+
+**By hand — if saved PGS results lack calibration provenance or use a different reference panel.**
+Verify or rebuild the scoring report. No recalculation is required solely to correct this warning when the recorded calculation panel matches the current determination. Saved personal results are not rewritten automatically.
+
 ## v0.6.5 — 09.10.2026
 
 ### What you can do now

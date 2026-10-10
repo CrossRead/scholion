@@ -329,6 +329,23 @@ Periodic updating (a button in the application, by hand or on a monthly schedule
 
 Both layers require a **BAM**, not just a VCF, and here is why: an ordinary VCF contains only the positions where you differ from the reference. For a polygenic score this breaks coverage — reference-homozygous scoring positions are simply absent, and the calculator honestly counts them as "not covered". So the positions needed are **re-genotyped** from the BAM separately, with calling done without the `-v` filter so that `0/0` calls stay in the output.
 
+**Prepare the shared reference population first.** Connecting the genome now prepares its population assignment automatically. Supply the aligned BAM and indexed FASTA together with the VCF, so preparation can call a small set of independent genotype sites, including reference homozygotes:
+
+```bash
+scholion choose-genome genome/<SAMPLE>.full.vcf.gz --bam <path-to-aligned-BAM> --reference <path-to-indexed-FASTA>
+scholion genome-status --json
+```
+
+The preparation verifies genome, BAM and FASTA assemblies, resolves public catalogue rsIDs in that assembly, and keeps all personal genotypes local. It reuses prepared depth-checked sites in the same genome folder where applicable. The assignment lives in the active profile, carries its source fingerprints, and is shared by the genome status and PGS calculations. A changed input invalidates its assignment. This is a coarse comparison of five reference panels, not ethnicity or admixture fractions. Fewer than 100 independent usable SNPs, an ambiguous comparison, mismatched samples or unavailable reference frequencies leave the population unresolved with a reason; PGS calculation then refuses to substitute EUR. An explicit override remains possible and is identified as such.
+
+For source-script preparation, set `PGS_GENOME_BUILD` to the verified BAM/FASTA assembly before extracting any positions. There is no default or arithmetic coordinate conversion:
+
+```bash
+export PGS_GENOME_BUILD=GRCh38
+```
+
+Use `GRCh37` instead when that is the verified assembly; the coordinate resolver uses the corresponding Ensembl service. An existing complete prepared genotype file can be analyzed directly with `python3 -m scholion.population`; this optional diagnostic uses the same assignment logic as connection and scoring.
+
 **Polygenic scores (PGS Catalog).** The computation is done by a separate sidecar process, `just-prs-mcp`, which is given only the **local path** to your VCF; the only things that leave the machine are requests for public scoring files. The order is this:
 
 ```bash
@@ -396,37 +413,29 @@ and, last, the layout this guide itself lays out above. So a person who followed
 scholion genotype-sites
 ```
 
-From the source tree the same step is two scripts:
-
-```bash
-python3 src/ingest/loci_sites_bed.py /tmp/loci_sites.bed
-OUT=genome/loci_sites.vcf.gz bash src/ingest/prs_genotype_sites.sh /tmp/loci_sites.bed
-```
+From the source tree, run the same core through `PYTHONPATH=src python3 -m scholion genotype-sites`.
 
 The BED is built from the catalogue of the build you have installed, so **repeat this step whenever a release grows the catalogue** — a sites file made earlier holds none of the new positions, and the release notes say so under «What needs recomputing». `scholion recompute` notices it from the record the package writes beside the file, and from the file's date when an older one carries no record. Only the listed positions are read from the BAM, through its index.
 
-**The longevity layer (LongevityMap).** The catalogue stores only rsIDs, so they first have to be resolved into GRCh38 coordinates through Ensembl (this needs network access — which again means the local machine, not the sandbox), and then re-genotyped from the BAM:
+**The longevity layer (LongevityMap).** Population preparation creates `longevity_sites.vcf.gz` and `longevity_rsmap.json` beside the connected genome. Reuse them for the longevity report; a separate BAM pass is unnecessary:
+
+```bash
+python3 src/ingest/longevity_report.py genome/longevity_sites.vcf.gz \
+  genome/longevity_rsmap.json src/scholion/knowledge/longevitymap.json \
+  /tmp/longevity_report.md
+```
+
+If preparing with source scripts instead, resolve coordinates in the explicitly verified `PGS_GENOME_BUILD`, then genotype them before any PGS calculation:
 
 ```bash
 python3 src/ingest/build_longevity_sites.py \
   src/scholion/knowledge/longevitymap.json \
   /tmp/longevity_sites.bed genome/longevity_rsmap.json
 OUT=genome/longevity_sites.vcf.gz bash src/ingest/prs_genotype_sites.sh /tmp/longevity_sites.bed
-python3 src/ingest/longevity_report.py genome/longevity_sites.vcf.gz \
-  genome/longevity_rsmap.json src/scholion/knowledge/longevitymap.json \
-  /tmp/longevity_report.md
+python3 src/ingest/ancestry_check.py
 ```
 
-**Which reference panel applies to you.** Those same re-genotyped sites answer a question nobody can answer about themselves: which of the five 1000 Genomes panels a polygenic percentile should be computed against. It is a step of preparing a genome, not a field to fill in — a superpopulation code is not something a person knows, and a box asking for one collects a guess that nothing downstream can tell from a measurement.
-
-```bash
-python3 src/ingest/ancestry_check.py --dry-run   # what it would read and write, fetching nothing
-python3 src/ingest/ancestry_check.py             # ~300 requests to Ensembl, one to two minutes
-```
-
-It writes `profile/ancestry_check.json`. Nothing applies it on its own: the percentile changes with the panel, so `scholion prs` reads the verdict, uses it, and says where it came from — measured from your own DNA, or fallen back on. Until this has been run, every percentile printed says out loud that it used a default panel. **Run it before building the polygenic results above**, or rebuild them afterwards: `scholion prs` marks the stored numbers as computed against a panel that is no longer the one that applies.
-
-`ONLY_SIGNIFICANT=1` limits coordinate resolution to the statistically significant entries of the catalogue — faster, if you do not need a full pass over Ensembl.
+The source wrapper and automatic connection use the same packaged determination. New PGS calculations use its population unless explicitly overridden and save that source. Saved results compare their historical panel with the current determination. A matching panel is shown as matching even if an older file lacks the original selection source; this agreement does not validate calibration. Different or unrecorded calculation populations remain warnings. Saved scores are never relabelled or rewritten by population preparation.
 
 Note the separation of layers: **`genome/`** is the cold database (the VCF and the re-genotyped positions), while the tabs of the application read **the distillate in `profile/`**: `profile/prs_results.json` and `profile/longevity_findings.json`. The first is built by the `prs_results_build.py` tool from the raw output of `prs report` (see above) — not by redirection. The second is built by the generator `src/ingest/longevity_findings_build.py`: it overlays the re-genotyped `longevity_sites.vcf.gz` onto the LongevityMap catalogue and onto the **curated catalogue of directions** `knowledge/longevity_directions.json` (which allele is "pro-longevity" according to the primary sources, with PMIDs). The key honesty of this layer lies in that separation: entries with a direction are shown with a verdict (favourable / mild plus / neutral / practical flag) and a short "what to do about it", whereas statistically significant carrier states WITHOUT a curated direction are marked as a navigator through the literature, not as "pluses" — for most LongevityMap entries the direction of the allele was never published at all (aggregate gene-based tests, multi-marker panels). `longevity_report.py` remains a human-readable markdown report.
 

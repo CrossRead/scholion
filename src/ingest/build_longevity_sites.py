@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""LongevityMap rsID → GRCh38 positions (via Ensembl REST) → BED + an rs↔pos map.
+"""LongevityMap rsID → explicitly selected assembly positions (via Ensembl REST) → BED + an rs↔pos map.
 
 The longevitymap.json catalog stores rsIDs only (no coordinates). To learn the
-owner's GENOTYPES at these variants, the rsIDs must be resolved into GRCh38 positions,
+owner's GENOTYPES at these variants, the rsIDs must be resolved into verified BAM assembly positions,
 then re-genotyped from merged.bam (prs_genotype_sites.sh with OUT=...).
 
 Network access is required (Ensembl) — run this on the Mac, not in the cloud sandbox.
@@ -17,6 +17,7 @@ import json, os, sys, time, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(HERE))                      # src/ — for `scholion`
+from _pgs_build import bed_metadata, requested_build           # noqa: E402
 from scholion import net                                       # noqa: E402
 
 
@@ -55,6 +56,9 @@ def _post(ids):
 
 
 def main():
+    build = requested_build()
+    global ENSEMBL
+    ENSEMBL = ("https://grch37.rest.ensembl.org" if build == "GRCh37" else "https://rest.ensembl.org") + "/variation/homo_sapiens"
     cat = _load_json(CATALOG)
     V = cat["variants"]
     rsids = []
@@ -81,7 +85,7 @@ def main():
                     time.sleep(2)
         for rs, info in (res or {}).items():
             for mp in (info.get("mappings") or []):
-                if mp.get("assembly_name") != "GRCh38":
+                if mp.get("assembly_name") != build:
                     continue
                 chrom = str(mp.get("seq_region_name"))
                 start = mp.get("start")
@@ -108,6 +112,11 @@ def main():
             o.write(f"{c}\t{p-1}\t{p}\n")
     with open(OUT_MAP, "w") as _fh:
         json.dump(rsmap, _fh, ensure_ascii=False, indent=0)
+    import hashlib
+    from pathlib import Path
+    bed_metadata(OUT_BED, build, [], {"service": "Ensembl", "assembly": build,
+                 "rsmap_path": str(Path(OUT_MAP).resolve()),
+                 "rsmap_sha256": hashlib.sha256(Path(OUT_MAP).read_bytes()).hexdigest()})
     print(f"✓ resolved {len(rsmap)} positions out of {len(rsids)} rsIDs")
     print(f"BED: {OUT_BED}")
     print(f"rs↔pos map: {OUT_MAP}")

@@ -36,10 +36,12 @@ def model_header(path, build):
             "harmonized_build": header.get("HmPOS_build")}
 
 
-def bed_metadata(path, build, models):
+def bed_metadata(path, build, models, position_source=None):
     path = Path(path)
     data = {"genome_build": build, "bed_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "models": models}
+    if position_source is not None:
+        data["position_source"] = position_source
     Path(str(path) + ".meta.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
 
@@ -48,7 +50,11 @@ def check_bed(path, build):
     meta = json.loads(Path(str(path) + ".meta.json").read_text(encoding="utf-8"))
     if meta.get("genome_build") != build or meta.get("bed_sha256") != hashlib.sha256(path.read_bytes()).hexdigest():
         raise ValueError("BED build/provenance does not match; regenerate the position list.")
-    if not meta.get("models") or any(m.get("harmonized_build") != build for m in meta["models"]):
+    source = meta.get("position_source") or {}
+    mapped = (source.get("service") == "Ensembl" and source.get("assembly") == build
+              and isinstance(source.get("rsmap_path"), str)
+              and hashlib.sha256(Path(source["rsmap_path"]).read_bytes()).hexdigest() == source.get("rsmap_sha256"))
+    if not mapped and (not meta.get("models") or any(m.get("harmonized_build") != build for m in meta["models"])):
         raise ValueError("BED has no matching model coordinate provenance.")
     return meta
 

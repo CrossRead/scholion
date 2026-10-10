@@ -156,7 +156,7 @@ class TestThePageShowsTheLevel(unittest.TestCase):
 
     def test_the_position_cards_draw_the_chip_and_the_ladder(self):
         page = (support.ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("${levelChip(p.level,p.level_short)}<b>${esc(p.gene)}</b>", page)
+        self.assertIn("${levelChip(p.level,p.level_short)}${systemGeneLink(p.gene,card.key)}", page)
         self.assertIn("${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}", page)
 
 

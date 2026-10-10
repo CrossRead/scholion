@@ -1245,6 +1245,7 @@ def available() -> Dict[str, Any]:
     else:
         frame = (None, False, None)
     paths = answerable_paths(*frame)
+    from . import population_preparation
     return {
         "unusable": near,
         # Which reader answered, and whether it was chosen or merely available.
@@ -1260,6 +1261,7 @@ def available() -> Dict[str, Any]:
         # Which file, whose sample, and what else was lying beside it. Silence on
         # any of the three is what let «the first one alphabetically» pass for an
         # answer about a person.
+        "population": population_preparation.state(),
         "vcf_count": len(candidates),
         # What the search set aside, and why. A file that drops out of a list in
         # silence is the same defect one level down: the reason is what tells a

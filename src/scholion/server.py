@@ -627,13 +627,9 @@ class Handler(BaseHTTPRequestHandler):
                 # The one question about the genome that a program may not answer
                 # for the person, asked where they are already looking at the
                 # names.
-                r = {"ok": True}
-                if "bam" in body:
-                    r = {**r, **store.set_genome_bam(body.get("bam") or "")}
-                if "reference" in body and r.get("ok"):
-                    r = {**r, **store.set_genome_reference(body.get("reference") or "")}
-                if r.get("ok") and ("path" in body or not ("bam" in body or "reference" in body)):
-                    r = {**r, **store.set_genome_vcf(body.get("path", ""))}
+                path = body.get("path", "") if "path" in body or not ("bam" in body or "reference" in body) else None
+                r = store.connect_genome(path, bam=body.get("bam") if "bam" in body else None,
+                                         reference=body.get("reference") if "reference" in body else None)
                 core.reset_cache()
                 return self._json(r)
             if u.path == "/api/goal":

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import gzip
+import hashlib
 import importlib.util
 import json
 import os
@@ -51,6 +52,25 @@ class BuildGuard(unittest.TestCase):
                 self.guard.requested_build()
         self.assertIsNone(self.guard.assembly_from_lengths([1000]))
         self.assertIsNone(self.guard.assembly_from_lengths([249250621, 248956422]))
+
+    def test_catalogue_positions_need_the_matching_assembly_and_unchanged_rsmap(self):
+        for build in ("GRCh37", "GRCh38"):
+            with self.subTest(build=build), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp).resolve()
+                bed, rsmap = root / "sites.bed", root / "rsmap.json"
+                bed.write_text("chr1\t99\t100\n", encoding="utf-8")
+                rsmap.write_text('{"chr1:100":"rs1000"}', encoding="utf-8")
+                source = {"service": "Ensembl", "assembly": build,
+                          "rsmap_path": str(rsmap),
+                          "rsmap_sha256": hashlib.sha256(rsmap.read_bytes()).hexdigest()}
+                self.guard.bed_metadata(bed, build, [], source)
+                self.assertEqual(source, self.guard.check_bed(bed, build)["position_source"])
+                other = "GRCh38" if build == "GRCh37" else "GRCh37"
+                with self.assertRaises(ValueError):
+                    self.guard.check_bed(bed, other)
+                rsmap.write_text('{"chr1:200":"rs1000"}', encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "coordinate provenance"):
+                    self.guard.check_bed(bed, build)
 
     def test_extraction_selects_the_target_coordinates_and_writes_provenance(self):
         for build in ("GRCh37", "GRCh38"):

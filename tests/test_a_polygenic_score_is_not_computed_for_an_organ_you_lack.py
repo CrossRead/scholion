@@ -345,6 +345,9 @@ class TestTheReportItself(unittest.TestCase):
         """`report` narrates its progress on stderr on purpose — a run over a real
         genome takes minutes and a silent one looks hung. Here it is swallowed:
         a test suite is not the console it was written for."""
+        # These transport/model tests use an explicit panel; unresolved input
+        # and automatic population assignment have their own end-to-end tests.
+        kw.setdefault("superpopulation", "EUR")
         fake = FakeMCP(answers)
         with mock.patch.object(prs, "_MCP", return_value=fake), \
              mock.patch.object(prs, "_model_build", return_value={"model_harmonized_build": "GRCh38"}), quiet():
@@ -404,7 +407,7 @@ class TestTheReportItself(unittest.TestCase):
         fake = FakeMCP({"normalize_vcf": {"path": "/tmp/g.parquet"},
                         "search_traits": {"traits": []}})
         with mock.patch.object(prs, "_MCP", return_value=fake), quiet():
-            got = prs.report(str(self.vcf), traits=traits)
+            got = prs.report(str(self.vcf), traits=traits, superpopulation="EUR")
         self.assertEqual("trait_not_found", got["traits"][0]["status"])
 
     def test_a_trait_that_threw_is_a_row_with_an_error_and_not_a_lost_line(self):
@@ -475,7 +478,7 @@ class TestTheReportItself(unittest.TestCase):
         fake = FakeMCP({"normalize_vcf": {"path": "/tmp/g.parquet"},
                         "compute_prs_by_trait": {"rows": [{"pgs_id": "P", "match_rate": 0.9}]}})
         with mock.patch.object(prs, "_MCP", return_value=fake), quiet():
-            got = prs.report(str(self.vcf), traits=traits)
+            got = prs.report(str(self.vcf), traits=traits, superpopulation="EUR")
         self.assertEqual(["Breast cancer"], [w["label"] for w in got["withheld_by_sex"]])
 
     def test_the_server_is_closed_even_when_a_trait_fails(self):

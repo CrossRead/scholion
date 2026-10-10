@@ -73,9 +73,9 @@ class TestThePageLinksToIt(unittest.TestCase):
 
     def test_the_radar_block_and_the_card_link_to_the_panel_page(self):
         html = (ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("async function viewPanel(key,reading=null)", html)
+        self.assertIn("async function viewPanel(key,reading=null,focusGene=null)", html)
         self.assertIn("/api/panel?key=", html)
-        self.assertEqual(2, html.count('data-panel="${esc('), "the radar block and the card both open it")
+        self.assertEqual(3, html.count('data-panel="${esc('), "the radar block, card and gene names open the panel")
         self.assertIn("closest('[data-panel]')", html)
 
 

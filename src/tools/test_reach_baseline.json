@@ -97,6 +97,8 @@
     "src/scholion/panel_reference.py": 100.0,
     "src/scholion/pgs_validation.py": 97.8,
     "src/scholion/phenoage.py": 81.9,
+    "src/scholion/population.py": 75.6,
+    "src/scholion/population_preparation.py": 67.1,
     "src/scholion/prescribing_basis.py": 100.0,
     "src/scholion/prevalence.py": 100.0,
     "src/scholion/provenance.py": 100.0,

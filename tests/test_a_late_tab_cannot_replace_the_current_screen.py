@@ -65,7 +65,7 @@ const viewPanel=()=>{opened++;visible.innerHTML='OLD LIST';};
 
     def test_panel_subviews_also_own_their_nodes(self):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
-        start = page.index("async function viewPanel(key,reading=null){")
+        start = page.index("async function viewPanel(key,reading=null,focusGene=null){")
         function = page[start:page.index("\n}\n", start) + 2]
         script = r"""
 const assert=require('node:assert/strict');

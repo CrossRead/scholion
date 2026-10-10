@@ -648,16 +648,30 @@ def _panel_facts(data: Dict[str, Any]) -> Dict[str, Any]:
     used = meta.get("superpopulation", "EUR")
     used_source = meta.get("superpopulation_source")
     applies = core.ancestry()
+    used_recorded = meta.get("superpopulation") in core.ANCESTRIES
+    matches = bool(applies["value"]) and used_recorded and applies["value"] == used
+    population_note = None
+    if applies["value"]:
+        population_note = _t("prs.population." + applies["source"],
+                             population=applies["value"])
+        if matches:
+            population_note += " " + _t("prs.population.matches", population=used)
+            if not used_source:
+                population_note += " " + _t("prs.population.source_unrecorded")
     return {
         "superpopulation": used,
         "superpopulation_source": used_source,
         "ancestry_stated": used_source in ("asked", "stated", "genome"),
         "ancestry_determined": applies["value"],
         "ancestry_source": applies["source"],
+        "ancestry_date": applies.get("date"),
+        "population_note": population_note,
+        "panel_matches_ancestry": matches,
+        "panel_recorded": used_recorded,
         # True only when there IS something to disagree with. No determination
         # is not a disagreement — it is the ordinary state before the genome has
         # been asked, and it has its own line in `limits`.
-        "panel_out_of_date": bool(applies["value"]) and applies["value"] != used,
+        "panel_out_of_date": bool(applies["value"]) and used_recorded and applies["value"] != used,
     }
 
 
@@ -671,12 +685,14 @@ def _panel_caveat(data: Dict[str, Any]) -> List[Dict[str, str]]:
     structure.
     """
     facts = _panel_facts(data)
+    if not facts["panel_recorded"]:
+        return [{"key": "panel_missing", "note": _t("prs.caveat.panel_missing")}]
     if facts["panel_out_of_date"]:
         return [{"key": "panel_out_of_date",
                  "note": _t("prs.caveat.panel_out_of_date",
                             used=facts["superpopulation"],
                             applies=facts["ancestry_determined"])}]
-    if not facts["ancestry_stated"]:
+    if not facts["ancestry_stated"] and not facts["panel_matches_ancestry"]:
         return [{"key": "panel_defaulted",
                  "note": _t("prs.caveat.panel_defaulted", used=facts["superpopulation"])}]
     return []

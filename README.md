@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.6.5** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.6.6** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -781,7 +781,10 @@ Two lookups do go out, and only when you ask for them by name. Resolving a drug
 missing from the local knowledge base sends **the drug name** — first to a free
 translation service if the name is Russian, then to the NLM RxNorm and RxClass
 APIs, then to the CPIC API for the gene–drug pair. Looking up an rsID queries
-Ensembl. A drug name can itself be personal information; these lookups are not
+Ensembl (`rest.ensembl.org`). Connecting a genome can resolve predefined public
+catalogue rsIDs through that service or `grch37.rest.ensembl.org`, according to
+the verified assembly, to prepare a reference population. Genotypes and sample
+identifiers are never sent in those requests. A drug name can itself be personal information; these lookups are not
 uploads of a complete profile. Separately, the first tool call can check PyPI
 for a new version at most once a day, with no medical data in the request.
 Installing an update requires the person's permission.

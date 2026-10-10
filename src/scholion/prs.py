@@ -414,7 +414,8 @@ def resolve_superpopulation(asked=None):
     parameter of a medical answer can be chosen: a percentile is a position
     within a population, and the population was picked by whoever wrote the
     default. Now the order is what the person overrode, else what their genome
-    determined, else the fallback — and the fallback SAYS it is one.
+    determined, else an unresolved sentinel. report() prepares the population before scoring
+    and refuses the run if that sentinel remains.
 
     Returned with its source because the number is the same either way and what
     may be claimed about it is not.
@@ -514,6 +515,22 @@ def report(vcf_path: str, traits=None, superpopulation=None,
     if build not in ("GRCh37", "GRCh38"):
         return {"ok": False, "status": "build_unknown", "assembly": assembly,
                 "error": _t("prs.validation.build_unknown")}
+    if panel["source"] == "default":
+        from . import population_preparation
+        assignment = population_preparation.prepare(genome.vcf_path() or Path(vcf_path))
+        panel = resolve_superpopulation()
+        if panel["source"] == "default":
+            return {"ok": False, "status": "population_unresolved",
+                    "population_assignment": assignment,
+                    "error": _t("prs.population.unresolved", reason=_t("prs.population.reason." + assignment["status"]))}
+        superpopulation = panel["value"]
+    if panel["source"] == "genome":
+        from . import core, population
+        check = core.ancestry_check()
+        if check.get("samples") and population.samples(Path(vcf_path)) != check["samples"]:
+            return {"ok": False, "status": "population_unresolved",
+                    "population_assignment": {"status": "sample_mismatch", "verdict_superpop": None},
+                    "error": _t("prs.population.unresolved", reason=_t("prs.population.reason.sample_mismatch"))}
     def _log(msg):
         import sys as _s
         print(msg, file=_s.stderr, flush=True)
@@ -644,10 +661,9 @@ def _main(argv=None):
     sub.add_parser("selftest")
     r = sub.add_parser("report")
     r.add_argument("--vcf", required=True)
-    r.add_argument("--pop", default=None,
+    r.add_argument("--pop", default=None, choices=("AFR", "AMR", "EAS", "EUR", "SAS"),
                    help="override the reference panel. Left alone, the panel determined "
-                        "from the genome is used, and where none has been determined the "
-                        "run says it fell back to a default")
+                        "from the genome is used; unresolved assignments stop scoring")
     r.add_argument("--only", nargs="*", default=None,
                    help="substrings to filter the traits by (a quick test, e.g. --only diabetes)")
     r.add_argument("--models", type=int, default=3,

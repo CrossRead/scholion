@@ -2283,6 +2283,22 @@ def ancestry() -> Dict[str, Any]:
     if stated in ANCESTRIES:
         return {"value": stated, "source": "stated"}
     check = ancestry_check()
+    if check.get("status") not in (None, "determined"):
+        return {"value": None, "source": None}
+    if check.get("source_vcf"):
+        from . import genome, population
+        connected = genome.vcf_path()
+        try:
+            path = Path(check["source_vcf"])
+            if check.get("source_rsmap") and population.fingerprint(Path(check["source_rsmap"])) != check.get("source_rsmap_sha256"):
+                return {"value": None, "source": None}
+            if connected and check.get("source_genome") and (str(connected.resolve()) != check["source_genome"] or population.genome_stamp(connected) != check.get("source_genome_stamp") or population.samples(connected) != check.get("source_genome_samples")):
+                return {"value": None, "source": None}
+            if population.fingerprint(path) != check.get("source_vcf_sha256") \
+                    or (connected and connected.resolve().parent != path.resolve().parent):
+                return {"value": None, "source": None}
+        except (OSError, ValueError, TypeError):
+            return {"value": None, "source": None}
     v = check.get("verdict_superpop")
     if v in ANCESTRIES:
         return {"value": v, "source": "genome", "date": check.get("date"),

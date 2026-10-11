@@ -1080,7 +1080,7 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         elif x["status"] == "no_data":
             L.append(f"- `{x['rsid']}` {x['gene']} — {_t('lipidgen.unread')}")
         else:
-            mark = _t("lipidgen.carrier") if x["carrier"] else _t("lipidgen.not_carrier")
+            mark = _t("lipidgen.direction_unknown" if x["carrier"] is None else "lipidgen.carrier" if x["carrier"] else "lipidgen.not_carrier")
             L.append(f"- `{x['rsid']}` {x['gene']} {x['genotype']} — **{mark}**")
             if x.get("verdict"):
                 L.append(f"  {x['verdict']}")
@@ -1101,7 +1101,7 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
     L += ["", f"**{_t('lipidgen.lpa.h')}**"]
     m = lpa.get("measured")
     if m:
-        L.append("- " + _t("lipidgen.lpa.measured", value=m["value"], unit=m["unit"],
+        L.append("- " + _t("lipidgen.lpa.measured", value=m["value"], unit=m.get("unit_display") or m["unit"],
                            date=m["date"]))
         if m.get("above"):
             L.append("  ⚠ " + _t("lipidgen.lpa.above", ref=m.get("ref_high")))

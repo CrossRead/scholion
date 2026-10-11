@@ -99,6 +99,28 @@ class DisplayContext(unittest.TestCase):
             self.assertIsNone(rows[rsid]["copies"])
             self.assertIn("variant_note", rows[rsid])
 
+    def test_lipid_measurement_unit_is_localized_without_changing_the_reading(self):
+        from scholion.engine import labs
+        from scholion.format_genome import lipid_genetics_report
+        for language, unit in (("en", "nmol/L"), ("ru", "\u043d\u043c\u043e\u043b\u044c/\u043b")):
+            i18n.set_lang(language)
+            marker = {"value": 12.5, "unit": "\u043d\u043c\u043e\u043b\u044c/\u043b", "unit_display": unit,
+                      "date": "2026-01-01", "flag": "ok", "series": [{"value": 12.5}]}
+            with patch.object(labs, "analyze_labs", return_value={"markers": [marker]}), patch.object(genomics, "prs_findings", return_value={}):
+                result = genomics.lipid_genetics()
+            self.assertEqual(12.5, result["lpa"]["measured"]["value"])
+            self.assertEqual(marker["unit"], result["lpa"]["measured"]["unit"])
+            self.assertIn("12.5 " + unit, lipid_genetics_report(result))
+
+    def test_cli_does_not_call_unresolved_pcsk9_direction_absent(self):
+        from scholion.format_genome import lipid_genetics_report
+        for language in ("en", "ru"):
+            i18n.set_lang(language)
+            row = {"status": "read", "rsid": "rs28362263", "gene": "PCSK9", "genotype": "GG", "carrier": None}
+            text = lipid_genetics_report({"pcsk9": [row]})
+            self.assertIn(i18n.t("lipidgen.direction_unknown"), text)
+            self.assertNotIn(i18n.t("lipidgen.not_carrier"), text)
+
     def test_screen_provenance_refusals_are_sentences_in_each_language(self):
         for lang in ("en", "ru"):
             i18n.set_lang(lang)

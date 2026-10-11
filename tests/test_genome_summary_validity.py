@@ -71,16 +71,28 @@ console.log(JSON.stringify([prsModelDetails(row),prsModelDetails({}),prsModelDet
 
     def test_lipid_card_keeps_unverified_values_out_of_the_percentile_label(self):
         script = "const t=k=>k, esc=x=>String(x), clinicalBasisHTML=()=>'';\n" + "function prsPercentile(p){return p==null?'—':Number(p.toFixed(2))>=100?'≥P99.99':'P'+p;}" + "\n" + self.function("renderLipidGenetics") + """
-const render=(reliable,percentile)=>renderLipidGenetics({status:'ok',lpa:{measured:{value:10,unit:'nmol/L'},estimate:{label:'Synthetic Lp(a)',pgs_id:'PGS002101',reliable,percentile,calibration_note:reliable?null:'CALIBRATION_GAP'}}});
+const render=(reliable,percentile)=>renderLipidGenetics({status:'ok',lpa:{measured:{value:10,unit:'SOURCE_UNIT',unit_display:'nmol/L'},estimate:{label:'Synthetic Lp(a)',pgs_id:'PGS002101',reliable,percentile,calibration_note:reliable?null:'CALIBRATION_GAP'}}});
 const badge=()=>'';
 console.log(JSON.stringify([render(true,99.9999),render(false,99),render(false,null)]));
 """
         rows = self.execute(script)
         self.assertIn('≥P99.99', rows[0])
         self.assertNotIn('P100', rows[0])
+        self.assertIn('10 nmol/L', rows[0])
+        self.assertNotIn('SOURCE_UNIT', rows[0])
         for html in rows[1:]:
             self.assertIn('web.prs.unverified', html)
             self.assertIn('CALIBRATION_GAP', html)
             self.assertIn('<details', html)
             self.assertNotIn('>99', html)
             self.assertNotIn('>null', html)
+
+    def test_screening_omits_empty_extra_classes_and_folds_available_ones(self):
+        script = "const t=k=>k, esc=x=>String(x);\n" + self.function("renderScreen") + """
+console.log(JSON.stringify([renderScreen({held:[],named:[]}),renderScreen({held:[],named:[{key:'test',label:'Synthetic class',count:1}]})]));
+"""
+        empty, named = self.execute(script)
+        self.assertNotIn('screen.no_named', empty)
+        self.assertNotIn('screen.named_header', empty)
+        self.assertIn('<details class="fold">', named)
+        self.assertIn('Synthetic class', named)

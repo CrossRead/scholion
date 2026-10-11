@@ -4078,7 +4078,7 @@ function renderLipidGenetics(d){
   const l=d.lpa||{}; const m=l.measured;
   const lpa = m
     ? `<div class="list-item"><div class="row">${m.above===true?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):m.above===false?badge('b-good',t('web.flag.ok')):badge('b-unknown',t('web.severity.unassessed'))}
-         <b>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
+         <b>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit_display??m.unit)}</b> <span class="muted">${esc(m.date)}</span></div></div>`
     : `<div class="cr-card card muted">${esc(l.what_to_do||t('clinical.withheld'))}${clinicalBasisHTML(l)}</div>`;
   const est = l.estimate
     ? `<div class="list-item"><div class="row"><b>${esc(l.estimate.label||'')}</b>
@@ -4352,13 +4352,12 @@ function renderScreen(scr){
   if(!scr)return `<div class="cr-card card muted">${esc(t('web.common.error'))}</div>`;
   const c=scr.classes||scr;
   const chips=(c.held||[]).map(r=>`<button class="cr-btn cr-btn--ghost ghost sc-cls" data-cls="${esc(r.key)}">${esc(r.label||r.key)} · ${r.count}</button>`).join(' ');
-  const named=(c.named||[]).map(r=>`<div class="list-item"><b>${esc(r.label||r.key)}</b> · ${r.count} — <span class="muted">${esc(r.source||'')}</span></div>`).join('')
-    || `<div class="why muted">${esc(t('screen.no_named'))}</div>`;
+  const named=(c.named||[]).map(r=>`<div class="list-item"><b>${esc(r.label||r.key)}</b> · ${r.count} — <span class="muted">${esc(r.source||'')}</span></div>`).join('');
   return `<div class="cr-card card"><div class="row"><b>${esc(t('screen.title'))}</b></div>
     <div class="meta" style="margin:8px 0">${esc(t('screen.classes_header'))}</div>
     <div class="drugchips">${chips}</div>
     <div id="sc-box" style="margin-top:14px"></div>
-    <div class="meta mt-4">${esc(t('screen.named_header'))}</div>${named}
+    ${named?`<details class="fold"><summary>${esc(t('screen.named_header'))}</summary>${named}</details>`:''}
     ${c.refused?`<div class="why muted">${esc(t('screen.dropped',{n:c.refused}))}</div>`:''}</div>`;
 }
 function screenClassHtml(r){

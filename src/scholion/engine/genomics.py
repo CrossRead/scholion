@@ -1222,7 +1222,7 @@ def lipid_genetics() -> Dict[str, Any]:
     measured = None
     if rows:
         last = rows[0]
-        measured = {k: last.get(k) for k in ('value', 'unit', 'date', 'date_source', 'ref_high', 'ref_origin', 'flag')}
+        measured = {k: last.get(k) for k in ('value', 'unit', 'unit_display', 'date', 'date_source', 'ref_high', 'ref_origin', 'flag')}
         measured['censored'] = last['series'][-1].get('censored')
         measured['above'] = last['flag'] == 'high' if last['flag'] in ('ok', 'high', 'low') and not measured['censored'] else None
     estimate = None

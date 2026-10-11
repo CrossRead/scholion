@@ -36,6 +36,13 @@ if [ "$1" = "view" ] && [ "$2" = "-h" ]; then
     *) echo '##fileformat=VCFv4.2'
        if [ "${CHR_PREFIX:-0}" = "1" ]; then echo '##contig=<ID=chr1>'; else echo '##contig=<ID=1>'; fi ;;
   esac
+  if [ "${LONG_HEADER:-0}" = "1" ]; then
+    i=0
+    while [ "$i" -lt 5000 ]; do
+      echo '##synthetic=long-header-for-pipe-lifetime' || exit 141
+      i=$((i + 1))
+    done
+  fi
   exit 0
 fi
 # view -i ... FILE (the extraction) and query: one significant row
@@ -101,13 +108,13 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
             f.truncate(11_000_000)
         self.calls = self.root / "calls.txt"
 
-    def run_it(self, chr_prefix: bool, reference: bool):
+    def run_it(self, chr_prefix: bool, reference: bool, long_header: bool = False):
         if reference:
             (self.genome / "GRCh38.fa").write_text(">chr1\nACGT\n", encoding="utf-8")
         env = {"PATH": f"{self.bin}{os.pathsep}/usr/bin{os.pathsep}/bin", "HOME": str(self.root),
                "SCHOLION_REPO_DIR": str(self.root), "SCHOLION_GENOME_DIR": str(self.genome),
                "SCHOLION_CLINVAR_CACHE": str(self.root / "cache"), "CALLS": str(self.calls),
-               "CHR_PREFIX": "1" if chr_prefix else "0", "LC_ALL": "C"}
+               "CHR_PREFIX": "1" if chr_prefix else "0", "LONG_HEADER": "1" if long_header else "0", "LC_ALL": "C"}
         return subprocess.run([support.posix_shell("bash"), str(SCRIPT)], env=env, capture_output=True, text=True, encoding="utf-8",
                               timeout=60, stdin=subprocess.DEVNULL)
 
@@ -129,6 +136,11 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
         p = self.run_it(chr_prefix=True, reference=False)
         self.assert_finished(p)
         self.assertFalse(json.loads((self.genome / "clinvar_norm.json").read_text(encoding="utf-8"))["left_aligned"])
+
+    def test_long_headers_are_consumed_without_corrupting_metadata(self):
+        p = self.run_it(chr_prefix=True, reference=False, long_header=True)
+        self.assert_finished(p)
+        self.assertIn("--rename-chrs", self.calls.read_text(encoding="utf-8"))
 
     def test_the_plain_branch(self):
         p = self.run_it(chr_prefix=False, reference=False)

@@ -70,7 +70,7 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 ### What is fixed
 
-The lipid panel retains the verification status of its Lp(a) polygenic estimate and never presents an unverified percentile as an ordinary reading. Extreme percentile labels remain below P100. Recovery of missing ClinVar gene names requires matching recorded coordinate provenance.
+The lipid panel retains the verification status of its Lp(a) polygenic estimate and never presents an unverified percentile as an ordinary reading. Extreme percentile labels remain below P100. Recovery of missing ClinVar gene names requires matching recorded coordinate provenance. ClinVar annotation also retains valid source metadata when reading long VCF headers.
 
 Today tables wrap long reference descriptions to fit the screen. Known source-language unit labels are rendered in the selected language without changing values or stored units. Saved goal and focus text can carry separate English and Russian versions. Class screening now explains stale or unverifiable scan provenance instead of exposing a message identifier.
 

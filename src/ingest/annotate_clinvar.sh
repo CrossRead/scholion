@@ -68,12 +68,14 @@ CLINVAR_VCF="$CACHE_DIR/clinvar.vcf.gz"
 echo "→ Checking/downloading a fresh ClinVar (GRCh38) …"
 curl -fsSL -z "$CLINVAR_VCF" -o "$CLINVAR_VCF" "$CLINVAR_URL"
 curl -fsSL -z "$CLINVAR_VCF.tbi" -o "$CLINVAR_VCF.tbi" "$CLINVAR_URL.tbi" || tabix -f -p vcf "$CLINVAR_VCF"
-CLINVAR_DATE="$(bcftools view -h "$CLINVAR_VCF" | grep -m1 -o 'fileDate=[0-9-]*' | cut -d= -f2 || echo '?')"
+# Consume the complete header: an early-closing grep can SIGPIPE bcftools.
+CLINVAR_DATE="$(bcftools view -h "$CLINVAR_VCF" | awk -F= '/^##fileDate=/{if (!seen++) print $2}')"
+CLINVAR_DATE="${CLINVAR_DATE:-?}"
 echo "  ClinVar version (fileDate): $CLINVAR_DATE"
 
 # --- 2. reconcile the chromosome names (ClinVar: '1'; a UCSC-based VCF: 'chr1') -
 PREF=""
-if bcftools view -h "$VCF" | grep -q '##contig=<ID=chr'; then PREF="chr"; fi
+if bcftools view -h "$VCF" | grep '##contig=<ID=chr' >/dev/null; then PREF="chr"; fi
 ANNOT="$CLINVAR_VCF"
 if [[ "$PREF" == "chr" ]]; then
   echo "→ The personal VCF uses the 'chr' prefix — renaming the ClinVar contigs to match…"

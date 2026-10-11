@@ -1229,13 +1229,10 @@ def lipid_genetics() -> Dict[str, Any]:
     for cat in (prs_findings().get("categories") or []):
         for tr in cat.get("traits") or []:
             if tr.get("pgs_id") == _LPA_PGS:
-                estimate = {"percentile": tr.get("percentile") if tr.get("reliable") else None,
-                            "pgs_id": tr.get("pgs_id"), "reliable": bool(tr.get("reliable")),
-                            "quality": tr.get("quality_label"), "label": tr.get("label"),
-                            "calibration_note": tr.get("calibration_note"),
-                            "reliability_note": tr.get("reliability_note"),
-                            "reading_note": tr.get("reading_note"),
-                            "reference_note": tr.get("reference_note")}
+                estimate = {k: tr.get(k) for k in ("pgs_id", "label", "calibration_note",
+                            "reliability_note", "reading_note", "reference_note")}
+                estimate.update(percentile=tr.get("percentile") if tr.get("reliable") else None,
+                                reliable=bool(tr.get("reliable")), quality=tr.get("quality_label"))
                 if not estimate["reliable"]:
                     estimate["diagnostic_percentile"] = tr.get("percentile") if tr.get("percentile") is not None else tr.get("diagnostic_percentile")
     lpa = guard_fields({}, {

@@ -39,6 +39,21 @@ def percentile_label(value: Any) -> str:
     return "P" + f"{p:.2f}".rstrip("0").rstrip(".")
 
 
+def scoring_verified(row: dict) -> bool:
+    """Whether a stored score carries the corrected called-allele witness."""
+    witness = row.get("scoring_validation")
+    return (isinstance(witness, dict) and witness.get("checked") is True
+            and witness.get("algorithm") == "scholion-called-alleles-v1"
+            and all(isinstance(witness.get(k), str) and len(witness[k]) == 64
+                    for k in ("input_sha256", "model_sha256")))
+
+
+def recalculation_status(rows: list) -> dict:
+    """An update never supplies missing scoring evidence or starts a genome job."""
+    count = sum(1 for row in rows if row.get("pgs_id") and not scoring_verified(row))
+    return {"required": count > 0, "traits": count, "reason": "scoring_unverified" if count else None}
+
+
 def validate(row: dict, *, expected_build: str | None = None,
              expected_ancestry: str | None = None) -> dict:
     """Return a copy; withdraw unverified percentiles without erasing their history.
@@ -49,6 +64,8 @@ def validate(row: dict, *, expected_build: str | None = None,
     """
     out = dict(row)
     reasons = []
+    if not scoring_verified(row):
+        reasons.append("scoring_unverified")
     method = row.get("percentile_method")
     if method != "reference_panel":
         reasons.append("method_unknown" if not method else "method_unsupported")
@@ -66,7 +83,7 @@ def validate(row: dict, *, expected_build: str | None = None,
             reasons.append("calibration_inconsistent")
     if not row.get("reference_panel") or not row.get("reference_panel_ancestry"):
         reasons.append("reference_identity_missing")
-    if expected_ancestry and row.get("reference_panel_ancestry") != expected_ancestry:
+    if expected_ancestry and row.get("reference_panel_ancestry") and row["reference_panel_ancestry"] != expected_ancestry:
         reasons.append("reference_population_mismatch")
     witness = row.get("reference_validation") or {}
     if not isinstance(witness, dict) or witness.get("checked") is not True:

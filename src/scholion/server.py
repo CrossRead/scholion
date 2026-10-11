@@ -13,6 +13,7 @@ knows about the other. An absent or unknown value means English.
 """
 from __future__ import annotations
 import json
+import hashlib
 import os
 import shutil
 import subprocess
@@ -20,6 +21,7 @@ import sys
 import traceback
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import Any, List
 from urllib.parse import urlparse, parse_qs
 
 from . import engine, store, core, i18n
@@ -33,6 +35,19 @@ from .i18n import t as _t
 # The request body limit. Everything the application accepts over POST is a lab point,
 # a drug or a path to a folder: kilobytes. Without a limit, `rfile.read(n)` will allocate
 # as much memory as the header asks for.
+def _profile_revision() -> str:
+    """Opaque local input identity; no paths or health values leave this endpoint."""
+    root = core.profile_dir().resolve()
+    stamps: List[Any] = [str(root)]
+    for path in sorted(root.glob("*.json")):
+        try:
+            st = path.stat()
+            stamps.append((path.name, st.st_mtime_ns, st.st_ctime_ns, st.st_size, st.st_ino))
+        except OSError:
+            continue
+    return hashlib.sha256(repr(stamps).encode()).hexdigest()
+
+
 _MAX_BODY = 1 << 20        # 1 MiB
 
 # The names under which the server may be addressed. The check is needed not against a
@@ -378,7 +393,7 @@ class Handler(BaseHTTPRequestHandler):
                 # EVERY tab, not only where /api/overview happens to be fetched. A demo
                 # that does not announce itself is a demo somebody mistakes for themselves.
                 return self._json({"app": "Scholion", "ok": True, "version": VERSION,
-                                   "synthetic": core.profile_is_synthetic()})
+                                   "synthetic": core.profile_is_synthetic(), "profile_revision": _profile_revision()})
             if p == "/api/i18n":
                 # The whole catalogue in one reply: the page renders its own labels
                 # from the same source the reports are rendered from, so a phrase
@@ -491,7 +506,7 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/screen":
                 return self._json(engine.screen((q.get("class") or [""])[0] or None))
             if p == "/api/systems":
-                return self._json(engine.systems())
+                return self._json(engine.systems((q.get("register") or [None])[0]))
             if p == "/api/system":
                 # One system as a card; the register is the density, never
                 # the verdict. With no key the answer names the systems.
@@ -783,10 +798,7 @@ def warm_up() -> int:
     """
     try:
         from . import engine as _engine
-        keys = [s["key"] for s in (_engine.systems().get("systems") or [])]
-        for key in keys:
-            _engine.system(key, "patient")
-        return len(keys)
+        return len(_engine.systems("patient").get("cards") or {})
     except Exception as exc:                                         # noqa: BLE001
         # Named on stderr rather than hidden: a warm-up that fails costs the
         # person nothing, but the reason is a defect worth reading.

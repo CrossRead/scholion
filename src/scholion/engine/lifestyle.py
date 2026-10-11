@@ -245,7 +245,7 @@ def lifestyle() -> Dict[str, Any]:
             m["counts_toward_conclusions"] = (not others) or (primary == src)
             out.append(m)
     # manual markers from metrics.json that are NOT in Garmin (e.g. waist/measurements) — also with a trend
-    _SKIP = {"weight", "steps", "resting_hr", "sleep_hours", "activity_min"}   # covered by Garmin
+    _SKIP = {"steps", "resting_hr", "sleep_hours", "activity_min"}   # device summaries
     for mk, marker in (core.metrics_json().get("metrics", {}) or {}).items():
         if mk in _SKIP or not marker.get("series"):
             continue
@@ -259,14 +259,47 @@ def lifestyle() -> Dict[str, Any]:
             continue
         direction = marker.get("direction") or ("lower_better" if marker.get("ref_high")
                                                 else ("higher_better" if marker.get("ref_low") else None))
-        info = {"label": marker.get("name", mk), "unit": marker.get("unit", ""),
+        info = {"label": (mm.get("Weight", {}).get("label") if mk == "weight" else None) or marker.get("name", mk), "unit": core.unit_label(marker.get("unit", "")),
                 "direction": direction, "group": "anthro", "why": marker.get("note", ""),
                 "target_high": marker.get("ref_high"), "target_low": marker.get("ref_low")}
         man = _life_metric(mk, info, monthly)
-        man["source"] = None                      # written down by hand, not by a device
+        if mk == "weight":
+            # Keep the device's monthly series independent of dated measurements.
+            # The latest reading, not a monthly average, supplies the current value.
+            from .profile_view import metrics_summary
+            current: Dict[str, Any] = next((r for r in metrics_summary()["metrics"] if r["key"] == "weight"), {})
+            if current.get("origin") != "manual":
+                continue
+            latest = _latest(marker["series"])
+            if not latest:
+                continue
+            man.update(value=latest["value"], date=latest["date"], key="Weight",
+                       series=sorted(marker["series"], key=lambda p: p["date"]),
+                       value_smooth=None, status="none", score=None, trend=None,
+                       overall_delta=None, improving=None, trend_good=None)
+        man["source"] = None                      # recorded measurement, not a device mean
         man["also_measured_by"] = []
         man["counts_toward_conclusions"] = True
         out.append(man)
+    # One weight card, retaining the distinct observation series. Device means
+    # and dated measurements are not averaged together or treated as one trend.
+    weight_rows = [m for m in out if m["key"] == "Weight"]
+    manual_weight = core.metrics_json().get("metrics", {}).get("weight") or {}
+    if weight_rows:
+        selected = next((m for m in weight_rows if m["source"] is None), None)
+        selected = selected or next((m for m in weight_rows if m["counts_toward_conclusions"]), weight_rows[0])
+        observations = [{"source": m["source"], "unit": m["unit"],
+                         "aggregation": "monthly_mean" if m["source"] else "measurement",
+                         "series": m["series"]} for m in weight_rows]
+        if manual_weight.get("series") and not any(o["source"] is None for o in observations):
+            observations.append({"source": None, "unit": core.unit_label(manual_weight.get("unit", "")),
+                                 "aggregation": "measurement", "series": sorted(manual_weight["series"], key=lambda p: p["date"])})
+        if len(weight_rows) > 1 and all(m["source"] is not None for m in weight_rows) and not primary:
+            selected = dict(selected, value=None, value_smooth=None, score=None, status="none",
+                            trend=None, improving=None, trend_good=None, counts_toward_conclusions=False)
+        selected["measurement_series"] = observations
+        out = [m for m in out if m["key"] != "Weight"]
+        out.insert(0, selected)
     # workouts: totals by type + the last active year
     workouts = []
     # Sessions are counted per device on purpose: two straps worn on the same
@@ -709,7 +742,7 @@ def _brief_life(key: str) -> Dict[str, Any]:
         ls = lifestyle()
     except Exception:                                            # noqa: BLE001
         return {"text": _t("brief.no_metric", key=key), "date": None, "status": "missing"}
-    for m in ls.get("metrics", []):
+    for m in sorted(ls.get("metrics", []), key=lambda r: str(r.get("date") or ""), reverse=True):
         if m.get("key") == key or m.get("label") == key:
             return {"text": f"{_brief_num(m.get('value'))} {m.get('unit') or ''}".strip(),
                     "value": m.get("value"), "date": m.get("date"),
@@ -863,8 +896,9 @@ def _focus_metric(metric: Dict[str, Any]) -> Dict[str, Any]:
     n30, n90 = _focus_nights(30), _focus_nights(90)
     field = "deep_min" if key == "DeepSleepMin" else None
     out = {"label": metric.get("label"), "unit": metric.get("unit"),
+           "unit_display": core.unit_label(metric.get("unit") or ""),
            "dir": metric.get("dir", "higher"),
-           "value": cur.get("value"), "raw": cur.get("raw"), "as_of": cur.get("date"),
+           "value": cur.get("value"), "raw": cur.get("value"), "as_of": cur.get("date"),
            "baseline": metric.get("baseline"), "baseline_note": metric.get("baseline_note"),
            "target": metric.get("target"), "target_source": metric.get("target_source"),
            "target_note": metric.get("target_note"),

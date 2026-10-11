@@ -292,3 +292,20 @@ class TestMissingPublicAnalytes(TableCase):
     def test_the_proposals_are_visible_in_the_existing_marker_list(self):
         entries = {r["key"]: r for r in markers_local.listing()["entries"]}
         self.assertTrue(all(key in entries for key, _, _ in CASES))
+
+    def test_printed_unit_after_reference_columns_and_wrapped_name(self):
+        examples = [
+            ("CA 242 2.7 0.0 - 20.0 U/mL", "ca_242", "U/mL"),
+            ("CA 72-4\n2.7 0.2 - 6.9 Ед/мл", "ca_72_4", "U/mL"),
+            ("11-дезоксикортикостерон < 1.5 0.00 - 5.00 нмоль/л", "deoxycorticosterone_11", "nmol/L"),
+            ("21-дезоксикортизол < 0.1 Женщина 0-1.24 нмоль/л", "deoxycortisol_21", "nmol/L"),
+            ("25-гидрокси-витамин D2 < 0.9 Обычный уровень: до 2.0 нг/мл", "vitamin_d2", "ng/mL"),
+        ]
+        for row, key, unit in examples:
+            with self.subTest(marker=key):
+                _, found = il.parse_report(HEADER + row, core.lab_markers()["markers"])
+                self.assertEqual(unit, found[key]["unit"])
+                self.assertEqual("proposed", core.lab_markers()["markers"][key]["status"])
+        self.assertEqual("", il._printed_unit("2.7 0 - 1 U/mL mg/dL", 3))
+        self.assertEqual("", il._printed_unit("2.7 0 - 1 CA 125 3.4 U/mL", 3))
+        self.assertEqual("", il._printed_unit("2.7 0 - 1 unknownunit", 3))

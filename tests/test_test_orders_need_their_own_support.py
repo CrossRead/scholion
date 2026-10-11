@@ -136,4 +136,7 @@ class TestIndependentTestProposals(unittest.TestCase):
                 mock.patch.object(labs, '_eval_condition', side_effect=ValueError('fixture error')):
             r = labs.suggest_tests()
         self.assertEqual(1, r['unresolved_count'])
-        self.assertIn('fixture error', fmt.tests_report(r))
+        self.assertEqual('fixture error', r['suggestions'][0]['error'])
+        text = fmt.tests_report(r)
+        self.assertIn(r['suggestions'][0]['suggest'], text)
+        self.assertNotIn('fixture error', text)

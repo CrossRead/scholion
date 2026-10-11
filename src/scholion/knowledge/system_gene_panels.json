@@ -1217,12 +1217,12 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "SLC22A1 G401S, one copy: a reduced-function OCT1 allele; as R61C — asked about, nothing decided.",
-              "ru": "SLC22A1 G401S, одна копия: аллель OCT1 со сниженной функцией; как R61C — о нём спрашивают, ничего не решается."
+              "en": "SLC22A1 G401S, one copy: a reduced-function OCT1 allele; as R61C.",
+              "ru": "SLC22A1 G401S, одна копия: аллель OCT1 со сниженной функцией; как R61C."
             },
             "hom": {
-              "en": "SLC22A1 G401S, two copies: a reduced-function OCT1 allele; as R61C — asked about, nothing decided.",
-              "ru": "SLC22A1 G401S, две копии: аллель OCT1 со сниженной функцией; как R61C — о нём спрашивают, ничего не решается."
+              "en": "SLC22A1 G401S, two copies: a reduced-function OCT1 allele; as R61C.",
+              "ru": "SLC22A1 G401S, две копии: аллель OCT1 со сниженной функцией; как R61C."
             }
           },
           "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline",
@@ -2155,12 +2155,12 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
-              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own.",
+              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет."
             },
             "hom": {
-              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
-              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own.",
+              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет."
             }
           },
           "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
@@ -3507,15 +3507,15 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
-              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples.",
+              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся."
             },
             "hom": {
-              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
-              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples.",
+              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся."
             }
           },
-          "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+          "source": "NCBI dbSNP, SPDI NC_000022.11:19963747:G:A; CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021): COMT is discussed without a dosing recommendation.",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
           "review": {
@@ -3526,7 +3526,7 @@
           "evidence": {
             "level": "C",
             "basis": "candidate",
-            "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+            "source": "NCBI dbSNP, SPDI NC_000022.11:19963747:G:A; CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021): COMT is discussed without a dosing recommendation.",
             "assigned": "2026-09-17",
             "judged": "many studies of Val158Met, and they disagree"
           }
@@ -3538,7 +3538,7 @@
             "en": "21-hydroxylase deficiency (congenital adrenal hyperplasia) cannot be read by short-read sequencing: the gene sits next to the pseudogene CYP21A1P and reads map to both — a «nothing found» here would be a statement about the method, not the person. It needs MLPA or long-read sequencing.",
             "ru": "Дефицит 21-гидроксилазы (ВДКН) не читается коротким чтением: ген лежит рядом с псевдогеном CYP21A1P, и чтения ложатся на оба — «ничего не найдено» здесь было бы утверждением о методе, а не о человеке. Нужен MLPA или длинное чтение."
           },
-          "source": "the owner's decision of 13.09.2026 (task 179, item 2); ACMG/AMP practice on segmental duplications"
+          "source": "ACMG/AMP practice on segmental duplications"
         }
       }
     },
@@ -4469,7 +4469,7 @@
             "en": "Androgen sensitivity by the AR CAG-repeat length is a repeat count, not a position: short reads do not call it reliably. It needs a fragment-length assay or long-read sequencing.",
             "ru": "Чувствительность к андрогенам по длине CAG-повтора AR — это число повторов, не позиция: короткое чтение его надёжно не вызывает. Нужен анализ длины фрагмента или длинное чтение."
           },
-          "source": "the owner's decision of 13.09.2026 (task 179, item 2)"
+          "source": "Scholion panel catalogue: this repeat-length assay is not part of the supported locus readings."
         }
       },
       "groups": [
@@ -5211,7 +5211,7 @@
             "en": "The Gilbert allele *28 is a TA repeat in the promoter, not a base change: short reads do not call it reliably and this catalogue does not hold it. A separate tool (PyPGx or a targeted indel call) settles it; *6 above is read.",
             "ru": "Аллель Жильбера *28 — TA-повтор в промоторе, не замена основания: короткое чтение его надёжно не вызывает, и в каталоге его нет. Решает отдельный инструмент (PyPGx или целевой вызов индела); *6 выше читается."
           },
-          "source": "the locus catalogue's pending note; the owner's decision of 13.09.2026 (task 179, item 2)"
+          "source": "Scholion panel catalogue: this repeat-length assay is not part of the supported locus readings."
         }
       }
     },
@@ -5574,12 +5574,12 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "MCM6 rs4988235, one copy of the persistence allele: lactase persists into adulthood — dairy is tolerated; asked about for calcium and vitamin D, nothing decided.",
-              "ru": "MCM6 rs4988235, одна копия аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится; о нём спрашивают ради кальция и витамина D, ничего не решается."
+              "en": "MCM6 rs4988235, one copy of the persistence allele: lactase persists into adulthood — dairy is tolerated.",
+              "ru": "MCM6 rs4988235, одна копия аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится."
             },
             "hom": {
-              "en": "MCM6 rs4988235, two copies of the persistence allele: lactase persists into adulthood — dairy is tolerated; asked about for calcium and vitamin D, nothing decided.",
-              "ru": "MCM6 rs4988235, две копии аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится; о нём спрашивают ради кальция и витамина D, ничего не решается."
+              "en": "MCM6 rs4988235, two copies of the persistence allele: lactase persists into adulthood — dairy is tolerated.",
+              "ru": "MCM6 rs4988235, две копии аллеля персистенции: лактаза сохраняется во взрослом возрасте — молочное переносится."
             }
           },
           "source": "Enattah 2002 Nat Genet (MCM6 and lactase persistence)",

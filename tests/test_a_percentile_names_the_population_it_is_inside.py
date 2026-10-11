@@ -109,6 +109,8 @@ class TestThePanelIsResolvedRatherThanDefaulted(unittest.TestCase):
             vcf = tmp / "sites.vcf"
             vcf.write_text("##fileformat=VCFv4.2\n", encoding="utf-8")
             with mock.patch.object(prs, "_MCP", return_value=Sidecar()), \
+                 mock.patch.object(prs, "ScoringVCF"), \
+                 mock.patch.object(prs, "_score_row", side_effect=lambda m, row, source, build, pop: prs._verify_row(m, row, row, build, pop)), \
                  mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}):
                 report = prs.report(str(vcf), normalize=False,
                                     traits=[{"term": "diabetes", "label": "Diabetes", "efo_id": "EFO_TEST"}])

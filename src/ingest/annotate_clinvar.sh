@@ -130,16 +130,16 @@ printf '{"left_aligned": %s, "reference": "%s", "normalised": true}\n' \
 
 echo "→ Annotating your VCF with the ClinVar fields (CLNSIG, CLNDN, CLNREVSTAT, RS)…"
 bcftools annotate -a "$ANNOT" \
-  -c INFO/CLNSIG,INFO/CLNDN,INFO/CLNREVSTAT,INFO/RS \
+  -c INFO/CLNSIG,INFO/CLNDN,INFO/CLNREVSTAT,INFO/RS,INFO/GENEINFO \
   "$NORM_VCF" -Oz -o "$OUT_VCF"
 tabix -f -p vcf "$OUT_VCF"
 
 # --- 4. extract the clinically SIGNIFICANT findings ---------------------------
 echo "→ Extracting the significant variants (Pathogenic / Likely_pathogenic / risk / drug_response)…"
 {
-  echo -e "chrom\tpos\tref\talt\tgenotype\trsid\tclnsig\tclndn\treview"
+  echo -e "chrom\tpos\tref\talt\tgenotype\trsid\tclnsig\tclndn\treview\tgene"
   bcftools view -i 'INFO/CLNSIG!="."' "$OUT_VCF" \
-    | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t[%GT]\trs%INFO/RS\t%INFO/CLNSIG\t%INFO/CLNDN\t%INFO/CLNREVSTAT\n' \
+    | bcftools query -f '%CHROM\t%POS\t%REF\t%ALT\t[%GT]\trs%INFO/RS\t%INFO/CLNSIG\t%INFO/CLNDN\t%INFO/CLNREVSTAT\t%INFO/GENEINFO\n' \
     | awk -F'\t' 'tolower($7) ~ /pathogenic|risk_factor|drug_response|association|protective/ && $7 !~ /^Benign/'
 } > "$OUT_TSV"
 

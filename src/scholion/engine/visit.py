@@ -63,7 +63,7 @@ def visit_sheet(include_reference: bool = False) -> Dict[str, Any]:
                     else position.get("read_why_text") or t("common.no_data"))
                 rows.append({k: position.get(k) for k in (
                     "gene", "rsid", "level", "reading_label", "read", "read_state", "read_why_text", "state",
-                    "reference_context", "passport", "value_only", "genotype", "source", "mechanism")})
+                    "reference_context", "interpretation", "passport", "value_only", "genotype", "source", "mechanism")})
             if rows:
                 appendix["panels"].append({"key": spec["key"], "label": panel["label"], "positions": rows})
     from .sources import provenance

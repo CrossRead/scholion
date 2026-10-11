@@ -124,7 +124,8 @@ LINE_BUDGETS = {
     # current length plus a third; the next axis of the same question (a
     # corridor bound to a laboratory or a method, say) belongs here too.
     "corridor": 250,
-    "goals": 550,
+    # A dated annual phenotype view joins explicitly mapped measurement sources.
+    "goals": 630,
     # 460 → 490 on 19.08.2026: the sex guard on polygenic traits is applied where
     # the report is BUILT, not only where the score is computed, because
     # `prs_results.json` is a stored result that may predate the moment the
@@ -257,7 +258,8 @@ LINE_BUDGETS = {
     # cannot stand in for, and the block that answers a decision to correct
     # GenCC reference assembly and the shared validity/inheritance projection;
     # gene descriptions and display-label logic stay in panel_reference.py.
-    "system_panels": 1610,
+    # Batched cards reuse one reading while retaining the existing index contract.
+    "system_panels": 1640,
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its
@@ -270,7 +272,10 @@ LINE_BUDGETS = {
     # locus (1100 → 1160; 1148 lines when raised).
     # 10.10.2026: the saved PGS panel, current assignment and selection-source
     # provenance are separate facts with a truthful shared note (1175 lines).
-    "genomics": 1200,
+    # Shared catalogue context also accompanies longevity and ClinVar readings.
+    # 11.10.2026: verified APOE diplotype context and all four PCSK9 readings
+    # preserve phase uncertainty and uncurated direction (1248 lines).
+    "genomics": 1260,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.
@@ -310,14 +315,16 @@ LINE_BUDGETS = {
     # 1010 → 1025 on 27.09.2026 (task 209): a wearable layer that fails to read
     # keeps its fitness domain on the radar, unscored and named as unread,
     # instead of vanishing and moving `overall` onto the other systems unsaid.
-    "lifestyle": 1030,  # Two lines attach the separate, sourced FIB-4 readout.
+    "lifestyle": 1070,  # Dated weight readings remain distinct from device monthly means.
+    #  # Two lines attach the separate, sourced FIB-4 readout.
     # A domain of its own on 14.09.2026: the review of a brief block — what
     # arrived after its wording was read, and a request built from it. It
     # reads the brief and the labs and writes nothing.
     "brief_review": 160,
     # 14.09.2026: the panel of a system as the catalogue describes it, for the
     # clinician — references and sentences, no genome, no labs.
-    "panel_catalogue": 120,
+    # Recorded interpretations retain confidence and support separately from analytical eligibility.
+    "panel_catalogue": 130,
     # Patient readings of the intake ledger do not belong to the reference book.
     "panel_intake": 110,
     "pgx_labels": 60,

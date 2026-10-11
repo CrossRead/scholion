@@ -100,11 +100,16 @@ class TestBasis(unittest.TestCase):
                 v = panel_form.verdict([row], {"status": "ok"})
                 self.assertEqual("not_determined", v["kind"])
                 self.assertEqual(1, v["withheld"])
-                self.assertIn(i18n.t("screen.why.conclusion_basis"), panel_form.verdict_line(v))
+                self.assertIn(i18n.t("interpretation.automatic_held").rstrip("."), panel_form.verdict_line(v))
                 self.assertIn(row["conclusion_basis"]["reason"], "\n".join(genotype_conclusion_lines([position])))
                 for register in ("patient", "clinician"):
                     projected = SP._project({"rows": [row]}, register)["rows"][0]
-                    self.assertIn(row["conclusion_basis"]["reason"], _system_gene_row(projected, register))
+                    rendered = _system_gene_row(projected, register)
+                    if (row.get("interpretation") or {}).get("summary"):
+                        self.assertIn(row["interpretation"]["summary"], rendered)
+                        self.assertIn(i18n.t("interpretation.gaps", missing=i18n.t("conclusion.missing.mechanism")), rendered)
+                    else:
+                        self.assertIn(row["conclusion_basis"]["reason"], rendered)
             reference = panel_catalogue._position(spec)
             self.assertEqual({}, reference["text"])
             self.assertIsNone(reference["expect"])
@@ -115,7 +120,7 @@ class TestBasis(unittest.TestCase):
         v = panel_form.verdict([held, {"gene": "B", "findings": 1, "read": True}], {"status": "ok"})
         self.assertEqual("finding", v["kind"])
         self.assertEqual(1, v["withheld"])
-        self.assertIn(i18n.t("conclusion.withheld_count", n=1), panel_form.verdict_line(v))
+        self.assertIn(i18n.t("interpretation.automatic_count", n=1), panel_form.verdict_line(v))
 
     def test_observed_allele_counts_are_not_reduced_by_missing_interpretation(self):
         for language in ("en", "ru"):
@@ -144,7 +149,7 @@ class TestBasis(unittest.TestCase):
             self.assertEqual("not_determined", v["kind"])
             self.assertEqual("genome_not_connected", v["why"])
             self.assertEqual(1, v["withheld"])
-            self.assertIn(i18n.t("conclusion.withheld_count", n=1), panel_form.verdict_line(v))
+            self.assertIn(i18n.t("interpretation.automatic_count", n=1), panel_form.verdict_line(v))
 
     def test_localisation_cannot_hide_a_missing_mechanism_translation(self):
         for language in ("en", "ru"):

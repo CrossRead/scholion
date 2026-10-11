@@ -899,6 +899,7 @@ LOCALIZABLE_FIELDS = {
     # explanations and verdicts
     "note", "why", "reason", "action", "advice", "caveat", "comment",
     "interpretation", "recommendation", "evidence_note", "validity_note",
+    "limitations", "evidence_reason",
     "meaning", "effect", "mechanism", "manage", "claim", "effect_size", "context",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
     "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",
@@ -936,11 +937,11 @@ LOCALIZABLE_FIELDS = {
     "label", "display_name", "name", "title", "category", "phenotype",
     "suggest", "specialist", "source", "class", "nutritional_dose", "forms",
     "one_line", "melatonin", "metabolic", "pk",
-    # `unit` is on this list ONLY because the resolver runs on knowledge files,
-    # never on a person's profile. A unit inside `wearable_metrics.json` is ours
-    # (we defined the metric); a unit inside someone's `labs.json` came off their
-    # form and is printed as written. Same field name, two different owners —
-    # which is exactly why the resolver is scoped to the knowledge directory.
+    # Explicit bilingual display wording in goals/focus is resolved by their
+    # dedicated readers; numeric target objects and raw observations stay intact.
+    "best", "target", "headline", "cap", "tlabel", "year", "a_label", "b_label",
+    # Unit labels in knowledge belong to the product. The resolver does not run
+    # on labs, metrics or wearable observations; their original units survive.
     "unit",
 }
 
@@ -1385,7 +1386,17 @@ def unit_label(code: str, default: str = "") -> str:
     a number is ugly and obvious, whereas an empty string is a number with no unit
     at all, and that is a number nobody can check.
     """
-    entry = unit_table().get(code) or {}
+    table = unit_table()
+    entry = table.get(code) or {}
+    if not entry and code:
+        normalized = _norm_unit(code)
+        raw = _read_json(knowledge_path("units.json")).get("units", {})
+        for identity, spec in raw.items():
+            labels = spec.get("label") or {}
+            spellings = [identity, *labels.values(), *(spec.get("synonyms") or [])]
+            if any(isinstance(s, str) and _norm_unit(s) == normalized for s in spellings):
+                entry = table.get(identity) or {}
+                break
     lbl = entry.get("label")
     if isinstance(lbl, str) and lbl:
         return lbl                       # already resolved by _read_knowledge
@@ -1699,7 +1710,8 @@ def focus_src() -> Dict[str, Any]:
     """PERSONAL focus of attention (profile/focus.json): the one task the owner is
     concentrated on right now. Curated wording and levers; the numbers the engine takes live."""
     p = profile_dir() / "focus.json"
-    return read_profile_json(p) if p.exists() else {}
+    from .i18n import lang
+    return _localize_tree(read_profile_json(p), lang()) if p.exists() else {}
 
 
 #: The yes/no fields a journal had before a profile could declare its own (task 176).
@@ -1769,7 +1781,8 @@ def health_goals() -> Dict[str, Any]:
     """PERSONAL goal for the metrics (profile/health_goals.json): the wording, the anchor points,
     the reference values and the chart parameters. Current values/series are taken live from labs+wearable."""
     p = profile_dir() / "health_goals.json"
-    return read_profile_json(p) if p.exists() else {}
+    from .i18n import lang
+    return _localize_tree(read_profile_json(p), lang()) if p.exists() else {}
 
 
 def clinician_targets() -> Dict[str, Any]:
@@ -2181,6 +2194,7 @@ def marker_catalog() -> List[Dict[str, Any]]:
         # heard of — one somebody added by hand, which has no other label.
         name = marker_display(spec, _lang()) or m.get("name", k)
         out.append({"key": k, "name": name, "unit": m.get("unit", ""),
+                    "unit_display": unit_label(m.get("unit", "")),
                     "canonical_unit": spec.get("unit", ""),
                     "unit_label": unit_label(spec.get("unit", "")) if spec.get("unit") else "",
                     "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high")})

@@ -20,13 +20,19 @@
       "label": {
         "en": "10¹²/L",
         "ru": "10¹²/л"
-      }
+      },
+      "synonyms": [
+        "10^12/л"
+      ]
     },
     "10*9/L": {
       "label": {
         "en": "10⁹/L",
         "ru": "10⁹/л"
-      }
+      },
+      "synonyms": [
+        "10^9/л"
+      ]
     },
     "U": {
       "label": {
@@ -92,7 +98,10 @@
       "label": {
         "en": "mL/min/1.73 m²",
         "ru": "мл/мин/1,73 м²"
-      }
+      },
+      "synonyms": [
+        "мл/мин/1.73 м²"
+      ]
     },
     "m[IU]/L": {
       "label": {
@@ -134,7 +143,10 @@
       "label": {
         "en": "mm/h",
         "ru": "мм/ч"
-      }
+      },
+      "synonyms": [
+        "мм/час"
+      ]
     },
     "mmol/L": {
       "label": {
@@ -243,14 +255,22 @@
         "en": "index",
         "ru": "индекс"
       },
-      "convertible": false
+      "convertible": false,
+      "synonyms": [
+        "индекс позитивности",
+        "ед"
+      ]
     },
     "{log10_CFU}/g": {
       "label": {
         "en": "log₁₀ CFU/g",
         "ru": "log₁₀ КОЕ/г"
       },
-      "convertible": false
+      "convertible": false,
+      "synonyms": [
+        "log10 КОЕ/г",
+        "log10 CFU/g"
+      ]
     },
     "{score}": {
       "label": {
@@ -265,6 +285,62 @@
         "ru": "титр"
       },
       "convertible": false
+    },
+    "kg": {
+      "label": {
+        "en": "kg",
+        "ru": "кг"
+      },
+      "synonyms": []
+    },
+    "cm": {
+      "label": {
+        "en": "cm",
+        "ru": "см"
+      },
+      "synonyms": []
+    },
+    "h/{night}": {
+      "label": {
+        "en": "h/night",
+        "ru": "ч/ночь"
+      },
+      "synonyms": []
+    },
+    "min/{night}": {
+      "label": {
+        "en": "min/night",
+        "ru": "мин/ночь"
+      },
+      "synonyms": []
+    },
+    "{steps}": {
+      "label": {
+        "en": "steps",
+        "ru": "шаги"
+      },
+      "synonyms": []
+    },
+    "{beats}/min": {
+      "label": {
+        "en": "bpm",
+        "ru": "уд/мин"
+      },
+      "synonyms": []
+    },
+    "mL/(kg.min)": {
+      "label": {
+        "en": "mL/kg/min",
+        "ru": "мл/кг/мин"
+      },
+      "synonyms": []
+    },
+    "min/d": {
+      "label": {
+        "en": "min/day",
+        "ru": "мин/день"
+      },
+      "synonyms": []
     }
   }
 }

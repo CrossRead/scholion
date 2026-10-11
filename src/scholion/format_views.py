@@ -10,7 +10,6 @@ from .i18n import plural as _plural, t as _t  # noqa: F401
 from .format_primitives import _PRIO_ICON, _flag_icon, _n
 from .test_proposals import test_basis_text
 from .goal_basis import goal_basis_text
-from .clinical_claims import basis_lines
 
 
 def lifestyle_report(r: Dict[str, Any]) -> str:
@@ -39,9 +38,14 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
         cov = m.get("coverage") or {}
         cvr = (" · " + _t("lifestyle.coverage", n=cov["n"], days=cov["days"])
                if cov.get("n") and cov.get("days") and cov["n"] < cov["days"] else "")
-        lines.append(f"{icon.get(m.get('status'),'•')} {m['label']}: **{_n(m['value'])} {m['unit']}**".rstrip()
+        lines.append(f"{icon.get(m.get('status'),'•')} {m['label']}: **{_n(m['value'])} {m.get('unit_display', m['unit'])}**".rstrip()
                      + f" ({m['date']}){tr}{improv}{brk}{cvr}")
-        lines.extend(basis_lines(m))
+        for observed in m.get("measurement_series") or []:
+            source = observed.get("source") or _t("web.phenotype.recorded")
+            kind = _t("web.life.monthly_mean" if observed["aggregation"] == "monthly_mean" else "web.life.dated_readings")
+            points = observed["series"]
+            if points:
+                lines.append(f"  {source} · {kind}: {points[0]['date']}→{points[-1]['date']} · {_n(points[-1]['value'])} {observed['unit']}")
         # A movement the sample cannot tell from its own noise says so, with the
         # size of the difference that WOULD be visible. Printed under the metric
         # rather than folded into the arrow: it is the reason there is no arrow.
@@ -59,7 +63,7 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
 
 def goal_report(r: Dict[str, Any]) -> str:
     """Goal for the metrics ("get the 2021–2022 shape back"): a now→goal table on live data."""
-    if not r.get("available"):
+    if not r.get("available") and not r.get("phenotype"):
         return r.get("message", _t("goal.not_set"))
     lines = [f"**🎯 {r.get('title', _t('goal.title_default'))}**"
              + (" · " + _t("goal.as_of", date=r["as_of"]) if r.get("as_of") else ""), ""]
@@ -75,6 +79,13 @@ def goal_report(r: Dict[str, Any]) -> str:
         lines.append(f"• {p.get('title')} · {p.get('year')}: {p.get('text')}")
     if r.get("peaks"):
         lines.append("")
+    if r.get("phenotype"):
+        lines.append(_t("web.phenotype.title"))
+        for row in r["phenotype"]:
+            for part in row["components"]:
+                lines.append(f"  {row['label']}: {part.get('value') if part.get('value') is not None else '—'} {part.get('unit_display', part['unit'])} · {part.get('date') or '—'} · {part['source']}")
+                if part["year_delta"] is not None:
+                    lines.append(f"    {_t('web.phenotype.year')}: {part['year_delta']:+g} {part.get('unit_display', part['unit'])} · {part['year_from']} → {part['year_to']}")
     lines.append(_t("goal.targets_header"))
     for t in r.get("targets", []):
         lines.append(f"  {t['label']}: {t.get('now','—')} → {t.get('target','')} · "
@@ -103,7 +114,7 @@ def tests_report(r: Dict[str, Any]) -> str:
     if not pending:
         lines.append(f"_{_t('tests.nothing_pending')}_")
     for s in errs:
-        lines.append("⚠️ " + _t("tests.rule_error", id=s["id"], error=s["error"]))
+        lines.append("⚠️ " + _t("tests.rule_error", name=s.get("suggest") or _t("tests.proposal_unavailable")))
     if done:
         lines.append("\n" + _t("tests.routine_header"))
         for s in done:
@@ -281,7 +292,7 @@ def overview_report(r: Dict[str, Any]) -> str:
             out.append(_t(phrase, n=len(items)))
             for m in items:
                 out.append(f"  {_flag_icon(m.get('flag'))} {m.get('name')}: "
-                           f"{m.get('value')} {m.get('unit', '')} ({m.get('date', '')})")
+                           f"{m.get('value')} {m.get('unit_display', m.get('unit', ''))} ({m.get('date', '')})")
             out.append("")
 
     hs = r.get("pending_suggestions") or r.get("high_suggestions") or []
@@ -342,7 +353,7 @@ def radar_report(r: Dict[str, Any]) -> str:
         for m in (dom.get("abnormal") or [])[:5]:
             stale = f" · {_t('common.stale')}" if m.get("stale") else ""
             out.append(f"      {_flag_icon(m.get('flag'))} {m.get('name')}: "
-                       f"{m.get('value')} {m.get('unit', '')} ({m.get('date', '')}){stale}")
+                       f"{m.get('value')} {m.get('unit_display', m.get('unit', ''))} ({m.get('date', '')}){stale}")
     out.append(f"\n_{r.get('disclaimer', '')}_")
     return "\n".join(out)
 
@@ -356,7 +367,7 @@ def second_opinion_report(r: Dict[str, Any]) -> str:
                else _t("second_opinion.no_abnormal"))
     for m in red:
         out.append(f"  {_flag_icon(m.get('flag'))} {m.get('name')}: {m.get('value')} "
-                   f"{m.get('unit', '')} ({m.get('date', '')})"
+                   f"{m.get('unit_display', m.get('unit', ''))} ({m.get('date', '')})"
                    + (f" · {_t('second_opinion.stale')}" if m.get("stale") else ""))
     df = r.get("drug_flags") or []
     out += ["", _t("second_opinion.pgx", n=len(df)) if df

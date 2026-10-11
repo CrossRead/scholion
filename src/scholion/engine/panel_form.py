@@ -161,6 +161,13 @@ def gene_row(gene: str, entry: Optional[Dict[str, Any]] = None,
     g = (gene or "").upper()
     row: Dict[str, Any] = dict(entry or {})
     row["gene"] = g
+    if not row.get("reference_context"):
+        from ..panel_reference import genome_context
+        context = genome_context(g, row.get("rsid") or "")
+        reference = context["reference_context"]
+        if reference.get("gene_source") or reference.get("variant_source"):
+            row["reference_context"] = reference
+            row.setdefault("level", context["level"])
     row.setdefault("pending", not bool(row.get("text")))
     if scan is not None and scan.get("status") != "ok":
         row["variant_state"] = None
@@ -300,11 +307,13 @@ def verdict_line(v: Dict[str, Any]) -> str:
         # close it (owner, 17.09.2026: «это вообще лишнее»).
         line = _t("screen.clear_partial", unread=_plural(v.get("unread") or 0, "count.rows"),
                   total=v.get("total") or 0)
+    elif v.get("why") == "conclusion_basis":
+        line = _t("interpretation.automatic_held")
     else:
         line = _t("screen.not_determined",
                   why=_why_text((v or {}).get("why") or "scan_not_run"))
     if v.get("withheld"):
-        line += "; " + _t("conclusion.withheld_count", n=v["withheld"])
+        line = line.rstrip(".") + "; " + _t("interpretation.automatic_count", n=v["withheld"])
     if v.get("depthless") and kind != "clear_file_only":
         line += "; " + _t("screen.and_depth_unmeasured", rows=_plural(v["depthless"], "count.rows"))
     if v.get("carriers"):

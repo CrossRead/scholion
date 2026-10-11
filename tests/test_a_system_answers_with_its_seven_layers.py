@@ -230,7 +230,7 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         self.assertTrue(p["pending"])
         self.assertEqual("hom", p["genotype"]["state"])
         self.assertEqual("no_text_for_state", p["pending_why"])
-        self.assertTrue(any(q["origin"] == "pending" and q["rsid"] == "rsPPEND"
+        self.assertFalse(any(q["origin"] == "pending" and q["rsid"] == "rsPPEND"
                             for q in SP.system("thyroid")["questions"]["rows"]))
 
     def test_a_risk_allele_nobody_named_is_not_derived(self):
@@ -238,7 +238,7 @@ class TestTheCuratedPositionsThroughTheGate(_State):
         self.assertEqual("risk_allele_not_declared", p["genotype"]["state"])
         self.assertTrue(p["read"])
         self.assertEqual("risk_allele", p["pending_why"])
-        self.assertTrue(any(q["origin"] == "risk_allele" for q in SP.system("thyroid")["questions"]["rows"]))
+        self.assertFalse(any(q["origin"] == "risk_allele" for q in SP.system("thyroid")["questions"]["rows"]))
 
     def test_the_absent_phrase_is_the_template_and_names_the_reading(self):
         p = self.rows()["PABS"]

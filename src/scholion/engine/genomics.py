@@ -17,6 +17,11 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     """Lookup of any locus in the personal full VCF (through the coordinate reference)."""
     from .. import genome
     r = genome.lookup(rsid=rsid, gene=gene)
+    from ..panel_reference import genome_context
+    if r.get("gene"):
+        r.update(genome_context(r["gene"], r.get("rsid") or ""))
+    for item in r.get("loci") or []:
+        item.update(genome_context(item.get("gene") or r.get("gene") or "", item.get("rsid") or ""))
     # Asked about a gene, answer with the frame as well as the loci: the
     # catalogue is one shelf of four, and «not in the coordinate reference» was
     # being read as a statement about the genome.
@@ -357,6 +362,24 @@ def _single_copy(rows: Dict[str, Any]) -> bool:
     return sex / autosomal < HALF_DEPTH_BELOW
 
 
+def _coverage_median(rows: Dict[str, Any], single: bool) -> Optional[float]:
+    field = "pct_10x" if single else "pct_20x"
+    vals = sorted(float(r[field]) for r in rows.values()
+                  if _on_the_same_kind(r, single)
+                  and str(r.get(field) or "").replace(".", "", 1).isdigit())
+    return vals[len(vals) // 2] if vals else None
+
+
+@core.memo_in_reading
+def _coverage_reference() -> Dict[str, Any]:
+    """The same coverage-table reference for every gene within one fresh reading."""
+    from .. import limits
+    rows = limits.callability()
+    return {"single_copy": _single_copy(rows),
+            "single_median": _coverage_median(rows, True),
+            "diploid_median": _coverage_median(rows, False)}
+
+
 def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
     """How well this one gene was read — four states, and only one is silent.
 
@@ -368,7 +391,8 @@ def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
     """
     from .. import limits as _limits
     g = (gene or "").upper()
-    if rows is None:
+    profile_rows = rows is None
+    if profile_rows:
         try:
             rows = _limits.callability()
         except Exception as exc:                                     # noqa: BLE001
@@ -389,7 +413,9 @@ def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
         out["state"] = "gene_not_in_table"
         out["table_size"] = len(rows)
         return out
-    single = _single_copy(rows) if str(row.get("chrom") or "") in SEX_CHROMOSOMES else False
+    reference = _coverage_reference() if profile_rows else None
+    on_sex = str(row.get("chrom") or "") in SEX_CHROMOSOMES
+    single = bool(reference["single_copy"] if reference else _single_copy(rows)) if on_sex else False
     # A locus present in ONE copy is read to half the depth of a diploid one by
     # construction, and the fraction of its bases at 20× collapses: on a 26×
     # genome the chrX median fell to 9 % against 80 % on the autosomes, and every
@@ -405,10 +431,7 @@ def gene_coverage(gene: str, rows=None) -> Dict[str, Any]:
     except (TypeError, ValueError):
         out["state"] = "not_measured"
         return out
-    vals = sorted(float(r[field]) for r in rows.values()
-                  if _on_the_same_kind(r, single)
-                  and str(r.get(field) or "").replace(".", "", 1).isdigit())
-    median = vals[len(vals) // 2] if vals else None
+    median = reference["single_median" if single else "diploid_median"] if reference else _coverage_median(rows, single)
     out.update({field: pct, "median_" + field: median, "copies": 1 if single else 2,
                 "mean_depth": row.get("mean_depth")})
     if pct < POORLY_READ_BELOW or (median is not None
@@ -541,6 +564,11 @@ def clinvar_findings(limit: int = 200) -> Dict[str, Any]:
     from .. import genome
     r = genome.clinvar_hits(limit=limit)
     r["disclaimer"] = DISCLAIMER()
+    from ..panel_reference import genome_context
+    loci = core.loci().get("loci") or {}
+    for hit in r.get("hits") or []:
+        genes = str(hit.get("gene") or (loci.get(hit.get("rsid")) or {}).get("gene") or "").split("|")
+        hit["gene_contexts"] = [genome_context(gene, hit.get("rsid") or "") for gene in genes if gene]
     bound = _input_boundary()
     if bound:
         r["input_boundary"] = bound
@@ -854,7 +882,7 @@ def prs_findings() -> Dict[str, Any]:
     if closed:
         return closed
     data = core.prs_results()
-    from ..pgs_validation import validate as validate_pgs
+    from ..pgs_validation import validate as validate_pgs, recalculation_status
     traits = [validate_pgs(t, expected_ancestry=(data.get("_meta") or {}).get("superpopulation"))
               for t in data.get("traits", [])] if isinstance(data, dict) else []
     if not traits:
@@ -873,8 +901,13 @@ def prs_findings() -> Dict[str, Any]:
     for tr in traits:                      # a guard layer: double counting of the input shows at once
         reasons = tr["calibration"]["reasons"]
         if reasons:
-            tr["calibration_note"] = _t("prs.validation.withdrawn") + " " + "; ".join(
+            tr["calibration_note"] = _t("prs.validation.calibration_only" if tr["build_validation"]["valid"]
+                                        and "scoring_unverified" not in reasons else "prs.validation.withdrawn") + " " + " ".join(
                 _t("prs.validation." + reason) for reason in reasons)
+        ref = tr.get("reference_validation") or {}
+        if not reasons and ref.get("kind") == "independent_called_reference":
+            tr["reference_note"] = _t("prs.independent_reference", count=ref.get("samples"),
+                                      population=tr.get("reference_panel_ancestry"))
         _mr = tr.get("match_rate")
         if isinstance(_mr, (int, float)) and _mr > 1.0001:
             tr["reliable"] = False
@@ -919,7 +952,19 @@ def prs_findings() -> Dict[str, Any]:
         return p if isinstance(p, (int, float)) else -1
     high = sorted([t for t in traits if t.get("reliable") and pnum(t) >= 80],
                   key=lambda t: -pnum(t))
+    for tr in traits:
+        if tr.get("pgs_id") and (tr.get("reading") or {}).get("sufficient") is False:
+            tr["reading_note"] = _t("prs.reading_sources")
+        if not tr.get("reliable") and (tr.get("percentile") is not None or tr.get("reading_note")):
+            mr, wm = tr.get("match_rate"), tr.get("weight_mass_coverage")
+            tr["reliability_note"] = _t("prs.reading_incomplete" if not (tr.get("reading") or {}).get("sufficient") else "web.prs.unverified", positions=(round(mr * 100, 1) if isinstance(mr, (int, float)) else "—"),
+                                       weights=(round(wm * 100, 1) if isinstance(wm, (int, float)) else "—"))
     reliable = [t for t in traits if t.get("reliable")]
+    recalculation = recalculation_status(traits)
+    if recalculation["required"]:
+        recalculation.update(title=_t("prs.recalculate.title"),
+                             note=_t("prs.recalculate.note", count=recalculation["traits"]),
+                             instructions=_t("prs.recalculate.instructions"))
     return {
         "available": True,
         "categories": [{"category": c, "traits": cats[c]} for c in order],
@@ -929,6 +974,8 @@ def prs_findings() -> Dict[str, Any]:
                      else _t("prs.from_a_genome_not_attached", date=_computed or "—")),
         },
         "high": high,
+        "high_note": _t("prs.high_rule"),
+        "recalculation": recalculation,
         "withheld_by_sex": withheld_by_sex,
         # Said on every report rather than remembered by whoever reads it: the
         # sum happens in another process, and what that process does not do is
@@ -1008,18 +1055,33 @@ def longevity_findings() -> Dict[str, Any]:
                                 'population_note_basis': src.get('population_caveat_basis'),
                                 'confidence_label_basis': src.get('confidence_basis')}, k, fields)
         k.clear(); k.update(guarded)
+    from ..panel_reference import genome_context
+    for item in known:
+        item.update(genome_context(str(item.get("gene") or ""), str(item.get("rsid") or "")))
     sig = data.get("significant_by_gene", {}) or {}
     # the famous longevity genes come first
     famous = ["FOXO3", "APOE", "SIRT1", "SIRT3", "CETP", "IL6", "TP53", "KL", "IGF1R",
               "AKT1", "APOC3", "ADIPOQ", "ACE", "TOMM40"]
     genes = sorted(sig.keys(), key=lambda g: (famous.index(g) if g in famous else 999, g))
-    sig_genes = [{"gene": g, "variants": sig[g]} for g in genes]
+    sig = {g: [{**v, "note": _t("longevity.catalogue_variant"),
+                 "catalogue_source": "LongevityMap (HAGR)"} for v in variants] for g, variants in sig.items()}
+    sig_genes = [{"gene": g, "variants": [{**v, **genome_context(g, v.get("rsid") or "")} for v in sig[g]],
+                  **genome_context(g)} for g in genes]
     meta = data.get("_meta", {})
+    apoe_reading = apoe()
+    if apoe_reading.get("status") == "no_genome":
+        apoe_reading = {**guard_fields(data.get("apoe") or {}, data.get("apoe") or {}, ("note",)), "status": "stored_unverified"}
+    apoe_spec = (core._read_knowledge("longevity_directions.json").get("apoe_interpretations") or {}).get(apoe_reading.get("genotype"))
+    if apoe_spec and apoe_reading.get("status") == "ok":
+        apoe_reading = {**apoe_reading, "level": apoe_spec["level"],
+                        "interpretation": {**apoe_spec, "notice": apoe_spec["limitations"], "missing": []}}
     return {
         "available": True,
-        "apoe": guard_fields(data.get('apoe') or {}, data.get('apoe') or {}, ('note',)) if data.get('apoe') else None,
+        "apoe": apoe_reading if apoe_reading else None,
         "known": known,
         "significant_genes": sig_genes,
+        "catalogue_note": _t("longevity.catalogue_note"),
+        "count_note": _t("longevity.count_note", count=meta.get("genotyped") or 0),
         "stats": {"genotyped": meta.get("genotyped"), "carriers": meta.get("carriers"),
                   "significant_carriers": meta.get("significant_carriers"),
                   "significant_genes": len(sig_genes)},
@@ -1134,6 +1196,26 @@ def lipid_genetics() -> Dict[str, Any]:
             "status": "unread" if unread else ("read" if copies is not None else "no_data"),
         }, ('label', 'verdict', 'verdict_token', 'population_note', 'action')))
 
+    from ..panel_reference import genome_context
+    for item in pcsk9:
+        item.update(genome_context("PCSK9", item["rsid"]))
+
+    waiting = []
+    for rsid in _PCSK9_WAITING:
+        if rsid not in loci:
+            continue
+        st = core.genotype_status(rsid) or {}
+        reading_available = st.get("confidence") in ("called", "confirmed_ref") and bool(st.get("genotype"))
+        variant = ((directions and core.longevity_directions().get("unresolved") or {}).get("variants") or {}).get(rsid) or {}
+        item = {"rsid": rsid, "gene": "PCSK9", "genotype": st.get("genotype") if reading_available else None,
+                "confidence": st.get("confidence"), "source": st.get("source"),
+                "status": "read" if reading_available else "unread", "carrier": None, "copies": None,
+                "interpretation_status": "direction_not_curated", "label": None,
+                "why": _t("lipidgen.direction_unknown"), "variant_note": variant.get("why")}
+        item.update(genome_context("PCSK9", rsid))
+        waiting.append(item)
+    pcsk9.extend(waiting)
+
     # Use the same dated form corridor and censoring rules as the laboratory door.
     from .labs import analyze_labs
     rows = analyze_labs(['lpa']).get('markers') or []
@@ -1147,8 +1229,15 @@ def lipid_genetics() -> Dict[str, Any]:
     for cat in (prs_findings().get("categories") or []):
         for tr in cat.get("traits") or []:
             if tr.get("pgs_id") == _LPA_PGS:
-                estimate = {"percentile": tr.get("percentile"), "pgs_id": tr.get("pgs_id"),
-                            "quality": tr.get("quality_label"), "label": tr.get("label")}
+                estimate = {"percentile": tr.get("percentile") if tr.get("reliable") else None,
+                            "pgs_id": tr.get("pgs_id"), "reliable": bool(tr.get("reliable")),
+                            "quality": tr.get("quality_label"), "label": tr.get("label"),
+                            "calibration_note": tr.get("calibration_note"),
+                            "reliability_note": tr.get("reliability_note"),
+                            "reading_note": tr.get("reading_note"),
+                            "reference_note": tr.get("reference_note")}
+                if not estimate["reliable"]:
+                    estimate["diagnostic_percentile"] = tr.get("percentile") if tr.get("percentile") is not None else tr.get("diagnostic_percentile")
     lpa = guard_fields({}, {
         "measured": measured,
         "estimate": estimate,
@@ -1163,9 +1252,7 @@ def lipid_genetics() -> Dict[str, Any]:
     return {
         "status": "ok",
         "pcsk9": pcsk9,
-        "pcsk9_waiting": [{"rsid": r, "gene": "PCSK9", 'output_kind': 'product_boundary',
-                           "why": _t('clinical.withheld')}
-                          for r in _PCSK9_WAITING if r in loci],
+        "pcsk9_waiting": waiting,
         "lpa": lpa,
         # Catalogue counts are not personal risk estimates.
         "headline": _t('clinical.lipid_counts', read=len(read), carriers=len(carriers)) if read else

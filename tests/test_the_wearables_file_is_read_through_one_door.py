@@ -194,6 +194,7 @@ class TestTheGoalTableReadsBothShapes(unittest.TestCase):
     def _now(self, data):
         with mock.patch.object(goals.core, "health_goals", return_value=GOALS), \
              mock.patch.object(goals.core, "labs", return_value={"markers": {}}), \
+             mock.patch.object(goals.core, "metrics_json", return_value={}), \
              mock.patch.object(goals.core, "wearable_trends", return_value=data):
             return {t["label"]: t for t in goals.goal_dashboard()["targets"]}
 

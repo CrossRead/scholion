@@ -1,8 +1,7 @@
 # Evidence levels A–E
 
 Every statement Scholion makes about a genetic position carries a letter from A
-to E. The letter says what stands behind the statement, and so what the product
-allows itself to say. It appears everywhere the statement does: on the page, in
+to E. The letter says what stands behind the statement, and the confidence with which it should be read. It appears everywhere the statement does: on the page, in
 the command line, in a tool's JSON, in a printed report, and in what an
 assistant retells from these tools.
 
@@ -14,25 +13,26 @@ different things.
 |---|---|---|
 | **A** | A clinical practice guideline, or a gene–disease link GenCC rates Definitive or Strong. | What follows, with the source. |
 | **B** | An association replicated in independent cohorts, with a measured effect size. | What follows, with the effect size and the source. |
-| **C** | Single studies, or studies that contradict each other. | Your genotype, and why no conclusion follows. |
-| **D** | A candidate gene whose association has not been replicated. | Your genotype, and why no conclusion follows. |
-| **E** | No source at all: the position came from a laboratory report and nothing published stands behind it. | Your genotype only, with no interpretation. |
+| **C** | Single studies, or studies that contradict each other. | Your reading and the available interpretation, with confidence, sources and limitations. |
+| **D** | A candidate gene whose association has not been replicated. | Your reading and the available interpretation, with confidence, sources and limitations. |
+| **E** | No source at all: the position came from a laboratory report and nothing published stands behind it. | Your reading, known gene function and any recorded interpretation labelled unestablished; missing variant evidence stays explicit. |
 
-## Where the line falls
+## Confidence and clinical eligibility
 
-A conclusion ("this means something for you") is printed at **A** and **B**
-only. The line between B and C does not move.
+Available catalogue interpretations are shown at every level A–E. Confidence
+qualifies an interpretation rather than suppressing its wording. The reader can
+inspect the source, mechanism and support gaps, and the clinician decides what
+weight to give the statement.
 
-C, D and E are not degrees of caution. They are three different reasons for
-printing a value without a conclusion, and they tell you different things:
+- **C** — studies are isolated or disagree;
+- **D** — evidence is limited and the association has not been replicated;
+- **E** — variant evidence is absent. A recorded interpretation is unestablished;
+  known gene function does not supply a missing variant effect.
 
-- **C** — the data disagree;
-- **D** — there are too few data;
-- **E** — there are no data.
-
-A position at E carries no sentence of the product's own. If a sentence could be
-written, there would be a source to write it from, and the position would not be
-at E.
+Showing an interpretation does not establish a diagnosis or a treatment rule.
+Automatic clinical findings and decision routes still require their own support;
+`verdict_allowed` describes that eligibility, not permission to display text.
+Gene function and GenCC gene–disease validity retain their own source and scope.
 
 ## Who assigns the letter
 
@@ -48,8 +48,8 @@ names no person.
 
 ## For assistants
 
-When you relay a statement from these tools, name its level with it. Do not
-retell a C, D or E position as a conclusion: say what the genotype is and why
-nothing follows from it.
+When you relay a statement from these tools, name its level with it. Retain its confidence, source and limitations. Do not promote a low-confidence
+interpretation to an established clinical finding, and do not invent missing
+facts or clinical support.
 
 In the command line, `scholion doc evidence-levels` prints this page.

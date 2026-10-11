@@ -71,14 +71,13 @@ def genotype_conclusion_lines(positions: List[Dict[str, Any]]) -> List[str]:
     # The genotype against the measurements, in the same words as the page: a
     # found position that names a marker is a question (printed among the
     # questions); none found says so; the alleles not carried say what did not apply.
-    L.append("**" + _t("system.panel.compare_h") + "**")
-    if not held and not any(p.get("expect") for p in found):
-        L.append(_t("system.panel.compare_none"))
     na: Dict[str, List[str]] = {}
     for p in absent:
         if p.get("expect"):
             na.setdefault(p["expect"].get("name") or p["expect"].get("marker") or "—", []).append(name(p))
-    L += [_t("system.panel.compare_absent", name=k, positions=", ".join(v)) for k, v in sorted(na.items())]
+    if na:
+        L.append("**" + _t("system.panel.compare_h") + "**")
+        L += [_t("system.panel.compare_absent", name=k, positions=", ".join(v)) for k, v in sorted(na.items())]
     return L
 
 

@@ -32,7 +32,7 @@ class TestTheLegend(unittest.TestCase):
                 with self.subTest(level=x["level"], field=field):
                     self.assertTrue(x[field]["en"] and x[field]["ru"])
 
-    def test_a_conclusion_is_allowed_at_a_and_b_only(self):
+    def test_automatic_clinical_eligibility_is_limited_to_a_and_b(self):
         self.assertEqual(["A", "B"], [x["level"] for x in _raw()["levels"] if x["verdict_allowed"]])
 
     def test_e_means_no_source(self):

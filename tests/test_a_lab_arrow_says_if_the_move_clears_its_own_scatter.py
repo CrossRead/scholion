@@ -68,7 +68,7 @@ class TestTheFloorIsMeasuredFromTheHistory(LabFloorCase):
 
     def test_the_report_says_so_in_words(self):
         """The rendered sentence, not just the flag underneath it."""
-        text = fmt.labs_report(engine.analyze_labs())
+        text = fmt.labs_report(engine.analyze_labs(), include_history=True)
         self.assertIn("own scatter", text,
                       "the arrow is printed with nothing said about what it can tell apart")
         self.assertIn("intervals)", text, "the sentence does not say what it was measured on")

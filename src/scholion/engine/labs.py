@@ -11,7 +11,7 @@ from ..threshold_basis import compare_threshold, guard_threshold, upper_bound_kn
 from ..test_proposals import guard_test_proposal
 from .targets import outside_target, target_view  # the target beside the corridor (task 170)
 from ..i18n import t as _t
-from ._helpers import _OPS, _recent_or_unknown, _active_names_by_class, DISCLAIMER
+from ._helpers import _OPS, _recent_or_unknown, _lab_display_recency, _active_names_by_class, DISCLAIMER
 from .corridor import point_corridor, flags_comparable
 
 
@@ -507,6 +507,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
         abnormal = flag not in ("ok", "norange", "unconfirmed_rule")
         results.append({
             "key": k, "name": core.marker_name({"key": k, "name": m["name"]}), "unit": m.get("unit", ""),
+            "unit_display": core.unit_label(m.get("unit", "")),
+            "display_recency": _lab_display_recency(latest.get("date", "")),
             # What the number is a measurement OF — the method behind the
             # interval and the code behind the analyte. Both were written and
             # verified in the knowledge files and read by nothing: `units_note`
@@ -525,12 +527,6 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             "flag": flag, "abnormal": abnormal, "direction_pref": direction_pref,
             "repeats": _reps,
             "proposed_rule": proposed_rule,
-            # A threshold like «impaired FASTING glucose» presumes a condition the
-            # number alone cannot carry. The base already records which tests are
-            # taken fasting; when the reading is the second draw of a day and
-            # nobody has said what stood between the two, that presumption is not
-            # safe and the report says so instead of asserting the diagnosis-shaped
-            # label. Two facts the system held and never compared.
             # A threshold like «impaired FASTING glucose» presumes a condition the
             # number alone cannot carry. The base already records which tests are
             # taken fasting; when the reading is the SECOND draw of a day, that
@@ -626,7 +622,15 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
     crossed = [r for r in results if any(d["crossed"] for d in r.get("decisions", []))]
     unresolved = [r for r in results if any(d["crossed"] is None for d in r.get("decisions", []))]
     outside = [r for r in results if r.get("outside_target")]
+    current = [r for r in results if r["display_recency"] is not False]
+    current_stats = {"count": len(current),
+                     "abnormal_count": sum(r["abnormal"] for r in current),
+                     "decision_unresolved_count": sum(any(d["crossed"] is None for d in r["decisions"]) for r in current),
+                     "near_limit_count": sum(bool(r.get("near_limit")) for r in current),
+                     "decision_crossed_count": sum(any(d["crossed"] for d in r["decisions"]) for r in current)}
     return {"status": "ok", "count": len(results), "abnormal_count": len(abnormal),
+            "display_window_months": 12, "current_stats": current_stats,
+            "historical_count": len(results) - len(current),
             "near_limit_count": len(near), "decision_crossed_count": len(crossed),
             "decision_unresolved_count": len(unresolved),
             "outside_target_count": len(outside),
@@ -708,25 +712,16 @@ def _marker_last_date(keys) -> Optional[str]:
     return unreadable or (min(ds) if ds and len(ds) == len(keys) else None)
 
 
-_FLAGS: Dict[str, Any] = {}
-
-
+@core.memo_in_reading
 def _flags_now() -> Dict[str, Any]:
-    """Each marker's flag against its corridor, computed once per suggestion pass."""
-    # Keyed by the profile it was computed from (task 192): a suggestion pass
-    # for one person must never read another person's flags.
-    where = str(core.profile_dir())
-    if _FLAGS.get("path") != where:
-        _FLAGS.clear()
-        _FLAGS["path"] = where
-        _FLAGS["v"] = {m.get("key"): m.get("flag") for m in analyze_labs().get("markers") or []}
-    return _FLAGS["v"]
+    """Each request owns its marker flags; concurrent readers cannot clear them."""
+    return {m.get("key"): m.get("flag") for m in analyze_labs().get("markers") or []}
 
 
+@core.in_reading
 def suggest_tests() -> Dict[str, Any]:
     """Supported proposals and explicitly withheld candidates, not automatic orders."""
     triggered = []
-    _FLAGS.clear()
     for rule in core.test_rules().get("rules", []):
         # A rule the panel author asked to hold (task 205 G): «not for everyone»
         # is a condition nobody has written yet. Until it is, the rule does not
@@ -749,7 +744,8 @@ def suggest_tests() -> Dict[str, Any]:
                         item["done_recently"] = True
                 triggered.append(item)
         except Exception as e:  # a rule must not take the whole tool down
-            triggered.append({"id": rule.get("id", "?"), "error": str(e)})
+            triggered.append({"id": rule.get("id", "?"), "error": str(e),
+                              "suggest": rule.get("suggest")})
     # recently done monitoring goes to the end; inside the groups — by priority
     triggered.sort(key=lambda r: (bool(r.get("done_recently")),
                                   _PRIORITY_ORDER.get(r.get("priority"), 3)))

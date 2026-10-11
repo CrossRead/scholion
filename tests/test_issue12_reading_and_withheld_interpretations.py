@@ -57,7 +57,7 @@ class TestIssue12(unittest.TestCase):
             self.assertEqual('not_determined', verdict['kind'])
             self.assertFalse(verdict.get('carriers'))
             questions = SP._questions({'rows': [row]}, {}, {}, {})['rows']
-            self.assertTrue(any(q['origin'] == 'conclusion_basis' for q in questions))
+            self.assertFalse(any(q['origin'] == 'conclusion_basis' for q in questions))
             self.assertFalse(any(q['origin'] in ('pending', 'moi') for q in questions))
 
     def test_unknown_or_presumed_is_never_a_negative_allele_result(self):
@@ -72,7 +72,7 @@ class TestIssue12(unittest.TestCase):
         row = self.row(supported=True, written=False)
         self.assertEqual('no_text_for_state', row['pending_why'])
         self.assertIn(i18n.t('system.row.pending'), _system_gene_row(row, 'clinician'))
-        self.assertTrue(any(q['origin'] == 'pending' for q in SP._questions({'rows': [row]}, {}, {}, {})['rows']))
+        self.assertFalse(any(q['origin'] == 'pending' for q in SP._questions({'rows': [row]}, {}, {}, {})['rows']))
 
     def test_f5_has_own_support_without_restoring_old_treatment_advice(self):
         row = self.row(supported=True)
@@ -94,7 +94,8 @@ class TestIssue12(unittest.TestCase):
             before = copy.deepcopy(row)
             lines = basis_lines(row, compact=True)
             self.assertEqual(1, len(lines))
-            self.assertIn('label, action, verdict_label', lines[0])
+            self.assertNotIn('[', lines[0])
+            self.assertEqual(['label', 'action', 'verdict_label'], list(row['clinical_basis']))
             self.assertEqual(1, lines[0].count(i18n.t('conclusion.missing.mechanism')))
             rendered = longevity_report({'available': True, 'known': [row]})
             self.assertIn('AG', rendered)

@@ -236,7 +236,7 @@ class TestThePrintedReportCarriesTheBlock(unittest.TestCase):
             self.skipTest("the transsulfuration position is not in this build")
         printed = fmt.system_report(SP.system("amino_acids", "clinician"))
         self.assertIn("link:", printed)
-        self.assertIn("Intake route: No interpretation", printed)
+        self.assertIn("Intake route: Support for an automatic conclusion is incomplete", printed)
         self.assertIsNone(rows[0]["route"])
 
 

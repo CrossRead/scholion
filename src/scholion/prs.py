@@ -22,6 +22,8 @@ from pathlib import Path
 
 from .i18n import plural as _plural, t as _t
 from .pgs_validation import number, reference_snapshot, validate
+from .pgs_scoring import ScoringVCF
+from .pgs_reference import calibration_for
 
 _DEFAULT_PKG = "just-prs-mcp@0.1.3"
 
@@ -286,7 +288,35 @@ def _model_build(pgs_id: str, build: str) -> dict:
             "model_format_version": header.get("format_version")}
 
 
-def _verify_row(m, row: dict, context: dict, build: str, population: str) -> dict:
+def _score_row(m, row: dict, source: ScoringVCF, build: str, population: str) -> dict:
+    """Replace the sidecar's sum with called-allele scoring before calibration."""
+    got = dict(row)
+    pid = str(got.get("pgs_id") or "")
+    if not re.fullmatch(r"PGS\d+", pid):
+        raise ValueError("Invalid PGS identifier")
+    model = _cache_root() / "scores" / f"{pid}_hmPOS_{build}.txt.gz"
+    got["sidecar_diagnostic_score"] = got.get("score")
+    got.update(source.score(model, build))
+    for key in ("percentile", "diagnostic_percentile", "reliable", "calibration_error",
+                "quality_summary", "error", "integrity_note", "validity_note"):
+        got.pop(key, None)
+    got.update(_model_build(pid, build))
+    got.setdefault("genome_build", build)
+    got.setdefault("detected_genome_build", build)
+    calibration = calibration_for(got, population)
+    if calibration is None:
+        calibration = m.call("percentile", {"pgs_id": pid, "prs_score": got["score"],
+            "superpopulation": population, "weight_mass_coverage": got["weight_mass_coverage"]})
+    got["percentile"] = calibration.get("percentile")
+    return _verify_row(m, got, got, build, population, calibration=calibration)
+
+
+def _pinned_models() -> dict:
+    from .core import _read_knowledge
+    return _read_knowledge("prs_models.json").get("models") or {}
+
+
+def _verify_row(m, row: dict, context: dict, build: str, population: str, *, calibration=None) -> dict:
     """Ask for the actual calibration, then apply Scholion's independent gate."""
     got = dict(row)
     got.update(_model_build(str(got.get("pgs_id") or ""), build))
@@ -295,9 +325,16 @@ def _verify_row(m, row: dict, context: dict, build: str, population: str) -> dic
     got["build_mismatch"] = bool(context.get("build_mismatch") or row.get("build_mismatch"))
     if number(got.get("score")) is not None and got.get("pgs_id"):
         try:
-            calibration = m.call("percentile", {
-                "pgs_id": got["pgs_id"], "prs_score": got["score"],
-                "superpopulation": population, "weight_mass_coverage": got.get("weight_mass_coverage")})
+            independent = calibration_for(got, population)
+            if independent is not None:
+                calibration = independent
+                # This is an explicit replacement calibration, not a repair of
+                # missing provenance in an old percentile or a changed model.
+                got["percentile"] = independent["percentile"]
+            if calibration is None:
+                calibration = m.call("percentile", {
+                    "pgs_id": got["pgs_id"], "prs_score": got["score"],
+                    "superpopulation": population, "weight_mass_coverage": got.get("weight_mass_coverage")})
             # Do not silently replace a number obtained with a different cache.
             # The consistency gate below compares the original percentile with
             # the current reference parameters and withdraws stale results.
@@ -314,6 +351,9 @@ def _verify_row(m, row: dict, context: dict, build: str, population: str) -> dic
                 "source": "just-prs.percentile (quality-filtered reference)",
                 "sidecar": PKG, "library": "just-prs==0.4.12",
                 "snapshot_sha256": reference_snapshot(got)}
+            if independent is not None:
+                got["reference_validation"] = dict(independent["validation"],
+                                                   snapshot_sha256=reference_snapshot(got))
         except (RuntimeError, TypeError, ValueError, AttributeError) as error:
             got["calibration_error"] = str(error)
     return validate(got, expected_build=build, expected_ancestry=population)
@@ -339,7 +379,7 @@ def _pick_covered(rows):
 
 
 def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lambda s: None,
-                            genome_build=None, population="EUR"):
+                            genome_build=None, population="EUR", source=None):
     """A fallback path for traits where the trait did not resolve or all models are
     genome-wide: we search for models by text, take the best COVERABLE one (≤max_variants)
     and compute it directly via compute_prs."""
@@ -356,26 +396,48 @@ def _search_scores_fallback(m, term, geno, vcf_path, max_variants=50000, log=lam
             continue
         vn = s.get("variants_number")
         pid = s.get("pgs_id") or s.get("id")
-        if pid and isinstance(vn, (int, float)) and 10 <= vn <= max_variants:
+        # A null count in the sidecar summary is not proof that no model exists.
+        if pid and number(vn) is None:
+            from . import net
+            meta = net.get_json(f"https://www.pgscatalog.org/rest/score/{pid}") or {}
+            vn = meta.get("variants_number")
+            if not s.get("trait_reported"):
+                s = dict(s, trait_reported=meta.get("trait_reported"))
+        endpoint = str(s.get("trait_reported") or "").strip().casefold()
+        if pid and number(vn) is not None and 1 <= vn <= max_variants and endpoint == term.strip().casefold():
             cand.append((vn, pid, s))
     if not cand:
         return None, _t("prs.no_coverable_models")
-    # the largest model under the threshold = usually the most elaborated and still coverable
+    # Calibration and measured coverage decide; size only caps preparation cost.
     cand.sort(reverse=True)
-    vn, pid, meta = cand[0]
-    args = {"pgs_id": pid, "vcf_path": vcf_path, "attach_performance": True}
-    args["genome_build"] = genome_build
-    if geno:
-        args["genotypes_path"] = geno
+    own_source = source is None
+    computed, failures = [], []
     try:
-        pr = m.call("compute_prs", args)
-        pr = _verify_row(m, pr, pr, genome_build, population)
-    except Exception as e:  # noqa
-        return None, f"compute_prs({pid}): {e}"
-    log(_t("prs.fallback_chosen", pgs_id=pid, variants=int(vn),
-           rate=f"{_num(pr.get('match_rate') if isinstance(pr, dict) else None):.2f}"))
-    return {"via": "search_scores", "pgs_id": pid, "variants_number": vn,
-            "score_meta": meta, "result": pr}, None
+        if own_source:
+            source = ScoringVCF(vcf_path)
+        for vn, pid, meta in cand[:3]:
+            args = {"pgs_id": pid, "vcf_path": vcf_path, "attach_performance": True,
+                    "genome_build": genome_build}
+            if geno:
+                args["genotypes_path"] = geno
+            try:
+                raw = m.call("compute_prs", args)
+                pr = _score_row(m, raw, source, genome_build, population)
+                computed.append({"via": "search_scores", "pgs_id": pid,
+                                 "variants_number": vn, "score_meta": meta, "result": pr})
+            except (RuntimeError, TypeError, ValueError, OSError) as error:
+                failures.append(f"compute_prs({pid}): {error}")
+        best = _pick_covered([c["result"] for c in computed])
+        if best is None:
+            return None, "; ".join(failures) or _t("prs.no_coverable_models")
+        chosen = next(c for c in computed if c["result"] is best)
+        log(_t("prs.fallback_chosen", pgs_id=chosen["pgs_id"], variants=int(chosen["variants_number"]),
+               rate=f"{_num(best.get('match_rate')):.2f}"))
+        chosen["candidates_checked"] = [c["pgs_id"] for c in computed]
+        return chosen, None
+    finally:
+        if own_source and source is not None:
+            source.close()
 
 
 def _sex_filtered(traits):
@@ -538,6 +600,8 @@ def report(vcf_path: str, traits=None, superpopulation=None,
     m = _MCP()
     out = []
     geno = None
+    source = None
+    pins = _pinned_models()
     # Parameters the server has refused ONCE are not offered again in this run.
     # Before this, `profile` and `include_children` — which the pinned 0.1.3 does
     # not accept — were sent with every trait, refused with every trait, and
@@ -560,6 +624,21 @@ def report(vcf_path: str, traits=None, superpopulation=None,
             _log(f"→ [{i}/{len(traits)}] PGS: {t.get('label')}…")
             row = {"label": t.get("label"), "category": t.get("category"), "term": t.get("term")}
             try:
+                pin = pins.get(t.get("term")) or {}
+                if pin.get("pgs_id"):
+                    args = {"pgs_id": pin["pgs_id"], "vcf_path": vcf_path,
+                            "genome_build": build, "attach_performance": True}
+                    if geno:
+                        args["genotypes_path"] = geno
+                    raw = m.call("compute_prs", args)
+                    if source is None:
+                        source = ScoringVCF(vcf_path)
+                    pinned_chosen = _score_row(m, raw, source, build, superpopulation)
+                    row.update(status="ok", chosen=pinned_chosen, selection="pinned",
+                               result={"rows": [pinned_chosen]},
+                               models=_models_summary({"rows": [pinned_chosen]}, 1))
+                    out.append(row)
+                    continue
                 efo = t.get("efo_id")
                 if not efo:
                     found = m.call("search_traits", {"term": t["term"], "limit": 1, "include_pgs_ids": False})
@@ -603,7 +682,11 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                                                      if k not in gone}})
                         else:
                             raise
-                    rows = [_verify_row(m, r, rep, build, superpopulation) for r in _rows_of(rep)]
+                    rows = []
+                    for candidate in _rows_of(rep):
+                        if source is None:
+                            source = ScoringVCF(vcf_path)
+                        rows.append(_score_row(m, candidate, source, build, superpopulation))
                     rep["rows"] = rows
                     # An uncalibrated model must not win by its spurious P100.
                     usable = [r for r in rows if r.get("reliable")]
@@ -621,10 +704,10 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 else:
                     row["status"] = "trait_not_found"
                 # the fallback path: no trait, or the chosen model is poorly covered
-                need_fb = fallback and (not efo or _num((row.get("chosen") or {}).get("match_rate")) < 0.9)
+                need_fb = not efo or (fallback and _num((row.get("chosen") or {}).get("match_rate")) < 0.9)
                 if need_fb:
                     fb, err = _search_scores_fallback(m, t["term"], geno, vcf_path, log=_log,
-                                                    genome_build=build, population=superpopulation)
+                                                    genome_build=build, population=superpopulation, source=source)
                     if fb:
                         prev = _num((row.get("chosen") or {}).get("match_rate"))
                         new = _num((fb.get("result") or {}).get("match_rate"))
@@ -651,6 +734,8 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 # silence looks exactly like a trait that was never in it.
                 "withheld_by_sex": withheld}
     finally:
+        if source is not None:
+            source.close()
         m.close()
 
 

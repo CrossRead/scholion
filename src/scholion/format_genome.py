@@ -101,6 +101,8 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
                                 why=(cov.get("why") or "").strip()
                                 or _t("gene.coverage_not_computed")))
     lines.append("")
+    from .panel_reference import reference_lines
+    lines.extend(reference_lines(r))
     v = r.get("variants") or {}
     conseq = v.get("consequential")
     lines.append(_t("gene.counts", total=v.get("total", 0), coding=v.get("coding", 0),
@@ -178,6 +180,8 @@ def genome_report(r: Dict[str, Any]) -> str:
         # shelves were asked cannot tell an answer from a silence, and the
         # catalogue is only one of four.
         lines = []
+        from .panel_reference import reference_lines
+        lines.extend(reference_lines(r))
         if r.get("layers"):
             lines += [gene_layers_report(r["layers"]), ""]
         lines.append(_t("genome.loci", gene=r["gene"]))
@@ -315,7 +319,8 @@ def genome_report(r: Dict[str, Any]) -> str:
         line += f"\n⚠️ _{res['note']}_"
     if r.get("note"):
         line += f"\n_{r['note']}_"
-    for _q in _locus_basis_lines(r):
+    from .panel_reference import reference_lines
+    for _q in reference_lines(r) + _locus_basis_lines(r):
         line += "\n" + _q
     line += f"\n\n_{r.get('disclaimer','')}_"
     return line
@@ -405,6 +410,8 @@ def screen_report(r: Dict[str, Any]) -> str:
             if row.get("read") is False:
                 line += " — " + _t("screen.gene_unread")
             L.append(line)
+            from .panel_reference import reference_lines
+            L.extend("  " + detail for detail in reference_lines(row))
         L.append("")
     L += _class_listing(r.get("classes") or r)
     if r.get("disclaimer"):
@@ -525,6 +532,10 @@ def clinvar_report(r: Dict[str, Any]) -> str:
     if r.get("indel_caveat"):
         lines += [r["indel_caveat"], ""]
     for h in r["hits"]:
+        from .panel_reference import reference_lines
+        for context in h.get("gene_contexts") or []:
+            lines.append("  " + str(context.get("gene") or ""))
+            lines.extend("    " + line for line in reference_lines(context))
         sig = (h.get("clnsig") or "").replace("_", " ")
         icon = "🔴" if "pathogenic" in (h.get("clnsig", "").lower()) else "🟠"
         cond = (h.get("clndn") or "").replace("|", " / ").replace("_", " ")
@@ -663,6 +674,9 @@ def prs_report(r: Dict[str, Any]) -> str:
     lines = [_t("prs.title") + " · "
              + _t("prs.reliable", reliable=s.get("reliable"), total=s.get("total")) + " · "
              + _t("prs.reference", population=s.get("superpopulation", "EUR")), ""]
+    recalculate = r.get("recalculation") or {}
+    if recalculate.get("required"):
+        lines += [recalculate["title"], recalculate["note"], recalculate["instructions"], ""]
     if s.get("population_note"):
         lines += [s["population_note"], ""]
     for w in (r.get("withheld_by_sex") or []):
@@ -672,6 +686,8 @@ def prs_report(r: Dict[str, Any]) -> str:
     high = r.get("high", [])
     if high:
         lines.append(_t("prs.above_average"))
+        if r.get("high_note"):
+            lines.append(r["high_note"])
         for t in high:
             p = t.get("percentile")
             lines.append(f"  🔶 {t['label']}: {percentile_label(p)}"
@@ -687,6 +703,7 @@ def prs_report(r: Dict[str, Any]) -> str:
         lines.append("· " + c["note"])
     if r.get("method_caveats"):
         lines.append("")
+    lines.append(_t("prs.verified_definition"))
     lines.append(_t("prs.evidence_legend"))
     lines.append(_t("prs.measure_legend"))
     lines.append("")
@@ -698,8 +715,14 @@ def prs_report(r: Dict[str, Any]) -> str:
             warn = "" if t.get("reliable") else " ⚠"
             ev = {"clinical": " ✚", "supportive": " ·"}.get(t.get("evidence"), "")
             lines.append(f"  {t['label']}: {ps}{warn}{ev}")
+            if t.get("reference_note"):
+                lines.append("    " + t["reference_note"])
             if t.get("calibration_note"):
                 lines.append("    " + t["calibration_note"])
+            if t.get("reliability_note"):
+                lines.append("    " + t["reliability_note"])
+            if t.get("reading_note"):
+                lines.append("    " + t["reading_note"])
             lines.append("    ↳ " + _prs_measurement_line(t))
         lines.append("")
     lines.append(f"_{r.get('disclaimer','')}_")
@@ -710,7 +733,7 @@ def longevity_report(r: Dict[str, Any]) -> str:
     """Longevity layer (LongevityMap): APOE ε + key markers + significant genes."""
     if not r.get("available"):
         return r.get("message", _t("longevity.not_ready"))
-    lines = [_t("longevity.title"), ""]
+    lines = [_t("longevity.title"), r.get("count_note") or "", r.get("catalogue_note") or "", ""]
     ap = r.get("apoe")
     if ap:
         # The longevity layer writes the key genotype, the early report wrote epsilon.
@@ -726,7 +749,11 @@ def longevity_report(r: Dict[str, Any]) -> str:
                         rs429358=ap.get("rs429358"), rs7412=ap.get("rs7412")))
         if ap.get("status") == "ambiguous_without_phase":
             lines.append("  ⚠ " + str(ap.get("message") or ""))
-        lines.extend(basis_lines(ap, compact=True))
+        if ap.get("interpretation"):
+            i = ap["interpretation"]
+            lines += [f"  {i['level']}: {i['summary']}", "  " + i['mechanism'], "  " + i['limitations'], "  " + i['source']]
+        elif ap.get("message"):
+            lines.append("  " + ap["message"])
         lines.append("")
     lines.append(_t("longevity.key_markers"))
     for k in r.get("known", []):
@@ -735,6 +762,8 @@ def longevity_report(r: Dict[str, Any]) -> str:
         for field in ('label', 'verdict_label', 'action', 'zygosity_note', 'population_note'):
             if k.get(field):
                 lines.append('  ' + str(k[field]))
+        from .panel_reference import reference_lines
+        lines.extend("  " + line for line in reference_lines(k))
         lines.extend(basis_lines(k, compact=True))
     st = r.get("stats", {})
     genes = ", ".join(g["gene"] for g in r.get("significant_genes", [])[:16])
@@ -743,6 +772,15 @@ def longevity_report(r: Dict[str, Any]) -> str:
                            genes=_plural(st.get("significant_genes") or 0, "count.genes_in")))
     if genes:
         lines.append(_t("longevity.genes_first", genes=genes))
+    for gene in r.get("significant_genes") or []:
+        lines.append("\n**" + gene["gene"] + "**")
+        from .panel_reference import reference_lines
+        lines.extend(reference_lines(gene))
+        for variant in gene.get("variants") or []:
+            lines.append("  " + str(variant.get("rsid") or "") + " · " + str(variant.get("genotype") or "—"))
+            lines.extend("  " + line for line in reference_lines(variant))
+            if variant.get("pmids"):
+                lines.append("  PMID: " + ", ".join(map(str, variant["pmids"])))
     lines.append(f"\n_{r.get('disclaimer','')}_")
     return "\n".join(lines)
 
@@ -1048,10 +1086,14 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
                 L.append(f"  {x['verdict']}")
         if x.get("population_note"):
             L.append(f"  ⚠ {x['population_note']}")
+        if x.get("variant_note"):
+            L.append("  " + x["variant_note"])
         L.extend(basis_lines(x))
+        from .panel_reference import reference_lines
+        L.extend("  " + detail for detail in reference_lines(x))
         if x.get("pmids"):
             L.append("  PMID: " + ", ".join(x["pmids"]))
-    if r.get("pcsk9_waiting"):
+    if r.get("pcsk9_waiting") and not all(w["rsid"] in {x["rsid"] for x in r.get("pcsk9", [])} for w in r["pcsk9_waiting"]):
         L += ["", f"**{_t('lipidgen.waiting_h')}**"]
         for w in r["pcsk9_waiting"]:
             L.append(f"- `{w['rsid']}` {w['gene']} — {w.get('why','')}")
@@ -1069,8 +1111,12 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         L.extend(basis_lines(lpa))
     if lpa.get("estimate"):
         e = lpa["estimate"]
-        L.append(f"- {e.get('label','')}: {e.get('percentile')} ({e.get('pgs_id')}, "
-                 f"{e.get('quality')})")
+        from .pgs_validation import percentile_label
+        value = percentile_label(e.get('percentile')) if e.get('reliable') else _t('web.prs.unverified')
+        L.append(f"- {e.get('label','')}: {value} ({e.get('pgs_id')}, "
+                 f"{e.get('quality') or '—'})")
+        L.extend("  " + e[key] for key in ("calibration_note", "reliability_note", "reading_note", "reference_note")
+                 if e.get(key))
         L.append(f"  ⚠ {lpa.get('estimate_is_not_a_measurement','')}")
     L += ["", f"_{r.get('disclaimer','')}_"]
     return "\n".join(L) + "\n"
@@ -1143,7 +1189,7 @@ def genotype_sites_report(r: Dict[str, Any]) -> str:
 def panel_report(r: Dict[str, Any]) -> str:
     """The panel as the catalogue describes it — for a clinician, with the references."""
     from .panel_notes import note_lines
-    from .panel_reference import reference_lines
+    from .panel_reference import interpretation_lines, reference_lines
     if r.get("status") == "unknown_system":
         return "✗ " + _t("system.unknown", key=r.get("key"), systems=", ".join(r.get("systems") or []))
     if "systems" in r and "positions" not in r:
@@ -1171,6 +1217,10 @@ def panel_report(r: Dict[str, Any]) -> str:
             head += " — " + _t("system.kind." + str(p.get("kind") or "unassigned")) + \
                     "; " + _t("system.mode." + str(p.get("mode") or "unknown"))
             L.append(head)
+            interpretation = (p.get("interpretation") or {}).get("summary")
+            if isinstance(interpretation, dict):
+                for state, sentence in interpretation.items():
+                    L += ["  " + detail for detail in interpretation_lines({**p, "interpretation": {**p["interpretation"], "summary": str(state) + ": " + sentence}})]
             L += ["  " + detail for detail in reference_lines(p)]
             if route_text(p):
                 L.append('  ' + route_text(p))
@@ -1183,8 +1233,7 @@ def panel_report(r: Dict[str, Any]) -> str:
                              str(p["reading"]["quality"]))
             if p.get("disposition"):
                 L.append("  " + _t("panel.intake." + p["disposition"]) +
-                         (" — " + str(p["reason"]) if p.get("reason") else "") +
-                         (" (" + _t("panel.intake.task", task=p["task"]) + ")" if p.get("task") else ""))
+                         (" — " + str(p["reason"]) if p.get("reason") else ""))
             L.append("  " + _t("panel.locus", hgvs=p.get("hgvs") or "—", allele=p.get("risk_allele") or "—"))
             if p.get("author_note"):
                 L.append("  " + note_lines(p["author_note"]).replace("\n", "\n  "))

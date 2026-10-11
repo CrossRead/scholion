@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Dict
 from .. import core
 from .. import subject as _subject
-from ..i18n import t as _t
+from ..i18n import t as _t, lang as _lang
 from ._helpers import _recent, DISCLAIMER
 from .labs import _latest, _trend, _flag_value, analyze_labs, suggest_tests
 from .genomics import genome_status
@@ -155,6 +155,7 @@ def metrics_summary() -> Dict[str, Any]:
     dev = _device_rows()
     out = []
     latest_weight = None
+    names = {v["person_metric"]: v.get("label") for v in core.wearable_metrics().get("metrics", {}).values() if v.get("person_metric")}
     for k, m in data.get("metrics", {}).items():
         series = m.get("series") or []
         latest = _latest(series) if series else None
@@ -166,7 +167,9 @@ def metrics_summary() -> Dict[str, Any]:
             latest is None or str(d_last["date"])[:7] > str(latest["date"])[:7])
         shown = d_last if take_device else latest
         shown_series = d["series"] if take_device else series
-        row = {"key": k, "name": m.get("name", k), "unit": m.get("unit", ""),
+        display_name = core._localized(m.get("labels") or {}, _lang()) or names.get(k) or m.get("name", k)
+        row = {"key": k, "name": display_name, "unit": m.get("unit", ""),
+               "unit_display": core.unit_label(m.get("unit", "")),
                "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
                "direction": m.get("direction"),
                "value": shown["value"] if shown else None,

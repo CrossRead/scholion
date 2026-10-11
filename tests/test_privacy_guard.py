@@ -92,6 +92,7 @@ class TestHostList(unittest.TestCase):
                                         # button, on an explicit request only (owner, 13.09.2026)
         "grch37.rest.ensembl.org",      # genome preparation in verified GRCh37 coordinates
         "rest.ensembl.org",             # parsing an rsID
+        "www.pgscatalog.org",          # public PGS metadata only
         "rxnav.nlm.nih.gov",            # RxNorm — normalising the name
     }
 

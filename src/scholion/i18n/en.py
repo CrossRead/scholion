@@ -32,7 +32,26 @@ them would break the grouping rather than the wording.
 from __future__ import annotations
 
 MESSAGES = {
-    "conclusion.withheld": "No interpretation: missing {missing}. Reading status is retained.",
+    "web.system.route_not_established": "No supported genetic interpretation for choosing a correction route.",
+    "web.system.route_support": "Sources and result check",
+    "web.system.med_no_class": "Class not recognised",
+    "web.system.med_no_map": "Class recognised; system assignment not established",
+    "web.system.med_unplaced": "System assignment not established · {n}",
+    "web.system.med_class": "Recognised class",
+    "web.system.med_dose": "Recorded dose / regimen",
+    "web.system.med_name": "Prescription",
+    "web.gen.col_confidence": "Confidence",
+    "interpretation.automatic_count": "rows with incomplete support for automatic clinical findings: {n}",
+    "interpretation.automatic_held": "Some automatic clinical findings cannot be established from the recorded support. Available interpretations are shown with their confidence.",
+    "web.gen.context_reference": "Catalogue interpretation",
+    "web.gen.context_lower": "Interpretation with limited confidence",
+    "web.gen.context_details": "Details and sources",
+    "web.gen.context_notice": "Interpretations carry Scholion confidence A–E. The letter opens the guide; a gene opens its panel reference. Confidence and limitations inform the clinician’s judgement.",
+    "interpretation.summary": "Interpretation · Scholion {level}: {text}",
+    "interpretation.notice": "This is the catalogue interpretation of the available reading, with its stated confidence; it does not establish a diagnosis or a treatment decision.",
+    "interpretation.gaps": "Support gaps: {missing}. Consider these when assessing the interpretation.",
+    "web.gen.col_reading": "Reading",
+    "conclusion.withheld": "Support for an automatic conclusion is incomplete: missing {missing}. Reading status is retained.",
     "conclusion.missing.source_identifier": "a source with a PMID/DOI",
     "conclusion.missing.mechanism": "a mechanism",
     "conclusion.missing.evidence_level": "evidence at level A or B",
@@ -41,7 +60,7 @@ MESSAGES = {
     "conclusion.subclaim.route": "Intake route",
     "conclusion.subclaim.under_load": "Response under load",
     "conclusion.subclaim.next_step": "Proposed next step",
-    "conclusion.withheld_count": "rows without interpretation: {n}; required source or mechanism missing",
+    "conclusion.withheld_count": "rows with incomplete support for an automatic conclusion: {n}; required source or mechanism missing",
     "conclusion.caution_level": "No prescribing interpretation: the evidence level is below B.",
     "conclusion.caution_header": "Genotype recorded; prescribing interpretation not available",
     "conclusion.caution_withheld_count": "Genotype-linked rules below B, shown as a count only: {n}",
@@ -468,7 +487,7 @@ MESSAGES = {
                                        "can be said about lab monitoring.",
     "unresolved.pgx_source": "Pharmacogenetics: CPIC was not queried — {why}.",
     "unresolved.labs_no_rule": "Lab monitoring: the catalogue has no rule for the class {classes}.",
-    "prescription.no_pgx": "no meaningful pharmacogenetics for this drug (CPIC): no gene affecting dose or effect was found. Our copy of the guidelines is dated {date} — that is what tells «nothing is known» from «this build is behind».",
+    "prescription.no_pgx": "No gene-based dosing or effect guidance for this drug was found in the CPIC catalogue dated {date}.",
     "common.unknown_date": "undated",
     "prescription.actionable": "important",
     "prescription.gene_phenotype": "your phenotype **{phenotype}** — {label}",
@@ -711,8 +730,8 @@ MESSAGES = {
     # ── suggested tests ──────────────────────────────────────────────────
     "tests.none": "No catalogue rule fired on the available profile. This does not establish that no tests are needed.",
     "tests.header": "**Test proposals and unresolved catalogue candidates** ({n}):",
-    "tests.proposal_withheld": "Test proposal withheld (catalogue rule {id})",
-    "tests.not_an_order": "A catalogue trigger alone does not support a test order; the independent grounds remain unresolved.",
+    "tests.proposal_withheld": "Test proposal not supported: insufficient evidence for an automatic recommendation.",
+    "tests.not_an_order": "A catalogue trigger alone does not establish that this test is needed.",
     "tests.basis": "{claim}: {detail}",
     "tests.claim.suggest": "Test selection support",
     "tests.claim.why": "Reason support",
@@ -728,7 +747,8 @@ MESSAGES = {
     "tests.specialist": "who to see: {name}",
     "tests.why": "why: {text}",
     "tests.nothing_pending": "No pending catalogue candidates; recorded monitoring is listed below. This is not a complete assessment of test needs.",
-    "tests.rule_error": "rule {id}: error ({error})",
+    "tests.rule_error": "Test proposal not assessed: {name}.",
+    "tests.proposal_unavailable": "test selection",
     "tests.routine_header": "**Routine follow-up — already done, tracked by interval:**",
     "tests.done": "{name} — measured {date}, repeat in ~{months} months.",
 
@@ -766,13 +786,13 @@ MESSAGES = {
     "genome.route.block.confirmation": "the reading still requires confirmation",
     "genome.route.block.measurement": "an exact dated measurement with units is not available in the current data",
     "genome.route.block.marker_basis": "the marker association is withheld for incomplete independent support",
-    'clinical.summary': 'Interpretations withheld [{fields}]: missing {missing}. Reading retained.',
+    'clinical.summary': 'Automatic clinical conclusion lacks {missing}. Reading retained.',
     'system.row.allele_present': 'named allele present; not a clinical finding by itself',
-    'system.row.withheld': 'interpretation withheld: clinical basis incomplete',
+    "system.row.withheld": "automatic clinical finding not established: support incomplete",
     'system.q.withheld': '{gene} {rsid}: {reason} Is there sufficient independent evidence for a clinical interpretation?',
-    "panel.withheld_count": 'A/B interpretations withheld: {n}. Reference biology and reading remain available.',
-    "clinical.basis": "Claim support [{field}]: {detail}",
-    "clinical.withheld": "Clinical interpretation withheld",
+    "panel.withheld_count": "A/B entries with incomplete support for automatic clinical findings: {n}. Available interpretations remain visible with confidence and limitations.",
+    "clinical.basis": "Support: {detail}",
+    "clinical.withheld": "Support for an automatic clinical conclusion is incomplete",
     "clinical.dose_unresolved": "Dose-context claims lack complete independent support; the recorded dose is not changed.",
     "clinical.genome_limit": "Genotypes and catalogue allele counts are not individual risk estimates or treatment advice.",
     "clinical.penetrance_limit": "This build reports source classifications; it does not estimate individual penetrance or diagnose disease.",
@@ -847,7 +867,7 @@ MESSAGES = {
     "prs.reference": "reference {population}",
     "prs.above_average": "Noticeably above average (screening):",
     "prs.withheld_by_sex": "not shown: this trait exists only for the {sex} sex, and a percentile about an organ the reader does not have is not a smaller error for being printed politely",
-    "prs.withheld_sex_unknown": "not shown: this trait exists only for the {sex} sex and no sex is recorded in the profile — the answer to «we do not know» is «then we do not say», not a default",
+    "prs.withheld_sex_unknown": "Not shown: this trait applies only to {sex}, and sex is not recorded in the profile.",
     "prs.caveat.strand_ambiguous": "a variant whose two alleles are each other's complement (A/T, C/G) matches either strand, so a strand flip in the source file is indistinguishable from a correct call — this build identifies such loci for a genotyping array and cannot do so inside a score it does not sum itself",
     "prs.caveat.missing_as_zero": "a variant of the model that is absent from your file is not added to the sum, which is arithmetically an imputed zero dose and biases the score downward; how much of the model's WEIGHT was actually present is measured and shown, and a percentile below the threshold is withdrawn from trust rather than footnoted",
     "prs.caveat.hard_genotypes": "hard genotypes only: an uncertain call is counted as a certain one, with no dosage",
@@ -1042,7 +1062,7 @@ MESSAGES = {
     "genome.refused.no_file": "The coordinate was found, but the full genome database is not connected yet (genome/*.vcf.gz + .tbi are needed).",
     "genome.refused.no_answer": "The coordinate was found and the file is connected, but the reader returned nothing at that position — most often a missing or broken index (`.tbi`/`.csi`). `scholion genome-status` says which. An empty answer is not a reference call and is not reported as one.",
     "genome.refused.unreadable_file": "The coordinate was found. The file in the genome folder is not readable as it stands — `scholion genome-status` prints the one command that fixes it. Nothing is missing; nothing needs to be obtained.",
-    "genome.refused.assembly_unsupported": "The coordinate was found, and so is your file: it is connected and indexed. It is called against a build this catalogue carries no coordinates for, and nothing is converted on the fly, because a converted position points at a real base that is the wrong one. `scholion genome-status` names the build and what to do.",
+    "genome.refused.assembly_unsupported": "Your indexed genome uses an assembly for which this catalogue has no coordinates. No locus result is available. `scholion genome-status` shows the assembly and preparation steps.",
     "genome.refused.several_files": "The coordinate was found. There is more than one genome file in the folder, and which of them is yours is not ours to guess — `SCHOLION_GENOME_VCF` says so in one variable.",
     "genome.refused.several_samples": "The coordinate was found. The file holds several samples — a trio or a joint call — and reading the first column would report somebody else as you. `SCHOLION_GENOME_SAMPLE` says which one is yours.",
     "genome.refused.foreign_input": "The coordinate was found. The folder holds genomic data that is not a readable VCF — `scholion genome-status` names each file and what it needs.",
@@ -1055,7 +1075,7 @@ MESSAGES = {
     "genome.refused_head.alleles_not_comparable": "the genotype names an allele that cannot be written beside this locus's own.",
     "genome.refused_head.not_sequenced": "the input is a chip, and a region is not a question a chip can answer.",
     "genome.unreadable_truncated": "the file ends without the end-of-file block bgzip always writes last: it was cut short — a copy or a download that did not finish. Nothing is read out of it, because a position past the cut has no row and would have answered «reference». Get a complete copy and compare the sizes.",
-    "genome.unreadable_pass_failed": "the pass over the file stopped part-way ({detail}). Nothing is read out of it, because a position past the failure has no row and would have answered «reference». `gzip -t` on the file says where it is damaged.",
+    "genome.unreadable_pass_failed": "Genome file reading failed part-way ({detail}). No genotype result is available from this read. Check file integrity with `gzip -t`.",
     "genome.unreadable_composition_unread": "the file could not be read to learn which kinds of variant it carries ({detail}). Without that, a missing row cannot be told from a variant this file never holds, so it is not reported as the reference. Check that the file is whole and readable, then ask again.",
     "genome.unreadable_reader_failed": "the reader failed at this position ({detail}). Nothing is read here: a failed read has said nothing about the person, and answering «reference» would have been a sentence about them made from an error. Check that the index sits beside the file and matches it (`tabix -p vcf` rebuilds it), then ask again.",
     "genome.unreadable_not_a_vcf": "the file does not open as a VCF — its first line is not a VCF header. Nothing is read out of it.",
@@ -1725,7 +1745,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.state.risk_allele_not_declared": "read, risk allele not named by the author",
     "system.state.None": "not determined",
     "system.why.no_current_prescriptions": "no current prescription is recorded in the profile",
-    "system.why.none_acts_here": "none of the current prescriptions belongs to a class the map places on this system",
+    "system.why.none_acts_here": "Current prescriptions have no recorded catalogue link to this system.",
     "system.why.no_target_set": "no clinician's target is recorded on a marker of this system",
     "system.q.target": "{marker}: the last value {value} {unit} ({date}) is within the corridor {low}–{high} and {side} the target {spec} set by {set_by} on {set_on} — is that worth discussing?",
     "system.why.no_lab_half": "this system has no laboratory panel: it is built from wearable metrics",
@@ -1736,7 +1756,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.why.all_read": "every row of the genetic half was read",
     "system.why.scan_not_run": "the genome is not readable on this profile, so nothing of the genetic half could be read",
     "system.why.no_rule_fired": "no rule of the test list touches a marker of this system on this profile",
-    "system.why.nothing_open": "nothing on this system is open for a question: no expectation was declared, no row waits for a phrase, no marker of the panel is missing",
+    "system.why.nothing_open": "No additional questions for this system from the available data.",
     "system.next.stale": "{marker}: last measured {date}, more than {months} months ago",
     "system.next.unread": "{gene} {rsid}: not read in this file ({why})",
     "system.next.unread_gene": "{gene}: not read for this purpose ({why})",
@@ -1773,7 +1793,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "panel.source_row": "source: {source}; study: {study}",
     "panel.signed.clinician": "sentence checked against its source by a clinician on {on}; curated {curated}",
     "panel.signed.author": "sentence checked against its source by the panel's author on {on}, not by a clinician; curated {curated}",
-    "panel.signed.open": "sentence is a draft from the named source; nobody has checked it yet; curated {curated}",
+    "panel.signed.open": "Clinical review not recorded; curated {curated}",
     "panel.unreadable": "a short read cannot read it — {reason} (source: {source})",
     "panel.for_clinician_note": "This page describes the panel itself — the knowledge, not the person: no genome or laboratory result is read here. The reading of this panel against the genome is on the radar and on the system's card.",
     "web.panel.open": "Panel and its studies — for the clinician",
@@ -1783,13 +1803,13 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.panel.summary": "panel as a whole: {positions} — named allele found in {found} ({found_genes}); not found in {absent} ({absent_genes}); not read: {unread} ({unread_genes})",
     "system.panel.kind.guideline": "to weigh when choosing a drug",
     "system.panel.conclusion_h": "Genotype of the system",
-    "system.panel.conclusion_note": "assembled from the panel's own sentences — nothing is added",
+    "system.panel.conclusion_note": "Catalogue interpretation for the recorded genotype",
     "system.panel.conclusion_found": "{positions} in the panel; the named allele was found in {found}: {genes}",
     "system.panel.conclusion_none_found": "none of the named alleles of the panel was found ({positions} checked)",
     "system.panel.conclusion_absent": "not carried: {genes}",
     "system.panel.conclusion_unread": "not read, {positions}: {genes}",
     "system.panel.polygenic_fold": "polygenic scores of this system ({scored} scored) — open",
-    "system.panel.compare_h": "Genotype against the measurements",
+    "system.panel.compare_h": "Genetic variants and laboratory measurements",
     "system.panel.compare_none": "this panel has no available position-to-marker interpretation for these measurements; their cause is not determined here",
     "system.panel.compare_absent": "expectation for {name} does not apply — the allele is not carried: {positions}",
     "system.panel.prescribing_h": "To weigh when choosing a drug",
@@ -1823,9 +1843,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.panel.under_load": "under a load ({test}): {reveals}",
     "system.routes.head": "If a decision to correct has been made, what the genotype says about the route",
     "system.routes.layer": "The route of a correction",
-    "system.on_demand.head": "A panel without a radar domain",
-    "system.on_demand.why": "why it is not on the radar: {why}",
-    "web.panels.on_demand": "Panels on demand — no laboratory half, no score",
+    "system.on_demand.head": "About this panel",
+    "system.on_demand.why": "{why}",
     "system.layer.on_demand_genetics": "The positions of the panel",
     "labs.genetics_of": "the genetics of this marker — {n}",
     "system.row.local_note": "a local opinion, not an evidence upgrade ({by}, {on})",
@@ -1845,7 +1864,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.gen.state.carrier": "carrier",
     "system.gen.state.unread": "not read",
     "system.gen.state.clear": "nothing found",
-    "system.routes.caveat": "The product does not say that anything should be corrected, and it does not rank these: a ranking would mean an optimum, which needs cost, availability, the clinical picture and your own preference. Each supported route carries what to recheck and when; a withheld interpretation names its missing basis instead.",
+    "system.routes.caveat": "The clinician decides whether correction is needed. Routes are not ranked. Each supported route carries a result check; evidence and reading gaps are shown separately.",
     "system.routes.no_rule": "If a decision to correct has been made: this build has no supported applicable interpretation for the choice of route. This does not establish absence of a genetic effect.",
     "system.routes.withheld_count": "Route interpretations withheld: {n}",
     "system.routes.unobserved_count": "Route rules not assessed because a genetic dependency was not observed here: {n}",
@@ -1868,7 +1887,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.row.needs_confirmation": 'a signal to confirm, not a finding',
     "system.row.needs_confirmation_text": 'Your file ({input}) shows a rare variant in {gene} at {rsid}. Chips often show rare variants that are not there: for BRCA1/2, only about 4 in 100 such results were confirmed. Before this means anything, the variant needs confirming by sequencing in a clinical laboratory.',
     "system.hyp.count": "Research hypotheses (C–D): {hyp}; positions with unknown variant influence (E): {values}. Reference biology remains visible; hypotheses are separate from findings.",
-    "system.hyp.head": "Hypotheses (C–D) and values without a source (E) — not conclusions",
+    "system.hyp.head": "C–E interpretations: hypotheses and evidence limitations",
     "system.hyp.row": "{gene} {rsid} — level {level} ({short}), a hypothesis: {said}",
     "system.hyp.no_sentence": "no sentence for this genotype (not read, or not written)",
     "system.hyp.value_e": "{gene} {rsid} — level E: {genotype}; no variant effect is established; sourced gene biology is separate",
@@ -1890,18 +1909,18 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.hyp.name.replication": "replication",
     "system.hyp.name.would_confirm": "what would confirm it",
     "system.hyp.name.would_refute": "what would refute it",
-    "system.hyp.rule": "How to retell these (canon, rule 2c): a C or D position is a hypothesis — name its level, source and gaps, give no advice by it. Reference biology is available at all A–E levels and does not establish a personal effect. At E the variant influence is unknown even when gene function is sourced.",
-    "web.hyp.short": "a hypothesis at level {level} — not a conclusion; its passport is in the clinician's register",
+    "system.hyp.rule": "C/D interpretations carry their confidence, source and evidence gaps. At E no variant effect is established. Gene function alone does not establish a personal variant effect.",
+    "web.hyp.short": "interpretation at confidence {level}; explanation and sources in the details",
     "web.hyp.value_e": "level E: variant influence unknown; gene function is separate",
     "web.hyp.head": "Hypothesis, level {level}:",
     "system.row.level": "level {level} ({short})",
-    "system.row.level_none": "no level assigned yet — no conclusion",
-    "system.row.not_finding_level": "a value without a conclusion — its level does not allow one",
+    "system.row.level_none": "confidence has not yet been assigned",
+    "system.row.not_finding_level": "automatic clinical finding not established at this confidence level",
     "system.row.ladder": "genotypes, base to top: {rungs}",
     "system.genetics.levels": "evidence levels of the positions: {levels}; with no level yet: {none}",
     "evidence.title": "Evidence levels A–E",
     "evidence.row": "**{level}** — {short}. {full} {says}",
-    "evidence.boundary": "A conclusion is printed only at levels {levels}. Below them, the product shows the value and says why nothing follows.",
+    "evidence.boundary": "Available interpretations are shown at every level A–E with confidence, sources and limitations. Automatic clinical findings require levels {levels} and complete support. The clinician assesses conclusions in their clinical context.",
     "evidence.more": "The full page: `scholion doc evidence-levels`.",
     "evidence.unavailable": "The legend of evidence levels is missing from this build.",
     "evidence.level_chip": "level {level}: {short}",
@@ -1981,7 +2000,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.genetics.composed": "base {source} {version} — genes: {base_genes}, of them read: {read_genes}; positions of the curated panel: {positions}, of them read: {read_positions}; findings: {findings}, carriers: {carriers}, waiting for a phrase: {pending}",
     "system.genetics.not_composed": "no genetic list for this system is in this build — {why}",
     "system.genetics.signature_author": "positions whose sentence the panel's author checked against its source, and no clinician: {n} (checked {date})",
-    "system.genetics.signature_open": "rows whose sentence is a draft from the named source, not checked by a clinician: {n}",
+    "system.genetics.signature_open": "rows without a recorded clinical review: {n}",
     "system.genetics.withheld": "hits withheld because the assertion is Limited, Disputed or Refuted: {n}",
     "system.genetics.excluded": "struck from the base by the clinician, with a source: {genes}",
     "system.genetics.refused": "rows the gate dropped, counted: {n}",
@@ -1996,14 +2015,14 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.row.pending": "waiting for the author's phrase",
     "system.row.signature_author": "checked against its source by the panel's author on {date} — not by a clinician",
     "system.row.signature_clinician": "checked against its source by a clinician on {date}",
-    "system.row.signature_open": "the sentence is a draft from the named source — a clinician has not checked it",
+    "system.row.signature_open": "Clinical review not recorded",
     "system.row.unread": "not read ({why})",
     "system.row.genotype": "genotype {genotype} ({confidence}, depth {depth})",
     "system.row.assertion": "{disease} — {classification}, {moi}; {submitter}, {date}",
     "system.row.patient_withheld": "rows read with nothing to say, shown in the clinician's register only: {n}",
     "system.meds.row": "{name} {dose} — via the class: {classes}",
-    "system.meds.unmapped": "current prescriptions whose class the map does not place on any system: {names}",
-    "system.meds.unclassified": "current prescriptions no class was recognised for: {names}",
+    "system.meds.unmapped": "System assignment not established (class recognised): {names}",
+    "system.meds.unclassified": "Prescription class not recognised: {names}",
     "system.target.row": "{name}: {spec} {unit} — set by {set_by} on {set_on}; now {value} ({date}), {side} the target",
     "system.target.no_value": "{name}: {spec} {unit} — set by {set_by} on {set_on}; not measured yet",
     "system.target.within": "within",
@@ -2625,7 +2644,7 @@ will go through them later.
     "fhir.reason.metric_unit_not_ours": "a body measurement in a unit this metric does not hold — nothing here converts, and a weight in pounds joining a series in kilograms is exactly the silence this gate exists for",
     "fhir.metrics_taken": "body measurements written into the metrics layer: {n}",
     "fhir.metrics_dry": "would take into the metrics layer, body measurements: {n} (nothing written)",
-    "fhir.reason.loinc_is_a_body_metric": "a body measurement, not a laboratory analyte — it does not belong in the marker dictionary at all, and where one of our own metrics holds the same quantity it is named beside the code",
+    "fhir.reason.loinc_is_a_body_metric": "Body measurement, not a laboratory analyte. A corresponding body metric is listed beside the code when available.",
     "fhir.reason.loinc_not_in_catalogue": "the LOINC code is not in this build's dictionary — matching by display name instead would be a guess about which analyte it is",
     "fhir.reason.no_loinc": "the observation carries no LOINC code at all",
     "fhir.reason.no_date": "no effective date, and a result without a date has no place in a series",
@@ -2841,7 +2860,7 @@ will go through them later.
     "web.overview.red_window": "over the last 12 months",
     "web.overview.stale_hidden": "Another {count} older than 12 months is hidden — see the «Labs» "
                                  "tab.",
-    "web.overview.tests_h": "Test proposals and unresolved candidates",
+    "web.overview.tests_h": "Test proposals",
     # Two different facts, and the old sentence covered both with the reassuring
     # one: nothing is flagged because nothing is out of range, or because nothing
     # has been measured. The count is what tells them apart.
@@ -2849,7 +2868,7 @@ will go through them later.
     "web.overview.no_red_nodata": "Nothing has been measured yet, so there is nothing to "
                                   "flag. Load lab results and this line will mean something.",
     # Same defect as `web.tests.none_pending`, and on the FIRST screen.
-    "web.overview.no_priority_tests": "No new order comes out of what is in the profile right now. Routine control and repeat intervals are in «What to test» on the Radar tab.",
+    "web.overview.no_priority_tests": "No supported test proposals from the available data.",
 
     # ── web: focus of attention ──────────────────────────────────────────
     "web.focus.track_tip": "baseline {base} · now {now} · target {target}",
@@ -2966,7 +2985,7 @@ will go through them later.
                            "which is not the same as «no monitoring is needed».",
     "web.rx.labs_class_unknown": "The class of this drug was not determined, so nothing can be said "
                                  "about lab monitoring.",
-    "web.rx.no_pgx": "no meaningful pharmacogenetics for this drug (CPIC): no gene affecting dose or effect was found. Our copy of the guidelines is dated {date} — that is what tells «nothing is known» from «this build is behind».",
+    "web.rx.no_pgx": "No gene-based dosing or effect guidance for this drug was found in the CPIC catalogue dated {date}.",
     "web.rx.curated_value": "куратор",
     "web.rx.actionable": "matters",
     "web.rx.your_phenotype": "your phenotype:",
@@ -2996,7 +3015,7 @@ will go through them later.
     "web.rx.h_meds": "Your prescriptions",
 
     # ── web: what to test ────────────────────────────────────────────────
-    "web.tests.title": "Test proposals and unresolved candidates ({n})",
+    "web.tests.title": "Test proposals ({n})",
     "web.tests.done": "taken",
     "web.tests.done_why": "already measured ({date}) — routine control, not a new order; a repeat "
                           "in roughly ~{months} months.",
@@ -3084,7 +3103,9 @@ will go through them later.
     "web.second.no_drug_data": "None of the {n} watch-list drugs could be judged — the profile "
                                "carries no genotype for the genes they depend on. This is a "
                                "statement about the data, not about the drugs.",
-    "web.second.tests_h": "Test proposals and unresolved candidates",
+    "web.second.tests_h": "Tests to discuss",
+    "web.panels.genetic": "Genetic panel",
+    "web.tests.none_supported": "No supported test proposals from the available data.",
     "web.second.by_system_h": "By body system — what is outside the corridor, what acts on it, what to ask",
     "web.second.genetics_lead": "Each block also carries the system's genetic half: the gene list composed from the Gene Curation Coalition's export (who asserted each link, how strongly, under which inheritance), and how much of it was read in this genome — never inside the 0–100 index or the verdict. Polygenic scores stay on the Genome tab. Where the genome is not a full one, the block says what a full genome would add.",
     "web.second.systems_silent": "nothing open on: {systems}",
@@ -3309,7 +3330,7 @@ will go through them later.
     "web.life.wk_hours": "{hours} h",
 
     # ── web: the lifestyle brief ─────────────────────────────────────────
-    "web.brief.sections_h": "The reasoning — why exactly this",
+    "web.brief.sections_h": "Assessment details",
     "web.brief.review_badge": "review",
     "web.brief.actions_h": "What to do",
     "web.brief.needs_review": "the brief needs a review",
@@ -3422,13 +3443,13 @@ will go through them later.
     "web.longevity.found_h": "What was found",
     "web.longevity.quiet_h": "Checked, and no effect in this direction",
     "web.longevity.nothing_found": "None of the markers checked carries an allele in the longevity direction. That is the ordinary answer, not a finding.",
-    "web.longevity.confidence.curated": "source: our own curated catalogue",
+    "web.longevity.confidence.curated": "source: curated catalogue",
     "web.longevity.confidence.high": "sources: strong",
     "web.longevity.confidence.medium": "sources: moderate",
     "web.longevity.confidence.low": "sources: weak",
     "web.longevity.carries": "carries the allele",
     "web.longevity.stat_checked": "variants checked",
-    "web.longevity.stat_carrier": "significant — carrier",
+    "web.longevity.stat_carrier": "non-reference readings in association catalogue",
     "web.longevity.stat_genes": "genes",
     "web.longevity.key_markers_h": "Key markers",
     "web.longevity.by_gene_h": "Significant carrier status by gene",
@@ -3513,11 +3534,7 @@ will go through them later.
     # ── web: the guide tab ─────────────────────────────────────────────
     "web.tab.guide": "Guide",
     "web.guide.title": "Guide",
-    "web.guide.intro": "What every screen in this application shows, in one place — so none "
-                       "of it has to stay unexplained just because the source is not at hand. "
-                       "Everything below describes the interface itself: colours, labels, "
-                       "terms. What your own numbers mean is explained on the screen that "
-                       "shows them, next to the number.",
+    "web.guide.intro": "Interface colours, labels and terms. Interpretations of personal results appear beside those results on their own screens.",
 
     "web.guide.sources_h": "Where a number comes from",
     "web.guide.sources_body": "Every page ends with its sources in one line. Open it to see where each piece of data was read from: your own files on this machine, or a public reference database consulted over the network (ClinVar, RxClass, Ensembl). Nothing is asserted without one of these two origins, and the two are never rendered the same colour. Whether a language model is connected on the Assistant page or not, this does not change: the numbers are always computed by code on your machine.",
@@ -3535,19 +3552,11 @@ will go through them later.
     "web.guide.status_critical_why": "Outside the laboratory reference range, or a safety flag "
                                      "raised from your own profile.",
     "web.guide.status_near_label": "at the edge",
-    "web.guide.status_near_why": "Formally inside the range, but pressed against its wall. "
-                                 "Rendered in blue rather than amber on purpose — so a "
-                                 "colour-blind reader sees a difference from «warning» in the "
-                                 "tone itself, not only in the caption.",
+    "web.guide.status_near_why": "The value is inside the reference range and close to a boundary.",
     "web.guide.status_unknown_label": "no data",
     "web.guide.status_unknown_why": "Nothing to judge yet — not measured, or not present in "
                                     "your files.",
-    "web.guide.status_three_note": "Judgement itself uses three levels, not five: good, warning, "
-                                   "critical. A fourth, near-identical level was tried and "
-                                   "dropped — at normal contrast it was indistinguishable from "
-                                   "«warning» to normal vision. «At the edge» and «no data» are "
-                                   "not severity levels; they mark a different kind of thing — "
-                                   "a value's position, or its absence.",
+    "web.guide.status_three_note": "Three display states: good, warning, critical. At the edge describes a value near a boundary; no data means the measurement is missing.",
 
     "web.guide.tour_h": "What each page is for",
     "web.guide.tour_overview": "The whole person on one screen: the key numbers, the body systems and the figure, what is out of range right now, what to test, the one thing being worked on, the goal, and last who the data belong to and their own indicators. Every section names the tab that owns it.",
@@ -3725,7 +3734,7 @@ will go through them later.
     "genome.refused_head.unnamed": 'there is no answer at this position, and the sentence below says why.',
     "genome.refused_head.not_on_chip": 'this position is not on the chip.',
     "genome.refused_head.no_call": 'the chip has a probe here and it did not call.',
-    "genome.refused_head.array_unreadable": 'the array file is there and could not be read — which is our failure, not a property of the chip.',
+    "genome.refused_head.array_unreadable": "The array file is present but could not be read. No genome assessment is available from it.",
     "genome.refused_head.no_coordinates_for_assembly": 'the catalogue has no coordinate for this locus in the build of your file.',
     "genome.refused_head.no_call_in_vcf": 'the position was read and no genotype was determined.',
     "genome.refused_head.malformed_genotype": 'the genotype field at this position could not be parsed.',
@@ -3815,7 +3824,7 @@ will go through them later.
     "narrow.path_closed_imputed_panel": "This path is closed for an imputed call set. {share} % of the rows in this file were inferred from a reference panel rather than observed in your sample, leaving {per_mb} observed variants per megabase. A finding read out of a model's output is the model's finding, not a measurement of you.",
     "narrow.path_closed_partial_callset_indels": 'This path is closed for a call set that holds indels only. Every single-base substitution is unreadable from this file — not absent from you, unreadable — so a screen run over it would report the absence of variants it could never have seen. Ask the provider for the substitution half of the call set.',
     "narrow.path_closed_partial_callset_snvs": 'This path is closed for a call set that holds substitutions only. Insertions and deletions are unreadable from this file, so a screen run over it would report the absence of variants it could never have seen.',
-    "narrow.path_closed_unmeasured": 'This path is closed because the breadth of this file could not be measured. These three answers all rest on «the genome was read here and nothing was found», and that sentence needs to be earned. Refusing a genome costs one command; answering from a screen costs a finding you might act on.',
+    "narrow.path_closed_unmeasured": "Genome-wide assessments are unavailable because the breadth of this input has not been established. An unread position is not a negative result.",
     # ---- a target the clinician set (task 170) ----
     "store.target_need_marker": 'a marker is required',
     "store.target_needs_set_by": 'a target needs its author (--set-by): a figure with nobody behind it would read back later as the product\'s own, and the product sets no targets. Nothing was written.',
@@ -3823,7 +3832,7 @@ will go through them later.
     "store.target_needs_bound": 'a target needs a figure: --low and/or --high for a range, or --value for a single number. Nothing was written.',
     "store.target_low_above_high": 'the lower bound {low} is above the upper bound {high}; nothing was written.',
     "store.target_marker_unknown": 'no marker «{marker}» is known, so the target would stand beside no series — nothing was written. Did you mean: {did_you_mean}.',
-    "store.target_unit_required": 'a target needs its unit: the figure is later compared with a series stored in the canonical unit, and assuming the usual one is what this check exists to prevent. Marker {marker} accepts: {accepted}.',
+    "store.target_unit_required": "A target needs a unit. Accepted units for {marker}: {accepted}.",
     "store.targets_what": 'Targets a treating clinician set, entered from their word with who and when. PERSONAL. Never derived, never a flag.',
     "store.no_targets_file": 'no target has been recorded yet',
     "store.target_none_for": 'no target is recorded for «{marker}»',
@@ -3912,7 +3921,7 @@ will go through them later.
     "web.overview.fact_index": "health index",
     "web.overview.fact_abnormal": "out of range, of all markers",
     "web.overview.fact_systems": "systems needing attention",
-    "web.overview.fact_tests": "test candidates",
+    "web.overview.fact_tests": "test proposals",
     "web.overview.more_in_labs": "The rest are on the Labs tab: {n}",
     "web.labs.fact_abnormal": "out of range, of all",
     "web.labs.fact_within": "in range",
@@ -3944,7 +3953,7 @@ will go through them later.
     "web.panel.fact_signed": "signed by a clinician",
     "web.genome.fact_actionable": "findings a doctor acts on",
     "web.genome.fact_prs_high": "scores well above average",
-    "web.genome.fact_long": "genes with longevity variants",
+    "web.genome.fact_long": "genes in longevity literature catalogue",
     "web.genome.set_aside_h": "Files set aside",
     "web.meds.fact_current": "taken now",
     "web.meds.fact_stopped": "stopped or paused",
@@ -3990,7 +3999,7 @@ will go through them later.
     "web.caution.source": "Source: {source}",
     "web.rx.more_genes": "Other genes the source links to this drug",
     "web.rx.context_h": "Genes of the system the drug acts on",
-    "web.second.quiet_h": "The other systems",
+    "web.second.quiet_h": "Other systems and panels",
     "web.second.pgx_fold": "Drugs your genotype would bear on, if prescribed",
     "web.menu.theme": "Theme: {theme}",
     "web.theme.system": "as the system",
@@ -4089,7 +4098,7 @@ will go through them later.
     "panel.reading.recorded": "Recorded genotype {genotype}, source: {source}. Not verified against the current genome file.",
     "panel.value_only": "No variant effect is established (level E); gene biology is separate.",
     "panel.reading.position_not_resolved": "The position is not resolved locally; no genotype was inferred.",
-    "panel.reading.indel_unsupported": "This build does not read insertions or deletions (task 172).",
+    "panel.reading.indel_unsupported": "This build does not read insertions or deletions.",
     "panel.reading.input_unavailable": "The current genome input is unavailable or was refused; not a negative result.",
     "panel.reading.not_positively_read": "No positive local call: absent, assumed or uncertain is not a reference genotype.",
     "panel.reading.quality": "Reading qualifications",
@@ -4225,7 +4234,12 @@ will go through them later.
     'fib4.input.ast': 'AST',
     'fib4.input.alt': 'ALT',
     'fib4.input.platelets': 'platelets',
-    'prs.validation.withdrawn': 'Percentile withheld: calibration or coordinates are not verified.',
+    'prs.recalculate.title': 'Check saved PGS after the scoring correction',
+    'prs.recalculate.note': 'The corrected allele calculation is not confirmed for {count} traits. Their previous percentiles are retained as diagnostic history and are excluded from confirmed results. Updating the application does not recalculate them.',
+    'prs.recalculate.instructions': 'First reuse the existing scoring-site VCF with called reference homozygotes to check the pinned models. Re-read positions from BAM only if required calls are missing; do not repeat whole-genome preparation. Keep a backup and rebuild the saved PGS report; retain unavailable reference results as unverified. This is a separate local genome operation and is not started by this update.',
+    'prs.recalculate.open': 'How to recalculate',
+    'prs.validation.withdrawn': 'Percentile withheld: calculation, calibration or coordinates are not verified.',
+    'prs.validation.scoring_unverified': 'Called alleles could not be scored with the verified matching rules.',
     'prs.validation.method_unknown': 'The calculation method was not recorded.',
     'prs.validation.method_unsupported': 'This fallback does not establish a validated population percentile.',
     'prs.validation.percentile_missing': 'No valid percentile is available.',
@@ -4237,3 +4251,71 @@ will go through them later.
     'prs.validation.build_unknown': 'The genome or model coordinate build is unknown or unsupported.',
     'prs.validation.build_mismatch': 'Genome and model coordinate builds disagree.',
 }
+
+MESSAGES.update({
+    "web.phenotype.title": "Phenotype and trends",
+    "web.phenotype.year": "Past year",
+    "web.phenotype.short": "Not enough measurements",
+    "web.phenotype.recorded": "Recorded measurement",
+    "web.phenotype.lab": "Lab measurement",
+    "web.goal.notes": "Saved goal and notes",
+    "web.goal.settings": "Goals and their reasons",
+    "web.focus.details": "Saved notes and journal",
+    "web.focus.updated": "Measurements update from your data. Notes and expected effects are saved context.",
+    "web.prs.validation": "Calculation details",
+    "web.prs.unverified": "Percentile needs verification",
+    "web.genome.gene_missing": "Gene not recorded in this annotation",
+    "prs.high_rule": "Includes all verified results at or above P80 with at least 90% of both model positions and absolute weight mass covered. Incomplete results below remain diagnostic and are marked separately.",
+    "prs.reading_incomplete": "Incomplete calculation: {positions}% of positions and {weights}% of absolute weight mass covered; both must reach 90%. Not included in the above-average summary.",
+    "web.prs.incomplete": "Incomplete calculation",
+    "longevity.catalogue_variant": "Studied in longevity literature; allele direction and effect have not been curated. See the primary publications.",
+    "longevity.catalogue_note": "LongevityMap (HAGR) is a literature catalogue. These entries report published associations, not proven effects in this person. E means Scholion has no curated interpretation of this variant; it does not rate the entire gene or the source publication.",
+    "longevity.count_note": "{count} is the number of catalogue positions with a saved genotype, including reference readings; it is not a count of genes or favourable variants.",
+    "web.longevity.catalogue": "Literature catalogue — associations without a curated effect direction",
+    "web.longevity.positions": "{count} positions",
+})
+
+MESSAGES["web.goal.note"] = "Values update from recorded measurements. Targets and highlighted periods belong to your saved personal goal."
+
+MESSAGES["goal.origin.line"] = "Reason for choosing the goal: {origin} \u00b7 {reason}"
+MESSAGES["web.phenotype.derived"] = "Calculated from current measurements"
+
+MESSAGES["web.prs.stat_reliable"] = "verified percentiles"
+
+MESSAGES.update({
+    "screen.why.metadata_unverified": "provenance is missing, invalid or predates the input-identity check",
+    "screen.why.source_unavailable": "the source VCF is unavailable or unreadable",
+    "screen.why.source_changed": "the input file or its identity has changed",
+    "screen.why.table_changed": "the table or its provenance changed",
+    "screen.why.sample_changed": "the selected sample does not match the scan",
+    "lipidgen.direction_unknown": "Reading available; effect direction not curated"
+})
+
+MESSAGES.update({
+    "web.longevity.context_h": "Curated variant context",
+    "web.longevity.uncurated_h": "Read positions without a curated variant interpretation"
+})
+
+MESSAGES.update({
+    "labs.display_window": "Current readings: past 12 months. Older measurements remain in history and charts.",
+    "labs.history_available": "Older readings ({n}) are available with scholion labs --history.",
+    "labs.history_heading": "History \u2014 readings older than one year ({n})",
+    "labs.history_note": "Historical flags describe the measurement on its recorded date, not the current state.",
+    "labs.historical": "Historical measurement \u2014 older than one year.",
+    "labs.date_unknown": "Measurement date is unknown; recency is not established.",
+    "target.historical": "Historical value: {value} ({date}); no current target comparison.",
+    "prs.validation.calibration_only": "Genome reading and coordinate builds are verified. The percentile is unavailable because reference calibration is not confirmed."
+})
+
+MESSAGES['prs.independent_reference'] = 'Approximate percentile from an independently checked reference of {count} {population} samples, using its mean and standard deviation. This validates the score scale, not clinical accuracy or absolute disease risk.'
+MESSAGES['prs.verified_definition'] = 'A verified percentile has checked scoring, coordinates, coverage and population calibration. Model accuracy is separate; the percentile is not disease probability.'
+MESSAGES['prs.reliable'] = '{reliable}/{total} verified percentiles'
+MESSAGES['system.polygenic.reliable'] = 'verified percentile'
+
+MESSAGES['sources.manual.pgs_reference'] = 'Reference statistics require complete scoring-site calls, checked allele orientation and identical original/harmonized model sites; a generic catalogue refresh cannot establish them.'
+MESSAGES['web.prs.details'] = 'Calculation and model accuracy'
+MESSAGES['web.prs.coverage'] = 'Called positions: {positions}%; covered weight: {weights}%.'
+MESSAGES['web.prs.accuracy_missing'] = 'Predictive accuracy of this model is not recorded.'
+MESSAGES['web.prs.accuracy_note'] = 'AUROC measures discrimination in a study, not your probability of disease.'
+
+MESSAGES.update({'web.second.gen_absent': 'Catalogue allele not detected at the read position (this refers to the variant, not an absent gene): {genes}', 'system.panel.conclusion_absent': 'catalogue allele not detected at the read positions: {genes}', 'web.life.monthly_mean': 'Monthly device average', 'web.life.dated_readings': 'Dated measurements', 'web.prs.incomplete': 'Insufficient genotype coverage', 'prs.reading_incomplete': 'Insufficient genotype coverage: {positions}% of positions and {weights}% of absolute weight mass covered; both must reach 90%. Not included in the above-average summary.', 'prs.reading_sources': 'The score uses called genotypes in the supplied VCF, including when they were prepared from BAM. A variant-only VCF may omit reference homozygotes; missing records are not assumed to be reference. With VCF only, supply a scoring-site VCF with called reference genotypes exported from a caller that retained these genotypes. If these calls are unavailable, the percentile remains unverified. BAM can supply missing calls when available.'})

@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "purpose": "Independently checked aggregate reference statistics; no model weights or individual genomes.",
+    "source_tier": "curated_reference",
+    "updated": "2026-10-11"
+  },
+  "references": [
+    {
+      "pgs_id": "PGS000646",
+      "population": "EUR",
+      "panel": "IGSR-1000G-Phase3-EUR-503",
+      "samples": 503,
+      "model_variants": 32,
+      "minimum_called_positions": 32,
+      "reference_coordinate_build": "GRCh37",
+      "mean": 6.477925031674975,
+      "std": 0.8634088876432371,
+      "estimation": "normal_mean_sd",
+      "model_sha256_by_build": {
+        "GRCh37": "99a1e76414d5f7b2d1a18a90d8623e2c70e6e3a64fa9d52d7b2dccc3eb58fda9",
+        "GRCh38": "385a04133408a88793bca5b784b23ab2e2e65c802fac7679a2902832461c65de"
+      },
+      "source": "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/",
+      "source_publication": "PMID:26432245; DOI:10.1038/nature15393",
+      "model_publication": "PMID:32991828; DOI:10.1016/j.ajhg.2020.08.025",
+      "reference_sample_list_sha256": "e9773545636380bb9962eeffab8dfbafd05e132a547a61dfde2b90a44a2e67d3",
+      "reference_called_sites_sha256": "d2c84be9ba234bb2e946207d2fbdf1443bd5442185bffd9ef4a2db9533c70e36",
+      "validation": "All 32 scoring sites directly called in each of 503 EUR samples; exact forward alleles; no absent-site imputation. Original GRCh37 and harmonized GRCh38 files have identical original sites, alleles and weights.",
+      "updated": "2026-10-11"
+    }
+  ]
+}

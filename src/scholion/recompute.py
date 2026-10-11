@@ -49,6 +49,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from .i18n import t as _t
 from typing import Any, Callable, Dict, List, Optional
 
 JOB = ".recompute.json"
@@ -413,6 +414,20 @@ def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, A
                                   "data": {"status": "missing"}}
         by_key[screen["key"]] = screen
         steps.append(screen)
+    from . import core
+    from .pgs_validation import recalculation_status
+    prs_data = core.prs_results()
+    prs_recalculation = recalculation_status(prs_data.get("traits", []))
+    # This scoring correction is data-driven: an already checked report needs
+    # no repeat job merely because the application's version marker is older.
+    steps = [s for s in steps if not (s.get("kind") == "by_hand" and
+             "if polygenic scores were computed before this release" in s.get("conditions", []))]
+    if prs_recalculation["required"]:
+        steps.append({"kind": "by_hand", "state": "by_hand", "source": "data",
+                      "attention_key": "prs-recalculate-" + str(prs_recalculation["traits"]),
+                      "versions": [], "conditions": [_t("prs.recalculate.title")],
+                      "text": _t("prs.recalculate.note", count=prs_recalculation["traits"])
+                              + " " + _t("prs.recalculate.instructions")})
     for s in steps:
         if s.get("key"):
             s["command"] = s["key"] + (" --force" if s.get("force") else "")

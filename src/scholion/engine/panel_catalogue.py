@@ -17,7 +17,7 @@ from ..i18n import t as _t
 from ..panel_notes import author_note
 from .. import core
 from ..conclusion_basis import conclusion_basis, guard_subclaims
-from ..panel_reference import reference_context
+from ..panel_reference import interpretation_context, reference_context
 from ..genome_routes import decision_route
 from . import panel_form, panel_gate
 from ._helpers import DISCLAIMER
@@ -31,8 +31,10 @@ _FIELDS = ("rsid", "gene", "hgvs", "protein", "risk_allele", "mode", "kind", "so
            "review", "disposition", "reason", "task", "read_refusal", "mechanism")
 
 def _position(p: Dict[str, Any]) -> Dict[str, Any]:
-    out = {k: p.get(k) for k in _FIELDS}
+    out: Dict[str, Any] = {k: p.get(k) for k in _FIELDS}
     out["mechanism"] = panel_form.one_language(p.get("mechanism")) or None
+    if p.get("read_refusal") == "indel_unsupported":
+        out["reason"] = _t("panel.reading.indel_unsupported")
     # The catalogue is read localised: a phrase is already the reader's string,
     # or still a {en, ru} pair when read raw — both are taken.
     text = p.get("text") if isinstance(p.get("text"), dict) else {}
@@ -45,6 +47,7 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     out["signed_on"] = panel_gate.reviewed_on(p)
     out.update(panel_gate.level_of(p, {x["level"]: x for x in panel_gate.legend().get("levels") or []}))
     out["reference_context"] = reference_context(p, out.get("level"))
+    out["interpretation"] = interpretation_context(p, out.get("level"), dict(out["text"]))
     if out.get("level") in ("C", "D", "E"):
         # Reference descriptions replace genotype-specific unvalidated wording.
         out["text"] = {}

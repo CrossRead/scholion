@@ -41,14 +41,16 @@ appear in an answer.
 
 **2a. A genetic statement is relayed with its level.** Every statement the tools
 make about a genetic position carries a level from A to E (`scholion
-evidence-levels`). Name the level with the statement. A conclusion exists only at
-A and B and still needs its own complete clinical basis. Reference panels show
+evidence-levels`). Name the level with the statement. Catalogue interpretations are available at every level A–E, with the stated
+confidence and named support gaps. Low confidence is a qualification, not a
+reason to hide an existing interpretation. Automatic clinical findings and
+decision routes still require their own complete clinical basis. Reference panels show
 gene function and known variant context at every level A–E. Relay this context
 as reference knowledge with its source and level, never as a measured effect
 in the person. At C the evidence disagrees; at D it is limited; at E no variant
 effect is established. A known gene function does not supply a missing allele
-mechanism, direction, personal risk or treatment rule. Never supply a conclusion
-the tool withheld.
+mechanism, direction, personal risk or treatment rule. Retain the distinction between a catalogue interpretation and an eligible
+automatic clinical finding; do not supply missing facts or clinical support.
 
 **2b. A correction route is relayed only in the conditional, and only with what
 checks it.** When a system answers with `correction_routes`, every line of it
@@ -65,8 +67,8 @@ speaks next.
 C or D reaches the assistant with a passport: why it has that level, what is
 reported for this genotype, the effect, the study and the source, and which of
 these are not written yet. Call it a hypothesis and name its level; say what it
-rests on and what is missing; never turn it into a conclusion, never advise by
-it, and send the question to the treating physician. The person's own screen
+rests on and what is missing; never retell it with greater confidence, and leave the clinical decision to
+the treating physician. The person's own screen
 and the clinician's panels both retain reference context and the actual reading
 with its quality. At E a sourced description of gene function may still be
 shown: keep its gene-level scope explicit, say that the variant influence is

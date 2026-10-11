@@ -100,3 +100,84 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     if context.get("variant_source"):
         lines.append(t("reference.variant_source", source=context["variant_source"]))
     return lines
+
+
+def interpretation_context(spec: Dict[str, Any], level: Any, summary: Any = None) -> Dict[str, Any]:
+    """Retain authored interpretation at every level, with its own support gaps.
+
+    The caller supplies only a sentence for a verified reading, or a dictionary
+    of catalogue sentences on the reference page. This never promotes a finding,
+    supplies a missing effect, or changes clinical decision eligibility.
+    """
+    from .conclusion_basis import conclusion_basis
+    basis = conclusion_basis(spec)
+    # Remove only the retired display-policy suffix, never a biological caveat.
+    def recorded(text: Any) -> Any:
+        if not isinstance(text, str):
+            return text
+        for suffix in ("; no verdict.", "; no conclusion.", "; no conclusion follows.", "; "+"\u0432\u044b\u0432\u043e\u0434\u0430 \u043d\u0435\u0442."):
+            if text.endswith(suffix):
+                return text[:-len(suffix)] + "."
+        return text
+    summary = {key: recorded(value) for key, value in summary.items()} if isinstance(summary, dict) else recorded(summary)
+    return {"scope": "catalogue_interpretation", "level": level,
+            "summary": summary, "mechanism": core._localized(spec.get("mechanism"), lang()) or None,
+            "source": basis.get("source"), "missing": basis["missing"],
+            "notice": t("interpretation.notice")}
+
+
+def interpretation_lines(row: Dict[str, Any]) -> List[str]:
+    """The same interpretation and confidence through CLI and agent reports."""
+    context = row.get("interpretation") or {}
+    summary = context.get("summary")
+    if not isinstance(summary, str) or not summary:
+        return []
+    lines = [t("interpretation.summary", level=context.get("level") or "—", text=summary),
+             context.get("notice") or t("interpretation.notice")]
+    if context.get("source"):
+        lines.append(t("decision.source", source=context["source"]))
+    if context.get("missing"):
+        lines.append(t("interpretation.gaps", missing=", ".join(t("conclusion.missing." + k)
+                                                               for k in context["missing"])))
+    return lines
+
+
+def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
+    """Reuse system-panel knowledge, without turning an annotation into an effect.
+
+    Scholion confidence belongs to our interpretation, not ClinVar's stars or
+    GenCC's disease validity. An uncurated variant has E context even when an
+    external database has classified it; that classification remains separate.
+    """
+    spec = None
+    for name, field in (("system_gene_panels.json", "systems"), ("on_demand_panels.json", "panels")):
+        for panel in (core._read_knowledge(name).get(field) or {}).values():
+            for entry in panel.get("positions") or []:
+                if entry.get("rsid") == rsid and str(entry.get("gene") or "").upper() == gene.upper():
+                    spec = entry
+                    break
+            if spec:
+                break
+        if spec:
+            break
+    if spec:
+        from .engine.panel_gate import level_of, legend
+        level = level_of(spec, {r["level"]: r for r in legend()["levels"]}).get("level") or "E"
+        context = reference_context(spec, level)
+    else:
+        assertions = []
+        for panel in (core._read_knowledge("gencc_gene_disease.json").get("systems") or {}).values():
+            for item in ((panel.get("genes") or {}).get(gene.upper()) or {}).get("submissions") or []:
+                if item not in assertions:
+                    assertions.append(item)
+        context = gene_reference_context(gene, assertions)
+        if not context.get("gene_source"):
+            fallback = reference_context({"gene": gene}, "E")
+            if fallback.get("gene_source"):
+                context.update({k: fallback[k] for k in ("gene_function", "gene_source", "retrieved")})
+        context["level"] = "E"
+        if rsid:
+            context["variant_status"] = "not_curated"
+            context["variant_context"] = t("reference.variant_unknown")
+        # E concerns missing variant interpretation; GenCC status is its own field.
+    return {"gene": gene, "rsid": rsid, "level": context["level"], "reference_context": context}

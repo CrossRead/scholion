@@ -107,7 +107,7 @@ class TestAuthorNotes(unittest.TestCase):
             self.assertIn(p["rsid"], text)
             self.assertEqual(p["disposition"], rows[p["rsid"]]["disposition"])
             if p.get("reason"):
-                self.assertIn(p["reason"], text)
+                self.assertIn(rows[p["rsid"]]["reason"], text)
         self.assertIsNotNone(rows["rs1799768"]["author_note"])
         self.assertIsNone(rows["rs3816873"]["author_note"])
         self.assertTrue(all("genotype" not in p for p in r["positions"]))

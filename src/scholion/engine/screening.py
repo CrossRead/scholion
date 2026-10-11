@@ -191,6 +191,9 @@ def screen(class_key: Optional[str] = None) -> Dict[str, Any]:
                      "read": read, "read_why": why,
                      "findings": len(by_gene.get(gene) or [])})
 
+    from ..panel_reference import genome_context
+    for item in rows:
+        item.update(genome_context(item["gene"]))
     return {"status": "ok", "mode": "class", "class": row["key"],
             "class_label": row.get("label") or row["key"],
             "class_source": row.get("source"), "count": row["count"],

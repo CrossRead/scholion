@@ -10,7 +10,10 @@ from .i18n import plural as _plural, t as _t  # noqa: F401
 from .format_primitives import _FLAG_ICON, _decision_suffix, _fmt_ref, _mark_icon, _near_suffix
 
 
-def labs_report(r: Dict[str, Any]) -> str:
+def labs_report(r: Dict[str, Any], *, include_history: bool = False) -> str:
+    if not include_history and "current_stats" in r:
+        r = {**r, **r["current_stats"], "markers": [m for m in r["markers"]
+                                                 if m.get("display_recency") is not False]}
     near_n, cross_n = r.get("near_limit_count"), r.get("decision_crossed_count")
     near_s = ", " + _t("labs.near_more", n=near_n) if near_n else ""
     cross_s = "; " + _t("labs.crossed", n=cross_n) if cross_n else ""
@@ -21,6 +24,10 @@ def labs_report(r: Dict[str, Any]) -> str:
               abnormal=_plural(r["abnormal_count"], "count.abnormal"),
               total=_plural(r["count"], "count.markers_of"))
     lines = [f"{head}{near_s}{cross_s}.", ""]
+    if "current_stats" in r and not include_history:
+        lines += [_t("labs.display_window"), ""]
+        if r.get("historical_count"):
+            lines += [_t("labs.history_available", n=r["historical_count"]), ""]
     if near_s:
         # Say what «at the edge» rests on. A flat ten per cent is not an
         # analyte-specific reference change value, and the difference is an order
@@ -29,7 +36,7 @@ def labs_report(r: Dict[str, Any]) -> str:
     for m in r["markers"]:
         icon = _mark_icon(m)
         ref = _fmt_ref(m)
-        val = f"{m['value']} {m['unit']}".strip()
+        val = f"{m['value']} {m.get('unit_display', m['unit'])}".strip()
         # Task 100. A date that did not come off the form is marked where the
         # date is shown, not only in the log of the ingest that stored it.
         _ds = m.get("date_source")
@@ -96,8 +103,10 @@ def labs_report(r: Dict[str, Any]) -> str:
         line += _near_suffix(m) + _decision_suffix(m)
         for mn in (m.get("method_notes") or []):
             line += "\n   _" + mn + "_"
-        if m.get("note"):
-            line += f" · _{m['note']}_"
+        if m.get("display_recency") is False:
+            line += " · " + _t("labs.historical")
+        elif m.get("display_recency") is None and "display_recency" in m:
+            line += " · " + _t("labs.date_unknown")
         line += _target_suffix(m)
         lines.append(line)
     lines.append(f"\n_{r['disclaimer']}_")
@@ -154,7 +163,7 @@ def targets_report(r: Dict[str, Any]) -> str:
         return _t("target.list_none")
     L = [_t("target.list_title", targets=_plural(r["count"], "count.targets")), ""]
     for tg in r["targets"]:
-        unit = f" {tg['unit']}" if tg.get("unit") else ""
+        unit = f" {tg.get('unit_display', tg['unit'])}" if tg.get("unit") else ""
         line = "• " + _t("target.list_line", name=tg["name"], spec=target_spec(tg) + unit,
                          set_by=tg.get("set_by", ""), set_on=tg.get("set_on", ""))
         if tg.get("note"):
@@ -164,7 +173,11 @@ def targets_report(r: Dict[str, Any]) -> str:
             line += "\n   " + _t("target.now_none")
         else:
             now = _t("target.now", value=cur["value"], date=cur["date"])
-            if tg.get("outside_target"):
+            if cur.get("display_recency") is False:
+                now = _t("target.historical", value=cur["value"], date=cur["date"])
+            elif "display_recency" in cur and cur["display_recency"] is None:
+                now = _t("labs.date_unknown")
+            elif tg.get("outside_target"):
                 side = _t("target.side_above" if tg.get("side") == "above"
                           else "target.side_below")
                 if tg.get("in_corridor"):

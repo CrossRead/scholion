@@ -28,7 +28,8 @@
       "cataract": "no radar domain for the eyes",
       "myopia": "no radar domain for the eyes",
       "glaucoma": "no radar domain for the eyes",
-      "age-related hearing impairment": "no radar domain for hearing"
+      "age-related hearing impairment": "no radar domain for hearing",
+      "longevity": "a lifespan endpoint, not an individual body system or a clinical prognosis"
     },
     "schema": "systems: { <radar domain key>: { traits: [trait names — keys of prs_models.json], why_empty?: {en, ru} } } — a system with no pinned model bearing on it lists no traits and says why; a trait appears under one system at most; every pinned trait that appears under no system is named in _meta.why_partial with the reason. `fitness` is absent on purpose: it has no genetic half (radar_domains.json), so nothing may be placed on it.",
     "source_tier": "curated_reference",

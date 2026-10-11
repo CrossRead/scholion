@@ -238,6 +238,24 @@
   table.dt td{padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
   table.dt td.v{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
   table.dt td.d{color:var(--muted);white-space:nowrap}
+  table.dt.marker-table{table-layout:fixed}
+  table.dt.marker-table th,table.dt.marker-table td{white-space:normal;overflow-wrap:anywhere}
+  table.dt.marker-table th:nth-child(1){width:27%}
+  table.dt.marker-table th:nth-child(2){width:18%}
+  table.dt.marker-table th:nth-child(3){width:29%}
+  table.dt.marker-table th:nth-child(4){width:13%}
+  table.dt.marker-table th:nth-child(5){width:13%}
+  table.dt.marker-table .badge{white-space:normal}
+  .marker-date-compact{display:none}
+  @media(max-width:640px){
+    table.dt.marker-table th:nth-child(1){width:31%}
+    table.dt.marker-table th:nth-child(2){width:23%}
+    table.dt.marker-table th:nth-child(3){width:26%}
+    table.dt.marker-table th:nth-child(5){width:20%}
+    table.dt.marker-table th,table.dt.marker-table td{padding:7px 4px;font-size:12px}
+    table.dt.marker-table .badge{padding:2px 5px;font-size:11px}
+    .marker-date-compact{display:block;margin-top:3px;color:var(--muted);font-size:11px}
+  }
   table.dt.gentbl tr.genrow{cursor:pointer}
   table.dt.gentbl tr.genrow:hover td{background:var(--hover)}
   table.dt.gentbl tr.gengroup td{font-size:var(--t-xs);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding-top:12px}
@@ -450,6 +468,16 @@
   /* ── the card of one system, and the radar laid out by system ───────── */
   #gd-levels{scroll-margin-top:140px}
   .lvl{cursor:pointer;font-weight:700;min-width:1.6em;text-align:center}
+  .route-group{margin:var(--sp3) 0}
+  .route-group h4{margin:0 0 var(--sp2)}
+  .route-item{border:1px solid var(--border);border-radius:var(--r);padding:var(--sp3);margin:var(--sp2) 0;font-size:var(--t-s);line-height:1.5;overflow-wrap:anywhere}
+  .route-item p{margin:var(--sp2) 0 0}
+  .route-support>div{color:var(--ink-2)}
+  .system-medications-table{table-layout:fixed}
+  .system-medications-table th,.system-medications-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}
+  .system-medications-table th:nth-child(1){width:30%}
+  .system-medications-table th:nth-child(2){width:45%}
+  .system-medication-unplaced{margin-top:var(--sp3)}
   .syscard .layer{margin-top:var(--sp5)}
   .syscard .layer h3{font-size:var(--t-m);font-weight:650;margin:0 0 8px;color:var(--ink);padding-bottom:6px;border-bottom:1px solid var(--grid)}
   .syscard .layer h3 small{color:var(--muted);font-weight:400;margin-left:6px}
@@ -475,6 +503,27 @@
   .gen-find>b{min-width:92px}
   .gen-find .txt{color:var(--ink-2);font-size:var(--t-s);flex:1 1 260px}
   .gen-find .badge{margin-left:auto}
+  .gen-context{margin:0;border:0;padding:0;min-width:0}
+  .gen-context>summary{cursor:pointer;list-style:none;font-weight:400;color:var(--ink-2)}
+  .gen-context>summary::-webkit-details-marker{display:none}
+  .gen-context-kind,.gen-context-more{display:block;font-size:12px}
+  .gen-context-more{color:var(--accent);margin-top:3px}
+  .gen-context-more::before{content:"▸ ";display:inline-block}
+  .gen-context[open] .gen-context-more::before{content:"▾ "}
+  .gen-context-preview{display:block;line-height:1.45;color:var(--ink-2)}
+  .gen-context-preview>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .gen-context-preview>span:first-child:not(:only-child){-webkit-line-clamp:1;color:var(--muted);font-size:12px}
+  .gen-context-preview>span:only-child{-webkit-line-clamp:3}
+  .gen-context[open] .gen-context-preview{display:none}
+  .gen-context-body{margin-top:8px;overflow-wrap:anywhere}
+  [data-genetic-summary]{table-layout:fixed;width:100%}
+  [data-genetic-summary] th:nth-child(1){width:76px;white-space:normal}
+  [data-genetic-summary] th:nth-child(2){width:150px}
+  [data-genetic-summary] th:nth-child(3){width:150px}
+  [data-genetic-summary] td{vertical-align:top}
+  [data-genetic-summary] td:nth-child(2) .small{display:block}
+  @media(max-width:640px){[data-genetic-summary]{min-width:0}[data-genetic-summary] th:nth-child(1){width:65px}[data-genetic-summary] th:nth-child(2){width:90px}[data-genetic-summary] th:nth-child(3){width:88px}[data-genetic-summary] th,[data-genetic-summary] td{padding:8px 4px;font-size:12px}[data-genetic-summary] td:nth-child(3) .badge{white-space:normal;font-size:11px}.gen-context-preview>span:only-child{-webkit-line-clamp:4}.gen-context-kind,.gen-context-more{font-size:11px}}
+  @media print{.gen-context-preview{display:none}.gen-context-body{display:block}.gen-context-more{display:none}}
   .gen-rest{font-size:13.5px;color:var(--muted);margin:6px 0 0}
   .match{margin:12px 0 0;padding:10px 12px;border-radius:var(--r-s);background:var(--surface-2);font-size:var(--t-s);color:var(--ink-2)}
   .match b{color:var(--ink)}
@@ -782,12 +831,12 @@ function noteHtml(text,cls){
 function markerTable(list){
   if(!list||!list.length) return '';
   const rows=list.map(m=>{const f=flagOf(m);
-    return `<tr${m.system?` data-system="${esc(m.system)}" title="${esc(t('system.open'))}"`:''}><td>${esc(m.name)}</td>`
-      +`<td class="v">${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit||'')}</span></td>`
+    return `<tr${m.system?` data-system="${esc(m.system)}" title="${esc(t('system.open'))}"`:''}><td>${esc(m.name)}<span class="marker-date-compact">${esc(fmtDate(m.date))}</span></td>`
+      +`<td class="v">${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit_display??m.unit??'')}</span></td>`
       +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`
       +((m.decisions||[]).some(d=>d.crossed===true||d.crossed===null)?`<tr><td colspan="5">${decisionNote(m,false)}</td></tr>`:'')
       +markerGeneticsRow(m);}).join('');
-  return `<div class="tblwrap"><table class="cr-table cr-table--compact dt"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
+  return `<div class="tblwrap"><table class="cr-table cr-table--compact dt marker-table"><thead><tr><th>${esc(t('web.table.marker'))}</th><th>${esc(t('web.table.value'))}</th>`
     +`<th>${esc(t('web.table.ref'))}</th><th class="opt">${esc(t('web.table.date'))}</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
@@ -796,7 +845,7 @@ function markerTable(list){
 // and the row is a door to the system card, where the person's state is.
 function markerGeneticsRow(m){
   const ps=m.positions||[]; if(!ps.length) return '';
-  const items=ps.map(p=>`${p.level?levelChip(p.level,p.level_short)+' ':''}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${p.direction?` <span class="muted small">${esc(t('system.panel.dir.'+p.direction))}</span>`:''}`+mechanismHtml(p)+(p.system?` ${systemLinkHtml(p.system,p.system_label||t('radar.domain.'+p.system))}`:'')).join(' · ');
+  const items=ps.map(p=>`${p.level?levelChip(p.level,p.level_short)+' ':''}<b>${esc(p.gene)}</b> <span class="muted">${esc(p.rsid||'')}</span>${p.direction?` <span class="muted small">${esc(t('system.panel.dir.'+p.direction))}</span>`:''}`+geneticBriefHtml(p,DISPLAY_MODE)+(p.system?` ${systemLinkHtml(p.system,p.system_label||t('radar.domain.'+p.system))}`:'')).join(' · ');
   return `<tr class="labgen"><td colspan="5" class="small"><span class="muted">${esc(t('labs.genetics_of',{n:ps.length}))}:</span> ${items}</td></tr>`;
 }
 function wantedLang(){
@@ -1216,9 +1265,21 @@ function bindGoalOrigins(root){
     }finally{button.disabled=false;}
   });
 }
+function phenotypeTable(g){
+  const source=c=>['lab','recorded','derived'].includes(c.source)?t('web.phenotype.'+c.source):t('web.life.device.'+c.source);
+  const current=c=>c.value==null?'<span class="muted">—</span>':`${esc(fmtNum(c.value))} ${esc(c.unit_display??c.unit??'')}<div class="cr-caption">${esc(fmtDate(c.date)||'')} · ${esc(source(c))}</div>`;
+  const annualSeries=c=>c.year_delta==null?`<span class="muted small">${esc(t('web.phenotype.short'))}</span>`
+    :`${sparkline(c.series,false)}<div class="cr-caption">${esc(c.year_delta>0?'+':'')}${esc(fmtNum(c.year_delta))} ${esc(c.unit_display??c.unit??'')}</div>`;
+  const annual=c=>c.device_history?`${annualSeries(c.device_history)}<div class="cr-caption">${esc(source(c.device_history))}</div>`:annualSeries(c);
+  return `<div class="tblscroll"><table class="cr-table cr-table--compact tgt" data-phenotype-table><thead><tr>
+    <th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.phenotype.year'))}</th>
+    <th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>
+    ${(g?.phenotype||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${r.components.map(c=>(r.components.length>1?`<div class="cr-caption">${esc(c.label||c.ref)}</div>`:'')+current(c)).join('<hr>')}</td><td>${r.components.map(annual).join('<hr>')}</td><td class="best">${esc(r.best||'—')}</td><td class="tgt">${esc(r.target||'—')}</td></tr>`).join('')}
+    </tbody></table></div>`;
+}
 function renderGoal(root, g){
   if(!g||!g.available||!(g.targets||[]).length){
-    root.innerHTML=`${goalEntitiesHTML((g&&g.entities)||[])}${g&&g.available?'':`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`}
+    root.innerHTML=`${phenotypeTable(g)}<details class="fold"><summary>${esc(t('web.goal.settings'))}</summary>${goalEntitiesHTML((g&&g.entities)||[])}</details>${g&&g.available?'':`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`}
       <div class="cr-card card" style="margin-top:12px">
         <div class="row"><b>${esc(t('web.goalgen.h'))}</b></div>
         <div class="meta" style="margin:6px 0 10px">${esc(t('web.goalgen.intro'))}</div>
@@ -1233,20 +1294,14 @@ function renderGoal(root, g){
   // carry it, or the series is empty. It was printed for seven of thirteen rows
   // for a month because the reader knew a shape the file had stopped being in,
   // and there was no way to tell that from the table. The reason is in the cell now.
-  const nowCell=r=>{
-    if(r.now_missing) return `<span class="muted">—</span><div class="why muted">${esc(r.now_missing_text||'')}</div>`;
-    const from=[r.now_date, r.now_device?t('web.life.device.'+r.now_device):''].filter(Boolean).join(' · ');
-    return `${esc(r.now)}${from?`<div class="why muted">${esc(from)}</div>`:''}`;
-  };
-  const rows=(g.targets||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${nowCell(r)}</td><td class="best">${esc(r.best)}</td><td class="tgt">${esc(r.target)}</td></tr>`).join('');
   const peaks=(g.peaks||[]).map(p=>`<div class="peak"><h4>${esc(p.title)} <span class="yr">· ${esc(p.year)}</span></h4><p>${esc(p.text)}</p></div>`).join('');
   const C=g.charts||{};
   root.innerHTML=`<div class="goalboard">
-    ${goalEntitiesHTML(g.entities||[])}
-    <div class="gb-headline"><b>${esc(t('web.goal.in_one_phrase'))}</b> ${esc(g.headline)}</div>
-    ${peaks?`<div class="peaks">${peaks}</div>`:''}
+    <details class="fold"><summary>${esc(t('web.goal.notes'))}${g.title?' · '+esc(g.title):''}</summary>
+      ${g.headline?`<p>${esc(g.headline)}</p>`:''}${peaks?`<div class="peaks">${peaks}</div>`:''}</details>
+    <details class="fold"><summary>${esc(t('web.goal.settings'))}</summary>${goalEntitiesHTML(g.entities||[])}</details>
     <h3 class="cr-h3 gh">${esc(t('web.goal.targets_h'))}</h3>
-    <div class="tblscroll"><table class="cr-table cr-table--compact tgt"><thead><tr><th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    ${phenotypeTable(g)}
     <div class="glegend">
       <span><i class="gdot gdot-series"></i>${esc(t('web.goal.lg_series'))}</span>
       <span><i class="gdot gdot-target"></i>${esc(t('web.goal.lg_target'))}</span>
@@ -1334,10 +1389,10 @@ function renderFocus(root,f){
   root.innerHTML=`<div class="fc">
     <div class="fch"><h3 class="cr-h3">${esc(f.title||'')}</h3>
       <span class="muted small">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
-    <p class="meta">${esc(t('clinical.recorded_focus'))}</p><p class="fcwhy">${esc(f.why||'')}</p>
-    ${f.goal_entity?`<p class="meta">${esc(t('goal.origin.line',{origin:f.goal_entity.origin.label,reason:f.goal_entity.origin.reason||'—'}))}</p>`:''}
-    <div class="fcnum"><b>${esc(String(m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')))}</b><span>${esc(m.unit||'')} · ${esc(m.label||'')}</span>
-      <span>${esc(t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}))}</span></div>
+    <div class="fcnum"><b>${esc(String(m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')))}</b><span>${esc(m.unit_display??m.unit??'')} · ${esc(m.label||'')}</span>
+      <span>${esc(m.mean_30!=null?t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}):fmtDate(m.as_of)||'')}</span></div>
+    <details class="fold" data-focus-notes><summary>${esc(t('web.focus.details'))}${f.updated?' · '+esc(fmtDate(f.updated)):''}</summary>
+    <p class="meta">${esc(t('web.focus.updated'))}</p><p>${esc(f.why||'')}</p>
     ${fcTrack(m)}
     <div class="muted" style="font-size:12.5px;margin-top:8px">${esc(m.target_note||'')}</div>
     <div style="margin-top:16px">
@@ -1363,6 +1418,7 @@ function renderFocus(root,f){
     </details>
     <details class="lsec" style="margin-top:10px"><summary>${esc(t('web.focus.questions_h'))}</summary>
       <div class="blk"><ul class="fcq">${(f.questions||[]).map(q=>`<li><b>${esc(q.to||'')}:</b> ${esc(q.text||'')}</li>`).join('')}</ul></div>
+    </details>
     </details>
   </div>`;
   const btn=$('#fc-save',root);
@@ -1408,7 +1464,7 @@ async function viewOverview(root){
   // Ordered by priority rather than filtered by it: the tile counts every
   // pending suggestion, and the list prints the same ones.
   const PRI={high:0,moderate:1,low:2};
-  const pending=(o.pending_suggestions||o.high_suggestions||[])
+  const pending=visibleTestProposals(o.pending_suggestions||o.high_suggestions)
     .slice().sort((a,b)=>(PRI[a.priority]??3)-(PRI[b.priority]??3));
   const oa=dArrow(radar.overall_delta);
   const facts=[
@@ -1434,12 +1490,10 @@ async function viewOverview(root){
     <h2 class="cr-h2 section">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.second_opinion')}</h2>
     <div id="ov-tests"></div>
     ${f&&f.available?`<h2 class="cr-h2 section">${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus"></div>`:''}
-    <h2 class="cr-h2 section">${esc((g&&g.title)||t('web.goal.title'))}${g&&g.as_of?` <span class="muted">· ${esc(t('web.goal.as_of',{date:fmtDate(g.as_of)}))}</span>`:''}</h2>
+    <h2 class="cr-h2 section">${esc(t('web.phenotype.title'))}${g&&g.as_of?` <span class="muted">· ${esc(t('web.goal.as_of',{date:fmtDate(g.as_of)}))}</span>`:''}</h2>
     <div id="ov-goal"></div>
     <h2 class="cr-h2 section">${esc(t('web.overview.person_h'))}</h2>
     <div id="ov-person"></div>
-    <h2 class="cr-h2 section">${esc(t('web.overview.metrics_h'))}</h2>
-    <div class="grid" id="ov-metrics"></div>
     ${sb}`;
   $('#visit-sheet-open',root).onclick=()=>viewVisitSheet(root);
   if(missing.length){
@@ -1448,12 +1502,10 @@ async function viewOverview(root){
       ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}</div>`;
   }
   renderSystems($('#ov-systems',root), radar);
-  await renderPerson($('#ov-person',root), []);
+  await renderPerson($('#ov-person',root), [], true, mx);
   const fill=$('#ov-fill',root);
   if(fill) fill.onclick=()=>{const pf=$('#mprof',root); if(pf){pf.classList.remove('hidden'); pf.scrollIntoView({behavior:'smooth',block:'center'});}};
-  const mg=$('#ov-metrics',root);
-  // Sorted the way the person's own file sorts them — filled first.
-  (mx.metrics||[]).forEach(m=>mg.appendChild(metricCard(m)));
+
   renderGoal($('#ov-goal',root), g);
   if(f&&f.available) renderFocus($('#ov-focus',root), f);
   // Nothing flagged has two causes and they are not alike: nothing is out of
@@ -1519,16 +1571,17 @@ function trendNote(m){
 function markerCard(m){
   const f = flagOf(m);
   const tr=trendNote(m);
-  // The free-text notes under the corridor line, cut at three lines: a note of
-  // twelve lines inside a card made the number the card is about hard to find.
-  const notes=[m.note,m.corridor_note].filter(Boolean).join(' · ');
+  // Structured method and interval qualifications are product output. Legacy
+  // free-text drafts remain in the source data, not in the current conclusion.
+  const notes=[...(m.method_notes||[]),m.corridor_note].filter(Boolean).join(' · ');
   return el(`<div class="cr-card card">
     <div class="label">${esc(m.name)}</div>
-    <div class="value">${esc(fmtNum(m.value))} <small>${esc(m.unit)}</small></div>
+    <div class="value">${esc(fmtNum(m.value))} <small>${esc(m.unit_display??m.unit)}</small></div>
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted small" title="${esc(m.date)}">${esc(fmtDate(m.date))}</span>`:''}${tr}</div>
     ${m.series&&m.series.length>1?sparkline(m.series,undefined,m.target?{ref_low:m.ref_low,ref_high:m.ref_high,target:m.target}:null):''}
     <div class="meta">${esc(refText(m))}${targetText(m)}${m.genome_link?` · ${ownerNoteHtml(m)}`:''}${m.system?` · ${systemLinkHtml(m.system)}`:''}</div>
     ${decisionNote(m,false)}
+    ${m.display_recency===false?`<div class="meta">${esc(t('labs.historical'))}</div>`:m.display_recency===null?`<div class="meta">${esc(t('labs.date_unknown'))}</div>`:''}
     ${noteHtml(notes,'meta')}
     ${targetAsk(m)}
   </div>`);
@@ -1563,7 +1616,7 @@ async function viewVisitSheet(root, reference=false){
     <h2 class="cr-h2">${esc(t('visit.measurements'))}</h2><p class="cr-caption">${esc(t('visit.range_note'))}</p>
     ${rows.length?`<div class="cr-table-wrap"><table class="cr-table--compact cr-table"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.form.value'))}</th><th>${esc(t('visit.reference_bounds'))}</th><th>${esc(t('visit.sources'))}</th></tr></thead>
     <tbody>${rows.map(m=>`<tr><th scope="row">${esc(m.name)}<br><time>${esc(m.date||'—')}</time></th>
-    <td data-label="${esc(t('web.form.value'))}"><span>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit||'')}</span></td><td data-label="${esc(t('visit.reference_bounds'))}"><span>${esc(m.ref_low??'—')}–${esc(m.ref_high??'—')}${targetText(m)}</span></td>
+    <td data-label="${esc(t('web.form.value'))}"><span>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit_display??m.unit??'')}</span></td><td data-label="${esc(t('visit.reference_bounds'))}"><span>${esc(m.ref_low??'—')}–${esc(m.ref_high??'—')}${targetText(m)}</span></td>
     <td data-label="${esc(t('visit.sources'))}"><span>${esc(m.source_label)}<br>${esc(m.date_basis_label)}</span></td></tr>`).join('')}</tbody></table></div>`:empty}
     <h2 class="cr-h2">${esc(t('visit.medications'))}</h2>
     ${meds.length?`<ul>${meds.map(m=>`<li><b>${esc(m.name)}</b> · ${esc(m.dose||'—')} · ${esc(m.start_date||t('treatment.undated'))}</li>`).join('')}</ul>`:empty}
@@ -1571,8 +1624,8 @@ async function viewVisitSheet(root, reference=false){
     <details class="visit-held" data-index-provenance><summary>${esc(t('visit.held',{n:held.length}))}</summary><ul>${held.map(m=>`<li>${esc(m.name)} · ${esc(m.date||'—')} · ${esc(m.corridor_note||t('visit.no_corridor'))}</li>`).join('')}</ul></details>
     <h2 class="cr-h2">${esc(t('visit.sources'))}</h2><div class="cr-body-s">${['labs','medications','metrics','genome_vcf'].map(k=>r.sources[k]?`<p><b>${esc(r.sources[k].label)}</b>: ${esc(r.sources[k].origin)} · ${esc(r.sources[k].updated||'—')}</p>`:'').join('')}</div>
     ${r.reference_appendix.included?`<section class="visit-reference"><h2 class="cr-h2">${esc(t('visit.appendix'))}</h2><p>${esc(r.appendix_note)}</p>
-    ${r.reference_appendix.panels.map(p=>`<section><h3 class="cr-h3">${esc(p.label)}</h3>${p.positions.map(x=>`<article class="cr-card"><b>${esc(x.gene)} ${esc(x.rsid)}</b> · ${esc(t('reference.level',{level:x.level}))}<p>${esc(t('visit.reading',{reading:x.reading_label||'—'}))}</p>
-    ${referenceContextHtml(x)}${passportHtml(x,'clinician')}<p class="cr-caption">${visitSourceLinks(x.reference_context?.variant_source||x.source)}</p></article>`).join('')}</section>`).join('')}</section>`:''}
+    ${r.reference_appendix.panels.map(p=>`<section><h3 class="cr-h3">${esc(p.label)}</h3>${p.positions.map(x=>`<article class="cr-card">${levelChip(x.level)} ${systemGeneLink(x.gene,p.key)} ${esc(x.rsid)}<p>${esc(t('visit.reading',{reading:x.reading_label||'—'}))}</p>
+    ${geneticBriefHtml(x,'clinician')}</article>`).join('')}</section>`).join('')}</section>`:''}
     <p class="cr-caption">${esc(r.disclaimer)}</p>`;
   $('#visit-back',root).onclick=()=>mount(current);
   $('#visit-print',root).onclick=()=>window.print();
@@ -1587,6 +1640,9 @@ async function viewLabs(root){
   // Out of range first, furthest outside its corridor leading; everything inside
   // keeps the alphabetical order it had — and is folded (task 195): 370 cards of
   // values in range were most of the tab's 76 screens.
+  const current=d.markers.filter(m=>m.display_recency!==false);
+  const historical=d.markers.filter(m=>m.display_recency===false);
+  const stats=d.current_stats||d;
   const OUT={high:0,low:0};
   const dist=m=>{
     const v=Number(m.value);
@@ -1597,14 +1653,14 @@ async function viewLabs(root){
       return (Number(m.ref_low)-v)/Math.abs(Number(m.ref_low));
     return 0;
   };
-  const flagged=d.markers.filter(m=>m.flag in OUT).sort((a,b)=>dist(b)-dist(a));
-  const rest=d.markers.filter(m=>!(m.flag in OUT));
-  const latest=d.markers.map(m=>String(m.date||'')).sort().pop()||'';
+  const flagged=current.filter(m=>m.flag in OUT).sort((a,b)=>dist(b)-dist(a));
+  const rest=current.filter(m=>!(m.flag in OUT));
+  const latest=current.map(m=>String(m.date||'')).sort().pop()||'';
   const facts=[
-    factHtml(`${d.abnormal_count}<small class="muted">/${d.count}</small>`,t('web.labs.fact_abnormal'),d.abnormal_count?'c-critical':(d.markers.some(m=>m.flag==='ok')?'c-good':'')),
-    factHtml(String(d.markers.filter(m=>m.flag==='ok').length),t('web.labs.fact_within'),d.markers.some(m=>m.flag==='ok')?'c-good':''),
-    d.markers.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?factHtml(String(d.markers.filter(m=>['norange','unconfirmed_rule'].includes(m.flag)).length),t('web.labs.fact_uncompared'),''):'',
-    d.decision_unresolved_count?factHtml(String(d.decision_unresolved_count),t('web.labs.fact_threshold_unresolved'),'c-warning'):'',
+    factHtml(`${stats.abnormal_count}<small class="muted">/${stats.count}</small>`,t('web.labs.fact_abnormal'),stats.abnormal_count?'c-critical':(current.some(m=>m.flag==='ok')?'c-good':'')),
+    factHtml(String(current.filter(m=>m.flag==='ok').length),t('web.labs.fact_within'),current.some(m=>m.flag==='ok')?'c-good':''),
+    current.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?factHtml(String(current.filter(m=>['norange','unconfirmed_rule'].includes(m.flag)).length),t('web.labs.fact_uncompared'),''):'',
+    stats.decision_unresolved_count?factHtml(String(stats.decision_unresolved_count),t('web.labs.fact_threshold_unresolved'),'c-warning'):'',
     latest?factHtml(esc(fmtDate(latest)),t('web.labs.fact_latest'),''):'',
   ];
   // The folder by its name; the whole path is in the tooltip, not in the text.
@@ -1620,17 +1676,21 @@ async function viewLabs(root){
     <div id="ingest-res" class="mb-3"></div>
     <div id="add-lab" class="hidden"></div>
     <div id="targets-box"></div>
+    <p class="cr-caption">${esc(t('labs.display_window'))}</p>
     <h2 class="cr-h2 section">${esc(t('web.labs.out_h'))} <span class="muted">· ${flagged.length}</span></h2>
     <div class="grid" id="labgrid"></div>
     ${rest.length?`<details class="fold mt-4" id="labrest"><summary>${esc(t(rest.some(m=>m.flag!=='ok')?'web.labs.other_h':'web.labs.within_h',{n:rest.length}))}</summary><div class="grid mt-2" id="labrestgrid"></div></details>`:''}
+    ${historical.length?`<details class="fold mt-4" id="labhistory"><summary>${esc(t('labs.history_heading',{n:historical.length}))}</summary><p class="meta">${esc(t('labs.history_note'))}</p><div class="grid mt-2" id="labhistorygrid"></div></details>`:''}
     ${sb}`;
   renderTargets($('#targets-box',root), cat);
   const g = $('#labgrid',root);
   flagged.forEach(m=>g.appendChild(markerCard(m)));
-  if(!flagged.length) g.innerHTML=emptyHtml(d.count?t(d.markers.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?'web.labs.none_out_unassessed':'web.labs.none_out'):t('web.overview.no_red_nodata'));
+  if(!flagged.length) g.innerHTML=emptyHtml(stats.count?t(current.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?'web.labs.none_out_unassessed':'web.labs.none_out'):t('web.overview.no_red_nodata'));
   // Drawn when opened: the cards inside the corridor are built on the first open.
   const rd=$('#labrest',root);
   if(rd) rd.addEventListener('toggle',()=>{ const rg=$('#labrestgrid',root); if(rd.open&&!rg.childElementCount) rest.forEach(m=>rg.appendChild(markerCard(m))); });
+  const hd=$('#labhistory',root);
+  if(hd) hd.addEventListener('toggle',()=>{ const hg=$('#labhistorygrid',root); if(hd.open&&!hg.childElementCount) historical.forEach(m=>hg.appendChild(markerCard(m))); });
   // the add form
   $('#toggle-add',root).onclick=()=>$('#add-lab',root).classList.toggle('hidden');
   renderAddLab($('#add-lab',root), cat);
@@ -1678,7 +1738,7 @@ async function previewLabArchive(box, approval=''){
   if(button)button.onclick=()=>{button.disabled=true;previewLabArchive(box,r.approval_token);};
 }
 function renderAddLab(box, cat){
-  const opts = cat.map(c=>`<option value="${esc(c.key)}">${esc(c.name)} (${esc(c.unit)})</option>`).join('');
+  const opts = cat.map(c=>`<option value="${esc(c.key)}">${esc(c.name)} (${esc(c.unit_display??c.unit)})</option>`).join('');
   box.innerHTML = `<div class="form">
     <div class="fr">
       <label class="cr-label">${esc(t('web.form.marker'))}<select class="cr-input" id="al-marker">${opts}<option value="__new">${esc(t('web.form.new_option'))}</option></select></label>
@@ -1717,16 +1777,18 @@ async function renderTargets(box, cat){
   const rows=(d.targets||[]).map(tg=>{
     const cur=tg.current;
     let now=cur?t('web.target.now',{value:cur.value,date:cur.date}):t('web.target.now_none');
-    if(cur&&tg.outside_target){
+    if(cur&&cur.display_recency===false){now=t('target.historical',{value:cur.value,date:fmtDate(cur.date)});}
+    else if(cur&&cur.display_recency===null){now=t('labs.date_unknown');}
+    else if(cur&&tg.outside_target){
       const side=t(tg.side==='above'?'web.target.side_above':'web.target.side_below');
       now+=' — '+(tg.in_corridor?t('web.target.discuss',{side}):t('web.target.outside_and_flagged',{side}));
     }else if(cur&&tg.outside_target===false){now+=' — '+t('web.target.within');}
-    return `<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(tg)}))}${tg.unit?' '+esc(tg.unit):''}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span>
+    return `<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: <span class="tgt">${esc(t('web.target.beside',{spec:targetSpec(tg)}))}${tg.unit?' '+esc(tg.unit_display??tg.unit):''}</span> <span class="muted">(${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span>
       <button class="cr-btn cr-btn--ghost ghost tg-rm" data-marker="${esc(tg.marker)}" style="margin-left:auto">✕ ${esc(t('web.target.remove'))}</button></div>
       <div class="why">${esc(now)}${tg.note?` · ${esc(tg.note)}`:''}</div></div>`;
   }).join('');
   const ask=(d.targets||[]).filter(tg=>d.to_discuss.includes(tg.marker));
-  const askList=ask.length?ask.map(tg=>`<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: ${tg.current.value} ${esc(tg.unit||'')} <span class="muted">${esc(refText(tg.current))}</span></div><div class="why tgt-ask">${esc(t('web.target.discuss',{side:t(tg.side==='above'?'web.target.side_above':'web.target.side_below')}))} <span class="muted">(${esc(t('web.target.beside',{spec:targetSpec(tg)}))}, ${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span></div></div>`).join('')
+  const askList=ask.length?ask.map(tg=>`<div class="list-item"><div class="row"><b>${esc(tg.name)}</b>: ${tg.current.value} ${esc(tg.unit_display??tg.unit??'')} <span class="muted">${esc(refText(tg.current))}</span></div><div class="why tgt-ask">${esc(t('web.target.discuss',{side:t(tg.side==='above'?'web.target.side_above':'web.target.side_below')}))} <span class="muted">(${esc(t('web.target.beside',{spec:targetSpec(tg)}))}, ${esc(t('web.target.provenance',{set_by:tg.set_by,set_on:tg.set_on}))})</span></div></div>`).join('')
     :`<div class="muted">${esc(t('web.target.discuss_none'))}</div>`;
   box.innerHTML=`<div class="cr-card card mb-3">
     <div class="row"><div class="so-h" style="margin:0">${esc(t('web.target.h'))}</div><button class="cr-btn cr-btn--ghost ghost" id="tg-toggle" style="margin-left:auto">+ ${esc(t('web.target.add_toggle'))}</button></div>
@@ -1743,7 +1805,7 @@ async function renderTargets(box, cat){
   });
 }
 function renderTargetForm(box, cat){
-  const opts=cat.map(c=>`<option value="${esc(c.key)}" data-unit="${esc(c.canonical_unit||c.unit||'')}">${esc(c.name)} (${esc(c.unit)})</option>`).join('');
+  const opts=cat.map(c=>`<option value="${esc(c.key)}" data-unit="${esc(c.canonical_unit||c.unit||'')}">${esc(c.name)} (${esc(c.unit_display??c.unit)})</option>`).join('');
   box.innerHTML=`<div class="form">
     <div class="so-h" style="margin:0 0 6px">${esc(t('web.target.form_h'))}</div>
     <div class="fr">
@@ -2122,7 +2184,7 @@ async function viewMedicines(root){
 
 // ---------------- What to test ----------------
 function testItem(s){
-  if(s.error)return el(`<div class="list-item">${esc(t('tests.rule_error',{id:s.id,error:s.error}))}</div>`);
+  if(s.error)return el(`<div class="list-item">${esc(t('tests.rule_error',{name:s.suggest||t('tests.proposal_unavailable')}))}</div>`);
   const bases=Object.entries(s.proposal_basis||{}).map(([claim,b])=>`<div class="why muted">${esc(t('tests.basis',{claim:t('tests.claim.'+claim),detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
   if(s.done_recently){
     const lm=s.last_measured||'', rm=s.recheck_months;
@@ -2256,10 +2318,28 @@ function mechanismHtml(p){
   const r=p.decision_route,workflow=r?`<div class="why muted" data-decision-route="${esc(r.kind)}">${esc(t('genome.route.line',{label:r.label,reason:r.reason}))}<div>${esc(r.notice)}</div></div>`:'';
   const sub=Object.entries(p.subclaim_basis||{}).map(([name,b])=>`<div class="why muted" data-subclaim-basis>${esc(t('conclusion.subclaim.'+name))}: ${esc(b.status==='incomplete'?b.reason:b.mechanism+' — '+b.source)}</div>`).join('');
   let clinical=sub+workflow;
-  if(p.conclusion_basis?.status==='incomplete') clinical=`<div class="why muted" data-conclusion-withheld>${esc(p.conclusion_basis.reason)}</div>`+clinical;
+  if(p.conclusion_basis?.status==='incomplete') clinical=`<div class="why muted" data-conclusion-withheld>${esc(p.interpretation&&p.conclusion_basis.missing?.length?t('interpretation.gaps',{missing:p.conclusion_basis.missing.map(k=>t('conclusion.missing.'+k)).join(', ')}):p.conclusion_basis.reason)}</div>`+clinical;
   else if(p.mechanism&&p.source&&!reference) clinical=`<div class="why" data-mechanism>${esc(t('system.row.mechanism',{text:p.mechanism}))}</div>`
     +`<div class="why muted">${esc(t('decision.source',{source:p.source}))}</div>`+clinical;
   return reference+(reference&&clinical?`<details data-clinical-checks><summary>${esc(t('reference.analytics'))}</summary>${clinical}</details>`:clinical);
+}
+
+function geneticPreviewHtml(p,fallback=''){
+  const c=p.reference_context, i=p.interpretation;
+  const sentence=typeof i?.summary==='string'&&i.summary?i.summary:(c?.variant_context||p.text||fallback||p.passport?.reported||p.conclusion_basis?.reason||'');
+  const parts=[c?.gene_function,sentence].filter(Boolean);
+  return `<span class="gen-context-preview">${parts.map(x=>`<span>${esc(x)}</span>`).join(' ')}</span>`;
+}
+function geneticBriefHtml(p,register='patient',fallback='',detailOnly=false){
+  const i=p.interpretation;
+  const interpretation=typeof i?.summary==='string'&&i.summary?`<div data-catalogue-interpretation>${esc(t('interpretation.summary',{level:i.level||'—',text:i.summary}))}${i.mechanism&&!i.summary.includes(i.mechanism)&&!p.reference_context?.variant_context?.includes(i.mechanism)?`<div class="why">${esc(t('system.row.mechanism',{text:i.mechanism}))}</div>`:''}<div class="why muted">${esc(i.notice||t('interpretation.notice'))}</div>${i.source?`<div class="why muted">${esc(t('decision.source',{source:i.source}))}</div>`:''}${i.missing?.length?`<div class="why muted">${esc(t('interpretation.gaps',{missing:i.missing.map(k=>t('conclusion.missing.'+k)).join(', ')}))}</div>`:''}</div>`:'';
+  const text=!p.reference_context&&!interpretation&&(p.text||fallback)?`<div>${esc(p.text||fallback)}</div>`:'';
+  const body=`<div class="gen-context-body">${interpretation}${text}${mechanismHtml(p)}${p.passport?passportHtml(p,register,!!i?.summary):''}${authorNoteHtml(p,register)}${clinicalBasisHTML(p,true)}</div>`;
+  return detailOnly?body:`<details class="gen-context" data-genetic-context><summary>${geneticPreviewHtml(p,fallback)}<span class="gen-context-more small">${esc(t('web.gen.context_details'))}</span></summary>${body}</details>`;
+}
+function geneticCatalogueFold(gen,card){
+  const table=genTableHtml(gen,card,card.register);
+  return table?`<details class="fold" data-genetic-catalogue><summary>${esc(t('web.system.genetics_detail'))}</summary>${table}</details>`:'';
 }
 
 function genTableHtml(gen,card,register){
@@ -2280,13 +2360,12 @@ function genTableHtml(gen,card,register){
       +`<td>${p.level?levelChip(p.level,p.level_short):`<span class="muted small">${esc(t('system.row.level_none'))}</span>`}</td>`
       +`<td>${pnlStateBadge(p)}</td>`
       +`<td class="opt muted small">${esc(p.link_text||'')}</td>`
-      +`<td>${p.reference_context?`<div>${esc(['C','D'].includes(p.level)?p.reference_context.gene_function:short(p.reference_context.gene_function))}</div><div class="why">${esc(['C','D'].includes(p.level)?p.reference_context.variant_context:short(p.reference_context.variant_context))}</div>`:esc(short(p.text||r.text||p.conclusion_basis?.reason||''))}${!p.reference_context&&p.decision_route?`<div class="why muted">${esc(p.decision_route.label)}</div>`:''}</td>`;
+      +`<td>${geneticPreviewHtml(p,r.text||'')}${!p.reference_context&&p.decision_route?`<div class="why muted">${esc(p.decision_route.label)}</div>`:''}</td>`;
     const detail=`<div class="pnl ${PNL_KIND[p.kind]||'k-c'}">`
       +`${p.local_note?`<div class="why localnote">${esc(t('system.row.local_note',{by:t('system.row.local_note_by.'+(p.local_note.by_role||'clinician')),on:fmtDate(p.local_note.on)||'—'}))}: ${esc(p.local_note.text)}</div>`:''}`
       +`${p.depth_note?`<div class="why muted">${esc(p.depth_note)}</div>`:''}`
       +`${p.presumed&&p.closes_text?`<div class="why muted">${esc(p.closes_text)}</div>`:''}`
-      +`${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}`
-      +`${mechanismHtml(p)}${authorNoteHtml(p,register)}${passportHtml(p,register)}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}`
+      +`${geneticBriefHtml(p,register,r.text||'',true)}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}`
       +`${register==='clinician'?geneRowDetail(r):''}</div>`;
     return genTableRow(id,cells,detail);
   };
@@ -2350,12 +2429,12 @@ function pnlStateBadge(p){
   if(p.presumed) return badge('b-unknown',t('system.gen.state.presumed'),p.read_why_text||'');
   if(p.read!==true) return badge('b-unknown',t('system.panel.state.unread'),p.read_why_text||p.read_why||'');
   const st=p.state||'None';
-  if(p.conclusion_basis?.status==='incomplete') return badge('b-unknown',p.genotype?.genotype||t('system.panel.state.'+st),p.conclusion_basis.reason);
+  const reading=(p.genotype?.genotype?p.genotype.genotype+' · ':'')+t('system.panel.state.'+st);
   // Read from the file, the depth unverified: the state keeps its colour and a
   // second, muted badge says what is not known about it.
-  if(p.depth_note) return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st))
+  if(p.depth_note) return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',reading)
     +' '+badge('b-unknown',t('system.gen.state.file_only'),p.depth_note);
-  return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',t('system.panel.state.'+st));
+  return badge(st==='hom'||st==='hemi'?'b-warning':st==='het'?'b-near':'b-unknown',reading);
 }
 function pnlExpect(ec,qn){
   if(!ec) return '';
@@ -2415,9 +2494,8 @@ function genSummaryHtml(gen, card){
   }
   const rows=(gen.rows||[]).filter(x=>x.unit==='position');
   const byId=Object.fromEntries(rows.map(x=>[x.gene+'|'+x.rsid,x]));
-  const held=st.filter(p=>p.conclusion_basis?.status==='incomplete');
-  const found=st.filter(p=>p.conclusion_basis?.status!=='incomplete'&&p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
-  const absent=st.filter(p=>p.conclusion_basis?.status!=='incomplete'&&p.read===true&&p.state==='absent');
+  const found=st.filter(p=>p.read===true&&(p.state==='het'||p.state==='hom'||p.state==='hemi'));
+  const absent=st.filter(p=>p.read===true&&p.state==='absent');
   const unread=st.filter(p=>p.read!==true);
   const foundGenes=new Set(found.map(p=>p.gene));
   const names=list=>{const c={}; list.forEach(p=>{const k=foundGenes.has(p.gene)?p.gene+' '+(p.rsid||''):p.gene;
@@ -2426,14 +2504,13 @@ function genSummaryHtml(gen, card){
   const observed=st.filter(p=>p.read===true&&['het','hom','hemi'].includes(p.state)).length;
   let h=countNote+`<div class="sys-sec">${esc(t('system.panel.conclusion_h'))} <span class="muted small">· ${esc(t('web.second.gen_h',{found:observed,read:st.length-unread.length,positions:plural(st.length,'count.positions')}))}</span></div>`;
   if(found.length){
-    h+=`<div class="tblwrap"><table class="cr-table cr-table--compact dt" data-genetic-summary><thead><tr><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_state'))}</th><th>${esc(t('web.gen.col_what'))}</th><th>${esc(t('web.gen.col_level'))}</th></tr></thead><tbody>`;
+    h+=`<div class="tblwrap"><table class="cr-table cr-table--compact dt" data-genetic-summary><thead><tr><th>${esc(t('web.gen.col_confidence'))}</th><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_reading'))}</th><th>${esc(t('web.gen.col_what'))}</th></tr></thead><tbody>`;
     h+=found.map(p=>{const r=byId[p.gene+'|'+p.rsid]||{};
-      const txt=String(p.text||r.text||p.reference_context?.variant_context||p.passport?.reported||(p.value_only?t('web.hyp.value_e'):''));
-      return `<tr><td>${systemGeneLink(p.gene,card.key)} <span class="muted small">${esc(p.rsid||'')}</span></td><td>${pnlStateBadge(p)}</td><td>${esc(txt)}${mechanismHtml(p)}${p.passport?passportHtml(p,card.register):''}</td><td>${levelChip(p.level,p.level_short)||'—'}</td></tr>`;}).join('');
+      return `<tr><td>${levelChip(p.level,p.level_short)||'—'}</td><td>${systemGeneLink(p.gene,card.key)} <span class="muted small">${esc(p.rsid||'')}</span></td><td>${pnlStateBadge(p)}</td><td>${geneticBriefHtml(p,card.register,r.text||'')}</td></tr>`;}).join('');
     h+='</tbody></table></div>';
+    h+=`<p class="cr-caption" data-interpretation-notice>${esc(t('web.gen.context_notice'))}</p>`;
   }
   if(absent.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_absent',{genes:'__GENES__'})).replace('__GENES__',names(absent))}</div>`;
-  h+=held.map(p=>`<div class="gen-rest">${systemGeneLink(p.gene,card.key)} ${esc(p.rsid||'')} ${pnlStateBadge(p)}${mechanismHtml(p)}</div>`).join('');
   if(unread.length) h+=`<div class="gen-rest">${esc(t('web.second.gen_unread',{genes:'__GENES__'})).replace('__GENES__',names(unread))}</div>`;
   // Positions read as «not read» only because the catalogue positions were never
   // genotyped from the alignment: the step that closes it, where the gap is seen.
@@ -2441,19 +2518,14 @@ function genSummaryHtml(gen, card){
   if(assumed) h+=`<div class="gen-rest">${esc(t('system.genetics.assumed_ref_hint',{positions:plural(assumed,'count.positions')}))} <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" data-recompute-open>${esc(t('web.recompute.open'))}</button></div>`;
   const qs=(card.questions||{}).rows||[];
   const qnum=Object.fromEntries(qs.map((q,i)=>[(q.gene||'')+'|'+(q.rsid||''),i+1]));
-  const cmp=found.filter(p=>(byId[p.gene+'|'+p.rsid]||{}).expect_check);
-  let m;
-  if(cmp.length) m=cmp.map(p=>`<div class="mt-1">${systemGeneLink(p.gene,card.key)} ${pnlExpect(byId[p.gene+'|'+p.rsid].expect_check,qnum[p.gene+'|'+p.rsid])}</div>`).join('');
-  else{
-    // The expectations the panel holds for alleles this person does not carry:
-    // the check happened, and this is what did not apply (owner, 14.09.2026).
-    const na={}; absent.filter(p=>p.expect).forEach(p=>{const k=p.expect.name||p.expect.marker; (na[k]=na[k]||[]).push(p.gene+' '+(p.rsid||''));});
-    m=esc(t('system.panel.compare_none'))+Object.keys(na).sort().map(k=>`<div class="muted small mt-1">${esc(t('system.panel.compare_absent',{name:k,positions:na[k].join(', ')}))}</div>`).join('');
+  const cmp=found.filter(p=>p.conclusion_basis?.status!=='incomplete'&&(byId[p.gene+'|'+p.rsid]||{}).expect_check);
+  if(cmp.length){
+    const m=cmp.map(p=>`<div class="mt-1">${systemGeneLink(p.gene,card.key)} ${pnlExpect(byId[p.gene+'|'+p.rsid].expect_check,qnum[p.gene+'|'+p.rsid])}</div>`).join('');
+    h+=`<div class="match"><b>${esc(t('system.panel.compare_h'))}.</b> ${m}</div>`;
   }
-  h+=`<div class="match"><b>${esc(t('system.panel.compare_h'))}.</b> ${m}</div>`;
   // What a guideline weighs when a drug is chosen. Not a prescription, and
   // nothing here says a drug is being taken.
-  const rx=found.filter(p=>p.kind==='guideline'||p.kind==='pair');
+  const rx=found.filter(p=>p.conclusion_basis?.status!=='incomplete'&&(p.kind==='guideline'||p.kind==='pair'));
   if(rx.length) h+=`<div class="gen-rest">${esc(t('system.panel.prescribing_h'))}: ${esc(rx.map(p=>p.gene).join(', '))} · ${esc(t('system.panel.prescribing_note'))}</div>`;
   return h;
 }
@@ -2491,7 +2563,7 @@ function panelLabsHtml(p){
   // Task 205 D, E: the author's pathways first, a value-only marker says so, and
   // the markers to read beside one are listed under it — measured or not.
   const comp=m=>(m.companions||[]).length?`<div class="muted small" style="margin-left:1.2em">${esc(t('system.panel_labs.companions',{list:m.companions.map(c=>c.measured?`${c.name} ${fmtNum(c.value)} ${c.unit||''}`.trim():t('system.panel_labs.companion_missing',{name:c.name})).join('; ')}))}</div>`:'';
-  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m)+context(m);
+  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m)+context(m);
   const byKey={}; (p.markers||[]).forEach(m=>byKey[m.key]=m);
   const grouped=new Set();
   let gs='';
@@ -2558,7 +2630,7 @@ function geneRowDetail(r){
   return out;
 }
 function basketRowHtml(row){
-  if(row.origin==='rule') return testItem(row).outerHTML;
+  if(row.origin==='rule') return visibleTestProposals([row]).length?testItem(row).outerHTML:'';
   return `<div class="row-l">· ${esc(row.text||'')}${row.closes?` — ${esc(row.closes)}`:''}${row.source?` <span class="muted">(${esc(row.source)})</span>`:''}${mechanismHtml(row)}</div>`;
 }
 // «If a decision to correct has been made» (task 200). Grouped by what the
@@ -2566,32 +2638,46 @@ function basketRowHtml(row){
 // `adds_nothing` is printed rather than left as silence.
 function correctionRoutesHtml(cr,register='patient'){
   if(!cr||cr.status!=='ok') return '';
-  const line=x=>`<div class="row-l">· <b>${esc(x.route_text||'')}</b> — ${esc(x.because||'')}`
-    +(x.on&&x.on.length?`<div class="why muted">${esc(t('system.routes.on',{markers:x.on.join(', ')}))}</div>`:'')
-    +(x.positions&&x.positions.length?`<div class="why muted">${esc(t('system.routes.positions',{positions:x.positions.join(', ')}))}</div>`:'')
-    +(x.recheck?`<div class="why">${esc(t('system.routes.recheck',{marker:x.recheck.marker_name||x.recheck.marker,weeks:plural(x.recheck.after_weeks,'count.weeks'),change:x.recheck.what_counts_as_change}))}</div>`:'')
-    +((x.evidence&&x.evidence.source)?`<div class="why muted">${esc(t('system.routes.source',{source:x.evidence.source}))}</div>`:'')
-    +[x.conclusion_basis,x.recheck?.conclusion_basis].filter(Boolean).map(b=>`<div class="why">${esc(b.mechanism)} — ${esc(b.source)}</div>`).join('')
-    +`</div>`;
-  let h=`<div class="row-l"><b>${esc(cr.head)}</b></div><div class="why muted">${esc(cr.caveat)}</div>`;
+  const line=x=>{
+    const basis=[x.conclusion_basis,x.recheck?.conclusion_basis].filter(Boolean);
+    const detail=(x.on?.length?`<p>${esc(t('system.routes.on',{markers:x.on.join(', ')}))}</p>`:'')
+      +(x.positions?.length?`<p>${esc(t('system.routes.positions',{positions:x.positions.join(', ')}))}</p>`:'')
+      +(x.recheck?`<p>${esc(t('system.routes.recheck',{marker:x.recheck.marker_name||x.recheck.marker,weeks:plural(x.recheck.after_weeks,'count.weeks'),change:x.recheck.what_counts_as_change}))}</p>`:'')
+      +(x.evidence?.source?`<p>${esc(t('system.routes.source',{source:x.evidence.source}))}</p>`:'')
+      +basis.map(b=>`<p>${esc(b.mechanism||'')} — ${esc(b.source||'')}</p>`).join('');
+    return `<div class="route-item">${x.route_text?`<b>${esc(x.route_text)}</b>`:''}<p>${esc(x.because||'')}</p>`
+      +(detail?`<details class="fold route-support"><summary>${esc(t('web.system.route_support'))}</summary><div>${detail}</div></details>`:'')+`</div>`;
+  };
+  let h=`<p class="cr-caption">${esc(cr.caveat)}</p>`;
   (cr.groups||[]).forEach(g=>{
-    h+=`<div class="sys-sec">${esc(g.says_text||g.says)}</div>`+g.rows.map(line).join('');
+    h+=`<section class="route-group"><h4 class="cr-h4">${esc(g.says_text||'')}</h4>${g.rows.map(line).join('')}</section>`;
   });
-  if((cr.adds_nothing||[]).length){
-    h+=`<div class="sys-sec">${esc((cr.adds_nothing[0]||{}).says_text||'')}</div>`
-      +cr.adds_nothing.map(line).join('');
+  if(cr.adds_nothing?.length) h+=cr.adds_nothing.map(line).join('');
+  if(!cr.groups?.length&&!cr.adds_nothing?.length) h+=`<div class="route-item">${esc(t('web.system.route_not_established'))}</div>`;
+  const held=cr.withheld||[],unobserved=cr.unobserved||[];
+  if(held.length){
+    const rows=held.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).map(x=>{
+      const parts=[x.reason,t('panel.intake.level',{level:x.evidence?.level||'—'}),(x.positions||[]).join(', '),x.evidence?.source].filter(Boolean);
+      return `<div class="route-item">${parts.map(esc).join(' · ')}</div>`;
+    }).join('');
+    h+=`<details class="fold" data-routes-withheld><summary>${esc(t('system.routes.withheld_count',{n:held.length}))}</summary>${rows}</details>`;
   }
-  const held=cr.withheld||[];
-  if(held.length) h+=`<div class="why" data-routes-withheld>${esc(t('system.routes.withheld_count',{n:held.length}))}</div>`;
-  held.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).forEach(x=>{
-    const parts=[x.reason,t('panel.intake.level',{level:x.evidence?.level||'—'}),(x.positions||[]).join(', '),x.evidence?.source].filter(Boolean);
-    h+=`<div class="why">${parts.map(esc).join(' — ')}</div>`;
-  });
-  const unobserved=cr.unobserved||[];
-  if(unobserved.length) h+=`<div class="why" data-routes-unobserved>${esc(t('system.routes.unobserved_count',{n:unobserved.length}))}</div>`;
-  unobserved.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).forEach(x=>{
-    h+=`<div class="why">${esc(x.reason)} — ${esc((x.dependencies||[]).join(', '))}</div>`;
-  });
+  if(unobserved.length){
+    const rows=unobserved.filter(x=>register==='clinician'||['A','B'].includes(x.evidence?.level)).map(x=>`<div class="route-item">${esc(x.reason)}${x.dependencies?.length?`<p>${esc(x.dependencies.join(', '))}</p>`:''}</div>`).join('');
+    h+=`<details class="fold" data-routes-unobserved><summary>${esc(t('system.routes.unobserved_count',{n:unobserved.length}))}</summary>${rows}</details>`;
+  }
+  return h;
+}
+
+function systemMedicationsHtml(med){
+  const head=`<thead><tr><th>${esc(t('web.system.med_name'))}</th><th>${esc(t('web.system.med_dose'))}</th><th>${esc(t('web.system.med_class'))}</th></tr></thead>`;
+  const table=rows=>`<div class="cr-table-wrap"><table class="cr-table system-medications-table">${head}<tbody>${rows}</tbody></table></div>`;
+  const row=(m,labels,reason='')=>`<tr><td><b>${esc(m.name||'')}</b></td><td>${esc(m.dose||'—')}</td><td>${esc(labels.join(', ')||reason||t('prescription.class_undefined'))}${reason&&labels.length?`<div class="cr-caption">${esc(reason)}</div>`:''}</td></tr>`;
+  let h=med.rows?.length?table(med.rows.map(m=>row(m,m.via_labels||[])).join('')):'';
+  if(med.empty_reason) h+=`<p class="cr-caption">${esc(med.empty_reason)}</p>`;
+  const unplaced=(med.unmapped||[]).map(m=>row(m,m.class_labels||[],t('web.system.med_no_map')))
+    .concat((med.unclassified||[]).map(m=>row(m,[],t('web.system.med_no_class'))));
+  if(unplaced.length) h+=`<details class="fold system-medication-unplaced" data-medications-unplaced><summary>${esc(t('web.system.med_unplaced',{n:unplaced.length}))}</summary>${table(unplaced.join(''))}</details>`;
   return h;
 }
 // The seven layers in the order of the brief, every one of them present — with
@@ -2605,7 +2691,7 @@ function systemCardHtml(r){
     L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.on_demand.head'))}</h3><div class="why">${esc(t('system.on_demand.why',{why:r.why_no_domain||'—'}))}</div>`
       +(r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:'')+`</div>`);
     const gen=r.genetics||{};
-    let b=genSummaryHtml(gen,r)+genTableHtml(gen,r,r.register);
+    let b=genSummaryHtml(gen,r)+geneticCatalogueFold(gen,r);
     L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.layer.on_demand_genetics'))}</h3>${b}</div>`);
     return L.join('');
   }
@@ -2615,7 +2701,7 @@ function systemCardHtml(r){
   else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
   else{
     b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
-    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit||'')} <span class="muted" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</span></div>`).join('');
+    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</span></div>`).join('');
   }
   if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
   if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
@@ -2650,17 +2736,13 @@ function systemCardHtml(r){
     if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
   }
   if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
-  b=summary+(b?`<details class="fold"${r.register==='clinician'||(gen.positions||[]).some(p=>p.reference_context)?' open':''}><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
+  b=summary+(b?`<details class="fold" data-genetic-catalogue><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
   layer(3,'system.layer.genetics',b);
   b=correctionRoutesHtml(r.correction_routes,r.register);
   // Not a numbered layer: the seven layers are the brief's own frame, and this
   // block answers a decision that is not the product's to make.
   if(b) L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.routes.layer'))}</h3>${b}</div>`);
-  const med=r.medications||{};
-  b=(med.rows||[]).map(m=>`<div class="row-l">· ${esc(t('system.meds.row',{name:m.name,dose:m.dose||'',classes:(m.via||[]).join(', ')}))}</div>`).join('');
-  if(med.empty_reason) b+=`<div class="row-l muted">${esc(med.empty_reason)}</div>`;
-  if((med.unmapped||[]).length) b+=`<div class="row-l muted">${esc(t('system.meds.unmapped',{names:med.unmapped.map(x=>x.name).join(', ')}))}</div>`;
-  if((med.unclassified||[]).length) b+=`<div class="row-l muted">${esc(t('system.meds.unclassified',{names:med.unclassified.map(x=>x.name).join(', ')}))}</div>`;
+  b=systemMedicationsHtml(r.medications||{});
   layer(4,'system.layer.medications',b);
   const tg=r.target||{};
   b=(tg.rows||[]).map(x=>{
@@ -2671,8 +2753,8 @@ function systemCardHtml(r){
   if(tg.empty_reason) b+=`<div class="row-l muted">${esc(tg.empty_reason)}</div>`;
   layer(5,'system.layer.target',b);
   const tests=r.tests||{};
-  b=(tests.rows||[]).map(s=>testItem(s).outerHTML).join('');
-  if(tests.empty_why) b+=`<div class="row-l muted">${esc(t('system.why.'+tests.empty_why))}</div>`;
+  b=visibleTestProposals(tests.rows).map(s=>testItem(s).outerHTML).join('');
+  if(!b) b=`<div class="row-l muted">${esc(t('web.tests.none_supported'))}</div>`;
   layer(6,'system.layer.tests',b);
   const qs=r.questions||{};
   b=(qs.rows||[]).length?`<ol>${qs.rows.map(q=>`<li>${esc(q.text)}</li>`).join('')}</ol>`:'';
@@ -2680,7 +2762,9 @@ function systemCardHtml(r){
   layer(7,'system.layer.questions',b);
   const nxt=r.next||{};
   b=['lab','genome','ask'].map(k=>{const bk=nxt[k]||{};
-    return `<div class="basket"><h4>${esc(t('system.next.'+k))}</h4>${(bk.rows||[]).map(basketRowHtml).join('')}${bk.empty_reason?`<div class="row-l muted"><i>${esc(bk.empty_reason)}</i></div>`:''}${(bk.full_genome&&bk.full_genome.text)?`<div class="row-l">${esc(bk.full_genome.text)}</div>`:''}</div>`;}).join('');
+    const rows=(bk.rows||[]).map(basketRowHtml).join('');
+    const empty=bk.empty_reason||(!rows&&k==='lab'?t('web.tests.none_supported'):'');
+    return `<div class="basket"><h4>${esc(t('system.next.'+k))}</h4>${rows}${empty?`<div class="row-l muted"><i>${esc(empty)}</i></div>`:''}${(bk.full_genome&&bk.full_genome.text)?`<div class="row-l">${esc(bk.full_genome.text)}</div>`:''}</div>`;}).join('');
   L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('web.system.next_h'))}</h3>${b}</div>`);
   return L.join('');
 }
@@ -2698,8 +2782,8 @@ async function viewPanel(key,reading=null,focusGene=null){
     ${p.level?levelChip(p.level,p.level_short):''}
     ${p.reading?`<div class="why" data-intake-reading="${esc(p.rsid)}">${esc(p.reading.message)}</div>${Object.keys(p.reading.quality||{}).length?`<div class="why muted">${esc(t('panel.reading.quality'))}: ${esc(JSON.stringify(p.reading.quality))}</div>`:''}`:''}
     <div class="why muted">${esc(t('panel.locus',{hgvs:p.hgvs||'—',allele:p.risk_allele||'—'}))}</div>
-    ${p.disposition?`<div class="why">${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}${p.task?' ('+esc(t('panel.intake.task',{task:p.task}))+')':''}</div>`:''}
-    ${['het','hom','hemi'].filter(s=>(p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc(p.text[s])}</div>`).join('')}
+    ${p.disposition?`<div class="why">${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}</div>`:''}
+    ${['het','hom','hemi'].filter(s=>((p.interpretation?.summary)||p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc((p.interpretation?.summary||p.text)[s])}</div>`).join('')}
     ${mechanismHtml(p)}
     ${p.classification?`<div class="why">${esc(t('panel.classification',{classification:p.classification,moi:p.moi||'—',disease:p.disease||'—'}))}</div>`:''}
     ${p.expect?`<div class="why">${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</div>`:''}
@@ -2756,7 +2840,7 @@ async function viewPanel(key,reading=null,focusGene=null){
 // that printing opened; the reader's own expanded rows stay expanded.
 let intakePrintOpened=[];
 window.addEventListener('beforeprint',()=>{
-  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])'));
+  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])'));
   intakePrintOpened.forEach(d=>d.open=true);
 });
 window.addEventListener('afterprint',()=>{
@@ -2999,7 +3083,7 @@ function fib4Html(index){
     <p class="cr-body-s">${esc(t('fib4.formula',{formula:index.formula}))}</p>${index.sources.map(x=>`<p class="cr-body-s">${visitSourceLinks(x.citation+' '+x.url)}</p>`).join('')}</details>`;
 }
 
-async function renderSystems(box, radar){
+async function renderSystems(box, radar, systemsAnswer=null){
   box.insertAdjacentHTML('beforebegin',`<p class="cr-body-s" data-radar-heuristic>${esc(radar.heuristic_note||t('radar.heuristic'))}</p><div class="why muted" data-display-limit>${esc(t('clinical.display_limit'))}</div>`);
   const doms = (radar.domains||[]);
   if(doms.length<3){ box.innerHTML=emptyHtml(t('web.radar.not_enough')); return; }
@@ -3026,7 +3110,7 @@ async function renderSystems(box, radar){
     const gen = Object.fromEntries(((sys&&sys.systems)||[]).map(s=>[s.key,s.genetics]));
     doms.forEach(d=>{ d.genetics = gen[d.key]||null; });
   };
-  if(_systems){ join(_systems); draw(false); return; }
+  if(_systems&&!systemsAnswer){ join(_systems); draw(false); return; }
   doms.forEach(d=>{ d.genetics = undefined; });
   draw(true);
   // The bar moves with the time waited and stops short of full: one request has
@@ -3037,7 +3121,7 @@ async function renderSystems(box, radar){
     if(!f){ clearInterval(timer); return; }
     f.style.width = (95*(1-Math.exp(-(Date.now()-t0)/2500))).toFixed(1)+'%';
   }, 150);
-  const sys = await systemsIndex().catch(()=>null);
+  const sys = await Promise.resolve(systemsAnswer||systemsIndex()).catch(()=>null);
   clearInterval(timer);
   if(!box.isConnected) return;                       // the reader has left the tab
   join(sys);
@@ -3123,9 +3207,37 @@ function radarSVG(domains){
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:600px">${rings}${axes}${prevPoly}
     ${currentTrace}${dots}${labels}${withPrev.length?legend:''}</svg>`;
 }
+function visibleTestProposals(rows){
+  return (rows||[]).filter(row=>row.proposal_status==='held'&&!row.error);
+}
+function rememberSystemCards(index,register,epoch,language){
+  if(epoch!==_answerEpoch||language!==LANG) return;
+  const listing={...index};delete listing.cards;delete listing.register;
+  _systems=listing;_apiCache.set(withLang('/api/systems'),JSON.stringify(listing));
+  for(const [key,card] of Object.entries(index.cards||{})){
+    if(card.status!=='ok'||card.register!==register) continue;
+    _apiCache.set(withLang('/api/system?key='+encodeURIComponent(key)+'&register='+encodeURIComponent(register)),JSON.stringify(card));
+  }
+}
 async function viewSecond(root){
-  const [radar,d,sug,sys,labs,sb]=await Promise.all([api('/api/radar'),api('/api/second-opinion'),
-    api('/api/suggest-tests'),systemsIndex(),api('/api/labs'),sourceBar(['labs','medications','pgx','interactions'])]);
+  const register=DISPLAY_MODE,epoch=_answerEpoch,language=LANG;
+  const details=Promise.all([api('/api/systems?register='+encodeURIComponent(register)),
+    api('/api/second-opinion'),api('/api/suggest-tests'),api('/api/labs'),
+    sourceBar(['labs','medications','pgx','interactions'])])
+    .then(replies=>({replies}),error=>({error}));
+  const radar=await api('/api/radar');
+  if(!root.isConnected) return;
+  if(radar.error) throw new Error(radar.error);
+  root.innerHTML=pageHead(t('web.tab.second_opinion'),t('web.page.radar.q'),[])
+    +'<div id="sl-first-picture"></div><div id="sl-first-blocks"></div>';
+  renderSystems($('#sl-first-picture',root),radar,details.then(result=>result.replies?.[0]||null));
+  showLoader($('#sl-first-blocks',root));
+  const result=await details;
+  if(!root.isConnected) return;
+  if(result.error) throw result.error;
+  const [sys,d,sug,labs,sb]=result.replies;
+  if(sys.error) throw new Error(sys.error);
+  rememberSystemCards(sys,register,epoch,language);
   // The radar's rows are a digest of the labs analysis and do not carry the
   // KIND of a genome link; it is joined back from the analysis by marker key.
   const kinds=Object.fromEntries((labs.markers||[]).map(m=>[m.key,m.genome_link_kind]));
@@ -3136,8 +3248,9 @@ async function viewSecond(root){
   const byKey=Object.fromEntries((radar.domains||[]).map(x=>[x.key,x]));
   const acting={};
   (sys.prescriptions||[]).forEach(p=>(p.systems||[]).forEach(k=>{(acting[k]=acting[k]||[]).push(p);}));
-  const pending=(sug.suggestions||[]).filter(s=>!s.done_recently);
-  const done=(sug.suggestions||[]).filter(s=>s.done_recently);
+  const proposals=visibleTestProposals(sug.suggestions);
+  const pending=proposals.filter(s=>!s.done_recently);
+  const done=proposals.filter(s=>s.done_recently);
   const speaks=s=>{const r=byKey[s.key]||{};
     return (r.abnormal||[]).length || (acting[s.key]||[]).length || (s.genetics||{}).status==='composed';};
   const rank={critical:0,warning:1,good:2,nodata:3};
@@ -3174,14 +3287,14 @@ async function viewSecond(root){
     <details class="fold mb-3"><summary>${esc(t('web.second.how_to_read'))}</summary><div class="meta">${esc(t('web.second.genetics_lead'))}</div></details>
     <div id="sl-blocks"></div>
     <h2 class="cr-h2 section">${esc(t('web.second.pgx_h'))}${tabLink('web.tab.medicines')}</h2><div id="sl-pgx"></div>
-    <h2 class="cr-h2 section">${esc(t('web.second.tests_h'))}</h2><div id="sl-tests"></div>
+    <div id="sl-tests"></div>
     <div class="printonly meta mt-4">${esc(d.disclaimer)}</div>
     ${sb}
     <div class="printonly printfoot">${esc(t('web.second.print_foot'))}</div>`;
   // The figure and the radar belong on this page too (owner, 14.09.2026): it is
   // the page carried to the doctor, and a body with its systems marked is read
   // faster across a desk than a list.
-  renderSystems($('#sl-systems',root), radar);
+  renderSystems($('#sl-systems',root), radar,sys);
   bindTabLinks(root);
   root.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>{
     const blk=root.querySelector('[data-sysblock="'+CSS.escape(b.dataset.jump)+'"]');
@@ -3192,8 +3305,7 @@ async function viewSecond(root){
   showLoader($('#sl-tests',root));
   // The same address the card page asks for, register included: one answer
   // in the session's memory, so a click from the radar opens the card at once.
-  const register=DISPLAY_MODE;
-  const cards=await Promise.all(chosen.map(s=>api('/api/system?key='+encodeURIComponent(s.key)+'&register='+encodeURIComponent(register)).catch(()=>null)));
+  const cards=chosen.map(s=>(sys.cards||{})[s.key]||null);
   // «What to test» stays owned by its route: the rows printed here are the
   // suggestions as that route returns them, filtered to the ids the card names.
   const usedTests=new Set(); let questions=0; const quietRows=[];
@@ -3265,14 +3377,12 @@ async function viewSecond(root){
     }
     return h+`</div>`;
   }).join('');
+  for(const panel of sys.on_demand||[]){
+    quietRows.push(`<tr data-system="${esc(panel.key)}" data-sysblock="${esc(panel.key)}"><td><b>${esc(panel.label)}</b></td>`
+      +`<td class="v">${esc(plural(panel.positions||0,'count.positions'))}</td><td class="d">${esc(t('web.panels.genetic'))}</td></tr>`);
+  }
   if(quietRows.length) blocks+=`<div class="sysblock quiet"><div class="sys-h"><span class="name">${esc(t('web.second.quiet_h'))}</span> <span class="muted">· ${quietRows.length}</span></div>`
     +`<div class="tblwrap"><table class="cr-table cr-table--compact dt">${quietRows.join('')}</table></div></div>`;
-  const onDemand=(sys.on_demand||[]);
-  // `h` is the accumulator INSIDE the map above and does not exist out here:
-  // the tab threw «h is not defined» before it painted anything (owner, 18.09.2026).
-  if(onDemand.length) blocks+=`<div class="sysblock"><div class="sys-h"><span class="name">${esc(t('web.panels.on_demand'))}</span></div>`
-    +onDemand.map(p=>`<div class="row-l">· <b>${esc(p.label)}</b> <span class="muted small">${esc(plural(p.positions||0,'count.positions'))}</span> — <span class="muted">${esc(p.why_no_domain||'')}</span> <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" data-system="${esc(p.key)}">${esc(t('web.second.open_card'))}</button></div>`).join('')
-    +`</div>`;
   const silent=(sys.systems||[]).filter(s=>!speaks(s));
   const silentLine=silent.length?`<div class="meta mb-3">${esc(t('web.second.systems_silent',{systems:silent.map(s=>s.label).join(', ')}))}</div>`:'';
   // `phenotype_label` is both the human form AND the one that carries the
@@ -3299,7 +3409,7 @@ async function viewSecond(root){
   // Folded to one line with its count (task 217, stage 0): the watchlist is the
   // general rule for drugs not taken, and it printed as a page of findings.
   $('#sl-pgx',root).innerHTML=drugs?rxFold(t('web.second.pgx_fold'),d.drug_flags.length,drugsBasis+drugs):drugsBasis+drugsEmpty;
-  $('#sl-tests',root).innerHTML=(tests||testsEmpty)+testsRoutine;
+  $('#sl-tests',root).innerHTML=proposals.length?`<h2 class="cr-h2 section">${esc(t('web.second.tests_h'))}</h2>`+(tests||testsEmpty)+testsRoutine:'';
   const qf=$('#sl-qfact b',root); if(qf) qf.textContent=String(questions);
   bindTabLinks(root);
 }
@@ -3375,8 +3485,8 @@ function metricCard(m){
 // four cards it showed were the four the device already measured, and it read
 // only the file somebody types into. It belongs at the top of the first screen,
 // which is where the reader asks «who is this and where are they now».
-async function renderPerson(root, given){
-  const d=await api('/api/metrics');
+async function renderPerson(root, given, compact=false, supplied=null){
+  const d=supplied||await api('/api/metrics');
   // What the profile is still missing, shown where it can be filled in. The
   // engine already computes it — `limits` answers «what cannot be said here and
   // what would close it», and a missing precondition is exactly that — but no
@@ -3398,7 +3508,7 @@ async function renderPerson(root, given){
       <div class="s"><b>${p.sex==='male'?esc(t('web.metrics.male')):p.sex==='female'?esc(t('web.metrics.female')):'—'}</b><span>${esc(t('web.metrics.sex'))}</span></div>
       <div class="s"><b>${d.age??'—'}</b><span>${esc(t('web.metrics.age'))}</span></div>
       <div class="s"><b>${p.height_cm??'—'}</b><span>${esc(t('web.metrics.height'))}</span></div>
-      ${bmiCard?'':`<div class="s"><b>${bmi?bmi.value:'—'}</b><span>${esc(t('web.metrics.bmi'))}${bmi&&bmi.category?' · '+esc(bmi.category):''}</span>${bmi?clinicalBasisHTML(bmi):''}</div>`}
+      ${bmiCard||compact?'':`<div class="s"><b>${bmi?bmi.value:'—'}</b><span>${esc(t('web.metrics.bmi'))}${bmi&&bmi.category?' · '+esc(bmi.category):''}</span>${bmi?clinicalBasisHTML(bmi):''}</div>`}
       <div class="s"><b>${esc((d.ancestry&&d.ancestry.value)||'—')}</b><span>${esc(t('web.metrics.panel_label'))}</span></div>
     </div>
     <div class="toolbar">
@@ -3413,7 +3523,7 @@ async function renderPerson(root, given){
     <div id="madd" class="hidden"></div>
     <div class="grid" id="mgrid"></div>`;
   const g=$('#mgrid',root);
-  d.metrics.forEach(m=>g.appendChild(metricCard(m)));
+  if(!compact) d.metrics.forEach(m=>g.appendChild(metricCard(m)));
   // the profile
   const pf=$('#mprof',root);
   // The year of birth may be stored as a full date (a medical record and the
@@ -3568,7 +3678,7 @@ function bulletBoard(snap){
 // same metric and nobody has said which one answers, the card says that too, and
 // the value is greyed out of every conclusion on the page.
 function srcTag(m){
-  if(!m.source) return '';
+  if(!m.source) return `<div class="srcline">${esc(t('web.phenotype.recorded'))}</div>`;
   const also=(m.also_measured_by||[]);
   const name=esc(t('web.life.device.'+m.source));
   if(!also.length) return `<div class="srcline">${esc(t('web.life.measured_by',{device:name}))}</div>`;
@@ -3584,7 +3694,7 @@ function lifeCard(m){
   const ST={ok:{cls:'b-good',key:'web.life.ok'},warn:{cls:'b-warning',key:'web.life.warn'},
             bad:{cls:'b-critical',key:'web.life.bad'},none:{cls:'b-unknown',key:'web.life.none'}};
   const s=ST[m.status]||ST.none;
-  let trendTxt='→ '+t('web.life.stable'), tcol='var(--muted)';
+  let trendTxt=m.trend?'→ '+t('web.life.stable'):'', tcol='var(--muted)';
   if(m.trend&&m.trend.direction!=='flat'){
     const ar=m.trend.direction==='up'?'↑':'↓';const dl=m.trend.delta;
     trendTxt=`${ar} ${t('web.life.trend_3m',{delta:(dl>0?'+':'')+dl})}`;
@@ -3593,11 +3703,11 @@ function lifeCard(m){
   const statusBadge=(m.status&&m.status!=='none')?badge(s.cls,t(s.key)):'';
   return el(`<div class="cr-card card">
     <div class="label">${esc(m.label)}</div>
-    <div class="value">${esc(m.value)} <small>${esc(m.unit)}</small></div>
+    <div class="value">${esc(m.value==null?'—':m.value)} <small>${esc(m.unit)}</small></div>
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
-    ${m.series&&m.series.length>1?sparkline(m.series,false):''}
+    ${m.measurement_series?m.measurement_series.map(o=>`<div class="srcline">${esc(o.source?t('web.life.measured_by',{device:t('web.life.device.'+o.source)}):t('web.phenotype.recorded'))} · ${esc(o.aggregation==='monthly_mean'?t('web.life.monthly_mean'):t('web.life.dated_readings'))}</div>${o.series.length>1?sparkline(o.series,false):''}`).join(''):(m.series&&m.series.length>1?sparkline(m.series,false):'')}
     ${srcTag(m)}
-    <div class="meta">${esc(t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>${clinicalBasisHTML(m)}
+    <div class="meta">${esc(m.value_smooth==null?fmtDate(m.date):t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>
   </div>`);
 }
 
@@ -3826,11 +3936,17 @@ function genomeCard(r){
   </div>`;
 }
 function prsPercentile(p){return p==null?'—':Number(p.toFixed(2))>=100?'≥P99.99':Number(p.toFixed(2))<=0?'≤P0.01':'P'+String(Number(p.toFixed(2)));}
-function pctBar(p,reliable){
-  if(p==null)return `<div class="muted small">${esc(t('web.prs.no_model'))}</div>`;
-  const col=p>=80?'var(--warning)':(p<=20?'var(--good)':'var(--accent)');
+function pctBar(p,reliable,hasModel=false){
+  if(p==null)return `<div class="muted small">${esc(t(hasModel?'web.prs.unverified':'web.prs.no_model'))}</div>`;
+  const col=!reliable?'var(--muted)':p>=80?'var(--warning)':(p<=20?'var(--good)':'var(--accent)');
   const op=reliable?1:0.4;
   return `<div class="pbar" style="opacity:${op}"><div class="pbar-fill" style="width:${Math.max(2,Math.min(100,p))}%;background:${col}"></div><span class="pbar-mark" style="left:${Math.max(0,Math.min(100,p))}%"></span></div>`;
+}
+function prsModelDetails(tr){
+  const st=tr.stability||{}, info=tr.informativeness||{};
+  const coverage=t('web.prs.coverage',{positions:st.coverage_pct==null?'—':st.coverage_pct,weights:st.weight_pct==null?'—':st.weight_pct});
+  const accuracy=info.auroc==null?t('web.prs.accuracy_missing'):t('prs.info_auroc',{auroc:info.auroc})+'. '+t('web.prs.accuracy_note');
+  return `<details class="fold"><summary>${esc(t('web.prs.details'))}</summary><p class="cr-caption">${esc(coverage)}</p><p class="cr-caption">${esc(accuracy)}</p>${tr.reading_note?`<p class="cr-caption">${esc(tr.reading_note)}</p>`:''}${tr.reference_note?`<p class="cr-caption">${esc(tr.reference_note)}</p>`:''}${tr.reference_validation&&/^https:\/\//.test(tr.reference_validation.source||'')?`<a class="small" href="${esc(/^https:\/\//.test(tr.reference_validation.source)?tr.reference_validation.source:"#")}" target="_blank" rel="noopener">${esc(t('web.genome.nav_sources'))}</a>`:''}</details>`;
 }
 // ---- render helpers (they return HTML) for the combined "Genome" tab ----
 function renderPRS(d){
@@ -3855,23 +3971,25 @@ function renderPRS(d){
   // the badge for the first time has to leave the page to learn that it is a
   // position in a population and not a probability — so the badge says it where
   // it stands. The wording is the Guide's own, not a second one written here.
-  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning',prsPercentile(tr.percentile),t('web.guide.term_prs_body'))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div></div>`).join('');
+  const high=d.high.map(tr=>`<div class="list-item"><div class="row"><b>${esc(tr.label)}</b> ${badge('b-warning',prsPercentile(tr.percentile),t('web.guide.term_prs_body'))} <span class="muted">${esc(tr.category)}</span></div><div class="why">${esc(t('web.prs.above_average',{pop:s.superpopulation||'EUR'}))}${tr.effect_size?' · '+esc(tr.effect_size):''}</div>${prsModelDetails(tr)}</div>`).join('');
   let cats='';
   d.categories.forEach(c=>{
     const rows=c.traits.map(tr=>{
       const rel=tr.reliable;const pv=prsPercentile(tr.percentile);
       const warn=(!rel&&tr.percentile!=null)?` <span class="muted" title="${esc(t('web.prs.low_coverage'))}">⚠</span>`:'';
-      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}${tr.calibration_note?`<div class="why muted">${esc(tr.calibration_note)}</div>`:''}</div><div class="prs-bar">${pctBar(tr.percentile,rel)}</div><div class="prs-num" title="${esc(t('web.guide.term_prs_body'))}">${esc(pv)}</div></div>`;
+      return `<div class="prs-row"><div class="prs-lbl">${esc(tr.label)}${warn}${tr.reliability_note?`<div class="cr-caption">${esc(tr.reliability_note)}</div>`:''}${prsModelDetails(tr)}${tr.calibration_note?`<details class="fold"><summary>${esc(t('web.prs.unverified'))}</summary><div class="why muted">${esc(tr.calibration_note)}</div></details>`:''}</div><div class="prs-bar">${tr.pgs_id?`<a href="https://www.pgscatalog.org/score/${esc(tr.pgs_id)}/" target="_blank" rel="noopener">${esc(tr.pgs_id)}</a>`:''}${pctBar(tr.percentile,rel,!!tr.pgs_id)}</div><div class="prs-num" title="${esc(t('web.guide.term_prs_body'))}">${esc(pv)}${!rel&&tr.percentile!=null?`<div class="cr-caption">${esc(t('web.prs.incomplete'))}</div>`:''}</div></div>`;
     }).join('');
     cats+=`<div class="prs-cat"><div class="prs-cat-h">${esc(c.category)}</div>${rows}</div>`;
   });
-  return `${prov}${populationNote}${panelNote}<div class="stat">
+  const recalculate=d.recalculation&&d.recalculation.required
+    ?`<div class="cr-card card mb-2"><b>${esc(d.recalculation.title)}</b><p>${esc(d.recalculation.note)}</p><button class="cr-btn cr-btn--ghost" data-recompute-open>${esc(t('prs.recalculate.open'))}</button></div>`:'';
+  return `${recalculate}${prov}${populationNote}${panelNote}<div class="stat">
       <div class="s"><b>${s.total}</b><span>${esc(t('web.prs.stat_traits'))}</span></div>
       <div class="s"><b>${s.reliable}</b><span>${esc(t('web.prs.stat_reliable'))}</span></div>
       <div class="s"><b>${s.high}</b><span>${esc(t('web.prs.stat_high'))}</span></div>
     </div>
-    <div class="meta mb-2">${esc(d.disclaimer)} ${esc(t('web.prs.scale_note'))}</div>
-    ${high?`<div class="so-h">${esc(t('web.prs.high_h'))}</div>${high}`:''}
+    <div class="meta mb-2">${esc(d.disclaimer)} ${esc(t('prs.verified_definition'))}</div>
+    ${high?`<div class="so-h">${esc(t('web.prs.high_h'))}</div><p class="cr-caption">${esc(d.high_note||'')}</p>${high}`:''}
     <div class="so-h">${esc(t('web.prs.all_h'))}</div>
     <div class="muted" style="font-size:12.5px;margin-bottom:8px">${esc(t('web.prs.legend'))}</div>
     ${cats}`;
@@ -3883,23 +4001,14 @@ function renderPRS(d){
 // languages, and none of it was being read.
 const _LVERDICT={plus:'b-good',plus_partial:'b-good',lean_plus:'b-good',good:'b-good',
                  neutral:'b-unknown',flag:'b-warning'};
-function longevityRow(k){
-  // The engine resolved both of these to sentences, or to nothing. It has the
-  // token sets; the page has neither, and a page that composes a message key out
-  // of a value from a stored file prints the key at the reader.
-  const mk=badge(_LVERDICT[k.verdict_token]||'b-unknown', k.verdict_label||'—');
-  const conf=k.confidence_label?`<span class="muted small">${esc(k.confidence_label)}</span>`:'';
-  const pm=(k.pmids||[]).length?`<div class="meta">PMID: ${(k.pmids||[]).map(x=>
-    `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(x)}/" target="_blank" rel="noreferrer noopener">${esc(x)}</a>`).join(', ')}</div>`:'';
-  return `<div class="list-item"><div class="row">${mk}<b>${esc(k.gene)}</b>
-      <span class="muted">${esc(t('web.genome.genotype'))} <b>${esc(k.genotype||'—')}</b></span>
-      <code style="margin-left:auto">${esc(k.rsid)}</code></div>
-    ${k.label?`<div class="why">${esc(k.label)}</div>`:''}
-    ${k.zygosity_note?`<div class="why muted">${esc(k.zygosity_note)}</div>`:''}
-    ${k.population_note?`<div class="why c-warning">⚠ ${esc(k.population_note)}</div>`:''}
-    ${k.action?`<div class="why muted">${esc(t('web.longevity.action_h'))}: ${esc(k.action)}</div>`:''}
-    ${clinicalBasisHTML(k,true)}${conf}${pm}</div>`;
+function genomeGeneTable(rows){
+  if(!rows.length) return '';
+  return `<div class="tblwrap"><table class="cr-table cr-table--compact dt gentbl" data-genome-gene-table><thead><tr>
+    <th>${esc(t('web.gen.col_confidence'))}</th><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_reading'))}</th><th>${esc(t('web.gen.col_what'))}</th>
+    </tr></thead><tbody>${rows.map(k=>`<tr><td>${levelChip(k.level)||'—'}</td><td><b>${esc(k.gene||'—')}</b><div class="small muted">${esc(k.rsid||'')}</div></td><td>${esc(k.genotype||'—')}${k.verdict_label?`<div class="small">${esc(k.verdict_label)}</div>`:''}</td><td>${geneticBriefHtml(k,DISPLAY_MODE,k.label||k.note||'')}${(k.pmids||[]).length?`<details class="fold"><summary>${esc(t('web.gen.context_details'))} · PMID</summary>${k.pmids.map(id=>`<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(id)}/" target="_blank" rel="noopener">${esc(id)}</a>`).join(' · ')}</details>`:''}</td></tr>`).join('')}</tbody></table></div>`;
 }
+function longevityRow(k){return genomeGeneTable([k]);}
+
 function renderLongevity(d){
   if(!d||!d.available)return `<div class="cr-card card muted">${esc((d&&d.message)||t('web.longevity.not_ready'))}</div>`;
   const ap=d.apoe;
@@ -3909,8 +4018,8 @@ function renderLongevity(d){
   // working, and working belongs underneath.
   const apCard=ap?`<div class="cr-card card">
     <div class="row"><b style="font-size:17px">APOE</b>
-      ${badge('b-unknown',ap.epsilon||ap.genotype||'—')}</div>
-    <div class="why">${esc(t('clinical.genome_limit'))}</div>${clinicalBasisHTML(ap,true)}
+      ${badge('b-unknown',ap.status==='ambiguous_without_phase'?(ap.candidates||[]).join(' / '):ap.epsilon||ap.genotype||'—')} ${levelChip(ap.level)}</div>
+    ${ap.interpretation?`<p>${esc(ap.interpretation.summary)}</p><details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary><p>${esc(ap.interpretation.mechanism)}</p><p>${esc(ap.interpretation.limitations)}</p><p>${esc(ap.interpretation.evidence_reason)}</p><p>${esc(ap.interpretation.source)}</p></details>`:`<p>${esc(ap.message||t('genome.apoe_unconfirmed'))}</p>`}
     <details class="fold"><summary>${esc(t('web.longevity.technical'))}</summary>
       <div class="meta mt-1">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b></div>
       ${ap.note?`<div class="meta mt-1">${esc(t('web.longevity.stored_note'))}: ${esc(ap.note)}</div>`:''}
@@ -3923,25 +4032,22 @@ function renderLongevity(d){
   // more findings under it. They are shown there, inside «how this is computed»,
   // so nothing is lost by not listing them twice.
   const listed=rows.filter(k=>k.verdict_token!=='see_apoe');
-  const unresolved=listed.filter(k=>k.unresolved_count);
-  const found=listed.filter(k=>!k.unresolved_count&&k.verdict_token&&k.verdict_token!=='neutral');
-  const quiet=listed.filter(k=>k.verdict_token==='neutral');
-  const known=`${found.length?`<div class="so-h">${esc(t('web.longevity.found_h'))} · ${found.length}</div>`+found.map(longevityRow).join('')
-      :`<div class="muted" style="margin-top:12px">${esc(t('clinical.genome_limit'))}</div>`}
-    ${unresolved.length?`<div class="so-h">${esc(t('clinical.withheld'))} · ${unresolved.length}</div>${unresolved.map(longevityRow).join('')}`:''}
-    ${quiet.length?`<details class="fold"><summary>${esc(t('web.longevity.quiet_h'))} · ${quiet.length}</summary>${quiet.map(longevityRow).join('')}</details>`:''}`;
-  const genes=d.significant_genes.slice(0,24).map(g=>`<button class="cr-btn cr-btn--ghost" style="cursor:default" title="${esc(g.variants.map(v=>v.rsid+' '+v.genotype).join(', '))}">${esc(g.gene)}: ${g.variants.length}</button>`).join('');
+  const described=listed.filter(k=>k.interpretation?.summary||k.reference_context?.variant_status==='described');
+  const uncurated=listed.filter(k=>!described.includes(k));
+  const known=`${described.length?`<div class="so-h">${esc(t('web.longevity.context_h'))} · ${described.length}</div>${genomeGeneTable(described)}`:''}
+    ${uncurated.length?`<details class="fold"><summary>${esc(t('web.longevity.uncurated_h'))} · ${uncurated.length}</summary><p class="cr-caption">${esc(d.catalogue_note||'')}</p>${genomeGeneTable(uncurated)}</details>`:''}`;
+  const genes=(d.significant_genes||[]).map(g=>`<details class="fold"><summary><b>${esc(g.gene)}</b> · ${g.variants.length}</summary>${geneticBriefHtml(g,DISPLAY_MODE,'',true)}${genomeGeneTable(g.variants)}</details>`).join('');
   const st=d.stats;
   return `<div class="stat">
       <div class="s"><b>${st.genotyped??'—'}</b><span>${esc(t('web.longevity.stat_checked'))}</span></div>
       <div class="s"><b>${st.significant_carriers??'—'}</b><span>${esc(t('web.longevity.stat_carrier'))}</span></div>
       <div class="s"><b>${st.significant_genes??'—'}</b><span>${esc(t('web.longevity.stat_genes'))}</span></div>
     </div>
+    <p class="cr-caption">${esc(d.count_note||'')}</p>
     ${apCard}
     ${known}
-    <div class="so-h">${esc(t('web.longevity.by_gene_h'))}</div>
-    <div class="muted" style="font-size:12.5px;margin-bottom:6px">${esc(t('web.longevity.by_gene_note'))}</div>
-    <div class="drugchips">${genes||'—'}</div>`;
+    <details class="fold" data-longevity-catalogue><summary>${esc(t('web.longevity.catalogue'))} · ${st.significant_carriers??'—'} / ${st.significant_genes??'—'}</summary>
+    <p class="cr-caption">${esc(d.catalogue_note||'')}</p><div>${genes||'—'}</div></details>`;
 }
 // The inherited half of a lipid profile, in one card: PCSK9 carriage and Lp(a).
 // They live here rather than one per tab because each is misread alone — a low
@@ -3953,7 +4059,7 @@ function renderLipidGenetics(d){
   if(!d||d.status!=='ok') return '';
   const rows=(d.pcsk9||[]).map(x=>{
     const badgeFor = x.status==='read'
-      ? (x.carrier?badge('b-unknown',t('lipidgen.carrier')):badge('b-unknown',t('lipidgen.not_carrier')))
+      ? (x.carrier==null?badge('b-unknown',t('lipidgen.direction_unknown')):x.carrier?badge('b-unknown',t('lipidgen.carrier')):badge('b-unknown',t('lipidgen.not_carrier')))
       : badge('b-unknown',t('lipidgen.unread'));
     return `<div class="list-item"><div class="row">${badgeFor}<b>${esc(x.gene)}</b>
         <code>${esc(x.rsid)}</code>
@@ -3961,12 +4067,12 @@ function renderLipidGenetics(d){
       ${x.label?`<div class="why">${esc(x.label)}</div>`:''}
       ${x.verdict?`<div class="why">${esc(x.verdict)}</div>`:''}
       ${x.population_note?`<div class="why c-warning">⚠ ${esc(x.population_note)}</div>`:''}
-      ${x.action?`<div class="why muted">${esc(x.action)}</div>`:''}
-      ${clinicalBasisHTML(x)}
+      ${x.action?`<div class="why muted">${esc(x.action)}</div>`:''}${x.variant_note?`<details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary><p>${esc(x.variant_note)}</p></details>`:''}
+      ${levelChip(x.level)}${geneticBriefHtml(x,DISPLAY_MODE)}
       ${(x.pmids||[]).length?`<div class="meta">PMID: ${(x.pmids||[]).map(pm=>
         `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(pm)}/" target="_blank" rel="noreferrer noopener">${esc(pm)}</a>`).join(', ')}</div>`:''}
     </div>`;}).join('');
-  const waiting=(d.pcsk9_waiting||[]).map(w=>`<div class="list-item" style="opacity:.7">
+  const waiting=(d.pcsk9_waiting||[]).filter(w=>!(d.pcsk9||[]).some(x=>x.rsid===w.rsid)).map(w=>`<div class="list-item" style="opacity:.7">
       <div class="row"><code>${esc(w.rsid)}</code> <b>${esc(w.gene)}</b></div>
       <div class="why">${esc(w.why||'')}</div></div>`).join('');
   const l=d.lpa||{}; const m=l.measured;
@@ -3976,7 +4082,8 @@ function renderLipidGenetics(d){
     : `<div class="cr-card card muted">${esc(l.what_to_do||t('clinical.withheld'))}${clinicalBasisHTML(l)}</div>`;
   const est = l.estimate
     ? `<div class="list-item"><div class="row"><b>${esc(l.estimate.label||'')}</b>
-         <span class="muted">${esc(String(l.estimate.percentile))} · ${esc(l.estimate.pgs_id||'')} · ${esc(l.estimate.quality||'')}</span></div>
+         <span class="muted">${esc(l.estimate.reliable?prsPercentile(l.estimate.percentile):t('web.prs.unverified'))} · ${esc(l.estimate.pgs_id||'')} · ${esc(l.estimate.quality||'')}</span></div>
+       ${[l.estimate.calibration_note,l.estimate.reliability_note,l.estimate.reading_note,l.estimate.reference_note].filter(Boolean).length?`<details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary>${[l.estimate.calibration_note,l.estimate.reliability_note,l.estimate.reading_note,l.estimate.reference_note].filter(Boolean).map(n=>`<p>${esc(n)}</p>`).join('')}</details>`:''}
        <div class="why c-warning">⚠ ${esc(l.estimate_is_not_a_measurement||'')}</div></div>`
     : '';
   return `<div class="cr-card card mb-2"><b>${esc(d.headline||'')}</b>
@@ -3998,7 +4105,7 @@ function renderClinvar(cv){
     const sigTxt=clnsigText(h.clnsig);
     const dis=h.disease?`<div class="why">${esc(diseaseText(h.disease))}</div>`:'';
     const rv=(h.review||'').indexOf('expert')>=0?' · '+esc(t('web.clinvar.experts')):((h.review||'').indexOf('multiple')>=0?' · '+esc(t('web.clinvar.several_labs')):'');
-    return `<div class="list-item"><div class="row">${badge(cls,sigTxt)} <code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> <span class="muted">${esc(h.chrom)}:${esc(h.pos)} ${esc(h.ref)}→${esc(h.alt)}</span> ${esc(t('web.genome.genotype'))} <b>${esc(h.genotype||'')}</b><span class="muted small">${rv}</span></div>${dis}</div>`;
+    return `<div class="list-item"><div class="row">${badge(cls,sigTxt)} <code>${esc(isRsid(h.rsid)?h.rsid:'—')}</code> <span class="muted">${esc(h.chrom)}:${esc(h.pos)} ${esc(h.ref)}→${esc(h.alt)}</span> ${esc(t('web.genome.genotype'))} <b>${esc(h.genotype||'')}</b><span class="muted small">${rv}</span></div>${dis}${(h.gene_contexts||[]).length?genomeGeneTable(h.gene_contexts.map(k=>({...k,genotype:h.genotype}))):`<div class="cr-caption">${esc(t('web.genome.gene_missing'))}</div>`}<details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary><div class="why">${esc(h.review_confidence||'')}${rv}</div></details></div>`;
   };
   const tmeta={};(cv.tiers||[]).forEach(x=>tmeta[x.key]=x);
   const noiseN=(cv.counts.association||0)+(cv.counts.uncertain||0);
@@ -4108,8 +4215,8 @@ function genomeFindings(cv, prs, lng, lip){
   // `rs` is set for a row that names a VARIANT: it opens the variant card. A
   // ClinVar row used to put the rsID in the gene slot, and a click asked the
   // gene endpoint about «rs…» — an empty card that looked like a gene with nothing.
-  const push = (rail, gene, badgeCls, badgeTxt, said, src, rs) =>
-    rows.push({rail, gene, badgeCls, badgeTxt, said, src, rs});
+  const push = (rail, gene, badgeCls, badgeTxt, said, src, rs, contexts=[]) =>
+    rows.push({rail, gene, badgeCls, badgeTxt, said, src, rs, contexts});
   // 1. what a doctor would act on
   (cv && cv.status === 'ok' ? (cv.hits || []) : []).forEach(h => {
     if (h.tier !== 'pathogenic' && h.tier !== 'drug') return;
@@ -4117,7 +4224,7 @@ function genomeFindings(cv, prs, lng, lip){
     push(h.tier === 'pathogenic' ? 'crit' : 'warn', isRsid(h.rsid) ? h.rsid : [h.chrom, h.pos].filter(Boolean).join(':'),
          h.tier === 'pathogenic' ? 'b-critical' : 'b-warning', sig,
          diseaseText(h.disease), 'ClinVar' + (h.stars ? ' · ' + h.stars + '★' : ''),
-         isRsid(h.rsid) ? h.rsid : '');
+         isRsid(h.rsid) ? h.rsid : '', (h.gene_contexts || []).map(c=>({...c,genotype:h.genotype})));
   });
   // 2. the inherited half of the lipid profile
   if (lip && lip.status === 'ok') {
@@ -4125,8 +4232,8 @@ function genomeFindings(cv, prs, lng, lip){
       if (x.status !== 'read') return;
       push(x.carrier ? 'good' : 'info', x.gene,
            x.carrier ? 'b-good' : 'b-unknown',
-           t(x.carrier ? 'lipidgen.carrier' : 'lipidgen.not_carrier'),
-           x.verdict || x.label || '', t('web.genome.nav_lipids'));
+           t(x.carrier==null ? 'lipidgen.direction_unknown' : x.carrier ? 'lipidgen.carrier' : 'lipidgen.not_carrier'),
+           x.verdict || x.label || '', t('web.genome.nav_lipids'), x.rsid, [x]);
     });
     const l = (lip.lpa || {});
     if (!l.measured && l.what_to_do)
@@ -4143,7 +4250,7 @@ function genomeFindings(cv, prs, lng, lip){
   ((lng && lng.available ? (lng.known || []) : [])).forEach(k => {
     if (k.carries_named_allele !== true) return;
     push('good', k.gene, 'b-good', t('web.longevity.carries'), k.note || '',
-         t('web.genome.nav_longevity'));
+         t('web.genome.nav_longevity'), k.rsid, [k]);
   });
   // 4. a position in a population, last, because that is what it is
   ((prs && prs.available ? (prs.high || []) : [])).forEach(tr => {
@@ -4156,7 +4263,8 @@ function genomeFindings(cv, prs, lng, lip){
       : (r.gene && !/:/.test(r.gene) ? ` data-gene-open="${esc(r.gene)}" style="cursor:pointer"` : '')}>
       <div class="row">${badge(r.badgeCls, r.badgeTxt)}${r.gene ? `<b>${esc(r.gene)}</b>` : ''}
         <span class="muted" style="margin-left:auto;font-size:12.5px">${esc(r.src)}</span></div>
-      ${r.said ? `<div class="why">${esc(r.said)}</div>` : ''}</div>`).join('');
+      ${r.said ? `<div class="why">${esc(r.said)}</div>` : ''}
+      ${r.contexts.length ? genomeGeneTable(r.contexts.map(c=>({...c, genotype:c.genotype||'', rsid:c.rsid||r.rs}))) : ''}</div>`).join('');
   return `<div class="meta mb-2">${esc(t('web.genome.findings_note'))}</div>${body}`;
 }
 
@@ -4183,6 +4291,7 @@ function geneRegionCard(d){
     ${list([`${loc.chrom}:${loc.start}–${loc.end} (${loc.strand}) · ${loc.assembly} · ${loc.transcript||'—'}`,
       t('gene.coords_from',{source:loc.source_file||loc.source||'—'}),...coverage,
       t('gene.counts',{total:v.total??'—',coding:v.coding??'—',consequential:v.consequential??t('gene.not_computed')})])}
+    ${d.reference_context ? genomeGeneTable([d]) : ''}
     ${list(rows.length?rows:[t('gene.coding_none')])}
     ${list(hits.length?[t('gene.flagged'),...hits.map(h=>`${h.chrom}:${h.pos} ${h.rsid||''} ${h.genotype||''} — ${h.clnsig||''}`)]:[t('gene.no_flagged')])}
     ${list((d.gaps||[]).map(g=>`${g.what}${g.fix?' · '+g.fix:''}`))}
@@ -4222,7 +4331,7 @@ function geneCard(d, cv, lng, lip, sys){
         `<div>${esc(k.note || '')}</div>`).join('') : '—')}
       ${cell(t('web.genome.nav_lipids'), lipRows.length ? lipRows.map(x =>
         `<div>${esc(x.verdict || x.label || '')}</div>`).join('') : '—')}
-    </div>${inSystems}</div>`;
+    </div>${geneticBriefHtml(d,DISPLAY_MODE)}${inSystems}</div>`;
 }
 
 // The second entry, on the page. The classes are listed beside the answer and
@@ -4257,8 +4366,8 @@ function screenClassHtml(r){
     const bits=[];
     if(g.findings)bits.push(esc(t('screen.gene_findings',{n:g.findings})));
     if(g.read===false)bits.push(esc(t('screen.gene_unread')));
-    return `<div class="list-item"><b>${esc(g.gene)}</b> — ${esc(g.phenotype||'—')}, ${esc(g.inheritance||'—')}`
-         + (bits.length?` <span class="muted">· ${bits.join(' · ')}</span>`:'')+`</div>`;
+    return `<div class="list-item">${levelChip(g.level)} <b>${esc(g.gene)}</b> — ${esc(g.phenotype||'—')}, ${esc(g.inheritance||'—')}`
+         + (bits.length?` <span class="muted">· ${bits.join(' · ')}</span>`:'')+geneticBriefHtml(g,DISPLAY_MODE)+`</div>`;
   }).join('');
   return `<div class="lsact" style="margin-bottom:10px">${esc(screenVerdictLine(r.verdict))}</div>${rows}`;
 }
@@ -4286,7 +4395,7 @@ async function viewGenome(root){
   const panes=[
     ['find', t('web.genome.nav_findings'), '', ()=>genomeFindings(cv,prs,lng,lip)],
     ['risks',t('web.genome.nav_risks'), n(prs&&prs.available?prs.stats.total:null), ()=>renderPRS(prs)],
-    ['long', t('web.genome.nav_longevity'), n(lng&&lng.available?lng.stats.genotyped:null), ()=>renderLongevity(lng)],
+    ['long', t('web.genome.nav_longevity'), lng&&lng.available?n(t('web.longevity.positions',{count:lng.stats.genotyped})):'', ()=>renderLongevity(lng)],
     ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
     ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)+weakBedHtml(wb)],
     ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="cr-card card muted">${esc(t('web.genome.db_after_script'))}</div>`],
@@ -4364,7 +4473,7 @@ async function viewGenome(root){
     const x=$('#gc-close',root); if(x)x.onclick=()=>{++lookup;card.innerHTML='';};
     card.scrollIntoView({block:'nearest'});}
   async function go(){const rs=$('#g-in',root).value.trim();if(!rs)return; return /^rs\d+$/i.test(rs)?openRs(rs):openGene(rs);}
-  root.querySelectorAll('[data-rs-open]').forEach(b=>b.onclick=()=>openRs(b.dataset.rsOpen));
+  root.querySelectorAll('[data-rs-open]').forEach(b=>b.onclick=e=>{if(!e.target.closest('a,button,summary,details'))openRs(b.dataset.rsOpen);});
   $('#g-go',root).onclick=go;$('#g-in',root).addEventListener('keydown',e=>{if(e.key==='Enter')go();});
   // updates: the button
   const ub=$('#upd-btn',root); if(ub) ub.onclick=async()=>{
@@ -4604,19 +4713,39 @@ function markCurrentTab(i){
     if(active) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
   });
 }
+let _profileRevision=null;
+let _revisionRead=null;
+async function refreshProfileAnswers(){
+  if(_revisionRead) return _revisionRead;
+  const epoch=_answerEpoch;
+  _revisionRead=(async()=>{
+    const p=await api('/api/ping').catch(()=>null);
+    if(epoch!==_answerEpoch||!p?.profile_revision) return false;
+    const changed=_profileRevision!==null&&_profileRevision!==p.profile_revision;
+    _profileRevision=p.profile_revision;
+    if(changed){forgetAnswers();_sources=null;_systems=null;}
+    return changed;
+  })();
+  try{return await _revisionRead;}finally{_revisionRead=null;}
+}
 function mount(i){
   current=i;
   markCurrentTab(i);
   // Each render owns its node. A late response from the previous tab (or
   // language/theme) can only fill a detached node, never the current screen.
   const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);showLoader(v);
-  return Promise.resolve().then(()=>TABS[i][1](v)).catch(e=>{
+  return refreshProfileAnswers().then(()=>v.isConnected?TABS[i][1](v):null).catch(e=>{
     if(v.isConnected) v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message);
   });
 }
 
 // The parts of the page that live outside the tabs. Redrawn on a language switch, so
 // that switching does not require a reload and does not lose the tab one is reading.
+window.addEventListener('focus',async()=>{
+  if(await refreshProfileAnswers()){
+    if(!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus')) mount(current);
+  }
+});
 let _version=null;
 let _synthetic=false;
 function renderDemoBanner(){
@@ -4702,8 +4831,8 @@ function rcAttention(p){
 // reload after a run, showing the report of a run the person had just watched.
 // Attention is owed to a step that is ready and has not been shown yet.
 function rcFingerprint(p){
-  return (p.steps||[]).filter(s=>s.source==='data'&&s.state==='ready')
-    .map(s=>s.command).sort().join('|');}
+  return (p.steps||[]).filter(s=>s.source==='data'&&(s.state==='ready'||s.attention_key))
+    .map(s=>s.attention_key||s.command).sort().join('|');}
 function rcSeen(){try{return localStorage.getItem('scholion.rc.seen')||'';}catch(e){return '';}}
 function rcRemember(p){try{localStorage.setItem('scholion.rc.seen',rcFingerprint(p));}catch(e){}}
 function renderRecompute(){
@@ -4713,7 +4842,7 @@ function renderRecompute(){
   const j=p.job||{}, running=j.status==='running', steps=p.steps||[];
   if(!_rcOpen&&!running&&j.status!=='interrupted'){
     box.hidden=false;
-    box.innerHTML=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span>${esc(t('web.recompute.pending',{steps:plural(p.ready||0,'count.steps')}))}</span>`
+    box.innerHTML=`<div class="row"><b>${esc(t('web.recompute.h'))}</b> <span>${esc(t('web.recompute.pending',{steps:plural((p.ready||0)+(p.steps||[]).filter(s=>s.attention_key).length,'count.steps')}))}</span>`
       +`<button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" id="rc-open">${esc(t('web.recompute.open'))}</button>`
       +`<button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" id="rc-later">${esc(t('web.recompute.later'))}</button></div>`;
     $('#rc-open').onclick=()=>{_rcOpen=true; renderRecompute();};
@@ -4750,7 +4879,7 @@ async function pollRecompute(){
 document.addEventListener('click',e=>{ if(e.target.closest('[data-recompute-open]')) openRecompute(); });
 // A row of the genetic table opens into the card it used to be.
 document.addEventListener('click',e=>{
-  if(e.target.closest('a,button,.lvl'))return;
+  if(e.target.closest('a,button,.lvl')||e.target.closest('tr.genrow details'))return;
   const tr=e.target.closest('tr.genrow'); if(!tr) return;
   const id=tr.getAttribute('data-genrow');
   const det=tr.parentNode.querySelector(`tr.gendet[data-gendet="${CSS.escape(id)}"]`);
@@ -4845,17 +4974,17 @@ function authorNoteHtml(p,register){
   return `<div class="why author-note"><b>${esc(n.label)}</b>${n.translation_label?' — '+esc(n.translation_label):''}`
     +`<p>${esc(n.text).replace(/\n/g,'<br>')}</p><div class="muted">${esc(n.caveat)}</div></div>`;
 }
-function passportHtml(p, register){
+function passportHtml(p, register,omitReported=false){
   const pp=p.passport;
   if(!pp) return p.value_only?`<div class="why muted">${esc(t('web.hyp.value_e'))}</div>`:'';
   if(register!=='clinician'){
     const source=pp.source?`<div class="small muted">${esc(t('system.hyp.part.source',{value:pp.source}))}</div>`:'';
-    return `<div class="why" data-hypothesis><b>${esc(t('web.hyp.head',{level:pp.level}))}</b> ${esc(pp.reported||p.reference_context?.variant_context||t('system.hyp.no_sentence'))}${source}</div>`;
+    return `<div class="why" data-hypothesis><b>${esc(t('web.hyp.head',{level:pp.level}))}</b> ${omitReported?'':esc(pp.reported||p.reference_context?.variant_context||t('system.hyp.no_sentence'))}${source}</div>`;
   }
   const parts=['why_this_level','mechanism','effect','population','study','replication','would_confirm','would_refute','source']
     .filter(k=>pp[k]).map(k=>`<div class="small">${esc(t('system.hyp.part.'+k,{value:pp[k]}))}</div>`).join('');
   const miss=(pp.missing||[]).length?`<div class="small muted">${esc(t('system.hyp.missing',{parts:pp.missing.map(m=>t('system.hyp.name.'+m)).join(', ')}))}</div>`:'';
-  return `<div class="why" data-hypothesis><b>${esc(t('web.hyp.head',{level:pp.level}))}</b> ${esc(pp.reported||t('system.hyp.no_sentence'))}${parts}${miss}</div>`;
+  return `<div class="why" data-hypothesis><b>${esc(t('web.hyp.head',{level:pp.level}))}</b> ${omitReported?'':esc(pp.reported||t('system.hyp.no_sentence'))}${parts}${miss}</div>`;
 }
 
 // Only Visit offers a patient choice, and only if there is a choice to make.

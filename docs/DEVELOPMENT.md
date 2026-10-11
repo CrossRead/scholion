@@ -378,3 +378,33 @@ clinical carrier counts, inheritance questions and verdicts use that field.
 Gene-level rows retain their existing clinical carrier meaning. Withholding a
 sentence preserves the reading and identifies `pending_why: conclusion_basis`;
 `no_text_for_state` means the sentence itself has not been written.
+
+## Reading radar cards together
+
+`scholion system --all --register clinician --json` and
+`GET /api/systems?register=clinician` read the same system cards in one reading.
+The unqualified systems listing remains unchanged. The batch adds `cards` keyed
+by system and derives its reading counts from those cards. Input discovery,
+coverage references and prescription classification are reused only within the
+reading, with copies returned to callers; no personal result persists between
+readings. The web paints the diagram before the batch returns and seeds its
+existing language/register cache only if the answer epoch still matches.
+
+## PGS dosage and repeat calculation
+
+The local scoring layer decodes both GT indices against the complete REF/ALT
+list, with case normalisation and a single-sample input requirement. Missing,
+partial, conflicting and unresolved calls are excluded; an absent scoring
+position is never imputed from a variant-only VCF. Strand reversal requires a
+known, non-palindromic SNP pair. Indels use exact allele representations.
+A private temporary disk index is shared across a report and then removed.
+Position coverage, absolute weight coverage, exclusion counts, algorithm identity
+and hashes of the model and input accompany the sum. Reference calibration is
+a separate check. A repeat run scores the pinned model first. Replacing a model
+requires an explicit model-change acceptance even if its old result was unusable.
+
+The recalculation proposal is bound to missing corrected scoring evidence, not
+to an application-version change. Legacy calibrated numbers without that evidence
+remain diagnostic. Existing scoring-site calls are reused; missing reference
+calibration never justifies re-reading BAM. Partial report merges retain per-model
+input identity instead of assigning the latest VCF to the whole report.

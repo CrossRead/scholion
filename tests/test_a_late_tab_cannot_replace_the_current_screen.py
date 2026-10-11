@@ -22,7 +22,7 @@ const assert=require('node:assert/strict');
 const handlers={},window={addEventListener:(name,fn)=>handlers[name]=fn};
 const rows=[{open:true},{open:false},{open:false}];
 const document={querySelectorAll:selector=>{
-  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])');
+  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])');
   return rows.filter(r=>!r.open);
 }};
 """ + functions + r"""
@@ -99,7 +99,7 @@ let current=0, visible;
 function node(){return {innerHTML:'',isConnected:true,cloneNode:()=>node(),
   replaceWith(next){this.isConnected=false;visible=next;}};}
 const $=()=>visible,document={querySelectorAll:()=>[]};
-const showLoader=()=>{},errorHtml=x=>x,t=x=>x;
+const showLoader=()=>{},errorHtml=x=>x,t=x=>x,refreshProfileAnswers=async()=>false;
 let first,second,fail=false;
 const TABS=[['a',v=>new Promise((resolve,reject)=>{first=()=>{
   if(fail)reject(Error('old failure'));else {v.innerHTML='A';resolve();}
@@ -108,8 +108,8 @@ const TABS=[['a',v=>new Promise((resolve,reject)=>{first=()=>{
 (async()=>{
   for(fail of [false,true]){
     visible=node();
-    const a=mount(0), b=mount(1);
-    await Promise.resolve();second();await b;first();await a;
+    const a=mount(0);await new Promise(setImmediate);
+    const b=mount(1);await new Promise(setImmediate);second();await b;first();await a;
     assert.equal(current,1);assert.equal(visible.innerHTML,'B');
   }
 })().catch(e=>{console.error(e);process.exitCode=1;});
@@ -135,3 +135,24 @@ const fetch=()=>new Promise(resolve=>{resolveRead=resolve;});
 """
         result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True, stdin=subprocess.DEVNULL)
         self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_external_import_invalidates_answers_without_discarding_unchanged_cache(self):
+        page=(support.ROOT / 'src/scholion/web/index.html').read_text(encoding='utf-8')
+        start=page.index('let _profileRevision=null;')
+        code=page[start:page.index('function mount(i){',start)]
+        script=r"""
+const assert=require('node:assert/strict');
+let _answerEpoch=0,_sources='sources',_systems='systems',cleared=0,revision='first',reply;
+const api=async()=>({profile_revision:revision});
+const forgetAnswers=()=>{_answerEpoch++;cleared++;};
+"""+code+r"""
+(async()=>{
+ assert.equal(await refreshProfileAnswers(),false);
+ assert.equal(await refreshProfileAnswers(),false);assert.equal(cleared,0);
+ revision='imported';assert.equal(await refreshProfileAnswers(),true);
+ assert.equal(cleared,1);assert.equal(_sources,null);assert.equal(_systems,null);
+ assert.equal(await refreshProfileAnswers(),false);assert.equal(cleared,1);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        result=subprocess.run([shutil.which('node'),'-e',script],text=True,capture_output=True,stdin=subprocess.DEVNULL,timeout=NODE_TIMEOUT)
+        self.assertEqual(0,result.returncode,result.stderr)

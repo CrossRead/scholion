@@ -93,6 +93,19 @@ Two rules govern the whole repository:
   this repository. Weights are downloaded by the user from
   https://www.pgscatalog.org/ under the terms of each individual score.
 
+### Independently checked PGS reference aggregates
+
+* File: `src/scholion/knowledge/prs_references.json`.
+* Project-computed means and standard deviations from the fixed IGSR / 1000
+  Genomes Phase 3 public reference, with input hashes and cohort provenance.
+* Reference publication: the 1000 Genomes Project Consortium (2015),
+  DOI:10.1038/nature15393, PMID:26432245. PGS000646 source: Fritsche et al.
+  (2020), DOI:10.1016/j.ajhg.2020.08.025, PMID:32991828.
+* No scoring weights, individual genotypes or individual reference scores are
+  redistributed. Model files are downloaded under their own source terms.
+* These statistics establish an approximate score scale, not clinical accuracy
+  or an absolute-risk model. Refresh requires a separately checked calculation.
+
 ### Everything else in `knowledge/`
 
 `acmg_sf.json`, `clinical_thresholds.json`, `dose_evidence.json`,

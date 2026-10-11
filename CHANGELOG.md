@@ -40,6 +40,64 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.7 — 11.10.2026
+
+### What you can do now
+
+**Read genetic interpretations with their confidence and limitations.** Available catalogue interpretations remain accessible at every Scholion evidence level A–E. Inspect them with `scholion system <key> --json` and `scholion panel <key>`. Missing support is identified beside the interpretation rather than hiding the recorded wording. Gene function, variant evidence and GenCC gene–disease validity remain distinct. Clinical decisions belong to the clinician; automatic findings and decision routes retain their eligibility checks.
+
+**Scan genetic panels in a consistent compact layout.** System summaries lead with the evidence letter, linked gene, reading and a short preview. Open a row's details for the full wording, sources, hypothesis passport and analytical checks. The complete catalogue starts folded in both patient and clinician views, including panels outside the radar. Evidence letters open the guide and gene names open the detailed reference.
+
+**Keep the visit agenda focused.** Catalogue gaps such as a missing genetic mechanism, an undefined risk allele or unwritten genotype wording stay in variant details instead of becoming repetitive questions to the clinician. Questions about measured values, carriership and applicable polygenic scores remain. Prescriptions use a structured table with readable class names; uncertain system assignments and correction-route support start folded.
+
+**Open the radar sooner.** The diagram appears before detailed cards finish loading. System cards are read together and reused when opened from the radar. Repeated input-file searches and coverage-reference calculations are avoided within the reading; the next reading still checks current inputs. Only supported test proposals appear in the main interface, and an empty genotype-to-laboratory comparison is omitted.
+
+**Clearer explanations in English and Russian.** Screens present results, evidence and limitations without development history. The evidence guide consistently distinguishes an available interpretation from eligibility for an automatic clinical finding.
+
+**Combine wearable and recorded weight.** Fitness presents one weight card with the current reading and separately labelled monthly device averages and dated measurements. Daily intensity minutes also populate the activity row of the current phenotype table. Factual measurement cards do not show clinical-support warnings intended for interpretations.
+
+**Read additional laboratory rows.** Recognition-only analytes now retain units printed after a reference interval, including wrapped result rows. Unknown or conflicting units still stop ingestion. Existing omitted rows require a targeted re-import of their source forms; proposed markers do not receive an inferred normal range.
+
+**See one current phenotype table.** The first tab combines current measurements, saved personal targets and dated changes within the past year. Personal focus notes and goal reasons start folded. Device history remains labelled separately from a newer recorded measurement. Imported data invalidates browser answers when the view is reopened or the application regains focus.
+
+**Review current laboratory results.** The main laboratory list and counters cover the past 12 months. Older measurements remain in expandable history and charts; they no longer appear as current deviations or current clinician-target questions. Use `scholion labs --history` for older readings. Units use the selected language without changing stored values. Unstructured legacy notes are retained in the data rather than presented as current product conclusions. Verified PGS readings with unavailable reference calibration now say which part remains unconfirmed.
+
+**Read genome references consistently.** Longevity, ClinVar, class screening, lipids and gene lookup use compact A–E descriptions with expandable sources. Scholion confidence remains separate from an external variant classification or GenCC gene–disease validity. Legacy ClinVar tables can recover gene names from an indexed local annotation using exact coordinate and allele matches.
+
+**Understand APOE results and the longevity catalogue.** Confirmed common APOE combinations have plain-language, sourced explanations with Scholion confidence and population limitations. Catalogue position counts are labelled explicitly. Literature associations without a curated variant effect remain available in a separate folded list, with publication links. All four PCSK9 positions retain their reading; an unresolved effect direction is distinct from absence of the allele.
+
+**Inspect PGS calculation separately from model accuracy.** Each trait can show called-position and weight coverage, recorded AUROC and reference provenance. A verified percentile establishes a checked population position; it does not establish clinical accuracy or an individual disease probability. An independently checked EUR reference is available for the exact supported PGS000646 model files. Its percentile is approximate and identifies the reference cohort.
+
+### What is fixed
+
+The lipid panel retains the verification status of its Lp(a) polygenic estimate and never presents an unverified percentile as an ordinary reading. Extreme percentile labels remain below P100. Recovery of missing ClinVar gene names requires matching recorded coordinate provenance.
+
+Today tables wrap long reference descriptions to fit the screen. Known source-language unit labels are rendered in the selected language without changing values or stored units. Saved goal and focus text can carry separate English and Russian versions. Class screening now explains stale or unverifiable scan provenance instead of exposing a message identifier.
+
+Polygenic scoring now counts the actual effect alleles at multi-allelic sites and accepts the case of soft-masked reference bases. Partial calls, conflicting records and unresolved allele representations reduce measured coverage instead of becoming reference genotypes or zero-dose matches. The score retains both position and weight coverage and an input/model witness before reference calibration. Recalculation uses the pinned model directly; a different candidate cannot replace it merely because the previous result was unusable. Exact trait-name fallback can resolve a missing catalogue search result without substituting a different endpoint.
+
+Lifestyle views could omit a newer recorded weight and show only the device's monthly average. The current value now follows the same source-selection rule as personal measurements; device averages are kept separately. A focus metric could show no current value even when a measurement was available. An unverified stored PGS percentile no longer appears as if its selected model were absent: the model identifier remains visible and calibration details start folded. Missing reference ancestry is distinguished from a confirmed population mismatch.
+
+A called variant could appear outside the found-variant table because its clinical interpretation lacked complete support. Readings are now grouped by what was actually read, independently of clinical eligibility. Simultaneous panel requests could leave a test proposal unassessed. Laboratory flags are now isolated per reading; an unassessed proposal has a readable status rather than a debug message. Repeated reference descriptions and automatically expanded catalogues no longer overwhelm the initial system view.
+
+### What this changes in the conclusions
+
+An interpretation's A–E confidence describes the evidence available for assessing it. Displaying an interpretation does not promote it to a supported automatic clinical finding. Scoring models and clinical thresholds remain the same. The PGS summary includes all admitted percentiles at or above P80; incomplete position or weight coverage is explained separately and does not become a high flag. Corrected allele dosage can change a polygenic score and its calibrated percentile on unchanged genomic input; no genotype is altered.
+
+### What is retracted
+
+The presentation rule that an existing catalogue interpretation must disappear solely because its confidence is below B or its support record is incomplete. The unrelated obesity publication previously cited for APOE is replaced with publications on APOE; this does not change the genotype reading.
+
+### What needs recomputing
+
+PGS000646 can use its separately verified EUR reference when the corrected score, exact model identity and effective coordinate build match. Its reference differs from earlier external calibrations: keep that change with the result and do not splice percentile series across references. Existing calls can be reused; a calibration change alone does not require BAM genotyping. Unsupported calibrations for other models remain unavailable.
+
+**By hand — if polygenic scores were computed before this release.**
+
+Check saved polygenic scores with the corrected matcher using existing scoring-site calls. Only missing required calls need targeted BAM genotyping. The application proposes this check when corrected scoring evidence is missing, and stops proposing it once the report has been checked. Updating the application does not start a genome operation. Earlier results may contain incorrect multi-allelic or soft-masked allele dosage, or overstate coverage. Do not grant old results a new scoring witness merely by copying metadata. Models without a validated reference distribution still have no supported population percentile; additional genotyping cannot establish that distribution. Reload the application for presentation changes. Existing measurements and saved personal goals are retained.
+
+
+
 
 ## v0.6.6 — 10.10.2026
 

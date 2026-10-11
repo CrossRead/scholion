@@ -918,6 +918,13 @@
         "en": "baseline: pinned by the first computation on a clean input (schoring_sites_ext.fixed)",
         "ru": "базовая линия: зафиксировано по первому расчёту на чистом входе (schoring_sites_ext.fixed)"
       }
+    },
+    "longevity": {
+      "pgs_id": "PGS000906",
+      "label": "Longevity",
+      "quality_label": null,
+      "pinned": "2026-10-10",
+      "reason": "pinned at the first usable computation"
     }
   }
 }

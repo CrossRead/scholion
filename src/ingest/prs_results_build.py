@@ -44,8 +44,9 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 from scholion.pgs_validation import validate  # noqa: E402
+from scholion import core  # noqa: E402
 
-RESULTS = ROOT / "profile" / "prs_results.json"
+RESULTS = core.profile_dir() / "prs_results.json"
 REGISTRY = ROOT / "src" / "scholion" / "knowledge" / "prs_models.json"
 KEEP = ("percentile", "quality_label", "match_rate", "weight_mass_coverage",
         "percentile_reliable", "effect_size",
@@ -56,7 +57,9 @@ KEEP += ("score", "percentile_method", "percentile_caveat", "reference_panel",
          "reference_panel_ancestry", "reference_mean", "reference_std", "z_score",
          "reference_validation", "genome_build", "detected_genome_build", "build_mismatch",
          "model_original_build", "model_harmonized_build", "model_format_version",
-         "diagnostic_percentile", "diagnostic_validity_note", "calibration_error")
+         "diagnostic_percentile", "diagnostic_validity_note", "calibration_error",
+         "scoring_validation", "sidecar_diagnostic_score", "variants_total", "variants_matched",
+         "weight_mass_total", "weight_mass_matched")
 #: What travels from the report's per-trait `models` block into the stored row:
 #: how many candidates there were, how many were scored and by what rule the
 #: rest were not, and the spread of the percentile across the scored models.
@@ -163,9 +166,11 @@ def main(argv):
         pin = pinned.get(term)
         model_changed = (pin and row.get("pgs_id") and row["pgs_id"] != pin.get("pgs_id"))
         accepted_here = accept_changes or any(a in (term or "").lower() for a in accept_terms)
-        if usable and model_changed and not accepted_here and old_usable:
+        if model_changed and not accepted_here:
             _record_candidate(pin, row, today)
-            kept = dict(old)
+            kept = dict(old) if old else {"term": term, "label": row.get("label"),
+                                         "pgs_id": pin["pgs_id"], "reliable": False}
+            kept["pending_model_candidate"] = row
             kept["integrity_note"] = (f"recomputation {today}: the server picked {row['pgs_id']} instead "
                                       f"of the pinned {pin['pgs_id']} — the value was not replaced, the "
                                       f"candidate was recorded in the registry. Review: python3 src/ingest/prs_model_review.py")
@@ -190,6 +195,8 @@ def main(argv):
                             "reason": "pinned at the first usable computation"}
         if usable:
             merged[term] = row
+            if old and old.get("diagnostic_percentile") is not None:
+                merged[term]["previous_result"] = old
             d = "new"
             if old_usable and _num(old.get("percentile")) is not None and _num(row.get("percentile")) is not None:
                 d += f" (P {old['percentile']}→{row['percentile']})"
@@ -214,6 +221,13 @@ def main(argv):
     traits += [v for k, v in merged.items() if k not in order]
     rel = sum(1 for t in traits if t.get("reliable"))
     meta = dict(old_doc.get("_meta") or {})
+    inputs = sorted({t["scoring_validation"]["input_vcf"] for t in traits
+                     if isinstance(t.get("scoring_validation"), dict)
+                     and t["scoring_validation"].get("input_vcf")})
+    model_rows = [t for t in traits if t.get("pgs_id")]
+    shared_input = inputs[0] if len(inputs) == 1 and all(
+        (t.get("scoring_validation") or {}).get("input_vcf") == inputs[0]
+        for t in model_rows) else None
     meta.update({
         "updated": today,
         "superpopulation": raw.get("superpopulation", meta.get("superpopulation", "EUR")),
@@ -226,7 +240,8 @@ def main(argv):
                                           meta.get("superpopulation_source")),
         "reliable_count": rel, "total": len(traits),
         "built_by": "src/ingest/prs_results_build.py",
-        "input_vcf": raw.get("vcf"),
+        "input_vcf": shared_input, "input_vcfs": inputs,
+        "last_recalculation_input_vcf": raw.get("vcf"),
         "validation": ("Calibration, coordinate build, variant and weight coverage are checked independently. "
                        "Unknown or unsupported calibration is withdrawn; only a previously validated result may be kept."),
     })
@@ -236,7 +251,8 @@ def main(argv):
                     "population, NOT a probability of disease. Discuss it with a doctor.")
 
     if RESULTS.exists():
-        bak = RESULTS.with_name(f"prs_results.json.bak-{today}")
+        stamp = _dt.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        bak = RESULTS.with_name(f"prs_results.json.bak-{stamp}")
         shutil.copy2(RESULTS, bak)
         print(f"backup: {bak.name}")
     RESULTS.parent.mkdir(exist_ok=True)

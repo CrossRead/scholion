@@ -16,10 +16,10 @@
         "ru": "Поведение и стрессовый ответ"
       },
       "why_no_domain": {
-        "en": "there is no laboratory marker a behaviour is read by; these are candidate genes of neurotransmission and the stress axis, and most of them stay at level C or D — a value and a reason, not a conclusion",
-        "ru": "поведение не читается лабораторным маркёром; это кандидатные гены нейромедиации и стрессовой оси, и большинство из них остаются на уровне C или D — значение и причина, а не вывод"
+        "en": "This panel has no laboratory score. It contains candidate genes involved in neurotransmission and the stress response, mostly at confidence level C or D. Each available interpretation carries its evidence level and limitations.",
+        "ru": "У этой панели нет лабораторного балла. Она включает кандидатные гены нейромедиации и стрессового ответа, преимущественно с уровнем доверия C или D. Каждая доступная трактовка сопровождается уровнем доказательности и ограничениями."
       },
-      "source": "the panel author's list of 29.06.2026 and the phrases of 17.09.2026 with their sources; the sentences are the product's own",
+      "source": "The panel author's position list, 2026-06-29; literature references are supplied for each position.",
       "positions": [
         {
           "rsid": "rs11174811",
@@ -718,10 +718,10 @@
         "ru": "Стоматология"
       },
       "why_no_domain": {
-        "en": "no laboratory marker reads the teeth; the seven positions the statement names have not been handed over yet",
-        "ru": "зубы не читаются лабораторным маркёром; семь позиций, названных в постановке, ещё не переданы"
+        "en": "This panel has no laboratory score. No curated genetic positions are currently available.",
+        "ru": "У этой панели нет лабораторного балла. Курируемые генетические позиции пока отсутствуют."
       },
-      "source": "the statement of task 199 names seven dental positions; none has arrived in the panel author's files",
+      "source": "Dental positions have not yet been supplied for this panel.",
       "positions": []
     },
     "folate_histamine_redox_choline": {
@@ -730,8 +730,8 @@
         "ru": "Фолат, гистамин, окислительно-восстановительные процессы и холин"
       },
       "why_no_domain": {
-        "en": "This cross-system position list has no single laboratory score. Existing curated interpretations are retained; newly entered positions have literature references, but genotype-specific wording and allele direction await clinical review. Inclusion does not diagnose a deficiency or assign supplements. Genotypes must be checked against phenotype: symptoms, measured laboratory values, diet, exposures and treatment history; absence of an allele does not demonstrate normal enzyme activity.",
-        "ru": "Межсистемный список позиций не имеет единой лабораторной оценки. Существующие курируемые трактовки сохранены; новые позиции снабжены литературными источниками, но формулировки по генотипам и направление аллелей ожидают клинической проверки. Включение в панель не устанавливает дефицит и не назначает добавки. Генотипы необходимо сопоставлять с фенотипом: симптомами, измеренными анализами, рационом, воздействиями и историей лечения; отсутствие аллеля не доказывает нормальную активность фермента."
+        "en": "Genetic variants related to folate and histamine metabolism, antioxidant pathways and choline. Each position shows gene function, the measured genotype and the available interpretation with confidence A–E. A genotype alone does not establish a nutrient deficiency or a need for supplements.",
+        "ru": "Генетические варианты, связанные с обменом фолата и гистамина, антиоксидантными процессами и холином. Для каждой позиции показаны функция гена, прочитанный генотип и доступная трактовка с уровнем доверия A–E. Сам по себе генотип не устанавливает дефицит веществ или необходимость добавок."
       },
       "source": "Position-list intake 2026-10-05; coordinates verified independently against Ensembl and NCBI dbSNP; clinical sources belong to each row.",
       "positions": [
@@ -781,12 +781,12 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
-              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+              "en": "MTHFR 1298C, one copy: a small effect on enzyme activity, none on homocysteine on its own.",
+              "ru": "MTHFR 1298C, одна копия: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет."
             },
             "hom": {
-              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own; asked about, nothing decided.",
-              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет; о нём спрашивают, ничего не решается."
+              "en": "MTHFR 1298C, two copies: a small effect on enzyme activity, none on homocysteine on its own.",
+              "ru": "MTHFR 1298C, две копии: небольшой эффект на активность фермента, сам по себе на гомоцистеин не влияет."
             }
           },
           "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
@@ -817,15 +817,15 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
-              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+              "en": "COMT rs4680, one copy of Met (Val/Met): the enzyme that breaks catecholamines down is partly thermolabile, so they are cleared somewhat more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples.",
+              "ru": "COMT rs4680, одна копия Met (Val/Met): фермент, разрушающий катехоламины, частично термолабилен, и они выводятся несколько медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся."
             },
             "hom": {
-              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples. Nothing is decided by this genotype — it is here because it is asked about often.",
-              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. По этому генотипу ничего не решается — он здесь потому, что о нём часто спрашивают."
+              "en": "COMT rs4680, two copies of Met (Met/Met): the thermolabile form of the enzyme, so catecholamines are broken down more slowly. CPIC names COMT in its opioid guideline and deliberately issues no dosing recommendation by it; the behavioural and cognitive associations of the 2000s do not reproduce in large samples.",
+              "ru": "COMT rs4680, две копии Met (Met/Met): термолабильная форма фермента, катехоламины разрушаются медленнее. CPIC называет COMT в руководстве по опиоидам и намеренно не даёт по нему рекомендаций по дозе; поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся."
             }
           },
-          "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+          "source": "NCBI dbSNP, SPDI NC_000022.11:19963747:G:A; CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021): COMT is discussed without a dosing recommendation.",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
           "review": {
@@ -836,7 +836,7 @@
           "evidence": {
             "level": "C",
             "basis": "candidate",
-            "source": "the locus catalogue (loci.json, task 174, 12.09.2026: coordinates verified against Ensembl REST and NCBI dbSNP, SPDI NC_000022.11:19963747:G:A); CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021) — COMT is named and no dosing recommendation is issued by it; placed on the radar under the adrenal axis (catecholamine degradation) by the owner's decision of 13.09.2026",
+            "source": "NCBI dbSNP, SPDI NC_000022.11:19963747:G:A; CPIC Guideline for Opioids (Crews et al., Clin Pharmacol Ther 2021): COMT is discussed without a dosing recommendation.",
             "assigned": "2026-09-17",
             "judged": "many studies of Val158Met, and they disagree"
           }

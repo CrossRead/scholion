@@ -16,6 +16,9 @@ def calibrated(row):
     out.setdefault("percentile_reliable", True)
     out.setdefault("match_rate", 1.0)
     out.setdefault("weight_mass_coverage", 1.0)
+    out["scoring_validation"] = {"checked": True, "algorithm": "scholion-called-alleles-v1",
+                                  "input_sha256": "0" * 64, "model_sha256": "1" * 64,
+                                  "synthetic": True}
     out["reference_validation"] = {"checked": True, "quality": "passed",
                                    "source": "synthetic test reference",
                                    "snapshot_sha256": reference_snapshot(out)}

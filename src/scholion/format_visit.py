@@ -47,6 +47,8 @@ def visit_report(data: Dict[str, Any]) -> str:
         for panel in data["reference_appendix"]["panels"]:
             lines += ["", panel["label"]]
             for row in panel["positions"]:
+                from .panel_reference import interpretation_lines
+                lines.extend(interpretation_lines(row))
                 context = row.get("reference_context") or {}
                 lines.append(f"• {row['gene']} {row['rsid']} · {row['level']} · "
                              + str(row.get("reading_label") or "—"))

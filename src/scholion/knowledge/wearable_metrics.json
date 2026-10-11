@@ -167,7 +167,8 @@
    "why": {
     "en": "structured exercise (WHO: ≥150 min/week of moderate ≈ 21/day)",
     "ru": "структурная нагрузка (ВОЗ: ≥150 мин/нед умеренной ≈ 21/день)"
-   }
+   },
+   "person_metric": "activity_min"
   },
   "CaloriesDaily": {
    "label": {

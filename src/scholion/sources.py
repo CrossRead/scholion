@@ -334,6 +334,16 @@ SOURCES: Dict[str, Dict[str, Any]] = {
         "auto": False,
         "why_manual": "sources.manual.pgs",
     },
+    "pgs_reference": {
+        "kind": "mirror",
+        "title": "IGSR Phase 3 — independently computed PGS reference aggregates",
+        "license": "public reference data; project-derived aggregate statistics only",
+        "homepage": "https://www.internationalgenome.org/data-portal/data-collection/phase3/",
+        "feeds": ["prs_references.json"],
+        "cadence": "fixed Phase 3 release; recheck when model or reference inputs change",
+        "auto": False,
+        "why_manual": "sources.manual.pgs_reference",
+    },
     "longevitymap": {
         "kind": "mirror",
         "title": "LongevityMap (HAGR) — longevity association variants",

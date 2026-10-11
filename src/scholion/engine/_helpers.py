@@ -42,6 +42,30 @@ def _recent(date_str: str, months: int = 12) -> bool:
     return _recent_or_unknown(date_str, months) is not False
 
 
+def _lab_display_recency(stamp: str) -> Optional[bool]:
+    """Past calendar year at the recorded precision; unknown dates stay unknown.
+
+    This is a display window, not a rule about clinical relevance. Historical
+    observations and their original flags remain available for explicit review.
+    """
+    today = datetime.date.today()
+    try:
+        cutoff = today.replace(year=today.year - 1)
+    except ValueError:  # February 29 has no counterpart in the preceding year
+        cutoff = today.replace(year=today.year - 1, day=28)
+    text = str(stamp or "")
+    try:
+        if len(text) >= 10:
+            day = datetime.date.fromisoformat(text[:10])
+            return cutoff <= day if day <= today else None
+        if len(text) == 7:
+            datetime.date.fromisoformat(text + "-01")
+            return cutoff.isoformat()[:7] <= text if text <= today.isoformat()[:7] else None
+    except ValueError:
+        pass
+    return None
+
+
 def DISCLAIMER() -> str:
     """The standing caveat under every report.
 

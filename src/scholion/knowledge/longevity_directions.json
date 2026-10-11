@@ -4,7 +4,7 @@
     "provenance": "Assembled on 2026-08-14 from the literature review «the direction of the alleles» (7 parallel reviews by PMID, 12.07.2026) + the KNOWN dictionary from longevity_report.py. The direction of an allele often depends on the population and on the linkage chain — where it cannot be resolved confidently, the variant sits in the unresolved section rather than here.",
     "how_to_extend": "A new entry — only with a PMID and an explicit favorable allele according to the primary source. Aggregate gene-based associations (SKAT and the like) have no direction at the SNP level — their place is in unresolved.",
     "schema": "directions[rsid] = {gene, favorable (an allele or null), label, confidence high/medium/low, zygosity_note?, population_caveat?, pmids[], action?, verdict_by_copies? {0:.., 1:.., 2:..}}",
-    "updated": "2026-08-18",
+    "updated": "2026-10-11",
     "source_tier": "primary_literature"
   },
   "directions": {
@@ -18,7 +18,9 @@
       "confidence": "high",
       "pmids": [
         "8346443",
-        "31954858"
+        "31356640",
+        "32511104",
+        "30060062"
       ],
       "action": {
         "en": "part of the APOE block, do not interpret it separately",
@@ -35,7 +37,9 @@
       "confidence": "high",
       "pmids": [
         "8346443",
-        "31954858"
+        "31356640",
+        "32511104",
+        "30060062"
       ],
       "action": {
         "en": "part of the APOE block; with ε2 keep an eye on the triglycerides/remnants",
@@ -538,6 +542,134 @@
           "en": "L253F. Loss of function is reported, but at ~0.19 % it is rare enough that the sourcing available is review-level. The position is in loci.json, so the genotype resolves and can be looked up; only the direction waits.",
           "ru": "L253F. Сообщается о потере функции, но при частоте ~0,19 % доступная источниковая база — обзорная. Позиция есть в loci.json, поэтому генотип резолвится и его можно посмотреть; ждёт только направление."
         }
+      }
+    }
+  },
+  "apoe_interpretations": {
+    "ε2/ε3": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "One ε2 and one ε3 copy; no ε4. Compared with ε3/ε3, studies found lower LDL cholesterol and some favourable associations with survival and reaching older ages. The longevity association is modest and varies across studies; it cannot predict your lifespan.",
+        "ru": "Одна копия ε2 и одна ε3; ε4 нет. В сравнении с ε3/ε3 исследования отмечали более низкий холестерин ЛПНП и некоторые благоприятные ассоциации с выживаемостью и достижением старших возрастов. Связь с долголетием умеренная и различается между исследованиями; она не предсказывает продолжительность вашей жизни."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      }
+    },
+    "ε2/ε2": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "Two ε2 copies; no ε4. This differs from ε2/ε3: lower LDL can coexist with higher triglycerides. Study results for ε2/ε3 cannot be transferred to this combination, and a longevity benefit is not established from this reading.",
+        "ru": "Две копии ε2; ε4 нет. Эта комбинация отличается от ε2/ε3: более низкий ЛПНП может сочетаться с повышенными триглицеридами. Результаты для ε2/ε3 нельзя переносить на эту комбинацию; преимущество в долголетии из этого чтения не установлено."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      }
+    },
+    "ε3/ε3": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "Two ε3 copies, the usual comparison group in APOE studies. No ε2 or ε4 was identified. This combination does not establish protection from disease or an individual life expectancy.",
+        "ru": "Две копии ε3 — обычная группа сравнения в исследованиях APOE. ε2 и ε4 не выявлены. Эта комбинация не устанавливает защиту от заболеваний или индивидуальную продолжительность жизни."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      }
+    },
+    "ε3/ε4": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "One ε3 and one ε4 copy. In population studies, ε4 was associated with higher Alzheimer disease risk and less favourable survival than ε3/ε3. This is an association, not a diagnosis, a disease probability or a predicted lifespan.",
+        "ru": "Одна копия ε3 и одна ε4. В популяционных исследованиях ε4 ассоциировалась с повышенным риском болезни Альцгеймера и менее благоприятной выживаемостью, чем ε3/ε3. Это ассоциация, а не диагноз, вероятность болезни или прогноз срока жизни."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      }
+    },
+    "ε4/ε4": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "Two ε4 copies. Studies found stronger associations with Alzheimer disease and shorter survival than for one ε4 copy. The genotype alone does not establish that the person has the disease or predict when it will occur.",
+        "ru": "Две копии ε4. В исследованиях ассоциации с болезнью Альцгеймера и более короткой выживаемостью были сильнее, чем при одной копии ε4. Сам генотип не устанавливает наличие заболевания и не предсказывает время его возникновения."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      }
+    },
+    "ε2/ε4": {
+      "level": "B",
+      "scope": "catalogue_interpretation",
+      "summary": {
+        "en": "One ε2 and one ε4 copy, if phase is confirmed. The ε2/ε3 interpretation does not apply: the presence of ε4 matters separately. Unphased heterozygosity at both defining positions does not uniquely determine this combination.",
+        "ru": "Одна копия ε2 и одна ε4, если фаза подтверждена. Интерпретация ε2/ε3 здесь не применяется: наличие ε4 имеет отдельное значение. Нефазированные гетерозиготы в обеих определяющих позициях не определяют эту комбинацию однозначно."
+      },
+      "mechanism": {
+        "en": "APOE encodes a protein involved in lipid transport and uptake. Its ε isoforms differ in receptor binding; this is a gene mechanism, not a measured cause of longevity in this person.",
+        "ru": "APOE кодирует белок, участвующий в переносе и поглощении липидов. Формы ε различаются связыванием с рецепторами; это механизм гена, а не измеренная причина долголетия у человека."
+      },
+      "source": "PMID: 31356640; PMID: 32511104; PMID: 30060062; DOI: 10.1016/S0022-2275(20)39885-0",
+      "limitations": {
+        "en": "Observational studies, largely of European ancestry. Group effect estimates are not personal probabilities. Survival associations vary by population and endpoint; measured lipids and clinical history remain separate evidence.",
+        "ru": "Наблюдательные исследования, преимущественно европейского происхождения. Оценки эффектов в группах не являются личными вероятностями. Связи с выживаемостью различаются по популяциям и исходам; измеренные липиды и клиническая история остаются отдельными данными."
+      },
+      "evidence_reason": {
+        "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
+        "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
       }
     }
   }

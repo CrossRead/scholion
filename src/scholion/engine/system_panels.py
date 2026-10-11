@@ -103,7 +103,7 @@ from typing import Any, Dict, List, Optional
 
 from ..pgs_validation import percentile_label
 from .. import core
-from ..panel_reference import gene_reference_context, reference_context
+from ..panel_reference import gene_reference_context, interpretation_context, reference_context
 from ..conclusion_basis import guard_position
 from ..genome_routes import decision_route
 from ..i18n import CATALOGUES, plural as _plural, t as _t
@@ -239,6 +239,7 @@ def class_systems() -> Dict[str, Any]:
             "source": meta.get("purpose"), "updated": meta.get("updated")}
 
 
+@core.memo_in_reading
 def prescriptions() -> List[Dict[str, Any]]:
     """The person's CURRENT prescriptions, each with its classes and the systems
     those classes act on — `map_status` says whether the map answered at all.
@@ -657,6 +658,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             # phrase» promised a statement E never gets (C22).
             row["pending"], row["pending_why"] = False, None
         row["reference_context"] = reference_context(p, lv.get("level"))
+        row["interpretation"] = interpretation_context(p, lv.get("level"), text if told and geno.get("read") is True else None)
         row = panel_form.gene_row(gene, guard_position(p, row), scan)
         row["read"] = geno.get("read")          # the position's own reading, not the gene's
         row["read_state"] = panel_form.read_state(bool(row["read"]), row.get("read_why"))
@@ -840,15 +842,21 @@ def _medications_layer(key: str) -> Dict[str, Any]:
     that acts on nothing.
     """
     rows, unmapped, unclassified = [], [], []
+    labels = core.med_classes().get("classes") or {}
     for p in prescriptions():
         if key in p["systems"]:
             rows.append({**{k: p[k] for k in ("name", "dose", "status", "classes")},
                          "via": sorted(c for c, keys in p["via"].items() if key in keys),
+                         "via_labels": [panel_form.one_language(labels.get(c, {}).get("label"))
+                                        for c in sorted(p["via"]) if key in p["via"][c] and labels.get(c, {}).get("label")],
                          "map_status": "mapped"})
         elif p["map_status"] == "no_map":
-            unmapped.append({"name": p["name"], "classes": p["classes"], "map_status": "no_map"})
+            unmapped.append({"name": p["name"], "dose": p["dose"], "classes": p["classes"],
+                             "class_labels": [panel_form.one_language(labels.get(c, {}).get("label"))
+                                              for c in p["classes"] if labels.get(c, {}).get("label")],
+                             "map_status": "no_map"})
         elif p["map_status"] == "no_class":
-            unclassified.append({"name": p["name"], "map_status": "no_class"})
+            unclassified.append({"name": p["name"], "dose": p["dose"], "map_status": "no_class"})
     cmap = class_systems()
     why = None
     if not rows:
@@ -995,7 +1003,7 @@ def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
             "local_note": r.get("local_note"), "author_note": r.get("author_note"), "group": r.get("group"),
             "route": r.get("route"), "mechanism": r.get("mechanism"), "source": r.get("source"),
             "conclusion_basis": r.get("conclusion_basis"),
-            "reference_context": r.get("reference_context"),
+            "reference_context": r.get("reference_context"), "interpretation": r.get("interpretation"),
             "decision_route": r.get("decision_route"),
             "subclaim_basis": r.get("subclaim_basis"),
             "not_a_finding_why": r.get("not_a_finding_why"), "needs_confirmation": r.get("needs_confirmation"),
@@ -1205,19 +1213,7 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
                                     from_value=ec.get("from_value") if ec.get("from_value") is not None else "—",
                                     to_value=ec.get("value")),
                          "data": ec})
-        if r.get("pending") and r.get("pending_why") == "risk_allele":
-            rows.append({"origin": "risk_allele", "gene": g, "rsid": rs,
-                         "text": _t("system.q.risk_allele", gene=g, rsid=rs), "data": None})
-        elif r.get("pending") and r.get("pending_why") == "conclusion_basis":
-            rows.append({"origin": "conclusion_basis", "gene": g, "rsid": rs,
-                         "text": _t("system.q.withheld", gene=g, rsid=rs,
-                                    reason=(r.get("conclusion_basis") or {}).get("reason") or ""),
-                         "data": r.get("conclusion_basis")})
-        elif r.get("pending") and r.get("unit") == "position":
-            st = (r.get("genotype") or {}).get("state")
-            rows.append({"origin": "pending", "gene": g, "rsid": rs,
-                         "text": _t("system.q.pending", gene=g, rsid=rs,
-                                    state=_t("system.state." + str(st))), "data": None})
+        # Catalogue support gaps belong to the variant detail, not the visit agenda.
         if r.get("clinical_carrier", r.get("carrier")):
             moi = r.get("moi") or ", ".join(r.get("moi_codes") or []) or "AR"
             rows.append({"origin": "moi", "gene": g, "rsid": rs,
@@ -1401,7 +1397,7 @@ _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",
                 "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route",
-                "reference_context", "genotype", "passport", "value_only", "author_note")
+                "reference_context", "interpretation", "genotype", "passport", "value_only", "author_note")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
@@ -1435,13 +1431,15 @@ def _project(gen: Dict[str, Any], register: str) -> Dict[str, Any]:
 
 # ---- the API ----------------------------------------------------------------
 @core.in_reading
-def systems() -> Dict[str, Any]:
+def systems(register: Optional[str] = None) -> Dict[str, Any]:
     """The systems: key, label in both languages, source, whether a laboratory
     half and a genetic half exist, and where the genetic list comes from.
 
     A reader who does not know which systems have an answer at all cannot tell
     a system with no list from a system where somebody looked and found nothing.
     """
+    if register is not None and register not in REGISTERS:
+        return {"status": "unknown_register", "register": register, "registers": list(REGISTERS)}
     base = (_base().get("systems") or {})
     cur = (_curated().get("systems") or {})
     from .labs import analyze_labs
@@ -1449,9 +1447,15 @@ def systems() -> Dict[str, Any]:
     radar = {d.get("key"): d for d in (health_radar().get("domains") or [])}
     by_key = {m["key"]: m for m in (analyze_labs().get("markers") or [])}
     findings: Optional[Dict[str, Any]] = None
+    cards: Dict[str, Any] = {}
     rows = []
     for d in domains():
         rd = radar.get(d["key"]) or {}
+        g: Dict[str, Any] = {}
+        if register is not None:
+            card = system(d["key"], register)
+            cards[d["key"]] = card
+            g = card.get("genetics") or {}
         b = base.get(d["key"]) if isinstance(base.get(d["key"]), dict) else None
         c = cur.get(d["key"]) if isinstance(cur.get(d["key"]), dict) else None
         if not d["genetic_half"]:
@@ -1467,7 +1471,8 @@ def systems() -> Dict[str, Any]:
         read = unread = 0
         scan = None
         if gstat == "composed":
-            g = _genetics_layer(d, by_key)
+            if register is None:
+                g = _genetics_layer(d, by_key)
             read, unread = g.get("read_count", 0), g.get("unread_count", 0)
             scan = (g.get("scan") or {}).get("status")
         # The scores, counted and never folded into either ring: mapped by the
@@ -1494,6 +1499,7 @@ def systems() -> Dict[str, Any]:
                                   "depthless_genes": g.get("depthless_genes", 0),
                                   "scan": scan, "polygenic": poly}})
     return {"status": "ok", "systems": rows, "count": len(rows), "on_demand": on_demand_panels(),
+            **({"cards": cards, "register": register} if register is not None else {}),
             "why_empty": panel_form.one_language((_curated().get("_meta") or {}).get("why_empty")),
             # The joins the other faces read from here rather than recomputing:
             # a prescription's systems, a gene's systems, a class's systems.

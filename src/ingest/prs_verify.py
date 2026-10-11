@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Independent recomputation of polygenic scores — a control over an outside calculation.
+"""Recomputation of polygenic scores — a control over an outside calculation.
 
 Why: the percentiles are computed by the external package just-prs, and its output holds
 impossible values — a match_rate above 1, that is "more variants matched than the model has".
@@ -7,9 +7,9 @@ This happens through double counting: the same position is present in the target
 twice (normalisation of multi-allelic sites through `bcftools norm -m -both` splits
 them across rows), and a naive counter credits it with both variants.
 
-This script computes on its own, using the standard library, with explicit deduplication
-and explicit parsing of the effect allele, and prints ITS OWN numbers next to the foreign
-ones. It fixes nothing — it makes the discrepancy visible.
+This script streams weights using the standard library and the application's strict
+allele matcher, and prints its numbers next to the outside calculation. The shared
+matcher prevents the control from inventing opposite-strand calls. It fixes nothing.
 
 IMPORTANT about "does not carry the effect allele". The target VCF was called without -v,
 so at reference-homozygous sites ALT equals ".", and the model's effect allele is
@@ -65,8 +65,9 @@ def load_target(vcf: Path):
             chrom = f[0][3:] if f[0].startswith("chr") else f[0]
             key = (chrom, f[1])
             lines_at[key] = lines_at.get(key, 0) + 1
-            gt = f[9].split(":")[0].replace("|", "/")
-            idx = [int(x) for x in gt.split("/") if x.isdigit()]
+            fmt = dict(zip(f[8].split(":"), f[9].split(":")))
+            gt = fmt.get("GT", ".").replace("|", "/").split("/")
+            idx = [int(x) for x in gt] if len(gt) == 2 and all(x.isdigit() for x in gt) else []
             rec = (f[3], [a for a in f[4].split(",")], idx)
             if key in geno:
                 dup += 1
@@ -101,47 +102,11 @@ def _site_alleles(rec):
 
 
 def dosage(effect: str, other: str, recs):
-    """Dose of the effect allele, with the right row chosen by the model's alleles.
-
-    Returns (dose, status): 'carried' — the allele is present in the call; 'zero' — the
-    site is covered, the allele is not carried; 'flip' — matched on the opposite strand;
-    None — no row of the position describes the model's variant.
-
-    Row priority: both of the model's alleles in the site (rank 2, answered at once) →
-    the effect allele present (rank 2, keep looking for better) → only the other one (rank 1).
-    Ranks are compared EXPLICITLY, not by "whichever came first": a row holding only the
-    other allele must not overwrite a later row that holds the effect allele.
-    """
-    if not recs:
-        return None, None
-    effect = effect.upper()
-    other = (other or "").upper()
-    best, best_rank = None, 0
-    for rec in recs:
-        site, calls = _site_alleles(rec)
-        if not calls:
-            continue
-        has_e, has_o = effect in site, bool(other) and other in site
-        if has_e and has_o:                       # unambiguous correspondence
-            return sum(1 for c in calls if c == effect), "carried" if effect in calls else "zero"
-        if has_e and best_rank < 2:
-            best, best_rank = (sum(1 for c in calls if c == effect),
-                               "carried" if effect in calls else "zero"), 2
-        elif has_o and best_rank < 1:
-            best, best_rank = (0, "zero"), 1
-    if best:
-        return best
-    eff_c = "".join(COMPLEMENT.get(b, "?") for b in reversed(effect))
-    oth_c = "".join(COMPLEMENT.get(b, "?") for b in reversed(other))
-    for rec in recs:
-        site, calls = _site_alleles(rec)
-        if not calls:
-            continue
-        if eff_c in site:
-            return sum(1 for c in calls if c == eff_c), "flip"
-        if oth_c and oth_c in site:
-            return 0, "flip"
-    return None, None
+    """Use the application's strict matcher; do not invent opposite-strand calls."""
+    if str(ROOT / "src") not in sys.path:
+        sys.path.insert(0, str(ROOT / "src"))
+    from scholion.pgs_scoring import dosage as match
+    return match(effect, other, recs)
 
 
 def score_model(path: Path, geno, dup_pos=None, legacy_pick=False):

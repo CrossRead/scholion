@@ -95,6 +95,8 @@
     "src/scholion/ouroboros_tools.py": 95.9,
     "src/scholion/panel_notes.py": 100.0,
     "src/scholion/panel_reference.py": 100.0,
+    "src/scholion/pgs_reference.py": 100.0,
+    "src/scholion/pgs_scoring.py": 92.6,
     "src/scholion/pgs_validation.py": 97.8,
     "src/scholion/phenoage.py": 81.9,
     "src/scholion/population.py": 75.6,

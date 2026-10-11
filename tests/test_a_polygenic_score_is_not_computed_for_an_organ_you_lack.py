@@ -334,6 +334,13 @@ class TestTheReportItself(unittest.TestCase):
         self._male.start()
         self._assembly = mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"})
         self._assembly.start()
+        # Transport and selection tests isolate the audited dosage step, which
+        # has actual single-sample call/weight regressions in its own module.
+        for patch in (mock.patch.object(prs, "_pinned_models", return_value={}),
+                      mock.patch.object(prs, "ScoringVCF"),
+                      mock.patch.object(prs, "_score_row", side_effect=lambda m, row, source, build, pop: prs._verify_row(m, row, row, build, pop))):
+            patch.start()
+            self.addCleanup(patch.stop)
 
     def tearDown(self):
         self._male.stop()
@@ -456,7 +463,7 @@ class TestTheReportItself(unittest.TestCase):
         got, _ = self.run_report(
             {"normalize_vcf": {"path": "/tmp/g.parquet"},
              "compute_prs_by_trait": {"rows": [{"pgs_id": "poor", "match_rate": 0.3}]},
-             "search_scores": {"scores": [{"pgs_id": "PGS999", "variants_number": 4000}]},
+             "search_scores": {"scores": [{"pgs_id": "PGS999", "variants_number": 4000, "trait_reported": "type 2 diabetes"}]},
              "compute_prs": calibrated({"pgs_id": "PGS999", "percentile": 50.0, "match_rate": 0.92}),
              "percentile": dict(calibrated({"percentile": 50.0}), method="reference_panel", reliable=True)}, fallback=True)
         self.assertEqual("ok_fallback", got["traits"][0]["status"])
@@ -466,7 +473,7 @@ class TestTheReportItself(unittest.TestCase):
         got, _ = self.run_report(
             {"normalize_vcf": {"path": "/tmp/g.parquet"},
              "compute_prs_by_trait": {"rows": [{"pgs_id": "poor", "match_rate": 0.5}]},
-             "search_scores": {"scores": [{"pgs_id": "PGS999", "variants_number": 4000}]},
+             "search_scores": {"scores": [{"pgs_id": "PGS999", "variants_number": 4000, "trait_reported": "type 2 diabetes"}]},
              "compute_prs": {"match_rate": 0.4}}, fallback=True)
         self.assertEqual("ok", got["traits"][0]["status"])
         self.assertNotIn("fallback", got["traits"][0])
@@ -510,23 +517,28 @@ class TestTheFallbackSearch(unittest.TestCase):
         self.assertIsNone(got)
         self.assertTrue(err)
 
-    def test_the_largest_model_that_can_still_be_covered_is_taken(self):
+    def test_calibration_beats_size_within_the_preparation_cap(self):
         fake = FakeMCP({"search_scores": {"scores": [
-            {"pgs_id": "small", "variants_number": 100},
-            {"pgs_id": "big", "variants_number": 40_000},
-            {"pgs_id": "huge", "variants_number": 900_000}]},
-            "compute_prs": {"match_rate": 0.9}})
-        got, err = prs._search_scores_fallback(fake, "diabetes", "/tmp/g.parquet",
-                                               "/tmp/x.vcf.gz")
+            {"pgs_id": "small", "variants_number": 100, "trait_reported": "diabetes"},
+            {"pgs_id": "big", "variants_number": 40000, "trait_reported": "diabetes"},
+            {"pgs_id": "huge", "variants_number": 900000, "trait_reported": "diabetes"}]},
+            "compute_prs": lambda args: {"pgs_id": args["pgs_id"]}})
+        def score(_m, row, _source, _build, _pop):
+            return calibrated(dict(row, percentile=50, match_rate=1,
+                                   percentile_reliable=row["pgs_id"] == "small"))
+        with mock.patch.object(prs, "_score_row", side_effect=score):
+            got, err = prs._search_scores_fallback(fake, "diabetes", "/tmp/g.parquet", "/tmp/x.vcf.gz",
+                                                   genome_build="GRCh38", source=mock.Mock())
         self.assertIsNone(err)
-        self.assertEqual("big", got["pgs_id"])
+        self.assertEqual("small", got["pgs_id"])
         args = next(a for n, a in fake.calls if n == "compute_prs")
         self.assertEqual("/tmp/g.parquet", args["genotypes_path"])
+        self.assertNotIn("huge", got["candidates_checked"])
 
     def test_a_computation_that_fails_is_reported_with_the_model_it_failed_on(self):
-        fake = FakeMCP({"search_scores": {"scores": [{"pgs_id": "PGS7", "variants_number": 900}]},
+        fake = FakeMCP({"search_scores": {"scores": [{"pgs_id": "PGS7", "variants_number": 900, "trait_reported": "diabetes"}]},
                         "compute_prs": RuntimeError("no weights")})
-        got, err = prs._search_scores_fallback(fake, "diabetes", None, "/tmp/x.vcf.gz")
+        got, err = prs._search_scores_fallback(fake, "diabetes", None, "/tmp/x.vcf.gz", source=mock.Mock())
         self.assertIsNone(got)
         self.assertIn("PGS7", err)
 

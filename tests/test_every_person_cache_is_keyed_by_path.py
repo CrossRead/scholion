@@ -35,7 +35,6 @@ KEYED = {
     "genome._REGION_CACHE": ("path", "the VCF's path among the key's parts"),
     "genome._CONTIGS_CACHE": ("path", "the VCF's path among the key's parts"),
     "linear._MEMO": ("path", "abspath|size|mtime_ns of the VCF"),
-    "engine/labs._FLAGS": ("path", "the profile folder under «path»; cleared when it differs"),
     "drugsource._MISS_REASON": ("program", "why a drug NAME was not found in RxNorm — "
                                 "offline or unknown; a fact about the network, not a person"),
     "recompute._last_write": ("program", "when the progress file was last written"),

@@ -13,7 +13,7 @@ from .format_primitives import _PRIO_ICON, _flag_icon, _level_counts_line, genot
 from .genome_routes import route_text
 from .pgs_validation import percentile_label
 from .panel_notes import note_lines
-from .panel_reference import reference_lines
+from .panel_reference import interpretation_lines, reference_lines
 from .test_proposals import test_basis_text
 
 
@@ -61,6 +61,8 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("link_text"):
         marks.append(_t("system.panel.link", link=r["link_text"]))
     line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
+    for interpretation_detail in interpretation_lines(r):
+        line += "\n   " + interpretation_detail
     for reference_detail in reference_lines(r):
         line += "\n   " + reference_detail
     if route_text(r):
@@ -68,7 +70,9 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("text"):
         line += "\n   " + str(r["text"])
     if (r.get("conclusion_basis") or {}).get("status") == "incomplete":
-        line += "\n   " + r["conclusion_basis"]["reason"]
+        basis = r["conclusion_basis"]
+        line += "\n   " + (_t("interpretation.gaps", missing=", ".join(_t("conclusion.missing." + key) for key in basis.get("missing") or []))
+                            if (r.get("interpretation") or {}).get("summary") else basis["reason"])
     for subclaim_detail in subclaim_lines(r):
         line += "\n   " + subclaim_detail
     if r.get("mechanism") and r.get("source"):
@@ -439,7 +443,7 @@ def system_report(r: Dict[str, Any]) -> str:
     L += ["", "**4. " + _t("system.layer.medications") + "**"]
     for m in med.get("rows") or []:
         L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
-                              classes=", ".join(m.get("via") or [])).replace("  ", " "))
+                              classes=", ".join(m.get("via_labels") or []) or _t("prescription.class_undefined")).replace("  ", " "))
     if med.get("empty_reason"):
         L.append("   " + med["empty_reason"])
     if med.get("unmapped"):
@@ -504,12 +508,14 @@ def _test_row(s: Dict[str, Any]) -> str:
     spec = (" · " + _t("tests.specialist", name=s["specialist"])
             if s.get("specialist") and s["specialist"] != "—" else "")
     if s.get('error'):
-        return _t('tests.rule_error', id=s.get('id'), error=s['error'])
+        return _t('tests.rule_error', name=s.get('suggest') or _t('tests.proposal_unavailable'))
     return f"**{s.get('suggest')}**{spec} — " + _t("tests.why", text=s.get("why") or "—") + '\n' + test_basis_text(s)
 
 
 def systems_report(r: Dict[str, Any]) -> str:
     """The systems, one line each: the two halves and what acts on it."""
+    if r.get("cards"):
+        return "\n\n".join(system_report(card) for card in r["cards"].values())
     L = ["**" + _t("systems.title") + "**", ""]
     acting: Dict[str, int] = {}
     for p in r.get("prescriptions") or []:

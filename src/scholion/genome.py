@@ -333,6 +333,7 @@ def not_ours() -> Optional[Dict[str, Any]]:
     return _subject.genome_conflict(p) if p is not None else None
 
 
+@core.memo_in_reading
 def vcf_path() -> Optional[Path]:
     """Path to the personal full VCF. env SCHOLION_GENOME_VCF, or a search in genome/.
 
@@ -1676,6 +1677,7 @@ def _allele_fraction(fmt, sample, idx):
     return round(alt / total, 3)
 
 
+@core.memo_in_reading
 def _sites_vcfs() -> List[str]:
     vp = vcf_path()
     if not vp:
@@ -2435,6 +2437,59 @@ def _review_confidence(review: str) -> Optional[str]:
     return 'ClinVar review_status: ' + review if review else None
 
 
+@core.memo_in_reading
+def _clinvar_local_gene_map() -> Dict[tuple, str]:
+    """Local annotation only: no genome data is sent to a reference service."""
+    path = Path(os.environ.get("SCHOLION_CLINVAR_CACHE", str(Path.home() / "genomic_work/clinvar"))) / "clinvar.vcf.gz"
+    if not path.exists() or not Path(str(path) + ".tbi").exists() or not _have_bcftools():
+        return {}
+    try:
+        import gzip
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            headers = []
+            for line in handle:
+                if not line.startswith("#"):
+                    break
+                headers.append(line)
+        if "##reference=GRCh38\n" not in headers:
+            return {}
+    except (OSError, EOFError, UnicodeError):
+        return {}
+    positions = set()
+    for base in core.genome_bases():
+        table = base / "clinvar_hits.tsv"
+        if table.exists():
+            try:
+                metadata = json.loads((base / "clinvar_meta.json").read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return {}
+            if not isinstance(metadata, dict) or "/vcf_GRCh38/" not in str(metadata.get("url") or ""):
+                return {}
+            lines = table.read_text(encoding="utf-8").splitlines()
+            header = lines[0].split("\t") if lines else []
+            for line in lines[1:]:
+                row = dict(zip(header, line.split("\t")))
+                chrom, pos = row.get("chrom", "").removeprefix("chr"), row.get("pos", "")
+                if chrom in {str(c) for c in range(1, 23)} | {"X", "Y", "MT"} and pos.isdigit():
+                    positions.add(f"{chrom}:{pos}-{pos}")
+            break
+    if not positions:
+        return {}
+    try:
+        result = subprocess.run(["bcftools", "query", "-r", ",".join(sorted(positions)),
+                    "-f", "%CHROM\t%POS\t%REF\t%ALT\t%INFO/GENEINFO\n", str(path)],
+                    capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=15)
+    except (OSError, subprocess.TimeoutExpired):
+        return {}
+    out = {}
+    if result.returncode == 0:
+        for line in result.stdout.splitlines():
+            fields = line.split("\t")
+            if len(fields) == 5 and fields[4] not in (".", ""):
+                out[tuple(fields[:4])] = "|".join(part.split(":")[0] for part in fields[4].split("|"))
+    return out
+
+
 def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     """The patient's clinically significant findings from genome/clinvar_hits.tsv, laid out
     by tiers of actionability: pathogenic → pharmacogenetics → risk factors → protective →
@@ -2454,13 +2509,19 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
         return {"status": "error", "message": str(e), "hits": []}
     header = lines[0].split("\t") if lines else []
     rows: List[Dict[str, Any]] = []
+    genes = _clinvar_local_gene_map()
     for ln in lines[1:]:
         parts = ln.split("\t")
         if len(parts) < len(header):
             continue
-        rec = dict(zip(header, parts))
+        rec: Dict[str, Any] = dict(zip(header, parts))
         tier = _clinvar_tier(rec.get("clnsig", ""))
         rec["tier"] = tier
+        if not rec.get("gene") or rec.get("gene") == ".":
+            key = (rec.get("chrom", "").removeprefix("chr"), rec.get("pos"), rec.get("ref"), rec.get("alt"))
+            rec["gene"] = genes.get(key) or None
+        elif ":" in rec["gene"]:
+            rec["gene"] = "|".join(part.split(":")[0] for part in rec["gene"].split("|"))
         rec["disease"] = _primary_disease(rec.get("clndn", ""))
         rec["_rank"] = (_TIER_ORDER.get(tier, 9),
                         _REVIEW_RANK.get((rec.get("review") or "").strip(), 6))

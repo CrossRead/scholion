@@ -10,6 +10,7 @@ Examples:
 """
 from __future__ import annotations
 import argparse
+from functools import partial
 import json
 import os
 import sys
@@ -108,6 +109,7 @@ def _add_answers_commands(sub, common) -> None:
 
     l = sub.add_parser("labs", parents=[common], help="lab analysis: flags + trends")
     l.add_argument("markers", nargs="*", help="marker keys (all of them by default)")
+    l.add_argument("--history", action="store_true", help="include readings older than one year")
 
     sub.add_parser("suggest-tests", parents=[common], help="which tests it makes sense to take")
     prf = sub.add_parser("profile", parents=[common],
@@ -177,6 +179,8 @@ def _add_answers_commands(sub, common) -> None:
                              "the genetic half and how much of it was read, the prescriptions "
                              "acting on it, the clinician's target, what to test, and the "
                              "questions for the clinician — in three baskets, never silently empty")
+    sy.add_argument("--all", action="store_true",
+                    help="read every system card together in one fresh reading")
     sy.add_argument("key", nargs="?",
                     help="the system's key (thyroid, lipids, …); omitted, the systems are listed")
     pn = sub.add_parser("panel", parents=[common],
@@ -1216,7 +1220,8 @@ def _cmd_drug(args) -> Any:
 
 
 def _cmd_labs(args) -> Any:
-    res, render = engine.analyze_labs(args.markers or None), fmt.labs_report
+    res = engine.analyze_labs(args.markers or None)
+    render = partial(fmt.labs_report, include_history=args.history or bool(args.markers))
     return res, render
 
 
@@ -1446,7 +1451,11 @@ def _cmd_screen(args) -> Any:
 
 
 def _cmd_system(args) -> Any:
-    if args.key:
+    if args.all:
+        if args.key:
+            raise ValueError("system --all cannot be combined with a system key")
+        res, render = engine.systems(args.register), fmt.systems_report
+    elif args.key:
         res, render = engine.system(args.key, args.register), fmt.system_report
     else:
         res, render = engine.systems(), fmt.systems_report

@@ -68,7 +68,9 @@ class FreshClient(unittest.TestCase):
         return dict(self.row, method="reference_panel", reliable=True)
 
     def run_report(self):
-        with mock.patch.object(prs, "_MCP", return_value=self.sidecar):
+        with mock.patch.object(prs, "_MCP", return_value=self.sidecar), \
+             mock.patch.object(prs, "ScoringVCF"), \
+             mock.patch.object(prs, "_score_row", side_effect=lambda m, row, source, build, pop: prs._verify_row(m, row, row, build, pop)):
             return prs.report(str(self.vcf), normalize=False,
                               traits=[{"term": "synthetic trait", "label": "Synthetic trait", "efo_id": "EFO_TEST"}])
 

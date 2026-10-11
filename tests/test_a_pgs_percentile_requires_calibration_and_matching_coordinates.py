@@ -127,6 +127,8 @@ class Bridge(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "input.vcf"; path.write_text("synthetic", encoding="utf-8")
             with mock.patch.object(prs, "_MCP", Sidecar), \
+                 mock.patch.object(prs, "ScoringVCF"), \
+                 mock.patch.object(prs, "_score_row", side_effect=lambda m, row, source, build, pop: prs._verify_row(m, row, row, build, pop)), \
                  mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}), \
                  mock.patch.object(prs, "_model_build", return_value={"model_harmonized_build": "GRCh38", "model_original_build": "GRCh37"}):
                 report = prs.report(str(path), traits=[{"term": "t", "label": "T", "efo_id": "EFO_TEST"}], superpopulation="EUR")

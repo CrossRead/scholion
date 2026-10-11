@@ -118,13 +118,15 @@ class TestLayerFourNamesThePrescriptionsActingOnASystem(_Pinned):
         m = SP.system("liver")["medications"]
         self.assertEqual([], m["rows"])
         self.assertEqual([{"name": "omeprazole", "classes": ["ppi"], "map_status": "no_map"}],
-                         m["unmapped"])
+                         [{k: row[k] for k in ("name", "classes", "map_status")} for row in m["unmapped"]])
+        self.assertEqual("20 mg", m["unmapped"][0]["dose"])
+        self.assertEqual([core.med_classes()["classes"]["ppi"]["label"]], m["unmapped"][0]["class_labels"])
 
     def test_a_prescription_no_class_recognises_is_listed_as_unclassified(self):
         self.write_meds([{"name": "zzz-unknown-substance"}])
         m = SP.system("liver")["medications"]
         self.assertEqual([{"name": "zzz-unknown-substance", "map_status": "no_class"}],
-                         m["unclassified"])
+                         [{k: row[k] for k in ("name", "map_status")} for row in m["unclassified"]])
 
     def test_a_stopped_prescription_is_not_a_current_one(self):
         self.write_meds([{"name": "atorvastatin", "status": "stopped"}])

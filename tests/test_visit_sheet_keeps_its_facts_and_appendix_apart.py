@@ -31,8 +31,14 @@ class TestVisitSheet(TableCase):
         from scholion.engine import system_panels
         position = {"gene": "SYNTHETIC", "rsid": "rs123", "level": "C", "read": True,
                     "state": "het", "text": "This must not enter the appendix as a clinical finding",
-                    "passport": {"level": "C", "reported": "A labelled hypothesis"},
-                    "reference_context": {"scope": "reference_only", "gene_function": "Gene biology"}}
+                    "interpretation": {"level": "C", "summary": "Recorded qualified interpretation",
+                                       "notice": "Clinician qualification", "source": "PMID:123",
+                                       "missing": ["mechanism"]},
+                    "passport": {"level": "C", "reported": "A labelled hypothesis",
+                                 "mechanism": "Recorded mechanism", "missing": ["replication"]},
+                    "reference_context": {"scope": "reference_only", "gene_function": "Gene biology",
+                                          "variant_context": "Variant context", "gene_source": "Gene source",
+                                          "variant_source": "Variant source"}}
         with mock.patch.object(system_panels, "systems", return_value={"systems": [{"key": "synthetic"}]}), \
                 mock.patch.object(system_panels, "system", return_value={"label": "Synthetic panel",
                           "genetics": {"positions": [position, {**position, "level": "A"}]}}):
@@ -42,6 +48,13 @@ class TestVisitSheet(TableCase):
         self.assertNotIn("text", row)
         self.assertEqual(1, len(data["reference_appendix"]["panels"][0]["positions"]))
         self.assertNotIn("This must not enter", json.dumps(data))
+        text = fmt.visit_report(data)
+        for expected in ("Synthetic panel", "SYNTHETIC rs123", "Recorded qualified interpretation",
+                         "Clinician qualification", "PMID:123", "Gene biology", "Variant context",
+                         "Gene source", "Variant source", "A labelled hypothesis", "Recorded mechanism",
+                         i18n.t("system.hyp.name.replication")):
+            self.assertIn(expected, text)
+        self.assertNotIn("This must not enter", text)
 
     def test_the_tool_and_cli_options_reach_the_same_core_structure(self):
         from scholion import cli

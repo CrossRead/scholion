@@ -65,6 +65,7 @@ def target_view(target: Dict[str, Any], value: Any = None) -> Dict[str, Any]:
     """The target as the renderers read it: the figures, the provenance, the side."""
     return {"low": target.get("low"), "high": target.get("high"),
             "value": target.get("value"), "unit": target.get("unit", ""),
+            "unit_display": core.unit_label(target.get("unit", "")),
             "set_by": target.get("set_by", ""), "set_on": target.get("set_on", ""),
             "note": target.get("note"), "side": target_side(target, value)}
 
@@ -95,7 +96,8 @@ def clinician_targets_view() -> Dict[str, Any]:
         current = None
         if m:
             current = {"value": m["value"], "date": m["date"], "flag": m["flag"],
-                       "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high")}
+                       "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
+                       "display_recency": m.get("display_recency")}
         rows.append({"marker": key, "name": name,
                      **target_view(tg, m["value"] if m else None),
                      "current": current,
@@ -103,7 +105,8 @@ def clinician_targets_view() -> Dict[str, Any]:
                      # The question this whole layer exists to ask: inside the
                      # laboratory corridor, outside the frame of treatment.
                      "in_corridor": (m["flag"] == "ok") if m else None})
-    to_discuss = [r for r in rows if r["outside_target"] and r["in_corridor"]]
+    to_discuss = [r for r in rows if r["outside_target"] and r["in_corridor"]
+                  and (r.get("current") or {}).get("display_recency") is True]
     return {"status": "ok", "count": len(rows),
             "outside_count": sum(1 for r in rows if r["outside_target"]),
             "to_discuss": [r["marker"] for r in to_discuss],

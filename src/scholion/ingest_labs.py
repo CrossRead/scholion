@@ -1557,7 +1557,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
 
 
 def _printed_unit(tail: str, end: int) -> str:
-    """Only an adjacent unit already named by our unit table, never a default.
+    """Only a unit printed in the result segment, never a default.
 
     Recognition-only entries have no chosen canonical unit or conversion. A
     form's spelling resolves through the existing label table, with factor one.
@@ -1566,12 +1566,26 @@ def _printed_unit(tail: str, end: int) -> str:
     candidates = []
     for code, entry in core._read_knowledge_raw("units.json").get("units", {}).items():
         for surface in [code, *(entry.get("label") or {}).values()]:
-            if isinstance(surface, str) and surface:
+            if isinstance(surface, str) and surface and not surface.isdecimal():
                 candidates.append((surface, code))
+    # Many forms put the reference interval between the result and its unit.
+    # Search only this already selected result segment, never neighbouring rows.
+    # Longest spellings consume their shorter substrings (ng/mL is not g/mL).
+    segment = tail[end:]
+    # A second recognised analyte starts another table cell. Its unit cannot
+    # complete the preceding result, even when PDF extraction joins the cells.
+    for spec in core.lab_markers().get("markers", {}).values():
+        for name in core.marker_rules(spec, "names"):
+            hit = re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", segment, re.IGNORECASE)
+            if hit:
+                segment = segment[:hit.start()]
+    codes = set()
     for surface, code in sorted(candidates, key=lambda item: len(item[0]), reverse=True):
-        if re.match(r"\s*" + re.escape(surface) + r"(?![\w/])", tail[end:], re.IGNORECASE):
-            return code
-    return ""
+        pattern = r"(?<![\w/])" + re.escape(surface) + r"(?![\w/])"
+        if re.search(pattern, segment, re.IGNORECASE):
+            codes.add(code)
+            segment = re.sub(pattern, " ", segment, flags=re.IGNORECASE)
+    return next(iter(codes)) if len(codes) == 1 else ""
 
 
 _LABEL_ROW = re.compile(r"^\s*([А-ЯЁA-Z][^\n]{2,90}?)\s+"

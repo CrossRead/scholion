@@ -155,6 +155,78 @@ def _goal_now(source: str) -> Dict[str, Any]:
             "missing": reasons[0] if reasons and not any(p != "—" for p in parts) else None}
 
 
+def _phenotype_rows(targets: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """One measurement table with dated, source-specific annual series.
+
+    Explicit quantity mappings join stored measurements to device metrics.
+    Composite targets retain separate values/dates: they are not new indices.
+    A device-specific target never substitutes another device's observations.
+    """
+    from datetime import date
+    from .profile_view import metrics_summary
+    today = date.today()
+    try:
+        edge = today.replace(year=today.year - 1)
+    except ValueError:  # February 29 in a non-leap reference year
+        edge = today.replace(year=today.year - 1, day=28)
+    ms = metrics_summary()
+    personal = {r["key"]: r for r in ms["metrics"]}
+    catalogue = core.wearable_metrics().get("metrics") or {}
+    covered = set()
+
+    def component(ref):
+        kind, _, name = ref.partition(":")
+        info = catalogue.get(name, {}) if kind == "wear" else (core.labs().get("markers") or {}).get(name, {})
+        points, device, reason = _goal_resolve(ref)
+        unit = info.get("unit") or ""
+        person_key = info.get("person_metric")
+        row = personal.get(person_key) if person_key else None
+        if row and reason != _SEVERAL_DEVICES:
+            covered.add(person_key)
+            if row.get("origin") == "manual":
+                points, device, reason = row["series"], None, None
+                unit = row.get("unit") or unit
+        out = observation(ref, points, unit, device or ("lab" if kind == "lab" else "recorded"), reason)
+        if row and row.get("origin") == "manual" and row.get("device"):
+            historical, src, why = _goal_resolve(ref)
+            if historical and not why:
+                out["device_history"] = observation(ref, historical, info.get("unit") or "", src)
+        out["label"] = (core.marker_name({"key": name, "name": info.get("name")})
+                        if kind == "lab" else info.get("name") or info.get("label") or name)
+        if ref == "wear:BMI" and ms.get("bmi"):
+            weight = personal.get("weight") or {}
+            if str(weight.get("date") or "") >= str(out.get("date") or ""):
+                out.update(value=ms["bmi"]["value"], date=weight.get("date"),
+                           source="derived", method=ms["bmi"]["method"])
+        return out
+
+    def observation(ref, points, unit, source, reason=None):
+        numeric = [p for p in points if isinstance(p.get("value"), (int, float))
+                   and not isinstance(p.get("value"), bool) and p.get("date")]
+        numeric.sort(key=lambda p: str(p["date"]))
+        recent = [p for p in numeric if str(p["date"])[:7] >= edge.isoformat()[:7]
+                  and str(p["date"])[:10] <= today.isoformat()
+                  and (len(str(p["date"])) == 7 or str(p["date"])[:10] >= edge.isoformat())]
+        latest = numeric[-1] if numeric else {}
+        delta = round(recent[-1]["value"] - recent[0]["value"], 2) if len(recent) > 1 else None
+        return {"ref": ref, "value": latest.get("value"), "date": latest.get("date"),
+                "unit": unit, "unit_display": core.unit_label(unit), "source": source, "missing": reason,
+                "series": recent, "year_delta": delta,
+                "year_from": recent[0]["date"] if recent else None,
+                "year_to": recent[-1]["date"] if recent else None}
+
+    rows = [{"label": r.get("label") or "", "best": r.get("best") or "",
+             "target": r.get("target") or "",
+             "components": [component(ref.strip()) for ref in str(r.get("source") or "").split("|")]}
+            for r in targets]
+    for key, r in personal.items():
+        if key not in covered:
+            rows.append({"label": r["name"], "best": "", "target": "",
+                         "components": [observation("metric:" + key, r["series"], r["unit"],
+                                        r["device"]["source"] if r["origin"] == "device" else "recorded")]})
+    return rows
+
+
 def goal_dashboard() -> Dict[str, Any]:
     """Dashboard of the GOAL ("get the 2021–2022 shape back") on the project's SINGLE data model.
 
@@ -166,7 +238,7 @@ def goal_dashboard() -> Dict[str, Any]:
     entities = goal_entities()
     if not g or not g.get("targets"):
         return {"available": bool(entities), "disclaimer": DISCLAIMER(), "entities": entities,
-                "targets": [], "charts": {}, "message": _t("goal.not_set")}
+                "targets": [], "phenotype": _phenotype_rows([]), "charts": {}, "message": _t("goal.not_set")}
 
     targets = []
     for t in g.get("targets", []):
@@ -182,6 +254,13 @@ def goal_dashboard() -> Dict[str, Any]:
                                              if now["missing"] in _NO_NOW else None),
                         "best": t.get("best", ""), "target": t.get("target", "")})
 
+    phenotype = _phenotype_rows(g.get("targets") or [])
+    for target, row in zip(targets, phenotype):
+        readings = row["components"]
+        target["now"] = " / ".join(_goal_num(p["value"]) for p in readings)
+        target["now_date"] = max((p["date"] for p in readings if p["date"]), default=None)
+        devices = {p["source"] for p in readings} - {"lab", "recorded", "derived"}
+        target["now_device"] = next(iter(devices)) if len(devices) == 1 else None
     ch = g.get("charts", {}) or {}
     charts: Dict[str, Any] = {}
 
@@ -224,6 +303,7 @@ def goal_dashboard() -> Dict[str, Any]:
                   or g.get("_meta", {}).get("updated")),
         "peaks": g.get("peaks", []),
         "targets": targets,
+        "phenotype": phenotype,
         "entities": entities,
         "charts": charts,
         "disclaimer": DISCLAIMER(),

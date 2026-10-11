@@ -847,8 +847,8 @@
       "alt": "A",
       "star": "Val158Met",
       "note": {
-        "en": "the A allele is Met: a thermolabile enzyme, so catecholamines are broken down more slowly. CPIC names the gene in its opioid guideline and deliberately issues NO dosing recommendation by it, and the behavioural and cognitive associations of the 2000s do not reproduce in large samples. It is in the catalogue because it is asked about often, not because anything is decided by it",
-        "ru": "аллель A — это Met: фермент термолабилен, и катехоламины разрушаются медленнее. CPIC называет ген в руководстве по опиоидам и намеренно НЕ даёт по нему рекомендаций по дозе, а поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся. Локус в каталоге потому, что о нём часто спрашивают, а не потому, что по нему что-то решается"
+        "en": "the A allele is Met: a thermolabile enzyme, so catecholamines are broken down more slowly. CPIC names the gene in its opioid guideline and deliberately issues NO dosing recommendation by it, and the behavioural and cognitive associations of the 2000s do not reproduce in large samples.",
+        "ru": "аллель A — это Met: фермент термолабилен, и катехоламины разрушаются медленнее. CPIC называет ген в руководстве по опиоидам и намеренно НЕ даёт по нему рекомендаций по дозе, а поведенческие и когнитивные ассоциации 2000-х на больших выборках не воспроизводятся."
       },
       "pos_grch37": 19951271
     },
@@ -912,8 +912,8 @@
       "alt": "T",
       "star": "p.Arg61Cys",
       "note": {
-        "en": "reduced-function OCT1 allele; the metformin association is inconsistent and CPIC issues no guideline — asked about, nothing decided",
-        "ru": "аллель OCT1 со сниженной функцией; связь с метформином противоречива, CPIC руководства не даёт — о нём спрашивают, ничего не решается"
+        "en": "reduced-function OCT1 allele; the metformin association is inconsistent and CPIC issues no guideline",
+        "ru": "аллель OCT1 со сниженной функцией; связь с метформином противоречива, CPIC руководства не даёт"
       },
       "pos_grch37": 160543148
     },

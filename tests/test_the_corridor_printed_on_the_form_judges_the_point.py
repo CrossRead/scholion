@@ -21,7 +21,7 @@ from unittest import mock
 import support
 from scholion import core, store
 from scholion import format as fmt
-from scholion.engine import labs
+from scholion.engine import labs, corridor
 
 
 def _one(key, series, marker_ref=None, sex="male"):
@@ -144,3 +144,22 @@ class TestTheReportSaysWhoseCorridorItPrints(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestCorridorWithoutRepositoryHistory(unittest.TestCase):
+    def test_unknown_sex_does_not_replace_a_recorded_default_with_a_sex_specific_range(self):
+        book = {"markers": {"synthetic": {"ref_low": 1, "ref_high": 3,
+                    "ref_by_sex": {"female": {"ref_low": 2, "ref_high": 4}}}}}
+        with mock.patch.object(core, "lab_markers", return_value=book), \
+             mock.patch.object(core, "profile_sex", return_value=None):
+            answer = corridor.point_corridor("synthetic", {"ref_low": 1, "ref_high": 3}, {})
+        self.assertEqual((1, 3), (answer["ref_low"], answer["ref_high"]))
+        self.assertTrue(answer["ref_sex_unknown"])
+
+    def test_explicitly_withheld_reference_is_not_replaced_by_profile_or_default(self):
+        with mock.patch.object(core, "lab_markers", return_value={"markers": {"synthetic": {"ref_low": 1, "ref_high": 3}}}):
+            answer = corridor.point_corridor("synthetic", {"ref_low": 1, "ref_high": 3},
+                                             {"reference_withheld": True, "ref_low": 2, "ref_high": 4})
+        self.assertIsNone(answer["ref_low"])
+        self.assertIsNone(answer["ref_high"])
+        self.assertIsNone(answer["ref_origin"])

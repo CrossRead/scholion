@@ -485,11 +485,13 @@ def _h_update(ctx: "ToolContext", confirm=False) -> str:
     return fmt.update_install_report(_upg.install(confirm=yes))
 
 
-def _h_recompute(ctx: "ToolContext", confirm=False) -> str:
+def _h_recompute(ctx: "ToolContext", confirm=False, stop=False) -> str:
     """READ by default: what this build asks the person's own data to recompute and why each
     step can or cannot run. With confirm=true it STARTS those steps in the background —
     reserved for the person's own yes in this conversation."""
     from scholion import recompute as _rc  # noqa: E402
+    if stop is True or str(stop).strip().lower() in ("true", "yes", "1"):
+        return fmt.recompute_stop_report(_rc.stop())
     yes = confirm is True or str(confirm).strip().lower() in ("true", "yes", "1")
     if not yes:
         return fmt.recompute_plan_report(_rc.plan())
@@ -618,7 +620,7 @@ _TOOLS = (
     ("sch_system", ("key", "register"), [], _h_system),
     ("sch_version", (), [], _h_version),
     ("sch_update", ("confirm",), [], _h_update),
-    ("sch_recompute", ("confirm",), [], _h_recompute),
+    ("sch_recompute", ("confirm", "stop"), [], _h_recompute),
     ("sch_medications", (), [], _h_medications),
     ("sch_genome_status", ("updates",), [], _h_genome_status),
     ("sch_selfcheck", ("full",), [], _h_selfcheck),

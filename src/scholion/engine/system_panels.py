@@ -779,7 +779,7 @@ def _polygenic_block(key: str, findings: Optional[Dict[str, Any]] = None) -> Dic
                "evidence": t_.get("evidence"), "evidence_label": t_.get("evidence_label"),
                "reliable": bool(t_.get("reliable"))}
         for k in ("validity_note", "integrity_note", "weight_mass_note", "evidence_note",
-                  "model_changed_from", "calibration_note", "calibration", "reading",
+                  "model_changed_from", "saved_result", "calibration_note", "calibration", "reading",
                   "build_validation", "percentile_method", "reference_validation"):
             if t_.get(k):
                 row[k] = t_[k]

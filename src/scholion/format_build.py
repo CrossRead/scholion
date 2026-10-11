@@ -406,6 +406,8 @@ def recompute_run_report(r: Dict[str, Any]) -> str:
     reason = r.get("reason")
     if reason == "busy":
         return _t("recompute.busy")
+    if reason == "worker_failed":
+        return _t("recompute.worker_failed", error=r.get("error") or "—")
     if reason == "per_call_host":
         return _t("recompute.per_call_host", host=r.get("host") or "—") + (
             "\n\n" + recompute_plan_report(r["plan"]) if r.get("plan") else "")

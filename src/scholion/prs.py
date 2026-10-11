@@ -19,6 +19,7 @@ import os
 import subprocess
 import re
 from pathlib import Path
+from typing import Callable, Optional
 
 from .i18n import plural as _plural, t as _t
 from .pgs_validation import number, reference_snapshot, validate
@@ -81,11 +82,17 @@ class PrsUnavailable(RuntimeError):
     """uvx/the server is unavailable — we show a tidy placeholder in the UI."""
 
 
+class PrsCancelled(RuntimeError):
+    """A requested stop interrupted the isolated scorer."""
+
+
 class _MCP:
     """A minimal synchronous MCP client over stdio (line-delimited JSON-RPC)."""
 
-    def __init__(self, mode: str = "essentials", timeout: float = 600.0):
+    def __init__(self, mode: str = "essentials", timeout: float = 600.0,
+                 cancelled: Optional[Callable[[], bool]] = None):
         self.timeout = timeout
+        self.cancelled = cancelled
         from . import net as _net
         if _net.offline():
             # SCHOLION_OFFLINE=1 must be a single, honest switch: uvx would reach
@@ -124,6 +131,22 @@ class _MCP:
         except Exception:
             self.close()
             raise
+        import queue
+        import threading
+        self._closed = threading.Event()
+        self._lines: queue.Queue[str] = queue.Queue()
+        def read_lines():
+            try:
+                while not self._closed.is_set():
+                    line = self.p.stdout.readline()
+                    if not isinstance(line, str):
+                        line = ""
+                    self._lines.put(line)
+                    if not line:
+                        break
+            finally:
+                self._lines.put("")
+        threading.Thread(target=read_lines, daemon=True).start()
         self._id = 0
         try:
             self._init()
@@ -136,8 +159,18 @@ class _MCP:
         self.p.stdin.flush()
 
     def _read_id(self, want):
+        import queue
+        import time
+        deadline = time.monotonic() + self.timeout
         for _ in range(10000):
-            line = self.p.stdout.readline()
+            if self.cancelled is not None and self.cancelled():
+                raise PrsCancelled(_t("prs.recompute.stopped"))
+            if time.monotonic() >= deadline:
+                raise PrsUnavailable(_t("prs.server_timeout"))
+            try:
+                line = self._lines.get(timeout=0.25)
+            except queue.Empty:
+                continue
             if not line:
                 # The server's own last words went to stderr, which is inherited
                 # and therefore already on the owner's screen — but the exception
@@ -193,8 +226,15 @@ class _MCP:
         return res
 
     def close(self):
+        if getattr(self, "_closed", None) is not None:
+            self._closed.set()
         try:
             self.p.terminate()
+            try:
+                self.p.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                self.p.kill()
+                self.p.wait()
         except Exception:  # quiet: best-effort cleanup of the helper process after the call
             pass
         if self._owned_constraint is not None:
@@ -545,7 +585,8 @@ def _rejected_keys(error_text: str, extra: dict) -> set:
 def report(vcf_path: str, traits=None, superpopulation=None,
            only=None, normalize: bool = True, models_per_trait: int = 3,
            profile: str = "curated", include_children: bool = False,
-           pick: str = "server", min_match_rate=None, fallback: bool = False) -> dict:
+           pick: str = "server", min_match_rate=None, fallback: bool = False,
+           progress=None, stop=None) -> dict:
     """Normalise the VCF once → compute_prs_by_trait(interpret) for each trait.
 
     only — a list of substrings to filter traits (a quick test on a single one).
@@ -597,7 +638,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
         import sys as _s
         print(msg, file=_s.stderr, flush=True)
 
-    m = _MCP()
+    m = _MCP(cancelled=stop) if stop is not None else _MCP()
     out = []
     geno = None
     source = None
@@ -621,6 +662,8 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                 geno = None
                 _log(_t("prs.normalise_failed", error=e))
         for i, t in enumerate(traits, 1):
+            if progress is not None:
+                progress(i - 1, len(traits), t.get("label") or t.get("term"))
             _log(f"→ [{i}/{len(traits)}] PGS: {t.get('label')}…")
             row = {"label": t.get("label"), "category": t.get("category"), "term": t.get("term")}
             try:
@@ -718,9 +761,13 @@ def report(vcf_path: str, traits=None, superpopulation=None,
                             row["status"] = "ok_fallback"
                     else:
                         row.setdefault("fallback_error", err)
+            except PrsCancelled:
+                raise
             except Exception as e:  # noqa
                 row["status"] = "error"; row["error"] = str(e)
             out.append(row)
+        if progress is not None:
+            progress(len(traits), len(traits), None)
         return {"ok": True, "vcf": vcf_path, "genotypes_path": geno,
                 "genome_build": build, "assembly_evidence": assembly,
                 "superpopulation": superpopulation,

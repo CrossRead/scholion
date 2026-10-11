@@ -99,11 +99,20 @@ def _call_sites(step, tick):
     return sites.genotype(progress=tick, stop=_stop_requested)
 
 
+def _call_prs(step, tick):
+    from . import prs_recompute
+    result = prs_recompute.calculate(confirm=True, progress=tick, stop=_stop_requested)
+    if result.get("status") == "stopped":
+        raise Stopped()
+    return result
+
+
 #: What this build runs by itself, keyed by the command a journal lead names.
 #: `folder` — the source folder the command reads (from `profile/sources.json`);
 #: `profile_file` / `genome_file` — what it rewrites, and what must exist for a
 #: release's «if … was ingested by an earlier version» to apply at all.
 RUNNERS: Dict[str, Dict[str, Any]] = {
+    "scholion prs": {"profile_file": "prs_results.json", "call": _call_prs},
     "scholion ingest-labs": {"folder": "labs_docs", "profile_file": "labs.json", "call": _call_labs},
     "scholion ingest-studies": {"folder": "labs_docs", "profile_file": "studies.json",
                                 "call": _call_studies},
@@ -250,6 +259,13 @@ def _judge(step: Dict[str, Any]) -> None:
     from . import core, sites, updates
     spec = RUNNERS[step["key"]]
     step["detail"] = {}
+    if step["key"] == "scholion prs":
+        from . import prs_recompute
+        st = prs_recompute.preflight()
+        step["state"] = st["status"]
+        step["why"] = None
+        step["detail"] = st
+        return
     if step["key"] == "scholion coverage":
         from . import coverage as _cov
         st = step.get("data") or _cov.state()
@@ -343,7 +359,8 @@ def program_prefix(installed: Any = _UNSET) -> str:
     return python + " -m scholion"
 
 
-def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, Any]:
+def plan(since: Optional[str] = None, text: Optional[str] = None,
+         prs_only: bool = False, force_prs: bool = False) -> Dict[str, Any]:
     """What would run, what a person has to do, and why each of the rest does not apply."""
     from . import sites, updates
     now = updates.installed()
@@ -415,22 +432,26 @@ def plan(since: Optional[str] = None, text: Optional[str] = None) -> Dict[str, A
         by_key[screen["key"]] = screen
         steps.append(screen)
     from . import core
-    from .pgs_validation import recalculation_status
+    from .prs_recompute import recalculation_status
     prs_data = core.prs_results()
-    prs_recalculation = recalculation_status(prs_data.get("traits", []))
+    prs_recalculation = recalculation_status(prs_data)
     # This scoring correction is data-driven: an already checked report needs
     # no repeat job merely because the application's version marker is older.
     steps = [s for s in steps if not (s.get("kind") == "by_hand" and
              "if polygenic scores were computed before this release" in s.get("conditions", []))]
-    if prs_recalculation["required"]:
-        steps.append({"kind": "by_hand", "state": "by_hand", "source": "data",
+    # The actual score witness, not the application's version, determines need.
+    steps = [s for s in steps if s.get("key") != "scholion prs"]
+    if prs_recalculation["required"] or force_prs:
+        steps.append({"kind": "command", "key": "scholion prs", "force": False,
+                      "source": "data", "versions": [], "conditions": [],
                       "attention_key": "prs-recalculate-" + str(prs_recalculation["traits"]),
-                      "versions": [], "conditions": [_t("prs.recalculate.title")],
-                      "text": _t("prs.recalculate.note", count=prs_recalculation["traits"])
-                              + " " + _t("prs.recalculate.instructions")})
+                      "text": _t("prs.recalculate.title")})
+    if prs_only:
+        steps = [s for s in steps if s.get("key") == "scholion prs"]
     for s in steps:
         if s.get("key"):
-            s["command"] = s["key"] + (" --force" if s.get("force") else "")
+            s["command"] = s["key"] + (" --recalculate --yes" if s["key"] == "scholion prs"
+                                           else " --force" if s.get("force") else "")
             _judge(s)
         s.pop("data", None)
     for i, s in enumerate(steps, 1):
@@ -478,16 +499,17 @@ def _summary(res: Any) -> Dict[str, Any]:
     if not isinstance(res, dict):
         return {}
     keep = ("files_seen", "files_processed", "errors", "positions", "chromosomes", "metrics",
-            "status", "reason", "error", "message", "rows", "path")
+            "status", "reason", "error", "message", "rows", "path", "backup",
+            "reliable", "preparation", "missing_before")
     return {k: res[k] for k in keep if k in res and not isinstance(res[k], (dict,))}
 
 
 def run(confirm: bool = False, since: Optional[str] = None, text: Optional[str] = None,
         calls: Optional[Dict[str, Callable]] = None,
         echo: Optional[Callable[[Dict[str, Any], int], None]] = None,
-        claimed: bool = False) -> Dict[str, Any]:
+        claimed: bool = False, prs_only: bool = False, force_prs: bool = False) -> Dict[str, Any]:
     """Run every `ready` step in order; nothing starts without `confirm`."""
-    p = plan(since=since, text=text)
+    p = plan(since=since, text=text, prs_only=prs_only, force_prs=force_prs)
     ready = [s for s in p["steps"] if s.get("state") == "ready"]
     if not confirm:
         return {"ok": False, "started": False, "reason": "not_confirmed", "plan": p}
@@ -568,7 +590,8 @@ def _run_steps(p: Dict[str, Any], ready: List[Dict[str, Any]], calls: Optional[D
     job["status"] = ("finished" if all(x == "done" for x in states)
                      else "stopped" if "stopped" in states else "failed")
     job["finished"] = _now()
-    if job["status"] == "finished" and not p["by_hand"] and not p["needs_input"]:
+    if job["status"] == "finished" and not p["by_hand"] and not p["needs_input"] and not all(
+            s["key"] == "scholion prs" for s in ready):
         if p["since"]:
             job["recorded"] = updates.mark_seen().get("recorded")
         else:
@@ -631,7 +654,8 @@ def _run_claimed(since: Optional[str], claim: Optional[Path],
         _run_bound(since, claim)
 
 
-def _run_bound(since: Optional[str], claim: Optional[Path]) -> None:
+def _run_bound(since: Optional[str], claim: Optional[Path], *,
+               prs_only: bool = False, force_prs: bool = False) -> None:
     """The thread's body: whatever `run` returns or raises, the job file ends in a
     terminal state and the claim is released. `run` can return before writing
     anything — the plan changed between the check and the start — and a job file
@@ -640,7 +664,7 @@ def _run_bound(since: Optional[str], claim: Optional[Path]) -> None:
     try:
         from . import container
         container.gate()
-        res = run(confirm=True, since=since, claimed=True)
+        res = run(confirm=True, since=since, claimed=True, prs_only=prs_only, force_prs=force_prs)
         if not res.get("started"):
             _write({"status": "failed", "pid": os.getpid(), "finished": _now(),
                     "reason": res.get("reason") or "not_started", "steps": []}, force=True)
@@ -667,9 +691,12 @@ def start_in_background(since: Optional[str] = None) -> Dict[str, Any]:
     from . import container
     context = container.capture()
     host = per_call_host()
-    if host:
-        return {"started": False, "reason": "per_call_host", "host": host, "plan": plan(since=since)}
     p = plan(since=since)
+    if host:
+        if any(s.get("key") == "scholion prs" and s.get("state") == "ready" for s in p["steps"]):
+            from . import prs_worker
+            return prs_worker.start(since)
+        return {"started": False, "reason": "per_call_host", "host": host, "plan": p}
     if p["job"].get("status") == "running":
         return {"started": False, "reason": "busy", "job": p["job"]}
     ready = [s for s in p["steps"] if s.get("state") == "ready"]

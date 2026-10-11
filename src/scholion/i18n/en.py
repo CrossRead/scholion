@@ -75,6 +75,9 @@ MESSAGES = {
     "treatment.due": "Control due by",
     "treatment.source": "Recorded plan source",
     "treatment.scope": "Recorded events, not an assessment of treatment response. An observation after a start does not establish an effect.",
+    "treatment.intake_start": "Intake start",
+    "treatment.intake_start_missing": "Exact intake start date not recorded",
+    "treatment.scheme_date": "Prescription scheme date",
     "treatment.start": "Prescription start",
     "treatment.undated": "Start date not recorded or invalid",
     "treatment.overdue": "Control date passed — no matching draw recorded in this profile",
@@ -4319,3 +4322,46 @@ MESSAGES['web.prs.accuracy_missing'] = 'Predictive accuracy of this model is not
 MESSAGES['web.prs.accuracy_note'] = 'AUROC measures discrimination in a study, not your probability of disease.'
 
 MESSAGES.update({'web.second.gen_absent': 'Catalogue allele not detected at the read position (this refers to the variant, not an absent gene): {genes}', 'system.panel.conclusion_absent': 'catalogue allele not detected at the read positions: {genes}', 'web.life.monthly_mean': 'Monthly device average', 'web.life.dated_readings': 'Dated measurements', 'web.prs.incomplete': 'Insufficient genotype coverage', 'prs.reading_incomplete': 'Insufficient genotype coverage: {positions}% of positions and {weights}% of absolute weight mass covered; both must reach 90%. Not included in the above-average summary.', 'prs.reading_sources': 'The score uses called genotypes in the supplied VCF, including when they were prepared from BAM. A variant-only VCF may omit reference homozygotes; missing records are not assumed to be reference. With VCF only, supply a scoring-site VCF with called reference genotypes exported from a caller that retained these genotypes. If these calls are unavailable, the percentile remains unverified. BAM can supply missing calls when available.'})
+
+
+MESSAGES.update({
+    'prs.recompute.no_input': 'The saved PGS report is readable, but this machine has no accessible scoring-site VCF or connected genome VCF. Connect the local input; a copied report cannot recreate genotypes. BAM and its matching reference can fill missing calls.',
+    'prs.recompute.build_unknown': 'The input coordinate build is not verified. Connect a VCF with recorded GRCh37 or GRCh38 coordinates.',
+    'prs.recompute.population_unknown': 'The reference population is not determined. Prepare the connected genome or record the reference population before recalculation.',
+    'prs.recompute.sample_mismatch': 'The input must contain one sample matching the connected genome and population determination. No results were replaced.',
+    'prs.recompute.invalid_vcf': 'The local VCF could not be read. Check the path and the single-sample file.',
+    'prs.recompute.no_models': 'No pinned models are available for these traits.',
+    'prs.recompute.no_uvx': 'uvx is required for the isolated PGS scorer; install uv before starting.',
+    'prs.recompute.ready': 'Recalculate pinned PGS models from local called genotypes. Reuse the existing VCF; fill missing positions from matching BAM when available. Keep the original report until the complete replacement is validated.',
+    'prs.recompute.build_mismatch': 'VCF, BAM, model coordinates and reference FASTA must use the same verified assembly.',
+    'prs.recompute.model': 'Preparing model {id}',
+    'prs.recompute.model_missing': 'Model {id} is not cached; offline recalculation cannot download it.',
+    'prs.recompute.chromosome': 'Reading missing scoring calls on chromosome {chrom}',
+    'prs.recompute.written': 'The new PGS report was validated and saved. Percentiles without verified calibration remain unconfirmed.',
+    'prs.recompute.stopped': 'Recalculation stopped. The previous PGS report was not replaced.',
+    'prs.recompute.failed': 'Recalculation did not complete. The previous PGS report was not replaced.',
+    'gene.reading.not_checked': 'The region has not been checked in the available input.',
+    'gene.reading.variants': 'Differences recorded in the available VCF: {count}.',
+    'gene.reading.no_differences': 'No differences from the {assembly} reference sequence were found in the available records for the checked region.',
+    'gene.reading.no_coverage': 'No read coverage was measured in the selected region; absence of VCF variants does not evaluate it.',
+    'gene.reading.coverage_unknown': 'Coverage is not measured. Missing VCF rows do not confirm reference genotypes.',
+    'gene.reading.partial_coverage': 'Uncovered bases are not evaluated. Read coverage is not the fraction of confirmed reference genotypes.',
+    'gene.reading.covered': 'Read depth covers the region; it does not itself confirm reference genotypes at every base.',
+    'gene.reference_link': 'Reference sequence of the checked region',
+    'gene.coverage_build_unknown': 'The alignment assembly is not verified against the checked region.',
+})
+
+MESSAGES["gene.coverage_line"] = "{what}: reads on {pct1}% of bases (≥1×), {pct0}% without reads; mean {mean}×, minimum {min}×; ≥10× on {pct10}%, ≥20× on {pct20}%."
+MESSAGES["prs.recalculate.instructions"] = "Preview with scholion prs --recalculate; confirm with scholion prs --recalculate --yes. The web update panel and sch_recompute use the same installed-package operation. Use scholion recompute --status or --stop while it runs. Inputs stay local; an old report is preserved on failure or cancellation."
+
+MESSAGES["tool.sch_recompute.param.stop"] = 'Request cancellation of the current local recalculation; do not start a new operation.'
+
+MESSAGES["prs.server_timeout"] = 'The local scorer did not answer within its time limit.'
+
+MESSAGES["gene.reference_calls"] = 'Read reference genotypes (quality remains position-specific)'
+
+MESSAGES["recompute.worker_failed"] = 'PGS recalculation could not start: {error}. The previous report is preserved.'
+
+MESSAGES.update({'prs.saved.label': 'Saved value: {value} (unverified)', 'prs.saved.recalculate': 'Recalculate PGS before using this result. The saved value remains visible until a new report is saved successfully.', 'prs.saved.unverified': 'Recalculation can check this result; a confirmed percentile still requires a suitable reference. This value is excluded from confirmed results.'})
+
+MESSAGES["prs.saved.short"] = 'Saved · unverified'

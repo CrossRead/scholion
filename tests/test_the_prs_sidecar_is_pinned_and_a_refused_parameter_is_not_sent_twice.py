@@ -136,6 +136,10 @@ class TestASilentServerNamesItsCause(unittest.TestCase):
     def test_the_exception_names_the_exit_code_and_the_pin(self):
         m = prs._MCP.__new__(prs._MCP)
         m.p = _FakeProcess([])
+        import queue
+        m._lines = queue.Queue()
+        m._lines.put("")
+        m.timeout, m.cancelled = 1, None
         with self.assertRaises(prs.PrsUnavailable) as cm:
             m._read_id(1)
         text = str(cm.exception)

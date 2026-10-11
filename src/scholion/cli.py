@@ -193,7 +193,10 @@ def _add_answers_commands(sub, common) -> None:
                              "genotype, depth, classification, submitter and the gate's counts; "
                              "the verdict is the same in both")
 
-    sub.add_parser("prs", parents=[common], help="polygenic risks (PGS): percentiles by trait")
+    pg = sub.add_parser("prs", parents=[common], help="polygenic scores: read results or recalculate pinned models")
+    pg.add_argument("--recalculate", action="store_true", help="preview an installed-package PGS recalculation")
+    pg.add_argument("--yes", action="store_true", help="confirm --recalculate; preserve the old report on failure")
+    pg.add_argument("--scoring-vcf", metavar="PATH", help="called scoring-site VCF; missing raw-VCF rows are never imputed")
     sub.add_parser("longevity", parents=[common], help="the longevity layer (LongevityMap): APOE ε + markers")
     sub.add_parser("lipid-genetics", parents=[common],
                    help="the inherited side of the lipid profile: PCSK9 carriage + Lp(a)")
@@ -1292,6 +1295,17 @@ def _cmd_acmg(args) -> Any:
 
 
 def _cmd_prs(args) -> Any:
+    if getattr(args, "recalculate", False):
+        from . import recompute as rc
+        if getattr(args, "scoring_vcf", None):
+            os.environ["SCHOLION_PRS_VCF"] = str(args.scoring_vcf)
+        if args.yes:
+            res = rc.run(confirm=True, prs_only=True, force_prs=True,
+                         echo=None if args.json else _recompute_echo)
+            return res, fmt.recompute_run_report
+        return rc.plan(prs_only=True, force_prs=True), fmt.recompute_plan_report
+    if getattr(args, "yes", False) or getattr(args, "scoring_vcf", None):
+        raise ValueError("--yes and --scoring-vcf require --recalculate")
     res, render = engine.prs_findings(), fmt.prs_report
     return res, render
 
@@ -1700,7 +1714,8 @@ def _main(argv=None) -> int:
         # Whatever this command writes goes into the container it read (task 192).
         with _container.pinned():
             from . import lifecycle, contract
-            lifecycle.record_current('write' if args.cmd in contract.WRITES else 'read',
+            lifecycle.record_current('write' if args.cmd in contract.WRITES or
+                                     (args.cmd == 'prs' and getattr(args, 'recalculate', False) and getattr(args, 'yes', False)) else 'read',
                                      'cli-tty' if sys.stdin.isatty() else 'cli-script')
             return _dispatch(p, args)
     finally:
@@ -1753,7 +1768,9 @@ def _dispatch(p, args) -> int:
         # `scholion limits --bed > weak.bed` must not leave a refusal sentence
         # in a file a laboratory will read as intervals.
         return 1
-    if args.cmd == "recompute" and res.get("started") and not res.get("ok"):
+    if args.cmd == "prs" and getattr(args, "recalculate", False) and getattr(args, "yes", False) and not res.get("ok"):
+        return 1
+    if args.cmd == "recompute" and getattr(args, "yes", False) and res.get("started") and not res.get("ok"):
         return 1
     if args.cmd == "selfcheck" and isinstance(res, dict) and any(
             c.get("severity") == "error" for c in res.get("skill_copies") or []):

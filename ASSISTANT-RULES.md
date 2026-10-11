@@ -103,8 +103,10 @@ relayed only with verified calibration and matching genome/model coordinate
 builds. Coverage and a sidecar reliability flag alone do not establish either.
 AUROC-only fallbacks, rejected references and legacy results without provenance
 are diagnostic values, not population positions; do not turn them into high-risk
-flags, reassurance or clinical questions. Relay the explicit reason for withholding
-a percentile. A high calibrated percentile is still not a disease probability.
+flags, reassurance or clinical questions. Keep previously recorded numbers visible
+as unverified saved values, with a recalculation recommendation wherever they
+appear; do not delete them before a replacement report is saved successfully.
+Relay the explicit reason for withholding a confirmed percentile. A high calibrated percentile is still not a disease probability.
 
 **9. A threshold that fires on almost everything gets fixed, not explained.** A
 cheap check before any interpretation: what fraction of objects did the flag hit?

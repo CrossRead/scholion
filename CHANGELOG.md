@@ -40,6 +40,62 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.8 — 11.10.2026
+
+### What you can do now
+
+**Recalculate saved PGS through the installed application.** Preview with
+`scholion prs --recalculate` and confirm with
+`scholion prs --recalculate --yes`. The web update panel and `sch_recompute`
+use the same operation, with progress and cancellation. A source checkout is
+no longer required. The operation reuses available scoring calls, including
+reference homozygotes, and reads a matching BAM only for missing model positions.
+VCF-only inputs retain their actual coverage; absent positions are not imputed.
+A report moved to another computer names missing local inputs. Failed or stopped
+work preserves the previous report, and a successful replacement keeps a backup.
+
+**Read a gene with the scope of its examination.** Gene lookup combines catalogue
+positions with available region findings, including noncoding differences.
+The answer identifies the reference build, interval and transcript, links the
+reference sequence, and shows measured depth and the fractions covered or lacking
+reads. Unmeasured coverage is distinguished from zero coverage. A zero variant
+count does not mean the gene is absent or every base matches the reference.
+
+Treatment lists and timelines use the recorded prescription date as the intake
+start when no separate intake start is recorded. Existing intake dates take
+precedence. The result retains the source of the default; an ambiguous or invalid
+prescription date does not supply a start. The treatment view distinguishes the
+scheme date from the intake start and remembers the selected interface language.
+
+### What changes in the conclusions
+
+Saved PGS scores are rebuilt with checked called-allele scoring and pinned models. Previously recorded numbers remain visible as unverified saved values in PGS, system panels, lipid views, CLI and agent results until a new report is saved successfully. They carry a recalculation recommendation and do not enter confirmed high-score summaries.
+Only verified calibration can establish a population percentile; an unavailable
+reference remains an explicit limitation. Coverage alone does not establish
+calibration or a disease probability. Gene conclusions remain bounded by the
+positions called and the coverage measured.
+
+A missing intake start no longer makes a dated prescription appear undated.
+This default does not establish the actual first dose or a treatment response.
+
+### What is retracted
+
+Previously saved percentiles lacking verified scoring or calibration remain
+diagnostic history; this release does not restore them as confirmed results.
+
+### What needs recomputing
+
+**Run `scholion prs --recalculate --yes` — if saved PGS scoring is unverified or the genome inputs, pinned model or reference population changed.**
+Preview with `scholion prs --recalculate` before confirming. An application update alone does not require
+repeating an already verified calculation. Review the plan and confirm before
+starting; genome preparation can take time. Repeating BAM calls cannot supply a
+missing reference distribution. Models without a pinned identity remain outside
+the recalculation rather than being silently changed.
+
+Gene lookups and existing prescription records are resolved when read, without
+rewriting their stored history or automatically preparing the whole genome.
+
+
 ## v0.6.7 — 11.10.2026
 
 ### What you can do now

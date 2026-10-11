@@ -51,7 +51,8 @@ def treatment_timeline(today: Optional[date] = None) -> Dict[str, Any]:
                 "dose": med.get("dose"), "current": med["current"],
                 "source": "medications.json"}
         start = str(med.get("start_date") or "")
-        event = {**base, "kind": "prescription_start", "date": start or None}
+        event = {**base, "kind": "prescription_start", "date": start or None,
+                 "start_date_provenance": med.get("start_date_provenance")}
         if store.date_resolution(start) is not None:
             events.append(event)
         else:

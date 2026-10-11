@@ -150,9 +150,11 @@ def _system_polygenic(poly: Any, register: str) -> List[str]:
                         scored=poly.get("scored") or 0, high=len(poly.get("high") or [])))
     for r in poly.get("rows") or []:
         line = "   · " + _t("system.polygenic.row", label=r.get("label"),
-                            percentile=percentile_label(r.get("percentile")),
+                            percentile=(r.get("saved_result") or {}).get("label") or percentile_label(r.get("percentile")),
                             reliable=_t("system.polygenic.reliable" if r.get("reliable")
                                         else "system.polygenic.unreliable"))
+        if (r.get("saved_result") or {}).get("note"):
+            line += "\n     " + r["saved_result"]["note"]
         if r.get("calibration_note"):
             line += "\n     " + str(r["calibration_note"])
         if register == "clinician":

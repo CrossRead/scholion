@@ -118,8 +118,10 @@ relayed only with verified calibration and matching genome/model coordinate
 builds. Coverage and a sidecar reliability flag alone do not establish either.
 AUROC-only fallbacks, rejected references and legacy results without provenance
 are diagnostic values, not population positions; do not turn them into high-risk
-flags, reassurance or clinical questions. Relay the explicit reason for withholding
-a percentile. A high calibrated percentile is still not a disease probability.
+flags, reassurance or clinical questions. Keep previously recorded numbers visible
+as unverified saved values, with a recalculation recommendation wherever they
+appear; do not delete them before a replacement report is saved successfully.
+Relay the explicit reason for withholding a confirmed percentile. A high calibrated percentile is still not a disease probability.
 
 **9. A threshold that fires on almost everything gets fixed, not explained.** A
 cheap check before any interpretation: what fraction of objects did the flag hit?
@@ -1205,7 +1207,15 @@ finding is confirmed by clinical typing before a drug is actually prescribed.
 
 ### Polygenic scores and the longevity layer
 
-**`prs`** reads `profile/prs_results.json` — polygenic scores from the PGS
+**`prs`** reads `profile/prs_results.json`; reading starts no calculation.
+`scholion prs --recalculate` previews the installed-package operation and
+`scholion prs --recalculate --yes` confirms it. Through MCP or the plugin, use
+`sch_recompute` to read the executable plan and start it only after the person
+confirms; call it again for progress. The web update panel uses that same runner.
+An inaccessible local VCF or BAM is named, not a reason to request a private
+source checkout. A failed or stopped operation preserves the old report.
+
+These are polygenic scores from the PGS
 Catalog. For every trait: the percentile (position in the population), quality of
 coverage, the `reliable` flag, the level of evidence `evidence` (clinical /
 supportive / research). Rules for the write-up:
@@ -1226,9 +1236,10 @@ supportive / research). Rules for the write-up:
   review (`src/ingest/prs_model_review.py`) and an explicit `--accept-model`; the
   field `model_changed_from` means a break in the series — a trend is not drawn
   across it.
-- The distillate is assembled only by the builder `src/ingest/prs_results_build.py`
-  from the raw output of the computation (`profile/prs_report_raw.json`). Redirecting
-  the raw output straight into a profile file produces an unreadable schema.
+- The installed recalculation builds the flat, independently validated report
+  itself, backs up the original bytes and saves atomically. Never redirect nested
+  `python -m scholion.prs report` output into `prs_results.json`. Source-only
+  audit and model-review scripts are not prerequisites for an installed user.
 - A share of matched positions greater than one is arithmetically impossible: the
   engine itself removes `reliable` and writes an `integrity_note` — the input has to
   be rebuilt, and the cause is usually double counting of positions in the input VCF.

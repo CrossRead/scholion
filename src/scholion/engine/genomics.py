@@ -53,14 +53,8 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
         if isinstance(_item, dict) and _item.get("rsid"):
             _item["basis"] = locus_basis(_item["rsid"])
     if gene and not rsid:
-        try:
-            r["layers"] = gene_layers(gene)
-        except Exception as exc:                                     # noqa: BLE001
-            # A frame that failed to build and vanished is a frame the reader
-            # believes was never needed. Same rule as everywhere else here: the
-            # failure is named, not swallowed.
-            r["layers"] = {"gene": (gene or "").upper(), "status": "unavailable",
-                           "reason": type(exc).__name__}
+        from ..gene_region import attach_reading
+        attach_reading(r, gene)
     r["disclaimer"] = DISCLAIMER()
     return r
 
@@ -882,12 +876,17 @@ def prs_findings() -> Dict[str, Any]:
     if closed:
         return closed
     data = core.prs_results()
-    from ..pgs_validation import validate as validate_pgs, recalculation_status
+    from ..pgs_validation import validate as validate_pgs, retain_saved_value
+    from ..prs_recompute import recalculation_status
     traits = [validate_pgs(t, expected_ancestry=(data.get("_meta") or {}).get("superpopulation"))
               for t in data.get("traits", [])] if isinstance(data, dict) else []
     if not traits:
         return {"available": False, "disclaimer": PRS_DISCLAIMER(),
                 "message": _t("prs.not_computed")}
+    recalculation = recalculation_status(data)
+    changed = recalculation.get("reason") in {"input_changed", "population_changed", "model_changed"}
+    for tr in traits:
+        retain_saved_value(tr, stale=changed)
     # WHERE THESE NUMBERS CAME FROM, and when. A polygenic score is a stored
     # RESULT: it was computed once from a VCF and lives in the profile afterwards.
     # So the screen could show twelve percentiles a centimetre below a chip
@@ -960,7 +959,6 @@ def prs_findings() -> Dict[str, Any]:
             tr["reliability_note"] = _t("prs.reading_incomplete" if not (tr.get("reading") or {}).get("sufficient") else "web.prs.unverified", positions=(round(mr * 100, 1) if isinstance(mr, (int, float)) else "—"),
                                        weights=(round(wm * 100, 1) if isinstance(wm, (int, float)) else "—"))
     reliable = [t for t in traits if t.get("reliable")]
-    recalculation = recalculation_status(traits)
     if recalculation["required"]:
         recalculation.update(title=_t("prs.recalculate.title"),
                              note=_t("prs.recalculate.note", count=recalculation["traits"]),
@@ -1229,7 +1227,7 @@ def lipid_genetics() -> Dict[str, Any]:
     for cat in (prs_findings().get("categories") or []):
         for tr in cat.get("traits") or []:
             if tr.get("pgs_id") == _LPA_PGS:
-                estimate = {k: tr.get(k) for k in ("pgs_id", "label", "calibration_note",
+                estimate = {k: tr.get(k) for k in ("pgs_id", "label", "calibration_note", "saved_result",
                             "reliability_note", "reading_note", "reference_note")}
                 estimate.update(percentile=tr.get("percentile") if tr.get("reliable") else None,
                                 reliable=bool(tr.get("reliable")), quality=tr.get("quality_label"))

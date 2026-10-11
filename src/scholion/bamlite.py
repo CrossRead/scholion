@@ -237,6 +237,7 @@ def summarise(cov: List[int], thresholds=(1, 10, 20, 30)) -> Dict[str, float]:
     s = sorted(cov)
     return {
         "bases": len(cov),
+        "pct_zero": round(100.0 * sum(c == 0 for c in cov) / n, 2),
         "mean": round(sum(cov) / n, 2),
         "median": s[n // 2] if cov else 0,
         "min": min(cov) if cov else 0,

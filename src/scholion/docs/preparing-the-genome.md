@@ -327,6 +327,21 @@ Periodic updating (a button in the application, by hand or on a monthly schedule
 
 ## 7. Step 4: polygenic scores and the longevity layer — optional
 
+### Installed-package PGS recalculation
+
+Use `scholion prs --recalculate` to preview and
+`scholion prs --recalculate --yes` to confirm. The web update panel and
+`sch_recompute` run the same packaged operation. Follow progress with
+`scholion recompute --status`; request cancellation with
+`scholion recompute --stop`. It reuses called scoring-site genotypes, obtains
+public pinned model files and fills only missing calls from a matching local
+BAM when available. The saved report is backed up and replaced atomically after
+validation; failed or stopped work preserves it. A moved report without local
+VCF/BAM identifies the missing input. These commands work after a wheel install
+and need no source helper scripts. The source pipeline below is for preparing
+new genome data and for separate development audits.
+
+
 Both layers require a **BAM**, not just a VCF, and here is why: an ordinary VCF contains only the positions where you differ from the reference. For a polygenic score this breaks coverage — reference-homozygous scoring positions are simply absent, and the calculator honestly counts them as "not covered". So the positions needed are **re-genotyped** from the BAM separately, with calling done without the `-v` filter so that `0/0` calls stay in the output.
 
 **Prepare the shared reference population first.** Connecting the genome now prepares its population assignment automatically. Supply the aligned BAM and indexed FASTA together with the VCF, so preparation can call a small set of independent genotype sites, including reference homozygotes:
@@ -437,7 +452,7 @@ python3 src/ingest/ancestry_check.py
 
 The source wrapper and automatic connection use the same packaged determination. New PGS calculations use its population unless explicitly overridden and save that source. Saved results compare their historical panel with the current determination. A matching panel is shown as matching even if an older file lacks the original selection source; this agreement does not validate calibration. Different or unrecorded calculation populations remain warnings. Saved scores are never relabelled or rewritten by population preparation.
 
-Note the separation of layers: **`genome/`** is the cold database (the VCF and the re-genotyped positions), while the tabs of the application read **the distillate in `profile/`**: `profile/prs_results.json` and `profile/longevity_findings.json`. The first is built by the `prs_results_build.py` tool from the raw output of `prs report` (see above) — not by redirection. The second is built by the generator `src/ingest/longevity_findings_build.py`: it overlays the re-genotyped `longevity_sites.vcf.gz` onto the LongevityMap catalogue and onto the **curated catalogue of directions** `knowledge/longevity_directions.json` (which allele is "pro-longevity" according to the primary sources, with PMIDs). The key honesty of this layer lies in that separation: entries with a direction are shown with a verdict (favourable / mild plus / neutral / practical flag) and a short "what to do about it", whereas statistically significant carrier states WITHOUT a curated direction are marked as a navigator through the literature, not as "pluses" — for most LongevityMap entries the direction of the allele was never published at all (aggregate gene-based tests, multi-marker panels). `longevity_report.py` remains a human-readable markdown report.
+Note the separation of layers: **`genome/`** is the cold database (the VCF and the re-genotyped positions), while the tabs of the application read **the distillate in `profile/`**: `profile/prs_results.json` and `profile/longevity_findings.json`. The first is built and saved by the installed recalculation operation, or by the source-only builder for development audits; raw nested scoring output must not replace it. The second is built by the generator `src/ingest/longevity_findings_build.py`: it overlays the re-genotyped `longevity_sites.vcf.gz` onto the LongevityMap catalogue and onto the **curated catalogue of directions** `knowledge/longevity_directions.json` (which allele is "pro-longevity" according to the primary sources, with PMIDs). The key honesty of this layer lies in that separation: entries with a direction are shown with a verdict (favourable / mild plus / neutral / practical flag) and a short "what to do about it", whereas statistically significant carrier states WITHOUT a curated direction are marked as a navigator through the literature, not as "pluses" — for most LongevityMap entries the direction of the allele was never published at all (aggregate gene-based tests, multi-marker panels). `longevity_report.py` remains a human-readable markdown report.
 
 The mandatory caveats that the project keeps in every output of this layer: polygenic scores are built predominantly on European cohorts; **a percentile is not a probability**; and the presence of a variant in a literature catalogue is not a "risk" but the fact of a publication.
 

@@ -324,3 +324,22 @@ scholion capabilities --json | python3 -c "import json,sys; print(json.load(sys.
   scholion genome-status      # what it can see of the genome, and why not
   scholion limits             # what it cannot say, and what would change that
   ```
+
+
+### Recalculating saved PGS through an assistant
+
+The installed MCP server's `sch_recompute` offers an executable, data-driven PGS
+step when stored scores need corrected allele scoring. Calling it without
+confirmation reads the plan and progress. After the person explicitly agrees,
+`confirm=true` starts the same packaged runner used by the web and
+`scholion prs --recalculate --yes`; subsequent calls read progress. Source-only
+preparation scripts are not required. The selected container and local input
+paths must match. A report copied from another machine cannot recreate an absent
+VCF or BAM; the plan identifies that gap. Failure or cancellation preserves the
+old report. Verified current results do not request this expensive operation
+merely because another application version was installed.
+
+A host that exits after each tool call starts confirmed PGS recalculation in a
+separate installed worker. The worker retains the captured container and checks
+its identity before writes; progress and cancellation use the same job files.
+It does not require a source checkout or a persistent chat process.

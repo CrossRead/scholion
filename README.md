@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.6.7** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.6.8** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -791,6 +791,9 @@ Installing an update requires the person's permission.
 PGS model discovery can query `www.pgscatalog.org` for public model identifiers,
 trait names and variant counts. No genotype, score, sample identifier or
 personal phenotype is sent; dosage and reference calibration run locally.
+Consented PGS recalculation downloads public model weights from `ftp.ebi.ac.uk`
+using only the pinned model identifier and coordinate build. Genetic files and
+personal results remain local.
 
 Tool answers are handed to the assistant host. If it uses a remote model, an
 answer containing genotypes, values, dates and the technical container ID may

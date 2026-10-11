@@ -887,8 +887,24 @@ def list_medications() -> List[Dict[str, Any]]:
     — the command, the page, the assistant's context — marks a stopped entry
     the same way instead of each deciding, or not deciding, on its own.
     """
-    return [{**m, "current": core.is_active_medication(m)}
-            for m in core.medications_json().get("medications", [])]
+    rows = []
+    for med in core.medications_json().get("medications", []):
+        row = {**med, "current": core.is_active_medication(med)}
+        if not med.get("start_date"):
+            stamp = med.get("prescription_date") or med.get("scheme_date")
+            source = "prescription_date" if med.get("prescription_date") else "scheme_date"
+            if not stamp:
+                dates = set(re.findall(r"\b(\d{2})\.(\d{2})\.(20\d{2})\b",
+                                       str(med.get("scheme") or "")))
+                if len(dates) == 1:
+                    day, month, year = dates.pop()
+                    stamp = f"{year}-{month}-{day}"
+                    source = "scheme"
+            if isinstance(stamp, str) and date_resolution(stamp) == "day":
+                row["start_date"] = stamp
+                row["start_date_provenance"] = {"kind": "prescription_date_default", "source": source}
+        rows.append(row)
+    return rows
 
 
 # ---- personal health metrics (metrics.json) ------------------------------

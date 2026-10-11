@@ -216,7 +216,7 @@ class RecalculationOffer(unittest.TestCase):
     def test_the_offer_depends_on_the_calculation_not_the_application_version(self):
         from scholion import core, engine, recompute, format as fmt
         from scholion.pgs_validation import recalculation_status
-        current = calibrated({"term": "test", "label": "Test", "pgs_id": "PGS000001", "percentile": 97.0})
+        current = calibrated({"term": "abdominal aortic aneurysm", "label": "Synthetic", "pgs_id": "PGS000753", "percentile": 97.0})
         old = dict(current)
         old.pop("scoring_validation")
         self.assertFalse(recalculation_status([current])["required"])
@@ -236,8 +236,8 @@ class RecalculationOffer(unittest.TestCase):
                 plan = recompute.plan(since="0.6.7", text="")
             offers = [s for s in plan["steps"] if s.get("attention_key")]
             self.assertEqual(1, len(offers))
-            self.assertEqual("by_hand", offers[0]["state"])
-            self.assertNotIn("key", offers[0])
+            self.assertEqual("needs_input", offers[0]["state"])
+            self.assertEqual("scholion prs", offers[0]["key"])
             (root / "prs_results.json").write_text(json.dumps({"traits": [current]}), encoding="utf-8")
             core.reset_cache()
             self.assertFalse(engine.prs_findings()["recalculation"]["required"])

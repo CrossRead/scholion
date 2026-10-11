@@ -66,7 +66,7 @@ def bam_path() -> Optional[Path]:
     vcf = genome.vcf_path()
     stems = []
     if vcf is not None:
-        name = vcf.name
+        name = Path(vcf).name
         for suffix in (".full.vcf.gz", ".vcf.gz", ".vcf"):
             if name.endswith(suffix):
                 stems.append(name[: -len(suffix)])
@@ -121,7 +121,8 @@ def _parse_row(row: List[str], sample: int = 0) -> Dict[str, Any]:
     call = dict(zip(fmt, val))
     ad = call.get("AD")
     return {"chrom": row[0], "pos": int(row[1]), "ref": row[3], "alt": row[4],
-            "qual": row[5], "genotype": call.get("GT"),
+            "qual": row[5], "filter": row[6], "genotype": call.get("GT"),
+            "genotype_quality": int(call["GQ"]) if call.get("GQ", "").isdigit() else None,
             "depth": int(call["DP"]) if call.get("DP", "").isdigit() else None,
             "allele_depth": [int(x) for x in ad.split(",") if x.isdigit()] if ad else None,
             "rsid": row[2] if len(row) > 2 and row[2] not in (".", "") else None}
@@ -167,7 +168,8 @@ def _clinvar_in_region(chrom: str, start: int, end: int) -> List[Dict[str, Any]]
     return out
 
 
-def _coverage(chrom: str, start: int, end: int, cds: List[List[Any]]) -> Dict[str, Any]:
+def _coverage(chrom: str, start: int, end: int, cds: List[List[Any]],
+              assembly: Optional[str] = None) -> Dict[str, Any]:
     """Depth over the gene and over its coding sequence, or a named absence."""
     bam = bam_path()
     if bam is None:
@@ -176,6 +178,10 @@ def _coverage(chrom: str, start: int, end: int, cds: List[List[Any]]) -> Dict[st
                 "fix": "SCHOLION_GENOME_BAM=/path/to/sample.merged.bam"}
     from . import bamlite
     try:
+        if assembly:
+            from . import sites
+            if sites.alignment_build(str(bam)).get("assembly") != assembly:
+                return {"source": None, "why": _t("gene.coverage_build_unknown"), "fix": ""}
         whole = bamlite.depth(bam, chrom, start, end)
     except KeyError:
         return {"source": None, "why": _t("gene.coverage_contig", chrom=chrom), "fix": ""}
@@ -220,6 +226,44 @@ def _protein(loc: Dict[str, Any], variants: List[Dict[str, Any]],
             v["protein"] = {"kind": "error", "detail": f"{type(exc).__name__}: {exc}"}
 
 
+def reading_summary(location, variants, coverage):
+    """A VCF search is not per-base identity, even with complete read depth."""
+    stats = coverage.get("cds") or coverage.get("gene")
+    total = variants.get("total", 0)
+    if not stats or stats.get("pct_1x") is None:
+        state = "coverage_unknown"
+    elif stats["pct_1x"] == 0:
+        state = "no_coverage"
+    elif stats["pct_1x"] < 100:
+        state = "partial_coverage"
+    else:
+        state = "covered"
+    if total:
+        message = _t("gene.reading.variants", count=total)
+    elif state == "no_coverage":
+        message = _t("gene.reading.no_coverage")
+    else:
+        message = _t("gene.reading.no_differences", assembly=location.get("assembly") or "—")
+    message += " " + _t("gene.reading." + state)
+    return {"state": state, "message": message,
+            "region": {k: location.get(k) for k in ("chrom", "start", "end", "assembly", "transcript")},
+            "scope": "cds" if coverage.get("cds") else "gene",
+            "coverage": stats, "reference_identity_confirmed": False,
+            "variant_search_complete": not bool(variants.get("uncalled_rows")),
+            "uncalled_rows": variants.get("uncalled_rows", 0)}
+
+
+def reference_region(location):
+    """The public reference interval, not a single invented value for a gene."""
+    from urllib.parse import urlencode
+    build = location.get("assembly")
+    host = "grch37.ensembl.org" if build == "GRCh37" else "www.ensembl.org"
+    where = f"{location['chrom']}:{location['start']}-{location['end']}"
+    return {"assembly": build, "transcript": location.get("transcript"),
+            "chrom": location["chrom"], "start": location["start"], "end": location["end"],
+            "source": "Ensembl reference sequence", "url": f"https://{host}/Homo_sapiens/Location/Sequence?" + urlencode({"r": where})}
+
+
 # ----------------------------------------------------------------------- report
 def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
     """Everything the owner's own data can say about one gene, gaps included."""
@@ -244,7 +288,10 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
 
     st = genome.available()
     out: Dict[str, Any] = {"status": "ok", "region": True, "gene": loc["gene"],
-                           "location": loc, "genome_ready": st["ready"]}
+                           "location": loc, "genome_ready": st["ready"],
+                           "reference_region": reference_region(loc),
+                           "coverage": _coverage(loc["chrom"], loc["start"], loc["end"],
+                                                 loc["cds"], loc.get("assembly"))}
     if not st["ready"]:
         out["status"] = "no_genome"
         out["reason"] = st.get("reason")
@@ -311,6 +358,7 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
                               detail="Select the sample with SCHOLION_VCF_SAMPLE."))
         return out
     variants = []
+    reference_calls = []
     uncalled = 0
     for row in rows:
         try:
@@ -321,9 +369,15 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
             return out
         gt = (v.get("genotype") or "").replace("|", "/").split("/")
         alts = v["alt"].split(",")
+        if v["filter"] not in ("PASS", "."):
+            uncalled += 1
+            continue
         if not gt or any(not a.isdigit() or int(a) > len(alts) for a in gt):
             uncalled += 1
             continue
+        v["personal_alleles"] = [v["ref"] if a == "0" else alts[int(a) - 1] for a in gt]
+        if all(a == "0" for a in gt):
+            reference_calls.append(v)
         # A reference homozygote is a read position, not a variant. An ALT that
         # belongs only to another sample must not be translated for this one.
         for allele in sorted({int(a) for a in gt if int(a) > 0}):
@@ -352,9 +406,11 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
                      if computed else None)
     out["variants"] = {"total": len(variants), "coding": len(coding),
                        "coding_rows": coding, "consequential": consequential,
-                       "consequence_computed": computed, "uncalled_rows": uncalled}
+                       "consequence_computed": computed, "uncalled_rows": uncalled,
+                       "noncoding_rows": [v for v in variants if not v.get("coding")],
+                       "reference_calls": reference_calls}
     out["clinvar"] = _clinvar_in_region(loc["chrom"], loc["start"], loc["end"])
-    out["coverage"] = _coverage(loc["chrom"], loc["start"], loc["end"], loc["cds"])
+    out["reading_summary"] = reading_summary(loc, out["variants"], out["coverage"])
     if out["coverage"].get("source") is None:
         gaps.append(_gap(out["coverage"].get("why", ""), out["coverage"].get("fix", "")))
     # Two blind spots of short reads that no amount of depth removes. They are
@@ -363,3 +419,19 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
     out["blind_spots"] = [_t("gene.blind_cnv"), _t("gene.blind_noncoding")]
     out["gaps"] = gaps
     return out
+
+
+def attach_reading(answer: Dict[str, Any], gene: str) -> None:
+    """Join region calls and measured coverage to a retained catalogue answer."""
+    from .engine.genomics import gene_layers
+    try:
+        answer["layers"] = gene_layers(gene)
+    except Exception as exc:  # noqa: BLE001
+        # A failed frame is a named gap, never an absent gene.
+        answer["layers"] = {"gene": gene.upper(), "status": "unavailable",
+                            "reason": type(exc).__name__}
+    if answer.get("loci") is not None:
+        region = report(gene)
+        region["catalogue_loci"] = answer.get("loci") or []
+        region["layers"] = answer.get("layers")
+        answer["region_report"] = region

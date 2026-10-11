@@ -33,6 +33,24 @@ def _refused_head(value: Optional[str]) -> str:
     return text
 
 
+def _gene_reading_frame(r: Dict[str, Any]) -> str:
+    cov = r.get("coverage") or {}
+    lines = []
+    if cov.get("source") == "bam":
+        for key, label in (("gene", _t("gene.whole")), ("cds", _t("gene.cds"))):
+            stats = cov.get(key)
+            if stats:
+                lines.append(_t("gene.coverage_line", what=label, mean=stats["mean"], min=stats["min"],
+                                pct1=stats.get("pct_1x", "—"), pct0=stats.get("pct_zero", "—"),
+                                pct10=stats["pct_10x"], pct20=stats["pct_20x"]))
+    else:
+        lines.append(_t("gene.coverage_missing", why=cov.get("why") or _t("gene.coverage_not_computed")))
+    reference = r.get("reference_region") or {}
+    if reference.get("url"):
+        lines.append("[" + _t("gene.reference_link") + "](" + reference["url"] + ")")
+    return "\n".join(lines)
+
+
 def _gene_region_report(r: Dict[str, Any]) -> str:
     """A gene answered from the owner's own reads (task 127).
 
@@ -63,7 +81,7 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
                                 start=loc.get("start"), end=loc.get("end"),
                                 strand=loc.get("strand"), assembly=loc.get("assembly"),
                                 transcript=loc.get("transcript") or "\u2014")
-                + "\n_" + str(r.get("message", "")) + "_")
+                + "\n_" + str(r.get("message", "")) + "_" + "\n" + _gene_reading_frame(r))
     if r.get("status") not in (None, "ok"):
         # Every refusal, by construction rather than by list: `assembly_mismatch`
         # and `contig_not_in_file` were missing from the list this replaced and
@@ -79,7 +97,7 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
                                 strand=loc.get("strand"), assembly=loc.get("assembly"),
                                 transcript=loc.get("transcript") or "\u2014")
                 + "\n_" + str(r.get("message", "")) + "_"
-                + (f"\n`{r['fix']}`" if r.get("fix") else ""))
+                + (f"\n`{r['fix']}`" if r.get("fix") else "") + "\n" + _gene_reading_frame(r))
     lines = [_t("gene.header", gene=r.get("gene"), chrom=loc.get("chrom"),
                 start=loc.get("start"), end=loc.get("end"), strand=loc.get("strand"),
                 assembly=loc.get("assembly"), transcript=loc.get("transcript") or "—"),
@@ -91,7 +109,8 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
             s = cov.get(key)
             if s:
                 lines.append("· " + _t("gene.coverage_line", what=label, mean=s["mean"],
-                                       min=s["min"], pct10=s["pct_10x"], pct20=s["pct_20x"]))
+                                       min=s["min"], pct1=s.get("pct_1x", "—"),
+                                       pct0=s.get("pct_zero", "—"), pct10=s["pct_10x"], pct20=s["pct_20x"]))
     else:
         # The whole value of this line is the reason. Printed empty it ends in a
         # dash and nothing — which reads as text that broke off, and a reader
@@ -100,6 +119,12 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
         lines.append("⚠️ " + _t("gene.coverage_missing",
                                 why=(cov.get("why") or "").strip()
                                 or _t("gene.coverage_not_computed")))
+    summary = r.get("reading_summary") or {}
+    if summary.get("message"):
+        lines += ["", summary["message"]]
+    reference = r.get("reference_region") or {}
+    if reference.get("url"):
+        lines.append("[" + _t("gene.reference_link") + "](" + reference["url"] + ")")
     lines.append("")
     from .panel_reference import reference_lines
     lines.extend(reference_lines(r))
@@ -107,7 +132,7 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
     conseq = v.get("consequential")
     lines.append(_t("gene.counts", total=v.get("total", 0), coding=v.get("coding", 0),
                     consequential=_t("gene.not_computed") if conseq is None else conseq))
-    rows = v.get("coding_rows") or []
+    rows = (v.get("coding_rows") or []) + (v.get("noncoding_rows") or [])
     if not rows:
         lines.append("_" + _t("gene.coding_none") + "_")
     for row in rows:
@@ -124,6 +149,12 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
         lines.append(f"• {row['chrom']}:{row['pos']} {row['ref']}>{row['alt']} "
                      f"{row.get('genotype') or '?'}{depth}{alleles} — {what}"
                      + (f" ({named})" if p.get("hgvs_p") and named else ""))
+    if v.get("reference_calls"):
+        lines += ["", _t("gene.reference_calls")]
+        for row in v["reference_calls"]:
+            lines.append(f"• {row['chrom']}:{row['pos']} REF {row['ref']} · {row['genotype']} "
+                         + "/".join(row.get("personal_alleles") or [])
+                         + (f" · {row['depth']}×" if row.get("depth") is not None else ""))
     lines.append("")
     hits = r.get("clinvar") or []
     if not hits:
@@ -147,6 +178,10 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
 
 def genome_report(r: Dict[str, Any]) -> str:
     st = r.get("status")
+    if r.get("region_report"):
+        region = _gene_region_report(r["region_report"])
+        catalogue = {k: v for k, v in r.items() if k != "region_report"}
+        return region + "\n\n" + genome_report(catalogue)
     # The gene-region answer is recognised BEFORE the refusal branches below.
     # Those are shaped around a single rsID and print «⚪ None (CASR, …)» when
     # handed a gene: a real refusal, rendered in the shape of a different question.
@@ -711,10 +746,13 @@ def prs_report(r: Dict[str, Any]) -> str:
         lines.append(f"__{c['category']}__")
         for t in c.get("traits", []):
             p = t.get("percentile")
-            ps = percentile_label(p) if isinstance(p, (int, float)) else _t("prs.no_model")
+            saved = t.get("saved_result") or {}
+            ps = saved.get("label") or (percentile_label(p) if isinstance(p, (int, float)) else _t("prs.no_model"))
             warn = "" if t.get("reliable") else " ⚠"
             ev = {"clinical": " ✚", "supportive": " ·"}.get(t.get("evidence"), "")
             lines.append(f"  {t['label']}: {ps}{warn}{ev}")
+            if saved.get("note"):
+                lines.append("    " + saved["note"])
             if t.get("reference_note"):
                 lines.append("    " + t["reference_note"])
             if t.get("calibration_note"):
@@ -1112,9 +1150,12 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
     if lpa.get("estimate"):
         e = lpa["estimate"]
         from .pgs_validation import percentile_label
-        value = percentile_label(e.get('percentile')) if e.get('reliable') else _t('web.prs.unverified')
+        saved = e.get("saved_result") or {}
+        value = saved.get("label") or (percentile_label(e.get('percentile')) if e.get('reliable') else _t('web.prs.unverified'))
         L.append(f"- {e.get('label','')}: {value} ({e.get('pgs_id')}, "
                  f"{e.get('quality') or '—'})")
+        if saved.get("note"):
+            L.append("  " + saved["note"])
         L.extend("  " + e[key] for key in ("calibration_note", "reliability_note", "reading_note", "reference_note")
                  if e.get(key))
         L.append(f"  ⚠ {lpa.get('estimate_is_not_a_measurement','')}")

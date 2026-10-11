@@ -208,6 +208,8 @@ class ScoringVCF:
                    "input_sha256": self.sha256, "input_vcf": str(self.path.resolve()),
                    "model_sha256": _sha(path),
                    "sample": self.sample, "genome_build": build,
+                   "input_stat": {"size": self.stat[0], "mtime_ns": self.stat[1]},
+                   "model_stat": {"size": model_stat.st_size, "mtime_ns": model_stat.st_mtime_ns},
                    "counts": dict(reasons), "variants_total": variants,
                    "variants_matched": matched, "absent_positions_imputed": 0}
         return {"score": math.fsum(parts), "variants_total": variants, "variants_matched": matched,

@@ -134,3 +134,21 @@ def validate(row: dict, *, expected_build: str | None = None,
             models["spread_pp"] = None
             out["models"] = models
     return out
+
+
+def retain_saved_value(row: dict, *, stale: bool = False) -> None:
+    """Expose stored numbers as history, never as a confirmed population result."""
+    from .i18n import t as _t
+    if stale:
+        if row.get("percentile") is not None:
+            row["diagnostic_percentile"] = row["percentile"]
+        row.update(percentile=None, reliable=False, percentile_reliable=False)
+    saved = number(row.get("diagnostic_percentile"))
+    if saved is None and not row.get("reliable"):
+        saved = number(row.get("percentile"))
+    if saved is not None and 0 <= saved <= 100 and not row.get("reliable"):
+        required = stale or not scoring_verified(row)
+        row["saved_result"] = {"value": saved, "status": "unverified",
+                               "recalculation_required": required,
+                               "label": _t("prs.saved.label", value=f"{saved:g}"),
+                               "note": _t("prs.saved.recalculate" if required else "prs.saved.unverified")}

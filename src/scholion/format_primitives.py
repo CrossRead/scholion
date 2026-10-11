@@ -424,6 +424,8 @@ def spelling_note(tail: str = "recompute") -> str:
 
 def recompute_why(step: Dict[str, Any]) -> str:
     why = step.get("why")
+    if step.get("key") == "scholion prs":
+        return (step.get("detail") or {}).get("message") or ""
     if not why:
         return ""
     d = step.get("detail") or {}

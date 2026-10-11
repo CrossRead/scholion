@@ -16,6 +16,7 @@ twice. A refusal is now remembered for the rest of the run.
 from __future__ import annotations
 
 import io
+from contextlib import redirect_stderr
 import os
 import tempfile
 import unittest
@@ -185,11 +186,16 @@ class TestARefusedParameterIsNotOfferedAgain(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             vcf = Path(d) / "g.vcf.gz"
             vcf.write_bytes(b"")
-            with mock.patch.object(prs, "_MCP", FakeMCP), \
+            progress_log = io.StringIO()
+            with redirect_stderr(progress_log), mock.patch.object(prs, "_MCP", FakeMCP), \
                  mock.patch("scholion.genome.assembly_evidence", return_value={"assembly": "GRCh38"}):
                 res = prs.report(str(vcf), traits=traits, normalize=False,
                                  profile="all", superpopulation="EUR")
         self.assertTrue(res["ok"], res)
+        self.assertTrue(progress_log.getvalue(), "technical progress remains visible")
+        for trait in traits:
+            self.assertNotIn(trait["label"], progress_log.getvalue())
+        self.assertEqual([t["label"] for t in traits], [t["label"] for t in res["traits"]])
         computes = [a for n, a in calls if n == "compute_prs_by_trait"]
         # First trait: offered with `profile`, refused, repeated without it.
         # Second trait: one call, and `profile` is not in it.

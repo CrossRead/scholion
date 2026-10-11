@@ -2719,6 +2719,7 @@ will go through them later.
     "prs.vcf_not_found": "VCF not found: {path}",
     "prs.normalising": "→ normalising the genome into genotypes (a full VCF takes minutes; the "
                        "result is cached)…",
+    "prs.scoring_progress": "→ PGS calculation in progress…",
     "prs.normalised": "  ✓ normalised: {path}",
     "prs.normalise_failed": "  ⚠ normalisation failed ({error}) — computing from the raw VCF "
                             "(slower)",

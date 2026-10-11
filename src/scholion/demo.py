@@ -303,7 +303,8 @@ def build_prs() -> dict:
             "reliable": ok, "source": "demo", "validity_note": note,
         }
         # Entirely synthetic calibration, explicitly identified as such.
-        z = NormalDist().inv_cdf(float(pct) / 100)
+        # Fictional calibration has a fixed precision across Python platforms.
+        z = round(NormalDist().inv_cdf(float(pct) / 100), 12)
         rec.update(score=z, z_score=z, reference_mean=0.0, reference_std=1.0,
                    percentile_method="reference_panel", reference_panel="synthetic-demo",
                    reference_panel_ancestry="EUR", genome_build="GRCh38",

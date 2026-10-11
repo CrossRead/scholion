@@ -664,7 +664,7 @@ def report(vcf_path: str, traits=None, superpopulation=None,
         for i, t in enumerate(traits, 1):
             if progress is not None:
                 progress(i - 1, len(traits), t.get("label") or t.get("term"))
-            _log(f"→ [{i}/{len(traits)}] PGS: {t.get('label')}…")
+            _log(_t("prs.scoring_progress"))
             row = {"label": t.get("label"), "category": t.get("category"), "term": t.get("term")}
             try:
                 pin = pins.get(t.get("term")) or {}

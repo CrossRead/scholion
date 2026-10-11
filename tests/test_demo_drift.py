@@ -14,6 +14,7 @@ deterministic — SEED is fixed for exactly this reason.
 """
 import json
 import unittest
+from unittest.mock import patch
 
 import support
 from scholion import demo as _demo
@@ -59,6 +60,16 @@ class TestDemoDrift(unittest.TestCase):
         self.assertTrue(idx.exists(), "demo/profile/index.md is missing")
         self.assertEqual(idx.read_text(encoding="utf-8"), _demo.INDEX_MD,
                          "index.md has drifted from the generator")
+
+
+class TestDemoCalibrationPortability(unittest.TestCase):
+    def test_machine_roundoff_does_not_change_the_recorded_profile(self):
+        expected = _demo.build_prs()
+        normal = _demo.NormalDist()
+        for delta in (-1e-15, 1e-15):
+            with self.subTest(delta=delta), patch.object(_demo, "NormalDist") as factory:
+                factory.return_value.inv_cdf.side_effect = lambda p: normal.inv_cdf(p) + delta
+                self.assertEqual(_demo.build_prs(), expected)
 
 
 if __name__ == "__main__":

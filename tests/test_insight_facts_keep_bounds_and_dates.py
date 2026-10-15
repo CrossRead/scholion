@@ -4,6 +4,8 @@ from __future__ import annotations
 import datetime
 from importlib import import_module
 import unittest
+import shutil
+import subprocess
 from unittest import mock
 
 import support  # noqa: F401
@@ -137,6 +139,40 @@ class OverviewFacts(unittest.TestCase):
             result = profile_view.overview()
         self.assertEqual(0, result["stale_abnormal_count"])
         self.assertEqual(0, result["abnormal_count"])
+
+
+@unittest.skipUnless(shutil.which("node"), "needs node for page rendering")
+class BoundWebFacts(unittest.TestCase):
+    def test_cards_tables_and_trend_graph_keep_limits_distinct(self):
+        page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        functions = []
+        for name in ("markerCard", "markerTable", "sparkline"):
+            start = page.index("function " + name + "(")
+            functions.append(page[start:page.index("\n}\n", start) + 2])
+        script = r"""
+const assert=require('node:assert/strict');
+const esc=x=>String(x??''),fmtNum=String,fmtDate=String,t=x=>x,el=x=>x;
+const flagOf=()=>({cls:'',key:''}),badge=()=>'',trendNote=()=>'',noteHtml=()=>'';
+const decisionNote=()=>'',targetText=()=>'',targetAsk=()=>'',refText=()=>'';
+const markerGeneticsRow=()=>'',windowSeries=s=>s;
+""" + "\n".join(functions) + r"""
+for(const sign of ['<','>']){
+ const bounded={name:'Synthetic',value:6.1,censored:sign,unit:'mmol/L',date:'2026-10-15',
+   series:[{date:'2026-09-15',value:5},{date:'2026-10-15',value:6.1,censored:sign}]};
+ const before=JSON.stringify(bounded);
+ for(const html of [markerCard(bounded),markerTable([bounded])]){
+  assert.ok(html.includes(sign+'6.1'),html);
+  assert.ok(!html.includes('<polyline'),html);
+ }
+ assert.equal(sparkline(bounded.series,false), '');
+ assert.equal(JSON.stringify(bounded),before);
+}
+const exact=[{date:'2026-09-15',value:5},{date:'2026-10-15',value:6.1}];
+assert.ok(sparkline(exact,false).includes('<polyline'));
+"""
+        result = subprocess.run([shutil.which("node")], input=script, text=True,
+                                capture_output=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stderr)
 
 
 if __name__ == "__main__":

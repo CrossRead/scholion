@@ -832,7 +832,7 @@ function markerTable(list){
   if(!list||!list.length) return '';
   const rows=list.map(m=>{const f=flagOf(m);
     return `<tr${m.system?` data-system="${esc(m.system)}" title="${esc(t('system.open'))}"`:''}><td>${esc(m.name)}<span class="marker-date-compact">${esc(fmtDate(m.date))}</span></td>`
-      +`<td class="v">${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit_display??m.unit??'')}</span></td>`
+      +`<td class="v">${esc(m.censored||'')}${esc(fmtNum(m.value))} <span class="muted small">${esc(m.unit_display??m.unit??'')}</span></td>`
       +`<td class="d">${esc(refText(m))}</td><td class="d opt" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</td><td>${badge(f.cls,t(f.key))}</td></tr>`
       +((m.decisions||[]).some(d=>d.crossed===true||d.crossed===null)?`<tr><td colspan="5">${decisionNote(m,false)}</td></tr>`:'')
       +markerGeneticsRow(m);}).join('');
@@ -1027,6 +1027,8 @@ function windowSeries(series){
 function sparkline(series,win,marks){
   if(win!==false) series=windowSeries(series);
   if(!series||series.length<2) return '';
+  // A reporting limit is not an exact point to connect on a trend line.
+  if(series.some(p=>p.censored)) return '';
   const w=168,h=40,pad=5;
   const tg=marks&&marks.target;
   const ys=series.map(p=>p.value);
@@ -1576,7 +1578,7 @@ function markerCard(m){
   const notes=[...(m.method_notes||[]),m.corridor_note].filter(Boolean).join(' · ');
   return el(`<div class="cr-card card">
     <div class="label">${esc(m.name)}</div>
-    <div class="value">${esc(fmtNum(m.value))} <small>${esc(m.unit_display??m.unit)}</small></div>
+    <div class="value">${esc(m.censored||'')}${esc(fmtNum(m.value))} <small>${esc(m.unit_display??m.unit)}</small></div>
     <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted small" title="${esc(m.date)}">${esc(fmtDate(m.date))}</span>`:''}${tr}</div>
     ${m.series&&m.series.length>1?sparkline(m.series,undefined,m.target?{ref_low:m.ref_low,ref_high:m.ref_high,target:m.target}:null):''}
     <div class="meta">${esc(refText(m))}${targetText(m)}${m.genome_link?` · ${ownerNoteHtml(m)}`:''}${m.system?` · ${systemLinkHtml(m.system)}`:''}</div>
@@ -2566,7 +2568,7 @@ function panelLabsHtml(p){
   // Task 205 D, E: the author's pathways first, a value-only marker says so, and
   // the markers to read beside one are listed under it — measured or not.
   const comp=m=>(m.companions||[]).length?`<div class="muted small" style="margin-left:1.2em">${esc(t('system.panel_labs.companions',{list:m.companions.map(c=>c.measured?`${c.name} ${fmtNum(c.value)} ${c.unit||''}`.trim():t('system.panel_labs.companion_missing',{name:c.name})).join('; ')}))}</div>`:'';
-  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m)+context(m);
+  const row=m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted">${esc(fmtDate(m.date)||'')}</span>${m.display_only?` <span class="muted small">— ${esc(t('system.panel_labs.display_only'))}</span>`:''}</div>`+comp(m)+context(m);
   const byKey={}; (p.markers||[]).forEach(m=>byKey[m.key]=m);
   const grouped=new Set();
   let gs='';
@@ -2704,7 +2706,7 @@ function systemCardHtml(r){
   else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
   else{
     b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
-    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</span></div>`).join('');
+    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</span></div>`).join('');
   }
   if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
   if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;

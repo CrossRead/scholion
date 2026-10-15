@@ -106,6 +106,8 @@ const nextBefore=JSON.stringify(next),stepHtml=basketRowHtml(next);
 assert.ok(stepHtml.includes('NEXT_STEP'));assert.ok(stepHtml.includes('OWN_STEP_MECHANISM'));
 assert.ok(stepHtml.includes('OWN_STEP_SOURCE'));assert.equal(JSON.stringify(next),nextBefore);
 """
-        result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
-                                stdin=subprocess.DEVNULL, timeout=10)
+        # stdin avoids the Windows command-line size limit; shared runners can
+        # also take longer than ten seconds merely to start Node.
+        result = subprocess.run([shutil.which("node")], input=script, text=True,
+                                capture_output=True, timeout=30)
         self.assertEqual(0, result.returncode, result.stderr)

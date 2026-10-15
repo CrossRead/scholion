@@ -40,6 +40,55 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.6.9 — 15.10.2026
+
+
+### What you can do now
+
+**Preserve qualitative and interval laboratory results.** Urinalysis absence statements, microscopy counts and intervals, and respiratory PCR targets now retain their printed result, specimen, method, date, unit, reference text and source. They appear beside numeric series in CLI, web and agent lab reports and participate in archive completeness checks. Absence is never converted to zero and an interval is never reduced to a midpoint. Conflicting same-draw forms are reported without silently replacing another source. Reviewed archive previews include these rows and apply them atomically after confirmation. Wrapped quantitative SARS-CoV-2 S RBD total antibody rows are recognised separately from their interpretation thresholds.
+
+Existing imported forms need a forced re-import to add these newly supported rows (`scholion ingest-labs FOLDER --force`). New recognition rules remain proposed and do not supply clinical reference intervals or verdicts. No genome recalculation is required.
+
+### Corrected conclusions
+
+**Keep reporting limits distinct from exact measurements.** Review summaries retain
+less-than and greater-than signs and use the laboratory flag at the boundary.
+A bounded observation no longer becomes an exact percentage change, personal
+baseline shift or estimate of measurement scatter.
+
+**Count confirmed deviations consistently.** A value recognised through an
+unconfirmed rule remains visible, but does not increase the out-of-range count.
+Invalid or future dates no longer establish that monitoring was completed recently.
+
+**Keep historical results out of the current visit agenda.** Results older than
+one year remain available in a separate history section. Values whose dates
+cannot establish recency are retained for review rather than presented as current.
+
+**Preserve laboratory row identity across wrapped lines.** Non-HDL cholesterol and
+separately named renal formulae are retained instead of omitted or mistaken for
+HDL or creatinine. Standard and high-sensitivity CRP remain separate assays;
+a neighbouring analyte’s reference scale no longer supplies a false grade.
+Unrecognised qualitative urinalysis rows are disclosed as labels for review,
+without turning absent findings or intervals into invented scalar values.
+New marker rules remain provisional until reviewed.
+
+### Existing stored data
+
+Inspect the updated summaries with `scholion labs`, `scholion overview` or
+`scholion brief-review`. They update when reopened; no laboratory values or dates
+are rewritten.
+No genome or polygenic-score recalculation is needed for these corrections.
+Previously saved polygenic results and the existing recalculation workflow remain
+available.
+
+### What needs recomputing
+
+**Run `scholion ingest-labs FOLDER --force` — if laboratory forms were imported before this update.**
+
+Re-import the original forms to recover omitted numeric rows, qualitative urinalysis results and PCR targets. This also separates newly recognised assay identities. Re-import does not automatically remove legacy points filed under a different assay: review those against the originals. Reopen the affected summaries or regenerate a saved visit sheet. No genome preparation or PGS recalculation is required.
+
+---
+
 ## v0.6.8 — 11.10.2026
 
 ### What you can do now

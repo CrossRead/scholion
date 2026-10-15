@@ -24,7 +24,7 @@
     "src/scholion/format_primitives.py": 1,
     "src/scholion/i18n/en.py": 9,
     "src/scholion/import_csv.py": 7,
-    "src/scholion/ingest_labs.py": 85,
+    "src/scholion/ingest_labs.py": 106,
     "src/scholion/ingest_studies.py": 23,
     "src/scholion/interaction_basis.py": 2,
     "src/scholion/knowledge/correction_routes.json": 7,
@@ -126,6 +126,7 @@
     "tests/test_uncovered_modules.py": 5,
     "tests/test_unit_gate.py": 1,
     "tests/test_what_is_said_about_the_tool_door_is_what_the_build_does.py": 1,
-    "tests/test_wife_report_class.py": 8
+    "tests/test_wife_report_class.py": 8,
+    "tests/test_wrapped_assays_keep_their_identity.py": 21
   }
 }

@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from . import core, ingest_labs
+from .lab_observations import parse_observations, equivalent
 from .i18n import t as _t
 
 _MIN_TEXT = 200  # less than this counts as «no text layer» (a scan / a placeholder)
@@ -160,6 +161,8 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
     mismatch: List[Dict[str, Any]] = []
     alt_method: List[Dict[str, Any]] = []
     covered = 0
+    observation_covered = 0
+    observation_coverage: Dict[str, Any] = {}
     coverage: Dict[str, Dict[str, Dict[str, str]]] = {}
     seen_markers: set = set()
 
@@ -178,7 +181,8 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
                 reason = _t("reconcile.no_text_layer" if size > 0 else "reconcile.empty_file")
                 unreadable.append({"file": _rel(f, root), "reason": reason, "bytes": size})
                 continue
-        if not (ingest_labs._DATE.search(text) or ingest_labs._DATE_FALLBACK.search(text)):
+        if not (ingest_labs._DATE.search(text) or ingest_labs._DATE_FALLBACK.search(text)
+                or ingest_labs.english_date(text)[0]):
             non_lab += 1
             continue
         low = text.lower()
@@ -190,8 +194,27 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
         # in the provenance they hung as «manual»). The rejection is not needed: a purely
         # genetic report yields no marker at all and is cut off by the `not found` check below.
         date, found = ingest_labs.parse_report(text, markers, source=str(f))
+        observations = parse_observations(text)
         ym = _ym(date)
-        if not ym or not found:
+        if ym:
+            saved = core.labs().get("observations", {})
+            for record in observations:
+                key = record["key"]
+                candidates = [p for p in saved.get(key, {}).get("series", [])
+                              if same_draw(p.get("date"), date)]
+                row = {"marker": key, "date": ym, "value": record["result_text"],
+                       "unit": record.get("unit"), "file": _rel(f, root), "kind": record["kind"]}
+                if not candidates:
+                    missing.append(dict(row, reason=_t("reconcile.point_absent")))
+                elif not any(equivalent(record, point) for point in candidates):
+                    mismatch.append(dict(row, pdf=record["result_text"],
+                                         profile=candidates[0]["result_text"]))
+                else:
+                    observation_covered += 1
+                seen_markers.add(key)
+                observation_coverage.setdefault(key, []).append(
+                    {**record, "draw_date": date, "file": _rel(f, root)})
+        if not ym or not (found or observations):
             non_lab += 1
             continue
         for key, v in found.items():
@@ -243,7 +266,7 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
         core.write_json(cov_path,
             {"_meta": {"generated_by": "scholion reconcile", "lab_dir": str(root),
                        "note": _t("reconcile.coverage_note")},
-             "coverage": coverage}, indent=1)
+             "coverage": coverage, "observations": observation_coverage}, indent=1)
         cov_written = str(cov_path)
     except Exception as e:
         cov_written = _t("reconcile.coverage_not_written", error=e)
@@ -262,7 +285,7 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
     return {"ok": True, "lab_dir": str(root),
             "files_total": len(files), "files_non_lab": non_lab,
             "unreadable": unreadable, "missing": miss_u, "mismatch": mismatch, "alt_method": alt_method,
-            "covered_points": covered, "markers_seen": sorted(seen_markers),
+            "observation_covered": observation_covered, "covered_points": covered, "markers_seen": sorted(seen_markers),
             "coverage_path": cov_written, "disclaimer": core.labs().get("_meta", {}).get("note", "")[:0]}
 
 

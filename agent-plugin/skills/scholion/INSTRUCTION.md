@@ -947,7 +947,11 @@ For multiple self-contained laboratory forms in one PDF, use the read-only
 `--archive-preview` first. Review the forms, collection times, specimens and
 source pages with the person before applying its token through `--approve-archive`.
 The equivalent `sch_ingest_labs` parameters are `archive_preview=true` and
-`approve_archive="<token>"`. An ambiguous archive or changed source/destination
+`approve_archive="<token>"`. For previously imported forms after a recognition update,
+use `scholion ingest-labs FOLDER --force` or `sch_ingest_labs(force=true)`.
+Qualitative and interval observations keep their printed wording and references
+beside numeric series in lab reports; recognition proposals do not supply a clinical verdict.
+An ambiguous archive or changed source/destination
 writes nothing; preview again rather than inventing boundaries or dates.
 
 - **Lab results.** New PDFs into the studies folder → `ingest-labs "<folder>"` or

@@ -25,7 +25,6 @@ from scholion import core, provenance
 AHEAD_OF_THE_BASE = {
     # The recomputation of a printed non-HDL cholesterol. No lab key stores the
     # printed value yet, so the entry waits for it rather than being dropped.
-    "non_hdl": "a printed non-HDL value has no key in the base yet",
     # The components of the omega-6/omega-3 ratio. Laboratories print the ratio
     # and the omega-3 index; the two sums are not stored, so this index is shown
     # as printed and cannot be recomputed. Task 200, stage C, decides them.

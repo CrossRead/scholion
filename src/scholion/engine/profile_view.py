@@ -33,8 +33,8 @@ def overview() -> Dict[str, Any]:
     tests = suggest_tests()
     # The overview is a current snapshot: only the markers measured within the last 12 months
     # (a sliding window from today). Older deviations are not shown on the main screen.
-    red = [m for m in labs["markers"] if m["flag"] not in ("ok", "norange") and _recent(m.get("date"))]
-    stale = sum(1 for m in labs["markers"] if m["flag"] not in ("ok", "norange") and not _recent(m.get("date")))
+    red = [m for m in labs["markers"] if m.get("abnormal") and _recent(m.get("date"))]
+    stale = sum(1 for m in labs["markers"] if m.get("abnormal") and not _recent(m.get("date")))
     return {
         "subject_id": core.profile_meta(core.pharmacogenomics()).get("subject_id"),
         "abnormal_count": len(red),

@@ -35,7 +35,7 @@ UNITS = json.loads((K / "units.json").read_text(encoding="utf-8"))["units"]
 
 #: Fields that belong to a language and must not be left at the top level.
 LANG_FIELDS = ("names", "exclude", "require", "form_require", "form_exclude",
-               "next_require", "next_exclude", "prefer_form", "display_name")
+               "next_require", "next_exclude", "row_require", "prefer_form", "display_name")
 
 SPECIMENS = {"blood", "serum", "plasma", "urine", "stool", "saliva"}
 

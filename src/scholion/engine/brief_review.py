@@ -25,39 +25,47 @@ from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import t as _t
 from .lifestyle import lifestyle_brief
+from .labs import _flag_value
+from .corridor import point_corridor
 
 
-def _status(value: Any, lo: Any, hi: Any) -> str:
+def _status(value: Any, lo: Any, hi: Any, censored: Optional[str] = None) -> str:
     try:
         v = float(value)
+        bounds = {"ref_low": float(lo) if lo is not None else None,
+                  "ref_high": float(hi) if hi is not None else None}
     except (TypeError, ValueError):
         return "unknown"
-    if lo is None and hi is None:
-        return "unknown"
-    if lo is not None and v < float(lo):
-        return "low"
-    if hi is not None and v > float(hi):
-        return "high"
-    return "ok"
+    flag = _flag_value(bounds, v, censored)
+    return "unknown" if flag == "norange" else flag
 
 
 def _point(p: Dict[str, Any], lo: Any, hi: Any) -> Dict[str, Any]:
     low = p.get("ref_low") if p.get("ref_low") is not None else lo
     high = p.get("ref_high") if p.get("ref_high") is not None else hi
     return {"date": str(p.get("date") or ""), "value": p.get("value"),
-            "status": _status(p.get("value"), low, high)}
+            **({"censored": p["censored"]} if p.get("censored") else {}),
+            "status": _status(p.get("value"), low, high, p.get("censored"))}
 
 
 def _marker_changes(key: str, reviewed: str) -> Dict[str, Any]:
     m = (core.labs().get("markers") or {}).get(key) or {}
     lo, hi = m.get("ref_low"), m.get("ref_high")
+    def qualified_point(point: Dict[str, Any]) -> Dict[str, Any]:
+        corridor = point_corridor(key, m, point)
+        result = _point({**point, "ref_low": corridor["ref_low"],
+                         "ref_high": corridor["ref_high"]}, None, None)
+        if (core.lab_markers().get("markers", {}).get(key) or {}).get("status") == "proposed":
+            result["status"] = "unknown"
+        return result
+
     series = sorted((p for p in (m.get("series") or []) if isinstance(p, dict) and p.get("date")),
                     key=lambda p: str(p.get("date")))
     before = [p for p in series if str(p["date"])[:10] <= reviewed]
-    after = [_point(p, lo, hi) for p in series if str(p["date"])[:10] > reviewed]
-    last_before = _point(before[-1], lo, hi) if before else None
+    after = [qualified_point(p) for p in series if str(p["date"])[:10] > reviewed]
+    last_before = qualified_point(before[-1]) if before else None
     direction = None
-    if last_before and after:
+    if last_before and after and not (last_before.get("censored") or after[-1].get("censored")):
         try:
             a, b = float(last_before["value"]), float(after[-1]["value"])
             direction = "up" if b > a else "down" if b < a else "same"
@@ -80,10 +88,10 @@ def _num(v: Any) -> str:
 
 def _change_line(c: Dict[str, Any]) -> str:
     unit = f" {c['unit']}" if c["unit"] else ""
-    before = (_t("brief.review.value", value=_num(c["before"]["value"]), unit=unit, date=c["before"]["date"][:10],
+    before = (_t("brief.review.value", value=(c["before"].get("censored") or "") + _num(c["before"]["value"]), unit=unit, date=c["before"]["date"][:10],
                  status=_t("brief.review.status." + c["before"]["status"]))
               if c["before"] else _t("brief.review.no_before"))
-    after = "; ".join(_t("brief.review.value", value=_num(p["value"]), unit=unit, date=p["date"][:10],
+    after = "; ".join(_t("brief.review.value", value=(p.get("censored") or "") + _num(p["value"]), unit=unit, date=p["date"][:10],
                          status=_t("brief.review.status." + p["status"])) for p in c["after"])
     return _t("brief.review.row", name=c["name"], before=before, after=after or "—")
 

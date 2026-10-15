@@ -33,6 +33,10 @@ def printed_context(rest: str, following: List[str], date: str, value: float, *,
         return {}
     table: List[Dict[str, Any]] = []
     for raw in rows or conditions:
+        # A one-sided sign glued to a range is an ambiguous printed scale,
+        # not a one-sided bound followed by a meaningful grade label.
+        if re.search(r"[<>≤≥]\s*" + _NUMBER + r"\s*[-–—]\s*" + _NUMBER, raw):
+            continue
         match = _BOUND.search(raw)
         assert match is not None  # rows were selected by this same immutable regex
         sign, bound, low, high = match.groups()

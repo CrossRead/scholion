@@ -63,6 +63,8 @@ CYRILLIC = re.compile(r"[Ѐ-ӿ]")
 PERSONAL_DIRS = {"profile", "genome", "raw", "work", "archive", "reports", "_backups",
                  "_to_delete", "_research", "inbox", "kb", "demo", ".git", "__pycache__", ".cache",
                  "dist", "node_modules",
+                 # Local interpreters and their dependencies do not ship.
+                 ".venv", "venv",
                  # `.claude/` holds the assistant's own working state, and since
                  # 08.09.2026 also the worktrees of its spawned sessions — a whole
                  # second copy of the tree, uncommitted, under the project root.
@@ -118,7 +120,7 @@ INPUT_FIELDS = {
     "patterns", "match", "keywords", "brand_ru",
     # conditions matched against the text of a form: also input, also in Russian
     "form_require", "form_exclude", "prefer_form", "require", "exclude",
-    "next_require", "next_exclude",
+    "next_require", "next_exclude", "row_require",
     "material",
 }
 

@@ -10,7 +10,7 @@ from .class_genotype import regimen_cautions
 from .goals import goal_dashboard
 from .labs import analyze_labs
 from .treatment import treatment_timeline
-from ._helpers import DISCLAIMER
+from ._helpers import DISCLAIMER, _recent_or_unknown
 
 
 @core.in_reading
@@ -22,6 +22,7 @@ def visit_sheet(include_reference: bool = False) -> Dict[str, Any]:
     raw = core.labs().get("markers") or {}
     selected: list[Dict[str, Any]] = []
     held: list[Dict[str, Any]] = []
+    historical: list[Dict[str, Any]] = []
     goals = goal_dashboard()
     for marker in labs["markers"]:
         row = dict(marker)
@@ -41,6 +42,16 @@ def visit_sheet(include_reference: bool = False) -> Dict[str, Any]:
         row["date_basis_label"] = t("visit.date_basis." + basis) if basis in (
             "form", "manual", "filename", "ordered", "unrecorded") else t("visit.date_basis.unrecorded")
 
+        relevant = (row.get("abnormal") or row.get("outside_target")
+                    or row.get("flag") == "norange" or row.get("reference_withheld"))
+        recency = _recent_or_unknown(str(row.get("date") or ""))
+        if relevant and row.get("date") and recency is False:
+            historical.append(row)
+            continue
+        if relevant and recency is not True:
+            row["recency_note"] = t("visit.date_unverified")
+            held.append(row)
+            continue
         if row.get("abnormal") or row.get("outside_target"):
             selected.append(row)
         elif row.get("flag") == "norange" or row.get("reference_withheld"):
@@ -72,6 +83,7 @@ def visit_sheet(include_reference: bool = False) -> Dict[str, Any]:
             "synthetic": core.profile_is_synthetic(), "title": t("visit.title"),
             "scope_note": t("visit.scope"), "goals": goals.get("entities", []),
             "measurements": selected, "held_measurements": held,
+            "historical_measurements": historical,
             "measurements_total": labs["count"], "medications": store.list_medications(),
             "regimen_cautions": regimen_cautions(), "treatment": treatment_timeline(),
             "sources": provenance(), "reference_appendix": appendix,

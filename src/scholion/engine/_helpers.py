@@ -7,6 +7,7 @@ them here is what lets labs<->pgx and half of lifestyle<->pgx import one way.
 """
 from __future__ import annotations
 
+import calendar
 import datetime
 from typing import Any, Dict, List, Optional
 from .. import core
@@ -21,17 +22,25 @@ def _recent_or_unknown(date_str: str, months: int = 12) -> Optional[bool]:
     must require `is True`: an unreadable date establishes nothing."""
     if not date_str:
         return False
+    text = str(date_str)
     try:
-        parts = str(date_str).split("-")
-        y, m = int(parts[0]), int(parts[1]) if len(parts) > 1 else 1
+        if len(text) == 7:
+            observed = datetime.date.fromisoformat(text + "-01")
+        elif len(text) == 10:
+            observed = datetime.date.fromisoformat(text)
+        else:
+            observed = datetime.datetime.fromisoformat(text).date()
     except ValueError:
         return None
     today = datetime.date.today()
-    cy, cm = today.year, today.month - months
-    while cm <= 0:
-        cm += 12
-        cy -= 1
-    return (y, m) >= (cy, cm)
+    if observed > today:
+        return None
+    cy, cm = divmod(today.year * 12 + today.month - 1 - months, 12)
+    cm += 1
+    cutoff = datetime.date(cy, cm, min(today.day, calendar.monthrange(cy, cm)[1]))
+    if len(text) == 7:
+        return (observed.year, observed.month) >= (cutoff.year, cutoff.month)
+    return observed >= cutoff
 
 
 def _recent(date_str: str, months: int = 12) -> bool:

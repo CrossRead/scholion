@@ -1599,7 +1599,7 @@ async function viewVisitSheet(root, reference=false){
   const r=await api('/api/visit-sheet'+(reference?'?reference=1':''));
   if(!root.isConnected)return;
   root.className='visit-sheet';
-  const rows=r.measurements||[],held=r.held_measurements||[],meds=(r.medications||[]).filter(m=>m.current);
+  const rows=r.measurements||[],held=r.held_measurements||[],history=r.historical_measurements||[],meds=(r.medications||[]).filter(m=>m.current);
   let cautionMarkup=cautionsHtml(r.regimen_cautions);
   for(const c of r.regimen_cautions||[])if(c.source)cautionMarkup=cautionMarkup.replace(esc(c.source),visitSourceLinks(c.source));
   const empty=`<p class="cr-muted">${esc(t('visit.empty'))}</p>`;
@@ -1621,7 +1621,8 @@ async function viewVisitSheet(root, reference=false){
     <h2 class="cr-h2">${esc(t('visit.medications'))}</h2>
     ${meds.length?`<ul>${meds.map(m=>`<li><b>${esc(m.name)}</b> · ${esc(m.dose||'—')} · ${esc(m.start_date||t('treatment.undated'))}</li>`).join('')}</ul>`:empty}
     ${controlsHtml(r.treatment.controls)}
-    <details class="visit-held" data-index-provenance><summary>${esc(t('visit.held',{n:held.length}))}</summary><ul>${held.map(m=>`<li>${esc(m.name)} · ${esc(m.date||'—')} · ${esc(m.corridor_note||t('visit.no_corridor'))}</li>`).join('')}</ul></details>
+    <details class="visit-held" data-index-provenance><summary>${esc(t('visit.held',{n:held.length}))}</summary><ul>${held.map(m=>`<li>${esc(m.name)} · ${esc(m.date||'—')} · ${esc(m.recency_note||m.corridor_note||t('visit.no_corridor'))}</li>`).join('')}</ul></details>
+    ${history.length?`<details class="visit-history"><summary>${esc(t('visit.historical',{n:history.length}))}</summary><ul>${history.map(m=>`<li><b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit_display??m.unit??'')} · ${esc(m.date||'—')}<br>${esc(m.source_label)}</li>`).join('')}</ul></details>`:''}
     <h2 class="cr-h2">${esc(t('visit.sources'))}</h2><div class="cr-body-s">${['labs','medications','metrics','genome_vcf'].map(k=>r.sources[k]?`<p><b>${esc(r.sources[k].label)}</b>: ${esc(r.sources[k].origin)} · ${esc(r.sources[k].updated||'—')}</p>`:'').join('')}</div>
     ${r.reference_appendix.included?`<section class="visit-reference"><h2 class="cr-h2">${esc(t('visit.appendix'))}</h2><p>${esc(r.appendix_note)}</p>
     ${r.reference_appendix.panels.map(p=>`<section><h3 class="cr-h3">${esc(p.label)}</h3>${p.positions.map(x=>`<article class="cr-card">${levelChip(x.level)} ${systemGeneLink(x.gene,p.key)} ${esc(x.rsid)}<p>${esc(t('visit.reading',{reading:x.reading_label||'—'}))}</p>
@@ -1666,6 +1667,7 @@ async function viewLabs(root){
   // The folder by its name; the whole path is in the tooltip, not in the text.
   const folder=docs?String(docs).split('/').filter(Boolean).pop():'';
   root.innerHTML = `${pageHead(t('web.tab.labs'),t('web.page.labs.q'),facts)}${treatmentHtml(meds.treatment)}
+    ${(d.observations||[]).length?`<details class="cr-card"><summary>${esc(t('labs.observations'))} · ${d.observations.length}</summary><p>${esc(t('labs.observations_note'))}</p>${d.observations.map(o=>`<details><summary>${esc(o.name)} [${esc(t(({urine:'labs.specimen_urine',respiratory_swab:'labs.specimen_respiratory_swab'})[o.specimen]||'labs.specimen_unknown'))}; ${esc(t(({PCR:'labs.method_pcr',urinalysis:'labs.method_urinalysis'})[o.method]||'labs.method_urinalysis'))}]: <b>${esc(o.result_text)}</b> ${esc(o.unit||'')} · ${esc(o.date)}</summary>${o.series.map(p=>`<p>${esc(p.date)} · ${esc(p.result_text)} ${esc(p.unit||'')} · ${esc(t('labs.printed_reference'))}: ${esc(p.reference_text||'—')}<br><small>${esc(p.source||'')}</small></p>`).join('')}</details>`).join('')}</details>`:''}
     <div class="toolbar">
       <button class="cr-btn act" id="ingest-run">${esc(t('web.labs.reingest'))}</button>
       <button class="cr-btn cr-btn--ghost ghost" id="archive-preview">${esc(t('archive.preview'))}</button>
@@ -1710,14 +1712,14 @@ async function viewLabs(root){
     if(!r.ok){box.innerHTML=errorHtml(r.error||t('web.common.error'));return;}
     const files=(r.per_file||[]).map(f=>`<li>${esc(f.file)} <span class="muted">(${esc(fmtDate(f.date))}): ${esc(plural(f.markers.length,'count.markers'))}</span></li>`).join('');
     const refused=(r.not_ingested||[]).map(f=>`<li>${esc(f.file)} — ${esc(f.detail||f.reason)}</li>`).join('');
-    const conflicts=(r.conflicts||[]).map(c=>`<li>${esc(t('ingest.conflict',c))}</li>`).join('');
+    const conflicts=(r.conflicts||[]).map(c=>`<li>${esc(t('ingest.conflict',c))}</li>`).join('')+(r.observation_conflicts||[]).map(c=>`<li>${esc(t('ingest.observation_conflict',{key:c.marker,date:c.date}))}</li>`).join('');
     const errors=(r.errors||[]).map(f=>`<li>${esc(t('web.common.error_prefix'))}${esc(f)}</li>`).join('');
     const unknown=(r.unrecognised_rows||[]).map(f=>`<li>${esc(t('ingest.unrecognised_rows',{file:f.file,n:f.count}))}<ul>${f.rows.map(row=>`<li>${esc(row.label)} [${esc(row.unit||'')}]</li>`).join('')}</ul></li>`).join('');
-    const report=`<div class="cr-card card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))}
+    const report=`<div class="cr-card card"><b>${esc(t('web.labs.ingest_files',{n:r.files_processed}))}</b>${esc(t('web.labs.ingest_points',{points:r.points_added,skipped:r.skipped}))} ${r.observations_added?esc(t('ingest.observations_added',{n:r.observations_added})):''}
       ${files?`<ul class="meta">${files}</ul>`:`<div class="meta">${esc(t('web.labs.ingest_nothing_new'))}</div>`}${refused||unknown||conflicts||errors?`<ul>${refused}${unknown}${conflicts}${errors}</ul>`:''}</div>`;
     box.innerHTML=report;
-    toast(r.points_added>0?t('web.labs.points_added',{n:r.points_added}):t('web.labs.no_new_data'));
-    if(r.points_added>0){_sources=null; await viewLabs($('#view')); const target=$('#ingest-res');if(target)target.innerHTML=report;}
+    toast(r.points_added>0?t('web.labs.points_added',{n:r.points_added}):r.observations_added?t('ingest.observations_added',{n:r.observations_added}):t('web.labs.no_new_data'));
+    if((r.points_added+r.observations_added)>0){_sources=null; await viewLabs($('#view')); const target=$('#ingest-res');if(target)target.innerHTML=report;}
   };
 }
 async function previewLabArchive(box, approval=''){
@@ -1725,12 +1727,12 @@ async function previewLabArchive(box, approval=''){
   const r=await post('/api/ingest-labs',approval?{approve_archive:approval}:{archive_preview:true});
   if(!r.preview){
     box.innerHTML=r.ok?`<div class="cr-card card">${esc(t('web.labs.points_added',{n:r.points_added}))}</div>`:errorHtml(r.error||t('web.common.failed'));
-    if(r.ok&&r.points_added>0){_sources=null;await viewLabs($('#view'));}
+    if(r.ok&&(r.points_added+(r.observations_added||0))>0){_sources=null;await viewLabs($('#view'));}
     return;
   }
   const forms=(r.forms||[]).map(f=>`<article class="cr-card card"><b>${esc(f.file)}</b> · ${esc(f.date)} · ${esc(t('archive.specimen.'+f.specimen))}
     <div class="meta">${esc(t('archive.pages',{pages:f.pages.join(', ')}))}</div>
-    <ul>${f.readings.map(p=>`<li>${esc(p.name)}: ${esc(p.censored||'')}${esc(String(p.value))} ${esc(p.unit||'')}</li>`).join('')}</ul></article>`).join('');
+    <ul>${f.readings.map(p=>`<li>${esc(p.name)}: ${esc(p.censored||'')}${esc(String(p.value))} ${esc(p.unit||'')}</li>`).join('')}${(f.observations||[]).map(p=>`<li>${esc(p.label)}: ${esc(p.result_text)} ${esc(p.unit||'')} · ${esc(p.reference_text||'—')}</li>`).join('')}</ul></article>`).join('');
   const refused=(r.not_ingested||[]).map(f=>`<li>${esc(f.file)}: ${esc(t('archive.reason.'+f.reason))}</li>`).join('');
   box.innerHTML=`<p>${esc(r.message||r.error||'')}</p>${r.error?errorHtml(r.error):''}${forms}${refused?`<ul>${refused}</ul>`:''}
     ${r.approval_token?`<button class="cr-btn act" id="archive-apply">${esc(t('archive.apply'))}</button>`:''}`;
@@ -3756,7 +3758,7 @@ function briefReview(b){
 }
 function briefReviewHtml(r){
   const tone=s=>s==='ok'?'b-good':s==='unknown'?'b-unknown':'b-warning';
-  const val=(p,u)=>`${esc(String(p.value))}${u?' '+esc(u):''} <span class="muted">(${esc(String(p.date).slice(0,10))})</span> ${badge(tone(p.status),t('brief.review.status.'+p.status))}`;
+  const val=(p,u)=>`${esc((p.censored||'')+String(p.value))}${u?' '+esc(u):''} <span class="muted">(${esc(String(p.date).slice(0,10))})</span> ${badge(tone(p.status),t('brief.review.status.'+p.status))}`;
   const rows=(r.markers||[]).filter(m=>(m.after||[]).length).map(m=>{
     const last=m.after[m.after.length-1];
     const moved=m.status_changed&&m.before?` <span style="color:var(--warning)">${esc(t('web.brief.review_moved',{from:t('brief.review.status.'+m.before.status),to:t('brief.review.status.'+last.status)}))}</span>`:'';

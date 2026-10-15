@@ -2,9 +2,9 @@
   "_meta": {
     "purpose": "PUBLIC dictionary for recognising lab markers in the text of a report (per-language name substrings → the labs.json key, units, references). Feeds the auto-ingest of a folder of lab PDFs. Holds no patient data, portable.",
     "note": "labels.<lang> holds everything that is a language: names — lower-case substrings to look for in a row of the form; exclude — if one occurs, the row is skipped; require / next_require / form_require and their negatives — the same, scoped to the segment after the name, to the next row, and to the form as a whole; display — the name shown on screen. A language absent from a marker falls back to one that is present.\nLanguage-independent, and deliberately outside labels: unit (a UCUM code — the label for it comes from knowledge/units.json in the output language), units ({unit surface form: multiplier to the canonical unit} — at once a gate and a conversion, populated only where a conversion is genuinely needed), specimen (blood/serum/plasma/urine/stool/saliva), the reference bounds, direction, plausible, loinc.",
-    "updated": "2026-10-05",
+    "updated": "2026-10-15",
     "generated": "2026-07-26: the dictionary was expanded from 57 to 193 markers after the actual names on 176 forms.",
-    "markers": 473,
+    "markers": 478,
     "recognition_proposals": "Entries marked proposed recognise names and preserve values without a norm claim until a person confirms the exact rule for their profile. unit_from_form takes an adjacent unit from the existing unit-label table, with no default or conversion; a later different unit is refused rather than mixed into a series. unitless is explicit for INR. No reference interval or standard identifier is supplied by a proposal.",
     "schema": 2,
     "languages": [
@@ -19,6 +19,135 @@
     "method": "The assay a series belongs to, for an element that laboratories measure two ways: `icp` (elemental analysis, ICP / ICP-MS, mass per litre) or `biochemistry` (clinical chemistry, molar). A series belongs to a method, not to a substance: a unit conversion is legitimate within a method and not across methods, so the ICP row of such an element accepts no molar unit and the two rows are separate keys. Declared, not inferred — `src/tools/check_method_mixing.py` reads it and refuses an element that mixes."
   },
   "markers": {
+    "crp": {
+      "status": "proposed",
+      "unit_from_form": true,
+      "labels": {
+        "en": {
+          "display": "C-reactive protein (standard assay)",
+          "names": [
+            "c-reactive protein",
+            "crp"
+          ],
+          "exclude": [
+            "ультрачувствитель",
+            "высокочувствитель",
+            "hs-crp",
+            "hscrp",
+            "high-sensitivity",
+            "high sensitivity"
+          ]
+        },
+        "ru": {
+          "display": "С-реактивный белок (обычный метод)",
+          "names": [
+            "с-реактивный белок",
+            "c-реактивный белок",
+            "срб"
+          ],
+          "exclude": [
+            "ультрачувствитель",
+            "высокочувствитель",
+            "hs-crp",
+            "hscrp",
+            "high-sensitivity",
+            "high sensitivity"
+          ]
+        }
+      },
+      "recognition_source": "Observed laboratory label; recognition only, pending confirmation."
+    },
+    "non_hdl": {
+      "status": "proposed",
+      "unit_from_form": true,
+      "labels": {
+        "en": {
+          "display": "Non-HDL cholesterol",
+          "names": [
+            "non-hdl cholesterol",
+            "non hdl cholesterol"
+          ]
+        },
+        "ru": {
+          "display": "Холестерин не-ЛПВП",
+          "names": [
+            "холестерин не липопротеинов высокой",
+            "холестерин не-лпвп",
+            "холестерин не лпвп"
+          ]
+        }
+      },
+      "recognition_source": "Observed laboratory label; recognition only, pending confirmation."
+    },
+    "egfr_mdrd": {
+      "status": "proposed",
+      "unit_from_form": true,
+      "labels": {
+        "en": {
+          "display": "eGFR (MDRD)",
+          "names": [
+            "estimated glomerular filtration rate (mdrd)",
+            "egfr (mdrd)"
+          ]
+        },
+        "ru": {
+          "display": "СКФ (MDRD)",
+          "names": [
+            "скорость клубочковой фильтрации (mdrd)"
+          ]
+        }
+      },
+      "recognition_source": "Observed laboratory label; recognition only, pending confirmation."
+    },
+    "creatinine_clearance_cg": {
+      "status": "proposed",
+      "unit_from_form": true,
+      "labels": {
+        "en": {
+          "display": "Creatinine clearance (Cockcroft-Gault), as printed",
+          "names": [
+            "cockcroft-gault"
+          ]
+        },
+        "ru": {
+          "display": "Клиренс по Кокрофту–Голту (как в бланке)",
+          "names": [
+            "скорость клубочковой фильтрации (формула"
+          ],
+          "row_require": [
+            "кокрофта-голта",
+            "кокрофта–голта"
+          ]
+        }
+      },
+      "recognition_source": "Observed laboratory label; recognition only, pending confirmation."
+    },
+    "sars_cov_2_s_total_antibodies": {
+      "status": "proposed",
+      "unit_from_form": true,
+      "standalone_result_unit": "BAU/ml",
+      "specimen": "blood",
+      "labels": {
+        "ru": {
+          "names": [
+            "суммарные антитела igm/igg к"
+          ],
+          "display": "Суммарные антитела IgM/IgG к RBD S SARS-CoV-2",
+          "form_require": [
+            "sars-cov-2"
+          ]
+        },
+        "en": {
+          "names": [
+            "total igm / igg antibodies to the receptor"
+          ],
+          "display": "SARS-CoV-2 S RBD total IgM/IgG antibodies",
+          "form_require": [
+            "sars-cov-2"
+          ]
+        }
+      }
+    },
       "ca_15_3": {
         "status": "proposed",
         "unit_from_form": true,
@@ -3821,7 +3950,10 @@
             "фосфокиназа",
             "моч",
             "фильтрац",
-            "скф"
+            "скф",
+            "ckd-epi",
+            "фильтраци",
+            "glomerular"
           ],
           "display": "Креатинин"
         },
@@ -3838,6 +3970,9 @@
             "urinary",
             "ratio",
             "egfr",
+            "glomerular",
+            "ckd-epi",
+            "фильтраци",
             "glomerular"
           ]
         }
@@ -3870,7 +4005,11 @@
             "с-реактивный белок",
             "срб"
           ],
-          "display": "С-реактивный белок, высокочувствительный"
+          "display": "С-реактивный белок, высокочувствительный",
+          "row_require": [
+            "ультрачувствитель",
+            "высокочувствитель"
+          ]
         },
         "en": {
           "display": "C-reactive protein (hs-CRP)",
@@ -3879,6 +4018,12 @@
             "hs-crp",
             "hscrp",
             "crp"
+          ],
+          "row_require": [
+            "hs-crp",
+            "hscrp",
+            "high-sensitivity",
+            "high sensitivity"
           ]
         }
       },
@@ -4726,7 +4871,7 @@
         5,
         200
       ],
-      "value_below": true,
+      "value_below": false,
       "labels": {
         "ru": {
           "names": [
@@ -4735,7 +4880,10 @@
           ],
           "exclude": [
             "зона",
-            "надпочечник"
+            "надпочечник",
+            "mdrd",
+            "кокроф",
+            "cockcroft"
           ],
           "display": "СКФ (CKD-EPI)"
         },
@@ -4745,6 +4893,11 @@
             "egfr",
             "estimated glomerular",
             "ckd-epi"
+          ],
+          "exclude": [
+            "mdrd",
+            "кокроф",
+            "cockcroft"
           ]
         }
       },

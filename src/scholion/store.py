@@ -740,7 +740,8 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
 
 @_serialized
 def add_lab_batch(rows: List[Dict[str, Any]], *, from_forms: bool = False,
-                  expected_profile_hash: Optional[str] = None) -> Dict[str, Any]:
+                  expected_profile_hash: Optional[str] = None,
+                  observations: Optional[List[Dict[str, Any]]] = None) -> Dict[str, Any]:
     """Validate a laboratory batch in memory and replace its data file atomically.
 
     A batch never claims a demonstration: that is a multi-file erase and cannot
@@ -766,10 +767,19 @@ def add_lab_batch(rows: List[Dict[str, Any]], *, from_forms: bool = False,
         if not result.get("ok"):
             return {"ok": False, "written": 0,
                     "error": _t("import_csv.write_failed", row=row.get("row", row["key"]), detail=result.get("error", ""))}
-    if rows:
+    observation_count = 0
+    for observation in observations or []:
+        if not from_forms:
+            return {"ok": False, "written": 0, "error": "observations_require_source_forms"}
+        result = _add_lab_observations([observation], observation["date"], source=observation["source"],
+                                      date_source="form", subject="owner", _data=data)
+        if not result.get("ok") or result.get("conflicts"):
+            return {"ok": False, "written": 0, "error": "conflicting_or_invalid_observation"}
+        observation_count += len(result["added"])
+    if rows or observation_count:
         _write_json(path, data)
         core.reset_cache()
-    return {"ok": True, "written": len(rows)}
+    return {"ok": True, "written": len(rows), "observations_added": observation_count}
 
 
 #: What a re-add keeps from the entry already there unless the caller gives
@@ -1451,3 +1461,44 @@ def connect_genome(path: Optional[str] = None, *, bam: Optional[str] = None,
     from . import population_preparation
     result["population_assignment"] = population_preparation.prepare()
     return result
+
+
+@_serialized
+def _add_lab_observations(records: List[Dict[str, Any]], date: str, *, source: str,
+                          date_source: str, subject: str,
+                          _data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Persist typed form results atomically; never coerce absence into zero."""
+    from .lab_observations import equivalent
+    if date_resolution(date) is None or date_source not in DATE_SOURCES:
+        return {"ok": False, "reason": "invalid_date"}
+    if any(not isinstance(r, dict) or not r.get("key") or r.get("kind") not in
+           ("qualitative", "interval", "count") or not r.get("result_text") for r in records):
+        return {"ok": False, "reason": "invalid_observation"}
+    err, claimed = _subject_gate(subject) if _data is None else (None, None)
+    if err:
+        return err
+    path = _path("labs.json")
+    data = _data if _data is not None else (
+        json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"markers": {}})
+    observations = data.setdefault("observations", {})
+    added, conflicts = [], []
+    for record in records:
+        key = record["key"]
+        observation = observations.setdefault(key, {"name": record["label"], "series": []})
+        series = observation["series"]
+        point = {k: v for k, v in record.items() if k not in ("key", "label")}
+        point.update(date=date, date_source=date_source, source=source, subject=subject)
+        previous = next((pt for pt in series if pt["date"] == date), None)
+        if previous and not equivalent(previous, point) and previous.get("source") != source:
+            conflicts.append({"marker": key, "date": date, "kept": previous,
+                              "other": point})
+            continue
+        if previous:
+            series.remove(previous)
+        series.append(point)
+        series.sort(key=lambda pt: pt["date"])
+        added.append(key)
+    if added and _data is None:
+        _write_json(path, data)
+        core.reset_cache()
+    return {"ok": True, "added": added, "conflicts": conflicts, "claimed": claimed}

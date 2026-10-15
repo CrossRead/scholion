@@ -121,6 +121,7 @@ def preview(folder: str) -> Dict[str, Any]:
     if not inputs["ok"]:
         return inputs
     rows: list[Dict[str, Any]] = []
+    observations: list[Dict[str, Any]] = []
     forms: list[Dict[str, Any]] = []
     refused: list[Dict[str, Any]] = []
     sources: Dict[str, str] = {}
@@ -142,7 +143,8 @@ def preview(folder: str) -> Dict[str, Any]:
                 continue
             for form in split["forms"]:
                 _, values = reader.parse_report(form["text"], markers, source=str(path))
-                if not values:
+                typed = reader.parse_observations(form["text"])
+                if not (values or typed):
                     refused.append({"file": path.name, "pages": form["pages"], "reason": "no_known_marker"})
                     continue
                 keys, readings = [], []
@@ -167,18 +169,27 @@ def preview(folder: str) -> Dict[str, Any]:
                     keys.append(key)
                     readings.append({"marker": key, "name": core.marker_display(spec, i18n.lang()),
                                      **observation})
-                forms.append({"file": path.name, "pages": form["pages"], "date": form["date"],
+                for observation in typed:
+                    fingerprint = (observation["key"], form["date"])
+                    from .lab_observations import equivalent
+                    if fingerprint in seen and not equivalent(seen[fingerprint], observation):
+                        refused.append({"file": path.name, "pages": form["pages"],
+                                        "reason": "conflicting_observations", "marker": observation["key"]})
+                    seen[fingerprint] = observation
+                    observations.append({**observation, "date": form["date"], "source": str(path.resolve()),
+                                         "source_context": {"sha256": before, "pages": form["pages"]}})
+                forms.append({"observations": typed, "file": path.name, "pages": form["pages"], "date": form["date"],
                               "specimen": form["specimen"], "markers": keys, "readings": readings})
         except (OSError, ValueError, reader.PdfUnreadable) as exc:
             refused.append({"file": path.name, "reason": "read_error", "detail": str(exc)})
     destination = store._path("labs.json").resolve()
     destination_hash = _digest(destination)
     payload = {"profile": str(core.profile_dir().resolve()), "destination": str(destination),
-               "destination_sha256": destination_hash, "sources": sources, "rows": rows}
+               "destination_sha256": destination_hash, "sources": sources, "rows": rows, "observations": observations}
     token = hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
     return {"ok": True, "status": "refused" if refused else "preview", "preview": True,
             "forms": forms, "not_ingested": refused, "points_added": 0,
-            "approval_token": None if refused or not rows else token,
+            "approval_token": None if refused or not (rows or observations) else token,
             "message": t("archive.preview_note"), "folder": str(Path(folder).expanduser().resolve()), "_payload": payload}
 
 
@@ -198,7 +209,7 @@ def run(folder: str, approval: str = "") -> Dict[str, Any]:
         except OSError:
             return {**plan, "ok": False, "error": t("archive.changed"), "points_added": 0}
         result = store.add_lab_batch(payload["rows"], from_forms=True,
-                                     expected_profile_hash=payload["destination_sha256"])
+                                     expected_profile_hash=payload["destination_sha256"], observations=payload["observations"])
         return {**plan, **result, "preview": False, "status": "applied" if result["ok"] else "refused",
                 "points_added": result.get("written", 0), "approval_token": None,
                 "files_processed": len(payload["sources"]) if result["ok"] else 0,

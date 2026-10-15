@@ -162,7 +162,7 @@ def _args(ctx: "ToolContext", given: dict) -> dict:
 
 
 def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool = False,
-                   approve_archive: str = "") -> str:
+                   approve_archive: str = "", force: bool = False) -> str:
     import json
     import os
     import shlex
@@ -193,6 +193,8 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
     env["SCHOLION_PROFILE_DIR"] = str(core.profile_dir())
     env["SCHOLION_REPO_DIR"] = str(core.repo_dir())
     command = [sys.executable, "-m", "scholion", "ingest-labs", folder, "--json"]
+    if _yes(force):
+        command.append("--force")
     try:
         with tempfile.TemporaryDirectory(prefix="scholion-ingest-worker-") as isolated:
             env["SCHOLION_WORKSTATION"] = os.path.join(isolated, "no-workstation.json")
@@ -597,7 +599,7 @@ _TOOLS = (
     ("sch_goal", (), [], _h_goal),
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
-    ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive"), ["folder"], _h_ingest_labs),
+    ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive", "force"), ["folder"], _h_ingest_labs),
     ("sch_overview", ("snapshot", "visit_sheet", "include_reference"), [], _h_overview),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", ("bed", "panel"), [], _h_limits),
@@ -629,7 +631,7 @@ _TOOLS = (
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
+_PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
                "levels": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 

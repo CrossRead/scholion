@@ -32,6 +32,20 @@ them would break the grouping rather than the wording.
 from __future__ import annotations
 
 MESSAGES = {
+    "labs.specimen_urine": "Urine",
+    "labs.specimen_respiratory_swab": "Respiratory swab",
+    "labs.specimen_unknown": "Specimen not recorded",
+    "labs.method_pcr": "PCR",
+    "labs.method_urinalysis": "Urinalysis",
+
+    "tool.sch_ingest_labs.param.force": "Re-read previously imported forms after a recognition update. Existing numeric method/conflict rules still apply.",
+    "ingest.observations_added": "Typed observations stored: {n}.",
+    "ingest.observation_conflict": "Conflicting typed result for {key} at {date}: existing result retained; check the source forms.",
+
+    "labs.observations": "Printed non-scalar results",
+    "labs.observations_note": "Recognition rules are proposed. Result and reference are transcribed; no numeric trend or clinical verdict is inferred.",
+    "labs.printed_reference": "Printed reference",
+
     "web.system.route_not_established": "No supported genetic interpretation for choosing a correction route.",
     "web.system.route_support": "Sources and result check",
     "web.system.med_no_class": "Class not recognised",
@@ -4183,6 +4197,8 @@ will go through them later.
     'visit.medications': 'Recorded current prescriptions',
     'visit.empty': 'No entries in this section.',
     'visit.held': 'No comparison available · count: {n}',
+    'visit.historical': 'Historical measurements, outside the current visit window · count: {n}',
+    'visit.date_unverified': 'The measurement date is unverified; it does not establish a current observation.',
     'visit.no_corridor': 'A supported reference corridor is not established.',
     'visit.observation_source': 'Observation source: {source} · collection date basis: {date_source}',
     'visit.appendix': 'Reference appendix — separate from personal findings',

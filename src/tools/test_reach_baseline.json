@@ -85,6 +85,7 @@
     "src/scholion/ingest_studies.py": 99.2,
     "src/scholion/interaction_basis.py": 100.0,
     "src/scholion/lab_archive.py": 92.8,
+    "src/scholion/lab_observations.py": 83.9,
     "src/scholion/lifecycle.py": 88.3,
     "src/scholion/limits.py": 83.2,
     "src/scholion/linear.py": 85.4,

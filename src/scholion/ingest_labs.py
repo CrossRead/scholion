@@ -24,6 +24,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from . import core, i18n, store
 from .i18n import t as _t
 from .reference_tables import printed_context
+from .lab_observations import parse_observations
 
 _NUM = r"\d+(?:[.,]\d+)?"
 # A «clean» number: not part of a word on either side, and never cut short.
@@ -1126,6 +1127,50 @@ def _single_form_problem(text: str, markers: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _logical_result_lines(text: str) -> List[str]:
+    """Keep wrapped method qualifiers with their own result, never a neighbour.
+
+    Some PDF tables extract a result between the two halves of its label.
+    Formula names and assay qualifiers are identity, not reference prose.
+    Only explicit continuations are joined; arbitrary adjacent rows are not.
+    """
+    lines = text.splitlines()
+    out: List[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        low = line.lower()
+        count = 1
+        if (i + 2 < len(lines) and re.fullmatch(r"\s*мл/мин/1[.,]73\s*", low)
+                and "фильтраци" in lines[i + 1].lower()
+                and lines[i + 2].strip().lower() == "кв.м."):
+            out.append(lines[i + 1] + " мл/мин/1.73 кв.м.")
+            i += 3
+            continue
+        if i + 2 < len(lines):
+            continuation = lines[i + 2].strip().lower()
+            renal = ("фильтраци" in low and
+                     re.match(r"(?:кокрофта[-–]голта\)|ckd[-–]epi)", continuation))
+            non_hdl = ("холестерин не липопротеинов высокой" in low and
+                       continuation.startswith("плотности"))
+            hs_crp = ("реактивный белок" in low
+                      and continuation.startswith(("ультрачувствитель", "высокочувствитель")))
+            if renal or non_hdl or hs_crp:
+                line = " ".join(lines[i:i + 3])
+                if renal:
+                    label = re.sub(r"\s*мл/мин/1[.,]73\s*$", "", lines[i])
+                    method = re.sub(r"\s*кв\.м\.\s*$", "", lines[i + 2])
+                    line = label + " " + method + " " + lines[i + 1] + " мл/мин/1.73 кв.м."
+                count = 3
+        if "фильтраци" in low and i + count < len(lines):
+            if lines[i + count].strip().lower() == "кв.м.":
+                line += " " + lines[i + count]
+                count += 1
+        out.append(line)
+        i += count
+    return out
+
+
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                  date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
@@ -1197,7 +1242,7 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         # This form writes its result its own way (powers of ten) — the general collector
         # does not apply and would give garbage («10» out of «10^6»), so the branch returns.
         return date, _parse_dysb(text, markers)
-    lines = text.splitlines()
+    lines = _logical_result_lines(text)
     found: Dict[str, Any] = {}
 
     def _wrapped_tail(i: int) -> str:
@@ -1313,6 +1358,9 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         for key, spec in markers.items():
             if key in found:
                 continue
+            row_required = core.marker_rules(spec, "row_require")
+            if row_required and not any(_name_key(x) in _name_key(low) for x in row_required):
+                continue
             if any(_name_key(x) in _name_key(low) for x in core.marker_rules(spec, "exclude")):
                 continue
             best = None
@@ -1352,6 +1400,8 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
             if any(_l < o[0] and _name_key(syn) in _name_key(o[1]) for k2, o in hits.items() if k2 != key):
                 continue
             spec = markers[key]
+            if spec.get("standalone_result_unit"):
+                continue
             # The qualifier window: when the value is already printed on this row, the
             # qualifier stands on the VERY next row («…антиген <value> нг/мл 0,000 - 2,000» ⏎
             # «(ПСА общий)»); when the row holds only a broken name, the next one is taken by
@@ -1540,7 +1590,13 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                           "ref_low": rl, "ref_high": rh}
             if spec.get("unit_from_form"):
                 found[key]["unit"] = _printed_unit(tail, nm.end())
-            context = printed_context(rest, lines[i + 1:i + 10], date or "", _to_float(nm.group(1)), censored=cens)
+            following = []
+            for reference_line in lines[i + 1:i + 10]:
+                if any(_occ(reference_line.lower(), name)
+                       for entry in markers.values() for name in core.marker_rules(entry, "names")):
+                    break
+                following.append(reference_line)
+            context = printed_context(rest, following, date or "", _to_float(nm.group(1)), censored=cens)
             if context:
                 selected = context.pop("selected_range", None)
                 if selected and from_unit:
@@ -1553,6 +1609,20 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                     found[key]["reference_withheld"] = True
             if cens:
                 found[key]["censored"] = cens
+    # Some wrapped immunoassays print the unit before the result on its own
+    # row. References beginning with < or > are not result candidates.
+    for key, spec in markers.items():
+        unit = spec.get("standalone_result_unit")
+        if not unit or not any(name.casefold() in text.casefold()
+                               for name in core.marker_rules(spec, "names")):
+            continue
+        pattern = re.compile(r"^\s*(?:" + re.escape(unit).replace(r"\/", r"\s*/\s*") +
+                             r"\s+(" + _NUM + r")|(" + _NUM + r")\s+" + re.escape(unit) +
+                             r")\s*$", re.I | re.M)
+        values = {_to_float(m.group(1) or m.group(2)) for m in pattern.finditer(text)}
+        if len(values) == 1:
+            found[key] = {"value": values.pop(), "unit": unit,
+                          "ref_low": None, "ref_high": None}
     return date, found
 
 
@@ -1565,7 +1635,7 @@ def _printed_unit(tail: str, end: int) -> str:
     """
     candidates = []
     for code, entry in core._read_knowledge_raw("units.json").get("units", {}).items():
-        for surface in [code, *(entry.get("label") or {}).values()]:
+        for surface in [code, *(entry.get("label") or {}).values(), *entry.get("synonyms", [])]:
             if isinstance(surface, str) and surface and not surface.isdecimal():
                 candidates.append((surface, code))
     # Many forms put the reference interval between the result and its unit.
@@ -1602,21 +1672,39 @@ def _unrecognised_labels(text: str, limit: int = 12):
     «19 files went past in silence» with a list a person can read.
     """
     markers = core.lab_markers().get("markers", {})
+    specimen = _specimen(text)
     known = []
     for spec in markers.values():
+        materials = spec.get("specimen") or ["blood"]
+        if specimen not in ([materials] if isinstance(materials, str) else materials):
+            continue
         known.extend(_name_key(x) for x in core.marker_rules(spec, "names"))
     out = []
-    for ln in text.splitlines():
+    for ln in _logical_result_lines(text):
         m = _LABEL_ROW.match(ln)
-        if not m:
+        qualitative = re.match(
+            r"^\s*([А-ЯЁA-Z][^\n]{1,90}?)\s+"
+            r"(?:не обнаружен[оаы]?|отсутству\w*|прозрачн\w*|темно[-–]желт\w*|"
+            r"светло[-–]желт\w*|соломенно[-–]желт\w*|\d+\s*[-–]\s*\d+\s+в п/зр)",
+            ln, re.IGNORECASE)
+        if not m and qualitative:
+            label = " ".join(qualitative.group(1).split())
+            unit = "в п/зр" if "в п/зр" in ln else ""
+        elif m:
+            label = " ".join(m.group(1).split())
+            unit = (m.group(2) or "").strip()
+        else:
             continue
-        label = " ".join(m.group(1).split())
         low = label.lower()
+        if re.match(r"^(?:не обнаружен[оаы]?|отсутству\w*|negative)\b", low):
+            continue
         if any(k in _name_key(low) for k in known):
             continue
-        if any(low.startswith(x) for x in ("дата", "пациент", "врач", "заказ", "адрес")):
+        if any(low.startswith(x) for x in ("дата", "пациент", "врач", "заказ", "адрес",
+                                         "заявка", "стр.", "оборудование", "возраст",
+                                         "request form", "certificate", "page ")):
             continue
-        item = {"label": label, "unit": (m.group(2) or "").strip()}
+        item = {"label": label, "unit": unit}
         if item not in out:
             out.append(item)
         if len(out) >= limit:
@@ -1904,6 +1992,7 @@ def ingest(folder: str, force: bool = False,
     manifest = _load_manifest()
     out: Dict[str, Any] = {
            "ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
+           "observations_added": 0, "observation_conflicts": [],
            "points_added": 0, "skipped": 0, "per_file": [], "conflicts": [],
            "repeats": [], "draw_times": {}, "resolution_mixed": [],
            # Points of the same day this run stood in for (task 128), and files
@@ -2089,16 +2178,19 @@ def ingest(folder: str, force: bool = False,
                 manifest[rk] = mt
                 continue
             date, found = parse_report(text, markers, source=str(f), date_hint=hint)
+            observations = parse_observations(text)
             problem = _single_form_problem(text, markers)
             if problem:
                 out["not_ingested"].append({"file": f.name, "reason": problem,
                                              "detail": _t("ingest_labs.reason_" + problem)})
                 continue
-            unknown = _unrecognised_labels(text, limit=1000)
+            observed_labels = {r["label"].casefold() for r in observations}
+            unknown = [r for r in _unrecognised_labels(text, limit=1000)
+                       if r["label"].casefold() not in observed_labels]
             if unknown:
                 out["unrecognised_rows"].append({"file": f.name, "count": len(unknown), "rows": unknown})
             ftl = text.lower()
-            if not date or not found:
+            if not date or not (found or observations):
                 # Name the lines that were not recognised, not just the file. This is
                 # what a dictionary proposal (task 80) will be built from: the labels
                 # and units of the rows nobody could place, and nothing else — never
@@ -2112,6 +2204,13 @@ def ingest(folder: str, force: bool = False,
                 manifest[rk] = mt
                 continue
             added = []
+            observed = store._add_lab_observations(observations, date, source=rk,
+                                                  date_source=date_src, subject="owner") if observations else {}
+            if observed and not observed.get("ok"):
+                raise ValueError(observed.get("reason", "observation_refused"))
+            observed_keys = observed.get("added", [])
+            out["observations_added"] += len(observed_keys)
+            out["observation_conflicts"].extend(observed.get("conflicts", []))
             # The point keeps the FULL stamp the form printed — day, and the clock time
             # when there was one. Truncating to the month was what made two draws in a
             # single day indistinguishable, so the second one could only be recorded as
@@ -2183,7 +2282,7 @@ def ingest(folder: str, force: bool = False,
                     out["not_ingested"].append({"file": f.name, "reason": r.get("reason") or "point_refused",
                                                 "marker": key, "detail": r.get("error")})
             manifest[rk] = mt
-            if added:
+            if added or observed_keys:
                 out["files_processed"] += 1
                 out["points_added"] += len(added)
                 # `date` stays the month for the readers that already parse it; the
@@ -2193,7 +2292,7 @@ def ingest(folder: str, force: bool = False,
                 # NameError, and no test noticed because none of them ran a successful
                 # ingest end to end. `test_ingest_reads_a_table.py` now does.
                 out["per_file"].append({"file": f.name, "date": day[:7],
-                                        "draw_date": date, "markers": added})
+                                        "draw_date": date, "markers": added, "observations": observed_keys})
         except Exception as e:
             # Broad on purpose: a reason somebody foresaw has its own entry
             # above, and this catches the ones nobody did.

@@ -21,6 +21,8 @@ the drop being pocketed silently.
 from __future__ import annotations
 
 import json
+from pathlib import Path
+import runpy
 import subprocess
 import sys
 import unittest
@@ -33,6 +35,12 @@ BASELINE = support.ROOT / "src" / "tools" / "language_baseline.json"
 
 @unittest.skipUnless(TOOL.exists(), "the language meter is not part of this build")
 class TestTheRemainderDoesNotGrow(unittest.TestCase):
+
+    def test_local_environment_dependencies_are_outside_the_shipping_audit(self):
+        skip = runpy.run_path(str(TOOL))["_skip"]
+        self.assertTrue(skip(Path(".venv/lib/python3.12/site-packages/dependency.py")))
+        self.assertTrue(skip(Path("venv/Lib/site-packages/dependency.py")))
+        self.assertFalse(skip(Path("src/scholion/example.py")))
 
     def test_strict_passes(self):
         p = subprocess.run([sys.executable, str(TOOL), "--strict"],

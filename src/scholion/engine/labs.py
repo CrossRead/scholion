@@ -49,9 +49,11 @@ def same_day_repeats(series: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         out.append({
             "day": day,
             "points": [{"at": str(p.get("date"))[11:] or None, "value": p.get("value"),
+                        **({"censored": p["censored"]} if p.get("censored") else {}),
                         "_stamp": str(p.get("date"))} for p in pts],
             "delta": (pts[-1].get("value") - pts[0].get("value"))
-                     if all(isinstance(p.get("value"), (int, float)) for p in (pts[0], pts[-1]))
+                     if all(isinstance(p.get("value"), (int, float)) and not p.get("censored")
+                            for p in (pts[0], pts[-1]))
                      else None,
             "context": next((p.get("draw_context") for p in reversed(pts)
                              if p.get("draw_context")), None),
@@ -123,7 +125,7 @@ def _personal_move(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
 
     A shift counts as significant when it exceeds BOTH 10 % of the personal baseline AND one and
     a half personal standard deviations (when there is enough history to estimate the scatter)."""
-    if not series or len(series) < 2:
+    if not series or len(series) < 2 or any(p.get("censored") for p in series):
         return None
     s = sorted(series, key=lambda p: p["date"])
     prior = [p["value"] for p in s[:-1] if isinstance(p.get("value"), (int, float))]
@@ -373,6 +375,8 @@ def change_floor(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     value at or below zero (a relative change is undefined), or a series that
     never moved at all. Nothing is assumed in its place.
     """
+    if any(p.get("censored") for p in series or []):
+        return None  # A reporting limit is not an observation of the scatter.
     s = sorted(series or [], key=lambda p: p["date"])
     diffs = []
     for a, b in zip(s, s[1:]):
@@ -418,6 +422,8 @@ def _trend(series: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     if not earlier:
         return None
     prev = earlier[-1]
+    if prev.get("censored") or last.get("censored"):
+        return None  # The boundary does not identify an exact difference.
     delta = round(last["value"] - prev["value"], 3)
     direction = "up" if delta > 0 else ("down" if delta < 0 else "flat")
     pct = round(100.0 * delta / prev["value"], 1) if prev["value"] else None
@@ -628,7 +634,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
                      "decision_unresolved_count": sum(any(d["crossed"] is None for d in r["decisions"]) for r in current),
                      "near_limit_count": sum(bool(r.get("near_limit")) for r in current),
                      "decision_crossed_count": sum(any(d["crossed"] for d in r["decisions"]) for r in current)}
-    return {"status": "ok", "count": len(results), "abnormal_count": len(abnormal),
+    from ..lab_observations import view as observation_view
+    return {"observations": observation_view(markers), "status": "ok", "count": len(results), "abnormal_count": len(abnormal),
             "display_window_months": 12, "current_stats": current_stats,
             "historical_count": len(results) - len(current),
             "near_limit_count": len(near), "decision_crossed_count": len(crossed),

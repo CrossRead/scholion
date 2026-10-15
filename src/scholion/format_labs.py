@@ -109,6 +109,18 @@ def labs_report(r: Dict[str, Any], *, include_history: bool = False) -> str:
             line += " · " + _t("labs.date_unknown")
         line += _target_suffix(m)
         lines.append(line)
+    if r.get("observations"):
+        lines += ["", _t("labs.observations"), _t("labs.observations_note")]
+        for observation in r["observations"]:
+            points = observation["series"] if include_history else [observation]
+            for point in points:
+                date_note = (" " + _t("labs.date_source_" + point["date_source"])) if point.get("date_source") in ("filename", "ordered") else ""
+                method = _t("labs.method_" + point["method"].lower())
+                specimen = _t("labs.specimen_" + point["specimen"])
+                lines.append(f"- {observation['name']} [{specimen}; {method}]: **{point['result_text']}** "
+                             f"{point.get('unit', '')} ({point['date']}{date_note}); "
+                             f"{_t('labs.printed_reference')}: {point.get('reference_text') or '—'}; "
+                             f"{point.get('source', '')}")
     lines.append(f"\n_{r['disclaimer']}_")
     return "\n".join(lines)
 
@@ -242,6 +254,8 @@ def reconcile_report(r: Dict[str, Any]) -> str:
              + _t("reconcile.markers_seen", n=len(r["markers_seen"])),
              ""]
 
+    if r.get("observation_covered"):
+        lines.append(_t("ingest.observations_added", n=r["observation_covered"]))
     unread = r.get("unreadable", [])
     if unread:
         lines.append("🔴 " + _t("reconcile.unreadable", n=len(unread)))
@@ -466,6 +480,9 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
                          + " · " + _t("archive.specimen." + form["specimen"]))
             for row in form["readings"]:
                 lines.append(f"  {row['name']}: {row.get('censored') or ''}{row['value']} {row['unit'] or ''}")
+            for row in form.get("observations", []):
+                lines.append(f"  {row['label']}: {row['result_text']} {row.get('unit', '')}; "
+                             f"{_t('labs.printed_reference')}: {row.get('reference_text') or '—'}")
         for refusal in r.get("not_ingested", []):
             lines.append(f"⚠️ {refusal['file']}: " + _t("archive.reason." + refusal["reason"]))
         if r.get("approval_token"):
@@ -500,6 +517,10 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
             if it["file"] in named:
                 continue
             L.append(f"- `{it['file']}` — {it.get('note', '')}")
+    if r.get("observations_added"):
+        L.append(_t("ingest.observations_added", n=r["observations_added"]))
+    for conflict in r.get("observation_conflicts", []):
+        L.append(_t("ingest.observation_conflict", key=conflict["marker"], date=conflict["date"]))
     for c in (r.get("conflicts") or [])[:10]:
         L.append(_t("ingest.conflict", marker=c["marker"], date=c["date"],
                     kept=c["kept"], other=c["other"]))

@@ -41,7 +41,14 @@ def visit_report(data: Dict[str, Any]) -> str:
         lines.append(str(control.get("plan_source") or t("treatment.unresolved")))
     lines += ["", t("visit.held", n=len(data["held_measurements"]))]
     lines.extend(f"• {r['name']} · {r.get('date') or '—'} · "
-                 + (r.get("corridor_note") or t("visit.no_corridor")) for r in data["held_measurements"])
+                 + (r.get("recency_note") or r.get("corridor_note") or t("visit.no_corridor")) for r in data["held_measurements"])
+    history = data.get("historical_measurements") or []
+    if history:
+        lines += ["", t("visit.historical", n=len(history))]
+        for row in history:
+            lines.append(f"• {row['name']}: {row.get('censored') or ''}{_n(row['value'])} "
+                         f"{row.get('unit') or ''} · {row.get('date') or '—'}")
+            lines.append("  " + row["source_label"])
     if data["reference_appendix"]["included"]:
         lines += ["", t("visit.appendix"), data["appendix_note"]]
         for panel in data["reference_appendix"]["panels"]:

@@ -110,7 +110,7 @@ LINE_BUDGETS = {
     # on every face — one field and the lazy helper that reads the domain file.
     # +10 for the list of every system a marker counts in (task 200).
     # task 200: the two conditions that ask for a test nobody has ever taken
-    "labs": 760,
+    "labs": 770,  # Reporting-limit guards for trends, scatter and same-draw repeats.
     # Added 12.09.2026, task 170: the clinician's target beside the corridor —
     # what a treatment aims at, told apart from what a laboratory calls normal.
     # It landed inside labs.py first and pushed it 90 lines over its wire; the

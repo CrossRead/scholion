@@ -1,0 +1,1211 @@
+{
+  "_meta": {
+    "note": "Recognition-only proposed entries. Typed printed results; no clinical ranges or interpretation. PCR targets retain their panel scope; overlapping targets are not independent pathogens.",
+    "source_tier": "curated_reference",
+    "updated": "2026-10-15"
+  },
+  "results": [
+    {
+      "code": "not_detected",
+      "labels": {
+        "ru": {
+          "names": [
+            "не обнаружено"
+          ]
+        },
+        "en": {
+          "names": [
+            "not detected",
+            "negative"
+          ]
+        }
+      }
+    },
+    {
+      "code": "detected",
+      "labels": {
+        "ru": {
+          "names": [
+            "обнаружено"
+          ]
+        },
+        "en": {
+          "names": [
+            "detected",
+            "positive"
+          ]
+        }
+      }
+    },
+    {
+      "code": "absent",
+      "labels": {
+        "ru": {
+          "names": [
+            "отсутствует",
+            "отсутствуют",
+            "отсутсвуют"
+          ]
+        },
+        "en": {
+          "names": [
+            "absent"
+          ]
+        }
+      }
+    },
+    {
+      "code": "present",
+      "labels": {
+        "ru": {
+          "names": [
+            "присутствует",
+            "присутствуют"
+          ]
+        },
+        "en": {
+          "names": [
+            "present"
+          ]
+        }
+      }
+    },
+    {
+      "code": "trace",
+      "labels": {
+        "ru": {
+          "names": [
+            "следы"
+          ]
+        },
+        "en": {
+          "names": [
+            "trace"
+          ]
+        }
+      }
+    },
+    {
+      "code": "dark_yellow",
+      "labels": {
+        "ru": {
+          "names": [
+            "темно-желтый",
+            "тёмно-жёлтый"
+          ]
+        },
+        "en": {
+          "names": [
+            "dark yellow"
+          ]
+        }
+      }
+    },
+    {
+      "code": "straw_yellow",
+      "labels": {
+        "ru": {
+          "names": [
+            "соломенно-желтый"
+          ]
+        },
+        "en": {
+          "names": [
+            "straw yellow"
+          ]
+        }
+      }
+    },
+    {
+      "code": "light_yellow",
+      "labels": {
+        "ru": {
+          "names": [
+            "светло-желтый"
+          ]
+        },
+        "en": {
+          "names": [
+            "light yellow"
+          ]
+        }
+      }
+    },
+    {
+      "code": "yellow",
+      "labels": {
+        "ru": {
+          "names": [
+            "желтый"
+          ]
+        },
+        "en": {
+          "names": [
+            "yellow"
+          ]
+        }
+      }
+    },
+    {
+      "code": "clear",
+      "labels": {
+        "ru": {
+          "names": [
+            "прозрачная",
+            "прозрачный"
+          ]
+        },
+        "en": {
+          "names": [
+            "clear"
+          ]
+        }
+      }
+    },
+    {
+      "code": "cloudy",
+      "labels": {
+        "ru": {
+          "names": [
+            "мутная",
+            "мутный"
+          ]
+        },
+        "en": {
+          "names": [
+            "cloudy"
+          ]
+        }
+      }
+    },
+    {
+      "code": "small_amount",
+      "labels": {
+        "ru": {
+          "names": [
+            "немного"
+          ]
+        },
+        "en": {
+          "names": [
+            "small amount"
+          ]
+        }
+      }
+    }
+  ],
+  "markers": {
+    "urinalysis_color": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "цвет"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "colour"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Colour"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_clarity": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "прозрачность"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "clarity"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Clarity"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_bilirubin": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "билирубин"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "bilirubin"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Bilirubin"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_urobilinogen": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "уробилиноген"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "urobilinogen"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Urobilinogen"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_nitrite": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "нитриты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "nitrites"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Nitrites"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_protein": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "белок"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "protein"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Protein"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_glucose": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "глюкоза"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "glucose"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Glucose"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_ketone": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "кетоновые тела"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "ketones"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Ketones"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_bacteria": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "бактерии"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "bacteria"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Bacteria"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_fungi": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "грибы"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "fungi"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Fungi"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_wbc": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "лейкоциты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "leukocytes"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Leukocytes"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_mucus": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "слизь"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "mucus"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Mucus"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_sperm": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "сперматозоиды"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "spermatozoa"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Spermatozoa"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_hyaline_casts": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "цилиндры гиалиновые"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "hyaline casts"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Hyaline casts"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_granular_casts": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "цилиндры зернистые"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "granular casts"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Granular casts"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_transitional_epithelium": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "эпителий переходный"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "transitional epithelium"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Transitional epithelium"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_squamous_epithelium": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "эпителий плоский"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "squamous epithelium"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Squamous epithelium"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_renal_epithelium": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "эпителий почечный"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "renal epithelium"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Renal epithelium"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_rbc_unchanged": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "эритроциты неизмененные"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "unchanged erythrocytes"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Unchanged erythrocytes"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_uric_acid_crystals": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "кристаллы мочевой кислоты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "uric acid crystals"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Uric acid crystals"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_oxalate_crystals": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "оксалаты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "oxalate crystals"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Oxalate crystals"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_triple_phosphate_crystals": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "трипельфосфаты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "triple phosphate crystals"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Triple phosphate crystals"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_urate_crystals": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "ураты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "urate crystals"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Urate crystals"
+        }
+      },
+      "allow_interval": true
+    },
+    "urinalysis_phosphate_crystals": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "labels": {
+        "ru": {
+          "names": [
+            "фосфаты"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "phosphate crystals"
+          ],
+          "form_require": [
+            "urinalysis"
+          ],
+          "display": "Phosphate crystals"
+        }
+      },
+      "allow_interval": true
+    },
+    "pcr_sars_cov_2": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "исследование на коронавирус sars"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "testing on coronavirus sars"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "SARS-CoV-2"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_adenovirus": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "аденовирусы гр."
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "adenovirus"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Adenovirus groups B, C, E"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_bocavirus": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "бокавирус"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "human bocavirus"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Bocavirus"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_parainfluenza_1": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "вирус парагриппа 1"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "parainfluenza virus 1"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Parainfluenza virus 1"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_parainfluenza_2": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "вирус парагриппа 2"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "parainfluenza virus 2"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Parainfluenza virus 2"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_parainfluenza_3": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "вирус парагриппа 3"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "parainfluenza virus 3"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Parainfluenza virus 3"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_parainfluenza_4": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "вирус парагриппа 4"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "parainfluenza virus 4"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Parainfluenza virus 4"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_coronavirus_hku1_oc43": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "коронавирусы (hcov hku-1"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "coronaviruses (hcov hku-1"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Coronaviruses HKU-1 / OC43"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_coronavirus_nl63_229e_oc43_hku1": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "коронавирусы (hcov nl63"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "coronaviruses (hcov nl63"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Coronaviruses NL63 / 229E / OC43 / HKU1"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_metapneumovirus": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "метапневмовирус"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "human metapneumovirus"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Metapneumovirus"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_rsv": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "респираторно-синцитиальный вирус"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "human respiratory syncytial virus"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Respiratory syncytial virus"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "pcr_rhinovirus": {
+      "status": "proposed",
+      "specimen": "unknown",
+      "method": "PCR",
+      "labels": {
+        "ru": {
+          "names": [
+            "риновирус"
+          ],
+          "form_require": [
+            "пцр"
+          ]
+        },
+        "en": {
+          "names": [
+            "human rhinovirus"
+          ],
+          "form_require": [
+            "pcr"
+          ],
+          "display": "Rhinovirus"
+        }
+      },
+      "allow_interval": false,
+      "specimen_from_form": true
+    },
+    "urinalysis_cylindroids": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "allow_interval": true,
+      "labels": {
+        "ru": {
+          "names": [
+            "цилиндроиды"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "cylindroids"
+          ],
+          "display": "Cylindroids",
+          "form_require": [
+            "urinalysis"
+          ]
+        }
+      }
+    },
+    "urinalysis_waxy_casts": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "allow_interval": true,
+      "labels": {
+        "ru": {
+          "names": [
+            "цилиндры восковидные"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "waxy casts"
+          ],
+          "display": "Waxy casts",
+          "form_require": [
+            "urinalysis"
+          ]
+        }
+      }
+    },
+    "urinalysis_rbc_changed": {
+      "status": "proposed",
+      "specimen": "urine",
+      "method": "urinalysis",
+      "allow_interval": true,
+      "labels": {
+        "ru": {
+          "names": [
+            "эритроциты измененные"
+          ],
+          "form_require": [
+            "общий анализ мочи"
+          ]
+        },
+        "en": {
+          "names": [
+            "changed erythrocytes"
+          ],
+          "display": "Changed erythrocytes",
+          "form_require": [
+            "urinalysis"
+          ]
+        }
+      }
+    }
+  },
+  "synonyms": [
+    "в п/зр.",
+    "г/л",
+    "ммоль/л",
+    "/HPF",
+    "g/L",
+    "mmol/L"
+  ],
+  "specimen_rules": {
+    "respiratory_swab": {
+      "labels": {
+        "ru": {
+          "names": [
+            "биоматериал: мазок из зева и носа"
+          ]
+        },
+        "en": {
+          "names": [
+            "sample type: nasopharyngeal swab",
+            "specimen: respiratory swab"
+          ]
+        }
+      }
+    }
+  }
+}

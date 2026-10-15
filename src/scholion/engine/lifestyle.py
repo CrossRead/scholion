@@ -378,7 +378,7 @@ def _marker_health_at(key: str, point: Optional[Dict[str, Any]]) -> Optional[int
     if not raw or not point:
         return None
     flag = _flag_value(raw, point["value"], point.get("censored"))
-    return _marker_health({"flag": flag, "value": point["value"],
+    return _marker_health({"flag": flag, "value": point["value"], "censored": point.get("censored"),
                            "ref_low": raw.get("ref_low"), "ref_high": raw.get("ref_high")})
 
 
@@ -395,7 +395,8 @@ def _marker_health(m: Dict[str, Any]) -> Optional[int]:
     and appeared among that system's deviations, while the marker list on the same
     screen said, correctly, that it was not one.
     """
-    if m.get("flag") in ("norange", "unconfirmed_rule"):
+    # A reporting limit establishes a bound, not the magnitude used by this index.
+    if m.get("censored") or m.get("flag") in ("norange", "unconfirmed_rule"):
         return None
     if m.get("flag") == "ok":
         return 100
@@ -510,6 +511,12 @@ def health_radar() -> Dict[str, Any]:
         panel = _panel_term(key, by_key)
         if panel is not None:
             scores.append(panel["score"])
+        abnormal = [{"key": m["key"], "name": core.marker_name(m), "value": m["value"], "unit": m["unit"],
+                          "flag": m["flag"], "censored": m.get("censored"), "ref_low": m["ref_low"], "ref_high": m["ref_high"],
+                          "ref_origin": m.get("ref_origin"),
+                          "date": m.get("date"), "stale": not _recent(m.get("date"), 18),
+                          "note": m.get("note"), "genome_link": m.get("genome_link")}
+                         for m in present if m.get("abnormal")]
         if not scores:
             # Two different silences, and the domain says which: nothing of this
             # system was taken, or what was taken carries no verdict — a number
@@ -521,11 +528,8 @@ def health_radar() -> Dict[str, Any]:
                             "prev_date": None, "compared": 0, "moved": [],
                             "total": len(keys), "measured": len(present),
                             "missing": [k for k in keys if k not in by_key],
-                            "ok": 0, "abnormal": []})
+                            "ok": 0, "abnormal": abnormal})
             continue
-        # `flag != "ok"` counted a marker with no corridor as a deviation, which
-        # the marker list on the same screen denies. One layer decides this.
-        abn = [m for m in present if m.get("abnormal")]
         score = round(sum(scores) / len(scores))
         status = "good" if score >= 80 else ("warning" if score >= 55 else "critical")
         # --- dynamics: ONLY the markers that have a previous point are compared,
@@ -575,12 +579,7 @@ def health_radar() -> Dict[str, Any]:
             "total": len(keys), "measured": len(present), "panel": panel,
             "missing": [k for k in keys if k not in by_key],
             "ok": sum(1 for m in present if m.get("flag") == "ok"),
-            "abnormal": [{"key": m["key"], "name": core.marker_name(m), "value": m["value"], "unit": m["unit"],
-                          "flag": m["flag"], "ref_low": m["ref_low"], "ref_high": m["ref_high"],
-                          "ref_origin": m.get("ref_origin"),
-                          "date": m.get("date"), "stale": not _recent(m.get("date"), 18),
-                          "note": m.get("note"), "genome_link": m.get("genome_link")}
-                         for m in abn],
+            "abnormal": abnormal,
         })
     # + the "Fitness" domain from lifestyle (wearable devices) — so that it counts in the analysis
     try:

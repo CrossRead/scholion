@@ -12,6 +12,8 @@ import support  # noqa: F401
 from scholion import i18n
 from scholion.engine import _helpers, labs, profile_view
 
+radar = import_module("scholion.engine.lifestyle")
+
 brief_review = import_module("scholion.engine.brief_review")
 
 
@@ -45,6 +47,32 @@ class BoundFacts(unittest.TestCase):
                       {"date": "2026-10-01", "value": 5, "censored": censor}]
             self.assertIsNone(labs._trend(points))
             self.assertIsNone(labs._trend(list(reversed(points))))
+
+
+    def test_radar_does_not_score_either_end_of_a_bounded_comparison(self):
+        raw = {"ref_low": 3, "ref_high": 6}
+        for sign in ("<", ">", "<=", ">="):
+            point = {"date": "2026-10-01", "value": 6, "censored": sign}
+            self.assertIsNone(radar._marker_health(dict(raw, value=6, flag="high", censored=sign)))
+            with mock.patch.object(radar.core, "labs", return_value={"markers": {"glucose": raw}}):
+                self.assertIsNone(radar._marker_health_at("glucose", point))
+        self.assertEqual(100, radar._marker_health(dict(raw, value=5, flag="ok")))
+
+    def test_radar_keeps_bounded_deviations_without_a_false_index_or_delta(self):
+        marker = {"key": "glucose", "name": "Synthetic", "value": 6, "unit": "mmol/L",
+                  "date": "2026-10-01", "censored": ">", "flag": "high", "abnormal": True,
+                  "ref_low": 3, "ref_high": 6}
+        with mock.patch.object(radar, "analyze_labs", return_value={"markers": [marker]}), \
+             mock.patch.object(radar, "_RADAR_DOMAINS", [("glucose", ["glucose"])]), \
+             mock.patch.object(radar, "_panel_term", return_value=None), \
+             mock.patch.object(radar, "lifestyle", return_value={}):
+            result = radar.health_radar()
+        domain = result["domains"][0]
+        self.assertIsNone(domain["score"])
+        self.assertIsNone(domain["delta"])
+        self.assertEqual([], domain["moved"])
+        self.assertEqual(">", domain["abnormal"][0]["censored"])
+        self.assertIsNone(result["overall_delta"])
 
     def test_exact_pair_still_has_its_actual_change(self):
         result = labs._trend([{"date": "2026-09-01", "value": 10},

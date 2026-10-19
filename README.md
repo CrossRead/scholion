@@ -23,25 +23,6 @@ container. Export and erasure are human-only. See
 
 ---
 
-## New in 0.7.0: follow changes, connect the evidence
-
-- **See what deserves attention by body system.** Today brings together annual laboratory direction, qualified wearable changes, recorded treatment dates and dated reports of symptoms or tolerability. A recent change can be shown separately from the longer-term direction; timing alone never proves a treatment effect.
-- **Read genetics beside the actual measurements.** System panels compare applicable read variants with the same laboratory observations used in insights. Known gene function comes first, with variant interpretation, Scholion A–E confidence, sources and limits kept distinct. GenCC disease validity remains separate.
-- **Prepare for a useful consultation.** Choose topics for a compact visit brief with dated measurements and the supporting comparisons. Save a local review explicitly and compare it later, including changed or withdrawn interpretations.
-- **Use one consistent history.** Manual and wearable weight share one source-labelled timeline and derived BMI. Labs are grouped by system; completed courses stay in treatment history. English and Russian views use the same facts, as do the CLI, web app and MCP tools.
-
-Existing records are retained. This release does not automatically rerun PGS or
-whole-genome preparation. New curated FOXO3 and ORAI1 positions can use verified
-readings already available; inspect `scholion genome-updates` before explicitly
-genotyping unread catalogue sites. A polygenic percentile is a population
-position, not a disease probability.
-
-[Full 0.7.0 changes](https://github.com/CrossRead/scholion/releases/tag/v0.7.0)
-· [English presentation](https://crossread.github.io/scholion/presentation.html)
-· [Russian presentation](https://crossread.github.io/scholion/presentation.ru.html)
-
----
-
 ## Sixty seconds, on nobody's data
 
 Before you decide whether this is worth pointing at your own medical record, run
@@ -116,6 +97,25 @@ release directory moves, and the tool reads the listing and stops if the pick is
 not unambiguous. `SCHOLION_OFFLINE=1` stops it before the network — it is the one
 thing in this tree that goes out on purpose.
 
+
+## New in 0.7.0: follow changes, connect the evidence
+
+- **See what deserves attention by body system.** Today brings together annual laboratory direction, qualified wearable changes, recorded treatment dates and dated reports of symptoms or tolerability. A recent change can be shown separately from the longer-term direction; timing alone never proves a treatment effect.
+- **Read genetics beside the actual measurements.** System panels compare applicable read variants with the same laboratory observations used in insights. Known gene function comes first, with variant interpretation, Scholion A–E confidence, sources and limits kept distinct. GenCC disease validity remains separate.
+- **Prepare for a useful consultation.** Choose topics for a compact visit brief with dated measurements and the supporting comparisons. Save a local review explicitly and compare it later, including changed or withdrawn interpretations.
+- **Use one consistent history.** Manual and wearable weight share one source-labelled timeline and derived BMI. Labs are grouped by system; completed courses stay in treatment history. English and Russian views use the same facts, as do the CLI, web app and MCP tools.
+
+Existing records are retained. This release does not automatically rerun PGS or
+whole-genome preparation. New curated positions in FOXO3 and ORAI1 can use verified
+readings already available; inspect `scholion genome-updates` before explicitly
+genotyping unread catalogue sites. A polygenic percentile is a population
+position, not a disease probability.
+
+[Full 0.7.0 changes](https://github.com/CrossRead/scholion/releases/tag/v0.7.0)
+· [English presentation](https://crossread.github.io/scholion/presentation.html)
+· [Russian presentation](https://crossread.github.io/scholion/presentation.ru.html)
+
+---
 
 ## Why
 

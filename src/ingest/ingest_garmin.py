@@ -12,6 +12,7 @@ PERSONAL data (the values) go to profile/ (locally); the script itself is impers
 from __future__ import annotations
 import datetime as _dt
 import calendar
+import math
 import glob, json, os, sys
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -86,6 +87,19 @@ def _stats(xs, month):
     out = {"n": n, "days": _days_in(month), "median": round(mid, 1)}
     if sd is not None:
         out["sd"] = round(sd, 2)
+    # Exact, distribution-free interval for the population median under
+    # independent days: P(Binomial(n, .5) < k) <= .025 at either end.
+    # Keep original order statistics; rounding inward would narrow coverage.
+    tail, rank = 0, 0
+    for k in range(1, n // 2 + 1):
+        tail += math.comb(n, k - 1)
+        if 2 * tail / (2 ** n) <= .05:
+            rank = k
+        else:
+            break
+    if rank:
+        out["median_interval"] = [xs[rank - 1], xs[n - rank]]
+        out["median_interval_method"] = "binomial-order-statistics-95"
     return out
 
 

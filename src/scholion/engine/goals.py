@@ -46,13 +46,22 @@ def _goal_resolve(ref: str) -> Tuple[List[Dict[str, Any]], Optional[str], Option
         return [], None, _NO_SERIES
     kind, _, key = ref.partition(":")
     pts: List[Dict[str, Any]] = []
+    if kind in ("life", "metric") or (kind == "wear" and ":" not in key and (key == "BMI" or (core.wearable_metrics().get("metrics", {}).get(key) or {}).get("person_metric"))):
+        from ..measurements import history, bmi_history
+        resolved = bmi_history() if key in ("BMI", "bmi") else history(key)
+        if resolved["series"]:
+            latest = resolved["latest"]
+            src = latest["measurement_source"] if latest else None
+            return resolved["series"], (src if src != "recorded" else None), resolved["missing"]
+        if kind in ("life", "metric"):
+            return [], None, _EMPTY
     if kind == "lab":
         markers = core.labs().get("markers", {})
         if key not in markers:
             return [], None, _NO_SERIES
         for p in (markers[key] or {}).get("series", []) or []:
             if p.get("value") is not None and p.get("date"):
-                pts.append({"date": str(p["date"]), "value": float(p["value"])})
+                pts.append({**p, "date": str(p["date"]), "value": float(p["value"])})
         return sorted(pts, key=lambda p: p["date"]), None, (None if pts else _EMPTY)
     if kind == "wear":
         return _wear_series(key)
@@ -98,7 +107,7 @@ def _wear_series(key: str) -> Tuple[List[Dict[str, Any]], Optional[str], Optiona
 def _goal_lv(ref: str) -> Dict[str, Any]:
     """Series → {l:[dates], v:[values]} for Chart.js."""
     s = _goal_series(ref)
-    return {"l": [p["date"] for p in s], "v": [p["value"] for p in s]}
+    return {"l": [p["date"] for p in s], "v": [p["value"] for p in s], "points": s}
 
 
 def _goal_merge(ref_a: str, ref_b: str) -> Dict[str, Any]:
@@ -139,9 +148,11 @@ def _goal_now(source: str) -> Dict[str, Any]:
     parts, dates, devices, reasons = [], [], [], []
     for ref in source.split("|"):
         pts, dev, why = _goal_resolve(ref.strip())
-        parts.append(_goal_num(pts[-1]["value"]) if pts else "—")
-        if pts:
-            dates.append(pts[-1]["date"])
+        from ..measurements import current
+        latest = current(pts) if not why else None
+        parts.append(_goal_num(latest["value"]) if latest else "—")
+        if latest:
+            dates.append(latest["date"])
         if dev:
             devices.append(dev)
         if why:
@@ -179,39 +190,51 @@ def _phenotype_rows(targets: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         info = catalogue.get(name, {}) if kind == "wear" else (core.labs().get("markers") or {}).get(name, {})
         points, device, reason = _goal_resolve(ref)
         unit = info.get("unit") or ""
-        person_key = info.get("person_metric")
+        person_key = "bmi" if ref == "wear:BMI" else info.get("person_metric")
+        if kind in ("life", "metric"):
+            person_key = name
         row = personal.get(person_key) if person_key else None
         if row and reason != _SEVERAL_DEVICES:
             covered.add(person_key)
+            unit = row.get("unit") or unit
             if row.get("origin") == "manual":
                 points, device, reason = row["series"], None, None
                 unit = row.get("unit") or unit
+        if ref == "wear:BMI" and ms.get("bmi"):
+            unit = "kg/m²"
         out = observation(ref, points, unit, device or ("lab" if kind == "lab" else "recorded"), reason)
-        if row and row.get("origin") == "manual" and row.get("device"):
-            historical, src, why = _goal_resolve(ref)
-            if historical and not why:
-                out["device_history"] = observation(ref, historical, info.get("unit") or "", src)
+        if kind == "lab" and points:
+            from ..trend_qualification import reading_status
+            latest = max(points, key=lambda p: str(p.get("date") or ""))
+            out["reading_status"] = reading_status({**info, **latest})
         out["label"] = (core.marker_name({"key": name, "name": info.get("name")})
                         if kind == "lab" else info.get("name") or info.get("label") or name)
         if ref == "wear:BMI" and ms.get("bmi"):
-            weight = personal.get("weight") or {}
-            if str(weight.get("date") or "") >= str(out.get("date") or ""):
-                out.update(value=ms["bmi"]["value"], date=weight.get("date"),
-                           source="derived", method=ms["bmi"]["method"])
+            out.update(method=ms["bmi"]["method"], height_cm=ms["bmi"]["height_cm"])
         return out
 
     def observation(ref, points, unit, source, reason=None):
         numeric = [p for p in points if isinstance(p.get("value"), (int, float))
-                   and not isinstance(p.get("value"), bool) and p.get("date")]
+                   and not isinstance(p.get("value"), bool) and p.get("date")
+                   and str(p["date"]) <= today.isoformat()]
         numeric.sort(key=lambda p: str(p["date"]))
         recent = [p for p in numeric if str(p["date"])[:7] >= edge.isoformat()[:7]
                   and str(p["date"])[:10] <= today.isoformat()
                   and (len(str(p["date"])) == 7 or str(p["date"])[:10] >= edge.isoformat())]
-        latest = numeric[-1] if numeric else {}
+        from ..measurements import current
+        latest = (current(numeric) or {}) if not reason else {}
+        if latest.get("measurement_source"):
+            source = latest["measurement_source"]
+        aggregations = {p.get("aggregation") for p in recent if p.get("aggregation")}
+        aggregation = "mixed" if len(aggregations) > 1 else next(iter(aggregations)) if aggregations else "monthly_mean" if ref.startswith("wear:") and source not in ("recorded", "lab", "derived") else "observation"
         delta = round(recent[-1]["value"] - recent[0]["value"], 2) if len(recent) > 1 else None
+        if aggregation == "mixed" or len({p.get("measurement_source") for p in recent}) > 1:
+            delta = None
         return {"ref": ref, "value": latest.get("value"), "date": latest.get("date"),
-                "unit": unit, "unit_display": core.unit_label(unit), "source": source, "missing": reason,
-                "series": recent, "year_delta": delta,
+                "unit": unit, "unit_display": core.unit_label(unit), "source": source,
+                "series_source": source, "missing": reason,
+                "series": recent, "aggregation": aggregation, "year_delta": delta,
+                "current_observation": latest, "series_record": latest.get("record"),
                 "year_from": recent[0]["date"] if recent else None,
                 "year_to": recent[-1]["date"] if recent else None}
 
@@ -223,7 +246,7 @@ def _phenotype_rows(targets: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         if key not in covered:
             rows.append({"label": r["name"], "best": "", "target": "",
                          "components": [observation("metric:" + key, r["series"], r["unit"],
-                                        r["device"]["source"] if r["origin"] == "device" else "recorded")]})
+                                        r["device"]["source"] if r["origin"] == "device" and r["device"] else "recorded", r.get("missing"))]})
     return rows
 
 

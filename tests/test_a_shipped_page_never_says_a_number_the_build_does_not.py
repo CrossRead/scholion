@@ -34,6 +34,7 @@ ROOT = Path(__file__).resolve().parents[1]
 #: page that exists at neither path is a defect, not a skip.
 PAGES = (("README.md",),
          ("docs/FOR-CLINICIANS.md", "src/scholion/docs/for-clinicians.md"),
+         ("docs/FOR-CLINICIANS-DETAILS.md", "src/scholion/docs/for-clinicians-details.md"),
          ("share/presentation.html", "docs/presentation.html"),
          ("share/presentation.ru.html", "docs/presentation.ru.html"),
          ("share/skill/INSTRUCTION.md", "claude-skill/INSTRUCTION.md",

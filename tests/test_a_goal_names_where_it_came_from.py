@@ -39,6 +39,19 @@ class TestGoalOrigins(unittest.TestCase):
             (self.profile / filename).write_text(json.dumps(data), encoding='utf-8')
         core.reset_cache()
 
+    def test_bilingual_goal_titles_are_text_and_identity_is_language_independent(self):
+        self.data['health_goals.json']['targets'][0]['label'] = {'en': 'Synthetic weight', 'ru': 'Synthetic local title'}
+        self.data['health_goals.json']['targets'][0]['target'] = {'en': '<80', 'ru': '<80'}
+        self.write_files()
+        i18n.set_lang('en')
+        first = goal_entities()[0]
+        i18n.set_lang('ru')
+        second = goal_entities()[0]
+        self.assertEqual(first['title'], 'Synthetic weight')
+        self.assertEqual(second['title'], 'Synthetic local title')
+        self.assertEqual(first['id'], second['id'])
+        self.assertEqual(first['target'], '<80')
+
     def test_a_goal_names_where_it_came_from(self):
         before = {p.name: p.read_bytes() for p in self.profile.glob('*.json')}
         rows = goal_entities()

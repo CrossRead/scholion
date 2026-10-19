@@ -41,6 +41,10 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 # small enough that a module heading back toward monolith trips the wire while
 # the diff is still one review long. Raising a number is allowed and visible.
 LINE_BUDGETS = {
+    # Event detection and feed assembly have separate responsibilities.
+    "insight_events": 260,  # Effective reference bounds and provenance belong to fact identity.
+    "insights": 160,  # Explicitly reported system observations join the same feed.
+    "insight_links": 100,  # Specific sourced PGS/phenotype joins.
     # Recorded treatment events and dated controls, independent of genotype cautions.
     "treatment": 125,
     # task 200 put a domain of its own (routes) and the gate's LINKS on the facade
@@ -110,7 +114,9 @@ LINE_BUDGETS = {
     # on every face — one field and the lazy helper that reads the domain file.
     # +10 for the list of every system a marker counts in (task 200).
     # task 200: the two conditions that ask for a test nobody has ever taken
-    "labs": 770,  # Reporting-limit guards for trends, scatter and same-draw repeats.
+    # 18.10.2026: current measurement groups are part of the laboratory result,
+    # alongside existing recency counts; no separate source or decision logic.
+    "labs": 800,  # Reporting limits, same-draw repeats and current system groups.
     # Added 12.09.2026, task 170: the clinician's target beside the corridor —
     # what a treatment aims at, told apart from what a laboratory calls normal.
     # It landed inside labs.py first and pushed it 90 lines over its wire; the
@@ -259,7 +265,9 @@ LINE_BUDGETS = {
     # GenCC reference assembly and the shared validity/inheritance projection;
     # gene descriptions and display-label logic stay in panel_reference.py.
     # Batched cards reuse one reading while retaining the existing index contract.
-    "system_panels": 1640,
+    # 18.10.2026: shared many-to-many prescription context adds recorded
+    # ingredients and distinguishes monitored systems from possible effects.
+    "system_panels": 1680,
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its
@@ -275,7 +283,8 @@ LINE_BUDGETS = {
     # Shared catalogue context also accompanies longevity and ClinVar readings.
     # 11.10.2026: verified APOE diplotype context and all four PCSK9 readings
     # preserve phase uncertainty and uncurated direction (1248 lines).
-    "genomics": 1260,
+    # Study gene-set labels and distinct symbols are counted separately.
+    "genomics": 1270,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.
@@ -368,9 +377,11 @@ LINE_BUDGETS = {
     "panel_book": 260,
     # 220 → 240 on 12.09.2026: the overview's age line names why it could not
     # be computed rather than answering «unknown» with nothing beside it.
-    "profile_view": 240,
+    "profile_view": 270,  # shared attention feed joins the existing overview
     # The printable visit structure owns no new clinical inference.
-    "visit": 150,
+    # 18.10.2026: compact agenda projections deduplicate dated measurements,
+    # genetic comparisons and conclusions; the original facts remain in JSON.
+    "visit": 210,
     # One source-bound calculator, separate from display indices and rendering.
     "validated": 200,
 }

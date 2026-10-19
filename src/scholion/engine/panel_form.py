@@ -221,6 +221,8 @@ def verdict(rows: List[Dict[str, Any]], scan: Dict[str, Any]) -> Dict[str, Any]:
         return {"kind": "not_determined",
                 "why": (scan or {}).get("reason") or "scan_not_run",
                 **({"withheld": withheld} if withheld else {})}
+    if not rows:
+        return {"kind": "not_determined", "why": "empty_panel", "total": 0}
     found = sum(int(r.get("findings") or 0) for r in rows)
     # The list holds genes AND, in the system entry, positions of a curated
     # panel; a row is one entry of it either way. The count below is over the

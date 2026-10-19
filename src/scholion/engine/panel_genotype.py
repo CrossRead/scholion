@@ -45,7 +45,7 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
         return {"state": None, "read": None, "why": scan.get("reason")}
     from .. import genome
     try:
-        r = genome.lookup(rsid) or {}
+        r = (genome.lookup(rsid, allow_network=False) if scan.get("local_only") else genome.lookup(rsid)) or {}
     except Exception as exc:                                         # noqa: BLE001
         return {"state": "unread", "read": False, "why": type(exc).__name__}
     res: Optional[Dict[str, Any]] = None
@@ -62,7 +62,9 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
     else:
         return {"state": "unread", "read": False, "why": r.get("status")}
     conf = res.get("confidence")
-    out = {"genotype": res.get("genotype"), "confidence": conf, "depth": res.get("depth")}
+    out = {"genotype": res.get("genotype"), "confidence": conf, "depth": res.get("depth"),
+           **{k: res[k] for k in ("source", "assembly", "read_pos", "filter", "qual", "allele_fraction",
+               "low_depth", "filtered", "imputed", "unverified_locus", "needs_confirmation", "date") if k in res}}
     if res.get("depth_unverified"):
         # The reader's own word (`genome._mark_depth_unverified`): the row is in
         # the file, it states no depth, and no alignment is here to measure one.

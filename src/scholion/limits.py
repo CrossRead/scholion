@@ -487,7 +487,8 @@ def _profile_limits() -> List[Dict[str, str]]:
     else:
         # A height with no weight beside it is the same sentence left unfinished
         # from the other end, and it names a different command.
-        weights = ((core.metrics_json().get("metrics") or {}).get("weight") or {}).get("series")
+        from .measurements import history
+        weights = history("weight")["latest"]
         if not weights:
             out.append(_item(_t("limits.no_weight_what"), _t("limits.no_weight_why"),
                              _t("limits.no_weight_closes"), kind="profile"))

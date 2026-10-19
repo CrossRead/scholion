@@ -74,7 +74,7 @@ class TestTheHintsAreDerived(unittest.TestCase):
 
     def test_the_writes_are_the_six_the_canon_names(self):
         writers = sorted(n for n, d in self.tools().items() if not d["annotations"]["readOnlyHint"])
-        self.assertEqual(["sch_focus_log", "sch_ingest_labs", "sch_lab_draw",
+        self.assertEqual(["sch_focus_log", "sch_ingest_labs", "sch_insight_snapshot", "sch_lab_draw",
                           "sch_marker_propose", "sch_recompute", "sch_update"], writers)
 
     def test_destructive_is_said_only_of_a_write(self):

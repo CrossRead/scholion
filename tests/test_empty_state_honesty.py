@@ -72,10 +72,16 @@ class TestTheOutputLayerReachesForBoth(unittest.TestCase):
     the fix: the previous version had the reassuring line and no branch at all.
     """
 
+    def test_attention_empty_state_makes_no_claim_of_health(self):
+        html = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        self.assertIn("t('insight.empty')", html)
+        for lang in ("en", "ru"):
+            self.assertNotEqual(_messages(lang)["insight.empty"], _messages(lang)["web.overview.no_red"])
+
     def test_the_interface_uses_both_lines_of_every_pair(self):
         html = (support.ROOT / "src" / "scholion" / "web"
                 / "index.html").read_text(encoding="utf-8")
-        for clean, nodata in PAIRS:
+        for clean, nodata in PAIRS[1:]:
             with self.subTest(key=clean):
                 self.assertIn(f"'{clean}'", html)
                 self.assertIn(f"'{nodata}'", html,
@@ -144,3 +150,17 @@ class TestTheSecondOpinionSaysHowMuchItCouldJudge(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestEmptyGeneticList(unittest.TestCase):
+    def test_readable_input_does_not_make_an_empty_catalogue_measured(self):
+        from scholion.engine.panel_form import verdict, verdict_line
+        from scholion.i18n import lang, set_lang
+        original = lang()
+        self.addCleanup(set_lang, original)
+        result = verdict([], {"status": "ok"})
+        self.assertEqual(result, {"kind": "not_determined", "why": "empty_panel", "total": 0})
+        for language in ("en", "ru"):
+            set_lang(language)
+            self.assertNotIn("0", verdict_line(result))
+            self.assertNotIn("empty_panel", verdict_line(result))

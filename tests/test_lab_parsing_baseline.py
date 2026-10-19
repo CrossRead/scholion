@@ -37,6 +37,11 @@ reported as a discrepancy with the first. Only the date changed — every marker
 and every parsed record stayed identical, which is what made the refresh safe to
 accept rather than a symptom to investigate.
 
+A THIRD deliberate extension (0.7.0): numeric report rows retain the printed
+specimen and a document digest. Only those provenance fields were added; dates,
+values, units, recognised markers and intervals remain the frozen baseline.
+A document digest is not evidence that two samples share a collection.
+
 A SECOND deliberate refresh (0.5.7): six records of `01_biochem` gained the
 one-sided corridor their own rows print («до 5,2», «более 1,0»). The baseline
 had recorded those rows with no corridor at all, which was the defect: a total

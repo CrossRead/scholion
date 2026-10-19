@@ -54,6 +54,7 @@
     "ingest-labs",
     "ingest-studies",
     "init",
+    "insight-snapshot",
     "lab-draw",
     "labs",
     "lifestyle",
@@ -269,6 +270,13 @@
       "complete",
       "panels",
       "rule"
+    ],
+    "insight-snapshot": [
+      "comparison",
+      "confirmation",
+      "count",
+      "ok",
+      "saved"
     ]
   },
   "profile_files": [

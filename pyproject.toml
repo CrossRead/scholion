@@ -121,6 +121,12 @@ pattern = "(?P<version>[^\\s]+)"
 [tool.hatch.build.targets.wheel]
 packages = ["src/scholion"]
 
+# The same canonical readers serve source and installed commands. A wheel cannot
+# rely on src/ingest beside the user's personal data directory.
+[tool.hatch.build.targets.wheel.force-include]
+"src/ingest/ingest_garmin.py" = "scholion/readers/ingest_garmin.py"
+"src/ingest/ingest_whoop.py" = "scholion/readers/ingest_whoop.py"
+
 # The sdist carries exactly what is needed for a reproducible build and for
 # understanding the legal position. The personal directories (profile/, genome/)
 # are not here and cannot be: they never reach git either.

@@ -286,7 +286,10 @@
           "source": "Bennet 2007 JAMA (APOE and lipids/CHD meta-analysis)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "LDL-C about +0.1–0.2 mmol/L per ε4 allele",
+          "effect_size": {
+            "en": "LDL-C about +0.1–0.2 mmol/L per ε4 allele",
+            "ru": "Холестерин ЛПНП примерно на +0.1–0.2 ммоль/л на аллель ε4"
+          },
           "study": "Bennet 2007 JAMA",
           "expect": {
             "marker": "ldl",
@@ -330,7 +333,10 @@
           "source": "Bennet 2007 JAMA; Mahley 2009 (type III hyperlipoproteinaemia in ε2/ε2)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "LDL-C about −0.3 mmol/L per ε2 allele",
+          "effect_size": {
+            "en": "LDL-C about −0.3 mmol/L per ε2 allele",
+            "ru": "Холестерин ЛПНП примерно на −0.3 ммоль/л на аллель ε2"
+          },
           "study": "Bennet 2007 JAMA",
           "expect": {
             "marker": "ldl",
@@ -661,7 +667,10 @@
           "source": "Clarke 2009 NEJM",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "Lp(a) markedly higher; CAD OR about 1.7 per allele",
+          "effect_size": {
+            "en": "Lp(a) markedly higher; CAD OR about 1.7 per allele",
+            "ru": "Липопротеин(a) заметно выше; отношение шансов ишемической болезни сердца примерно 1.7 на аллель"
+          },
           "study": "Clarke 2009 NEJM",
           "expect": {
             "marker": "lpa",
@@ -669,7 +678,13 @@
             "note": {
               "en": "an LPA risk allele: lipoprotein(a) is expected high",
               "ru": "аллель риска LPA: липопротеин(a) ожидается высоким"
-            }
+            },
+            "source": "PMID:20032323; DOI:10.1056/NEJMoa0902604",
+            "mechanism": {
+              "en": "The LPA variant is associated with higher Lp(a), smaller apo(a) isoforms and fewer kringle IV type 2 repeats in studied populations. It does not measure isoform size or individual cardiovascular risk.",
+              "ru": "В изученных популяциях вариант LPA связан с более высоким Лп(а), меньшими изоформами апо(а) и меньшим числом повторов kringle IV типа 2. Он не измеряет размер изоформы или индивидуальный сердечно-сосудистый риск."
+            },
+            "context_only": true
           },
           "review": {
             "by_role": "panel_author",
@@ -705,7 +720,10 @@
           "source": "Clarke 2009 NEJM",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "Lp(a) markedly higher; CAD OR about 1.9 per allele",
+          "effect_size": {
+            "en": "Lp(a) markedly higher; CAD OR about 1.9 per allele",
+            "ru": "Липопротеин(a) заметно выше; отношение шансов ишемической болезни сердца примерно 1.9 на аллель"
+          },
           "study": "Clarke 2009 NEJM",
           "expect": {
             "marker": "lpa",
@@ -713,7 +731,13 @@
             "note": {
               "en": "an LPA risk allele: lipoprotein(a) is expected high",
               "ru": "аллель риска LPA: липопротеин(a) ожидается высоким"
-            }
+            },
+            "source": "PMID:20032323; DOI:10.1056/NEJMoa0902604",
+            "mechanism": {
+              "en": "The LPA variant is associated with higher Lp(a), smaller apo(a) isoforms and fewer kringle IV type 2 repeats in studied populations. It does not measure isoform size or individual cardiovascular risk.",
+              "ru": "В изученных популяциях вариант LPA связан с более высоким Лп(а), меньшими изоформами апо(а) и меньшим числом повторов kringle IV типа 2. Он не измеряет размер изоформы или индивидуальный сердечно-сосудистый риск."
+            },
+            "context_only": true
           },
           "review": {
             "by_role": "panel_author",
@@ -771,7 +795,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -796,7 +823,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -830,7 +860,10 @@
               "ru": "F13A1 Val34Leu (T), две копии: защитная ассоциация сильнее всего; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "venous thromboembolism risk LOWER per Leu34 allele",
+          "effect_size": {
+            "en": "venous thromboembolism risk LOWER per Leu34 allele",
+            "ru": "Риск венозной тромбоэмболии НИЖЕ на аллель Leu34"
+          },
           "study": "Wells 2006",
           "source": "PMID 16740590 (Wells 2006: factor XIII Val34Leu is protective against VTE, HuGE review and meta-analysis); PMID 12358922 (Van Hylckama Vlieg 2002)",
           "submitter": "panel_2026_09_18",
@@ -867,7 +900,10 @@
               "ru": "ITGA2 C807T (T), две копии: та же ассоциация, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "ischaemic stroke association per T allele; higher platelet collagen receptor density",
+          "effect_size": {
+            "en": "ischaemic stroke association per T allele; higher platelet collagen receptor density",
+            "ru": "Ассоциация с ишемическим инсультом на аллель T; выше плотность рецептора коллагена на тромбоцитах"
+          },
           "study": "Nikolopoulos 2007",
           "source": "PMID 16820192 (Nikolopoulos 2007: ITGA2 C807T and ischemic stroke, meta-analysis); PMID 26556301 (Nissinen 2016: platelet response and α2β1 integrin)",
           "submitter": "panel_2026_09_18",
@@ -903,7 +939,10 @@
               "ru": "ITGB3 PlA2 (C), две копии: та же ассоциация, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "a small increase in some arterial events per PlA2 allele",
+          "effect_size": {
+            "en": "a small increase in some arterial events per PlA2 allele",
+            "ru": "Небольшое увеличение частоты некоторых артериальных событий на аллель PlA2"
+          },
           "study": "Di Castelnuovo 2001",
           "source": "PMID 11341496 (Di Castelnuovo 2001: PlA1/PlA2 and coronary risk, meta-analysis); PMID 38920993 (Coadă 2024: PlA1/A2 and stroke, updated meta-analysis); PMID 23834376",
           "submitter": "panel_2026_09_18",
@@ -940,7 +979,10 @@
               "ru": "FGB −455G/A (A), две копии: фибриноген выше, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "plasma fibrinogen higher per A allele",
+          "effect_size": {
+            "en": "plasma fibrinogen higher per A allele",
+            "ru": "Фибриноген плазмы выше на аллель A"
+          },
           "study": "Ken-Dror 2012",
           "source": "PMID 22388766 (Ken-Dror 2012: a genetic instrument for Mendelian randomization of fibrinogen); PMID 39674435 (Ken-Dror 2025)",
           "submitter": "panel_2026_09_18",
@@ -1078,7 +1120,10 @@
           "source": "Grant 2006 Nat Genet",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "T2D OR about 1.4 per allele",
+          "effect_size": {
+            "en": "T2D OR about 1.4 per allele",
+            "ru": "Отношение шансов диабета 2 типа примерно 1.4 на аллель"
+          },
           "study": "Grant 2006 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -1114,7 +1159,10 @@
           "source": "Orho-Melander 2008 Diabetes",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "fasting glucose about −0.03 to −0.08 mmol/L per T allele; triglycerides higher",
+          "effect_size": {
+            "en": "fasting glucose about −0.03 to −0.08 mmol/L per T allele; triglycerides higher",
+            "ru": "Глюкоза натощак примерно на −0.03…−0.08 ммоль/л на аллель T; триглицериды выше"
+          },
           "study": "Orho-Melander 2008 Diabetes; GWAS Catalog (many cohorts, BMI-adjusted included)",
           "expect": {
             "marker": "glucose",
@@ -1158,7 +1206,10 @@
           "source": "Altshuler 2000 Nat Genet (PPARG Pro12Ala)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "T2D OR about 0.8 per Ala allele",
+          "effect_size": {
+            "en": "T2D OR about 0.8 per Ala allele",
+            "ru": "Отношение шансов диабета 2 типа примерно 0.8 на аллель Ala"
+          },
           "study": "Altshuler 2000 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -1250,7 +1301,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -1275,7 +1329,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -1309,7 +1366,10 @@
               "ru": "ADIPOQ +276G/T (T), две копии: то же, больше, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "adiponectin and lipid levels differ by genotype in a meta-analysis",
+          "effect_size": {
+            "en": "adiponectin and lipid levels differ by genotype in a meta-analysis",
+            "ru": "В метаанализе уровни адипонектина и липидов различаются по генотипу"
+          },
           "study": "Su 2021",
           "source": "PMID 34384110 (Su 2021: ADIPOQ polymorphisms, adiponectin and lipids, meta-analysis); PMID 27915341 (de Luis 2016); PMID 39290095 (Tang 2024)",
           "submitter": "panel_2026_09_18",
@@ -1345,7 +1405,10 @@
               "ru": "ADIPOQ +45T/G (G), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "adiponectin lower and obesity association per G allele",
+          "effect_size": {
+            "en": "adiponectin lower and obesity association per G allele",
+            "ru": "Адипонектин ниже; ассоциация с ожирением на аллель G"
+          },
           "study": "Wu 2014",
           "source": "PMID 24740426 (Wu 2014: rs2241766 and obesity in adults, meta-analysis); PMID 27554120 (Zhou 2016: rs2241766 and metabolic syndrome)",
           "submitter": "panel_2026_09_18",
@@ -1381,7 +1444,10 @@
               "ru": "CDKAL1 (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per C allele; glucose-stimulated insulin secretion lower",
+          "effect_size": {
+            "en": "type 2 diabetes association per C allele; glucose-stimulated insulin secretion lower",
+            "ru": "Ассоциация с диабетом 2 типа на аллель C; ниже секреция инсулина в ответ на глюкозу"
+          },
           "study": "Tuerxunyiming 2015",
           "source": "PMID 18285412 (Stancáková 2008: rs7754840 and impaired insulin secretion); PMID 26770330 (Tuerxunyiming 2015: rs7754840 and T2D, meta-analysis of 70,141 subjects)",
           "submitter": "panel_2026_09_18",
@@ -1417,7 +1483,10 @@
               "ru": "CDKAL1 (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per C allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per C allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель C"
+          },
           "study": "Wu 2008",
           "source": "PMID 20847106 (Miyaki 2010: a CDKAL1 polymorphism); PMID 18633108 (Wu 2008: CDKAL1, CDKN2A/B, IGF2BP2, SLC30A8 and HHEX/IDE and T2D); PMID 29372795",
           "submitter": "panel_2026_09_18",
@@ -1453,7 +1522,10 @@
               "ru": "CDKAL1 (G), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per G allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per G allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель G"
+          },
           "study": "Li 2013",
           "source": "PMID 24185407 (Li 2013: rs7756992 and T2D, meta-analysis of 62,567 subjects); PMID 20568056 (Dehwah 2010: CDKAL1 and T2D, global meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -1489,7 +1561,10 @@
               "ru": "FTO (A), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "obesity association per A allele in a meta-analysis",
+          "effect_size": {
+            "en": "obesity association per A allele in a meta-analysis",
+            "ru": "Ассоциация с ожирением на аллель A в метаанализе"
+          },
           "study": "Peng 2011",
           "source": "PMID 21651756 (Peng 2011: FTO gene polymorphisms and obesity risk, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -1525,7 +1600,10 @@
               "ru": "FTO (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "obesity association per C allele; the functional variant of the locus",
+          "effect_size": {
+            "en": "obesity association per C allele; the functional variant of the locus",
+            "ru": "Ассоциация с ожирением на аллель C; функциональный вариант локуса"
+          },
           "study": "Claussnitzer 2015 NEJM",
           "source": "PMID 21651756 (Peng 2011: FTO and obesity, meta-analysis); PMID 26287746 (Claussnitzer 2015, NEJM: FTO obesity variant circuitry and adipocyte browning)",
           "submitter": "panel_2026_09_18",
@@ -1561,7 +1639,10 @@
               "ru": "FTO (G), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "obesity association per G allele; OR about 1.5 per allele in the early meta-analysis",
+          "effect_size": {
+            "en": "obesity association per G allele; OR about 1.5 per allele in the early meta-analysis",
+            "ru": "Ассоциация с ожирением на аллель G; отношение шансов примерно 1.5 на аллель в раннем метаанализе"
+          },
           "study": "Peng 2011",
           "source": "PMID 21651756 (Peng 2011: FTO and obesity, meta-analysis); PMID 41862896 (Eghbali 2026: FTO variants and adult obesity)",
           "submitter": "panel_2026_09_18",
@@ -1597,7 +1678,10 @@
               "ru": "FTO (A), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "body mass index and obesity association per A allele",
+          "effect_size": {
+            "en": "body mass index and obesity association per A allele",
+            "ru": "Ассоциация с индексом массы тела и ожирением на аллель A"
+          },
           "study": "Peng 2011",
           "source": "PMID 21651756 (Peng 2011: FTO gene polymorphisms and obesity risk, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -1633,7 +1717,10 @@
               "ru": "KCNJ11 (G), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per G allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per G allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель G"
+          },
           "study": "Qin 2013",
           "source": "PMID 24065655 (Qin 2013: common variants in the KCNJ11-ABCC8 region and T2D, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -1669,7 +1756,10 @@
               "ru": "KCNJ11 E23K (T), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per T (Lys23) allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per T (Lys23) allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель T (Lys23)"
+          },
           "study": "Gong 2012",
           "source": "PMID 22082043 (Gong 2012: KCNJ11 polymorphism and T2D, global meta-analysis); PMID 29685723 (Wang 2018: Kir6.2 rs5219 and T2D, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -1706,7 +1796,10 @@
               "ru": "около MC4R (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "obesity association per C allele, replicated",
+          "effect_size": {
+            "en": "obesity association per C allele, replicated",
+            "ru": "Ассоциация с ожирением на аллель C воспроизведена"
+          },
           "study": "Xi 2012",
           "source": "PMID 23049848 (Xi 2012: the common polymorphism near MC4R and obesity, systematic review); PMID 31954858 (Yu 2020: rs17782313 and obesity, meta-analysis); PMID 37621650",
           "submitter": "panel_2026_09_18",
@@ -1742,7 +1835,10 @@
               "ru": "MTNR1B (G), две копии: глюкоза натощак выше, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "fasting glucose about +0.07 mmol/L per G allele",
+          "effect_size": {
+            "en": "fasting glucose about +0.07 mmol/L per G allele",
+            "ru": "Глюкоза натощак примерно на +0.07 ммоль/л на аллель G"
+          },
           "study": "Prokopenko 2009",
           "source": "PMID 19060907 (Prokopenko 2009: variants in MTNR1B influence fasting glucose); PMID 19324940 (Sparsø 2009: the G allele of rs10830963 and IFG/T2D)",
           "submitter": "panel_2026_09_18",
@@ -1786,7 +1882,10 @@
               "ru": "SLC30A8 R325W (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per C (Arg325) allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per C (Arg325) allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель C (Arg325)"
+          },
           "study": "Cheng 2015",
           "source": "PMID 21131091 (Xu 2011: rs13266634 of SLC30A8 and T2D); PMID 26214053 (Cheng 2015: rs13266634 and T2D, meta-analysis); PMID 36827808",
           "submitter": "panel_2026_09_18",
@@ -1823,7 +1922,10 @@
               "ru": "TCF7L2 (T), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per T allele; insulin secretion lower",
+          "effect_size": {
+            "en": "type 2 diabetes association per T allele; insulin secretion lower",
+            "ru": "Ассоциация с диабетом 2 типа на аллель T; ниже секреция инсулина"
+          },
           "study": "Wang 2013",
           "source": "PMID 23579632 (Wang 2013: rs12255372 of TCF7L2 and T2D, meta-analysis); PMID 17130514 (Munoz 2006: TCF7L2 and reduced insulin secretion)",
           "submitter": "panel_2026_09_18",
@@ -1859,7 +1961,10 @@
               "ru": "TCF7L2 (C), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 2 diabetes association per C allele",
+          "effect_size": {
+            "en": "type 2 diabetes association per C allele",
+            "ru": "Ассоциация с диабетом 2 типа на аллель C"
+          },
           "study": "Peng 2013",
           "source": "PMID 23188737 (Peng 2013: TCF7L2 polymorphisms and T2D, updated meta-analysis); PMID 19228405 (Tong 2009: TCF7L2 and T2D, HuGE review)",
           "submitter": "panel_2026_09_18",
@@ -1895,7 +2000,10 @@
               "ru": "HLA-DQA1 (A), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "type 1 diabetes association per A allele, very strong in the HLA region",
+          "effect_size": {
+            "en": "type 1 diabetes association per A allele, very strong in the HLA region",
+            "ru": "Ассоциация с диабетом 1 типа на аллель A; очень сильная в области HLA"
+          },
           "study": "Cooper 2008",
           "source": "PMID 18978792 (Cooper 2008: GWAS meta-analysis of type 1 diabetes loci); PMID 25661663 (Kiani 2015: 32 type 1 diabetes loci in Pakistani patients)",
           "submitter": "panel_2026_09_18",
@@ -1932,7 +2040,10 @@
               "ru": "ADIPOQ rs182052 (A), две копии: то же, на каждую копию; эффект небольшой и зависит от других факторов. Читать только вместе с ИМТ и талией, липидограммой, глюкозой, HbA1c и при необходимости инсулином."
             }
           },
-          "effect_size": "per A allele: adiponectin β = −0.11; type 2 diabetes OR 2.29; coronary disease OR 1.55 (one Russian cohort, n = 447)",
+          "effect_size": {
+            "en": "per A allele: adiponectin β = −0.11; type 2 diabetes OR 2.29; coronary disease OR 1.55 (one Russian cohort, n = 447)",
+            "ru": "На аллель A: адипонектин β = −0.11; отношение шансов диабета 2 типа 2.29, ишемической болезни сердца 1.55 (одна российская когорта, n = 447)"
+          },
           "study": "Smetnev 2019",
           "source": "PMID 31561637 (Smetnev 2019, Biomolecules 9:537: ADIPOQ rs182052, adiponectin and cardiometabolic disease in Russian patients)",
           "submitter": "panel_2026_09_23",
@@ -2122,7 +2233,10 @@
           "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "homocysteine about +20–25 % in TT with low folate",
+          "effect_size": {
+            "en": "homocysteine about +20–25 % in TT with low folate",
+            "ru": "Гомоцистеин примерно на +20–25 % при TT и низком фолате"
+          },
           "study": "Klerk 2002 JAMA",
           "expect": {
             "marker": "homocysteine",
@@ -2166,7 +2280,10 @@
           "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "no reproducible effect on homocysteine alone",
+          "effect_size": {
+            "en": "no reproducible effect on homocysteine alone",
+            "ru": "Воспроизводимый самостоятельный эффект на гомоцистеин не показан"
+          },
           "study": "Weisberg 1998",
           "review": {
             "by_role": "panel_author",
@@ -2375,7 +2492,10 @@
           "source": "Evans 2011 Nat Genet (HLA-B27 tag SNP)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "ankylosing spondylitis OR about 40 for HLA-B*27",
+          "effect_size": {
+            "en": "ankylosing spondylitis OR about 40 for HLA-B*27",
+            "ru": "Отношение шансов анкилозирующего спондилита примерно 40 для HLA-B*27"
+          },
           "study": "Evans 2011 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -2411,7 +2531,10 @@
           "source": "Kathiresan 2006 Circulation (CRP gene variants and CRP level)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "association with the baseline CRP level; the allele direction not confirmed by a second source",
+          "effect_size": {
+            "en": "association with the baseline CRP level; the allele direction not confirmed by a second source",
+            "ru": "Связь с базовым уровнем СРБ; направление эффекта аллеля не подтверждено вторым источником"
+          },
           "study": "Kathiresan 2006 Circulation",
           "review": {
             "by_role": "panel_author",
@@ -2447,7 +2570,10 @@
           "source": "Ferreira 2013 PLoS Genet (IL6R Asp358Ala)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "CRP about −10 % per C allele",
+          "effect_size": {
+            "en": "CRP about −10 % per C allele",
+            "ru": "СРБ примерно на −10 % на аллель C"
+          },
           "study": "Ferreira 2013 PLoS Genet",
           "review": {
             "by_role": "panel_author",
@@ -2518,7 +2644,10 @@
           "source": "Panicker 2009 JCEM (DIO2 Thr92Ala and LT4/LT3 response); ETA 2012 guideline",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "psychological well-being on LT4 lower in Ala/Ala (Panicker 2009); no effect on TSH or fT4",
+          "effect_size": {
+            "en": "psychological well-being on LT4 lower in Ala/Ala (Panicker 2009); no effect on TSH or fT4",
+            "ru": "Психологическое самочувствие на левотироксине хуже при Ala/Ala (Panicker 2009); влияния на ТТГ и свободный T4 нет"
+          },
           "study": "Panicker 2009 JCEM",
           "review": {
             "by_role": "panel_author",
@@ -2554,7 +2683,10 @@
           "source": "Panicker 2008 JCEM (DIO1 variants and the fT3/fT4 ratio)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "fT3/fT4 ratio lower per A allele (Panicker 2008)",
+          "effect_size": {
+            "en": "fT3/fT4 ratio lower per A allele (Panicker 2008)",
+            "ru": "Отношение свободных T3/T4 ниже на аллель A (Panicker 2008)"
+          },
           "study": "Panicker 2008 JCEM",
           "review": {
             "by_role": "panel_author",
@@ -2590,7 +2722,10 @@
           "source": "Peeters 2003 JCEM (DIO1 C785T and thyroid hormone levels)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "fT4 higher, T3 lower per T allele (Peeters 2003)",
+          "effect_size": {
+            "en": "fT4 higher, T3 lower per T allele (Peeters 2003)",
+            "ru": "Свободный T4 выше, T3 ниже на аллель T (Peeters 2003)"
+          },
           "study": "Peeters 2003 JCEM",
           "review": {
             "by_role": "panel_author",
@@ -2626,7 +2761,10 @@
           "source": "the clinician's thyroid panel of 12.09.2026",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none established on its own",
+          "effect_size": {
+            "en": "none established on its own",
+            "ru": "Самостоятельный эффект не установлен"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -2662,7 +2800,10 @@
           "source": "the clinician's thyroid panel of 12.09.2026",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none established on its own",
+          "effect_size": {
+            "en": "none established on its own",
+            "ru": "Самостоятельный эффект не установлен"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -3047,7 +3188,10 @@
           "source": "Brand 2009 Hum Mol Genet (TSHR intron 1 and Graves' disease)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "Graves' disease OR about 1.5 per A allele",
+          "effect_size": {
+            "en": "Graves' disease OR about 1.5 per A allele",
+            "ru": "Отношение шансов болезни Грейвса примерно 1.5 на аллель A"
+          },
           "study": "Brand 2009 Hum Mol Genet",
           "review": {
             "by_role": "panel_author",
@@ -3083,7 +3227,10 @@
           "source": "the clinician's panel; ClinVar benign",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none (benign polymorphism)",
+          "effect_size": {
+            "en": "none (benign polymorphism)",
+            "ru": "Эффект отсутствует: доброкачественный полиморфизм"
+          },
           "study": "ClinVar",
           "review": {
             "by_role": "panel_author",
@@ -3119,7 +3266,10 @@
           "source": "the clinician's panel",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none established",
+          "effect_size": {
+            "en": "none established",
+            "ru": "Эффект не установлен"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -3155,7 +3305,10 @@
           "source": "the clinician's panel",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none (synonymous)",
+          "effect_size": {
+            "en": "none (synonymous)",
+            "ru": "Эффект отсутствует: синонимический вариант"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -3191,7 +3344,10 @@
           "source": "the clinician's panel",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none established",
+          "effect_size": {
+            "en": "none established",
+            "ru": "Эффект не установлен"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -3227,7 +3383,10 @@
           "source": "the clinician's panel",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "none established",
+          "effect_size": {
+            "en": "none established",
+            "ru": "Эффект не установлен"
+          },
           "study": "the clinician's panel",
           "review": {
             "by_role": "panel_author",
@@ -3282,7 +3441,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3316,7 +3478,10 @@
               "ru": "TPO (G), две копии: то же, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "anti-TPO antibodies and autoimmune thyroid disease association per G allele",
+          "effect_size": {
+            "en": "anti-TPO antibodies and autoimmune thyroid disease association per G allele",
+            "ru": "Ассоциация с антителами к ТПО и аутоиммунными заболеваниями щитовидной железы на аллель G"
+          },
           "study": "Kwak 2014",
           "source": "PMID 24722205 (Kwak 2014: GWAS on thyroid function and anti-TPO antibodies in Koreans); PMID 28845025 (Tomari 2017: TPO polymorphisms and AITD); PMID 38542286 (Lacka 2024)",
           "submitter": "panel_2026_09_18",
@@ -3566,7 +3731,10 @@
           "source": "Ohlsson 2011 PLoS Genet (SHBG variants and testosterone)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "total testosterone about +0.3 SD per A allele",
+          "effect_size": {
+            "en": "total testosterone about +0.3 SD per A allele",
+            "ru": "Общий тестостерон примерно на +0.3 стандартного отклонения на аллель A"
+          },
           "study": "Ohlsson 2011 PLoS Genet",
           "expect": {
             "marker": "testosterone",
@@ -3610,7 +3778,10 @@
           "source": "Ohlsson 2011 PLoS Genet",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "total testosterone lower per T allele",
+          "effect_size": {
+            "en": "total testosterone lower per T allele",
+            "ru": "Общий тестостерон ниже на аллель T"
+          },
           "study": "Ohlsson 2011 PLoS Genet",
           "expect": {
             "marker": "testosterone",
@@ -3731,7 +3902,10 @@
           "source": "PMID 38354602 (Eur J Obstet Gynecol Reprod Biol 2024); Nyholt 2012 Nat Genet",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "endometriosis OR about 1.15 per A allele",
+          "effect_size": {
+            "en": "endometriosis OR about 1.15 per A allele",
+            "ru": "Отношение шансов эндометриоза примерно 1.15 на аллель A"
+          },
           "study": "Nyholt 2012 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -3767,7 +3941,10 @@
           "source": "PMID 23104006 (Nyholt 2012, Nat Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "endometriosis OR about 1.1 per G allele",
+          "effect_size": {
+            "en": "endometriosis OR about 1.1 per G allele",
+            "ru": "Отношение шансов эндометриоза примерно 1.1 на аллель G"
+          },
           "study": "Nyholt 2012 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -3803,7 +3980,10 @@
           "source": "PMID 31487746 (Geburtshilfe Frauenheilkd 2019)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "association with polycystic ovary syndrome in some populations",
+          "effect_size": {
+            "en": "association with polycystic ovary syndrome in some populations",
+            "ru": "Связь с синдромом поликистозных яичников в отдельных популяциях"
+          },
           "study": "PMID 31487746",
           "review": {
             "by_role": "panel_author",
@@ -3827,7 +4007,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3852,7 +4035,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3877,7 +4063,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3902,7 +4091,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3927,7 +4119,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -3961,7 +4156,10 @@
               "ru": "AR (A), две копии: то же единственное исследование; вывода нет."
             }
           },
-          "effect_size": "PSA concentration differs by genotype; no measured effect on androgen sensitivity",
+          "effect_size": {
+            "en": "PSA concentration differs by genotype; no measured effect on androgen sensitivity",
+            "ru": "Концентрация ПСА различается по генотипу; измеренное влияние на чувствительность к андрогенам не показано"
+          },
           "study": "Bentmar Holgersson 2014",
           "source": "PMID 25012998 (Bentmar Holgersson 2014: androgen receptor polymorphism and PSA in European men)",
           "submitter": "panel_2026_09_18",
@@ -3997,7 +4195,10 @@
               "ru": "AR E211 (G), две копии: та же ассоциация; вывода нет."
             }
           },
-          "effect_size": "androgenetic alopecia association in a meta-analysis; no effect on androgen-dependent processes shown",
+          "effect_size": {
+            "en": "androgenetic alopecia association in a meta-analysis; no effect on androgen-dependent processes shown",
+            "ru": "Ассоциация с андрогенетической алопецией в метаанализе; влияние на андрогензависимые процессы не показано"
+          },
           "study": "Zhuo 2012",
           "source": "PMID 21981665 (Zhuo 2012: AR polymorphisms and androgenetic alopecia, meta-analysis); PMID 17256155 (Ellis 2007: the polyglycine repeat does not confer susceptibility)",
           "submitter": "panel_2026_09_18",
@@ -4033,7 +4234,10 @@
               "ru": "промотор CYP17A1 (C), две копии: та же ассоциация, сильнее, чем при одной копии; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "polycystic ovary syndrome association per C allele, replicated",
+          "effect_size": {
+            "en": "polycystic ovary syndrome association per C allele, replicated",
+            "ru": "Ассоциация с синдромом поликистозных яичников на аллель C воспроизведена"
+          },
           "study": "Xu 2021",
           "source": "PMID 34538754 (Xu 2021: rs743572 of CYP17A1 and PCOS); PMID 34788226 (Liu 2021: CYP17 T/C and PCOS susceptibility); PMID 17986287 (2008)",
           "submitter": "panel_2026_09_18",
@@ -4069,7 +4273,10 @@
               "ru": "CYP19A1 (G), две копии: тот же сдвиг, больше, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "serum estradiol and aromatase activity differ by genotype",
+          "effect_size": {
+            "en": "serum estradiol and aromatase activity differ by genotype",
+            "ru": "Эстрадиол сыворотки и активность ароматазы различаются по генотипу"
+          },
           "study": "Eriksson 2009",
           "source": "PMID 19116238 (Eriksson 2009: sex-steroid genes and serum estrogen in men); PMID 21972004 (Zhang 2012: rs2470152 and aromatase activity); PMID 19818337",
           "submitter": "panel_2026_09_18",
@@ -4113,7 +4320,10 @@
               "ru": "ESR1 PvuII (C), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "no measured effect for this variant in the sources named",
+          "effect_size": {
+            "en": "no measured effect for this variant in the sources named",
+            "ru": "В названных источниках измеренный эффект этого варианта не показан"
+          },
           "study": "Sowers 2006",
           "source": "PMID 16949387 (Sowers 2006: ovarian ageing markers and sex-steroid genotypes); PMID 31568130 (Lledó 2019: genetic variants and ovarian response)",
           "submitter": "panel_2026_09_18",
@@ -4149,7 +4359,10 @@
               "ru": "ESR1 (G), две копии: то же единственное исследование; вывода нет."
             }
           },
-          "effect_size": "breast cancer risk in one Korean study; nothing on estrogen-dependent phenotypes as claimed",
+          "effect_size": {
+            "en": "breast cancer risk in one Korean study; nothing on estrogen-dependent phenotypes as claimed",
+            "ru": "Риск рака молочной железы в одном корейском исследовании; заявленное влияние на эстрогензависимые признаки не показано"
+          },
           "study": "Son 2015",
           "source": "PMID 25323936 (Son 2015: ESR1 rs2881766 and breast cancer risk in Korean women)",
           "submitter": "panel_2026_09_18",
@@ -4185,7 +4398,10 @@
               "ru": "ESR1 XbaI (G), две копии: та же ассоциация, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "endometriosis association per G allele, replicated",
+          "effect_size": {
+            "en": "endometriosis association per G allele, replicated",
+            "ru": "Ассоциация с эндометриозом на аллель G воспроизведена"
+          },
           "study": "Zhao 2016",
           "source": "PMID 24427778 (Paskulin 2013: rs9340799, endometriosis-related infertility); PMID 27373811 (Zhao 2016: ESR1 polymorphisms and endometriosis, meta-analysis); PMID 32776754",
           "submitter": "panel_2026_09_18",
@@ -4221,7 +4437,10 @@
               "ru": "PGR PROGINS (A), две копии: та же ассоциация, сильнее; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "endometriosis association per PROGINS allele, replicated",
+          "effect_size": {
+            "en": "endometriosis association per PROGINS allele, replicated",
+            "ru": "Ассоциация с эндометриозом на аллель PROGINS воспроизведена"
+          },
           "study": "Pabalan 2014",
           "source": "PMID 11821088 (Wieser 2002: PROGINS and endometriosis); PMID 24943061 (Pabalan 2014: PROGINS and endometriosis, meta-analysis); PMID 20719308",
           "submitter": "panel_2026_09_18",
@@ -4257,7 +4476,10 @@
               "ru": "PGR +331G/A (A), две копии: та же защитная ассоциация; это ассоциация, а не диагноз."
             }
           },
-          "effect_size": "a lower risk of deep infiltrating endometriosis per A allele",
+          "effect_size": {
+            "en": "a lower risk of deep infiltrating endometriosis per A allele",
+            "ru": "Более низкий риск глубокого инфильтративного эндометриоза на аллель A"
+          },
           "study": "van Kaam 2007",
           "source": "PMID 16920727 (van Kaam 2007: PR +331G/A and a decreased risk of deep infiltrating endometriosis); PMID 20719308 (Near 2011); PMID 31435600",
           "submitter": "panel_2026_09_18",
@@ -4293,7 +4515,10 @@
               "ru": "SHBG (T), две копии: ГСПГ выше, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "SHBG higher per T allele; total testosterone follows SHBG",
+          "effect_size": {
+            "en": "SHBG higher per T allele; total testosterone follows SHBG",
+            "ru": "ГСПГ выше на аллель T; общий тестостерон изменяется вслед за ГСПГ"
+          },
           "study": "Coviello 2012 PLoS Genet",
           "source": "PMID 22829776 (Coviello 2012, PLoS Genet: GWAS meta-analysis of circulating SHBG); PMID 21998597 (Ohlsson 2011: genetic determinants of serum testosterone in men)",
           "submitter": "panel_2026_09_18",
@@ -4329,7 +4554,10 @@
               "ru": "SULT2A1 (A), две копии: ДГЭА-С ниже, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "DHEA-S lower per A allele",
+          "effect_size": {
+            "en": "DHEA-S lower per A allele",
+            "ru": "ДГЭА-С ниже на аллель A"
+          },
           "study": "Zhai 2011 PLoS Genet",
           "source": "PMID 21533175 (Zhai 2011, PLoS Genet: eight common variants and serum DHEAS); PMID 23132913 (Haring 2013: the SULT2A1 variant and DHEAS)",
           "submitter": "panel_2026_09_18",
@@ -4365,7 +4593,10 @@
               "ru": "ZKSCAN5 (T), две копии: ДГЭА-С ниже, чем при одной копии; это разница в уровне в крови, а не болезнь."
             }
           },
-          "effect_size": "DHEA-S lower per T allele",
+          "effect_size": {
+            "en": "DHEA-S lower per T allele",
+            "ru": "ДГЭА-С ниже на аллель T"
+          },
           "study": "Zhai 2011 PLoS Genet",
           "source": "PMID 21533175 (Zhai 2011, PLoS Genet: DHEAS GWAS meta-analysis); PMID 28712091 (Vernerova 2018: genetic factors and lower DHEAS)",
           "submitter": "panel_2026_09_18",
@@ -4403,9 +4634,15 @@
               "ru": "SRD5A1 rs1691053 (C), две копии: то же — лестница не установлена, значение показано без вывода. При клинических признаках гиперандрогении: тестостерон, SHBG, ДГЭА-S, андростендион, ДГТ — по показаниям."
             }
           },
-          "effect_size": "no replicated effect for this position",
+          "effect_size": {
+            "en": "no replicated effect for this position",
+            "ru": "Воспроизведённый эффект этой позиции не установлен"
+          },
           "study": null,
-          "source": "the panel author's review of 17.09.2026: no reproducible PMID or DOI supports a C → CC ladder for rs1691053",
+          "source": {
+            "en": "the panel author's review of 17.09.2026: no reproducible PMID or DOI supports a C → CC ladder for rs1691053",
+            "ru": "Проверка автора панели от 17.09.2026: воспроизводимый эффект ряда C → CC для rs1691053 не подтверждён PMID или DOI"
+          },
           "submitter": "panel_2026_09_23",
           "curated_on": "2026-09-23",
           "review": {
@@ -4416,7 +4653,10 @@
           "evidence": {
             "level": "D",
             "basis": "judged",
-            "source": "the panel author's review of 17.09.2026",
+            "source": {
+              "en": "the panel author's review of 17.09.2026",
+              "ru": "Проверка автора панели от 17.09.2026"
+            },
             "assigned": "2026-09-25",
             "judged": "no reproducible source for a genotype ladder"
           }
@@ -4444,7 +4684,10 @@
               "ru": "rs5934505 у женщины: связь с тестостероном установлена в исследованиях мужчин; для женщин лестница CC → CT → TT не установлена, значение показано без вывода."
             }
           },
-          "effect_size": "lower total and free testosterone in men with T than with C; no association with SHBG",
+          "effect_size": {
+            "en": "lower total and free testosterone in men with T than with C; no association with SHBG",
+            "ru": "Общий и свободный тестостерон у мужчин с T ниже, чем с C; связи с ГСПГ нет"
+          },
           "study": "Ohlsson 2011; Chen 2016",
           "source": "PMID 21998597 (Ohlsson 2011, PLoS Genet: genetic determinants of serum testosterone in men); PMID 26602056 (Chen 2016, Andrology: rs5934505, low testosterone and late-onset hypogonadism in Chinese men)",
           "submitter": "panel_2026_09_23",
@@ -4618,7 +4861,10 @@
           "source": "Witt 2000 Nat Genet (SPINK1 N34S and chronic pancreatitis)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "chronic pancreatitis OR about 12 (homozygotes), about 2–3 (heterozygotes)",
+          "effect_size": {
+            "en": "chronic pancreatitis OR about 12 (homozygotes), about 2–3 (heterozygotes)",
+            "ru": "Отношение шансов хронического панкреатита примерно 12 у гомозигот и 2–3 у гетерозигот"
+          },
           "study": "Witt 2000 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -4692,7 +4938,10 @@
           "source": "Brooks 2009 PLoS Med (ALDH2*2 and alcohol)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+          "effect_size": {
+            "en": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+            "ru": "Отношение шансов рака пищевода примерно 3–4 у употребляющих алкоголь гетерозигот"
+          },
           "study": "Brooks 2009 PLoS Med",
           "review": {
             "by_role": "panel_author",
@@ -4772,7 +5021,10 @@
           "source": "Romeo 2008 Nat Genet (PNPLA3 I148M and hepatic fat)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "hepatic fat about +25 % per G allele; NAFLD OR about 3.5 in GG",
+          "effect_size": {
+            "en": "hepatic fat about +25 % per G allele; NAFLD OR about 3.5 in GG",
+            "ru": "Жир в печени примерно на +25 % на аллель G; отношение шансов неалкогольной жировой болезни печени примерно 3.5 при GG"
+          },
           "study": "Romeo 2008 Nat Genet",
           "expect": {
             "marker": "alt",
@@ -4816,7 +5068,10 @@
           "source": "Kozlitina 2014 Nat Genet (TM6SF2 E167K)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "hepatic fat higher, LDL-C about −0.1 mmol/L per T allele",
+          "effect_size": {
+            "en": "hepatic fat higher, LDL-C about −0.1 mmol/L per T allele",
+            "ru": "Жир в печени выше, холестерин ЛПНП примерно на −0.1 ммоль/л на аллель T"
+          },
           "study": "Kozlitina 2014 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -5139,7 +5394,10 @@
           "source": "Brooks 2009 PLoS Med",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+          "effect_size": {
+            "en": "oesophageal cancer OR about 3–4 in drinking heterozygotes",
+            "ru": "Отношение шансов рака пищевода примерно 3–4 у употребляющих алкоголь гетерозигот"
+          },
           "study": "Brooks 2009 PLoS Med",
           "review": {
             "by_role": "panel_author",
@@ -5163,7 +5421,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -5188,7 +5449,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -5239,7 +5503,10 @@
           "source": "Wang 2010 Lancet (GWAS of 25-hydroxyvitamin D)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "25-OH-D about −5 nmol/L per G allele",
+          "effect_size": {
+            "en": "25-OH-D about −5 nmol/L per G allele",
+            "ru": "25-OH-D примерно на −5 нмоль/л на аллель G"
+          },
           "study": "Wang 2010 Lancet",
           "expect": {
             "marker": "vitamin_d",
@@ -5283,7 +5550,10 @@
           "source": "Wang 2010 Lancet",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "25-OH-D about −3 nmol/L per G allele",
+          "effect_size": {
+            "en": "25-OH-D about −3 nmol/L per G allele",
+            "ru": "25-OH-D примерно на −3 нмоль/л на аллель G"
+          },
           "study": "Wang 2010 Lancet",
           "expect": {
             "marker": "vitamin_d",
@@ -5327,7 +5597,10 @@
           "source": "Wang 2010 Lancet",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "25-OH-D about −3 nmol/L per G allele (T raises it)",
+          "effect_size": {
+            "en": "25-OH-D about −3 nmol/L per G allele (T raises it)",
+            "ru": "25-OH-D примерно на −3 нмоль/л на аллель G (аллель T повышает уровень)"
+          },
           "study": "Wang 2010 Lancet; direction confirmed in the GWAS Catalog and Ensembl, 13.09.2026",
           "expect": {
             "marker": "vitamin_d",
@@ -5371,7 +5644,10 @@
           "source": "Hazra 2008 Nat Genet (FUT2 and vitamin B12)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "plasma B12 somewhat higher in non-secretors",
+          "effect_size": {
+            "en": "plasma B12 somewhat higher in non-secretors",
+            "ru": "Витамин B12 плазмы несколько выше при несекреторном статусе"
+          },
           "study": "Hazra 2008 Nat Genet; OMIM vitamin B12 plasma level QTL 1",
           "expect": {
             "marker": "vitamin_b12",
@@ -5461,7 +5737,10 @@
           "source": "Benyamin 2009 Nat Genet (TMPRSS6 A736V and iron)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "ferritin and haemoglobin lower per V allele",
+          "effect_size": {
+            "en": "ferritin and haemoglobin lower per V allele",
+            "ru": "Ферритин и гемоглобин ниже на аллель V"
+          },
           "study": "Benyamin 2009 Nat Genet",
           "expect": {
             "marker": "ferritin",
@@ -5505,7 +5784,10 @@
           "source": "Lemaitre 2011 PLoS Genet (FADS and long-chain omega-3)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "EPA and DHA lower per T allele",
+          "effect_size": {
+            "en": "EPA and DHA lower per T allele",
+            "ru": "ЭПК и ДГК ниже на аллель T"
+          },
           "study": "Lemaitre 2011 PLoS Genet",
           "expect": {
             "marker": "omega3_index",
@@ -5549,7 +5831,10 @@
           "source": "Lemaitre 2011 PLoS Genet",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "EPA and DHA lower per T allele",
+          "effect_size": {
+            "en": "EPA and DHA lower per T allele",
+            "ru": "ЭПК и ДГК ниже на аллель T"
+          },
           "study": "Lemaitre 2011 PLoS Genet",
           "review": {
             "by_role": "panel_author",
@@ -5585,7 +5870,10 @@
           "source": "Enattah 2002 Nat Genet (MCM6 and lactase persistence)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "lactase persistence (a trait, not a risk)",
+          "effect_size": {
+            "en": "lactase persistence (a trait, not a risk)",
+            "ru": "Сохранение активности лактазы во взрослом возрасте — признак, а не риск"
+          },
           "study": "Enattah 2002 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -5637,7 +5925,13 @@
             "note": {
               "en": "the ABCG2 141K allele: urate tends to be higher",
               "ru": "аллель ABCG2 141K: урат склонен быть выше"
-            }
+            },
+            "source": "PMID:19506252; PMID:23552988; DOI:10.1073/pnas.0901249106",
+            "mechanism": {
+              "en": "The Q141K variant reduces urate transport in experimental systems and its T allele is associated with higher serum urate in population studies. This does not establish the cause of an individual measurement.",
+              "ru": "В экспериментальных системах вариант Q141K снижает транспорт уратов; аллель T связан с более высокой мочевой кислотой в популяционных исследованиях. Это не устанавливает причину индивидуального результата."
+            },
+            "context_only": true
           },
           "evidence": {
             "level": "B",
@@ -5673,7 +5967,10 @@
           "source": "Vitart 2008 Nat Genet (SLC2A9 and urate)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "serum urate about −0.3 mg/dL per T allele",
+          "effect_size": {
+            "en": "serum urate about −0.3 mg/dL per T allele",
+            "ru": "Урат сыворотки примерно на −0.3 мг/дл на аллель T"
+          },
           "study": "Vitart 2008 Nat Genet",
           "expect": {
             "marker": "uric_acid",
@@ -5751,7 +6048,10 @@
           "source": "Köttgen 2009 Nat Genet (UMOD and CKD)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "CKD OR about 0.8 per T allele",
+          "effect_size": {
+            "en": "CKD OR about 0.8 per T allele",
+            "ru": "Отношение шансов хронической болезни почек примерно 0.8 на аллель T"
+          },
           "study": "Köttgen 2009 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -5787,7 +6087,10 @@
           "source": "Genovese 2010 Science (APOL1 G1/G2 and kidney disease)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "FSGS OR about 10–17 with two risk alleles",
+          "effect_size": {
+            "en": "FSGS OR about 10–17 with two risk alleles",
+            "ru": "Отношение шансов фокально-сегментарного гломерулосклероза примерно 10–17 при двух аллелях риска"
+          },
           "study": "Genovese 2010 Science",
           "review": {
             "by_role": "panel_author",
@@ -5823,7 +6126,10 @@
           "source": "Genovese 2010 Science",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "see rs73885319",
+          "effect_size": {
+            "en": "see rs73885319",
+            "ru": "См. rs73885319"
+          },
           "study": "Genovese 2010 Science",
           "review": {
             "by_role": "panel_author",
@@ -5915,7 +6221,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -5940,7 +6249,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -5977,7 +6289,10 @@
               "ru": "SLC2A9 rs863225072, две копии: генотип, который GenCC связывает с «hypouricemia, renal, 2» (Strong, AR); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (SLC2A9, hypouricemia, renal, 2, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (SLC2A9, hypouricemia, renal, 2, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (SLC2A9, hypouricemia, renal, 2, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6019,7 +6334,10 @@
           "source": "PMID 32333475 (meta-analysis, J Gene Med 2020); Begovich 2004 Am J Hum Genet",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "rheumatoid arthritis OR about 1.6–1.9 per T allele in Europeans",
+          "effect_size": {
+            "en": "rheumatoid arthritis OR about 1.6–1.9 per T allele in Europeans",
+            "ru": "Отношение шансов ревматоидного артрита примерно 1.6–1.9 на аллель T в европейских выборках"
+          },
           "study": "Begovich 2004; meta-analysis PMID 32333475",
           "review": {
             "by_role": "panel_author",
@@ -6064,7 +6382,10 @@
           "source": "PMID 17804842 (Remmers 2007, N Engl J Med)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "rheumatoid arthritis OR about 1.3, lupus OR about 1.55 per T allele",
+          "effect_size": {
+            "en": "rheumatoid arthritis OR about 1.3, lupus OR about 1.55 per T allele",
+            "ru": "Отношение шансов ревматоидного артрита примерно 1.3, волчанки примерно 1.55 на аллель T"
+          },
           "study": "Remmers 2007 N Engl J Med",
           "review": {
             "by_role": "panel_author",
@@ -6108,7 +6429,10 @@
           "source": "PMID 20112363 (Shimane 2010, Arthritis Rheum)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "lupus OR about 1.7–2 per G allele; weaker for rheumatoid arthritis",
+          "effect_size": {
+            "en": "lupus OR about 1.7–2 per G allele; weaker for rheumatoid arthritis",
+            "ru": "Отношение шансов волчанки примерно 1.7–2 на аллель G; для ревматоидного артрита связь слабее"
+          },
           "study": "Shimane 2010 Arthritis Rheum",
           "review": {
             "by_role": "panel_author",
@@ -6152,7 +6476,10 @@
           "source": "PMID 27108589 (meta-analysis, Clin Rheumatol 2016); Evans 2011 Nat Genet",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "ankylosing spondylitis OR about 1.4 per T allele, in HLA-B27 carriers",
+          "effect_size": {
+            "en": "ankylosing spondylitis OR about 1.4 per T allele, in HLA-B27 carriers",
+            "ru": "Отношение шансов анкилозирующего спондилита примерно 1.4 на аллель T у носителей HLA-B27"
+          },
           "study": "Evans 2011 Nat Genet; meta-analysis PMID 27108589",
           "review": {
             "by_role": "panel_author",
@@ -6196,7 +6523,10 @@
           "source": "PMID 20953188 (Hüffmeier 2010, Nat Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "psoriatic arthritis OR about 1.9, psoriasis OR about 1.5 per T allele",
+          "effect_size": {
+            "en": "psoriatic arthritis OR about 1.9, psoriasis OR about 1.5 per T allele",
+            "ru": "Отношение шансов псориатического артрита примерно 1.9, псориаза примерно 1.5 на аллель T"
+          },
           "study": "Hüffmeier 2010 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -6240,7 +6570,10 @@
           "source": "PMID 31347288 (meta-analysis, Int J Rheum Dis 2019)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "lupus OR about 1.5 per T allele; rheumatoid arthritis about 1.1",
+          "effect_size": {
+            "en": "lupus OR about 1.5 per T allele; rheumatoid arthritis about 1.1",
+            "ru": "Отношение шансов волчанки примерно 1.5, ревматоидного артрита примерно 1.1 на аллель T"
+          },
           "study": "meta-analysis PMID 31347288",
           "review": {
             "by_role": "panel_author",
@@ -6284,7 +6617,10 @@
           "source": "PMID 28653215 (meta-analysis); PMID 18087673; PMID 19470526 (European population)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "rheumatoid arthritis OR about 1.3 per T allele in East Asians; not consistent in Europeans",
+          "effect_size": {
+            "en": "rheumatoid arthritis OR about 1.3 per T allele in East Asians; not consistent in Europeans",
+            "ru": "Отношение шансов ревматоидного артрита примерно 1.3 на аллель T в восточноазиатских выборках; в европейских результаты непостоянны"
+          },
           "study": "Suzuki 2003; meta-analysis PMID 28653215",
           "review": {
             "by_role": "panel_author",
@@ -6316,7 +6652,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6341,7 +6680,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6366,7 +6708,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6391,7 +6736,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6416,7 +6764,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6441,7 +6792,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6466,7 +6820,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6491,7 +6848,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6528,7 +6888,10 @@
               "ru": "COPA rs794727993, две копии: генотип, который GenCC связывает с «autoimmune interstitial lung disease-arthritis syndrome» (Strong, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (COPA, autoimmune interstitial lung disease-arthritis syndrome, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (COPA, autoimmune interstitial lung disease-arthritis syndrome, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (COPA, autoimmune interstitial lung disease-arthritis syndrome, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6565,7 +6928,10 @@
               "ru": "CTLA4 rs1357409506, две копии: генотип, который GenCC связывает с «autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (CTLA4, autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (CTLA4, autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (CTLA4, autoimmune lymphoproliferative syndrome due to CTLA4 haploinsufficiency, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6602,7 +6968,10 @@
               "ru": "FAS rs778993919, две копии: генотип, который GenCC связывает с «autoimmune lymphoproliferative syndrome type 1» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (FAS, autoimmune lymphoproliferative syndrome type 1, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (FAS, autoimmune lymphoproliferative syndrome type 1, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (FAS, autoimmune lymphoproliferative syndrome type 1, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6639,7 +7008,10 @@
               "ru": "IFIH1 rs587777446, две копии: генотип, который GenCC связывает с «IFIH1-related type 1 interferonopathy» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (IFIH1, IFIH1-related type 1 interferonopathy, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (IFIH1, IFIH1-related type 1 interferonopathy, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (IFIH1, IFIH1-related type 1 interferonopathy, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6676,7 +7048,10 @@
               "ru": "IFNGR1 rs1236009877, две копии: генотип, который GenCC связывает с «immunodeficiency 27A» (Definitive, AR); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (IFNGR1, immunodeficiency 27A, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (IFNGR1, immunodeficiency 27A, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (IFNGR1, immunodeficiency 27A, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6713,7 +7088,10 @@
               "ru": "IKZF1 rs530073586, две копии: генотип, который GenCC связывает с «pancytopenia due to IKZF1 mutations» (Strong, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (IKZF1, pancytopenia due to IKZF1 mutations, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (IKZF1, pancytopenia due to IKZF1 mutations, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (IKZF1, pancytopenia due to IKZF1 mutations, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6750,7 +7128,10 @@
               "ru": "IL36RN rs387906914, две копии: генотип, который GenCC связывает с «autoinflammatory syndrome» (Strong, SD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (IL36RN, autoinflammatory syndrome, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (IL36RN, autoinflammatory syndrome, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (IL36RN, autoinflammatory syndrome, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6787,7 +7168,10 @@
               "ru": "MEFV rs28940579, две копии: генотип, который GenCC связывает с «familial Mediterranean fever» (Definitive, SD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (MEFV, familial Mediterranean fever, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (MEFV, familial Mediterranean fever, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (MEFV, familial Mediterranean fever, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6824,7 +7208,10 @@
               "ru": "NFKB2 rs397514332, две копии: генотип, который GenCC связывает с «immunodeficiency, common variable, 10» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (NFKB2, immunodeficiency, common variable, 10, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (NFKB2, immunodeficiency, common variable, 10, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (NFKB2, immunodeficiency, common variable, 10, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6861,7 +7248,10 @@
               "ru": "NLRC4 rs587781260, две копии: генотип, который GenCC связывает с «periodic fever-infantile enterocolitis-autoinflammatory syndrome» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (NLRC4, periodic fever-infantile enterocolitis-autoinflammatory syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (NLRC4, periodic fever-infantile enterocolitis-autoinflammatory syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (NLRC4, periodic fever-infantile enterocolitis-autoinflammatory syndrome, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6898,7 +7288,10 @@
               "ru": "NLRP12 rs1404302953, две копии: генотип, который GenCC связывает с «familial cold autoinflammatory syndrome 2» (Strong, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (NLRP12, familial cold autoinflammatory syndrome 2, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (NLRP12, familial cold autoinflammatory syndrome 2, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (NLRP12, familial cold autoinflammatory syndrome 2, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6935,7 +7328,10 @@
               "ru": "NLRP3 rs121908150, две копии: генотип, который GenCC связывает с «cryopyrin-associated periodic syndrome» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (NLRP3, cryopyrin-associated periodic syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (NLRP3, cryopyrin-associated periodic syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (NLRP3, cryopyrin-associated periodic syndrome, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -6972,7 +7368,10 @@
               "ru": "NOD2 rs104895477, две копии: генотип, который GenCC связывает с «Blau syndrome» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (NOD2, Blau syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (NOD2, Blau syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (NOD2, Blau syndrome, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7009,7 +7408,10 @@
               "ru": "PIK3CD rs397518423, две копии: генотип, который GenCC связывает с «immunodeficiency 14» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (PIK3CD, immunodeficiency 14, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (PIK3CD, immunodeficiency 14, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (PIK3CD, immunodeficiency 14, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7046,7 +7448,10 @@
               "ru": "PIK3R1 rs587777709, две копии: генотип, который GenCC связывает с «immunodeficiency 36 with lymphoproliferation» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (PIK3R1, immunodeficiency 36 with lymphoproliferation, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (PIK3R1, immunodeficiency 36 with lymphoproliferation, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (PIK3R1, immunodeficiency 36 with lymphoproliferation, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7083,7 +7488,10 @@
               "ru": "PSTPIP1 rs28939089, две копии: генотип, который GenCC связывает с «hyperzincemia with functional zinc depletion» (Strong, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (PSTPIP1, hyperzincemia with functional zinc depletion, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (PSTPIP1, hyperzincemia with functional zinc depletion, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (PSTPIP1, hyperzincemia with functional zinc depletion, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7120,7 +7528,10 @@
               "ru": "STAT1 rs587777630, две копии: генотип, который GenCC связывает с «immunodeficiency 31B» (Definitive, AR); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (STAT1, immunodeficiency 31B, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (STAT1, immunodeficiency 31B, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (STAT1, immunodeficiency 31B, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7157,7 +7568,10 @@
               "ru": "STAT3 rs869312892, две копии: генотип, который GenCC связывает с «hyper-IgE recurrent infection syndrome 1, autosomal dominant» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (STAT3, hyper-IgE recurrent infection syndrome 1, autosomal dominant, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (STAT3, hyper-IgE recurrent infection syndrome 1, autosomal dominant, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (STAT3, hyper-IgE recurrent infection syndrome 1, autosomal dominant, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7194,7 +7608,10 @@
               "ru": "TNFAIP3 rs864321626, две копии: генотип, который GenCC связывает с «autoinflammatory syndrome, familial, Behcet-like 1» (Strong, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (TNFAIP3, autoinflammatory syndrome, familial, Behcet-like 1, Strong); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (TNFAIP3, autoinflammatory syndrome, familial, Behcet-like 1, Strong); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (TNFAIP3, autoinflammatory syndrome, familial, Behcet-like 1, Strong); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7231,7 +7648,10 @@
               "ru": "TNFRSF1A rs104895217, две копии: генотип, который GenCC связывает с «TNF receptor 1-associated periodic fever syndrome» (Definitive, AD); следом идёт клиническая оценка — не диагноз."
             }
           },
-          "source": "GenCC (TNFRSF1A, TNF receptor 1-associated periodic fever syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+          "source": {
+            "en": "GenCC (TNFRSF1A, TNF receptor 1-associated periodic fever syndrome, Definitive); the panel author's list of 29.06.2026 names the variant",
+            "ru": "GenCC (TNFRSF1A, TNF receptor 1-associated periodic fever syndrome, Definitive); вариант указан в списке автора панели от 29.06.2026"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7246,6 +7666,182 @@
             "assigned": "2026-09-18",
             "by_rule": "GenCC Definitive/Strong"
           }
+        },
+        {
+          "rsid": "rs118203993",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121627018C>T",
+          "transcript": "NM_032790.4:c.271C>T",
+          "protein": "p.Arg91Trp",
+          "risk_allele": "T",
+          "strand": "+",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "classification": "Pathogenic",
+          "moi": "AR",
+          "text": {
+            "het": {
+              "en": "One R91W copy is compatible with recessive carrier status; it does not establish ORAI1 deficiency. A second pathogenic allele has not been excluded by testing this position.",
+              "ru": "Одна копия R91W соответствует возможному носительству рецессивного варианта и не устанавливает дефицит ORAI1. Проверка этой позиции не исключает второй патогенный аллель."
+            },
+            "hom": {
+              "en": "Two R91W copies are consistent with the genotype reported in recessive ORAI1 immunodeficiency. Confirm the finding and assess it with clinical features; this panel is not a diagnosis.",
+              "ru": "Две копии R91W соответствуют генотипу, описанному при рецессивном иммунодефиците ORAI1. Находку нужно подтвердить и сопоставить с клиническими проявлениями; панель не устанавливает диагноз."
+            }
+          },
+          "source": "PMID:16582901; DOI:10.1038/nature04702; PMID:19075015; DOI:10.1074/jbc.M808346200; ClinVar RCV000001346.6; https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/",
+          "mechanism": {
+            "en": "R91W disrupts CRAC channel function and store-operated calcium entry in cells.",
+            "ru": "R91W нарушает функцию канала CRAC и вход кальция в клетку после опустошения депо."
+          },
+          "curated_on": "2026-10-18",
+          "evidence": {
+            "level": "C",
+            "basis": "primary_functional_and_family",
+            "source": "PMID:16582901; DOI:10.1038/nature04702; PMID:19075015; DOI:10.1074/jbc.M808346200; ClinVar RCV000001346.6; https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/",
+            "assigned": "2026-10-18",
+            "judged": "Scholion interpretation is limited to the variant-specific evidence cited here; ClinVar classification and review status are separate."
+          },
+          "database_assertion": {
+            "database": "ClinVar",
+            "accession": "RCV000001346.6",
+            "classification": "Pathogenic",
+            "retrieved": "2026-10-18",
+            "source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/",
+            "review_status": "no assertion criteria provided"
+          },
+          "note_on_review": "Source curation completed; independent clinical review remains open.",
+          "submitter": "scholion_070_source_curation"
+        },
+        {
+          "rsid": "rs786204796",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121627039G>A",
+          "transcript": "NM_032790.4:c.292G>A",
+          "protein": "p.Gly98Ser",
+          "risk_allele": "A",
+          "strand": "+",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "classification": "Pathogenic",
+          "moi": "AD",
+          "text": {
+            "het": {
+              "en": "One G98S copy was associated with dominantly inherited tubular aggregate myopathy in two families. A confirmed finding needs clinical assessment; it is not recessive carrier status.",
+              "ru": "Одна копия G98S была связана с доминантной миопатией с тубулярными агрегатами в двух семьях. Подтверждённая находка требует клинического сопоставления; это не рецессивное носительство."
+            },
+            "hom": {
+              "en": "The published families carried one G98S copy. A two-copy call needs confirmation; severity cannot be extrapolated by doubling the one-copy effect.",
+              "ru": "В опубликованных семьях обнаружена одна копия G98S. Результат с двумя копиями требует подтверждения; тяжесть нельзя оценить удвоением эффекта одной копии."
+            }
+          },
+          "source": "PMID:25227914; DOI:10.1093/hmg/ddu477; ClinVar VCV000189256.7; https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/",
+          "mechanism": {
+            "en": "G98S activates CRAC channels constitutively in experimental systems, independently of store depletion and STIM1 activation.",
+            "ru": "G98S вызывает постоянную активацию каналов CRAC в экспериментальных системах независимо от опустошения депо и активации STIM1."
+          },
+          "curated_on": "2026-10-18",
+          "evidence": {
+            "level": "C",
+            "basis": "primary_functional_and_family",
+            "source": "PMID:25227914; DOI:10.1093/hmg/ddu477; ClinVar VCV000189256.7; https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/",
+            "assigned": "2026-10-18",
+            "judged": "Scholion interpretation is limited to the variant-specific evidence cited here; ClinVar classification and review status are separate."
+          },
+          "database_assertion": {
+            "database": "ClinVar",
+            "accession": "VCV000189256.7",
+            "classification": "Pathogenic",
+            "retrieved": "2026-10-18",
+            "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/",
+            "review_status": "criteria provided, single submitter"
+          },
+          "note_on_review": "Source curation completed; independent clinical review remains open.",
+          "submitter": "scholion_070_source_curation"
+        },
+        {
+          "rsid": "rs3741596",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121641389A>G",
+          "transcript": "NM_032790.4:c.652A>G",
+          "protein": "p.Ser218Gly",
+          "risk_allele": "G",
+          "strand": "+",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "classification": "Benign",
+          "moi": "unknown",
+          "text": {
+            "het": {
+              "en": "One S218G copy: ClinVar classifies this variant as benign, with multiple submissions and no classification conflict. It is not a clinical finding in this panel.",
+              "ru": "Одна копия S218G: ClinVar классифицирует вариант как доброкачественный; несколько заявок без конфликта классификаций. Клинической находкой в этой панели он не считается."
+            },
+            "hom": {
+              "en": "Two S218G copies: the benign ClinVar classification does not become pathogenic with two copies. This is not a clinical finding in this panel.",
+              "ru": "Две копии S218G: доброкачественная классификация ClinVar не становится патогенной из-за двух копий. Клинической находкой в этой панели это не считается."
+            }
+          },
+          "source": "ClinVar VCV000379436.12; https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/",
+          "curated_on": "2026-10-18",
+          "evidence": {
+            "level": "D",
+            "basis": "database_classification",
+            "source": "ClinVar VCV000379436.12; https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/",
+            "assigned": "2026-10-18",
+            "judged": "Scholion interpretation is limited to the variant-specific evidence cited here; ClinVar classification and review status are separate."
+          },
+          "database_assertion": {
+            "database": "ClinVar",
+            "accession": "VCV000379436.12",
+            "classification": "Benign",
+            "retrieved": "2026-10-18",
+            "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/",
+            "review_status": "criteria provided, multiple submitters, no conflicts"
+          },
+          "note_on_review": "Source curation completed; independent clinical review remains open.",
+          "submitter": "scholion_070_source_curation"
+        },
+        {
+          "rsid": "rs781829024",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121626842A>C",
+          "transcript": "NM_032790.4:c.100A>C",
+          "protein": "p.Ser34Arg",
+          "risk_allele": "C",
+          "strand": "+",
+          "mode": "monogenic",
+          "kind": "asked_about",
+          "classification": "Conflicting classifications of pathogenicity",
+          "moi": "unknown",
+          "text": {
+            "het": {
+              "en": "One S34R copy: ClinVar has conflicting uncertain-significance and likely-benign submissions. This does not establish ORAI1-related disease.",
+              "ru": "Одна копия S34R: в ClinVar конфликтуют заявки с неопределённой значимостью и вероятно доброкачественной оценкой. Это не устанавливает заболевание, связанное с ORAI1."
+            },
+            "hom": {
+              "en": "Two S34R copies: the classification remains conflicting; two copies do not resolve uncertainty or establish a recessive diagnosis.",
+              "ru": "Две копии S34R: классификация остаётся конфликтной; число копий не устраняет неопределённость и не устанавливает рецессивный диагноз."
+            }
+          },
+          "source": "ClinVar VCV000541941.54; https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/",
+          "curated_on": "2026-10-18",
+          "evidence": {
+            "level": "C",
+            "basis": "database_classification",
+            "source": "ClinVar VCV000541941.54; https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/",
+            "assigned": "2026-10-18",
+            "judged": "Scholion interpretation is limited to the variant-specific evidence cited here; ClinVar classification and review status are separate."
+          },
+          "database_assertion": {
+            "database": "ClinVar",
+            "accession": "VCV000541941.54",
+            "classification": "Conflicting classifications of pathogenicity",
+            "retrieved": "2026-10-18",
+            "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/",
+            "review_status": "criteria provided, conflicting classifications"
+          },
+          "note_on_review": "Source curation completed; independent clinical review remains open.",
+          "submitter": "scholion_070_source_curation"
         }
       ]
     },
@@ -7273,7 +7869,10 @@
           "source": "PMID 20436471 (Albagha 2010, Nat Genet); PMID 29782529",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "Paget disease of bone OR about 1.4 per T allele",
+          "effect_size": {
+            "en": "Paget disease of bone OR about 1.4 per T allele",
+            "ru": "Отношение шансов костной болезни Педжета примерно 1.4 на аллель T"
+          },
           "study": "Albagha 2010 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -7309,7 +7908,10 @@
           "source": "PMID 26272126 (Oddsson 2015, Nat Commun); PMID 31754202",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "association with serum alkaline phosphatase and bone phenotypes; direction for bone not settled",
+          "effect_size": {
+            "en": "association with serum alkaline phosphatase and bone phenotypes; direction for bone not settled",
+            "ru": "Связь с щелочной фосфатазой сыворотки и костными признаками; направление влияния на кость не установлено"
+          },
           "study": "Oddsson 2015 Nat Commun",
           "review": {
             "by_role": "panel_author",
@@ -7345,7 +7947,10 @@
           "source": "PMID 20798928 (meta-analysis); PMID 12810179",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "bone density slightly lower and vertebral fracture risk about 1.3 times higher in TT",
+          "effect_size": {
+            "en": "bone density slightly lower and vertebral fracture risk about 1.3 times higher in TT",
+            "ru": "Плотность костной ткани немного ниже; риск переломов позвонков примерно в 1.3 раза выше при TT"
+          },
           "study": "Ralston 2006 PLoS Med (GENOMOS); meta-analysis PMID 20798928",
           "review": {
             "by_role": "panel_author",
@@ -7382,7 +7987,10 @@
           "source": "PMID 20798928; PMID 37086417",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "association with bone density in some studies, not consistent",
+          "effect_size": {
+            "en": "association with bone density in some studies, not consistent",
+            "ru": "Связь с плотностью костной ткани в некоторых исследованиях; результаты непостоянны"
+          },
           "study": "meta-analysis PMID 20798928",
           "review": {
             "by_role": "panel_author",
@@ -7418,7 +8026,10 @@
           "source": "PMID 20798928; PMID 19016596",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "association with bone density in a few studies",
+          "effect_size": {
+            "en": "association with bone density in a few studies",
+            "ru": "Связь с плотностью костной ткани в нескольких исследованиях"
+          },
           "study": "meta-analysis PMID 20798928",
           "review": {
             "by_role": "panel_author",
@@ -7455,7 +8066,10 @@
           "source": "PMID 18588671; PMID 25580429; PMID 25664010",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "bone density slightly lower, fracture risk about 1.1 times higher per T allele",
+          "effect_size": {
+            "en": "bone density slightly lower, fracture risk about 1.1 times higher per T allele",
+            "ru": "Плотность костной ткани немного ниже; риск переломов примерно в 1.1 раза выше на аллель T"
+          },
           "study": "van Meurs 2008 JAMA (GENOMOS)",
           "review": {
             "by_role": "panel_author",
@@ -7479,7 +8093,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7504,7 +8121,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7529,7 +8149,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7554,7 +8177,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7579,7 +8205,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7604,7 +8233,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E; the list's allele was written on the gene strand; complemented to the plus strand",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E; аллель из списка приведён с цепи гена к положительной цепи"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7629,7 +8261,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": null,
-          "source": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+          "source": {
+            "en": "the panel author's list of 29.06.2026 — the position is named there with its risk allele and no source; level E",
+            "ru": "Список автора панели от 29.06.2026: позиция с названным аллелем; первоисточник не указан; уровень E"
+          },
           "submitter": "panel_2026_09_18",
           "curated_on": "2026-09-18",
           "review": {
@@ -7672,7 +8307,10 @@
           "source": "PMID 33414548 (Lotta 2021, Nat Genet); PMID 24816252 (Shin 2014, Nat Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma glycine higher per C allele",
+          "effect_size": {
+            "en": "plasma glycine higher per C allele",
+            "ru": "Глицин плазмы выше на аллель C"
+          },
           "study": "Lotta 2021 Nat Genet; Shin 2014 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -7698,7 +8336,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7723,7 +8364,10 @@
           "source": "PMID 33414548 (Lotta 2021, Nat Genet); Lotta 2016 PLoS Med",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma isoleucine, leucine and valine higher per C allele",
+          "effect_size": {
+            "en": "plasma isoleucine, leucine and valine higher per C allele",
+            "ru": "Изолейцин, лейцин и валин плазмы выше на аллель C"
+          },
           "study": "Lotta 2021 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -7749,7 +8393,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7774,7 +8421,10 @@
           "source": "PMID 30659259 (Imaizumi 2019, Eur J Hum Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma asparagine higher per T allele",
+          "effect_size": {
+            "en": "plasma asparagine higher per T allele",
+            "ru": "Аспарагин плазмы выше на аллель T"
+          },
           "study": "Imaizumi 2019 Eur J Hum Genet",
           "review": {
             "by_role": "panel_author",
@@ -7793,7 +8443,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7818,7 +8471,10 @@
           "source": "PMID 37277652 (Schlosser 2023, Nat Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "β-aminoisobutyric acid higher per T allele",
+          "effect_size": {
+            "en": "β-aminoisobutyric acid higher per T allele",
+            "ru": "β-аминоизомасляная кислота выше на аллель T"
+          },
           "study": "Schlosser 2023 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -7837,7 +8493,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7862,7 +8521,10 @@
           "source": "PMID 30659259 (Imaizumi 2019); PMID 33414548 (Lotta 2021); PMID 36357675 (Surendran 2022)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "associated with plasma arginine; the direction differs between studies",
+          "effect_size": {
+            "en": "associated with plasma arginine; the direction differs between studies",
+            "ru": "Связь с аргинином плазмы; направление различается между исследованиями"
+          },
           "study": "Lotta 2021; Surendran 2022",
           "review": {
             "by_role": "panel_author",
@@ -7881,7 +8543,10 @@
             "oral_free": "matters",
             "iv": "matters",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7906,7 +8571,10 @@
           "source": "PMID 19503597 (Kolz 2009, PLoS Genet); PMID 30993211 (Nakatochi 2019, Commun Biol)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "serum uric acid lower per T allele",
+          "effect_size": {
+            "en": "serum uric acid lower per T allele",
+            "ru": "Мочевая кислота сыворотки ниже на аллель T"
+          },
           "study": "Kolz 2009 PLoS Genet",
           "review": {
             "by_role": "panel_author",
@@ -7932,7 +8600,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -7957,7 +8628,10 @@
           "source": "PMID 19503597 (Kolz 2009, PLoS Genet); PMID 21983786 (Sulem 2011, Nat Genet)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "serum uric acid about +0.2–0.4 mg/dL per T allele",
+          "effect_size": {
+            "en": "serum uric acid about +0.2–0.4 mg/dL per T allele",
+            "ru": "Мочевая кислота сыворотки примерно на +0.2–0.4 мг/дл на аллель T"
+          },
           "study": "Kolz 2009 PLoS Genet",
           "review": {
             "by_role": "panel_author",
@@ -7983,7 +8657,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8008,7 +8685,10 @@
           "source": "PMID 36357675 (Surendran 2022, Nat Med); PMID 41044249 (Zoodsma 2025, a genetic map of human metabolism)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma glycine higher per A allele",
+          "effect_size": {
+            "en": "plasma glycine higher per A allele",
+            "ru": "Глицин плазмы выше на аллель A"
+          },
           "study": "Surendran 2022 Nat Med",
           "review": {
             "by_role": "panel_author",
@@ -8027,7 +8707,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8052,7 +8735,10 @@
           "source": "Whitcomb 2012 Nat Genet (PRSS1–PRSS2 and chronic pancreatitis)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "chronic pancreatitis OR about 1.4 per C allele",
+          "effect_size": {
+            "en": "chronic pancreatitis OR about 1.4 per C allele",
+            "ru": "Отношение шансов хронического панкреатита примерно 1.4 на аллель C"
+          },
           "study": "Whitcomb 2012 Nat Genet",
           "review": {
             "by_role": "panel_author",
@@ -8071,7 +8757,10 @@
             "oral_free": "bypassed",
             "iv": "bypassed",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8096,7 +8785,10 @@
           "source": "PMID 23824729 (van Meurs 2013, Am J Clin Nutr: the MTR and MTRR loci, with other lead variants)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "homocysteine slightly different in some studies, not consistently",
+          "effect_size": {
+            "en": "homocysteine slightly different in some studies, not consistently",
+            "ru": "Гомоцистеин немного различается в некоторых исследованиях; результаты непостоянны"
+          },
           "study": "van Meurs 2013 Am J Clin Nutr",
           "review": {
             "by_role": "panel_author",
@@ -8115,7 +8807,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8140,7 +8835,10 @@
           "source": "PMID 23824729 (van Meurs 2013, Am J Clin Nutr: the MTR and MTRR loci, with other lead variants); PMID 29340279 (Wang 2017, MTRR A66G)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "homocysteine slightly higher in some studies, not consistently",
+          "effect_size": {
+            "en": "homocysteine slightly higher in some studies, not consistently",
+            "ru": "Гомоцистеин немного выше в некоторых исследованиях; результаты непостоянны"
+          },
           "study": "van Meurs 2013 Am J Clin Nutr",
           "review": {
             "by_role": "panel_author",
@@ -8159,7 +8857,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8220,7 +8921,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8262,13 +8966,30 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           },
           "mechanism": {
             "en": "ABCG2 transports urate out of cells. Q141K reduced urate transport in functional assays; this is not a measurement of an individual's excretion.",
             "ru": "ABCG2 выводит урат из клеток. В функциональных экспериментах Q141K снижал транспорт урата; это не измерение выведения урата у конкретного человека."
           },
-          "note_on_review": "Source-based revision; human review of this wording is open."
+          "note_on_review": "Source-based revision; human review of this wording is open.",
+          "expect": {
+            "marker": "uric_acid",
+            "direction": "higher",
+            "note": {
+              "en": "the ABCG2 141K allele: urate tends to be higher",
+              "ru": "аллель ABCG2 141K: урат склонен быть выше"
+            },
+            "source": "PMID:19506252; PMID:23552988; DOI:10.1073/pnas.0901249106",
+            "mechanism": {
+              "en": "The Q141K variant reduces urate transport in experimental systems and its T allele is associated with higher serum urate in population studies. This does not establish the cause of an individual measurement.",
+              "ru": "В экспериментальных системах вариант Q141K снижает транспорт уратов; аллель T связан с более высокой мочевой кислотой в популяционных исследованиях. Это не устанавливает причину индивидуального результата."
+            },
+            "context_only": true
+          }
         },
         {
           "rsid": "rs12356193",
@@ -8291,7 +9012,10 @@
           "source": "PMID 19503597 (Kolz 2009, PLoS Genet: urate +0.08 mg/dL per A); PMID 39406924 (Major 2024: gout OR 1.09); PMID 24816252 (Shin 2014: carnitine)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "serum urate about +0.08 mg/dL per A allele; carnitine higher",
+          "effect_size": {
+            "en": "serum urate about +0.08 mg/dL per A allele; carnitine higher",
+            "ru": "Урат сыворотки примерно на +0.08 мг/дл на аллель A; карнитин выше"
+          },
           "study": "Kolz 2009 PLoS Genet; Major 2024",
           "review": {
             "by_role": "panel_author",
@@ -8311,7 +9035,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8335,7 +9062,10 @@
           "source": "PMID 33414548 (Lotta 2021: valine, leucine); PMID 36357675 (Surendran 2022); PMID 38448586 (2024, multi-ancestry: valine); PMID 27898682 (Lotta 2016: 21 kb upstream of PPM1K)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma valine and leucine higher per T allele",
+          "effect_size": {
+            "en": "plasma valine and leucine higher per T allele",
+            "ru": "Валин и лейцин плазмы выше на аллель T"
+          },
           "study": "Lotta 2021 Nat Genet; Surendran 2022 Nat Med",
           "review": {
             "by_role": "panel_author",
@@ -8355,7 +9085,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8379,7 +9112,10 @@
           "source": "PMID 38448586 (2024, multi-ancestry: glutamine −0.24 SD per A); PMID 30659259 (Imaizumi 2019: glutamine −0.41)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma glutamine lower per A allele; isoleucine slightly higher",
+          "effect_size": {
+            "en": "plasma glutamine lower per A allele; isoleucine slightly higher",
+            "ru": "Глутамин плазмы ниже на аллель A; изолейцин немного выше"
+          },
           "study": "Imaizumi 2019 Eur J Hum Genet",
           "review": {
             "by_role": "panel_author",
@@ -8399,7 +9135,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8423,7 +9162,10 @@
           "source": "PMID 36635386 (Chen 2023: N-acetyl amino acids); PMID 37277652 (Schlosser 2023); PMID 20383146 (Köttgen 2010: eGFR); PMID 26831199 (Pattaro 2016)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "N-acetylated amino acids markedly higher per G allele; eGFR slightly higher",
+          "effect_size": {
+            "en": "N-acetylated amino acids markedly higher per G allele; eGFR slightly higher",
+            "ru": "N-ацетилированные аминокислоты заметно выше на аллель G; расчётная СКФ немного выше"
+          },
           "study": "Chen 2023 Nat Genet; Köttgen 2010",
           "review": {
             "by_role": "panel_author",
@@ -8443,7 +9185,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8467,7 +9212,10 @@
           "source": "PMID 34887591 (triglycerides, C lowers); PMID 38658550 (urate, T raises); PMID 40436827 (creatinine, T lowers); PMID 34594039 (albumin)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "per T (Leu446): triglycerides and urate higher, serum creatinine and albumin slightly different",
+          "effect_size": {
+            "en": "per T (Leu446): triglycerides and urate higher, serum creatinine and albumin slightly different",
+            "ru": "На T (Leu446): триглицериды и урат выше, креатинин и альбумин сыворотки немного различаются"
+          },
           "study": "GLGC 2021; Major 2024",
           "review": {
             "by_role": "panel_author",
@@ -8487,7 +9235,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8511,7 +9262,10 @@
           "source": "PMID 24651765 (Williams 2014, PLoS Genet: post-load homocysteine +0.36 per T)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "homocysteine after a methionine load higher per T allele; one study",
+          "effect_size": {
+            "en": "homocysteine after a methionine load higher per T allele; one study",
+            "ru": "Гомоцистеин после метиониновой нагрузки выше на аллель T; одно исследование"
+          },
           "study": "Williams 2014 PLoS Genet",
           "review": {
             "by_role": "panel_author",
@@ -8531,7 +9285,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           },
           "under_load": {
             "test": "methionine_load",
@@ -8562,7 +9319,10 @@
           "source": "PMID 30659259 (Imaizumi 2019: serine −0.28 SD per T)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma serine lower per T allele; one study",
+          "effect_size": {
+            "en": "plasma serine lower per T allele; one study",
+            "ru": "Серин плазмы ниже на аллель T; одно исследование"
+          },
           "study": "Imaizumi 2019 Eur J Hum Genet",
           "review": {
             "by_role": "panel_author",
@@ -8582,7 +9342,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         },
         {
@@ -8606,7 +9369,10 @@
           "source": "PMID 30659259 (Imaizumi 2019: C raises proline); PMID 26068415 (Draisma 2015: T raises proline)",
           "submitter": "clinical_review_2026_09",
           "curated_on": "2026-09-17",
-          "effect_size": "plasma proline associated; the direction differs between studies",
+          "effect_size": {
+            "en": "plasma proline associated; the direction differs between studies",
+            "ru": "Связь с пролином плазмы; направление различается между исследованиями"
+          },
           "study": "Imaizumi 2019; Draisma 2015",
           "review": {
             "by_role": "panel_author",
@@ -8626,7 +9392,10 @@
             "oral_free": "sharper",
             "iv": "sharper",
             "basis": "mechanism",
-            "source": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens"
+            "source": {
+              "en": "the panel author's table of 17.09.2026, nine links of the chain against three routes: which links a route removes and which it sharpens",
+              "ru": "Таблица автора панели от 17.09.2026: девять звеньев цепи и три маршрута; какие звенья маршрут устраняет и какие усиливает"
+            }
           }
         }
       ],
@@ -8677,7 +9446,10 @@
         }
       },
       "carrier_classes": {
-        "source": "the panel author's answers of 21.09.2026 (the classes) and 23.09.2026 (the OTC wording for men); the wording for a heterozygous woman was written by the product against GeneReviews OTC deficiency (NBK154378) and approved by the panel author on 27.09.2026",
+        "source": {
+          "en": "the panel author's answers of 21.09.2026 (the classes) and 23.09.2026 (the OTC wording for men); the wording for a heterozygous woman was written by the product against GeneReviews OTC deficiency (NBK154378) and approved by the panel author on 27.09.2026",
+          "ru": "Ответы автора панели от 21.09.2026 (классы вариантов) и 23.09.2026 (OTC у мужчин); формулировка для гетерозиготной женщины основана на GeneReviews OTC deficiency (NBK154378) и согласована автором панели 27.09.2026"
+        },
         "review": {
           "by_role": "panel_author",
           "on": "2026-09-27",

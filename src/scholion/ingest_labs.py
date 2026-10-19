@@ -1171,6 +1171,21 @@ def _logical_result_lines(text: str) -> List[str]:
     return out
 
 
+def _result_specimen(text: str) -> Optional[str]:
+    """Only an unambiguous printed collection header, never a test's name."""
+    aliases = ((('serum', 'сыворот'), 'serum'), (('plasma', 'плазм'), 'plasma'),
+               (('whole blood', 'цельная кровь', 'цельной крови'), 'whole_blood'),
+               (('urine', 'моча', 'мочи'), 'urine'))
+    values = []
+    for match in _BIOMAT.finditer(text):
+        raw = match.group(1).lower()
+        kinds = {kind for words, kind in aliases if any(word in raw for word in words)}
+        if len(kinds) != 1:
+            return None
+        values.append(next(iter(kinds)))
+    return values[0] if values and len(set(values)) == 1 else None
+
+
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                  date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
@@ -1623,6 +1638,13 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
         if len(values) == 1:
             found[key] = {"value": values.pop(), "unit": unit,
                           "ref_low": None, "ref_high": None}
+    from hashlib import sha256
+    for value in found.values():
+        value['form_id'] = sha256(text.encode('utf-8')).hexdigest()
+    specimen = _result_specimen(text)
+    if specimen:
+        for value in found.values():
+            value.update(specimen=specimen, specimen_source='form_header')
     return date, found
 
 

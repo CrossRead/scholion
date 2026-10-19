@@ -52,7 +52,7 @@ class TestInterpretationConfidence(unittest.TestCase):
         page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
         for name in ("systemGeneLink", "shownGenetics", "hypothesisCountHtml", "clinicalBasisHTML", "referenceContextHtml",
-                     "mechanismHtml", "passportHtml", "geneticPreviewHtml", "geneticBriefHtml", "genSummaryHtml"):
+                     "mechanismHtml", "passportHtml", "geneticPreviewHtml", "geneticBriefHtml", "geneticComparisonHTML", "genSummaryHtml"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start)+2])
         script = r"""
@@ -165,7 +165,14 @@ for(const c of cases)for(const register of ['patient','clinician']){
   }
   if(p.interpretation.source&&sentence)assert.ok(detail.includes(esc(p.interpretation.source)),id+' missing source');
   const brief=geneticBriefHtml(p,register);
-  assert.ok(brief.startsWith('<details class="gen-context" data-genetic-context>'),id);
+  assert.ok(brief.startsWith('<div class="gen-description" data-gene-description>'),id);
+  const preview=brief.slice(0,brief.indexOf('<details'));
+  if(context.function_status!=='not_curated')assert.ok(preview.includes(esc(context.gene_function)),id+' known function is immediately visible');
+  else assert.ok(!preview.includes('<strong>'+esc(context.gene_function)),id+' missing knowledge is not bold biology');
+  if(p.interpretation.summary){
+   assert.ok(preview.includes(esc(p.interpretation.summary)),id+' interpretation is immediately visible');
+   if(context.function_status!=='not_curated')assert.ok(preview.indexOf(esc(context.gene_function))<preview.indexOf('data-level='),id+' known biology before confidence');
+  }
   assert.ok(!brief.includes('data-genetic-context open'),id);
  }else{
   assert.ok(html.includes('GenCC:'),id);
@@ -173,7 +180,13 @@ for(const c of cases)for(const register of ['patient','clinician']){
    for(const field of ['disease_label','classification_label','moi_label','submitter','curated_on'])
     if(a[field])assert.ok(detail.includes(esc(a[field])),id+' '+field);
   }
-  assert.ok(!html.includes('data-level='),id+' invented Scholion variant grade');
+  const withoutMechanisms=html.replace(/<details class="fold" data-mechanistic-hypotheses>[\s\S]*?<\/details>/g,'');
+  assert.ok(!withoutMechanisms.includes('data-level='),id+' invented Scholion variant grade');
+  for(const hypothesis of context.mechanistic_hypotheses||[]){
+   assert.ok(detail.includes(esc(hypothesis.summary)),id+' missing mechanism');
+   assert.ok(detail.includes('genlab.mechanism_level'),id+' unlabeled mechanism grade');
+   assert.equal(hypothesis.level_scope,'mechanism_reference_not_personal_variant',id);
+  }
  }
  assert.equal(JSON.stringify(p),before,id+' mutated input');
 }

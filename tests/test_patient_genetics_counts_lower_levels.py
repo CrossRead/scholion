@@ -14,7 +14,7 @@ class TestPatientPresentation(unittest.TestCase):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
         for name in ("systemGeneLink", "shownGenetics", "hypothesisCountHtml", "clinicalBasisHTML", "referenceContextHtml", "mechanismHtml", "geneticPreviewHtml", "geneticBriefHtml", "genTableRow", "genTableHtml",
-                     "panelHtml", "genSummaryHtml", "markerGeneticsRow", "basketRowHtml"):
+                     "panelHtml", "geneticComparisonHTML", "genSummaryHtml", "markerGeneticsRow", "basketRowHtml"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])
         script = r"""

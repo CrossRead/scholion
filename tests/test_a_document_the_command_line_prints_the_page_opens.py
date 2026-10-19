@@ -54,7 +54,7 @@ class TestEveryDocumentOpens(unittest.TestCase):
         from scholion import engine
         page = (Path(engine.__file__).resolve().parent.parent
                 / "web" / "index.html").read_text(encoding="utf-8")
-        offered = set(re.findall(r'href="/doc/([a-z0-9-]+)"', page))
+        offered = set(re.findall(r'href="/doc/([a-z0-9-]+)(?:\?[^"]*)?"', page))
         self.assertTrue(offered, "the page offers no document at all")
         have = {n for n, _ in docs.available()}
         self.assertEqual(set(), offered - have,
@@ -128,3 +128,25 @@ class TestNothingIsSilentlyDropped(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LocalizedClinicianBrief(unittest.TestCase):
+    def test_unknown_and_escaping_documents_are_not_read(self):
+        for name in ("no-such-document", "../VERSION", "", "../../etc/passwd"):
+            with self.subTest(name=name):
+                self.assertIsNone(docs.read(name))
+
+    def test_cli_reader_and_page_share_selected_language(self):
+        from scholion import i18n
+        previous = i18n.lang()
+        self.addCleanup(i18n.set_lang, previous)
+        for language, title in [('en', 'information for the clinician'), ('ru', 'информация для врача')]:
+            i18n.set_lang(language)
+            text = docs.read('FOR_CLINICIANS.md')
+            self.assertIn(title, text)
+            page = docpage.page('for-clinicians')
+            self.assertIn(title, page)
+            self.assertIn(f'<html lang="{language}">', page)
+            self.assertIn(f'href="/?lang={language}"', page)
+        i18n.set_lang('en')
+        self.assertEqual(docs.path_of('for-clinicians').read_text(encoding='utf-8'), docs.read('for-clinicians'))

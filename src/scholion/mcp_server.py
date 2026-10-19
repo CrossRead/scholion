@@ -90,6 +90,7 @@ LIST_CACHE_SCOPE = "public"
 #: a profile without a genome, and a report with one carries other fields beside
 #: these. Adding is allowed; removing is the same incompatible change it is there.
 OUTPUT_FIELDS = {
+    "sch_insight_snapshot": "insight-snapshot",
     "sch_overview": "overview", "sch_analyze_labs": "labs",
     "sch_suggest_tests": "suggest-tests", "sch_second_opinion": "second-opinion",
     "sch_radar": "radar", "sch_health_metrics": "metrics", "sch_goal": "goal",
@@ -98,6 +99,7 @@ OUTPUT_FIELDS = {
     "sch_check_prescription": "prescription",
 }
 _CONTRACT_FIELDS = {
+    "insight-snapshot": ("ok", "saved", "confirmation", "comparison", "count"),
     "overview": ("abnormal_count", "disclaimer", "flagged", "genome", "genome_gaps", "high_flags",
                  "high_suggestions", "lifestyle", "markers_total", "medications_count", "metrics",
                  "pending_suggestions", "stale_abnormal_count", "subject_id", "suggestions_count",

@@ -343,6 +343,9 @@ class Handler(BaseHTTPRequestHandler):
         person who started the server, not by the one who sent the request.
         """
         from . import container as _container
+        from .engine.visit import VisitSelectionChanged
+        if isinstance(exc, VisitSelectionChanged):
+            return self._json({"error": _t("visit.selection_changed")}, 409)
         if isinstance(exc, _container.ContainerError):
             # Which person's data a request may touch: a refusal the page shows,
             # with its code, so it can tell «the patient changed» from the rest.
@@ -440,9 +443,13 @@ class Handler(BaseHTTPRequestHandler):
             if p in ("/favicon.png", "/favicon-32.png", "/favicon-16.png", "/apple-touch-icon.png"):
                 return self._file(_WEB / p.lstrip("/"), "image/png")
             if p == "/api/overview":
-                return self._json(engine.overview())
+                return self._json(engine.overview(int(q.get("period", ["365"])[0])))
+            if p == "/api/insight-snapshot":
+                from .insight_history import review_snapshot
+                return self._json(review_snapshot())
             if p == "/api/visit-sheet":
-                return self._json(engine.visit_sheet(q.get("reference", [""])[0] == "1"))
+                return self._json(engine.visit_sheet(q.get("reference", [""])[0] == "1",
+                    q.get("item", []) if q.get("selection") == ["explicit"] else q.get("item")))
             if p == "/api/goal":
                 return self._json(engine.goal_dashboard())
             if p == "/api/goal-suggest":
@@ -656,6 +663,9 @@ class Handler(BaseHTTPRequestHandler):
                 picked = [p for p in sug["proposals"] if p["key"] in want] if want \
                     else sug["proposals"]
                 return self._json(store.write_goal_targets(picked))
+            if u.path == "/api/insight-snapshot":
+                from .insight_history import review_snapshot
+                return self._json(review_snapshot(str(body.get("confirm") or "")))
             if u.path == "/api/medications":
                 return self._json(store.add_medication(
                     body.get("name", ""), body.get("dose", ""), body.get("note", ""),
@@ -674,7 +684,8 @@ class Handler(BaseHTTPRequestHandler):
                     body.get("date", ""), alcohol=body.get("alcohol") or "",
                     atenolol=bool(body.get("atenolol")), late_meal=bool(body.get("late_meal")),
                     note=body.get("note") or "",
-                    factors=[str(x) for x in (body.get("factors") or []) if isinstance(x, str)]))
+                    factors=[str(x) for x in (body.get("factors") or []) if isinstance(x, str)],
+                    response=body.get("response")))
             if u.path == "/api/metrics/profile":
                 return self._json(store.update_metric_profile(body))
             if u.path == "/api/pick-folder":

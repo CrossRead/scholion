@@ -174,7 +174,7 @@ class BoundWebFacts(unittest.TestCase):
     def test_cards_tables_and_trend_graph_keep_limits_distinct(self):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
         functions = []
-        for name in ("markerCard", "markerTable", "sparkline"):
+        for name in ("markerCard", "markerTable", "measurementLabel", "sparkline"):
             start = page.index("function " + name + "(")
             functions.append(page[start:page.index("\n}\n", start) + 2])
         script = r"""
@@ -183,6 +183,7 @@ const esc=x=>String(x??''),fmtNum=String,fmtDate=String,t=x=>x,el=x=>x;
 const flagOf=()=>({cls:'',key:''}),badge=()=>'',trendNote=()=>'',noteHtml=()=>'';
 const decisionNote=()=>'',targetText=()=>'',targetAsk=()=>'',refText=()=>'';
 const markerGeneticsRow=()=>'',windowSeries=s=>s;
+const measurementGroups=series=>[...new Set(series.map(p=>measurementLabel(p)))];
 """ + "\n".join(functions) + r"""
 for(const sign of ['<','>']){
  const bounded={name:'Synthetic',value:6.1,censored:sign,unit:'mmol/L',date:'2026-10-15',

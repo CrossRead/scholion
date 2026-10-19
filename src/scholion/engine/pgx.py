@@ -731,7 +731,7 @@ def check_interactions(drug: str) -> Dict[str, Any]:
     # a negative statement resting on half the list, with the unread half never
     # named. Naming it costs one line and turns a claim into an instruction.
     unrecognised = [m.get("name", "") for m in core.active_medications()
-                    if not core.classify_drug(m["name"])]
+                    if not core.medication_classes(m)]
     # …and `excluded` says what was deliberately NOT compared. An entry the
     # physician has stopped must not produce a warning — and its disappearance
     # must not be silent either, because a red line that stops being printed and a

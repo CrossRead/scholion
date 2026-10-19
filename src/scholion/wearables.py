@@ -81,8 +81,10 @@ def device_label(name: Optional[str]) -> str:
 
 
 def _builder(name: str):
-    """Load a reader from `src/ingest/` — they live outside the package."""
-    p = core.repo_dir() / "src" / "ingest" / name
+    """Use the bundled wheel reader, or the canonical reader in a source build."""
+    p = Path(__file__).resolve().parent / "readers" / name
+    if not p.is_file():
+        p = core.repo_dir() / "src" / "ingest" / name
     if not p.exists():
         raise FileNotFoundError(_t("wearables.builder_missing", path=p))
     spec = importlib.util.spec_from_file_location(f"_sch_{Path(name).stem}", p)

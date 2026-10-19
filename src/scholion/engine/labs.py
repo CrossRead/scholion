@@ -10,7 +10,7 @@ from .. import core
 from ..threshold_basis import compare_threshold, guard_threshold, upper_bound_known
 from ..test_proposals import guard_test_proposal
 from .targets import outside_target, target_view  # the target beside the corridor (task 170)
-from ..i18n import t as _t
+from ..i18n import t as _t, lang
 from ._helpers import _OPS, _recent_or_unknown, _lab_display_recency, _active_names_by_class, DISCLAIMER
 from .corridor import point_corridor, flags_comparable
 
@@ -451,7 +451,7 @@ def _method_notes(key: str, spec: Dict[str, Any]) -> List[str]:
     for raw in (spec.get("units_note"),
                 ((core.lab_test_meta().get("tests") or {}).get(key) or {}).get("loinc_note")):
         if isinstance(raw, dict):        # unresolved catalogue, both languages
-            raw = raw.get("ru") or raw.get("en")
+            raw = core._localized(raw, lang())
         if raw and str(raw).strip():
             out.append(str(raw).strip())
     return out
@@ -482,6 +482,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
     except Exception:
         active_classes = set()
     results = []
+    positions = _positions_by_marker()
+    systems = _marker_systems_all()
     for k in keys:
         m = data.get(k)
         if not m or not m.get("series"):
@@ -529,6 +531,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             # reads is a field that does not exist — `ref_sex_unknown` was
             # computed for months and read by nobody.
             "date_source": latest.get("date_source") or "unrecorded",
+            **{field: latest.get(field) for field in ("specimen", "biomaterial", "specimen_source",
+                "sample_id", "draw_id", "form_id", "method", "fasting", "source")},
             "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
             "flag": flag, "abnormal": abnormal, "direction_pref": direction_pref,
             "repeats": _reps,
@@ -581,8 +585,8 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             "system": _marker_systems().get(k),
             # The genetics of this marker (task 199 G): the curated positions
             # whose expectation names it, static; the state is the card's.
-            "positions": _positions_by_marker().get(k) or [],
-            "systems": _marker_systems_all().get(k) or [],
+            "positions": positions.get(k) or [],
+            "systems": systems.get(k) or [],
         })
     # Task 170. The clinician's target stands BESIDE the corridor and touches
     # neither `flag` nor `abnormal`: it is the frame of a treatment, not a
@@ -634,9 +638,18 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
                      "decision_unresolved_count": sum(any(d["crossed"] is None for d in r["decisions"]) for r in current),
                      "near_limit_count": sum(bool(r.get("near_limit")) for r in current),
                      "decision_crossed_count": sum(any(d["crossed"] for d in r["decisions"]) for r in current)}
+    from .system_panels import domains
+    system_groups = []
+    for system in [d["key"] for d in domains()] + ["other"]:
+        members = [r for r in current if system in (r.get("systems") or ["other"])]
+        if members:
+            system_groups.append({"key": system,
+                "label": _t("web.labs.other_system") if system == "other" else _t("radar.domain." + system),
+                "markers": [r["key"] for r in members], "measured": len(members),
+                "abnormal": sum(r["abnormal"] for r in members)})
     from ..lab_observations import view as observation_view
     return {"observations": observation_view(markers), "status": "ok", "count": len(results), "abnormal_count": len(abnormal),
-            "display_window_months": 12, "current_stats": current_stats,
+            "display_window_months": 12, "current_stats": current_stats, "system_groups": system_groups,
             "historical_count": len(results) - len(current),
             "near_limit_count": len(near), "decision_crossed_count": len(crossed),
             "decision_unresolved_count": len(unresolved),

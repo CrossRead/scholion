@@ -13,6 +13,41 @@ NODE_TIMEOUT = 60
 
 @unittest.skipUnless(shutil.which("node"), "needs node for the page's JavaScript")
 class TestLateResponses(unittest.TestCase):
+    def test_today_first_paint_does_not_wait_for_context_and_late_context_cannot_replace_visit(self):
+        page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        start = page.index("async function viewOverview(root){")
+        function = page[start:page.index("\n}\n", start) + 2]
+        script = r"""
+const assert=require('node:assert/strict');
+let DISPLAY_MODE='patient', overviewRead=0, attentionPeriod=365, finishContext, goalPaints=0;
+const nodes={};
+const $=id=>nodes[id]??=( {innerHTML:'',textContent:'',querySelectorAll:()=>[],setAttribute:()=>{},removeAttribute:()=>{}} );
+const root={isConnected:true,className:'',innerHTML:'',querySelectorAll:()=>[],classList:{contains:name=>root.className===name}};
+const api=url=>url.startsWith('/api/overview')?new Promise(resolve=>finishContext=resolve):Promise.resolve({domains:[],phenotype:[]});
+const t=x=>x, esc=x=>x, pageHead=()=>'',firstTabLabel=()=>'',bodySVG=()=>'',radarSVG=()=>'',responseForm=()=>'';
+const wireSystems=()=>{},renderGoal=()=>goalPaints++,lazyOverviewBlock=()=>{},bindTabLinks=()=>{},plural=()=>'';
+let visits=0;const viewVisitSheet=async()=>{visits++;};
+const attentionHTML=()=> 'LATE INSIGHTS',visitSelection=new Set();let visitSelectionTouched=false;
+""" + function + r"""
+(async()=>{
+  await viewOverview(root);
+  assert.ok(root.innerHTML.includes('today-person-map'));
+  assert.equal(goalPaints,1,'annual measurements are displayed without waiting for context');
+  assert.equal(typeof $('#visit-sheet-open').onclick,'function','navigation is immediately usable');
+  root.className='visit-sheet';root.innerHTML='VISIT';
+  finishContext({attention:{summary:[]},medications_count:0,genome_gaps:[]});
+  await new Promise(setImmediate);
+  assert.equal(root.innerHTML,'VISIT');
+  assert.equal($('#today-insights').innerHTML,'');
+  assert.equal(goalPaints,1);
+  DISPLAY_MODE='clinician';await viewOverview(root);assert.equal(visits,1);
+  assert.equal(goalPaints,1,'visit mode opens its distinct brief');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
+                                stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
+        self.assertEqual(0, result.returncode, result.stderr)
+
     def test_printing_opens_provenance_and_restores_the_readers_expansions(self):
         page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
         start = page.index("let intakePrintOpened=[];")
@@ -22,7 +57,7 @@ const assert=require('node:assert/strict');
 const handlers={},window={addEventListener:(name,fn)=>handlers[name]=fn};
 const rows=[{open:true},{open:false},{open:false}];
 const document={querySelectorAll:selector=>{
-  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])');
+  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])');
   return rows.filter(r=>!r.open);
 }};
 """ + functions + r"""

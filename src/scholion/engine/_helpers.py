@@ -174,7 +174,7 @@ def _active_names_by_class() -> Dict[str, List[str]]:
     names = core.active_medications()
     for m in names:
         nm = m.get("name", "")
-        for cls in core.classify_drug(nm):
+        for cls in core.medication_classes(m):
             out.setdefault(cls, [])
             if nm not in out[cls]:
                 out[cls].append(nm)

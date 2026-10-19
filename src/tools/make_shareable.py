@@ -55,6 +55,11 @@ RASTER_MAX_B64 = 30_000  # base64 characters (~22 KB) — above the threshold it
 # image fails the audit: a text audit cannot look inside a JPEG, and a new screenshot
 # may hold real lab results and genotypes. Add a hash here only after viewing the image.
 APPROVED_RASTER_SHA256 = {
+    "fe27b0a2cad3e26860697945f31657050464688513468d7ed5483ed82bee32dd": "0.7.0 synthetic release illustration today en; viewed 2026-10-18",
+    "7336674ac6f7d5679a1d983dcbd97477e79e3dd4c76d56c96355787650633287": "0.7.0 synthetic release illustration visit en; viewed 2026-10-18",
+    "4d7accd5ff6b2991dfd657edefa14818d5fb0c8e81f0855d8fb5179eb88f9783": "0.7.0 synthetic release illustration today ru; viewed 2026-10-18",
+    "e1d010a6b93cdddf29a2be2c822a65dadfd0860112ad96366c35bd25ed042802": "0.7.0 synthetic release illustration visit ru; viewed 2026-10-18",
+
     # Viewed on 2026-10-05: twelve 0.6.0 screenshots, EN/RU, recovered from
     # the final isolated browser acceptance. Every image retains DEMO-0001,
     # its fictional-profile banner, demo container and engine version.

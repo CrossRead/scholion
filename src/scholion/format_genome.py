@@ -787,21 +787,27 @@ def longevity_report(r: Dict[str, Any]) -> str:
                         rs429358=ap.get("rs429358"), rs7412=ap.get("rs7412")))
         if ap.get("status") == "ambiguous_without_phase":
             lines.append("  ⚠ " + str(ap.get("message") or ""))
+        from .panel_reference import reference_lines
+        lines.extend("  " + line for line in reference_lines(ap))
         if ap.get("interpretation"):
             i = ap["interpretation"]
-            lines += [f"  {i['level']}: {i['summary']}", "  " + i['mechanism'], "  " + i['limitations'], "  " + i['source']]
+            lines += ["  " + i['summary'], "  " + i['mechanism'], "  " + i['limitations'],
+                      "  " + i['source'], "  " + _t("reference.level", level=i['level'])]
         elif ap.get("message"):
             lines.append("  " + ap["message"])
         lines.append("")
     lines.append(_t("longevity.key_markers"))
     for k in r.get("known", []):
         mk = " ✔" + _t("longevity.carries") if k.get("carries_named_allele") is True else ""
-        lines.append(f"  {k['gene']} {k['rsid']}: {k.get('genotype') or '—'}{mk} — {k.get('note') or ''}")
+        lines.append(f"  {k['gene']} {k['rsid']}: {k.get('genotype') or '—'}{mk}")
+        from .panel_reference import reference_lines, interpretation_lines
+        lines.extend("  " + line for line in reference_lines(k))
+        lines.extend("  " + line for line in interpretation_lines(k))
+        if k.get('note'):
+            lines.append("  " + str(k['note']))
         for field in ('label', 'verdict_label', 'action', 'zygosity_note', 'population_note'):
             if k.get(field):
                 lines.append('  ' + str(k[field]))
-        from .panel_reference import reference_lines
-        lines.extend("  " + line for line in reference_lines(k))
         lines.extend(basis_lines(k, compact=True))
     st = r.get("stats", {})
     genes = ", ".join(g["gene"] for g in r.get("significant_genes", [])[:16])
@@ -1120,15 +1126,15 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         else:
             mark = _t("lipidgen.direction_unknown" if x["carrier"] is None else "lipidgen.carrier" if x["carrier"] else "lipidgen.not_carrier")
             L.append(f"- `{x['rsid']}` {x['gene']} {x['genotype']} — **{mark}**")
-            if x.get("verdict"):
-                L.append(f"  {x['verdict']}")
+        from .panel_reference import reference_lines
+        L.extend("  " + detail for detail in reference_lines(x))
+        if x.get("verdict"):
+            L.append(f"  {x['verdict']}")
         if x.get("population_note"):
             L.append(f"  ⚠ {x['population_note']}")
         if x.get("variant_note"):
             L.append("  " + x["variant_note"])
         L.extend(basis_lines(x))
-        from .panel_reference import reference_lines
-        L.extend("  " + detail for detail in reference_lines(x))
         if x.get("pmids"):
             L.append("  PMID: " + ", ".join(x["pmids"]))
     if r.get("pcsk9_waiting") and not all(w["rsid"] in {x["rsid"] for x in r.get("pcsk9", [])} for w in r["pcsk9_waiting"]):
@@ -1286,7 +1292,7 @@ def panel_report(r: Dict[str, Any]) -> str:
             if (p.get("conclusion_basis") or {}).get("status") == "incomplete":
                 L.append("  " + p["conclusion_basis"]["reason"])
             L += ["  " + detail for detail in subclaim_lines(p)]
-            if p.get("classification"):
+            if p.get("classification") and not (p.get("interpretation") or {}).get("database_assertion"):
                 L.append("  " + _t("panel.classification", classification=p["classification"],
                                    moi=p.get("moi") or "—", disease=p.get("disease") or "—"))
             if p.get("expect"):

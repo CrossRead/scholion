@@ -32,6 +32,196 @@ them would break the grouping rather than the wording.
 from __future__ import annotations
 
 MESSAGES = {
+    'web.visit.drug': 'Medicine or supplement',
+    'web.visit.dose': 'Recorded dose',
+    'web.visit.since': 'Since',
+
+    'web.phenotype.period_scope': 'Period for the table below',
+    'web.phenotype.period_help': 'Switches the observation window in the phenotype table. System insights retain their year, quarter and month comparisons.',
+    'web.period.365': 'Year',
+    'web.period.90': 'Quarter',
+    'web.period.30': 'Month',
+    'web.goal.charts_open': 'Explore detailed charts',
+    'web.insight.loading': 'Comparing measurements, treatment and genetic context…',
+    'web.visit.conclusion': 'Finding',
+    'web.visit.support': 'Supporting observations',
+    'web.visit.agenda': 'Discussion by system',
+    'web.visit.rx_section': 'Current treatment',
+    'web.visit.questions_section': 'Questions to decide together',
+    'web.body.systems_h': 'Body systems',
+
+    'insight.context.system_match': '{system}: genetics and laboratory findings',
+    'insight.context.note': 'Profile note reviewed on {date}: {text}',
+    'insight.context.coincides': 'During the laboratory observation period, {name} also changed: {before} → {after} {unit} ({start}–{end}). This temporal overlap does not establish the cause of either change.',
+    'insight.kind.genetic_phenotype': '{name}: genetic association and laboratory finding',
+    'insight.context.concordant': '{gene} {rsid} (Scholion {level}): {marker} is {value} {unit} ({date}), outside its reference range in the direction associated with this variant. This is consistent with the predisposition, but does not establish the cause.',
+    'insight.context.within': '{gene} {rsid} (Scholion {level}): {marker} is {value} {unit} ({date}), within its recorded range. The predisposition does not mean that an abnormality must be present.',
+    'insight.context.different_direction': '{gene} {rsid} (Scholion {level}): {marker} is {value} {unit} ({date}); the abnormality is in a different direction from this association. This variant does not explain that result.',
+    'insight.context.question': 'For {system}, does the combination of the measured abnormality, genetic association, current treatment and recorded lifestyle affect the existing support plan?',
+    'insight.context.notice': 'Genetics describes a background predisposition. Treatment timing and lifestyle observations are considered alongside it; they do not by themselves establish what caused a change or justify additional testing.',
+    'insight.context.title': 'Genetics and lifestyle',
+    'insight.context.lifestyle': 'Recorded lifestyle context',
+    'insight.context.lifestyle_value': '{name}: {value} {unit} · {date} · {source}',
+    'insight.window.365': 'Year · long term',
+    'insight.window.90': 'Quarter · forming',
+    'insight.window.30': 'Month · forming',
+    'insight.window_direction': '{window}: {direction}',
+    'insight.arrow.up': 'rising',
+    'insight.arrow.down': 'falling',
+    'insight.forming_short': 'A recent direction is forming.',
+    'insight.chart.range': 'Recorded bounds',
+    'insight.chart.readings': 'Readings: {n} · {unit}',
+    'insight.latest_within': 'Latest measurement within the recorded range.',
+    'insight.one_reading': 'One recorded measurement',
+    'insight.no_readings': '—',
+
+    'insight.long_direction.up': 'an upward direction over the year',
+    'insight.long_direction.down': 'a downward direction over the year',
+    'insight.latest_outside': 'The latest value remains outside the recorded bounds.',
+
+    'visit.full_print': 'Print all supporting details',
+    'insight.forming': 'A long-term direction is forming.',
+    'insight.system.reported': 'reported changes',
+    'insight.kind.reported_response': 'Reported changes: {name}',
+    'response.title': 'Record a change in how you feel',
+    'response.help': 'Record what changed in symptoms, everyday function or tolerability, in your own words. Measurements are not required.',
+    'response.invalid': 'Provide a past or current date, a system, an aspect, a direction and your own description.',
+    'response.system': 'Body system',
+    'response.medication': 'Treatment, if related (name as recorded)',
+    'response.aspect': 'What changed',
+    'response.change': 'Your observation',
+    'response.note': 'Describe what you noticed',
+    'response.aspect.symptom': 'symptoms',
+    'response.aspect.function': 'everyday function',
+    'response.aspect.tolerability': 'tolerability',
+    'response.change.better': 'better',
+    'response.change.worse': 'worse',
+    'response.change.unchanged': 'no change noticed',
+    'response.change.mixed': 'mixed changes',
+    'response.report': 'Patient report, {date}: {aspect} — {change}. “{note}”',
+    'response.during': 'Recorded during {drug}. This does not establish a treatment effect.',
+    'response.linked': 'The person linked this observation to {drug}; the timing of use is not confirmed.',
+    'response.divergent': 'Reported changes and measured direction differ; review them together.',
+    'response.question': 'How do the reported changes in {system} relate to measurements and treatment tolerability?',
+    'tool.sch_focus_log.param.response_system': 'The body-system key explicitly selected by the person; only record their testimony, never infer response.',
+    'tool.sch_focus_log.param.response_medication': 'Optional recorded medication name explicitly linked by the person.',
+    'tool.sch_focus_log.param.response_aspect': 'symptom, function or tolerability, as stated by the person.',
+    'tool.sch_focus_log.param.response_change': 'better, worse, unchanged or mixed, as stated by the person. Keep their exact words in note.',
+
+    'insight.change_neutral': '{name}: {direction}. Period medians: {before} → {after} {unit}.',
+    'insight.rx.system_temporal_only': '{drug}: observations in the same system changed after the recorded start. A treatment effect is not established.',
+    'insight.rx.no_marker': '{drug}: no monitored marker is recorded for this course; treatment response has not been assessed.',
+    'insight.basis.target': 'recorded target',
+    'insight.basis.reference': 'laboratory range',
+    'insight.basis.unknown': 'no directional criterion recorded',
+    'insight.direction.toward': 'closer to the {basis}',
+    'insight.direction.away': 'farther from the {basis}',
+    'insight.direction.within': 'both period medians within the {basis}',
+    'insight.direction.unchanged': 'distance from the {basis} unchanged',
+    'insight.direction.unclassified': 'a change is observed; benefit or harm is not established',
+    'insight.change_line': '{name}: {direction}. Period medians: {before} → {after} {unit}; {meaning}.',
+    'insight.latest_reversal': 'The latest reading moves back away from the target/range.',
+    'insight.system.mixed': 'changes in different directions',
+    'insight.system.toward': 'moving toward targets or ranges',
+    'insight.system.away': 'moving away from targets or ranges',
+    'insight.system.observed': 'changes over time',
+    'insight.rx.no_start': '{drug}: the start of actual use is not dated; treatment response cannot be compared.',
+    'insight.rx.no_baseline': '{drug}: there are not enough comparable measurements of the monitored markers before and during use to assess response.',
+    'insight.rx.temporal_only': '{drug}: measurements before and during use can be compared. Other causes of change remain possible.',
+    'insight.rx_pair': '{name}, before → during treatment: {before} → {after} {unit}; {meaning}.',
+    'insight.question.mixed': '{system}: which changes matter for the treatment goal, and which need checking?',
+    'insight.question.toward': '{system}: does the movement toward the recorded target/range match the intended treatment response?',
+    'insight.question.away': '{system}: what could explain movement away from the recorded target/range, and how should it be checked?',
+    'insight.question.observed': '{system}: do these changes matter for the current treatment goal?',
+    'insight.question.treatment': 'Which marker, target and follow-up date should be used to assess the current treatment?',
+    'visit.questions': 'Questions for this visit',
+    'visit.year': 'System review · last 12 months',
+    'visit.rx_history': 'Completed or paused courses',
+    'visit.summary_heading': 'Visit brief',
+    'visit.summary_counts': 'System topics: {systems}. Current prescriptions: {medications}. Recorded overdue checks: {controls}.',
+    'insight.annual_scope': 'Year: long-term direction. Quarter and month: emerging changes where comparable measurements are available.',
+    'insight.more_evidence': 'All findings and evidence',
+
+    'insight.latest_observation': 'Last value in this series: {value} {unit} ({date}).',
+    'insight.treatment_context_ended': 'Completed course in this period: {name}, {start} — {end}.',
+    'insight.period_dates': 'Early observations: {a}; later observations: {b}.',
+    'insight.treatment_context': "Recorded treatment in this period: {name}, {start} — {end}.",
+    'insight.ongoing': "current",
+    'insight.repeated_fold': "Repeated deviations ({n})",
+    'insight.period_shift_summary_means': "{name}: early → later median of monthly means: {before} → {after} {unit}; months: {n}, {start} — {end}.",
+
+    'insight.panel_changes': "Changes over time · {name}",
+    'insight.panel_repeated': "Repeated findings · {name}",
+    'insight.kind.period_shift': "{name}: later readings differ from earlier readings",
+    'insight.period_shift_summary': "{name}: early → later median: {before} → {after} {unit}; readings: {n}, {start} — {end}.",
+    'insight.repeated_summary': "{name}: outside the interval on {start} and {end}.",
+    'insight.limit.descriptive_periods': "A descriptive comparison of recorded observations over the stated window; no clinical significance or treatment effect is inferred.",
+    'insight.observations': "All individual observations ({n})",
+    'insight.highlights_empty': "No supported longitudinal or combined finding is available yet. Individual results remain below and in Labs.",
+    'insight.panel_open': "Compare the panel history",
+    'insight.period_ranges': "Early range {a} ({na} readings); late range {b} ({nb} readings).",
+    'treatment.history_controls': "Monitoring for completed prescriptions",
+
+    "tool.sch_insight_snapshot.title": 'Review history',
+    'insight.coverage': '{date}: {n}/{days} days · SD {sd}',
+    'insight.mdd': 'Estimated detectable difference: {value}',
+    'insight.reading_unverified': 'Saved genotype; the reading has not been confirmed by the available source.',
+    'insight.method_unknown': 'The measurement method is not recorded; comparability cannot be fully checked.',
+    'insight.period_observations': 'Recorded observations',
+    'insight.no_change_estimate': 'The available observations do not establish a distinguishable change.',
+
+    'insight.kind.pgs_phenotype': '{name}: the measured result and its polygenic score agree in direction',
+    'insight.delta': 'Observed change',
+    'insight.pgs': '{model}: P{value} within {population}',
+    "tool.sch_overview.param.agenda_ids": 'Comma-separated feed item IDs for the visit agenda; omitted means all current items.',
+    'tool.sch_insight_snapshot.description': 'Preview changes since the last local review. Save only after the person asks, passing the preview fingerprint as confirm. Never creates measurements or recomputes genomes.',
+    'tool.sch_insight_snapshot.param.confirm': 'Fingerprint returned by preview; omit to read without writing.',
+    'tool.sch_overview.param.period': 'Observation window: 30, 90 or 365 days.',
+    'insight.title': 'What needs attention',
+    'insight.empty': 'No supported attention signals in the available data.',
+    'insight.details': 'Facts and sources',
+    'insight.more': 'Show all ({n})',
+    'insight.period': 'Observation window (days): {n}',
+    'insight.open': 'Open details',
+    'insight.kind.clinical_threshold': '{name}: clinical threshold crossed',
+    'insight.kind.abnormal': '{name}: outside the reference interval',
+    'insight.kind.repeated_abnormal': '{name}: deviation repeated on separate draws',
+    'insight.kind.lab_change': '{name}: change exceeds variation estimated from history',
+    'insight.kind.goal_toward': '{name}: moving towards the recorded target',
+    'insight.kind.goal_away': '{name}: moving away from the recorded target',
+    'insight.kind.prescription_genotype': '{name}: the genotype matters for this prescription',
+    'insight.kind.overdue_control': '{name}: planned follow-up is overdue',
+    'insight.kind.wearable_change': '{name}: a supported change between recorded periods',
+    'insight.kind.planned_test': '{name}',
+    'insight.priority.0': 'Existing clinical rule',
+    'insight.priority.1': 'Recorded follow-up plan',
+    'insight.priority.2': 'Measured deviation',
+    'insight.priority.3': 'Observed change',
+    'insight.priority.4': 'Existing test proposal',
+    'insight.limit.own_history_variation': 'Variation is estimated from your history and may include real changes.',
+    'insight.limit.not_clinical_significance': 'A measurable change does not by itself establish a clinical effect or its cause.',
+    'insight.limit.independent_days_assumed': 'The uncertainty estimate assumes independent daily observations.',
+    'insight.limit.nonoverlapping_median_intervals': 'The recorded median intervals do not overlap.',
+    'insight.save': 'Save this review',
+    'insight.saved': 'Review saved locally.',
+    'insight.changed': 'Data changed; review the refreshed result before saving.',
+    'insight.history': 'Changes since the saved review',
+    'insight.no_history': 'No previous review has been saved.',
+    'insight.diff.new': 'New',
+    'insight.diff.changed': 'Changed',
+    'insight.diff.unchanged': 'Still present',
+    'insight.diff.resolved': 'Latest comparable observation is within range',
+    'insight.diff.withdrawn': 'Previous interpretation withdrawn',
+    'insight.diff.unavailable': 'No longer supported by the available current data',
+    'insight.reason.data': 'Input observations changed',
+    'insight.reason.rules': 'Rule or knowledge changed',
+    'insight.reason.both': 'Observations and rules changed',
+    'insight.reason.unknown': 'Reason cannot be established',
+    'insight.agenda': 'Visit agenda',
+    'insight.select': 'Include in the visit agenda',
+    'insight.stat.mean': 'Period mean',
+    'insight.stat.median': 'Period median',
+    'insight.comparison_unavailable': 'Comparison not established',
     "labs.specimen_urine": "Urine",
     "labs.specimen_respiratory_swab": "Respiratory swab",
     "labs.specimen_unknown": "Specimen not recorded",
@@ -364,6 +554,7 @@ MESSAGES = {
     "screen.not_determined": "this build cannot answer for this list — {why}",
     "screen.why.not_ready": "the genome is not readable on this profile — see the genome status",
     "screen.why.unavailable": "the genome could not be opened — see the genome status",
+    "screen.why.empty_panel": "this catalogue has no entries to assess; no genetic result is established",
     "screen.why.no_panel": "no genetic list for this system is in this build — nobody has authored one, and that is a statement about the build, not about the person",
     "screen.why.no_genetic_half": "this system has no genetic half by design: it is built from wearable metrics",
     "screen.why.class_not_held": "no gene list for it is in this build, neither published nor curated; the list of classes above says what there is",
@@ -3350,7 +3541,7 @@ will go through them later.
     # ── web: the lifestyle brief ─────────────────────────────────────────
     "web.brief.sections_h": "Assessment details",
     "web.brief.review_badge": "review",
-    "web.brief.actions_h": "What to do",
+    "web.brief.actions_h": "Saved plan and notes",
     "web.brief.needs_review": "the brief needs a review",
     "brief.review.status.ok": "in range",
     "brief.review.status.low": "below range",
@@ -3492,9 +3683,7 @@ will go through them later.
     "web.clinvar.show_weak": "Show the weak and ambiguous ones ({n})",
 
     # ── web: checking the databases for updates ──────────────────────────
-    "web.updates.never": "There have been no checks yet. Press «Refresh ClinVar» — the "
-                         "application will compare your genome against a fresh ClinVar and show "
-                         "what is new.",
+    "web.updates.never": "No database update checks have been recorded.",
     "web.updates.last_check": "Last check:",
     "web.updates.nothing_new": "Nothing new since the last check.",
     "web.updates.new_h": "New findings ({n})",
@@ -3555,7 +3744,7 @@ will go through them later.
     "web.guide.intro": "Interface colours, labels and terms. Interpretations of personal results appear beside those results on their own screens.",
 
     "web.guide.sources_h": "Where a number comes from",
-    "web.guide.sources_body": "Every page ends with its sources in one line. Open it to see where each piece of data was read from: your own files on this machine, or a public reference database consulted over the network (ClinVar, RxClass, Ensembl). Nothing is asserted without one of these two origins, and the two are never rendered the same colour. Whether a language model is connected on the Assistant page or not, this does not change: the numbers are always computed by code on your machine.",
+    'web.guide.sources_body': 'Measurements retain their dates and recorded origins. Genetic explanations retain their literature and database sources in the expandable evidence. Personal records stay distinct from reference knowledge; values are computed locally whether or not an assistant is connected.',
 
     "web.guide.status_h": "Colours and badges",
     "web.guide.status_intro": "The same five badges recur on almost every page. Colour is never the only signal — a number and a caption always sit next to it, so the badge stays readable even where colour is not.",
@@ -3577,16 +3766,15 @@ will go through them later.
     "web.guide.status_three_note": "Three display states: good, warning, critical. At the edge describes a value near a boundary; no data means the measurement is missing.",
 
     "web.guide.tour_h": "What each page is for",
-    "web.guide.tour_overview": "The whole person on one screen: the key numbers, the body systems and the figure, what is out of range right now, what to test, the one thing being worked on, the goal, and last who the data belong to and their own indicators. Every section names the tab that owns it.",
-    "web.guide.tour_labs": "Every lab marker on file, flagged against its reference range, with "
-                           "a trend line where enough measurements exist.",
+    'web.guide.tour_overview': 'The person map, expandable system insights and annual phenotype dynamics together. Highlighted headings open the attention cards. Genetic and lifestyle details stay in their own linked sections. Buttons open the visit brief and changes since the saved review.',
+    'web.guide.tour_labs': 'Current laboratory measurements grouped by body system. Each group shows measured and abnormal counts and opens the individual values and their history.',
     "web.guide.tour_genome": "Polygenic scores as population percentiles, longevity-linked "
                              "variants, ClinVar findings in your genome, a check for what "
                              "changed since ClinVar was last read, and a lookup by gene or "
                              "rsID.",
     "web.guide.tour_lifestyle": "Wearable-derived metrics against a personal goal, a bullet bar "
                                 "per metric, and workout history.",
-    "web.guide.tour_second_opinion": "The figure and the radar, an index of the systems, and one block per system: a one-sentence verdict, the measurements as a table, the genotype findings and whether they agree with the measurements, and the questions for the doctor; the rest is folded under «More». Each block has two buttons: the system's card, and the panel with its studies for the clinician. Prints as the sheet to take to the appointment.",
+    'web.guide.tour_second_opinion': 'The figure and radar show body systems. Open a system for current laboratory values, dynamics, gene explanations, relevant prescriptions and qualified comparisons. Gene function and available variant interpretation come before confidence and expandable evidence.',
     "web.guide.tour_assistant": "Whether a language model is connected, what it is and is not "
                                 "allowed to see, and how to connect one if you want richer "
                                 "wording on top of the same numbers.",
@@ -3929,7 +4117,7 @@ will go through them later.
     "count.genes_unread.one": "{n} target gene not read from the genome",
     "count.genes_unread.few": "{n} target genes not read from the genome",
     "count.genes_unread.many": "{n} target genes not read from the genome",
-    "web.page.overview.q": "Where you are now: what is out of range, which systems need attention, what to take next.",
+    "web.page.overview.q": 'Your health today: changes over time and systems worth attention.',
     "web.page.radar.q": "Every body system before a visit to the doctor: what is out of range, what acts on it, what to ask.",
     "web.page.labs.q": "Your laboratory results: what is out of range now, and how each value has moved.",
     "web.page.genome.q": "What your genome file can answer, and what was found in it.",
@@ -4140,6 +4328,9 @@ will go through them later.
     "reference.gene_source": 'Gene-function source: {source}',
     "reference.variant_source": 'Variant-context source: {source}',
     "reference.notice": 'Reference knowledge describes a gene or the literature, not a measured effect in this person. Personal conclusions remain subject to separate clinical checks.',
+    "reference.gene_set": "The study lists a set of {count} genes; their functions are described separately.",
+    "reference.gene_set_variant": "A study gene list does not establish which gene mediates each variant association.",
+    "reference.resolved_gene": "Function described for the resolved gene: {gene}.",
     "reference.gene_unknown": 'Gene function has not been curated.',
     "reference.variant_unknown": 'A specific mechanism or influence of this variant has not been curated. Gene function alone cannot establish it.',
     "reference.analytics": 'Scholion analytical checks',
@@ -4195,6 +4386,11 @@ will go through them later.
     'visit.goals': 'Questions and recorded goals',
     'visit.measurements': 'Values outside a recorded corridor or goal',
     'visit.medications': 'Recorded current prescriptions',
+    'insight.rx.date_uncertain': '{drug}: the recorded measurement dates are approximate; their position before or during use is not established.',
+    'visit.selection_changed': 'An agenda item changed; refresh the review',
+    'visit.load_failed': 'The visit sheet could not be loaded. Retry or return to topic selection.',
+    'visit.retry': 'Retry',
+    'visit.reselect': 'Select topics again',
     'visit.empty': 'No entries in this section.',
     'visit.held': 'No comparison available · count: {n}',
     'visit.historical': 'Historical measurements, outside the current visit window · count: {n}',
@@ -4291,7 +4487,7 @@ MESSAGES.update({
     "longevity.catalogue_variant": "Studied in longevity literature; allele direction and effect have not been curated. See the primary publications.",
     "longevity.catalogue_note": "LongevityMap (HAGR) is a literature catalogue. These entries report published associations, not proven effects in this person. E means Scholion has no curated interpretation of this variant; it does not rate the entire gene or the source publication.",
     "longevity.count_note": "{count} is the number of catalogue positions with a saved genotype, including reference readings; it is not a count of genes or favourable variants.",
-    "web.longevity.catalogue": "Literature catalogue — associations without a curated effect direction",
+    "web.longevity.catalogue": "Associations without a curated effect direction",
     "web.longevity.positions": "{count} positions",
 })
 
@@ -4382,3 +4578,133 @@ MESSAGES["recompute.worker_failed"] = 'PGS recalculation could not start: {error
 MESSAGES.update({'prs.saved.label': 'Saved value: {value} (unverified)', 'prs.saved.recalculate': 'Recalculate PGS before using this result. The saved value remains visible until a new report is saved successfully.', 'prs.saved.unverified': 'Recalculation can check this result; a confirmed percentile still requires a suitable reference. This value is excluded from confirmed results.'})
 
 MESSAGES["prs.saved.short"] = 'Saved · unverified'
+
+MESSAGES.update({'insight.reference': 'Reference: {low}–{high}', 'insight.database': 'ClinVar: {classification} · {review} · {accession} · checked {date}', 'insight.database.Pathogenic': 'Pathogenic', 'insight.database.Benign': 'Benign', 'insight.database.Conflicting classifications of pathogenicity': 'Conflicting classifications', 'insight.database.no_assertion_criteria_provided': 'No assertion criteria provided', 'insight.database.criteria_provided_single_submitter': 'Criteria provided, single submitter', 'insight.database.criteria_provided_multiple_submitters_no_conflicts': 'Criteria provided, multiple submitters, no conflicts', 'insight.database.criteria_provided_conflicting_classifications': 'Criteria provided, conflicting classifications'})
+
+MESSAGES.update({'insight.no_changes': 'No changes since the saved review.', 'insight.unchanged': 'Unchanged'})
+
+MESSAGES.update({'insight.target': 'Recorded goal: {value} {unit}'})
+
+MESSAGES["web.phenotype.device_history"] = 'Device history: {source}'
+
+MESSAGES.update({"doc.clinician_brief": "# Scholion — information for the clinician\n\nScholion brings a person's laboratory history, recorded prescriptions, genome and wearable measurements into one local profile. It supports preparation for an appointment; it does not diagnose or prescribe treatment.\n\n## Start with the visit sheet\n\nChoose **Visit** in the application header. The first tab opens a structured sheet with topics grouped by body system, the conclusions and supporting measurements, questions for discussion and current prescriptions. Completed courses remain in history. Sources and detailed observations can be expanded; the sheet can be printed.\n\n## Read change at the right timescale\n\n**Year** describes a long-term direction; **quarter and month** describe emerging changes when the measurements are comparable. A recent decline can coexist with a rise over a longer interval. Dates, units and data sources accompany the observations. Weight and BMI combine recorded and Garmin measurements in one timeline, with the source and aggregation period retained for each point.\n\nReported changes in symptoms, function or tolerability are shown separately from measured change. An improvement after the recorded start of a prescription establishes timing, not proof that the treatment caused it. Genetics and known lifestyle observations provide context, not a substitute for examination.\n\n## How to read genetics\n\nSystem panels show the actual reading, gene function, variant context and the **Scholion A–E evidence level**. Open the letter for its definition and the gene for details and sources. A gene–disease relationship from **GenCC** carries its own validity classification; it is distinct from evidence for an individual variant. A missing call does not mean the gene or allele is absent.\n\nA **PGS percentile is a position in a reference population, not the probability of disease**. Calculation, coverage, coordinates and calibration must be verified. Previously saved unverified values retain their status and an explanation. Clinical findings require their own supporting evidence; a catalogue association alone does not establish a diagnosis.\n\n## Use the observations, keep the decision clinical\n\nA single recent measurement within its recorded range may be sufficient to describe the current finding. Missing trend points alone are not a reason for more tests. Additional testing needs a specific indication or an existing monitoring plan. Targets, treatment decisions and follow-up belong to the treating clinician.\n\nThe same computed facts are available in the local application, CLI and MCP interface. A language assistant receives those facts and their provenance; its wording still needs clinical review. The profile remains local unless the person chooses an external assistant or another explicit data transfer.\n\n**Contact:** scholion.dev@proton.me · [Project and documentation](https://github.com/CrossRead/scholion). Please do not send patient data through public issues or unsolicited attachments. [Extended project description](for-clinicians-details).\n"})
+
+MESSAGES["web.measurement.month_only"] = 'Recorded value; month known'
+
+MESSAGES.update({
+    'genlab.title': 'Genetics and laboratory observations',
+    'genlab.facts': 'Recorded facts',
+    'genlab.interpretation': 'Interpretation',
+    'genlab.hypothesis': 'Hypothesis for review',
+    'genlab.details': 'Evidence, quality and applicability',
+    'genlab.lab_source': 'Laboratory source',
+    'genlab.genotype_source': 'Genotype source',
+    'genlab.checked': 'Knowledge source checked: {date}; not clinical validation.',
+    'genlab.contrary': 'Observations in the other direction',
+    'genlab.check_quality': 'Verify the existing genotype report, locus and call quality before interpreting this combination. This is not an automatic request for a new test.',
+    'genlab.check_context': 'Review collection conditions, treatment and relevant clinical context in the existing records. Missing trend points alone do not justify additional tests.',
+    'genlab.question': 'Does the sourced {gene} association add useful context to {marker} when reviewing the existing care plan?',
+    'genlab.normal_note': 'A value within its range does not remove genetic predisposition.',
+    'genlab.no_cause': 'Agreement does not establish a cause or a treatment effect.',
+    'genlab.other_systems': 'Also relevant to',
+    'genlab.quality.usable': 'Usable call under the recorded quality checks',
+    'genlab.quality.unread': 'Position not read; no inference about allele absence',
+    'genlab.quality.presumed': 'Reference genotype presumed, not measured',
+    'genlab.quality.confirmation': 'The caller flags a need for confirmation',
+    'genlab.quality.low_depth': 'Low read depth',
+    'genlab.quality.filtered': 'The call did not pass filtering',
+    'genlab.quality.imputed': 'Imputed genotype',
+    'genlab.quality.locus': 'Locus identity is unverified',
+    'genlab.quality.quality_unknown': 'Call quality is not recorded sufficiently',
+    'genlab.quality.missing': 'No measurement in this profile',
+    'genlab.quality.stale': 'Historical measurement, older than one year',
+    'genlab.quality.date_unknown': 'Measurement date is missing, invalid or in the future',
+    'genlab.quality.date_uncertain': 'Measurement date needs confirmation',
+    'genlab.quality.proposed': 'Marker recognition is awaiting confirmation',
+    'genlab.quality.unit_conflict': 'Measurement units disagree',
+    'genlab.quality.not_comparable': 'Value or reference range does not support a directional comparison',
+    'genlab.quality.allele_absent': 'The catalogue allele was not detected in the read position',
+    'genlab.quality.genotype_scope': 'This genotype is outside the supported association scope',
+    'genlab.quality.sex_scope': 'Study sex does not match or is unknown',
+    'genlab.quality.fasting_unknown': 'Fasting collection conditions are unconfirmed',
+    'genlab.status.concordant': 'Association and measurement agree in direction',
+    'genlab.status.within': 'Measurement within range',
+    'genlab.status.different_direction': 'Different direction',
+    'genlab.status.not_comparable': 'No current directional comparison',
+    'genlab.status.context_only': 'Reference context; personal relation is not established',
+    'genlab.status.hypothesis': 'Hypothesis, not an established personal link',
+    'genlab.status.excluded': 'Not supported for this comparison',
+    'genlab.status.unread': 'Position not read',
+    'genlab.status.allele_absent': 'Catalogue allele not detected at the read position',
+    'genlab.type.common_variant': 'Common-variant population association',
+    'genlab.type.monogenic': 'Monogenic variant context; inheritance matters',
+    'genlab.type.biomarker_bias': 'Possible biomarker distortion',
+    'genlab.type.polygenic': 'Polygenic population position, not disease probability',
+})
+
+MESSAGES["insight.context.different_direction"] = 'For {gene} {rsid} (Scholion {level}), {marker}: {value} {unit} on {date} is in the opposite direction to the recorded association. This does not rule out a genetic contribution; other factors may dominate.'
+
+MESSAGES["genlab.source"] = 'Source'
+
+MESSAGES["genlab.reference"] = "Reference association"
+
+MESSAGES["genlab.quality.catalogue_identity"] = "Catalogue allele or coordinate identity differs from the reviewed association"
+
+MESSAGES["genlab.quality.evidence_scope"] = "Evidence level or association type does not support automatic comparison"
+
+MESSAGES["genlab.quality.specimen_unknown"] = "The specimen of this result is not recorded"
+
+MESSAGES["genlab.quality.specimen_scope"] = "This specimen is outside the association scope"
+
+MESSAGES["genlab.quality.unit_scope"] = "Measurement units do not match the reviewed endpoint"
+
+MESSAGES["genlab.quality.method_scope"] = "The recorded method does not match the reviewed endpoint"
+
+MESSAGES["genlab.specimen"] = "Specimen"
+
+MESSAGES["genlab.specimen.plasma"] = "Plasma"
+
+MESSAGES["genlab.specimen.serum"] = "Serum"
+
+MESSAGES["genlab.specimen.whole_blood"] = "Whole blood"
+
+MESSAGES["genlab.specimen.urine"] = "Urine"
+
+MESSAGES["genlab.specimen.blood"] = "Blood, type unspecified"
+
+MESSAGES["genlab.specimen.unknown"] = "Not recorded"
+
+MESSAGES["genlab.quality.assembly_unknown"] = "The coordinate build of the reading is not confirmed"
+
+MESSAGES['genlab.status.context_available'] = 'Combined observations available'
+MESSAGES['genlab.status.compatible_pattern'] = 'Compatible biochemical pattern'
+MESSAGES['genlab.status.bias_possible'] = 'Possible measurement bias'
+MESSAGES['genlab.quality.draw_identity'] = 'A common collection is not confirmed for these results'
+MESSAGES['genlab.quality.diplotype_unconfirmed'] = 'The required full diplotype is not confirmed'
+MESSAGES['genlab.quality.diplotype_context_only'] = 'This diplotype does not establish the reviewed directional comparison'
+MESSAGES['genlab.quality.assay_curation_pending'] = 'Assay applicability needs clarification for this association'
+MESSAGES['genlab.quality.episode_and_variant_review'] = 'Interpret alongside the clinical episode and exact variant classification'
+MESSAGES['genlab.quality.inheritance_and_phenotype'] = 'Inheritance and the relevant clinical phenotype require separate assessment'
+MESSAGES['genlab.quality.molecular_and_biochemical_context'] = 'A gene-level mechanism does not establish variant causality; inheritance, phase and biochemical context matter'
+MESSAGES['genlab.quality.clinical_context_required'] = 'Interpret with recorded symptoms, history and alternative explanations'
+MESSAGES['genlab.quality.diplotype_and_treatment_context'] = 'A complete pharmacogenetic phenotype and an active treatment course are needed for personal interpretation'
+MESSAGES['genlab.quality.treatment_not_causal'] = 'Changes during treatment alone do not establish its effect'
+MESSAGES['genlab.specimen.edta_plasma'] = 'EDTA plasma'
+MESSAGES['genlab.specimen.packed_red_blood_cells'] = 'Packed red blood cells'
+MESSAGES['genlab.observed_ratio'] = 'Observed ratio, without a diagnostic reference range'
+MESSAGES['genlab.reference_patterns'] = 'Mechanisms to consider'
+MESSAGES['genlab.mechanism_level'] = 'Mechanism evidence; not the personal variant classification'
+
+MESSAGES['system.meds.relation.class_context'] = 'Class context'
+MESSAGES['system.meds.relation.possible_effect'] = 'Possible influence; response is not established'
+MESSAGES['system.meds.relation.monitoring'] = 'Monitoring context; not an indication for treatment'
+
+MESSAGES['web.labs.other_system'] = 'Other measurements'
+MESSAGES['web.labs.group_counts'] = 'Measured: {measured} · Out of range: {abnormal}'
+MESSAGES['web.labs.open_system'] = 'Open this system in Labs'
+
+MESSAGES['web.visit.before'] = 'Earlier'
+MESSAGES['web.visit.latest'] = 'Latest'
+MESSAGES['web.visit.observation_appendix'] = 'Source observations — optional appendix'
+
+MESSAGES["web.gen.evidence_link"] = "Evidence · Scholion confidence"

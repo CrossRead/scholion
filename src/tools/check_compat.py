@@ -48,6 +48,7 @@ FIXTURE = ROOT / "tests" / "fixtures" / "profile"
 # Commands whose JSON is captured into the baseline. Writing and long-running ones
 # are left out: their contract is the result of the operation, not the shape of a report.
 SNAPSHOT_CMDS = [
+    ["insight-snapshot"],  # Preview only: no confirmation, no write.
     ["overview"], ["labs"], ["suggest-tests"], ["second-opinion"], ["radar"],
     ["medications"], ["markers"], ["metrics"], ["goal"], ["genome-status"],
     ["genome-updates"], ["clinvar"], ["acmg"], ["prs"], ["longevity"],

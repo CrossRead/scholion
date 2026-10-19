@@ -38,6 +38,11 @@ class TestReferencePanels(unittest.TestCase):
                     self.assertTrue(context["variant_context"])
                     self.assertEqual("reference_only", context["scope"])
                     self.assertEqual(p["evidence"]["level"], context["level"])
+        longevity = core._read_knowledge("longevity_directions.json")["directions"]
+        for spec in longevity.values():
+            if spec.get("level"):
+                seen.add(spec["gene"])
+                self.assertTrue(raw["genes"][spec["gene"]]["source"])
         self.assertEqual(set(raw["genes"]), seen)
         # Retired NCBI records bearing the same symbol must not replace these.
         for gene, uid in (("CYP2C19", "1557"), ("CYP2R1", "120227"), ("PRKN", "5071")):

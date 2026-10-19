@@ -11,7 +11,7 @@ import json
 from typing import Any, Dict, Iterator, Tuple
 
 from . import core
-from .i18n import t
+from .i18n import t, lang
 
 ORIGINS = ('complaint', 'lab', 'genome', 'history', 'clinician', 'prevention')
 
@@ -61,8 +61,8 @@ def goal_entities() -> list[Dict[str, Any]]:
             if filename == 'clinician_targets.json' else row.get('target', metric.get('target'))
         out.append({'id': entity_id(filename, pointer, row),
                     'kind': 'focus' if pointer == ('focus',) else 'track' if pointer[0] == 'tracks' else 'target',
-                    'title': row.get('label') or row.get('title') or row.get('marker') or row.get('id') or t('goal.title_default'),
-                    'origin': origin_view(row, filename), 'target': target,
+                    'title': core._localized(row.get('label') or row.get('title') or row.get('marker') or row.get('id') or t('goal.title_default'), lang()),
+                    'origin': origin_view(row, filename), 'target': core._localized(target, lang()),
                     'measurement_source': row.get('source') if filename == 'health_goals.json' else row.get('marker') or metric.get('key'),
                     'record': {'file': filename, 'pointer': list(pointer)},
                     'provenance': row.get('_from') or {'source': filename, 'on': row.get('set_on') or row.get('started')}})

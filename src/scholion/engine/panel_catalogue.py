@@ -26,9 +26,9 @@ from .system_panels import _curated, _labels, domains
 #: What a position carries, in the order the page prints it. `text` is the
 #: authored sentence per genotype state, in both languages; the page prints the
 #: reader's own.
-_FIELDS = ("rsid", "gene", "hgvs", "protein", "risk_allele", "mode", "kind", "source", "study",
+_FIELDS = ("rsid", "gene", "transcript", "hgvs", "protein", "risk_allele", "mode", "kind", "source", "study",
            "effect_size", "classification", "moi", "disease", "submitter", "curated_on",
-           "review", "disposition", "reason", "task", "read_refusal", "mechanism")
+           "review", "disposition", "reason", "task", "read_refusal", "mechanism", "database_assertion")
 
 def _position(p: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {k: p.get(k) for k in _FIELDS}

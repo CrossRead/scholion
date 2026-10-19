@@ -247,3 +247,65 @@ is supplied by these proposals; a confirmed row uses the form's own corridor.
 ## What is not done yet
 
 - The data migration itself.
+
+## Explicit insight reviews
+
+`insight_reviews.json` is an optional local review history. `scholion insight-snapshot`
+previews the changes and returns a fingerprint; `--confirm <fingerprint>` saves
+that exact review. A changed input requires a fresh preview. The file keeps
+item identifiers, source/rule fingerprints and comparison metadata, not a
+second copy of the measurement series. Reading Today or upgrading never writes
+it. Keep it with its originating profile; a different profile is not a valid
+comparison baseline.
+
+`scholion overview --period 30` selects the summary window (30, 90 or 365 days).
+Its `attention` field includes all items, reasons, source facts and the period
+summary. `--visit-sheet --agenda-id <id>` selects agenda items, repeated for
+multiple IDs; `--no-agenda` selects none. Omission retains all current items.
+The MCP `sch_overview` tool accepts the same period and comma-separated
+`agenda_ids` (an empty string selects none); `sch_insight_snapshot` implements
+the same preview and confirmation protocol. Existing overview fields remain
+available to integrations.
+
+### Dated response observations
+
+`focus_log.json` retains its existing `entries`. Its optional `responses` list
+stores `{date, response: {system, medication, aspect, change}, note, source}`.
+`source` is `patient_report`; `note` preserves the person's words. `aspect` is
+`symptom`, `function` or `tolerability`; `change` is `better`, `worse`, `unchanged`
+or `mixed`. A date/system/medication/aspect identifies one editable observation;
+other observations and the ordinary journal are preserved. Use `focus-log` with
+`--response-system`, `--response-medication`, `--response-aspect`,
+`--response-change` and `--note`, the Today form, or `sch_focus_log` with the same
+underscored parameter names. These observations feed system insights and the
+visit brief even without laboratory measurements. They do not establish a
+causal treatment effect. User-entered words retain their original language.
+
+
+The shared attention feed evaluates three independent rolling windows: 365,
+90 and 30 days. A comparison needs at least four comparable observations, at
+least two in each calendar half, and a span of at least 180, 45 or 15 days,
+respectively. These are descriptive display criteria, not clinical significance
+thresholds. Recent directions remain forming; disagreement with the annual
+direction stays visible. No points are interpolated and a monthly device mean
+is never expanded into daily observations. Missing trend data do not create a
+test recommendation. A single recent exact reading within its recorded bounds
+can be displayed as within range without establishing a direction of change.
+
+### System insight context
+
+Attention highlights carry `context.genetics` and `context.lifestyle`, with
+`causal: false`. Genetic context reuses the system panel's position reader and
+its quality, evidence and clinical-support guards. `context_summary` highlights
+only a supported common-variant association matching an exact recent laboratory
+abnormality; one observation suffices for this comparison but never for a trend.
+Normal and opposite-direction readings are preserved beside the association.
+GenCC gene membership alone is not a personal predisposition.
+
+Lifestyle entries retain their source, date and aggregation. Qualified wearable
+changes are described alongside laboratory observations only when their periods
+overlap. Reviewed profile notes are linked only by explicit watched markers and
+are not reused when newer watched measurements have arrived. Missing diet or
+habit information is not inferred. These context fields are shared by overview,
+visit-sheet, CLI and MCP responses. No additional genotype calculation or
+external identifier lookup is started to build an insight.

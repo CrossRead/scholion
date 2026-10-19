@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import Any, Dict
 from .. import core
 from .. import subject as _subject
-from ..i18n import t as _t, lang as _lang
+from ..i18n import lang as _lang
 from ._helpers import _recent, DISCLAIMER
 from .labs import _latest, _trend, _flag_value, analyze_labs, suggest_tests
 from .genomics import genome_status
@@ -27,7 +27,8 @@ def load_profile() -> Dict[str, Any]:
     }
 
 
-def overview() -> Dict[str, Any]:
+@core.in_reading
+def overview(period: int = 365) -> Dict[str, Any]:
     """Summary for the main screen: red flags, counters, gaps."""
     labs = analyze_labs()
     tests = suggest_tests()
@@ -35,6 +36,11 @@ def overview() -> Dict[str, Any]:
     # (a sliding window from today). Older deviations are not shown on the main screen.
     red = [m for m in labs["markers"] if m.get("abnormal") and _recent(m.get("date"))]
     stale = sum(1 for m in labs["markers"] if m.get("abnormal") and not _recent(m.get("date")))
+    from .insights import attention_feed
+    from .lifestyle import lifestyle
+    cautions = _regimen_cautions()
+    controls = treatment_timeline()["overdue"]
+    feed = attention_feed(labs, cautions, controls, lifestyle(), tests["suggestions"], period)
     return {
         "subject_id": core.profile_meta(core.pharmacogenomics()).get("subject_id"),
         "abnormal_count": len(red),
@@ -56,8 +62,9 @@ def overview() -> Dict[str, Any]:
         "flagged": red,
         # A prescription the person takes against a genotype read (0.6.0): the
         # first thing on the first screen, before any count.
-        "regimen_cautions": _regimen_cautions(),
-        "overdue_controls": treatment_timeline()["overdue"],
+        "regimen_cautions": cautions,
+        "overdue_controls": controls,
+        "attention": feed,
         "high_flags": [m for m in red if m["flag"] == "high"],
         "watch_flags": [m for m in red if m["flag"] == "low"],
         "suggestions_count": tests["count"],
@@ -113,25 +120,19 @@ def _device_rows() -> Dict[str, Dict[str, Any]]:
     silently switched device between two readings would show a step the person
     would take for a change in themselves.
     """
-    from .. import wearables
-    cat = (core.wearable_metrics().get("metrics") or {})
-    blocks = dict(wearables.series(core.wearable_trends()))
-    out: Dict[str, Dict[str, Any]] = {}
-    for name, spec in cat.items():
-        key = (spec or {}).get("person_metric")
+    from ..measurements import history
+    out = {}
+    for name, spec in core.wearable_metrics().get("metrics", {}).items():
+        key = spec.get("person_metric")
         if not key:
             continue
-        carry = {s: b for s, b in blocks.items() if name in (b.get("metrics") or {})}
-        if len(carry) != 1:
-            continue
-        src, block = next(iter(carry.items()))
-        months = (block.get("metrics") or {}).get(name) or {}
-        series = sorted(({"date": str(mo), "value": float(v)}
-                         for mo, v in months.items() if isinstance(v, (int, float))),
-                        key=lambda p: p["date"])
-        if series:
-            out[key] = {"source": src, "series": series, "metric": name,
-                        "label": spec.get("label"), "unit": spec.get("unit")}
+        combined = history(key)
+        device_points = [p for p in combined["series"] if p["measurement_source"] != "recorded"]
+        sources = {p["measurement_source"] for p in device_points}
+        src = core.wearable_primary() if core.wearable_primary() in sources else next(iter(sources)) if len(sources) == 1 else None
+        if src:
+            out[key] = {"source": src, "series": [p for p in device_points if p["measurement_source"] == src],
+                        "metric": name, "label": spec.get("label"), "unit": spec.get("unit")}
     return out
 
 
@@ -150,32 +151,41 @@ def metrics_summary() -> Dict[str, Any]:
     taken on a day are not the same statement, and the person made the second on
     purpose. Neither file is written to — this is a view.
     """
+    from ..measurements import history, bmi_history
     data = core.metrics_json()
     prof = data.get("profile", {})
     dev = _device_rows()
     out = []
     latest_weight = None
     names = {v["person_metric"]: v.get("label") for v in core.wearable_metrics().get("metrics", {}).values() if v.get("person_metric")}
-    for k, m in data.get("metrics", {}).items():
-        series = m.get("series") or []
+    definitions = dict(data.get("metrics") or {})
+    for name, spec in core.wearable_metrics().get("metrics", {}).items():
+        key = spec.get("person_metric")
+        if key and key not in definitions and history(key)["series"]:
+            definitions[key] = {"name": spec.get("label") or name, "unit": spec.get("unit") or ""}
+    for k, m in definitions.items():
+        combined = bmi_history() if k == "bmi" else history(k)
+        series = [p for p in combined["series"] if p["measurement_source"] == "recorded"]
         latest = _latest(series) if series else None
         d = dev.get(k)
         d_last = d["series"][-1] if d else None
         # Months against days: a monthly point is compared on its month, which is
         # what it is. Equal month → the hand-entered reading stands.
-        take_device = bool(d_last) and (
-            latest is None or str(d_last["date"])[:7] > str(latest["date"])[:7])
-        shown = d_last if take_device else latest
-        shown_series = d["series"] if take_device else series
+        shown = combined["latest"]
+        take_device = bool(shown and shown["measurement_source"] != "recorded")
+        shown_series = combined["series"]
+        trend_series = [p for p in shown_series if shown and p["measurement_source"] == shown["measurement_source"]
+                        and p["aggregation"] == shown["aggregation"]]
         display_name = core._localized(m.get("labels") or {}, _lang()) or names.get(k) or m.get("name", k)
-        row = {"key": k, "name": display_name, "unit": m.get("unit", ""),
-               "unit_display": core.unit_label(m.get("unit", "")),
+        row = {"key": k, "name": display_name, "unit": combined["unit"],
+               "unit_display": core.unit_label(combined["unit"]),
                "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
                "direction": m.get("direction"),
                "value": shown["value"] if shown else None,
                "date": shown["date"] if shown else None,
                "flag": _flag_value(m, shown["value"], shown.get("censored")) if shown else "unknown",
-               "trend": _trend(shown_series),
+               "trend": _trend(trend_series),
+               "combined_history": True, "current_observation": shown, "missing": combined["missing"],
                "series": sorted(shown_series, key=lambda p: p["date"]),
                # Where the number on the card came from, and what the other store
                # holds — so a person who types a weight in can see the watch's
@@ -192,17 +202,14 @@ def metrics_summary() -> Dict[str, Any]:
     bmi = None
     h = prof.get("height_cm")
     if h and latest_weight:
-        try:
-            bmi_val = round(latest_weight / (float(h) / 100) ** 2, 1)
-            cat = _t("bmi.under" if bmi_val < 18.5 else "bmi.normal" if bmi_val < 25
-                     else "bmi.over" if bmi_val < 30 else "bmi.obese")
-            flag = "ok" if 18.5 <= bmi_val < 25 else ("low" if bmi_val < 18.5 else "high")
-            from ..clinical_claims import guard_fields
-            bmi = guard_fields({}, {"value": bmi_val, "category": cat, "flag": flag}, ('category', 'flag'))
-            bmi.update(flag='unknown', output_kind='derived_measurement',
-                       source='metrics.json:profile.height_cm + latest weight', method='weight_kg / height_m^2')
-        except Exception:
-            bmi = None
+        derived = bmi_history()
+        current = derived["latest"]
+        if derived.get("derived") and current:
+            bmi = {"value": current["value"], "date": current["date"], "category": None, "flag": "unknown",
+                   "output_kind": "derived_measurement", "clinical_basis": {}, "unresolved_count": 0,
+                   "series": derived["series"],
+                   "source": current["measurement_source"], "current_observation": current,
+                   "method": current["method"], "height_cm": derived["height_cm"]}
     age = _age_from(prof)
     # The devices THIS build can read, so a face offering the choice offers
     # exactly those. A page carrying its own list is a page that goes stale the

@@ -235,10 +235,10 @@ def _snapshot_text(r) -> str:
 # The snapshot is the overview with nothing phrased: whose profile this is, which
 # marker keys and which pharmacogenes it holds, which target genes have no data.
 def _overview_data(snapshot: bool = False, visit_sheet: bool = False,
-                   include_reference: bool = False):
+                   include_reference: bool = False, period: int = 365, agenda_ids: str | None = None):
     if _yes(visit_sheet) or _yes(include_reference):
-        return engine.visit_sheet(_yes(include_reference))
-    return engine.load_profile() if _yes(snapshot) else engine.overview()
+        return engine.visit_sheet(_yes(include_reference), ([s.strip() for s in agenda_ids.split(",") if s.strip()] if agenda_ids is not None else None))
+    return engine.load_profile() if _yes(snapshot) else engine.overview(int(period))
 
 
 def _overview_render(result):
@@ -250,6 +250,19 @@ def _overview_render(result):
 
 
 _h_overview = _reported(_overview_data, _overview_render)
+
+
+def _review_data(confirm: str = ""):
+    from .insight_history import review_snapshot
+    return review_snapshot(confirm)
+
+
+def _review_render(result):
+    from .format_insights import review_report
+    return review_report(result)
+
+
+_h_insight_snapshot = _reported(_review_data, _review_render)
 _h_second_opinion = _reported(lambda: engine.second_opinion(), lambda r: fmt.second_opinion_report(r))
 
 
@@ -421,7 +434,8 @@ def _h_focus(ctx: "ToolContext") -> str:
 
 
 def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol: bool = False,
-                 late_meal: bool = False, note: str = "", factors: str = "") -> str:
+                 late_meal: bool = False, note: str = "", factors: str = "", response_system: str = "",
+                 response_medication: str = "", response_aspect: str = "", response_change: str = "") -> str:
     """The one tool that writes. See `contract.DICTATED` for why it may.
 
     It records what the person said happened — a glass of wine, a late meal, a
@@ -431,7 +445,9 @@ def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol
     """
     from . import store
     a = _args(ctx, {"date": date, "alcohol": alcohol, "atenolol": atenolol,
-                    "late_meal": late_meal, "note": note, "factors": factors})
+                    "late_meal": late_meal, "note": note, "factors": factors,
+                    "response_system": response_system, "response_medication": response_medication,
+                    "response_aspect": response_aspect, "response_change": response_change})
     date = (a.get("date") or "").strip()
     res = store.add_focus_entry(
         date,
@@ -439,7 +455,9 @@ def _h_focus_log(ctx: "ToolContext", date: str = "", alcohol: str = "", atenolol
         atenolol=bool(a.get("atenolol")),
         late_meal=bool(a.get("late_meal")),
         note=(a.get("note") or "").strip(),
-        factors=[x.strip() for x in str(a.get("factors") or "").split(",") if x.strip()])
+        factors=[x.strip() for x in str(a.get("factors") or "").split(",") if x.strip()],
+        response=({k: str(a.get("response_" + k) or "") for k in ("system", "medication", "aspect", "change")}
+                  if any(a.get("response_" + k) for k in ("system", "medication", "aspect", "change")) else None))
     if not res.get("ok"):
         return f"⚠️ {res.get('error', '')}"
     return _t("tool.sch_focus_log.done", date=date, action=res.get("action", ""))
@@ -600,7 +618,8 @@ _TOOLS = (
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
     ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive", "force"), ["folder"], _h_ingest_labs),
-    ("sch_overview", ("snapshot", "visit_sheet", "include_reference"), [], _h_overview),
+    ("sch_overview", ("snapshot", "visit_sheet", "include_reference", "period", "agenda_ids"), [], _h_overview),
+    ("sch_insight_snapshot", ("confirm",), [], _h_insight_snapshot),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", ("bed", "panel"), [], _h_limits),
     ("sch_rules", ("levels",), [], _h_rules_or_levels),
@@ -612,7 +631,8 @@ _TOOLS = (
     ("sch_flag_rate", (), [], _h_flag_rate),
     ("sch_radar", (), [], _h_radar),
     ("sch_focus", (), [], _h_focus),
-    ("sch_focus_log", ("date", "alcohol", "factors", "atenolol", "late_meal", "note"), ["date"],
+    ("sch_focus_log", ("date", "alcohol", "factors", "atenolol", "late_meal", "note",
+                       "response_system", "response_medication", "response_aspect", "response_change"), ["date"],
      _h_focus_log),
     ("sch_brief", (), [], _h_brief),
     ("sch_acmg", (), [], _h_acmg),
@@ -637,8 +657,12 @@ _PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boo
 
 
 def _schema(name: str, params, required) -> dict:
-    props = {p: {"type": _PARAM_TYPE.get(p, "string"),
+    props: dict[str, dict] = {p: {"type": _PARAM_TYPE.get(p, "string"),
                  "description": _t(f"tool.{name}.param.{p}")} for p in params}
+    if name == "sch_insight_snapshot":
+        props["confirm"]["type"] = "string"
+    if name == "sch_overview":
+        props["period"].update(type="integer", enum=[30, 90, 365])
     schema = {"name": name,
               "description": _t(f"tool.{name}.description"),
               "parameters": {"type": "object", "properties": props}}

@@ -1879,6 +1879,7 @@ def _pattern_hits(text: str, pat: str) -> bool:
     return re.search(rx, text) is not None
 
 
+@memo_in_reading
 def classify_drug(name: str) -> List[str]:
     """Classes of a drug by its name (public dictionary). For checking a new prescription.
 
@@ -1900,6 +1901,20 @@ def classify_drug(name: str) -> List[str]:
         if hit:
             out.append(cls)
     return out
+
+
+def medication_classes(medication: Dict[str, Any]) -> List[str]:
+    """Classify the name and explicitly listed ingredients, never free-text notes.
+
+    Reported composition identifies possible class context; it does not verify
+    ingredient amounts, equivalence to a prescription drug, or a clinical effect.
+    """
+    names = [medication.get("name") or ""]
+    composition = medication.get("composition_as_reported")
+    ingredients = composition.get("ingredients") if isinstance(composition, dict) else None
+    if isinstance(ingredients, list):
+        names.extend(x for x in ingredients if isinstance(x, str) and x.strip())
+    return list(dict.fromkeys(c for name in names for c in classify_drug(name)))
 
 
 # ---- source folders selected by the user (profile/sources.json) ----------
@@ -2053,6 +2068,17 @@ def is_active_medication(med: Dict[str, Any]) -> bool:
     current, and `medications_without_status()` exists so that it can be said out
     loud rather than assumed.
     """
+    # A recorded end date closes a course even if an old status still says active.
+    end = str(med.get("end_date") or "")
+    try:
+        if len(end) == 10 and datetime.date.fromisoformat(end) < datetime.date.today():
+            return False
+        if len(end) == 7:
+            datetime.date.fromisoformat(end + "-01")
+            if end < datetime.date.today().isoformat()[:7]:
+                return False
+    except ValueError:
+        pass  # An invalid date cannot silently stop a recorded prescription.
     if "status" not in med:
         return True
     status = str(med.get("status") or "").strip().lower()

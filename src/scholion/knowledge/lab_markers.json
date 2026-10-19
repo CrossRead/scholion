@@ -1760,6 +1760,46 @@
       "ref_sex": "any",
       "ref_age": "any"
     },
+    "albumin_fraction_abs": {
+      "unit": "g/L",
+      "labels": {
+        "ru": {
+          "display": "Альбумин, абсолютная белковая фракция",
+          "names": [
+            "альбумин abs",
+            "альбумин абс",
+            "альбумин, абс"
+          ],
+          "form_require": [
+            "белковые фракции",
+            "электрофорез белков"
+          ],
+          "require": [
+            "г/л"
+          ]
+        },
+        "en": {
+          "display": "Albumin, absolute protein fraction",
+          "names": [
+            "albumin abs",
+            "albumin, absolute"
+          ],
+          "form_require": [
+            "protein fractions",
+            "protein electrophoresis"
+          ],
+          "require": [
+            "g/l",
+            "g/dl"
+          ]
+        }
+      },
+      "convert_note": "1 g/dL = 10 g/L.",
+      "convert": {
+        "g/dL": 10.0,
+        "г/дл": 10.0
+      }
+    },
     "albumin_pct": {
       "unit": "%",
       "plausible": [

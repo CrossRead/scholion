@@ -1,0 +1,1441 @@
+{
+  "_meta": {
+    "version": "2",
+    "updated": "2026-10-18",
+    "scope": "Independently sourced associations and explicit hypotheses; per-result applicability is required, not clinical validation.",
+    "source_tier": "primary_literature",
+    "source_tier_note": "Project summaries of linked primary studies; applicability and exclusion decisions are separately labelled, not verbatim clinical guidance."
+  },
+  "links": [
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/16554528/; https://doi.org/10.1371/journal.pgen.1003379",
+      "summary": {
+        "en": "PCSK9 R46L is associated with lower LDL cholesterol.",
+        "ru": "PCSK9 R46L связан с более низким холестерином ЛПНП."
+      },
+      "limitations": {
+        "en": "Population association; treatment and other causes can dominate the measured LDL. This does not predict an untreated personal baseline.",
+        "ru": "Популяционная связь; лечение и другие факторы могут сильнее влиять на ЛПНП. Индивидуальный уровень без лечения не предсказывается."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs11591147",
+      "gene": "PCSK9",
+      "marker": "ldl",
+      "direction": "lower",
+      "systems": [
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000001.11:g.55039974G>T",
+      "association_id": "PCSK9:rs11591147:ldl:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://doi.org/10.1371/journal.pgen.1003379",
+      "summary": {
+        "en": "PCSK9 C679X is associated with lower LDL cholesterol.",
+        "ru": "PCSK9 C679X связан с более низким холестерином ЛПНП."
+      },
+      "limitations": {
+        "en": "The strongest source evidence is in African American cohorts; confirm rare calls and consider treatment.",
+        "ru": "Основные данные получены в афроамериканских когортах; важно подтвердить редкий вариант и учесть лечение."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs28362286",
+      "gene": "PCSK9",
+      "marker": "ldl",
+      "direction": "lower",
+      "systems": [
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000001.11:g.55063542C>A",
+      "association_id": "PCSK9:rs28362286:ldl:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://www.jci.org/articles/view/1847",
+      "summary": {
+        "en": "APOB R3527Q affects LDL receptor binding; raised LDL can be compatible with this mechanism.",
+        "ru": "APOB R3527Q влияет на связывание с рецептором ЛПНП; повышение ЛПНП может согласовываться с этим механизмом."
+      },
+      "limitations": {
+        "en": "Monogenic variant context requires confirmed identity, inheritance and clinical assessment; LDL alone does not diagnose familial hypercholesterolaemia.",
+        "ru": "Нужны подтверждение варианта, оценка наследования и клинических данных; один ЛПНП не устанавливает семейную гиперхолестеринемию."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs5742904",
+      "gene": "APOB",
+      "marker": "ldl",
+      "direction": "higher",
+      "systems": [
+        "lipids"
+      ],
+      "evidence_type": "monogenic",
+      "association_level": "A",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000002.12:g.21006288C>T",
+      "association_id": "APOB:rs5742904:ldl:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/17878422/",
+      "summary": {
+        "en": "APOE ε4 haplotypes have population associations with LDL cholesterol.",
+        "ru": "Гаплотипы APOE ε4 связаны с уровнем ЛПНП в популяционных исследованиях."
+      },
+      "limitations": {
+        "en": "One SNP does not establish the APOE diplotype. Review both rs429358 and rs7412, phase when needed, and treatment; ε2/ε2 needs separate assessment.",
+        "ru": "Один SNP не определяет диплотип APOE. Нужны rs429358 и rs7412, при необходимости фаза, и учёт лечения; ε2/ε2 требует отдельной оценки."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs429358",
+      "gene": "APOE",
+      "marker": "ldl",
+      "direction": "higher",
+      "systems": [
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000019.10:g.44908684T>C",
+      "association_id": "APOE:rs429358:ldl:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/17878422/",
+      "summary": {
+        "en": "APOE ε2 haplotypes have population associations with LDL cholesterol.",
+        "ru": "Гаплотипы APOE ε2 связаны с уровнем ЛПНП в популяционных исследованиях."
+      },
+      "limitations": {
+        "en": "One SNP does not establish the APOE diplotype. Review both rs429358 and rs7412, phase when needed, and treatment; ε2/ε2 needs separate assessment.",
+        "ru": "Один SNP не определяет диплотип APOE. Нужны rs429358 и rs7412, при необходимости фаза, и учёт лечения; ε2/ε2 требует отдельной оценки."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs7412",
+      "gene": "APOE",
+      "marker": "ldl",
+      "direction": "lower",
+      "systems": [
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000019.10:g.44908822C>T",
+      "association_id": "APOE:rs7412:ldl:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20032323/",
+      "summary": {
+        "en": "This LPA allele is associated with higher measured lipoprotein(a).",
+        "ru": "Этот аллель LPA связан с более высокой измеренной концентрацией липопротеина(а)."
+      },
+      "limitations": {
+        "en": "Association, not an individual concentration or disease probability; repeat structure and ancestry affect applicability.",
+        "ru": "Связь не определяет индивидуальную концентрацию или вероятность болезни; важны структура повторов и применимость к популяции."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs10455872",
+      "gene": "LPA",
+      "marker": "lpa",
+      "direction": "higher",
+      "systems": [
+        "cardio"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000006.12:g.160589086A>G",
+      "association_id": "LPA:rs10455872:lpa:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20032323/",
+      "summary": {
+        "en": "This LPA allele is associated with higher measured lipoprotein(a).",
+        "ru": "Этот аллель LPA связан с более высокой измеренной концентрацией липопротеина(а)."
+      },
+      "limitations": {
+        "en": "Association, not an individual concentration or disease probability; repeat structure and ancestry affect applicability.",
+        "ru": "Связь не определяет индивидуальную концентрацию или вероятность болезни; важны структура повторов и применимость к популяции."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs3798220",
+      "gene": "LPA",
+      "marker": "lpa",
+      "direction": "higher",
+      "systems": [
+        "cardio"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000006.12:g.160540105T>C",
+      "association_id": "LPA:rs3798220:lpa:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22388766/",
+      "summary": {
+        "en": "FGB rs1800790 is associated with fibrinogen variation.",
+        "ru": "FGB rs1800790 связан с различиями уровня фибриногена."
+      },
+      "limitations": {
+        "en": "The exact directional claim needs allele-level verification; inflammation and treatment can alter fibrinogen. No automatic directional comparison.",
+        "ru": "Направление для конкретного аллеля требует проверки; воспаление и лечение влияют на фибриноген. Автоматическое сравнение направления не выполняется."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs1800790",
+      "gene": "FGB",
+      "marker": "fibrinogen",
+      "direction": "higher",
+      "systems": [
+        "cardio"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000004.12:g.154562556G>A",
+      "association_id": "FGB:rs1800790:fibrinogen:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6817529/",
+      "summary": {
+        "en": "This G6PD variant is associated with lower HbA1c independently of glycaemia.",
+        "ru": "Этот вариант G6PD связан со снижением HbA1c независимо от уровня глюкозы."
+      },
+      "limitations": {
+        "en": "This is potential biomarker bias, not improved glucose control. Review sex, genotype, G6PD activity, erythrocyte turnover and glucose-based observations.",
+        "ru": "Это возможное смещение показателя, а не улучшение контроля глюкозы. Важны пол, генотип, активность G6PD, обновление эритроцитов и измерения глюкозы."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "evidence_type": "biomarker_bias",
+      "rsid": "rs1050828",
+      "gene": "G6PD",
+      "marker": "hba1c",
+      "direction": "lower",
+      "systems": [
+        "glucose"
+      ],
+      "association_level": "A",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000023.11:g.154536002C>T",
+      "association_id": "G6PD:rs1050828:hba1c:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8792153/",
+      "summary": {
+        "en": "This G6PD variant is associated with lower HbA1c independently of glycaemia.",
+        "ru": "Этот вариант G6PD связан со снижением HbA1c независимо от уровня глюкозы."
+      },
+      "limitations": {
+        "en": "This is potential biomarker bias, not improved glucose control. Review sex, genotype, G6PD activity, erythrocyte turnover and glucose-based observations.",
+        "ru": "Это возможное смещение показателя, а не улучшение контроля глюкозы. Важны пол, генотип, активность G6PD, обновление эритроцитов и измерения глюкозы."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "evidence_type": "biomarker_bias",
+      "rsid": "rs5030868",
+      "gene": "G6PD",
+      "marker": "hba1c",
+      "direction": "lower",
+      "systems": [
+        "glucose"
+      ],
+      "association_level": "A",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000023.11:g.154534419G>A",
+      "association_id": "G6PD:rs5030868:hba1c:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2570409/",
+      "summary": {
+        "en": "GCKR Leu446 is associated with lower fasting glucose.",
+        "ru": "GCKR Leu446 связан с более низкой глюкозой натощак."
+      },
+      "limitations": {
+        "en": "This concerns fasting glucose, not a diagnosis or protection from diabetes; fasting conditions and glucose-lowering treatment matter.",
+        "ru": "Связь относится к глюкозе натощак и не означает защиту от диабета; важны условия забора и сахароснижающее лечение."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "requires_fasting": true,
+      "rsid": "rs1260326",
+      "gene": "GCKR",
+      "marker": "glucose",
+      "direction": "lower",
+      "systems": [
+        "glucose"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000002.12:g.27508073T>C",
+      "association_id": "GCKR:rs1260326:glucose:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19060907/",
+      "summary": {
+        "en": "The MTNR1B G allele is associated with higher fasting glucose.",
+        "ru": "Аллель G MTNR1B связан с более высокой глюкозой натощак."
+      },
+      "limitations": {
+        "en": "A small population association does not identify the cause of hyperglycaemia; fasting conditions and treatment matter.",
+        "ru": "Небольшая популяционная связь не устанавливает причину гипергликемии; важны условия забора и лечение."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "requires_fasting": true,
+      "rsid": "rs10830963",
+      "gene": "MTNR1B",
+      "marker": "glucose",
+      "direction": "higher",
+      "systems": [
+        "glucose"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000011.10:g.92975544C>G",
+      "association_id": "MTNR1B:rs10830963:glucose:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/9843457/",
+      "summary": {
+        "en": "MTHFR 677TT is associated with higher homocysteine, particularly with low folate.",
+        "ru": "MTHFR 677TT связан с более высоким гомоцистеином, особенно при низком уровне фолатов."
+      },
+      "limitations": {
+        "en": "This comparison is limited to two copies; folate, B12, kidney function and treatment also matter. It is not a thrombophilia diagnosis.",
+        "ru": "Сопоставление ограничено двумя копиями; важны фолаты, B12, функция почек и лечение. Это не диагноз тромбофилии."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "states": [
+        "hom"
+      ],
+      "rsid": "rs1801133",
+      "gene": "MTHFR",
+      "marker": "homocysteine",
+      "direction": "higher",
+      "systems": [
+        "inflammation"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000001.11:g.11796321G>A",
+      "association_id": "MTHFR:rs1801133:homocysteine:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "excluded",
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/6450/",
+      "summary": {
+        "en": "The recorded TSHR identity needs reconciliation before comparison with TSH.",
+        "ru": "Идентичность записанного варианта TSHR требует сверки до сопоставления с ТТГ."
+      },
+      "limitations": {
+        "en": "The available source record does not establish the catalogue coordinate/protein combination. Do not infer activation from a gene-level relationship.",
+        "ru": "Доступная запись источника не подтверждает сочетание координаты и белкового изменения каталога. Связь на уровне гена не доказывает активацию этого варианта."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs121908876",
+      "gene": "TSHR",
+      "marker": "tsh",
+      "direction": "lower",
+      "systems": [
+        "thyroid"
+      ],
+      "evidence_type": "monogenic",
+      "association_level": "A",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000014.9:g.81143572G>A",
+      "association_id": "TSHR:rs121908876:tsh:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://www.jstage.jst.go.jp/article/endocrj/68/12/68_EJ21-0353/_html/-char/en",
+      "summary": {
+        "en": "TSHR R450H has been reported in congenital hypothyroidism.",
+        "ru": "TSHR R450H описан при врождённом гипотиреозе."
+      },
+      "limitations": {
+        "en": "Confirm genomic strand/identity, zygosity and inheritance; this source does not establish elevated TSH in every heterozygote.",
+        "ru": "Нужны проверка цепи и идентичности, зиготности и наследования; источник не устанавливает повышение ТТГ у каждого гетерозиготного носителя."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs189261858",
+      "gene": "TSHR",
+      "marker": "tsh",
+      "direction": "higher",
+      "systems": [
+        "thyroid"
+      ],
+      "evidence_type": "monogenic",
+      "association_level": "A",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000014.9:g.81143407G>A",
+      "association_id": "TSHR:rs189261858:tsh:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/24722205/",
+      "summary": {
+        "en": "TPO rs2071403 was associated with anti-TPO antibody positivity in a Korean cohort.",
+        "ru": "TPO rs2071403 связан с наличием антител к ТПО в корейской когорте."
+      },
+      "limitations": {
+        "en": "Antibody positivity is not a quantitative prediction of antibody titre or thyroid function; ancestry and sex affect applicability.",
+        "ru": "Наличие антител не равно прогнозу их титра или функции щитовидной железы; важны популяция и пол."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs2071403",
+      "gene": "TPO",
+      "marker": "anti_tpo",
+      "direction": "higher",
+      "systems": [
+        "thyroid"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000002.12:g.1413472A>G",
+      "association_id": "TPO:rs2071403:anti_tpo:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://doi.org/10.1371/journal.pgen.1002313",
+      "summary": {
+        "en": "SHBG variation can accompany differences in total testosterone and binding.",
+        "ru": "Вариации SHBG могут сопровождаться различиями общего тестостерона и его связывания."
+      },
+      "limitations": {
+        "en": "Evidence in men; total and free testosterone differ. Review SHBG, sampling time, hormone treatment and the exact allele. No diagnosis of androgen deficiency.",
+        "ru": "Данные получены у мужчин; общий и свободный тестостерон различаются. Нужны SHBG, время забора, гормональное лечение и точный аллель. Диагноз дефицита андрогенов не устанавливается."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "sex": "male",
+      "rsid": "rs1799941",
+      "gene": "SHBG",
+      "marker": "testosterone",
+      "direction": "higher",
+      "systems": [
+        "gonads"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000017.11:g.7630105G>A",
+      "association_id": "SHBG:rs1799941:testosterone:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://doi.org/10.1371/journal.pgen.1002313",
+      "summary": {
+        "en": "SHBG variation can accompany differences in total testosterone and binding.",
+        "ru": "Вариации SHBG могут сопровождаться различиями общего тестостерона и его связывания."
+      },
+      "limitations": {
+        "en": "Evidence in men; total and free testosterone differ. Review SHBG, sampling time, hormone treatment and the exact allele. No diagnosis of androgen deficiency.",
+        "ru": "Данные получены у мужчин; общий и свободный тестостерон различаются. Нужны SHBG, время забора, гормональное лечение и точный аллель. Диагноз дефицита андрогенов не устанавливается."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "sex": "male",
+      "rsid": "rs6258",
+      "gene": "SHBG",
+      "marker": "testosterone",
+      "direction": "lower",
+      "systems": [
+        "gonads"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000017.11:g.7631360C>T",
+      "association_id": "SHBG:rs6258:testosterone:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19116238/",
+      "summary": {
+        "en": "CYP19A1 rs2470152 was associated with estradiol in men.",
+        "ru": "CYP19A1 rs2470152 связан с эстрадиолом у мужчин."
+      },
+      "limitations": {
+        "en": "The direction for the catalogue allele is not verified here; sex, assay and hormone treatment matter.",
+        "ru": "Направление для аллеля каталога здесь не подтверждено; важны пол, метод анализа и гормональное лечение."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "sex": "male",
+      "rsid": "rs2470152",
+      "gene": "CYP19A1",
+      "marker": "estradiol",
+      "direction": "higher",
+      "systems": [
+        "gonads"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000015.10:g.51302775G>C",
+      "association_id": "CYP19A1:rs2470152:estradiol:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2597056/",
+      "summary": {
+        "en": "PNPLA3 I148M is associated with liver fat and, in some cohorts, higher liver enzymes.",
+        "ru": "PNPLA3 I148M связан с жиром в печени и, в некоторых когортах, повышением печёночных ферментов."
+      },
+      "limitations": {
+        "en": "ALT is not a measurement of liver fat; normal ALT does not exclude steatosis. Alcohol, adiposity, medications and other causes need assessment.",
+        "ru": "АЛТ не измеряет жир в печени; нормальный АЛТ не исключает стеатоз. Важны алкоголь, состав тела, лекарства и другие причины."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs738409",
+      "gene": "PNPLA3",
+      "marker": "alt",
+      "direction": "higher",
+      "systems": [
+        "liver"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000022.11:g.43928847C>G",
+      "association_id": "PNPLA3:rs738409:alt:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20541252/; https://pmc.ncbi.nlm.nih.gov/articles/PMC3818310/",
+      "summary": {
+        "en": "The G allele is associated with lower circulating 25-hydroxyvitamin D.",
+        "ru": "Аллель G связан с более низким уровнем 25-гидроксивитамина D в крови."
+      },
+      "limitations": {
+        "en": "A population association does not establish deficiency or a supplement dose. Season, supplements, assay and population matter.",
+        "ru": "Популяционная связь не устанавливает дефицит или дозу добавки. Важны сезон, добавки, метод измерения и популяция."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs2282679",
+      "gene": "GC",
+      "marker": "vitamin_d",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000004.12:g.71742666T>G",
+      "association_id": "GC:rs2282679:vitamin_d:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20541252/; https://pmc.ncbi.nlm.nih.gov/articles/PMC3818310/",
+      "summary": {
+        "en": "The G allele is associated with lower circulating 25-hydroxyvitamin D.",
+        "ru": "Аллель G связан с более низким уровнем 25-гидроксивитамина D в крови."
+      },
+      "limitations": {
+        "en": "A population association does not establish deficiency or a supplement dose. Season, supplements, assay and population matter.",
+        "ru": "Популяционная связь не устанавливает дефицит или дозу добавки. Важны сезон, добавки, метод измерения и популяция."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs10741657",
+      "gene": "CYP2R1",
+      "marker": "vitamin_d",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000011.10:g.14893332A>G",
+      "association_id": "CYP2R1:rs10741657:vitamin_d:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20541252/; https://pmc.ncbi.nlm.nih.gov/articles/PMC3818310/",
+      "summary": {
+        "en": "The G allele is associated with lower circulating 25-hydroxyvitamin D.",
+        "ru": "Аллель G связан с более низким уровнем 25-гидроксивитамина D в крови."
+      },
+      "limitations": {
+        "en": "A population association does not establish deficiency or a supplement dose. Season, supplements, assay and population matter.",
+        "ru": "Популяционная связь не устанавливает дефицит или дозу добавки. Важны сезон, добавки, метод измерения и популяция."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs12785878",
+      "gene": "DHCR7",
+      "marker": "vitamin_d",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "G",
+      "catalogue_hgvs": "NC_000011.10:g.71456403G>T",
+      "association_id": "DHCR7:rs12785878:vitamin_d:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5886113/",
+      "summary": {
+        "en": "FUT2 AA non-secretors tend to have higher total B12, largely through haptocorrin-bound B12.",
+        "ru": "У несекреторов FUT2 AA общий B12 обычно выше, преимущественно за счёт B12, связанного с гаптокоррином."
+      },
+      "limitations": {
+        "en": "Limited to two A copies; total B12 does not establish cellular B12 sufficiency. One copy is not a non-secretor genotype.",
+        "ru": "Только для двух копий A; общий B12 не устанавливает обеспеченность клеток. Одна копия не означает генотип несекретора."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "states": [
+        "hom"
+      ],
+      "rsid": "rs601338",
+      "gene": "FUT2",
+      "marker": "vitamin_b12",
+      "direction": "higher",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000019.10:g.48703417G>A",
+      "association_id": "FUT2:rs601338:vitamin_b12:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000019.40/",
+      "summary": {
+        "en": "HFE C282Y homozygosity can accompany increased iron stores.",
+        "ru": "Гомозиготность HFE C282Y может сопровождаться увеличением запасов железа."
+      },
+      "limitations": {
+        "en": "Incomplete penetrance; ferritin alone does not establish iron overload. Review transferrin saturation, inflammation, sex, age and confirmed genotype.",
+        "ru": "Пенетрантность неполная; один ферритин не устанавливает перегрузку железом. Важны насыщение трансферрина, воспаление, пол, возраст и подтверждение генотипа."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "states": [
+        "hom"
+      ],
+      "rsid": "rs1800562",
+      "gene": "HFE",
+      "marker": "ferritin",
+      "direction": "higher",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "monogenic",
+      "association_level": "A",
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000006.12:g.26092913G>A",
+      "association_id": "HFE:rs1800562:ferritin:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22301935/; https://pmc.ncbi.nlm.nih.gov/articles/PMC7784039/",
+      "summary": {
+        "en": "TMPRSS6 is associated with iron parameters; evidence for ferritin varies between cohorts.",
+        "ru": "TMPRSS6 связан с показателями обмена железа; данные по ферритину различаются между когортами."
+      },
+      "limitations": {
+        "en": "A Chinese study found a ferritin association, while a population replication did not. Do not infer iron deficiency from this allele.",
+        "ru": "В китайском исследовании обнаружена связь с ферритином, в популяционной репликации — нет. Аллель не устанавливает дефицит железа."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "association_level": "C",
+      "rsid": "rs855791",
+      "gene": "TMPRSS6",
+      "marker": "ferritin",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000022.11:g.37066896A>G",
+      "association_id": "TMPRSS6:rs855791:ferritin:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "excluded",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3145614/",
+      "summary": {
+        "en": "FADS1 evidence concerns individual plasma fatty acids, not this omega-3 index.",
+        "ru": "Данные FADS1 относятся к отдельным жирным кислотам плазмы, а не к этому омега‑3 индексу."
+      },
+      "limitations": {
+        "en": "Different specimen and endpoint: the recorded lower omega-3 index claim is not supported by this study. Gene function remains available.",
+        "ru": "Другой материал и конечный показатель: этот источник не подтверждает записанное снижение омега‑3 индекса. Описание функции гена сохраняется."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs174546",
+      "gene": "FADS1",
+      "marker": "omega3_index",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000011.10:g.61802358C>T",
+      "association_id": "FADS1:rs174546:omega3_index:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19506252/; https://pubmed.ncbi.nlm.nih.gov/23263486/",
+      "summary": {
+        "en": "ABCG2 Q141K reduces urate transport in experiments and is associated with higher serum urate.",
+        "ru": "ABCG2 Q141K снижает транспорт уратов в экспериментах и связан с более высокой мочевой кислотой крови."
+      },
+      "limitations": {
+        "en": "Population association, not a measured excretion defect or a diagnosis. Kidney function, medicines and lifestyle also matter.",
+        "ru": "Популяционная связь не измеряет нарушение выведения и не устанавливает диагноз. Важны функция почек, лекарства и образ жизни."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs2231142",
+      "gene": "ABCG2",
+      "marker": "uric_acid",
+      "direction": "higher",
+      "systems": [
+        "renal",
+        "amino_acids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000004.12:g.88131171G>T",
+      "association_id": "ABCG2:rs2231142:uric_acid:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/18834626/",
+      "summary": {
+        "en": "The SLC2A9 T allele is associated with lower serum urate.",
+        "ru": "Аллель T SLC2A9 связан с более низкой мочевой кислотой крови."
+      },
+      "limitations": {
+        "en": "Population association, strongest in the studied European-ancestry cohorts; it does not determine an individual concentration.",
+        "ru": "Популяционная связь, наиболее выраженная в изученных когортах европейского происхождения; индивидуальный уровень не определяется."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs16890979",
+      "gene": "SLC2A9",
+      "marker": "uric_acid",
+      "direction": "lower",
+      "systems": [
+        "renal"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000004.12:g.9920543C>T",
+      "association_id": "SLC2A9:rs16890979:uric_acid:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "status": "hypothesis",
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/120/",
+      "summary": {
+        "en": "Biallelic CBS I278T can impair homocysteine metabolism.",
+        "ru": "Биаллельный CBS I278T может нарушать обмен гомоцистеина."
+      },
+      "limitations": {
+        "en": "Recessive inheritance; a single allele does not establish homocystinuria. Confirm the locus because an insertion can mimic this call; treatment affects homocysteine.",
+        "ru": "Рецессивное наследование; одна копия не устанавливает гомоцистинурию. Нужна проверка локуса: вставка может имитировать этот вызов; лечение влияет на гомоцистеин."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "states": [
+        "hom"
+      ],
+      "rsid": "rs5742905",
+      "gene": "CBS",
+      "marker": "homocysteine",
+      "direction": "higher",
+      "systems": [
+        "amino_acids"
+      ],
+      "evidence_type": "monogenic",
+      "association_level": "A",
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000021.9:g.43063074A>G",
+      "association_id": "CBS:rs5742905:homocysteine:quantitative",
+      "relation_type": "quantitative"
+    },
+    {
+      "association_id": "GCKR:rs1260326:triglycerides:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2494697/; https://pmc.ncbi.nlm.nih.gov/articles/PMC2570409/; https://www.ncbi.nlm.nih.gov/clinvar/RCV001618209.6/; https://pmc.ncbi.nlm.nih.gov/articles/PMC2758140/",
+      "summary": {
+        "en": "The GCKR T allele is associated with higher triglycerides. Triglycerides and glucose may therefore follow different directions.",
+        "ru": "Аллель T GCKR связан с более высокими триглицеридами. Поэтому триглицериды и глюкоза могут изменяться в разных направлениях."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs1260326",
+      "gene": "GCKR",
+      "marker": "triglycerides",
+      "direction": "higher",
+      "systems": [
+        "glucose",
+        "amino_acids",
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000002.12:g.27508073T>C",
+      "specimens": [
+        "plasma"
+      ],
+      "units": [
+        "mmol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "glucose",
+      "requires_fasting": true
+    },
+    {
+      "association_id": "TM6SF2:rs58542926:ldl:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3969786/; https://pmc.ncbi.nlm.nih.gov/articles/PMC5397347/",
+      "summary": {
+        "en": "TM6SF2 E167K is associated with lower LDL cholesterol in blood; this does not imply less fat in the liver.",
+        "ru": "Вариант TM6SF2 E167K связан с более низкими ЛПНП в крови; это не означает меньшего накопления жира в печени."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs58542926",
+      "gene": "TM6SF2",
+      "marker": "ldl",
+      "direction": "lower",
+      "systems": [
+        "liver",
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000019.10:g.19268740C>T",
+      "specimens": [
+        "serum"
+      ],
+      "units": [
+        "mmol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "liver",
+      "requires_fasting": true
+    },
+    {
+      "association_id": "TM6SF2:rs58542926:triglycerides:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3969786/; https://pmc.ncbi.nlm.nih.gov/articles/PMC5397347/",
+      "summary": {
+        "en": "TM6SF2 E167K is associated with lower triglycerides in blood; this does not imply less fat in the liver.",
+        "ru": "Вариант TM6SF2 E167K связан с более низкими триглицеридами в крови; это не означает меньшего накопления жира в печени."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs58542926",
+      "gene": "TM6SF2",
+      "marker": "triglycerides",
+      "direction": "lower",
+      "systems": [
+        "liver",
+        "lipids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000019.10:g.19268740C>T",
+      "specimens": [
+        "serum"
+      ],
+      "units": [
+        "mmol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "liver",
+      "requires_fasting": true
+    },
+    {
+      "association_id": "PPM1K:rs1440581:aa_leucine:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1002179",
+      "summary": {
+        "en": "The rs1440581 C allele is associated with higher plasma leucine. PPM1K helps regulate branched-chain amino acid breakdown.",
+        "ru": "Аллель C rs1440581 связан с более высоким лейцином плазмы. PPM1K участвует в регуляции распада аминокислот с разветвлённой цепью."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs1440581",
+      "gene": "PPM1K",
+      "marker": "aa_leucine",
+      "direction": "higher",
+      "systems": [
+        "amino_acids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000004.12:g.88305270T>C",
+      "specimens": [
+        "plasma"
+      ],
+      "units": [
+        "umol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "amino_acids"
+    },
+    {
+      "association_id": "PPM1K:rs1440581:valine:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1002179",
+      "summary": {
+        "en": "The rs1440581 C allele is associated with higher plasma valine through the same PPM1K pathway as leucine.",
+        "ru": "Аллель C rs1440581 связан с более высоким валином плазмы; это тот же механизм PPM1K, что и для лейцина."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs1440581",
+      "gene": "PPM1K",
+      "marker": "valine",
+      "direction": "higher",
+      "systems": [
+        "amino_acids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000004.12:g.88305270T>C",
+      "specimens": [
+        "plasma"
+      ],
+      "units": [
+        "umol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "amino_acids"
+    },
+    {
+      "association_id": "CPS1:rs715:aa_glycine:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://www.nature.com/articles/ncomms10558; https://www.nature.com/articles/s41467-019-08936-1",
+      "summary": {
+        "en": "The rs715 C allele is associated with higher plasma glycine; the association differs by sex. This common variant does not establish rare CPS1 deficiency.",
+        "ru": "Аллель C rs715 связан с более высоким глицином плазмы; выраженность связи зависит от пола. Этот обычный вариант не устанавливает редкую недостаточность CPS1."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs715",
+      "gene": "CPS1",
+      "marker": "aa_glycine",
+      "direction": "higher",
+      "systems": [
+        "amino_acids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000002.12:g.210678331T>C",
+      "specimens": [
+        "plasma"
+      ],
+      "units": [
+        "umol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "amino_acids"
+    },
+    {
+      "association_id": "AGXT2:rs37369:aa_baiba:quantitative",
+      "relation_type": "quantitative",
+      "status": "hypothesis",
+      "source": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0088544",
+      "summary": {
+        "en": "In a study, the rs37369 T allele was associated with higher plasma BAIBA; this AGXT2 variant may reduce its breakdown. Evidence for this comparison is limited.",
+        "ru": "В исследовании аллель T rs37369 был связан с более высокой BAIBA плазмы; вариант AGXT2 может уменьшать её расщепление. Данные для этого сопоставления ограничены."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs37369",
+      "gene": "AGXT2",
+      "marker": "aa_baiba",
+      "direction": "higher",
+      "systems": [
+        "amino_acids"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "D",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "T",
+      "catalogue_hgvs": "NC_000005.10:g.35037010C>T",
+      "specimens": [
+        "plasma"
+      ],
+      "units": [
+        "umol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "amino_acids"
+    },
+    {
+      "association_id": "IL6R:rs2228145:crp_hs:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22421339/; https://pmc.ncbi.nlm.nih.gov/articles/PMC5871397/",
+      "summary": {
+        "en": "The rs2228145 C allele is associated with lower hsCRP and altered IL-6 signalling. A normal hsCRP does not exclude inflammatory disease.",
+        "ru": "Аллель C rs2228145 связан с более низким hsCRP и изменением передачи сигнала IL-6. Нормальный hsCRP не исключает воспалительное заболевание."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs2228145",
+      "gene": "IL6R",
+      "marker": "crp_hs",
+      "direction": "lower",
+      "systems": [
+        "inflammation"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "C",
+      "catalogue_hgvs": "NC_000001.11:g.154454494A>C",
+      "specimens": [
+        "serum"
+      ],
+      "units": [
+        "mg/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "inflammation",
+      "methods": [
+        "high_sensitivity_immunoturbidimetry",
+        "high_sensitivity"
+      ]
+    },
+    {
+      "association_id": "TMPRSS6:rs855791:iron:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/23794717/",
+      "summary": {
+        "en": "The rs855791 A allele is associated with lower serum iron. TMPRSS6 contributes to iron absorption and availability.",
+        "ru": "Аллель A rs855791 связан с более низким сывороточным железом. TMPRSS6 участвует в регуляции усвоения и доступности железа."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs855791",
+      "gene": "TMPRSS6",
+      "marker": "iron",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000022.11:g.37066896A>G",
+      "specimens": [
+        "serum"
+      ],
+      "units": [
+        "umol/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "micronutrients",
+      "methods": [
+        "biochemistry"
+      ]
+    },
+    {
+      "association_id": "TMPRSS6:rs855791:transferrin_sat:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/23794717/",
+      "summary": {
+        "en": "The rs855791 A allele is associated with lower transferrin saturation, as part of the shared iron-regulation context.",
+        "ru": "Аллель A rs855791 связан с более низким насыщением трансферрина железом. Это часть общего контекста обмена железа."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs855791",
+      "gene": "TMPRSS6",
+      "marker": "transferrin_sat",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000022.11:g.37066896A>G",
+      "specimens": [
+        "serum"
+      ],
+      "units": [
+        "%"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "micronutrients",
+      "methods": [
+        "reported",
+        "validated_same_draw_calculation"
+      ]
+    },
+    {
+      "association_id": "TMPRSS6:rs855791:hemoglobin:quantitative",
+      "relation_type": "quantitative",
+      "status": "supported",
+      "source": "https://www.nature.com/articles/ng.462",
+      "summary": {
+        "en": "The rs855791 A allele is associated with slightly lower haemoglobin. Carrying the allele alone does not establish anaemia or iron deficiency.",
+        "ru": "Аллель A rs855791 связан с несколько более низким гемоглобином. Наличие аллеля само по себе не устанавливает анемию или дефицит железа."
+      },
+      "limitations": {
+        "en": "Population association, not a personal cause or a treatment recommendation. Use the recorded specimen, collection conditions and reference range. Treatment, diet and other causes may dominate this measurement; a normal value does not remove the predisposition. No numerical effect is transferred from a study.",
+        "ru": "Популяционная связь, не личная причина и не рекомендация лечения. Учитываются записанные биоматериал, условия забора и референс. Лечение, питание и другие причины могут сильнее влиять на измерение; норма не отменяет предрасположенность. Численный эффект исследования на человека не переносится."
+      },
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "rsid": "rs855791",
+      "gene": "TMPRSS6",
+      "marker": "hemoglobin",
+      "direction": "lower",
+      "systems": [
+        "micronutrients"
+      ],
+      "evidence_type": "common_variant",
+      "association_level": "B",
+      "independent_claim": true,
+      "states": [
+        "het",
+        "hom",
+        "hemi"
+      ],
+      "catalogue_allele": "A",
+      "catalogue_hgvs": "NC_000022.11:g.37066896A>G",
+      "specimens": [
+        "whole_blood"
+      ],
+      "units": [
+        "g/L"
+      ],
+      "requires_verified_assembly": true,
+      "reference_system": "micronutrients",
+      "methods": [
+        "cbc"
+      ]
+    }
+  ]
+}

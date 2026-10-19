@@ -142,7 +142,10 @@ class TestRemainingOutputOnTheSyntheticProfile(_Read):
         self.assertEqual('unknown', bmi['flag'])
         self.assertEqual('derived_measurement', bmi['output_kind'])
         self.assertTrue(bmi['method'])
-        self.assertEqual('incomplete', bmi['clinical_basis']['category']['status'])
+        self.assertEqual({}, bmi['clinical_basis'])
+        for language in ('en', 'ru'):
+            i18n.set_lang(language)
+            self.assertNotIn(i18n.t('clinical.withheld'), fmt.metrics_report(engine.metrics_summary()))
 
     def test_wearable_indices_are_labelled_as_display_comparisons_on_both_languages(self):
         for language in ('en', 'ru'):
@@ -151,7 +154,9 @@ class TestRemainingOutputOnTheSyntheticProfile(_Read):
             self.assertEqual('display_index', result['output_kind'])
             self.assertIn(i18n.t('clinical.display_limit'), fmt.lifestyle_report(result))
             for row in result['metrics']:
-                self.assertEqual('display_reference_comparison', row.get('output_kind'))
+                self.assertIn(row.get('output_kind'), ('display_reference_comparison', 'recorded_measurement', 'derived_measurement'))
+                if row.get('output_kind') in ('recorded_measurement', 'derived_measurement'):
+                    self.assertIsNone(row.get('score'))
                 if row.get('clinical_basis'):
                     self.assertIsNone(row['why'])
 

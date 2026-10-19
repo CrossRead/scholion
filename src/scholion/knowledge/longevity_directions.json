@@ -75,26 +75,76 @@
       "gene": "FOXO3",
       "favorable": "G",
       "label": {
-        "en": "G — the most reproduced variant of human longevity (the Willcox model)",
-        "ru": "G — самый воспроизведённый вариант долголетия человека (модель Willcox)"
+        "en": "FOXO3 rs2802292: an association with longevity, with conflicting replication.",
+        "ru": "FOXO3 rs2802292: ассоциация с долголетием при противоречивом воспроизведении."
       },
-      "confidence": "high",
+      "confidence": "curated",
       "zygosity_note": {
-        "en": "the effect is dose-dependent: GG is stronger than GT",
-        "ru": "эффект дозозависим: GG сильнее, чем GT"
+        "en": "Neither one nor two G copies provides a calibrated prediction of years lived. A dose-response ranking is not used.",
+        "ru": "Ни одна, ни две копии G не дают калиброванного прогноза лет жизни. Ранжирование по числу копий не используется."
       },
       "pmids": [
         "18765803",
-        "19470488"
+        "27071935",
+        "27621247",
+        "29733381"
       ],
       "action": {
-        "en": "the insulin/IGF axis: carriage of G is an argument that insulin-sensitising measures (weight loss, exercise) will fall on responsive genetics; monitoring by HOMA-IR",
-        "ru": "инсулин/IGF-ось: носительство G — довод, что инсулин-сенсибилизирующие меры (похудение, нагрузка) лягут на отзывчивую генетику; контроль по HOMA-IR"
+        "en": "No genotype-specific test, supplement or treatment response is established. Current blood pressure, lipids, glucose and lifestyle retain their own meaning independently of this allele.",
+        "ru": "Специфические для этого генотипа анализы, добавки или ответ на лечение не установлены. Текущие давление, липиды, глюкоза и образ жизни сохраняют собственное значение независимо от этого аллеля."
       },
-      "verdict_by_copies": {
-        "0": "neutral",
-        "1": "plus_partial",
-        "2": "plus"
+      "verdict_by_copies": {},
+      "curated_on": "2026-10-18",
+      "level": "C",
+      "source": "PMID:18765803; PMID:27071935; PMID:27621247; PMID:29733381",
+      "evidence_reason": {
+        "en": "Human longevity associations and experimental regulatory evidence exist, but a direct replication in Japanese and Northern Italian centenarians was negative. These data do not support an individual lifespan or treatment-response estimate.",
+        "ru": "Есть ассоциации с долголетием у людей и экспериментальные данные о регуляции, но прямое исследование японских и североитальянских долгожителей не подтвердило связь. Эти данные не позволяют оценить личную продолжительность жизни или ответ на лечение."
+      },
+      "mechanism": {
+        "en": "In human cell experiments, the G allele creates an HSF1-binding site in an intronic enhancer and increases stress-dependent FOXO3 expression. This is a regulatory mechanism, not a measured effect on an individual’s aging.",
+        "ru": "В экспериментах на клетках человека аллель G создаёт участок связывания HSF1 во внутригенном энхансере и усиливает стресс-зависимую экспрессию FOXO3. Это регуляторный механизм, а не измеренный эффект на старение конкретного человека."
+      },
+      "population_caveat": {
+        "en": "The initial association concerned Japanese-American men reaching at least 95 years. A prospective study followed older Japanese-American men and older white and Black adults for 17 years. A later case-control study found no significant association in Japanese or Northern Italian centenarians. Results depend on population, sex and the definition of longevity.",
+        "ru": "Первая ассоциация описана у американских мужчин японского происхождения, доживших как минимум до 95 лет. Проспективное исследование наблюдало пожилых мужчин японского происхождения, а также пожилых белых и чернокожих участников 17 лет. Последующее исследование случай–контроль не выявило значимой связи у японских и североитальянских столетних людей. Результаты зависят от популяции, пола и определения долголетия."
+      },
+      "text": {
+        "absent": {
+          "en": "The longevity-associated G allele was not read at rs2802292. This does not imply shorter life.",
+          "ru": "Аллель G, изучавшийся в связи с долголетием, в rs2802292 не обнаружен при чтении позиции. Это не означает более короткую жизнь."
+        },
+        "het": {
+          "en": "One G copy was read. This allele was associated with longevity in some human studies, but not in all replications; it does not predict your lifespan.",
+          "ru": "Прочитана одна копия G. В части исследований у людей этот аллель связан с долголетием, но связь воспроизвелась не во всех работах; личную продолжительность жизни он не предсказывает."
+        },
+        "hom": {
+          "en": "Two G copies were read. Published longevity associations do not establish twice the benefit or an individual lifespan prediction.",
+          "ru": "Прочитаны две копии G. Опубликованные ассоциации с долголетием не устанавливают удвоенную пользу и не предсказывают личную продолжительность жизни."
+        }
+      },
+      "study": {
+        "effect": {
+          "en": "The 2016 prospective study reported about 10% lower all-cause mortality among G carriers over 17 years. This cohort result is not an individual risk reduction or extra years of life.",
+          "ru": "Проспективное исследование 2016 года сообщило примерно на 10% меньшую общую смертность у носителей G за 17 лет. Это результат когорты, а не личное снижение риска или добавленные годы жизни."
+        },
+        "conflict_source": "PMID:27621247; DOI:10.1016/j.maturitas.2016.07.016",
+        "description": {
+          "en": "Exceptional longevity and all-cause/cause-specific mortality; observational human studies.",
+          "ru": "Исключительное долголетие и общая/причинно-специфическая смертность; наблюдательные исследования людей."
+        }
+      },
+      "source_passport": {
+        "version": "curation-2026-10-18",
+        "accessed": "2026-10-18",
+        "content": "Original Scholion paraphrases; no article text or dataset copied.",
+        "license": "CC BY 4.0 for Scholion-authored descriptions; source articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/18765803/",
+          "https://pubmed.ncbi.nlm.nih.gov/27071935/",
+          "https://pubmed.ncbi.nlm.nih.gov/27621247/",
+          "https://pubmed.ncbi.nlm.nih.gov/29733381/"
+        ]
       }
     },
     "rs12206094": {

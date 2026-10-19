@@ -679,7 +679,8 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     mixed = _mixed_resolution(series, date)
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
-    for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method", "source"):
+    for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method", "source",
+                  "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting"):
         if reference_context and field in reference_context:
             pt[field] = reference_context[field]
     if subject:
@@ -709,7 +710,8 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             # …nor the old point's corridor: a form that printed no range must
             # not be shown as having printed the previous form's.
             if field not in ("date_source", "censored", "ref_low", "ref_high",
-                             "reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method"):
+                             "reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method",
+                             "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting"):
                 pt.setdefault(field, kept)
     if date_kept_from_old:
         pt["date_source"] = next((old.get("date_source") for old in gone
@@ -1024,7 +1026,8 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
 @_serialized
 def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
                     late_meal: bool = False, note: str = "",
-                    factors: Optional[List[str]] = None) -> Dict[str, Any]:
+                    factors: Optional[List[str]] = None,
+                    response: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
     """Add/replace an entry in the episode log (profile/focus_log.json).
 
     An entry of the same date is replaced — as lab points are. An empty entry (nothing
@@ -1034,8 +1037,21 @@ def add_focus_entry(date: str, *, alcohol: str = "", atenolol: bool = False,
     if not date:
         return {"ok": False, "error": _t("store.need_date")}
     p = core.profile_dir() / "focus_log.json"
-    data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
+    data: Dict[str, Any] = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
         "_meta": {"what": _t("store.focus_log_what")}, "entries": []}
+    if response is not None:
+        from .reported_response import validate
+        if not validate(date, response, note):
+            return {"ok": False, "error": _t("response.invalid")}
+        records = data.setdefault("responses", [])
+        identity = (date, response["system"], response.get("medication", ""), response["aspect"])
+        records = [r for r in records if (r.get("date"), r.get("response", {}).get("system"),
+            r.get("response", {}).get("medication", ""), r.get("response", {}).get("aspect")) != identity]
+        records.append({"date": date, "response": response, "note": note.strip(), "source": "patient_report"})
+        data["responses"] = sorted(records, key=lambda r: r["date"])
+        core.write_json(p, data, indent=1)
+        core.reset_cache()
+        return {"ok": True, "date": date, "removed": False, "entries": len(records), "action": "recorded"}
     # `factors` names the journal's own yes/no fields (task 176); `atenolol` and
     # `late_meal` are kept as synonyms for callers written before it.
     named = [str(f).strip() for f in (factors or []) if str(f).strip()]

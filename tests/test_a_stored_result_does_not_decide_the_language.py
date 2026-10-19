@@ -110,7 +110,7 @@ class TestTheCatalogueNamesThings(_InEnglish):
 
     def test_a_longevity_marker_is_explained_in_the_language_being_read(self):
         known = {k["rsid"]: k for k in genomics.longevity_findings()["known"]}
-        self.assertIn("most reproduced", known[RSID]["label"])
+        self.assertIn("FOXO3", known[RSID]["label"])
         self.assertNotIn("воспроизведённый", known[RSID]["label"])
         self.assertTrue(known[RSID].get("action"))
         self.assertNotIn("ось", known[RSID]["action"])
@@ -122,12 +122,11 @@ class TestTheCatalogueNamesThings(_InEnglish):
         self.assertEqual('incomplete', known['rs00000000']['clinical_basis']['label']['status'])
 
     def test_the_verdict_is_recomputed_from_the_catalogue_not_from_the_file(self):
-        """One copy of the FOXO3 favourable allele is `plus_partial` in the
-        catalogue. The file says `neutral`, which is what the catalogue said on
-        the day of the build — and a stored verdict outliving its rule is the
-        same defect as a stored name outliving its language."""
+        """FOXO3 has conflicting human replication: the current catalogue no
+        longer grants an individual favourable verdict. A stored neutral or
+        favourable verdict must not outlive that reviewed rule."""
         known = {k["rsid"]: k for k in genomics.longevity_findings()["known"]}
-        self.assertEqual(known[RSID]["verdict_token"], "plus_partial")
+        self.assertIsNone(known[RSID]["verdict_token"])
 
 
 class TestAnUnknownTokenNeverBecomesAKey(_InEnglish):
@@ -151,9 +150,9 @@ class TestAnUnknownTokenNeverBecomesAKey(_InEnglish):
 
     def test_a_verdict_the_catalogue_does_know_still_becomes_a_sentence(self):
         k = {x["rsid"]: x for x in genomics.longevity_findings()["known"]}[RSID]
-        self.assertEqual(k["verdict_token"], "plus_partial")
-        self.assertTrue(k["verdict_label"])
-        self.assertNotIn("longevity.verdict", k["verdict_label"])
+        self.assertIsNone(k["verdict_token"])
+        self.assertTrue(k["interpretation"]["summary"])
+        self.assertNotIn("longevity.verdict", str(k["verdict_label"]))
 
 
 class TestTheApoeComponentsAreTheCardAndNotTwoFindings(_InEnglish):

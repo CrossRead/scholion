@@ -19,6 +19,7 @@ from scholion import mcp_server, ouroboros_tools
 
 #: 39 tools, frozen at 0.5.11 (27.09.2026).
 FROZEN = frozenset({
+    "sch_insight_snapshot",  # Added in 0.7.0; confirmed local review history.
     "sch_acmg", "sch_analyze_labs", "sch_array", "sch_brief", "sch_capabilities",
     "sch_check_drug_gene", "sch_check_prescription", "sch_clinvar_findings", "sch_flag_rate",
     "sch_focus", "sch_focus_log", "sch_genome_lookup", "sch_genome_status", "sch_goal",

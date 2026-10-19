@@ -97,6 +97,36 @@ cannot be said without a separate test.
 it" ≠ "there is a form". Before any negative conclusion about labs, run
 `selfcheck` / `reconcile`; call an unreadable file unreadable, not missing.
 
+**5a. Reported response and measured direction remain distinct.** A dated report
+of symptoms, everyday function or tolerability may be recorded verbatim through
+`focus-log`, with the system and direction the person explicitly selected. It
+needs no laboratory confirmation to be shown, but remains patient testimony.
+Never invent such a report, infer its direction or turn it into a treatment
+outcome. Long-term laboratory direction is described separately, including a
+forming trend, its observation window and uncertainty. Neither chronology nor
+agreement between a report and measurements establishes causation.
+
+**5b. Missing trend data are not an indication for testing.** A single exact,
+recent measurement within its recorded reference range may be described as such,
+without prompting for more measurements merely to draw a trend. Do not expand
+routine checkups solely to fill a chart or support a treatment comparison.
+Recommend additional testing only with a specific supported indication: an
+existing clinician monitoring plan, a relevant abnormality or symptom, or
+applicable age- and indication-based screening. Keep the reason with the
+recommendation; no generic requests to collect missing trend data.
+
+**5c. A system insight considers the person's context.** Compare laboratory
+findings and direction with the actual read variants in that system, recorded
+prescriptions and known lifestyle observations. A sourced variant association
+that agrees with an actual measurement is stated explicitly, with its A–E
+level and the measured date; neither the agreement nor a trend proves a genetic
+cause. A normal measurement remains normal despite a predisposition. Distinguish
+patient reports, reviewed profile notes and measured lifestyle data; do not
+invent missing habits or reuse stale notes as current evidence. Retain relevant
+context in the patient view, clinician brief and agent response. Discuss changes
+to an existing support plan only from that combined picture, without converting
+an association into a dose, treatment order or generic request for more tests.
+
 **6. Composite indices are computed from a single panel.** PhenoAge, HOMA-IR,
 eGFR and ratios are computed from markers of one draw; substituting a missing
 marker from an earlier panel is forbidden. A printed index from the same form
@@ -692,7 +722,7 @@ python3 -m scholion system thyroid           # one system as a card, in one bloc
                                              #   clinician — and the next step in three baskets, none silently empty.
                                              #   `--register clinician` adds rsID, genotype, depth, classification
                                              #   and the gate's counts; the verdict is the same in both registers
-                                             #   In front of the base stands a panel somebody wrote: 217 positions
+                                             #   In front of the base stands a panel somebody wrote: 221 positions
                                              #   across the systems, a row being a POSITION and not a gene.
                                              #   A row whose phrase for the state found has not been written prints
                                              #   as pending. Every shipped row is SIGNED BY THE PANEL'S AUTHOR AND BY
@@ -853,7 +883,7 @@ The journal is needed where two factors always coincide in time and passive data
 does not separate them.
 
 The Ouroboros tools and the MCP server are the same core through one registry —
-39 tools. One tool may answer for more than one command, the second behind a
+40 tools. One tool may answer for more than one command, the second behind a
 flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
 `updates=true` is `genome-updates`, `sch_analyze_labs` with `catalogue=true` is
 `markers`, `sch_rules` with `levels=true` is `evidence-levels`, `sch_overview` with
@@ -861,7 +891,8 @@ flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
 (`sch_ingest_labs`, `sch_focus_log`, `sch_lab_draw`, `sch_marker_propose`) and none
 sets a value; `sch_update` installs the program and `sch_recompute` rebuilds what the
 person's own files already hold, each only with `confirm=true` after the person's
-yes: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
+yes. `sch_insight_snapshot` saves a review only with its preview fingerprint in
+`confirm`; previewing does not write. The complete list is: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_insight_snapshot`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
 `scholion capabilities --json` derives the list from the build, and is the one
 to trust when this paragraph and the build disagree.
 
@@ -1488,3 +1519,17 @@ these observations cannot establish applicability or absence of acute illness.
 Below age 35 Scholion conservatively withholds the formula value; an age derived
 only from birth year is explicitly approximate. The radar itself is a project
 heuristic, never a validated probability or a composite clinical risk score.
+
+## Attention and saved reviews
+
+`scholion overview --period 30` (also 90 or 365) returns the shared attention
+feed, with all events, facts, dates and rule identities. `sch_overview` accepts
+`period` and returns the same structure. The first five visible web items are
+not a limit on the tool result. A repeated deviation requires independent
+comparable draws; an observed shift is not proof of causation.
+
+`scholion insight-snapshot` previews changes since the last saved review and
+returns a confirmation fingerprint. Only when the person asks to save this
+review, pass that fingerprint with `--confirm`. `sch_insight_snapshot` uses the
+same `confirm` parameter. Reading, previewing and comparing do not write the
+profile or recompute a genome. Missing or stale inputs do not mean resolution.

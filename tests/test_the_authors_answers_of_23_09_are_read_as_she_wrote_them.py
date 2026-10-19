@@ -258,7 +258,8 @@ class TestHerApprovalOf27_09(unittest.TestCase):
     def test_the_womans_otc_wording_is_no_longer_only_ours(self):
         book = _raw("system_gene_panels.json")["systems"]["amino_acids"]["carrier_classes"]
         self.assertEqual(self.ON, book["review"]["on"])
-        self.assertIn("approved by the panel author on 27.09.2026", book["source"])
+        self.assertIn("approved by the panel author on 27.09.2026", book["source"]["en"])
+        self.assertIn("27.09.2026", book["source"]["ru"])
 
     def test_the_new_route_rules_carry_it_too(self):
         keys = ("pah_carrier_phenylalanine", "ass1_asl_carrier_citrulline", "slc6a19_carrier_niacinamide",

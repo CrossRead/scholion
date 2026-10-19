@@ -54,6 +54,7 @@ SWEEP_EXCEPTIONS = {"GET /api/diag", "POST /api/pick-folder"}
 
 #: Bodies for the POST routes. Every one writes into the temporary profile.
 POST_BODIES = {
+    "/api/insight-snapshot": {},  # Preview is read-only; confirmation tested separately.
     # An empty path is the «clear the choice» call, and it is the only body that
     # is safe to send at a profile the test does not own.
     "/api/choose-genome": {"path": ""},

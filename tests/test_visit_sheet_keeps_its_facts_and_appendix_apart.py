@@ -9,6 +9,48 @@ from tests.test_ingest_reads_a_table import TableCase
 
 
 class TestVisitSheet(TableCase):
+    def test_current_result_without_range_stays_unassessed(self):
+        from datetime import date
+        row = {"key": "synthetic-unassessed", "name": "Synthetic observation",
+               "date": date.today().isoformat(), "date_source": "legacy-unknown-origin",
+               "abnormal": False, "flag": "norange", "value": 12, "unit": "u"}
+        with mock.patch("scholion.engine.visit.analyze_labs", return_value={"markers": [row], "count": 1}):
+            result = engine.visit_sheet()
+        self.assertEqual(result["measurements"], [])
+        held = result["held_measurements"][0]
+        self.assertEqual(held["key"], "synthetic-unassessed")
+        self.assertEqual(held["date_basis_label"], i18n.t("visit.date_basis.unrecorded"))
+
+
+    def test_plain_text_source_is_retained_in_the_visit_handout(self):
+        from datetime import date
+        from scholion import core
+        stamp = date.today().isoformat()
+        row = {"key": "creatinine", "name": "Creatinine", "date": stamp,
+               "abnormal": True, "flag": "high", "value": 150, "unit": "µmol/L"}
+        (self.profile / "labs.json").write_text(json.dumps({"markers": {
+            "creatinine": {"series": [{"date": stamp, "value": 150,
+                                      "source": "Synthetic archived form"}]}}}), encoding="utf-8")
+        core.reset_cache()
+        with mock.patch("scholion.engine.visit.analyze_labs", return_value={"markers": [row], "count": 1}):
+            result = engine.visit_sheet()
+        self.assertEqual(result["measurements"][0]["source"], "Synthetic archived form")
+        self.assertIn("Synthetic archived form", result["measurements"][0]["source_label"])
+
+
+    def test_disappeared_agenda_item_requires_refresh(self):
+        with self.assertRaisesRegex(ValueError, "refresh the review"):
+            engine.visit_sheet(agenda_ids=["lab:no-longer-present"])
+
+    def test_undated_abnormal_result_is_held_outside_current_agenda(self):
+        row = {"key": "synthetic", "name": "Synthetic observation", "date": None,
+               "abnormal": True, "flag": "high", "value": 12, "unit": "u"}
+        with mock.patch("scholion.engine.visit.analyze_labs", return_value={"markers": [row], "count": 1}):
+            result = engine.visit_sheet()
+        self.assertEqual(result["measurements"], [])
+        self.assertEqual(result["held_measurements"][0]["key"], "synthetic")
+        self.assertEqual(result["held_measurements"][0]["recency_note"], i18n.t("visit.date_unverified"))
+
     def test_sources_and_unassessed_values_survive_without_writing(self):
         source = {"path": "synthetic-form.pdf", "pages": [2, 3], "specimen": "blood"}
         self.assertTrue(store.add_lab_point("creatinine", "2026-02-01T08:30", 150,
@@ -66,7 +108,7 @@ class TestVisitSheet(TableCase):
             self.assertEqual("Synthetic visit sheet", ouroboros_tools._h_overview(None, visit_sheet=True,
                                                                                   include_reference=True))
             self.assertEqual("Synthetic visit sheet", ouroboros_tools._h_overview.both(visit_sheet=True)[0])
-            read.assert_any_call(True)
+            read.assert_any_call(True, None)
 
     def test_russian_sheet_has_translated_headings_and_date_basis(self):
         previous = i18n.lang()

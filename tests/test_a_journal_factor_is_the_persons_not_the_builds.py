@@ -95,9 +95,11 @@ class TestTheFaces(_Profile):
             tools["sch_focus_log"].handler(ot.ToolContext(), date="2026-09-20", factors="beta_blocker")
         self.assertTrue(self.entries()[0]["beta_blocker"])
 
-    def test_the_page_draws_the_declared_factors_and_names_no_drug(self):
+    def test_the_page_keeps_response_recording_without_the_retired_focus_block(self):
         page = (support.SRC / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("f.journal.factors", page)
+        self.assertNotIn("today-focus", page)
+        self.assertIn("response-form", page)
+        self.assertIn("/api/focus/log", page)
         self.assertNotIn("fc-aten", page)
         self.assertNotIn("web.focus.atenolol", page)
 

@@ -70,7 +70,9 @@ class TestIndependentClaims(unittest.TestCase):
 
     def test_the_reference_book_and_marker_index_share_the_gate(self):
         original = core._read_knowledge("system_gene_panels.json")["systems"]["renal"]["positions"]
-        spec = next(p for p in original if p.get("rsid") == "rs2231142")
+        spec = copy.deepcopy(next(p for p in original if p.get("rsid") == "rs2231142"))
+        spec["expect"].pop("source", None)
+        spec["expect"].pop("mechanism", None)
         reference = panel_catalogue._position(spec)
         self.assertEqual("complete", reference["conclusion_basis"]["status"])
         self.assertIsNone(reference["expect"])
@@ -92,7 +94,7 @@ class TestIndependentClaims(unittest.TestCase):
             with mock.patch.object(SP, "_genotype", return_value={"state": "het", "read": True,
                                    "genotype": "G/T", "confidence": "called"}), \
                     mock.patch.object(SP, "_has_alignment", return_value=False):
-                row = SP._curated_rows("amino_acids", {**raw, "positions": [spec]}, [],
+                row = SP._curated_rows("amino_acids", {**raw, "positions": [spec]}, [spec["expect"]["marker"]],
                                       {"status": "ok", "input_profile": "whole_genome"}, {})["rows"][0]
             self.assertIsNone(row["route"])
             self.assertTrue(row["read"])

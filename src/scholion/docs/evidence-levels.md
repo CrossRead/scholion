@@ -15,7 +15,7 @@ different things.
 | **B** | An association replicated in independent cohorts, with a measured effect size. | What follows, with the effect size and the source. |
 | **C** | Single studies, or studies that contradict each other. | Your reading and the available interpretation, with confidence, sources and limitations. |
 | **D** | A candidate gene whose association has not been replicated. | Your reading and the available interpretation, with confidence, sources and limitations. |
-| **E** | No source at all: the position came from a laboratory report and nothing published stands behind it. | Your reading, known gene function and any recorded interpretation labelled unestablished; missing variant evidence stays explicit. |
+| **E** | An interpretation of this specific variant is not established in the curated sources. Known gene function and any external database classification are shown separately. | Your reading, known gene function and any recorded interpretation labelled unestablished; missing variant evidence stays explicit. |
 
 ## Confidence and clinical eligibility
 

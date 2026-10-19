@@ -476,13 +476,18 @@ def medications_report(r: Dict[str, Any]) -> str:
         for event in treatment.get("undated") or []:
             out.append(f"  · {event['name']} — {_t('treatment.undated')}")
         out += control_lines(treatment.get("controls") or [])
+        if treatment.get("historical_controls"):
+            out += ["", _t("treatment.history_controls")]
+            out += control_lines(treatment["historical_controls"], include_inactive=True)
     return "\n".join(out)
 
 
-def control_lines(controls: List[Dict[str, Any]]) -> List[str]:
+def control_lines(controls: List[Dict[str, Any]], include_inactive: bool = False) -> List[str]:
     """The same dated-plan facts in the regimen and the first screen."""
     out = []
     for control in controls:
+        if control.get("current") is False and not include_inactive:
+            continue
         out.append("  · " + _t("treatment.control", name=control.get("name") or "—",
                               marker=control.get("marker") or "—",
                               start=control.get("from") or "—", due=control.get("due") or "—")

@@ -120,7 +120,7 @@ class TestC5EveryAnswerNamesItsContainer(_Two):
         s = mcp_server.Session()
         self.rpc("initialize", {"protocolVersion": "2025-06-18"}, s)
         names = [t["name"] for t in self.rpc("tools/list", {}, s)["result"]["tools"]]
-        self.assertEqual(39, len(names))
+        self.assertEqual(40, len(names))
         for name in names:
             if name in WRITERS:
                 continue

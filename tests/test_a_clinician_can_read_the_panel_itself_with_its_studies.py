@@ -75,7 +75,9 @@ class TestThePageLinksToIt(unittest.TestCase):
         html = (ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
         self.assertIn("async function viewPanel(key,reading=null,focusGene=null)", html)
         self.assertIn("/api/panel?key=", html)
-        self.assertEqual(3, html.count('data-panel="${esc('), "the radar block, card and gene names open the panel")
+        for door in ('data-panel="${esc(key)}" data-panel-gene=',
+                     'data-panel="${esc(r.key)}"', 'data-panel="${esc(s.key)}"'):
+            self.assertIn(door, html, "the existing radar, system and gene doors remain available")
         self.assertIn("closest('[data-panel]')", html)
 
 

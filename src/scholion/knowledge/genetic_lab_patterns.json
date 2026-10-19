@@ -1,0 +1,1770 @@
+{
+  "_meta": {
+    "version": "1",
+    "updated": "2026-10-18",
+    "source_tier": "curated_reference",
+    "scope": "Conditional clinical contexts; no diagnosis or clinical validation."
+  },
+  "patterns": [
+    {
+      "association_id": "pattern:dio1_ft3_ft4",
+      "kind": "ratio",
+      "genes": [
+        "DIO1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs2235544",
+          "gene": "DIO1",
+          "hgvs": "NC_000001.11:g.53909897C>A",
+          "risk_allele": "A",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "thyroid"
+      ],
+      "markers": [
+        "t3_free",
+        "t4_free"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "The DIO1 A allele is associated with a lower free T3/free T4 ratio. The ratio alone does not establish hormone deficiency.",
+        "ru": "Аллель A DIO1 связан с меньшим отношением свободного T3 к свободному T4. Само отношение не устанавливает недостаток гормонов."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2515080/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "t3_free": {
+          "specimens": [
+            "serum",
+            "edta_plasma"
+          ],
+          "units": [
+            "pmol/L"
+          ],
+          "methods": [
+            "immunoassay",
+            "chemiluminescence",
+            "eclia",
+            "ria"
+          ]
+        },
+        "t4_free": {
+          "specimens": [
+            "serum",
+            "edta_plasma"
+          ],
+          "units": [
+            "pmol/L"
+          ],
+          "methods": [
+            "immunoassay",
+            "chemiluminescence",
+            "eclia",
+            "ria"
+          ]
+        }
+      },
+      "requires_same_draw": true,
+      "requires_sex": false,
+      "hypothesis_reason": null
+    },
+    {
+      "association_id": "pattern:shbg_12150660_testosterone",
+      "kind": "hypothesis",
+      "genes": [
+        "SHBG"
+      ],
+      "variants": [
+        {
+          "rsid": "rs12150660",
+          "gene": "SHBG",
+          "hgvs": "NC_000017.11:g.7618597G>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "gonads"
+      ],
+      "markers": [
+        "testosterone",
+        "shbg"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This SHBG variant is associated with higher total testosterone; SHBG binding affects its interpretation.",
+        "ru": "Этот вариант SHBG связан с более высоким общим тестостероном; связывание с SHBG влияет на его интерпретацию."
+      },
+      "source": "https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1002313",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "testosterone": {
+          "specimens": [],
+          "units": [
+            "nmol/L"
+          ]
+        },
+        "shbg": {
+          "specimens": [],
+          "units": [
+            "nmol/L"
+          ]
+        }
+      },
+      "requires_same_draw": false,
+      "requires_sex": false,
+      "hypothesis_reason": "assay_curation_pending"
+    },
+    {
+      "association_id": "pattern:apoe_diplotype_ldl",
+      "kind": "apoe",
+      "genes": [
+        "APOE"
+      ],
+      "variants": [
+        {
+          "rsid": "rs429358",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908684T>C",
+          "risk_allele": "C",
+          "mode": "common_variant"
+        },
+        {
+          "rsid": "rs7412",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908822C>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "ldl"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "APOE affects lipoprotein metabolism. An unambiguous diplotype helps place LDL cholesterol and current treatment in genetic context.",
+        "ru": "APOE влияет на обмен липопротеинов. Однозначный диплотип помогает сопоставить генетическую предрасположенность с ЛПНП и текущим лечением."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/8018666/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "ldl": {
+          "specimens": [
+            "plasma"
+          ],
+          "units": [
+            "mmol/L"
+          ]
+        }
+      },
+      "requires_same_draw": false,
+      "requires_sex": false,
+      "hypothesis_reason": null,
+      "replaces": [
+        "APOE:rs429358:ldl:quantitative",
+        "APOE:rs7412:ldl:quantitative"
+      ]
+    },
+    {
+      "association_id": "pattern:hfe_c282y_iron",
+      "kind": "iron",
+      "genes": [
+        "HFE"
+      ],
+      "variants": [
+        {
+          "rsid": "rs1800562",
+          "gene": "HFE",
+          "hgvs": "NC_000006.12:g.26092913G>A",
+          "risk_allele": "A",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "liver",
+        "micronutrients",
+        "gonads"
+      ],
+      "markers": [
+        "ferritin",
+        "transferrin_sat"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "With two HFE C282Y copies, ferritin is interpreted together with transferrin saturation. Joint elevation is compatible with possible iron overload but does not establish its cause.",
+        "ru": "При двух копиях HFE C282Y ферритин оценивают вместе с насыщением трансферрина. Их совместное повышение согласуется с возможной перегрузкой железом, но не устанавливает её причину."
+      },
+      "source": "https://www.nejm.org/doi/full/10.1056/NEJMoa073286; https://www.ncbi.nlm.nih.gov/books/NBK1440/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "ferritin": {
+          "specimens": [
+            "serum"
+          ],
+          "units": [
+            "ug/L"
+          ]
+        },
+        "transferrin_sat": {
+          "specimens": [
+            "serum"
+          ],
+          "units": [
+            "%"
+          ],
+          "methods": [
+            "reported",
+            "validated_same_draw_calculation"
+          ]
+        }
+      },
+      "requires_same_draw": true,
+      "requires_sex": true,
+      "hypothesis_reason": null,
+      "replaces": [
+        "HFE:rs1800562:ferritin:quantitative"
+      ]
+    },
+    {
+      "association_id": "pattern:g6pd_rs1050828_hba1c",
+      "kind": "bias",
+      "genes": [
+        "G6PD"
+      ],
+      "variants": [
+        {
+          "rsid": "rs1050828",
+          "gene": "G6PD",
+          "hgvs": "NC_000023.11:g.154536002C>T",
+          "risk_allele": "T",
+          "mode": "pgx"
+        }
+      ],
+      "systems": [
+        "glucose"
+      ],
+      "markers": [
+        "hba1c"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This G6PD variant can lower HbA1c independently of glucose. A low HbA1c therefore does not always indicate improved glycaemia.",
+        "ru": "Этот вариант G6PD может снижать HbA1c независимо от уровня глюкозы. Низкий HbA1c поэтому не всегда означает улучшение гликемии."
+      },
+      "source": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1002383; https://biobank.ndph.ox.ac.uk/showcase/ukb/docs/serum_hb1ac.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "hba1c": {
+          "specimens": [
+            "whole_blood",
+            "packed_red_blood_cells"
+          ],
+          "units": [
+            "%"
+          ],
+          "methods": [
+            "hplc",
+            "validated_hba1c"
+          ]
+        }
+      },
+      "requires_same_draw": false,
+      "requires_sex": true,
+      "hypothesis_reason": null,
+      "replaces": [
+        "G6PD:rs1050828:hba1c:quantitative"
+      ]
+    },
+    {
+      "association_id": "pattern:g6pd_rs5030868_hba1c",
+      "kind": "bias",
+      "genes": [
+        "G6PD"
+      ],
+      "variants": [
+        {
+          "rsid": "rs5030868",
+          "gene": "G6PD",
+          "hgvs": "NC_000023.11:g.154534419G>A",
+          "risk_allele": "A",
+          "mode": "pgx"
+        }
+      ],
+      "systems": [
+        "glucose"
+      ],
+      "markers": [
+        "hba1c"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This G6PD variant can lower HbA1c independently of glucose. A low HbA1c therefore does not always indicate improved glycaemia.",
+        "ru": "Этот вариант G6PD может снижать HbA1c независимо от уровня глюкозы. Низкий HbA1c поэтому не всегда означает улучшение гликемии."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8792153/; https://biobank.ndph.ox.ac.uk/showcase/ukb/docs/serum_hb1ac.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "endpoint": {
+        "hba1c": {
+          "specimens": [
+            "whole_blood",
+            "packed_red_blood_cells"
+          ],
+          "units": [
+            "%"
+          ],
+          "methods": [
+            "hplc",
+            "validated_hba1c"
+          ]
+        }
+      },
+      "requires_same_draw": false,
+      "requires_sex": true,
+      "hypothesis_reason": null,
+      "replaces": [
+        "G6PD:rs5030868:hba1c:quantitative"
+      ]
+    },
+    {
+      "association_id": "pattern:rs111033565_episode",
+      "kind": "hypothesis",
+      "genes": [
+        "PRSS1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs111033565",
+          "gene": "PRSS1",
+          "hgvs": "NC_000007.14:g.142751938G>A",
+          "risk_allele": "A",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "pancreas"
+      ],
+      "markers": [
+        "lipase",
+        "amylase"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This variant is relevant to pancreatitis susceptibility. Interpret enzymes alongside a recorded clinical episode; normal values between episodes do not remove susceptibility.",
+        "ru": "Этот вариант относится к предрасположенности к панкреатиту. Ферменты оценивают вместе с записанным клиническим эпизодом; нормальные значения между эпизодами не отменяют предрасположенность."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK84399/; https://www.ncbi.nlm.nih.gov/books/NBK190101/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "episode_and_variant_review"
+    },
+    {
+      "association_id": "pattern:rs111033566_episode",
+      "kind": "hypothesis",
+      "genes": [
+        "PRSS1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs111033566",
+          "gene": "PRSS1",
+          "hgvs": "NC_000007.14:g.142750600A>C",
+          "risk_allele": "C",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "pancreas"
+      ],
+      "markers": [
+        "lipase",
+        "amylase"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This variant is relevant to pancreatitis susceptibility. Interpret enzymes alongside a recorded clinical episode; normal values between episodes do not remove susceptibility.",
+        "ru": "Этот вариант относится к предрасположенности к панкреатиту. Ферменты оценивают вместе с записанным клиническим эпизодом; нормальные значения между эпизодами не отменяют предрасположенность."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK84399/; https://www.ncbi.nlm.nih.gov/books/NBK190101/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "episode_and_variant_review"
+    },
+    {
+      "association_id": "pattern:rs17107315_episode",
+      "kind": "hypothesis",
+      "genes": [
+        "SPINK1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs17107315",
+          "gene": "SPINK1",
+          "hgvs": "NC_000005.10:g.147828115T>C",
+          "risk_allele": "C",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "pancreas"
+      ],
+      "markers": [
+        "lipase",
+        "amylase"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "This variant is relevant to pancreatitis susceptibility. Interpret enzymes alongside a recorded clinical episode; normal values between episodes do not remove susceptibility.",
+        "ru": "Этот вариант относится к предрасположенности к панкреатиту. Ферменты оценивают вместе с записанным клиническим эпизодом; нормальные значения между эпизодами не отменяют предрасположенность."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK84399/; https://www.ncbi.nlm.nih.gov/books/NBK190101/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "episode_and_variant_review"
+    },
+    {
+      "association_id": "pattern:rs118203993_context",
+      "kind": "hypothesis",
+      "genes": [
+        "ORAI1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs118203993",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121627018C>T",
+          "risk_allele": "T",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [
+        "lymph_abs"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "ORAI1 loss of function requires biallelic assessment and immune-function context; a normal lymphocyte count does not establish normal cellular function.",
+        "ru": "Потеря функции ORAI1 требует оценки двух аллелей и иммунной функции; нормальное число лимфоцитов не доказывает нормальную функцию клеток."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20004786/; https://pubmed.ncbi.nlm.nih.gov/25227914/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "inheritance_and_phenotype"
+    },
+    {
+      "association_id": "pattern:rs786204796_context",
+      "kind": "hypothesis",
+      "genes": [
+        "ORAI1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs786204796",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121627039G>A",
+          "risk_allele": "A",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [],
+      "association_level": "B",
+      "summary": {
+        "en": "ORAI1 gain of function concerns a different, muscle-related mechanism. Serum calcium is not a measure of cellular calcium entry.",
+        "ru": "Активация ORAI1 относится к другому, мышечному механизму. Кальций сыворотки не измеряет вход кальция в клетки."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20004786/; https://pubmed.ncbi.nlm.nih.gov/25227914/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "inheritance_and_phenotype"
+    },
+    {
+      "association_id": "pattern:rs3741596_context",
+      "kind": "excluded",
+      "genes": [
+        "ORAI1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs3741596",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121641389A>G",
+          "risk_allele": "G",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [],
+      "association_level": "B",
+      "summary": {
+        "en": "This benign ORAI1 catalogue variant does not establish a pathogenic mechanism.",
+        "ru": "Этот доброкачественный вариант ORAI1 в каталоге не устанавливает патогенный механизм."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20004786/; https://pubmed.ncbi.nlm.nih.gov/25227914/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "inheritance_and_phenotype"
+    },
+    {
+      "association_id": "pattern:rs781829024_context",
+      "kind": "excluded",
+      "genes": [
+        "ORAI1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs781829024",
+          "gene": "ORAI1",
+          "hgvs": "NC_000012.12:g.121626842A>C",
+          "risk_allele": "C",
+          "mode": "monogenic"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [],
+      "association_level": "C",
+      "summary": {
+        "en": "Conflicting ORAI1 classification does not establish pathogenicity from allele count.",
+        "ru": "Конфликтующая классификация ORAI1 не устанавливает патогенность по числу копий аллеля."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20004786/; https://pubmed.ncbi.nlm.nih.gov/25227914/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "inheritance_and_phenotype"
+    },
+    {
+      "association_id": "pattern:asl_context",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "ASL"
+      ],
+      "variants": [],
+      "systems": [
+        "amino_acids"
+      ],
+      "markers": [
+        "citrulline",
+        "aa_arginine",
+        "aa_glutamine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "ASL participates in the urea cycle. A relevant molecular finding needs inheritance/phase and biochemical context; albumin and total protein do not measure ASL activity. Argininosuccinate cannot be replaced by arginine.",
+        "ru": "ASL участвует в цикле мочевины. Релевантная молекулярная находка требует оценки наследования, фазы и биохимического контекста; альбумин и общий белок не измеряют активность ASL. Аргининосукцинат нельзя заменить аргинином."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK51784/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:thiopurine_blood",
+      "kind": "drug_context",
+      "genes": [
+        "TPMT",
+        "NUDT15"
+      ],
+      "variants": [
+        {
+          "rsid": "rs1800462",
+          "gene": "TPMT",
+          "hgvs": "NC_000006.12:g.18143724C>G",
+          "risk_allele": "G",
+          "mode": "pgx"
+        },
+        {
+          "rsid": "rs1142345",
+          "gene": "TPMT",
+          "hgvs": "NC_000006.12:g.18130687T>C",
+          "risk_allele": "C",
+          "mode": "pgx"
+        },
+        {
+          "rsid": "rs116855232",
+          "gene": "NUDT15",
+          "hgvs": "NC_000013.11:g.48045719C>T",
+          "risk_allele": "T",
+          "mode": "pgx"
+        }
+      ],
+      "systems": [
+        "inflammation"
+      ],
+      "markers": [
+        "wbc",
+        "neut_abs",
+        "platelets"
+      ],
+      "association_level": "A",
+      "summary": {
+        "en": "An established TPMT/NUDT15 phenotype can qualify thiopurine tolerance. Blood-count changes during a recorded active course are context, not proof of drug causation; a tag SNP alone does not establish the full phenotype.",
+        "ru": "Установленный фенотип TPMT/NUDT15 может уточнить переносимость тиопуринов. Изменения ОАК во время записанного действующего курса — контекст, а не доказательство лекарственной причины; один SNP не определяет полный фенотип."
+      },
+      "source": "https://files.cpicpgx.org/data/guideline/publication/thiopurines/2026/41618934.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "diplotype_and_treatment_context"
+    },
+    {
+      "association_id": "pattern:tm6sf2_alt",
+      "kind": "hypothesis",
+      "genes": [
+        "TM6SF2"
+      ],
+      "variants": [
+        {
+          "rsid": "rs58542926",
+          "gene": "TM6SF2",
+          "hgvs": "NC_000019.10:g.19268740C>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "liver"
+      ],
+      "markers": [
+        "alt"
+      ],
+      "association_level": "C",
+      "summary": {
+        "en": "TM6SF2 liver-fat susceptibility does not imply persistently high ALT; normal ALT does not exclude steatosis.",
+        "ru": "Предрасположенность TM6SF2 к накоплению жира в печени не означает постоянно высокую АЛТ; нормальная АЛТ не исключает стеатоз."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3969786/; https://pmc.ncbi.nlm.nih.gov/articles/PMC5397347/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "clinical_context_required"
+    },
+    {
+      "association_id": "pattern:ugt1a1_bilirubin",
+      "kind": "hypothesis",
+      "genes": [
+        "UGT1A1"
+      ],
+      "variants": [
+        {
+          "rsid": "rs4148323",
+          "gene": "UGT1A1",
+          "hgvs": "NC_000002.12:g.233760498G>A",
+          "risk_allele": "A",
+          "mode": "pgx"
+        }
+      ],
+      "systems": [
+        "liver"
+      ],
+      "markers": [
+        "bilirubin_total"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "UGT1A1 can affect bilirubin handling. Total bilirubin alone does not establish an unconjugated predominance or Gilbert syndrome.",
+        "ru": "UGT1A1 может влиять на обмен билирубина. Общий билирубин сам по себе не устанавливает преобладание непрямой фракции или синдром Жильбера."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20639394/; https://pubmed.ncbi.nlm.nih.gov/19343046/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "clinical_context_required"
+    },
+    {
+      "association_id": "pattern:umod_egfr",
+      "kind": "hypothesis",
+      "genes": [
+        "UMOD"
+      ],
+      "variants": [
+        {
+          "rsid": "rs12917707",
+          "gene": "UMOD",
+          "hgvs": "NC_000016.10:g.20356368G>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "renal"
+      ],
+      "markers": [
+        "egfr_ckdepi"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "The UMOD association concerns creatinine-based eGFR. The equation and comparable measurements matter; raw creatinine cannot replace this endpoint.",
+        "ru": "Связь UMOD относится к рСКФ по креатинину. Важны формула и сопоставимые измерения; сам креатинин не заменяет этот показатель."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3039280/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "clinical_context_required"
+    },
+    {
+      "association_id": "pattern:shbg_6258",
+      "kind": "hypothesis",
+      "genes": [
+        "SHBG"
+      ],
+      "variants": [
+        {
+          "rsid": "rs6258",
+          "gene": "SHBG",
+          "hgvs": "NC_000017.11:g.7631360C>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "gonads"
+      ],
+      "markers": [
+        "testosterone",
+        "shbg"
+      ],
+      "association_level": "C",
+      "summary": {
+        "en": "SHBG binding can change how total testosterone is interpreted. Measured and calculated free testosterone are distinct; this variant does not establish androgen status.",
+        "ru": "Связывание с SHBG может менять интерпретацию общего тестостерона. Измеренный и расчётный свободный тестостерон различаются; этот вариант не устанавливает андрогенный статус."
+      },
+      "source": "https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1002313",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "clinical_context_required"
+    },
+    {
+      "association_id": "pattern:apoe_e2e2_mixed_lipids",
+      "kind": "apoe_mixed",
+      "genes": [
+        "APOE"
+      ],
+      "variants": [
+        {
+          "rsid": "rs429358",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908684T>C",
+          "risk_allele": "C",
+          "mode": "common_variant"
+        },
+        {
+          "rsid": "rs7412",
+          "gene": "APOE",
+          "hgvs": "NC_000019.10:g.44908822C>T",
+          "risk_allele": "T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "cholesterol_total",
+        "triglycerides"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "An unambiguous APOE epsilon2/epsilon2 diplotype can inform a mixed-lipid hypothesis. Genotype and total cholesterol/triglycerides alone do not diagnose dysbetalipoproteinaemia.",
+        "ru": "Однозначный диплотип APOE ε2/ε2 может уточнить гипотезу сочетанного изменения липидов. Генотип, общий холестерин и триглицериды сами по себе не устанавливают дисбеталипопротеинемию."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/7966894/; https://pubmed.ncbi.nlm.nih.gov/8018666/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "clinical_context_required"
+    },
+    {
+      "association_id": "pattern:ldlr_fh_ldl",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "LDLR"
+      ],
+      "variants": [],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "ldl"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "A classified LDLR finding requires its specific mechanism and inheritance before linking it to LDL. GenCC validity alone does not establish this person’s molecular diagnosis.",
+        "ru": "Классифицированная находка LDLR требует оценки конкретного механизма и наследования перед сопоставлением с ЛПНП. Достоверность GenCC сама по себе не устанавливает молекулярный диагноз у человека."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK174884/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:apob_fh_ldl",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "APOB"
+      ],
+      "variants": [],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "ldl"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "A classified APOB finding requires its specific mechanism and inheritance before linking it to LDL. GenCC validity alone does not establish this person’s molecular diagnosis.",
+        "ru": "Классифицированная находка APOB требует оценки конкретного механизма и наследования перед сопоставлением с ЛПНП. Достоверность GenCC сама по себе не устанавливает молекулярный диагноз у человека."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK174884/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:pcsk9_fh_ldl",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "PCSK9"
+      ],
+      "variants": [],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "ldl"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "A classified PCSK9 finding requires its specific mechanism and inheritance before linking it to LDL. GenCC validity alone does not establish this person’s molecular diagnosis.",
+        "ru": "Классифицированная находка PCSK9 требует оценки конкретного механизма и наследования перед сопоставлением с ЛПНП. Достоверность GenCC сама по себе не устанавливает молекулярный диагноз у человека."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK174884/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:ldlrap1_fh_ldl",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "LDLRAP1"
+      ],
+      "variants": [],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "ldl"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "A classified LDLRAP1 finding requires its specific mechanism and inheritance before linking it to LDL. GenCC validity alone does not establish this person’s molecular diagnosis.",
+        "ru": "Классифицированная находка LDLRAP1 требует оценки конкретного механизма и наследования перед сопоставлением с ЛПНП. Достоверность GenCC сама по себе не устанавливает молекулярный диагноз у человека."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK174884/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "en": "A clinical hypothesis, not a diagnosis or proof of causation. A normal measurement does not remove a predisposition. Missing data are not an indication for additional testing. Inheritance, phase, variant classification, treatment and clinical history need their own recorded evidence.",
+        "ru": "Клиническая гипотеза, не диагноз и не доказательство причины. Нормальное измерение не отменяет предрасположенность. Недостаток данных не является показанием к дополнительным анализам. Наследование, фаза, классификация варианта, лечение и анамнез требуют собственных записанных оснований."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:nitrogen_disposal",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "CPS1",
+        "NAGS",
+        "OTC",
+        "ASS1",
+        "ARG1",
+        "SLC25A15",
+        "SLC25A13"
+      ],
+      "variants": [],
+      "systems": [
+        "amino_acids",
+        "liver"
+      ],
+      "markers": [
+        "ammonia",
+        "citrulline",
+        "aa_arginine",
+        "aa_ornithine",
+        "aa_glutamine",
+        "oa_orotic"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "Urea-cycle defects can alter ammonia and amino-acid patterns; direction depends on the affected step. Compare an ammonia elevation with the amino-acid pattern and the exact variant. Isolated low citrulline does not establish a cycle defect.",
+        "ru": "Нарушение этапов цикла мочевины может менять аммиак и профиль аминокислот; направление зависит от этапа. Сопоставить эпизод повышения аммиака с аминокислотным профилем и точным вариантом. Один низкий цитруллин не устанавливает дефект цикла."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1217/; https://www.ncbi.nlm.nih.gov/books/NBK55827/bin/Decreased-Citrulline.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "CPS1 rs715 не запускает моногенную гипотезу. Оротовая кислота неспецифична; обработка образца аммиака критична.",
+        "en": "CPS1 rs715 must not activate a monogenic hypothesis. Orotic acid is nonspecific; ammonia sample handling matters."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "OTC": "X-linked; heterozygous females require phenotype-specific review",
+        "other_members": "autosomal recessive"
+      },
+      "missing_inputs": [
+        "same_episode_specimen_and_processing",
+        "argininosuccinate_not_in_dictionary",
+        "homocitrulline_not_in_dictionary",
+        "phase_and_pathogenic_variant_confirmation"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:branched_chain_catabolism",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "BCKDHA",
+        "BCKDHB",
+        "DBT"
+      ],
+      "variants": [],
+      "systems": [
+        "amino_acids"
+      ],
+      "markers": [
+        "aa_leucine",
+        "aa_isoleucine",
+        "valine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "The BCKD complex participates in leucine, isoleucine and valine breakdown. A coordinated BCAA elevation can be reviewed alongside a confirmed monogenic finding and episode context.",
+        "ru": "Комплекс BCKD участвует в распаде лейцина, изолейцина и валина. Согласованное повышение BCAA можно обсудить вместе с подтверждённой моногенной находкой и контекстом эпизода."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1319/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Умеренное изменение BCAA не устанавливает MSUD; питание и состояние обмена учитываются отдельно.",
+        "en": "A modest BCAA change does not establish MSUD; nutritional and metabolic context remain separate."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "all_members": "autosomal recessive"
+      },
+      "missing_inputs": [
+        "alloisoleucine_not_in_dictionary",
+        "episode_timing_and_nutrition",
+        "confirmed_biallelic_variants_in_trans"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:intracellular_cobalamin_remethylation",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "MMACHC",
+        "MMADHC",
+        "LMBRD1",
+        "ABCD4",
+        "MTR",
+        "MTRR",
+        "MTHFR"
+      ],
+      "variants": [],
+      "systems": [
+        "amino_acids",
+        "micronutrients"
+      ],
+      "markers": [
+        "homocysteine",
+        "aa_methionine",
+        "oa_methylmalonic",
+        "vitamin_b12",
+        "folate",
+        "creatinine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "Remethylation links homocysteine and methionine; some B12-processing defects also raise methylmalonic acid. Review homocysteine, methionine and MMA jointly, keeping circulating B12 distinct from intracellular function.",
+        "ru": "Реметилирование связывает гомоцистеин и метионин; часть дефектов B12 также повышает метилмалоновую кислоту. Сопоставить сочетание гомоцистеина, метионина и MMA, сохранив различие между концентрацией B12 и внутриклеточной функцией."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1328/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Обычные MTHFR/MTR/MTRR SNP не означают тяжёлый ферментный дефект. Мочевая MMA не подменяет сывороточную; учитывать функцию почек.",
+        "en": "Common MTHFR/MTR/MTRR SNPs do not establish severe enzyme deficiency. Urine MMA cannot substitute for serum MMA; renal function matters."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "all_listed_members": "autosomal recessive for the disorders in this pattern"
+      },
+      "missing_inputs": [
+        "plasma_serum_MMA_not_in_dictionary",
+        "same_episode_specimen",
+        "nutrition_and_supplement_history",
+        "confirmed_biallelic_pathogenic_variants"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:phenylalanine_handling",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "PAH",
+        "PTS",
+        "QDPR",
+        "PCBD1",
+        "DNAJC12"
+      ],
+      "variants": [],
+      "systems": [
+        "amino_acids"
+      ],
+      "markers": [
+        "aa_phenylalanine",
+        "aa_tyrosine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "PAH converts phenylalanine to tyrosine; BH4 and related proteins support this pathway. Persistent phenylalanine elevation permits discussion of this pathway with genotype and specialist evaluation.",
+        "ru": "PAH превращает фенилаланин в тирозин; BH4 и связанные белки поддерживают этот путь. Устойчивое повышение фенилаланина допускает обсуждение этого механизма с учётом генотипа и специализированного обследования."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1504/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Не выводить дефицит BH4 по одному SNP, низкому тирозину или соотношению из разных заборов.",
+        "en": "Do not infer BH4 deficiency from one SNP, low tyrosine or a ratio assembled from different draws."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "all_listed_members": "autosomal recessive"
+      },
+      "missing_inputs": [
+        "pterins_not_in_dictionary",
+        "DHPR_activity_not_in_dictionary",
+        "age_nutrition_and_treatment_context",
+        "confirmed_biallelic_variants"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:chylomicron_clearance",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "LPL",
+        "APOC2",
+        "APOA5",
+        "GPIHBP1"
+      ],
+      "variants": [],
+      "systems": [
+        "lipids"
+      ],
+      "markers": [
+        "triglycerides",
+        "hdl",
+        "apob",
+        "glucose",
+        "hba1c",
+        "tsh"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "LPL and its cofactors support clearance of triglyceride-rich particles. Persistent marked hypertriglyceridemia can be compared with exact variants and history after considering secondary causes.",
+        "ru": "LPL и его кофакторы обеспечивают удаление богатых триглицеридами частиц. Стойкую выраженную гипертриглицеридемию можно сопоставить с точными вариантами и анамнезом после учёта вторичных причин."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1308/; https://www.ncbi.nlm.nih.gov/books/NBK395574/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Не объявлять семейную хиломикронемию по одной аллели или обычному повышению TG. Диабет, алкоголь и лекарства могут менять картину.",
+        "en": "Do not label familial chylomicronemia from one allele or an ordinary TG elevation. Diabetes, alcohol and medication can alter the pattern."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "all_listed_members": "autosomal recessive for familial chylomicronemia; single variants may have different susceptibility effects"
+      },
+      "missing_inputs": [
+        "fasting_and_treatment_history",
+        "chylomicron_presence_or_specialist_assessment",
+        "phase_and_variant_class",
+        "LMF1_absent_from_current_GenCC_system_catalogue"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:glyoxylate_oxalate",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "AGXT",
+        "GRHPR",
+        "HOGA1"
+      ],
+      "variants": [],
+      "systems": [
+        "renal"
+      ],
+      "markers": [
+        "oa_oxalic",
+        "creatinine",
+        "urine_creatinine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "Defects in these enzymes can increase oxalate production. Review confirmed hyperoxaluria with stone history, kidney function and exact variants.",
+        "ru": "Дефекты этих ферментов могут увеличивать образование оксалатов. Обсудить подтверждённую гипероксалурию вместе с камнями, функцией почек и точными вариантами."
+      },
+      "source": "https://medlineplus.gov/genetics/condition/primary-hyperoxaluria/; https://www.ncbi.nlm.nih.gov/books/NBK2692/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Оксалаты кала не подходят. Одиночный органический профиль мочи не равен диагнозу; питание и кишечное всасывание — альтернативы.",
+        "en": "Stool oxalate is unsuitable. One urine organic-acid profile is not a diagnosis; diet and intestinal absorption are alternatives."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "all_members": "autosomal recessive"
+      },
+      "missing_inputs": [
+        "validated_urinary_oxalate_method_and_age_reference",
+        "24h_collection_or_appropriate_creatinine_ratio",
+        "plasma_oxalate_when_clinically_relevant_not_in_dictionary",
+        "stone_composition_history"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:cystine_transport",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "SLC3A1",
+        "SLC7A9"
+      ],
+      "variants": [],
+      "systems": [
+        "renal",
+        "amino_acids"
+      ],
+      "markers": [
+        "urine_aa_cystine",
+        "urine_aa_lysine",
+        "urine_aa_ornithine",
+        "urine_aa_arginine",
+        "urine_cystine_creatinine_ratio",
+        "urine_ph"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "The transporter reabsorbs cystine and dibasic amino acids from filtrate. The urine pattern and stone composition can be reviewed alongside exact variants; blood does not replace urine.",
+        "ru": "Транспортёр возвращает цистин и двухосновные аминокислоты из первичной мочи. Мочевой паттерн и состав камней можно сопоставить с точными вариантами; кровь не заменяет мочу."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK619248/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Носительство нельзя всегда считать ни заболеванием, ни безусловно нейтральным: исключения зависят от гена и варианта.",
+        "en": "A heterozygous finding is neither always disease nor always neutral: exceptions depend on gene and variant."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "biallelic": "autosomal recessive",
+        "SLC7A9_heterozygous": "reduced-penetrance phenotype possible",
+        "SLC3A1_heterozygous": "specific exon5–9 tandem duplication exception; not any single variant",
+        "digenic": "requires explicit specialist interpretation"
+      },
+      "missing_inputs": [
+        "validated_urinary_method_and_collection",
+        "stone_composition",
+        "CNV_and_phase_resolution",
+        "specific_SLC3A1_duplication_identity"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:phosphate_handling",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "PHEX",
+        "FGF23",
+        "DMP1",
+        "ENPP1",
+        "SLC34A3",
+        "SLC34A1"
+      ],
+      "variants": [],
+      "systems": [
+        "musculoskeletal",
+        "micronutrients",
+        "renal"
+      ],
+      "markers": [
+        "phosphorus",
+        "alp",
+        "pth",
+        "calcium_total",
+        "calcium_ionized",
+        "vitamin_d",
+        "creatinine"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "Phosphate loss may involve FGF23 regulation or renal tubular transporters. Compare persistently low phosphate with the mineral profile, age and the exact variant mechanism.",
+        "ru": "Потери фосфата могут зависеть от FGF23 или транспортёров почечных канальцев. Сопоставить устойчиво низкий фосфат с минеральным профилем, возрастом и точным механизмом варианта."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK279172/; https://medlineplus.gov/download/genetics/condition/hereditary-hypophosphatemic-rickets.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Низкий фосфат не доказывает почечную потерю. Разные механизмы одного гена могут давать противоположные картины.",
+        "en": "Low phosphate does not establish renal wasting. Different mechanisms in one gene may produce opposite patterns."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "PHEX": "X-linked dominant",
+        "FGF23": "autosomal dominant hypophosphatemic form requires appropriate gain-of-function mechanism",
+        "DMP1_ENPP1": "autosomal recessive hypophosphatemic forms",
+        "SLC34A3": "autosomal recessive HHRH; heterozygous phenotypes require separate review",
+        "SLC34A1": "phenotype-specific AD/AR assertions; no blanket model"
+      },
+      "missing_inputs": [
+        "urinary_phosphate_not_in_dictionary",
+        "paired_TmP_GFR_inputs_not_complete",
+        "FGF23_not_in_dictionary",
+        "1_25_dihydroxyvitamin_D_not_in_dictionary",
+        "age_specific_reference_and_medications"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:low_alkaline_phosphatase",
+      "kind": "gene_hypothesis",
+      "genes": [
+        "ALPL"
+      ],
+      "variants": [],
+      "systems": [
+        "musculoskeletal"
+      ],
+      "markers": [
+        "alp",
+        "bone_alp",
+        "vitamin_b6",
+        "calcium_total",
+        "phosphorus"
+      ],
+      "association_level": "B",
+      "summary": {
+        "en": "ALPL participates in mineralization; hypophosphatasia is associated with reduced alkaline phosphatase activity. Persistently low age-adjusted ALP can be reviewed with bone/dental history and the exact ALPL variant.",
+        "ru": "ALPL участвует в минерализации; гипофосфатазия связана со сниженной активностью щелочной фосфатазы. Стойко низкую возрастную ЩФ можно обсудить с костно-зубным анамнезом и точным вариантом ALPL."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/books/NBK1150/?report=reader; https://www.ncbi.nlm.nih.gov/gtr/conditions/C0268413/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "limitations": {
+        "ru": "Обычный ALPL rs1256328 не равен гипофосфатазии. Общий ключ vitamin_b6 не доказывает, что измерен PLP.",
+        "en": "Common ALPL rs1256328 does not establish hypophosphatasia. The generic vitamin_b6 key does not establish a PLP assay."
+      },
+      "hypothesis_reason": "molecular_and_biochemical_context",
+      "inheritance": {
+        "ALPL": "autosomal recessive or dominant depending on variant and phenotype"
+      },
+      "missing_inputs": [
+        "age_sex_specific_ALP_reference",
+        "PLP_analyte_identity_and_B6_supplement_context",
+        "urinary_phosphoethanolamine_not_in_dictionary",
+        "bone_dental_history"
+      ],
+      "level_scope": "mechanism_reference_not_personal_variant"
+    },
+    {
+      "association_id": "pattern:ptpn22_autoimmune_joint_context",
+      "kind": "hypothesis",
+      "genes": [
+        "PTPN22"
+      ],
+      "variants": [
+        {
+          "gene": "PTPN22",
+          "rsid": "rs2476601",
+          "risk_allele": "T",
+          "hgvs": "NC_000001.11:g.113834946A>G",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [
+        "anti_ccp",
+        "rheumatoid_factor",
+        "crp_hs",
+        "esr"
+      ],
+      "association_level": "D",
+      "summary": {
+        "ru": "PTPN22 R620W связан с восприимчивостью к некоторым аутоиммунным заболеваниям. При уже записанных суставных симптомах и результатах anti-CCP/РФ это дополнительный контекст для врача; вариант не устанавливает причину симптомов или активность заболевания.",
+        "en": "PTPN22 R620W is associated with susceptibility to some autoimmune diseases. Recorded joint symptoms and anti-CCP/RF results may give this finding clinical context; it does not establish their cause or disease activity."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1216068/; https://pmc.ncbi.nlm.nih.gov/articles/PMC3055597/; https://www.ncbi.nlm.nih.gov/clinvar/RCV000009461.2/?cmd=HTOn",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": true,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:erap1_hla_back_pain_context",
+      "kind": "hypothesis",
+      "genes": [
+        "ERAP1"
+      ],
+      "variants": [
+        {
+          "gene": "ERAP1",
+          "rsid": "rs30187",
+          "risk_allele": "T",
+          "hgvs": "NC_000005.10:g.96788627T>C",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [
+        "crp_hs",
+        "esr"
+      ],
+      "association_level": "D",
+      "summary": {
+        "ru": "ERAP1 участвует в подготовке пептидов для HLA. Связь rs30187 с аксиальным воспалительным заболеванием зависит от HLA-контекста; уже известные HLA и характер боли информативнее отдельного SNP. Нормальные СОЭ/СРБ не превращают вариант в незначимый и не подтверждают заболевание.",
+        "en": "ERAP1 trims peptides for HLA presentation. The rs30187 association with axial inflammatory disease depends on HLA context; an existing HLA result and the pain pattern matter more than this SNP alone. Normal ESR/CRP neither confirms disease nor resolves the genetic context."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/21743469/; https://pmc.ncbi.nlm.nih.gov/articles/PMC4443427/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": false,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:padi4_citrullination_uncertain_context",
+      "kind": "hypothesis",
+      "genes": [
+        "PADI4"
+      ],
+      "variants": [
+        {
+          "gene": "PADI4",
+          "rsid": "rs2240340",
+          "risk_allele": "T",
+          "hgvs": "NC_000001.11:g.17336144T>C",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [
+        "anti_ccp",
+        "rheumatoid_factor"
+      ],
+      "association_level": "C",
+      "summary": {
+        "ru": "PADI4 участвует в цитруллинировании белков, но связь rs2240340 с ревматоидным артритом различается между популяциями. Генотип не объясняет автоматически положительный anti-CCP; результат антител и суставные симптомы оцениваются самостоятельно.",
+        "en": "PADI4 participates in protein citrullination, but the rs2240340 association with rheumatoid arthritis varies across populations. The genotype does not automatically explain a positive anti-CCP result; antibodies and joint symptoms require independent assessment."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19470526/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": true,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:nod2_intestinal_symptom_context",
+      "kind": "hypothesis",
+      "genes": [
+        "NOD2"
+      ],
+      "variants": [
+        {
+          "gene": "NOD2",
+          "rsid": "rs2066844",
+          "risk_allele": "T",
+          "hgvs": "NC_000016.10:g.50712015C>T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "immune"
+      ],
+      "markers": [
+        "crp_hs",
+        "esr",
+        "hemoglobin",
+        "albumin"
+      ],
+      "association_level": "D",
+      "summary": {
+        "ru": "NOD2 R702W связан с повышенной восприимчивостью к болезни Крона. При уже записанных длительных кишечных симптомах это контекст для врача; нормальные анализы крови не исключают кишечное заболевание, а отклонения сами по себе не подтверждают его.",
+        "en": "NOD2 R702W is associated with increased susceptibility to Crohn disease. Recorded persistent intestinal symptoms may make it relevant to clinical assessment; normal blood tests do not exclude intestinal disease, and abnormal values do not establish it."
+      },
+      "source": "https://www.nature.com/articles/35079107; https://www.ncbi.nlm.nih.gov/clinvar/variation/4693/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": false,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:lrp5_measured_bone_density_context",
+      "kind": "hypothesis",
+      "genes": [
+        "LRP5"
+      ],
+      "variants": [
+        {
+          "gene": "LRP5",
+          "rsid": "rs3736228",
+          "risk_allele": "T",
+          "hgvs": "NC_000011.10:g.68433827C>T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "musculoskeletal"
+      ],
+      "markers": [],
+      "association_level": "D",
+      "summary": {
+        "ru": "LRP5 Ala1330Val связан с небольшим снижением плотности кости в исследованиях. Если денситометрия или переломы уже известны, вариант дополняет их обсуждение вместе с возрастом, нагрузкой и лекарствами; кальций крови плотность кости не заменяет.",
+        "en": "LRP5 Ala1330Val is associated with modestly lower bone density in studies. Existing DXA or fracture history can be considered alongside age, activity and medicines; blood calcium does not substitute for bone density."
+      },
+      "source": "https://jamanetwork.com/journals/jama/fullarticle/181639",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": false,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:col1a1_bone_matrix_context",
+      "kind": "hypothesis",
+      "genes": [
+        "COL1A1"
+      ],
+      "variants": [
+        {
+          "gene": "COL1A1",
+          "rsid": "rs1800012",
+          "risk_allele": "T",
+          "hgvs": "NC_000017.11:g.50200388C>A",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "musculoskeletal"
+      ],
+      "markers": [],
+      "association_level": "D",
+      "summary": {
+        "ru": "Вариант Sp1 COL1A1 влияет на регуляцию коллагена костного матрикса. В крупном исследовании две копии T на транскриптной цепи были связаны с немного меньшей плотностью кости; общего увеличения риска всех переломов не показано. Оценка опирается на имеющиеся денситометрию и анамнез.",
+        "en": "The COL1A1 Sp1 variant affects regulation of bone-matrix collagen. In a large study, two transcript-strand T copies were associated with modestly lower bone density, without an overall increase in all fractures. Assessment rests on existing DXA and fracture history."
+      },
+      "source": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.0030090; https://www.ncbi.nlm.nih.gov/clinvar/variation/811535/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": true,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:optn_existing_bone_turnover_context",
+      "kind": "hypothesis",
+      "genes": [
+        "OPTN"
+      ],
+      "variants": [
+        {
+          "gene": "OPTN",
+          "rsid": "rs1561570",
+          "risk_allele": "T",
+          "hgvs": "NC_000010.11:g.13113726T>C",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "musculoskeletal"
+      ],
+      "markers": [
+        "alp",
+        "alt",
+        "ast",
+        "ggt"
+      ],
+      "association_level": "D",
+      "summary": {
+        "ru": "OPTN rs1561570 связан с восприимчивостью к болезни Педжета кости. Если уже есть стойкое повышение ЩФ и костные симптомы, врач может учитывать этот контекст, отделяя костный источник ЩФ от печёночного. Один SNP или одно повышение ЩФ диагноз не устанавливают.",
+        "en": "OPTN rs1561570 is associated with susceptibility to Paget disease of bone. Persistent ALP elevation with recorded bone symptoms may give it context, while distinguishing bone from liver sources of ALP. Neither the SNP nor an isolated ALP rise establishes the diagnosis."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20436471/; https://www.research.ed.ac.uk/en/publications/genetic-variants-in-the-optineurin-gene-are-associated-with-disea; https://paget.org.uk/media/filer_public/a5/23/a523daba-2740-4620-961e-61b163a97615/1_information_for_health_professionals_booklet.pdf",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": false,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:comt_response_history_context",
+      "kind": "hypothesis",
+      "genes": [
+        "COMT"
+      ],
+      "variants": [
+        {
+          "gene": "COMT",
+          "rsid": "rs4680",
+          "risk_allele": "A",
+          "hgvs": "NC_000022.11:g.19963748G>A",
+          "mode": "pgx"
+        }
+      ],
+      "systems": [
+        "adrenals"
+      ],
+      "markers": [],
+      "association_level": "D",
+      "summary": {
+        "ru": "COMT Val158Met меняет активность фермента обмена катехоламинов. Возможная связь с переживанием стресса или ответом на обезболивание зависит от контекста и не задаёт ожидаемый кортизол. Для врача полезнее записанный характер ответа и его время относительно лечения.",
+        "en": "COMT Val158Met changes catecholamine-metabolising enzyme activity. Possible relevance to stress experience or analgesic response is context-dependent and does not define an expected cortisol level. A recorded response and its timing relative to treatment are more useful clinically."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8249478/; https://pmc.ncbi.nlm.nih.gov/articles/PMC5489380/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": false,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:pemt_restricted_diet_context",
+      "kind": "hypothesis",
+      "genes": [
+        "PEMT"
+      ],
+      "variants": [
+        {
+          "gene": "PEMT",
+          "rsid": "rs12325817",
+          "risk_allele": null,
+          "hgvs": "NC_000017.11:g.17583205C>G",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "folate_histamine_redox_choline"
+      ],
+      "markers": [
+        "alt",
+        "ast",
+        "ck"
+      ],
+      "association_level": "D",
+      "summary": {
+        "ru": "Для PEMT описана зависимость переносимости дефицита холина от генетического варианта и эстрогенного контекста. При действительно ограниченном рационе и уже известных изменениях печени или мышц врач может рассмотреть питание как одну из причин; генотип не доказывает дефицит холина.",
+        "en": "PEMT studies describe genotype- and estrogen-dependent susceptibility to choline depletion. If a genuinely restricted diet and liver or muscle findings are already documented, nutrition may be one clinical consideration; genotype does not establish choline deficiency."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/; https://pubmed.ncbi.nlm.nih.gov/21059658/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": true,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    },
+    {
+      "association_id": "pattern:aoc1_food_symptom_context",
+      "kind": "hypothesis",
+      "genes": [
+        "AOC1"
+      ],
+      "variants": [
+        {
+          "gene": "AOC1",
+          "rsid": "rs10156191",
+          "risk_allele": null,
+          "hgvs": "NC_000007.14:g.150856517C>T",
+          "mode": "common_variant"
+        }
+      ],
+      "systems": [
+        "folate_histamine_redox_choline"
+      ],
+      "markers": [],
+      "association_level": "C",
+      "summary": {
+        "ru": "AOC1 кодирует диаминоксидазу, участвующую в расщеплении пищевого гистамина. Для rs10156191 результаты исследований активности DAO и симптомов неоднозначны. Вариант может быть лишь дополнительной гипотезой при воспроизводимых пищевых реакциях; он не подтверждает непереносимость гистамина или аллергию.",
+        "en": "AOC1 encodes diamine oxidase, involved in dietary histamine breakdown. Findings for rs10156191, DAO activity and symptoms are inconsistent. It can only be an additional hypothesis when reproducible food reactions are recorded; it does not establish histamine intolerance or allergy."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/21488903/; https://www.mdpi.com/2072-6643/16/8/1142; https://pubmed.ncbi.nlm.nih.gov/25612138/; https://pubmed.ncbi.nlm.nih.gov/35113457/",
+      "checked_on": "2026-10-18",
+      "review_kind": "source_check_not_clinical_validation",
+      "hypothesis_reason": "clinical_context_required",
+      "reference_only": true,
+      "level_scope": "personal_context_hypothesis",
+      "limitations": {
+        "en": "Use documented symptoms, history and measurements; missing records are not negative findings. This hypothesis neither establishes a diagnosis nor requests tests or treatment. The population association and its possible relevance to this person have different confidence.",
+        "ru": "Сопоставлять с записанными симптомами, анамнезом и измерениями; отсутствие записи не означает отрицательный результат. Гипотеза не устанавливает диагноз и не назначает анализы или лечение. Популяционная связь и её возможная роль у человека имеют разную достоверность."
+      }
+    }
+  ]
+}

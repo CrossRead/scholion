@@ -217,7 +217,8 @@ def metrics_report(r: Dict[str, Any]) -> str:
         head.append(_t("metrics.height", value=prof["height_cm"]))
     if r.get("bmi"):
         b = r["bmi"]
-        head.append(_t("metrics.bmi", value=b["value"], category=b.get("category") or _t('clinical.withheld')))
+        head.append(_t("metrics.bmi", value=b["value"], category=b["category"]) if b.get("category")
+                    else f"{_t('web.metrics.bmi')} {b['value']}")
     lines = [_t("metrics.title") + (f" — {', '.join(head)}" if head else ""), ""]
     from .clinical_claims import basis_lines
     lines.extend(basis_lines(r.get('bmi') or {}))

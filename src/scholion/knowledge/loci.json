@@ -3413,6 +3413,86 @@
         "en": "Panel position. The alternative is the allele represented in the submitted position list, not an assigned risk allele. Genotype-specific interpretation awaits clinical review.",
         "ru": "Позиция панели. Альтернативный аллель соответствует переданному списку позиций и не обозначает установленный риск. Интерпретация по генотипам ожидает клинической проверки."
       }
+    },
+    "rs118203993": {
+      "gene": "ORAI1",
+      "chrom": "12",
+      "pos": 121627018,
+      "pos_grch37": 122064924,
+      "ref": "C",
+      "alt": "T",
+      "build": "GRCh38",
+      "coordinate_source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/",
+      "coordinate_accession": "RCV000001346.6",
+      "retrieved": "2026-10-18",
+      "note": {
+        "en": "ORAI1 p.Arg91Trp",
+        "ru": "ORAI1 p.Arg91Trp"
+      }
+    },
+    "rs786204796": {
+      "gene": "ORAI1",
+      "chrom": "12",
+      "pos": 121627039,
+      "pos_grch37": 122064945,
+      "ref": "G",
+      "alt": "A",
+      "build": "GRCh38",
+      "coordinate_source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/",
+      "coordinate_accession": "VCV000189256.7",
+      "retrieved": "2026-10-18",
+      "note": {
+        "en": "ORAI1 p.Gly98Ser",
+        "ru": "ORAI1 p.Gly98Ser"
+      }
+    },
+    "rs3741596": {
+      "gene": "ORAI1",
+      "chrom": "12",
+      "pos": 121641389,
+      "pos_grch37": 122079295,
+      "ref": "A",
+      "alt": "G",
+      "build": "GRCh38",
+      "coordinate_source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/",
+      "coordinate_accession": "VCV000379436.12",
+      "retrieved": "2026-10-18",
+      "note": {
+        "en": "ORAI1 p.Ser218Gly",
+        "ru": "ORAI1 p.Ser218Gly"
+      }
+    },
+    "rs781829024": {
+      "gene": "ORAI1",
+      "chrom": "12",
+      "pos": 121626842,
+      "pos_grch37": 122064747,
+      "ref": "A",
+      "alt": "C",
+      "build": "GRCh38",
+      "coordinate_source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/",
+      "coordinate_accession": "VCV000541941.54",
+      "retrieved": "2026-10-18",
+      "note": {
+        "en": "ORAI1 p.Ser34Arg",
+        "ru": "ORAI1 p.Ser34Arg"
+      }
+    },
+    "rs2802292": {
+      "gene": "FOXO3",
+      "chrom": "6",
+      "pos": 108587315,
+      "pos_grch37": 108908518,
+      "ref": "G",
+      "alt": "T",
+      "build": "GRCh38",
+      "coordinate_source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/1269978/",
+      "coordinate_accession": "VCV001269978.1",
+      "retrieved": "2026-10-18",
+      "note": {
+        "en": "FOXO3 intronic longevity-associated position",
+        "ru": "Внутригенная позиция FOXO3, изучавшаяся в связи с долголетием"
+      }
     }
   }
 }

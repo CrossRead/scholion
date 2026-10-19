@@ -142,7 +142,7 @@ class TestFactorVLeidenUnderThePillReachesEveryFace(_Demo):
 
     def test_the_page_prints_it_on_the_three_views(self):
         page = (support.SRC / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        for needle in ("${cautionsHtml(o.regimen_cautions)}", "${cautionsHtml(d.cautions)}",
+        for needle in ("box.innerHTML=attentionHTML(o.attention)", "${cautionsHtml(d.cautions)}",
                        "${cautionsHtml(meds&&meds.cautions)}"):
             self.assertIn(needle, page)
 

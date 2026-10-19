@@ -30,6 +30,8 @@ PKG = Path(__file__).resolve().parent
 PARITY: Dict[str, str] = {
     # reading
     "GET /api/overview": "overview",
+    "GET /api/insight-snapshot": "insight-snapshot",
+    "POST /api/insight-snapshot": "insight-snapshot",
     "GET /api/visit-sheet": "overview",
     "GET /api/goal": "goal",
     "GET /api/goal-suggest": "goal-suggest",
@@ -281,6 +283,7 @@ PLUGIN: Dict[str, str] = {
     "provenance": "sch_provenance",
     "ingest-labs": "sch_ingest_labs",
     "overview": "sch_overview",
+    "insight-snapshot": "sch_insight_snapshot",
     "second-opinion": "sch_second_opinion",
     "limits": "sch_limits",
     "sources": "sch_sources",
@@ -833,6 +836,7 @@ def check_i18n_keys() -> List[str]:
 # different act from a model typing a value it settled on itself, and only the
 # second is the one the canon forbids.
 WRITES = {
+    "insight-snapshot",
     "export", "erase",
     "init", "demo", "add-lab", "add-med", "remove-med", "add-metric", "focus-log",
     "set-folder", "import-labs", "import-fhir", "ingest-labs", "ingest-studies", "ingest-garmin",
@@ -915,6 +919,7 @@ DICTATED = {"focus-log", "target", "lab-draw", "marker", "brief-reviewed"}
 # handed a folder of new results should be able to load them, and the values it
 # writes are the laboratory's, read off the form.
 TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearable",
+               "insight-snapshot",  # saves existing deterministic facts, never authors measurements
                "import-labs", "import-fhir",
                "redact", "recompute", "genotype-sites", "coverage",
                # Rebuilds a table out of the person's own variant file, like the

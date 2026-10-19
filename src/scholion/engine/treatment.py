@@ -60,10 +60,12 @@ def treatment_timeline(today: Optional[date] = None) -> Dict[str, Any]:
         schedule = med.get("monitoring_schedule")
         if schedule is None:
             if med.get("monitoring"):
-                controls.append({**base, "status": "unresolved", "reason": "unstructured_plan"})
+                controls.append({**base, "status": "unresolved" if med["current"] else "inactive",
+                                 "reason": "unstructured_plan"})
             continue
         if not isinstance(schedule, list):
-            controls.append({**base, "status": "unresolved", "reason": "invalid_plan"})
+            controls.append({**base, "status": "unresolved" if med["current"] else "inactive",
+                             "reason": "invalid_plan"})
             continue
         for item in schedule:
             plan = item if isinstance(item, dict) else {}
@@ -71,7 +73,7 @@ def treatment_timeline(today: Optional[date] = None) -> Dict[str, Any]:
             begin, due = _day(plan.get("from")), _day(plan.get("due"))
             control = {**base, "marker": marker, "from": plan.get("from"),
                        "due": plan.get("due"), "plan_source": plan.get("source"),
-                       "status": "unresolved", "reason": "invalid_plan"}
+                       "status": "unresolved" if med["current"] else "inactive", "reason": "invalid_plan"}
             if (not isinstance(marker, str) or marker not in known or not begin or not due
                     or begin > due or not isinstance(plan.get("source"), str)
                     or not plan["source"].strip()):
@@ -88,5 +90,7 @@ def treatment_timeline(today: Optional[date] = None) -> Dict[str, Any]:
             controls.append(control)
     return {"as_of": now.isoformat(), "events": sorted(events, key=lambda e: (e["date"], e["kind"])),
             "undated": undated, "controls": controls,
+            "current_controls": [c for c in controls if c["current"]],
+            "historical_controls": [c for c in controls if not c["current"]],
             "overdue": [c for c in controls if c["status"] == "overdue"],
             "interpretation": "recorded_events_only", "response_assessed": False}

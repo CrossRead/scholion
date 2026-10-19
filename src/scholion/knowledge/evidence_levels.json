@@ -93,12 +93,12 @@
       ],
       "verdict_allowed": false,
       "short": {
-        "en": "no source",
-        "ru": "источника нет"
+        "en": "variant evidence not established",
+        "ru": "данные о варианте не установлены"
       },
       "full": {
-        "en": "No source at all: the position came from a laboratory report and nothing published stands behind it.",
-        "ru": "Источника нет вовсе: позиция пришла из отчёта лаборатории, и за ней нет ни одной публикации."
+        "en": "An interpretation of this specific variant is not established in the curated sources. Known gene function and any external database classification are shown separately.",
+        "ru": "Интерпретация конкретного варианта не установлена в курируемых источниках. Известная функция гена и классификация внешней базы показываются отдельно."
       },
       "says": {
         "en": "The product shows the reading, known gene function and any recorded interpretation explicitly as unestablished; missing variant evidence remains explicit.",

@@ -40,6 +40,67 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.0 — 19.10.2026
+
+- Detailed genetic-panel effect and provenance explanations now follow the selected interface language; study values and original references are preserved.
+- Radar units, saved lifestyle metric captions and compound ClinVar classification labels follow the selected language. Original measurements and personal notes are retained.
+- Long-term laboratory trends can show a forming direction despite overlapping readings; isolated spikes remain separate observations. Dated patient reports of symptoms, everyday function and tolerability appear alongside system trends and in the visit brief, without being treated as measured treatment effects. Existing journal entries are preserved.
+
+### What you can do now
+
+- Today summarises the last year by body system, alongside the person map. Comparable period medians are assessed against recorded targets or stable laboratory ranges; changing ranges and unknown targets remain explicit. Treatment comparisons require recorded starts and monitored markers, and retain uncertainty about cause.
+- Today brings the person and system map together with one attention list. Repeated laboratory deviations, changes distinguishable from recorded variation, movement toward an explicit target, and qualified wearable changes share their facts and sources. Related reasons appear together under highlighted, initially collapsed system headings; individual laboratory results remain in Labs.
+- Today shows one annual phenotype overview. The CLI and MCP retain 30, 90 and 365-day analysis, for example `scholion overview --period 90`. Recorded monthly means remain labelled as means, and incomplete or incompatible observations do not establish a confident change.
+- Save a local review explicitly and compare it with the next review. The comparison distinguishes changed observations from changed rules, brings withdrawn interpretations first, and does not mistake missing data for recovery.
+- A visit brief brings together system changes over the year, current prescriptions and specific discussion questions, with completed courses and detailed measurements kept separately.
+- Choose attention items for the visit agenda. The sheet reuses their evidence and keeps historical measurements and the optional genetic appendix separate. The same results and review operations are available through the CLI and MCP.
+- A specific, calibrated LDL polygenic score can be presented alongside elevated measured LDL with its study population and treatment limitations. This is an association, not an individual disease probability or a causal explanation.
+- Curated FOXO3 context includes positive and negative human studies, variant mechanism and applicability limits. The immune panel adds four distinct ORAI1 variants, separating recessive loss of function, dominant activation, benign classification and conflicting classifications.
+
+- System insights now include the person's read genetic variants and dated lifestyle context. Supported matches between a variant association and a current laboratory abnormality are visible even without a trend, with evidence level and source. Normal readings remain normal despite a predisposition. The same context accompanies the clinician brief and agent responses; no genomic recalculation is required.
+
+- System panels now compare source-checked variant associations with the same dated laboratory observations used in insights. Evidence level, call quality and applicability stay separate: historical or uncertain results remain visible without confirming a current association. The clinician view includes direct sources, knowledge-check dates, limitations and contrary observations; hypotheses remain labelled.
+
+- A position can be compared with several relevant measurements. Composite contexts include phase-aware APOE, iron markers with HFE, thyroid-hormone ratios and possible HbA1c bias; collection identity and specimen requirements are checked before combining results. Broader gene mechanisms remain sourced hypotheses with the actual variant and GenCC assertion, rather than gene names being treated as diagnoses. Additional panels use the same comparison logic.
+
+- Gene descriptions share one reading order across panels and genome views: known function, available variant interpretation, then confidence and expandable evidence. Low-confidence explanations remain readable, and GenCC validity stays distinct from Scholion's variant evidence level.
+- Gene-function references now cover previously undescribed longevity catalogue genes, with NCBI Gene and Gene Ontology sources in both languages. Predicted functions, non-coding loci, pseudogenes and withdrawn models are distinguished. Study gene sets are kept separate from variant-to-gene assignments. Longevity catalogue disclosures use visible buttons, and gene lookup states retain the same description format.
+- Current prescriptions can relate to several body systems through recognised classes, explicitly recorded ingredients and laboratory monitoring. Possible effects and monitoring remain distinct; unrecognised products are identified rather than assigned an unsupported action.
+- Labs open as collapsed system groups with measured and abnormal counts. System cards can expand their current measurements and open the matching Labs group.
+
+### What is retracted
+
+**The individual favourable FOXO3 verdict is retired.** Positive human associations and studies that did not reproduce them are now shown together at Scholion level C. Existing genotype readings and the reference explanation remain available; no individual lifespan effect is assigned.
+
+### Corrected display and consistency
+
+- Empty genetic catalogues no longer appear as fully read negative results. Longevity counts distinguish individual gene symbols from study gene sets. Gene searches retain reference biology when a region cannot be read without an index. Undated assistant text is no longer labelled fresh.
+
+- System trend insights follow the same selected measurement source as current values and period comparisons. Secondary device histories remain inspectable without silently replacing the main trend.
+- Review history tracks changes to the effective laboratory range and its origin. Switching the display language does not change measurement identity or invalidate an otherwise unchanged review confirmation.
+- An ambiguous device choice no longer produces a difference between unrelated device histories. Approximate laboratory dates remain visible but do not establish an exact before/during-treatment comparison. A visit agenda whose selected topics changed offers retry and explicit reselection instead of an unfinished loading screen.
+- Recorded weight and wearable weight now share one source-labelled history across Today, Lifestyle, goals, charts and assistant responses. Weight and derived BMI use one plotted line; each point retains its source. Attention cards link to the system genetic panel and Lifestyle instead of repeating those details. BMI uses the same weights and recorded height. A newer recorded weight no longer disappears from a chart or leaves BMI pointing in an older direction. Month-only recorded values remain distinct from device monthly means; differing devices are never silently treated as one measurement method.
+- The same current-value rule applies to mapped sleep, steps, resting heart rate and activity readings. Imported measurements no longer appear missing merely because they were not entered by hand.
+- Personal and Visit views now open different working screens. The clinician introduction follows the selected language, and the complete technical reference remains available.
+- The first screen renders the person map and phenotype before the heavier contextual review. Chart switches and visit actions are explicit, duplicate overview blocks are removed, and completed prescriptions remain in history instead of the current regimen.
+
+### Existing data
+
+- Expired courses no longer remain current solely because an old status says active. Absolute albumin in a protein-fraction panel is recognised separately from biochemical albumin; existing records are retained for source review.
+- Existing laboratory, wearable and genetic records are retained. Reviews are saved only on request. This update does not automatically rerun PGS or whole-genome preparation.
+- Garmin and WHOOP exports can be imported from the installed wheel without a separate source checkout.
+- Older wearable summaries without sufficient coverage or uncertainty keep their values but cannot establish a qualified change. Newly imported daily Garmin records include the uncertainty needed for median comparisons.
+- New curated positions use available verified readings; an unread position remains unread. Reference explanations do not imply that the variant is present.
+
+### What needs recomputing
+
+**Run `scholion genotype-sites` — if the new ORAI1 or FOXO3 positions are unread and your local alignment is available.**
+Inspect unread positions with `scholion genome-updates` before requesting this
+explicit catalogue-site genotyping operation. Existing verified calls need no repeat. Without the source alignment, retain the
+saved readings and reference explanations; an unread position remains unknown.
+PGS scores do not need recalculation for these additions.
+
+
 ## v0.6.9 — 15.10.2026
 
 
@@ -6020,3 +6081,8 @@ in plain text or encoded — and three independent barriers keeping personal dat
 out of git.
 
 ---
+
+- System insights show annual direction alongside emerging month and quarter
+  changes, with compact charts. Recent reversals remain visible even when the
+  annual direction differs. A single reading within its recorded range does
+  not trigger requests for more tests merely to draw a trend.

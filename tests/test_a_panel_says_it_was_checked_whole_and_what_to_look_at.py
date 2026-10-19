@@ -117,7 +117,7 @@ class TestThePageDrawsThePanelFromTheStates(unittest.TestCase):
                       "and so does the card page, in its register")
         self.assertNotIn("panel.map(x=>`<div class=\"row-l\">${systemGeneRow(x,'patient')}</div>`)", html,
                          "the radar no longer prints the panel as a paragraph per row")
-        for key in ("system.panel.conclusion_h", "system.panel.compare_h", "system.panel.prescribing_h",
+        for key in ("system.panel.conclusion_h", "genlab.title", "system.panel.prescribing_h",
                     "system.panel.polygenic_fold", "system.panel.question_ref"):
             self.assertIn(key, html)
 

@@ -93,8 +93,8 @@
       "loinc": "13457-7",
       "loinc_name": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by calculation",
       "loinc_note": {
-        "en": "the code is specifically for CALCULATED LDL (by calculation) — it matches the Friedewald formula on our lab forms; direct measurement has a different code (18262-6), and if the method changes the code has to change too",
-        "ru": "код именно для РАСЧЁТНОГО ЛПНП (by calculation) — совпадает с формулой Фридвальда в наших бланках; у прямого измерения код другой (18262-6), при смене метода менять и код"
+        "en": "Calculated LDL and direct LDL measurements use different methods. Comparisons retain the method reported on the laboratory form.",
+        "ru": "Расчётный ЛПНП и прямое измерение ЛПНП получены разными методами. При сравнении результатов учитывается метод, указанный в бланке."
       }
     },
     "hdl": {

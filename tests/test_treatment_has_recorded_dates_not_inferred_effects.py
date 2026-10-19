@@ -129,3 +129,16 @@ class TestRecordedPlanWrite(unittest.TestCase):
             self.assertFalse(store.add_medication("Synthetic", start_date=True)["ok"])
             self.assertFalse(store.add_medication("Synthetic", control={"marker": "tsh"})["ok"])
             self.assertFalse(store.add_medication("Synthetic", control="invalid")["ok"])
+
+
+class TestStoppedMonitoring(TestTreatmentTimeline):
+    def test_unstructured_and_invalid_plans_for_stopped_drugs_are_historical(self):
+        for plan in ({'monitoring':{'old':'text'}}, {'monitoring_schedule':'old'},
+                     {'monitoring_schedule':[{'marker':'unknown'}]}):
+            med={'name':'Synthetic stopped','status':'stopped_2026-02-01',**plan}
+            data=self.timeline(meds=[med])
+            self.assertEqual(data['controls'][0]['status'],'inactive')
+            self.assertEqual(data['current_controls'],[])
+            self.assertEqual(len(data['historical_controls']),1)
+            self.assertEqual(format_prescription.control_lines(data['controls']),[])
+            self.assertTrue(format_prescription.control_lines(data['controls'],include_inactive=True))

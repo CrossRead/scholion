@@ -43,6 +43,13 @@ POST_NOT_IN_THE_PAGE = {
 }
 
 
+# Retained read contracts whose standalone UI blocks were explicitly retired.
+GET_NOT_IN_THE_PAGE = {
+    "/api/focus": "The legacy focus card duplicated Goals and was removed in 0.7.0; saved notes and the agent contract remain accessible.",
+    "/api/limits": "The generic missing-data block was removed in 0.7.0; specific reading limitations remain beside the affected results.",
+}
+
+
 class TestEveryReadReachesTheBrowser(unittest.TestCase):
 
     def setUp(self):
@@ -54,7 +61,7 @@ class TestEveryReadReachesTheBrowser(unittest.TestCase):
     def test_the_page_asks_for_every_get_route(self):
         gets = {r.split(" ", 1)[1] for r in contract.server_routes()
                 if r.startswith("GET /api/")}
-        never = sorted(gets - self.called)
+        never = sorted(gets - self.called - set(GET_NOT_IN_THE_PAGE))
         self.assertEqual([], never,
                          "the server answers these and the page never asks — they exist for "
                          "every face except the one most people use: " + ", ".join(never))
@@ -95,10 +102,16 @@ class TestWhatTheNewWorkRendersInParticular(unittest.TestCase):
             self.skipTest("this build carries no web page")
         self.page = WEB.read_text(encoding="utf-8")
 
-    def test_the_profile_tab_shows_what_the_profile_is_missing(self):
-        self.assertIn("/api/limits", self.page)
-        self.assertIn("web.metrics.missing_head", self.page,
-                      "the page fetches the limits and says nothing about them")
+    def test_retired_overview_blocks_are_not_rendered(self):
+        for marker in ("today-focus", "today-limits", "today-sources", "web.metrics.missing_head"):
+            self.assertNotIn(marker, self.page)
+
+    def test_retired_reads_still_exist_but_are_not_claimed_as_ui(self):
+        gets = {r.split(" ", 1)[1] for r in contract.server_routes()
+                if r.startswith("GET /api/")}
+        self.assertFalse(set(GET_NOT_IN_THE_PAGE) - gets)
+        called = set(re.findall(r"[\"'](/api/[a-z0-9/-]+)", self.page))
+        self.assertFalse(set(GET_NOT_IN_THE_PAGE) & called)
 
     def test_the_percentiles_carry_the_panel_they_are_a_position_inside(self):
         self.assertIn("method_caveats", self.page,

@@ -15,6 +15,8 @@ class TestChartRoles(unittest.TestCase):
         helpers = page[page.index("let _goalMarksReady="):page.index("// A chart box is emitted")]
         start = page.index("function drawGoalCharts(")
         draw = page[start:page.index("\n}\n", start) + 2]
+        start_helpers = page.index("function measurementLabel(")
+        helpers += page[start_helpers:page.index("function sparkline(", start_helpers)]
         script = r"""
 const assert=require('node:assert/strict');
 let theme='light',plugin,charts=[];
@@ -75,3 +77,26 @@ for(const band of [{from:'2010',to:'2011'},{from:'2021-06',to:'2021-09'},
         result = subprocess.run([shutil.which("node"), "-e", script], text=True,
                                 capture_output=True, stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_weight_and_attention_use_the_compact_annual_view(self):
+        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        names = ("measurementLabel", "measurementGroups", "bodyMassMetric", "measurementDatasets",
+                 "sparkline", "insightContextHTML", "attentionItemHTML", "attentionHTML")
+        functions = []
+        for name in names:
+            start = page.index("function " + name + "(")
+            if name in ("measurementGroups", "bodyMassMetric"):
+                functions.append(page[start:].splitlines()[0])
+            else:
+                functions.append(page[start:page.index("\n}", start) + 2])
+        script = STUBS + "\n".join(functions) + BEHAVIOR
+        result = subprocess.run([shutil.which("node"), "-e", script], text=True,
+                                capture_output=True, stdin=subprocess.DEVNULL, timeout=10)
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertNotIn("data-period=", page)
+        self.assertNotIn("applyPeriod", page)
+        self.assertIn("${[365].map(window=>{", page)
+
+
+STUBS = "const assert=require('node:assert/strict');const esc=x=>String(x??''),t=(x)=>x,fmtDate=x=>x,fmtNum=x=>String(x),CT={series:'orange',ink2:'black'},gline=(v,c)=>({data:v,borderColor:c});\nconst DISPLAY_MODE='patient',visitSelection=new Set();\nconst insightWindowsHTML=()=>'',levelChip=()=>'',insightFactHTML=f=>f.record,comparisonHTML=()=>'';\n"
+BEHAVIOR = 'const points=[{date:\'2026-01\',value:105,measurement_source:\'garmin\',aggregation:\'monthly_mean\'},{date:\'2026-02-20\',value:103,measurement_source:\'recorded\'},{date:\'2026-06\',value:101,measurement_source:\'garmin\',aggregation:\'monthly_mean\'},{date:\'2026-10-19\',value:98,measurement_source:\'recorded\'}];\nassert.equal(measurementDatasets({points},true).length,1);\nassert.deepEqual(measurementDatasets({points},true)[0].data,[105,103,101,98]);\nconst graph=sparkline(points,false,null,true);\nassert.equal((graph.match(/<polyline/g)||[]).length,1);assert.equal((graph.match(/<circle/g)||[]).length,4);\nassert.ok(graph.includes(\'garmin\'));assert.ok(graph.includes(\'web.phenotype.recorded\'));\nassert.equal((sparkline(points,false).match(/<polyline/g)||[]).length,2);\nfor(const key of [\'weight\',\'wear:Weight\',\'metric:weight\',\'BMI\',\'wear:BMI\'])assert.ok(bodyMassMetric(key));\nassert.ok(!bodyMassMetric(\'SleepDuration\'));\nconst item={id:\'system:lipids\',system:\'lipids\',title:\'Lipid trend\',summaries:[\'Measured change\'],context_summary:\'PRIVATE GENETIC SUMMARY\',context_lifestyle_summary:\'PRIVATE LIFESTYLE SUMMARY\',context:{genetics:[{gene:\'SYN\',summary:\'PRIVATE GENE\'}],lifestyle:[{key:\'weight\',value:98}],comparisons:[{summary:\'PRIVATE COMPARISON\'}]},facts:[{record:\'genotype\'},{record:\'labs.json\'}],events:[{kind:\'genetic_phenotype\',detail:{mechanism:\'PRIVATE MECHANISM\'}}]};\nconst card=attentionItemHTML(item);\nassert.ok(card.startsWith(\'<details class="cr-card attention-item" data-attention-card><summary>\'));\nassert.ok(!card.includes(\' open\'));assert.ok(!card.includes(\'PRIVATE\'));assert.ok(!card.includes(\'data-genetic-comparison\'));\nassert.ok(card.includes(\'data-panel="lipids"\'));assert.ok(card.includes(\'data-goto="web.tab.lifestyle"\'));assert.ok(card.includes(\'labs.json\'));\nconst feed=attentionHTML({highlights:Array.from({length:8},(_,i)=>({...item,id:String(i)})),follow_up:[{...item,id:\'follow\'}]});\nassert.equal((feed.match(/data-attention-card/g)||[]).length,9);\nconsole.log(\'Weight, annual controls, collapsed attention and context links PASS\');\n'

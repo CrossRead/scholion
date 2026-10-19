@@ -146,3 +146,15 @@ class TestTheBacklogStaysConsistent(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LocalDesignOutputsNeverShip(unittest.TestCase):
+    def test_output_directory_is_not_a_package_input(self):
+        import ast
+        tree = ast.parse(_read(SHAREABLE))
+        for directory in ("outputs", "research_notes"):
+            with self.subTest(directory=directory):
+                self.assertFalse(any(p.startswith(directory) for p in _sdist_include(_read(PYPROJECT))))
+                self.assertFalse(any(isinstance(n, ast.Constant) and isinstance(n.value, str)
+                                     and (n.value == directory or n.value.startswith(directory + "/"))
+                                     for n in ast.walk(tree)))

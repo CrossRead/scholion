@@ -48,6 +48,23 @@ def call(cmd: str) -> str:
 
 class TestTheClaimsHold(unittest.TestCase):
 
+    def setUp(self):
+        # The canon also names write operations. Probe them on a private copy,
+        # even when their default arguments are refused before a data write.
+        import shutil
+        import tempfile
+        from pathlib import Path
+        from scholion import core
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        profile = Path(tmp.name).resolve() / "profile"
+        shutil.copytree(support.FIXTURE_PROFILE, profile)
+        self.addCleanup(support.pin_profile(profile))
+        ot.unpin_session()
+        self.addCleanup(ot.unpin_session)
+        core.reset_cache()
+        self.addCleanup(core.reset_cache)
+
     def test_nothing_said_about_the_door_disagrees_with_the_build(self):
         self.assertEqual([], contract.check_door_claims())
 

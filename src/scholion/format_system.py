@@ -61,10 +61,10 @@ def _system_gene_row(r: Dict[str, Any], register: str) -> str:
     if r.get("link_text"):
         marks.append(_t("system.panel.link", link=r["link_text"]))
     line = "· " + head + ((" — " + "; ".join(marks)) if marks else "")
-    for interpretation_detail in interpretation_lines(r):
-        line += "\n   " + interpretation_detail
     for reference_detail in reference_lines(r):
         line += "\n   " + reference_detail
+    for interpretation_detail in interpretation_lines(r):
+        line += "\n   " + interpretation_detail
     if route_text(r):
         line += '\n   ' + route_text(r)
     if r.get("text"):
@@ -319,6 +319,10 @@ def system_report(r: Dict[str, Any]) -> str:
             L.append("   " + _system_gene_row(row, reg).replace("\n", "\n   "))
         if not gen.get("rows"):
             L.append("   " + str((gen.get("curated") or {}).get("why_empty") or ""))
+        from .genetic_comparison import lines as comparison_lines, visible
+        for comparison in r.get("genetic_lab_comparisons") or []:
+            if visible(comparison, reg == "clinician"):
+                L.extend(comparison_lines(comparison, reg == "clinician"))
         L += hypotheses_lines(all_gen, reg == "clinician")
         L += [f"{p.get('gene')} {p.get('rsid')} — {route_text(p)}" for p in gen.get('positions', []) if route_text(p)]
         return "\n".join(L).rstrip() + "\n"
@@ -365,9 +369,15 @@ def system_report(r: Dict[str, Any]) -> str:
         for m in dyn.get("moved") or []:
             L.append("   · " + _t("system.dynamics.moved", name=m.get("name"),
                                   from_value=m.get("from_value"), to_value=m.get("to_value"),
-                                  unit=m.get("unit") or ""))
+                                  unit=m.get("unit_display", m.get("unit")) or ""))
     else:
         L.append("   " + _t("system.dynamics." + str(dyn.get("status") or "absent")))
+    if r.get("genetic_lab_comparisons"):
+        from .genetic_comparison import lines as comparison_lines, visible
+        L += ["", _t("genlab.title")]
+        for item in r["genetic_lab_comparisons"]:
+            if visible(item, reg == "clinician"):
+                L.extend(comparison_lines(item, reg == "clinician"))
     # 3 — the genetic half
     all_gen = r.get("genetics") or {}
     gen = _shown_genetics(all_gen, reg)
@@ -446,6 +456,9 @@ def system_report(r: Dict[str, Any]) -> str:
     for m in med.get("rows") or []:
         L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
                               classes=", ".join(m.get("via_labels") or []) or _t("prescription.class_undefined")).replace("  ", " "))
+    for m in med.get("rows") or []:
+        for link in m.get("system_links") or []:
+            L.append("   · " + str(m.get("name") or "") + ": " + link["relation_label"] + (" — " + link["note"] if link.get("note") else ""))
     if med.get("empty_reason"):
         L.append("   " + med["empty_reason"])
     if med.get("unmapped"):

@@ -2310,11 +2310,11 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf"}
 
 
-def lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dict[str, Any]:
+def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_network: bool = True) -> Dict[str, Any]:
     """Public lookup: by rsID (any — catalogue/cache/Ensembl) or by gene (catalogue loci)."""
     st = available()
     if rsid:
-        loc = resolve_rsid(rsid, allow_network=True)
+        loc = resolve_rsid(rsid, allow_network=allow_network)
         if not loc:
             return {"status": "unknown_rsid", "rsid": rsid,
                     "message": _t("genome.rsid_unknown", rsid=rsid)}
@@ -2342,7 +2342,7 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dict[str, 
         items = [rs for rs, l in loci().get("loci", {}).items() if l.get("gene", "").upper() == gene.upper()]
         if items:
             return {"status": "ok", "gene": gene,
-                    "loci": [lookup(rsid=rs) for rs in items] if st["ready"] else [{"rsid": rs, "locus": locus(rs)} for rs in items],
+                    "loci": [lookup(rsid=rs, allow_network=allow_network) for rs in items] if st["ready"] else [{"rsid": rs, "locus": locus(rs)} for rs in items],
                     "genome_ready": st["ready"]}
         # Task 127. The catalogue not holding the gene used to end the query —
         # «Gene CASR is not in the coordinate reference», a true sentence about
@@ -2818,6 +2818,11 @@ def apoe_status():
         return {"status": "no_genome"}
     g1 = genotype_from_vcf("rs429358")
     g2 = genotype_from_vcf("rs7412")
+    return _apoe_from_readings(g1, g2)
+
+
+def _apoe_from_readings(g1, g2):
+    """The same unordered, phase-aware result for already-read system positions."""
     if not g1 or not g2 or not g1.get("genotype") or not g2.get("genotype"):
         # On an array either SNP may be absent or uncalled, and «one of the two
         # is missing» is a different answer from «no genome».

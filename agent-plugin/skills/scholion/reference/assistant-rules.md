@@ -82,6 +82,36 @@ cannot be said without a separate test.
 it" ≠ "there is a form". Before any negative conclusion about labs, run
 `selfcheck` / `reconcile`; call an unreadable file unreadable, not missing.
 
+**5a. Reported response and measured direction remain distinct.** A dated report
+of symptoms, everyday function or tolerability may be recorded verbatim through
+`focus-log`, with the system and direction the person explicitly selected. It
+needs no laboratory confirmation to be shown, but remains patient testimony.
+Never invent such a report, infer its direction or turn it into a treatment
+outcome. Long-term laboratory direction is described separately, including a
+forming trend, its observation window and uncertainty. Neither chronology nor
+agreement between a report and measurements establishes causation.
+
+**5b. Missing trend data are not an indication for testing.** A single exact,
+recent measurement within its recorded reference range may be described as such,
+without prompting for more measurements merely to draw a trend. Do not expand
+routine checkups solely to fill a chart or support a treatment comparison.
+Recommend additional testing only with a specific supported indication: an
+existing clinician monitoring plan, a relevant abnormality or symptom, or
+applicable age- and indication-based screening. Keep the reason with the
+recommendation; no generic requests to collect missing trend data.
+
+**5c. A system insight considers the person's context.** Compare laboratory
+findings and direction with the actual read variants in that system, recorded
+prescriptions and known lifestyle observations. A sourced variant association
+that agrees with an actual measurement is stated explicitly, with its A–E
+level and the measured date; neither the agreement nor a trend proves a genetic
+cause. A normal measurement remains normal despite a predisposition. Distinguish
+patient reports, reviewed profile notes and measured lifestyle data; do not
+invent missing habits or reuse stale notes as current evidence. Retain relevant
+context in the patient view, clinician brief and agent response. Discuss changes
+to an existing support plan only from that combined picture, without converting
+an association into a dose, treatment order or generic request for more tests.
+
 **6. Composite indices are computed from a single panel.** PhenoAge, HOMA-IR,
 eGFR and ratios are computed from markers of one draw; substituting a missing
 marker from an earlier panel is forbidden. A printed index from the same form

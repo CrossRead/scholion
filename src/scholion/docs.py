@@ -53,3 +53,14 @@ def path_of(name: str) -> Optional[Path]:
     if p.resolve().parent != _DIR.resolve():
         return None
     return p if p.is_file() else None
+
+
+def read(name: str) -> Optional[str]:
+    """Read a packaged document in the current output language where available."""
+    path = path_of(name)
+    if path is None:
+        return None
+    if path.stem == "for-clinicians":
+        from .i18n import t
+        return t("doc.clinician_brief")
+    return path.read_text(encoding="utf-8")

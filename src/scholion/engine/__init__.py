@@ -84,7 +84,9 @@ from .routes import ROUTE_CLASSES, ROUTE_ORDER, ROUTE_LEVELS, ROUTE_CONDITIONAL,
 from .panel_book import on_demand_panels, positions_by_marker  # noqa: F401
 from .class_genotype import cautions, regimen_cautions, medications_view  # noqa: F401
 from .treatment import treatment_timeline  # noqa: F401
-from .visit import visit_sheet  # noqa: F401
+from .visit import visit_sheet, visit_topic  # noqa: F401
+from .insight_events import insight_events  # noqa: F401
+from .insights import attention_feed  # noqa: F401
 from .validated import fib4  # noqa: F401
 from .panel_intake import author_readings  # noqa: F401
 from .hypothesis import hypothesis_passport, is_value_only  # noqa: F401
@@ -105,7 +107,7 @@ from .system_panels import (  # noqa: F401 -- the facade re-exports every name
     genes_index,
     marker_systems, marker_systems_all,
     class_systems,
-    prescriptions,
+    prescriptions, medication_system_context,
     composition,
 )
 from .screening import (  # noqa: F401 -- the facade re-exports every name
@@ -231,3 +233,5 @@ from .prs_quality import (  # noqa: F401 -- the facade re-exports every name
 from .targets import (  # noqa: F401 -- the facade re-exports every name
     outside_target, target_side, target_view, clinician_targets_view,
 )
+
+from .insight_links import linked_pgs_events  # noqa: F401 -- shared engine facade

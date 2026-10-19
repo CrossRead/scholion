@@ -1476,6 +1476,24 @@
         "en": "This gene encodes a zinc finger protein of the Kruppel family. The protein contains a SCAN box and a KRAB A domain and may be involved in transcriptional regulation. A similar protein in mouse is differentially expressed in spermatogenesis.",
         "ru": "Белок с цинковыми пальцами; участие в регуляции транскрипции описано предположительно."
       }
+    },
+    "ORAI1": {
+      "scope": "gene_function",
+      "retrieved": "2026-10-18",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/84876",
+      "description": {
+        "en": "ORAI1 forms the calcium-selective pore of CRAC channels. Store-operated calcium entry helps activate immune cells. Gene function alone does not predict blood calcium or a need for calcium supplements.",
+        "ru": "ORAI1 образует кальций-селективную пору каналов CRAC. Вход кальция после опустошения внутриклеточных депо участвует в активации иммунных клеток. Функция гена сама по себе не предсказывает кальций крови и потребность в добавках кальция."
+      }
+    },
+    "FOXO3": {
+      "scope": "gene_function",
+      "retrieved": "2026-10-18",
+      "description": {
+        "en": "FOXO3 is a transcription factor involved in cellular stress responses.",
+        "ru": "FOXO3 — транскрипционный фактор, участвующий в клеточном ответе на стресс."
+      },
+      "source": "PMID:29733381; DOI:10.1093/nar/gky331"
     }
   },
   "variants": {
@@ -3866,6 +3884,74 @@
       ],
       "curated_on": "2026-10-06",
       "scope": "reference_only"
+    },
+    "rs118203993": {
+      "gene": "ORAI1",
+      "description": {
+        "en": "R91W disrupts CRAC channel function and store-operated calcium entry in cells.",
+        "ru": "R91W нарушает функцию канала CRAC и вход кальция в клетку после опустошения депо."
+      },
+      "source": "PMID:16582901; DOI:10.1038/nature04702; PMID:19075015; DOI:10.1074/jbc.M808346200; ClinVar RCV000001346.6; https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/",
+      "database_assertion": {
+        "database": "ClinVar",
+        "accession": "RCV000001346.6",
+        "classification": "Pathogenic",
+        "retrieved": "2026-10-18",
+        "source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001346/"
+      }
+    },
+    "rs786204796": {
+      "gene": "ORAI1",
+      "description": {
+        "en": "G98S activates CRAC channels constitutively in experimental systems, independently of store depletion and STIM1 activation.",
+        "ru": "G98S вызывает постоянную активацию каналов CRAC в экспериментальных системах независимо от опустошения депо и активации STIM1."
+      },
+      "source": "PMID:25227914; DOI:10.1093/hmg/ddu477; ClinVar VCV000189256.7; https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/",
+      "database_assertion": {
+        "database": "ClinVar",
+        "accession": "VCV000189256.7",
+        "classification": "Pathogenic",
+        "retrieved": "2026-10-18",
+        "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/189256/"
+      }
+    },
+    "rs3741596": {
+      "gene": "ORAI1",
+      "description": {
+        "en": "A pathogenic molecular effect of S218G is not established by the curated evidence.",
+        "ru": "Патогенный молекулярный эффект S218G по собранным данным не установлен."
+      },
+      "source": "ClinVar VCV000379436.12; https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/",
+      "database_assertion": {
+        "database": "ClinVar",
+        "accession": "VCV000379436.12",
+        "classification": "Benign",
+        "retrieved": "2026-10-18",
+        "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/379436/"
+      }
+    },
+    "rs781829024": {
+      "gene": "ORAI1",
+      "description": {
+        "en": "A variant-specific functional effect is not established; the general channel function cannot resolve the classification conflict.",
+        "ru": "Специфический функциональный эффект варианта не установлен; общая функция канала не разрешает конфликт классификаций."
+      },
+      "source": "ClinVar VCV000541941.54; https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/",
+      "database_assertion": {
+        "database": "ClinVar",
+        "accession": "VCV000541941.54",
+        "classification": "Conflicting classifications of pathogenicity",
+        "retrieved": "2026-10-18",
+        "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/541941/"
+      }
+    },
+    "rs2802292": {
+      "gene": "FOXO3",
+      "description": {
+        "en": "FOXO3 rs2802292: an association with longevity, with conflicting replication.",
+        "ru": "FOXO3 rs2802292: ассоциация с долголетием при противоречивом воспроизведении."
+      },
+      "source": "PMID:18765803; PMID:27071935; PMID:27621247; PMID:29733381"
     }
   }
 }

@@ -187,7 +187,10 @@ def _on_demand_card(key: str, spec: Dict[str, Any], register: str) -> Dict[str, 
     """
     scan = panel_form.scan_for(sorted({str(p.get("gene") or "").upper()
                                        for p in spec.get("positions") or [] if isinstance(p, dict)}))
-    cur = _curated_rows(key, spec, [], scan, {})
+    from .labs import analyze_labs
+    from ..genetic_comparison import system_comparisons
+    by_key = {m["key"]: m for m in analyze_labs().get("markers") or []}
+    cur = _curated_rows(key, spec, [], scan, by_key)
     rows = cur["rows"]
     _attach_local_notes(rows)
     groups = _groups(key, spec, rows)
@@ -215,6 +218,7 @@ def _on_demand_card(key: str, spec: Dict[str, Any], register: str) -> Dict[str, 
     labels = {c: raw.get(c, key) for c in ("en", "ru")} if isinstance(raw, dict) else {c: label for c in ("en", "ru")}
     return {"status": "ok", "key": key, "label": label, "labels": labels,
             "register": register, "on_demand": True,
+            "genetic_lab_comparisons": system_comparisons(rows, by_key, key),
             "why_no_domain": panel_form.one_language(spec.get("why_no_domain")),
             "source": panel_form.one_language(spec.get("source")), "genetic_half": True, "markers": [],
             "labs": {"status": "no_laboratory_half", "markers": [], "measured": 0, "total": 0},

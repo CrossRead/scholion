@@ -18,8 +18,9 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     from .. import genome
     r = genome.lookup(rsid=rsid, gene=gene)
     from ..panel_reference import genome_context
-    if r.get("gene"):
-        r.update(genome_context(r["gene"], r.get("rsid") or ""))
+    context_gene = r.get("gene") or (r.get("locus") or {}).get("gene")
+    if context_gene:
+        r.update(genome_context(context_gene, r.get("rsid") or ""))
     for item in r.get("loci") or []:
         item.update(genome_context(item.get("gene") or r.get("gene") or "", item.get("rsid") or ""))
     # Asked about a gene, answer with the frame as well as the loci: the
@@ -55,6 +56,10 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     if gene and not rsid:
         from ..gene_region import attach_reading
         attach_reading(r, gene)
+        for answer in (r, r.get("region_report")):
+            if isinstance(answer, dict):
+                context = genome_context(answer.get("gene") or gene)
+                answer.update({key: context[key] for key in ("reference_context", "level")})
     r["disclaimer"] = DISCLAIMER()
     return r
 
@@ -1053,9 +1058,10 @@ def longevity_findings() -> Dict[str, Any]:
                                 'population_note_basis': src.get('population_caveat_basis'),
                                 'confidence_label_basis': src.get('confidence_basis')}, k, fields)
         k.clear(); k.update(guarded)
-    from ..panel_reference import genome_context
-    for item in known:
+    from ..panel_reference import genome_context, longevity_interpretation
+    for index, item in enumerate(known):
         item.update(genome_context(str(item.get("gene") or ""), str(item.get("rsid") or "")))
+        known[index] = longevity_interpretation(item, _dirs.get(item.get("rsid")) or {})
     sig = data.get("significant_by_gene", {}) or {}
     # the famous longevity genes come first
     famous = ["FOXO3", "APOE", "SIRT1", "SIRT3", "CETP", "IL6", "TP53", "KL", "IGF1R",
@@ -1069,6 +1075,7 @@ def longevity_findings() -> Dict[str, Any]:
     apoe_reading = apoe()
     if apoe_reading.get("status") == "no_genome":
         apoe_reading = {**guard_fields(data.get("apoe") or {}, data.get("apoe") or {}, ("note",)), "status": "stored_unverified"}
+    apoe_reading["reference_context"] = genome_context("APOE")["reference_context"]
     apoe_spec = (core._read_knowledge("longevity_directions.json").get("apoe_interpretations") or {}).get(apoe_reading.get("genotype"))
     if apoe_spec and apoe_reading.get("status") == "ok":
         apoe_reading = {**apoe_reading, "level": apoe_spec["level"],
@@ -1082,7 +1089,9 @@ def longevity_findings() -> Dict[str, Any]:
         "count_note": _t("longevity.count_note", count=meta.get("genotyped") or 0),
         "stats": {"genotyped": meta.get("genotyped"), "carriers": meta.get("carriers"),
                   "significant_carriers": meta.get("significant_carriers"),
-                  "significant_genes": len(sig_genes)},
+                  "significant_genes": len({symbol.strip().upper() for group in genes
+                                            for symbol in group.split(",") if symbol.strip()}),
+                  "catalogue_gene_sets": len(sig_genes)},
         "disclaimer": _t('clinical.genome_limit') + " " + DISCLAIMER(),
     }
 

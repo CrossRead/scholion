@@ -22,7 +22,7 @@ import re
 from typing import List
 
 from . import docs as _docs
-from .i18n import t as _t
+from .i18n import t as _t, lang as _lang
 
 _STYLE = """
 :root{color-scheme:light}
@@ -48,7 +48,7 @@ th,td{border:1px solid #e4e1db;padding:.45rem .6rem;text-align:left;vertical-ali
 th{background:#f2efe9}
 .back{display:inline-block;margin-bottom:1.6rem;font-size:.92rem}
 .foot{margin-top:3rem;padding-top:1rem;border-top:1px solid #e4e1db;color:#6b6862;font-size:.88rem}
-@media print{.back{display:none}body{background:#fff}}
+@media print{.back{display:none}body{background:#fff;font-size:10pt;line-height:1.3}main{max-width:none;padding:0}h1{font-size:17pt;margin:0 0 10pt}h2{font-size:12pt;margin:12pt 0 5pt}p,ul,ol{margin:0 0 7pt}.foot{margin-top:12pt;font-size:8pt}}
 """
 
 _INLINE = (
@@ -160,7 +160,7 @@ def page(name: str) -> str:
     p = _docs.path_of(name)
     if p is None:
         return _list_page()
-    md = p.read_text(encoding="utf-8")
+    md = _docs.read(name) or ""
     # The document's own first heading, not the file name it was asked for by:
     # this page is handed over and printed, and «for-clinicians.md» in a browser
     # tab names our filing system rather than what the reader is holding.
@@ -169,7 +169,7 @@ def page(name: str) -> str:
 
 
 def _list_page() -> str:
-    items = "".join(f'<li><a href="/doc/{k}">{html.escape(k)}</a> '
+    items = "".join(f'<li><a href="/doc/{k}?lang={_lang()}">{html.escape(k)}</a> '
                     f'<span style="color:#6b6862">{b // 1024} KB</span></li>'
                     for k, b in _docs.available())
     return _wrap(_t("web.doc.list_title"), f"<h1>{html.escape(_t('web.doc.list_title'))}</h1>"
@@ -177,10 +177,10 @@ def _list_page() -> str:
 
 
 def _wrap(title: str, body: str) -> str:
-    return ("<!doctype html><html><head><meta charset=\"utf-8\">"
+    return (f'<!doctype html><html lang="{_lang()}"><head><meta charset="utf-8">'
             "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
             f"<title>{html.escape(title)}</title><style>{_STYLE}</style></head><body><main>"
-            f'<a class="back" href="/">\u2190 {html.escape(_t("web.doc.back"))}</a>'
+            f'<a class="back" href="/?lang={_lang()}">\u2190 {html.escape(_t("web.doc.back"))}</a>'
             f"{body}"
             f'<div class="foot">{html.escape(_t("web.doc.foot"))}</div>'
             "</main></body></html>")

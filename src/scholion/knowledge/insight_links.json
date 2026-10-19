@@ -1,0 +1,27 @@
+{
+  "_meta": {
+    "source_tier": "curated_reference",
+    "updated": "2026-10-18",
+    "scope": "Specific model-to-measurement associations. No PGS weights, individual risk conversion or causal attribution."
+  },
+  "links": [
+    {
+      "id": "ldl-pgs000061",
+      "pgs_id": "PGS000061",
+      "marker": "ldl",
+      "flag": "high",
+      "reference_population": "EUR",
+      "percentile_min": 80,
+      "level": "C",
+      "source": "Johnson et al. 2015; DOI:10.1371/journal.pone.0126361; https://www.pgscatalog.org/score/PGS000061/",
+      "summary": {
+        "en": "The confirmed LDL polygenic percentile and the measured LDL are both elevated. The model was associated with measured LDL in the MESA cohort; this pairing does not identify the cause of this result or quantify cardiovascular risk.",
+        "ru": "Подтверждённый полигенный перцентиль ЛПНП и измеренный ЛПНП повышены. В когорте MESA модель была связана с измеренным ЛПНП; это сочетание не устанавливает причину результата и не оценивает сердечно-сосудистый риск."
+      },
+      "limitations": {
+        "en": "The score was developed from European GWAS. Performance differed between study populations. People taking lipid-lowering medicines were excluded; treated LDL cannot be interpreted as the untreated phenotype used in that study. P80 is a display selection threshold, not a clinical cutoff.",
+        "ru": "Модель построена по европейским GWAS. Качество различалось между популяциями исследования. Принимавшие гиполипидемические препараты были исключены; ЛПНП на фоне лечения нельзя трактовать как исходный показатель из исследования. P80 — порог отбора для отображения, а не клиническая граница."
+      }
+    }
+  ]
+}

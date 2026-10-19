@@ -193,6 +193,9 @@ def _skip(rel: Path) -> bool:
     # Keys and lists are posix on every host: on Windows `str(rel)` carries
     # backslashes, matched nothing in the baseline, and every file read as
     # «not in the baseline at all» (the first Windows cell that ran, 08.09.2026).
+    # Local design and research artifacts are not package inputs; packaging tests hold this boundary.
+    if rel.parts and rel.parts[0] in {"outputs", "research_notes"}:
+        return True
     if set(rel.parts) & PERSONAL_DIRS:
         return True
     key = rel.as_posix()

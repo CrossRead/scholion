@@ -23,7 +23,7 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
     icon = {"ok": "🟢", "warn": "🟠", "bad": "🔴", "none": "•"}
     for m in ms:
         t = m.get("trend")
-        tr = f" · {m['first_date']}→{m['date']}: {_n(m['first'])}→{_n(m['value'])}" if m.get("first_date") != m.get("date") else ""
+        tr = f" · {m['first_date']}→{m['date']}: {_n(m['first'])}→{_n(m['value'])}" if m.get("first_date") and m.get("first_date") != m.get("date") else ""
         improv = ""
         if m.get("improving") is True:
             improv = f" ({_t('lifestyle.improving')})"
@@ -53,6 +53,15 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
             lines.append("    " + _t("lifestyle.not_distinguishable",
                                      delta=_n(abs(t["delta"])), mdd=_n(t["mdd"]),
                                      unit=m.get("unit", "")).rstrip())
+    from .format_insights import comparison_lines
+    for metric in ms:
+        if metric.get("comparison"):
+            comparison = metric["comparison"]
+            lines.append(metric["label"] + ":")
+            lines.extend(comparison_lines(comparison))
+            if comparison.get("distinguishable") is not True or not comparison.get("eligible"):
+                lines.append(_t("insight.no_change_estimate"))
+            lines.extend(_t("insight.limit." + key) for key in comparison.get("limitations") or [])
     wk = r.get("workouts", [])
     if wk:
         top = ", ".join(f"{x['type']} ({x['total']})" for x in wk[:6])
@@ -283,11 +292,15 @@ def overview_report(r: Dict[str, Any]) -> str:
         head += _t("overview.stale_note", n=r["stale_abnormal_count"])
     from .format_prescription import caution_lines, control_lines
     out = caution_lines(r.get("regimen_cautions") or []) + [head + ".", ""]
-    if r.get("overdue_controls"):
+    feed = r.get("attention")
+    if feed:
+        from .format_insights import attention_report, summary_report
+        out = [attention_report(feed), "", head + ".", "", summary_report(feed)]
+    if not feed and r.get("overdue_controls"):
         out += [_t("treatment.overdue")] + control_lines(r["overdue_controls"]) + [""]
 
     for key, phrase in (("high_flags", "overview.high"), ("watch_flags", "overview.low")):
-        items = r.get(key) or []
+        items = [] if feed else r.get(key) or []
         if items:
             out.append(_t(phrase, n=len(items)))
             for m in items:
@@ -300,7 +313,7 @@ def overview_report(r: Dict[str, Any]) -> str:
     if r.get("high_suggestions"):
         line += _t("overview.suggestions_priority", n=len(r["high_suggestions"]))
     out.append(line + ".")
-    for s in hs:
+    for s in ([] if feed else hs):
         out.append(f"  · {s.get('suggest')} — {s.get('why', '')}")
         out.append(test_basis_text(s))
 

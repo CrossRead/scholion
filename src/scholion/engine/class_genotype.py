@@ -85,7 +85,7 @@ def regimen_cautions() -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for med in core.active_medications():
         name = med.get("name") or ""
-        out += cautions(core.classify_drug(name), name)
+        out += cautions(core.medication_classes(med), name)
     return out
 
 

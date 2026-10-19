@@ -113,14 +113,17 @@ class TestLayerFourNamesThePrescriptionsActingOnASystem(_Pinned):
         self.assertEqual("none_acts_here", thy["empty_why"])
         self.assertTrue(thy["empty_reason"])
 
-    def test_a_prescription_whose_class_has_no_row_is_listed_as_unmapped(self):
+    def test_monitoring_can_place_a_class_without_an_action_row(self):
         self.write_meds([{"name": "omeprazole", "dose": "20 mg"}])
-        m = SP.system("liver")["medications"]
-        self.assertEqual([], m["rows"])
-        self.assertEqual([{"name": "omeprazole", "classes": ["ppi"], "map_status": "no_map"}],
-                         [{k: row[k] for k in ("name", "classes", "map_status")} for row in m["unmapped"]])
-        self.assertEqual("20 mg", m["unmapped"][0]["dose"])
-        self.assertEqual([core.med_classes()["classes"]["ppi"]["label"]], m["unmapped"][0]["class_labels"])
+        context = SP.prescriptions()[0]
+        self.assertEqual(context["classes"], ["ppi"])
+        self.assertEqual(context["map_status"], "mapped")
+        self.assertTrue(context["system_links"])
+        self.assertEqual({x["relation"] for x in context["system_links"]}, {"monitoring"})
+        for system in context["systems"]:
+            layer = SP.system(system)["medications"]
+            self.assertEqual(layer["rows"][0]["dose"], "20 mg")
+            self.assertEqual(layer["rows"][0]["classes"], ["ppi"])
 
     def test_a_prescription_no_class_recognises_is_listed_as_unclassified(self):
         self.write_meds([{"name": "zzz-unknown-substance"}])
@@ -138,8 +141,12 @@ class TestLayerFourNamesThePrescriptionsActingOnASystem(_Pinned):
         # The fixture holds a statin and a vitamin D preparation, in that order.
         statin, vitamin_d = [m["name"] for m in core.active_medications()]
         rows = SP.systems()["prescriptions"]
+        self.assertEqual({statin, vitamin_d}, {r["name"] for r in rows})
+        self.assertEqual(len(rows), 2)
         self.assertEqual({statin: ["lipids"], vitamin_d: ["micronutrients"]},
-                         {r["name"]: r["systems"] for r in rows})
+                         {r["name"]: sorted({x["system"] for x in r["system_links"]
+                                            if x["relation"] != "monitoring"}) for r in rows})
+        self.assertTrue(all(set(r["systems"]) == {x["system"] for x in r["system_links"]} for r in rows))
 
 
 class TestLayerFiveIsTheCliniciansTarget(_Pinned):

@@ -10,6 +10,42 @@ from typing import Any, Dict, List
 
 from . import core
 from .i18n import CATALOGUES, lang, t
+from .genetic_patterns import reference_patterns
+
+
+def gene_function_entry(gene: str) -> Dict[str, Any]:
+    """Prefer existing curated biology, then sourced human function annotations.
+
+    The added registry describes genes, never a variant's effect or evidence
+    grade. Catalogue aliases retain their original label and resolved identity.
+    """
+    for name in ("panel_reference_context.json", "gencc_reference_context.json",
+                 "gene_function_context.json"):
+        genes = core._read_knowledge(name).get("genes") or {}
+        entry = genes.get(gene) or genes.get(gene.upper()) or {}
+        if entry.get("description") and entry.get("source"):
+            return entry
+    return {}
+
+
+def _function_fields(gene: str, rsid: str = "") -> Dict[str, Any]:
+    entry = gene_function_entry(gene)
+    canonical = gene
+    if not entry and rsid:
+        # Some intake labels are historical abbreviations or misspellings.
+        # Resolve biology only through this exact curated locus, never fuzzy
+        # name matching; retain the source's label and variant evidence level.
+        resolved = ((core.loci().get("loci") or {}).get(rsid) or {}).get("gene")
+        if resolved:
+            canonical = str(resolved)
+            entry = gene_function_entry(canonical)
+    return {"gene_function": entry.get("description") or t("reference.gene_unknown"),
+            "gene_source": entry.get("source"), "gene_source_scope": "gene_function",
+            "retrieved": entry.get("retrieved"), "limitations": entry.get("caveat"),
+            "canonical_symbol": entry.get("canonical_symbol") or canonical,
+            "function_status": (entry.get("function_status") or "curated") if entry else "not_curated",
+            "function_support": entry.get("function_support") or [],
+            "gene_additional_sources": entry.get("additional_sources") or []}
 
 
 def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -31,12 +67,10 @@ def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[
             "classification_label": t(class_key) if class_key in CATALOGUES[lang()] else classification,
             "moi_label": t(moi_key) if moi_key in CATALOGUES[lang()] else moi})
     return {"scope": "reference_only", "level": None,
-            "gene_function": entry.get("description") or t("reference.gene_unknown"),
-            "gene_source": entry.get("source"), "gene_source_scope": "gene_function",
-            "retrieved": entry.get("retrieved"),
+            "mechanistic_hypotheses": reference_patterns(gene),
+            **_function_fields(gene),
             "variant_context": t("reference.variant_not_supplied"),
             "variant_source": None, "variant_status": "not_supplied",
-            "limitations": entry.get("caveat"),
             "gencc_assertions": associations,
             "gencc_source": "https://thegencc.org/",
             "gencc_version": book.get("_meta", {}).get("gencc_export_version"),
@@ -47,7 +81,6 @@ def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
     """A position's reference card; never a genotype-specific conclusion."""
     book = core._read_knowledge("panel_reference_context.json")
     gene = str(spec.get("gene") or "").upper()
-    gene_entry = (book.get("genes") or {}).get(gene) or {}
     variant = (book.get("variants") or {}).get(spec.get("rsid")) or {}
     if variant.get("gene") != gene:
         variant = {}
@@ -66,11 +99,9 @@ def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
         source = spec.get("source") or (spec.get("evidence") or {}).get("source")
     if not isinstance(description, str) or not isinstance(source, str) or level == "E":
         description, source = None, None
-    function = gene_entry.get("description") if gene_entry.get("scope") == "gene_function" else None
     return {"scope": "reference_only", "level": level,
-            "gene_function": function or t("reference.gene_unknown"),
-            "gene_source": gene_entry.get("source") if function else None,
-            "gene_source_scope": "gene_function", "retrieved": gene_entry.get("retrieved"),
+            "mechanistic_hypotheses": reference_patterns(gene, spec.get("rsid")),
+            **_function_fields(gene, spec.get("rsid") or ""),
             "variant_context": description or t("reference.variant_unknown"),
             "variant_source": source, "variant_status": "described" if description else "not_curated",
             "notice": t("reference.notice")}
@@ -81,10 +112,21 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     context = row.get("reference_context")
     if not isinstance(context, dict):
         return []
-    lines = [t("reference.gene_level") if context.get("variant_status") == "not_supplied"
-             else t("reference.level", level=context.get("level") or "—"),
-             t("reference.gene", text=context.get("gene_function")),
+    lines = [t("reference.gene", text=context.get("gene_function")),
              t("reference.variant", text=context.get("variant_context"))]
+    canonical = context.get("canonical_symbol")
+    if canonical and row.get("gene") and canonical.upper() != str(row["gene"]).upper():
+        lines.append(t("reference.resolved_gene", gene=canonical))
+    assertion = (row.get("interpretation") or {}).get("database_assertion")
+    if assertion:
+        lines.append(assertion["description"])
+    if row.get("transcript"):
+        lines.append(str(row["transcript"]) + " · " + str(row.get("hgvs") or ""))
+    for hypothesis in context.get("mechanistic_hypotheses") or []:
+        lines.append(t("genlab.reference_patterns") + " · Scholion " + hypothesis["association_level"])
+        if hypothesis.get("level_scope") == "mechanism_reference_not_personal_variant":
+            lines.append(t("genlab.mechanism_level"))
+        lines.extend([hypothesis["summary"], hypothesis["limitations"], hypothesis["source"]])
     if context.get("limitations"):
         lines.append(context["limitations"])
     for assertion in context.get("gencc_assertions") or []:
@@ -97,9 +139,31 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
                        source=context.get("gencc_source")))
     if context.get("gene_source"):
         lines.append(t("reference.gene_source", source=context["gene_source"]))
+    for source in context.get("gene_additional_sources") or []:
+        lines.append(t("reference.gene_source", source=source))
     if context.get("variant_source"):
         lines.append(t("reference.variant_source", source=context["variant_source"]))
+    lines.append(t("reference.gene_level") if context.get("variant_status") == "not_supplied"
+                 else t("reference.level", level=context.get("level") or "—"))
+    if context.get("scope") == "catalogue_gene_set":
+        for gene in row.get("gene_contexts") or []:
+            lines.append("\n**" + str(gene["gene"]) + "**")
+            lines.extend(reference_lines(gene))
     return lines
+
+
+def database_assertion(assertion: Any) -> Any:
+    if not isinstance(assertion, dict):
+        return None
+    out = dict(assertion)
+    for field in ("classification", "review_status"):
+        value = str(out.get(field) or "unknown")
+        key = "insight.database." + (value.replace(",", "").replace(" ", "_") if field == "review_status" else value)
+        out[field + "_label"] = t(key) if key in CATALOGUES[lang()] else str(out.get(field) or "—")
+    out["description"] = t("insight.database", classification=out["classification_label"],
+        review=out["review_status_label"], accession=out.get("accession") or "—",
+        date=out.get("retrieved") or out.get("checked_on") or "—")
+    return out
 
 
 def interpretation_context(spec: Dict[str, Any], level: Any, summary: Any = None) -> Dict[str, Any]:
@@ -123,7 +187,7 @@ def interpretation_context(spec: Dict[str, Any], level: Any, summary: Any = None
     return {"scope": "catalogue_interpretation", "level": level,
             "summary": summary, "mechanism": core._localized(spec.get("mechanism"), lang()) or None,
             "source": basis.get("source"), "missing": basis["missing"],
-            "notice": t("interpretation.notice")}
+            "notice": t("interpretation.notice"), "database_assertion": database_assertion(spec.get("database_assertion"))}
 
 
 def interpretation_lines(row: Dict[str, Any]) -> List[str]:
@@ -132,14 +196,43 @@ def interpretation_lines(row: Dict[str, Any]) -> List[str]:
     summary = context.get("summary")
     if not isinstance(summary, str) or not summary:
         return []
-    lines = [t("interpretation.summary", level=context.get("level") or "—", text=summary),
-             context.get("notice") or t("interpretation.notice")]
+    lines = [summary, context.get("notice") or t("interpretation.notice")]
     if context.get("source"):
         lines.append(t("decision.source", source=context["source"]))
+    for field in ("evidence_reason", "population", "study_effect", "reading_note"):
+        if context.get(field):
+            lines.append(str(context[field]))
     if context.get("missing"):
         lines.append(t("interpretation.gaps", missing=", ".join(t("conclusion.missing." + k)
                                                                for k in context["missing"])))
+    lines.append(t("reference.level", level=context.get("level") or "—"))
     return lines
+
+
+def longevity_interpretation(row: Dict[str, Any], spec: Dict[str, Any]) -> Dict[str, Any]:
+    """Apply the shared catalogue presentation, with a separately verified call."""
+    if not spec.get("level"):
+        return row
+    from .engine.panel_gate import copies
+    reading = core.genotype_status(row["rsid"]) or {}
+    locus = (core.loci().get("loci") or {}).get(row["rsid"]) or {}
+    alleles = (str(locus["ref"]), str(locus["alt"])) if locus.get("ref") and locus.get("alt") else None
+    count = copies(reading.get("genotype") or "", spec["favorable"], alleles)
+    verified = (reading.get("confidence") in ("called", "confirmed_ref", "reported")
+                and not reading.get("depth_unverified") and not reading.get("conflict")
+                and count in (0, 1, 2))
+    state = ("absent", "het", "hom")[count] if verified and count is not None else None
+    summary = (spec.get("text") or {}).get(state) if state else spec.get("label")
+    context = interpretation_context(spec, spec["level"], summary)
+    context.update(personalized=verified, reading_note=None if verified else t("insight.reading_unverified"),
+                   evidence_reason=spec.get("evidence_reason"),
+                   population=spec.get("population_caveat"),
+                   study_effect=(spec.get("study") or {}).get("effect"),
+                   notice=spec.get("action"), source_passport=spec.get("source_passport"))
+    return {**row, "level": spec["level"], "reading": reading, "read": verified,
+            "interpretation": context, "verdict_token": None, "verdict_label": None,
+            "genotype": reading.get("genotype") if verified else row.get("genotype"),
+            "stored_genotype": row.get("genotype")}
 
 
 def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
@@ -149,6 +242,20 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
     GenCC's disease validity. An uncurated variant has E context even when an
     external database has classified it; that classification remains separate.
     """
+    members = list(dict.fromkeys(part.strip() for part in gene.split(",") if part.strip()))
+    if len(members) > 1:
+        # LongevityMap sometimes records a study's gene set. It is not a
+        # functional assignment of every listed variant to every listed gene.
+        context = {"scope": "catalogue_gene_set", "level": "E",
+                   "gene_function": t("reference.gene_set", count=len(members)),
+                   "gene_source": "https://genomics.senescence.info/longevity/",
+                   "gene_source_scope": "study_gene_set",
+                   "variant_context": t("reference.gene_set_variant"),
+                   "variant_status": "not_curated" if rsid else "not_supplied",
+                   "limitations": t("reference.gene_set_variant")}
+        return {"gene": gene, "rsid": rsid, "level": "E", "reference_context": context,
+                "catalogue_genes": members,
+                "gene_contexts": [genome_context(member) for member in members] if not rsid else []}
     spec = None
     for name, field in (("system_gene_panels.json", "systems"), ("on_demand_panels.json", "panels")):
         for panel in (core._read_knowledge(name).get(field) or {}).values():
@@ -165,6 +272,10 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
         level = level_of(spec, {r["level"]: r for r in legend()["levels"]}).get("level") or "E"
         context = reference_context(spec, level)
     else:
+        curated = (core._read_knowledge("longevity_directions.json").get("directions") or {}).get(rsid) or {}
+        if curated.get("gene") == gene and curated.get("level"):
+            return {"gene": gene, "rsid": rsid, "level": curated["level"],
+                    "reference_context": reference_context({**curated, "rsid": rsid}, curated["level"])}
         assertions = []
         for panel in (core._read_knowledge("gencc_gene_disease.json").get("systems") or {}).values():
             for item in ((panel.get("genes") or {}).get(gene.upper()) or {}).get("submissions") or []:
@@ -172,9 +283,11 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
                     assertions.append(item)
         context = gene_reference_context(gene, assertions)
         if not context.get("gene_source"):
-            fallback = reference_context({"gene": gene}, "E")
+            fallback = reference_context({"gene": gene, "rsid": rsid}, "E")
             if fallback.get("gene_source"):
-                context.update({k: fallback[k] for k in ("gene_function", "gene_source", "retrieved")})
+                context.update({k: fallback[k] for k in ("gene_function", "gene_source", "retrieved",
+                    "canonical_symbol", "function_status", "function_support", "limitations",
+                    "gene_additional_sources")})
         context["level"] = "E"
         if rsid:
             context["variant_status"] = "not_curated"

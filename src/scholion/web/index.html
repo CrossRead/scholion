@@ -271,7 +271,8 @@
   .sparkwrap{margin-top:10px}
   .sparkdates{display:flex;justify-content:space-between;width:168px;font-size:11.5px;color:var(--muted);margin-top:3px}
   .sparkwrap .spark{margin-top:0}
-  .sparkleg{display:flex;gap:10px;width:168px;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .sparkleg{display:flex;flex-direction:column;gap:3px;max-width:320px;font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35}
+  .sparkleg>span{display:block;min-width:0}
   .sparkleg .lg-tg,.tgt{color:var(--warning)}
   .tgt-ask{color:var(--ink-2)}
   .stat{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:var(--sp4)}
@@ -306,30 +307,6 @@
   .row4 .cell{background:var(--surface-2);border-radius:var(--r-s);padding:10px 12px;font-size:var(--t-s);min-width:0}
   .row4 .cellhead{font-size:var(--t-xs);color:var(--muted);margin-bottom:4px}
 
-  /* ---- focus of attention (the card on "Overview") ---- */
-  .fc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);
-      border-radius:var(--r);padding:16px 18px}
-  .fc .fch{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
-  .fc .fch h3{margin:0;font-size:17px;font-weight:700}
-  .fc .fcwhy{color:var(--ink-2);font-size:var(--t-s);line-height:1.6;margin:8px 0 0}
-  .fc .fcnum{display:flex;align-items:baseline;gap:10px;margin:14px 0 2px;flex-wrap:wrap}
-  .fc .fcnum b{font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
-  .fc .fcnum span{color:var(--muted);font-size:var(--t-s)}
-  .fctrack{position:relative;height:10px;background:var(--surface-2);border-radius:999px;margin:14px 0 6px}
-  .fctrack .zn{position:absolute;top:0;height:100%;border-radius:999px;background:color-mix(in srgb,var(--good) 20%,transparent)}
-  .fctrack .mk{position:absolute;top:-3px;width:2px;height:16px;background:var(--ink-2);border-radius:1px;box-shadow:0 0 0 2px var(--surface)}
-  .fctrack .dt{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--surface)}
-  .fcscale{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-  .fclv{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--border)}
-  .fclv:first-of-type{border-top:none}
-  .fclv .mk{font-size:13px;color:var(--muted);text-align:center;line-height:1.7}
-  .fclv .ti{font-size:var(--t-s);color:var(--ink)}
-  .fclv .ex{color:var(--muted);font-size:12.5px;font-weight:400}
-  .fclv .nw{font-size:13px;color:var(--ink-2);margin-top:2px}
-  .fclv .ev{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.55}
-  .fcq li{font-size:var(--t-s);color:var(--ink-2);margin-bottom:6px;line-height:1.55}
-  .fcform{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
-  .fcform label{font-size:13px;color:var(--ink-2);display:flex;align-items:center;gap:6px}
   .bltbox{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px}
   .bltgrp{font-size:13px;color:var(--muted);margin:12px 0 4px;font-weight:600}
   .bltgrp:first-child{margin-top:0}
@@ -477,6 +454,9 @@
   .system-medications-table th,.system-medications-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}
   .system-medications-table th:nth-child(1){width:30%}
   .system-medications-table th:nth-child(2){width:45%}
+  .lab-system-group{margin-bottom:var(--sp3)}
+  .lab-system-group>summary{cursor:pointer;display:list-item;padding:var(--sp3)}
+  .lab-system-group>summary .meta{margin-left:var(--sp2)}
   .system-medication-unplaced{margin-top:var(--sp3)}
   .syscard .layer{margin-top:var(--sp5)}
   .syscard .layer h3{font-size:var(--t-m);font-weight:650;margin:0 0 8px;color:var(--ink);padding-bottom:6px;border-bottom:1px solid var(--grid)}
@@ -504,17 +484,18 @@
   .gen-find .txt{color:var(--ink-2);font-size:var(--t-s);flex:1 1 260px}
   .gen-find .badge{margin-left:auto}
   .gen-context{margin:0;border:0;padding:0;min-width:0}
-  .gen-context>summary{cursor:pointer;list-style:none;font-weight:400;color:var(--ink-2)}
+  .gen-context>summary{cursor:pointer;list-style:none;font-weight:400;color:var(--accent);font-size:12px}
   .gen-context>summary::-webkit-details-marker{display:none}
   .gen-context-kind,.gen-context-more{display:block;font-size:12px}
   .gen-context-more{color:var(--accent);margin-top:3px}
   .gen-context-more::before{content:"▸ ";display:inline-block}
   .gen-context[open] .gen-context-more::before{content:"▾ "}
   .gen-context-preview{display:block;line-height:1.45;color:var(--ink-2)}
-  .gen-context-preview>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-  .gen-context-preview>span:first-child:not(:only-child){-webkit-line-clamp:1;color:var(--muted);font-size:12px}
+  .gen-context-preview>span{display:block}
+  .gen-context-preview>strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;color:var(--ink);font-size:inherit;font-weight:600}
   .gen-context-preview>span:only-child{-webkit-line-clamp:3}
-  .gen-context[open] .gen-context-preview{display:none}
+  .gen-description{min-width:0}
+  .gen-evidence{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 3px;color:var(--muted);font-size:12px}
   .gen-context-body{margin-top:8px;overflow-wrap:anywhere}
   [data-genetic-summary]{table-layout:fixed;width:100%}
   [data-genetic-summary] th:nth-child(1){width:76px;white-space:normal}
@@ -523,7 +504,7 @@
   [data-genetic-summary] td{vertical-align:top}
   [data-genetic-summary] td:nth-child(2) .small{display:block}
   @media(max-width:640px){[data-genetic-summary]{min-width:0}[data-genetic-summary] th:nth-child(1){width:65px}[data-genetic-summary] th:nth-child(2){width:90px}[data-genetic-summary] th:nth-child(3){width:88px}[data-genetic-summary] th,[data-genetic-summary] td{padding:8px 4px;font-size:12px}[data-genetic-summary] td:nth-child(3) .badge{white-space:normal;font-size:11px}.gen-context-preview>span:only-child{-webkit-line-clamp:4}.gen-context-kind,.gen-context-more{font-size:11px}}
-  @media print{.gen-context-preview{display:none}.gen-context-body{display:block}.gen-context-more{display:none}}
+  @media print{.gen-context-body{display:block}.gen-context-more{display:none}}
   .gen-rest{font-size:13.5px;color:var(--muted);margin:6px 0 0}
   .match{margin:12px 0 0;padding:10px 12px;border-radius:var(--r-s);background:var(--surface-2);font-size:var(--t-s);color:var(--ink-2)}
   .match b{color:var(--ink)}
@@ -655,6 +636,87 @@
     .visit-sheet .visit-reference{break-before:page}
     .visit-sheet .cr-card{break-inside:avoid}
   }
+
+.today-lead{display:grid;grid-template-columns:minmax(230px,0.8fr) minmax(0,1.4fr);gap:var(--cr-space-5,24px);align-items:start}
+.today-lead .sysbox svg{max-height:300px}
+.attention-item{padding:8px 14px;margin-bottom:10px;overflow-wrap:anywhere}
+
+.insight-windows{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:10px 0}
+.insight-window{min-width:0;border-top:2px solid var(--border);padding-top:6px}
+.insight-chart{margin:8px 0;color:var(--muted)}
+.insight-chart[data-direction="toward"]{color:var(--good)}
+.insight-chart[data-direction="away"]{color:var(--warning)}
+.insight-chart figcaption{color:var(--ink);font-size:var(--t-s)}
+.insight-chart svg{width:100%;height:70px;display:block}
+.insight-chart .chart-dates{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.insight-chart .chart-dates strong{color:var(--ink);font-size:12px;font-weight:600}
+.insight-chart .chart-dates>span:last-child{text-align:right}
+.insight-chart .chart-meaning{font-size:var(--t-s);margin:4px 0}
+@media(max-width:480px){.insight-windows{grid-template-columns:1fr}.insight-chart svg{max-width:300px}}
+
+.today-view .attention-item>summary{cursor:pointer;color:var(--accent);padding:4px 0;line-height:1.5}
+.today-view .attention-item>summary .insight-title{text-decoration:underline;text-underline-offset:3px}
+.today-view .attention-item[open]>summary{margin-bottom:8px}
+.insight-context-links{margin-top:10px;gap:8px;flex-wrap:wrap}
+.attention-item ul{padding-left:20px}
+.attention-item p.small{margin:.3rem 0}
+.attention-item details.fold{margin-top:0}
+.attention-item details.fold>summary{padding:2px 0}
+.today-lead h2{margin-top:0}
+.today-lead .meta{font-size:var(--t-s)}
+@media(max-width:760px){.today-lead{grid-template-columns:1fr}.today-lead .sysbox{max-height:320px}}
+
+/* Today and visit use the same Crossread scale and controls. */
+.today-view .attention-item{padding:var(--cr-space-3);margin:0 0 var(--cr-space-2);font-size:14px;line-height:1.4;border-radius:var(--cr-radius-m)}
+.today-view .attention-item .insight-title{font-size:15px;line-height:1.35;display:inline}
+.today-view .insight-windows{gap:12px;margin:6px 0}
+.today-view .insight-chart{margin:4px 0;display:grid;grid-template-columns:minmax(0,1fr) 120px;column-gap:12px;align-items:center}
+.today-view .insight-chart svg{height:42px;grid-column:2;grid-row:1 / span 2}
+.today-view .insight-chart figcaption,.today-view .insight-chart .chart-meaning{font-size:13px}
+.today-view .insight-chart .chart-dates{grid-column:2;grid-row:3;font-size:10px;gap:2px;flex-wrap:wrap}
+.today-view .insight-chart figcaption{grid-column:1;grid-row:1}
+.today-view .insight-chart>.meta{grid-column:1;margin:2px 0}
+.today-view .insight-chart>span.meta{grid-row:3;align-self:start}
+.today-view .insight-chart .meta{font-size:11px}.today-view .attention-item .fold>summary{line-height:1.4}.today-view .insight-chart .chart-meaning{max-width:34em}
+.today-view .insight-chart .chart-meaning{margin:2px 0;grid-column:1;grid-row:2}
+.today-view .insight-window>.meta{font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.today-view .attention-item details{font-size:13px}
+.today-actions .cr-btn{white-space:normal;height:auto;min-height:var(--cr-control-m);padding:10px 16px;text-align:center}
+.today-view .today-lead .sysbox svg{max-height:420px}
+.period-control{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 16px;padding:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--cr-radius-m)}
+.period-control p{flex-basis:100%;margin:0}
+.segmented,.chart-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.segmented .cr-btn[aria-pressed="true"],.chart-tabs .cr-btn[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chart-disclosure{border:1px solid var(--border);border-radius:var(--cr-radius-m);margin-top:16px!important;padding:0 12px;background:var(--surface)}
+.chart-disclosure>summary{font-weight:600;color:var(--accent);padding:12px 0!important}
+.chart-tabs{margin:8px 0 16px;gap:8px}
+.chart-tabs .cr-btn{white-space:normal;height:auto;min-height:36px;padding:8px 12px}
+[data-chart-panel][hidden]{display:none!important}
+[aria-busy="true"]{opacity:.65}
+.loading-context{padding:16px;border:1px solid var(--border);border-radius:var(--cr-radius-m);background:var(--surface)}
+.visit-sheet{margin:auto;font-size:14px;line-height:1.5}
+.visit-sheet section{margin:24px 0}
+.visit-sheet .visit-cover{display:block;padding:24px;border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--cr-radius-l);background:var(--surface)}
+.visit-sheet .visit-cover h1{margin:6px 0 12px;white-space:normal}
+.visit-nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.visit-topic{border:1px solid var(--border);border-radius:var(--cr-radius-m);overflow:hidden;background:var(--surface);margin:12px 0}
+.visit-topic>header{padding:12px 16px;background:var(--surface-2);display:flex;align-items:center;gap:12px;font-weight:600}
+.visit-number{color:var(--accent);font-variant-numeric:tabular-nums;font-size:18px}
+.visit-topic-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;padding:16px}
+.visit-topic-body h3{margin:0 0 8px;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.visit-topic p,.visit-topic li{margin-bottom:8px}
+.visit-topic .insight-windows{margin:0}
+.visit-topic .insight-chart svg{height:52px}
+.visit-topic .insight-chart .chart-dates{font-size:10px}
+.visit-topic .insight-chart .chart-meaning{font-size:12px}
+.visit-topic-footer{padding:0 16px 12px}
+.visit-sheet .visit-questions{padding:16px 24px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--cr-radius-m)}
+.visit-sheet .visit-questions li{margin:8px 0}
+.visit-sheet .visit-rx td,.visit-sheet .visit-rx th{padding:8px 12px}
+@media(max-width:760px){.today-view .today-lead{grid-template-columns:1fr}.visit-topic-body{grid-template-columns:1fr}.visit-sheet .visit-cover{padding:16px}.period-control{align-items:flex-start}.chart-tabs{flex-direction:column}}
+@media print{.visit-nav{display:none}.visit-sheet .visit-cover{display:block!important;padding:12px}.visit-sheet .visit-topic>header{display:flex!important}.visit-sheet .visit-topic{break-inside:avoid;margin:10px 0}.visit-topic-body{gap:12px;padding:12px}.visit-topic>header{padding:8px 12px}.visit-sheet section{margin:14px 0}.visit-sheet .visit-rx{font-size:9pt}}
+
+details.longevity-disclosure > summary.cr-btn{display:flex;justify-content:flex-start;width:fit-content;max-width:100%;height:auto;min-height:var(--cr-control-m);padding:10px 16px;margin:12px 0;border-color:var(--cr-border-strong);background:var(--cr-surface);font-size:14px;line-height:1.4;white-space:normal;cursor:pointer}
 </style>
 <script>
 /* The theme follows the system unless the menu pinned one. Applied before the
@@ -720,6 +782,7 @@ function setDisplayMode(mode,remount=true){
   try{sessionStorage.setItem('scholion-mode',mode);}catch(e){}
   renderMode(); buildNav(); renderPatients();
   if(!remount) return;
+  current=Math.max(0,current);
   return mount(current);
 }
 
@@ -804,7 +867,7 @@ function factHtml(value,label,cls,goto){
 // does not name is printed as it came, with its underscores opened.
 function clnsigText(s){
   return String(s||'').split(/[|,/]/).map(x=>x.trim()).filter(Boolean).map(x=>{
-    const v=t('clinvar.sig.'+x.toLowerCase().replace(/[\s-]+/g,'_'));
+    const v=t('clinvar.sig.'+x.toLowerCase().replace(/[\s-]+/g,'_').replace(/^_+|_+$/g,''));
     return v.startsWith('⟦')?x.replace(/_/g,' '):v;
   }).join(' / ');
 }
@@ -972,20 +1035,6 @@ async function sourceBar(keys){
   const brief=list.map(([,s])=>`<b>${esc(s.label)}</b>${s.updated?' '+esc(fmtDate(s.updated)):(s.present===false?' — '+esc(t('web.source.absent')):'')}`).join(' · ');
   return `<details class="srcfoot"><summary>${esc(t('web.source.line_h'))}: ${brief}</summary><div class="srcbar">${list.map(([k,s])=>srcChip(s,k)).join('')}</div></details>`;
 }
-async function overviewSourceBar(){
-  const s=await sources();
-  const locDates=['labs','medications','metrics'].map(k=>s[k]&&s[k].present?s[k].updated:null).filter(Boolean).sort();
-  const locDate=locDates.length?locDates[locDates.length-1]:null;
-  const pub=[];
-  if(s.pgx)pub.push('CPIC/PharmGKB');
-  if(s.catalog)pub.push('Ensembl GRCh38');
-  if(s.clinvar&&s.clinvar.present)pub.push('ClinVar'+(s.clinvar.release?' '+s.clinvar.release:''));
-  const pubs=pub.join(', ')||'CPIC, Ensembl';
-  return `<details class="srcfoot"><summary>${esc(t('web.source.line_h'))}: <b>${esc(t('web.source.local_kinds'))}</b>${locDate?' '+esc(fmtDate(locDate)):''} · <b>${esc(pubs)}</b></summary>
-    <div class="srcbar"><span class="srcchip local">🔒 ${esc(t('web.source.local_label'))}: <b>${esc(t('web.source.local_kinds'))}</b>${locDate?' · '+esc(t('web.source.profile_updated',{date:fmtDate(locDate)})):''}</span>
-    <span class="srcchip public">🌍 ${esc(t('web.source.public_label'))}: <b>${esc(pubs)}</b></span></div></details>`;
-}
-
 // The status vocabulary is stored as KEYS, not as phrases: the tables are built once at
 // load time, while the language may change afterwards without a reload.
 const FLAG = {
@@ -1024,7 +1073,19 @@ function windowSeries(series){
 // is a faint solid band and the target a dashed band or line in another colour:
 // two kinds of «normal» on one chart must not share a stroke, or the reader
 // cannot tell the laboratory's range from the treatment's aim.
-function sparkline(series,win,marks){
+function measurementLabel(p){
+  const src=p.measurement_source;
+  if(!src)return '';
+  return (src==='recorded'?t('web.phenotype.recorded'):t('web.life.device.'+src))+' · '+t(p.aggregation==='monthly_mean'?'web.life.monthly_mean':p.date?.length===7?'web.measurement.month_only':'web.life.dated_readings');
+}
+function measurementGroups(series){return [...new Set(series.map(p=>measurementLabel(p)))];}
+function bodyMassMetric(ref){return ['weight','bmi'].includes(String(ref||'').split(':').at(-1).toLowerCase());}
+function measurementDatasets(c,unified=false){
+  if(unified)return [{...gline(c.points?.map(p=>p.value)||c.v,CT.series),spanGaps:false}];
+  if(!c.points?.some(p=>p.measurement_source))return [gline(c.v,CT.series)];
+  return measurementGroups(c.points).map((label,i)=>({...gline(c.points.map(p=>measurementLabel(p)===label?p.value:null),i===0?CT.series:CT.ink2),label,spanGaps:true,borderDash:i?[3,3]:[]}));
+}
+function sparkline(series,win,marks,unified=false){
   if(win!==false) series=windowSeries(series);
   if(!series||series.length<2) return '';
   // A reporting limit is not an exact point to connect on a trend line.
@@ -1036,12 +1097,15 @@ function sparkline(series,win,marks){
   // corridor — a wide reference range would flatten the series to a stroke
   const tv=tg?[tg.low,tg.high,tg.value].filter(v=>v!=null).map(Number):[];
   const mn=Math.min(...ys,...tv),mx=Math.max(...ys,...tv),rng=(mx-mn)||1;
-  const X=i=>pad+(w-2*pad)*(i/(series.length-1));
+  const groups=measurementGroups(series), annotated=series.some(p=>p.measurement_source);
+  const stamps=series.map(p=>Date.parse(p.date.length===7?p.date+'-01':p.date));
+  const X=i=>pad+(w-2*pad)*(annotated&&stamps.at(-1)>stamps[0]?(stamps[i]-stamps[0])/(stamps.at(-1)-stamps[0]):i/(series.length-1));
+  const color=p=>groups.indexOf(measurementLabel(p))===0?'var(--accent)':'var(--ink-2)';
   const Y=v=>h-pad-(h-2*pad)*((v-mn)/rng);
   const clampY=v=>Math.max(pad,Math.min(h-pad,Y(v)));
-  const pts=series.map((p,i)=>`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`).join(' ');
+  const lines=unified?`<polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${series.map((p,i)=>`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`).join(' ')}"/>`:groups.map((group,j)=>`<polyline fill="none" stroke="${j?'var(--ink-2)':'var(--accent)'}" stroke-width="2" ${j?'stroke-dasharray="3 3"':''} stroke-linejoin="round" stroke-linecap="round" points="${series.map((p,i)=>measurementLabel(p)===group?`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`:null).filter(Boolean).join(' ')}"/>`).join('');
   // points with the date on hover — the date each measurement was taken
-  const dots=series.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.value).toFixed(1)}" r="${i===series.length-1?3.2:2.3}" fill="var(--accent)"><title>${esc(fmtDate(p.date))}: ${esc(fmtNum(p.value))}</title></circle>`).join('');
+  const dots=series.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.value).toFixed(1)}" r="${i===series.length-1?3.2:2.3}" fill="${unified?'var(--accent)':color(p)}"><title>${esc(fmtDate(p.date))}: ${esc(fmtNum(p.value))}${annotated?" · "+esc(measurementLabel(p)):""}</title></circle>`).join('');
   let bands='', legend='';
   if(tg){
     const lo=marks.ref_low!=null?clampY(Number(marks.ref_low)):h-pad, hi=marks.ref_high!=null?clampY(Number(marks.ref_high)):pad;
@@ -1057,11 +1121,11 @@ function sparkline(series,win,marks){
   return `<div class="sparkwrap">
     <svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
       ${bands}
-      <polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/>
+      ${lines}
       ${dots}
     </svg>
     <div class="sparkdates"><span>${esc(fmtDate(d0))}</span><span>${esc(fmtDate(dN))}</span></div>
-    ${legend}
+    ${legend}${annotated&&!unified?`<div class="sparkleg">${groups.map((label,i)=>`<span>${i?"╌":"━"} ${esc(label)}</span>`).join("")}</div>`:""}
   </div>`;
 }
 // The figures of a clinician's target as one token — «1–2», «≤2», «16.7» —
@@ -1270,9 +1334,9 @@ function bindGoalOrigins(root){
 function phenotypeTable(g){
   const source=c=>['lab','recorded','derived'].includes(c.source)?t('web.phenotype.'+c.source):t('web.life.device.'+c.source);
   const current=c=>c.value==null?'<span class="muted">—</span>':`${esc(fmtNum(c.value))} ${esc(c.unit_display??c.unit??'')}<div class="cr-caption">${esc(fmtDate(c.date)||'')} · ${esc(source(c))}</div>`;
-  const annualSeries=c=>c.year_delta==null?`<span class="muted small">${esc(t('web.phenotype.short'))}</span>`
-    :`${sparkline(c.series,false)}<div class="cr-caption">${esc(c.year_delta>0?'+':'')}${esc(fmtNum(c.year_delta))} ${esc(c.unit_display??c.unit??'')}</div>`;
-  const annual=c=>c.device_history?`${annualSeries(c.device_history)}<div class="cr-caption">${esc(source(c.device_history))}</div>`:annualSeries(c);
+  const annualSeries=c=>{if(bodyMassMetric(c.ref)){const series=c.period?.series||c.series||[];if(series.length>1){const first=series[0],last=series.at(-1),unit=c.unit_display??c.unit??'';return sparkline(series,false,null,true)+`<div class="cr-caption">${esc(fmtNum(first.value))} ${esc(unit)} · ${esc(fmtDate(first.date))} → ${esc(fmtNum(last.value))} ${esc(unit)} · ${esc(fmtDate(last.date))}</div>`;}}if(c.period){const p=c.period;return p.delta==null?`${p.series?.length>1?sparkline(p.series,false,null,bodyMassMetric(c.ref)):''}<span class="muted small">${esc(t(p.series?.length>1?'insight.comparison_unavailable':c.reading_status==='within'?'insight.latest_within':p.series?.length?'insight.one_reading':'insight.no_readings'))}</span>`:`${sparkline(p.series,false,null,bodyMassMetric(c.ref))}<div class="cr-caption">${esc(fmtDate(p.from))} → ${esc(fmtDate(p.to))} · ${p.delta>0?'+':''}${esc(fmtNum(p.delta))} ${esc(c.unit_display??c.unit??'')}${p.statistic==='mean'?' · '+esc(t('insight.stat.mean')):''}${p.comparison_source?' · '+esc(p.comparison_source==='recorded'?t('web.phenotype.recorded'):t('web.life.device.'+p.comparison_source)):''}</div>`;}return c.year_delta==null?`<span class="muted small">${esc(t(c.reading_status==='within'?'insight.latest_within':c.value!=null?'insight.one_reading':'insight.no_readings'))}</span>`
+    :`${sparkline(c.series,false,null,bodyMassMetric(c.ref))}<div class="cr-caption">${esc(c.year_delta>0?'+':'')}${esc(fmtNum(c.year_delta))} ${esc(c.unit_display??c.unit??'')}</div>`;};
+  const annual=c=>{const primary=annualSeries(c);return !bodyMassMetric(c.ref)&&c.device_history?`${primary}<details class="fold"><summary>${esc(t('web.phenotype.device_history',{source:source(c.device_history)}))}</summary>${annualSeries(c.device_history)}</details>`:primary;};
   return `<div class="tblscroll"><table class="cr-table cr-table--compact tgt" data-phenotype-table><thead><tr>
     <th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.phenotype.year'))}</th>
     <th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>
@@ -1304,33 +1368,42 @@ function renderGoal(root, g){
     <details class="fold"><summary>${esc(t('web.goal.settings'))}</summary>${goalEntitiesHTML(g.entities||[])}</details>
     <h3 class="cr-h3 gh">${esc(t('web.goal.targets_h'))}</h3>
     ${phenotypeTable(g)}
+    <details class="fold chart-disclosure" data-goal-charts><summary>${esc(t('web.goal.charts_open'))}</summary>
+    <div class="chart-tabs" role="tablist" aria-label="${esc(t('web.goal.charts_open'))}">${['body','metabolism','fitness'].map((key,i)=>`<button class="cr-btn cr-btn--s" role="tab" id="chart-tab-${key}" aria-controls="chart-panel-${key}" aria-selected="${i===0}" tabindex="${i===0?0:-1}" data-chart-tab="${key}">${esc(t('web.goal.'+key+'_h'))}</button>`).join('')}</div>
     <div class="glegend">
       <span><i class="gdot gdot-series"></i>${esc(t('web.goal.lg_series'))}</span>
       <span><i class="gdot gdot-target"></i>${esc(t('web.goal.lg_target'))}</span>
       <span><i class="gdot gdot-band"></i>${esc(t('web.goal.lg_window'))}</span>
     </div>
-    ${gsection(t('web.goal.body_h'),'g2',[
+    <section id="chart-panel-body" role="tabpanel" aria-labelledby="chart-tab-body" data-chart-panel="body">${gsection(t('web.goal.body_h'),'g2',[
       gbox(C.weight,'big',t('web.goal.weight'),'gcW'),
       gbox(C.bodycomp,'big',t('web.goal.bodycomp'),'gcBC')])}
-    <h3 class="cr-h3 gh">${esc(t('web.goal.metabolism_h'))}</h3>
+    </section><section id="chart-panel-metabolism" role="tabpanel" aria-labelledby="chart-tab-metabolism" data-chart-panel="metabolism" hidden><h3 class="cr-h3 gh">${esc(t('web.goal.metabolism_h'))}</h3>
     ${(C.minis||[]).some(gdrawn)?'<div class="cgrid g4" id="gminis"></div>'
       :`<div class="muted small">${esc(t('web.goal.chart_nodata'))}</div><div id="gminis"></div>`}
-    ${gsection(t('web.goal.fitness_h'),'g2',[
+    </section><section id="chart-panel-fitness" role="tabpanel" aria-labelledby="chart-tab-fitness" data-chart-panel="fitness" hidden>${gsection(t('web.goal.fitness_h'),'g2',[
       gbox(C.fit,'med',t('web.goal.aerobic'),'gcFIT'),
       gbox(C.la,'med',t('web.goal.ldl_alt'),'gcLA')])}
-    <div class="muted" style="font-size:12px;margin-top:14px">${t('web.goal.note',{key_metric:'<b>'+esc(t('web.goal.note_key'))+'</b>'})}</div>
+    </section></details><div class="muted" style="font-size:12px;margin-top:14px">${t('web.goal.note',{key_metric:'<b>'+esc(t('web.goal.note_key'))+'</b>'})}</div>
   </div>`;
   const gm=$('#gminis',root);
   (C.minis||[]).filter(gdrawn).forEach(m=>gm.appendChild(el(`<div class="chartbox mini"><h4>${esc(m.title)}</h4><p class="cap">${esc(m.cap)}</p><div class="cv"><canvas id="gc_${esc(m.id)}"></canvas></div></div>`)));
-  drawGoalCharts(C, root);
+  const chartFold=$('[data-goal-charts]',root);
+  if(chartFold)chartFold.ontoggle=()=>{if(chartFold.open)drawGoalCharts(C,root);};
+  const chartTabs=[...root.querySelectorAll('[data-chart-tab]')];
+  chartTabs.forEach((tab,i)=>{
+    tab.onclick=()=>{chartTabs.forEach(b=>{const active=b===tab;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;});root.querySelectorAll('[data-chart-panel]').forEach(p=>p.hidden=p.dataset.chartPanel!==tab.dataset.chartTab);drawGoalCharts(C,root);};
+    tab.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?0:e.key==='End'?chartTabs.length-1:(i+(e.key==='ArrowRight'?1:chartTabs.length-1))%chartTabs.length;chartTabs[next].click();chartTabs[next].focus();}};
+  });
+  if(!chartFold)drawGoalCharts(C, root);
   bindGoalOrigins(root);
 }
 function drawGoalCharts(C, root){
   if(!goalSetup()){ root.appendChild(el(`<div class="muted" style="font-size:12.5px;margin-top:8px">${esc(t('web.goal.charts_unavailable'))}</div>`)); return; }
   destroyGoalCharts();
   if(C.weight&&C.weight.l&&C.weight.l.length){
-    _goalCharts.push(new Chart($('#gcW',root),{type:"line",data:{labels:C.weight.l,datasets:[gline(C.weight.v,CT.series)]},
-      options:gbase({plugins:{legend:{display:false},marks:{band:C.weight.band,targets:C.weight.targets}},
+    _goalCharts.push(new Chart($('#gcW',root),{type:"line",data:{labels:C.weight.l,datasets:measurementDatasets(C.weight,true)},
+      options:gbase({plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>measurementLabel(C.weight.points?.[ctx.dataIndex]||{})}},marks:{band:C.weight.band,targets:C.weight.targets}},
         scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:8,color:CT.muted}},
           y:{grid:GGRID,suggestedMin:C.weight.min,suggestedMax:C.weight.max,ticks:{color:CT.ink2}}}})}));
   }
@@ -1344,8 +1417,8 @@ function drawGoalCharts(C, root){
           y2:{position:"right",grid:{drawOnChartArea:false},suggestedMin:C.bodycomp.y2min,suggestedMax:C.bodycomp.y2max,ticks:{color:CT.ink2},title:{display:true,text:t('web.goal.ds_muscle')}}}})}));
   }
   (C.minis||[]).forEach(m=>{ if(!m.l||!m.l.length) return;
-    _goalCharts.push(new Chart($('#gc_'+m.id,root),{type:"line",data:{labels:m.l,datasets:[gline(m.v,CT.series)]},
-      options:gbase({plugins:{legend:{display:false},marks:{targets:[{value:m.tgt,label:m.tlabel}]}},
+    _goalCharts.push(new Chart($('#gc_'+m.id,root),{type:"line",data:{labels:m.l,datasets:measurementDatasets(m,bodyMassMetric(m.id||m.ref))},
+      options:gbase({plugins:{legend:{display:!bodyMassMetric(m.id||m.ref)&&!!m.points?.some(p=>p.measurement_source)},tooltip:{callbacks:{afterLabel:ctx=>measurementLabel(m.points?.[ctx.dataIndex]||{})}},marks:{targets:[{value:m.tgt,label:m.tlabel}]}},
         scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:4,color:CT.muted,font:{size:9}}},
           y:{grid:GGRID,suggestedMin:m.min,suggestedMax:m.max,ticks:{color:CT.ink2,maxTicksLimit:4}}}})}));
   });
@@ -1359,85 +1432,6 @@ function drawGoalCharts(C, root){
   });
 }
 
-// ---------------- Focus of attention ----------------
-// The single task the owner is concentrating on right now. The track shows the path
-// "baseline -> now -> target"; the green zone is the stretch already covered.
-// The levers are observations from the owner's own data, not prescriptions: the
-// assistant does not change therapy.
-const FCMARK={primary:'▶',secondary:'·',hypothesis:'?'};
-function fcTrack(m){
-  const lo=m.baseline, hi=m.target, cur=(m.mean_30!=null?m.mean_30:m.raw);
-  if(lo==null||hi==null||cur==null) return '';
-  const min=Math.min(lo,hi,cur), max=Math.max(lo,hi,cur), pad=(max-min)*0.15||1;
-  const a=min-pad, b=max+pad, pc=v=>Math.max(0,Math.min(100,(v-a)/(b-a)*100));
-  const better = m.dir!=='lower' ? cur>=lo : cur<=lo;
-  const col = better? 'var(--good)':'var(--critical)';
-  const z0=Math.min(pc(lo),pc(cur)), z1=Math.max(pc(lo),pc(cur));
-  return `<div class="fctrack" title="${esc(t('web.focus.track_tip',{base:lo,now:cur,target:hi}))}">
-      <div class="zn" style="left:${z0.toFixed(1)}%;width:${(z1-z0).toFixed(1)}%"></div>
-      <div class="mk" style="left:${pc(lo).toFixed(1)}%"></div>
-      <div class="mk" style="left:${pc(hi).toFixed(1)}%"></div>
-      <div class="dt" style="left:${pc(cur).toFixed(1)}%;background:${col}"></div>
-    </div>
-    <div class="fcscale"><span>${esc(t('web.focus.baseline',{value:m.baseline_txt||lo}))}</span><span>${esc(t('web.focus.target',{value:m.target_txt||hi,unit:m.unit||''}))}</span></div>`;
-}
-function renderFocus(root,f){
-  if(!f||!f.available){ root.innerHTML=''; return; }
-  const m=f.metric||{}, cur=(m.mean_30!=null?m.mean_30:m.raw);
-  const dl=(m.delta!=null)?`<span class="badge ${m.delta>=2?'b-good':(m.delta<=-2?'b-critical':'b-unknown')}">${esc(t('web.focus.vs_baseline',{delta:m.delta_txt||m.delta}))}</span>`:'';
-  const levers=(f.levers||[]).slice().sort((x,y)=>({primary:0,secondary:1,hypothesis:2}[x.status]??3)-({primary:0,secondary:1,hypothesis:2}[y.status]??3));
-  const j=(f.journal&&f.journal.state)||{};
-  const today=localDay();
-  root.innerHTML=`<div class="fc">
-    <div class="fch"><h3 class="cr-h3">${esc(f.title||'')}</h3>
-      <span class="muted small">${esc(t('web.focus.since',{date:f.started||''}))}</span>${dl}</div>
-    <div class="fcnum"><b>${esc(String(m.mean_30_txt&&m.mean_30_txt!=='—'?m.mean_30_txt:(cur!=null?cur:'—')))}</b><span>${esc(m.unit_display??m.unit??'')} · ${esc(m.label||'')}</span>
-      <span>${esc(m.mean_30!=null?t('web.focus.mean_over',{nights:plural(m.nights_30||0,'count.nights'),from:m.window_from||'',to:m.window_to||''}):fmtDate(m.as_of)||'')}</span></div>
-    <details class="fold" data-focus-notes><summary>${esc(t('web.focus.details'))}${f.updated?' · '+esc(fmtDate(f.updated)):''}</summary>
-    <p class="meta">${esc(t('web.focus.updated'))}</p><p>${esc(f.why||'')}</p>
-    ${fcTrack(m)}
-    <div class="muted" style="font-size:12.5px;margin-top:8px">${esc(m.target_note||'')}</div>
-    <div style="margin-top:16px">
-      <div class="bltgrp">${esc(t('web.focus.levers_h'))}</div>
-      ${levers.map(l=>`<div class="fclv"><div class="mk">${FCMARK[l.status]||'·'}</div><div>
-        <div class="ti">${esc(l.title||'')} <span class="ex">· ${(l.expected||'').trim().startsWith('+')?esc(t('web.focus.expected_prefix')):''}${esc(l.expected||'—')}</span></div>
-        ${l.now&&l.now.text?`<div class="nw">${esc(t('web.focus.now',{text:l.now.text}))}</div>`:''}
-        <div class="ev">${esc(l.evidence||'')}</div></div></div>`).join('')}
-    </div>
-    <details class="lsec" style="margin-top:14px">
-      <summary>${esc(t('web.focus.journal_h'))} ${esc(j.logged_nights?t('web.focus.journal_count',{entries:plural(j.logged_nights,'count.entries')}):t('web.focus.journal_empty'))}</summary>
-      <div class="blk"><p>${esc((f.journal&&f.journal.why)||'')}</p>
-        <div class="fcform">
-          <input class="cr-input" type="date" id="fc-date" value="${esc(today)}">
-          <select class="cr-input" id="fc-alc"><option value="">${esc(t('web.focus.alcohol_none'))}</option>
-            <option value="light">${esc(t('web.focus.alcohol_light'))}</option><option value="heavy">${esc(t('web.focus.alcohol_heavy'))}</option></select>
-          ${((f.journal&&f.journal.factors)||[]).map(x=>`<label class="cr-label cr-check"><input type="checkbox" class="fc-factor" data-key="${esc(x.key)}"> ${esc(x.label||x.key)}</label>`).join('')}
-          <input class="cr-input" id="fc-note" placeholder="${esc(t('web.focus.note_placeholder'))}" style="flex:1;min-width:150px">
-          <button class="cr-btn act" id="fc-save">${esc(t('web.focus.save'))}</button>
-        </div>
-        <div class="muted" style="font-size:12.5px;margin-top:9px">${esc(j.text||'')}</div>
-      </div>
-    </details>
-    <details class="lsec" style="margin-top:10px"><summary>${esc(t('web.focus.questions_h'))}</summary>
-      <div class="blk"><ul class="fcq">${(f.questions||[]).map(q=>`<li><b>${esc(q.to||'')}:</b> ${esc(q.text||'')}</li>`).join('')}</ul></div>
-    </details>
-    </details>
-  </div>`;
-  const btn=$('#fc-save',root);
-  if(btn) btn.onclick=async()=>{
-    btn.disabled=true;
-    const r=await post('/api/focus/log',{date:$('#fc-date',root).value,
-      alcohol:$('#fc-alc',root).value,
-      // The journal's own yes/no factors (task 176), not one drug by name.
-      factors:[...root.querySelectorAll('.fc-factor')].filter(c=>c.checked).map(c=>c.dataset.key),
-      note:$('#fc-note',root).value});
-    btn.disabled=false;
-    if(r&&r.ok){ toast(r.removed?t('web.focus.entry_removed'):t('web.focus.entry_saved',{n:r.entries}));
-                 renderFocus(root, await api('/api/focus')); }
-    else toast(t('web.focus.save_failed')+(r&&r.error?': '+r.error:''));
-  };
-}
-
 // ---------------- Overview ----------------
 // ---- going to the tab that owns a block ------------------------------------
 // `Overview` and `Second opinion` are compilations by design: they show pieces
@@ -1448,79 +1442,185 @@ function tabLink(key){return `<a href="#" class="tablink" data-goto="${esc(key)}
 function bindTabLinks(root){root.querySelectorAll('[data-goto]').forEach(a=>a.onclick=e=>{
   e.preventDefault();goTab(a.getAttribute('data-goto'));});}
 
-async function viewOverview(root){
-  const [g,o,sb,f,radar,mx,lim] = await Promise.all([api('/api/goal'), api('/api/overview'),
-    overviewSourceBar(), api('/api/focus'), api('/api/radar'), api('/api/metrics'),
-    api('/api/limits').catch(()=>({items:[]}))]);
-  // Built from parts rather than one format string: a profile with no subject id
-  // came out as «subject ?», and a count of unread genes needs its plural form.
-  const parts=[];
-  if(o.subject_id) parts.push(t('web.header.subject',{subject:o.subject_id}));
-  parts.push(plural(o.medications_count,'count.prescriptions'));
-  if(o.genome_gaps.length) parts.push(plural(o.genome_gaps.length,'count.genes_unread'));
-  if(!root.isConnected) return;
-  $('#subhead').textContent = parts.join(' · ');
-  const doms=(radar.domains||[]).filter(d=>d.score!=null);
-  const attention=doms.filter(d=>d.status==='warning'||d.status==='critical');
-  const flagged=(o.flagged||o.high_flags||[]);
-  // Ordered by priority rather than filtered by it: the tile counts every
-  // pending suggestion, and the list prints the same ones.
-  const PRI={high:0,moderate:1,low:2};
-  const pending=visibleTestProposals(o.pending_suggestions||o.high_suggestions)
-    .slice().sort((a,b)=>(PRI[a.priority]??3)-(PRI[b.priority]??3));
-  const oa=dArrow(radar.overall_delta);
-  const facts=[
-    radar.overall!=null?factHtml(`${radar.overall}${radar.prev_overall!=null&&oa.txt?`<small style="color:${oa.col}">${esc(oa.txt)}</small>`:''}`,
-      t('web.overview.fact_index'),scoreCls(radar.overall),'web.tab.second_opinion'):'',
-    factHtml(`${o.abnormal_count}<small class="muted">/${o.markers_total}</small>`,t('web.overview.fact_abnormal'),o.abnormal_count?'c-critical':'','web.tab.labs'),
-    factHtml(String(attention.length),t('web.overview.fact_systems'),attention.length?'c-warning':'c-good','web.tab.second_opinion'),
-    factHtml(String(pending.length),t('web.overview.fact_tests'),'','web.tab.second_opinion'),
-  ];
-  const missing=((lim&&lim.items)||[]).filter(i=>i.kind==='profile');
-  // The reading order (task 195): the numbers first, then the body as a whole,
-  // what is outside the corridor now, what to take next, the one thing being
-  // worked on, the goal — and the person's own profile and measurements last.
-  // A precondition the profile lacks is the exception: it is said at the top,
-  // because every number below it may depend on it.
-  root.innerHTML = `${pageHead(firstTabLabel(),t('web.page.overview.q'),facts)}<div class="toolbar"><button class="cr-btn cr-btn--ghost" id="visit-sheet-open">${esc(t('visit.title'))}</button></div>${cautionsHtml(o.regimen_cautions)}${controlsHtml(o.overdue_controls,true)}
-    <div id="ov-missing"></div>
-    <h2 class="cr-h2 section mt-0">${esc(t('web.body.title'))}</h2>
-    <div id="ov-systems"></div>
-    <h2 class="cr-h2 section">${esc(t('web.overview.red_h'))} <span class="muted">· ${esc(t('web.overview.red_window'))}</span>${tabLink('web.tab.labs')}</h2>
-    ${o.stale_abnormal_count?`<div class="meta mb-2">${esc(t('web.overview.stale_hidden',{count:plural(o.stale_abnormal_count,'count.abnormal')}))}</div>`:''}
-    <div id="ov-red"></div>
-    <h2 class="cr-h2 section">${esc(t('web.overview.tests_h'))}${tabLink('web.tab.second_opinion')}</h2>
-    <div id="ov-tests"></div>
-    ${f&&f.available?`<h2 class="cr-h2 section">${esc(t('web.overview.focus_h'))}</h2><div id="ov-focus"></div>`:''}
-    <h2 class="cr-h2 section">${esc(t('web.phenotype.title'))}${g&&g.as_of?` <span class="muted">· ${esc(t('web.goal.as_of',{date:fmtDate(g.as_of)}))}</span>`:''}</h2>
-    <div id="ov-goal"></div>
-    <h2 class="cr-h2 section">${esc(t('web.overview.person_h'))}</h2>
-    <div id="ov-person"></div>
-    ${sb}`;
-  $('#visit-sheet-open',root).onclick=()=>viewVisitSheet(root);
-  if(missing.length){
-    $('#ov-missing',root).innerHTML=`<div class="cr-card card warnbox mb-4"><div class="row"><b>${esc(t('web.metrics.missing_head'))}</b>
-      <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm ml-auto" id="ov-fill">${esc(t('web.metrics.profile_btn'))}</button></div>
-      ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}</div>`;
-  }
-  renderSystems($('#ov-systems',root), radar);
-  await renderPerson($('#ov-person',root), [], true, mx);
-  const fill=$('#ov-fill',root);
-  if(fill) fill.onclick=()=>{const pf=$('#mprof',root); if(pf){pf.classList.remove('hidden'); pf.scrollIntoView({behavior:'smooth',block:'center'});}};
+let visitSelection=new Set(),visitSelectionTouched=false;
+function insightFactHTML(f){
+  const target=f.target, bounds=target?(target.value!=null?target.value:(target.low??'—')+'–'+(target.high??'—')):null;
+  const value=target?esc(t('insight.target',{value:bounds,unit:target.unit||''})):f.percentile!=null?esc(t('insight.pgs',{model:f.pgs_id,value:f.percentile,population:f.reference_panel_ancestry})):f.genotype?esc((f.gene||'')+' '+(f.rsid||'')+': '+f.genotype):f.value==null?'':`${esc(f.censored||'')}${esc(String(f.value))} ${esc(f.unit_display||f.unit||'')}`;
+  const source=typeof f.source==='string'?f.source:(f.source?.path||f.record||'');
+  return `<li><time>${esc(f.date||'—')}</time> ${value}<span class="meta"> · ${esc(source)}</span>${f.ref_low!=null||f.ref_high!=null?`<span class="meta"> · ${esc(t('insight.reference',{low:f.ref_low??'—',high:f.ref_high??'—'}))}</span>`:''}</li>`;
+}
+function comparisonHTML(c){
+  if(!c)return '';
+  const lines=[];
+  if(['mean','median'].includes(c.statistic))lines.push(t('insight.stat.'+c.statistic));
+  if(c.delta!=null)lines.push(t('insight.delta')+': '+c.delta);
+  if(c.mdd!=null)lines.push(t('insight.mdd',{value:c.mdd}));
+  for(const key of ['before','after']){const p=c[key],s=p?.stats;if(s)lines.push(t('insight.coverage',{date:p.date,n:s.n,days:s.days,sd:s.sd}));}
+  if(c.before_dates)lines.push(t('insight.period_dates',{a:c.before_dates.map(x=>x.slice(0,10)).join(' — '),b:c.after_dates.map(x=>x.slice(0,10)).join(' — ')}));
+  if(c.before_range)lines.push(t('insight.period_ranges',{a:c.before_range.join('–'),b:c.after_range.join('–'),na:c.before_n,nb:c.after_n}));
+  if(c.method_recorded===false||(c.comparison&&c.comparison.method_recorded===false))lines.push(t('insight.method_unknown'));
+  return lines.map(x=>`<p class="meta">${esc(x)}</p>`).join('');
+}
+function insightChartHTML(change){
+  const points=(change.series||[]).map(p=>({x:Date.parse(String(p.date).length===7?p.date+'-01':p.date),y:p.value,date:p.date}))
+    .filter(p=>Number.isFinite(p.x)&&typeof p.y==='number'&&Number.isFinite(p.y)).sort((a,b)=>a.x-b.x);
+  if(points.length<2)return '';
+  const c=change.comparison||{}, b=change.basis||{}, limits=[b.low,b.high].filter(v=>typeof v==='number'&&Number.isFinite(v));
+  const min=Math.min(...points.map(p=>p.y),...limits),max=Math.max(...points.map(p=>p.y),...limits),span=max-min||1;
+  const x=p=>8+184*(p.x-points[0].x)/(points.at(-1).x-points[0].x||1),y=v=>54-44*(v-min)/span;
+  const path=points.map(p=>x(p).toFixed(2)+','+y(p.y).toFixed(2)).join(' ');
+  const meaning=t('insight.direction.'+change.status,{basis:t('insight.basis.'+(['target','reference'].includes(b.basis)?b.basis:'unknown'))});
+  const label=change.name+' · '+t('insight.window.'+change.window)+' · '+t('insight.arrow.'+c.direction);
+  const boundLines=limits.map(v=>`<path d="${esc('M8 '+y(v).toFixed(2)+' H192')}" stroke="currentColor" stroke-dasharray="3 4" opacity=".4"><title>${esc(t('insight.chart.range')+': '+fmtNum(v))}</title></path>`).join('');
+  return `<figure class="insight-chart" data-direction="${esc(change.status)}"><figcaption><b>${esc(change.name)}</b> <span>${esc(c.direction==='up'?'↗':'↘')} ${esc(t('insight.arrow.'+c.direction))}</span></figcaption>
+    <svg viewBox="0 0 200 64" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title>${boundLines}<polyline points="${esc(path)}" fill="none" stroke="currentColor" stroke-width="2"/>${points.map(p=>`<circle cx="${esc(x(p).toFixed(2))}" cy="${esc(y(p.y).toFixed(2))}" r="2.5" fill="currentColor"><title>${esc(p.date+': '+fmtNum(p.y))}</title></circle>`).join('')}</svg>
+    <div class="chart-dates"><span><strong>${esc(fmtNum(points[0].y))} ${esc(change.series[0].unit_display||change.series[0].unit||'')}</strong><br>${esc(fmtDate(points[0].date))}</span><span><strong>${esc(fmtNum(points.at(-1).y))} ${esc(change.series[0].unit_display||change.series[0].unit||'')}</strong><br>${esc(fmtDate(points.at(-1).date))}</span></div><p class="chart-meaning">${esc(meaning)}</p>
+    ${change.show_latest!==false&&b.latest_outside?`<p class="meta">${esc(t('insight.latest_outside'))}</p>`:''}${change.show_latest!==false&&b.latest_reversal?`<p class="meta">${esc(t('insight.latest_reversal'))}</p>`:''}
+    <span class="meta">${change.series[0]?.measurement_source?esc(measurementLabel(change.series[0]))+" · ":""}${esc(t('insight.chart.readings',{n:points.length,unit:change.series[0].unit_display||change.series[0].unit||''}))}</span></figure>`;
+}
+function insightWindowsHTML(item){
+  const changes=item.trajectory?.changes||[];
+  return changes.length?`<div class="insight-windows">${[365].map(window=>{
+    const rows=changes.filter(c=>c.window===window);if(!rows.length)return '';
+    return `<section class="insight-window"><b class="meta">${esc(t('insight.window.'+window))}</b>${rows.slice(0,1).map(c=>insightChartHTML({...c,show_latest:window===365||!changes.some(a=>a.marker===c.marker&&a.window===365)})).join('')}${rows.length>1?`<details class="fold"><summary>${esc(t('insight.more',{n:rows.length-1}))}</summary>${rows.slice(1).map(insightChartHTML).join('')}</details>`:''}</section>`;
+  }).join('')}</div>`:'';
+}
 
-  renderGoal($('#ov-goal',root), g);
-  if(f&&f.available) renderFocus($('#ov-focus',root), f);
-  // Nothing flagged has two causes and they are not alike: nothing is out of
-  // range, or nothing has been measured. The list is `flagged`, not
-  // `high_flags`: a value below its floor belongs here as much as one above.
-  const red = $('#ov-red',root);
-  const SHOWN=12;
-  red.innerHTML = flagged.length
-    ? markerTable(flagged.slice(0,SHOWN))+(flagged.length>SHOWN?`<div class="meta">${esc(t('web.overview.more_in_labs',{n:flagged.length-SHOWN}))}</div>`:'')
-    : emptyHtml(o.markers_total ? t('web.overview.no_red',{n:o.markers_total}) : t('web.overview.no_red_nodata'));
-  const box = $('#ov-tests',root);
-  pending.forEach(s=>box.appendChild(testItem(s)));
-  if(!pending.length) box.innerHTML=emptyHtml(t('web.overview.no_priority_tests'));
+function geneticComparisonHTML(rows,clinician=false,system=''){
+  const visible=(rows||[]).filter(r=>clinician||r.eligible||(!['excluded','unread','allele_absent'].includes(r.status)&&r.state&&r.state!=='absent'));
+  if(!visible.length)return '';
+  return `<div data-genetic-comparison class="tblwrap"><table class="cr-table cr-table--compact"><colgroup><col style="width:20%"><col style="width:12%"><col style="width:68%"></colgroup><thead><tr><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_confidence'))}</th><th>${esc(t('genlab.title'))}</th></tr></thead><tbody>${visible.map(r=>{
+    const q=r.quality||{}, observations=r.observations||[r.observation];
+    return `<tr data-association="${esc(r.association_id||r.id)}"><td>${(r.genes||[r.gene]).map(g=>systemGeneLink(g,r.reference_system||system)).join(', ')}<div class="meta">${esc(r.rsid)}</div><div>${esc(r.display_genotype||'—')}</div></td><td>${levelChip(r.level)}${r.level_scope==='mechanism_reference_not_personal_variant'?`<div class="meta">${esc(t('genlab.mechanism_level'))}</div>`:''}</td><td><p class="small genlab-explanation"><strong>${esc(r.comparison&&r.comparison!==r.status_label?r.comparison:r.summary)}</strong></p><p class="meta genlab-status">${esc(r.status_label)}</p>
+      ${clinician?`<details class="fold"><summary>${esc(t('genlab.details'))}</summary>
+        <p><b>${esc(t('genlab.facts'))}</b> · ${esc(r.evidence_label)}</p>
+        ${observations.filter(o=>o?.point).map(o=>{const p=o.point;return `<p>${esc(p.name||o.marker||r.marker)}: ${esc(p.value??'—')} ${esc(p.unit_display||p.unit||'')} · ${esc(p.date||'—')}</p><p class="meta">${esc(t('genlab.lab_source'))}: ${esc(typeof p.source==='object'?JSON.stringify(p.source):p.source||'—')} · ${esc(t('genlab.specimen'))}: ${esc(t('genlab.specimen.'+(['plasma','serum','whole_blood','urine','blood','edta_plasma','packed_red_blood_cells'].includes(p.specimen||p.biomaterial)?(p.specimen||p.biomaterial):'unknown')))}</p>`;}).join('')}
+        ${r.derived?`<p>${esc(t('genlab.observed_ratio'))}: ${esc(Number(r.derived.value).toPrecision(3))}</p>`:''}
+        ${(r.variant_readings||[]).filter(x=>x.gene).map(x=>`<p class="meta">${esc(x.gene)} ${esc(x.rsid||'')} · ${esc(x.genotype?.genotype||'—')}</p>${(x.variant_records||[]).map(v=>`<p class="meta">${esc(v.chrom||'')}:${esc(v.pos||'')} ${esc(v.ref||'')}&gt;${esc(v.alt||'')} · ${esc(v.zygosity||'—')} · ${esc(v.clnsig||v.classification||'—')}</p>`).join('')}${(x.assertions||[]).map(a=>`<p class="meta">GenCC: ${esc(a.disease_label||a.disease)} · ${esc(a.classification_label||a.classification)} · ${esc(a.moi_label||a.moi_code||a.moi)}</p>`).join('')}`).join('')}
+        <p class="meta">${esc(t('genlab.genotype_source'))}: ${esc(q.source||'—')} · DP ${esc(q.depth??'—')} · ${esc(q.date||'—')}</p>
+        <p><b>${esc(t(r.knowledge_status==='hypothesis'?'genlab.hypothesis':'genlab.reference'))}</b>: ${esc(r.summary)}</p>
+        ${(r.reason_labels||[]).map(x=>`<p class="meta">${esc(x)}</p>`).join('')}
+        <p>${esc(r.limitations)}</p><p class="meta">${esc(t('genlab.checked',{date:r.knowledge?.checked_on||'—'}))}</p>
+        <p>${(r.source_links||[]).filter(u=>/^https:\/\//.test(u)).map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))} ${i+1}</a>`).join(' · ')}</p>
+        ${r.contrary_observations?.length?`<p><b>${esc(t('genlab.contrary'))}</b>: ${r.contrary_observations.map(x=>`${esc(x.date)}: ${esc(x.value)} ${esc(x.unit_display||x.unit||'')}`).join('; ')}</p>`:''}
+        <p>${esc(r.what_to_check)}</p>${r.question?`<p>${esc(r.question)}</p>`:''}
+        <p class="meta">${esc(t('genlab.no_cause'))}</p></details>`:''}</td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+
+function insightContextHTML(item){
+  const c=item.context||{}, genes=c.genetics||[], life=(c.lifestyle||[]).filter(r=>r.scope!=='patient_report');
+  const links=[];
+  if(genes.length||(c.comparisons||[]).length)links.push(item.system
+    ?`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#panel/${encodeURIComponent(item.system)}" data-panel="${esc(item.system)}">${esc(t('system.layer.genetics'))}</a>`
+    :`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#" data-goto="web.tab.genome">${esc(t('web.tab.genome'))}</a>`);
+  if(life.length)links.push(`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#" data-goto="web.tab.lifestyle">${esc(t('web.tab.lifestyle'))}</a>`);
+  return links.length?`<nav class="toolbar insight-context-links" data-insight-context-links>${links.join('')}</nav>`:'';
+}
+
+function attentionItemHTML(item, select=true){
+  const summaries=item.summaries||[], chartSummaries=new Set((item.trajectory?.changes||[]).map(c=>c.summary)), lead=summaries.filter(s=>!chartSummaries.has(s)).slice(0,2);
+  const detail=(item.events||[]).filter(e=>e.kind!=='genetic_phenotype').map(e=>{
+    const d=e.detail||{};
+    const texts=[d.action,d.factor,d.why_it_matters,d.mechanism,d.why,d.source,d.plan_source,d.study_limitations].filter(v=>typeof v==='string'&&v);
+    const comparison=d.trend||(d.before_range?d:d.comparison)||(d.statistic?d:null);
+    return `<div>${e.title!==item.title?`<p>${esc(e.title)}</p>`:''}${texts.map(v=>`<p>${esc(v)}</p>`).join('')}
+      ${comparisonHTML(comparison)}${d.trend&&d.comparison?comparisonHTML(d.comparison):''}
+      ${(e.limitations||[]).map(k=>`<p class="meta">${esc(t('insight.limit.'+k))}</p>`).join('')}</div>`;
+  }).join('');
+  return `<details class="cr-card attention-item" data-attention-card><summary><strong class="insight-title">${esc(item.title)}</strong> ${item.level?levelChip(item.level):''}</summary><div class="attention-body">
+    ${insightWindowsHTML(item)}${lead.map(s=>`<p class="small">${esc(s)}</p>`).join('')}
+    ${item.summaries?.length?'':`<div class="meta"><time>${esc(item.date||'')}</time>${item.reason?' · '+esc(item.reason):''}</div>`}
+    ${insightContextHTML(item)}<details class="fold" data-insight-detail><summary>${esc(t('insight.more_evidence'))}</summary>${summaries.filter(s=>!lead.includes(s)).map(s=>`<p>${esc(s)}</p>`).join('')}${(item.detail_summaries||[]).map(s=>`<p class="meta">${esc(s)}</p>`).join('')}<ul>${(item.facts||[]).filter(f=>f.record!=='genotype').map(insightFactHTML).join('')}</ul>${detail}
+      ${item.system?`<a href="#" data-system="${esc(item.system)}">${esc(t('insight.panel_open'))}</a>`:`<a href="#" data-goto="web.tab.${esc(item.destination)}">${esc(t('insight.open'))}</a>`}
+      ${select?`<label class="cr-label"><input type="checkbox" data-visit-item="${esc(item.id)}" ${visitSelection.has(item.id)?'checked':''}> ${esc(t('insight.select'))}</label>`:''}</details></div></details>`;
+}
+function attentionHTML(feed){
+  const items=feed?.highlights??feed?.items??[], followUp=feed?.follow_up||[];
+  return `<h2 class="cr-h2">${esc(t('insight.title'))}</h2><p class="meta">${esc(t('web.phenotype.year'))}</p>
+    ${items.map(i=>attentionItemHTML(i)).join('')}
+    ${followUp.length?`<h3 class="cr-h3">${esc(t('insight.repeated_fold',{n:followUp.length}))}</h3>${followUp.map(i=>attentionItemHTML(i)).join('')}`:''}
+    ${!items.length&&!followUp.length?`<p>${esc(feed?.items?.length?t('insight.highlights_empty'):t('insight.empty'))}</p>`:''}`;
+}
+
+function reviewChangesHTML(c){
+  if(!c?.available)return `<p>${esc(t('insight.no_history'))}</p>`;
+  const items=c.items||[],changed=items.filter(i=>i.status!=='unchanged'),same=items.filter(i=>i.status==='unchanged');
+  return (changed.length?changed.map(i=>`<p><b>${esc(i.label)}</b>: ${esc((i.current||i.previous)?.name||'')} · ${esc(i.reason_label)}</p>`).join(''):`<p>${esc(t('insight.no_changes'))}</p>`)
+    +(same.length?`<details class="fold"><summary>${esc(t('insight.unchanged'))} (${same.length})</summary>${same.map(i=>`<p>${esc((i.current||i.previous)?.name||'')}</p>`).join('')}</details>`:'');
+}
+function responseForm(domains){
+  domains=domains.some(d=>d.key==='fitness')?domains:[...domains,{key:'fitness'}];
+  return `<details class="fold"><summary>${esc(t('response.title'))}</summary><p>${esc(t('response.help'))}</p>
+    <form id="response-form" class="cr-card">
+    <label class="cr-label">${esc(t('web.form.date_day'))}<input class="cr-input" type="date" name="date" value="${esc(localDay())}" max="${esc(localDay())}" required></label>
+    <label class="cr-label">${esc(t('response.system'))}<select class="cr-input" name="system" required><option value="">—</option>${domains.map(d=>`<option value="${esc(d.key)}">${esc(t('radar.domain.'+d.key))}</option>`).join('')}</select></label>
+    <label class="cr-label">${esc(t('response.medication'))}<input class="cr-input" name="medication"></label>
+    <label class="cr-label">${esc(t('response.aspect'))}<select class="cr-input" name="aspect">${['symptom','function','tolerability'].map(k=>`<option value="${esc(k)}">${esc(t('response.aspect.'+k))}</option>`).join('')}</select></label>
+    <label class="cr-label">${esc(t('response.change'))}<select class="cr-input" name="change" required><option value="">—</option>${['better','worse','unchanged','mixed'].map(k=>`<option value="${esc(k)}">${esc(t('response.change.'+k))}</option>`).join('')}</select></label>
+    <label class="cr-label">${esc(t('response.note'))}<textarea class="cr-input" name="note" required></textarea></label>
+    <button class="cr-btn" type="submit">${esc(t('web.focus.save'))}</button><p class="meta" role="status"></p></form></details>`;
+}
+let overviewRead=0;
+function lazyOverviewBlock(root,id,load){
+  const fold=$('#'+id,root);let loaded=false;
+  fold.ontoggle=async()=>{if(!fold.open||loaded)return;loaded=true;const box=fold.querySelector('[data-lazy-body]');box.textContent=t('web.common.loading');try{await load(box);}catch(error){box.textContent=t('web.common.error');loaded=false;}};
+}
+async function viewOverview(root){
+  if(DISPLAY_MODE==='clinician')return viewVisitSheet(root);
+  const read=++overviewRead, valid=()=>root.isConnected&&read===overviewRead&&root.classList.contains('today-view');
+  root.className='today-view';
+  const overviewPromise=api('/api/overview?period=365').catch(()=>({error:t('web.common.error')}));
+  const [g,radar]=await Promise.all([api('/api/goal'),api('/api/radar')]);
+  if(!valid())return;
+  root.innerHTML=`${pageHead(firstTabLabel(),t('web.page.overview.q'),[])}
+    <div class="toolbar today-actions"><button class="cr-btn cr-btn--primary" id="visit-sheet-open">${esc(t('visit.title'))}</button>
+      <button class="cr-btn" id="review-preview">${esc(t('insight.history'))}</button></div>
+    <div id="review-history"></div>
+    <div class="today-lead"><div id="today-person-map"><h2 class="cr-h2">${esc(t('web.body.systems_h'))}</h2>
+      <div class="sysbox">${bodySVG(radar.domains||[],radar.sex||'',true)}</div><p class="meta">${esc(t('web.body.hint'))}</p>
+      <details class="fold"><summary>${esc(t('web.body.radar_h'))}</summary>${radarSVG(radar.domains||[])}
+        <p class="meta">${esc(radar.heuristic_note||t('radar.heuristic'))}</p></details></div>
+      <section id="today-insights" aria-live="polite"><h2 class="cr-h2">${esc(t('insight.title'))}</h2><p class="cr-caption loading-context" role="status">${esc(t('web.insight.loading'))}</p></section></div>
+    ${responseForm(radar.domains||[])}
+    <h2 class="cr-h2 section">${esc(t('web.phenotype.title'))}</h2>
+
+    <div id="ov-goal"></div>
+    <details class="fold" id="today-person"><summary>${esc(t('web.overview.person_h'))}</summary><div data-lazy-body></div></details>
+    `;
+  wireSystems($('#today-person-map',root),radar.domains||[]);
+  renderGoal($('#ov-goal',root),g);
+  lazyOverviewBlock(root,'today-person',async box=>renderPerson(box,true,await api('/api/metrics')));
+  overviewPromise.then(o=>{
+    if(!valid())return;
+    const box=$('#today-insights',root);if(o.error){box.innerHTML=`<p role="alert">${esc(o.error)}</p>`;return;}
+    const parts=[];if(o.subject_id)parts.push(t('web.header.subject',{subject:o.subject_id}));
+    parts.push(plural(o.medications_count,'count.prescriptions'));if(o.genome_gaps.length)parts.push(plural(o.genome_gaps.length,'count.genes_unread'));
+    $('#subhead').textContent=parts.join(' · ');
+    box.innerHTML=attentionHTML(o.attention);
+    renderGoal($('#ov-goal',root),{...g,phenotype:o.attention.summary,period:365});
+    box.querySelectorAll('[data-visit-item]').forEach(c=>c.onchange=()=>{visitSelectionTouched=true;c.checked?visitSelection.add(c.dataset.visitItem):visitSelection.delete(c.dataset.visitItem);});
+    bindTabLinks(box);wireSystems(box,radar.domains||[]);
+  });
+  $('#visit-sheet-open',root).onclick=()=>viewVisitSheet(root);
+  $('#response-form',root).onsubmit=async event=>{
+    event.preventDefault();const form=event.currentTarget, data=new FormData(form), button=form.querySelector('button');
+    button.disabled=true;
+    try{const r=await post('/api/focus/log',{date:data.get('date'),note:data.get('note'),
+      response:Object.fromEntries(['system','medication','aspect','change'].map(k=>[k,data.get(k)]))});
+      if(r.ok){toast(t('web.focus.entry_saved',{n:r.entries}));await viewOverview(root);}
+      else form.querySelector('[role=status]').textContent=r.error||t('web.focus.save_failed');
+    }catch(error){form.querySelector('[role=status]').textContent=t('web.focus.save_failed');}
+    finally{button.disabled=false;}
+  };
+  $('#review-preview',root).onclick=async()=>{
+    const r=await api('/api/insight-snapshot'); if(!root.isConnected)return;
+    const box=$('#review-history',root), c=r.comparison||{};
+    box.innerHTML=`<div class="cr-card"><h2 class="cr-h2">${esc(t('insight.history'))}</h2>
+      ${reviewChangesHTML(c)}
+      <button class="cr-btn" id="review-save">${esc(t('insight.save'))}</button></div>`;
+    $('#review-save',box).onclick=async()=>{const saved=await post('/api/insight-snapshot',{confirm:r.confirmation});toast(saved.message||saved.error||'');};
+  };
   bindTabLinks(root);
 }
 
@@ -1596,45 +1696,78 @@ function visitSourceLinks(value){
   for(const doi of text.matchAll(/DOI\s*:?\s*(10\.\d{4,9}\/[^\s;<>]+)/g))links.push('https://doi.org/'+doi[1]);
   return `${esc(text)} ${[...new Set(links)].map(url=>`<a class="cr-source" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`).join(' ')}`;
 }
+function visitInsightHTML(item,index){
+  const brief=item.visit_brief||{}, conclusions=brief.conclusions||item.summaries||[];
+  const point=p=>`${esc(p.censored||'')}${esc(fmtNum(p.value))} ${esc(p.unit_display||p.unit||'')}<br><span class="meta">${esc(fmtDate(p.date))}</span>`;
+  const readings=(brief.measurements||[]).map(m=>`<tr><th scope="row">${esc(m.name)}</th><td>${m.count>1?point(m.first):'—'}</td><td>${point(m.latest)}</td></tr>`).join('');
+  return `<article class="visit-topic"><header><span class="visit-number">${String(index+1).padStart(2,'0')}</span><span>${esc(item.title)}</span>${item.level?levelChip(item.level):''}</header>
+    <div class="visit-topic-body"><div><h3>${esc(t('web.visit.conclusion'))}</h3>${conclusions.map(x=>`<p>${esc(x)}</p>`).join('')}${(brief.support||[]).map(x=>`<p class="small">${esc(x)}</p>`).join('')}</div>
+    ${readings?`<div><h3>${esc(t('web.visit.support'))}</h3><table class="cr-table cr-table--compact"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.visit.before'))}</th><th>${esc(t('web.visit.latest'))}</th></tr></thead><tbody>${readings}</tbody></table></div>`:''}</div>
+    ${brief.comparisons?.length?`<div class="visit-topic-footer">${geneticComparisonHTML(brief.comparisons,true,item.system||'')}</div>`:''}</article>`;
+}
 async function viewVisitSheet(root, reference=false){
+  const read=++overviewRead;
   showLoader(root);
-  const r=await api('/api/visit-sheet'+(reference?'?reference=1':''));
-  if(!root.isConnected)return;
+  const query=new URLSearchParams();if(visitSelectionTouched)query.set('selection','explicit');if(reference)query.set('reference','1');visitSelection.forEach(id=>query.append('item',id));
+  let r;
+  try{r=await api('/api/visit-sheet?'+query);}
+  catch(e){r={error:t('visit.load_failed')};}
+  if(!root.isConnected||read!==overviewRead)return;
+  if(r?.error||!r?.container||!r?.treatment||!r?.sources||!r?.reference_appendix){
+    root.innerHTML=`<div class="cr-card"><p role="alert">${esc(r?.error||t('visit.load_failed'))}</p>
+      <div class="toolbar"><button class="cr-btn" id="visit-retry">${esc(t('visit.retry'))}</button>
+      <button class="cr-btn cr-btn--ghost" id="visit-reselect">${esc(t('visit.reselect'))}</button></div></div>`;
+    $('#visit-retry',root).onclick=()=>{forgetAnswers();return viewVisitSheet(root,reference);};
+    $('#visit-reselect',root).onclick=()=>{
+      visitSelection.clear();visitSelectionTouched=false;forgetAnswers();
+      return DISPLAY_MODE==='clinician'?setDisplayMode('patient'):mount(0);
+    };
+    return;
+  }
   root.className='visit-sheet';
-  const rows=r.measurements||[],held=r.held_measurements||[],history=r.historical_measurements||[],meds=(r.medications||[]).filter(m=>m.current);
-  let cautionMarkup=cautionsHtml(r.regimen_cautions);
+  markCurrentTab(DISPLAY_MODE==='clinician'?0:-1);
+  const rows=r.remaining_measurements??r.measurements??[],held=r.held_measurements||[],history=r.historical_measurements||[],meds=(r.medications||[]).filter(m=>m.current);
+  let cautionMarkup=cautionsHtml(r.remaining_cautions??r.regimen_cautions);
   for(const c of r.regimen_cautions||[])if(c.source)cautionMarkup=cautionMarkup.replace(esc(c.source),visitSourceLinks(c.source));
   const empty=`<p class="cr-muted">${esc(t('visit.empty'))}</p>`;
   root.innerHTML=`<div class="toolbar visit-actions"><button class="cr-btn cr-btn--ghost" id="visit-back">← ${esc(t('visit.back'))}</button>
     ${!reference?`<button class="cr-btn cr-btn--ghost" id="visit-reference">${esc(t('visit.include_reference'))}</button>`:''}
+    <label class="cr-label"><input type="checkbox" id="visit-full-print"> ${esc(t('visit.full_print'))}</label>
     <button class="cr-btn" id="visit-print">${esc(t('visit.print'))}</button></div>
-    <h1 class="cr-h1">${esc(r.title)}</h1>
+    <header class="visit-cover"><p class="cr-caption">SCHOLION · ${esc(fmtDate(r.as_of))}</p><h1 class="cr-h1">${esc(r.title)}</h1>
     <p class="cr-caption">${esc(t('visit.stamp',{id:r.container.id||'—',version:r.version,date:r.as_of}))}</p>
     ${r.synthetic?`<p class="cr-alert cr-alert--warning">${esc(t('web.header.demo_banner'))}</p>`:''}
-    <p class="cr-body-s">${esc(r.scope_note)}</p>
-    <h2 class="cr-h2">${esc(t('visit.goals'))}</h2>
-    ${(r.goals||[]).length?`<ul>${r.goals.map(g=>`<li><b>${esc(g.title)}</b> · ${esc(g.origin.label)} · ${esc(g.record.file)}</li>`).join('')}</ul>`:empty}
-    ${cautionMarkup}
-    <h2 class="cr-h2">${esc(t('visit.measurements'))}</h2><p class="cr-caption">${esc(t('visit.range_note'))}</p>
+    <p class="cr-body">${esc(r.brief?.summary||'')}</p><p class="cr-caption">${esc(r.scope_note)}</p></header>
+    <nav class="visit-nav" aria-label="${esc(t('visit.title'))}"><a class="cr-btn cr-btn--s" href="#visit-agenda">${esc(t('web.visit.agenda'))}</a><a class="cr-btn cr-btn--s" href="#visit-questions">${esc(t('web.visit.questions_section'))}</a><a class="cr-btn cr-btn--s" href="#visit-treatment">${esc(t('web.visit.rx_section'))}</a></nav>
+    ${r.review_changes?.available?`<details class="fold"><summary>${esc(t('insight.history'))}</summary>${reviewChangesHTML(r.review_changes)}</details>`:''}
+    <section id="visit-agenda"><h2 class="cr-h2">${esc(t('web.visit.agenda'))}</h2>
+    ${(r.agenda?.items||[]).map(visitInsightHTML).join('')||empty}</section>
+    <section id="visit-questions"><h2 class="cr-h2">${esc(t('web.visit.questions_section'))}</h2>
+    ${r.brief?.questions?.length?`<ol class="visit-questions">${r.brief.questions.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>`:empty}</section>
+    <details class="fold visit-support"><summary>${esc(t('visit.goals'))}</summary>
+    ${(r.goals||[]).length?`<ul>${r.goals.map(g=>`<li><b>${esc(g.title)}</b>${typeof g.target==='string'?' · '+esc(g.target):''}</li>`).join('')}</ul>`:empty}
+    </details>${cautionMarkup}
+    <details class="fold visit-support"><summary>${esc(t('visit.measurements'))}</summary><p class="cr-caption">${esc(t('visit.range_note'))}</p>
     ${rows.length?`<div class="cr-table-wrap"><table class="cr-table--compact cr-table"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.form.value'))}</th><th>${esc(t('visit.reference_bounds'))}</th><th>${esc(t('visit.sources'))}</th></tr></thead>
     <tbody>${rows.map(m=>`<tr><th scope="row">${esc(m.name)}<br><time>${esc(m.date||'—')}</time></th>
     <td data-label="${esc(t('web.form.value'))}"><span>${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit_display??m.unit??'')}</span></td><td data-label="${esc(t('visit.reference_bounds'))}"><span>${esc(m.ref_low??'—')}–${esc(m.ref_high??'—')}${targetText(m)}</span></td>
     <td data-label="${esc(t('visit.sources'))}"><span>${esc(m.source_label)}<br>${esc(m.date_basis_label)}</span></td></tr>`).join('')}</tbody></table></div>`:empty}
-    <h2 class="cr-h2">${esc(t('visit.medications'))}</h2>
-    ${meds.length?`<ul>${meds.map(m=>`<li><b>${esc(m.name)}</b> · ${esc(m.dose||'—')} · ${esc(m.start_date||t('treatment.undated'))}</li>`).join('')}</ul>`:empty}
-    ${controlsHtml(r.treatment.controls)}
+    </details><section id="visit-treatment"><h2 class="cr-h2">${esc(t('web.visit.rx_section'))}</h2>
+    ${meds.length?`<div class="cr-table-wrap"><table class="cr-table cr-table--compact visit-rx"><thead><tr><th>${esc(t('web.visit.drug'))}</th><th>${esc(t('web.visit.dose'))}</th><th>${esc(t('web.visit.since'))}</th></tr></thead><tbody>${meds.map(m=>`<tr><th scope="row">${esc(m.name)}</th><td data-label="${esc(t('web.visit.dose'))}">${esc(m.dose||'—')}</td><td data-label="${esc(t('web.visit.since'))}">${esc(m.start_date?fmtDate(m.start_date):t('treatment.undated'))}</td></tr>`).join('')}</tbody></table></div>`:empty}</section>
+    ${r.historical_medications?.length?`<details class="fold visit-support"><summary>${esc(t('visit.rx_history'))}</summary><ul>${r.historical_medications.map(m=>`<li>${esc(m.name)} · ${esc(m.end_date||m.status||'—')}</li>`).join('')}</ul></details>`:''}
+    ${controlsHtml(r.remaining_controls??r.treatment.controls)}
     <details class="visit-held" data-index-provenance><summary>${esc(t('visit.held',{n:held.length}))}</summary><ul>${held.map(m=>`<li>${esc(m.name)} · ${esc(m.date||'—')} · ${esc(m.recency_note||m.corridor_note||t('visit.no_corridor'))}</li>`).join('')}</ul></details>
     ${history.length?`<details class="visit-history"><summary>${esc(t('visit.historical',{n:history.length}))}</summary><ul>${history.map(m=>`<li><b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(String(m.value))} ${esc(m.unit_display??m.unit??'')} · ${esc(m.date||'—')}<br>${esc(m.source_label)}</li>`).join('')}</ul></details>`:''}
-    <h2 class="cr-h2">${esc(t('visit.sources'))}</h2><div class="cr-body-s">${['labs','medications','metrics','genome_vcf'].map(k=>r.sources[k]?`<p><b>${esc(r.sources[k].label)}</b>: ${esc(r.sources[k].origin)} · ${esc(r.sources[k].updated||'—')}</p>`:'').join('')}</div>
     ${r.reference_appendix.included?`<section class="visit-reference"><h2 class="cr-h2">${esc(t('visit.appendix'))}</h2><p>${esc(r.appendix_note)}</p>
     ${r.reference_appendix.panels.map(p=>`<section><h3 class="cr-h3">${esc(p.label)}</h3>${p.positions.map(x=>`<article class="cr-card">${levelChip(x.level)} ${systemGeneLink(x.gene,p.key)} ${esc(x.rsid)}<p>${esc(t('visit.reading',{reading:x.reading_label||'—'}))}</p>
     ${geneticBriefHtml(x,'clinician')}</article>`).join('')}</section>`).join('')}</section>`:''}
     <p class="cr-caption">${esc(r.disclaimer)}</p>`;
-  $('#visit-back',root).onclick=()=>mount(current);
-  $('#visit-print',root).onclick=()=>window.print();
+  $('#visit-back',root).onclick=()=>DISPLAY_MODE==='clinician'?setDisplayMode('patient'):mount(0);
+  $('#visit-print',root).onclick=()=>{root.toggleAttribute('data-full-print',$('#visit-full-print',root).checked);window.print();};
   const add=$('#visit-reference',root);if(add)add.onclick=()=>viewVisitSheet(root,true);
 }
 
+let labSystemToOpen=null;
 async function viewLabs(root){
   const [d,catR,sb,cfgR,meds]=await Promise.all([api('/api/labs'),api('/api/markers'),sourceBar(['labs']),api('/api/source-config'),api('/api/medications')]);
   // the series for the sparklines are pulled from the catalogue
@@ -1646,18 +1779,6 @@ async function viewLabs(root){
   const current=d.markers.filter(m=>m.display_recency!==false);
   const historical=d.markers.filter(m=>m.display_recency===false);
   const stats=d.current_stats||d;
-  const OUT={high:0,low:0};
-  const dist=m=>{
-    const v=Number(m.value);
-    if(!isFinite(v)) return 0;
-    if(m.flag==='high'&&m.ref_high!=null&&Number(m.ref_high)!==0)
-      return (v-Number(m.ref_high))/Math.abs(Number(m.ref_high));
-    if(m.flag==='low'&&m.ref_low!=null&&Number(m.ref_low)!==0)
-      return (Number(m.ref_low)-v)/Math.abs(Number(m.ref_low));
-    return 0;
-  };
-  const flagged=current.filter(m=>m.flag in OUT).sort((a,b)=>dist(b)-dist(a));
-  const rest=current.filter(m=>!(m.flag in OUT));
   const latest=current.map(m=>String(m.date||'')).sort().pop()||'';
   const facts=[
     factHtml(`${stats.abnormal_count}<small class="muted">/${stats.count}</small>`,t('web.labs.fact_abnormal'),stats.abnormal_count?'c-critical':(current.some(m=>m.flag==='ok')?'c-good':'')),
@@ -1681,18 +1802,17 @@ async function viewLabs(root){
     <div id="add-lab" class="hidden"></div>
     <div id="targets-box"></div>
     <p class="cr-caption">${esc(t('labs.display_window'))}</p>
-    <h2 class="cr-h2 section">${esc(t('web.labs.out_h'))} <span class="muted">· ${flagged.length}</span></h2>
-    <div class="grid" id="labgrid"></div>
-    ${rest.length?`<details class="fold mt-4" id="labrest"><summary>${esc(t(rest.some(m=>m.flag!=='ok')?'web.labs.other_h':'web.labs.within_h',{n:rest.length}))}</summary><div class="grid mt-2" id="labrestgrid"></div></details>`:''}
+    <div id="lab-system-groups">${(d.system_groups||[]).map(g=>`<details class="cr-card lab-system-group" data-lab-group="${esc(g.key)}"><summary><strong>${esc(g.label)}</strong> <span class="meta">${esc(t('web.labs.group_counts',{measured:g.measured,abnormal:g.abnormal}))}</span></summary><div class="grid mt-2"></div></details>`).join('')}</div>
     ${historical.length?`<details class="fold mt-4" id="labhistory"><summary>${esc(t('labs.history_heading',{n:historical.length}))}</summary><p class="meta">${esc(t('labs.history_note'))}</p><div class="grid mt-2" id="labhistorygrid"></div></details>`:''}
     ${sb}`;
   renderTargets($('#targets-box',root), cat);
-  const g = $('#labgrid',root);
-  flagged.forEach(m=>g.appendChild(markerCard(m)));
-  if(!flagged.length) g.innerHTML=emptyHtml(stats.count?t(current.some(m=>['norange','unconfirmed_rule'].includes(m.flag))?'web.labs.none_out_unassessed':'web.labs.none_out'):t('web.overview.no_red_nodata'));
-  // Drawn when opened: the cards inside the corridor are built on the first open.
-  const rd=$('#labrest',root);
-  if(rd) rd.addEventListener('toggle',()=>{ const rg=$('#labrestgrid',root); if(rd.open&&!rg.childElementCount) rest.forEach(m=>rg.appendChild(markerCard(m))); });
+  root.querySelectorAll('[data-lab-group]').forEach(detail=>{
+    const group=(d.system_groups||[]).find(g=>g.key===detail.dataset.labGroup);
+    const draw=()=>{const grid=detail.querySelector('.grid');if(detail.open&&!grid.childElementCount) current.filter(m=>group.markers.includes(m.key)).forEach(m=>grid.appendChild(markerCard(m)));};
+    detail.addEventListener('toggle',draw);
+    if(labSystemToOpen===group.key){detail.open=true;draw();detail.scrollIntoView({block:'start'});}
+  });
+  labSystemToOpen=null;
   const hd=$('#labhistory',root);
   if(hd) hd.addEventListener('toggle',()=>{ const hg=$('#labhistorygrid',root); if(hd.open&&!hg.childElementCount) historical.forEach(m=>hg.appendChild(markerCard(m))); });
   // the add form
@@ -2309,17 +2429,23 @@ function clinicalBasisHTML(p,compact=false){
 function referenceContextHtml(p){
   const c=p.reference_context;
   if(!c) return '';
-  return `<div class="why" data-reference-context><div class="cr-caption">${esc(c.variant_status==='not_supplied'?t('reference.gene_level'):t('reference.level',{level:c.level||'—'}))}</div>`
-    +`<div>${esc(t('reference.gene',{text:c.gene_function}))}</div>`
+  return `<div class="why" data-reference-context>${c.function_status==='not_curated'?'':`<div><strong>${esc(c.gene_function)}</strong></div>`}`
     +`<div>${esc(t('reference.variant',{text:c.variant_context}))}</div>`
+    +`${c.canonical_symbol&&p.gene&&c.canonical_symbol.toUpperCase()!==p.gene.toUpperCase()?`<p class="cr-caption">${esc(t('reference.resolved_gene',{gene:c.canonical_symbol}))}</p>`:''}`
     +`${c.gene_source?`<div class="why muted">${esc(t('reference.gene_source',{source:c.gene_source}))}</div>`:''}`
+    +`${(c.gene_additional_sources||[]).filter(u=>/^https:\/\//.test(u)).map(u=>`<div class="why muted"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))}</a></div>`).join('')}`
     +`${c.variant_source?`<div class="why muted">${esc(t('reference.variant_source',{source:c.variant_source}))}</div>`:''}`
+    +`${(c.mechanistic_hypotheses||[]).length?`<details class="fold" data-mechanistic-hypotheses><summary>${esc(t('genlab.reference_patterns'))}</summary>${c.mechanistic_hypotheses.map(h=>`<p>${levelChip(h.association_level)} ${h.level_scope==='mechanism_reference_not_personal_variant'?esc(t('genlab.mechanism_level')):''}</p><p>${esc(h.summary)}</p><p class="meta">${esc(h.limitations)}</p><p>${(h.source_links||[]).filter(u=>/^https:\/\//.test(u)).map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))} ${i+1}</a>`).join(' · ')}</p>`).join('')}</details>`:''}`
     +`${c.limitations?`<div class="why muted">${esc(c.limitations)}</div>`:''}`
     +`${(c.gencc_assertions||[]).map(a=>`<div class="why" data-gencc-assertion>${esc(t('gencc.assertion',{disease:a.disease_label,classification:a.classification_label,moi:a.moi_label,submitter:a.submitter||'—',date:a.curated_on||'—'}))}</div>`).join('')}`
-    +`${c.gencc_assertions?.length?`<div class="why muted">${esc(t('gencc.source',{version:c.gencc_version||'—',source:c.gencc_source}))}</div>`:''}</div>`;
+    +`${c.gencc_assertions?.length?`<div class="why muted">${esc(t('gencc.source',{version:c.gencc_version||'—',source:c.gencc_source}))}</div>`:''}`
+    +`${c.function_status==='not_curated'?`<p class="cr-caption">${esc(c.gene_function)}</p>`:''}`
+    +`<p class="cr-caption">${esc(c.variant_status==='not_supplied'?t('reference.gene_level'):t('reference.level',{level:c.level||'—'}))}</p></div>`;
 }
 function mechanismHtml(p){
-  const reference=referenceContextHtml(p);
+  const assertion=p.interpretation?.database_assertion;
+  const identity=(assertion?.description?`<p class="cr-caption">${esc(assertion.description)}</p>`:'')+(p.transcript?`<p class="cr-caption">${esc(p.transcript)} · ${esc(p.hgvs||'')}</p>`:'');
+  const reference=identity+referenceContextHtml(p);
   const r=p.decision_route,workflow=r?`<div class="why muted" data-decision-route="${esc(r.kind)}">${esc(t('genome.route.line',{label:r.label,reason:r.reason}))}<div>${esc(r.notice)}</div></div>`:'';
   const sub=Object.entries(p.subclaim_basis||{}).map(([name,b])=>`<div class="why muted" data-subclaim-basis>${esc(t('conclusion.subclaim.'+name))}: ${esc(b.status==='incomplete'?b.reason:b.mechanism+' — '+b.source)}</div>`).join('');
   let clinical=sub+workflow;
@@ -2331,16 +2457,19 @@ function mechanismHtml(p){
 
 function geneticPreviewHtml(p,fallback=''){
   const c=p.reference_context, i=p.interpretation;
-  const sentence=typeof i?.summary==='string'&&i.summary?i.summary:(c?.variant_context||p.text||fallback||p.passport?.reported||p.conclusion_basis?.reason||'');
-  const parts=[c?.gene_function,sentence].filter(Boolean);
-  return `<span class="gen-context-preview">${parts.map(x=>`<span>${esc(x)}</span>`).join(' ')}</span>`;
+  const sentence=typeof i?.summary==='string'&&i.summary?i.summary:(p.text||p.passport?.reported||c?.variant_context||fallback||'');
+  const parts=[...new Set([c?.function_status==='not_curated'?null:c?.gene_function,sentence].filter(Boolean))];
+  return `<span class="gen-context-preview">${parts.map((x,j)=>j===0&&(c?.function_status!=='not_curated'||i?.summary||p.text)?`<strong>${esc(x)}</strong>`:`<span>${esc(x)}</span>`).join(' ')}</span>`;
 }
 function geneticBriefHtml(p,register='patient',fallback='',detailOnly=false){
   const i=p.interpretation;
-  const interpretation=typeof i?.summary==='string'&&i.summary?`<div data-catalogue-interpretation>${esc(t('interpretation.summary',{level:i.level||'—',text:i.summary}))}${i.mechanism&&!i.summary.includes(i.mechanism)&&!p.reference_context?.variant_context?.includes(i.mechanism)?`<div class="why">${esc(t('system.row.mechanism',{text:i.mechanism}))}</div>`:''}<div class="why muted">${esc(i.notice||t('interpretation.notice'))}</div>${i.source?`<div class="why muted">${esc(t('decision.source',{source:i.source}))}</div>`:''}${i.missing?.length?`<div class="why muted">${esc(t('interpretation.gaps',{missing:i.missing.map(k=>t('conclusion.missing.'+k)).join(', ')}))}</div>`:''}</div>`:'';
+  const interpretation=typeof i?.summary==='string'&&i.summary?`<div data-catalogue-interpretation>${esc(i.summary)}${i.mechanism&&!i.summary.includes(i.mechanism)&&!p.reference_context?.variant_context?.includes(i.mechanism)?`<div class="why">${esc(t('system.row.mechanism',{text:i.mechanism}))}</div>`:''}<div class="why muted">${esc(i.notice||t('interpretation.notice'))}</div>${['evidence_reason','population','study_effect','reading_note'].map(k=>i[k]?`<p class="cr-caption">${esc(i[k])}</p>`:'').join('')}${i.source?`<div class="why muted">${esc(t('decision.source',{source:i.source}))}</div>`:''}${i.missing?.length?`<div class="why muted">${esc(t('interpretation.gaps',{missing:i.missing.map(k=>t('conclusion.missing.'+k)).join(', ')}))}</div>`:''}</div>`:'';
   const text=!p.reference_context&&!interpretation&&(p.text||fallback)?`<div>${esc(p.text||fallback)}</div>`:'';
   const body=`<div class="gen-context-body">${interpretation}${text}${mechanismHtml(p)}${p.passport?passportHtml(p,register,!!i?.summary):''}${authorNoteHtml(p,register)}${clinicalBasisHTML(p,true)}</div>`;
-  return detailOnly?body:`<details class="gen-context" data-genetic-context><summary>${geneticPreviewHtml(p,fallback)}<span class="gen-context-more small">${esc(t('web.gen.context_details'))}</span></summary>${body}</details>`;
+  const c=p.reference_context, level=i?.level||(c?.variant_status==='not_supplied'?null:(p.level||c?.level));
+  return detailOnly?body:`<div class="gen-description" data-gene-description>${geneticPreviewHtml(p,fallback)}
+    ${level?`<div class="gen-evidence">${esc(t('web.gen.evidence_link'))} ${levelChip(level)}</div>`:''}
+    <details class="gen-context" data-genetic-context><summary>${esc(t('web.gen.context_details'))}</summary>${body}</details></div>`;
 }
 function geneticCatalogueFold(gen,card){
   const table=genTableHtml(gen,card,card.register);
@@ -2378,12 +2507,12 @@ function genTableHtml(gen,card,register){
     const id='g:'+g.gene;
     const cells=`<td>${systemGeneLink(g.gene,card.key)}</td><td class="muted small">GenCC: ${esc((g.classifications||[]).map(x=>t('gencc.class.'+x)).join(', ')||'—')}</td>`
       +`<td>${geneStateBadge(g)}</td><td class="opt muted small">${esc((g.moi_codes||[]).join(', ')||'')}</td>`
-      +`<td>${g.reference_context?`<div>${esc(short(g.reference_context.gene_function))}</div>`:''}${esc(short(g.carrier_class_text||g.two_variants_text||g.text||g.file_says_text||''))}</td>`;
-    const detail=`<div class="pnl k-c">${g.text?`<div class="pnl-text">${esc(g.text)}</div>`:''}`
+      +`<td>${geneticPreviewHtml(g,g.carrier_class_text||g.two_variants_text||g.file_says_text||'')}</td>`;
+    const detail=`<div class="pnl k-c">${referenceContextHtml(g)}${g.text?`<div class="pnl-text">${esc(g.text)}</div>`:''}`
       +[g.carrier_class_text,g.two_variants_text].filter(Boolean).map(x=>`<div class="why">${esc(x)}</div>`).join('')
       +`${g.file_says_text?`<div class="why muted">${esc(g.file_says_text)}</div>`:''}`
       +`${g.read===false?`<div class="why muted">${esc(t('system.row.unread',{why:g.read_why_text||g.read_why||'—'}))}</div>`:''}`
-      +`${referenceContextHtml(g)}${register==='clinician'?geneRowDetail(g):''}</div>`;
+      +`${register==='clinician'?geneRowDetail(g):''}</div>`;
     return genTableRow(id,cells,detail);
   };
   let body='';
@@ -2471,7 +2600,7 @@ function panelHtml(gen,card,register){
   let h=`<div class="sys-sec">${esc(t('system.panel.h'))} <span class="muted small">· ${esc(t('system.panel.checked',{positions:plural(states.length,'count.positions')}))}</span></div>`;
   const cardOf=(p,dim)=>{const r=byId[p.gene+'|'+p.rsid]||{};
     return `<div class="pnl ${PNL_KIND[p.kind]||'k-c'}${dim?' pnl-dim':''}"><div class="pnl-head">${levelChip(p.level,p.level_short)}${systemGeneLink(p.gene,card.key)} <span class="muted">${esc(p.rsid||'')}</span>${pnlStateBadge(p)}<span class="muted small">${esc(t('system.panel.kind.'+(p.kind||'unassigned')))}</span>${p.link_text?`<span class="muted small">· ${esc(t('system.panel.link',{link:p.link_text}))}</span>`:''}${r.signature==='open'?`<span class="muted small">· ${esc(t('system.row.signature_open'))}</span>`:''}</div>
-      ${(p.text||r.text)?`<div class="pnl-text">${esc(p.text||r.text)}</div>`:''}${mechanismHtml(p)}${passportHtml(p,register)}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}${register==='clinician'?geneRowDetail(r):''}</div>`;};
+      ${geneticBriefHtml(p,register,p.text||r.text||'')}${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}${register==='clinician'?geneRowDetail(r):''}</div>`;};
   const byGene=list=>{const g={}; list.forEach(p=>{(g[p.gene]=g[p.gene]||[]).push(p);}); return Object.keys(g).sort().flatMap(k=>g[k]);};
   h+=byGene(found).map(p=>cardOf(p,false)).join('')+byGene(other).map(p=>cardOf(p,false)).join('')+byGene(absent).map(p=>cardOf(p,true)).join('')+byGene(unread).map(p=>cardOf(p,true)).join('');
   // the polygenic scores of the system, folded (owner, 14.09.2026)
@@ -2521,13 +2650,7 @@ function genSummaryHtml(gen, card){
   // genotyped from the alignment: the step that closes it, where the gap is seen.
   const assumed=st.filter(x=>x.read===false&&x.read_why==='assumed_ref').length;
   if(assumed) h+=`<div class="gen-rest">${esc(t('system.genetics.assumed_ref_hint',{positions:plural(assumed,'count.positions')}))} <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm" data-recompute-open>${esc(t('web.recompute.open'))}</button></div>`;
-  const qs=(card.questions||{}).rows||[];
-  const qnum=Object.fromEntries(qs.map((q,i)=>[(q.gene||'')+'|'+(q.rsid||''),i+1]));
-  const cmp=found.filter(p=>p.conclusion_basis?.status!=='incomplete'&&(byId[p.gene+'|'+p.rsid]||{}).expect_check);
-  if(cmp.length){
-    const m=cmp.map(p=>`<div class="mt-1">${systemGeneLink(p.gene,card.key)} ${pnlExpect(byId[p.gene+'|'+p.rsid].expect_check,qnum[p.gene+'|'+p.rsid])}</div>`).join('');
-    h+=`<div class="match"><b>${esc(t('system.panel.compare_h'))}.</b> ${m}</div>`;
-  }
+  h+=geneticComparisonHTML(card.genetic_lab_comparisons,card.register==='clinician',card.key);
   // What a guideline weighs when a drug is chosen. Not a prescription, and
   // nothing here says a drug is being taken.
   const rx=found.filter(p=>p.conclusion_basis?.status!=='incomplete'&&(p.kind==='guideline'||p.kind==='pair'));
@@ -2553,9 +2676,9 @@ function systemGeneRow(r, register){
   if(r.not_a_finding_why==='kind') marks.push(t('system.row.not_finding_kind',{kind:t('system.kind.'+(r.kind||'unassigned'))}));
   let out=`<div class="list-item" style="padding:10px 14px;margin-bottom:6px"><div>${r.level?levelChip(r.level,r.level_short)+' ':''}<b>${esc(r.gene)}</b> ${esc(head.replace(r.gene,'').trim())}`
     + (marks.length?` <span class="muted">· ${esc(marks.join(' · '))}</span>`:'')+`</div>`;
-  if(r.text) out+=`<div class="why">${esc(r.text)}</div>`;
+  out+=geneticBriefHtml(r,register,r.text||'');
   if(r.file_says_text) out+=`<div class="why muted">${esc(r.file_says_text)}</div>`;
-  out+=mechanismHtml(r)+ladderHtml(r);
+  out+=ladderHtml(r);
   if(register==='clinician') out+=geneRowDetail(r);
   return out+`</div>`;
 }
@@ -2677,7 +2800,7 @@ function correctionRoutesHtml(cr,register='patient'){
 function systemMedicationsHtml(med){
   const head=`<thead><tr><th>${esc(t('web.system.med_name'))}</th><th>${esc(t('web.system.med_dose'))}</th><th>${esc(t('web.system.med_class'))}</th></tr></thead>`;
   const table=rows=>`<div class="cr-table-wrap"><table class="cr-table system-medications-table">${head}<tbody>${rows}</tbody></table></div>`;
-  const row=(m,labels,reason='')=>`<tr><td><b>${esc(m.name||'')}</b></td><td>${esc(m.dose||'—')}</td><td>${esc(labels.join(', ')||reason||t('prescription.class_undefined'))}${reason&&labels.length?`<div class="cr-caption">${esc(reason)}</div>`:''}</td></tr>`;
+  const row=(m,labels,reason='')=>`<tr><td><b>${esc(m.name||'')}</b></td><td>${esc(m.dose||'—')}</td><td>${esc(labels.join(', ')||reason||t('prescription.class_undefined'))}${(m.system_links||[]).map(x=>`<p class="cr-caption">${esc(x.relation_label)}${x.note?' · '+esc(x.note):''}</p>`).join('')}${reason&&labels.length?`<div class="cr-caption">${esc(reason)}</div>`:''}</td></tr>`;
   let h=med.rows?.length?table(med.rows.map(m=>row(m,m.via_labels||[])).join('')):'';
   if(med.empty_reason) h+=`<p class="cr-caption">${esc(med.empty_reason)}</p>`;
   const unplaced=(med.unmapped||[]).map(m=>row(m,m.class_labels||[],t('web.system.med_no_map')))
@@ -2706,19 +2829,21 @@ function systemCardHtml(r){
   else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
   else{
     b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
-    b+=(lab.abnormal||[]).map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="muted" title="${esc(m.date||'')}">${esc(fmtDate(m.date))}</span></div>`).join('');
   }
   if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
   if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
   if(lab.panel_term) b+=`<div class="row-l">${esc(t('system.panel_labs.term',{outside:lab.panel_term.outside,judged:lab.panel_term.judged,score:lab.panel_term.score}))}</div>`;
   b+=panelLabsHtml(lab.panel);
   b+=(r.validated_indices||[]).map(fib4Html).join('');
+  const readings=lab.current_markers||[];
+  const readingRows=readings.map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="meta">${esc(fmtDate(m.date))}</span>${m.series?.length>1?sparkline(m.series,undefined,null,bodyMassMetric(m.key)):''}</div>`).join('');
+  b=`<details class="fold system-current-labs"><summary>${esc(t('web.labs.group_counts',{measured:readings.length,abnormal:readings.filter(m=>m.abnormal).length}))}</summary>${readingRows}<button class="cr-btn cr-btn--ghost" data-lab-system="${esc(r.key)}">${esc(t('web.labs.open_system'))}</button>${b}</details>`;
   layer(1,'system.layer.labs',b);
   const dyn=r.dynamics||{};
   if(dyn.status==='ok'){
     const d=dyn.delta||0;
     b=`<div class="row-l">${esc(t('system.dynamics.line',{prev:dyn.prev_score,score:dyn.compared_score,delta:(d>0?'+':'')+d,date:fmtDate(dyn.prev_date)||'—',compared:dyn.compared||0}))}</div>`
-     +(dyn.moved||[]).map(m=>`<div class="row-l">· ${esc(t('system.dynamics.moved',{name:m.name,from_value:m.from_value,to_value:m.to_value,unit:m.unit||''}))}</div>`).join('');
+     +(dyn.moved||[]).map(m=>`<div class="row-l">· ${esc(t('system.dynamics.moved',{name:m.name,from_value:m.from_value,to_value:m.to_value,unit:m.unit_display??m.unit??''}))}</div>`).join('');
   } else b=`<div class="row-l">${esc(t('system.dynamics.'+(dyn.status||'absent')))}</div>`;
   layer(2,'system.layer.dynamics',b);
   const gen=r.genetics||{};
@@ -2788,9 +2913,9 @@ async function viewPanel(key,reading=null,focusGene=null){
     ${p.reading?`<div class="why" data-intake-reading="${esc(p.rsid)}">${esc(p.reading.message)}</div>${Object.keys(p.reading.quality||{}).length?`<div class="why muted">${esc(t('panel.reading.quality'))}: ${esc(JSON.stringify(p.reading.quality))}</div>`:''}`:''}
     <div class="why muted">${esc(t('panel.locus',{hgvs:p.hgvs||'—',allele:p.risk_allele||'—'}))}</div>
     ${p.disposition?`<div class="why">${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}</div>`:''}
-    ${['het','hom','hemi'].filter(s=>((p.interpretation?.summary)||p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc((p.interpretation?.summary||p.text)[s])}</div>`).join('')}
     ${mechanismHtml(p)}
-    ${p.classification?`<div class="why">${esc(t('panel.classification',{classification:p.classification,moi:p.moi||'—',disease:p.disease||'—'}))}</div>`:''}
+    ${['het','hom','hemi'].filter(s=>((p.interpretation?.summary)||p.text||{})[s]).map(s=>`<div class="pnl-text"><b>${esc(t('panel.state.'+s))}:</b> ${esc((p.interpretation?.summary||p.text)[s])}</div>`).join('')}
+    ${p.classification&&!p.interpretation?.database_assertion?`<div class="why">${esc(t('panel.classification',{classification:p.classification,moi:p.moi||'—',disease:p.disease||'—'}))}</div>`:''}
     ${p.expect?`<div class="why">${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</div>`:''}
     ${p.effect_size?`<div class="why">${esc(t('panel.effect',{effect:p.effect_size}))}</div>`:''}
     ${authorNoteHtml(p,'clinician')}
@@ -2845,7 +2970,7 @@ async function viewPanel(key,reading=null,focusGene=null){
 // that printing opened; the reader's own expanded rows stay expanded.
 let intakePrintOpened=[];
 window.addEventListener('beforeprint',()=>{
-  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open])'));
+  intakePrintOpened=Array.from(document.querySelectorAll('#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])'));
   intakePrintOpened.forEach(d=>d.open=true);
 });
 window.addEventListener('afterprint',()=>{
@@ -2926,7 +3051,7 @@ function wrapWords(text, width){
   if(cur) out.push(cur);
   return out.length?out:[''];
 }
-function bodySVG(domains, sex){
+function bodySVG(domains, sex, systemView=false){
   const im = SILHOUETTE[sex];
   // No third silhouette exists and the profile may not say. Refusing to draw is
   // the same answer this application gives everywhere else it does not know.
@@ -2955,7 +3080,10 @@ function bodySVG(domains, sex){
   const marks=[];
   domains.forEach(d=>{
     const pl=d.place||{};
-    if(pl.parts) pl.parts.forEach(p=>{
+    if(systemView&&pl.parts?.length){
+      const anchor=pl.parts.find(p=>ORGAN_SPOT[p.place]);
+      if(anchor)marks.push({dom:d,place:anchor.place,label:d.label,score:d.score,status:d.status,measured:d.measured,total:d.total,part:false});
+    }else if(pl.parts) pl.parts.forEach(p=>{
       if(ORGAN_SPOT[p.place])
         marks.push({dom:d, place:p.place, label:p.label||d.label, score:p.score, status:p.status,
                     measured:p.measured, total:p.total, part:true});
@@ -3190,7 +3318,7 @@ function radarSVG(domains){
     const [x,y]=pt(i,dom.score==null?R:R*dom.score/100);
     if(dom.score==null)return `<g class="rdot rdot-empty" data-dom="${esc(dom.key)}" tabindex="0" role="button" aria-label="${esc(dom.label+': '+t('common.no_data'))}"><title>${esc(t('common.no_data'))}</title><circle class="rdotc" cx="${x}" cy="${y}" r="4.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/></g>`;
     const a=dArrow(dom.delta);
-    const mv=(dom.moved||[]).map(m=>`\n  · ${m.name}: ${m.from_value} → ${m.to_value} ${m.unit||''}`).join('');
+    const mv=(dom.moved||[]).map(m=>`\n  · ${m.name}: ${m.from_value} → ${m.to_value} ${m.unit_display??m.unit??''}`).join('');
     const dyn=dom.prev_score!=null?'\n'+t('web.radar.was',{score:dom.prev_score,compared:dom.compared,date:dom.prev_date||t('web.radar.prev_measurement'),word:a.word})+mv:'\n'+t('web.radar.no_previous');
     // Two rings about every dot, the same two as on the figure: the share of
     // the laboratory panel measured (inner), the share of the genetic half
@@ -3228,7 +3356,7 @@ async function viewSecond(root){
   const register=DISPLAY_MODE,epoch=_answerEpoch,language=LANG;
   const details=Promise.all([api('/api/systems?register='+encodeURIComponent(register)),
     api('/api/second-opinion'),api('/api/suggest-tests'),api('/api/labs'),
-    sourceBar(['labs','medications','pgx','interactions'])])
+    sourceBar(['labs','medications','pgx','interactions']),api('/api/overview?period=365')])
     .then(replies=>({replies}),error=>({error}));
   const radar=await api('/api/radar');
   if(!root.isConnected) return;
@@ -3240,7 +3368,7 @@ async function viewSecond(root){
   const result=await details;
   if(!root.isConnected) return;
   if(result.error) throw result.error;
-  const [sys,d,sug,labs,sb]=result.replies;
+  const [sys,d,sug,labs,sb,overview]=result.replies;
   if(sys.error) throw new Error(sys.error);
   rememberSystemCards(sys,register,epoch,language);
   // The radar's rows are a digest of the labs analysis and do not carry the
@@ -3285,7 +3413,7 @@ async function viewSecond(root){
     ${pageHead(t('web.tab.second_opinion'),t('web.page.radar.q'),facts)}
     <div class="toolbar">
       <button class="cr-btn cr-btn--ghost ghost" onclick="window.print()">${esc(t('web.second.print'))}</button>
-      <a class="ghost" href="/doc/for-clinicians" target="_blank" rel="noopener" title="${esc(t('web.second.for_clinician_note'))}">${esc(t('web.second.for_clinician'))}</a>
+      <a class="ghost" href="/doc/for-clinicians?lang=${encodeURIComponent(LANG)}" target="_blank" rel="noopener" title="${esc(t('web.second.for_clinician_note'))}">${esc(t('web.second.for_clinician'))}</a>
     </div>
     <div id="sl-systems" class="mb-4"></div>
     <div class="sysindex">${index}</div>
@@ -3331,6 +3459,8 @@ async function viewSecond(root){
     // and its prescriptions; every other block is its verdict and one fold. The
     // radar page was twelve screens, each block printed in full whatever it said.
     const needs=['critical','warning'].includes(dom.status);
+    const insight=(overview?.attention?.highlights||[]).find(x=>x.system===s.key);
+    if(insight)h+=attentionItemHTML(insight,false);
     let lead=markerTable(recent);
     if(stale.length) lead+=`<details class="fold"><summary>${esc(t('web.second.stale_lead'))} · ${stale.length}</summary>${markerTable(stale)}</details>`;
     if((acting[s.key]||[]).length)
@@ -3445,7 +3575,7 @@ function controlsHtml(controls, overdueOnly=false){
 }
 function treatmentHtml(data){
   if(!data)return '';
-  return `${controlsHtml(data.controls)}<details class="fold" data-treatment-timeline><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.scope'))}</p><ol>${(data.events||[]).map(e=>`<li><time>${esc(e.date)}</time> · ${e.kind==='prescription_start'?`<b>${esc(t('treatment.start'))}: ${esc(e.name)}</b> ${esc(e.dose||'')}`:`${esc(e.name)}: ${esc(e.comparator||'')}${esc(e.value??'—')} ${esc(e.unit||'')}`}</li>`).join('')}</ol>${(data.undated||[]).map(e=>`<div class="meta">${esc(e.name)} · ${esc(t('treatment.undated'))}</div>`).join('')}</details>`;
+  return `${controlsHtml(data.current_controls??(data.controls||[]).filter(c=>c.current!==false))}${(data.historical_controls||[]).length?`<details class="fold" data-historical-controls><summary>${esc(t('treatment.history_controls'))}</summary>${controlsHtml(data.historical_controls)}</details>`:''}<details class="fold" data-treatment-timeline><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.scope'))}</p><ol>${(data.events||[]).map(e=>`<li><time>${esc(e.date)}</time> · ${e.kind==='prescription_start'?`<b>${esc(t('treatment.start'))}: ${esc(e.name)}</b> ${esc(e.dose||'')}`:`${esc(e.name)}: ${esc(e.comparator||'')}${esc(e.value??'—')} ${esc(e.unit||'')}`}</li>`).join('')}</ol>${(data.undated||[]).map(e=>`<div class="meta">${esc(e.name)} · ${esc(t('treatment.undated'))}</div>`).join('')}</details>`;
 }
 function medItem(m, sys){
   // `current` is the server's verdict by the one rule in core — the page does not
@@ -3480,7 +3610,7 @@ function metricCard(m){
     <div class="label">${esc(m.name)}</div>
     <div class="value">${has?esc(m.value):'—'} <small>${esc(m.unit)}</small></div>
     <div class="row">${has?badge(f.cls==='b-good'||f.cls==='b-critical'||f.cls==='b-warning'?f.cls:'b-good', t(f.key)):badge('b-unknown',t('web.flag.unknown'))}${tr}</div>
-    ${m.series&&m.series.length>1?sparkline(m.series):''}
+    ${m.series&&m.series.length>1?sparkline(m.series,undefined,null,bodyMassMetric(m.key)):''}
     <div class="meta">${esc(refText(m))}${has&&m.date?` · ${esc(m.date)}`:''}</div>
     ${metricOrigin(m)}
   </div>`);
@@ -3490,20 +3620,8 @@ function metricCard(m){
 // four cards it showed were the four the device already measured, and it read
 // only the file somebody types into. It belongs at the top of the first screen,
 // which is where the reader asks «who is this and where are they now».
-async function renderPerson(root, given, compact=false, supplied=null){
+async function renderPerson(root, compact=false, supplied=null){
   const d=supplied||await api('/api/metrics');
-  // What the profile is still missing, shown where it can be filled in. The
-  // engine already computes it — `limits` answers «what cannot be said here and
-  // what would close it», and a missing precondition is exactly that — but no
-  // page had ever asked that route for anything, so the whole layer reached the
-  // command line and the assistant and never a person in a browser.
-  // The whole first screen asks for its data at once. This one used to be
-  // fetched here, after everything else had already come back, and it is the
-  // second slowest route in the product — the person's own block then waited on
-  // it alone, at the top of the page, with the rest of the screen already drawn.
-  let missing=[];
-  if(given!==undefined){ missing=given; }
-  else { try{ missing=((await api('/api/limits')).items||[]).filter(i=>i.kind==='profile'); }catch(e){} }
   const p=d.profile||{};
   const bmi=d.bmi;
   // One BMI on the page (task 217, stage 0): the tile only when no card below carries it.
@@ -3520,10 +3638,6 @@ async function renderPerson(root, given, compact=false, supplied=null){
       <button class="cr-btn cr-btn--ghost ghost" id="toggle-mprof">${esc(t('web.metrics.profile_btn'))}</button>
       <button class="cr-btn cr-btn--ghost ghost" id="toggle-madd">+ ${esc(t('web.metrics.add_btn'))}</button>
     </div>
-    ${missing.length?`<div class="cr-card card warnbox mb-4">
-      <div class="row"><b>${esc(t('web.metrics.missing_head'))}</b></div>
-      ${missing.map(i=>`<div class="why mt-2">⚠ ${esc(i.what)}</div>`).join('')}
-    </div>`:''}
     <div id="mprof" class="hidden"></div>
     <div id="madd" class="hidden"></div>
     <div class="grid" id="mgrid"></div>`;
@@ -3710,8 +3824,9 @@ function lifeCard(m){
     <div class="label">${esc(m.label)}</div>
     <div class="value">${esc(m.value==null?'—':m.value)} <small>${esc(m.unit)}</small></div>
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
-    ${m.measurement_series?m.measurement_series.map(o=>`<div class="srcline">${esc(o.source?t('web.life.measured_by',{device:t('web.life.device.'+o.source)}):t('web.phenotype.recorded'))} · ${esc(o.aggregation==='monthly_mean'?t('web.life.monthly_mean'):t('web.life.dated_readings'))}</div>${o.series.length>1?sparkline(o.series,false):''}`).join(''):(m.series&&m.series.length>1?sparkline(m.series,false):'')}
+    ${m.combined_history?sparkline(m.series,false,null,bodyMassMetric(m.key)):m.measurement_series?m.measurement_series.map(o=>`<div class="srcline">${esc(o.source?t('web.life.measured_by',{device:t('web.life.device.'+o.source)}):t('web.phenotype.recorded'))} · ${esc(o.aggregation==='monthly_mean'?t('web.life.monthly_mean'):t('web.life.dated_readings'))}</div>${o.series.length>1?sparkline(o.series,false):''}`).join(''):(m.series&&m.series.length>1?sparkline(m.series,false):'')}
     ${srcTag(m)}
+    ${m.comparison?`<details class="fold"><summary>${esc(t('insight.details'))}</summary>${comparisonHTML(m.comparison)}${m.comparison.eligible&&m.comparison.distinguishable===true?'':`<p class="meta">${esc(t('insight.no_change_estimate'))}</p>`}${(m.comparison.limitations||[]).map(k=>`<p class="meta">${esc(t('insight.limit.'+k))}</p>`).join('')}</details>`:''}
     <div class="meta">${esc(m.value_smooth==null?fmtDate(m.date):t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>
   </div>`);
 }
@@ -3786,12 +3901,12 @@ async function viewLifestyle(root){
   const hasM=!!(d.metrics&&d.metrics.length);
   const fs=hasM?d.fitness_score:null;
   const snap=(brief&&brief.snapshot)||[];
-  const hero=s=>{const x=snap.find(y=>y.label===s);return x&&x.raw!=null
+  const hero=s=>{const x=snap.find(y=>y.key===s);return x&&x.raw!=null
     ?`<div class="cr-card cr-stat fact"><b style="color:${BLTCOL[bulletStatus(x)]}">${esc(fmtNum(x.raw))}</b><span>${esc(t('web.life.hero',{label:x.label.toLowerCase(),target:fmtNum(x.target_value)}))}</span></div>`:''};
 
   let html=`${pageHead(t('web.tab.lifestyle'),t('web.page.lifestyle.q'),[
       fs!=null?factHtml(String(fs),t('web.life.fitness_score'),scoreCls(fs)):'',
-      ...t('web.bullet.match.hero').split('|').map(hero)])}
+      ...['BodyFat','MuscleMass','homa_ir'].map(hero)])}
     <div class="toolbar">
       <button class="cr-btn cr-btn--ghost ghost" id="grefresh">${esc(t('web.life.wearable_btn'))}</button>
       <span class="muted small" id="gmsg">${esc(t('web.life.wearable_note'))}</span>
@@ -3915,8 +4030,8 @@ async function viewLifestyle(root){
 function genomeCard(r){
   if(r.status==='unknown_rsid') return `<div class="cr-card card muted">${esc(r.message)}</div>`;
   if(r.status==='unknown_gene') return `<div class="cr-card card muted">${esc(t('web.genome.unknown_gene'))}</div>`;
-  if(r.status==='no_genome'){const l=r.locus||{};return `<div class="cr-card card"><div class="row">⚪ <b>${esc(r.rsid)}</b> <span class="muted">${esc(l.gene||'')} · ${esc(l.chrom)}:${esc(l.pos)}</span></div><div class="meta">${esc(r.message||'')}</div></div>`;}
-  if(r.gene&&r.loci){return `<div class="cr-card card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}<ul class="meta">${r.loci.map(x=>{const rs=x.result||{};const g=rs.confidence==='assumed_ref'?null:rs.genotype;return `<li><code>${esc(x.rsid)}</code>${x.star?' '+esc(x.star):''} ${x.chrom?esc(x.chrom)+':'+esc(x.pos):''} — ${g?esc(t('web.genome.genotype'))+' <b>'+esc(g)+'</b>':'—'}</li>`;}).join('')}</ul></div>`;}
+  if(r.status==='no_genome'){const l=r.locus||{};return `<div class="cr-card card"><div class="row">⚪ <b>${esc(r.rsid)}</b> <span class="muted">${esc(l.gene||'')} · ${esc(l.chrom)}:${esc(l.pos)}</span></div><div class="meta">${esc(r.message||'')}</div>${geneticBriefHtml(r,DISPLAY_MODE)}</div>`;}
+  if(r.gene&&r.loci){return `<div class="cr-card card"><b>${esc(r.gene)}</b> — ${esc(t('web.genome.loci'))}${geneticBriefHtml(r,DISPLAY_MODE)}${genomeGeneTable(r.loci.map(x=>({...x,genotype:x.result?.confidence==='assumed_ref'?null:x.result?.genotype,reading:x.result})))}</div>`;}
   const res=r.result||{};
   // All three confidence levels are named, and the note about THIS read is shown.
   // `res.note` ("depth is low (4 reads) — the call is unreliable") reached no
@@ -3937,7 +4052,7 @@ function genomeCard(r){
     ${res.conflict?`<div class="meta" style="color:var(--critical)">⚠ ${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</div>`:''}
     ${res.confirmed_by==='profile'?`<div class="meta" style="color:var(--good)">${esc(t('genome.confirmed_by_report'))}</div>`:''}
     ${res.note?`<div class="meta">⚠ ${esc(res.note)}</div>`:''}
-    ${r.note?`<div class="meta">${esc(r.note)}</div>`:''}
+    ${geneticBriefHtml(r,DISPLAY_MODE,r.note||'')}
   </div>`;
 }
 function prsPercentile(p){return p==null?'—':Number(p.toFixed(2))>=100?'≥P99.99':Number(p.toFixed(2))<=0?'≤P0.01':'P'+String(Number(p.toFixed(2)));}
@@ -4010,7 +4125,7 @@ function genomeGeneTable(rows){
   if(!rows.length) return '';
   return `<div class="tblwrap"><table class="cr-table cr-table--compact dt gentbl" data-genome-gene-table><thead><tr>
     <th>${esc(t('web.gen.col_confidence'))}</th><th>${esc(t('web.gen.col_row'))}</th><th>${esc(t('web.gen.col_reading'))}</th><th>${esc(t('web.gen.col_what'))}</th>
-    </tr></thead><tbody>${rows.map(k=>`<tr><td>${levelChip(k.level)||'—'}</td><td><b>${esc(k.gene||'—')}</b><div class="small muted">${esc(k.rsid||'')}</div></td><td>${esc(k.genotype||'—')}${k.verdict_label?`<div class="small">${esc(k.verdict_label)}</div>`:''}</td><td>${geneticBriefHtml(k,DISPLAY_MODE,k.label||k.note||'')}${(k.pmids||[]).length?`<details class="fold"><summary>${esc(t('web.gen.context_details'))} · PMID</summary>${k.pmids.map(id=>`<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(id)}/" target="_blank" rel="noopener">${esc(id)}</a>`).join(' · ')}</details>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+    </tr></thead><tbody>${rows.map(k=>`<tr><td>${k.reference_context?.variant_status==='not_supplied'?'—':levelChip(k.level)||'—'}</td><td><b>${esc(k.gene||'—')}</b><div class="small muted">${esc(k.rsid||'')}</div></td><td>${esc(k.genotype||'—')}${k.reading?.note?`<div class="cr-caption">${esc(k.reading.note)}</div>`:''}${k.star?`<div class="cr-caption">${esc(k.star)}</div>`:''}${k.chrom?`<div class="cr-caption">${esc(k.chrom)}:${esc(k.pos)}</div>`:''}${k.reading?.depth!=null?`<div class="cr-caption">${esc(t('web.genome.coverage',{value:k.reading.depth}))}</div>`:''}${k.verdict_label?`<div class="small">${esc(k.verdict_label)}</div>`:''}</td><td>${geneticBriefHtml(k,DISPLAY_MODE,k.label||k.note||'')}${(k.pmids||[]).length?`<details class="fold"><summary>${esc(t('web.gen.context_details'))} · PMID</summary>${k.pmids.map(id=>`<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(id)}/" target="_blank" rel="noopener">${esc(id)}</a>`).join(' · ')}</details>`:''}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function longevityRow(k){return genomeGeneTable([k]);}
 
@@ -4023,8 +4138,8 @@ function renderLongevity(d){
   // working, and working belongs underneath.
   const apCard=ap?`<div class="cr-card card">
     <div class="row"><b style="font-size:17px">APOE</b>
-      ${badge('b-unknown',ap.status==='ambiguous_without_phase'?(ap.candidates||[]).join(' / '):ap.epsilon||ap.genotype||'—')} ${levelChip(ap.level)}</div>
-    ${ap.interpretation?`<p>${esc(ap.interpretation.summary)}</p><details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary><p>${esc(ap.interpretation.mechanism)}</p><p>${esc(ap.interpretation.limitations)}</p><p>${esc(ap.interpretation.evidence_reason)}</p><p>${esc(ap.interpretation.source)}</p></details>`:`<p>${esc(ap.message||t('genome.apoe_unconfirmed'))}</p>`}
+      ${badge('b-unknown',ap.status==='ambiguous_without_phase'?(ap.candidates||[]).join(' / '):ap.epsilon||ap.genotype||'—')} </div>
+    ${geneticBriefHtml(ap,DISPLAY_MODE,ap.message||t('genome.apoe_unconfirmed'))}
     <details class="fold"><summary>${esc(t('web.longevity.technical'))}</summary>
       <div class="meta mt-1">rs429358 = <b>${esc(ap.rs429358||'—')}</b>, rs7412 = <b>${esc(ap.rs7412||'—')}</b></div>
       ${ap.note?`<div class="meta mt-1">${esc(t('web.longevity.stored_note'))}: ${esc(ap.note)}</div>`:''}
@@ -4040,8 +4155,8 @@ function renderLongevity(d){
   const described=listed.filter(k=>k.interpretation?.summary||k.reference_context?.variant_status==='described');
   const uncurated=listed.filter(k=>!described.includes(k));
   const known=`${described.length?`<div class="so-h">${esc(t('web.longevity.context_h'))} · ${described.length}</div>${genomeGeneTable(described)}`:''}
-    ${uncurated.length?`<details class="fold"><summary>${esc(t('web.longevity.uncurated_h'))} · ${uncurated.length}</summary><p class="cr-caption">${esc(d.catalogue_note||'')}</p>${genomeGeneTable(uncurated)}</details>`:''}`;
-  const genes=(d.significant_genes||[]).map(g=>`<details class="fold"><summary><b>${esc(g.gene)}</b> · ${g.variants.length}</summary>${geneticBriefHtml(g,DISPLAY_MODE,'',true)}${genomeGeneTable(g.variants)}</details>`).join('');
+    ${uncurated.length?`<details class="fold longevity-disclosure"><summary class="cr-btn">${esc(t('web.longevity.uncurated_h'))} · ${uncurated.length}</summary><p class="cr-caption">${esc(d.catalogue_note||'')}</p>${genomeGeneTable(uncurated)}</details>`:''}`;
+  const genes=(d.significant_genes||[]).map(g=>`<details class="fold"><summary><b>${esc(g.gene)}</b> · ${g.variants.length}</summary>${g.gene_contexts?.length?genomeGeneTable(g.gene_contexts):geneticBriefHtml(g,DISPLAY_MODE)}${genomeGeneTable(g.variants)}</details>`).join('');
   const st=d.stats;
   return `<div class="stat">
       <div class="s"><b>${st.genotyped??'—'}</b><span>${esc(t('web.longevity.stat_checked'))}</span></div>
@@ -4051,7 +4166,7 @@ function renderLongevity(d){
     <p class="cr-caption">${esc(d.count_note||'')}</p>
     ${apCard}
     ${known}
-    <details class="fold" data-longevity-catalogue><summary>${esc(t('web.longevity.catalogue'))} · ${st.significant_carriers??'—'} / ${st.significant_genes??'—'}</summary>
+    <details class="fold longevity-disclosure" data-longevity-catalogue><summary class="cr-btn">${esc(t('web.longevity.catalogue'))} · ${st.significant_carriers??'—'} / ${st.significant_genes??'—'}</summary>
     <p class="cr-caption">${esc(d.catalogue_note||'')}</p><div>${genes||'—'}</div></details>`;
 }
 // The inherited half of a lipid profile, in one card: PCSK9 carriage and Lp(a).
@@ -4069,17 +4184,17 @@ function renderLipidGenetics(d){
     return `<div class="list-item"><div class="row">${badgeFor}<b>${esc(x.gene)}</b>
         <code>${esc(x.rsid)}</code>
         ${x.genotype?`<span class="muted">${esc(t('web.genome.genotype'))} <b>${esc(x.genotype)}</b></span>`:''}</div>
+      ${geneticBriefHtml(x,DISPLAY_MODE,x.label||x.verdict||'')}
       ${x.label?`<div class="why">${esc(x.label)}</div>`:''}
       ${x.verdict?`<div class="why">${esc(x.verdict)}</div>`:''}
       ${x.population_note?`<div class="why c-warning">⚠ ${esc(x.population_note)}</div>`:''}
       ${x.action?`<div class="why muted">${esc(x.action)}</div>`:''}${x.variant_note?`<details class="fold"><summary>${esc(t('web.gen.context_details'))}</summary><p>${esc(x.variant_note)}</p></details>`:''}
-      ${levelChip(x.level)}${geneticBriefHtml(x,DISPLAY_MODE)}
       ${(x.pmids||[]).length?`<div class="meta">PMID: ${(x.pmids||[]).map(pm=>
         `<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(pm)}/" target="_blank" rel="noreferrer noopener">${esc(pm)}</a>`).join(', ')}</div>`:''}
     </div>`;}).join('');
   const waiting=(d.pcsk9_waiting||[]).filter(w=>!(d.pcsk9||[]).some(x=>x.rsid===w.rsid)).map(w=>`<div class="list-item" style="opacity:.7">
       <div class="row"><code>${esc(w.rsid)}</code> <b>${esc(w.gene)}</b></div>
-      <div class="why">${esc(w.why||'')}</div></div>`).join('');
+      <div class="why">${esc(w.why||'')}</div>${geneticBriefHtml(w,DISPLAY_MODE)}</div>`).join('');
   const l=d.lpa||{}; const m=l.measured;
   const lpa = m
     ? `<div class="list-item"><div class="row">${m.above===true?badge('b-critical',t('lipidgen.lpa.above',{ref:m.ref_high})):m.above===false?badge('b-good',t('web.flag.ok')):badge('b-unknown',t('web.severity.unassessed'))}
@@ -4287,7 +4402,7 @@ function geneRegionCard(d){
     : [t('gene.coverage_missing',{why:cov.why||t('gene.coverage_not_computed')})];
   const reference=d.reference_region&&d.reference_region.url?`<a href="${esc(d.reference_region.url)}" target="_blank" rel="noopener noreferrer">${esc(t('gene.reference_link'))}</a>`:'';
   if(d.status && d.status!=='ok'){
-    return `<div class="cr-card card" style="margin-bottom:14px">${head}${list([d.message||'',...(d.searched||[]),d.fix||'',...coverage].filter(Boolean))}${reference}</div>`;
+    return `<div class="cr-card card" style="margin-bottom:14px">${head}${d.reference_context?geneticBriefHtml(d,DISPLAY_MODE):''}${list([d.message||'',...(d.searched||[]),d.fix||'',...coverage].filter(Boolean))}${reference}</div>`;
   }
   const rows=[...(v.coding_rows||[]),...(v.noncoding_rows||[])].map(r=>{
     const p=r.protein||{};
@@ -4295,12 +4410,12 @@ function geneRegionCard(d){
   });
   const hits=d.clinvar||[];
   return `<div class="cr-card card" style="margin-bottom:14px">${head}
+    ${d.reference_context ? geneticBriefHtml(d,DISPLAY_MODE) : ''}
     ${list([`${loc.chrom}:${loc.start}–${loc.end} (${loc.strand}) · ${loc.assembly} · ${loc.transcript||'—'}`,
       t('gene.coords_from',{source:loc.source_file||loc.source||'—'}),...coverage,
       t('gene.counts',{total:v.total??'—',coding:v.coding??'—',consequential:v.consequential??t('gene.not_computed')})])}
     ${list([(d.reading_summary||{}).message||''].filter(Boolean))}
     ${d.reference_region&&d.reference_region.url?`<a href="${esc(d.reference_region.url)}" target="_blank" rel="noopener noreferrer">${esc(t('gene.reference_link'))}</a>`:''}
-    ${d.reference_context ? genomeGeneTable([d]) : ''}
     ${list(rows.length?rows:[t('gene.coding_none')])}
     ${(v.reference_calls||[]).length?`<details class="fold"><summary>${esc(t('gene.reference_calls'))}</summary>${list(v.reference_calls.map(r=>`${r.chrom}:${r.pos} REF ${r.ref} · ${r.genotype} ${(r.personal_alleles||[]).join('/')} · ${r.depth??'—'}×`))}</details>`:''}
     ${list(hits.length?[t('gene.flagged'),...hits.map(h=>`${h.chrom}:${h.pos} ${h.rsid||''} ${h.genotype||''} — ${h.clnsig||''}`)]:[t('gene.no_flagged')])}
@@ -4310,7 +4425,7 @@ function geneRegionCard(d){
 function geneCard(d, cv, lng, lip, sys){
   if(d&&d.region_report){
     const catalogue={...d};delete catalogue.region_report;
-    return geneRegionCard(d.region_report)+`<details class="fold"><summary>${esc(t("genome.loci",{gene:d.gene}))}</summary>${geneCard(catalogue,cv,lng,lip,sys).replace('id="gc-close"','data-gc-close')}</details>`;
+    return geneRegionCard(d.region_report)+`<details class="fold"><summary>${esc(d.gene)} — ${esc(t("web.genome.loci"))}</summary>${geneCard(catalogue,cv,lng,lip,sys).replace('id="gc-close"','data-gc-close')}</details>`;
   }
   if(d && (d.region || d.status==='unresolved_gene')) return geneRegionCard(d);
   if (!d || !d.gene) return genomeCard(d);
@@ -4337,7 +4452,7 @@ function geneCard(d, cv, lng, lip, sys){
     <div class="row"><b style="font-size:17px">${esc(d.gene)}</b>
       <span class="muted">${esc(t('web.genome.loci'))} ${loci.length}</span>
       <button class="cr-btn cr-btn--ghost ghost" id="gc-close" style="margin-left:auto">${esc(t('web.common.close'))}</button></div>
-    <div class="row4">
+    ${geneticBriefHtml(d,DISPLAY_MODE)}<div class="row4">
       ${cell(t('web.genome.genotype'), lociHTML)}
       ${cell('ClinVar', cvRows.length ? cvRows.map(h =>
         `<div>${esc(clnsigText(h.clnsig))}${h.disease ? ' — ' + esc(diseaseText(h.disease)) : ''}</div>`).join('') : '—')}
@@ -4345,7 +4460,7 @@ function geneCard(d, cv, lng, lip, sys){
         `<div>${esc(k.note || '')}</div>`).join('') : '—')}
       ${cell(t('web.genome.nav_lipids'), lipRows.length ? lipRows.map(x =>
         `<div>${esc(x.verdict || x.label || '')}</div>`).join('') : '—')}
-    </div>${geneticBriefHtml(d,DISPLAY_MODE)}${inSystems}</div>`;
+    </div>${inSystems}</div>`;
 }
 
 // The second entry, on the page. The classes are listed beside the answer and
@@ -4379,7 +4494,7 @@ function screenClassHtml(r){
     const bits=[];
     if(g.findings)bits.push(esc(t('screen.gene_findings',{n:g.findings})));
     if(g.read===false)bits.push(esc(t('screen.gene_unread')));
-    return `<div class="list-item">${levelChip(g.level)} <b>${esc(g.gene)}</b> — ${esc(g.phenotype||'—')}, ${esc(g.inheritance||'—')}`
+    return `<div class="list-item"><b>${esc(g.gene)}</b> — ${esc(g.phenotype||'—')}, ${esc(g.inheritance||'—')}`
          + (bits.length?` <span class="muted">· ${bits.join(' · ')}</span>`:'')+geneticBriefHtml(g,DISPLAY_MODE)+`</div>`;
   }).join('');
   return `<div class="lsact" style="margin-bottom:10px">${esc(screenVerdictLine(r.verdict))}</div>${rows}`;
@@ -4521,8 +4636,8 @@ async function viewAssistant(root){
       ${e.id==='any'?`<div class="row mt-2"><button class="cr-btn cr-btn--ghost ghost" id="ctxbtn">${esc(t('web.assistant.collect_btn'))}</button><span class="muted" id="ctxinfo"></span></div>
         <div class="why">${esc(t('web.assistant.context_warning'))}</div>`:''}
     </div>`).join('');
-  const cur=(d.curated||[]).map(c=>{
-      const st=!c.exists?['b-unknown','web.assistant.absent']:(c.stale?['b-warning','web.assistant.stale']:['b-good','web.assistant.fresh']);
+  const cur=(d.curated||[]).filter(c=>c.id!=='focus').map(c=>{
+      const st=!c.exists?['b-unknown','web.assistant.absent']:(c.stale?['b-warning','web.assistant.stale']:!c.updated?['b-unknown','web.assistant.no_date']:['b-good','web.assistant.fresh']);
       const flag=c.stale&&c.id==='brief'?`<button class="cr-btn cr-btn--ghost ghost" data-open-brief>⚠ ${esc(t('web.assistant.stale'))} · ${esc(t('web.brief.review_btn'))}</button>`:badge(st[0],t(st[1]));
       return `<div class="list-item assist-entry"><div class="row">${flag}<b>${esc(c.title)}</b>
         <span class="muted">${esc(c.updated?t('web.assistant.updated',{date:c.updated}):t('web.assistant.no_date'))} · ${esc(t('web.assistant.tab_of',{tab:c.tab}))}</span></div>
@@ -4922,6 +5037,7 @@ async function switchLang(code){
   _sources=null;                      // the source chips are worded from the catalogue too
   _systems=null;                      // and so are the systems' labels
   renderChrome(); buildNav(); mount(current); loadPatients();
+  loadRecompute();
 }
 
 // picking a source folder from disk (the native macOS dialog) — a delegated handler
@@ -4931,6 +5047,8 @@ document.addEventListener('click',async e=>{
   const pick=e.target.closest('[data-pick]');
   const clr=e.target.closest('[data-clear]');
   const lng=e.target.closest('[data-lang]');
+  const lablink=e.target.closest('[data-lab-system]');
+  if(lablink){e.preventDefault();labSystemToOpen=lablink.dataset.labSystem;goTab('web.tab.labs');return;}
   const sysl=e.target.closest('[data-system]');
   const pnl=e.target.closest('[data-panel]');
   if(pnl){ e.preventDefault(); viewPanel(pnl.getAttribute('data-panel'),null,pnl.getAttribute('data-panel-gene')); return; }

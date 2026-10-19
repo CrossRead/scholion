@@ -19,7 +19,10 @@
         "en": "This panel has no laboratory score. It contains candidate genes involved in neurotransmission and the stress response, mostly at confidence level C or D. Each available interpretation carries its evidence level and limitations.",
         "ru": "У этой панели нет лабораторного балла. Она включает кандидатные гены нейромедиации и стрессового ответа, преимущественно с уровнем доверия C или D. Каждая доступная трактовка сопровождается уровнем доказательности и ограничениями."
       },
-      "source": "The panel author's position list, 2026-06-29; literature references are supplied for each position.",
+      "source": {
+        "en": "The panel author's position list, 2026-06-29; literature references are supplied for each position.",
+        "ru": "Список позиций автора панели от 29.06.2026; для каждой позиции приведены ссылки на литературу."
+      },
       "positions": [
         {
           "rsid": "rs11174811",
@@ -39,7 +42,10 @@
               "ru": "AVPR1A 3'UTR (A), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "substance use disorder association in one study; a miRNA target-site effect in another",
+          "effect_size": {
+            "en": "substance use disorder association in one study; a miRNA target-site effect in another",
+            "ru": "Ассоциация с расстройством употребления веществ в одном исследовании; влияние на участок-мишень микроРНК в другом"
+          },
           "study": "Maher 2011",
           "source": "PMID 21514569 (Maher 2011: AVPR1A and substance use disorders); PMID 31053625 (Zhang 2019: miRNA target site polymorphisms in AVPR1A)",
           "submitter": "panel_2026_09_18",
@@ -75,7 +81,10 @@
               "ru": "BDNF Val66Met (A), две копии: Met/Met, те же ассоциации, сильнее; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "declarative memory slightly lower per Met allele; a stress-dependent depression association",
+          "effect_size": {
+            "en": "declarative memory slightly lower per Met allele; a stress-dependent depression association",
+            "ru": "Декларативная память немного хуже на аллель Met; связь с депрессией зависит от стресса"
+          },
           "study": "Kambeitz 2012",
           "source": "PMID 22813992 (Kambeitz 2012: BDNF Val66Met and declarative memory, meta-analysis); PMID 24433458 (Hosang 2014: stress and BDNF Val66Met in depression, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -112,7 +121,10 @@
               "ru": "CRHR1 (T), две копии: то же единственное исследование; вывода нет."
             }
           },
-          "effect_size": "depression association in one study",
+          "effect_size": {
+            "en": "depression association in one study",
+            "ru": "Ассоциация с депрессией в одном исследовании"
+          },
           "study": "Hernández-Díaz 2021",
           "source": "PMID 34279801 (Hernández-Díaz 2021: rs242941, rs1876828, rs242939 and rs110402 of CRHR1 and depression)",
           "submitter": "panel_2026_09_18",
@@ -148,7 +160,10 @@
               "ru": "DRD1 3'UTR (A), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "allele-specific expression of DRD1; no clinical outcome measured",
+          "effect_size": {
+            "en": "allele-specific expression of DRD1; no clinical outcome measured",
+            "ru": "Аллель-специфическая экспрессия DRD1; клинический исход не измерялся"
+          },
           "study": "Huang 2009",
           "source": "PMID 19135651 (Huang 2009: differential allelic expression of DRD1 modulated by miR-504)",
           "submitter": "panel_2026_09_18",
@@ -184,7 +199,10 @@
               "ru": "DRD2/ANKK1 Taq1A (A1), две копии: A1/A1, то же, сильнее; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "striatal D2/3 receptor binding differs per A1 allele; the variant is in ANKK1, beside DRD2",
+          "effect_size": {
+            "en": "striatal D2/3 receptor binding differs per A1 allele; the variant is in ANKK1, beside DRD2",
+            "ru": "Связывание стриарных рецепторов D2/3 различается на аллель A1; вариант расположен в ANKK1 рядом с DRD2"
+          },
           "study": "Savitz 2013",
           "source": "PMID 23683269 (Savitz 2013: DRD2/ANKK1 Taq1A and D2/3 receptor binding); PMID 15146457 (Neville 2004: ANKK1, a kinase gene closely linked to DRD2)",
           "submitter": "panel_2026_09_18",
@@ -220,7 +238,10 @@
               "ru": "DRD2 C957T (T), две копии: то же единственное исследование; вывода нет."
             }
           },
-          "effect_size": "extrastriatal D2 receptor availability differs per T allele in one PET study",
+          "effect_size": {
+            "en": "extrastriatal D2 receptor availability differs per T allele in one PET study",
+            "ru": "Доступность внестриарных рецепторов D2 различается на аллель T в одном ПЭТ-исследовании"
+          },
           "study": "Hirvonen 2009",
           "source": "PMID 19285111 (Hirvonen 2009: C957T of DRD2 predicts extrastriatal dopamine receptor availability)",
           "submitter": "panel_2026_09_18",
@@ -256,7 +277,10 @@
               "ru": "промотор DRD4 (T), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "a smoking association in one study",
+          "effect_size": {
+            "en": "a smoking association in one study",
+            "ru": "Ассоциация с курением в одном исследовании"
+          },
           "study": "Pérez-Rubio 2017",
           "source": "PMID 28103253 (Pérez-Rubio 2017: HTR2A and DRD4 polymorphisms and smoking)",
           "submitter": "panel_2026_09_18",
@@ -292,7 +316,10 @@
               "ru": "HTR1A −1019C/G (G), две копии: то же, сильнее; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "mood disorder association and antidepressant response differ per G allele",
+          "effect_size": {
+            "en": "mood disorder association and antidepressant response differ per G allele",
+            "ru": "Ассоциация с расстройствами настроения и ответ на антидепрессанты различаются на аллель G"
+          },
           "study": "Kishi 2013",
           "source": "PMID 22752684 (Kishi 2013: the serotonin 1A receptor gene and mood disorders, extended meta-analysis); PMID 22890315 (Zhao 2012: rs6295 and antidepressants, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -328,7 +355,10 @@
               "ru": "HTR2A (G), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "temperament trait associations in two studies",
+          "effect_size": {
+            "en": "temperament trait associations in two studies",
+            "ru": "Ассоциации с чертами темперамента в двух исследованиях"
+          },
           "study": "Giegling 2006",
           "source": "PMID 16814396 (Giegling 2006: anger- and aggression-related traits and the 5-HT2A gene); PMID 17590256 (Serretti 2007: 5-HT2A SNPs and the Temperament and Character Inventory)",
           "submitter": "panel_2026_09_18",
@@ -364,7 +394,10 @@
               "ru": "HTR2A −1438A/G (A), две копии: то же, сильнее; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "the meta-analysed association per A allele",
+          "effect_size": {
+            "en": "the meta-analysed association per A allele",
+            "ru": "Ассоциация на аллель A по данным метаанализа"
+          },
           "study": "Jin 2013",
           "source": "PMID 23317793 (Jin 2013: the −1438A/G (rs6311) polymorphism of HTR2A, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -400,7 +433,10 @@
               "ru": "HTR2A His452Tyr (A), две копии: Tyr/Tyr, то же, сильнее; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "receptor function and antidepressant response differ per Tyr452 allele",
+          "effect_size": {
+            "en": "receptor function and antidepressant response differ per Tyr452 allele",
+            "ru": "Функция рецептора и ответ на антидепрессанты различаются на аллель Tyr452"
+          },
           "study": "Wagner 2008",
           "source": "PMID 18611292 (Wagner 2008: the His452Tyr variant of the 5-HT2A receptor); PMID 32819202 (Du 2020: genetic polymorphism and antidepressants, network meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -437,7 +473,10 @@
               "ru": "MAOB, интрон 13 (G), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "no replicated association; one negative study",
+          "effect_size": {
+            "en": "no replicated association; one negative study",
+            "ru": "Воспроизведённая ассоциация отсутствует; одно отрицательное исследование"
+          },
           "study": "Wei 2011",
           "source": "PMID 21978760 (Wei 2011: MAOA/B genes and schizophrenia in Han Chinese); PMID 31275445 (Perfilyeva 2019: no association of rs1799836 with autism)",
           "submitter": "panel_2026_09_18",
@@ -473,7 +512,10 @@
               "ru": "NR3C1 3'UTR (G), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "no source for this variant as such",
+          "effect_size": {
+            "en": "no source for this variant as such",
+            "ru": "Источник именно для этого варианта не указан"
+          },
           "study": "Kumsta 2009",
           "source": "PMID 18663733 (Kumsta 2009: a glucocorticoid receptor promoter polymorphism — not the 3'UTR variant this position is)",
           "submitter": "panel_2026_09_18",
@@ -509,7 +551,10 @@
               "ru": "OXTR (T), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "a gene × environment effect in one study",
+          "effect_size": {
+            "en": "a gene × environment effect in one study",
+            "ru": "Взаимодействие гена и среды в одном исследовании"
+          },
           "study": "Dobewall 2018",
           "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)",
           "submitter": "panel_2026_09_18",
@@ -545,7 +590,10 @@
               "ru": "OXTR, интрон (A), две копии: то же; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "small sociality-related effects in a meta-analysis",
+          "effect_size": {
+            "en": "small sociality-related effects in a meta-analysis",
+            "ru": "Небольшие эффекты, связанные с социальностью, в метаанализе"
+          },
           "study": "Bakermans-Kranenburg 2014",
           "source": "PMID 23921259 (Bakermans-Kranenburg 2014: a sociability gene? meta-analysis of oxytocin receptor genotype effects)",
           "submitter": "panel_2026_09_18",
@@ -581,7 +629,10 @@
               "ru": "OXTR (A), две копии: то же; ассоциация, а не свойство человека."
             }
           },
-          "effect_size": "small sociality-related effects per A allele in meta-analyses",
+          "effect_size": {
+            "en": "small sociality-related effects per A allele in meta-analyses",
+            "ru": "Небольшие эффекты, связанные с социальностью, на аллель A в метаанализах"
+          },
           "study": "Li 2015",
           "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)",
           "submitter": "panel_2026_09_18",
@@ -617,7 +668,10 @@
               "ru": "SLC6A2 (T), две копии: то же; вывода нет."
             }
           },
-          "effect_size": "no replicated association",
+          "effect_size": {
+            "en": "no replicated association",
+            "ru": "Воспроизведённая ассоциация отсутствует"
+          },
           "study": "Kim 2014",
           "source": "PMID 29230023 (Myer 2018: pharmacogenetic predictors of methylphenidate efficacy); PMID 24655776 (Kim 2014: SLC6A2 polymorphisms and suicide in MDD)",
           "submitter": "panel_2026_09_18",
@@ -654,7 +708,10 @@
               "ru": "TH Val81Met (A), две копии: то же — кандидатный вариант с номинальными ассоциациями; ни вывода о дофамине, ни дофаминергических назначений только по генотипу."
             }
           },
-          "effect_size": "a nominal association with motor symptom severity in early Parkinson's disease (p = 0.007)",
+          "effect_size": {
+            "en": "a nominal association with motor symptom severity in early Parkinson's disease (p = 0.007)",
+            "ru": "Номинальная ассоциация с тяжестью двигательных симптомов ранней болезни Паркинсона (p = 0.007)"
+          },
           "study": "Greenbaum 2013",
           "source": "PMID 23596382 (Greenbaum 2013, Front Neurosci: variants associated with dopaminergic compensation in early Parkinson's disease)",
           "submitter": "panel_2026_09_23",
@@ -756,7 +813,10 @@
           "source": "Klerk 2002 JAMA (MTHFR 677TT and homocysteine)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "homocysteine about +20–25 % in TT with low folate",
+          "effect_size": {
+            "en": "homocysteine about +20–25 % in TT with low folate",
+            "ru": "Гомоцистеин примерно на +20–25 % при TT и низком фолате"
+          },
           "study": "Klerk 2002 JAMA",
           "review": {
             "by_role": "panel_author",
@@ -792,7 +852,10 @@
           "source": "Weisberg 1998 Mol Genet Metab (MTHFR A1298C)",
           "submitter": "panel_2026_09_13",
           "curated_on": "2026-09-13",
-          "effect_size": "no reproducible effect on homocysteine alone",
+          "effect_size": {
+            "en": "no reproducible effect on homocysteine alone",
+            "ru": "Воспроизводимый самостоятельный эффект на гомоцистеин не показан"
+          },
           "study": "Weisberg 1998",
           "review": {
             "by_role": "panel_author",
@@ -850,7 +913,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "effect_size": {
+            "en": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+            "ru": "Кандидатные ассоциации различаются по признаку; валидированный диагностический или лечебный алгоритм отсутствует."
+          },
           "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
           "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
           "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
@@ -876,7 +942,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "effect_size": {
+            "en": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+            "ru": "Кандидатные ассоциации различаются по признаку; валидированный диагностический или лечебный алгоритм отсутствует."
+          },
           "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
           "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
           "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
@@ -902,7 +971,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "effect_size": {
+            "en": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+            "ru": "Кандидатные ассоциации различаются по признаку; валидированный диагностический или лечебный алгоритм отсутствует."
+          },
           "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
           "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
           "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
@@ -928,7 +1000,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+          "effect_size": {
+            "en": "Candidate associations differ by phenotype; no validated diagnostic or treatment algorithm.",
+            "ru": "Кандидатные ассоциации различаются по признаку; валидированный диагностический или лечебный алгоритм отсутствует."
+          },
           "population": "197 Spanish migraine patients and 245 controls; a separate pilot of symptomatic and healthy Caucasian participants",
           "study": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
           "source": "PMID 25612138; https://pmc.ncbi.nlm.nih.gov/articles/PMC11054051/",
@@ -954,7 +1029,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+          "effect_size": {
+            "en": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+            "ru": "Ни один из двух SNP по отдельности не показал значимых различий между случаями и контролем; результат для гаплотипа не является эффектом отдельного SNP или измерением фермента в мозге."
+          },
           "population": "859 patients with schizophrenia and 826 controls; sex-specific haplotype analysis",
           "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
           "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
@@ -980,7 +1058,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+          "effect_size": {
+            "en": "Neither SNP alone showed significant case-control differences; a haplotype result is not a SNP effect or a brain enzyme measurement.",
+            "ru": "Ни один из двух SNP по отдельности не показал значимых различий между случаями и контролем; результат для гаплотипа не является эффектом отдельного SNP или измерением фермента в мозге."
+          },
           "population": "859 patients with schizophrenia and 826 controls; sex-specific haplotype analysis",
           "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
           "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8593344/",
@@ -1006,7 +1087,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+          "effect_size": {
+            "en": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+            "ru": "Кинетические различия зависят от субстрата; оценка индивидуального клинического эффекта или ответа на добавки отсутствует."
+          },
           "population": "Recombinant GSTP1 enzymes in vitro",
           "study": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
           "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
@@ -1032,7 +1116,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+          "effect_size": {
+            "en": "Substrate-dependent kinetic differences; no individual clinical effect or supplement-response estimate.",
+            "ru": "Кинетические различия зависят от субстрата; оценка индивидуального клинического эффекта или ответа на добавки отсутствует."
+          },
           "population": "Recombinant GSTP1 enzymes in vitro",
           "study": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
           "source": "PMID 22401947; DOI 10.1016/j.tiv.2012.02.005",
@@ -1058,7 +1145,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Treatment-by-genotype interaction P=0.165; subgroup results do not establish a genotype-based selenium regimen.",
+          "effect_size": {
+            "en": "Treatment-by-genotype interaction P=0.165; subgroup results do not establish a genotype-based selenium regimen.",
+            "ru": "Взаимодействие лечения и генотипа: P=0.165; результаты подгрупп не устанавливают схему приёма селена по генотипу."
+          },
           "population": "255 coronary artery disease patients in New Zealand; two randomized supplementation trials",
           "study": "PMID 22952184; DOI 10.3945/ajcn.112.043125",
           "source": "PMID 22952184; DOI 10.3945/ajcn.112.043125",
@@ -1084,7 +1174,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+          "effect_size": {
+            "en": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+            "ru": "Функциональные и клинические ассоциации не устанавливают индивидуальную недостаточность оксида азота или выбор лечения."
+          },
           "population": "Recombinant enzyme and cellular experiments; INVEST-GENES hypertensive coronary artery disease cohort",
           "study": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
           "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
@@ -1110,7 +1203,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+          "effect_size": {
+            "en": "Functional and clinical associations do not establish individual nitric oxide deficiency or treatment selection.",
+            "ru": "Функциональные и клинические ассоциации не устанавливают индивидуальную недостаточность оксида азота или выбор лечения."
+          },
           "population": "Recombinant enzyme and cellular experiments; INVEST-GENES hypertensive coronary artery disease cohort",
           "study": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
           "source": "PMID 11331296; https://pmc.ncbi.nlm.nih.gov/articles/PMC2803093/",
@@ -1136,7 +1232,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+          "effect_size": {
+            "en": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+            "ru": "Ассоциации зависят от пола и дефицита в питании; валидированная доза фосфатидилхолина по генотипу не установлена."
+          },
           "population": "Older patients with metabolic disorders; 57 adults in a controlled choline-depletion study",
           "study": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
           "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
@@ -1162,7 +1261,10 @@
           "mode": "common_variant",
           "kind": "asked_about",
           "text": {},
-          "effect_size": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+          "effect_size": {
+            "en": "Associations depend on sex and dietary depletion; no validated genotype-based phosphatidylcholine dose.",
+            "ru": "Ассоциации зависят от пола и дефицита в питании; валидированная доза фосфатидилхолина по генотипу не установлена."
+          },
           "population": "Older patients with metabolic disorders; 57 adults in a controlled choline-depletion study",
           "study": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",
           "source": "PMID 37513629; https://pmc.ncbi.nlm.nih.gov/articles/PMC1574369/",

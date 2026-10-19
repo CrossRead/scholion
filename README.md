@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.6.9** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.7.0** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -20,6 +20,25 @@ Visit are display modes, not patient switches. Each agent answer names its
 technical container ID; a conversation refuses after a human switches the
 container. Export and erasure are human-only. See
 [container lifecycle](docs/CONTAINER-LIFECYCLE.md) and [privacy](PRIVACY.md).
+
+---
+
+## New in 0.7.0: follow changes, connect the evidence
+
+- **See what deserves attention by body system.** Today brings together annual laboratory direction, qualified wearable changes, recorded treatment dates and dated reports of symptoms or tolerability. A recent change can be shown separately from the longer-term direction; timing alone never proves a treatment effect.
+- **Read genetics beside the actual measurements.** System panels compare applicable read variants with the same laboratory observations used in insights. Known gene function comes first, with variant interpretation, Scholion A–E confidence, sources and limits kept distinct. GenCC disease validity remains separate.
+- **Prepare for a useful consultation.** Choose topics for a compact visit brief with dated measurements and the supporting comparisons. Save a local review explicitly and compare it later, including changed or withdrawn interpretations.
+- **Use one consistent history.** Manual and wearable weight share one source-labelled timeline and derived BMI. Labs are grouped by system; completed courses stay in treatment history. English and Russian views use the same facts, as do the CLI, web app and MCP tools.
+
+Existing records are retained. This release does not automatically rerun PGS or
+whole-genome preparation. New curated FOXO3 and ORAI1 positions can use verified
+readings already available; inspect `scholion genome-updates` before explicitly
+genotyping unread catalogue sites. A polygenic percentile is a population
+position, not a disease probability.
+
+[Full 0.7.0 changes](https://github.com/CrossRead/scholion/releases/tag/v0.7.0)
+· [English presentation](https://crossread.github.io/scholion/presentation.html)
+· [Русская презентация](https://crossread.github.io/scholion/presentation.ru.html)
 
 ---
 
@@ -239,7 +258,7 @@ inheritance, on what date. A weak or refuted assertion travels marked as such
 instead of being quietly dropped or quietly promoted, and one copy of an allele
 in a recessive gene is printed as carriership, never as a risk line.
 
-**In front of that base stands the layer a base cannot supply: 217 positions
+**In front of that base stands the layer a base cannot supply: 221 positions
 across fourteen of the systems, authored rather than generated, each with its
 evidence level.** The unit of a row is
 a position, not a gene — an rsID with its HGVS on a RefSeq accession, the allele
@@ -537,7 +556,7 @@ ships. `scholion doc connecting-an-agent` describes every door, and
 
 ### 4. A plugin for Ouroboros
 
-`scholion/ouroboros_tools.py` registers 39 `sch_*` tools — a body system as one
+`scholion/ouroboros_tools.py` registers 40 `sch_*` tools — a body system as one
 card, second opinion on a drug, lab analysis, locus lookup, polygenic scores,
 longevity, goals and more.
 Ouroboros discovers tool modules by scanning its own tools package, so one line

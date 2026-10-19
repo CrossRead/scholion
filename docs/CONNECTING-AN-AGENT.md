@@ -343,3 +343,17 @@ A host that exits after each tool call starts confirmed PGS recalculation in a
 separate installed worker. The worker retains the captured container and checks
 its identity before writes; progress and cancellation use the same job files.
 It does not require a source checkout or a persistent chat process.
+
+### Trends and review history
+
+Use `sch_overview` for the complete attention feed, including its facts,
+limitations and source/rule identities. The first screen may show only its
+leading items; the tool returns all of them. Choose `period` 30, 90 or 365 for
+the phenotype summary. For a visit, supply `agenda_ids` from the current feed;
+an empty string selects none, and omission selects all current items.
+
+`sch_insight_snapshot` previews changes without writing. Save a review only
+when the person requests it, using the returned fingerprint as `confirm`.
+If the input changes, obtain and review a new preview. A missing or older
+observation is not evidence of recovery. These operations do not recalculate
+a genome or change treatment.

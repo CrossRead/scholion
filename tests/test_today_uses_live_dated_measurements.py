@@ -42,7 +42,8 @@ class LiveMeasurements(unittest.TestCase):
         r=_phenotype_rows([{'label':'Personal weight goal','source':'wear:Weight','target':'Chosen target'}])
         self.assertEqual(1,len(r));self.assertEqual(77,r[0]['components'][0]['value'])
         self.assertIsNone(r[0]['components'][0]['year_delta'])
-        self.assertEqual(-4,r[0]['components'][0]['device_history']['year_delta'])
+        self.assertEqual(3, len(r[0]['components'][0]['series']))
+        self.assertNotIn('device_history', r[0]['components'][0])
     def test_device_specific_goal_keeps_its_own_device(self):
         r=_phenotype_rows([{'label':'Device weight','source':'wear:garmin:Weight'}])[0]
         self.assertEqual(81,r['components'][0]['value']);self.assertEqual('garmin',r['components'][0]['source'])

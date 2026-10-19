@@ -10,6 +10,16 @@
     "source_tier": "curated_reference"
   },
   "units": {
+    "kg/m2": {
+      "label": {
+        "en": "kg/m²",
+        "ru": "кг/м²"
+      },
+      "synonyms": [
+        "kg/m²",
+        "кг/м²"
+      ]
+    },
     "%": {
       "label": {
         "en": "%",
@@ -320,7 +330,13 @@
         "en": "steps",
         "ru": "шаги"
       },
-      "synonyms": []
+      "synonyms": [
+        "шаг",
+        "шаг/день",
+        "шагов/день",
+        "steps/day",
+        "steps/d"
+      ]
     },
     "{beats}/min": {
       "label": {

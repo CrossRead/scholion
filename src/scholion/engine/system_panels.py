@@ -239,6 +239,53 @@ def class_systems() -> Dict[str, Any]:
             "source": meta.get("purpose"), "updated": meta.get("updated")}
 
 
+
+
+def medication_system_context(medication: Dict[str, Any]) -> Dict[str, Any]:
+    """One many-to-many projection, with effect and monitoring kept distinct."""
+    classes = core.medication_classes(medication)
+    book = core._read_knowledge("drug_class_systems.json") or {}
+    mapped = class_systems()["classes"]
+    known = {d["key"] for d in domains()}
+    links: List[Dict[str, Any]] = []
+    for cls in classes:
+        spec = (book.get("classes") or {}).get(cls) or {}
+        for system in mapped.get(cls, []):
+            links.append({"system": system, "class": cls,
+                          "relation": spec.get("relation", "class_context"),
+                          "source": spec.get("source"),
+                          "note": panel_form.one_language(spec.get("note") or {})})
+    name = core._norm_drug(medication.get("name") or "")
+    composition = medication.get("composition_as_reported") or {}
+    ingredients = composition.get("ingredients") if isinstance(composition, dict) else None
+    names = [name] + ([core._norm_drug(x) for x in ingredients if isinstance(x, str)]
+                      if isinstance(ingredients, list) else [])
+    for spec in book.get("ingredient_links") or []:
+        if any(core._pattern_hits(n, core._norm_drug(pattern))
+               for n in names for pattern in spec.get("names") or []):
+            for system in spec.get("systems") or []:
+                if system in known:
+                    links.append({"system": system, "class": None,
+                                  "relation": spec["relation"], "source": spec.get("source"),
+                                  "note": panel_form.one_language(spec.get("note") or {})})
+    owners = marker_systems()
+    monitoring = core.drug_lab_monitoring().get("classes") or {}
+    for cls in classes:
+        labs = (monitoring.get(cls) or {}).get("labs") or []
+        for system in sorted({owners[k] for k in labs if k in owners}):
+            links.append({"system": system, "class": cls, "relation": "monitoring",
+                          "markers": [k for k in labs if owners.get(k) == system],
+                          "source": "drug_lab_monitoring.json", "note": ""})
+    for link in links:
+        link["relation_label"] = _t("system.meds.relation." + link["relation"])
+    via = {c: sorted({x["system"] for x in links if x["class"] == c}) for c in classes}
+    via = {c: keys for c, keys in via.items() if keys}
+    systems_ = sorted({x["system"] for x in links})
+    return {"classes": classes, "systems": systems_, "via": via, "system_links": links,
+            "map_status": "mapped" if systems_ else "no_map" if classes else "no_class"}
+
+
+
 @core.memo_in_reading
 def prescriptions() -> List[Dict[str, Any]]:
     """The person's CURRENT prescriptions, each with its classes and the systems
@@ -250,21 +297,15 @@ def prescriptions() -> List[Dict[str, Any]]:
     the system card both read this, so a prescription is placed the same way
     on every face.
     """
-    cmap = class_systems()["classes"]
     rows = []
     for m in core.active_medications():
-        classes = core.classify_drug(m.get("name") or "")
-        via = {c: cmap[c] for c in classes if c in cmap}
-        systems_ = sorted({s for keys in via.values() for s in keys})
         rows.append({"name": m.get("name"), "dose": m.get("dose"), "status": m.get("status"),
-                     "classes": classes, "via": via, "systems": systems_,
-                     "map_status": ("mapped" if systems_ else
-                                    "no_map" if classes else "no_class")})
+                     **medication_system_context(m)})
     return rows
 
 
 # ---- the base-generated monogenic half -------------------------------------
-def _base_rows(key: str) -> Dict[str, Any]:
+def _base_rows(key: str, genes: Optional[set] = None) -> Dict[str, Any]:
     """One row per gene the base composed for this system, every submitter kept.
 
     GenCC does not re-check its submitters, so two of them disagreeing on one
@@ -283,6 +324,8 @@ def _base_rows(key: str) -> Dict[str, Any]:
         return {"status": "not_composed", "rows": [], **version}
     rows = []
     for gene, g in sorted((spec.get("genes") or {}).items()):
+        if genes is not None and gene not in genes:
+            continue
         subs = [s for s in (g or {}).get("submissions") or [] if isinstance(s, dict)]
         assertions = [{"disease": s.get("disease"), "disease_id": s.get("disease_id"),
                        "classification": s.get("classification"), "moi": s.get("moi"),
@@ -374,6 +417,7 @@ def _finish_base_row(row: Dict[str, Any], scan: Dict[str, Any],
     else:
         row["read"], row["read_why"] = panel_form.bases_read(row["gene"], cov)
     hits = clinvar.get("by_gene", {}).get(row["gene"]) or []
+    row["variant_records"] = hits
     findings, carrier, withheld = 0, False, 0
     x_recessive = bool(row.get("moi_codes")) and set(row["moi_codes"]) == {"XLR"}
     sex = core.profile_sex() if x_recessive else None
@@ -477,34 +521,9 @@ def _corridor(low, high) -> str:
 
 
 def _expect_check(exp: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
-    """The author's expectation next to the person's numbers — a question's data.
-
-    Arithmetic only: the last value, its corridor, where the value sits in it,
-    and the movement from the previous point. Whether that agrees with the
-    expectation is not decided here; the origin of the sentence is the author,
-    and the engine fills in the numbers. A marker never taken is a GAP.
-    """
-    marker = str(exp.get("marker") or "")
-    m = by_key.get(marker)
-    out = {"marker": marker, "direction": exp.get("direction"),
-           "note": panel_form.one_language(exp.get("note")) or None}
-    if not m:
-        return {**out, "gap": True}
-    lo, hi, v = m.get("ref_low"), m.get("ref_high"), m.get("value")
-    position = "unknown"
-    if isinstance(v, (int, float)):
-        if isinstance(lo, (int, float)) and v < lo:
-            position = "below"
-        elif isinstance(hi, (int, float)) and v > hi:
-            position = "above"
-        elif isinstance(lo, (int, float)) or isinstance(hi, (int, float)):
-            position = "within"
-    series = m.get("series") or []
-    prev = series[-2] if len(series) >= 2 else None
-    return {**out, "gap": False, "name": m.get("name"), "value": v, "unit": m.get("unit"),
-            "date": m.get("date"), "ref_low": lo, "ref_high": hi, "position": position,
-            "from_value": prev.get("value") if prev else None,
-            "from_date": prev.get("date") if prev else None}
+    """Compatibility field projected from the shared observation policy."""
+    from ..genetic_comparison import legacy_expectation
+    return legacy_expectation(exp, by_key)
 
 
 def _level_counts(rows: List[Dict[str, Any]]) -> Dict[str, int]:
@@ -523,7 +542,7 @@ def _levels() -> Optional[Dict[str, Any]]:
 
 
 def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
-                  scan: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, Any]:
+                  scan: Dict[str, Any], by_key: Dict[str, Any], *, position_only: bool = False) -> Dict[str, Any]:
     """The clinician's positions through the gate, each with the person's state.
 
     Every refusal is counted BY REASON: a row dropped for lacking a mode and a
@@ -590,7 +609,11 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             not_why, carrier = "presumed", False
         elif state in ("het", "hom", "hemi") and text:
             if mode == "monogenic":
-                if cls in NOT_A_FINDING or cls not in FINDING_GRADE:
+                assertion = p.get("database_assertion") or {}
+                variant_classified = (assertion.get("database") == "ClinVar"
+                                      and assertion.get("classification") == cls)
+                supported = cls in ("Pathogenic", "Likely pathogenic") if variant_classified else cls in FINDING_GRADE
+                if not supported:
                     not_why = "classification"
                 elif carrier:
                     not_why = "carrier"
@@ -620,6 +643,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                "route": _route(p.get("route"), spec.get("routes")),
                "risk_allele": p.get("risk_allele"), "mode": mode, "kind": kind,
                "classification": cls, "moi": moi, "disease": p.get("disease"),
+               "database_assertion": p.get("database_assertion"), "transcript": p.get("transcript"),
                "effect_size": p.get("effect_size"), "study": p.get("study"),
                "source": source, "mechanism": (panel_form.one_language(p.get("mechanism")) or None)
                if lv["verdict_allowed"] else None,
@@ -659,7 +683,11 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             row["pending"], row["pending_why"] = False, None
         row["reference_context"] = reference_context(p, lv.get("level"))
         row["interpretation"] = interpretation_context(p, lv.get("level"), text if told and geno.get("read") is True else None)
-        row = panel_form.gene_row(gene, guard_position(p, row), scan)
+        row = guard_position(p, row)
+        # Insight context needs the exact position, not a second scan of every
+        # catalogue position in its gene. Both paths keep the same position gate.
+        if not position_only:
+            row = panel_form.gene_row(gene, row, scan)
         row["read"] = geno.get("read")          # the position's own reading, not the gene's
         row["read_state"] = panel_form.read_state(bool(row["read"]), row.get("read_why"))
         if row["read"] is True and geno.get("depth_unverified"):
@@ -670,6 +698,9 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
             row["closes_text"] = _closes_text("presumed_ref")
         row["read_why_text"] = _read_why_text(row.get("read_why"))
         row['decision_route'] = decision_route(row, by_key)
+        from ..genetic_comparison import compare_all
+        row['comparisons'] = compare_all(row, by_key, key)
+        row['genetic_lab_comparison'] = next(iter(row['comparisons']), None)
         rows.append(row)
     # What short reads cannot read in this system — a gene beside its
     # pseudogene, a repeat — named with the reason and a source; without a
@@ -818,6 +849,7 @@ def _labs_layer(dom: Dict[str, Any], rd: Optional[Dict[str, Any]],
             # Layer 7 already printed names for the same gap while this layer
             # printed `cholesterol_total` — one card, two spellings of one fact.
             "missing_names": [_marker_name(k) for k in (rd.get("missing") or [])],
+            "current_markers": [by_key[k] for k in dom["markers"] if k in by_key and by_key[k].get("display_recency") is not False],
             "stale": stale, "panel": panel_labs.panel_view(dom, by_key),
             "panel_term": rd.get("panel")}
 
@@ -849,6 +881,7 @@ def _medications_layer(key: str) -> Dict[str, Any]:
                          "via": sorted(c for c, keys in p["via"].items() if key in keys),
                          "via_labels": [panel_form.one_language(labels.get(c, {}).get("label"))
                                         for c in sorted(p["via"]) if key in p["via"][c] and labels.get(c, {}).get("label")],
+                         "system_links": [x for x in p.get("system_links", []) if x["system"] == key],
                          "map_status": "mapped"})
         elif p["map_status"] == "no_map":
             unmapped.append({"name": p["name"], "dose": p["dose"], "classes": p["classes"],
@@ -1181,6 +1214,8 @@ def _questions(gen: Dict[str, Any], labs: Dict[str, Any], tests: Dict[str, Any],
     for r in gen.get("rows") or []:
         g, rs = r.get("gene"), r.get("rsid")
         ec = r.get("expect_check")
+        if ec and ec.get("context_only"):
+            continue  # Context matching alone never asks for an additional test.
         if ec and ec.get("gap"):
             waiting.setdefault(ec["marker"], []).append(f"{g} {rs}")
         elif ec and str(r.get("state")) not in ("het", "hom", "hemi"):
@@ -1397,7 +1432,7 @@ _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",
                 "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route",
-                "reference_context", "interpretation", "genotype", "passport", "value_only", "author_note")
+                "reference_context", "interpretation", "genotype", "passport", "value_only", "author_note", "genetic_lab_comparison", "comparisons")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
@@ -1542,6 +1577,8 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
     rd = _radar_domain(dom["key"])
     labs = _labs_layer(dom, rd, by_key)
     gen = _genetics_layer(dom, by_key)
+    from ..genetic_comparison import system_comparisons
+    comparisons = system_comparisons(gen.get("rows") or [], by_key, dom["key"])
     target = _target_layer(dom, by_key)
     tests = _tests_layer(dom["markers"])
     questions = _questions(gen, labs, tests, by_key, target)
@@ -1560,7 +1597,7 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
             "markers": dom["markers"],
             "labs": labs, "dynamics": _dynamics_layer(rd),
             "validated_indices": [fib4()] if dom["key"] == "liver" else [],
-            "genetics": _project(gen, register),
+            "genetics": _project(gen, register), "genetic_lab_comparisons": comparisons,
             "medications": _medications_layer(dom["key"]),
             "target": target,
             "tests": tests, "questions": questions,

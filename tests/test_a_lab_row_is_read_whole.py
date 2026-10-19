@@ -76,6 +76,36 @@ class TestALongerAnalyteIsNotTheShorterOne(unittest.TestCase):
         self.assertEqual(42.0, _parse("Альбумин  42  г/л  35 - 52")["albumin"]["value"])
 
 
+class TestAlbuminMethodsStaySeparate(unittest.TestCase):
+
+    def test_absolute_fraction_is_not_biochemical_albumin(self):
+        found = _parse("Белковые фракции\n"
+                       "Альбумин  62  %  55 - 67\n"
+                       "Альбумин abs.  43  г/л  40 - 48\n"
+                       "Альбумин/глобулиновый коэффициент  1,8  отн. ед.")
+        self.assertNotIn("albumin", found)
+        self.assertEqual(62, found["albumin_pct"]["value"])
+        fraction = found["albumin_fraction_abs"]
+        self.assertEqual(43, fraction["value"])
+        self.assertEqual((40, 48), (fraction["ref_low"], fraction["ref_high"]))
+
+    def test_both_methods_in_one_form_keep_both_values(self):
+        found = _parse("Альбумин  46  г/л  35 - 52\n"
+                       "Белковые фракции\nАльбумин abs.  43  г/л  40 - 48")
+        self.assertEqual(46, found["albumin"]["value"])
+        self.assertEqual(43, found["albumin_fraction_abs"]["value"])
+
+    def test_english_fraction_has_the_same_distinct_identity(self):
+        found = _parse("Protein electrophoresis\nAlbumin, absolute  4.3  g/dL  4.0 - 4.8")
+        self.assertNotIn("albumin", found)
+        self.assertEqual(43, found["albumin_fraction_abs"]["value"])
+
+    def test_absolute_without_fraction_context_does_not_infer_a_method(self):
+        found = _parse("Albumin, absolute  46  g/L  35 - 52")
+        self.assertNotIn("albumin_fraction_abs", found)
+        self.assertEqual(46, found["albumin"]["value"])
+
+
 class TestTheUnitOnTheRowIsHonoured(unittest.TestCase):
 
     def test_a_factor_unit_converts_the_value_and_the_corridor(self):

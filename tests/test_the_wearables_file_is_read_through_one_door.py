@@ -214,7 +214,7 @@ class TestTheGoalTableReadsBothShapes(unittest.TestCase):
 
     def test_the_series_behind_the_chart_is_the_whole_series(self):
         with mock.patch.object(goals.core, "wearable_trends",
-                               return_value=wear_file("new", self.MONTHS)):
+                               return_value=wear_file("new", self.MONTHS)), mock.patch.object(goals.core, "metrics_json", return_value={}):
             pts, dev, why = goals._goal_resolve("wear:Weight")
         self.assertEqual([p["date"] for p in pts], ["2026-06", "2026-07"])
         self.assertEqual(dev, "garmin")
@@ -227,10 +227,11 @@ class TestTwoWatchesAreNotOneSeries(unittest.TestCase):
         "garmin": {"metrics": {"RestingHeartRate": {"2026-07": 64}}},
         "whoop": {"metrics": {"RestingHeartRate": {"2026-07": 58}}}}}
 
-    def test_a_metric_two_devices_report_resolves_to_nothing(self):
+    def test_two_devices_retain_sources_without_selecting_a_current_value(self):
         with mock.patch.object(goals.core, "wearable_trends", return_value=self.TWO):
             pts, dev, why = goals._goal_resolve("wear:RestingHeartRate")
-        self.assertEqual(pts, [], "the two series were merged or one was picked")
+        self.assertEqual({p["measurement_source"] for p in pts}, {"garmin", "whoop"})
+        self.assertIsNone(dev)
         self.assertEqual(why, "several_devices")
 
     def test_naming_the_device_answers_it(self):

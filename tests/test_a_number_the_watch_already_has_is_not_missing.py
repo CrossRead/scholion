@@ -41,7 +41,7 @@ def wear(months, device="garmin"):
 
 def person(series_by_key):
     return {"profile": {"sex": "male", "birth_year": 1980, "height_cm": 180},
-            "metrics": {k: {"name": k, "unit": "u", "ref_low": 8000 if k == "steps" else None,
+            "metrics": {k: {"name": k, "unit": "steps" if k == "steps" else "kg" if k == "weight" else "cm", "ref_low": 8000 if k == "steps" else None,
                             "series": v}
                         for k, v in series_by_key.items()}}
 
@@ -74,7 +74,8 @@ class TestTheDeviceFillsWhatNobodyTypedIn(unittest.TestCase):
         points would draw one line and label it with another."""
         r = rows(person({"steps": [{"date": "2026-07-11", "value": 6000}]}),
                  wear({"StepsDaily": {"2026-07": 8000, "2026-08": 8356}}))["steps"]
-        self.assertEqual([p["date"] for p in r["series"]], ["2026-07", "2026-08"])
+        self.assertEqual([p["date"] for p in r["series"]], ["2026-07", "2026-07-11", "2026-08"])
+        self.assertEqual({p["measurement_source"] for p in r["series"]}, {"recorded", "garmin"})
 
     def test_a_newer_hand_entered_reading_wins(self):
         r = rows(person({"weight": [{"date": "2026-08-25", "value": 99.8}]}),

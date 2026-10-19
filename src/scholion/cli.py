@@ -366,6 +366,13 @@ def _add_maintenance_commands(sub, common) -> None:
     ov.add_argument("--visit-sheet", action="store_true", help="prepare a source-bound visit handout")
     ov.add_argument("--reference-appendix", action="store_true",
                     help="include a separate reference appendix with the visit handout")
+    ov.add_argument("--period", type=int, choices=(30, 90, 365), default=365,
+                    help="observation window for the shared attention summary")
+    ov.add_argument("--agenda-id", action="append", help="include this feed item in the visit sheet; repeat to select more")
+    ov.add_argument("--no-agenda", action="store_true", help="prepare the handout without attention items")
+    rev = sub.add_parser("insight-snapshot", parents=[common],
+                         help="preview a local review snapshot; save only with its confirmation fingerprint")
+    rev.add_argument("--confirm", default="", help="fingerprint from the preview")
     sub.add_parser("second-opinion", parents=[common],
                    help="a second look before a visit: deviations + the PGx watchlist + what to take")
     sub.add_parser("radar", parents=[common],
@@ -470,6 +477,9 @@ def _add_records_commands(sub, common) -> None:
                     help="a yes/no factor of the journal, as profile/focus.json names it; repeat for several")
     fl.add_argument("--atenolol", action="store_true", help=argparse.SUPPRESS)
     fl.add_argument("--late-meal", action="store_true"); fl.add_argument("--note", default="")
+
+    for field in ("system", "medication", "aspect", "change"):
+        fl.add_argument("--response-" + field, default="", help="patient-reported response: " + field)
 
     # A target the treating clinician set, kept beside the laboratory corridor
     # (task 170). Sub-subcommands rather than flags, because `set` and `remove`
@@ -990,7 +1000,7 @@ def _cmd_doc(args) -> int:
         print(_t("doc.unknown", name=args.name,
                  known=", ".join(k for k, _ in _docs.available())), file=sys.stderr)
         return 1
-    text = path.read_text(encoding="utf-8")
+    text = _docs.read(args.name) or ""
     if args.json:
         print(json.dumps({"name": args.name, "path": str(path),
                           "bytes": len(text.encode()),
@@ -1051,10 +1061,16 @@ def _cmd_assistant(args) -> Any:
     return res, render
 
 
+def _cmd_insight_snapshot(args) -> Any:
+    from .insight_history import review_snapshot
+    from .format_insights import review_report
+    return review_snapshot(args.confirm), review_report
+
+
 def _cmd_overview(args) -> Any:
     if args.visit_sheet or args.reference_appendix:
-        return engine.visit_sheet(args.reference_appendix), fmt.visit_report
-    res, render = engine.overview(), fmt.overview_report
+        return engine.visit_sheet(args.reference_appendix, [] if args.no_agenda else args.agenda_id), fmt.visit_report
+    res, render = engine.overview(args.period), fmt.overview_report
     return res, render
 
 
@@ -1173,7 +1189,11 @@ def _cmd_remove_med(args) -> Any:
 def _cmd_focus_log(args) -> Any:
     from . import store as _st
     res = _st.add_focus_entry(args.date, alcohol=args.alcohol, atenolol=args.atenolol,
-                              late_meal=args.late_meal, note=args.note, factors=args.factor)
+                              late_meal=args.late_meal, note=args.note, factors=args.factor,
+                              response=({k: getattr(args, "response_" + k) for k in
+                                  ("system", "medication", "aspect", "change")}
+                                  if any(getattr(args, "response_" + k) for k in
+                                      ("system", "medication", "aspect", "change")) else None))
     render = fmt.write_result
     return res, render
 
@@ -1603,6 +1623,7 @@ _ACTIONS = [
 
 
 _QUERIES = [
+    (_is("insight-snapshot"), _cmd_insight_snapshot),
     (_is("assistant"), _cmd_assistant),
     (_is("overview"), _cmd_overview),
     (_is("second-opinion"), _cmd_second_opinion),

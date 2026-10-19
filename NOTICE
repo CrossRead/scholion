@@ -74,3 +74,12 @@ Gene reference biology in the panels includes bilingual functional paraphrases
 of NCBI Gene / RefSeq summaries retrieved on 2026-10-06. Each description carries
 its NCBI Gene URL. These describe gene function, not individual variant effects.
 NCBI / NLM content policy: https://www.ncbi.nlm.nih.gov/home/about/policies/
+
+Gene-level function annotations
+-------------------------------
+Selected Gene Ontology annotations, condensed and translated, are attributed to
+the Gene Ontology Consortium (https://geneontology.org/), under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). Ontology release: 2026-07-26.
+The annotations are provided without warranty. Gene-level biology does not
+establish the effect of a particular variant. Source records and annotation
+evidence codes accompany the selected descriptions in gene_function_context.json.

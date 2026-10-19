@@ -38,7 +38,7 @@ position, not a disease probability.
 
 [Full 0.7.0 changes](https://github.com/CrossRead/scholion/releases/tag/v0.7.0)
 · [English presentation](https://crossread.github.io/scholion/presentation.html)
-· [Русская презентация](https://crossread.github.io/scholion/presentation.ru.html)
+· [Russian presentation](https://crossread.github.io/scholion/presentation.ru.html)
 
 ---
 

@@ -64,7 +64,7 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
     conf = res.get("confidence")
     out = {"genotype": res.get("genotype"), "confidence": conf, "depth": res.get("depth"),
            **{k: res[k] for k in ("source", "assembly", "read_pos", "filter", "qual", "allele_fraction",
-               "low_depth", "filtered", "imputed", "unverified_locus", "needs_confirmation", "date") if k in res}}
+               "low_depth", "filtered", "imputed", "unverified_locus", "needs_confirmation", "date", "observations", "variant_identity", "raw_genotype", "phased", "interpretation_applicable") if k in res}}
     if res.get("depth_unverified"):
         # The reader's own word (`genome._mark_depth_unverified`): the row is in
         # the file, it states no depth, and no alignment is here to measure one.
@@ -72,6 +72,9 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
     m = _HGVS.match((hgvs or "").strip())
     ref = m.group(3) if m else None
     if conf == "called":
+        if res.get("interpretation_applicable") is False:
+            return {**out, "state": "risk_allele_not_declared", "read": True,
+                    "why": "effect_allele_not_applicable"}
         if not risk_allele:
             return {**out, "state": "risk_allele_not_declared", "read": True}
         # A genotype holding a letter that is not one of the two at this

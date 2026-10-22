@@ -40,6 +40,41 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.1 — 23.10.2026
+
+### New capabilities
+
+- The updated Ouroboros integration opens Scholion's web interface inside its Widgets panel. A guided start creates a profile or connects an existing one after confirmation; the interface and assistant tools use the same profile. Laboratory imports and saved changes remain available after a restart. Existing medical files stay in place; this integration does not require recalculating genetic results or connecting a language model.
+
+### Corrected conclusions
+
+- Source-checked allele definitions follow the selected genome assembly, including positions whose reference base differs between GRCh37 and GRCh38. Site-reference evidence retains its actual read base; partial or unselected-sample calls cannot confirm a reference genotype.
+- A different substitution at a curated position retains its observed genotype without inheriting the selected variant's effect. Conflicting calls at one position remain unresolved. Corrected multi-allelic definitions distinguish the read alleles, variant identity and effect allele; an unconfirmed effect direction stays explicit without hiding known gene function.
+- A moved ACMG source can be verified by content instead of requiring a clinical rescan. Saved findings whose source or knowledge cannot be verified remain visible as historical rows, separately from current findings. The recorded ClinVar date, ACMG catalogue and interpretation rules remain distinct from a claim to have checked the latest online source.
+- Body-composition estimates retain their units, original values and measurement pairing. Fat mass and fat-free mass are derived only from weight and fat percentage in the same exported record. Water, fat, muscle and bone estimates overlap and are never added as independent compartments. The manufacturer's bone-mass estimate is displayed separately from bone density.
+- Body-composition changes are descriptive unless a sourced, applicable personal goal and comparable measurements support a goal comparison. Monthly means stay distinct from dated readings; invalid values and unknown units remain visible without becoming numeric health conclusions.
+- Folder selection provides a system dialog on Windows and macOS and manual path entry on every platform. Selecting a source folder is separate from confirming its path or importing its contents. Cancellation and failed validation preserve the previous setting. Selecting a genome folder does not start an analysis; preparing a selected genome remains an explicit operation.
+
+### Development checks
+
+- Selecting a test module, class, method or file now runs only the requested tests in both test runners. Duplicate checks and repeated command launches have been consolidated while retaining the distinct regression cases. This does not change stored medical data or require recalculation.
+
+### What is retracted
+
+- Allele-specific interpretations with an unconfirmed correspondence to the genomic strand no longer establish a personal effect. Corrected reference explanations remain available with their limitations.
+- A universal body-fat target and automatic improvement labels for unsupported body-composition comparisons are withdrawn. Device estimates do not count as several independent confirmations of a health change.
+
+### What needs recomputing
+
+Nothing needs a mandatory genomic recalculation solely because of this update.
+
+Curated locus readings and panel explanations use the corrected definitions on the next request. Existing genotypes are preserved; this update alone does not require BAM preparation or PGS recalculation. If a position remains unread, inspect `scholion genome-updates` before requesting site genotyping.
+
+Use `scholion recompute` to inspect the data-driven ACMG action. A moved source with a saved content witness can use `scholion acmg-scan --verify-only`. A changed genome, changed knowledge, or an older report without the required content witness needs an explicit clinical scan with the named inputs. Failed or cancelled verification preserves the saved report. No clinical scan starts merely by opening a page.
+
+Re-import an available Garmin export with `scholion ingest-wearable FOLDER --device garmin` to retain per-record body-composition pairing and the bone estimate. Saved monthly history and local corrections are preserved; missing source pairing is not reconstructed from monthly averages. No genomic recalculation is needed for these changes.
+
+
 ## v0.7.0 — 19.10.2026
 
 - Detailed genetic-panel effect and provenance explanations now follow the selected interface language; study values and original references are preserved.

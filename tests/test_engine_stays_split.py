@@ -324,7 +324,7 @@ LINE_BUDGETS = {
     # 1010 → 1025 on 27.09.2026 (task 209): a wearable layer that fails to read
     # keeps its fitness domain on the radar, unscored and named as unread,
     # instead of vanishing and moving `overall` onto the other systems unsaid.
-    "lifestyle": 1070,  # Dated weight readings remain distinct from device monthly means.
+    "lifestyle": 1110,  # Body-event qualification and invalid histories feed the shared cards and brief.
     #  # Two lines attach the separate, sourced FIB-4 readout.
     # A domain of its own on 14.09.2026: the review of a brief block — what
     # arrived after its wording was read, and a request built from it. It
@@ -364,7 +364,7 @@ LINE_BUDGETS = {
     # records is read when no file reads the position — F5, CYP2C19, MTHFR and
     # APOE printed «not read» on the radar of a profile that holds them.
     # X ploidy is also checked when the clinical allele direction is unset.
-    "panel_genotype": 210,
+    "panel_genotype": 230,  # Retain literal allele identity separately from applicability of its effect.
     # 0.6.0 (task 217 stage 1): a class of prescription against a genotype read —
     # the table in knowledge/class_genotype_cautions.json, asked for a new
     # prescription and for the regimen already taken.

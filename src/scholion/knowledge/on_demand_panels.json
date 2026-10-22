@@ -106,8 +106,8 @@
         {
           "rsid": "rs242941",
           "gene": "CRHR1",
-          "hgvs": "NC_000017.11:g.45815154A>T",
-          "risk_allele": "T",
+          "hgvs": "NC_000017.11:g.45815154A>C",
+          "risk_allele": null,
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -140,7 +140,13 @@
             "source": "PMID 34279801 (Hernández-Díaz 2021: rs242941, rs1876828, rs242939 and rs110402 of CRHR1 and depression)",
             "assigned": "2026-09-18",
             "judged": "one study of four CRHR1 variants and depression"
-          }
+          },
+          "effect_orientation_unverified": true,
+          "allele_note": {
+            "en": "The genotype can be read. The effect allele has not been established on the reference genome strand; no personal effect is assigned.",
+            "ru": "Генотип доступен для чтения. Аллель эффекта на цепи референсного генома не подтверждён; персональное влияние не определяется."
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/242941"
         },
         {
           "rsid": "rs686",
@@ -301,8 +307,8 @@
         {
           "rsid": "rs6295",
           "gene": "HTR1A",
-          "hgvs": "NC_000005.10:g.63962738C>A",
-          "risk_allele": "C",
+          "hgvs": "NC_000005.10:g.63962738C>G",
+          "risk_allele": null,
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -335,13 +341,19 @@
             "source": "PMID 22752684 (Kishi 2013: the serotonin 1A receptor gene and mood disorders, extended meta-analysis); PMID 22890315 (Zhao 2012: rs6295 and antidepressants, meta-analysis)",
             "assigned": "2026-09-18",
             "judged": "two meta-analyses: mood disorders, and antidepressant response"
-          }
+          },
+          "effect_orientation_unverified": true,
+          "allele_note": {
+            "en": "The genotype can be read. The effect allele has not been established on the reference genome strand; no personal effect is assigned.",
+            "ru": "Генотип доступен для чтения. Аллель эффекта на цепи референсного генома не подтверждён; персональное влияние не определяется."
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6295"
         },
         {
           "rsid": "rs594242",
           "gene": "HTR2A",
-          "hgvs": "NC_000013.11:g.46883917C>A",
-          "risk_allele": "C",
+          "hgvs": "NC_000013.11:g.46883917C>G",
+          "risk_allele": null,
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -374,7 +386,13 @@
             "source": "PMID 16814396 (Giegling 2006: anger- and aggression-related traits and the 5-HT2A gene); PMID 17590256 (Serretti 2007: 5-HT2A SNPs and the Temperament and Character Inventory)",
             "assigned": "2026-09-18",
             "judged": "two studies of temperament traits, the variant not named in either title"
-          }
+          },
+          "effect_orientation_unverified": true,
+          "allele_note": {
+            "en": "The genotype can be read. The effect allele has not been established on the reference genome strand; no personal effect is assigned.",
+            "ru": "Генотип доступен для чтения. Аллель эффекта на цепи референсного генома не подтверждён; персональное влияние не определяется."
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/594242"
         },
         {
           "rsid": "rs6311",
@@ -536,8 +554,8 @@
         {
           "rsid": "rs1042778",
           "gene": "OXTR",
-          "hgvs": "NC_000003.12:g.8752859G>A",
-          "risk_allele": "A",
+          "hgvs": "NC_000003.12:g.8752859G>T",
+          "risk_allele": "T",
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -570,7 +588,8 @@
             "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)",
             "assigned": "2026-09-18",
             "judged": "one study of a gene × family-environment effect"
-          }
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1042778"
         },
         {
           "rsid": "rs2254298",
@@ -614,8 +633,8 @@
         {
           "rsid": "rs53576",
           "gene": "OXTR",
-          "hgvs": "NC_000003.12:g.8762685A>T",
-          "risk_allele": "T",
+          "hgvs": "NC_000003.12:g.8762685A>G",
+          "risk_allele": "A",
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -648,7 +667,8 @@
             "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)",
             "assigned": "2026-09-18",
             "judged": "two meta-analyses of sociality"
-          }
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/53576"
         },
         {
           "rsid": "rs5569",

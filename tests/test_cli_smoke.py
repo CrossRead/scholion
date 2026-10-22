@@ -33,36 +33,43 @@ def commands_to_smoke():
 
 class TestSmoke(unittest.TestCase):
 
-    def test_commands_answer(self):
-        for cmd, argv in commands_to_smoke():
-            with self.subTest(command=cmd):
-                code, out, err = support.run(argv)
-                self.assertEqual(code, 0, f"{cmd}: exit code {code}\n{err[-800:]}")
-                self.assertNotIn("Traceback", err, f"{cmd}: a traceback in stderr")
-                self.assertTrue(out.strip(), f"{cmd}: empty output")
+    def fixture_state(self):
+        return {p.relative_to(support.FIXTURE_PROFILE).as_posix(): p.read_bytes()
+                for p in support.FIXTURE_PROFILE.rglob("*") if p.is_file()}
 
-    def test_the_sweep_leaves_the_shared_fixture_as_it_found_it(self):
-        """The sweep runs every read command against the git-tracked fixture. A
-        writer that slipped into it leaves a lock file or a manifest there —
-        `choose-genome` did on 09.09.2026 — and the next `git add -A` commits it.
-        So the sweep is followed by a look at the directory it was pointed at."""
-        for cmd, argv in commands_to_smoke():
-            support.run(argv)
-        fixture = support.ROOT / "tests" / "fixtures" / "profile"
-        left = sorted(p.name for p in fixture.iterdir()
+    def assert_fixture_unchanged(self, before):
+        self.assertEqual(self.fixture_state(), before, "the CLI sweep changed the shared fixture")
+        left = sorted(p.name for p in support.FIXTURE_PROFILE.iterdir()
                       if p.name == ".write.lock" or p.name.startswith("ingest_")
                       or p.name.startswith(".") and p.name.endswith(".tmp"))
         self.assertEqual([], left, "the sweep wrote into the shared fixture: " + ", ".join(left)
                          + " — a writing command has to be excluded from ARGS_FOR and "
                            "tested on a copy")
 
+    def test_commands_answer(self):
+        before = self.fixture_state()
+        for cmd, argv in commands_to_smoke():
+            with self.subTest(command=cmd):
+                try:
+                    code, out, err = support.run(argv)
+                    self.assertEqual(code, 0, f"{cmd}: exit code {code}\n{err[-800:]}")
+                    self.assertNotIn("Traceback", err, f"{cmd}: a traceback in stderr")
+                    self.assertTrue(out.strip(), f"{cmd}: empty output")
+                finally:
+                    # Check the very same execution, including failed commands.
+                    self.assert_fixture_unchanged(before)
+
     def test_json_parses(self):
+        before = self.fixture_state()
         for cmd, argv in commands_to_smoke():
             if cmd in ("serve",):
                 continue
             with self.subTest(command=cmd):
-                data = support.run_json(argv)
-                self.assertIsInstance(data, (dict, list), f"{cmd}: --json did not return an object")
+                try:
+                    data = support.run_json(argv)
+                    self.assertIsInstance(data, (dict, list), f"{cmd}: --json did not return an object")
+                finally:
+                    self.assert_fixture_unchanged(before)
 
     def test_empty_profile_answers_honestly(self):
         """A new user: there is no data at all. No crashes, no invented zeroes."""

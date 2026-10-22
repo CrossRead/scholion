@@ -173,31 +173,9 @@ _PICK_PROMPTS = {
 
 
 def _choose_folder_native(prompt: str) -> dict:
-    """Open the native folder-picking dialog (macOS). Returns a POSIX path.
-
-    Works when the server is started inside the user's graphical session (via
-    Scholion.command/.app). Off macOS it returns a hint to enter the path by hand."""
-    if sys.platform != "darwin":
-        return {"ok": False, "error": _t("server.pick.macos_only")}
-    safe = prompt.replace('"', "'")
-    script = (
-        'tell application "System Events" to activate\n'
-        f'set theFolder to choose folder with prompt "{safe}"\n'
-        'return POSIX path of theFolder'
-    )
-    try:
-        r = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, timeout=300)
-    except Exception as e:
-        return {"ok": False, "error": str(e)}
-    if r.returncode != 0:
-        err = r.stderr or ""
-        # The words are macOS's, not ours: osascript reports a cancelled dialog in the
-        # language of the system, so the Russian stem is a VALUE we compare against.
-        if "-128" in err or "User canceled" in err or "отмен" in err.lower():
-            return {"ok": False, "canceled": True}
-        return {"ok": False, "error": err.strip() or _t("server.pick.failed")}
-    path = r.stdout.strip()
-    return {"ok": True, "path": path} if path else {"ok": False, "error": _t("server.pick.empty_path")}
+    """A local native dialog with a manual-entry fallback on every platform."""
+    from .folder_picker import choose
+    return choose(prompt)
 
 
 def _marker_catalog():
@@ -519,6 +497,8 @@ class Handler(BaseHTTPRequestHandler):
                 # the verdict. With no key the answer names the systems.
                 return self._json(engine.system((q.get("key") or [""])[0],
                                                 (q.get("register") or ["patient"])[0]))
+            if p == "/api/acmg":
+                return self._json(engine.acmg_findings())
             if p == "/api/clinvar":
                 return self._json(engine.clinvar_findings())
             if p == "/api/prs":
@@ -690,11 +670,25 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(store.update_metric_profile(body))
             if u.path == "/api/pick-folder":
                 domain = body.get("domain", "")
+                from . import container as _container
+                expected = body.get("container_id")
+                if expected is not None and expected != _container.named().get("id"):
+                    return self._json({"ok": False, "reason": "container_changed", "error": _t("folder.context_changed")})
                 # the path can be passed directly (manual entry), otherwise the native dialog
-                if body.get("path"):
-                    return self._json(store.set_source_folder(domain, body["path"]))
+                if not isinstance(domain, str) or not domain.strip():
+                    return self._json({"ok": False, "reason": "invalid_domain", "error": _t("store.unknown_source")})
+                if "path" in body:
+                    path = body["path"]
+                    if isinstance(path, str) and path.strip():
+                        from .folder_picker import probe
+                        checked = probe(path)
+                        if not checked["ok"]:
+                            return self._json(checked)
+                    return self._json(store.set_source_folder(domain, path))
                 res = _choose_folder_native(_t(_PICK_PROMPTS.get(domain, "server.pick.default")))
                 if not res.get("ok"):
+                    return self._json(res)
+                if body.get("preview") is True:
                     return self._json(res)
                 saved = store.set_source_folder(domain, res["path"])
                 return self._json({**saved, "path": res["path"]})

@@ -271,6 +271,10 @@ def genome_report(r: Dict[str, Any]) -> str:
                  if _chrom else _t("genome.no_coordinate"))
         head = _refused_head(res.get("confidence") or "unreadable_file")
         why = res.get("note") or _t("genome.refused.no_answer")
+        observations = res.get("observations") or []
+        if observations:
+            why += " " + _t("genome.other_observation", genotypes=", ".join(
+                x["genotype"] for x in observations))
         return f"⚪ {r.get('rsid')} ({r.get('gene') or '—'}, {where}) — {head}\n_{why}_"
     gt = res.get("genotype", "?")
     # All three levels of confidence are named. `confirmed_ref` had no line at
@@ -609,10 +613,24 @@ def acmg_report(r: Dict[str, Any]) -> str:
     if st == "not_run":
         return f"ℹ️ {r.get('message','')}\n\n" + _t("acmg.how_to_run")
     if st != "ok":
-        return f"⚠️ {r.get('message','')}"
+        lines = [f"⚠️ {r.get('message','')}"]
+        if r.get("saved_hits"):
+            lines += ["", "**" + _t("acmg.saved_history") + "**"]
+            for hit in r["saved_hits"]:
+                lines.append("- " + " · ".join(str(hit.get(k) or "—") for k in
+                                               ("gene", "rsid", "zygosity", "clnsig")))
+        if r.get("recalculation"):
+            lines += ["", _t("acmg.saved_action", command=r["recalculation"]["command"])]
+        return "\n".join(lines)
     ver = r.get("version", "ACMG SF")
     out = [_t("acmg.header", version=ver, genes=r.get("gene_count"),
               scanned=r.get("scanned") or "—"), ""]
+    knowledge = r.get("knowledge_status") or {}
+    if knowledge:
+        out += [_t("acmg.source_versions", clinvar=knowledge.get("clinvar_file_date") or "—",
+                   catalogue=knowledge.get("catalogue_version") or "—",
+                   rules=knowledge.get("rules_version") or "—",
+                   date=knowledge.get("scanned") or "—"), ""]
     rep, car = r.get("reportable") or [], r.get("carriers") or []
     if rep:
         out.append("🔴 " + _t("acmg.reportable", n=len(rep)))

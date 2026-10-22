@@ -100,6 +100,7 @@ def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
     if not isinstance(description, str) or not isinstance(source, str) or level == "E":
         description, source = None, None
     return {"scope": "reference_only", "level": level,
+            "allele_note": core._localized(spec.get("allele_note"), lang()),
             "mechanistic_hypotheses": reference_patterns(gene, spec.get("rsid")),
             **_function_fields(gene, spec.get("rsid") or ""),
             "variant_context": description or t("reference.variant_unknown"),
@@ -129,6 +130,8 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
         lines.extend([hypothesis["summary"], hypothesis["limitations"], hypothesis["source"]])
     if context.get("limitations"):
         lines.append(context["limitations"])
+    if context.get("allele_note"):
+        lines.append(context["allele_note"])
     for assertion in context.get("gencc_assertions") or []:
         lines.append(t("gencc.assertion", disease=assertion["disease_label"],
                        classification=assertion["classification_label"],

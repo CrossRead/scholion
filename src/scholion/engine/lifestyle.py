@@ -225,10 +225,32 @@ def lifestyle() -> Dict[str, Any]:
     for key in meta.get("order", list(mm.keys())):
         for src, block in blocks:
             sd = (block.get("metrics") or {}).get(key)
-            if not (isinstance(sd, dict) and sd):
+            from ..body_composition import BODY, monthly_values, invalid_values, event_points
+            invalid = invalid_values(block, key) if key in BODY else []
+            points = event_points(block, key) if key in BODY else []
+            if not sd and points:
+                paired: dict = {}
+                for point in points:
+                    paired.setdefault(point['date'][:7], []).append(point['value'])
+                sd = {month: sum(values)/len(values) for month, values in paired.items()}
+            if not (isinstance(sd, dict) and sd) and not invalid:
                 continue
+            sd = sd if isinstance(sd, dict) else {}
             stats = (block.get("stats") or {}).get(key)
-            m = _life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key), stats)
+            if key in BODY:
+                sd, bad = monthly_values(key, sd)
+                invalid += bad
+            if not sd:
+                m = {"key": key, "label": (mm.get(key) or {}).get("label", key),
+                     "unit": (mm.get(key) or {}).get("unit", ""), "value": None,
+                     "date": max([str(k) for k in (block.get("metrics") or {}).get(key, {})]
+                                 + [str(p.get("date") or "") for p in invalid]),
+                     "group": (mm.get(key) or {}).get("group", "anthro"),
+                     "series": [], "smooth": [], "status": "none", "score": None}
+            else:
+                m = _life_metric(key, mm.get(key, {"label": key}), sd, cmp_from.get(key), stats)
+            if invalid:
+                m["body_invalid_values"] = invalid
             # What the latest point stands on, where the reader will look for it:
             # a month computed from nineteen nights of thirty-one is not the month.
             last_st = (stats or {}).get(m["date"]) if stats else None
@@ -278,12 +300,15 @@ def lifestyle() -> Dict[str, Any]:
         out.append(man)
     from ..measurement_views import combine_lifestyle
     out = combine_lifestyle(out, mm)
+    from ..body_composition import qualify as _qualify_body, BODY
+    out = [_qualify_body(m, next((block for source, block in blocks if source == m.get("source")), {}))
+           if m.get("key") in BODY else m for m in out]
     # workouts: totals by type + the last active year
     workouts = []
     # Sessions are counted per device on purpose: two straps worn on the same
     # day are two records of one workout, and adding them would report a
     # training volume nobody did.
-    wnew = {}
+    wnew: dict = {}
     for _src, _block in blocks:
         for _yr, _types in (_block.get("workouts") or {}).items():
             if isinstance(_types, dict):
@@ -333,7 +358,9 @@ def lifestyle() -> Dict[str, Any]:
             watch.append(item)
     conclusions = {"good": good, "watch": watch}
     unresolved = sorted(k for k, srcs in shared.items() if primary not in srcs)
-    return {"metrics": out, "workouts": workouts[:14], "fitness_score": fitness, 'output_kind': 'display_index',
+    return {"body_composition": {"notice": _t("body.overlap"), "details": _t("body.overlap_example"),
+                                "definition_source": "https://www8.garmin.com/manuals/webhelp/GUID-0BADEBCF-960D-4961-856C-86B9204BC169/EN-US/GUID-CB348359-1E39-491B-86B5-79CB12FB6A8C.html"},
+            "metrics": out, "workouts": workouts[:14], "fitness_score": fitness, 'output_kind': 'display_index',
             "conclusions": conclusions,
             "sources": [s for s, _ in blocks], "primary_source": primary,
             "shared_metrics": {k: v for k, v in sorted(shared.items())},
@@ -727,7 +754,7 @@ def _brief_life(key: str) -> Dict[str, Any]:
         if m.get("key") == key or m.get("label") == key:
             return {"text": f"{_brief_num(m.get('value'))} {core.unit_label(m.get('unit') or '')}".strip(),
                     "name": m.get("label"),
-                    "value": m.get("value"), "date": m.get("date"),
+                    "value": m.get("value"), "date": m.get("date"), "metric": m,
                     "status": m.get("status") or "ok"}
     return {"text": _t("brief.no_metric", key=key), "date": None, "status": "missing"}
 
@@ -792,13 +819,22 @@ def _brief_snapshot_item(s: Dict[str, Any]) -> Dict[str, Any]:
         raw = float(raw) if raw is not None else None
     except (TypeError, ValueError):
         raw = None
-    return {"label": reading.get("name") or s.get("label"), "kind": kind, "key": key,
+    result = {"label": reading.get("name") or s.get("label"), "kind": kind, "key": key,
             "value": r["text"], "raw": raw,
             "unit": s.get("unit") or "", "min": s.get("min"), "max": s.get("max"),
             "target_value": s.get("target_value"), "dir": s.get("dir") or "lower",
             "date": used.get("date"), "status": used.get("status"),
             "target": s.get("target") or "", "tone": s.get("tone") or "muted",
             "source": s.get("source"), "note": s.get("note") or ""}
+    from ..body_composition import BODY
+    if kind == "life" and key in BODY:
+        metric = reading.get("metric") or {}
+        result.update(status=metric.get("status", "none"),
+                      body_qualified=True, synthetic=metric.get("synthetic", False),
+                      target_value=(metric.get("body_goal") or {}).get("target"),
+                      note=metric.get("composition_note", ""),
+                      target=(metric.get("body_goal") or {}).get("label", ""))
+    return result
 
 
 def lifestyle_brief() -> Dict[str, Any]:

@@ -218,7 +218,8 @@ def migrate(data: Dict[str, Any]) -> Dict[str, Any]:
     out: Dict[str, Any] = {
         "_meta": {"shape": SHAPE, "migrated": True},
         "sources": {name: {"_meta": meta, "metrics": metrics or {},
-                           "workouts": workouts}},
+                           "workouts": workouts,
+                           **({"body_composition": data["body_composition"]} if "body_composition" in data else {})}},
     }
     if cmp_from:
         out["_meta"]["comparable_from"] = cmp_from
@@ -251,6 +252,12 @@ def _merge(fresh: Dict[str, Any], previous: Dict[str, Any], source: str) -> int:
     prev = migrate(previous or {})
     block = (prev.get("sources") or {}).get(source) or {}
     kept = 0
+    old_events = (block.get("body_composition") or {}).get("events") or []
+    if old_events:
+        composition = fresh.setdefault("body_composition", {"version": 1})
+        events = {e["event_id"]: e for e in old_events}
+        events.update({e["event_id"]: e for e in composition.get("events") or []})
+        composition["events"] = sorted(events.values(), key=lambda e: (e.get("date", ""), e["event_id"]))
     # `metrics` is the series; `stats` is what each of its points stands on. They
     # are merged by ONE loop rather than two, because two loops over the same
     # months are two chances for the number and its sample size to drift apart.
@@ -382,6 +389,8 @@ def apply_corrections(built: Dict[str, Any], source: str,
             if isinstance(st, dict) and month in st:
                 st[month] = {**st[month], "corrected": True}
         applied.append(dict(c))
+    if built.get("body_composition"):
+        built["body_composition"]["corrections"] = [dict(c) for c in applied]
     return applied, stale, refused
 
 
@@ -452,7 +461,8 @@ def reingest(folder: Optional[str] = None, source: Optional[str] = None,
                  if source == "whoop" else mod.build(str(path)))
     except Exception as e:                                       # noqa: BLE001
         return {"ok": False, "error": _t("wearables.parse_failed", error=e)}
-    if built.get("ok") is False or not built.get("metrics"):
+    if built.get("ok") is False or not (built.get("metrics") or
+            (built.get("body_composition") or {}).get("events")):
         return {"ok": False, "error": _t("wearables.nothing_recognised", path=path, device=source)}
     # The person's corrections are read BEFORE anything is erased or written: a
     # file of them that will not read stops the rebuild, because a rebuild

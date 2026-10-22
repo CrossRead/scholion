@@ -69,6 +69,7 @@ class StubHost:
         self.permissions = set(permissions)
         self.state_dir = state_dir
         self.tools: list[str] = []
+        self.tool_schemas: dict[str, dict] = {}
         self.routes: dict[str, object] = {}
         self.tabs: list[tuple] = []
         self.logs: list[tuple] = []
@@ -83,6 +84,7 @@ class StubHost:
     def register_tool(self, name, handler, **kw):
         self._require("register_tool")
         self.tools.append(name)
+        self.tool_schemas[name] = kw.get("schema", {})
 
     def register_route(self, path, handler, methods=("GET",)):
         self._require("register_route")
@@ -94,6 +96,14 @@ class StubHost:
 
     def get_state_dir(self) -> str:
         return str(self.state_dir)
+
+    def get_settings(self, keys):
+        self._require("get_settings")
+        return {}
+
+    def register_companion_process(self, name):
+        self._require("register_companion_process")
+        self.companion = name
 
     def log(self, level, message, **fields):
         self.logs.append((level, message))
@@ -173,13 +183,37 @@ class TestItAsksForWhatItUses(HubSkillCase):
         self.register()
         self.assertEqual(len(ouroboros_tools.get_tools()), len(self.host.tools))
 
+    def test_cancellation_is_a_boolean_in_the_host_schema(self):
+        self.register()
+        self.assertEqual("boolean", self.host.tool_schemas["recompute"]["properties"]["stop"]["type"])
+
+    def test_a_cli_worker_can_import_the_same_engine_from_an_unrelated_directory(self):
+        import subprocess
+        import scholion
+        self.register()
+        worker = subprocess.run(
+            [sys.executable, "-c", "import scholion; print(scholion.__file__)"],
+            cwd=self.state, env=dict(os.environ), capture_output=True, text=True, timeout=10,
+            stdin=subprocess.DEVNULL,
+        )
+        self.assertEqual(0, worker.returncode, worker.stderr)
+        self.assertEqual(Path(scholion.__file__).resolve(), Path(worker.stdout.strip()).resolve())
+
 
 class TestTheFirstThingAnOwnerSees(HubSkillCase):
 
     def test_it_registers_the_tab_and_the_routes_that_feed_it(self):
         self.register()
         self.assertEqual(1, len(self.host.tabs), "no tab: the owner meets a tool list and no door")
-        self.assertEqual({"state", "init", "folder"}, set(self.host.routes))
+        self.assertEqual({"state", "init", "folder", "connect", "launch", "choose", "web"}, set(self.host.routes))
+        self.assertEqual("web", self.host.companion)
+
+    def test_creation_action_names_its_effect_in_the_host_renderer(self):
+        self.register()
+        self.assertEqual("module", self.host.tabs[0][2]["kind"])
+        widget = (SKILL_DIR / self.host.tabs[0][2]["entry"]).read_text(encoding="utf-8")
+        self.assertIn("hub-create", widget)
+        self.assertIn("json('init', {})", widget)
 
     def test_before_anything_exists_it_names_a_directory_and_offers_to_make_it(self):
         self.register()
@@ -193,13 +227,35 @@ class TestTheFirstThingAnOwnerSees(HubSkillCase):
 
     def test_the_tab_prints_the_real_path_rather_than_an_example(self):
         self.register()
+        self.call("init")
         _tab_id, _title, render = self.host.tabs[0]
-        text = " ".join(c.get("text", "") for c in render.get("components", []))
-        self.assertIn(str(self.state), text,
-                      "the instructions name a path that is not this installation's")
+        widget = (SKILL_DIR / render["entry"]).read_text(encoding="utf-8")
+        state = self.call("state")
+        for slot in ("data_dir", "labs_dir", "genome_dir", "wearables_dir", "guide_path"):
+            if slot != "guide_path":
+                self.assertIn(slot, widget)
+            self.assertIn(str(self.state), state[slot])
 
 
 class TestTheButtonThatLaysOutTheDirectory(HubSkillCase):
+
+    def test_setup_explains_placement_and_does_not_promise_automatic_analysis(self):
+        self.register()
+        self.assertTrue(self.call("init")["ok"])
+        state = self.call("state")
+        guide = Path(state["guide_path"])
+        text = guide.read_text(encoding="utf-8")
+        self.assertIn("Copying files is not automatic analysis", text)
+        for slot in ("labs_dir", "genome_dir", "wearables_dir", "profile_dir"):
+            self.assertIn(state[slot], text)
+        genome = Path(state["data_dir"]) / "genome" / "README.md"
+        self.assertNotIn("automatically", genome.read_text(encoding="utf-8"))
+        self.assertTrue(state["subject_id"].startswith("p-"))
+        for path in (guide, genome):
+            path.write_text("Owner's existing instructions", encoding="utf-8")
+        self.call("init")
+        for path in (guide, genome):
+            self.assertEqual("Owner's existing instructions", path.read_text(encoding="utf-8"))
 
     def test_it_creates_the_layout_the_readmes_describe(self):
         self.register()
@@ -252,6 +308,54 @@ class TestTheButtonThatLaysOutTheDirectory(HubSkillCase):
 
 
 class TestItDoesNotAnswerAboutDataItDoesNotHave(HubSkillCase):
+
+    def test_no_local_guide_is_reported_as_a_file_until_it_exists(self):
+        self.register()
+        state = self.call("state")
+        self.assertIn("below", state["guide_path"])
+        self.call("init")
+        self.assertTrue(Path(self.call("state")["guide_path"]).is_file())
+
+    def test_selected_external_laboratory_folder_is_the_one_shown(self):
+        self.register()
+        self.call("init")
+        external = self.state / "Laboratory forms with spaces"
+        external.mkdir()
+        self.assertTrue(self.call("folder", {"path": str(external)})["ok"])
+        self.assertEqual(str(external), self.call("state")["labs_dir"])
+        self.assertEqual([], list(external.iterdir()))
+
+    def test_existing_lab_records_without_a_genome_are_not_called_empty(self):
+        from scholion import store
+        self.register()
+        self.call("init")
+        self.assertTrue(store.add_lab_point("glucose", "2026-10-01", 5.0,
+                                            unit="mmol/L")["ok"])
+        state = self.call("state")
+        self.assertGreater(state["markers"], 0)
+        self.assertEqual("not connected", state["genome"])
+        self.assertNotIn("empty", state["hint"])
+
+    def test_demo_data_are_identified_before_any_interpretation(self):
+        from scholion import store
+        self.register()
+        self.call("init")
+        self.assertTrue(store.init_profile(demo=True, force=True)["ok"])
+        state = self.call("state")
+        self.assertEqual("synthetic demo", state["data_kind"])
+        self.assertTrue(state["subject_id"].startswith("p-"))
+        self.assertNotEqual("DEMO-0001", state["subject_id"])
+
+    def test_unreadable_folder_settings_are_a_read_error_not_a_zero_count(self):
+        from scholion import core
+        self.register()
+        self.call("init")
+        (core.profile_dir() / "sources.json").write_text("not json", encoding="utf-8")
+        core.reset_cache()
+        state = self.call("state")
+        self.assertEqual("—", state["markers"])
+        self.assertTrue(state["read_error"])
+        self.assertIn("could not be read", state["hint"])
 
     def test_an_empty_directory_is_not_called_a_connected_genome(self):
         """`overview()["genome"]` is a report and is always present.

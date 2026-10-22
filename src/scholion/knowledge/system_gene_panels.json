@@ -1867,7 +1867,7 @@
         {
           "rsid": "rs13266634",
           "gene": "SLC30A8",
-          "hgvs": "NC_000008.11:g.117172544C>A",
+          "hgvs": "NC_000008.11:g.117172544C>T",
           "risk_allele": "C",
           "strand": "+",
           "mode": "common_variant",
@@ -1902,7 +1902,8 @@
             "assigned": "2026-09-18",
             "judged": "two meta-analyses of type 2 diabetes and a functional study"
           },
-          "protein": "p.Arg325Trp"
+          "protein": "p.Arg325Trp",
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/13266634"
         },
         {
           "rsid": "rs12255372",
@@ -8143,8 +8144,8 @@
         {
           "rsid": "rs3134069",
           "gene": "TNFRSF11B",
-          "hgvs": "NC_000008.11:g.118952749A>G",
-          "risk_allele": "G",
+          "hgvs": "NC_000008.11:g.118952749A>C",
+          "risk_allele": null,
           "strand": "+",
           "mode": "common_variant",
           "kind": "asked_about",
@@ -8166,7 +8167,13 @@
             "source": "none named",
             "assigned": "2026-09-18",
             "judged": "no source is named for this position at all — E by the legend's own definition, a value without a conclusion"
-          }
+          },
+          "effect_orientation_unverified": true,
+          "allele_note": {
+            "en": "The genotype can be read. The effect allele has not been established on the reference genome strand; no personal effect is assigned.",
+            "ru": "Генотип доступен для чтения. Аллель эффекта на цепи референсного генома не подтверждён; персональное влияние не определяется."
+          },
+          "allele_identity_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3134069"
         },
         {
           "rsid": "rs7639618",

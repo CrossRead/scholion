@@ -169,8 +169,8 @@ class TestStrandAmbiguousLociAreNamed(_Array):
     EXPECTED = {"rs67376798", "rs75017182", "rs1800462",
                 "rs1799945", "rs17580", "rs12934922",
                 "rs738409", "rs1801282", "rs1801253", "rs151261408", "rs119461977",
-                "rs10830963", "rs1236009877", "rs2109505", "rs242941", "rs2470152", "rs27044",
-                "rs397514332", "rs5219", "rs53576", "rs590688", "rs7754840", "rs9939609", "rs1049793", "rs12325817", "rs121908524"}
+                "rs10830963", "rs1236009877", "rs2109505", "rs6295", "rs2470152", "rs27044",
+                "rs397514332", "rs5219", "rs594242", "rs590688", "rs7754840", "rs9939609", "rs1049793", "rs12325817", "rs121908524"}
 
     def test_they_are_computed_from_the_catalogue_not_hardcoded(self):
         self._use("23andme.txt")

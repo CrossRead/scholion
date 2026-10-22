@@ -141,9 +141,9 @@ class TestAnEnglishFormParsesToo(unittest.TestCase):
         cls.markers = core.lab_markers().get("markers", {})
         cls.text = (FORMS / "06_english_panel.txt").read_text(encoding="utf-8")
 
-    def setUp(self):
-        self.date, self.found = ingest_labs.parse_report(
-            self.text, self.markers, source="06_english_panel.txt")
+        # These checks only inspect the parsed form; none mutates the result.
+        cls.date, cls.found = ingest_labs.parse_report(
+            cls.text, cls.markers, source="06_english_panel.txt")
 
     def test_the_iso_date_is_read(self):
         self.assertEqual(self.date, "2024-03-14")
@@ -165,13 +165,14 @@ class TestAnEnglishFormParsesToo(unittest.TestCase):
         self.assertEqual(self.found["neut_abs"]["value"], 3.62)
         self.assertEqual(self.found["wbc"]["value"], 6.2)
 
-    def test_a_number_inside_the_name_is_not_taken_for_the_result(self):
+    def test_a_number_in_the_name_is_ignored_and_the_english_unit_is_converted(self):
         """«Vitamin D (25-OH)» — the 25 belongs to the name.
 
         In Russian the digits stand BEFORE the name («25-ОН витамин D») and the
         segment searched for a value starts after it, so this never arose. In
         English the qualifier trails the name: the parser read 25 nmol/L, converted
         it to 10 ng/mL and reported a deficiency for a value that was normal.
+        The actual 62.5 nmol/L must instead become 25 ng/mL.
         """
         self.assertEqual(self.found["vitamin_d"]["value"], 25.0)
 
@@ -179,10 +180,6 @@ class TestAnEnglishFormParsesToo(unittest.TestCase):
         """«Triglycerides» on the form, `triglyceride` in the dictionary."""
         self.assertIn("triglycerides", self.found)
         self.assertEqual(self.found["triglycerides"]["value"], 2.31)
-
-    def test_the_conversion_still_runs_on_an_english_unit(self):
-        """62.5 nmol/L of vitamin D is 25 ng/mL — the gate converts, it does not copy."""
-        self.assertEqual(self.found["vitamin_d"]["value"], 25.0)
 
 
 if __name__ == "__main__":

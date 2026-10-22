@@ -19,6 +19,12 @@ _spec.loader.exec_module(check_compat)
 
 class TestCompatibility(unittest.TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        # Both assertions read the same immutable-in-practice snapshot. No
+        # cache survives this class or another interpreter's acceptance run.
+        cls.snapshot = check_compat.collect()
+
     def test_baseline_is_in_place(self):
         self.assertTrue(check_compat.BASELINE.exists(),
                         "there is no contract baseline — take one: "
@@ -27,7 +33,7 @@ class TestCompatibility(unittest.TestCase):
     def test_nothing_went_missing(self):
         import json
         base = json.loads(check_compat.BASELINE.read_text(encoding="utf-8"))
-        cur = check_compat.collect()
+        cur = self.snapshot
         problems = check_compat.compare(base, cur)
         self.assertEqual(problems, [], "\n".join(
             ["The public contract has narrowed — that is an incompatible change:", *problems,
@@ -35,7 +41,7 @@ class TestCompatibility(unittest.TestCase):
                  "and an entry in the CHANGELOG."]))
 
     def test_snapshots_were_taken_without_errors(self):
-        cur = check_compat.collect()
+        cur = self.snapshot
         broken = {k: v for k, v in cur["json_fields"].items() if isinstance(v, dict)}
         self.assertEqual(broken, {}, f"commands did not return valid JSON: {broken}")
 

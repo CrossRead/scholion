@@ -10,7 +10,7 @@ model that speaks the protocol can call the same tools, and a plugin package in
 the Agent Plugins format for ChatGPT desktop, Codex, Cursor, VS Code, GitHub
 Copilot and Kiro.
 
-**Version 0.7.0** — first published as `0.1.0` on 16.08.2026. Not a medical
+**Version 0.7.1** — first published as `0.1.0` on 16.08.2026. Not a medical
 device and not a doctor. Everything the system produces is material for your
 own decisions and for a conversation with your physician.
 
@@ -807,6 +807,8 @@ identifiers are never sent in those requests. A drug name can itself be personal
 uploads of a complete profile. Separately, the first tool call can check PyPI
 for a new version at most once a day, with no medical data in the request.
 Installing an update requires the person's permission.
+Reference link: `www8.garmin.com` hosts manufacturer definitions of body-composition estimates; opening that reference is explicit, and no profile is sent.
+
 PGS model discovery can query `www.pgscatalog.org` for public model identifiers,
 trait names and variant counts. No genotype, score, sample identifier or
 personal phenotype is sent; dosage and reference calibration run locally.

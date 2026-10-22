@@ -54,6 +54,17 @@ class _Lang:
 
 class TestTheHintsAreDerived(unittest.TestCase):
 
+    def test_boolean_handler_parameters_are_booleans_in_the_tool_schema(self):
+        import inspect
+        tools = {entry.name: entry.schema for entry in ouroboros_tools.get_tools()}
+        for name, params, _required, handler in ouroboros_tools._TOOLS:
+            signature = inspect.signature(handler)
+            for param in params:
+                declared = signature.parameters.get(param)
+                if declared is not None and isinstance(declared.default, bool):
+                    with self.subTest(tool=name, parameter=param):
+                        self.assertEqual("boolean", tools[name]["parameters"]["properties"][param]["type"])
+
     def tools(self, version="2025-06-18"):
         return {d["name"]: d for d in mcp_server.tool_descriptors(version)}
 

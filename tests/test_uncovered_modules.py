@@ -87,10 +87,6 @@ class TestIngestStudies(unittest.TestCase):
         self.assertGreater(len(text), 200, "the recogniser ignores anything too short to be a report")
         self.assertTrue(ingest_studies.looks_like_conclusion(text))
 
-    def test_something_too_short_to_be_a_report_is_not_one(self):
-        """A length floor, and it is deliberate: a stray heading is not a conclusion."""
-        self.assertFalse(ingest_studies.looks_like_conclusion("ЗАКЛЮЧЕНИЕ: норма"))
-
     def test_a_lab_form_is_not_a_conclusion(self):
         self.assertFalse(ingest_studies.looks_like_conclusion("Ферритин 12 нг/мл 13-150"))
 

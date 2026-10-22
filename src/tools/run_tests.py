@@ -21,7 +21,9 @@ Usage:
 """
 from __future__ import annotations
 
+import argparse
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -55,7 +57,42 @@ def environment() -> dict:
     # happens to lie next to it.
     e["SCHOLION_GENOME_VCF"] = str(ROOT / "tests" / "fixtures" / "no-such-file.vcf.gz")
     e["SCHOLION_GENOME_DIR"] = str(ROOT / "tests" / "fixtures" / "no-genome")
+    e["SCHOLION_WORKSTATION"] = str(ROOT / "tests" / "fixtures" / "no-workstation.json")
     return e
+
+
+def selection(argv: list[str]) -> tuple[list[str], bool]:
+    """Keep named tests out of discovery, which ignores them with explicit -s."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--suite-only", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("-s", "--start-directory")
+    parser.add_argument("-p", "--pattern")
+    parser.add_argument("-t", "--top-level-directory")
+    parser.add_argument("-k", action="append", default=[])
+    for short, long in (("-v", "--verbose"), ("-q", "--quiet"),
+                        ("-f", "--failfast"), ("-c", "--catch"), ("-b", "--buffer")):
+        parser.add_argument(short, long, action="store_true")
+    parser.add_argument("--locals", action="store_true")
+    parser.add_argument("tests", nargs="*")
+    args = parser.parse_intermixed_args(argv)
+    discovery = (args.start_directory, args.pattern, args.top_level_directory)
+    if args.tests and any(discovery):
+        parser.error("named tests cannot be combined with discovery -s/-p/-t")
+    for name in args.tests:
+        if not re.fullmatch(r"tests(?:[./][A-Za-z_]\w*)+", name):
+            parser.error(f"invalid test selector {name!r}; remove any pasted comment after #")
+    flags = [flag for flag, value in (("-v", args.verbose), ("-q", args.quiet),
+             ("-f", args.failfast), ("-c", args.catch), ("-b", args.buffer),
+             ("--locals", args.locals)) if value]
+    for pattern in args.k:
+        flags.extend(["-k", pattern])
+    if args.tests:
+        print("▶ named tests: " + ", ".join(args.tests), flush=True)
+        return [*flags, *args.tests], args.suite_only
+    print("▶ test discovery: " + (args.pattern or "test*.py"), flush=True)
+    return ["discover", "-s", args.start_directory or "tests", "-t",
+            args.top_level_directory or ".", "-p", args.pattern or "test*.py",
+            *flags], args.suite_only
 
 
 #: The checks that run after the suite, each only if the tool is present: the
@@ -73,6 +110,7 @@ AFTER = (
 
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
+    test_args, suite_only = selection(argv)
     env = environment()
     os.environ.update(env)
     # This process's own banners, for the same reason as the children's.
@@ -85,10 +123,12 @@ def main(argv=None) -> int:
     # A separate process, not `unittest.main()` in this one: the environment above
     # has to be in place before `scholion` is imported anywhere, and a test that
     # spawns the CLI must inherit exactly it.
-    cmd = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-t", ".", *argv]
+    cmd = [sys.executable, "-m", "unittest", *test_args]
     r = subprocess.run(cmd, cwd=str(ROOT), env=env, stdin=subprocess.DEVNULL)
     if r.returncode != 0:
         return r.returncode
+    if suite_only:
+        return 0
 
     for title, tool, flags in AFTER:
         path = ROOT / "src" / "tools" / tool

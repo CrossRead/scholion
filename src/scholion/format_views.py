@@ -21,6 +21,8 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
     lines = [_t("lifestyle.title")
              + (" · " + _t("lifestyle.fitness_score", score=fs) if fs is not None else ""), "", _t('clinical.display_limit'), ""]
     icon = {"ok": "🟢", "warn": "🟠", "bad": "🔴", "none": "•"}
+    if r.get("body_composition"):
+        lines += [r["body_composition"]["notice"], r["body_composition"]["details"], ""]
     for m in ms:
         t = m.get("trend")
         tr = f" · {m['first_date']}→{m['date']}: {_n(m['first'])}→{_n(m['value'])}" if m.get("first_date") and m.get("first_date") != m.get("date") else ""
@@ -29,6 +31,8 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
             improv = f" ({_t('lifestyle.improving')})"
         elif m.get("improving") is False:
             improv = f" ({_t('lifestyle.worsening')})"
+        if m.get("qualified_change_text"):
+            improv = " (" + m["qualified_change_text"] + ")"
         # The break in the series is named out loud: otherwise "from 2022-01" reads as
         # "there was no data before then", while there is data, it is not comparable.
         brk = (" · " + _t("lifestyle.comparable_from", date=m["comparable_from"])
@@ -40,6 +44,12 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
                if cov.get("n") and cov.get("days") and cov["n"] < cov["days"] else "")
         lines.append(f"{icon.get(m.get('status'),'•')} {m['label']}: **{_n(m['value'])} {m.get('unit_display', m['unit'])}**".rstrip()
                      + f" ({m['date']}){tr}{improv}{brk}{cvr}")
+        if m.get("composition_note"):
+            lines.append("  " + m["composition_note"])
+            if (m.get("body_quality") or {}).get("note"):
+                lines.append("  " + m["body_quality"]["note"])
+            if (m.get("body_quality") or {}).get("invalid_note"):
+                lines.append("  " + m["body_quality"]["invalid_note"])
         for observed in m.get("measurement_series") or []:
             source = observed.get("source") or _t("web.phenotype.recorded")
             kind = _t("web.life.monthly_mean" if observed["aggregation"] == "monthly_mean" else "web.life.dated_readings")

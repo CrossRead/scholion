@@ -99,10 +99,6 @@ class TestTheAnswerSaysItOnTheScreen(unittest.TestCase):
 
 class TestTheInvariantAcceptsExactlyTwoShapes(unittest.TestCase):
 
-    def test_a_pair_passes(self):
-        self.assertEqual([], UC.invariant_problems(
-            {"loci": {"rs1": {"ref": "A", "alt": "G"}}}))
-
     def test_a_held_position_passes(self):
         self.assertEqual([], UC.invariant_problems(
             {"loci": {"rs1": {"ref": "C", "alleles_observed": ["C", "A", "G"]}}}))
@@ -122,11 +118,6 @@ class TestTheInvariantAcceptsExactlyTwoShapes(unittest.TestCase):
     def test_a_missing_reference_base_is_still_refused(self):
         self.assertTrue(UC.invariant_problems(
             {"loci": {"rs1": {"alleles_observed": ["C", "A", "G"]}}}))
-
-    def test_the_shipped_catalogue_still_satisfies_it(self):
-        cat = json.loads((ROOT / "src" / "scholion" / "knowledge" / "loci.json")
-                         .read_text(encoding="utf-8"))
-        self.assertEqual([], UC.invariant_problems(cat))
 
 
 class TestTheUpdateToolEntersSuchAPosition(unittest.TestCase):

@@ -30,21 +30,12 @@ export SCHOLION_WORKSTATION="$ROOT/tests/fixtures/no-workstation.json"
 # arguments. unittest answers with its usage text, which does not look like "the
 # tests never ran at all" and is easily mistaken for a successful run. So the
 # refusal is spelled out in words.
-for a in "$@"; do
-  case "$a" in
-    -*|tests.*|tests/*) ;;
-    *) echo "⚠ the argument «$a» does not look like a unittest flag."
-       echo "  It looks like the command was pasted together with its comment: in"
-       echo "  interactive zsh the hash does not start a comment. Run it without"
-       echo "  the tail after #."
-       exit 2 ;;
-  esac
-done
+# Both entry points use the same selector validation in run_tests.py.
 
 echo "▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not depend on whether some external reference answers today)"
 # `< /dev/null`: no test may read the terminal. One that does passes on CI,
 # where stdin is closed, and hangs for whoever runs the suite by hand.
-python3 -m unittest discover -s tests -t . "$@" < /dev/null
+python3 src/tools/run_tests.py --suite-only "$@" < /dev/null
 echo "▶ backward compatibility of the public contract"
 python3 src/tools/check_compat.py
 # These steps run only if the tool is present in this build: the anonymised

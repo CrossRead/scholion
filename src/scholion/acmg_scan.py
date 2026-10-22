@@ -386,7 +386,7 @@ def table_refusal(table: Path, meta: Optional[Dict[str, Any]], personal,
     if not meta.get("personal_identity") or not meta.get("table_sha256"):
         return "metadata_unverified"
     if meta.get("personal_path") != identity["path"] or meta["personal_identity"] != identity:
-        return "source_changed"
+        return "source_verification_needed" if meta.get("personal_sha256") else "source_changed"
     try:
         current_digest = hashlib.sha256(table.read_bytes()).hexdigest()
     except OSError:
@@ -401,6 +401,11 @@ def table_refusal(table: Path, meta: Optional[Dict[str, Any]], personal,
             return "sample_changed"
     except (OSError, ValueError, IndexError):
         return "sample_changed"
+    if meta.get("schema_version") == 2:
+        from .acmg_identity import knowledge
+        status = knowledge(meta)
+        if status.get("reason"):
+            return status["reason"]
     return None
 
 
@@ -504,6 +509,9 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
 
     cat = _catalogue()
     genes = cat["genes"]
+    clinical_before = source_identity(clinvar_vcf)
+    from .acmg_identity import catalogue_digest as _catalogue_digest
+    catalogue_before = _catalogue_digest()
     idx, cv_scanned = _index(clinvar_vcf, genes)
     if not idx:
         return {"status": "clinvar_empty", "clinvar_scanned": cv_scanned,
@@ -513,54 +521,62 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
     scanned = 0
     no_calls = 0
     total_bytes = os.path.getsize(personal)
-    with open(personal, "rb") as raw, \
-            gzip.open(raw, "rt", encoding="utf-8", errors="replace") as fh:
-        for line in fh:
-            if line[0] == "#":
-                continue
-            scanned += 1
-            if progress is not None and scanned % PROGRESS_EVERY == 0:
-                # Compressed bytes consumed: the one measure of «how far» a
-                # stream offers without reading it twice.
-                progress(raw.tell(), total_bytes, line.split("\t", 1)[0])
-            f = line.rstrip("\r\n").split("\t")
-            if len(f) < 10 + col:
-                continue
-            chrom = _norm_chrom(f[0])
-            # The index of each ALT is what the genotype refers to: `1` is the
-            # first ALT, `2` the second. ClinVar records one ALT per row, so a
-            # match names the index whose copies are to be counted, not the row.
-            hits = [(k, alt, idx.get(_variant_key(chrom, f[1], f[3], alt)))
-                    for k, alt in enumerate(f[4].split(","), 1)]
-            hits = [h for h in hits if h[2]]
-            if not hits:
-                continue
-            alleles = _alleles(f[9 + col])
-            if _is_no_call(alleles):
-                # The file did not read this position. Neither a reference nor a
-                # finding — and not dropped either: the count is said with the
-                # result, because «none found» over an unread P/LP position is a
-                # weaker sentence than «none found».
-                no_calls += 1
-                continue
-            filt = f[6] if len(f) > 6 else "."
-            for k, alt, rec in hits:
-                zyg = _zygosity(alleles, k)
-                if zyg is None:
+    from .acmg_identity import DigestReader, catalogue_digest, fingerprint, RULES_VERSION
+    clinical_sha256, clinical_identity = fingerprint(clinvar_vcf)
+    if clinical_identity != clinical_before:
+        return {"status": "source_changed", "message": _t("acmg_scan.source_changed")}
+    with open(personal, "rb") as raw:
+        digest_reader = DigestReader(raw)
+        fh = gzip.open(digest_reader, "rt", encoding="utf-8", errors="replace")
+        with fh:
+            for line in fh:
+                if line[0] == "#":
                     continue
-                for g in rec["genes"]:
-                    rows.append({"gene": g, "chrom": f[0], "pos": f[1], "ref": f[3], "alt": alt,
-                                 "rsid": rec["rsid"], "zygosity": zyg, "clnsig": rec["clnsig"],
-                                 "review": rec["review"], "clndn": rec["clndn"],
-                                 "phenotype": _text(genes[g]["phenotype"]),
-                                 "inheritance": genes[g]["inheritance"],
-                                 "report_rule": genes[g]["report_rule"],
-                                 "filter": filt, "passed": filt in _FILTER_PASSED})
+                scanned += 1
+                if progress is not None and scanned % PROGRESS_EVERY == 0:
+                    # Compressed bytes consumed: the one measure of «how far» a
+                    # stream offers without reading it twice.
+                    progress(raw.tell(), total_bytes, line.split("\t", 1)[0])
+                f = line.rstrip("\r\n").split("\t")
+                if len(f) < 10 + col:
+                    continue
+                chrom = _norm_chrom(f[0])
+                # The index of each ALT is what the genotype refers to: `1` is the
+                # first ALT, `2` the second. ClinVar records one ALT per row, so a
+                # match names the index whose copies are to be counted, not the row.
+                hits = [(k, alt, idx.get(_variant_key(chrom, f[1], f[3], alt)))
+                        for k, alt in enumerate(f[4].split(","), 1)]
+                hits = [h for h in hits if h[2]]
+                if not hits:
+                    continue
+                alleles = _alleles(f[9 + col])
+                if _is_no_call(alleles):
+                    # The file did not read this position. Neither a reference nor a
+                    # finding — and not dropped either: the count is said with the
+                    # result, because «none found» over an unread P/LP position is a
+                    # weaker sentence than «none found».
+                    no_calls += 1
+                    continue
+                filt = f[6] if len(f) > 6 else "."
+                for k, alt, rec in hits:
+                    zyg = _zygosity(alleles, k)
+                    if zyg is None:
+                        continue
+                    for g in rec["genes"]:
+                        rows.append({"gene": g, "chrom": f[0], "pos": f[1], "ref": f[3], "alt": alt,
+                                     "rsid": rec["rsid"], "zygosity": zyg, "clnsig": rec["clnsig"],
+                                     "review": rec["review"], "clndn": rec["clndn"],
+                                     "phenotype": _text(genes[g]["phenotype"]),
+                                     "inheritance": genes[g]["inheritance"],
+                                     "report_rule": genes[g]["report_rule"],
+                                     "filter": filt, "passed": filt in _FILTER_PASSED})
     _decide(rows)
 
     # A source replaced during a scan must not give the old rows a new identity.
     try:
-        unchanged = source_identity(personal) == personal_identity
+        unchanged = (source_identity(personal) == personal_identity
+                     and source_identity(clinvar_vcf) == clinical_identity
+                     and catalogue_digest() == catalogue_before)
     except OSError:
         unchanged = False
     if not unchanged:
@@ -577,11 +593,15 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
         "\t".join(str(r.get(c, "")).replace("\t", " ") for c in COLS)
         for r in sorted(rows, key=lambda r: (r["reportable"] != "yes", r["gene"]))]
     table_content = ("\n".join(lines) + "\n").encode("utf-8")
-    _atomic_bytes(out, table_content)
-
     yes = sum(1 for r in rows if r["reportable"] == "yes")
     filtered = sum(1 for r in rows if r["reportable"] == "filtered")
     meta = {
+        "schema_version": 2,
+        "personal_sha256": digest_reader.digest.hexdigest(),
+        "clinvar_sha256": clinical_sha256,
+        "clinvar_identity": clinical_identity,
+        "catalogue_sha256": catalogue_digest(),
+        "rules_version": RULES_VERSION,
         "table": OUT_NAME,
         "assembly": asm,
         "clinvar_assembly": cv_asm,
@@ -599,8 +619,20 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
         "no_calls": no_calls,
         "filtered": filtered,
     }
-    _atomic_bytes(target / META_NAME,
-                  (json.dumps(meta, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    # Preserve both old halves if the second atomic write fails. A reader in
+    # the small interval refuses by digest instead of combining generations.
+    previous = {p: p.read_bytes() if p.exists() else None for p in (out, target / META_NAME)}
+    try:
+        _atomic_bytes(out, table_content)
+        _atomic_bytes(target / META_NAME,
+                      (json.dumps(meta, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    except BaseException:
+        for path, content in previous.items():
+            if content is not None:
+                _atomic_bytes(path, content)
+            elif path.exists():
+                path.unlink()
+        raise
 
     message = _t("acmg_scan.done", found=len(rows), yes=yes, path=str(out))
     if no_calls:

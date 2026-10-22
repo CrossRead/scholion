@@ -261,6 +261,8 @@ def _add_ingest_commands(sub, common) -> None:
     ac.add_argument("--clinvar", help="the published ClinVar VCF (also SCHOLION_CLINVAR_VCF); "
                                       "without it the command prints the one download it needs")
     ac.add_argument("--out-dir", help="where to write the table (the genome folder by default)")
+    ac.add_argument("--verify-only", action="store_true",
+                    help="verify saved content after a move without repeating the clinical scan")
 
     sub.add_parser("capabilities", parents=[common],
                    help="what this build can do — every command, what it does, "
@@ -1337,7 +1339,11 @@ def _cmd_longevity(args) -> Any:
 
 def _cmd_acmg_scan(args) -> Any:
     from . import acmg_scan as _as
-    res = _as.scan(clinvar_vcf=args.clinvar, out_dir=args.out_dir)
+    if args.verify_only:
+        from .acmg_identity import verify
+        res = verify(out_dir=args.out_dir)
+    else:
+        res = _as.scan(clinvar_vcf=args.clinvar, out_dir=args.out_dir)
     # A refusal is a result here — «the ClinVar file is not here, fetch this
     # one» is printed in full, in both shapes — and the exit code still says
     # whether the TABLE WAS WRITTEN. The first version returned 0 on every

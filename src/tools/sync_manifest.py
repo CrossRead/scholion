@@ -18,8 +18,10 @@ same shape as `sync_docs.py` for documents and `sync_rules.py` for the rules:
 the fields that can be derived are written by the build, and the prose stays a
 person's to write.
 
-Two fields, and only two, because they are the ones that go stale in silence:
-the version and the tool count. Everything else in that file is a judgement
+Three fields are derived: the version, the tool count, and the minimum engine
+dependency. The host caches dependencies by their declaration, so a new plugin
+version with the old requirement can keep an older engine installed.
+Everything else in that file is a judgement
 about what to say, and a generator has no business writing it.
 """
 from __future__ import annotations
@@ -49,6 +51,8 @@ def render(text: str, version: str, tools: int) -> str:
     # «N tools» wherever it is claimed — in the front-matter description a host
     # shows, and in the body a model reads. One number, one source.
     out = re.sub(r"\b\d+ tools\b", f"{tools} tools", out)
+    out = re.sub(r"^([ \t]*package:[ \t]*)scholion(?:>=[0-9.]+)?[ \t]*$",
+                 lambda m: f"{m.group(1)}scholion>={version}", out, flags=re.M)
     return out
 
 

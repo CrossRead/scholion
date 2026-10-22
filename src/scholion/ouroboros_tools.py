@@ -651,7 +651,7 @@ _TOOLS = (
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean",
+_PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean", "stop": "boolean",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
                "levels": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 

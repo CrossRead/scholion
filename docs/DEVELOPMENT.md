@@ -134,6 +134,15 @@ fields and profile file names: they may grow and may not shrink. A change to
 `knowledge/` that alters results on unchanged input is a SERIES BREAK and is
 MINOR at minimum — `docs/VERSIONING.md` has the whole rule.
 
+For a bounded development check, both runners accept a module, class, method,
+or test file path. For example, `bash run_tests.sh tests.test_compat` runs that
+module; `python3 src/tools/run_tests.py tests.test_compat` selects the same tests
+on a machine without bash. Multiple names and `-k` filters are supported.
+Discovery patterns use `-p test_compat.py`; do not combine discovery options
+(`-s`, `-p`, `-t`) with explicit test names. Invalid names fail instead of
+falling back to the full suite. The post-suite checks still run; a bounded
+check is not full release acceptance. Run without selectors for that acceptance.
+
 **Test the artefact, not only the repository.** A check that agrees with the
 single environment its author sat in has cost this project five separate
 incidents (a CI job that could not run where it was sent; a metadata line

@@ -86,6 +86,9 @@ def _call_garmin(step, tick):
 
 def _call_acmg(step, tick):
     from . import acmg_scan
+    if step.get("operation") == "verify":
+        from .acmg_identity import verify
+        return verify(progress=tick)
     return acmg_scan.scan(progress=tick)
 
 
@@ -317,6 +320,14 @@ def _judge(step: Dict[str, Any]) -> None:
         step["detail"]["file"] = gf
         return
     if step["key"] == "scholion acmg-scan":
+        from .acmg_identity import state
+        current = step.get("data") or state()
+        step["detail"].update(current)
+        if current.get("operation") == "verify":
+            step["operation"] = "verify"
+            step["command"] += " --verify-only"
+            step["state"], step["why"] = "ready", "acmg_verify"
+            return
         # The scan refuses without the published ClinVar VCF; said here, before
         # anything runs, rather than as a failed step after the ones before it.
         from .coverage import clinvar_path
@@ -431,6 +442,15 @@ def plan(since: Optional[str] = None, text: Optional[str] = None,
                                   "data": {"status": "missing"}}
         by_key[screen["key"]] = screen
         steps.append(screen)
+    if "scholion acmg-scan" not in by_key:
+        from .acmg_identity import state as acmg_state
+        current_acmg = acmg_state()
+        if current_acmg.get("status") == "unverified":
+            screen = {"kind": "command", "key": "scholion acmg-scan", "force": False,
+                      "source": "data", "versions": [], "conditions": [], "text": None,
+                      "data": current_acmg}
+            by_key[screen["key"]] = screen
+            steps.append(screen)
     from . import core
     from .prs_recompute import recalculation_status
     prs_data = core.prs_results()
@@ -474,6 +494,8 @@ def _backup(step: Dict[str, Any], folder: Optional[Path]) -> Optional[Path]:
         sources.append(core.source_path("labs") if pf == "labs.json" else core.profile_dir() / pf)
     if spec.get("genome_file"):
         sources += [b / spec["genome_file"] for b in core.genome_bases()]
+        if step["key"] == "scholion acmg-scan":
+            sources += [b / "acmg_sf_hits.meta.json" for b in core.genome_bases()]
     sources = [p for p in sources if p.is_file()]
     if not sources:
         return folder

@@ -899,7 +899,7 @@ LOCALIZABLE_FIELDS = {
     # explanations and verdicts
     "note", "why", "reason", "action", "advice", "caveat", "comment",
     "interpretation", "recommendation", "evidence_note", "validity_note",
-    "limitations", "evidence_reason",
+    "limitations", "evidence_reason", "allele_note",
     "meaning", "effect", "mechanism", "manage", "claim", "effect_size", "context",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
     "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",

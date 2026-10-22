@@ -673,6 +673,15 @@ def locus_position(loc: Dict[str, Any], assembly: Optional[str]) -> Optional[int
     return int(pos) if pos else None
 
 
+def locus_alleles(loc: Dict[str, Any], assembly: Optional[str]) -> Dict[str, Any]:
+    """Use a source-checked allele pair for this build, without changing its effect."""
+    mapping = (loc.get("assembly_alleles") or {}).get(assembly or "") or {}
+    if (mapping.get("position") == locus_position(loc, assembly) and mapping.get("source")
+            and {mapping.get("ref"), mapping.get("alt")} == {loc.get("ref"), loc.get("alt")}):
+        return {**loc, "ref": mapping["ref"], "alt": mapping["alt"]}
+    return loc
+
+
 def catalogue_assemblies() -> List[str]:
     """The builds the catalogue can actually answer in, measured not declared.
 
@@ -1699,7 +1708,8 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     for vcf in _sites_vcfs():
         # Each sites file answers in its OWN build, exactly as the main VCF does.
-        pos = locus_position(loc, assembly_of(vcf))
+        site_loc = locus_alleles(loc, assembly_of(vcf))
+        pos = locus_position(site_loc, assembly_of(vcf))
         if pos is None:
             continue
         try:
@@ -1709,13 +1719,17 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         for f in rows:
             if len(f) < 10 or str(f[1]) != str(pos):
                 continue
-            col = 9 + (sample_index(vcf) or 0)
+            chosen_sample = sample_index(vcf)
+            if chosen_sample is None or f[6] not in ("PASS", ".") or f[3] != site_loc.get("ref"):
+                continue
+            col = 9 + chosen_sample
             if len(f) <= col:
                 continue
             fmt, sample = f[8].split(":"), f[col].split(":")
-            gt_raw = sample[fmt.index("GT")] if "GT" in fmt else sample[0]
-            idx = [i for i in gt_raw.replace("|", "/").split("/") if i.isdigit()]
-            if not idx or any(i != "0" for i in idx):
+            gt_pos = fmt.index("GT") if "GT" in fmt else None
+            gt_raw = sample[gt_pos] if gt_pos is not None and gt_pos < len(sample) else ""
+            idx = gt_raw.replace("|", "/").split("/")
+            if len(idx) not in (1, 2) or any(i != "0" for i in idx):
                 continue          # not the reference — the main VCF decides
             dp = None
             if "DP" in fmt:
@@ -1723,7 +1737,8 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                     dp = int(sample[fmt.index("DP")])
                 except Exception:
                     dp = None
-            return {"depth": dp, "evidence_file": Path(vcf).name}
+            return {"depth": dp, "evidence_file": Path(vcf).name,
+                    "genotype": f[3] * len(idx), "assembly": assembly_of(vcf)}
     return None
 
 
@@ -1967,6 +1982,36 @@ def _linear_refusal(why: str, detail: str = "") -> Dict[str, Any]:
             "note": _t("genome.unreadable_" + key, detail=detail)}
 
 
+def _other_snp_observations(rows: List[list], col: int, assembly: str,
+                            pos: int) -> List[Dict[str, Any]]:
+    """Keep a directly read SNP separate from the queried association's identity.
+
+    No indel normalisation or strand inference: only literal single-base calls
+    on a row whose reference has already matched the catalogue are observations.
+    Nothing returned here is a genotype of the requested variant.
+    """
+    observed = []
+    for row in rows:
+        alleles = [row[3]] + row[4].split(",")
+        if any(a not in ("A", "C", "G", "T") for a in alleles):
+            continue
+        fmt, sample = row[8].split(":"), row[9 + col].split(":")
+        raw = sample[fmt.index("GT")] if "GT" in fmt and fmt.index("GT") < len(sample) else ""
+        parts = raw.replace("|", "/").split("/")
+        if not parts or any(not x.isdigit() or int(x) >= len(alleles) for x in parts):
+            continue
+        out = {"genotype": "".join(alleles[int(x)] for x in parts),
+               "raw_genotype": raw, "ref": row[3], "alt": row[4],
+               "assembly": assembly, "read_pos": pos, "source": "vcf",
+               "filter": row[6], "interpretation_applicable": False}
+        try:
+            out["depth"] = int(sample[fmt.index("DP")]) if "DP" in fmt else None
+        except (ValueError, IndexError):
+            out["depth"] = None
+        observed.append(out)
+    return observed
+
+
 def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """The patient's genotype at a resolved locus — from the VCF, or from an array.
 
@@ -1976,6 +2021,7 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     interrogated at all, and carrying the assumption across would turn «this
     instrument cannot see that locus» into «you do not have that variant».
     """
+    catalogue_loc = loc
     # A position the source reports with more than one alternative allele is
     # refused here, before anything is read. The catalogue can hold such a
     # position — its coordinate and the alleles actually observed there are
@@ -2070,6 +2116,8 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # builds is not constant even within a chromosome and a converted coordinate
     # would point at a real base that is the wrong one.
     asm = assembly_of(str(vp))
+    loc = locus_alleles(catalogue_loc, asm)
+    ref = loc.get("ref") or "N"
     pos = locus_position(loc, asm) if asm else loc.get("pos")
     if pos is None:
         return {"genotype": None, "confidence": "no_coordinates_for_assembly",
@@ -2099,10 +2147,10 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return {"genotype": None, "confidence": "no_row_and_build_unknown", "source": "vcf",
                 "assembly": None, "note": _t("genome.no_row_and_build_unknown")}
     if not lines:
-        ev = _ref_evidence(loc)
+        ev = _ref_evidence(catalogue_loc)
         if ev:
             dp = ev.get("depth")
-            out = {"genotype": f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
+            out = {"genotype": ev.get("genotype") or f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
                    "depth": dp, "evidence_file": ev.get("evidence_file"),
                    "note": _t("genome.confirmed_ref")}
             if dp is not None and dp < _MIN_DEPTH:
@@ -2144,9 +2192,32 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # the wrong answer is Factor V Leiden. The reviewer caught the conflict by
     # hand and withheld the conclusion himself; the product would not have.
     cref, calts = _catalogue_alleles(loc)
+    # Publicly verified alternatives describe a locus; the selected ALT still
+    # describes the association. Keep literal readings without borrowing that
+    # association for another allele of the same multi-allelic rsID.
+    identity = (loc.get("allele_identity") or {}).get("builds", {}).get(asm, {})
+    if (identity.get("position") == pos and loc.get("reading_alternatives")
+            and set(loc["reading_alternatives"]) == set(identity.get("alternatives") or [])):
+        calts = calts | set(loc["reading_alternatives"])
     rows = [f for f in lines if len(f) >= 10 and len(f) > 9 + col]
     verdicts = [(f, _row_about_locus(f, cref, calts)) for f in rows]
-    chosen = next((f for f, v in verdicts if v == "match"), None)
+    matching = [f for f, verdict in verdicts if verdict == "match"]
+    signatures = set()
+    for candidate in matching:
+        fmt, sample = candidate[8].split(":"), candidate[9 + col].split(":")
+        raw = sample[fmt.index("GT")] if "GT" in fmt and fmt.index("GT") < len(sample) else ""
+        indices = raw.replace("|", "/").split("/")
+        if not indices or any(not i.isdigit() for i in indices):
+            continue
+        letters = _alleles_for_genotype(candidate[3], candidate[4].split(","), cref, calts, indices)
+        if letters is not None and all(int(i) < len(letters) for i in indices):
+            signatures.add(tuple(sorted(letters[int(i)] for i in indices)))
+    if len(signatures) > 1:
+        return {"genotype": None, "confidence": "conflicting_calls", "source": "vcf",
+                "assembly": asm, "read_pos": pos, "interpretation_applicable": False,
+                "observations": _other_snp_observations(matching, col, asm, pos),
+                "note": _t("genome.conflicting_calls")}
+    chosen = matching[0] if matching else None
     if chosen is None:
         block = next((f for f, v in verdicts if v == "ref_block"), None)
         if block is not None:
@@ -2198,6 +2269,8 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                     "source": "vcf", "assembly": asm, "read_pos": pos,
                     "expected": f"{cref}>{'/'.join(sorted(calts))}" if cref else None,
                     "found": found,
+                    "interpretation_applicable": False,
+                    "observations": _other_snp_observations(others, col, asm, pos),
                     "note": _t("genome.other_variant_at_position",
                                expected=f"{cref}>{'/'.join(sorted(calts))}" if cref else "?",
                                found=", ".join(found))}
@@ -2262,14 +2335,19 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 dp = None
         out = {"genotype": gt, "confidence": "called", "source": "vcf",
                "ref": vref, "alt": f[4], "depth": dp,
-               "assembly": asm, "read_pos": pos, "filter": f[6]}
+               "assembly": asm, "read_pos": pos, "filter": f[6],
+               "raw_genotype": gt_raw, "phased": "|" in gt_raw,
+               "variant_identity": {"assembly": asm, "chrom": str(loc["chrom"]),
+                                    "pos": pos, "ref": cref, "alternatives": sorted(calts)}}
+        if loc.get("reading_alternatives"):
+            out["interpretation_applicable"] = set(gt) <= {cref, loc.get("alt")}
         # A row carrying more than one alternative answers for our locus AND for
         # something else at the same base; the genotype may legitimately name an
         # allele that is not ours, and the reader is told so rather than left to
         # infer it from a two-letter string.
         if len([a for a in valt if a]) > 1:
             out["multiallelic"] = True
-        if cref is None or not calts:
+        if cref is None or not calts or asm is None:
             out["unverified_locus"] = True
         # Task 87, second half. An imputed genotype is not an observation. The
         # corpus holds a file where 98.8 % of rows carry FILTER=IMP, and the
@@ -2608,7 +2686,12 @@ def _acmg_coverage(cat: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _acmg_unverified(reason, meta, prov, source) -> Dict[str, Any]:
-    return {"status": "table_unverified", "version": meta.get("version"),
+    from .acmg_identity import saved_rows, knowledge
+    operation = "verify" if reason in ("source_verification_needed", "clinvar_verification_needed") else "scan"
+    return {"saved_hits": saved_rows(Path(source)), "saved_unverified": True,
+            "knowledge_status": knowledge(prov) if prov else {"status": "unverified"},
+            "recalculation": {"required": True, "operation": operation,
+                              "command": "scholion acmg-scan" + (" --verify-only" if operation == "verify" else "")},"status": "table_unverified", "version": meta.get("version"),
             "hits": [], "reportable": [], "carriers": [], "filtered": [],
             "needs_variant_class": [], "needs_phase": [],
             "reason": reason, "table_provenance": prov,
@@ -2641,6 +2724,7 @@ def acmg_sf_findings() -> Dict[str, Any]:
     # the earlier scan against ClinVar of another build holds a silent zero. Both
     # are a crossed table, and a crossed table is not a list of findings.
     from . import acmg_scan as _acmg
+    from .acmg_identity import knowledge as _acmg_knowledge
     prov = _acmg.read_meta(f)
     vp = vcf_path()
     mine = assembly_of(str(vp)) if vp else None
@@ -2747,6 +2831,7 @@ def acmg_sf_findings() -> Dict[str, Any]:
             # The coverage this answer rests on. «No findings» over a gene read to
             # 71 % is a different sentence from «no findings» over one read whole,
             # and until now they were the same sentence.
+            "knowledge_status": _acmg_knowledge(prov or {}),
             "coverage": _acmg_coverage(cat),
             "gene_count": meta.get("gene_count"), "new_in_version": meta.get("new_in_v33", []),
             "count": len(rows), "reportable": reportable, "carriers": carriers,

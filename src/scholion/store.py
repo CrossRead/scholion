@@ -78,32 +78,62 @@ def set_source_folder(domain: str, folder: str) -> Dict[str, Any]:
 
     For JSON domains, if the folder has no file yet, it moves the current data there from
     the profile (so that nothing is lost)."""
-    domain = (domain or "").strip()
+    domain = domain.strip() if isinstance(domain, str) else ""
     if not domain:
-        return {"ok": False, "error": _t("store.unknown_source")}
-    fp = Path((folder or "").strip()).expanduser()
-    if not fp.exists() or not fp.is_dir():
-        return {"ok": False, "error": _t("store.folder_not_found", path=fp)}
+        return {"ok": False, "reason": "invalid_domain", "error": _t("store.unknown_source")}
+    if not isinstance(folder, str) or not folder.strip():
+        return {"ok": False, "reason": "empty_path", "error": _t("server.pick.empty_path")}
+    try:
+        fp = Path(folder.strip()).expanduser()
+        if not fp.is_absolute():
+            fp = fp.absolute()
+        if not fp.exists() or not fp.is_dir():
+            return {"ok": False, "reason": "folder_not_found", "error": _t("store.folder_not_found", path=fp)}
+        next(fp.iterdir(), None)
+    except (OSError, ValueError):
+        return {"ok": False, "reason": "folder_unavailable", "error": _t("folder.access_failed")}
     cfgp = core.profile_dir() / "sources.json"
     cfg = json.loads(cfgp.read_text(encoding="utf-8")) if cfgp.exists() else {}
     cfg.setdefault("_meta", {"purpose": _t("store.sources_purpose")})
     section = "folders" if domain in _KNOWN_SOURCE_DOMAINS else "external_sources"
     cfg.setdefault(section, {})[domain] = str(fp)
-    _write_json(cfgp, cfg)
-    core.reset_cache()
-    # move the data into the new folder if there is no file there yet
+    # Copy before changing configuration. A failed copy must not switch the
+    # active input. Exclusive creation never overwrites another session's file.
     fname = core._DOMAIN_FILE.get(domain)
-    if fname:
-        target = fp / fname
-        if not target.exists():
+    target = fp / fname if fname else None
+    created = None
+    created_identity = None
+    content = b""
+    try:
+        if target is not None and not target.exists():
             src = core.profile_dir() / fname
             if src.exists():
-                target.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-        core.reset_cache()
+                content = src.read_bytes()
+                try:
+                    with target.open("xb") as stream:
+                        created = target
+                        created_identity = os.fstat(stream.fileno())
+                        stream.write(content)
+                except FileExistsError:
+                    pass
+        _write_json(cfgp, cfg)
+    except OSError:
+        if created is not None:
+            try:
+                stamp = created.stat()
+                if (created_identity is not None and stamp.st_ino == created_identity.st_ino
+                        and stamp.st_dev == created_identity.st_dev
+                        and content.startswith(created.read_bytes())):
+                    created.unlink()
+            except OSError:
+                pass  # The copied bytes remain local; the previous selection still applies.
+        return {"ok": False, "reason": "folder_write_failed", "error": _t("folder.access_failed")}
+    core.reset_cache()
     result = {"ok": True, "domain": domain, "folder": str(fp), "section": section}
     if domain == "genome":
-        from . import population_preparation
-        result["population_assignment"] = population_preparation.prepare()
+        # Choosing a folder is configuration, not permission for a BAM job or
+        # network lookup. Explicit genome selection still prepares population.
+        result["population_assignment"] = {"status": "deferred_to_genome_selection", "verdict_superpop": None}
     return result
 
 

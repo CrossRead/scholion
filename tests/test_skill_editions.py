@@ -299,6 +299,9 @@ _SKIP_PARTS = {"_to_delete", "_backups", "archive", "dist", "node_modules", ".gi
 
 
 def _live(p) -> bool:
+    # Ignored analysis downloads are not skill editions delivered by this build.
+    if p.is_relative_to(support.ROOT / "reports"):
+        return False
     return not (set(p.parts) & _SKIP_PARTS) and "._stale" not in str(p)
 
 

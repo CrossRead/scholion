@@ -753,10 +753,14 @@ try{const th=localStorage.getItem('scholion-theme'); if(th==='light'||th==='dark
 <div class="toast" id="toast"></div>
 </div>
 
+<dialog class="cr-dialog" id="source-folder-dialog" aria-labelledby="source-folder-title" style="width:min(620px,calc(100vw - 32px))"></dialog>
 <dialog class="cr-dialog" id="container-dialog" aria-labelledby="container-dialog-title" style="width:min(800px,calc(100vw - 32px))"></dialog>
 
 <script>
 const API = "";
+async function confirmAction(message){
+  return window.ScholionHost ? window.ScholionHost.confirm(message) : window.confirm(message);
+}
 const $ = (s,el=document)=>el.querySelector(s);
 const el = (h)=>{const tpl=document.createElement('template');tpl.innerHTML=h.trim();return tpl.content.firstChild;};
 const esc = (s)=>String(s??'').replace(/[&<>"'`]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
@@ -912,6 +916,7 @@ function markerGeneticsRow(m){
   return `<tr class="labgen"><td colspan="5" class="small"><span class="muted">${esc(t('labs.genetics_of',{n:ps.length}))}:</span> ${items}</td></tr>`;
 }
 function wantedLang(){
+  if(window.ScholionHost?.lang) return window.ScholionHost.lang;
   const q=new URLSearchParams(location.search).get('lang');
   let stored=null;
   try{stored=sessionStorage.getItem('scholion.lang')||localStorage.getItem('scholion.lang');}catch(e){}
@@ -1788,7 +1793,7 @@ async function viewLabs(root){
     latest?factHtml(esc(fmtDate(latest)),t('web.labs.fact_latest'),''):'',
   ];
   // The folder by its name; the whole path is in the tooltip, not in the text.
-  const folder=docs?String(docs).split('/').filter(Boolean).pop():'';
+  const folder=docs?String(docs).split(/[\\/]/).filter(Boolean).pop():'';
   root.innerHTML = `${pageHead(t('web.tab.labs'),t('web.page.labs.q'),facts)}${treatmentHtml(meds.treatment)}
     ${(d.observations||[]).length?`<details class="cr-card"><summary>${esc(t('labs.observations'))} · ${d.observations.length}</summary><p>${esc(t('labs.observations_note'))}</p>${d.observations.map(o=>`<details><summary>${esc(o.name)} [${esc(t(({urine:'labs.specimen_urine',respiratory_swab:'labs.specimen_respiratory_swab'})[o.specimen]||'labs.specimen_unknown'))}; ${esc(t(({PCR:'labs.method_pcr',urinalysis:'labs.method_urinalysis'})[o.method]||'labs.method_urinalysis'))}]: <b>${esc(o.result_text)}</b> ${esc(o.unit||'')} · ${esc(o.date)}</summary>${o.series.map(p=>`<p>${esc(p.date)} · ${esc(p.result_text)} ${esc(p.unit||'')} · ${esc(t('labs.printed_reference'))}: ${esc(p.reference_text||'—')}<br><small>${esc(p.source||'')}</small></p>`).join('')}</details>`).join('')}</details>`:''}
     <div class="toolbar">
@@ -1818,13 +1823,8 @@ async function viewLabs(root){
   // the add form
   $('#toggle-add',root).onclick=()=>$('#add-lab',root).classList.toggle('hidden');
   renderAddLab($('#add-lab',root), cat);
-  // choosing the folder of studies
-  $('#pick-docs',root).onclick=async()=>{
-    const r=await post('/api/pick-folder',{domain:'labs_docs'});
-    if(r&&r.canceled){toast(t('web.common.canceled'));return;}
-    if(r&&r.ok){toast(t('web.common.folder_chosen'));viewLabs($('#view'));}
-    else toast(t('web.common.error_prefix')+((r&&r.error)||t('web.common.failed')));
-  };
+  // One source chooser for document archives and all source-bar buttons.
+  $('#pick-docs',root).onclick=()=>openSourceFolder('labs_docs', $('#pick-docs',root));
   $('#archive-preview',root).onclick=()=>previewLabArchive($('#ingest-res',root));
   // ingest PDF -> labs.json
   $('#ingest-run',root).onclick=async()=>{
@@ -2751,6 +2751,8 @@ function levelNoteHtml(r){
 function geneRowDetail(r){
   let out='';
   const g=r.genotype||{};
+  if(g.observations?.length) out+=`<div class="why muted">${esc(t('genome.other_observation',{genotypes:g.observations.map(x=>x.genotype).join(', ')}))}</div>`;
+  if(r.allele_note) out+=`<div class="why muted">${esc(r.allele_note)}</div>`;
   if(g.genotype) out+=`<div class="why muted">${esc(t('system.row.genotype',{genotype:g.genotype,confidence:g.confidence||'—',depth:g.depth!=null?g.depth:'—'}))}</div>`;
   (r.assertions||[]).forEach(a=>{out+=`<div class="why muted">${esc(t('system.row.assertion',{disease:a.disease_label||a.disease||'—',classification:a.classification_label||a.classification||'—',moi:a.moi_label||a.moi||'—',submitter:a.submitter||'—',date:a.curated_on||'—'}))}</div>`;});
   if(r.signature==='clinician') out+=`<div class="why muted">${esc(t('system.row.signature_clinician',{date:r.signed_on||'—'}))}</div>`;
@@ -3058,7 +3060,8 @@ function bodySVG(domains, sex, systemView=false){
   if(!im) return `<div class="nosex">${esc(t('web.body.no_sex'))}</div>`;
   const W=700,H=470,x0=(W-im.w)/2,y0=14;
   const at=([fx,fy])=>[x0+fx*im.w, y0+fy*im.h];
-  let defs=`<mask id="silh" mask-type="alpha"><image href="${im.f}" x="${x0}" y="${y0}"`
+  const image=window.ScholionHost?.assets?.[im.f]||im.f;
+  let defs=`<mask id="silh" mask-type="alpha"><image href="${image}" x="${x0}" y="${y0}"`
     +` width="${im.w}" height="${im.h}"/></mask>`
     +`<filter id="silhedge"><feMorphology operator="dilate" radius="1.6"/></filter>`
     +`<filter id="silhsoft" x="-70%" y="-70%" width="240%" height="240%">`
@@ -3724,7 +3727,7 @@ function bulletStatus(s){
   //   crit — outside the laboratory reference corridor.
   // The thresholds are not invented: the red one is set by the laboratory, the yellow
   // one by the distance to the goal.
-  if(s.raw==null) return 'none';
+  if(s.raw==null||(s.body_qualified&&s.target_value==null)) return 'none';
   const bad = (s.status==='high'||s.status==='low'||s.status==='bad');
   if(bad) return 'crit';
   if(s.target_value==null) return 'good';          // no goal — judged by the corridor alone
@@ -3816,16 +3819,20 @@ function lifeCard(m){
   let trendTxt=m.trend?'→ '+t('web.life.stable'):'', tcol='var(--muted)';
   if(m.trend&&m.trend.direction!=='flat'){
     const ar=m.trend.direction==='up'?'↑':'↓';const dl=m.trend.delta;
-    trendTxt=`${ar} ${t('web.life.trend_3m',{delta:(dl>0?'+':'')+dl})}`;
+    trendTxt=m.measurement_kind?t('body.change',{delta:(dl>0?'+':'')+dl,unit:m.delta_unit||m.unit||'',start:fmtDate(m.trend.from),end:fmtDate(m.trend.to)}):`${ar} ${t('web.life.trend_3m',{delta:(dl>0?'+':'')+dl})}`;
     tcol=m.trend_good===true?'var(--good)':(m.trend_good===false?'var(--critical)':'var(--ink-2)');
   }
-  const statusBadge=(m.status&&m.status!=='none')?badge(s.cls,t(s.key)):'';
+  const statusBadge=(m.status&&m.status!=='none')?badge(s.cls,m.status_text||t(s.key)):'';
   return el(`<div class="cr-card card">
     <div class="label">${esc(m.label)}</div>
+    ${m.composition_note?`<div class="cr-caption">${esc(m.composition_note)}</div>`:''}
+    ${m.qualified_change_text?`<div class="cr-caption">${esc(m.qualified_change_text)}</div>`:''}
     <div class="value">${esc(m.value==null?'—':m.value)} <small>${esc(m.unit)}</small></div>
     <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
     ${m.combined_history?sparkline(m.series,false,null,bodyMassMetric(m.key)):m.measurement_series?m.measurement_series.map(o=>`<div class="srcline">${esc(o.source?t('web.life.measured_by',{device:t('web.life.device.'+o.source)}):t('web.phenotype.recorded'))} · ${esc(o.aggregation==='monthly_mean'?t('web.life.monthly_mean'):t('web.life.dated_readings'))}</div>${o.series.length>1?sparkline(o.series,false):''}`).join(''):(m.series&&m.series.length>1?sparkline(m.series,false):'')}
     ${srcTag(m)}
+    ${m.body_quality?.note?`<div class="cr-caption">${esc(m.body_quality.note)}</div>`:''}
+    ${m.body_quality?.invalid_note?`<details class="fold"><summary>${esc(t('body.invalid_h'))}</summary><p>${esc(m.body_quality.invalid_note)}</p>${(m.body_invalid_values||[]).map(x=>`<p>${esc(x.date)}: ${esc(x.raw_value)} ${esc(x.raw_unit)}</p>`).join('')}</details>`:''}
     ${m.comparison?`<details class="fold"><summary>${esc(t('insight.details'))}</summary>${comparisonHTML(m.comparison)}${m.comparison.eligible&&m.comparison.distinguishable===true?'':`<p class="meta">${esc(t('insight.no_change_estimate'))}</p>`}${(m.comparison.limitations||[]).map(k=>`<p class="meta">${esc(t('insight.limit.'+k))}</p>`).join('')}</details>`:''}
     <div class="meta">${esc(m.value_smooth==null?fmtDate(m.date):t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>
   </div>`);
@@ -3901,7 +3908,7 @@ async function viewLifestyle(root){
   const hasM=!!(d.metrics&&d.metrics.length);
   const fs=hasM?d.fitness_score:null;
   const snap=(brief&&brief.snapshot)||[];
-  const hero=s=>{const x=snap.find(y=>y.key===s);return x&&x.raw!=null
+  const hero=s=>{const x=snap.find(y=>y.key===s);return x&&x.raw!=null&&(!x.body_qualified||x.target_value!=null)
     ?`<div class="cr-card cr-stat fact"><b style="color:${BLTCOL[bulletStatus(x)]}">${esc(fmtNum(x.raw))}</b><span>${esc(t('web.life.hero',{label:x.label.toLowerCase(),target:fmtNum(x.target_value)}))}</span></div>`:''};
 
   let html=`${pageHead(t('web.tab.lifestyle'),t('web.page.lifestyle.q'),[
@@ -3950,7 +3957,7 @@ async function viewLifestyle(root){
     const GROUPS=[['anthro','web.life.group_anthro'],['activity','web.life.group_activity'],['recovery','web.life.group_recovery']];
     GROUPS.forEach(([g,titleKey])=>{
       if(d.metrics.some(m=>m.group===g)||g==='anthro')
-        html+=`<h2 class="cr-h2 section">${esc(t(titleKey))}</h2>${g==='anthro'?waistBar:''}<div class="grid" id="lg-${g}"></div>`;
+        html+=`<h2 class="cr-h2 section">${esc(t(titleKey))}</h2>${g==='anthro'?waistBar:''}${g==='anthro'&&d.body_composition?`<div class="cr-card card"><p>${esc(d.body_composition.notice)}</p><details class="fold"><summary>${esc(t('insight.details'))}</summary><p>${esc(d.body_composition.details)}</p></details></div>`:''}<div class="grid" id="lg-${g}"></div>`;
     });
   }
   html+=`<div style="margin-top:26px">${briefReview(brief)}${briefSections(brief)}${briefDropped(brief)}</div>`;
@@ -4324,7 +4331,8 @@ function genomeState(st){
       <span class="muted">${st.ready?esc((st.vcf||'').split('/').pop()):esc(t('web.genome.db_after_script'))}</span></div>
     ${facts.length?`<div class="meta mt-1">${facts.join(' · ')}</div>`:''}
     <div class="meta mt-1">${esc(t('web.genome.intro'))}</div>${frame}${aside}
-    ${st.population?`<div class="meta mt-1">${esc(st.population.note||'')} ${esc(st.population.scope||'')}</div>`:''}</div>`;
+    ${st.population?`<div class="meta mt-1">${esc(st.population.note||'')} ${esc(st.population.scope||'')}</div>`:''}
+    ${st.ready&&st.vcf&&st.population&&!['determined','ambiguous','running'].includes(st.population.status)?`<div class="row mt-2"><button class="cr-btn cr-btn--ghost" data-choose-genome="${esc(st.vcf)}">${esc(t('folder.prepare_genome'))}</button><span class="cr-caption">${esc(t('folder.genome_hint'))}</span></div>`:''}</div>`;
 }
 // The whole feed of the tab, built from the four answers the tab already has.
 // The sections below are cut by SOURCE — ClinVar, polygenic, longevity, lipids —
@@ -4508,6 +4516,26 @@ function weakBedHtml(r){
   if(!r.ok && r.note) return `<div class="cr-card card muted" style="margin-top:10px">${esc(r.note)}</div>`;
   return '';
 }
+function renderACMG(r){
+  const prov=r.table_provenance||{}, k=r.knowledge_status||{};
+  let html=`<h3 class="cr-h3">${esc(t('acmg.web_title'))}</h3>`;
+  if(r.message)html+=`<p>${esc(r.message)}</p>`;
+  if(r.status==='ok'){
+    html+=`<p class="cr-caption">${esc(t('acmg.web_recorded',{assembly:prov.assembly||'—',sample:prov.sample||'—'}))}</p>`;
+    html+=`<p class="cr-caption">${esc(t('acmg.source_versions',{clinvar:k.clinvar_file_date||'—',catalogue:k.catalogue_version||'—',rules:k.rules_version||'—',date:k.scanned||'—'}))}</p>`;
+    const rows=items=>items.map(h=>`<div class="list-item"><b>${esc(h.gene||'—')}</b> · ${esc(h.rsid||'')} · ${esc(h.zygosity||'')}<div>${esc(clnsigText(h.clnsig))} · ${esc(h.phenotype||'')}</div></div>`).join('');
+    const reportable=r.reportable||[];
+    html+=`<p>${esc(reportable.length?t('acmg.reportable',{n:reportable.length}):t('acmg.no_reportable'))}</p>`+rows(reportable);
+    if(r.coverage?.note)html+=`<p class="cr-caption">${esc(r.coverage.note)}</p>`;
+    const other=[...(r.carriers||[]),...(r.needs_variant_class||[]),...(r.needs_phase||[]),...(r.filtered||[])];
+    if(other.length)html+=`<details class="fold"><summary>${esc(t('acmg.web_other'))} (${other.length})</summary>${rows(other)}</details>`;
+  }else if((r.saved_hits||[]).length){
+    html+=`<details class="fold"><summary>${esc(t('acmg.saved_history'))} (${r.saved_hits.length})</summary>${r.saved_hits.map(h=>`<div class="list-item">${esc(h.gene||'—')} · ${esc(h.rsid||'')} · ${esc(h.zygosity||'')} · ${esc(clnsigText(h.clnsig))}</div>`).join('')}</details>`;
+  }
+  if(r.recalculation)html+=`<p class="cr-caption">${esc(t('acmg.saved_action',{command:r.recalculation.command}))}</p><button class="cr-btn cr-btn--ghost" data-acmg-recompute>${esc(t('web.recompute.open'))}</button>`;
+  return html;
+}
+
 async function viewGenome(root){
   const [st,cv,prs,lng,upd,lip,scr,wb,meds]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
@@ -4524,7 +4552,7 @@ async function viewGenome(root){
     ['find', t('web.genome.nav_findings'), '', ()=>genomeFindings(cv,prs,lng,lip)],
     ['risks',t('web.genome.nav_risks'), n(prs&&prs.available?prs.stats.total:null), ()=>renderPRS(prs)],
     ['long', t('web.genome.nav_longevity'), lng&&lng.available?n(t('web.longevity.positions',{count:lng.stats.genotyped})):'', ()=>renderLongevity(lng)],
-    ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)],
+    ['clin', t('web.genome.nav_clinvar'), n(cv&&cv.status==='ok'?cv.count:null), ()=>renderClinvar(cv)+`<div class="cr-card card mt-2" id="acmg-result"><button class="cr-btn cr-btn--ghost" id="acmg-load">${esc(t('acmg.web_load'))}</button></div>`],
     ['screen',t('web.genome.nav_screen'), '', ()=>renderScreen(scr)+weakBedHtml(wb)],
     ['lip',  t('web.genome.nav_lipids'), '', ()=>renderLipidGenetics(lip)||`<div class="cr-card card muted">${esc(t('web.genome.db_after_script'))}</div>`],
     ['locus',t('web.genome.nav_locus'), '', ()=>`<div class="row"><input class="cr-input" id="g-in" placeholder="${esc(t('web.genome.locus_placeholder'))}" style="flex:1 1 240px"><button class="cr-btn act" id="g-go">${esc(t('web.genome.find'))}</button></div>
@@ -4557,6 +4585,11 @@ async function viewGenome(root){
     ${panes.map(([id,_l,_c,body],i)=>`<div class="gpane" id="gp-${id}"${i?' hidden':''}>${body()}</div>`).join('')}
     ${sb}`;
 
+  $('#acmg-load',root).onclick=async()=>{
+    const box=$('#acmg-result',root);showLoader(box);
+    try{box.innerHTML=renderACMG(await api('/api/acmg'));const button=$('[data-acmg-recompute]',box);if(button)button.onclick=openRecompute;}
+    catch(error){box.innerHTML=errorHtml(error.message);}
+  };
   const showPane=id=>{
     root.querySelectorAll('.subnav button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.pane===id)));
     root.querySelectorAll('.gpane').forEach(p=>{p.hidden=(p.id!=='gp-'+id);});
@@ -4572,9 +4605,13 @@ async function viewGenome(root){
   // dialog for a «domain» that was a file path.
   root.querySelectorAll('[data-choose-genome]').forEach(b=>b.onclick=async()=>{
     b.disabled=true; b.textContent=t('prs.population.preparing');
-    const r=await post('/api/choose-genome',{path:b.dataset.chooseGenome});
-    if(r&&r.error){toast(r.error);return;}
-    viewGenome(root);
+    const caption=t('folder.prepare_genome');
+    try{
+      const r=await post('/api/choose-genome',{path:b.dataset.chooseGenome});
+      if(r&&r.error){toast(r.error);return;}
+      viewGenome(root);
+    }catch(error){toast(error.message);}
+    finally{if(b.isConnected){b.disabled=false;b.textContent=caption;}}
   });
 
   const card=$('#g-card',root);
@@ -4810,7 +4847,7 @@ function buildNav(){
       const b=document.createElement('button'); b.className='cr-btn cr-btn--s act btn-sm mt-2'; b.textContent=t('web.menu.install');
       b.onclick=async ev=>{
         ev.stopPropagation();
-        if(!confirm(t('web.menu.install_confirm',{latest:r.latest}))) return;
+        if(!await confirmAction(t('web.menu.install_confirm',{latest:r.latest}))) return;
         b.disabled=true; out.textContent=t('web.menu.installing');
         const res=await post('/api/update',{confirm:true});
         out.textContent=(res&&(res.report||res.error))||t('web.common.failed');
@@ -4986,7 +5023,7 @@ function renderRecompute(){
   }
   box.hidden=false; box.innerHTML=h;
   const st=$('#rc-start'); if(st) st.onclick=async()=>{
-    if(!confirm(t('web.recompute.confirm',{steps:plural(p.ready,'count.steps')}))) return;
+    if(!await confirmAction(t('web.recompute.confirm',{steps:plural(p.ready,'count.steps')}))) return;
     st.disabled=true;
     const r=await post('/api/recompute',{confirm:true});
     if(r&&r.started){_rcOpen=true; pollRecompute();}
@@ -5032,7 +5069,8 @@ async function switchLang(code){
   if(code===LANG) return;
   await loadLang(code);
   const u=new URL(location.href); u.searchParams.set('lang',LANG);
-  history.replaceState(null,'',u.pathname+u.search+u.hash);
+  if(window.ScholionHost) window.ScholionHost.setLang(LANG);
+  else history.replaceState(null,'',u.pathname+u.search+u.hash);
   forgetAnswers();                    // the answers were worded in the other language
   _sources=null;                      // the source chips are worded from the catalogue too
   _systems=null;                      // and so are the systems' labels
@@ -5040,7 +5078,62 @@ async function switchLang(code){
   loadRecompute();
 }
 
-// picking a source folder from disk (the native macOS dialog) — a delegated handler
+// A native choice only fills this form. Saving is a separate explicit action,
+// so cancellation or a delayed native reply cannot change source configuration.
+let sourceFolderGeneration=0;
+function sourceContainer(){return (_patients.find(p=>p.active)||{}).id||null;}
+function openSourceFolder(domain, trigger){
+  const dialog=$('#source-folder-dialog');
+  if(dialog.open){dialog.focus();return;}
+  const generation=++sourceFolderGeneration, container=sourceContainer();
+  let busy=false, saving=false;
+  dialog.innerHTML=`<form class="cr-dialog__body" id="source-folder-form">
+    <h2 class="cr-h2 cr-dialog__title" id="source-folder-title">${esc(t('folder.title'))}</h2>
+    <p class="cr-caption">${esc(t('folder.server_path'))}</p>
+    <label class="cr-label" for="source-folder-path">${esc(t('folder.path_label'))}</label>
+    <input class="cr-input" id="source-folder-path" type="text" autocomplete="off" spellcheck="false" style="width:100%" placeholder="${esc(t('folder.path_placeholder'))}">
+    <div class="row mt-2" style="gap:8px"><button class="cr-btn cr-btn--ghost" type="button" id="source-folder-native">${esc(t('folder.native_btn'))}</button></div>
+    <p class="cr-caption" id="source-folder-message" role="status" aria-live="polite">${esc(t('folder.save_hint'))}</p>
+    <div class="cr-dialog__foot"><button class="cr-btn cr-btn--ghost" type="button" id="source-folder-cancel">${esc(t('folder.cancel'))}</button><button class="cr-btn" type="submit" id="source-folder-save">${esc(t('folder.save'))}</button></div>
+  </form>`;
+  const input=$('#source-folder-path'), message=$('#source-folder-message');
+  const active=()=>dialog.open&&generation===sourceFolderGeneration&&container===sourceContainer();
+  const state=()=>{input.disabled=busy;$('#source-folder-native').disabled=busy;$('#source-folder-save').disabled=busy||!input.value.trim();$('#source-folder-cancel').disabled=saving;};
+  input.oninput=state;
+  $('#source-folder-cancel').onclick=()=>dialog.close();
+  dialog.oncancel=event=>{if(saving)event.preventDefault();};
+  dialog.onclose=()=>{sourceFolderGeneration++;if(trigger?.isConnected){trigger.disabled=false;trigger.focus();}};
+  $('#source-folder-native').onclick=async()=>{
+    busy=true;state();message.textContent=t('web.common.opening_picker');
+    try{
+      const result=await post('/api/pick-folder',{domain,preview:true,container_id:container});
+      if(!active())return;
+      if(result?.ok){input.value=result.path;message.textContent=t('folder.save_hint');}
+      else message.textContent=result?.canceled?t('web.common.canceled'):(result?.error||t('folder.native_unavailable'));
+    }catch(error){if(active())message.textContent=error.message;}
+    finally{if(active()){busy=false;state();input.focus();}}
+  };
+  $('#source-folder-form').onsubmit=async event=>{
+    event.preventDefault();
+    if(busy)return;
+    if(!active()){message.textContent=t('folder.context_changed');return;}
+    const path=input.value.trim();
+    if(!path){message.textContent=t('server.pick.empty_path');return;}
+    busy=true;saving=true;state();message.textContent=t('folder.saving');
+    try{
+      const result=await post('/api/pick-folder',{domain,path,container_id:container});
+      if(!active())return;
+      if(result?.ok){dialog.close();toast(t('web.common.folder_chosen'));_sources=null;mount(current);}
+      else message.textContent=result?.error||t('web.common.failed');
+    }catch(error){if(active())message.textContent=error.message;}
+    finally{if(active()){busy=false;saving=false;state();}}
+  };
+  if(trigger)trigger.disabled=true;
+  dialog.showModal();state();input.focus();
+}
+
+// Picking sources is delegated once; native and manual paths share the same form.
+
 document.addEventListener('click',async e=>{
   if(!e.target.closest('.menu')) closeMenu();
   const cl=e.target.closest('.clamp'); if(cl) cl.classList.toggle('open');
@@ -5057,15 +5150,8 @@ document.addEventListener('click',async e=>{
   // prescription — opens the system's card; one handler, every face of it.
   if(sysl){ e.preventDefault(); viewSystem(sysl.getAttribute('data-system'),sysl.getAttribute('data-register')); return; }
   if(pick){
-    const domain=pick.getAttribute('data-pick');
-    pick.disabled=true;toast(t('web.common.opening_picker'));
-    try{
-      const r=await post('/api/pick-folder',{domain});
-      if(r&&r.canceled){toast(t('web.common.canceled'));}
-      else if(r&&r.ok){toast(t('web.common.folder_chosen'));_sources=null;mount(current);}
-      else{toast(t('web.common.error_prefix')+((r&&r.error)||t('web.common.failed')));}
-    }catch(err){toast(t('web.common.error_prefix')+err.message);}
-    pick.disabled=false;
+    e.preventDefault();
+    openSourceFolder(pick.getAttribute('data-pick'),pick);
   }else if(clr){
     const domain=clr.getAttribute('data-clear');
     const r=await post('/api/clear-folder',{domain});
@@ -5093,6 +5179,16 @@ document.addEventListener('click',async e=>{
   api('/api/version').then(u=>{_update=u; renderUpdateNote();}).catch(()=>{});
   loadRecompute();
   loadPatients();
+  if(window.ScholionHost){
+    if(window.ScholionHost.initialTab) goTab(window.ScholionHost.initialTab);
+    let refreshPending=false;
+    window.ScholionHost.refresh=async()=>{
+      if(await refreshProfileAnswers()) refreshPending=true;
+      if(refreshPending&&!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus')){
+        refreshPending=false;mount(current);
+      }
+    };
+  }
 })();
 
 // 0.6.0 (U2): a position below B is a hypothesis with its passport. The

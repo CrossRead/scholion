@@ -148,7 +148,7 @@ class TestTheHubEntryAgreesWithTheBuild(unittest.TestCase):
     #: unannounced has been reviewed by nobody.
     KEYS = ["name", "description", "version", "type", "runtime", "entry",
             "plugin_api", "os", "permissions", "env_from_settings",
-            "install_specs", "when_to_use", "timeout_sec"]
+            "companion_processes", "ui_tab", "install_specs", "when_to_use", "timeout_sec"]
 
     def setUp(self):
         path = ROOT / self.ENTRY

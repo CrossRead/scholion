@@ -12,7 +12,7 @@ from scholion import core, format_prescription, store
 from scholion.engine import treatment
 
 
-class TestTreatmentTimeline(unittest.TestCase):
+class TimelineFixture:
     def setUp(self):
         self.plan = {"marker": "tsh", "from": "2026-03-01", "due": "2026-03-15",
                      "source": "Synthetic recorded plan"}
@@ -25,6 +25,8 @@ class TestTreatmentTimeline(unittest.TestCase):
                     "name": "TSH", "series": list(points)}}}):
             return treatment.treatment_timeline(day)
 
+
+class TestTreatmentTimeline(TimelineFixture, unittest.TestCase):
     def test_every_prescription_shows_where_it_is_in_time(self):
         second = {"name": "Undated", "status": "stopped"}
         result = self.timeline([{"date": "2026-01-12", "value": 2.5}], [self.med, second])
@@ -131,7 +133,7 @@ class TestRecordedPlanWrite(unittest.TestCase):
             self.assertFalse(store.add_medication("Synthetic", control="invalid")["ok"])
 
 
-class TestStoppedMonitoring(TestTreatmentTimeline):
+class TestStoppedMonitoring(TimelineFixture, unittest.TestCase):
     def test_unstructured_and_invalid_plans_for_stopped_drugs_are_historical(self):
         for plan in ({'monitoring':{'old':'text'}}, {'monitoring_schedule':'old'},
                      {'monitoring_schedule':[{'marker':'unknown'}]}):

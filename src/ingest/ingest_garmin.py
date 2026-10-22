@@ -272,30 +272,40 @@ def build(gdir: str) -> dict:
                     bedt[y].append(float(bed))
     nightly.sort(key=lambda x: x["date"] or "")
 
-    # --- body composition (Garmin Index smart scales): weight, BMI, fat, water, muscle ---
+    # Body records preserve event pairing and invalid source values. The shared
+    # helper ships in the wheel; the fallback only supports this standalone
+    # reader launched directly from the source tree.
+    try:
+        from scholion.body_composition import garmin_event
+    except ModuleNotFoundError as exc:
+        if exc.name != "scholion":
+            raise
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from scholion.body_composition import garmin_event
     weight = defaultdict(list); bmi = defaultdict(list); bfat = defaultdict(list)
-    bwater = defaultdict(list); muscle = defaultdict(list)
+    bwater = defaultdict(list); muscle = defaultdict(list); bone = defaultdict(list)
+    body_events = {}
+    body_series = {"Weight": weight, "BMI": bmi, "BodyFat": bfat, "BodyWater": bwater,
+                   "MuscleMass": muscle, "BoneMass": bone}
     for f in glob.glob(os.path.join(W, "*userBioMetrics.json")):
         try:
             recs = _load_json(f)
         except Exception as e:                                   # noqa: BLE001
             unreadable.append(f"{_file_label(f)}: {type(e).__name__}")
             continue
-        for r in recs if isinstance(recs, list) else []:
-            y = _month_of((r.get("metaData") or {}).get("calendarDate"))
-            w = r.get("weight") if isinstance(r.get("weight"), dict) else {}
-            if not y:
+        for record in recs if isinstance(recs, list) else []:
+            if not isinstance(record, dict) or not isinstance(record.get("weight"), dict):
                 continue
-            wv = w.get("weight")
-            if isinstance(wv, (int, float)) and wv > 0:
-                weight[y].append(wv / 1000.0)               # grams → kg
-            for key, dst in (("bmi", bmi), ("bodyFat", bfat), ("bodyWater", bwater)):
-                v = w.get(key)
-                if isinstance(v, (int, float)) and v > 0:
-                    dst[y].append(v)
-            mm = w.get("muscleMass")
-            if isinstance(mm, (int, float)) and mm > 0:
-                muscle[y].append(mm / 1000.0)               # grams → kg
+            event = garmin_event(record)
+            if event["event_id"] in body_events:
+                continue
+            body_events[event["event_id"]] = event
+            if not event["date_valid"]:
+                continue
+            month = event["date"][:7]
+            for key, field in event["fields"].items():
+                if field["status"] == "usable":
+                    body_series[key][month].append(field["value"])
 
     # --- workouts (summarizedActivities) ---
     workouts = defaultdict(lambda: defaultdict(lambda: {"count": 0, "hours": 0.0}))
@@ -333,7 +343,7 @@ def build(gdir: str) -> dict:
     #: drift apart, so they are named once and used twice.
     _sources = {
         "Weight": weight, "BMI": bmi, "BodyFat": bfat, "MuscleMass": muscle,
-        "BodyWater": bwater, "RestingHeartRate": rhr, "HRV": hrv, "Stress": stress,
+        "BodyWater": bwater, "BoneMass": bone, "RestingHeartRate": rhr, "HRV": hrv, "Stress": stress,
         "BodyBatteryHigh": bbhigh, "BodyBatteryLow": bblow, "Respiration": resp,
         "VO2Max": vo2, "StepsDaily": steps, "IntensityMinutesDaily": intens,
         "SleepHours": sleep, "DeepSleepMin": deep, "RemSleepMin": rem,
@@ -346,6 +356,7 @@ def build(gdir: str) -> dict:
         "BodyFat": _monthly(bfat),
         "MuscleMass": _monthly(muscle),
         "BodyWater": _monthly(bwater),
+        "BoneMass": _monthly(bone),
         "RestingHeartRate": _monthly(rhr),
         "HRV": _monthly(hrv),
         "Stress": _monthly(stress),
@@ -383,6 +394,8 @@ def build(gdir: str) -> dict:
                      "respiration and HRV are recovery/autonomic signals. Workouts are yearly totals "
                      "by type."),
         },
+        "body_composition": {"version": 1, "pairing": "single_exported_record",
+                             "events": sorted(body_events.values(), key=lambda e: (e["date"], e["event_id"]))},
         "metrics": {k: v for k, v in metrics.items() if v},
         # Beside the series, never inside it: the value of a point stays a number,
         # so every reader that already knows how to draw this series still does.

@@ -46,28 +46,46 @@ def history(key: str, device: str | None = None) -> dict:
     # Recognized unit labels denote the same quantity; never join different units.
     same_unit = not manual.get('unit') or not spec.get('unit') or core.unit_label(manual['unit']) == core.unit_label(spec['unit'])
     points = []
+    rejected = []
+    from .body_composition import BODY, monthly_values
+    def usable(value, stamp):
+        if name not in BODY:
+            return True
+        clean, bad = monthly_values(name, {str(stamp): value})
+        rejected.extend(bad)
+        return bool(clean)
     if not device:
         for p in manual.get('series') or []:
-            if _valid(p) and (not p.get('unit') or core.unit_label(p['unit']) == core.unit_label(unit)):
+            if usable(p.get('value'), p.get('date')) and _valid(p) and (not p.get('unit') or core.unit_label(p['unit']) == core.unit_label(unit)):
                 points.append({**p, 'unit': unit, 'measurement_source': 'recorded',
                     'aggregation': p.get('aggregation') or 'observation',
-                    'record': 'metrics.json'})
+                    'record': 'metrics.json', 'synthetic': bool((data.get('_meta') or {}).get('synthetic'))})
     for src, block in wearables.series(core.wearable_trends()):
         if device and src != device:
             continue
         if not same_unit:
             continue
+        from .body_composition import event_points
+        events = event_points(block, name)
+        event_months = {p['date'][:7] for p in events}
+        for event in events:
+            point = {**event, 'measurement_source': src, 'source': src,
+                     'unit': unit, 'synthetic': bool((block.get('_meta') or {}).get('synthetic'))}
+            if _valid(point):
+                points.append(point)
         for month, value in ((block.get('metrics') or {}).get(name) or {}).items():
+            if str(month)[:7] in event_months:
+                continue
             p = {'date': str(month), 'value': value, 'unit': unit,
                  'measurement_source': src, 'source': src, 'device': src,
                  'aggregation': 'monthly_mean', 'record': 'wearable_trends.json',
                  'stats': ((block.get('stats') or {}).get(name) or {}).get(month) or {}}
-            if _valid(p):
+            if usable(value, month) and _valid(p):
                 points.append(p)
     points.sort(key=lambda p: (str(p['date']), p['measurement_source']))
     latest = current(points, device)
     return {'key': person_key, 'metric': name, 'unit': unit, 'series': points,
-            'latest': latest, 'missing': 'several_devices' if points and not latest else 'empty_series' if not points else None}
+            'latest': latest, 'invalid_values': rejected, 'missing': 'several_devices' if points and not latest else 'empty_series' if not points else None}
 
 
 def current(points: list[dict], device: str | None = None) -> dict | None:

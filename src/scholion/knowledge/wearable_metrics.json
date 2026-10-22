@@ -12,6 +12,7 @@
   "BMI",
   "BodyFat",
   "MuscleMass",
+  "BoneMass",
   "BodyWater",
   "VO2Max",
   "StepsDaily",
@@ -52,11 +53,11 @@
     "en": "kg",
     "ru": "кг"
    },
-   "direction": "lower_better",
+   "direction": null,
    "group": "anthro",
    "why": {
-    "en": "in metabolic syndrome, weight reduction is a common goal",
-    "ru": "при метаболическом синдроме снижение веса — частая цель"
+    "en": "Value and descriptive change; a personal goal needs its own support and applicability.",
+    "ru": "Значение и описательное изменение; индивидуальная цель требует собственных оснований и применимости."
    },
    "person_metric": "weight"
   },
@@ -66,12 +67,11 @@
     "ru": "ИМТ"
    },
    "unit": "",
-   "direction": "lower_better",
-   "target_high": 25,
+   "direction": null,
    "group": "anthro",
    "why": {
-    "en": "excess body mass strengthens insulin resistance",
-    "ru": "избыточная масса усиливает инсулинорезистентность"
+    "en": "Value and descriptive change; a personal goal needs its own support and applicability.",
+    "ru": "Значение и описательное изменение; индивидуальная цель требует собственных оснований и применимости."
    }
   },
   "BodyFat": {
@@ -80,12 +80,11 @@
     "ru": "Жир"
    },
    "unit": "%",
-   "direction": "lower_better",
-   "target_high": 20,
+   "direction": null,
    "group": "anthro",
    "why": {
-    "en": "visceral fat → ↓testosterone, ↑inflammation, insulin resistance",
-    "ru": "висцеральный жир → ↓тестостерон, ↑воспаление, инсулинорезистентность"
+    "en": "Value and descriptive change; a personal goal needs its own support and applicability.",
+    "ru": "Значение и описательное изменение; индивидуальная цель требует собственных оснований и применимости."
    }
   },
   "MuscleMass": {
@@ -97,11 +96,11 @@
     "en": "kg",
     "ru": "кг"
    },
-   "direction": "higher_better",
+   "direction": null,
    "group": "anthro",
    "why": {
-    "en": "keeping/building muscle while losing weight is metabolically protective",
-    "ru": "сохранять/растить мышцы при похудении — метаболически защищает"
+    "en": "Value and descriptive change; a personal goal needs its own support and applicability.",
+    "ru": "Значение и описательное изменение; индивидуальная цель требует собственных оснований и применимости."
    }
   },
   "BodyWater": {
@@ -113,8 +112,8 @@
    "direction": null,
    "group": "anthro",
    "why": {
-    "en": "hydration/composition; typical range differs by sex (men ~55–60%)",
-    "ru": "гидратация/состав; типичный диапазон зависит от пола (муж. ~55–60%)"
+    "en": "Value and descriptive change; a personal goal needs its own support and applicability.",
+    "ru": "Значение и описательное изменение; индивидуальная цель требует собственных оснований и применимости."
    }
   },
   "VO2Max": {
@@ -548,6 +547,22 @@
    "why": {
     "en": "skin, not core: useful as a deviation from one's own baseline and meaningless as an absolute number",
     "ru": "кожи, а не тела: полезна как отклонение от собственного базиса и бессмысленна как абсолютное число"
+   }
+  },
+  "BoneMass": {
+   "label": {
+    "en": "Bone mass estimate",
+    "ru": "Костный показатель (оценка)"
+   },
+   "unit": {
+    "en": "kg",
+    "ru": "кг"
+   },
+   "direction": null,
+   "group": "anthro",
+   "why": {
+    "en": "The manufacturer estimate is not DXA bone mineral density.",
+    "ru": "Оценка производителя не является минеральной плотностью кости по DXA."
    }
   }
  },

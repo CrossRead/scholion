@@ -61,6 +61,7 @@ PARITY: Dict[str, str] = {
     "GET /api/panel": "panel",
     "GET /api/lifestyle": "lifestyle",
     "GET /api/clinvar": "clinvar",
+    "GET /api/acmg": "acmg",
     "GET /api/screen": "screen",
     # One command, two doors: `system` lists, `system KEY` is the card. The map
     # names commands, not invocations (see `goal-suggest` below).
@@ -176,7 +177,6 @@ CLI_ONLY: Dict[str, str] = {
              "site-packages and its path cannot be named to a person. Not needed in the web — "
              "no model works there",
     "profile": "a snapshot of the profile for the skill; in the web that state is on the screens",
-    "acmg": "ACMG SF secondary findings — in the web they are part of the «Genome» tab",
     "phenoage": "biological age: computed from a panel; in the web it is a block of the overview",
     "reconcile": "the PDF → profile audit, a long maintenance operation",
     "selfcheck": "a short integrity banner for the start of an assistant's session",
@@ -1068,7 +1068,10 @@ def access() -> Dict[str, Any]:
                               "for": "an agent, with a tab for the person", "agent_surface": True,
                               "installs": "pip package `scholion`",
                               "onboarding": "a Widgets tab that names the data "
-                                            "directory and lays it out on request"},
+                                            "directory and lays it out on request",
+                              "human_ui": {"agent_surface": False, "render": "module",
+                                           "entry": "widget.js", "backend": "web_companion.py",
+                                           "profile": "the same selected profile as the assistant tools"}},
             # The door that needs no plugin mechanism at all: a folder with an
             # entry file in it, which several hosts read from one shared path.
             # Derived rather than described — the size and whether the entry

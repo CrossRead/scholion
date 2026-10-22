@@ -4708,3 +4708,139 @@ MESSAGES['web.visit.latest'] = 'Latest'
 MESSAGES['web.visit.observation_appendix'] = 'Source observations — optional appendix'
 
 MESSAGES["web.gen.evidence_link"] = "Evidence · Scholion confidence"
+
+MESSAGES["genome.other_observation"] = 'Observed at this coordinate: {genotypes}. This reading does not establish the queried variant or its effect.'
+
+MESSAGES['genome.acmg_stale.source_verification_needed'] = 'The source location changed; its saved content identity needs verification.'
+
+MESSAGES['genome.acmg_stale.clinvar_verification_needed'] = 'The local ClinVar source changed; verify its content before reusing the report.'
+
+MESSAGES['genome.acmg_stale.knowledge_changed'] = 'The reference knowledge or analysis rules changed; update the analysis.'
+
+MESSAGES['acmg.verify.refused'] = 'The saved report was preserved. Verification could not confirm it: {reason}'
+
+MESSAGES['acmg.verify.done'] = 'Saved content verified. The source location was updated without repeating the clinical scan.'
+
+MESSAGES['recompute.why.acmg_verify'] = 'Verify saved ACMG source content after a location change.'
+
+MESSAGES['acmg.saved_history'] = 'Saved findings — unverified history, not current clinical findings'
+
+MESSAGES['acmg.saved_action'] = 'Available operation: {command}. Preview and confirm through Recompute.'
+
+MESSAGES['acmg.source_versions'] = 'ClinVar: {clinvar}; catalogue: {catalogue}; analysis: {date}. No check of the latest remote release was performed. Rules: {rules}.'
+
+MESSAGES['genome.refused_head.conflicting_calls'] = 'conflicting genotype calls at this variant'
+
+MESSAGES['genome.conflicting_calls'] = 'Several rows for the same variant carry incompatible genotypes. The readings are preserved, but no personal effect is assigned. Check the call set or resolve the conflict before interpreting it.'
+
+MESSAGES['body.kind.reported_weight'] = 'Recorded weight'
+
+MESSAGES['body.kind.derived_index'] = 'Calculated index'
+
+MESSAGES['body.kind.manufacturer_estimate'] = 'Device estimate'
+
+MESSAGES['body.synthetic'] = 'Synthetic example'
+
+MESSAGES['body.percentage_points'] = 'percentage points'
+
+MESSAGES['body.estimate_notice'] = 'A device estimate; a change alone does not establish tissue gain/loss or dehydration.'
+
+MESSAGES['body.overlap'] = 'Body-composition estimates overlap: water, muscles and bone are not separate slices to add to body fat.'
+
+MESSAGES['body.overlap_example'] = 'For example, a 60 kg weight, 24.3% body fat, 54.4% water and 25.1 kg muscle estimate are not contradictory because muscles and other tissues contain water. Fat percentage refers to total weight. Fat mass can be derived only from weight and fat percentage in the same weighing record. Bone mass is a manufacturer estimate, not DXA bone density.'
+
+MESSAGES['body.goal_reached'] = 'Recorded goal reached'
+
+MESSAGES['body.goal_above'] = 'Above the recorded goal'
+
+MESSAGES['body.goal_below'] = 'Below the recorded goal'
+
+MESSAGES['body.legacy'] = 'Saved monthly estimate; individual weighing records and method details are unavailable.'
+
+MESSAGES['body.invalid'] = 'Some saved values cannot be used for calculations. The original values and reasons remain available in details.'
+
+MESSAGES['body.invalid_h'] = 'Source values requiring review'
+
+MESSAGES['body.garmin_muscle'] = 'Skeletal muscle mass estimate'
+
+MESSAGES['body.change'] = 'Recorded change: {delta} {unit} ({start}–{end})'
+
+MESSAGES['body.monthly'] = 'Monthly average'
+
+MESSAGES['body.last_reading'] = 'Latest recorded observation'
+
+MESSAGES["body.legacy_partial"] = 'Part of this history is stored as monthly averages without individual weighing records.'
+
+MESSAGES['body.toward_goal'] = 'Moving toward the recorded goal'
+
+MESSAGES['body.away_goal'] = 'Moving away from the recorded goal'
+
+MESSAGES['insight.limit.body_estimate_accuracy_unknown'] = 'Repeatability does not establish the accuracy of a body-composition estimate or a clinical tissue change.'
+
+MESSAGES['folder.native_unavailable'] = 'A native folder dialog is unavailable here. Paste the folder path below.'
+
+MESSAGES['folder.dialog_timeout'] = 'The folder dialog did not respond. You can enter the path manually.'
+
+MESSAGES['folder.access_failed'] = 'The folder is unavailable or the setting could not be saved. The previous selection is retained.'
+
+MESSAGES['folder.title'] = 'Choose a source folder'
+
+MESSAGES['folder.path_label'] = 'Full folder path'
+
+MESSAGES['folder.path_placeholder'] = 'C:\\Users\\…\\Documents\\Labs or /Users/…/Labs'
+
+MESSAGES['folder.server_path'] = 'Enter a folder on the computer running Scholion. Files stay there; this form does not upload them.'
+
+MESSAGES['folder.native_btn'] = 'Browse on this computer'
+
+MESSAGES['folder.save_hint'] = 'Browse for a folder or paste its path, then save. Import starts separately.'
+
+MESSAGES['folder.cancel'] = 'Cancel'
+
+MESSAGES['folder.save'] = 'Save folder'
+
+MESSAGES['folder.prepare_genome'] = 'Prepare selected genome'
+
+MESSAGES['folder.genome_hint'] = 'Folder selection does not start analysis. Genome preparation checks the selected file and determines population when the required inputs are available.'
+
+MESSAGES["folder.context_changed"] = 'The selected profile changed. Close this form and open folder selection again for the intended person.'
+
+MESSAGES["folder.path_timeout"] = 'The folder did not respond in time. The previous selection is retained. Check the share or choose another folder.'
+MESSAGES["folder.saving"] = 'Checking the folder and saving the setting…'
+
+MESSAGES['acmg.web_title'] = 'ACMG secondary findings'
+MESSAGES['acmg.web_recorded'] = 'Recorded analysis: {assembly}; sample: {sample}.'
+MESSAGES['acmg.web_other'] = 'Carrier states and observations requiring review'
+MESSAGES['acmg.web_load'] = 'Show saved ACMG analysis'
+
+# Embedded Scholion start screen in Ouroboros.
+MESSAGES.update({
+    'hub.intro': 'Your health data, one picture. Start with laboratory results; add genetics and wearable data when you are ready.',
+    'hub.privacy': 'Files are processed on this computer. Results you discuss with the assistant follow its model and provider settings.',
+    'hub.first': 'Where shall we start?',
+    'hub.create': 'Create my profile',
+    'hub.existing': 'I already use Scholion',
+    'hub.connect_help': 'Choose your existing Scholion data folder or its profile folder. We will show the detected profile before you confirm; your files stay in place.',
+    'hub.choose': 'Choose folder',
+    'hub.folder_path': 'Or paste the full folder path',
+    'hub.check_folder': 'Check this folder',
+    'hub.found': 'Profile found. Connect this profile to both the panel and assistant?',
+    'hub.connect': 'Connect this profile',
+    'hub.open': 'Open Scholion',
+    'hub.add_labs': 'Add laboratory results',
+    'hub.ready': 'Your profile is ready',
+    'hub.markers': 'laboratory markers',
+    'hub.settings': 'Settings and data folders',
+    'hub.same_profile': 'This panel and the assistant use the same profile.',
+    'hub.caveat': 'Not a medical device. A second opinion for discussion with your physician.',
+    'hub.working': 'Working…',
+    'hub.close': 'Close',
+    'hub.confirm': 'Confirm',
+    'hub.unavailable': 'The local panel is unavailable. Reopen the widget or check that the Scholion plugin is enabled.',
+    'hub.external_link': 'Copy this source link and open it in your browser. Ouroboros keeps embedded panels in a restricted frame.',
+    'hub.data_dir': 'Data folder',
+    'hub.profile_dir': 'Structured profile',
+    'hub.labs_dir': 'Original laboratory forms',
+    'hub.genome_dir': 'Genetic files',
+    'hub.wearables_dir': 'Wearable exports',
+})

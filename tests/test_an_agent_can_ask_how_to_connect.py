@@ -173,7 +173,7 @@ class TestTheManifestIsWrittenAndNotRemembered(unittest.TestCase):
 
     A test that catches a hand-typed version tells you it is wrong after you
     have written it wrong, and makes every version bump one more thing to
-    remember. `sync_manifest.py` writes the two fields that can be derived, and
+    remember. `sync_manifest.py` writes the fields that can be derived, and
     `run_tests.sh` runs it in report mode beside the document and rule checks.
     """
 
@@ -201,6 +201,21 @@ class TestTheManifestIsWrittenAndNotRemembered(unittest.TestCase):
         self.assertIn("version: 9.9.9", fresh)
         self.assertIn("77 tools", fresh)
         self.assertNotEqual(fresh, stale)
+
+    def test_a_new_plugin_requires_its_engine_in_the_hosts_dependency_cache(self):
+        import importlib.util
+        tool = support.ROOT / "src" / "tools" / "sync_manifest.py"
+        if not tool.exists():
+            self.skipTest("sync_manifest.py is not part of this build")
+        spec = importlib.util.spec_from_file_location("sync_manifest", tool)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        for requirement in ("scholion", "scholion>=0.5.7"):
+            with self.subTest(requirement=requirement):
+                stale = f"version: 0.5.7\ninstall_specs:\n  - kind: pip\n    package: {requirement}\n"
+                fresh = mod.render(stale, "0.7.0", 40)
+                self.assertIn("package: scholion>=0.7.0\n", fresh)
+                self.assertEqual(fresh, mod.render(fresh, "0.7.0", 40))
 
 
 class TestTheReadmeDoesNotCountThingsTheBuildAlsoCounts(unittest.TestCase):

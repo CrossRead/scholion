@@ -32,7 +32,7 @@ the build — this table is the readable copy of it.
 | **MCP server** | `scholion mcp` | the assistant speaks the Model Context Protocol |
 | **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
-| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus a **Scholion** tab on the Widgets page, which is where the owner is told what to load and where |
+| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus the embedded **Scholion** web application on the Widgets page, using the same selected profile as the tools |
 | **Agent Plugins package** | import the folder agent-plugin/ into a client that reads Agent Plugins, or install it as a Claude plugin | ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot, Kiro, Claude Code, Cowork — one import brings the tools and the instruction that governs them together |
 
 There is also `scholion serve` — a local web page for a person, bound to
@@ -40,6 +40,18 @@ There is also `scholion serve` — a local web page for a person, bound to
 
 All of them run the same engine, so an answer does not depend on which door it
 came through. Pick by what the host can do, not by what you want to ask.
+
+### The embedded Ouroboros interface
+
+The Scholion Widgets card can create a profile or explicitly connect an existing
+one, then opens the installed web application. Its visual interface is for the
+person; model tools keep their own declared permissions. A host-supervised local
+companion and the authenticated module bridge share the tools' saved profile
+connection. No browser, terminal, fixed port, separate copy of the medical data,
+or model connection is required by Scholion. The host's own model-setup screen
+can still apply. The panel refuses a mismatched profile rather than choosing a
+running Scholion instance elsewhere. Source links open through the host's external-link bridge; downloads go through
+the host. See the Hub skill's setup instructions.
 
 ### The skill folder
 

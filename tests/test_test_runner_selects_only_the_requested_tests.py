@@ -32,7 +32,7 @@ class TestRunnerSelection(unittest.TestCase):
             "class Other(unittest.TestCase):\n"
             " def test_other(self): print('OTHER_TEST')\n", encoding="utf-8")
 
-    def run_runner(self, face, args):
+    def run_runner(self, face, args, env_overrides=None):
         if face == "shell":
             bash = support.posix_shell("bash")
             if not bash:
@@ -43,10 +43,22 @@ class TestRunnerSelection(unittest.TestCase):
         env = support.env()
         # Avoid another interpreter's acceptance pass in this miniature repository.
         env.update(CI="true", SCHOLION_SKIP_REACH="1")
+        env.update(env_overrides or {})
         env["PATH"] = str(Path(sys.executable).parent) + os.pathsep + env.get("PATH", "")
         return subprocess.run([*command, *args], cwd=self.root, env=env,
-                              capture_output=True, text=True, timeout=15,
+                              capture_output=True, text=True, encoding="utf-8", timeout=15,
                               stdin=subprocess.DEVNULL)
+
+    def test_a_legacy_console_is_configured_before_selection_prints(self):
+        for args, count in (([], 3), (["tests.test_chosen"], 2)):
+            with self.subTest(args=args):
+                result = self.run_runner("python", args, {
+                    "PYTHONIOENCODING": "cp1252", "PYTHONUTF8": "0",
+                })
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(f"Ran {count} tests", result.stderr)
+                self.assertIn("AFTER_SUITE_GATE", result.stdout)
+                self.assertNotIn("UnicodeEncodeError", result.stderr)
 
     def check_named(self, face):
         cases = (

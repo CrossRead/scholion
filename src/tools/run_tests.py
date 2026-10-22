@@ -110,13 +110,14 @@ AFTER = (
 
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    test_args, suite_only = selection(argv)
     env = environment()
     os.environ.update(env)
     # This process's own banners, for the same reason as the children's.
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="backslashreplace")
+
+    test_args, suite_only = selection(argv)
 
     print("▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not "
           "depend on whether some external reference answers today)")

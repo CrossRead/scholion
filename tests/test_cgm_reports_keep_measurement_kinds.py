@@ -26,6 +26,17 @@ def report(sha='a', path='/synthetic/report.pdf'):
 
 
 class TestChartResponses(unittest.TestCase):
+    def test_missing_iana_data_is_a_named_refusal_without_a_guessed_offset(self):
+        from zoneinfo import ZoneInfoNotFoundError
+        r = report()
+        r['timezone'] = 'Europe/Moscow'
+        with patch('zoneinfo.ZoneInfo', side_effect=ZoneInfoNotFoundError('synthetic missing database')):
+            actual = cgm._night_alignment(r)
+        self.assertEqual('not_established', actual['status'])
+        self.assertEqual('timezone_unavailable', actual['reason'])
+        self.assertEqual([], actual['intervals'])
+        self.assertFalse(actual['daily_extrema_used_as_night'])
+
     def test_sensor_context_requires_a_dated_lab_overlap_and_never_equates_methods(self):
         r=report();markers={'glucose':{'key':'glucose','date':'2026-01-10','value':6.1}}
         context=cgm.laboratory_context(r,markers)

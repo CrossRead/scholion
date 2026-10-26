@@ -316,8 +316,8 @@ const systemGeneLink=esc,levelChip=esc,cautionsHtml=()=>'',visitSourceLinks=esc;
 for(const text of ['Synthetic qualified association','Synthetic uncertainty','1:123 A&gt;G',
                    'Synthetic classification','Synthetic incomplete support']) assert.ok(html.includes(text),text);
 """
-        process = subprocess.run([node, '-e', script], text=True, encoding='utf-8',
-                                 capture_output=True, stdin=subprocess.DEVNULL, timeout=30)
+        process = subprocess.run([node], input=script, text=True, encoding='utf-8',
+                                 capture_output=True, timeout=30)
         self.assertEqual(0, process.returncode, process.stderr)
 
     def test_document_keeps_dates_units_and_qualifies_the_axis_without_inventing_a_response(self):
@@ -425,8 +425,8 @@ const systemGeneLink=esc,levelChip=esc,cautionsHtml=()=>'',visitSourceLinks=esc,
 for(const unwanted of ['visit.report.plan','visit.report.response','visit.empty',
                        'visit.report.no_plan','visit.focus.no_measurements']) assert.ok(!html.includes(unwanted),unwanted);
 """
-            run = subprocess.run([node, '-e', script], text=True, capture_output=True,
-                                 stdin=subprocess.DEVNULL, timeout=30)
+            run = subprocess.run([node], input=script, text=True, encoding='utf-8', capture_output=True,
+                                 timeout=30)
             self.assertEqual(0, run.returncode, run.stderr)
 
     def test_visit_body_charts_use_the_shared_manual_and_device_history(self):

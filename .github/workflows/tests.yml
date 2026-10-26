@@ -67,10 +67,15 @@ jobs:
           python -VV
           python -c "import sys, platform; print(sys.executable, platform.platform())"
 
+      - name: Windows IANA timezone data declared by the package
+        if: runner.os == 'Windows'
+        # Windows has no system IANA database. Match the declared runtime
+        # prerequisite, rather than silently losing CGM/sleep comparisons.
+        run: python -m pip install tzdata
+
       - name: The suite
-        # No dependencies are installed on purpose. The project promises to run
-        # on the standard library alone, and installing anything here would test
-        # a configuration no user has.
+        # Keep optional native readers absent. Windows receives only the IANA
+        # data prerequisite that a normal package installation also receives.
         if: runner.os != 'Windows'
         run: ./run_tests.sh
 

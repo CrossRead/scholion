@@ -17,8 +17,8 @@ Scholion is not a medical device, does not diagnose and does not change treatmen
 
 [English presentation](https://crossread.github.io/scholion/presentation.html)
 · [Russian presentation](https://crossread.github.io/scholion/presentation.ru.html)
-· [For clinicians](docs/FOR-CLINICIANS.md)
-· [Changes and update instructions](CHANGELOG.md)
+· [For clinicians](https://github.com/CrossRead/scholion/blob/main/docs/FOR-CLINICIANS.md)
+· [Changes and update instructions](https://github.com/CrossRead/scholion/blob/main/CHANGELOG.md)
 
 ## Sixty seconds: try the demo
 
@@ -214,7 +214,7 @@ shows the supported catalogue readings; it is not a complete clinical gene test.
 
 **One result across interfaces.** The web application, CLI and assistant tools
 call the same core. `scholion capabilities --json` describes the available
-interfaces from the current build; [connecting an assistant](docs/CONNECTING-AN-AGENT.md)
+interfaces from the current build; [connecting an assistant](https://github.com/CrossRead/scholion/blob/main/docs/CONNECTING-AN-AGENT.md)
 explains how to use them.
 
 **Sources travel with the result.** A measurement retains its date, units and
@@ -253,8 +253,8 @@ persuasive explanation. The source tests include `tests/test_flag_prevalence.py`
 - Clinical estimates have different outcomes, time horizons and eligibility.
   They do not substitute for a clinical assessment.
 
-See [the assistant rules](ASSISTANT-RULES.md), [the disclaimer](DISCLAIMER.md) and
-[the clinician reference](docs/FOR-CLINICIANS-DETAILS.md).
+See [the assistant rules](https://github.com/CrossRead/scholion/blob/main/ASSISTANT-RULES.md), [the disclaimer](https://github.com/CrossRead/scholion/blob/main/DISCLAIMER.md) and
+[the clinician reference](https://github.com/CrossRead/scholion/blob/main/docs/FOR-CLINICIANS-DETAILS.md).
 
 ## Bring what you have
 
@@ -269,7 +269,7 @@ You can start below the genome layer and add other sources later.
 | A FHIR bundle | `scholion import-fhir bundle.json` | Code-matched results and supported vital signs |
 | Garmin or WHOOP exports | `scholion ingest-wearable "<folder>"` | Activity, sleep and body metrics |
 | Prescriptions | `scholion add-med "name" --dose "…"` | A recorded regimen for comparison and monitoring review |
-| A VCF, BAM or consumer array | [Genome preparation](share/PREPARING-THE-GENOME.md) | The analyses supported by that input and its preparation |
+| A VCF, BAM or consumer array | [Genome preparation](https://github.com/CrossRead/scholion/blob/main/docs/PREPARING-THE-GENOME.md) | The analyses supported by that input and its preparation |
 | A Lumiflex application PDF | `scholion ingest-studies "<folder>" --dry-run` | Preview and explicit import of a sensor report |
 
 ## Five ways to install
@@ -292,7 +292,7 @@ SCHOLION_PROFILE_DIR=demo/profile ./bin/crossread overview
 
 The folder's PDF workflows also need `pdfplumber`. The pip installation below
 resolves this dependency automatically. On Windows, use the installed command or
-follow the source setup in [development documentation](docs/DEVELOPMENT.md).
+follow the source setup in [development documentation](https://github.com/CrossRead/scholion/blob/main/docs/DEVELOPMENT.md).
 
 ### 2. A pip package
 
@@ -345,8 +345,8 @@ commands.
 The Hub skill provides a profile connection flow and the embedded **Scholion** web
 interface on the Widgets page. The visual panel and assistant tools use the same
 selected profile. The host's own model setup is separate from the local engine.
-See [the connection guide](docs/CONNECTING-AN-AGENT.md#the-embedded-ouroboros-interface)
-and the [Hub skill](ouroboros_plugin/hub/scholion/SKILL.md).
+See [the connection guide](https://github.com/CrossRead/scholion/blob/main/docs/CONNECTING-AN-AGENT.md#the-embedded-ouroboros-interface)
+and the [plugin setup guide](https://github.com/CrossRead/scholion/blob/main/ouroboros_plugin/README.md).
 
 For a classic checkout, `scholion/ouroboros_tools.py` registers 40 `sch_*` tools. Install
 the engine in the interpreter used by Ouroboros, then place this import shim in
@@ -381,7 +381,7 @@ For an MCP client, use its local server configuration:
 Use an absolute executable path if the host cannot find the installed command.
 MCP uses standard input/output and does not need a Scholion API key or an open
 network port. The host's own account or model subscription is separate.
-[Connection instructions](docs/CONNECTING-AN-AGENT.md) and
+[Connection instructions](https://github.com/CrossRead/scholion/blob/main/docs/CONNECTING-AN-AGENT.md) and
 `scholion capabilities --json` describe the interfaces of the installed build.
 
 ## Updating and existing data
@@ -406,7 +406,7 @@ required BAM and reference. Re-import affected compound PDFs or FHIR bundles
 through preview if you need the repaired parsing. Old stored values are retained;
 a previously misclassified series is not silently removed from history. Re-import
 wearable sleep only where the older record lacks intervals needed for a comparison.
-The [release journal](CHANGELOG.md) gives the conditions for each update.
+The [release journal](https://github.com/CrossRead/scholion/blob/main/CHANGELOG.md) gives the conditions for each update.
 
 When using an unpacked folder, keep the data directory outside the replaceable
 application folder or preserve `profile/`, `genome/`, `raw/`, `work/` and `archive/`
@@ -430,7 +430,7 @@ It must not rely on helpers found only in a developer's private checkout.
 
 Building a genome from FASTQ, broad preparation pipelines and release tooling
 belong to the source toolkit in `src/ingest/` and `src/tools/`. See
-[preparing the genome](share/PREPARING-THE-GENOME.md) for the operation you need.
+[preparing the genome](https://github.com/CrossRead/scholion/blob/main/docs/PREPARING-THE-GENOME.md) for the operation you need.
 A VCF alone does not supply alignment depth or reference-homozygous scoring calls
 that it does not contain.
 
@@ -454,7 +454,7 @@ elsewhere through the source configuration.
 One container holds one person. Clinicians can keep several containers with
 explicit selection; Personal and Visit modes are not patient switches. Agent
 answers carry the selected technical container ID. Export and erasure are human
-operations. See [container lifecycle](docs/CONTAINER-LIFECYCLE.md).
+operations. See [container lifecycle](https://github.com/CrossRead/scholion/blob/main/docs/CONTAINER-LIFECYCLE.md).
 
 Analysis runs locally without a language model. The web server binds to loopback.
 Reference lookups and downloads have narrower, explicit network behaviour:
@@ -480,7 +480,7 @@ an assistant host:** if the host uses a remote model, tool answers containing
 medical values, genotypes, dates and a technical container ID may reach that
 provider. Review the host's privacy policy before connecting real data.
 
-[PRIVACY.md](PRIVACY.md) describes containers, journals, export, erasure and copies
+[PRIVACY.md](https://github.com/CrossRead/scholion/blob/main/PRIVACY.md) describes containers, journals, export, erasure and copies
 outside the application. Personal data is excluded from the public source and
 package by path checks, content checks and the sanitizer.
 
@@ -503,25 +503,25 @@ release gates test synthetic fixtures with networking disabled, validate the
 knowledge and documentation, and audit the sanitized package. Real input-format
 checks use a separate consented corpus; personal files and findings do not ship.
 
-[Development guide](docs/DEVELOPMENT.md)
-· [Versioning](docs/VERSIONING.md)
-· [Contributing](CONTRIBUTING.md)
-· [Security reporting](SECURITY.md)
-· [Threat model](THREAT_MODEL.md)
+[Development guide](https://github.com/CrossRead/scholion/blob/main/docs/DEVELOPMENT.md)
+· [Versioning](https://github.com/CrossRead/scholion/blob/main/docs/VERSIONING.md)
+· [Contributing](https://github.com/CrossRead/scholion/blob/main/CONTRIBUTING.md)
+· [Security reporting](https://github.com/CrossRead/scholion/blob/main/SECURITY.md)
+· [Threat model](https://github.com/CrossRead/scholion/blob/main/THREAT_MODEL.md)
 
 Thanks to the **Personal Genome Project** participants for open-consent format
 validation, **Synthea** for synthetic FHIR input and **Genomi** for the vendored
 input detector. Sources, licences and required citations are recorded in
-[ATTRIBUTION.md](ATTRIBUTION.md).
+[ATTRIBUTION.md](https://github.com/CrossRead/scholion/blob/main/ATTRIBUTION.md).
 
 ## Licences
 
-- Code: [Apache-2.0](LICENSE).
-- Curated knowledge: [CC BY 4.0](LICENSE-DATA), with source-specific notices in
-  [NOTICE](NOTICE) and provenance in [ATTRIBUTION.md](ATTRIBUTION.md).
+- Code: [Apache-2.0](https://github.com/CrossRead/scholion/blob/main/LICENSE).
+- Curated knowledge: [CC BY 4.0](https://github.com/CrossRead/scholion/blob/main/LICENSE-DATA), with source-specific notices in
+  [NOTICE](https://github.com/CrossRead/scholion/blob/main/NOTICE) and provenance in [ATTRIBUTION.md](https://github.com/CrossRead/scholion/blob/main/ATTRIBUTION.md).
 - PGS weights and other materials with incompatible redistribution terms are
   not bundled. Runtime availability does not change their source licences.
-- Purpose and limitations: [DISCLAIMER.md](DISCLAIMER.md).
+- Purpose and limitations: [DISCLAIMER.md](https://github.com/CrossRead/scholion/blob/main/DISCLAIMER.md).
 
 ## Contact
 

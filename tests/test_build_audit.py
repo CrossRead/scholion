@@ -958,7 +958,12 @@ class TestPublicDocumentationLinks(unittest.TestCase):
             delivery = Path(folder).resolve()
             ms._build_docs(support.ROOT, delivery)
             text = (support.ROOT / 'README.md').read_text(encoding='utf-8')
-            links = re.findall(r'\]\((docs/[^)#]+)(?:#[^)]*)?\)', text)
+            urls = re.findall(r'\]\(([^)\s]+)\)', text)
+            self.assertTrue(all(url.startswith(('https:', 'http:', '#', 'mailto:'))
+                                for url in urls), 'PyPI must not receive broken relative links')
+            prefix = 'https://github.com/CrossRead/scholion/blob/main/'
+            links = [url[len(prefix):].split('#', 1)[0] for url in urls
+                     if url.startswith(prefix + 'docs/')]
             self.assertTrue(links)
             for link in links:
                 with self.subTest(link=link):

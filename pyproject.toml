@@ -138,6 +138,7 @@ packages = ["src/scholion"]
 # Without tests/ and run_tests.sh such a run is impossible in principle.
 [tool.hatch.build.targets.sdist]
 include = [
+    "/docs",
     "/src/scholion",
     "/src/tools",
     # The data-preparation scripts: the genome build guide points at them, and

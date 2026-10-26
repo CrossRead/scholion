@@ -25,7 +25,8 @@
   "grch37_unresolved_note": "A locus here answers in GRCh38 only, and says so: `pos_grch37` is null and the reason is above. `fill_grch37.py` cannot close it — the sources disagree, and the next attempt needs a third one, not another run. Recorded 13.09.2026 with the radar-segment panels.",
   "grch37_same_as_grch38": {
    "rs1800955": "DRD4 promoter, 11p15.5 at 636 kb from the telomere: NCBI and Ensembl both give 636784 in GRCh37 AND in GRCh38 — the assemblies coincide there, and the equal number is a coordinate, not a copy"
-  }
+  },
+  "literal_readings_updated": "2026-10-23"
  },
  "regions": {
   "CYP2D6": {
@@ -3713,6 +3714,3799 @@
     "en": "FOXO3 intronic longevity-associated position",
     "ru": "Внутригенная позиция FOXO3, изучавшаяся в связи с долголетием"
    }
+  },
+  "rs2236225": {
+   "gene": "MTHFD1",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "MTHFD1"
+   ],
+   "chrom": "14",
+   "pos": 64442127,
+   "pos_grch37": 64908845,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236225",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "d5787b57c1d4703aaf731c19828d05db9f85f1e1824c6149c17606fa0de9cbd5",
+    "builds": {
+     "GRCh38": {
+      "chrom": "14",
+      "position": 64442127,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000014.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236225",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr14;start=64442126;end=64442127",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "14",
+      "position": 64908845,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000014.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236225",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr14;start=64908844;end=64908845",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236225"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs45575636": {
+   "gene": "ABCB4",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ABCB4"
+   ],
+   "chrom": "7",
+   "pos": 87431528,
+   "pos_grch37": 87060844,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/45575636",
+   "reading_alternatives": [
+    "A",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "bae906549b32113c1ed399b24b59d78271b7ebd6349d8236b6e6f95e81a72d7e",
+    "builds": {
+     "GRCh38": {
+      "chrom": "7",
+      "position": 87431528,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000007.14",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/45575636",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=87431527;end=87431528",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "7",
+      "position": 87060844,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000007.13",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/45575636",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=87060843;end=87060844",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/45575636"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "A",
+    "G",
+    "T"
+   ]
+  },
+  "rs3178250": {
+   "gene": "BMP2",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "BMP2"
+   ],
+   "chrom": "20",
+   "pos": 6779554,
+   "pos_grch37": 6760201,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3178250",
+   "reading_alternatives": [
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "6dfceb3faec8cf7d6690c1f3ae30baab0c4eca4efb70c6719b3a02b5223dc797",
+    "builds": {
+     "GRCh38": {
+      "chrom": "20",
+      "position": 6779554,
+      "reference": "T",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000020.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3178250",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr20;start=6779553;end=6779554",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "20",
+      "position": 6760201,
+      "reference": "T",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000020.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3178250",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr20;start=6760200;end=6760201",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3178250"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "C",
+    "G"
+   ]
+  },
+  "rs523349": {
+   "gene": "SRD5A2",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "SRD5A2"
+   ],
+   "chrom": "2",
+   "pos": 31580636,
+   "pos_grch37": 31805706,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/523349",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "a99d467ad196fc61d4f78118540fb4c5ca122f7125bdc378e9418fed5e0c1667",
+    "builds": {
+     "GRCh38": {
+      "chrom": "2",
+      "position": 31580636,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000002.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/523349",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr2;start=31580635;end=31580636",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "2",
+      "position": 31805706,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000002.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/523349",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr2;start=31805705;end=31805706",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/523349"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs11200638": {
+   "gene": "HTRA1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "HTRA1",
+    "LOC105378525"
+   ],
+   "chrom": "10",
+   "pos": 122461028,
+   "pos_grch37": 124220544,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11200638",
+   "reading_alternatives": [
+    "A",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "f7e18314739af0b8e0453006235db66afd41d3158b0c3a806862a2343f5a2f8c",
+    "builds": {
+     "GRCh38": {
+      "chrom": "10",
+      "position": 122461028,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000010.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11200638",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr10;start=122461027;end=122461028",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "10",
+      "position": 124220544,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000010.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11200638",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr10;start=124220543;end=124220544",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11200638"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "T"
+   ]
+  },
+  "rs174547": {
+   "gene": "FADS1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "FADS1"
+   ],
+   "chrom": "11",
+   "pos": 61803311,
+   "pos_grch37": 61570783,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/174547",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "7c3e8d5eaa11a805db5f91a850880e3c189cf314c82eb43d98d545c03a508db4",
+    "builds": {
+     "GRCh38": {
+      "chrom": "11",
+      "position": 61803311,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000011.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/174547",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr11;start=61803310;end=61803311",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "11",
+      "position": 61570783,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000011.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/174547",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr11;start=61570782;end=61570783",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/174547"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs12101255": {
+   "gene": "TSHR",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "TSHR"
+   ],
+   "chrom": "14",
+   "pos": 80984708,
+   "pos_grch37": 81451052,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12101255",
+   "reading_alternatives": [
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "6281f334db5e79adf1c79494f989d02d51db0a840c7fbf864504fafe8487eb12",
+    "builds": {
+     "GRCh38": {
+      "chrom": "14",
+      "position": 80984708,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000014.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12101255",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr14;start=80984707;end=80984708",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "14",
+      "position": 81451052,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000014.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12101255",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr14;start=81451051;end=81451052",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12101255"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "T"
+  },
+  "rs2287622": {
+   "gene": "ABCB11",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ABCB11"
+   ],
+   "chrom": "2",
+   "pos": 168973818,
+   "pos_grch37": 169830328,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2287622",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "ad2a1d002b2343881c015054647050fe73b6753039030cc114db5729d8dfd89c",
+    "builds": {
+     "GRCh38": {
+      "chrom": "2",
+      "position": 168973818,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000002.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2287622",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr2;start=168973817;end=168973818",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "2",
+      "position": 169830328,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000002.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2287622",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr2;start=169830327;end=169830328",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2287622"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs1801197": {
+   "gene": "CALCR",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CALCR"
+   ],
+   "chrom": "7",
+   "pos": 93426441,
+   "pos_grch37": 93055753,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "2e33d1dfcd1e159c563c5c398ef06151d1521dfd4f810f0e19b3a01ebb44e82a",
+    "builds": {
+     "GRCh38": {
+      "chrom": "7",
+      "position": 93426441,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000007.14",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=93426440;end=93426441",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "7",
+      "position": 93055753,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000007.13",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=93055752;end=93055753",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs373740199": {
+   "gene": "RTEL1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "RTEL1",
+    "RTEL1-TNFRSF6B"
+   ],
+   "chrom": "20",
+   "pos": 63693247,
+   "pos_grch37": 62324600,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/373740199",
+   "reading_alternatives": [
+    "A",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "561cd661381e748f715caef4e73240f4c6378d5a7051217a6a6c8327cc6d0208",
+    "builds": {
+     "GRCh38": {
+      "chrom": "20",
+      "position": 63693247,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000020.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/373740199",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr20;start=63693246;end=63693247",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "20",
+      "position": 62324600,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000020.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/373740199",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr20;start=62324599;end=62324600",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/373740199"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "A",
+    "G",
+    "T"
+   ]
+  },
+  "rs1202283": {
+   "gene": "ABCB4",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ABCB4"
+   ],
+   "chrom": "7",
+   "pos": 87452976,
+   "pos_grch37": 87082292,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1202283",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "35f29bfebf2867c72606d7e174f223b47285af656c16716dae6dfa7d27d452c6",
+    "builds": {
+     "GRCh38": {
+      "chrom": "7",
+      "position": 87452976,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000007.14",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1202283",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=87452975;end=87452976",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "7",
+      "position": 87082292,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000007.13",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1202283",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=87082291;end=87082292",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1202283"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs2305795": {
+   "gene": "P2RY11",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "EIF3G",
+    "P2RY11",
+    "PPAN-P2RY11"
+   ],
+   "chrom": "19",
+   "pos": 10115376,
+   "pos_grch37": 10226052,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2305795",
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "6ee1a68d6348c7028bde9bdbe7ef0a54df6c3cf555fc246649f572556b0fb0e4",
+    "builds": {
+     "GRCh38": {
+      "chrom": "19",
+      "position": 10115376,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000019.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2305795",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr19;start=10115375;end=10115376",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "19",
+      "position": 10226052,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000019.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2305795",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr19;start=10226051;end=10226052",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2305795"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C"
+   ]
+  },
+  "rs234706": {
+   "gene": "CBS",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "CBS"
+   ],
+   "chrom": "21",
+   "pos": 43065240,
+   "pos_grch37": 44485350,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/234706",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "cfd70060ade583d31dab9abec128d9bb24497c3c30656aa20a8dd52971f0272e",
+    "builds": {
+     "GRCh38": {
+      "chrom": "21",
+      "position": 43065240,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000021.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/234706",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr21;start=43065239;end=43065240",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "21",
+      "position": 44485350,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000021.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/234706",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr21;start=44485349;end=44485350",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/234706"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs138726443": {
+   "gene": "FLG",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "FLG"
+   ],
+   "chrom": "1",
+   "pos": 152307547,
+   "pos_grch37": 152280023,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/138726443",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "db4a4408de43ebb36adbb38e65c2e575fd8907ec0fe23a65f222e219a41f4dbc",
+    "builds": {
+     "GRCh38": {
+      "chrom": "1",
+      "position": 152307547,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000001.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/138726443",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr1;start=152307546;end=152307547",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "1",
+      "position": 152280023,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000001.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/138726443",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr1;start=152280022;end=152280023",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/138726443"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs1801198": {
+   "gene": "TCN2",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "TCN2"
+   ],
+   "chrom": "22",
+   "pos": 30615623,
+   "pos_grch37": 31011610,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801198",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "3739014b1dba0e6411d8c35fee13ec12cd78826f49df2b891aa1f527e578ec58",
+    "builds": {
+     "GRCh38": {
+      "chrom": "22",
+      "position": 30615623,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000022.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801198",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr22;start=30615622;end=30615623",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "22",
+      "position": 31011610,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000022.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801198",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr22;start=31011609;end=31011610",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801198"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs3816873": {
+   "gene": "MTTP",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "MTTP"
+   ],
+   "chrom": "4",
+   "pos": 99583507,
+   "pos_grch37": 100504664,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3816873",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "1925536d73ec3ade2a70acb8000a903e7823d3470b57bc884ef05585c879aa48",
+    "builds": {
+     "GRCh38": {
+      "chrom": "4",
+      "position": 99583507,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000004.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3816873",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr4;start=99583506;end=99583507",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "4",
+      "position": 100504664,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000004.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3816873",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr4;start=100504663;end=100504664",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3816873"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs965513": {
+   "gene": "PTCSC2",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "PTCSC2"
+   ],
+   "chrom": "9",
+   "pos": 97793827,
+   "pos_grch37": 100556109,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/965513",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "6e90ecec40b879869075516d03f346287e6cbbd149aea75d94ac37c3da55dedc",
+    "builds": {
+     "GRCh38": {
+      "chrom": "9",
+      "position": 97793827,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/965513",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr9;start=97793826;end=97793827",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "9",
+      "position": 100556109,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/965513",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr9;start=100556108;end=100556109",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/965513"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs6977820": {
+   "gene": "DPP6",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "DPP6"
+   ],
+   "chrom": "7",
+   "pos": 154374935,
+   "pos_grch37": 154072020,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6977820",
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "b323f1381ecaa536bc663ff14c1425bf75f3b41141469095d697551c40d9be2f",
+    "builds": {
+     "GRCh38": {
+      "chrom": "7",
+      "position": 154374935,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000007.14",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6977820",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=154374934;end=154374935",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "7",
+      "position": 154072020,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000007.13",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6977820",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=154072019;end=154072020",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6977820"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "A",
+    "C"
+   ]
+  },
+  "rs886041402": {
+   "gene": "CARD14",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CARD14"
+   ],
+   "chrom": "17",
+   "pos": 80182791,
+   "pos_grch37": 78156590,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/886041402",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "70ae702d8218f20a51f91114453122c992a1ada15fff0c426b29104b223f2947",
+    "builds": {
+     "GRCh38": {
+      "chrom": "17",
+      "position": 80182791,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000017.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/886041402",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr17;start=80182790;end=80182791",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "17",
+      "position": 78156590,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000017.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/886041402",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr17;start=78156589;end=78156590",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/886041402"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs2228570": {
+   "gene": "VDR",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "VDR"
+   ],
+   "chrom": "12",
+   "pos": 47879112,
+   "pos_grch37": 48272895,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2228570",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "0669cfa424fb018adffa0bcc9b61fa6036a4905c33eca71012ebc2a22c75e112",
+    "builds": {
+     "GRCh38": {
+      "chrom": "12",
+      "position": 47879112,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000012.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2228570",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr12;start=47879111;end=47879112",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "12",
+      "position": 48272895,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000012.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2228570",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr12;start=48272894;end=48272895",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2228570"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs7975232": {
+   "gene": "VDR",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "VDR"
+   ],
+   "chrom": "12",
+   "pos": 47845054,
+   "pos_grch37": 48238837,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7975232",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "247b2fd843a45cc6da234a812e41f928deb115a5f7ad06eb85b45247b4c1bb18",
+    "builds": {
+     "GRCh38": {
+      "chrom": "12",
+      "position": 47845054,
+      "reference": "C",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000012.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7975232",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr12;start=47845053;end=47845054",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "12",
+      "position": 48238837,
+      "reference": "C",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000012.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7975232",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr12;start=48238836;end=48238837",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7975232"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs2764264": {
+   "gene": "FOXO3",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FOXO3"
+   ],
+   "chrom": "6",
+   "pos": 108613258,
+   "pos_grch37": 108934461,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2764264",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "a7d8c4b8639136bf3120e93ca262a22fdb9f5b557bf21c36a85a4d719ff74ee5",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 108613258,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2764264",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=108613257;end=108613258",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 108934461,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2764264",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=108934460;end=108934461",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2764264"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs58238559": {
+   "gene": "ABCB4",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ABCB4"
+   ],
+   "chrom": "7",
+   "pos": 87452957,
+   "pos_grch37": 87082273,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/58238559",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "646abf72949be5d56619e8b8bc14e27650447c4eb25c9e48a4119b0f5d46fe9e",
+    "builds": {
+     "GRCh38": {
+      "chrom": "7",
+      "position": 87452957,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000007.14",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/58238559",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=87452956;end=87452957",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "7",
+      "position": 87082273,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000007.13",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/58238559",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=87082272;end=87082273",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/58238559"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs1051266": {
+   "gene": "SLC19A1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "SLC19A1"
+   ],
+   "chrom": "21",
+   "pos": 45537880,
+   "pos_grch37": 46957794,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1051266",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "bdf1862ea8a518965505b87d243298354ea4810e36d513a16fdb67c6725dc7ba",
+    "builds": {
+     "GRCh38": {
+      "chrom": "21",
+      "position": 45537880,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000021.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1051266",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr21;start=45537879;end=45537880",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "21",
+      "position": 46957794,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000021.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1051266",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr21;start=46957793;end=46957794",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1051266"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "A",
+    "C",
+    "G"
+   ]
+  },
+  "rs4646536": {
+   "gene": "CYP27B1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CYP27B1"
+   ],
+   "chrom": "12",
+   "pos": 57764205,
+   "pos_grch37": 58157988,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4646536",
+   "reading_alternatives": [
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "b297eb09df4e8883bae6aa07d22deeb2718f02a529cc2cde55abb638c815a2f6",
+    "builds": {
+     "GRCh38": {
+      "chrom": "12",
+      "position": 57764205,
+      "reference": "A",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000012.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4646536",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr12;start=57764204;end=57764205",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "12",
+      "position": 58157988,
+      "reference": "A",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000012.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4646536",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr12;start=58157987;end=58157988",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4646536"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "G"
+  },
+  "rs11172113": {
+   "gene": "LRP1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "LRP1"
+   ],
+   "chrom": "12",
+   "pos": 57133500,
+   "pos_grch37": 57527283,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11172113",
+   "reading_alternatives": [
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "8b795dc5eda19291f63f264b70d324a8ccde2e871fb308a31c9eb81b6e2afc01",
+    "builds": {
+     "GRCh38": {
+      "chrom": "12",
+      "position": 57133500,
+      "reference": "T",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000012.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11172113",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr12;start=57133499;end=57133500",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "12",
+      "position": 57527283,
+      "reference": "T",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000012.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11172113",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr12;start=57527282;end=57527283",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11172113"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "C",
+    "G"
+   ]
+  },
+  "rs1111875": {
+   "gene": "HHEX",
+   "gene_assignment": "submitted_region_label_not_effect_mediation",
+   "annotation_genes": [],
+   "chrom": "10",
+   "pos": 92703125,
+   "pos_grch37": 94462882,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1111875",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "0d4ff465bd82b38daca87ec4302645666c7cd4ba0ca8bac08772c75363bddaf7",
+    "builds": {
+     "GRCh38": {
+      "chrom": "10",
+      "position": 92703125,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000010.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1111875",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr10;start=92703124;end=92703125",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "10",
+      "position": 94462882,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000010.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1111875",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr10;start=94462881;end=94462882",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1111875"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs11012732": {
+   "gene": "MLLT10",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "MLLT10"
+   ],
+   "chrom": "10",
+   "pos": 21541175,
+   "pos_grch37": 21830104,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11012732",
+   "reading_alternatives": [
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "04a7b1b46b1e9f3321660918d7e510892209255bbc34234556473487261ce992",
+    "builds": {
+     "GRCh38": {
+      "chrom": "10",
+      "position": 21541175,
+      "reference": "A",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000010.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11012732",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr10;start=21541174;end=21541175",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "10",
+      "position": 21830104,
+      "reference": "A",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000010.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11012732",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr10;start=21830103;end=21830104",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11012732"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "G"
+  },
+  "rs387906896": {
+   "gene": "NCSTN",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "NCSTN"
+   ],
+   "chrom": "1",
+   "pos": 160349583,
+   "pos_grch37": 160319373,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/387906896",
+   "reading_alternatives": [
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "a82a629c91b344cfb199ec1174771ebe668f7c68ea0425a692d10d4bf749557f",
+    "builds": {
+     "GRCh38": {
+      "chrom": "1",
+      "position": 160349583,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000001.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/387906896",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr1;start=160349582;end=160349583",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "1",
+      "position": 160319373,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000001.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/387906896",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr1;start=160319372;end=160319373",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/387906896"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "T"
+  },
+  "rs4588": {
+   "gene": "GC",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "GC"
+   ],
+   "chrom": "4",
+   "pos": 71752606,
+   "pos_grch37": 72618323,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4588",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "075c70b44cee8f5e1f16d26e1c5c9cbfc4a751531e3a315e24a41625cb79ba46",
+    "builds": {
+     "GRCh38": {
+      "chrom": "4",
+      "position": 71752606,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000004.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4588",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr4;start=71752605;end=71752606",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "4",
+      "position": 72618323,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000004.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4588",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr4;start=72618322;end=72618323",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4588"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs63750900": {
+   "gene": "PSEN1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "PSEN1"
+   ],
+   "chrom": "14",
+   "pos": 73198067,
+   "pos_grch37": 73664775,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750900",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "25d61089e563c2a9a54f29984ec26318bb631ec5049af6eab99544c7feaacf8c",
+    "builds": {
+     "GRCh38": {
+      "chrom": "14",
+      "position": 73198067,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000014.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750900",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr14;start=73198066;end=73198067",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "14",
+      "position": 73664775,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000014.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750900",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr14;start=73664774;end=73664775",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750900"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs2060793": {
+   "gene": "CYP2R1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CYP2R1",
+    "LOC124902638"
+   ],
+   "chrom": "11",
+   "pos": 14893764,
+   "pos_grch37": 14915310,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2060793",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "a14e630085a9d6ad0b5a00677401eb3dbc788000ff476415da9535bb2d3a3203",
+    "builds": {
+     "GRCh38": {
+      "chrom": "11",
+      "position": 14893764,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000011.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2060793",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr11;start=14893763;end=14893764",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "11",
+      "position": 14915310,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000011.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2060793",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr11;start=14915309;end=14915310",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2060793"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs7120118": {
+   "gene": "NR1H3",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "NR1H3"
+   ],
+   "chrom": "11",
+   "pos": 47264739,
+   "pos_grch37": 47286290,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7120118",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "c9238211a161cff005b1c67b8e1d3c27161619697a26c17e1ebe6531042f7706",
+    "builds": {
+     "GRCh38": {
+      "chrom": "11",
+      "position": 47264739,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000011.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7120118",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr11;start=47264738;end=47264739",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "11",
+      "position": 47286290,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000011.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7120118",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr11;start=47286289;end=47286290",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7120118"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "A",
+    "C",
+    "G"
+   ]
+  },
+  "rs2275376": {
+   "gene": "ALPL",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ALPL"
+   ],
+   "chrom": "1",
+   "pos": 21570425,
+   "pos_grch37": 21896918,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2275376",
+   "reading_alternatives": [
+    "A",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "410d7d221eae4128de5e3ae98860736eb0f6a0fab3ea9f8156a37c129a29f1b7",
+    "builds": {
+     "GRCh38": {
+      "chrom": "1",
+      "position": 21570425,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000001.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2275376",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr1;start=21570424;end=21570425",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "1",
+      "position": 21896918,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000001.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2275376",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr1;start=21896917;end=21896918",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2275376"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "T"
+   ]
+  },
+  "rs17085007": {
+   "gene": "—",
+   "gene_assignment": "no_gene_annotation",
+   "annotation_genes": [],
+   "chrom": "13",
+   "pos": 26957130,
+   "pos_grch37": 27531267,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/17085007",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "1852bdf42418fe295bfad7ce6cbdadb5fa461d3265e9aee37d7ef7b1cc96c586",
+    "builds": {
+     "GRCh38": {
+      "chrom": "13",
+      "position": 26957130,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000013.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/17085007",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr13;start=26957129;end=26957130",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "13",
+      "position": 27531267,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000013.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/17085007",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr13;start=27531266;end=27531267",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/17085007"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs8052123": {
+   "gene": "CCDC102A",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ADGRG5",
+    "CCDC102A"
+   ],
+   "chrom": "16",
+   "pos": 57529759,
+   "pos_grch37": 57563671,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/8052123",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "2f02867c46bceee5261b9fe81481906855972d860cffdcde2730b5a609201c08",
+    "builds": {
+     "GRCh38": {
+      "chrom": "16",
+      "position": 57529759,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000016.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/8052123",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr16;start=57529758;end=57529759",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "16",
+      "position": 57563671,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000016.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/8052123",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr16;start=57563670;end=57563671",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/8052123"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs2075650": {
+   "gene": "TOMM40",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "TOMM40"
+   ],
+   "chrom": "19",
+   "pos": 44892362,
+   "pos_grch37": 45395619,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2075650",
+   "reading_alternatives": [
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "cd4d30d11b64eeccbe716b8d644ca40e169f7ecc85a9ec2309b232b3e3c0029f",
+    "builds": {
+     "GRCh38": {
+      "chrom": "19",
+      "position": 44892362,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000019.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2075650",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr19;start=44892361;end=44892362",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "19",
+      "position": 45395619,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000019.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2075650",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr19;start=45395618;end=45395619",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2075650"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G"
+   ]
+  },
+  "rs2253310": {
+   "gene": "FOXO3",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FOXO3"
+   ],
+   "chrom": "6",
+   "pos": 108567390,
+   "pos_grch37": 108888593,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2253310",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "b8f179280c1d88dd54583e46746ee22c44e6f5569a0ad463dee5105432d9df4e",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 108567390,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2253310",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=108567389;end=108567390",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 108888593,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2253310",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=108888592;end=108888593",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2253310"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs727479": {
+   "gene": "CYP19A1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CYP19A1",
+    "MIR4713",
+    "MIR4713HG"
+   ],
+   "chrom": "15",
+   "pos": 51242350,
+   "pos_grch37": 51534547,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/727479",
+   "reading_alternatives": [
+    "A",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "b83c3b7b36ee45a2661d8367a72da94873dd5cfbb06990218386dea0aca01723",
+    "builds": {
+     "GRCh38": {
+      "chrom": "15",
+      "position": 51242350,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000015.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/727479",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr15;start=51242349;end=51242350",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "15",
+      "position": 51534547,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000015.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/727479",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr15;start=51534546;end=51534547",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/727479"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "A",
+    "G",
+    "T"
+   ]
+  },
+  "rs10757278": {
+   "gene": "CDKN2B-AS1",
+   "gene_assignment": "submitted_region_label_not_effect_mediation",
+   "annotation_genes": [],
+   "chrom": "9",
+   "pos": 22124478,
+   "pos_grch37": 22124477,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10757278",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "94f3fede03e1793b90cdf2b106139a58431b2d32ca824ff14d532c83c8f1d175",
+    "builds": {
+     "GRCh38": {
+      "chrom": "9",
+      "position": 22124478,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10757278",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr9;start=22124477;end=22124478",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "9",
+      "position": 22124477,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10757278",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr9;start=22124476;end=22124477",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10757278"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs1360780": {
+   "gene": "FKBP5",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FKBP5"
+   ],
+   "chrom": "6",
+   "pos": 35639794,
+   "pos_grch37": 35607571,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1360780",
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "1eb2fbe63cee1f9f801e26c7b20c47838e7b7691a438f20af57c9242e864af51",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 35639794,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1360780",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=35639793;end=35639794",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 35607571,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1360780",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=35607570;end=35607571",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1360780"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "A",
+    "C"
+   ]
+  },
+  "rs964112": {
+   "gene": "ELP4",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "ELP4"
+   ],
+   "chrom": "11",
+   "pos": 31657400,
+   "pos_grch37": 31678948,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/964112",
+   "reading_alternatives": [
+    "A",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "24bac160ee50617b3bff545003fb5a7816a45269c316316840d0f0354224f260",
+    "builds": {
+     "GRCh38": {
+      "chrom": "11",
+      "position": 31657400,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G"
+      ],
+      "accession": "NC_000011.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/964112",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr11;start=31657399;end=31657400",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "11",
+      "position": 31678948,
+      "reference": "C",
+      "alternatives": [
+       "A",
+       "G"
+      ],
+      "accession": "NC_000011.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/964112",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr11;start=31678947;end=31678948",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/964112"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "A",
+    "G"
+   ]
+  },
+  "rs3733890": {
+   "gene": "BHMT",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "BHMT"
+   ],
+   "chrom": "5",
+   "pos": 79126136,
+   "pos_grch37": 78421959,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3733890",
+   "reading_alternatives": [
+    "A"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "5b64639f5b963ebd3c9ce539739240db63bc20d8d9cc99c86682ae19e58887dd",
+    "builds": {
+     "GRCh38": {
+      "chrom": "5",
+      "position": 79126136,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000005.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3733890",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr5;start=79126135;end=79126136",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "5",
+      "position": 78421959,
+      "reference": "G",
+      "alternatives": [
+       "A"
+      ],
+      "accession": "NC_000005.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3733890",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr5;start=78421958;end=78421959",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3733890"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "A"
+  },
+  "rs7044529": {
+   "gene": "COL5A1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "COL5A1"
+   ],
+   "chrom": "9",
+   "pos": 134676205,
+   "pos_grch37": 137568051,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7044529",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "355bbc609e64af31b90604cfe83c9c2c1e4978cc8423830fe01215922b9030ac",
+    "builds": {
+     "GRCh38": {
+      "chrom": "9",
+      "position": 134676205,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7044529",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr9;start=134676204;end=134676205",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "9",
+      "position": 137568051,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000009.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7044529",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr9;start=137568050;end=137568051",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7044529"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs769471844": {
+   "gene": "TMC6",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "TMC6"
+   ],
+   "chrom": "17",
+   "pos": 78124181,
+   "pos_grch37": 76120262,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/769471844",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "5cb4dc0d47089dc02dc0aa00273f1c2c6ce16b66d076bd951b7ef98ebe3d02ae",
+    "builds": {
+     "GRCh38": {
+      "chrom": "17",
+      "position": 78124181,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000017.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/769471844",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr17;start=78124180;end=78124181",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "17",
+      "position": 76120262,
+      "reference": "T",
+      "alternatives": [
+       "A",
+       "C",
+       "G"
+      ],
+      "accession": "NC_000017.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/769471844",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr17;start=76120261;end=76120262",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/769471844"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "T",
+    "A",
+    "C",
+    "G"
+   ]
+  },
+  "rs104893624": {
+   "gene": "CXCR4",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CXCR4"
+   ],
+   "chrom": "2",
+   "pos": 136114928,
+   "pos_grch37": 136872498,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893624",
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "3f687cdb0611b87d6d49d695bff52983c2863db40854b863807395eaeef7aa1b",
+    "builds": {
+     "GRCh38": {
+      "chrom": "2",
+      "position": 136114928,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000002.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893624",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr2;start=136114927;end=136114928",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "2",
+      "position": 136872498,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000002.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893624",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr2;start=136872497;end=136872498",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893624"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C"
+   ]
+  },
+  "rs3753841": {
+   "gene": "COL11A1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "COL11A1"
+   ],
+   "chrom": "1",
+   "pos": 102914362,
+   "pos_grch37": 103379918,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3753841",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "4aa58dbd929cb0d7b7e7793f1406987a39e8ec1b8cd2549d3139126809e17a16",
+    "builds": {
+     "GRCh38": {
+      "chrom": "1",
+      "position": 102914362,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000001.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3753841",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr1;start=102914361;end=102914362",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "1",
+      "position": 103379918,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000001.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3753841",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr1;start=103379917;end=103379918",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3753841"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs4946935": {
+   "gene": "FOXO3",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FOXO3"
+   ],
+   "chrom": "6",
+   "pos": 108679539,
+   "pos_grch37": 109000742,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4946935",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "71ee482a01e94fc7710869aef433cf3df416b5edfb5eb739944f40482bc52943",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 108679539,
+      "reference": "A",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4946935",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=108679538;end=108679539",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 109000742,
+      "reference": "A",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4946935",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=109000741;end=109000742",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4946935"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "G",
+    "T"
+   ]
+  },
+  "rs2073618": {
+   "gene": "TNFRSF11B",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "COLEC10",
+    "TNFRSF11B"
+   ],
+   "chrom": "8",
+   "pos": 118951813,
+   "pos_grch37": 119964052,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2073618",
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "cbfadfd501649c87222385892ef26d4c1fd84f485a3a09ac1309919ec5a4ecab",
+    "builds": {
+     "GRCh38": {
+      "chrom": "8",
+      "position": 118951813,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000008.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2073618",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr8;start=118951812;end=118951813",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "8",
+      "position": 119964052,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C"
+      ],
+      "accession": "NC_000008.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2073618",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr8;start=119964051;end=119964052",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2073618"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C"
+   ]
+  },
+  "rs10946398": {
+   "gene": "CDKAL1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "CDKAL1"
+   ],
+   "chrom": "6",
+   "pos": 20660803,
+   "pos_grch37": 20661034,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10946398",
+   "reading_alternatives": [
+    "C",
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "2cf98cb74256ca9f3b8b6152b3e7f25e2c62e7d14146ad90e1fef64c819b4ca8",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 20660803,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10946398",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=20660802;end=20660803",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 20661034,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10946398",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=20661033;end=20661034",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/10946398"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G"
+   ]
+  },
+  "rs2185570": {
+   "gene": "CYP2C9",
+   "gene_assignment": "submitted_region_label_not_effect_mediation",
+   "annotation_genes": [],
+   "chrom": "10",
+   "pos": 94991513,
+   "pos_grch37": 96751270,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2185570",
+   "reading_alternatives": [
+    "C"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "26f512af6577b3ebd8b9002645a1977ce61b3cfd0beed0c4f0872cf29aab6f3a",
+    "builds": {
+     "GRCh38": {
+      "chrom": "10",
+      "position": 94991513,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000010.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2185570",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr10;start=94991512;end=94991513",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "10",
+      "position": 96751270,
+      "reference": "T",
+      "alternatives": [
+       "C"
+      ],
+      "accession": "NC_000010.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2185570",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr10;start=96751269;end=96751270",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2185570"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "C"
+  },
+  "rs63750082": {
+   "gene": "PSEN1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "PSEN1"
+   ],
+   "chrom": "14",
+   "pos": 73192712,
+   "pos_grch37": 73659420,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750082",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "a24a4c63ee5b4c134b381cd476c44f59c8b6eaf481e58337eebfd14476f1afad",
+    "builds": {
+     "GRCh38": {
+      "chrom": "14",
+      "position": 73192712,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000014.9",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750082",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr14;start=73192711;end=73192712",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "14",
+      "position": 73659420,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000014.8",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750082",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr14;start=73659419;end=73659420",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/63750082"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs4570625": {
+   "gene": "TPH2",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "TPH2"
+   ],
+   "chrom": "12",
+   "pos": 71938143,
+   "pos_grch37": 72331923,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4570625",
+   "reading_alternatives": [
+    "A",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "9311cae36b6f589e334549dff6cb87c32ddcf83be1e7f73fb14bcb9d4873c40e",
+    "builds": {
+     "GRCh38": {
+      "chrom": "12",
+      "position": 71938143,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000012.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4570625",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr12;start=71938142;end=71938143",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "12",
+      "position": 72331923,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "T"
+      ],
+      "accession": "NC_000012.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4570625",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr12;start=72331922;end=72331923",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4570625"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "T"
+   ]
+  },
+  "rs13217795": {
+   "gene": "FOXO3",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FOXO3"
+   ],
+   "chrom": "6",
+   "pos": 108652895,
+   "pos_grch37": 108974098,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/13217795",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "5af334a342f4e8e53bde604e50eb9486dd911a0b660e27435973f51eda9d77b7",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 108652895,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/13217795",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=108652894;end=108652895",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 108974098,
+      "reference": "C",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/13217795",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=108974097;end=108974098",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/13217795"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs12206094": {
+   "gene": "FOXO3",
+   "gene_assignment": "public_gene_annotation_not_effect_mediation",
+   "annotation_genes": [
+    "FOXO3"
+   ],
+   "chrom": "6",
+   "pos": 108584997,
+   "pos_grch37": 108906200,
+   "ref": "C",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12206094",
+   "reading_alternatives": [
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "3bda21f66b9334d11ee529e6d9e0000ea27478407be7062c9c3a70a8b2106019",
+    "builds": {
+     "GRCh38": {
+      "chrom": "6",
+      "position": 108584997,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000006.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12206094",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=108584996;end=108584997",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "6",
+      "position": 108906200,
+      "reference": "C",
+      "alternatives": [
+       "T"
+      ],
+      "accession": "NC_000006.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12206094",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=108906199;end=108906200",
+      "sequence_reference": "C",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/12206094"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "T"
+  },
+  "rs770066110": {
+   "gene": "TERT",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "TERT"
+   ],
+   "chrom": "5",
+   "pos": 1272247,
+   "pos_grch37": 1272362,
+   "ref": "G",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/770066110",
+   "reading_alternatives": [
+    "A",
+    "C",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "c617d0cc42602411ab5c4d8bd2f109af3f8edd4be8c59ac0c284b3a542e2c5e2",
+    "builds": {
+     "GRCh38": {
+      "chrom": "5",
+      "position": 1272247,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000005.10",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/770066110",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr5;start=1272246;end=1272247",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "5",
+      "position": 1272362,
+      "reference": "G",
+      "alternatives": [
+       "A",
+       "C",
+       "T"
+      ],
+      "accession": "NC_000005.9",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/770066110",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr5;start=1272361;end=1272362",
+      "sequence_reference": "G",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/770066110"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "G",
+    "A",
+    "C",
+    "T"
+   ]
+  },
+  "rs4355801": {
+   "gene": "TNFRSF11B",
+   "gene_assignment": "submitted_region_label_not_effect_mediation",
+   "annotation_genes": [],
+   "chrom": "8",
+   "pos": 118911634,
+   "pos_grch37": 119923873,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4355801",
+   "reading_alternatives": [
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "585c70691de2455f1d4535cd1bd065850f3afe15ec3a55a3cabe1f0f7e13e121",
+    "builds": {
+     "GRCh38": {
+      "chrom": "8",
+      "position": 118911634,
+      "reference": "A",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000008.11",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4355801",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr8;start=118911633;end=118911634",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "8",
+      "position": 119923873,
+      "reference": "A",
+      "alternatives": [
+       "G",
+       "T"
+      ],
+      "accession": "NC_000008.10",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4355801",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr8;start=119923872;end=119923873",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/4355801"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "G",
+    "T"
+   ]
+  },
+  "rs7041": {
+   "gene": "GC",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "GC"
+   ],
+   "chrom": "4",
+   "pos": 71752617,
+   "pos_grch37": 72618334,
+   "ref": "A",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7041",
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "6b04b2471669f5ad96b22616389f590ffd629601608cf182f35895471a47a9ad",
+    "builds": {
+     "GRCh38": {
+      "chrom": "4",
+      "position": 71752617,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000004.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7041",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr4;start=71752616;end=71752617",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "4",
+      "position": 72618334,
+      "reference": "A",
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ],
+      "accession": "NC_000004.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7041",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr4;start=72618333;end=72618334",
+      "sequence_reference": "A",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/7041"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alleles_observed": [
+    "A",
+    "C",
+    "G",
+    "T"
+   ]
+  },
+  "rs2300478": {
+   "gene": "MEIS1",
+   "gene_assignment": "exact_source_label_and_public_gene_annotation",
+   "annotation_genes": [
+    "LOC124900511",
+    "MEIS1"
+   ],
+   "chrom": "2",
+   "pos": 66554321,
+   "pos_grch37": 66781453,
+   "ref": "T",
+   "coordinate_source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2300478",
+   "reading_alternatives": [
+    "G"
+   ],
+   "allele_identity": {
+    "scope": "literal_genotype_only",
+    "checked_on": "2026-10-23",
+    "source_record_sha256": "92f99ecd03a6f148ba81a86885603adfecd07cc51ed031656c37cf3b64e4a10b",
+    "builds": {
+     "GRCh38": {
+      "chrom": "2",
+      "position": 66554321,
+      "reference": "T",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000002.12",
+      "assembly": "GRCh38.p14",
+      "assembly_accession": "GCF_000001405.40",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2300478",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr2;start=66554320;end=66554321",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     },
+     "GRCh37": {
+      "chrom": "2",
+      "position": 66781453,
+      "reference": "T",
+      "alternatives": [
+       "G"
+      ],
+      "accession": "NC_000002.11",
+      "assembly": "GRCh37.p13",
+      "assembly_accession": "GCF_000001405.25",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2300478",
+      "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr2;start=66781452;end=66781453",
+      "sequence_reference": "T",
+      "checked_on": "2026-10-23"
+     }
+    },
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2300478"
+   },
+   "note": {
+    "en": "Verified sequence reading only. No studied effect allele, direction or individual risk is assigned by this coordinate record. Gene labels are reference navigation, not proof of effect mediation.",
+    "ru": "Только проверенное чтение последовательности. Эта запись координат не задаёт изученный аллель эффекта, его направление или индивидуальный риск. Обозначение гена служит справочной навигации и не доказывает механизм действия варианта."
+   },
+   "alt": "G"
   }
  }
 }

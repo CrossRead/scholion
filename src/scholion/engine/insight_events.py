@@ -1,45 +1,49 @@
 """Identify events from existing calculators; no ranking, persistence or rendering."""
 from __future__ import annotations
 
-import hashlib
-import json
 import re
 from datetime import date
 from typing import Any
 
 from .. import core
+from .treatment import _treatment_medications
 from ..i18n import t
+from ..knowledge_provenance import digest as _digest
 from ..trend_qualification import comparable_observations, observation_day
 from .labs import _flag_value, _trend
 from .corridor import point_corridor
 
 
-def _digest(value: Any) -> str:
-    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False,
-                                    default=str).encode()).hexdigest()
-
-
 def _fact_identity(fact: dict) -> dict:
     """Translation is presentation, not an observation or a change in evidence."""
-    return {k: fact.get(k) for k in ("record", "key", "date", "value", "censored", "comparator",
+    identity = {k: fact.get(k) for k in ("record", "key", "date", "value", "censored", "comparator",
         "source", "date_source", "method", "unit", "stats", "drug", "rsid", "genotype", "state",
         "genotype_source", "gene", "recorded_reference", "ref_low", "ref_high", "ref_origin", "reference_withheld", "marker", "from", "due", "plan_source", "dose", "target",
-        "system", "aspect", "change", "note", "during_recorded_course", "pgs_id", "percentile", "reference_panel_ancestry", "computed", "class", "end_date", "current") if k in fact}
+        "system", "aspect", "change", "note", "during_recorded_course", "pgs_id", "percentile", "reference_panel_ancestry", "computed", "class", "end_date", "current",
+        "source_record", "ingest_method", "sample_id", "draw_id", "variants", "diplotype") if k in fact}
+    observed_genotype=identity.get("genotype")
+    if isinstance(observed_genotype, dict):
+        identity["genotype"] = {k: v for k, v in observed_genotype.items()
+                                if k not in ("note", "message", "why_label", "source_label", "unit_display")}
+    return identity
 
 
 def _event(kind: str, key: str, name: str, facts: list[dict], *, priority: int = 3,
            destination: str = "labs", rule: Any = None, detail: Any = None) -> dict:
+    from ..knowledge_provenance import sources
     return {"id": kind + ":" + key, "kind": kind, "key": key,
             "title": t("insight.kind." + kind, name=name), "name": name,
             "date": max((str(p.get("date") or "") for p in facts), default=""),
             "priority": priority, "destination": destination, "facts": facts,
-            "detail": detail, "rule": {"id": kind, "version": "1", "digest": _digest(rule)},
+            "detail": detail, "rule": {"id": kind, "version": "1", "digest": _digest(rule),
+                                       "sources": sources(rule)},
             "facts_digest": _digest([_fact_identity(f) for f in facts]), "limitations": [], "level": None}
 
 
 def _fact(key: str, point: dict, row: dict) -> dict:
     return {"record": "labs.json", "key": key, **{k: point.get(k) for k in (
         "date", "value", "censored", "comparator", "source", "date_source", "method")},
+        **{k: point[k] for k in ("source_record", "ingest_method", "sample_id", "draw_id") if k in point},
         "unit": row.get("unit"), "unit_display": row.get("unit_display"),
         "ref_low": point.get("ref_low", row.get("ref_low")),
         "ref_high": point.get("ref_high", row.get("ref_high")),
@@ -224,12 +228,12 @@ def _annual_events(summary: list[dict], labs: dict, window: int = 365) -> list[d
 
 def _treatment_context(marker: str, start: str, end: str) -> list[dict]:
     """Recorded treatment chronology in the same system, without attribution."""
-    from .system_panels import medication_system_context
     domains = core._read_knowledge_raw("radar_domains.json").get("domains") or []
     systems = {d["key"] for d in domains if marker in d.get("markers", [])}
     context = []
-    for med in core.medications_json().get("medications") or []:
-        if not systems.intersection(medication_system_context(med)["systems"]):
+    for row in _treatment_medications():
+        med = row['medication']
+        if not systems.intersection(row['systems']):
             continue
         begin = str(med.get("start_date") or "")
         stop = str(med.get("end_date") or "")

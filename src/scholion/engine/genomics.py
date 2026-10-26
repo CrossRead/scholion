@@ -563,11 +563,6 @@ def clinvar_findings(limit: int = 200) -> Dict[str, Any]:
     from .. import genome
     r = genome.clinvar_hits(limit=limit)
     r["disclaimer"] = DISCLAIMER()
-    from ..panel_reference import genome_context
-    loci = core.loci().get("loci") or {}
-    for hit in r.get("hits") or []:
-        genes = str(hit.get("gene") or (loci.get(hit.get("rsid")) or {}).get("gene") or "").split("|")
-        hit["gene_contexts"] = [genome_context(gene, hit.get("rsid") or "") for gene in genes if gene]
     bound = _input_boundary()
     if bound:
         r["input_boundary"] = bound
@@ -1010,10 +1005,16 @@ def longevity_findings() -> Dict[str, Any]:
     The key parts are the APOE ε status and the well-studied markers (FOXO3 and so on).
     """
     data = core.longevity_data()
-    if not data or not data.get("known"):
-        return {"available": False, "disclaimer": DISCLAIMER(),
-                "message": _t("longevity.not_built")}
+    data = data or {}
     known = [dict(k) for k in data.get("known", []) or []]
+    reference_book = core._read_knowledge("longevity_directions.json")
+    existing = {row.get("rsid") for row in known}
+    for rsid in reference_book.get("_meta", {}).get("reviewed_positions_228") or []:
+        if rsid in existing:
+            continue
+        spec = reference_book["directions"][rsid]
+        known.append({"rsid":rsid,"gene":spec["gene"],"genotype":None,
+                      "verdict":"see_apoe" if rsid in ("rs429358","rs7412") else None})
     # Same rule as the polygenic layer, and one more thing: the page was printing
     # `note`, and these rows carry none. Everything that says what a marker MEANS
     # — what the allele is, what the dose does, what it argues for — is in the
@@ -1082,6 +1083,7 @@ def longevity_findings() -> Dict[str, Any]:
                         "interpretation": {**apoe_spec, "notice": apoe_spec["limitations"], "missing": []}}
     return {
         "available": True,
+        "message": None if data else _t("longevity.reference_only"),
         "apoe": apoe_reading if apoe_reading else None,
         "known": known,
         "significant_genes": sig_genes,

@@ -40,6 +40,7 @@ def overview(period: int = 365) -> Dict[str, Any]:
     from .lifestyle import lifestyle
     cautions = _regimen_cautions()
     controls = treatment_timeline()["overdue"]
+    from ..clinical_estimates import panel as clinical_panel
     feed = attention_feed(labs, cautions, controls, lifestyle(), tests["suggestions"], period)
     return {
         "subject_id": core.profile_meta(core.pharmacogenomics()).get("subject_id"),
@@ -65,6 +66,7 @@ def overview(period: int = 365) -> Dict[str, Any]:
         "regimen_cautions": cautions,
         "overdue_controls": controls,
         "attention": feed,
+        "clinical_estimates": clinical_panel(),
         "high_flags": [m for m in red if m["flag"] == "high"],
         "watch_flags": [m for m in red if m["flag"] == "low"],
         "suggestions_count": tests["count"],
@@ -176,7 +178,7 @@ def metrics_summary() -> Dict[str, Any]:
         shown_series = combined["series"]
         trend_series = [p for p in shown_series if shown and p["measurement_source"] == shown["measurement_source"]
                         and p["aggregation"] == shown["aggregation"]]
-        display_name = core._localized(m.get("labels") or {}, _lang()) or names.get(k) or m.get("name", k)
+        display_name = core._localized(m.get("labels") or {}, _lang()) or names.get(k) or core.marker_name({"key":k,"name":m.get("name",k)})
         row = {"key": k, "name": display_name, "unit": combined["unit"],
                "unit_display": core.unit_label(combined["unit"]),
                "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),

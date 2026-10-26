@@ -70,6 +70,44 @@ def _stamp(text: str) -> Optional[str]:
 
 def split_forms(text: str) -> Dict[str, Any]:
     """Conservative page grouping; an orphan or inconsistent page rejects a file."""
+    from .cgm_pdf import recognizes
+    if recognizes(text):
+        return {'ok':False,'reason':'cgm_report_use_studies_import'}
+    documents = reader.lab_documents(text)
+    if any(d.get("section") for d in documents):
+        section_forms = []
+        markers = core.lab_markers().get("markers", {})
+        offset = 0
+        for document in documents:
+            part = document["text"]
+            start = text.find(part, offset)
+            offset = start + len(part)
+            page_number = text[:max(start, 0)].count("\f") + 1
+            if document.get("problem"):
+                return {"ok": False, "reason": "ambiguous_form_header", "page": page_number}
+            stamp = document.get("date_hint")
+            _, values = reader.parse_report(part, markers, date_hint=stamp)
+            typed = reader.parse_observations(part)
+            if not (values or typed):
+                if document.get("date_hint"):
+                    return {"ok": False, "reason": "no_known_marker", "page": page_number}
+                continue
+            title = (document.get("section") or {}).get("title", "")
+            specimen = _specimen(part)
+            if specimen is None:
+                stated = {kind for pattern, kind in ((r"кров|blood", "blood"), (r"моч|urine", "urine"))
+                          if re.search(pattern, title, re.I)}
+                specimen = next(iter(stated)) if len(stated) == 1 else None
+            if not stamp or not specimen:
+                return {"ok": False, "reason": "ambiguous_form_boundary", "page": page_number}
+            # An explicit collection header wins over the section heading.
+            stamp = _stamp(part) or stamp
+            if len(reader._form_stamps(part)) > 1:
+                return {"ok": False, "reason": "conflicting_continuation", "page": page_number}
+            section_forms.append({"date": stamp, "specimen": specimen, "pages": list(range(page_number, page_number + part.rstrip().count("\f") + 1)),
+                          "order": None, "pagination": None, "text": part,
+                          "section": document["section"]})
+        return {"ok": bool(section_forms), "forms": section_forms, **({} if section_forms else {"reason": "no_text"})}
     pages = text.split("\f")
     while pages and not pages[-1].strip():
         pages.pop()
@@ -142,7 +180,7 @@ def preview(folder: str) -> Dict[str, Any]:
                 refused.append({"file": path.name, **split})
                 continue
             for form in split["forms"]:
-                _, values = reader.parse_report(form["text"], markers, source=str(path))
+                _, values = reader.parse_report(form["text"], markers, source=str(path), date_hint=form["date"])
                 typed = reader.parse_observations(form["text"])
                 if not (values or typed):
                     refused.append({"file": path.name, "pages": form["pages"], "reason": "no_known_marker"})
@@ -159,7 +197,8 @@ def preview(folder: str) -> Dict[str, Any]:
                                         "reason": "conflicting_observations", "marker": key})
                     seen[fingerprint] = observation
                     context = {**value, "source": {"path": str(path.resolve()), "sha256": before,
-                               "pages": form["pages"], "specimen": form["specimen"], "draw_date": form["date"]}}
+                               "pages": form["pages"], "specimen": form["specimen"], "draw_date": form["date"],
+                               **({"section": form["section"]} if form.get("section") else {})}}
                     rl, rh = value["ref_low"], value["ref_high"]
                     if spec.get("ref_locked") and not value.get("reference_table"):
                         rl, rh = spec.get("ref_low"), spec.get("ref_high")

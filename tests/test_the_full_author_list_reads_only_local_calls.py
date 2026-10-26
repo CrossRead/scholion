@@ -74,9 +74,14 @@ class TestIntakeReadings(unittest.TestCase):
             self.assertIsNone(r["genotype"])
 
     def test_a_waiting_position_can_be_read_without_becoming_a_finding(self):
+        from scholion.engine import panel_catalogue
+        book = panel_catalogue.panel_description("author_list")
+        candidate = next(p for p in book["positions"] if p["rsid"] == "rs3816873")
+        candidate.update(disposition="waiting", reason="Uncurated synthetic candidate", task=239, text={})
         loc = {"chrom": "1", "pos": 123, "ref": "A", "alt": "G"}
         with mock.patch.object(genome, "available", return_value={"ready": True}), \
                 mock.patch.object(genome, "resolve_rsid", return_value=loc), \
+                mock.patch.object(panel_catalogue, "panel_description", return_value=book), \
                 mock.patch.object(genome, "_gt_at", return_value={
                     "confidence": "called", "genotype": "AG", "depth": 20,
                     "source": "synthetic", "low_depth": False}):

@@ -94,3 +94,11 @@ def treatment_timeline(today: Optional[date] = None) -> Dict[str, Any]:
             "historical_controls": [c for c in controls if not c["current"]],
             "overdue": [c for c in controls if c["status"] == "overdue"],
             "interpretation": "recorded_events_only", "response_assessed": False}
+
+
+@core.memo_in_reading
+def _treatment_medications() -> list[dict]:
+    """Classify all recorded treatments once, including completed ones."""
+    from .system_panels import medication_system_context
+    return [{'medication': med, 'systems': medication_system_context(med)['systems']}
+            for med in core.medications_json().get('medications') or []]

@@ -7,7 +7,16 @@
       "Variant context paraphrased from the sources held by the curated panels; no individual risk coefficients or treatment instructions",
       "Primary molecular and human studies checked 2026-10-06; variant-level references record DOI/PMID and access scope. This reference update does not change clinical grades or permissions."
     ],
-    "source_tier": "curated_reference"
+    "source_tier": "curated_reference",
+    "position_label_resolutions": {
+      "rs1801197": {
+        "CALC": {
+          "canonical_symbol": "CALCR",
+          "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197",
+          "reason": "The submitted position is in CALCR. CALC is also a historical symbol for MICU1, so a global symbol alias must not override exact position identity."
+        }
+      }
+    }
   },
   "genes": {
     "ABCB4": {
@@ -2544,27 +2553,27 @@
     },
     "rs1801280": {
       "description": {
-        "en": "NAT2 *5 is a slow-acetylation allele context; acetylator phenotype requires the complete pair of haplotypes, not one position.",
-        "ru": "NAT2 *5 относится к аллелям медленного ацетилирования; фенотип ацетилятора требует полной пары гаплотипов, а не одной позиции."
+        "en": "NAT2 rs1801280 is used in reduced-function haplotype definitions. One position does not identify the complete acetylator phenotype. Isoniazid studies and the hydralazine guideline require a complete genotype context; this result does not select a dose.",
+        "ru": "NAT2 rs1801280 используется в определениях гаплотипов со сниженной функцией. Одна позиция не определяет полный фенотип ацетилирования. Для применения исследований изониазида и руководства по гидралазину нужен полный генотипический контекст; эта строка не выбирает дозу."
       },
       "gene": "NAT2",
-      "source": "no CPIC/DPWG guideline; isoniazid hepatotoxicity literature (NAT2 slow acetylators)"
+      "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071"
     },
     "rs1799930": {
       "description": {
-        "en": "NAT2 *6 is a slow-acetylation allele context; other NAT2 positions and haplotype phase are needed for the phenotype.",
-        "ru": "NAT2 *6 относится к аллелям медленного ацетилирования; для фенотипа нужны другие позиции NAT2 и фаза гаплотипов."
+        "en": "NAT2 rs1799930 is part of reduced-function haplotype definitions. Its reading contributes to haplotype analysis, not a standalone slow-acetylator diagnosis or drug dose.",
+        "ru": "NAT2 rs1799930 входит в определения гаплотипов со сниженной функцией. Чтение позиции помогает анализу гаплотипов, но отдельно не устанавливает медленное ацетилирование и дозу препарата."
       },
       "gene": "NAT2",
-      "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature"
+      "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071"
     },
     "rs1799931": {
       "description": {
-        "en": "NAT2 *7 is a slow-acetylation allele context; other NAT2 positions and haplotype phase are needed for the phenotype.",
-        "ru": "NAT2 *7 относится к аллелям медленного ацетилирования; для фенотипа нужны другие позиции NAT2 и фаза гаплотипов."
+        "en": "NAT2 rs1799931 is used in reduced-function haplotype definitions. Haplotype phase and other alleles matter; a single position does not establish the complete acetylator phenotype.",
+        "ru": "NAT2 rs1799931 используется в определениях гаплотипов со сниженной функцией. Важны фаза гаплотипов и остальные аллели; одна позиция не устанавливает полный фенотип ацетилирования."
       },
       "gene": "NAT2",
-      "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature"
+      "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071"
     },
     "rs2282679": {
       "gene": "GC",

@@ -1186,6 +1186,37 @@ def _result_specimen(text: str) -> Optional[str]:
     return values[0] if values and len(set(values)) == 1 else None
 
 
+def lab_documents(text: str) -> List[Dict[str, Any]]:
+    """Independent dated sections of a report, shared by import and audit.
+
+    A section heading supplies only its own section's date. A normal form still
+    follows the ordinary parser, and a lone non-laboratory heading is not enough
+    to reinterpret a document as a laboratory panel. Invalid headings are named,
+    never repaired with the file name or another section's date.
+    """
+    from datetime import datetime
+    from .ingest_studies import split_documents
+    parts = split_documents(text, allow_single=True)
+    dated = [p for p in parts if p.get("date")]
+    if not dated or (len(dated) == 1 and not re.search(
+            r"анализ|кров|лаборатор|панел|биохим|гормон|иммун|моч|липид|витамин|гемостаз|"
+            r"blood|chemistry|haemat|hemat|urine|laborator|panel", dated[0]["what"], re.I)):
+        return [{"text": text, "date_hint": None, "section": None}]
+    out = []
+    for index, part in enumerate(parts):
+        stamp = part.get("date") or None
+        problem = None
+        if stamp:
+            try:
+                datetime.fromisoformat(stamp)
+            except ValueError:
+                problem = "invalid_section_date"
+        section = {"index": index, "title": part["what"], "date": stamp}
+        out.append({"text": part["text"], "date_hint": stamp,
+                    "section": section, "problem": problem})
+    return out
+
+
 def parse_report(text: str, markers: Dict[str, Any], source: str = "",
                  date_hint: Optional[str] = None) -> Tuple[Optional[str], Dict[str, Any]]:
     """From the report text: the date (YYYY-MM-DD) and {key: {value, ref_low, ref_high}}.
@@ -1194,6 +1225,9 @@ def parse_report(text: str, markers: Dict[str, Any], source: str = "",
     («Антитела к циклическому / <value> / цитруллиновому пептиду (АЦЦП)»),
     the value is taken from the neighbouring row that starts with a number.
     """
+    from .cgm_pdf import recognizes
+    if recognizes(text):
+        return None, {}
     # The single-form API cannot safely stamp a merged archive with its first date.
     # Refuse rather than misdate data; ingest reports this reason explicitly.
     if _single_form_problem(text, markers):
@@ -1947,15 +1981,15 @@ def _inputs(folder: str) -> Dict[str, Any]:
     # every PDF under it.
     if not (folder or "").strip():
         return {"ok": False, "error": _t("ingest_labs.folder_not_named")}
-    ex = _ensure_extractor()
     root = Path(folder).expanduser()
     if not root.exists() or not root.is_dir():
         return {"ok": False, "error": _t("ingest_labs.folder_not_found", path=root)}
     files = sorted(f for f in root.rglob("*")
                    if f.is_file()
-                   and (f.suffix.lower() == ".pdf" or f.suffix.lower() in _TEXT_SUFFIXES))
+                   and (f.suffix.lower() in (".pdf", ".json") or f.suffix.lower() in _TEXT_SUFFIXES))
     if not files:
         return {"ok": False, "error": _t("ingest_labs.folder_empty", path=root)}
+    ex = _ensure_extractor() if any(f.suffix.lower() == ".pdf" for f in files) else None
     if not ex and all(f.suffix.lower() == ".pdf" for f in files):
         # Only PDFs here and nothing to read them with: that is a refusal, and it
         # names the command. But it is no longer a refusal for the whole folder —
@@ -2072,7 +2106,34 @@ def ingest(folder: str, force: bool = False,
         # again, since nothing about it was settled. And the command exits
         # non-zero (see `errors` below): a partial result is no longer reported
         # as a clean one, because silence is what rule 9 forbids.
+        progress_failed = False
         try:
+            if f.suffix.lower() == ".json":
+                from . import ingest_fhir
+                result = ingest_fhir.ingest(str(f))
+                if not result.get("ok"):
+                    out["not_ingested"].append({"file": f.name, "reason": "fhir_not_read",
+                                                "detail": result.get("error")})
+                    continue
+                added = result.get("added") or []
+                added_metrics = result.get("added_metrics") or []
+                out["points_added"] += len(added)
+                out["metrics_added"] = out.get("metrics_added", 0) + len(added_metrics)
+                if added or added_metrics:
+                    out["files_processed"] += 1
+                    out["per_file"].append({"file": f.name, "kind": "fhir",
+                                            "markers": added, "metrics": added_metrics,
+                                            "draw_dates": sorted({p["date"] for p in result["points"] + result["metrics"]})})
+                for row in result.get("skipped") or []:
+                    out["not_ingested"].append({"file": f.name, "reason": row["reason"],
+                                                "detail": _t("fhir.reason." + row["reason"]),
+                                                "label": row.get("label"), "loinc": row.get("detail")})
+                for row in result.get("refused") or []:
+                    out["not_ingested"].append({"file": f.name, "reason": "point_refused",
+                                                "detail": row.get("reason"), "label": row.get("label")})
+                if not result.get("refused"):
+                    manifest[rk] = mt
+                continue
             text = _read_any(f) or ""
             hint = None
             # Task 100. Which of the three date sources actually answered for THIS
@@ -2141,181 +2202,207 @@ def ingest(folder: str, force: bool = False,
                                       first=dates[0], last=dates[-1])})
                     manifest[rk] = mt
                     continue
-            dates = _form_stamps(text)
-            if len(dates) > 1:
-                out["not_ingested"].append(
-                    {"file": f.name, "reason": "several_draw_dates",
-                     "detail": _t("ingest_labs.reason_several_dates", n=len(dates),
-                                  first=dates[0], last=dates[-1])})
+            from .cgm_pdf import recognizes as _is_cgm_report
+            if _is_cgm_report(text):
+                out['not_ingested'].append({'file':f.name,'reason':'cgm_report',
+                                           'detail':_t('ingest_labs.reason_cgm_report')})
+                manifest[rk]=mt
                 continue
-            en_date, ambiguous = english_date(text)
-            if ambiguous:
-                # A date IS on the page and cannot be read. Saying «no date on this
-                # form» here would be untrue, and «no date» is the sentence that
-                # makes a person go looking for one.
-                out["not_ingested"].append(
-                    {"file": f.name, "reason": "ambiguous_date",
-                     "detail": _t("ingest_labs.reason_ambiguous_date", raw=ambiguous["raw"],
-                                  first=ambiguous["both"][0], second=ambiguous["both"][1])})
-                manifest[rk] = mt
-                continue
-            if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
-                # Before the file name: a date the form gives for something NEAR the
-                # draw. Four lipid panels in the reference corpus print «Ordered
-                # Date» and nothing else — refusing them buys nothing, since the
-                # order and the draw are a day or two apart, but filing the number
-                # without saying which date it is would be a claim the form does not
-                # make. So it is used, and named.
-                near_date, near_amb, near_kind = english_date_near(text)
-                if near_amb:
-                    out["not_ingested"].append(
-                        {"file": f.name, "reason": "ambiguous_date",
-                         "detail": _t("ingest_labs.reason_ambiguous_date", raw=near_amb["raw"],
-                                      first=near_amb["both"][0], second=near_amb["both"][1])})
-                    manifest[rk] = mt
+            initial_hint = hint
+            processed_before = out["files_processed"]
+            refused_before = len(out["not_ingested"])
+            for document in lab_documents(text):
+                if progress is not None:
+                    progress_failed = True
+                    progress(n_file, len(files), f.name)
+                    progress_failed = False
+                section_context = {"section": document["section"]} if document.get("section") else {}
+                text = document["text"]
+                date_src = "form"
+                hint = document.get("date_hint") or (initial_hint if not document.get("section") else None)
+                if document.get("problem"):
+                    out["not_ingested"].append({"file": f.name, **section_context, "reason": document["problem"],
+                                                "section": document["section"],
+                                                "detail": _t("ingest_labs.reason_invalid_section_date", date=document["date_hint"])})
                     continue
-                if near_date:
-                    hint = near_date
-                    date_src = "ordered"
-                    out.setdefault("date_not_the_draw", []).append(
-                        {"file": f.name, "date": near_date, "kind": near_kind,
-                         "note": _t("ingest_labs.date_not_the_draw", date=near_date)})
-            if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
-                # Before giving up: the FILE NAME. It is a weaker witness than the
-                # page — people rename files to the day they downloaded them — so it
-                # is used only here, at the end, and the report says the date did not
-                # come off the form.
-                hint = date_from_filename(f.name)
-                if hint:
-                    date_src = "filename"
-                    out.setdefault("date_from_filename", []).append(
-                        {"file": f.name, "date": hint,
-                         "note": _t("ingest_labs.date_from_filename", date=hint)})
-            if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
-                out["not_ingested"].append(
-                    {"file": f.name,
-                     "reason": "no_draw_date" if text.strip() else "no_text",
-                     "detail": _t("ingest_labs.reason_no_date") if text.strip()
-                               else _t("ingest_labs.reason_no_text")})
-                manifest[rk] = mt
-                continue
-            date, found = parse_report(text, markers, source=str(f), date_hint=hint)
-            observations = parse_observations(text)
-            problem = _single_form_problem(text, markers)
-            if problem:
-                out["not_ingested"].append({"file": f.name, "reason": problem,
-                                             "detail": _t("ingest_labs.reason_" + problem)})
-                continue
-            observed_labels = {r["label"].casefold() for r in observations}
-            unknown = [r for r in _unrecognised_labels(text, limit=1000)
-                       if r["label"].casefold() not in observed_labels]
-            if unknown:
-                out["unrecognised_rows"].append({"file": f.name, "count": len(unknown), "rows": unknown})
-            ftl = text.lower()
-            if not date or not (found or observations):
-                # Name the lines that were not recognised, not just the file. This is
-                # what a dictionary proposal (task 80) will be built from: the labels
-                # and units of the rows nobody could place, and nothing else — never
-                # the patient's numbers.
-                out["not_ingested"].append(
-                    {"file": f.name,
-                     "reason": "no_date" if not date else "no_known_marker",
-                     "detail": _t("ingest_labs.reason_no_date") if not date
-                               else _t("ingest_labs.reason_no_marker"),
-                     "unrecognised": [] if not date else _unrecognised_labels(text)})
-                manifest[rk] = mt
-                continue
-            added = []
-            observed = store._add_lab_observations(observations, date, source=rk,
-                                                  date_source=date_src, subject="owner") if observations else {}
-            if observed and not observed.get("ok"):
-                raise ValueError(observed.get("reason", "observation_refused"))
-            observed_keys = observed.get("added", [])
-            out["observations_added"] += len(observed_keys)
-            out["observation_conflicts"].extend(observed.get("conflicts", []))
-            # The point keeps the FULL stamp the form printed — day, and the clock time
-            # when there was one. Truncating to the month was what made two draws in a
-            # single day indistinguishable, so the second one could only be recorded as
-            # a discrepancy with the first.
-            stamp = date
-            day = date[:10]
-            for key, v in found.items():
-                spec = markers[key]
-                if spec.get("ref_locked") and not v.get("reference_table"):
-                    # Qualitative panels print in the «Норма» column not a range but a scale of
-                    # interpretation: «<15 - не обнаружено; 15-25 сомнительно; >25 - обнаружено».
-                    # The parser sees the range 15-25 there and takes the «grey zone» for the
-                    # reference — a negative result then reads as «below normal».
-                    # ref_locked=true: the reference comes only from the dictionary, form ignored.
-                    rl, rh = spec.get("ref_low"), spec.get("ref_high")
-                else:
-                    # Only what the FORM printed. The dictionary corridor used to be copied in
-                    # here when the form printed none, and the point then carried it as its own:
-                    # the corridor reader took it for the form's range and skipped every check
-                    # it makes before lending the reference base — whose sex the corridor was
-                    # transcribed from, which age band it belongs to. A woman's point was
-                    # judged by a man's ceiling with nothing on screen saying so. A point with
-                    # no printed range now stays without one, and the base is lent — or
-                    # withheld, with its reason — by the one place that knows the rules.
-                    rl, rh = v["ref_low"], v["ref_high"]
-                # display_name — the printed name of the marker, used when names[] holds only
-                # lower-case search substrings (e.g. the dysbacteriosis panel).
-                name = (existing.get(key) or core.marker_display(spec, i18n.lang())
-                        or (core.marker_rules(spec, "names") or [key])[0].capitalize())
-                prio = 2 if any(x.lower() in ftl for x in core.marker_rules(spec, "prefer_form")) else 1
-                # A REPEAT is not a conflict. Two stamps on one day are two measurements —
-                # blood drawn before a procedure or a dose and again after it — and both
-                # belong in the series. A conflict is two readings claiming to be THE SAME
-                # measurement: the same stamp, a different number.
-                same_day = seen_pt.get((key, day))
-                mixed_stamp = (same_day is not None and same_day[3] != stamp
-                               and (len(same_day[3]) <= 10 or len(stamp) <= 10))
-                if same_day is not None and same_day[3] != stamp and not mixed_stamp:
-                    out.setdefault("repeats", []).append(
-                        {"marker": key, "day": day,
-                         "first": {"at": same_day[3], "value": same_day[0], "from": same_day[1]},
-                         "second": {"at": stamp, "value": v["value"], "from": f.name}})
-                prev = seen_pt.get((key, stamp))
-                if prev is None and mixed_stamp:
-                    prev = same_day
-                if prev is not None:
-                    if prev[0] == v["value"]:
+                dates = _form_stamps(text)
+                if len(dates) > 1:
+                    out["not_ingested"].append(
+                        {"file": f.name, **section_context, "reason": "several_draw_dates",
+                         "detail": _t("ingest_labs.reason_several_dates", n=len(dates),
+                                      first=dates[0], last=dates[-1])})
+                    continue
+                en_date, ambiguous = english_date(text)
+                if ambiguous:
+                    # A date IS on the page and cannot be read. Saying «no date on this
+                    # form» here would be untrue, and «no date» is the sentence that
+                    # makes a person go looking for one.
+                    out["not_ingested"].append(
+                        {"file": f.name, **section_context, "reason": "ambiguous_date",
+                         "detail": _t("ingest_labs.reason_ambiguous_date", raw=ambiguous["raw"],
+                                      first=ambiguous["both"][0], second=ambiguous["both"][1])})
+                    continue
+                if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+                    # Before the file name: a date the form gives for something NEAR the
+                    # draw. Four lipid panels in the reference corpus print «Ordered
+                    # Date» and nothing else — refusing them buys nothing, since the
+                    # order and the draw are a day or two apart, but filing the number
+                    # without saying which date it is would be a claim the form does not
+                    # make. So it is used, and named.
+                    near_date, near_amb, near_kind = english_date_near(text)
+                    if near_amb:
+                        out["not_ingested"].append(
+                            {"file": f.name, **section_context, "reason": "ambiguous_date",
+                             "detail": _t("ingest_labs.reason_ambiguous_date", raw=near_amb["raw"],
+                                          first=near_amb["both"][0], second=near_amb["both"][1])})
                         continue
-                    if prio <= prev[2]:           # an equal or higher-priority method is recorded
-                        out["conflicts"].append({"marker": key, "date": stamp,
-                                                 "kept": prev[0], "kept_from": prev[1],
-                                                 "other": v["value"], "other_from": f.name})
-                        continue
-                    out["conflicts"].append({"marker": key, "date": stamp,   # new method prevails
-                                             "kept": v["value"], "kept_from": f.name,
-                                             "other": prev[0], "other_from": prev[1]})
-                r = store.add_lab_point(key, stamp, v["value"], name=name, unit=v.get("unit") or spec.get("unit"),
-                                        ref_low=rl, ref_high=rh, direction=spec.get("direction"),
-                                        censored=v.get("censored"),
-                                        date_source=date_src, subject="owner", reference_context={**v,
-                                            "ingest_method": {"path": rk, "mtime": mt, "priority": prio}})
-                if r.get("ok"):
-                    seen_pt[(key, stamp)] = (v["value"], f.name, prio, stamp)
-                    if same_day is None or mixed_stamp:
-                        seen_pt[(key, day)] = (v["value"], f.name, prio, stamp)
-                    added.append(key)
-                    _carry_store_flags(out, key, stamp, r)
-                else:
-                    out["not_ingested"].append({"file": f.name, "reason": r.get("reason") or "point_refused",
-                                                "marker": key, "detail": r.get("error")})
-            manifest[rk] = mt
-            if added or observed_keys:
-                out["files_processed"] += 1
-                out["points_added"] += len(added)
-                # `date` stays the month for the readers that already parse it; the
-                # full stamp is `draw_date`. `ym` was the month variable, and when the
-                # point started keeping its full stamp the assignment went and this
-                # reference stayed: every ingest that actually added a point raised
-                # NameError, and no test noticed because none of them ran a successful
-                # ingest end to end. `test_ingest_reads_a_table.py` now does.
-                out["per_file"].append({"file": f.name, "date": day[:7],
-                                        "draw_date": date, "markers": added, "observations": observed_keys})
+                    if near_date:
+                        hint = near_date
+                        date_src = "ordered"
+                        out.setdefault("date_not_the_draw", []).append(
+                            {"file": f.name, **section_context, "date": near_date, "kind": near_kind,
+                             "note": _t("ingest_labs.date_not_the_draw", date=near_date)})
+                if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+                    # Before giving up: the FILE NAME. It is a weaker witness than the
+                    # page — people rename files to the day they downloaded them — so it
+                    # is used only here, at the end, and the report says the date did not
+                    # come off the form.
+                    hint = date_from_filename(f.name)
+                    if hint:
+                        date_src = "filename"
+                        out.setdefault("date_from_filename", []).append(
+                            {"file": f.name, **section_context, "date": hint,
+                             "note": _t("ingest_labs.date_from_filename", date=hint)})
+                if not (hint or en_date or _DATE.search(text) or _DATE_FALLBACK.search(text)):
+                    out["not_ingested"].append(
+                        {"file": f.name, **section_context,
+                         "reason": "no_draw_date" if text.strip() else "no_text",
+                         "detail": _t("ingest_labs.reason_no_date") if text.strip()
+                                   else _t("ingest_labs.reason_no_text")})
+                    continue
+                date, found = parse_report(text, markers, source=str(f), date_hint=hint)
+                observations = parse_observations(text)
+                problem = _single_form_problem(text, markers)
+                if problem:
+                    out["not_ingested"].append({"file": f.name, **section_context, "reason": problem,
+                                                 "detail": _t("ingest_labs.reason_" + problem)})
+                    continue
+                observed_labels = {r["label"].casefold() for r in observations}
+                unknown = [r for r in _unrecognised_labels(text, limit=1000)
+                           if r["label"].casefold() not in observed_labels]
+                if unknown:
+                    out["unrecognised_rows"].append({"file": f.name, **section_context, "count": len(unknown), "rows": unknown})
+                ftl = text.lower()
+                if not date or not (found or observations):
+                    # Name the lines that were not recognised, not just the file. This is
+                    # what a dictionary proposal (task 80) will be built from: the labels
+                    # and units of the rows nobody could place, and nothing else — never
+                    # the patient's numbers.
+                    out["not_ingested"].append(
+                        {"file": f.name, **section_context,
+                         "reason": "no_date" if not date else "no_known_marker",
+                         "detail": _t("ingest_labs.reason_no_date") if not date
+                                   else _t("ingest_labs.reason_no_marker"),
+                         "unrecognised": [] if not date else _unrecognised_labels(text)})
+                    continue
+                added = []
+                observed = store._add_lab_observations(observations, date, source=rk,
+                                                      date_source=date_src, subject="owner") if observations else {}
+                if observed and not observed.get("ok"):
+                    raise ValueError(observed.get("reason", "observation_refused"))
+                observed_keys = observed.get("added", [])
+                out["observations_added"] += len(observed_keys)
+                out["observation_conflicts"].extend(observed.get("conflicts", []))
+                # The point keeps the FULL stamp the form printed — day, and the clock time
+                # when there was one. Truncating to the month was what made two draws in a
+                # single day indistinguishable, so the second one could only be recorded as
+                # a discrepancy with the first.
+                stamp = date
+                day = date[:10]
+                for key, v in found.items():
+                    spec = markers[key]
+                    if spec.get("ref_locked") and not v.get("reference_table"):
+                        # Qualitative panels print in the «Норма» column not a range but a scale of
+                        # interpretation: «<15 - не обнаружено; 15-25 сомнительно; >25 - обнаружено».
+                        # The parser sees the range 15-25 there and takes the «grey zone» for the
+                        # reference — a negative result then reads as «below normal».
+                        # ref_locked=true: the reference comes only from the dictionary, form ignored.
+                        rl, rh = spec.get("ref_low"), spec.get("ref_high")
+                    else:
+                        # Only what the FORM printed. The dictionary corridor used to be copied in
+                        # here when the form printed none, and the point then carried it as its own:
+                        # the corridor reader took it for the form's range and skipped every check
+                        # it makes before lending the reference base — whose sex the corridor was
+                        # transcribed from, which age band it belongs to. A woman's point was
+                        # judged by a man's ceiling with nothing on screen saying so. A point with
+                        # no printed range now stays without one, and the base is lent — or
+                        # withheld, with its reason — by the one place that knows the rules.
+                        rl, rh = v["ref_low"], v["ref_high"]
+                    # display_name — the printed name of the marker, used when names[] holds only
+                    # lower-case search substrings (e.g. the dysbacteriosis panel).
+                    name = (existing.get(key) or core.marker_display(spec, i18n.lang())
+                            or (core.marker_rules(spec, "names") or [key])[0].capitalize())
+                    prio = 2 if any(x.lower() in ftl for x in core.marker_rules(spec, "prefer_form")) else 1
+                    # A REPEAT is not a conflict. Two stamps on one day are two measurements —
+                    # blood drawn before a procedure or a dose and again after it — and both
+                    # belong in the series. A conflict is two readings claiming to be THE SAME
+                    # measurement: the same stamp, a different number.
+                    same_day = seen_pt.get((key, day))
+                    mixed_stamp = (same_day is not None and same_day[3] != stamp
+                                   and (len(same_day[3]) <= 10 or len(stamp) <= 10))
+                    if same_day is not None and same_day[3] != stamp and not mixed_stamp:
+                        out.setdefault("repeats", []).append(
+                            {"marker": key, "day": day,
+                             "first": {"at": same_day[3], "value": same_day[0], "from": same_day[1]},
+                             "second": {"at": stamp, "value": v["value"], "from": f.name}})
+                    prev = seen_pt.get((key, stamp))
+                    if prev is None and mixed_stamp:
+                        prev = same_day
+                    if prev is not None:
+                        if prev[0] == v["value"]:
+                            continue
+                        if prio <= prev[2]:           # an equal or higher-priority method is recorded
+                            out["conflicts"].append({"marker": key, "date": stamp,
+                                                     "kept": prev[0], "kept_from": prev[1],
+                                                     "other": v["value"], "other_from": f.name})
+                            continue
+                        out["conflicts"].append({"marker": key, "date": stamp,   # new method prevails
+                                                 "kept": v["value"], "kept_from": f.name,
+                                                 "other": prev[0], "other_from": prev[1]})
+                    r = store.add_lab_point(key, stamp, v["value"], name=name, unit=v.get("unit") or spec.get("unit"),
+                                            ref_low=rl, ref_high=rh, direction=spec.get("direction"),
+                                            censored=v.get("censored"),
+                                            date_source=date_src, subject="owner", reference_context={**v,
+                                                "ingest_method": {"path": rk, "mtime": mt, "priority": prio,
+                                                **({"section": document["section"]} if document.get("section") else {})}})
+                    if r.get("ok"):
+                        seen_pt[(key, stamp)] = (v["value"], f.name, prio, stamp)
+                        if same_day is None or mixed_stamp:
+                            seen_pt[(key, day)] = (v["value"], f.name, prio, stamp)
+                        added.append(key)
+                        _carry_store_flags(out, key, stamp, r)
+                    else:
+                        out["not_ingested"].append({"file": f.name, **section_context, "reason": r.get("reason") or "point_refused",
+                                                    "marker": key, "detail": r.get("error")})
+                if added or observed_keys:
+                    out["files_processed"] += 1
+                    out["points_added"] += len(added)
+                    # `date` stays the month for the readers that already parse it; the
+                    # full stamp is `draw_date`. `ym` was the month variable, and when the
+                    # point started keeping its full stamp the assignment went and this
+                    # reference stayed: every ingest that actually added a point raised
+                    # NameError, and no test noticed because none of them ran a successful
+                    # ingest end to end. `test_ingest_reads_a_table.py` now does.
+                    out["per_file"].append({"file": f.name, **section_context, "date": day[:7],
+                                            "draw_date": date, "markers": added, "observations": observed_keys,
+                                            **({"section": document["section"]} if document.get("section") else {})})
+            out["files_processed"] = processed_before + int(out["files_processed"] > processed_before)
+            if not any(r.get("reason") in {"invalid_section_date", "error", "point_refused"}
+                       for r in out["not_ingested"][refused_before:]):
+                manifest[rk] = mt
         except Exception as e:
+            if progress_failed:
+                raise
             # Broad on purpose: a reason somebody foresaw has its own entry
             # above, and this catches the ones nobody did.
             out["not_ingested"].append(

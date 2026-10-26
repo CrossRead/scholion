@@ -114,19 +114,30 @@ class TestTheWholeCuratedCatalogue(unittest.TestCase):
 
     def test_reviewed_identity_has_a_source_and_both_assembly_witnesses(self):
         checked = 0
+        literal = 0
         for rsid, loc in core._read_knowledge_raw('loci.json')['loci'].items():
             if 'allele_identity' not in loc:
                 continue
-            checked += 1
+            identity = loc['allele_identity']
+            observation_only = identity.get('scope') == 'literal_genotype_only'
+            if observation_only:
+                literal += 1
+            else:
+                checked += 1
             with self.subTest(rsid=rsid):
-                identity = loc['allele_identity']
                 self.assertTrue(identity['source'].endswith('/'+rsid[2:]))
                 self.assertEqual(set(identity['builds']), {'GRCh37', 'GRCh38'})
                 for build, key in [('GRCh38', 'pos'), ('GRCh37', 'pos_grch37')]:
                     self.assertEqual(identity['builds'][build]['position'], loc[key])
-                    self.assertIn(loc['alt'], identity['builds'][build]['alternatives'])
-                self.assertIn(loc['alt'], loc['reading_alternatives'])
+                    if observation_only:
+                        self.assertEqual(set(loc['reading_alternatives']),
+                                         set(identity['builds'][build]['alternatives']))
+                    else:
+                        self.assertIn(loc['alt'], identity['builds'][build]['alternatives'])
+                if not observation_only:
+                    self.assertIn(loc['alt'], loc['reading_alternatives'])
         self.assertEqual(checked, 7)
+        self.assertGreaterEqual(literal, 59)
 
     def test_r325w_is_ct_in_both_the_catalogue_and_the_curated_association(self):
         loc = core._read_knowledge_raw('loci.json')['loci']['rs13266634']

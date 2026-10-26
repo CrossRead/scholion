@@ -52,7 +52,9 @@ class TestTheDescription(unittest.TestCase):
 
     def test_the_listing_and_the_refusal(self):
         listing = PC.panel_description()
-        self.assertEqual(sorted([*CATALOGUE, "author_list"]), sorted(s["key"] for s in listing["systems"]))
+        from scholion.engine.thematic_panels import thematic_summaries
+        self.assertEqual(set(CATALOGUE) | {"author_list"} | {s["key"] for s in thematic_summaries()},
+                         {s["key"] for s in listing["systems"]})
         r = PC.panel_description("nope")
         self.assertEqual("unknown_system", r["status"])
         self.assertIn("lipids", r["systems"])

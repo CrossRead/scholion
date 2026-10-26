@@ -81,7 +81,7 @@ for(const band of [{from:'2010',to:'2011'},{from:'2021-06',to:'2021-09'},
     def test_weight_and_attention_use_the_compact_annual_view(self):
         page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
         names = ("measurementLabel", "measurementGroups", "bodyMassMetric", "measurementDatasets",
-                 "sparkline", "insightContextHTML", "attentionItemHTML", "attentionHTML")
+                 "sparkline", "insightBasisHTML", "insightContextHTML", "attentionItemHTML", "attentionHTML")
         functions = []
         for name in names:
             start = page.index("function " + name + "(")

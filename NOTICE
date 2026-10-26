@@ -43,7 +43,9 @@ Regenstrief Institute, Inc.
 LOINC codes appear in src/scholion/knowledge/lab_test_meta.json, each one
 next to the laboratory test it identifies and its LOINC long common name. Codes
 that could not be verified against the LOINC search service are marked and left
-empty rather than guessed.
+empty rather than guessed. The 2026-10 mapping review also retains blood-specific
+series, source-reported methods, legacy MDRD identity and vital components;
+term-page sources accompany the mappings in lab_test_meta.json.
 
 --------------------------------------------------------------------------
 THIRD-PARTY RESOURCES USED AT RUN TIME, NOT REDISTRIBUTED HERE

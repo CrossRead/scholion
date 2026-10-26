@@ -193,7 +193,7 @@ class TestTheListCarriesTheCorrectedGenes(unittest.TestCase):
     def test_th_and_mttp(self):
         rows = {r["rsid"]: r for r in list(_raw("panel_intake.json")["lists"].values())[0]["positions"]}
         self.assertEqual(("TH", "in_catalogue"), (rows["rs6356"]["gene"], rows["rs6356"]["disposition"]))
-        self.assertEqual(("MTTP", "refused"), (rows["rs3816873"]["gene"], rows["rs3816873"]["disposition"]))
+        self.assertEqual(("MTTP", "in_catalogue"), (rows["rs3816873"]["gene"], rows["rs3816873"]["disposition"]))
         self.assertEqual("TH", _raw("loci.json")["loci"]["rs6356"]["gene"])
 
 

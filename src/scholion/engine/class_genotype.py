@@ -95,5 +95,10 @@ def medications_view() -> Dict[str, Any]:
     cannot drift apart on whether the caution is printed."""
     from .. import store
     from .treatment import treatment_timeline
-    return {"medications": store.list_medications(), "cautions": regimen_cautions(),
+    from .system_panels import medication_system_context
+    medications = store.list_medications()
+    for medication in medications:
+        if medication.get("current") is not False:
+            medication["system_context"] = medication_system_context(medication)
+    return {"medications": medications, "cautions": regimen_cautions(),
             "treatment": treatment_timeline()}

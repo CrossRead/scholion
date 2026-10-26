@@ -96,7 +96,7 @@ class TestEveryObservationIsAccountedFor(FhirCase):
         self.assertEqual(len(self.plan["points"])
                          + len(self.plan.get("metrics") or [])
                          + len(self.plan["skipped"]),
-                         self.plan["observations"],
+                         self.plan.get("measurement_entries", self.plan["observations"]),
                          "an observation that is neither taken nor named has disappeared")
 
     def test_every_skip_carries_a_reason(self):
@@ -111,10 +111,18 @@ class TestEveryObservationIsAccountedFor(FhirCase):
                 self.assertEqual(core.loinc_index().get(p["loinc"]), p["key"])
 
     def test_a_code_we_do_not_carry_is_named_rather_than_approximated(self):
-        reasons = {s["reason"] for s in self.plan["skipped"]}
-        self.assertIn("loinc_not_in_catalogue", reasons,
-                      "this bundle does carry codes outside our dictionary — if none is "
-                      "reported, something matched them by display text")
+        # Keep this negative case even as real fixture codes gain mappings.
+        from unittest import mock
+        bundle = {"resourceType": "Bundle", "entry": [{"resource": {
+            "resourceType": "Observation", "status": "final",
+            "effectiveDateTime": "2024-03-02",
+            "code": {"text": "Glucose", "coding": [{"system": ingest_fhir.LOINC_SYSTEM,
+                                                       "code": "UNKNOWN_SOURCE_CODE"}]},
+            "valueQuantity": {"value": 5.1, "code": "mmol/L"}}}]}
+        with mock.patch.object(ingest_fhir, "read_bundle", return_value={"ok": True, "bundle": bundle}):
+            plan = ingest_fhir.plan(BUNDLE)
+        self.assertEqual([], plan["points"])
+        self.assertIn("loinc_not_in_catalogue", {s["reason"] for s in plan["skipped"]})
 
     def test_the_draw_time_keeps_its_clock(self):
         stamped = [p for p in self.plan["points"] if "T" in p["date"]]

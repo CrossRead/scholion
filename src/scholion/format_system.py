@@ -278,6 +278,9 @@ def system_report(r: Dict[str, Any]) -> str:
     the three baskets. The two registers print the same facts at two densities
     and the verdict is the same line in both (brief §7).
     """
+    if r.get("clinical_estimates"):
+        from .format_clinical import report
+        return report(r)
     if r.get("reference_only") or r.get("patient_readings"):
         from .format_genome import panel_report
         return panel_report(r)
@@ -379,9 +382,14 @@ def system_report(r: Dict[str, Any]) -> str:
             if visible(item, reg == "clinician"):
                 L.extend(comparison_lines(item, reg == "clinician"))
     # 3 — the genetic half
+    if r.get("cgm_link"):
+        L.append(r["cgm_link"]["label"] + " · scholion lifestyle")
     all_gen = r.get("genetics") or {}
     gen = _shown_genetics(all_gen, reg)
     L += ["", "**3. " + _t("system.layer.genetics") + "**"]
+    for panel in r.get("thematic_panels") or []:
+        L.append("   " + _t("thematic.list_row", label=panel["label"], key=panel["key"], n=panel["genes"]) +
+                 " · scholion panel " + panel["key"])
     if gen.get("status") == "composed":
         base = gen.get("base") or {}
         L.append("   " + _t("system.genetics.composed",
@@ -455,7 +463,7 @@ def system_report(r: Dict[str, Any]) -> str:
     L += ["", "**4. " + _t("system.layer.medications") + "**"]
     for m in med.get("rows") or []:
         L.append("   · " + _t("system.meds.row", name=m.get("name"), dose=m.get("dose") or "",
-                              classes=", ".join(m.get("via_labels") or []) or _t("prescription.class_undefined")).replace("  ", " "))
+                              classes=", ".join(m.get("via_labels") or []) or _t("system.meds.named_substance" if m.get("system_links") else "prescription.class_undefined")).replace("  ", " "))
     for m in med.get("rows") or []:
         for link in m.get("system_links") or []:
             L.append("   · " + str(m.get("name") or "") + ": " + link["relation_label"] + (" — " + link["note"] if link.get("note") else ""))

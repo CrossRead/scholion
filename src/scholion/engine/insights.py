@@ -80,6 +80,11 @@ def attention_feed(labs: dict, cautions: list[dict], controls: list[dict],
               "value": r.get("value")} for r in labs.get("markers") or []}
     synthesized = _highlights(items)
     attach_context(synthesized, context)
+    from ..insight_basis import bind
+    for item in items:
+        bind(item, preserve_existing=True)
+    for item in synthesized:
+        bind(item)
     highlights = [i for i in synthesized if any(e["kind"] != "repeated_abnormal" for e in i["events"])]
     follow_up = [i for i in synthesized if all(e["kind"] == "repeated_abnormal" for e in i["events"])]
     return {"items": items, "count": len(items), "visible_count": min(visible, len(items)),

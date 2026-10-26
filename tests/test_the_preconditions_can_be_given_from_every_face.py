@@ -189,7 +189,8 @@ class TestTheWebHasADoorToTheseFields(unittest.TestCase):
                          "the profile form does not offer: " + ", ".join(missing))
 
     def test_the_form_posts_all_of_them(self):
-        call = self.src[self.src.index("post('/api/metrics/profile'"):]
+        start = self.src.index("$('#mp-save'")
+        call = self.src[self.src.index("post('/api/metrics/profile'", start):]
         call = call[:call.index("\n")]
         for f in ASKED_FOR:
             with self.subTest(field=f):

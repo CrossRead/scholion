@@ -12,7 +12,7 @@ def catalogue() -> list[dict]:
 
 def reference_patterns(gene: str, rsid: str | None = None) -> list[dict]:
     """Sourced context remains readable even without a personal finding."""
-    fields = ('association_id', 'summary', 'limitations', 'association_level', 'source', 'level_scope')
+    fields = ('association_id', 'summary', 'limitations', 'association_level', 'source', 'level_scope', 'markers', 'systems')
     return [{**{k: p.get(k) for k in fields}, 'source_links': gc.sources(p['source'])}
             for p in catalogue() if gene in p['genes'] and
             (not p['variants'] or any(v['rsid'] == rsid for v in p['variants']))]

@@ -80,6 +80,7 @@
       "recognition_source": "Observed laboratory label; recognition only, pending confirmation."
     },
     "egfr_mdrd": {
+      "unit": "mL/min/{1.73_m2}",
       "status": "proposed",
       "unit_from_form": true,
       "labels": {
@@ -13010,6 +13011,168 @@
       },
       "ref_sex": "any",
       "ref_age": "any"
+    },
+    "glucose_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mmol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Glucose, blood"
+        },
+        "ru": {
+          "display": "Глюкоза, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/2339-0",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval.",
+      "convert": {
+        "mg/dL": 0.05551,
+        "мг/дл": 0.05551
+      },
+      "convert_note": "Glucose M = 180.16 g/mol; 1 mg/dL = 10/180.16 = 0.05551 mmol/L."
+    },
+    "creatinine_blood": {
+      "input_kind": "coded_observation",
+      "unit": "umol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Creatinine, blood"
+        },
+        "ru": {
+          "display": "Креатинин, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/38483-4",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval.",
+      "convert": {
+        "mg/dL": 88.4,
+        "мг/дл": 88.4
+      },
+      "convert_note": "Creatinine M = 113.12 g/mol; 1 mg/dL = 10000/113.12 = 88.4 µmol/L."
+    },
+    "urea_nitrogen_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mg/dL",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Urea nitrogen, blood"
+        },
+        "ru": {
+          "display": "Азот мочевины, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/6299-2",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
+    },
+    "sodium_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mmol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Sodium, blood"
+        },
+        "ru": {
+          "display": "Натрий, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/2947-0",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
+    },
+    "potassium_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mmol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Potassium, blood"
+        },
+        "ru": {
+          "display": "Калий, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/6298-4",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
+    },
+    "chloride_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mmol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Chloride, blood"
+        },
+        "ru": {
+          "display": "Хлорид, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/2069-3",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
+    },
+    "carbon_dioxide_blood": {
+      "input_kind": "coded_observation",
+      "unit": "mmol/L",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Total carbon dioxide, blood"
+        },
+        "ru": {
+          "display": "Общий углекислый газ, кровь"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/20565-8",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
+    },
+    "calcium_blood_reported": {
+      "input_kind": "coded_observation",
+      "unit": "mg/dL",
+      "specimen": "blood",
+      "labels": {
+        "en": {
+          "display": "Calcium, blood (method unspecified)"
+        },
+        "ru": {
+          "display": "Кальций, кровь — метод не указан"
+        }
+      },
+      "reference_source": {
+        "url": "https://loinc.org/49765-1",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "reference_scope": "Blood-specific reported concentration; do not substitute for a serum/plasma measurement or borrow its interval."
     }
   }
 }

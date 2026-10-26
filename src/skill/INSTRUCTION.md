@@ -76,15 +76,36 @@ unknown, and never present it as a genotype effect. A panel
 author's note, where one exists, is an opinion at the position's level and is
 retold as one.
 
-**3. Annotation carries no direction.** "Pathogenic", `stop_gained`,
-`frameshift`, a coloured mark in a commercial report — all of these describe the
-variant's relation to the REFERENCE SEQUENCE, not to the person. What a mark
-means in a particular report is read from that report's legend, not guessed from
-its colour. Before any conclusion from the genome, five filters in order, and the
+**3. Annotation alone does not establish personal effect.** "Pathogenic" is a
+variant's disease-related classification in its asserted context; `stop_gained`
+and `frameshift` describe a consequence against the reference sequence. None of
+these alone establishes disease in the person. What a coloured mark means in a
+particular report is read from that report's legend, not guessed from its colour. Before any conclusion from the genome, five filters in order, and the
 first one that fires closes the question: phenotype plausibility (before
 consulting any database) → zygosity, inheritance mode and sex → allele direction
 from a primary source → effect size against analytical error → coverage at that
 exact position.
+
+**3a. Variant classification, carriage and disease remain separate.** Start a
+finding description with sourced gene biology and the recorded reason for
+including the variant. Put inheritance and personal-meaning qualifications after
+this content; generic cautions must not replace the biological description. For
+every profile, relay the actual genotype, zygosity and available reading quality
+with the finding. Name the sourced inheritance model for the relevant disease; a
+gene-level reference is qualified as such and cannot silently become a
+variant-specific rule. A single heterozygous pathogenic or likely pathogenic
+variant under a supported autosomal recessive model is described as a carrier
+context, not a diagnosis. The saved list does not exclude a second allele,
+structural variants or unread regions. Two recorded variants do not establish
+that they affect different gene copies; preserve unresolved phase. Dominant,
+homozygous and X-linked findings require their own clinical interpretation:
+neither dismiss them as ordinary recessive carriage nor turn a database label
+into a diagnosis. If allele identity, reading or inheritance is unresolved,
+state that uncertainty rather than infer it from the gene name. Keep ClinVar
+classification, GenCC gene-disease validity and Scholion A–E confidence separate,
+with their sources and versions. Preserve this meaning in patient and clinician
+views, visit documents, CLI and agent/plugin responses; a red pathogenic label
+alone must not stand for a person's disease.
 
 **4. A negative result is qualified by coverage.** "No findings" means "none in
 the part that was read". Without per-gene callability the statement is empty: a
@@ -887,7 +908,12 @@ The Ouroboros tools and the MCP server are the same core through one registry �
 flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
 `updates=true` is `genome-updates`, `sch_analyze_labs` with `catalogue=true` is
 `markers`, `sch_rules` with `levels=true` is `evidence-levels`, `sch_overview` with
-`snapshot=true` is `profile`. Four of them write what the person handed over
+`snapshot=true` is `profile`, `sch_ingest_labs` with `kind=studies` is
+`ingest-studies` (preview first; pass its `approval_token` as `confirm` to import
+conclusions, imaging and Lumiflex application CGM PDFs into the same profile).
+`sch_lifestyle` reads the saved report, curves, events and approximate responses;
+`cgm_report` selects a saved source revision by SHA-256. Sensor statistics never
+replace laboratory glucose or HbA1c. Four of them write what the person handed over
 (`sch_ingest_labs`, `sch_focus_log`, `sch_lab_draw`, `sch_marker_propose`) and none
 sets a value; `sch_update` installs the program and `sch_recompute` rebuilds what the
 person's own files already hold, each only with `confirm=true` after the person's

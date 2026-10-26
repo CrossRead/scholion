@@ -43,7 +43,7 @@ ENGINE_DIR = Path(engine_pkg.__file__).resolve().parent
 LINE_BUDGETS = {
     # Event detection and feed assembly have separate responsibilities.
     "insight_events": 260,  # Effective reference bounds and provenance belong to fact identity.
-    "insights": 160,  # Explicitly reported system observations join the same feed.
+    "insights": 180,  # Reported observations and used-source fingerprints join the same feed.
     "insight_links": 100,  # Specific sourced PGS/phenotype joins.
     # Recorded treatment events and dated controls, independent of genotype cautions.
     "treatment": 125,
@@ -284,7 +284,7 @@ LINE_BUDGETS = {
     # 11.10.2026: verified APOE diplotype context and all four PCSK9 readings
     # preserve phase uncertainty and uncurated direction (1248 lines).
     # Study gene-set labels and distinct symbols are counted separately.
-    "genomics": 1270,
+    "genomics": 1300,  # Source-bound nine-position longevity references remain visible without a saved report.
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.
@@ -336,6 +336,8 @@ LINE_BUDGETS = {
     "panel_catalogue": 130,
     # Patient readings of the intake ledger do not belong to the reference book.
     "panel_intake": 110,
+    # Reference topics reuse the existing Systems and catalogue reader, without radar scoring.
+    "thematic_panels": 110,
     "pgx_labels": 60,
     # The gate a curated panel row passes (task 199): the locus rule, the
     # impersonal review, the evidence legend — split out of system_panels.

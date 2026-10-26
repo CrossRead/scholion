@@ -59,6 +59,27 @@ class TestReviewedArchive(TableCase):
     def labs(self):
         return json.loads((self.profile / "labs.json").read_text(encoding="utf-8"))["markers"]
 
+    def test_sensor_report_cannot_be_imported_as_a_laboratory_archive(self):
+        from scholion import cgm_pdf
+        with mock.patch.object(cgm_pdf,'recognizes',return_value=True):
+            result=self.preview(form())
+        self.assertEqual(result['status'],'refused')
+        self.assertEqual(result['not_ingested'][0]['reason'],'cgm_report_use_studies_import')
+        self.assertIsNone(result['approval_token'])
+        self.assertFalse((self.profile/'labs.json').exists())
+
+    def test_source_replaced_after_preview_is_not_committed(self):
+        text=form();token=self.preview(text)['approval_token']
+        real_preview=lab_archive.preview
+        def changed(folder):
+            plan=real_preview(folder)
+            self.pdf.write_bytes(b'changed after complete parsing')
+            return plan
+        with mock.patch.object(lab_archive,'preview',side_effect=changed):
+            result=self.preview(text,token)
+        self.assertFalse(result['ok']);self.assertEqual(result['points_added'],0)
+        self.assertFalse((self.profile/'labs.json').exists())
+
     def test_preview_writes_nothing_and_each_draw_keeps_its_source_pages(self):
         text = form() + "\f" + form("01.06.2026", value=90)
         before = {p.name: p.read_bytes() for p in self.profile.iterdir()}

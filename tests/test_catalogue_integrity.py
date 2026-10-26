@@ -104,6 +104,8 @@ class TestTheModelIsNotNarrowerThanTheCatalogue(unittest.TestCase):
         # A1298C carries far less weight than C677T and MTHFR is not a CPIC
         # level A gene: adding it would be extending the model, not repairing it.
         ("MTHFR", "rs1801131"),
+        # Newly verified literal position only: no star-allele definition or dose rule.
+        ("CYP2C9", "rs2185570"),
     }
 
     def test_every_deficient_allele_is_modelled_or_accepted(self):

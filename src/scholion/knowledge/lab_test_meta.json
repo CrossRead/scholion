@@ -20,7 +20,8 @@
       "verified": "2026-08-14",
       "source": "NLM Clinical Table Search Service (clinicaltables.nlm.nih.gov, LOINC items v3) — every code was checked by a query on the code itself and reconciled with the full name",
       "coverage": "34 codes reconciled, 13 marked as not reconciled",
-      "rule": "A LOINC code is NEVER written from memory: an invented code looks like a standard and silently breaks the exchange. No confirmation — the field stays null with the status «not verified»."
+      "rule": "A LOINC code is NEVER written from memory: an invented code looks like a standard and silently breaks the exchange. No confirmation — the field stays null with the status «not verified».",
+      "additional_review": "2026-10-23; official LOINC term pages linked per mapping; blood specimen and reported MDRD kept separate; no new clinical intervals."
     },
     "source_tier": "curated_reference"
   },
@@ -30,7 +31,31 @@
       "biomaterial": "serum",
       "fasting": true,
       "loinc": "2345-7",
-      "loinc_name": "Glucose [Mass/volume] in Serum or Plasma"
+      "loinc_name": "Glucose [Mass/volume] in Serum or Plasma",
+      "loinc_also": [
+        {
+          "code": "1558-6",
+          "name": "Fasting glucose [Mass/volume] in Serum or Plasma",
+          "why": "Same serum/plasma glucose analyte and concentration property; fasting is explicitly preserved from this code, not assigned to all glucose results. Existing mass-to-molar unit conversion still applies.",
+          "source": {
+            "url": "https://loinc.org/1558-6",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          }
+        }
+      ],
+      "loinc_context": {
+        "1558-6": {
+          "specimen": "serum_plasma",
+          "fasting": true,
+          "source": {
+            "url": "https://loinc.org/1558-6",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Same serum/plasma glucose analyte and concentration property; fasting is explicitly preserved from this code, not assigned to all glucose results. Existing mass-to-molar unit conversion still applies."
+        }
+      }
     },
     "insulin": {
       "tier": 2,
@@ -95,6 +120,30 @@
       "loinc_note": {
         "en": "Calculated LDL and direct LDL measurements use different methods. Comparisons retain the method reported on the laboratory form.",
         "ru": "Расчётный ЛПНП и прямое измерение ЛПНП получены разными методами. При сравнении результатов учитывается метод, указанный в бланке."
+      },
+      "loinc_also": [
+        {
+          "code": "18262-6",
+          "name": "Cholesterol in LDL [Mass/volume] in Serum or Plasma by Direct assay",
+          "why": "Same LDL cholesterol analyte and specimen as the LDL series. The reported direct assay is retained as a method, never relabelled calculated LDL; printed units and intervals remain authoritative.",
+          "source": {
+            "url": "https://loinc.org/18262-6",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          }
+        }
+      ],
+      "loinc_context": {
+        "18262-6": {
+          "specimen": "serum_plasma",
+          "method": "direct_assay",
+          "source": {
+            "url": "https://loinc.org/18262-6",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Same LDL cholesterol analyte and specimen as the LDL series. The reported direct assay is retained as a method, never relabelled calculated LDL; printed units and intervals remain authoritative."
+        }
       }
     },
     "hdl": {
@@ -395,7 +444,7 @@
     },
     "calcium_blood": {
       "tier": 1,
-      "biomaterial": "serum",
+      "biomaterial": "blood",
       "requires": [
         "albumin"
       ],
@@ -403,8 +452,12 @@
         "en": "it is read only together with albumin",
         "ru": "читается только вместе с альбумином"
       },
-      "loinc": "17861-6",
-      "loinc_name": "Calcium [Mass/volume] in Serum or Plasma"
+      "loinc": null,
+      "loinc_name": null,
+      "loinc_note": {
+        "en": "The ICP-specific row has no verified LOINC mapping. A serum/plasma calcium code does not identify this whole-blood elemental assay.",
+        "ru": "Для строки элементного анализа ICP соответствие LOINC не подтверждено. Код кальция сыворотки/плазмы не относится к этому анализу цельной крови."
+      }
     },
     "apob": {
       "tier": 2,
@@ -651,14 +704,206 @@
         "en": "an index, not an assay: urine over plasma lysine — renal losses of the dibasic amino acids, read with cystine",
         "ru": "индекс, а не анализ: лизин мочи к лизину плазмы — почечные потери двухосновных аминокислот, читается вместе с цистином"
       }
+    },
+    "microalbumin_creatinine_ratio": {
+      "tier": 1,
+      "loinc": "14959-1",
+      "loinc_name": "Microalbumin/Creatinine [Mass Ratio] in Urine",
+      "loinc_context": {
+        "14959-1": {
+          "specimen": "urine",
+          "source": {
+            "url": "https://loinc.org/14959-1",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "This is the same urinary albumin-to-creatinine mass ratio. A concentration of albumin or a timed excretion is not this ratio; units are checked independently."
+        }
+      }
+    },
+    "egfr_mdrd": {
+      "tier": 1,
+      "loinc": "33914-3",
+      "loinc_name": "Glomerular filtration rate [Volume Rate/Area] in Serum or Plasma by Creatinine-based formula (MDRD)/1.73 sq M",
+      "loinc_context": {
+        "33914-3": {
+          "specimen": "serum_plasma",
+          "method": "MDRD",
+          "term_status": "discouraged",
+          "replacement_code": "77147-7",
+          "source": {
+            "url": "https://loinc.org/33914-3",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Preserve a historical reported MDRD result in its own series. The deprecated specimen-specific term maps to a newer MDRD term in LOINC; it is not CKD-EPI and never overwrites the CKD-EPI series."
+        }
+      }
+    },
+    "glucose_blood": {
+      "tier": 1,
+      "loinc": "2339-0",
+      "loinc_name": "Glucose [Mass/volume] in Blood",
+      "loinc_context": {
+        "2339-0": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/2339-0",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "creatinine_blood": {
+      "tier": 1,
+      "loinc": "38483-4",
+      "loinc_name": "Creatinine [Mass/volume] in Blood",
+      "loinc_context": {
+        "38483-4": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/38483-4",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "urea_nitrogen_blood": {
+      "tier": 1,
+      "loinc": "6299-2",
+      "loinc_name": "Urea nitrogen [Mass/volume] in Blood",
+      "loinc_context": {
+        "6299-2": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/6299-2",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "sodium_blood": {
+      "tier": 1,
+      "loinc": "2947-0",
+      "loinc_name": "Sodium [Moles/volume] in Blood",
+      "loinc_context": {
+        "2947-0": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/2947-0",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "potassium_blood": {
+      "tier": 1,
+      "loinc": "6298-4",
+      "loinc_name": "Potassium [Moles/volume] in Blood",
+      "loinc_context": {
+        "6298-4": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/6298-4",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "chloride_blood": {
+      "tier": 1,
+      "loinc": "2069-3",
+      "loinc_name": "Chloride [Moles/volume] in Blood",
+      "loinc_context": {
+        "2069-3": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/2069-3",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "carbon_dioxide_blood": {
+      "tier": 1,
+      "loinc": "20565-8",
+      "loinc_name": "Carbon dioxide, total [Moles/volume] in Blood",
+      "loinc_context": {
+        "20565-8": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/20565-8",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "calcium_blood_reported": {
+      "tier": 1,
+      "loinc": "49765-1",
+      "loinc_name": "Calcium [Mass/volume] in Blood",
+      "loinc_context": {
+        "49765-1": {
+          "specimen": "blood",
+          "source": {
+            "url": "https://loinc.org/49765-1",
+            "reviewed_on": "2026-10-23",
+            "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+          },
+          "why": "Blood-specific LOINC term. Stored in a separate series from serum/plasma and from unlike analytes; no matrix conversion or unprinted interval is assumed."
+        }
+      }
+    },
+    "calcium_total": {
+      "tier": 1,
+      "biomaterial": "serum",
+      "requires": [
+        "albumin"
+      ],
+      "loinc": "17861-6",
+      "loinc_name": "Calcium [Mass/volume] in Serum or Plasma",
+      "loinc_context": {
+        "17861-6": {
+          "specimen": "serum_plasma",
+          "source": {
+            "url": "https://loinc.org/17861-6",
+            "reviewed_on": "2026-10-23"
+          },
+          "why": "This code identifies serum/plasma calcium mass concentration. It belongs to the serum total-calcium quantity and its existing mass-to-molar conversion, not the separate whole-blood elemental ICP row. No specific assay method is inferred; any reported method remains in the source record."
+        }
+      }
     }
   },
   "body_metrics": {
     "_note": "LOINC codes that name a BODY MEASUREMENT rather than a laboratory analyte. A measurement of the person is written where one of our metrics holds the same quantity in the same unit — `ours` names it and `unit` is the only unit accepted, because nothing here converts and a weight in pounds joining a series in kilograms is the defect this project spends its time removing. Where `ours` is null the reason says what the value is instead, so that a refusal is an answer and not a shrug.",
     "8302-2": {
       "name": "Body Height",
-      "ours": null,
-      "why": "height is one field of the profile rather than a series; the bundle's value is reported so it can be set with `scholion profile --height-cm`"
+      "ours": "height",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "cm",
+      "display_name": {
+        "en": "Body height",
+        "ru": "Рост"
+      },
+      "source": {
+        "url": "https://loinc.org/8302-2",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "29463-7": {
       "name": "Body Weight",
@@ -668,38 +913,169 @@
     },
     "59576-9": {
       "name": "Body mass index (BMI) [Percentile] Per age and gender",
-      "ours": null,
-      "why": "a percentile against an age-and-sex reference, not the index our bmi metric holds"
+      "ours": "bmi_percentile",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "%",
+      "display_name": {
+        "en": "BMI percentile for age and sex",
+        "ru": "Перцентиль ИМТ по возрасту и полу"
+      },
+      "source": {
+        "url": "https://loinc.org/59576-9",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "8310-5": {
       "name": "Body temperature",
-      "ours": null,
-      "why": "no metric of ours holds temperature"
+      "ours": "body_temperature",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "Cel",
+      "display_name": {
+        "en": "Body temperature",
+        "ru": "Температура тела"
+      },
+      "source": {
+        "url": "https://loinc.org/8310-5",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "8331-1": {
       "name": "Oral temperature",
-      "ours": null,
-      "why": "no metric of ours holds temperature"
+      "ours": "body_temperature",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "Cel",
+      "display_name": {
+        "en": "Oral temperature",
+        "ru": "Температура во рту"
+      },
+      "source": {
+        "url": "https://loinc.org/8331-1",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "method": "oral",
+      "specificity": 1
     },
     "8867-4": {
       "name": "Heart rate",
-      "ours": null,
-      "why": "a heart rate at a visit is not the resting home pulse our metric means; the two are not interchangeable"
+      "ours": "heart_rate",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "/min",
+      "display_name": {
+        "en": "Heart rate at measurement",
+        "ru": "Пульс во время измерения"
+      },
+      "source": {
+        "url": "https://loinc.org/8867-4",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "9279-1": {
       "name": "Respiratory rate",
-      "ours": null,
-      "why": "no metric of ours holds respiratory rate"
+      "ours": "respiratory_rate",
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity.",
+      "unit": "/min",
+      "display_name": {
+        "en": "Respiratory rate",
+        "ru": "Частота дыхания"
+      },
+      "source": {
+        "url": "https://loinc.org/9279-1",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "2708-6": {
       "name": "Oxygen saturation in Arterial blood",
-      "ours": null,
-      "why": "no metric of ours holds oxygen saturation; the wearable layer keeps its own, measured differently"
+      "ours": "oxygen_saturation",
+      "why": "The generic arterial oxygen saturation code and its pulse-oximetry specialization denote the same quantity. Preserve the more specific stated method; do not infer a blood draw from a method-unspecified code or merge this observation with a wearable aggregate.",
+      "unit": "%",
+      "display_name": {
+        "en": "Oxygen saturation at measurement",
+        "ru": "Насыщение кислородом во время измерения"
+      },
+      "source": {
+        "url": "https://loinc.org/2708-6",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      }
     },
     "59408-5": {
       "name": "Oxygen saturation in Arterial blood by Pulse oximetry",
-      "ours": null,
-      "why": "as above, and by a different method again"
+      "ours": "oxygen_saturation",
+      "why": "The generic arterial oxygen saturation code and its pulse-oximetry specialization denote the same quantity. Preserve the more specific stated method; do not infer a blood draw from a method-unspecified code or merge this observation with a wearable aggregate.",
+      "unit": "%",
+      "display_name": {
+        "en": "Oxygen saturation by pulse oximetry",
+        "ru": "Насыщение кислородом по пульсоксиметру"
+      },
+      "source": {
+        "url": "https://loinc.org/59408-5",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "method": "pulse_oximetry",
+      "specificity": 1
+    },
+    "39156-5": {
+      "name": "Body mass index",
+      "ours": "bmi",
+      "unit": "kg/m2",
+      "display_name": {
+        "en": "Body mass index",
+        "ru": "Индекс массы тела"
+      },
+      "source": {
+        "url": "https://loinc.org/39156-5",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity."
+    },
+    "8480-6": {
+      "name": "Systolic blood pressure",
+      "ours": "systolic_bp",
+      "unit": "mm[Hg]",
+      "display_name": {
+        "en": "Systolic blood pressure",
+        "ru": "Систолическое давление"
+      },
+      "source": {
+        "url": "https://loinc.org/8480-6",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity."
+    },
+    "8462-4": {
+      "name": "Diastolic blood pressure",
+      "ours": "diastolic_bp",
+      "unit": "mm[Hg]",
+      "display_name": {
+        "en": "Diastolic blood pressure",
+        "ru": "Диастолическое давление"
+      },
+      "source": {
+        "url": "https://loinc.org/8462-4",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "why": "A reported measurement of this quantity is stored in its own metrics series, with source and method. It is not substituted for a different measurement or silently applied to the profile identity."
+    }
+  },
+  "known_unmapped_observations": {
+    "65853-4": {
+      "name": "General cardiovascular disease 10Y risk [#] Framingham.D'Agostino",
+      "reason": "external_score_not_supported",
+      "source": {
+        "url": "https://loinc.org/65853-4",
+        "reviewed_on": "2026-10-23",
+        "scope": "Term identity, specimen and measurement property; not a clinical threshold"
+      },
+      "why": "A named externally computed score, not an analyte or a new Scholion calculator. This code denotes a numeric score; an accompanying percent unit cannot establish its scale or calibration. Retain a named refusal rather than substitute it for SCORE2."
     }
   }
 }

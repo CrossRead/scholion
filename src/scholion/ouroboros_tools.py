@@ -112,8 +112,8 @@ _h_metrics = _reported(lambda: engine.metrics_summary(), lambda r: fmt.metrics_r
 _h_clinvar = _reported(lambda: engine.clinvar_findings(), lambda r: fmt.clinvar_report(r))
 
 
-def _h_lifestyle(ctx: "ToolContext") -> str:
-    return fmt.lifestyle_report(engine.lifestyle())
+_h_lifestyle = _reported(lambda cgm_report='': engine.lifestyle(cgm_report),
+                        lambda r: fmt.lifestyle_report(r))
 
 
 _h_prs = _reported(lambda: engine.prs_findings(), lambda r: fmt.prs_report(r))
@@ -162,7 +162,7 @@ def _args(ctx: "ToolContext", given: dict) -> dict:
 
 
 def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool = False,
-                   approve_archive: str = "", force: bool = False) -> str:
+                   approve_archive: str = "", force: bool = False, kind: str = "labs", confirm: str = "") -> str:
     import json
     import os
     import shlex
@@ -176,7 +176,9 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
     # profile (12.09.2026, in an audit harness — the owner's own reports).
     if not (folder or "").strip():
         return "⚠️ " + _t("ingest_labs.folder_not_named")
-    if archive_preview or approve_archive:
+    if kind not in ("labs","studies"):
+        return "⚠️ " + _t("ingest.unknown_kind")
+    if kind == "labs" and (archive_preview or approve_archive):
         from scholion import lab_archive
         return fmt.ingest_labs_report(lab_archive.run(folder, approval=approve_archive))
     inputs = ingest_labs._inputs(folder)
@@ -192,7 +194,10 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
     env = dict(os.environ)
     env["SCHOLION_PROFILE_DIR"] = str(core.profile_dir())
     env["SCHOLION_REPO_DIR"] = str(core.repo_dir())
-    command = [sys.executable, "-m", "scholion", "ingest-labs", folder, "--json"]
+    operation="ingest-studies" if kind == "studies" else "ingest-labs"
+    command = [sys.executable, "-m", "scholion", operation, folder, "--json"]
+    if kind == "studies":
+        command.extend(["--approve", confirm] if confirm else ["--dry-run"])
     if _yes(force):
         command.append("--force")
     try:
@@ -200,7 +205,7 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
             env["SCHOLION_WORKSTATION"] = os.path.join(isolated, "no-workstation.json")
             worker = subprocess.run(command, capture_output=True, text=True, env=env, timeout=105)
     except subprocess.TimeoutExpired:
-        return "⚠️ " + _t("tool.host_ingest_timeout", command="scholion ingest-labs " + shlex.quote(folder))
+        return "⚠️ " + _t("tool.host_ingest_timeout", command="scholion " + operation + " " + shlex.quote(folder))
     try:
         r = json.loads(worker.stdout)
     except (ValueError, TypeError):
@@ -208,6 +213,8 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
     core.reset_cache()
     if not isinstance(r, dict):
         return "⚠️ " + _t("web.common.error")
+    if kind == "studies":
+        return json.dumps(r,ensure_ascii=False) if r.get("dry_run") or not r.get("ok") else fmt.ingest_studies_report(r)
     if not r.get("ok"):
         return fmt.ingest_labs_report(r) if r.get("errors") else f"⚠️ {r.get('error')}"
     # The same report the command line prints — the per-file table used to be
@@ -235,9 +242,16 @@ def _snapshot_text(r) -> str:
 # The snapshot is the overview with nothing phrased: whose profile this is, which
 # marker keys and which pharmacogenes it holds, which target genes have no data.
 def _overview_data(snapshot: bool = False, visit_sheet: bool = False,
-                   include_reference: bool = False, period: int = 365, agenda_ids: str | None = None):
-    if _yes(visit_sheet) or _yes(include_reference):
-        return engine.visit_sheet(_yes(include_reference), ([s.strip() for s in agenda_ids.split(",") if s.strip()] if agenda_ids is not None else None))
+                   include_reference: bool = False, period: int = 365, agenda_ids: str | None = None,
+                   compact: bool = False, visit_systems: str | None = None,
+                   visit_panels: str | None = None, visit_focus: str = ""):
+    if _yes(visit_sheet) or _yes(include_reference) or _yes(compact) or visit_systems is not None or visit_panels is not None or visit_focus:
+        options = ({"compact": _yes(compact),
+                    "visit_systems": [k.strip() for k in visit_systems.split(",") if k.strip()] if visit_systems is not None else None,
+                    "visit_panels": [k.strip() for k in visit_panels.split(",") if k.strip()] if visit_panels is not None else None,
+                    "visit_focus": visit_focus}
+                   if _yes(compact) or visit_systems is not None or visit_panels is not None or visit_focus else {})
+        return engine.visit_sheet(_yes(include_reference), ([s.strip() for s in agenda_ids.split(",") if s.strip()] if agenda_ids is not None else None), **options)
     return engine.load_profile() if _yes(snapshot) else engine.overview(int(period))
 
 
@@ -610,15 +624,15 @@ _TOOLS = (
     ("sch_genome_lookup", ("rsid", "gene"), [], _h_genome),
     ("sch_check_prescription", ("drug",), ["drug"], _h_prescription),
     ("sch_health_metrics", (), [], _h_metrics),
-    ("sch_lifestyle", (), [], _h_lifestyle),
+    ("sch_lifestyle", ("cgm_report",), [], _h_lifestyle),
     ("sch_clinvar_findings", (), [], _h_clinvar),
     ("sch_prs", (), [], _h_prs),
     ("sch_longevity", (), [], _h_longevity),
     ("sch_goal", (), [], _h_goal),
     ("sch_phenoage", ("panel",), [], _h_phenoage),
     ("sch_provenance", ("refresh",), [], _h_provenance),
-    ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive", "force"), ["folder"], _h_ingest_labs),
-    ("sch_overview", ("snapshot", "visit_sheet", "include_reference", "period", "agenda_ids"), [], _h_overview),
+    ("sch_ingest_labs", ("folder", "archive_preview", "approve_archive", "force", "kind", "confirm"), ["folder"], _h_ingest_labs),
+    ("sch_overview", ("snapshot", "visit_sheet", "include_reference", "period", "agenda_ids", "compact", "visit_systems", "visit_panels", "visit_focus"), [], _h_overview),
     ("sch_insight_snapshot", ("confirm",), [], _h_insight_snapshot),
     ("sch_second_opinion", (), [], _h_second_opinion),
     ("sch_limits", ("bed", "panel"), [], _h_limits),
@@ -653,7 +667,7 @@ _TOOLS = (
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
 _PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean", "stop": "boolean",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
-               "levels": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
+               "levels": "boolean", "compact": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 
 
 def _schema(name: str, params, required) -> dict:

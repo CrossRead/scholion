@@ -64,7 +64,8 @@ be reached.
 as they are; Claude Code and Hermes each keep their own folder and take the same
 single file. OpenClaw is also served through its own registry — that is the
 supported route there, and the `git:` form of its installer is not, because it
-expects a repository whose root is the skill. The README carries the table, with the date it was checked.
+expects a repository whose root is the skill. Use the host’s configured skill directory, or pass that directory explicitly to
+`scholion skill --install`.
 The directory has to be named `scholion` — the format requires the folder name
 and the `name` field to match.
 
@@ -369,3 +370,22 @@ when the person requests it, using the returned fingerprint as `confirm`.
 If the input changes, obtain and review a new preview. A missing or older
 observation is not evidence of recovery. These operations do not recalculate
 a genome or change treatment.
+
+
+### Pathway panels, clinical estimates and CGM
+
+Use `sch_system(key="clinical_estimates")` for the shared FIB-4 and PhenoAge
+panel. Both retain their own dated inputs and method sources; no clinical
+questionnaire is required. Missing inputs must not be invented or borrowed from
+a different draw.
+`sch_system(key="methylation")` and the other keys returned by `sch_panel`
+provide pathway readings. Reference-only panels do not require a genome.
+
+For a folder the person explicitly names, use
+`sch_ingest_labs(folder="...", kind="studies")` to preview instrumental studies
+and Lumiflex application CGM PDFs. After the person reviews the preview, call it
+again with its exact `approval_token` in `confirm`. Changed inputs invalidate the
+token. `sch_lifestyle(cgm_report="SOURCE_SHA256")` reads a saved revision; omit
+that parameter to read the latest report. The same registry serves MCP and
+Ouroboros. A graph-derived response is approximate, and a sensor GMI is not a
+laboratory HbA1c result. Import does not prepare a genome or recalculate PGS.

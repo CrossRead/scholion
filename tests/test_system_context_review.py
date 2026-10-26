@@ -114,6 +114,8 @@ class SystemContextReviewTests(unittest.TestCase):
         self.assertNotIn("Possible relation",brief["support"])
         data = visit_sheet(agenda_ids=[])
         data["agenda"]["items"] = [{**item,"visit_brief":brief}]
+        # Exercise the retained pre-document JSON shape, not a stale projection.
+        data.pop("document", None)
         rendered = visit_report(data)
         self.assertIn("5 mmol/L",rendered)
         self.assertIn("4 mmol/L",rendered)

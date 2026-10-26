@@ -85,6 +85,7 @@ class TestHostList(unittest.TestCase):
     """
 
     EXPECTED = {
+        "doi.org",                     # supported estimate reference links; no profile requests
         "www8.garmin.com",             # explicit manufacturer reference link, no profile upload
         "api.cpicpgx.org",              # gene↔drug pairs from CPIC
         "api.mymemory.translated.net",  # translation of the Russian drug name

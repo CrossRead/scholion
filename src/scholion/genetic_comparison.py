@@ -220,6 +220,8 @@ def _compare_spec(row: dict, markers: dict, spec: dict) -> dict:
                 shift = {**shift, 'eligible': False, 'reason': 'proposed_rule'}
             horizons.append({'window': window, **shift})
     check = t('genlab.check_quality') if quality['status'] != 'usable' else t('genlab.check_context')
+    from .knowledge_provenance import association
+    witness = association(association_id(spec))
     return {'id': spec['rsid'] + ':' + spec['marker'], 'association_id': association_id(spec),
         'relation_type': spec.get('relation_type', 'quantitative'), 'association_level': spec['association_level'], 'gene': row['gene'], 'rsid': row['rsid'],
         'systems': spec['systems'], 'reference_system': spec.get('reference_system'), 'level': level, 'variant_level': row.get('level'),
@@ -234,7 +236,7 @@ def _compare_spec(row: dict, markers: dict, spec: dict) -> dict:
         'source': spec['source'], 'source_links': sources(spec['source']),
         'knowledge': {'version': catalogue().get('_meta', {}).get('version'),
                       'checked_on': spec['checked_on'], 'review_kind': spec['review_kind'],
-                      'clinical_review': None},
+                      'clinical_review': None, 'record': witness},
         'limitations': spec['limitations'], 'reasons': list(dict.fromkeys(reasons)),
         'reason_labels': [t('genlab.quality.' + r) for r in dict.fromkeys(reasons)],
         'applicable': applicable, 'horizons': horizons, 'contrary_observations': history,

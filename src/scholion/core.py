@@ -990,7 +990,7 @@ LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status
                           # the routes protein arrives by, what each route state
                           # means, the load tests and the classes of what a
                           # genotype says about a route.
-                          "links", "routes", "load_tests", "route_classes"}
+                          "links", "routes", "load_tests", "route_classes", "source_passport"}
 
 # A language map whose values are STRUCTURE, not prose: `labels` in the marker
 # dictionary holds, per language, a marker's display name together with the
@@ -1484,8 +1484,9 @@ def resolve_unit(spec: Dict[str, Any], given: str) -> Dict[str, Any]:
         return {"ok": True, "factor": 1.0, "offset": 0.0, "canonical": canonical}
     entry = (_read_knowledge_raw("units.json").get("units", {}).get(canonical) or {})
     labels = entry.get("label") or {}
-    if isinstance(labels, dict) and any(_norm_unit(v) == g for v in labels.values()
-                                        if isinstance(v, str)):
+    spellings = list(labels.values()) if isinstance(labels, dict) else []
+    spellings.extend(entry.get("synonyms") or [])
+    if any(isinstance(v, str) and _norm_unit(v) == g for v in spellings):
         return {"ok": True, "factor": 1.0, "offset": 0.0, "canonical": canonical}
 
     return {"ok": False, "canonical": canonical, "accepted": _accepted_units(spec),
@@ -1527,10 +1528,11 @@ def _accepted_units(spec: Dict[str, Any]) -> List[str]:
     canonical = spec.get("unit") or ""
     if canonical:
         out.append(canonical)
-        labels = ((_read_knowledge_raw("units.json").get("units", {}).get(canonical) or {})
-                  .get("label") or {})
+        entry = _read_knowledge_raw("units.json").get("units", {}).get(canonical) or {}
+        labels = entry.get("label") or {}
         if isinstance(labels, dict):
             out.extend(v for v in labels.values() if isinstance(v, str) and v not in out)
+        out.extend(v for v in entry.get("synonyms") or [] if isinstance(v, str) and v not in out)
     for source in (spec.get("convert") or {}, spec.get("units") or {},
                    spec.get("convert_affine") or {}):
         for surface in source:
@@ -1580,6 +1582,9 @@ def marker_name(m: Dict[str, Any]) -> str:
     antibodies» (found redrawing the radar, 27.09.2026). The profile's name
     survives for a marker the dictionary does not know."""
     from .i18n import lang as _lang
+    if m.get("key") in ("systolic_bp", "waist_cm"):
+        from .i18n import t
+        return t("clinical.metric." + m["key"])
     known = (lab_markers().get("markers") or {}).get(m.get("key")) or {}
     return marker_display(known, _lang() or "en") or m.get("name") or m.get("key", "")
 

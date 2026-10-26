@@ -267,6 +267,12 @@ def reconcile_report(r: Dict[str, Any]) -> str:
     else:
         lines.append("🟢 " + _t("reconcile.all_readable"))
 
+    unparsed = r.get("unparsed_sections", [])
+    if unparsed:
+        lines.append("\n🟠 " + _t("selfcheck.unparsed_sections", n=len(unparsed)))
+        for section in unparsed:
+            lines.append(f"   • {section['file']} — {section.get('detail') or section['reason']}")
+
     miss = r.get("missing", [])
     if miss:
         lines.append("\n🟡 " + _t("reconcile.missing", n=len(miss)))
@@ -274,7 +280,7 @@ def reconcile_report(r: Dict[str, Any]) -> str:
             u = f" {m['unit']}" if m.get("unit") else ""
             lines.append(f"   • {m['marker']} {m['date']} = {m['value']}{u}  ← {m['file']} ({m['reason']})")
     else:
-        lines.append("\n🟢 " + _t("reconcile.no_missing"))
+        lines.append("\n" + (_t("reconcile.completeness_unknown") if unparsed else "🟢 " + _t("reconcile.no_missing")))
 
     mm = r.get("mismatch", [])
     if mm:
@@ -494,6 +500,8 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
         return f"⚠️ {r.get('error', '')}"
     L = [_t("ingest.labs_done", files=r.get("files_processed", 0),
             points=r.get("points_added", 0), skipped=r.get("skipped", 0))]
+    if r.get("metrics_added"):
+        L.append(_t("fhir.metrics_taken", n=r["metrics_added"]))
     for item in r.get("unrecognised_rows") or []:
         L.append(_t("ingest.unrecognised_rows", file=item["file"], n=item["count"]))
         L.extend(f"    · {row['label']} [{row.get('unit') or ''}]" for row in item["rows"])
@@ -501,7 +509,9 @@ def ingest_labs_report(r: Dict[str, Any]) -> str:
     if missed:
         L += ["", _t("ingest.not_ingested_header", n=len(missed))]
         for it in missed[:20]:
-            L.append(f"- `{it['file']}` — {it.get('detail', it.get('reason', ''))}")
+            section = (it.get("section") or {}).get("title")
+            label = f" · {section}" if section else ""
+            L.append(f"- `{it['file']}`{label} — {it.get('detail', it.get('reason', ''))}")
             for row in (it.get("unrecognised") or [])[:6]:
                 unit = f" [{row['unit']}]" if row.get("unit") else ""
                 L.append(f"    · «{row['label']}»{unit}")
@@ -562,6 +572,8 @@ def ingest_studies_report(r: Dict[str, Any]) -> str:
     is listed apart so the two files that DID go missing are not buried under
     forty that went where they belong.
     """
+    if r.get("dry_run"):
+        return _t("cgm.preview_result", added=r.get("would_add",0), updated=r.get("would_update",0), failed=len(r.get("not_ingested") or []))+"\n"+str(r.get("approval_token") or "")
     if not r.get("ok"):
         return f"⚠️ {r.get('error', '')}"
     L = [_t("ingest.studies_done", total=r.get("total"), added=r.get("added"),

@@ -4,7 +4,15 @@ Scholion brings a person's laboratory history, recorded prescriptions, genome an
 
 ## Start with the visit sheet
 
-Choose **Visit** in the application header. The first tab opens a structured sheet with topics grouped by body system, the conclusions and supporting measurements, questions for discussion and current prescriptions. Completed courses remain in history. Sources and detailed observations can be expanded; the sheet can be printed.
+Open **Visit sheet** from Today and select the body systems, thematic gene panels
+and question relevant to the appointment. The short sheet starts with meaningful
+findings and dated measurements, including available annual direction. Genetics
+is selected for an explicit link to a discussed measurement or prescription;
+each included factor states why it is relevant. It is not an alphabetical sample
+of the catalogue. Important recorded alerts remain visible outside a narrow
+selection. The full handout and source details remain available; completed
+courses stay in treatment history. Preparing a sheet does not start genome or
+polygenic-score recalculation.
 
 ## Read change at the right timescale
 
@@ -14,7 +22,24 @@ Reported changes in symptoms, function or tolerability are shown separately from
 
 ## How to read genetics
 
-System panels show the actual reading, gene function, variant context and the **Scholion A–E evidence level**. Open the letter for its definition and the gene for details and sources. A gene–disease relationship from **GenCC** carries its own validity classification; it is distinct from evidence for an individual variant. A missing call does not mean the gene or allele is absent.
+Gene cards start with known function, followed by the actual reading and quality,
+the known influence of the specific variant and applicable comparisons with the
+person's measurements. Open the **Scholion A–E** letter for its definition and
+the gene for details and sources. **GenCC** gene–disease validity and **ClinVar**
+variant classification have separate labels and sources. A missing call does not
+mean the gene or allele is absent.
+
+Findings show zygosity and sourced inheritance. A single heterozygous finding
+under a supported recessive model is carrier context, not a diagnosis. Dominant,
+X-linked, mixed and unresolved cases retain their own qualifications. Two
+heterozygous variants do not establish compound heterozygosity without phase.
+The classification of a variant, the validity of a gene–disease relationship and
+the meaning of that finding for a person are different questions.
+
+The existing body systems remain in place. Methylation has a shared thematic
+view; research associations involving neurotransmitters and stress remain
+separate from clinical neurogenetics. A rare metabolic disease link is explained
+on its gene card rather than introducing a new body-system score.
 
 A **PGS percentile is a position in a reference population, not the probability of disease**. Calculation, coverage, coordinates and calibration must be verified. Previously saved unverified values retain their status and an explanation. Clinical findings require their own supporting evidence; a catalogue association alone does not establish a diagnosis.
 

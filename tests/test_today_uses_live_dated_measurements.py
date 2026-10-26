@@ -95,7 +95,9 @@ class LiveMeasurements(unittest.TestCase):
         from scholion import genome
         from scholion.engine import genomics
         hit = {"gene": "GNMT|SYN1", "rsid": "rs9296404", "genotype": "0/1", "clnsig": "Pathogenic", "stars": 4}
-        with mock.patch.object(genome, "clinvar_hits", return_value={"status": "ok", "hits": [hit]}), \
+        table = self.root / "clinvar_hits.tsv"
+        table.write_text("\t".join(hit) + "\n" + "\t".join(str(v) for v in hit.values()) + "\n", encoding="utf-8")
+        with mock.patch.object(core, "genome_bases", return_value=[self.root]), \
              mock.patch.object(genome, "clinvar_normalisation", return_value={"left_aligned": True}), \
              mock.patch.object(genomics, "_array_only_input", return_value=None), \
              mock.patch.object(genomics, "_input_boundary", return_value=None):

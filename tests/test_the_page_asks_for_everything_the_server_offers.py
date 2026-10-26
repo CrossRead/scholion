@@ -36,10 +36,6 @@ POST_NOT_IN_THE_PAGE = {
         "superseded by /api/ingest-wearable when a second device arrived. The name "
         "survives because the public contract may not shrink; the page uses the "
         "one that asks which device it is looking at.",
-    "/api/ingest-studies":
-        "a real gap: doctors' conclusions can be loaded from the command line and "
-        "not from the page. Recorded here so that it is a known absence rather "
-        "than a discovery.",
 }
 
 

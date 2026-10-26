@@ -29,7 +29,9 @@
         "t4_free": "Thyroxine is synthesised by the thyroid follicle; the mark and the gland are the same thing.",
         "t3_free": "Triiodothyronine is secreted by the thyroid and also made outside it by deiodination of T4 in liver and kidney; the gland is the regulated source and carries the mark.",
         "anti_tpo": "An antibody against thyroid peroxidase is produced by lymphocytes, which are everywhere and mean nothing as a place. It is the named exception to the producing-organ rule and is marked at the gland it is raised against, which is where its consequence is."
-      }
+      },
+      "system_anchor": "thyroid",
+      "system_anchor_note": "Schematic navigation anchor for the whole System. The System label and score cover its entire panel; by_marker retains the producing-organ detail and is not replaced by this anchor."
     },
     "adrenals": {
       "place": "adrenals",
@@ -45,7 +47,9 @@
         "testosterone": "Testosterone is produced by the gonads — the testis, and the ovary together with the adrenal cortex — so the mark sits at the pelvis on either figure.",
         "dht": "Dihydrotestosterone is not secreted by a gland: it is converted from testosterone by 5α-reductase in the tissues that respond to it — prostate, skin, hair follicle. There is no one place to mark, and marking the gonad would name the source of its precursor instead.",
         "estradiol": "Estradiol comes from the ovary in one person and from aromatisation in adipose tissue in another, so no single mark is true of both figures. The number is shown, the place is not claimed."
-      }
+      },
+      "system_anchor": "gonads",
+      "system_anchor_note": "Schematic navigation anchor for the whole System. The System label and score cover its entire panel; by_marker retains the producing-organ detail and is not replaced by this anchor."
     },
     "growth": {
       "by_marker": {
@@ -55,7 +59,9 @@
       "basis": {
         "igf1": "IGF-1 is made by the hepatocyte under growth hormone: the pituitary sends the signal and the liver writes the answer, which is the organ carrying the mark.",
         "gh": "Growth hormone is secreted by the anterior pituitary, which is where the signal of this axis begins."
-      }
+      },
+      "system_anchor": "pituitary",
+      "system_anchor_note": "Schematic navigation anchor for the whole System. The System label and score cover its entire panel; by_marker retains the producing-organ detail and is not replaced by this anchor."
     },
     "pancreas": {
       "place": "pancreas",
@@ -81,7 +87,9 @@
         "hba1c": "Glycated haemoglobin forms inside the red cell wherever the blood happens to be. It is a record of exposure over three months, not a product of a gland.",
         "homa_ir": "An index computed from glucose and insulin: an arithmetic result, not a substance, and it has no place of origin at all.",
         "insulin": "Insulin is secreted by the beta cell of the pancreatic islet — the one member of this panel with a gland behind it, and the reason the pancreas is lit by a carbohydrate marker."
-      }
+      },
+      "system_anchor": "pancreas",
+      "system_anchor_note": "Schematic navigation anchor for the whole System. The System label and score cover its entire panel; by_marker retains the producing-organ detail and is not replaced by this anchor."
     },
     "lipids": {
       "systemic": true,

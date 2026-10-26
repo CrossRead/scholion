@@ -111,7 +111,7 @@ def _wear_status(latest: float, meta: Dict[str, Any]):
     return "none", None
 
 
-def lifestyle() -> Dict[str, Any]:
+def lifestyle(cgm_report: str = '') -> Dict[str, Any]:
     """Historical lifestyle data (wearable devices): trends by year, status vs the target,
     improvement/worsening, a workout summary and an integral fitness score (for the radar/analysis)."""
     data = core.wearable_trends()
@@ -290,7 +290,7 @@ def lifestyle() -> Dict[str, Any]:
             continue
         direction = marker.get("direction") or ("lower_better" if marker.get("ref_high")
                                                 else ("higher_better" if marker.get("ref_low") else None))
-        info = {"label": (mm.get("Weight", {}).get("label") if mk == "weight" else None) or marker.get("name", mk), "unit": core.unit_label(marker.get("unit", "")),
+        info = {"label": (mm.get("Weight", {}).get("label") if mk == "weight" else None) or core.marker_name({"key":mk,"name":marker.get("name",mk)}), "unit": core.unit_label(marker.get("unit", "")),
                 "direction": direction, "group": "anthro", "why": marker.get("note", ""),
                 "target_high": marker.get("ref_high"), "target_low": marker.get("ref_low")}
         man = _life_metric(mk, info, monthly)
@@ -358,8 +358,10 @@ def lifestyle() -> Dict[str, Any]:
             watch.append(item)
     conclusions = {"good": good, "watch": watch}
     unresolved = sorted(k for k, srcs in shared.items() if primary not in srcs)
+    from ..cgm import summary as cgm_summary
     return {"body_composition": {"notice": _t("body.overlap"), "details": _t("body.overlap_example"),
                                 "definition_source": "https://www8.garmin.com/manuals/webhelp/GUID-0BADEBCF-960D-4961-856C-86B9204BC169/EN-US/GUID-CB348359-1E39-491B-86B5-79CB12FB6A8C.html"},
+            "cgm": cgm_summary(cgm_report),
             "metrics": out, "workouts": workouts[:14], "fitness_score": fitness, 'output_kind': 'display_index',
             "conclusions": conclusions,
             "sources": [s for s, _ in blocks], "primary_source": primary,

@@ -15,7 +15,7 @@ from .goal_basis import goal_basis_text
 def lifestyle_report(r: Dict[str, Any]) -> str:
     """Lifestyle (wearable devices): year-by-year trends + a workout summary."""
     ms = r.get("metrics", [])
-    if not ms:
+    if not ms and not (r.get('cgm') or {}).get('available') and not (r.get('cgm') or {}).get('requested_report'):
         return _t("lifestyle.empty")
     fs = r.get("fitness_score")
     lines = [_t("lifestyle.title")
@@ -72,6 +72,8 @@ def lifestyle_report(r: Dict[str, Any]) -> str:
             if comparison.get("distinguishable") is not True or not comparison.get("eligible"):
                 lines.append(_t("insight.no_change_estimate"))
             lines.extend(_t("insight.limit." + key) for key in comparison.get("limitations") or [])
+    from .format_cgm import lines as cgm_lines
+    lines.extend(cgm_lines(r.get("cgm") or {}))
     wk = r.get("workouts", [])
     if wk:
         top = ", ".join(f"{x['type']} ({x['total']})" for x in wk[:6])
@@ -317,6 +319,13 @@ def overview_report(r: Dict[str, Any]) -> str:
                 out.append(f"  {_flag_icon(m.get('flag'))} {m.get('name')}: "
                            f"{m.get('value')} {m.get('unit_display', m.get('unit', ''))} ({m.get('date', '')})")
             out.append("")
+
+    if r.get("clinical_estimates"):
+        estimates = r["clinical_estimates"]
+        out += ["", estimates["label"]]
+        out += [row["name"] + ": " + ("—" if row["value"] is None else str(row["value"])+" "+row["unit"])
+                + " · " + _t("clinical.status."+row["status"]) for row in estimates["estimates"]]
+        out.append("scholion system clinical_estimates")
 
     hs = r.get("pending_suggestions") or r.get("high_suggestions") or []
     line = _t("overview.suggestions", n=r.get("suggestions_count", 0))

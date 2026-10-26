@@ -2,8 +2,30 @@
 from .i18n import t
 
 
+def basis_lines(item: dict) -> list[str]:
+    basis = (item.get("provenance") or {}).get("basis") or {}
+    if not basis:
+        return []
+    lines = [t("insight.basis.title")]
+    seen = set()
+    for fact in basis.get("facts") or []:
+        source = fact.get("source") or t("insight.basis.source_unknown")
+        key = (str(source), fact.get("date"))
+        if key in seen:
+            continue
+        seen.add(key)
+        lines.append(str(fact.get("date") or "—") + " · " + str(source))
+        if fact.get("availability") == "unavailable":
+            lines.append(t("insight.basis.unavailable"))
+    for witness in (basis.get("knowledge") or []) + (basis.get("rule_sources") or []):
+        lines.append(str(witness.get("source") or t("insight.basis.source_unknown")) + " · " +
+                     str(witness.get("checked_on") or "—") + " · " + str(witness.get("version") or "—"))
+    lines += [t("insight.basis.recorded"), t("insight.basis.refresh")]
+    return lines
+
+
 def review_change_lines(comparison: dict) -> list[str]:
-    items = comparison.get("items") or []
+    items = comparison.get("display_items", comparison.get("items")) or []
     changed = [i for i in items if i["status"] != "unchanged"]
     lines = [] if changed else [t("insight.no_changes")]
     for item in changed:
@@ -98,6 +120,8 @@ def attention_report(feed: dict, clinician: bool = False) -> str:
                 lines.extend(comparison_lines(detail["comparison"]))
             for limit in event.get("limitations") or []:
                 lines.append(t("insight.limit." + limit))
+        if clinician:
+            lines.extend(basis_lines(item))
     if "highlights" in feed and feed["items"]:
         lines += ["", t("insight.observations", n=len(feed["items"]))]
         lines.extend(item["title"] + " · " + item["date"] for item in feed["items"])

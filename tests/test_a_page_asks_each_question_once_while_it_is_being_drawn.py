@@ -73,17 +73,55 @@ class TestOneReading(unittest.TestCase):
         self.assertEqual([1, 1], calls)
 
 
-class TestTheServerWarmsTheCardsAfterBinding(unittest.TestCase):
+class TestTheServerPreparesOnlyBoundedPositions(unittest.TestCase):
 
-    def test_the_warm_up_reads_every_system_once_and_swallows_a_failure(self):
-        from scholion import engine, server
-        from scholion.engine import system_panels as SP
-        n = server.warm_up()
-        self.assertEqual(len(SP.domains()), n)
-        # The warm-up reads through the engine facade, so that is where a
-        # failure is planted.
-        with mock.patch.object(engine, "systems", side_effect=RuntimeError("cold disk")):
+    def test_warm_up_does_not_compute_invisible_panels_and_keeps_failure_optional(self):
+        from scholion import engine, genome, server
+        with mock.patch.object(engine, "systems", side_effect=AssertionError("eager hidden panels")), \
+                mock.patch.object(genome, "_prefetch_catalogue_rows") as prepare, \
+                mock.patch.dict(genome._REGION_CACHE, {("synthetic",): ()}, clear=True):
+            self.assertEqual(1, server.warm_up())
+            prepare.assert_called_once_with()
+        with mock.patch.object(genome, "_prefetch_catalogue_rows", side_effect=RuntimeError("cold disk")):
             self.assertEqual(0, server.warm_up())
+
+    def test_startup_integrity_uses_the_same_package_and_pinned_profile_in_a_child(self):
+        import subprocess
+        import sys
+        from scholion import server
+        profile = support.FIXTURE_PROFILE.resolve()
+        repo = support.ROOT.resolve()
+        completed = subprocess.CompletedProcess([], 0, 'Synthetic integrity summary\n', '')
+        with mock.patch.object(server.subprocess, 'run', return_value=completed) as run, \
+                mock.patch('builtins.print') as output:
+            server._startup_selfcheck(profile, repo)
+        args, kwargs = run.call_args
+        self.assertEqual([sys.executable, '-c'], args[0][:2])
+        self.assertIn('reconcile.selfcheck_summary(reconcile.reconcile())', args[0][2])
+        self.assertEqual(str(profile), kwargs['env']['SCHOLION_PROFILE_DIR'])
+        self.assertEqual(str(repo), kwargs['env']['SCHOLION_REPO_DIR'])
+        self.assertEqual(str(Path(server.__file__).resolve().parent.parent), kwargs['env']['PYTHONPATH'])
+        self.assertEqual(300, kwargs['timeout'])
+        self.assertNotIn('shell', kwargs)
+        output.assert_called_once_with('Synthetic integrity summary', flush=True)
+
+    def test_failed_integrity_child_is_named_instead_of_printing_a_success(self):
+        import subprocess
+        from scholion import server, i18n
+        for result in (subprocess.CompletedProcess([], 1, '', 'Synthetic failure'),
+                       subprocess.TimeoutExpired('synthetic child', 300)):
+            with self.subTest(result=type(result).__name__), \
+                    mock.patch.object(server.subprocess, 'run') as run, \
+                    mock.patch('builtins.print') as output:
+                if isinstance(result, Exception):
+                    run.side_effect = result
+                else:
+                    run.return_value = result
+                server._startup_selfcheck(support.FIXTURE_PROFILE, support.ROOT)
+                self.assertTrue(output.called)
+                error = str(result) if isinstance(result, Exception) else 'Synthetic failure'
+                self.assertEqual(i18n.t('server.selfcheck_skipped', error=error),
+                                 output.call_args.args[0])
 
 
 class _Folder(unittest.TestCase):

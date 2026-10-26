@@ -62,7 +62,7 @@ def visit_topic(item: dict) -> dict:
         conclusions.append(item["context_lifestyle_summary"])
     if not conclusions:
         conclusions = [item.get("title") or ""]
-    support = []
+    support = [context['cgm']['message']] if context.get('cgm') else []
     for event in item.get("events") or []:
         detail = event.get("detail") or {}
         for key in ("action", "factor", "why_it_matters", "why", "plan_source"):
@@ -75,7 +75,9 @@ def visit_topic(item: dict) -> dict:
 
 
 @core.in_reading
-def visit_sheet(include_reference: bool = False, agenda_ids: list[str] | None = None) -> Dict[str, Any]:
+def visit_sheet(include_reference: bool = False, agenda_ids: list[str] | None = None, *,
+                compact: bool = False, visit_systems: list[str] | None = None,
+                visit_panels: list[str] | None = None, visit_focus: str = "") -> Dict[str, Any]:
     """Do not promote a reference sentence to a personal clinical conclusion."""
     # The package sets its version after importing the engine facade.
     from .. import __version__
@@ -161,13 +163,15 @@ def visit_sheet(include_reference: bool = False, agenda_ids: list[str] | None = 
                 appendix["panels"].append({"key": spec["key"], "label": panel["label"], "positions": rows})
     agenda = [{**item, "visit_brief": visit_topic(item)} for item in agenda]
     from .sources import provenance
+    from ..clinical_estimates import panel as clinical_panel
     medications = store.list_medications()
     questions = list(dict.fromkeys(q for item in agenda for q in item.get("questions", [])))
     brief = {"period": 365, "questions": questions, "summary": t("visit.summary_counts",
              systems=sum(bool(i.get("system")) for i in agenda),
              medications=sum(m["current"] for m in medications), controls=len(treatment["overdue"]))}
-    return {"ok": True, "kind": "visit_sheet", "container": container.named(),
+    result = {"ok": True, "kind": "visit_sheet", "container": container.named(),
             "version": __version__, "as_of": date.today().isoformat(),
+            "clinical_estimates": clinical_panel(),
             "synthetic": core.profile_is_synthetic(), "title": t("visit.title"),
             "scope_note": t("visit.scope"), "goals": goals.get("entities", []),
             "agenda": {"items": agenda, "count": len(agenda), "total": len(feed["items"]),
@@ -184,3 +188,13 @@ def visit_sheet(include_reference: bool = False, agenda_ids: list[str] | None = 
             "regimen_cautions": cautions, "treatment": treatment,
             "sources": provenance(), "reference_appendix": appendix,
             "appendix_note": t("visit.appendix_note"), "disclaimer": DISCLAIMER()}
+
+    result["safety_topics"] = [{**i, "visit_brief": visit_topic(i)} for i in highlights
+        if any(e["kind"] in ("clinical_threshold", "overdue_control") for e in i["events"])]
+    if compact or visit_systems is not None or visit_panels is not None or visit_focus:
+        from ..visit_focus import build
+        result["appointment"] = build(result, visit_systems, visit_panels, visit_focus, lab_markers=labs["markers"])
+    from ..visit_focus import build, document
+    projection = result.get("appointment") or build(result, None, None, "", full=True, lab_markers=labs["markers"])
+    result["document"] = document(result, projection, compact="appointment" in result)
+    return result

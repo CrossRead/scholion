@@ -30,7 +30,7 @@ build-backend = "hatchling.build"
 [project]
 name = "scholion"
 dynamic = ["version"]
-description = "Local analysis layer over your own medical data — genome, lab history, prescriptions, wearables"
+description = "Local health insights for patients and clinicians: connect lab trends, genetics, prescriptions and wearable data"
 readme = "README.md"
 requires-python = ">=3.10"
 
@@ -81,10 +81,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
 ]
 
-# One dependency, and it is deliberate — the reasoning is at the top of this file.
+# PDF extraction and, on Windows, the IANA database absent from the OS.
 dependencies = [
     # Lab PDFs are the first data most people load. See the note at the top.
     "pdfplumber>=0.11",
+    "tzdata; sys_platform == 'win32'",
 ]
 
 [project.optional-dependencies]

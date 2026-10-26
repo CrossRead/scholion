@@ -63,6 +63,9 @@ def _position(p: Dict[str, Any]) -> Dict[str, Any]:
 
 def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
     """One system's panel as the catalogue holds it; with no key, every system that has one."""
+    from . import thematic_panels
+    if key in (thematic_panels.thematic_catalogue().get("panels") or {}):
+        return thematic_panels.thematic_reference(key)
     cur = _curated()
     systems = cur.get("systems") or {}
     meta = cur.get("_meta") or {}
@@ -95,7 +98,7 @@ def panel_description(key: Optional[str] = None) -> Dict[str, Any]:
                 "key": "author_list", "label": _t("panel.author_list"),
                 "positions": sum(len(s.get("positions", [])) for s in
                                  core._read_knowledge("panel_intake.json").get("lists", {}).values()),
-                "unreadable": 0}]}
+                "unreadable": 0}] + thematic_panels.thematic_summaries()}
     spec = systems.get(key) if isinstance(systems.get(key), dict) else {}
     positions = [_position(p) for p in spec.get("positions") or [] if isinstance(p, dict)]
     by_gene: Dict[str, List[Dict[str, Any]]] = {}

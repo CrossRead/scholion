@@ -13,7 +13,6 @@ whichever name they are asked by.
 """
 from __future__ import annotations
 
-import gzip
 import shutil
 import struct
 import tempfile
@@ -24,6 +23,7 @@ from unittest import mock
 import support  # noqa: F401
 from scholion import bamlite, gene_region
 from scholion.engine import genomics
+from tests.test_a_file_without_an_index_is_still_a_file import bgzf
 
 
 def write_alignment(path: Path, contigs, reads) -> None:
@@ -44,9 +44,13 @@ def write_alignment(path: Path, contigs, reads) -> None:
         rec = struct.pack("<iiBBHHHiiii", ref, pos, len(name), 60, 4680, 1, 0, length, -1, -1, 0)
         rec += name + struct.pack("<I", length << 4) + b"\x11" * ((length + 1) // 2) + b"\x28" * length
         body += struct.pack("<i", len(rec)) + rec
-    packed = gzip.compress(head + body)
+    # An indexed BAM is BGZF, not an ordinary gzip stream. Both virtual
+    # offsets lie in this small fixture's first decompressed block.
+    if len(head + body) > 60_000:
+        raise ValueError("this single-block fixture needs a larger index writer")
+    packed = bgzf(head + body)
     path.write_bytes(packed)
-    chunk = struct.pack("<QQ", len(head), len(packed) << 16)
+    chunk = struct.pack("<QQ", len(head), len(head + body))
     index = b"BAI\x01" + struct.pack("<i", len(contigs))
     for _ in contigs:
         index += struct.pack("<i", 1) + struct.pack("<Ii", 0, 1) + chunk + struct.pack("<i", 0)

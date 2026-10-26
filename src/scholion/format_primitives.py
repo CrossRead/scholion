@@ -337,7 +337,7 @@ def _coverage_line(c: Dict[str, Any]) -> str:
 _SEV_ICON = {"high": "🔴", "moderate": "🟠", "low": "🟢"}
 
 
-_TIER_ICON = {"drug": "💊", "pathogenic": "🔴", "risk": "🟠", "protective": "🟢"}
+_TIER_ICON = {"drug": "💊", "pathogenic": "🟠", "risk": "🟠", "protective": "🟢"}
 
 
 def _clinvar_block(cv: Dict[str, Any]) -> str:
@@ -346,13 +346,22 @@ def _clinvar_block(cv: Dict[str, Any]) -> str:
         return ""
     out = ["\n**🧬 " + _t("clinvar_block.header") + "**"]
     for h in cv["hits"][:12]:
+        context = h.get("personal_context") or {}
         ic = _TIER_ICON.get(h.get("tier"), "•")
+        if h.get("tier") == "pathogenic":
+            ic = "⚪️" if context.get("status") == "carrier_context" else "🟠"
         sig = (h.get("clnsig") or "").replace("_", " ")
         via = (_t("clinvar_block.via_gene", gene=h["gene"]) if h.get("gene")
                else _t("clinvar_block.via_name"))
         dis = f" — {h['disease']}" if h.get("disease") else ""
         gt = _t("clinvar_block.genotype", genotype=h.get("genotype", "?"))
         out.append(f"{ic} `{h.get('rsid','')}` {sig} ({gt}, {via}){dis}")
+        from .panel_reference import reference_lines
+        for gene_context in h.get("gene_contexts") or []:
+            out.extend("  " + line for line in reference_lines(gene_context))
+        if context and context.get("status") != "classification_only":
+            from .finding_context import lines as context_lines
+            out.extend("  " + line for line in context_lines(h))
     return "\n".join(out)
 
 

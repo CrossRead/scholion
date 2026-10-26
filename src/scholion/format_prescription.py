@@ -465,6 +465,19 @@ def medications_report(r: Dict[str, Any]) -> str:
             head = _first_sentence(note)
             line += f" ({head}…)" if len(note) > len(head) + 2 else f" ({head})"
         out.append(line)
+        context = m.get("system_context") or {}
+        if context.get("systems"):
+            out.append("    " + _t("system.acts_on", systems=", ".join(
+                _t("radar.domain." + key) for key in context["systems"])))
+            seen = set()
+            for link in context.get("system_links") or []:
+                signature = (link["relation"], link.get("note"))
+                if signature not in seen:
+                    seen.add(signature)
+                    out.append("      " + link["relation_label"] +
+                               (": " + link["note"] if link.get("note") else ""))
+        for item in context.get("outside_contexts") or []:
+            out.append("    " + item["note"])
     out.append("")
     out.append(_t("medications.pgx_legend"))
     treatment = r.get("treatment") or {}

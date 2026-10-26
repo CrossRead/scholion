@@ -24,6 +24,7 @@ PKG = support.SRC / "scholion"
 #: module.name → what the key is. «path» entries hold a person's data and key
 #: it by the file it came from; «program» entries hold nothing about a person.
 KEYED = {
+    "knowledge_provenance._RAW_CACHE": ("path", "resolved knowledge file path; mtime, size and reader identity checked before reuse"),
     "core._JSON_CACHE": ("path", "the file's path and its modification time"),
     "core._STAMP_CACHE": ("path", "the file's path and its modification time"),
     "core._KB_CACHE": ("path", "path|language; the path may be a local copy beside the profile"),

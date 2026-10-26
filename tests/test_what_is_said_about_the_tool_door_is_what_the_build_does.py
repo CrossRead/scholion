@@ -407,10 +407,11 @@ class TestTheInstructionNamesTheToolsTheBuildHas(unittest.TestCase):
     def test_every_second_reading_is_spelled_out(self):
         para = self.paragraph()
         for cmd, args in sorted(contract.PLUGIN_ARGS.items()):
-            for name in args:
+            for name, value in args.items():
                 with self.subTest(command=cmd):
                     self.assertIn(f"`{contract.PLUGIN[cmd]}` with", para)
-                    self.assertIn(f"`{name}=true` is", para)
+                    said=str(value).lower() if isinstance(value,bool) else str(value)
+                    self.assertIn(f"`{name}={said}` is", para)
                     self.assertIn(f"`{cmd}`", para)
 
 

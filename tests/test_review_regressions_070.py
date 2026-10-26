@@ -166,11 +166,12 @@ class VisitRecovery(TestCase):
         script = r"""
 const assert=require('node:assert/strict');
 let overviewRead=0,visitSelection=new Set(['lab:removed']),visitSelectionTouched=true,DISPLAY_MODE='patient';
+let visitFocusSystems=['lipids'],visitFocusPanels=['methylation'],visitFocusQuestion='Synthetic question';
 const nodes={},$=id=>nodes[id]??={};
 let forgotten=0, mounted=0;
 const forgetAnswers=()=>forgotten++,mount=()=>mounted++,setDisplayMode=m=>{DISPLAY_MODE=m;mounted++;};
 const t=k=>k,esc=x=>String(x).replaceAll('<','&lt;'),fmtDate=String;
-const showLoader=r=>r.innerHTML='Loading',markCurrentTab=()=>{};
+const showLoader=r=>r.innerHTML='Loading',markCurrentTab=()=>{},wireSystems=()=>{};
 const cautionsHtml=()=>'',controlsHtml=()=>'',reviewChangesHTML=()=>'',visitInsightHTML=()=>'';
 const root={isConnected:true,innerHTML:'',className:''};
 let answer,requested;
@@ -184,6 +185,7 @@ const api=async url=>{requested=url;if(answer instanceof Error)throw answer;retu
    answer={container:{id:'synthetic'},treatment:{controls:[]},sources:{},reference_appendix:{included:false}};
    await $('#visit-retry').onclick();assert.ok(root.innerHTML.includes('visit-cover'));
    assert.ok(requested.includes('item=lab%3Aremoved'),'retry preserves explicit selection');
+   assert.ok(requested.includes('system=lipids')&&requested.includes('panel=methylation')&&requested.includes('focus=Synthetic+question'),'retry preserves visit focus');
  }
  answer={error:'stale'};await viewVisitSheet(root);
  $('#visit-reselect').onclick();assert.equal(visitSelection.size,0);assert.equal(visitSelectionTouched,false);

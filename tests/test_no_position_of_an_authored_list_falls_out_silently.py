@@ -54,6 +54,10 @@ class TestTheLedger(unittest.TestCase):
         text = "".join((KNOW / f).read_text(encoding="utf-8")
                        for f in ("system_gene_panels.json", "on_demand_panels.json"))
         shown = {x.lower() for x in re.findall(r'"rsid":\s*"(rs\d+)"', text, re.I)}
+        # Coordinate-only additions are exposed through the common authored
+        # reference/reading panel, rather than promoted to a clinical system rule.
+        from scholion.engine import panel_description
+        shown.update(p['rsid'].lower() for p in panel_description('author_list')['positions'])
         stale = [f"row {p['row']} {p['rsid']}" for _, lst in self.lists() for p in lst["positions"]
                  if p.get("disposition") == "in_catalogue"
                  and (p["rsid"].lower() not in self.loci or p["rsid"].lower() not in shown)]

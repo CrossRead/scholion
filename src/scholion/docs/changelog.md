@@ -40,6 +40,163 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.2 — 26.10.2026
+
+**Carrier status is distinguished from disease.** Genome findings now show
+zygosity, sourced inheritance and what the recorded call can establish. A single
+heterozygous finding under a supported recessive model is presented as carrier
+context, separately from the variant's ClinVar classification. Multiple variants
+without established phase, mixed inheritance and incomplete readings remain
+explicitly unresolved. The same context reaches the web, command line and
+assistant tools. Existing saved findings need no genome recalculation; their
+classification and secondary-finding reporting rules remain unchanged.
+
+**Visit handouts connect genetics to the actual discussion.** Current deviations
+are grouped by System with their measurements and available annual history.
+A genetic factor is included for an explicit link to a discussed measurement
+or a recorded prescription, with its inclusion reason and evidence limits.
+System membership or alphabetical order alone no longer selects a factor.
+Counts cover the complete relevant set before preview limits and distinguish
+unique factors from their appearances in several Systems. Existing genomic
+readings need no recalculation for this presentation change.
+
+**The Today radar is visible immediately.** The system chart appears alongside
+the existing overview without an extra disclosure click.
+
+**Attention cards load faster.** A page shares repeated reference lookups and
+reads indexed catalogue positions in bounded batches. Startup PDF integrity
+checks run separately from the web interpreter. Measurements, genetic reading
+checks and card contents are retained; this change requires no recalculation.
+
+**Clinical estimates recognise available inputs more accurately.** Laboratory
+values with an import-source witness and registered unit spellings are accepted
+by the same conversion rules as other measurements. FIB-4 and PhenoAge use
+measurements from one draw; missing inputs are named without borrowing values
+from another draw.
+
+**Verified reference readings remain visible.** Some newly added SNPs could be
+shown as unread even when the aligned-read evidence confirmed the reference
+alleles. The reading now retains the evidence file's assembly and coordinate.
+An existing valid sites file needs no recalculation solely for this correction.
+
+**Prescriptions have broader, qualified System links.** Named nutrients and
+substances can relate to several Systems, with physiological context, research,
+possible influence and monitoring distinguished. A link is not a demonstrated
+treatment response. Food, gastrointestinal context outside the System map and
+formulation-dependent records receive an explanation instead of an arbitrary
+System assignment. The same relationships are available in the web, CLI and
+assistant tools; saved prescriptions and doses are not rewritten.
+
+**Compound laboratory documents retain separate collection dates.** Dated sections
+inside a discharge summary can be imported without assigning every result to the
+first date. Import, completeness checks and reverse provenance use the same
+section boundaries. Invalid section dates are reported; different draws remain
+separate. Reviewed archive previews retain their source and specimen checks.
+
+**FHIR measurements retain their identity.** Additional verified LOINC mappings
+preserve specimen, reported assay and source identifiers. Blood-specific
+concentrations stay separate from serum/plasma; a reported MDRD estimate does not
+become CKD-EPI. Vital signs and blood-pressure components enter the metrics layer.
+An issue date without a collection date remains approximate, and conflicting
+codes or invalid quantities receive a named refusal. FHIR bundles can also be
+imported through the shared folder-import path used by the web and assistant.
+
+Serum calcium imported from FHIR could previously be assigned to the separate
+elemental whole-blood series. It now enters the serum total-calcium series; a
+method-unspecified blood result stays separate from both.
+
+**Reference gene panels keep biological context separate from personal findings.**
+Pathway panels cover 525 genes and one separately labelled gene region within the
+existing body Systems. Methylation is shared across the relevant Systems;
+research associations in neurotransmission and stress are separate from clinical
+neurogenetics. Gene functions, actual readings, variant context and available
+measurements use one core across the application, CLI and assistant tools.
+Scholion confidence, GenCC gene–disease validity and ClinVar classifications
+remain separate. The supplementary GenCC snapshot retains all submitters and
+validity classes, including disagreement; the absence of a submission is not a
+negative genetic result. The main GenCC catalogue also retains all 1469 genes, with refreshed identity and function-source witnesses, bilingual descriptions, and current validity assertions for the existing disease concepts. Gene-level biology does not establish the effect of a personal variant. Gene names with mixed letter case retain their functions, translated disease labels and source identity when searched in upper case. Text reports also retain known functions and GenCC assertions when personal genotype reading is unavailable.
+
+Every thematic gene card also opens the existing gene-region reader, including
+genes without selected catalogue positions. It shows observed variants, the
+reference transcript and measured coverage where available. Coding changes are
+kept separate from other regional variants and from clinical classifications.
+Opening a panel does not start a region scan or genome preparation; the CLI and
+assistant expose the same explicitly requested reading.
+
+**Gene-region coverage could incorrectly appear low or absent.** Some larger
+alignment regions were read only in part, while other indexed intervals could
+include extra reads. Coverage now respects the complete indexed block boundaries,
+and a truncated alignment record produces an explicit failure instead of an
+ordinary coverage result. Reference transcripts, observed sequence changes and
+the limits of an absence claim remain visible together.
+
+**Reference coordinates are not an effect allele.** Newly verified SNP positions
+can be read in either supported genome build without borrowing a risk allele or
+inferring reference homozygosity from a missing VCF row. Verified insertion,
+deletion and repeat identities remain reference entries where specialized allele
+reading is required. Known readings and source documents are retained.
+
+**Gene descriptions lead finding cards.** Known gene biology and the recorded
+reason for including a variant appear before inheritance and personal-meaning
+qualifications. Additional reference descriptions distinguish protein genes,
+noncoding transcripts and regulatory DNA regions. Stored readings and variant
+classifications are retained; these descriptive changes do not require a genome
+recalculation.
+
+**Clinical estimates share one panel.** The existing FIB-4 index and PhenoAge
+appear in a compact Today block and a detailed panel. Each retains its own
+outcome, scale, dated inputs, source and applicability. Completed estimates also
+appear in the visit sheet; missing inputs are not borrowed from another draw.
+
+**Lumiflex application PDFs can be previewed and imported.** Printed summary and
+daily statistics, recorded meal/activity events and approximate readings of
+visible curves stay distinct. Post-meal comparisons require a complete visible
+window and retain overlapping events. Sleep alignment uses explicit report timezones and sourced Garmin, WHOOP or
+recorded sleep intervals. Approximate sleep-period means, ranges and variation
+remain separate from device sleep summaries; the last recorded meal is not
+assumed to be the last actual meal. Within-device night comparisons retain their
+included and excluded records and exploratory sensitivity. Food and activity
+events have separate visible comparison windows. Sensor data never become a fasting
+laboratory glucose or HbA1c series. Source revisions remain available after an
+update; failed or stopped imports preserve saved reports. The CLI, local web
+application, MCP and Ouroboros tools use the same import and reading paths.
+
+**Visit handouts follow the appointment focus.** Select body systems, thematic gene panels and a question for the visit. The short sheet combines dated measurements, existing system insights, relevant recorded prescriptions and qualified genetic context; important recorded alerts stay visible outside a narrow selection. GenCC gene–disease validity remains separate from variant confidence. The full handout and original structured fields remain available through the web, CLI, MCP and Ouroboros tools. Preparing a handout does not start genome or polygenic-score recalculation.
+
+**Insight sources and changes are easier to inspect.** A system conclusion keeps
+its used measurements, source identifiers, knowledge records and rule versions.
+Comparisons with a saved review distinguish changed observations from changed
+knowledge; missing original files remain explicit. Opening a report does not
+start genome preparation or polygenic-score recalculation.
+
+**Corrected reference statements.** NAT2 descriptions no longer claim that no
+guideline exists: the hydralazine guideline and isoniazid studies have different
+scopes, and an isolated position does not establish a complete acetylator
+phenotype or dose. Longevity references correct mismatched citations, preserve
+conflicting study results and do not count linked positions as independent
+benefits. A low-quality or unverified genotype does not receive a personalized
+longevity conclusion.
+
+### What needs recomputing
+
+**Run `scholion ingest-labs` — if a previous compound-form or FHIR import omitted measurements or used the wrong calcium series.**
+Re-import the affected source folder. Earlier stored values are unchanged; inspect the import preview before replacing results.
+
+**Run `scholion genotype-sites` — if newly added catalogue positions are unread and a local alignment with its matching reference is available.**
+Review the targeted site-genotyping preview before confirming the operation. Existing results remain visible. This release does not require whole-genome preparation or polygenic-score recalculation merely because the version changed.
+
+Reopen a previously exported gene-region report if its coverage informed a
+decision: these reports calculate coverage again when requested. The coverage
+reader correction does not change saved polygenic scores or require their
+recalculation. The catalogue update is offered when its saved position set is
+outdated; an already current set is not queued again.
+
+For sleep alignment, re-import a wearable export if its saved night summaries
+do not yet contain start and end timestamps. Missing timestamps are not inferred
+from sleep duration. This does not require re-importing laboratory data.
+
+Saved sensor reports are unchanged by a preview. Reference descriptions and clinical estimates update on read; use `scholion system clinical_estimates` and `scholion lifestyle` to inspect them.
+
 ## v0.7.1 — 23.10.2026
 
 ### New capabilities

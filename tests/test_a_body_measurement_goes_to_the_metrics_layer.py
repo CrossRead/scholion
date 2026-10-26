@@ -75,18 +75,18 @@ class TestTheBundleIsReadIntoTwoLayers(unittest.TestCase):
         plan = ingest_fhir.plan(BUNDLE)
         metrics = plan.get("metrics") or []
         self.assertTrue(metrics, "the bundle's body measurements were not planned at all")
-        self.assertEqual({"weight"}, {m["metric"] for m in metrics})
-        self.assertEqual({"kg"}, {m["unit"] for m in metrics})
+        self.assertIn("weight", {m["metric"] for m in metrics})
+        self.assertEqual({"kg"}, {m["unit"] for m in metrics if m["metric"] == "weight"})
         self.assertNotIn("weight", {p["key"] for p in plan["points"]},
                          "a body measurement was planned as a laboratory point")
 
-    def test_what_no_metric_holds_is_refused_by_name(self):
+    def test_a_more_specific_measurement_method_is_retained(self):
         plan = ingest_fhir.plan(BUNDLE)
-        said = [s for s in plan["skipped"] if s["reason"] == "loinc_is_a_body_metric"]
-        self.assertTrue(said)
-        for s in said:
-            self.assertIsNone(s.get("ours"), "this one has a metric and should have been written")
-            self.assertTrue(s.get("detail"), "the code is what somebody has to look up")
+        oxygen = [m for m in plan["metrics"] if m["metric"] == "oxygen_saturation"]
+        self.assertTrue(oxygen)
+        self.assertTrue(all(m["source_record"]["method"] == "pulse_oximetry" for m in oxygen))
+        self.assertIn("heart_rate", {m["metric"] for m in plan["metrics"]})
+        self.assertNotIn("resting_hr", {m["metric"] for m in plan["metrics"]})
 
     def test_the_import_writes_it_into_the_metrics_file(self):
         d = pathlib.Path(tempfile.mkdtemp(prefix="fhir_metric_"))

@@ -157,6 +157,7 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
     files = sorted(root.rglob("*.pdf"))
     unreadable: List[Dict[str, Any]] = []
     non_lab = 0
+    unparsed_sections: List[Dict[str, Any]] = []
     missing: List[Dict[str, Any]] = []
     mismatch: List[Dict[str, Any]] = []
     alt_method: List[Dict[str, Any]] = []
@@ -181,77 +182,94 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
                 reason = _t("reconcile.no_text_layer" if size > 0 else "reconcile.empty_file")
                 unreadable.append({"file": _rel(f, root), "reason": reason, "bytes": size})
                 continue
-        if not (ingest_labs._DATE.search(text) or ingest_labs._DATE_FALLBACK.search(text)
-                or ingest_labs.english_date(text)[0]):
+        from .cgm_pdf import recognizes as _is_cgm_report
+        if _is_cgm_report(text):
             non_lab += 1
             continue
-        low = text.lower()
-        # There used to be a rejection of a «genetic report» here by the words «полиморфизм /
-        # nm_0 / генетическ» BEFORE parsing. It broke HYBRID forms: «Гормоны мочи» (estrogen
-        # metabolites) print both a table of measurements and a section of COMT/CYP1B1
-        # polymorphisms — the file was discarded whole, and its est_* points were invisible to
-        # both reconciliations (in reconcile they fell neither into covered nor into missing;
-        # in the provenance they hung as «manual»). The rejection is not needed: a purely
-        # genetic report yields no marker at all and is cut off by the `not found` check below.
-        date, found = ingest_labs.parse_report(text, markers, source=str(f))
-        observations = parse_observations(text)
-        ym = _ym(date)
-        if ym:
-            saved = core.labs().get("observations", {})
-            for record in observations:
-                key = record["key"]
-                candidates = [p for p in saved.get(key, {}).get("series", [])
-                              if same_draw(p.get("date"), date)]
-                row = {"marker": key, "date": ym, "value": record["result_text"],
-                       "unit": record.get("unit"), "file": _rel(f, root), "kind": record["kind"]}
-                if not candidates:
-                    missing.append(dict(row, reason=_t("reconcile.point_absent")))
-                elif not any(equivalent(record, point) for point in candidates):
-                    mismatch.append(dict(row, pdf=record["result_text"],
-                                         profile=candidates[0]["result_text"]))
-                else:
-                    observation_covered += 1
+        non_lab_before = non_lab
+        file_has_lab = False
+        for document in ingest_labs.lab_documents(text):
+            text = document["text"]
+            if document.get("problem"):
+                unparsed_sections.append({"file": _rel(f, root), "reason": document["problem"],
+                                          "section": document["section"],
+                                          "detail": _t("ingest_labs.reason_invalid_section_date", date=document["date_hint"])})
+                continue
+            if not (document.get("date_hint") or ingest_labs._DATE.search(text) or ingest_labs._DATE_FALLBACK.search(text)
+                    or ingest_labs.english_date(text)[0]):
+                non_lab += 1
+                continue
+            low = text.lower()
+            # There used to be a rejection of a «genetic report» here by the words «полиморфизм /
+            # nm_0 / генетическ» BEFORE parsing. It broke HYBRID forms: «Гормоны мочи» (estrogen
+            # metabolites) print both a table of measurements and a section of COMT/CYP1B1
+            # polymorphisms — the file was discarded whole, and its est_* points were invisible to
+            # both reconciliations (in reconcile they fell neither into covered nor into missing;
+            # in the provenance they hung as «manual»). The rejection is not needed: a purely
+            # genetic report yields no marker at all and is cut off by the `not found` check below.
+            date, found = ingest_labs.parse_report(text, markers, source=str(f), date_hint=document.get("date_hint"))
+            observations = parse_observations(text)
+            ym = _ym(date)
+            if ym:
+                saved = core.labs().get("observations", {})
+                for record in observations:
+                    key = record["key"]
+                    candidates = [p for p in saved.get(key, {}).get("series", [])
+                                  if same_draw(p.get("date"), date)]
+                    row = {"marker": key, "date": ym, "draw_date": date, "value": record["result_text"],
+                           "unit": record.get("unit"), "file": _rel(f, root), "kind": record["kind"]}
+                    if not candidates:
+                        missing.append(dict(row, reason=_t("reconcile.point_absent")))
+                    elif not any(equivalent(record, point) for point in candidates):
+                        mismatch.append(dict(row, pdf=record["result_text"],
+                                             profile=candidates[0]["result_text"]))
+                    else:
+                        observation_covered += 1
+                    seen_markers.add(key)
+                    observation_coverage.setdefault(key, []).append(
+                        {**record, "draw_date": date, "file": _rel(f, root)})
+            if not ym or not (found or observations):
+                non_lab += 1
+                continue
+            file_has_lab = True
+            for key, v in found.items():
                 seen_markers.add(key)
-                observation_coverage.setdefault(key, []).append(
-                    {**record, "draw_date": date, "file": _rel(f, root)})
-        if not ym or not (found or observations):
-            non_lab += 1
-            continue
-        for key, v in found.items():
-            seen_markers.add(key)
-            val = v["value"]
-            slot = coverage.setdefault(key, {}).setdefault(
-                ym, {"file": _rel(f, root), "draw_date": date, "value": val, "sources": []})
-            # ALL sources for a (marker, month), not just the first: otherwise the reverse check
-            # falsely complains about the second method of the same draw (LC-MS vs immunoassay).
-            src = {"file": _rel(f, root), "draw_date": date, "value": val,
-                   "form": _form_of(_rel(f, root), low)}
-            if src not in slot["sources"]:
-                slot["sources"].append(src)
-            same = [pv for pd, pv in prof.get(key, []) if same_draw(pd, date or ym)]
-            close = [pv for pv in same if _close(val, pv)]
-            if key not in prof:
-                missing.append({"marker": key, "date": ym, "value": val,
-                                "unit": markers[key].get("unit"), "file": _rel(f, root),
-                                "reason": _t("reconcile.marker_absent")})
-            elif not same:
-                missing.append({"marker": key, "date": ym, "value": val,
-                                "unit": markers[key].get("unit"), "file": _rel(f, root),
-                                "reason": _t("reconcile.point_absent")})
-            elif not close:
-                # Not a divergence but the second method of the same draw: the marker has a
-                # preferred form declared (prefer_form, e.g. the LC-MS steroid profile), and
-                # the profile holds the value from exactly that one. Otherwise such pairs hang
-                # in «divergences» forever and screen off the real omissions.
-                pf = [x.lower() for x in core.marker_rules(markers[key], "prefer_form")]
-                if pf and not any(x in low for x in pf):
-                    alt_method.append({"marker": key, "date": ym, "pdf": val,
-                                       "profile": same[0], "file": _rel(f, root)})
+                val = v["value"]
+                slot = coverage.setdefault(key, {}).setdefault(
+                    ym, {"file": _rel(f, root), "draw_date": date, "value": val, "sources": []})
+                # ALL sources for a (marker, month), not just the first: otherwise the reverse check
+                # falsely complains about the second method of the same draw (LC-MS vs immunoassay).
+                src = {"file": _rel(f, root), "draw_date": date, "value": val,
+                       "form": _form_of(_rel(f, root), low),
+                       **({"section": document["section"]} if document.get("section") else {})}
+                if src not in slot["sources"]:
+                    slot["sources"].append(src)
+                same = [pv for pd, pv in prof.get(key, []) if same_draw(pd, date or ym)]
+                close = [pv for pv in same if _close(val, pv)]
+                if key not in prof:
+                    missing.append({"marker": key, "date": ym, "draw_date": date, "value": val,
+                                    "unit": markers[key].get("unit"), "file": _rel(f, root),
+                                    "reason": _t("reconcile.marker_absent")})
+                elif not same:
+                    missing.append({"marker": key, "date": ym, "draw_date": date, "value": val,
+                                    "unit": markers[key].get("unit"), "file": _rel(f, root),
+                                    "reason": _t("reconcile.point_absent")})
+                elif not close:
+                    # Not a divergence but the second method of the same draw: the marker has a
+                    # preferred form declared (prefer_form, e.g. the LC-MS steroid profile), and
+                    # the profile holds the value from exactly that one. Otherwise such pairs hang
+                    # in «divergences» forever and screen off the real omissions.
+                    pf = [x.lower() for x in core.marker_rules(markers[key], "prefer_form")]
+                    if pf and not any(x in low for x in pf):
+                        alt_method.append({"marker": key, "date": ym, "draw_date": date, "pdf": val,
+                                           "profile": same[0], "file": _rel(f, root)})
+                    else:
+                        mismatch.append({"marker": key, "date": ym, "draw_date": date, "pdf": val,
+                                         "profile": same[0], "file": _rel(f, root)})
                 else:
-                    mismatch.append({"marker": key, "date": ym, "pdf": val,
-                                     "profile": same[0], "file": _rel(f, root)})
-            else:
-                covered += 1
+                    covered += 1
+
+        non_lab = non_lab_before + int(not file_has_lab)
 
     # The provenance goes to the PROFILE directory, which is where the profile
     # lives. It used to be written to `repo_dir()/profile` — a path built from
@@ -274,7 +292,7 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
     # make missing unique by (marker,date)
     seen = set(); miss_u = []
     for r in missing:
-        k = (r["marker"], r["date"])
+        k = (r["marker"], r.get("draw_date") or r["date"])
         if k in seen:
             continue
         seen.add(k); miss_u.append(r)
@@ -284,7 +302,7 @@ def reconcile(lab_dir: Optional[str] = None, ocr: bool = False) -> Dict[str, Any
 
     return {"ok": True, "lab_dir": str(root),
             "files_total": len(files), "files_non_lab": non_lab,
-            "unreadable": unreadable, "missing": miss_u, "mismatch": mismatch, "alt_method": alt_method,
+            "unreadable": unreadable, "unparsed_sections": unparsed_sections, "missing": miss_u, "mismatch": mismatch, "alt_method": alt_method,
             "observation_covered": observation_covered, "covered_points": covered, "markers_seen": sorted(seen_markers),
             "coverage_path": cov_written, "disclaimer": core.labs().get("_meta", {}).get("note", "")[:0]}
 
@@ -346,13 +364,18 @@ def selfcheck_summary(res: Dict[str, Any]) -> str:
     miss = res.get("missing", [])
     mm = res.get("mismatch", [])
     lines = []
+    unparsed = res.get("unparsed_sections", [])
     if un:
         lines.append(_t("selfcheck.unreadable", n=len(un)))
         for u in un[:12]:
             lines.append(f"   🔴 {u['file']} — {u['reason']}")
         lines.append(_t("selfcheck.unreadable_hint"))
-    else:
+    elif not unparsed:
         lines.append(_t("selfcheck.ok"))
+    if unparsed:
+        lines.append(_t("selfcheck.unparsed_sections", n=len(unparsed)))
+        for section in unparsed[:12]:
+            lines.append(f"   🔴 {section['file']} — {section.get('detail') or section['reason']}")
     lines.append(_t("selfcheck.counters", files=res.get("files_total"),
                     covered=res.get("covered_points"), missing=len(miss), mismatch=len(mm)))
     return "\n".join(lines)

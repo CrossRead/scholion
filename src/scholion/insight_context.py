@@ -159,6 +159,9 @@ def prepare_context(items: list[dict], labs: dict, wearable: dict, phenotype: li
     systems.update(f['system'] for item in items for f in item['facts'] if f.get('system'))
     if any(f.get('record') in ('wearable_trends.json', 'metrics.json') for item in items for f in item['facts']):
         systems.add('fitness')
+    if systems:
+        from .genome import _prefetch_catalogue_rows
+        _prefetch_catalogue_rows()
     contexts: dict[str, dict] = {}
     panels = {system: _panel_rows(system, by_key) for system in sorted(systems)}
     for system in sorted(systems):
@@ -171,6 +174,9 @@ def prepare_context(items: list[dict], labs: dict, wearable: dict, phenotype: li
         from .genetic_comparison import system_comparisons
         contexts[system] = {'comparisons': system_comparisons(rows, by_key, system), 'genetics': genetics, 'lifestyle': _lifestyle_context(phenotype, wearable, system),
                             'scope': 'recorded_context', 'causal': False}
+        if system=='glucose':
+            from .cgm import laboratory_context
+            contexts[system]['cgm']=laboratory_context((wearable.get('cgm') or {}).get('current'),by_key)
         # A single abnormal reading plus a supported carried variant is useful
         # even without enough observations for a trend. Do not manufacture a trend.
         for context in contexts[system]['comparisons']:
@@ -193,6 +199,13 @@ def prepare_context(items: list[dict], labs: dict, wearable: dict, phenotype: li
                       'knowledge': context['knowledge'], 'status': 'complete'},
                 detail={'why': context['comparison'],
                         'source': context['source'], 'mechanism': context['summary']})
+            if context['knowledge'].get('record'):
+                event['knowledge_records'] = [context['knowledge']['record']]
+                # The selected bilingual source record is the identity; changing
+                # the interface language is not a change of clinical knowledge.
+                from .knowledge_provenance import digest
+                event['rule']['digest'] = digest({'record': context['knowledge']['record'].get('record_digest'),
+                    'status': 'complete', 'association': context['association_id']})
             event['level'] = context['level']
             if not any(e['id'] == event['id'] for e in item['events']):
                 item['events'].append(event)
@@ -241,6 +254,9 @@ def attach_context(groups: list[dict], prepared: dict) -> None:
 
 def context_lines(item: dict, clinician: bool = False) -> list[str]:
     context = item.get('context') or {}
+    if context.get('cgm'):
+        return_lines=[context['cgm']['message']]
+    else:return_lines=[]
     lines = [item['context_summary']] if item.get('context_summary') else []
     lines.extend(context.get('coexisting_changes') or [])
     from .genetic_comparison import lines as comparison_lines, visible
@@ -272,4 +288,4 @@ def context_lines(item: dict, clinician: bool = False) -> list[str]:
                        date=row.get('date'), source=row.get('source_label') or row.get('source') or row.get('record')))
     if context.get('genetics') or context.get('lifestyle'):
         lines.append(item.get('context_notice') or t('insight.context.notice'))
-    return lines
+    return return_lines+lines

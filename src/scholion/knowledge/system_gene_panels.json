@@ -39,19 +39,69 @@
     "unreadable": "`systems.<key>.unreadable` names a gene or an allele of this system that short-read sequencing cannot read — a gene beside its pseudogene (CYP21A2), a repeat (the AR CAG repeat, UGT1A1*28) — with the reason and a source. The engine prints such a gene as «requires a separate method» and never as read or as clear (owner's decision of 13.09.2026, task 179).",
     "signature": "review records a human comparison of the current sentence with its source, by role and date. Rows without that review carry note_on_review and are shown as open. Revising a sentence removes its former review; the source and evidence level do not imply human endorsement. Personal clinician notes remain in the private profile.",
     "evidence": "`evidence {level, basis, source, assigned, by_rule | judged}` is the judgement of the source a row names, with the letter of the legend in evidence_levels.json (task 199). A conclusion is printed only at A and B. On 17.09.2026 every row got its letter: 32 where the row's own fields decide it (`by_rule`: a CPIC guideline row, a monogenic row GenCC rates Definitive or Strong), 60 by a judgement of the strength of the evidence for the link the row states (`judged` says what it rests on), on the owner's instruction. The letter grades the link, not the sentence: a row whose kind of link concludes nothing still prints no conclusion at A or B.",
-    "waiting_199d": {
-      "rs2228570": "musculoskeletal: the list names no single base as the allele (A / G)",
-      "rs2275376": "musculoskeletal: the list names no single base as the allele ()",
-      "rs886041402": "immune: CARD14 has no GenCC assertion in the base",
-      "rs104893624": "immune: CXCR4 has no GenCC assertion in the base",
-      "rs138726443": "immune: FLG has no GenCC assertion in the base",
-      "rs587776856": "immune: not a single-base variant (ATTAATT/ATT)",
-      "rs387906896": "immune: NCSTN has no GenCC assertion in the base",
-      "rs373740199": "immune: RTEL1 has no GenCC assertion in the base",
-      "rs770066110": "immune: TERT has no GenCC assertion in the base",
-      "rs769471844": "immune: TMC6 has no GenCC assertion in the base"
-    },
-    "mechanism": "A bilingual explanation of the biological link, with the primary reference in source. A mechanism is context, not a patient-specific treatment response or a dose instruction."
+    "mechanism": "A bilingual explanation of the biological link, with the primary reference in source. A mechanism is context, not a patient-specific treatment response or a dose instruction.",
+    "reviewed_199d": {
+      "rs2228570": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2228570"
+      },
+      "rs2275376": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2275376"
+      },
+      "rs886041402": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/886041402"
+      },
+      "rs104893624": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893624"
+      },
+      "rs138726443": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/138726443"
+      },
+      "rs587776856": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "verified_indel_reference_reader_refuses",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/587776856"
+      },
+      "rs387906896": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/387906896"
+      },
+      "rs373740199": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/373740199"
+      },
+      "rs770066110": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/770066110"
+      },
+      "rs769471844": {
+        "reviewed_on": "2026-10-23",
+        "scope": "Reference identity and reading support; no clinical promotion",
+        "resolution": "literal_reading_without_effect_allele",
+        "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/769471844"
+      }
+    }
   },
   "systems": {
     "lipids": {
@@ -5282,17 +5332,17 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "NAT2 *5 (341C), one copy: one of three slow-acetylator alleles — with two slow alleles isoniazid is cleared slowly and hepatotoxicity is likelier; no guideline sets a dose by it.",
-              "ru": "NAT2 *5 (341C), одна копия: один из трёх аллелей медленного ацетилирования — при двух медленных аллелях изониазид выводится медленно и гепатотоксичность вероятнее; дозу по этому ни одно руководство не задаёт."
+              "en": "NAT2 rs1801280 is used in reduced-function haplotype definitions. One position does not identify the complete acetylator phenotype. Isoniazid studies and the hydralazine guideline require a complete genotype context; this result does not select a dose.",
+              "ru": "NAT2 rs1801280 используется в определениях гаплотипов со сниженной функцией. Одна позиция не определяет полный фенотип ацетилирования. Для применения исследований изониазида и руководства по гидралазину нужен полный генотипический контекст; эта строка не выбирает дозу."
             },
             "hom": {
-              "en": "NAT2 *5 (341C), two copies: one of three slow-acetylator alleles — with two slow alleles isoniazid is cleared slowly and hepatotoxicity is likelier; no guideline sets a dose by it.",
-              "ru": "NAT2 *5 (341C), две копии: один из трёх аллелей медленного ацетилирования — при двух медленных аллелях изониазид выводится медленно и гепатотоксичность вероятнее; дозу по этому ни одно руководство не задаёт."
+              "en": "NAT2 rs1801280 is used in reduced-function haplotype definitions. One position does not identify the complete acetylator phenotype. Isoniazid studies and the hydralazine guideline require a complete genotype context; this result does not select a dose.",
+              "ru": "NAT2 rs1801280 используется в определениях гаплотипов со сниженной функцией. Одна позиция не определяет полный фенотип ацетилирования. Для применения исследований изониазида и руководства по гидралазину нужен полный генотипический контекст; эта строка не выбирает дозу."
             }
           },
-          "source": "no CPIC/DPWG guideline; isoniazid hepatotoxicity literature (NAT2 slow acetylators)",
+          "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-24",
           "review": {
             "by_role": "panel_author",
             "on": "2026-09-13",
@@ -5301,9 +5351,22 @@
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "no CPIC/DPWG guideline; isoniazid hepatotoxicity literature (NAT2 slow acetylators)",
+            "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
             "assigned": "2026-09-17",
-            "judged": "slow acetylation and isoniazid liver injury are replicated in meta-analyses; no CPIC guideline"
+            "judged": "Variant/haplotype reference context; complete diplotype required. CPIC 2025 guidance is specific to hydralazine, not a universal NAT2 drug rule."
+          },
+          "clinical_review": {
+            "on": "2026-10-24",
+            "by_role": "curator",
+            "outcome": "haplotype_reference_only",
+            "sources": [
+              "https://pubmed.ncbi.nlm.nih.gov/23150149/",
+              "https://cpicpgx.org/guidelines/cpic-guideline-for-hydralazine-and-nat2/"
+            ],
+            "note": {
+              "en": "NAT2 rs1801280 is used in reduced-function haplotype definitions. One position does not identify the complete acetylator phenotype. Isoniazid studies and the hydralazine guideline require a complete genotype context; this result does not select a dose.",
+              "ru": "NAT2 rs1801280 используется в определениях гаплотипов со сниженной функцией. Одна позиция не определяет полный фенотип ацетилирования. Для применения исследований изониазида и руководства по гидралазину нужен полный генотипический контекст; эта строка не выбирает дозу."
+            }
           }
         },
         {
@@ -5316,17 +5379,17 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "NAT2 *6 (590A), one copy: a slow-acetylator allele; read together with *5 and *7.",
-              "ru": "NAT2 *6 (590A), одна копия: аллель медленного ацетилирования; читать вместе с *5 и *7."
+              "en": "NAT2 rs1799930 is part of reduced-function haplotype definitions. Its reading contributes to haplotype analysis, not a standalone slow-acetylator diagnosis or drug dose.",
+              "ru": "NAT2 rs1799930 входит в определения гаплотипов со сниженной функцией. Чтение позиции помогает анализу гаплотипов, но отдельно не устанавливает медленное ацетилирование и дозу препарата."
             },
             "hom": {
-              "en": "NAT2 *6 (590A), two copies: a slow-acetylator allele; read together with *5 and *7.",
-              "ru": "NAT2 *6 (590A), две копии: аллель медленного ацетилирования; читать вместе с *5 и *7."
+              "en": "NAT2 rs1799930 is part of reduced-function haplotype definitions. Its reading contributes to haplotype analysis, not a standalone slow-acetylator diagnosis or drug dose.",
+              "ru": "NAT2 rs1799930 входит в определения гаплотипов со сниженной функцией. Чтение позиции помогает анализу гаплотипов, но отдельно не устанавливает медленное ацетилирование и дозу препарата."
             }
           },
-          "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+          "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-24",
           "review": {
             "by_role": "panel_author",
             "on": "2026-09-13",
@@ -5335,9 +5398,22 @@
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+            "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
             "assigned": "2026-09-17",
-            "judged": "slow acetylation and isoniazid liver injury are replicated in meta-analyses; no CPIC guideline"
+            "judged": "Variant/haplotype reference context; complete diplotype required. CPIC 2025 guidance is specific to hydralazine, not a universal NAT2 drug rule."
+          },
+          "clinical_review": {
+            "on": "2026-10-24",
+            "by_role": "curator",
+            "outcome": "haplotype_reference_only",
+            "sources": [
+              "https://pubmed.ncbi.nlm.nih.gov/23150149/",
+              "https://cpicpgx.org/guidelines/cpic-guideline-for-hydralazine-and-nat2/"
+            ],
+            "note": {
+              "en": "NAT2 rs1799930 is part of reduced-function haplotype definitions. Its reading contributes to haplotype analysis, not a standalone slow-acetylator diagnosis or drug dose.",
+              "ru": "NAT2 rs1799930 входит в определения гаплотипов со сниженной функцией. Чтение позиции помогает анализу гаплотипов, но отдельно не устанавливает медленное ацетилирование и дозу препарата."
+            }
           }
         },
         {
@@ -5350,17 +5426,17 @@
           "kind": "asked_about",
           "text": {
             "het": {
-              "en": "NAT2 *7 (857A), one copy: a slow-acetylator allele; read together with *5 and *6.",
-              "ru": "NAT2 *7 (857A), одна копия: аллель медленного ацетилирования; читать вместе с *5 и *6."
+              "en": "NAT2 rs1799931 is used in reduced-function haplotype definitions. Haplotype phase and other alleles matter; a single position does not establish the complete acetylator phenotype.",
+              "ru": "NAT2 rs1799931 используется в определениях гаплотипов со сниженной функцией. Важны фаза гаплотипов и остальные аллели; одна позиция не устанавливает полный фенотип ацетилирования."
             },
             "hom": {
-              "en": "NAT2 *7 (857A), two copies: a slow-acetylator allele; read together with *5 and *6.",
-              "ru": "NAT2 *7 (857A), две копии: аллель медленного ацетилирования; читать вместе с *5 и *6."
+              "en": "NAT2 rs1799931 is used in reduced-function haplotype definitions. Haplotype phase and other alleles matter; a single position does not establish the complete acetylator phenotype.",
+              "ru": "NAT2 rs1799931 используется в определениях гаплотипов со сниженной функцией. Важны фаза гаплотипов и остальные аллели; одна позиция не устанавливает полный фенотип ацетилирования."
             }
           },
-          "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+          "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
           "submitter": "panel_2026_09_13",
-          "curated_on": "2026-09-13",
+          "curated_on": "2026-10-24",
           "review": {
             "by_role": "panel_author",
             "on": "2026-09-13",
@@ -5369,9 +5445,22 @@
           "evidence": {
             "level": "B",
             "basis": "gwas",
-            "source": "no CPIC/DPWG guideline; NAT2 slow-acetylator literature",
+            "source": "PMID:23150149 DOI:10.1007/s00228-012-1429-9; PMID:40974042 DOI:10.1002/cpt.70071",
             "assigned": "2026-09-17",
-            "judged": "slow acetylation and isoniazid liver injury are replicated in meta-analyses; no CPIC guideline"
+            "judged": "Variant/haplotype reference context; complete diplotype required. CPIC 2025 guidance is specific to hydralazine, not a universal NAT2 drug rule."
+          },
+          "clinical_review": {
+            "on": "2026-10-24",
+            "by_role": "curator",
+            "outcome": "haplotype_reference_only",
+            "sources": [
+              "https://pubmed.ncbi.nlm.nih.gov/23150149/",
+              "https://cpicpgx.org/guidelines/cpic-guideline-for-hydralazine-and-nat2/"
+            ],
+            "note": {
+              "en": "NAT2 rs1799931 is used in reduced-function haplotype definitions. Haplotype phase and other alleles matter; a single position does not establish the complete acetylator phenotype.",
+              "ru": "NAT2 rs1799931 используется в определениях гаплотипов со сниженной функцией. Важны фаза гаплотипов и остальные аллели; одна позиция не устанавливает полный фенотип ацетилирования."
+            }
           }
         },
         {

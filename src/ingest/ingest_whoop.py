@@ -35,8 +35,10 @@ Standard library only.
 from __future__ import annotations
 
 import csv
+import datetime as dt
 import io
 import json
+import re
 import sys
 import zipfile
 from collections import defaultdict
@@ -300,6 +302,21 @@ def build(source: str, knowledge: Optional[Dict[str, Any]] = None) -> Dict[str, 
         if not d:
             continue
         night: Dict[str, Any] = {"date": d}
+        columns = {_norm(k): v for k, v in row.items()}
+        zone = re.fullmatch(r"UTC([+-])(\d{2}):(\d{2})", columns.get("cycle timezone", ""))
+        try:
+            offset = dt.timedelta(hours=int(zone[2]), minutes=int(zone[3])) if zone else None
+            if offset is not None and offset <= dt.timedelta(hours=14) and int(zone[3]) < 60:
+                tz = dt.timezone(offset if zone[1] == "+" else -offset)
+                begin = dt.datetime.fromisoformat(columns["sleep onset"])
+                end = dt.datetime.fromisoformat(columns["wake onset"])
+                begin = begin.replace(tzinfo=tz) if begin.tzinfo is None else begin
+                end = end.replace(tzinfo=tz) if end.tzinfo is None else end
+                if end > begin:
+                    night.update(started_at=begin.isoformat(), ended_at=end.isoformat(),
+                                 source="WHOOP sleeps.csv", sleep_kind="main_sleep")
+        except (KeyError, ValueError, TypeError):
+            pass  # A daily summary survives; an interval without its zone does not appear.
         for header, raw in row.items():
             hit = table.get(_norm(header))
             if not hit:

@@ -248,6 +248,7 @@ def medication_system_context(medication: Dict[str, Any]) -> Dict[str, Any]:
     mapped = class_systems()["classes"]
     known = {d["key"] for d in domains()}
     links: List[Dict[str, Any]] = []
+    outside: List[Dict[str, Any]] = []
     for cls in classes:
         spec = (book.get("classes") or {}).get(cls) or {}
         for system in mapped.get(cls, []):
@@ -263,6 +264,9 @@ def medication_system_context(medication: Dict[str, Any]) -> Dict[str, Any]:
     for spec in book.get("ingredient_links") or []:
         if any(core._pattern_hits(n, core._norm_drug(pattern))
                for n in names for pattern in spec.get("names") or []):
+            if spec.get("disposition"):
+                outside.append({"disposition": spec["disposition"], "source": spec.get("source"),
+                                "note": panel_form.one_language(spec.get("note") or {})})
             for system in spec.get("systems") or []:
                 if system in known:
                     links.append({"system": system, "class": None,
@@ -282,7 +286,8 @@ def medication_system_context(medication: Dict[str, Any]) -> Dict[str, Any]:
     via = {c: keys for c, keys in via.items() if keys}
     systems_ = sorted({x["system"] for x in links})
     return {"classes": classes, "systems": systems_, "via": via, "system_links": links,
-            "map_status": "mapped" if systems_ else "no_map" if classes else "no_class"}
+            "outside_contexts": outside,
+            "map_status": "mapped" if systems_ else "outside_model" if outside else "no_map" if classes else "no_class"}
 
 
 
@@ -291,9 +296,8 @@ def prescriptions() -> List[Dict[str, Any]]:
     """The person's CURRENT prescriptions, each with its classes and the systems
     those classes act on — `map_status` says whether the map answered at all.
 
-    Three states and none of them is an empty list: mapped (at least one class
-    has a row), no_map (classes recognised, none of them in the map) and
-    no_class (the dictionary recognised no class). The medications listing and
+    The status distinguishes mapped links, recognised classes with no mapping,
+    unrecognised names and an explicitly reviewed outside-model context. The medications listing and
     the system card both read this, so a prescription is placed the same way
     on every face.
     """
@@ -330,7 +334,12 @@ def _base_rows(key: str, genes: Optional[set] = None) -> Dict[str, Any]:
         assertions = [{"disease": s.get("disease"), "disease_id": s.get("disease_id"),
                        "classification": s.get("classification"), "moi": s.get("moi"),
                        "moi_code": s.get("moi_code") or "unknown",
-                       "submitter": s.get("submitter"), "curated_on": s.get("curated_on")}
+                       "submitter": s.get("submitter"), "curated_on": s.get("curated_on"),
+                       "submission_id": s.get("submission_id"),
+                       "submission_version": s.get("submission_version"),
+                       "gencc_version_or_date": s.get("gencc_version_or_date"),
+                       "source_pmids": s.get("source_pmids"),
+                       "public_report": s.get("public_report")}
                       for s in subs]
         grade = [a for a in assertions if a["classification"] in FINDING_GRADE]
         weaker = sum(1 for a in assertions if a["classification"] in NOT_A_FINDING)
@@ -358,6 +367,12 @@ def _clinvar_by_gene(scan: Dict[str, Any]) -> Dict[str, Any]:
     reason there are none to group."""
     if scan.get("status") != "ok":
         return {"status": scan.get("status"), "reason": scan.get("reason"), "by_gene": {}}
+    return _clinical_findings_by_gene()
+
+
+@core.memo_in_reading
+def _clinical_findings_by_gene() -> Dict[str, Any]:
+    """Share the small clinical index across systems within one answer only."""
     from .genomics import clinvar_findings
     try:
         cv = clinvar_findings() or {}
@@ -659,7 +674,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                # gate, so it never reads as a review.
                "signature": panel_gate.review_state(p),
                "signed_on": panel_gate.reviewed_on(p),
-               "review": p.get("review"),
+               "review": p.get("review"), "clinical_review": p.get("clinical_review"),
                "text": text, "pending": pending, "pending_why": pending_why,
                "findings": finding, "not_a_finding_why": not_why, "clinical_carrier": carrier and not confirm,
                "carrier": (state in ("het", "hom", "hemi")) if geno.get("read") is True
@@ -1550,6 +1565,15 @@ def systems(register: Optional[str] = None) -> Dict[str, Any]:
 @core.in_reading
 def system(key: str, register: str = "patient") -> Dict[str, Any]:
     """One system whole: the seven layers, the verdict, the three baskets."""
+    if key == "clinical_estimates" and register in REGISTERS:
+        from ..clinical_estimates import panel
+        return {**panel(), "register": register}
+    from . import thematic_panels
+    if key in (thematic_panels.thematic_catalogue().get("panels") or {}):
+        if register not in REGISTERS:
+            return {"status": "unknown_register", "key": key, "register": register,
+                    "registers": list(REGISTERS)}
+        return thematic_panels.thematic_readings(key, register)
     if key == "author_list":
         from .panel_catalogue import panel_description
         from .panel_intake import author_readings
@@ -1600,7 +1624,9 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
             "markers": dom["markers"],
             "labs": labs, "dynamics": _dynamics_layer(rd),
             "validated_indices": [fib4()] if dom["key"] == "liver" else [],
+            "cgm_link": {"destination":"lifestyle", "label":_t("cgm.title")} if dom["key"] == "glucose" else None,
             "genetics": _project(gen, register), "genetic_lab_comparisons": comparisons,
+            "thematic_panels": thematic_panels.thematic_summaries(dom["key"]),
             "medications": _medications_layer(dom["key"]),
             "target": target,
             "tests": tests, "questions": questions,

@@ -189,9 +189,9 @@ CLI_ONLY: Dict[str, str] = {
            "length of a session. A web route would mean a second server with its own lifetime "
            "inside the one this command replaces, and a model that wants these answers in a "
            "browser already has the web interface itself",
-    "import-fhir": "a FHIR bundle imported from a path on disk. No web route for the same reason "
-                   "as `import-labs`: a page reachable from a browser must not be able to read an "
-                   "arbitrary file by name",
+    "import-fhir": "the direct-file form of FHIR import. The configured-folder ingest-labs route "
+                   "and sch_ingest_labs tool import the same bundles through the same core; no "
+                   "additional web route accepts arbitrary file paths",
     "import-labs": "a CSV/TSV panel imported from a path on disk. The web has no route because "
                    "a page reachable from a browser must not be able to read an arbitrary file "
                    "by name — that is a file picker's job, and the picker is the next step, not "
@@ -282,6 +282,7 @@ PLUGIN: Dict[str, str] = {
     "phenoage": "sch_phenoage",
     "provenance": "sch_provenance",
     "ingest-labs": "sch_ingest_labs",
+    "ingest-studies": "sch_ingest_labs",
     "overview": "sch_overview",
     "insight-snapshot": "sch_insight_snapshot",
     "second-opinion": "sch_second_opinion",
@@ -340,6 +341,7 @@ PLUGIN: Dict[str, str] = {
 #: The arguments that make a tool answer for THIS command, where one tool answers
 #: for more than one. A command absent from here is its tool's plain call.
 PLUGIN_ARGS: Dict[str, Dict[str, Any]] = {
+    "ingest-studies": {"kind": "studies"},
     "genome-updates": {"updates": True},
     "reconcile": {"full": True},
     "markers": {"catalogue": True},
@@ -396,7 +398,7 @@ NO_PLUGIN: Dict[str, str] = {
                     "reads the same facts through `sch_brief` and `sch_analyze_labs` and needs no "
                     "request addressed to itself",
     "brief-reviewed": "a write, and the statement it records is the person's own",
-    "import-labs": "a write", "ingest-studies": "a write", "ingest-garmin": "a write",
+    "import-labs": "a write", "ingest-garmin": "a write",
     "ingest-wearable": "a write",
     "import-fhir": "a write",
     # Dictated, like `focus-log`, and unlike it not a tool. What the journal
@@ -548,7 +550,7 @@ TOOLLESS: Dict[str, Any] = {
     "add-metric": ("writes", ()), "set-folder": ("writes", ()), "init": ("writes", ()),
     "demo": ("writes", ()), "choose-genome": ("writes", ()), "redact": ("writes", ()),
     "brief-reviewed": ("writes", ()), "import-labs": ("writes", ()),
-    "import-fhir": ("writes", ()), "ingest-studies": ("writes", ()),
+    "import-fhir": ("writes", ()),
     "ingest-garmin": ("writes", ()), "ingest-wearable": ("writes", ()),
     # The reading half is a tool: the target stands beside the corridor there.
     "target": ("writes", ("sch_analyze_labs",)),

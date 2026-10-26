@@ -509,6 +509,7 @@ def _points_this_write_replaces(series: List[Dict[str, Any]], date: str) -> List
 
 DATE_SOURCES = {
     "form":       "the draw date printed on the form itself",
+    "issued":     "the issue date of a report without a recorded collection date",
     "ordered":    "a date the form prints for the ORDER or the receipt, not the draw",
     "filename":   "the file name — what somebody called the file, not what the form says",
     "manual":     "entered by the person",
@@ -516,7 +517,7 @@ DATE_SOURCES = {
 }
 #: The two that are not the draw and not the person's own word. Everything shown
 #: about such a point carries the caveat.
-DATE_APPROXIMATE = ("ordered", "filename")
+DATE_APPROXIMATE = ("ordered", "filename", "issued")
 
 
 @_serialized
@@ -710,7 +711,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
     pt: Dict[str, Any] = {"date": date, "value": value,
                           "date_source": date_source or "unrecorded"}
     for field in ("reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method", "source",
-                  "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting"):
+                  "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting", "source_record"):
         if reference_context and field in reference_context:
             pt[field] = reference_context[field]
     if subject:
@@ -741,7 +742,7 @@ def add_lab_point(marker: str, date: str, value: float, *, name: Optional[str] =
             # not be shown as having printed the previous form's.
             if field not in ("date_source", "censored", "ref_low", "ref_high",
                              "reference_table", "reference_grade", "reference_kind", "reference_withheld", "ingest_method",
-                             "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting"):
+                             "specimen", "biomaterial", "specimen_source", "sample_id", "draw_id", "form_id", "method", "fasting", "source_record"):
                 pt.setdefault(field, kept)
     if date_kept_from_old:
         pt["date_source"] = next((old.get("date_source") for old in gone
@@ -954,7 +955,8 @@ def list_medications() -> List[Dict[str, Any]]:
 def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str] = None,
                      unit: Optional[str] = None, ref_low: Optional[float] = None,
                      ref_high: Optional[float] = None, direction: Optional[str] = None,
-                     subject: Optional[str] = None) -> Dict[str, Any]:
+                     subject: Optional[str] = None,
+                     source_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Add/update a health metric point in metrics.json (replacing the point of the same date).
 
     `subject` as in `add_lab_point`.
@@ -984,6 +986,13 @@ def add_metric_point(metric: str, date: str, value: float, *, name: Optional[str
     series: List[Dict[str, Any]] = m.setdefault("series", [])
     series[:] = [pt for pt in series if pt.get("date") != date]
     point: Dict[str, Any] = {"date": date, "value": value}
+    if source_context:
+        if source_context.get("source_record"):
+            point["source_record"] = source_context["source_record"]
+            if source_context["source_record"].get("date_role") == "issued":
+                point["date_source"] = "issued"
+        if source_context.get("labels"):
+            m["labels"] = source_context["labels"]
     if subject:
         point[_subj.FIELD] = subject
     series.append(point)
@@ -1045,6 +1054,20 @@ def update_metric_profile(fields: Dict[str, Any]) -> Dict[str, Any]:
         if not normalised:
             return {"ok": False, "error": _t("store.unknown_sex", value=fields["sex"])}
         fields["sex"] = normalised
+    if "cgm_timezones" in fields:
+        from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+        zones=fields["cgm_timezones"]
+        try:
+            if not isinstance(zones,dict) or any(not re.fullmatch(r"[0-9a-f]{64}",key) for key in zones):
+                raise ValueError("source identity")
+            for zone in zones.values():
+                if not isinstance(zone,str):raise ValueError("timezone")
+                ZoneInfo(zone)
+        except (ValueError,TypeError,ZoneInfoNotFoundError):
+            return {"ok":False,"error":_t("cgm.timezone_invalid")}
+        prof["cgm_timezones"]={**(prof.get("cgm_timezones") or {}),**zones}
+    if "clinical_context" in fields:
+        return {"ok": False, "error": _t("clinical.context_removed")}
     for k in ("sex", "birth_year", "height_cm", "ancestry", "wearable_primary"):
         if k in fields and fields[k] not in (None, ""):
             prof[k] = fields[k]

@@ -322,6 +322,9 @@ class Handler(BaseHTTPRequestHandler):
         """
         from . import container as _container
         from .engine.visit import VisitSelectionChanged
+        from .visit_focus import VisitFocusInvalid
+        if isinstance(exc, VisitFocusInvalid):
+            return self._json({"error": str(exc)}, 400)
         if isinstance(exc, VisitSelectionChanged):
             return self._json({"error": _t("visit.selection_changed")}, 409)
         if isinstance(exc, _container.ContainerError):
@@ -427,7 +430,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(review_snapshot())
             if p == "/api/visit-sheet":
                 return self._json(engine.visit_sheet(q.get("reference", [""])[0] == "1",
-                    q.get("item", []) if q.get("selection") == ["explicit"] else q.get("item")))
+                    q.get("item", []) if q.get("selection") == ["explicit"] else q.get("item"),
+                    compact=q.get("compact") == ["1"],
+                    visit_systems=q.get("system", []) if q.get("focus_selection") == ["explicit"] else q.get("system"),
+                    visit_panels=q.get("panel"), visit_focus=q.get("focus", [""])[0]))
             if p == "/api/goal":
                 return self._json(engine.goal_dashboard())
             if p == "/api/goal-suggest":
@@ -487,7 +493,7 @@ class Handler(BaseHTTPRequestHandler):
                 # person hands to the assistant. Reads; the verdict stays theirs.
                 return self._json(engine.brief_review((q.get("block") or [""])[0] or None))
             if p == "/api/lifestyle":
-                return self._json(engine.lifestyle())
+                return self._json(engine.lifestyle((q.get('cgm_report') or [''])[0]))
             if p == "/api/screen":
                 return self._json(engine.screen((q.get("class") or [""])[0] or None))
             if p == "/api/systems":
@@ -738,7 +744,8 @@ class Handler(BaseHTTPRequestHandler):
                 if not folder:
                     return self._json({"ok": False, "error": _t("server.no_studies_folder")})
                 from . import ingest_studies
-                return self._json(ingest_studies.ingest(folder, force=bool(body.get("force"))))
+                return self._json(ingest_studies.ingest(folder, force=bool(body.get("force")),
+                     dry_run=bool(body.get("preview")), approval=str(body.get("confirm") or "")))
             if u.path == "/api/ingest-labs":
                 folder = body.get("path") or core.source_config().get("labs_docs")
                 if not folder:
@@ -793,22 +800,44 @@ def _already_ours(host: str, port: int) -> bool:
 
 
 def warm_up() -> int:
-    """Read every system's card once, so the first page finds the reads warm.
+    """Prepare bounded indexed positions, never all invisible system cards.
 
-    The first radar of a session paid for every cold read — the genome folder,
-    the catalogue positions, the coverage table — while the person watched a
-    bar (owner, 14.09.2026). The same reads happen here, right after the port
-    is bound and on a thread of their own. Returns how many cards were read; a
-    failure is swallowed, because a warm-up that fails has cost nothing.
+    Building every detailed panel competed with the requested first screen for
+    CPU and disk. Panels still read their full data when opened. Return the
+    number of cached region results, or zero on an optional warm-up failure.
     """
     try:
-        from . import engine as _engine
-        return len(_engine.systems("patient").get("cards") or {})
+        from . import genome as _genome
+        with core.reading_session():
+            _genome._prefetch_catalogue_rows()
+        return len(_genome._REGION_CACHE)
     except Exception as exc:                                         # noqa: BLE001
         # Named on stderr rather than hidden: a warm-up that fails costs the
         # person nothing, but the reason is a defect worth reading.
         print(f"warm-up skipped: {type(exc).__name__}: {exc}", file=sys.stderr, flush=True)
         return 0
+
+
+def _startup_selfcheck(profile: Path, repo: Path) -> None:
+    """Keep PDF reconciliation off the web interpreter, with its data root fixed."""
+    environment = dict(os.environ)
+    environment["SCHOLION_PROFILE_DIR"] = str(profile)
+    environment["SCHOLION_REPO_DIR"] = str(repo)
+    # Use this exact source tree or installed wheel, even when serve was called
+    # from elsewhere. No source-only helper is needed in the installed package.
+    environment["PYTHONPATH"] = str(Path(__file__).resolve().parent.parent)
+    program = ("from scholion import reconcile; "
+               "print(reconcile.selfcheck_summary(reconcile.reconcile()), flush=True)")
+    try:
+        result = subprocess.run([sys.executable, "-c", program], env=environment,
+                                capture_output=True, text=True, timeout=300,
+                                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        if result.returncode != 0:
+            raise RuntimeError((result.stderr or result.stdout).strip()[:300])
+        print(result.stdout.rstrip(), flush=True)
+    except Exception as exc:                                         # noqa: BLE001
+        # Optional startup reporting must not stop serving; the failure is named.
+        print(_t("server.selfcheck_skipped", error=exc), flush=True)
 
 
 def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, tries: int = 12) -> None:
@@ -835,14 +864,10 @@ def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, 
     except core.SourcesUnreadable as e:
         print(f"⚠️  {e}", flush=True)
 
-    # The lab integrity self-check at start-up (in the background, it does not block the server)
-    def _selfcheck():
-        try:
-            from . import reconcile as _rec
-            print(_rec.selfcheck_summary(_rec.reconcile()), flush=True)
-        except Exception as _e:  # the check must not bring the application down
-            print(_t("server.selfcheck_skipped", error=_e), flush=True)
-    threading.Thread(target=_selfcheck, daemon=True).start()
+    # Parsing PDFs shares the interpreter lock even on a background thread.
+    # Pin the selected roots before starting the separate reconciliation process.
+    threading.Thread(target=_startup_selfcheck,
+                     args=(core.profile_dir().resolve(), core.repo_dir().resolve()), daemon=True).start()
 
     # 1) our instance is already running on the requested port → open the browser
     if _already_ours(host, port):

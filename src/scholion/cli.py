@@ -132,6 +132,8 @@ def _add_answers_commands(sub, common) -> None:
                           "without it such a metric is shown from both and enters no "
                           f"conclusion. `{_core.NO_WEARABLE}` records that there is no "
                           "wearable, so nothing asks again")
+    prf.add_argument("--cgm-timezones", metavar="JSON_FILE",
+                     help="record report SHA256 to explicit IANA timezone mappings from a local JSON file")
     prf.add_argument("--height-cm", type=float, default=None,
                      help="height in centimetres — the body-mass index is computed from it, "
                           "and without it nothing that needs a height is shown. The page has "
@@ -154,7 +156,8 @@ def _add_answers_commands(sub, common) -> None:
                    help="the focus of attention: the current task, the live metric, the levers, the journal")
     sub.add_parser("brief", parents=[common],
                    help="the lifestyle brief: live numbers + curated wordings")
-    sub.add_parser("lifestyle", parents=[common], help="lifestyle (wearables): monthly trends + body composition")
+    life=sub.add_parser("lifestyle", parents=[common], help="lifestyle (wearables): monthly trends + body composition")
+    life.add_argument('--cgm-report', default='', help='read a saved CGM PDF revision by source SHA-256')
     sub.add_parser("goal", parents=[common], help="your goal for the metrics, on live data")
     _gs = sub.add_parser("goal-suggest", parents=[common],
                          help="propose a goal from your own series and the published guidelines")
@@ -217,6 +220,8 @@ def _add_ingest_commands(sub, common) -> None:
                          help="extract doctors' CONCLUSIONS and instrumental studies "
                               "(ECG/ultrasound/MRI/consultations) from the PDFs in a folder → studies.json")
     ist.add_argument("folder", nargs="?", help="the folder with the PDFs (the studies folder by default)")
+    ist.add_argument("--dry-run", action="store_true", help="preview studies/CGM import without writing")
+    ist.add_argument("--approve", default="", help="apply only the matching studies import preview")
     ist.add_argument("--force", action="store_true", help="re-read every file")
 
     igw = sub.add_parser("ingest-wearable", parents=[common],
@@ -372,6 +377,10 @@ def _add_maintenance_commands(sub, common) -> None:
                     help="observation window for the shared attention summary")
     ov.add_argument("--agenda-id", action="append", help="include this feed item in the visit sheet; repeat to select more")
     ov.add_argument("--no-agenda", action="store_true", help="prepare the handout without attention items")
+    ov.add_argument("--compact", action="store_true", help="prepare a short visit-specific handout")
+    ov.add_argument("--visit-system", action="append", help="system in this visit; repeat to select more")
+    ov.add_argument("--visit-panel", action="append", help="thematic gene panel selected for this visit")
+    ov.add_argument("--visit-focus", default="", help="the patient or clinician's question for this visit")
     rev = sub.add_parser("insight-snapshot", parents=[common],
                          help="preview a local review snapshot; save only with its confirmation fingerprint")
     rev.add_argument("--confirm", default="", help="fingerprint from the preview")
@@ -707,10 +716,14 @@ def main(argv=None) -> int:
     # a stream that cannot carry them dies halfway through, having already
     # written part of the file. See `console.speak_utf8`.
     from . import console as _console
+    from .visit_focus import VisitFocusInvalid
     from . import container as _container
     _console.speak_utf8()
     try:
         return _main(argv)
+    except VisitFocusInvalid as e:
+        print(str(e), file=sys.stderr)
+        return 2
     except _core.ProfileFromTheFuture as e:
         print(f"⚠️  {e}", file=sys.stderr)
         return 3
@@ -1070,8 +1083,11 @@ def _cmd_insight_snapshot(args) -> Any:
 
 
 def _cmd_overview(args) -> Any:
-    if args.visit_sheet or args.reference_appendix:
-        return engine.visit_sheet(args.reference_appendix, [] if args.no_agenda else args.agenda_id), fmt.visit_report
+    if args.visit_sheet or args.reference_appendix or args.compact or args.visit_system or args.visit_panel or args.visit_focus:
+        options = ({"compact": args.compact, "visit_systems": args.visit_system,
+                    "visit_panels": args.visit_panel, "visit_focus": args.visit_focus}
+                   if args.compact or args.visit_system or args.visit_panel or args.visit_focus else {})
+        return engine.visit_sheet(args.reference_appendix, [] if args.no_agenda else args.agenda_id, **options), fmt.visit_report
     res, render = engine.overview(args.period), fmt.overview_report
     return res, render
 
@@ -1286,7 +1302,7 @@ def _cmd_brief_review(args) -> Any:
 
 
 def _cmd_lifestyle(args) -> Any:
-    res, render = engine.lifestyle(), fmt.lifestyle_report
+    res, render = engine.lifestyle(getattr(args, 'cgm_report', '')), fmt.lifestyle_report
     return res, render
 
 
@@ -1530,7 +1546,7 @@ def _cmd_ingest_studies(args) -> Any:
         res, render = ({"ok": False, "error": _t("ingest.no_folder")},
                        lambda r: f"⚠️ {r['error']}")
     else:
-        res = ingest_studies.ingest(folder, force=args.force)
+        res = ingest_studies.ingest(folder, force=args.force, dry_run=args.dry_run, approval=args.approve)
         render = fmt.ingest_studies_report
     return res, render
 
@@ -1589,6 +1605,8 @@ def _cmd_provenance(args) -> Any:
 def _cmd_profile_with_fields(args) -> Any:
     from . import store as _st
     fields = {}
+    if getattr(args, "cgm_timezones", None):
+        fields["cgm_timezones"] = json.loads(Path(args.cgm_timezones).read_text(encoding="utf-8"))
     if args.sex:
         fields["sex"] = args.sex
     if args.birth_year:
@@ -1693,7 +1711,7 @@ _QUERIES = [
     (_is("selfcheck"), _cmd_selfcheck),
     (_is("phenoage"), _cmd_phenoage),
     (_is("provenance"), _cmd_provenance),
-    (lambda args: args.cmd == 'profile' and (getattr(args, 'sex', None) or getattr(args, 'birth_year', None) or getattr(args, 'height_cm', None) or getattr(args, 'wearable', None) or getattr(args, 'ancestry', None)), _cmd_profile_with_fields),
+    (lambda args: args.cmd == 'profile' and (getattr(args, 'sex', None) or getattr(args, 'birth_year', None) or getattr(args, 'height_cm', None) or getattr(args, 'wearable', None) or getattr(args, 'ancestry', None) or getattr(args, 'cgm_timezones', None)), _cmd_profile_with_fields),
     (_is("profile"), _cmd_profile),
 ]
 
@@ -1789,7 +1807,7 @@ def _dispatch(p, args) -> int:
     # that write a value somebody typed, a refusal is a failure of the command.
     # Folder and ingest commands keep answering 0 on «nothing there»: an absence
     # of data is an answer, and their reports already say what was not read.
-    if args.cmd in _VALUE_WRITES and isinstance(res, dict) and res.get("ok") is False:
+    if (args.cmd in _VALUE_WRITES or (args.cmd == "profile" and getattr(args, "cgm_timezones", None))) and isinstance(res, dict) and res.get("ok") is False:
         return 1
     if args.cmd == "limits" and args.bed and not res.get("ok"):
         # `scholion limits --bed > weak.bed` must not leave a refusal sentence

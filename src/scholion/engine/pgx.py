@@ -915,6 +915,8 @@ def clinvar_for_drug(drug: str, genome_sec: Dict[str, Any], info=None) -> Dict[s
         seen.add(key)
         out.append({"rsid": rsid, "genotype": h.get("genotype"), "clnsig": h.get("clnsig"),
                     "disease": h.get("disease"), "tier": tier,
+                    "personal_context": h.get("personal_context"),
+                    "gene_contexts": h.get("gene_contexts") or [],
                     "gene": rs2gene.get(rsid), "by_drug": by_drug})
     order = {"drug": 0, "pathogenic": 1, "risk": 2, "protective": 3}
     out.sort(key=lambda x: order.get(x["tier"], 5))

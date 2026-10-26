@@ -59,7 +59,13 @@ class TestTheSchemaIsWhatTheReadersAssume(unittest.TestCase):
         but it must be a visible number rather than an accident, so a migration
         that dropped names on the floor shows up as a jump in this count.
         """
-        nameless = [k for k, spec in MARKERS.items() if not core.marker_rules(spec, "names")]
+        nameless = [k for k, spec in MARKERS.items() if not core.marker_rules(spec, "names")
+                    and spec.get("input_kind") != "coded_observation"]
+        for key, spec in MARKERS.items():
+            if spec.get("input_kind") == "coded_observation":
+                mapping = core.lab_test_meta()["tests"][key]
+                self.assertTrue(mapping.get("loinc"), key)
+                self.assertTrue(mapping.get("loinc_context"), key)
         self.assertEqual(nameless, [], "markers with no recognition names at all: "
                          + ", ".join(nameless[:10]))
 

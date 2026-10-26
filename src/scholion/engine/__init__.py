@@ -235,3 +235,7 @@ from .targets import (  # noqa: F401 -- the facade re-exports every name
 )
 
 from .insight_links import linked_pgs_events  # noqa: F401 -- shared engine facade
+
+from .thematic_panels import (  # noqa: F401 -- shared reference topic facade
+    thematic_catalogue, thematic_summaries, thematic_reference, thematic_readings,
+)

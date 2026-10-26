@@ -41,8 +41,10 @@ class TestReferencePanels(unittest.TestCase):
         longevity = core._read_knowledge("longevity_directions.json")["directions"]
         for spec in longevity.values():
             if spec.get("level"):
-                seen.add(spec["gene"])
-                self.assertTrue(raw["genes"][spec["gene"]]["source"])
+                from scholion.panel_reference import gene_function_entry
+                self.assertTrue(gene_function_entry(spec["gene"])["source"])
+                if spec["gene"] in raw["genes"]:
+                    seen.add(spec["gene"])
         self.assertEqual(set(raw["genes"]), seen)
         # Retired NCBI records bearing the same symbol must not replace these.
         for gene, uid in (("CYP2C19", "1557"), ("CYP2R1", "120227"), ("PRKN", "5071")):

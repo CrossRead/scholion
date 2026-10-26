@@ -16,6 +16,27 @@ class TestSourcedGeneFunctions(unittest.TestCase):
     def setUp(self):
         self.addCleanup(i18n.set_lang, i18n.lang())
 
+    def test_refused_personal_reading_keeps_known_biology_and_gencc_in_agent_text(self):
+        from scholion import format as fmt
+        for language in ('en','ru'):
+            i18n.set_lang(language)
+            reference=genome_context('C10ORF71')
+            expected=reference['reference_context']['gene_function']
+            for status in ('no_genome','unindexed','unresolved_gene'):
+                result={**reference,'status':status,'region':{'synthetic':True},
+                        'location':{'chrom':'10','start':1,'end':2,'assembly':'GRCh38'},
+                        'message':'Synthetic reading refusal','coverage':{'why':'Synthetic missing alignment'}}
+                text=fmt.genome_report(result)
+                self.assertIn(expected,text,status)
+                self.assertIn('GenCC',text,status)
+                self.assertIn('2026-10-14',text,status)
+                self.assertNotIn('variants in the gene: 0',text)
+            position={**genome_context('C10ORF71','rsSynthetic'),'status':'no_genome',
+                      'message':'Synthetic no genome','chrom':'10','pos':1}
+            text=fmt.genome_report(position)
+            self.assertIn(expected,text)
+            self.assertIn('GenCC',text)
+
     def test_known_functions_cross_the_same_three_reference_paths(self):
         for language, fragment in (("en", "telomerase"), ("ru", "\u0442\u0435\u043b\u043e\u043c\u0435\u0440\u0430\u0437\u044b")):
             i18n.set_lang(language)
@@ -132,7 +153,7 @@ class TestSourcedGeneFunctions(unittest.TestCase):
         entries = core._read_knowledge_raw("gene_function_context.json")["genes"]
         self.assertGreater(len(entries), 650)
         for symbol, entry in entries.items():
-            self.assertEqual(entry["scope"], "gene_function", symbol)
+            self.assertEqual(entry["scope"], "genomic_annotation" if entry.get("gene_type") == "BIOLOGICAL_REGION" else "gene_function", symbol)
             self.assertTrue(entry.get("source"), symbol)
             self.assertEqual(set(entry["description"]), {"en", "ru"}, symbol)
             self.assertNotIn("level", entry, symbol)
@@ -143,6 +164,41 @@ class TestSourcedGeneFunctions(unittest.TestCase):
                     self.assertNotIn("NOT", annotation["qualifier"], symbol)
                     self.assertNotEqual(annotation["evidence_code"], "ND", symbol)
         self.assertIn("CC BY 4.0", core._read_knowledge_raw("gene_function_context.json")["_meta"]["go_attribution"])
+
+    def test_official_previous_symbols_reuse_canonical_function_without_a_variant_claim(self):
+        from scholion.panel_reference import gene_function_entry
+        for language in ("en", "ru"):
+            i18n.set_lang(language)
+            for alias, canonical in (("ARNTL", "BMAL1"), ("CALC", "MICU1"), ("GIF", "CBLIF")):
+                previous = gene_function_entry(alias)
+                current = gene_function_entry(canonical)
+                self.assertEqual(previous["description"], current["description"])
+                self.assertEqual(previous["canonical_symbol"], canonical)
+                self.assertTrue(previous["identity_source"].startswith("https://www.genenames.org/"))
+                card = genome_context(alias, "rsSynthetic")
+                self.assertEqual(card["level"], "E")
+                self.assertEqual(card["reference_context"]["variant_status"], "not_curated")
+            # Family names and misspellings do not become official aliases.
+            for unknown in ("F13", "LRP", "COL1R1", "LPR1"):
+                self.assertFalse(gene_function_entry(unknown), unknown)
+
+    def test_expanded_functions_reach_both_languages_without_inventing_readings(self):
+        for language, fragments in (("en", {"CNDP1": "carnosinase", "MICU1": "calcium",
+                                            "BMAL1": "circadian", "ACADM": "fatty acids",
+                                            "HSD17B13": "predicted"}),
+                                    ("ru", {"CNDP1": "карнозиназу", "MICU1": "кальция",
+                                            "BMAL1": "суточные", "ACADM": "жирных кислот",
+                                            "HSD17B13": "предсказанная"})):
+            i18n.set_lang(language)
+            for symbol, fragment in fragments.items():
+                card = genome_context(symbol, "rsSynthetic")
+                context = card["reference_context"]
+                self.assertIn(fragment, context["gene_function"], symbol)
+                self.assertTrue(context["gene_source"], symbol)
+                self.assertEqual(card["level"], "E")
+                self.assertEqual(context["variant_status"], "not_curated")
+                self.assertNotIn("genotype", card)
+                self.assertIn(context["gene_function"], "\n".join(reference_lines(card)))
 
     def test_panel_effects_and_provenance_follow_the_output_language(self):
         def values(node, field):

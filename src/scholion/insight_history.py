@@ -29,6 +29,11 @@ def _snapshot(feed: dict) -> dict:
                        "date": i["date"], "level": i.get("level"),
                        "kinds": [e["kind"] for e in i["events"]],
                        "provenance": i["provenance"]} for i in feed["items"]] + _reference_reviews(),
+            "system_items": [{"id": i["id"], "name": i["name"], "title": i["title"],
+                       "date": i["date"], "level": i.get("level"),
+                       "member_ids": i.get("member_ids") or [i["id"]],
+                       "provenance": i["provenance"]} for i in
+                       (feed.get("highlights") or []) + (feed.get("follow_up") or [])],
             "states": {k: {f: v.get(f) for f in ("flag", "date", "current", "proposed",
                                                 "method", "unit", "ref_low", "ref_high",
                                                 "data_digest", "rules_digest")}
@@ -101,14 +106,69 @@ def compare_review(feed: dict, previous: dict | None = None) -> dict:
                       "label": t("insight.diff." + status), "reason_label": t("insight.reason." + reason),
                       "previous": old, "current": new})
     diffs.sort(key=lambda d: (d["status"] != "withdrawn", d["status"] == "unchanged", d["id"]))
-    return {"available": True, "saved_at": previous.get("saved_at"), "items": diffs}
+    system_diffs = _compare_system_items(_snapshot(feed), previous)
+    covered = {key for diff in system_diffs for row in (diff.get("previous"), diff.get("current"))
+               if row for key in row.get("member_ids") or []}
+    return {"available": True, "saved_at": previous.get("saved_at"), "items": diffs,
+            "system_items": system_diffs,
+            "display_items": system_diffs + [diff for diff in diffs if diff["id"] not in covered],
+            "system_baseline": "system_items" in previous}
+
+
+def _compare_system_items(current: dict, previous: dict) -> list[dict]:
+    """A legacy snapshot has no system basis; do not invent its old sources."""
+    if "system_items" not in previous:
+        return []
+    now = {i["id"]: i for i in current.get("system_items") or []}
+    before = {i["id"]: i for i in previous.get("system_items") or []}
+    changes = []
+    for key in sorted(set(now) | set(before)):
+        old, new = before.get(key), now.get(key)
+        if not old:
+            status, reason = "new", "data"
+        elif not new:
+            status, reason = "unavailable", "unknown"
+        else:
+            a, b = old["provenance"], new["provenance"]
+            data = a.get("facts_digest") != b.get("facts_digest")
+            rules = a.get("rules_digest") != b.get("rules_digest")
+            status = "changed" if data or rules else "unchanged"
+            reason = "both" if data and rules else "data" if data else "rules" if rules else "unknown"
+            if old.get("level") in ("A", "B") and new.get("level") not in ("A", "B", None):
+                status, reason = "withdrawn", "rules"
+        changes.append({"id": key, "status": status, "reason": reason,
+                        "label": t("insight.diff." + status), "reason_label": t("insight.reason." + reason),
+                        "previous": old, "current": new,
+                        "basis_changes": _basis_changes(old, new),
+                        "refresh": ((new or {}).get("provenance") or {}).get("basis", {}).get("refresh")})
+    return changes
+
+
+def _basis_changes(old: dict | None, new: dict | None) -> list[dict]:
+    result = []
+    for kind, collection, digest_key in (("fact", "facts", "fact_digest"),
+                                          ("knowledge", "knowledge", "record_digest")):
+        def entries(item):
+            basis = ((item or {}).get("provenance") or {}).get("basis") or {}
+            rows = basis.get(collection) or []
+            return {(row.get("id") or _digest([row.get(k) for k in ("record", "key", "date")])): row
+                    for row in rows}
+        before, after = entries(old), entries(new)
+        for key in sorted(set(before) | set(after)):
+            a, b = before.get(key), after.get(key)
+            if a is not None and b is not None and a.get(digest_key) == b.get(digest_key):
+                continue
+            result.append({"kind": kind, "id": key, "previous": a, "current": b})
+    return result
 
 
 def _identity(snap: dict) -> str:
     """A translation or a save timestamp is not a new clinical review."""
     return _digest({**snap, "saved_at": None, "container": None,
                     "items": [{k: v for k, v in item.items() if k not in ("name", "title")}
-                              for item in snap["items"]]})
+                              for item in snap["items"]],
+                    "system_items": [{k: v for k, v in item.items() if k not in ("name", "title")}
+                                     for item in snap.get("system_items") or []]})
 
 
 def review_snapshot(confirm: str = "") -> dict:

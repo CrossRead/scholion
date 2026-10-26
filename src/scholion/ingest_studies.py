@@ -103,18 +103,17 @@ ALARMING = (REASON_SEVERAL, REASON_PART_NOT_READ, REASON_NO_TEXT, REASON_NOT_EXT
 #: clinic renamed a section. What is recognised is the SHAPE «title + date + end of
 #: line», and a title ending in a colon is excluded because that is a field label
 #: («Дата рождения: 01.01.1970»), not a heading.
-_SECTION = re.compile(r"^[ \t]*([А-ЯЁ][^\n:]{3,70}?)[ \t]+"
-                      r"(\d{2})[.\-/](\d{2})[.\-/](\d{4})[ \t]*$", re.M)
+_SECTION = re.compile(r"^[ \t]*([A-ZА-ЯЁ][^\n:]{3,70}?)[ \t]+"
+                      r"(\d{2})[.\-/](\d{2})[.\-/](\d{4})"
+                      r"(?:[ \t]+(\d{2}):(\d{2}))?[ \t]*$", re.M)
 
 
 def sections_in(text: str) -> List[Dict[str, str]]:
     """The study sections of a multi-document file: «what» and «when», in order.
 
-    Two or more of these mean one PDF is carrying several studies. This loader
-    cannot split such a file yet — but a file it cannot split must SAY SO, with the
-    count, instead of being handed to the laboratory loader as somebody else's
-    problem. That handoff is how a ten-page discharge summary fell between the two
-    loaders and stayed out of the profile for six years.
+    Two or more headings identify a compound document. Both importers use the
+    same section boundaries; a section that cannot be read is reported rather
+    than being treated as another importer's responsibility.
     """
     out: List[Dict[str, str]] = []
     for m in _SECTION.finditer(text or ""):
@@ -123,7 +122,7 @@ def sections_in(text: str) -> List[Dict[str, str]]:
     return out
 
 
-def split_documents(text: str) -> List[Dict[str, str]]:
+def split_documents(text: str, *, allow_single: bool = False) -> List[Dict[str, str]]:
     """One PDF holding several studies → one slice per study, in order.
 
     A section runs from its heading to the next heading; the tail runs to the end
@@ -141,13 +140,15 @@ def split_documents(text: str) -> List[Dict[str, str]]:
     whole as before.
     """
     hits = list(_SECTION.finditer(text or ""))
-    if len(hits) < 2:
+    if len(hits) < (1 if allow_single else 2):
         return []
     out: List[Dict[str, str]] = []
     for i, m in enumerate(hits):
         end = hits[i + 1].start() if i + 1 < len(hits) else len(text)
-        out.append({"what": _clean(m.group(1)),
-                    "date": f"{m.group(4)}-{m.group(3)}-{m.group(2)}",
+        stamp = f"{m.group(4)}-{m.group(3)}-{m.group(2)}"
+        if m.group(5):
+            stamp += f"T{m.group(5)}:{m.group(6)}"
+        out.append({"what": _clean(m.group(1)), "date": stamp,
                     "text": text[m.start():end]})
     # The prologue: whatever stood before the first heading. Kept so that nothing
     # of the file is unaccounted for — the accounting invariant this loader now
@@ -311,23 +312,48 @@ def _sid(path: Path, date: Optional[str]) -> str:
     return f"{stem}_{(date or 'nodate').replace('-', '')}"
 
 
+def _approval_token(root: Path, force: bool) -> str:
+    from .knowledge_provenance import digest
+    import hashlib
+    from . import cgm_pdf, cgm
+    target=core.profile_dir()/"studies.json"
+    return digest({"profile_root":str(core.profile_dir().resolve()),"profile":hashlib.sha256(target.read_bytes()).hexdigest() if target.exists() else None,
+                   "readers":[(Path(name).name,hashlib.sha256(Path(name).read_bytes()).hexdigest())
+                              for name in (__file__,cgm_pdf.__file__,cgm.__file__)],
+                   "root":str(root.resolve()),"force":force,
+                   "files":[(str(p.resolve()),hashlib.sha256(p.read_bytes()).hexdigest()) for p in sorted(root.rglob("*.pdf"))]})
+
+
+from .store import _serialized
+
+
+@_serialized
 def ingest(folder: str, force: bool = False,
-           progress: Optional[Callable[[int, int, Optional[str]], None]] = None) -> Dict[str, Any]:
+           progress: Optional[Callable[[int, int, Optional[str]], None]] = None,
+           dry_run: bool = False, approval: str = "") -> Dict[str, Any]:
     """Walk the folder of PDFs and update profile/studies.json with conclusions. Incremental."""
     if not _ensure_extractor():
         return {"ok": False, "error": _t("studies.no_pdf_reader")}
     root = Path(folder).expanduser()
     if not root.exists() or not root.is_dir():
         return {"ok": False, "error": _t("studies.folder_not_found", path=root)}
+    try:
+        token = _approval_token(root, force) if dry_run or approval else None
+    except OSError as exc:
+        return {"ok":False,"error":_t("studies.preview_unreadable", detail=str(exc))}
+    if approval and token != approval:
+        return {"ok":False,"error":_t("studies.preview_changed")}
     p = core.profile_dir() / "studies.json"
-    data = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
+    data: Dict[str, Any] = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {
         "_meta": {"what": _t("studies.meta_what")},
         "studies": []}
-    by_id = {s.get("id"): s for s in data.get("studies") or []}
-    moved = _manifest_moved("studies")
+    by_id: Dict[str, Dict[str, Any]] = {s.get("id"): s for s in data.get("studies") or []}
+    moved = None if dry_run else _manifest_moved("studies")
     manifest = _load_manifest()
     files = sorted(root.rglob("*.pdf"))
-    added, updated, skipped = [], [], 0
+    added: List[str] = []
+    updated: List[str] = []
+    skipped = 0
     missed: List[Dict[str, Any]] = []
     for n_file, f in enumerate(files):
         if progress is not None:
@@ -337,8 +363,14 @@ def ingest(folder: str, force: bool = False,
         key, known = core.manifest_lookup(manifest, f)
         mtime = f.stat().st_mtime
         if not force and known == mtime:
-            skipped += 1
-            continue
+            # A changed PDF can retain its timestamp. Recheck only known CGM
+            # sources; ordinary studies keep their existing incremental path.
+            cgm_versions = [v for study in by_id.values() for v in (study.get("cgm") or {}).get("versions") or []
+                            if v.get("source", {}).get("path") == str(f.resolve())]
+            import hashlib
+            if not cgm_versions or any(v["source"]["sha256"] == hashlib.sha256(f.read_bytes()).hexdigest() for v in cgm_versions):
+                skipped += 1
+                continue
         try:
             text = _read_pdf(f) or ""
         except PdfUnreadable as e:
@@ -347,6 +379,20 @@ def ingest(folder: str, force: bool = False,
             # so it is read again next time instead of counting as seen.
             missed.append({"file": f.name, "reason": REASON_UNREADABLE,
                            "detail": _t("studies.reason_unreadable", error=str(e) or "-")})
+            continue
+        from . import cgm, cgm_pdf
+        if cgm_pdf.recognizes(text):
+            try:
+                report = cgm_pdf.extract(f, checkpoint=(lambda: progress(n_file, len(files), f.name)) if progress else None)
+                sid, change = cgm.merge(by_id, report, f.name)
+            except (OSError, ValueError) as exc:
+                missed.append({"file":f.name,"reason":REASON_UNREADABLE,"detail":str(exc)})
+                continue
+            manifest[key] = mtime
+            if change == "unchanged":
+                skipped += 1
+            else:
+                (added if change == "added" else updated).append(sid)
             continue
         st = parse_study(text, source=f.name)
         manifest[key] = mtime
@@ -394,7 +440,7 @@ def ingest(folder: str, force: bool = False,
         if reason:
             # Named, not dropped. Which file, and what happened to it — so that a
             # document nobody parsed is a line in the report rather than an absence.
-            item = {"file": f.name, "reason": reason,
+            item: Dict[str, Any] = {"file": f.name, "reason": reason,
                     "detail": _t("studies.reason_" + reason)}
             if reason == REASON_SEVERAL:
                 found = sections_in(text)
@@ -403,6 +449,7 @@ def ingest(folder: str, force: bool = False,
                                     n=len(found))
             missed.append(item)
             continue
+        assert st is not None
         sid = _sid(f, st["date"])
         st["id"] = sid
         if sid in by_id:
@@ -420,7 +467,19 @@ def ingest(folder: str, force: bool = False,
             added.append(sid)
     data["studies"] = sorted(by_id.values(), key=lambda s: (s.get("date") or "", s.get("id") or ""))
     (data.setdefault("_meta", {}))["updated"] = _dt.date.today().isoformat()
-    core.write_json(p, data, indent=1)
+    if dry_run:
+        return {"ok":True,"dry_run":True,"approval_token":token,"files_seen":len(files),
+                "added":0,"updated":0,"would_add":len(added),"would_update":len(updated),
+                "skipped_unchanged":skipped,"not_ingested":missed,"total":len(data["studies"]),
+                "alarming":sum(1 for m in missed if m["reason"] in ALARMING)}
+    if approval:
+        try:
+            if _approval_token(root, force) != approval:
+                return {"ok":False,"error":_t("studies.preview_changed")}
+        except OSError as exc:
+            return {"ok":False,"error":_t("studies.preview_unreadable", detail=str(exc))}
+    if added or updated:
+        core.write_json(p, data, indent=1)
     _save_manifest(manifest)
     core.reset_cache()
     return {"ok": True, "files_seen": len(files), "skipped_unchanged": skipped,

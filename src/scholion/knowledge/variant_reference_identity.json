@@ -1,0 +1,297 @@
+{
+  "_meta": {
+    "scope": "Public verified reference identities only. No personal genotype, effect allele or clinical validity is supplied.",
+    "checked_on": "2026-10-23",
+    "updated": "2026-10-24",
+    "source_tier": "curated_reference"
+  },
+  "variants": {
+    "rs1587874400": {
+      "rsid": "rs1587874400",
+      "gene": "SECISBP2",
+      "variant_class": "delins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1587874400",
+      "source_sha256": "b58e69d434b5cefa4b001306dd2c4fbe1f478ab0d6e5f2a72abf73501e0f06a9",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000009.12",
+          "chrom": "9",
+          "position_zero_based": 89328751,
+          "reference": "TTT",
+          "alternatives": [
+            "TT"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr9;start=89328731;end=89328774",
+          "sequence_sha256": "44d2b1cb74f15ed4c0dea13b6d9a8904d0f4cf3cdf4996c2aa984fd4bb398990"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000009.11",
+          "chrom": "9",
+          "position_zero_based": 91943666,
+          "reference": "TTT",
+          "alternatives": [
+            "TT"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr9;start=91943646;end=91943689",
+          "sequence_sha256": "f5a658646fc07f975a5bcacb133646923b515eeb259d2d1de245724433d4d888"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs1587875298": {
+      "rsid": "rs1587875298",
+      "gene": "SECISBP2",
+      "variant_class": "delins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1587875298",
+      "source_sha256": "80e6027131057132eb2a1c7550487e4a53f6c21652d4947de506242b91d4d93e",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000009.12",
+          "chrom": "9",
+          "position_zero_based": 89328882,
+          "reference": "AAA",
+          "alternatives": [
+            "AAAA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr9;start=89328862;end=89328905",
+          "sequence_sha256": "cbdcb186ba38b2cd456221388b96032473628fcf58d493bd484c248001d51992"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000009.11",
+          "chrom": "9",
+          "position_zero_based": 91943797,
+          "reference": "AAA",
+          "alternatives": [
+            "AAAA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr9;start=91943777;end=91943820",
+          "sequence_sha256": "a096d1fa66552d369d2c8c5eb31c043e75e154d8fa1adadbdfa00864d172bfd5"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs1799768": {
+      "rsid": "rs1799768",
+      "gene": "SERPINE1",
+      "variant_class": "ins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1799768",
+      "source_sha256": "2db2618ac4ec1a04b2e15997c9d51a8deb828146e5abaf8e2a4cd8ffead9e4c0",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000007.14",
+          "chrom": "7",
+          "position_zero_based": 101126425,
+          "reference": "",
+          "alternatives": [
+            "A",
+            "C"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr7;start=101126405;end=101126445",
+          "sequence_sha256": "40ca2feb93ae3acf476168df74fcb0dc51ee92862db3bf12381c15e4909718d4"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000007.13",
+          "chrom": "7",
+          "position_zero_based": 100769706,
+          "reference": "",
+          "alternatives": [
+            "A",
+            "C"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr7;start=100769686;end=100769726",
+          "sequence_sha256": "b90701263a83236ed7575f76c05e531ffb97ff81791fe69552721ad686222ec7"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs587776856": {
+      "rsid": "rs587776856",
+      "gene": "IFNGR1",
+      "variant_class": "delins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/587776856",
+      "source_sha256": "549d3a7962277175c6a684a35c18796a9e5863620d5a10c8869deac7ea8e56c9",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000006.12",
+          "chrom": "6",
+          "position_zero_based": 137200919,
+          "reference": "ATTAATT",
+          "alternatives": [
+            "ATT"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr6;start=137200899;end=137200946",
+          "sequence_sha256": "55cb89db23e66b79cae3bb3cf0925d131ace59f3eb33312e26e6ac8ab974f0c8"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000006.11",
+          "chrom": "6",
+          "position_zero_based": 137522056,
+          "reference": "ATTAATT",
+          "alternatives": [
+            "ATT"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr6;start=137522036;end=137522083",
+          "sequence_sha256": "e438f8b0ab90887c1082b664325dae0ae9498291f8767763a34ae425bee787c6"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs71785313": {
+      "rsid": "rs71785313",
+      "gene": "APOL1",
+      "variant_class": "delins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/71785313",
+      "source_sha256": "d00480c8e3e5e3618ad3ff46d16a485bcee023e272a6930f8ae337775fe5bb42",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000022.11",
+          "chrom": "22",
+          "position_zero_based": 36265995,
+          "reference": "ATAATTATAA",
+          "alternatives": [
+            "ATAA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr22;start=36265975;end=36266025",
+          "sequence_sha256": "bd88b6266e48954cbd842686398268722a5982b89a33d4f05865f375031169e8"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000022.10",
+          "chrom": "22",
+          "position_zero_based": 36662041,
+          "reference": "ATAATTATAA",
+          "alternatives": [
+            "ATAA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr22;start=36662021;end=36662071",
+          "sequence_sha256": "44f7b12ae9c186c72e3d3a4b1cc29ef9d57a0be1858f6cf04a6e368debd72d66"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs72613567": {
+      "rsid": "rs72613567",
+      "gene": "HSD17B13",
+      "variant_class": "delins",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/72613567",
+      "source_sha256": "3b9d296842aa7f41fb5879513e40526a93244dbebf437c1d9342a36c77065067",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000004.12",
+          "chrom": "4",
+          "position_zero_based": 87310240,
+          "reference": "A",
+          "alternatives": [
+            "AA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr4;start=87310220;end=87310261",
+          "sequence_sha256": "4889aa6fd1ba4a341699dc4e10a6eb8f9b756400a1e085f88815453494688487"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000004.11",
+          "chrom": "4",
+          "position_zero_based": 88231392,
+          "reference": "A",
+          "alternatives": [
+            "AA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr4;start=88231372;end=88231413",
+          "sequence_sha256": "6389735785166891b0738f14d7393d17a6fc9e2b9270a1f37e1371268c32a5c5"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": []
+    },
+    "rs3064744": {
+      "rsid": "rs3064744",
+      "gene": "UGT1A1",
+      "variant_class": "tandem_repeat",
+      "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3064744",
+      "source_sha256": "0f14fd2bcfb0537a9783bec34ad05dbd37ee14b8871a3c59fcdf7efa69bfbc57",
+      "checked_on": "2026-10-23",
+      "builds": {
+        "GRCh38": {
+          "assembly": "GRCh38.p14",
+          "accession": "NC_000002.12",
+          "chrom": "2",
+          "position_zero_based": 233760233,
+          "reference": "ATATATATATATATA",
+          "alternatives": [
+            "ATATATATATA",
+            "ATATATATATATA",
+            "ATATATATATATATATA",
+            "ATATATATATATATATATA",
+            "ATATATATATATATATATATA",
+            "ATATATATATATATATATATATA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg38;chrom=chr2;start=233760213;end=233760268",
+          "sequence_sha256": "56fe1722c057c1a67123dde055368bf1a5901b7aed66d87ceac076d69a9fcb80"
+        },
+        "GRCh37": {
+          "assembly": "GRCh37.p13",
+          "accession": "NC_000002.11",
+          "chrom": "2",
+          "position_zero_based": 234668879,
+          "reference": "ATATATATATATATA",
+          "alternatives": [
+            "ATATATATATA",
+            "ATATATATATATA",
+            "ATATATATATATATATA",
+            "ATATATATATATATATATA",
+            "ATATATATATATATATATATA",
+            "ATATATATATATATATATATATA"
+          ],
+          "coordinate_system": "SPDI_zero_based_interbase",
+          "sequence_source": "https://api.genome.ucsc.edu/getData/sequence?genome=hg19;chrom=chr2;start=234668859;end=234668914",
+          "sequence_sha256": "cbc2caa86ca606aad42d30cece3b21ab3bd3317585b656652802670f506772be"
+        }
+      },
+      "effect_allele": null,
+      "personal_call_supported": false,
+      "aliases": [
+        "rs8175347"
+      ]
+    }
+  }
+}

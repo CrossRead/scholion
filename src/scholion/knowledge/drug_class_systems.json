@@ -7,7 +7,8 @@
     "why_partial": "Class-name associations are retained. macrolide, ppi, nsaid, iodine and thiopurine have no action-system row; recorded laboratory monitoring can still relate them to a system. Sourced possible effects and monitoring are distinct from treatment indications. Unrecognised names remain unclassified.",
     "schema": "classes: { <med_classes.json class key>: { systems: [<radar_domains.json domain key>, ...], source: '<why this row is a fact>' } }",
     "source_tier": "curated_reference",
-    "updated": "2026-10-18"
+    "updated": "2026-10-25",
+    "context_policy": "Nutrient/substance biology, research context, possible effect and monitoring remain separate. Out-of-model or formulation-dependent contexts are explicit, not forced into a System."
   },
   "classes": {
     "thyroid_hormone": {
@@ -234,6 +235,414 @@
         "en": "Weight and lipid changes were observed in trials; an individual response and its cause require the dated measurements.",
         "ru": "В исследованиях наблюдались изменения веса и липидов; индивидуальный отклик и его причины оцениваются по измерениям с датами."
       }
+    },
+    {
+      "names": [
+        "ester-c",
+        "ester c",
+        "витамин c",
+        "vitamin c"
+      ],
+      "systems": [
+        "micronutrients",
+        "immune",
+        "musculoskeletal"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/VitaminC-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Vitamin C participates in collagen synthesis and immune function. This is nutrient context, not evidence that supplementation changed these systems.",
+        "ru": "Витамин C участвует в синтезе коллагена и работе иммунной системы. Это физиологический контекст, а не установленный отклик на добавку."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "zn",
+        "zinc",
+        "цинк"
+      ],
+      "systems": [
+        "micronutrients",
+        "immune"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/Zinc-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Zinc is involved in enzyme activity and immune function; a recorded supplement does not establish a deficiency or an individual benefit.",
+        "ru": "Цинк участвует в ферментативных процессах и работе иммунитета; запись добавки не устанавливает дефицит или индивидуальную пользу."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "selenium",
+        "селен"
+      ],
+      "systems": [
+        "micronutrients",
+        "thyroid"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/Selenium-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Selenium-containing proteins participate in thyroid-hormone metabolism. This does not establish a thyroid treatment effect.",
+        "ru": "Селенсодержащие белки участвуют в обмене гормонов щитовидной железы. Это не устанавливает лечебный эффект добавки."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "l-tyrosine",
+        "l tyrosine",
+        "тирозин"
+      ],
+      "systems": [
+        "amino_acids"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6898",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Tyrosine is an amino-acid substrate. Pathway membership does not establish an effect of the administered product.",
+        "ru": "Тирозин — аминокислотный субстрат. Принадлежность к пути обмена не устанавливает эффект принимаемого продукта."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "glycine",
+        "глицин"
+      ],
+      "systems": [
+        "amino_acids"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2731",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Glycine participates in amino-acid metabolism. Endogenous physiology is not evidence of a supplement response.",
+        "ru": "Глицин относится к аминокислотному обмену. Физиологическая роль вещества не доказывает отклик на добавку."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "b complex",
+        "b-complex",
+        "b6",
+        "pyridoxine",
+        "пиридоксин"
+      ],
+      "systems": [
+        "micronutrients",
+        "amino_acids"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/VitaminB6-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "B-vitamin context includes amino-acid and one-carbon metabolism; the exact ingredients and amounts of a complex still require its label.",
+        "ru": "Витаминный контекст включает аминокислотный и одноуглеродный обмен; точные состав и количества компонентов комплекса требуют этикетки."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "melatonin",
+        "мелатонин"
+      ],
+      "systems": [
+        "fitness"
+      ],
+      "relation": "substance_context",
+      "source": "https://www.nccih.nih.gov/health/melatonin-what-you-need-to-know",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Sleep and circadian context; the recorded use does not establish improved sleep in this person.",
+        "ru": "Контекст сна и суточных ритмов; запись приёма не устанавливает улучшение сна у человека."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "l-tryptophan",
+        "l tryptophan",
+        "триптофан"
+      ],
+      "systems": [
+        "amino_acids"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/7166",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Tryptophan is a substrate in amino-acid and serotonin pathways; this is not a prediction of mood or a sleep-treatment claim.",
+        "ru": "Триптофан — субстрат аминокислотного обмена и серотонинового пути; это не прогноз настроения и не утверждение об эффекте на сон."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "sod",
+        "супероксиддисмутаза"
+      ],
+      "systems": [
+        "amino_acids"
+      ],
+      "relation": "substance_context",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6647",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "The named enzyme has a redox role. Its endogenous function does not establish absorption or an effect of an oral product.",
+        "ru": "У названного фермента есть окислительно-восстановительная функция. Она не устанавливает всасывание или эффект принимаемого продукта."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "neuro-mag",
+        "neuro mag",
+        "extramag",
+        "магний",
+        "magnesium"
+      ],
+      "systems": [
+        "micronutrients",
+        "musculoskeletal"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Magnesium is relevant to mineral and neuromuscular function. Product form and elemental amount are not inferred from a brand name.",
+        "ru": "Магний связан с минеральным обменом и нервно-мышечной функцией. Форма и количество элементарного магния не выводятся из торгового названия."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "l-citrulline",
+        "l citrulline",
+        "цитруллин"
+      ],
+      "systems": [
+        "amino_acids",
+        "cardio"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/ExerciseandAthleticPerformance-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Citrulline relates to arginine/nitric-oxide metabolism. Physiological context is not evidence of an individual vascular or exercise benefit.",
+        "ru": "Цитруллин связан с обменом аргинина и оксида азота. Физиологический контекст не доказывает сосудистую пользу или улучшение физической формы."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "glutathione",
+        "глутатион"
+      ],
+      "systems": [
+        "amino_acids",
+        "liver"
+      ],
+      "relation": "substance_context",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/2729",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Glutathione has a redox and amino-acid synthesis context. This does not establish the effect or bioavailability of the recorded formulation.",
+        "ru": "Глутатион связан с окислительно-восстановительными процессами и аминокислотным синтезом. Эффект и биодоступность записанной формы этим не установлены."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "phosphatidylcholine",
+        "фосфатидилхолин"
+      ],
+      "systems": [
+        "liver",
+        "lipids",
+        "micronutrients"
+      ],
+      "relation": "nutrient_context",
+      "source": "https://ods.od.nih.gov/factsheets/Choline-HealthProfessional/",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Phosphatidylcholine/choline participates in membranes and lipid transport. No correction of liver or lipid findings is inferred.",
+        "ru": "Фосфатидилхолин и холин участвуют в построении мембран и транспорте липидов. Коррекция печёночных или липидных изменений не предполагается."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "same",
+        "sam-e",
+        "s-adenosylmethionine",
+        "адеметионин"
+      ],
+      "systems": [
+        "amino_acids",
+        "liver"
+      ],
+      "relation": "substance_context",
+      "source": "https://www.nccih.nih.gov/health/sadenosyllmethionine-same-in-depth",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "SAMe participates in methyl-transfer reactions. This does not establish a clinical effect of the recorded product or an indication to take it.",
+        "ru": "SAMe участвует в переносе метильных групп. Это не устанавливает клинический эффект записанного продукта или показание к его приёму."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "rhodiola",
+        "родиола"
+      ],
+      "systems": [
+        "fitness"
+      ],
+      "relation": "research_context",
+      "source": "https://www.nccih.nih.gov/health/rhodiola",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Fatigue/stress research context only; reliable evidence of benefit remains limited. No adrenal effect is inferred.",
+        "ru": "Только исследовательский контекст утомления и стресса; надёжные данные о пользе ограничены. Воздействие на надпочечники не предполагается."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "mots-c",
+        "mots c"
+      ],
+      "systems": [
+        "glucose",
+        "fitness"
+      ],
+      "relation": "research_context",
+      "source": "https://www.fda.gov/media/193342/download",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Research context for metabolic and physical-function questions. Human benefit and safety for the recorded use are not established.",
+        "ru": "Исследовательский контекст обмена веществ и физического состояния. Польза и безопасность записанного применения у человека не установлены."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "ss-31",
+        "ss 31",
+        "elamipretide",
+        "эламипретид"
+      ],
+      "systems": [
+        "musculoskeletal",
+        "fitness"
+      ],
+      "relation": "substance_context",
+      "source": "https://www.fda.gov/drugs/drug-trials-snapshots/drug-trials-snapshots-forzinity",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Elamipretide has mitochondrial/muscle context. Evidence for the licensed injection in Barth syndrome does not validate another formulation or general wellness use.",
+        "ru": "Эламипретид связан с митохондриями и мышечной функцией. Данные о зарегистрированной инъекционной форме при синдроме Барта не подтверждают другую форму или общеоздоровительное применение."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "tb-500",
+        "tb500",
+        "bpc-157",
+        "bpc157"
+      ],
+      "systems": [
+        "musculoskeletal"
+      ],
+      "relation": "research_context",
+      "source": "https://www.fda.gov/media/193342/download",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Tissue/musculoskeletal research context only. System placement does not establish healing efficacy, formulation identity or safety.",
+        "ru": "Только исследовательский контекст тканей и опорно-двигательной системы. Размещение не устанавливает эффективность заживления, идентичность формы или безопасность."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "igf lr3",
+        "igf-1 lr3",
+        "lr3 igf",
+        "long r3 igf"
+      ],
+      "systems": [
+        "growth",
+        "glucose"
+      ],
+      "relation": "research_context",
+      "source": "https://resources.rndsystems.com/pdfs/valukine/val172-lr3-igf-1-202412-2.pdf",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Modified IGF analogue/receptor context, not a clinically validated regimen. IGF-1 evidence does not establish efficacy or exposure of a topical LR3 product.",
+        "ru": "Контекст модифицированного аналога IGF и его рецепторов, а не клинически подтверждённой схемы. Данные об IGF-1 не устанавливают эффективность или экспозицию наружного продукта LR3."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule"
+    },
+    {
+      "names": [
+        "кефир",
+        "kefir"
+      ],
+      "systems": [],
+      "relation": "nutrient_context",
+      "source": "https://www.nccih.nih.gov/health/probiotics-usefulness-and-safety",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Food/diet context, outside the current System map. No strain-specific probiotic benefit is inferred.",
+        "ru": "Пищевая позиция: контекст питания вне текущей карты Систем. Польза конкретного пробиотического штамма не предполагается."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule",
+      "disposition": "outside_model"
+    },
+    {
+      "names": [
+        "lactoflorene",
+        "лактoфлорен",
+        "лактофлорен"
+      ],
+      "systems": [],
+      "relation": "substance_context",
+      "source": "https://www.nccih.nih.gov/health/probiotics-usefulness-and-safety",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "Gastrointestinal/probiotic context is outside the current System map. It is not assigned to immunity merely because it is a probiotic.",
+        "ru": "Пробиотический и желудочно-кишечный контекст находится вне текущей карты Систем. Принадлежность к пробиотикам сама по себе не связывает позицию с Иммунитетом."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule",
+      "disposition": "outside_model"
+    },
+    {
+      "names": [
+        "пимафуцин",
+        "pimafucin",
+        "natamycin",
+        "натамицин"
+      ],
+      "systems": [],
+      "relation": "substance_context",
+      "source": "Recorded substance name; anatomical assignment requires the formulation and indication.",
+      "checked_on": "2026-10-25",
+      "note": {
+        "en": "The recorded name alone does not establish a System: natamycin products have different routes and indications. The formulation and purpose need to be specified.",
+        "ru": "Одно название не определяет Систему: у натамицина бывают разные формы и показания. Нужно уточнить форму и цель назначения."
+      },
+      "scope": "navigation_context_not_personal_response_or_prescribing_rule",
+      "disposition": "needs_formulation"
     }
   ]
 }

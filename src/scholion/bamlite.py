@@ -160,22 +160,48 @@ def reference_lengths(bam: str | Path) -> Dict[str, int]:
 
 
 def _read_chunk(fh, cb: int, ce: int) -> bytes:
-    """The decompressed bytes of one index chunk, from virtual offset cb to ce."""
+    """Read exactly [cb, ce) in BGZF virtual coordinates, including block tails.
+
+    A buffered gzip reader can move the underlying file ahead of the bytes it
+    has returned. Its file position cannot decide whether a virtual chunk has
+    ended: that truncated large chunks and included later records in small ones.
+    """
+    if cb < 0 or ce < cb:
+        raise ValueError("invalid BAM index chunk")
     coff, uoff = cb >> 16, cb & 0xFFFF
-    end_coff = ce >> 16
-    fh.seek(coff)
-    gz = gzip.GzipFile(fileobj=fh)
+    end_coff, end_uoff = ce >> 16, ce & 0xFFFF
     buf = bytearray()
-    while True:
-        piece = gz.read(1 << 20)
-        if not piece:
+    while coff < end_coff or (coff == end_coff and uoff < end_uoff):
+        fh.seek(coff)
+        head = fh.read(12)
+        if len(head) != 12 or head[:4] != b"\x1f\x8b\x08\x04":
+            raise ValueError("missing or invalid BGZF block in BAM chunk")
+        extra = fh.read(struct.unpack_from("<H", head, 10)[0])
+        block_size, p = None, 0
+        while p + 4 <= len(extra):
+            length = struct.unpack_from("<H", extra, p + 2)[0]
+            if p + 4 + length > len(extra):
+                raise ValueError("truncated BGZF extra field")
+            if extra[p:p + 2] == b"BC" and length == 2:
+                block_size = struct.unpack_from("<H", extra, p + 4)[0] + 1
+            p += 4 + length
+        if block_size is None or not len(head) + len(extra) + 8 <= block_size <= 65536:
+            raise ValueError("invalid BGZF block size")
+        rest = fh.read(block_size - len(head) - len(extra))
+        if len(head) + len(extra) + len(rest) != block_size:
+            raise ValueError("truncated BGZF block")
+        data = gzip.decompress(head + extra + rest)
+        stop = end_uoff if coff == end_coff else len(data)
+        if not 0 <= uoff <= stop <= len(data):
+            raise ValueError("BAM virtual offset is outside its BGZF block")
+        buf += data[uoff:stop]
+        if coff == end_coff:
             break
-        buf += piece
-        # Read past the end block before stopping: a record may straddle a block edge.
-        if fh.tell() > end_coff:
-            break
-    gz.close()
-    return bytes(buf[uoff:])
+        coff += block_size
+        uoff = 0
+        if coff > end_coff:
+            raise ValueError("BAM chunk end is not a BGZF block boundary")
+    return bytes(buf)
 
 
 def depth(bam: str | Path, chrom: str, beg: int, end: int, *,
@@ -204,16 +230,20 @@ def depth(bam: str | Path, chrom: str, beg: int, end: int, *,
         for cb, ce in idx.chunks(ref, b0, e0):
             data = _read_chunk(fh, cb, ce)
             p, n = 0, len(data)
-            while p + 4 <= n:
+            while p < n:
+                if p + 4 > n:
+                    raise ValueError("truncated BAM record size in index chunk")
                 (bsize,) = struct.unpack_from("<i", data, p)
                 if bsize < 32 or p + 4 + bsize > n:
-                    break
+                    raise ValueError("invalid or truncated BAM record in index chunk")
                 rec = data[p + 4:p + 4 + bsize]
                 p += 4 + bsize
                 r_ref, r_pos = struct.unpack_from("<ii", rec, 0)
                 l_rn, mapq = rec[8], rec[9]
                 n_cig = struct.unpack_from("<H", rec, 12)[0]
                 flag = struct.unpack_from("<H", rec, 14)[0]
+                if 32 + l_rn + 4 * n_cig > len(rec):
+                    raise ValueError("truncated BAM CIGAR in index chunk")
                 if r_ref != ref or flag & _SKIP_FLAGS or mapq < min_mapq:
                     continue
                 q, pos = 32 + l_rn, r_pos

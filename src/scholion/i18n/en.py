@@ -520,6 +520,9 @@ MESSAGES = {
     "tool.sch_marker_propose.param.unit": "the unit the forms print the value in",
     "tool.sch_marker_propose.param.names_en": "English names for the same marker, separated by «;», if any",
     "system.unknown_register": "no such register: «{register}» — the registers are: {registers}",
+    "ingest_labs.reason_invalid_section_date": "The section date {date} is not valid; its measurements were not dated or imported.",
+    "selfcheck.unparsed_sections": "Laboratory sections not assessed: {n}.",
+    "reconcile.completeness_unknown": "Completeness cannot be confirmed for the sections not assessed.",
     "ingest_labs.folder_not_named": "no folder was named — nothing is read from the current directory by default; name the folder that holds the laboratory forms",
     "screen.title": "Screening by class of disease",
     "screen.classes_header": "classes this build can screen",
@@ -888,8 +891,8 @@ MESSAGES = {
     "count.results.few": "{n} results",
     "count.results.many": "{n} results",
     "count.genes.one": "{n} gene",
-    "count.genes.few": "{n} genes",
-    "count.genes.many": "{n} genes",
+    "count.genes.few": "Genes: {n}",
+    "count.genes.many": "Genes: {n}",
     "count.bytes.one": "{n} byte",
     "count.bytes.few": "{n} bytes",
     "count.bytes.many": "{n} bytes",
@@ -1146,8 +1149,8 @@ MESSAGES = {
     "longevity.significant": "Significant carrier states: {carriers} across {genes}.",
     "longevity.genes_first": "Genes (first ones): {genes}",
     "count.genes_in.one": "{n} gene",
-    "count.genes_in.few": "{n} genes",
-    "count.genes_in.many": "{n} genes",
+    "count.genes_in.few": "Genes: {n}",
+    "count.genes_in.many": "Genes: {n}",
 
     # ── lifestyle (wearables) ────────────────────────────────────────────
     "lifestyle.empty": "There is no lifestyle data (wearable devices) yet.",
@@ -1621,10 +1624,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
                                                "the genes through CPIC by rxcui). Russian "
                                                "names are accepted.",
     "tool.sch_check_prescription.param.drug": "the name of the drug (Russian/English)",
-    "tool.sch_ingest_labs.description": "Extract lab markers with their dates from the PDF "
-                                        "reports in a given folder (e.g. a «Lab reports» "
-                                        "folder) and add them to profile/labs.json. "
-                                        "Incremental: only new or changed files are read.",
+    'tool.sch_ingest_labs.description': 'Import dated laboratory forms and FHIR bundles (kind=labs), or conclusions, imaging and Lumiflex CGM application PDFs (kind=studies). Studies require a preview followed by its exact confirmation token. Printed sensor statistics and chart approximations remain separate from laboratory measurements.',
     "tool.sch_ingest_labs.param.folder": "the path to the folder of lab PDFs",
     "tool.sch_health_metrics.description": "The owner's personal health metrics "
                                            "(profile/metrics.json): age, BMI, sleep, weight, "
@@ -1988,6 +1988,34 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.panel.h": "The segment's panel — the positions a clinician acts on",
     "panel.title": "Panel of the system «{label}» — as the catalogue describes it",
     "panel.list_h": "Panels of the body systems",
+    "thematic.title": "Gene panels",
+    "genome.literal_passport_incomplete": "The source passport for this literal SNP reading is incomplete or inconsistent. No genotype is reported.",
+    "reference.intergenic": "An intergenic position: this source does not assign a gene to it. A nearby gene is not evidence that the variant changes that gene's function.",
+    "insight.basis.title": "Sources and refresh",
+    "insight.basis.fact": "Observation",
+    "insight.basis.knowledge": "Knowledge",
+    "insight.basis.date": "Date / version",
+    "insight.basis.source": "Source",
+    "insight.basis.source_unknown": "Source not recorded",
+    "insight.basis.unavailable": "Source file unavailable; recorded data retained",
+    "insight.basis.recorded": "Source identities and hashes are recorded witnesses; opening this view does not verify the current contents of the original files.",
+    "insight.basis.refresh": "This insight is recalculated when opened. No genome preparation or PGS calculation is started.",
+    "thematic.reference_note": "Gene functions and existing variant knowledge, grouped by biological pathway. Membership does not change a system score.",
+    "thematic.reading_note": "Readings refer to the listed catalogue positions. They do not establish coverage of the whole gene or exclude other variants.",
+    "thematic.reference": "Reference without personal data",
+    "thematic.readings": "My catalogue readings",
+    "thematic.genes": "Genes: {n}",
+    "thematic.regions": "Gene regions: {n}",
+    "thematic.positions": "{read} of {total} catalogue positions read",
+    "thematic.no_positions": "No individual catalogue position is included for this gene. Its function is reference knowledge; this is not a negative genetic result.",
+    "thematic.read_gene": "Read the gene region and coverage",
+    "thematic.gene_reading_note": "Catalogue positions and a gene-region search are different checks. Each gene card can read the available variants and coverage in its region on request, including genes without a selected catalogue position.",
+    "thematic.read_gene_command": "Gene-region reading: scholion genome --gene {gene}",
+    "gene.protein_annotation": "Protein change from the reference",
+    "gene.noncoding_rows": "Other variants in the region · {n}",
+    "gene.annotation_scope": "These are observed sequence differences and technical protein annotations, not a pathogenicity assessment. Curated variant interpretations and ClinVar classifications are separate. Coverage refers to the shown transcript; an empty variant list does not exclude disease.",
+    "thematic.support": "Gene reference and GenCC validity",
+    "thematic.list_row": "{label} ({key}) — reference genes: {n}",
     "panel.list_row": "{label} ({key}): {positions}, genes a short read cannot read: {unreadable}",
     "panel.counts": "{positions} in {genes}; with a named study: {with_study}; with an expectation of a marker: {with_expectation}; signed by a clinician: {signed}",
     "panel.source": "catalogue dated {updated}; every row names its own source and study",
@@ -2187,7 +2215,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.layer.labs": "Laboratory now",
     "system.layer.dynamics": "Movement",
     "system.layer.genetics": "Genetics of the system",
-    "system.layer.medications": "Prescriptions acting on this system",
+    "system.layer.medications": "Prescriptions related to this system",
     "system.layer.target": "Target set by the clinician",
     "system.layer.tests": "What to test",
     "system.layer.questions": "Questions for the clinician",
@@ -2244,8 +2272,8 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.of_marker": "system: {label}",
     "system.of_gene": "named in systems: {systems}",
     "system.of_gene_none": "named in no system's genetic half",
-    "system.acts_on": "acts on: {systems}",
-    "system.acts_on_none": "acts on no mapped system ({status})",
+    "system.acts_on": "Related systems: {systems}",
+    "system.acts_on_none": "System links have not been assigned ({status})",
     "system.print": "print this system",
     "systems.title": "Body systems",
     "systems.labs": "{score}/100, measured {measured} of {total}",
@@ -2848,6 +2876,12 @@ will go through them later.
     "fhir.added": "taken into the profile: {n}",
     "fhir.refused": "{label} — not written: {reason}",
     "fhir.not_taken": "**Not taken, by reason:**",
+    "labs.date_source_issued": "· report issue date; collection date not recorded",
+    "fhir.reason.invalid_quantity": "the quantity is not a finite number",
+    "fhir.reason.ambiguous_loinc": "the supplied codes identify different measurements; a series was not chosen",
+    "fhir.reason.invalid_date": "the measurement date is invalid",
+    "fhir.reason.reference_unit_mismatch": "the reference interval uses a different unit from the result",
+    "fhir.reason.external_score_not_supported": "an externally reported score whose scale and method are not supported; it was not treated as a Scholion calculation",
     "fhir.reason.no_quantity": "no numeric value in the resource (a coded result, a panel that only groups its members, an attachment)",
     "fhir.reason.metric_unit_not_ours": "a body measurement in a unit this metric does not hold — nothing here converts, and a weight in pounds joining a series in kilograms is exactly the silence this gate exists for",
     "fhir.metrics_taken": "body measurements written into the metrics layer: {n}",
@@ -3580,7 +3614,7 @@ will go through them later.
     "web.genome.nav_findings": "Findings",
     "web.genome.nav_sources": "Sources",
     "web.genome.findings_none": "Nothing found: either no genome is being read, or no source has marked anything. Which of the two is said in the genome status above.",
-    "web.genome.findings_note": "Ordered by what can be done about a line, not by where it came from. Clicking a gene gathers everything known about it into one card.",
+    "web.genome.findings_note": "ClinVar classifications come first, ordered by category and review status. This is not a ranking of personal risk. Open a variant to review its reading and context.",
     "web.common.close": "close",
     "web.genome.nav_summary": "Summary",
     "web.genome.nav_updates": "Updates",
@@ -3672,11 +3706,8 @@ will go through them later.
     "web.clinvar.nothing": "No significant findings were extracted",
     "web.clinvar.experts": "experts",
     "web.clinvar.several_labs": "several laboratories",
-    "web.clinvar.actionable_of": "actionable findings out of {total}",
-    "web.clinvar.intro": "Your variants marked up against a fresh ClinVar. The important ones on "
-                         "top: {pathogenic} (carrier status/disease), {pgx} (drugs), {risk}. The "
-                         "remaining {n} (weak/ambiguous) are behind the fold and are usually not a "
-                         "risk. Not a diagnosis.",
+    "web.clinvar.actionable_of": 'records in the main categories out of {total}; not a count of diagnoses',
+    "web.clinvar.intro": 'ClinVar classifies variants. Each record below separates the saved reading, inheritance and meaning for the person; a classification alone does not establish disease.',
     "web.clinvar.w_pathogenic": "pathogenic",
     "web.clinvar.w_pgx": "pharmacogenetics",
     "web.clinvar.w_risk": "risk factors",
@@ -4157,7 +4188,7 @@ will go through them later.
     "web.panel.fact_genes": "genes",
     "web.panel.fact_studies": "positions with a study",
     "web.panel.fact_signed": "signed by a clinician",
-    "web.genome.fact_actionable": "findings a doctor acts on",
+    "web.genome.fact_actionable": 'variant records in the main ClinVar categories',
     "web.genome.fact_prs_high": "scores well above average",
     "web.genome.fact_long": "genes in longevity literature catalogue",
     "web.genome.set_aside_h": "Files set aside",
@@ -4587,7 +4618,7 @@ MESSAGES.update({'insight.target': 'Recorded goal: {value} {unit}'})
 
 MESSAGES["web.phenotype.device_history"] = 'Device history: {source}'
 
-MESSAGES.update({"doc.clinician_brief": "# Scholion — information for the clinician\n\nScholion brings a person's laboratory history, recorded prescriptions, genome and wearable measurements into one local profile. It supports preparation for an appointment; it does not diagnose or prescribe treatment.\n\n## Start with the visit sheet\n\nChoose **Visit** in the application header. The first tab opens a structured sheet with topics grouped by body system, the conclusions and supporting measurements, questions for discussion and current prescriptions. Completed courses remain in history. Sources and detailed observations can be expanded; the sheet can be printed.\n\n## Read change at the right timescale\n\n**Year** describes a long-term direction; **quarter and month** describe emerging changes when the measurements are comparable. A recent decline can coexist with a rise over a longer interval. Dates, units and data sources accompany the observations. Weight and BMI combine recorded and Garmin measurements in one timeline, with the source and aggregation period retained for each point.\n\nReported changes in symptoms, function or tolerability are shown separately from measured change. An improvement after the recorded start of a prescription establishes timing, not proof that the treatment caused it. Genetics and known lifestyle observations provide context, not a substitute for examination.\n\n## How to read genetics\n\nSystem panels show the actual reading, gene function, variant context and the **Scholion A–E evidence level**. Open the letter for its definition and the gene for details and sources. A gene–disease relationship from **GenCC** carries its own validity classification; it is distinct from evidence for an individual variant. A missing call does not mean the gene or allele is absent.\n\nA **PGS percentile is a position in a reference population, not the probability of disease**. Calculation, coverage, coordinates and calibration must be verified. Previously saved unverified values retain their status and an explanation. Clinical findings require their own supporting evidence; a catalogue association alone does not establish a diagnosis.\n\n## Use the observations, keep the decision clinical\n\nA single recent measurement within its recorded range may be sufficient to describe the current finding. Missing trend points alone are not a reason for more tests. Additional testing needs a specific indication or an existing monitoring plan. Targets, treatment decisions and follow-up belong to the treating clinician.\n\nThe same computed facts are available in the local application, CLI and MCP interface. A language assistant receives those facts and their provenance; its wording still needs clinical review. The profile remains local unless the person chooses an external assistant or another explicit data transfer.\n\n**Contact:** scholion.dev@proton.me · [Project and documentation](https://github.com/CrossRead/scholion). Please do not send patient data through public issues or unsolicited attachments. [Extended project description](for-clinicians-details).\n"})
+MESSAGES.update({"doc.clinician_brief": "# Scholion — information for the clinician\n\nScholion brings a person's laboratory history, recorded prescriptions, genome and wearable measurements into one local profile. It supports preparation for an appointment; it does not diagnose or prescribe treatment.\n\n## Start with the visit sheet\n\nOpen **Visit sheet** from Today and select the body systems, thematic gene panels\nand question relevant to the appointment. The short sheet starts with meaningful\nfindings and dated measurements, including available annual direction. Genetics\nis selected for an explicit link to a discussed measurement or prescription;\neach included factor states why it is relevant. It is not an alphabetical sample\nof the catalogue. Important recorded alerts remain visible outside a narrow\nselection. The full handout and source details remain available; completed\ncourses stay in treatment history. Preparing a sheet does not start genome or\npolygenic-score recalculation.\n\n## Read change at the right timescale\n\n**Year** describes a long-term direction; **quarter and month** describe emerging changes when the measurements are comparable. A recent decline can coexist with a rise over a longer interval. Dates, units and data sources accompany the observations. Weight and BMI combine recorded and Garmin measurements in one timeline, with the source and aggregation period retained for each point.\n\nReported changes in symptoms, function or tolerability are shown separately from measured change. An improvement after the recorded start of a prescription establishes timing, not proof that the treatment caused it. Genetics and known lifestyle observations provide context, not a substitute for examination.\n\n## How to read genetics\n\nGene cards start with known function, followed by the actual reading and quality,\nthe known influence of the specific variant and applicable comparisons with the\nperson's measurements. Open the **Scholion A–E** letter for its definition and\nthe gene for details and sources. **GenCC** gene–disease validity and **ClinVar**\nvariant classification have separate labels and sources. A missing call does not\nmean the gene or allele is absent.\n\nFindings show zygosity and sourced inheritance. A single heterozygous finding\nunder a supported recessive model is carrier context, not a diagnosis. Dominant,\nX-linked, mixed and unresolved cases retain their own qualifications. Two\nheterozygous variants do not establish compound heterozygosity without phase.\nThe classification of a variant, the validity of a gene–disease relationship and\nthe meaning of that finding for a person are different questions.\n\nThe existing body systems remain in place. Methylation has a shared thematic\nview; research associations involving neurotransmitters and stress remain\nseparate from clinical neurogenetics. A rare metabolic disease link is explained\non its gene card rather than introducing a new body-system score.\n\nA **PGS percentile is a position in a reference population, not the probability of disease**. Calculation, coverage, coordinates and calibration must be verified. Previously saved unverified values retain their status and an explanation. Clinical findings require their own supporting evidence; a catalogue association alone does not establish a diagnosis.\n\n## Use the observations, keep the decision clinical\n\nA single recent measurement within its recorded range may be sufficient to describe the current finding. Missing trend points alone are not a reason for more tests. Additional testing needs a specific indication or an existing monitoring plan. Targets, treatment decisions and follow-up belong to the treating clinician.\n\nThe same computed facts are available in the local application, CLI and MCP interface. A language assistant receives those facts and their provenance; its wording still needs clinical review. The profile remains local unless the person chooses an external assistant or another explicit data transfer.\n\n**Contact:** scholion.dev@proton.me · [Project and documentation](https://github.com/CrossRead/scholion). Please do not send patient data through public issues or unsolicited attachments. [Extended project description](for-clinicians-details).\n"})
 
 MESSAGES["web.measurement.month_only"] = 'Recorded value; month known'
 
@@ -4844,3 +4875,372 @@ MESSAGES.update({
     'hub.genome_dir': 'Genetic files',
     'hub.wearables_dir': 'Wearable exports',
 })
+
+# Source-bound clinical estimates.
+MESSAGES.update({
+    "clinical.stale": "The inputs are more than a year old; the historical index remains in its original panel.",
+    "clinical.title": "Clinical estimates",
+    "clinical.points": "points",
+    "clinical.years": "years",
+    'clinical.incompatible_draw': 'Available measurements have different collection dates or incompatible source/sample identities. They are shown separately and are not combined for this estimate.',
+    "clinical.context_note": 'Estimates use dated measurements from the last year. Missing inputs are not a reason to order tests solely to fill a calculator.',
+    "clinical.context_invalid": "Clinical answers were not saved: check {fields}.",
+    "clinical.answers": "Clinical questionnaire",
+    "clinical.save": "Save my answers",
+    "clinical.source": "Source of answers",
+    "clinical.date": "Assessment date",
+    "clinical.unknown": "Not recorded",
+    "clinical.yes": "Yes",
+    "clinical.no": "No",
+    "clinical.inputs": "Inputs and sources",
+    "clinical.missing": "Not available: {fields}",
+    "clinical.details": "Open clinical estimates",
+    "clinical.phenoage.interpretation": "Laboratory-based model age, computed from one draw. It is not a measured biological age or an individual lifespan prediction.",
+    "clinical.fib4.name": "Liver fibrosis screening index (FIB-4)",
+    "clinical.fib4.endpoint": "Indirect fibrosis screening index",
+    "clinical.fib4.horizon": "At the laboratory draw",
+    "clinical.fib4.population": "Applicability is stated by the existing FIB-4 method.",
+    "clinical.phenoage.name": "Laboratory model age (PhenoAge)",
+    "clinical.phenoage.endpoint": "Model age from nine laboratory inputs and chronological age",
+    "clinical.phenoage.horizon": "At the laboratory draw",
+    "clinical.phenoage.population": "Population model, Levine 2018.",
+    "clinical.status.missing": "Inputs missing",
+    "clinical.status.computed": "Calculated",
+    "clinical.status.invalid": "Inputs cannot be used",
+    "clinical.status.not_applicable": "Method does not apply",
+    "clinical.status.unavailable": "Calculation unavailable",
+    "clinical.field.albumin": "albumin",
+    "clinical.field.creatinine": "creatinine",
+    "clinical.field.glucose": "glucose",
+    "clinical.field.crp": "hs-CRP",
+    "clinical.field.lymph": "lymphocytes, %",
+    "clinical.field.mcv": "MCV (CBC)",
+    "clinical.field.rdw": "RDW (CBC)",
+    "clinical.field.alp": "alkaline phosphatase",
+    "clinical.field.wbc": "leukocytes (CBC)",
+    "clinical.field.ast": "AST",
+    "clinical.field.alt": "ALT",
+    "clinical.field.platelets": "Platelets",
+    "clinical.field.current_smoker": "Current smoker",
+    "clinical.field.known_cvd": "Established cardiovascular disease",
+    "clinical.field.diabetes": "Diagnosed diabetes",
+    "clinical.field.advanced_ckd": "Known advanced chronic kidney disease",
+    "clinical.field.familial_hypercholesterolemia": "Known familial hypercholesterolemia",
+    "clinical.field.pregnant": "Current pregnancy",
+    "clinical.field.activity_30m": "Usually at least 30 minutes of activity a day",
+    "clinical.field.vegetables_daily": "Vegetables, fruit or berries every day",
+    "clinical.field.antihypertensive_ever": "Ever regularly used blood-pressure medication",
+    "clinical.field.high_glucose_ever": "Ever recorded high blood glucose, including during pregnancy",
+    "clinical.field.family_diabetes": "Diabetes in relatives",
+    "clinical.field.age": "Age",
+    "clinical.field.sex": "Sex",
+    "clinical.field.systolic_bp": "Systolic blood pressure, mmHg",
+    "clinical.field.waist_cm": "Waist circumference, cm",
+    "clinical.field.bmi": "Body mass index",
+    "clinical.field.cholesterol_total": "Total cholesterol",
+    "clinical.field.hdl": "HDL cholesterol",
+    "clinical.field.egfr_ckdepi": "eGFR CKD-EPI",
+    "clinical.field.microalbumin_creatinine_ratio": "Urine albumin/creatinine ratio",
+    "clinical.region.low": "Low",
+    "clinical.region.moderate": "Moderate",
+    "clinical.region.high": "High",
+    "clinical.region.very_high": "Very high",
+    "clinical.family.none": "No relatives known to have diabetes",
+    "clinical.family.second_degree": "Grandparent, aunt, uncle or first cousin",
+    "clinical.family.first_degree": "Parent, sibling or own child"
+})
+
+MESSAGES["reference.gencc_not_in_snapshot"] = 'No gene–disease assertion for this gene in GenCC snapshot {version}. This is not a negative genome result.'
+
+MESSAGES["longevity.reference_only"] = 'The reading is shown as observed; the adjacent study describes a population association, not a personal effect estimate.'
+
+
+
+
+
+
+
+
+
+
+
+# CGM application PDF messages.
+MESSAGES.update({
+    "cgm.title": "Glucose sensor (CGM)",
+    "cgm.notice": "Sensor data and device estimates are separate from fasting laboratory glucose and HbA1c. A PDF curve is not the original sensor series.",
+    "cgm.approximate": "Approximate reading of the visible PDF curve; not exact sensor observations or evidence of a causal food or activity effect.",
+    "cgm.sleep_unknown": "A night-time match is not established without an explicit report timezone and dated sleep intervals. A daily minimum is not a night-time minimum.",
+    "cgm.timezone_invalid": "Timezone was not saved: use a source SHA256 and a valid IANA zone such as Europe/Moscow.",
+    "cgm.import": "Import application PDF",
+    "cgm.folder": "Folder containing PDF reports",
+    "cgm.pick": "Choose folder",
+    "cgm.preview": "Preview import",
+    "cgm.confirm": "Import the reviewed files",
+    "cgm.cancel": "Cancel",
+    "cgm.preview_result": "Ready to add: {added}; update: {updated}; unread: {failed}. Existing revisions are retained.",
+    "cgm.importing": "Importing reports…",
+    "cgm.previewing": "Checking PDF reports…",
+    "cgm.empty": "No CGM report has been imported. You can import the verified Lumiflex application PDF format.",
+    "cgm.summary": "Printed report statistics",
+    "cgm.mean": "Reported mean",
+    "cgm.gmi": "Sensor estimate (GMI)",
+    "cgm.cv": "Variation (CV)",
+    "cgm.tir": "Time in reported range (TIR)",
+    "cgm.reported_coverage": "Reported sensor coverage",
+    "cgm.curves": "Daily curves and events",
+    "cgm.meal": "Meal",
+    "cgm.activity": "Activity",
+    "cgm.unknown": "Unclassified event",
+    "cgm.label": "Description as printed",
+    "cgm.truncated": "Description is truncated in the source.",
+    "cgm.responses": "Approximate observations after food or activity",
+    "cgm.baseline": "Baseline",
+    "cgm.peak": "Peak",
+    "cgm.delta": "Change from baseline",
+    "cgm.peak_time": "Minutes to peak",
+    "cgm.area": "Area above baseline",
+    "cgm.overlap": "Other recorded events in the window: {events}",
+    "cgm.incomplete": "Visible curve does not cover the full comparison window. No response value is inferred.",
+    "cgm.sleep": "Sleep comparison",
+    "cgm.history": "Report history and sources",
+    "cgm.versions": "Saved revisions: {n}",
+    "cgm.zone": "Timezone of this report (IANA)",
+    "cgm.save_zone": "Save report timezone",
+    "cgm.zone_unknown": "Report timezone is not recorded.",
+    "cgm.axis_unavailable": "The curve cannot be read in this PDF layout; printed statistics and recognized events remain available.",
+    "cgm.daily": "Daily statistics as printed",
+    "cgm.daily_mean": "The daily row is labelled ambiguously by the source and is not substituted for a verified daily mean.",
+    "studies.preview_changed": "The files or profile changed after preview. Review the import again.",
+    "studies.preview_unreadable": "Import preview could not read a source: {detail}",
+    "ingest.unknown_kind": "Choose labs or studies import.",
+    "ingest_labs.reason_cgm_report": "A sensor report is separate from laboratory glucose. Use ingest-studies to preview and import it.",
+    "tool.sch_lifestyle.param.cgm_report": "Optional saved CGM source SHA-256; omitted selects the latest report.",
+    "tool.sch_ingest_labs.param.kind": "labs for laboratory forms; studies for conclusions, imaging and Lumiflex CGM PDF. Studies first returns a read-only preview token.",
+    "tool.sch_ingest_labs.param.confirm": "For kind=studies only: the exact approval_token from a reviewed preview. Omitting it writes nothing.",
+    "cgm.select_report": "Choose a saved report revision",
+    "cgm.report_not_found": "The requested CGM revision is not in this profile.",
+    "cgm.stat.sample_count": "Recorded samples",
+    "cgm.stat.reported_mean_ambiguous": "Ambiguously labelled daily statistic",
+    "cgm.stat.sd": "Standard deviation",
+    "cgm.stat.cv": "Variation (CV)",
+    "cgm.stat.maximum": "Maximum glucose",
+    "cgm.stat.minimum": "Minimum glucose",
+    "cgm.stat.lage": "Largest excursion (LAGE)",
+    "cgm.stat.mage": "Mean excursion amplitude (MAGE)",
+    "cgm.stat.fraction_ge_13_9": "Glucose ≥13.9 mmol/L",
+    "cgm.stat.fraction_ge_10": "Glucose ≥10.0 mmol/L",
+    "cgm.stat.fraction_ge_7_8": "Glucose ≥7.8 mmol/L",
+    "cgm.stat.fraction_le_3_9": "Glucose ≤3.9 mmol/L",
+    "cgm.stat.fraction_le_2_8": "Glucose ≤2.8 mmol/L",
+    "cgm.stat.fraction_reported_3_9_to_10": "Glucose in the reported 3.9–10.0 mmol/L range"
+})
+# End CGM application PDF messages.
+
+# Verified specialized reference identities.
+MESSAGES.update({
+    "reference.specialized_reading": "The reference sequence is verified in both builds. This insertion, deletion or repeat needs a specialized allele reader; no personal genotype or effect is inferred.",
+    "reference.spdi": "{build} · {accession} · SPDI start (zero-based): {start}; {ref} → {alt}"
+})
+
+# Shared thematic observations, without genotype-effect inference.
+MESSAGES.update({
+    "thematic.comparison": "Measurements related to the recorded mechanism",
+    "thematic.comparison_note": "These are recorded measurements in the biological context of the gene. They do not establish an effect of the person’s variant or a diagnosis."
+})
+
+# Dated CGM context, without causal inference.
+MESSAGES.update({
+    "cgm.laboratory_context": "A laboratory measurement falls within the CGM report period {start}–{end}. The sensor report gives a mean of {mean} {unit}. Sensor and fasting laboratory values describe different sampling conditions; they are not one series and do not establish a cause."
+})
+
+MESSAGES["clinical.panel_limit"] = 'Each method has its own outcome, inputs and applicability. Results use different scales and must not be combined into one score. A model estimate or category does not establish a diagnosis or a treatment decision.'
+MESSAGES['clinical.metric.systolic_bp'] = 'Systolic blood pressure'
+MESSAGES['clinical.metric.waist_cm'] = 'Waist circumference'
+MESSAGES['clinical.point_unit.one'] = 'point'
+MESSAGES['clinical.point_unit.few'] = 'points'
+MESSAGES['clinical.point_unit.many'] = 'points'
+
+MESSAGES.update({
+    "cgm.sleep_context": "Only sourced sleep intervals are aligned. Curve values are approximate; the last recorded meal need not be the last actual meal. Device scores describe the whole sleep, not timed sleep stages.",
+    "cgm.sleep_period": "Recorded sleep",
+    "cgm.duration": "Sleep interval, hours",
+    "cgm.sleep_values": "Approximate mean / minimum / maximum / SD, mmol/L",
+    "cgm.last_meal": "Last recorded meal → sleep, hours",
+    "cgm.not_recorded": "Not recorded",
+    "cgm.sleep_score": "Device sleep score",
+    "cgm.sleep_phases": "Whole-sleep summaries, minutes",
+    "cgm.deep_min": "Deep sleep",
+    "cgm.rem_min": "REM sleep",
+    "cgm.light_min": "Light sleep",
+    "cgm.awake_min": "Awake",
+    "cgm.awake_count": "Awakenings",
+    "cgm.associations": "Across recorded nights",
+    "cgm.association_limit": "Exploratory within-device comparison, not causation. A coefficient requires at least 8 complete main sleeps and variation in both values. The leave-one-night-out range shows sensitivity, not a confidence interval. Nights may depend on each other.",
+    "cgm.association_rows": "Included: {included}; excluded: {excluded}",
+    "cgm.descriptive": "Descriptive comparison only",
+    "cgm.sensitivity": "Leave-one-night-out range",
+    "cgm.duration_hours": "Sleep duration vs mean glucose",
+    "cgm.last_recorded_meal_gap_hours": "Recorded food-to-sleep interval vs mean glucose",
+    "cgm.score": "Device sleep score vs mean glucose",
+    "cgm.excluded": "Excluded sleep records",
+    "cgm.reason.interval_or_source_unverified": "Sleep interval, timezone or source is unverified",
+    "cgm.reason.dst_transition": "Clock offset changed within sleep; the PDF axis has no offset",
+    "cgm.reason.nap_not_night": "A recorded nap is not a night",
+    "cgm.return_baseline": "Toward baseline by the end of the visible window",
+    "cgm.return_yes": "Observed",
+    "cgm.return_no": "Not observed"
+})
+
+MESSAGES.update({
+    "cgm.end_value": "End of comparison window",
+    "cgm.minimum": "Minimum"
+})
+
+
+# The short handout shares the same visit selection across every entry point.
+MESSAGES.update({
+    'visit.focus.question': 'Question for this visit',
+    'visit.focus.choose': 'Choose the visit focus',
+    'visit.focus.systems': 'Body systems',
+    'visit.focus.panels': 'Gene panels for discussion',
+    'visit.focus.apply': 'Prepare the selected brief',
+    'visit.focus.scope': 'Selected systems and recorded personal context for this visit. Associations do not establish a diagnosis or treatment effect.',
+    'visit.focus.suggested': 'The initial focus suggests up to three systems from current attention items. Change it for the actual visit.',
+    'visit.focus.full': 'Full recorded handout',
+    'visit.focus.gene': 'Gene / position',
+    'visit.focus.reading': 'Reading / confidence',
+    'visit.focus.meaning': 'Known meaning for discussion',
+    'visit.focus.depth': 'Recorded depth: {depth}×; reading details are retained in the panel.',
+    'visit.focus.level': 'Scholion {level}',
+    'visit.focus.more_medications': 'Other current prescriptions linked to this system: {n}; open the system for the full list.',
+    'visit.focus.more_measurements': 'Additional measurements in the system view: {n}.',
+    'visit.focus.more_genetics': 'Other readings in the selected panel: {n}; the short sheet shows a preview.',
+    'visit.focus.other': 'Other recorded attention topics outside this visit: {n}. They remain in the product.',
+    'visit.focus.no_measurements': 'No current laboratory measurements are recorded for this system; this is not a reason for additional testing by itself.',
+    'visit.focus.no_panel_calls': 'No positively read catalogue positions are available for this selected panel. This does not exclude a variant elsewhere in its genes.',
+    'visit.focus.separate_scales': 'Scholion A–E qualifies the variant claim. GenCC qualifies gene–disease validity; ClinVar classifies a specific variant. These are separate scales.',
+    'visit.focus.open_system': 'Open this system',
+    'visit.focus.open_panel': 'Open the selected panel',
+    'visit.focus.invalid_selection': 'Unknown visit system or gene panel. Refresh the available choices.',
+    'visit.focus.invalid_question': 'The visit question must be text of at most 500 characters.',
+    'tool.sch_overview.param.compact': 'Prepare a short visit-specific handout; full recorded fields remain in JSON.',
+    'tool.sch_overview.param.visit_systems': 'Comma-separated body-system keys explicitly selected for this visit; empty means none.',
+    'tool.sch_overview.param.visit_panels': 'Comma-separated thematic gene-panel keys explicitly selected for this visit.',
+    'tool.sch_overview.param.visit_focus': 'The patient or clinician question for this visit, at most 500 characters; never invent it.',
+})
+
+MESSAGES["visit.focus.depth_unknown"] = 'Recorded read depth is unavailable; see the reading source and qualifications in the panel.'
+
+MESSAGES['system.meds.relation.nutrient_context'] = 'Physiological nutrient context; no individual response established'
+MESSAGES['system.meds.relation.substance_context'] = 'Known substance context; formulation and individual effect remain separate'
+MESSAGES['system.meds.relation.research_context'] = 'Research context; not an established treatment effect'
+MESSAGES['system.meds.named_substance'] = 'Named substance context'
+MESSAGES['system.meds.link_basis'] = 'Why these systems are linked'
+
+MESSAGES.update({
+    'visit.report.short': 'Brief for the appointment',
+    'visit.report.full': 'Full appointment report',
+    'visit.report.headline': 'What matters for this visit',
+    'visit.report.overview': 'The overall picture',
+    'visit.report.dynamics': 'Recorded changes over the past year',
+    'visit.report.discuss': 'Decisions to discuss',
+    'visit.report.response': 'Prescriptions and observed response',
+    'visit.report.context': 'Recorded purpose or system context',
+    'visit.report.observed': 'What the observations support',
+    'visit.report.next': 'What will support the next decision',
+    'visit.report.plan': 'The next observation period',
+    'visit.report.control': 'Recorded check',
+    'visit.report.when': 'Recorded timing',
+    'visit.report.genetics': 'What genetics adds to this discussion',
+    'visit.report.attention': 'What to discuss by body System',
+    'visit.report.gene_for_marker': 'Included for the discussion of {marker}.',
+    'visit.report.gene_for_drug': 'Included because of the recorded prescription: {drug}.',
+    'visit.report.gene_reason': 'Why included',
+    'visit.report.variant_context_only': 'The known variant mechanism is relevant to this measurement. The collection conditions do not support a confirmed personal comparison.',
+    'visit.report.genetic_count': 'Unique genetic factors relevant to this visit: {total}; shown: {shown}.',
+    'visit.report.more_factors': 'Other relevant factors in this system: {n}. Open the system panel.',
+    'visit.report.more_markers': 'Other observations in this system: {n}.',
+    'visit.report.details': 'System findings and supporting observations',
+    'visit.report.open_question': 'Agree on the purpose, expected response and review timing with the clinician.',
+    'visit.report.more_rx': 'Other relevant prescriptions in the full report: {n}.',
+    'visit.report.more_questions': 'Other recorded questions in the full report: {n}.',
+    'visit.report.points': 'Dated observations and sources',
+    'visit.report.single': 'One recorded observation; no trend is inferred.',
+    'visit.report.separate': 'The observations cannot support one connected trend; their individual values remain available.',
+    'visit.report.chronology': 'Collection dates and course starts are shown separately. The sequence of changes does not establish a treatment effect.',
+    'visit.report.response_note': 'A system link or a change after a prescription does not establish its individual effect. Patient-reported response and measured direction remain separate.',
+    'visit.report.plan_note': 'The recorded monitoring plan retains its dates and source.',
+    'visit.report.legend': 'Colour follows the existing system assessment. An arrow shows a numerical direction, not risk or treatment efficacy. Points use their actual dates; gaps are not filled.',
+    'visit.report.records': 'Original observations and additional records',
+})
+
+MESSAGES.update({'visit.report.mixed': 'Some changes are encouraging. Other priorities remain.', 'visit.report.toward': 'There is encouraging movement. Review it in context.', 'visit.report.away': 'Some changes need attention at this visit.'})
+
+
+MESSAGES.update({"visit.report.body_history": 'One body-mass history from recorded and device measurements. Monthly means and individual readings retain their type and source; the line does not establish a treatment effect.'})
+
+
+# Personal reading context remains separate from database classification.
+MESSAGES.update({
+    'finding.zygosity.unknown': 'Reading is incomplete or unknown',
+    'finding.zygosity.reference': 'Reference genotype',
+    'finding.zygosity.haploid': 'Single-allele reading',
+    'finding.zygosity.homozygous': 'Homozygous',
+    'finding.zygosity.heterozygous': 'Heterozygous',
+    'finding.mode.AR': 'Autosomal recessive (AR)',
+    'finding.mode.AD': 'Autosomal dominant (AD)',
+    'finding.mode.SD': 'Semidominant (SD)',
+    'finding.mode.XL': 'X-linked (XL)',
+    'finding.mode.XLR': 'X-linked recessive (XLR)',
+    'finding.mode.XLD': 'X-linked dominant (XLD)',
+    'finding.mode.unknown': 'Not established',
+    'finding.reading_line': 'Reading: {genotype} · {zygosity}. Inheritance: {inheritance}.',
+    'finding.status.carrier_context': 'Recessive carrier context',
+    'finding.meaning.carrier_context': 'One copy of the specified variant is recorded. Under recessive inheritance this is consistent with carrier status; it does not establish the disease.',
+    'finding.status.phase_unresolved': 'Allele phase needs review',
+    'finding.meaning.phase_unresolved': 'More than one relevant variant is recorded. Whether they affect different copies of the gene has not been established; neither a diagnosis nor isolated carrier status follows from this list.',
+    'finding.status.recessive_review': 'Recessive finding for clinical review',
+    'finding.meaning.recessive_review': 'The variant is recorded in both copies at this position. This can be relevant under recessive inheritance and warrants assessment of the call and clinical features; it is not a diagnosis.',
+    'finding.status.dominant_review': 'Finding for clinical review',
+    'finding.meaning.dominant_review': 'Under dominant inheritance one altered copy can be relevant. Variant-specific evidence, penetrance and clinical features determine its personal significance; the database label does not establish disease.',
+    'finding.status.x_linked_review': 'X-linked finding for clinical review',
+    'finding.meaning.x_linked_review': 'The meaning depends on the specific disorder, chromosome copy number and clinical features. A heterozygous X-linked finding is not automatically harmless carrier status.',
+    'finding.status.inheritance_mixed': 'Inheritance needs clarification',
+    'finding.meaning.inheritance_mixed': 'The reference holds more than one inheritance model for this gene or condition. A model cannot be assigned to this variant from the gene name alone.',
+    'finding.status.inheritance_unknown': 'Personal significance not established',
+    'finding.meaning.inheritance_unknown': 'A pathogenic classification is recorded, but a supported inheritance model for interpreting this call is unavailable. Carrier status or disease cannot be inferred from the label alone.',
+    'finding.status.reading_unresolved': 'Reading needs clarification',
+    'finding.meaning.reading_unresolved': 'The saved reading does not establish carriage of the named alternative allele reliably. Do not infer carrier status or disease from this row.',
+    'finding.status.variant_class_review': 'Variant class needs review',
+    'finding.meaning.variant_class_review': 'This panel reports only specified classes of variants in this gene. The required class has not been confirmed; the record is not an established secondary finding.',
+    'finding.status.classification_only': 'Database context',
+    'finding.meaning.classification_only': 'This classification alone does not establish a monogenic disease or recessive carrier status. Interpret a drug response or association in its own context.',
+    'finding.scope.unknown': 'A supported inheritance source is unavailable.',
+    'finding.scope.condition': 'Inheritance is taken from GenCC assertions matching the recorded condition.',
+    'finding.scope.gene_reference': 'Inheritance is gene-level reference context from GenCC; its applicability to this variant and condition needs clinical verification.',
+    'finding.scope.acmg_panel': 'Inheritance is taken from the ACMG panel for its specified phenotype.',
+    'finding.limitations': 'The list does not exclude a second variant, deletions/duplications or unread regions. It does not establish a diagnosis or a treatment indication.',
+    'finding.details': 'Inheritance and interpretation sources',
+    'finding.genotype': 'Genotype and inheritance',
+})
+
+MESSAGES.update({"finding.condition": 'Classification context'})
+
+MESSAGES.update({"finding.status.inheritance_review": 'Inheritance needs clinical review', "finding.meaning.inheritance_review": 'The inheritance model is recorded, but personal significance cannot be determined from this saved call alone.'})
+
+MESSAGES.update({"finding.source": 'Inheritance source: {source}; reference version: {version}.'})
+
+MESSAGES.update({'finding.reading_only': 'Reading: {genotype} · {zygosity}.'})
+
+MESSAGES.update({
+    'finding.reason.pathogenic': 'This variant is listed because its saved ClinVar record classifies it as pathogenic or likely pathogenic.',
+    'finding.reason.drug': 'This variant is listed because its saved ClinVar record concerns a response to a medicine.',
+    'finding.reason.risk': 'This variant is listed because its saved ClinVar record reports a risk association.',
+    'finding.reason.protective': 'This variant is listed because its saved ClinVar record reports a protective association.',
+    'finding.reason.association': 'This variant is listed as an association in the saved ClinVar data.',
+    'finding.reason.uncertain': 'This variant is retained from the saved ClinVar data with an uncertain or conflicting classification.',
+    'finding.reason.acmg': 'This variant is retained in the saved ACMG secondary-findings panel; its reporting category is shown separately.',
+    'clinical.context_removed': 'The clinical questionnaire is not included in this build. Existing saved profile data have not been changed.',
+})
+
+MESSAGES.update({'reference.region': 'Locus description: {text}', 'reference.region_source': 'Annotation source: {source}'})

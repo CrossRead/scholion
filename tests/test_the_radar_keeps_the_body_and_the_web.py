@@ -22,12 +22,13 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
 import support
-from scholion import core, demo
+from scholion import core, demo, i18n
 
 PAGE = (support.SRC / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
 BODY_MAP = json.loads((support.SRC / "scholion" / "knowledge" / "body_map.json").read_text(encoding="utf-8"))
@@ -73,6 +74,44 @@ class TestTheTwoPicturesStay(unittest.TestCase):
         body = body[:body.index("\n}\n")]
         self.assertIn("split(' · ')", body)
         self.assertIn("label:p.label||d.label", body)
+
+
+    def test_today_and_radar_label_the_whole_system_at_its_navigation_anchor(self):
+        node = shutil.which('node')
+        if not node:
+            self.skipTest('Node is needed for the actual SVG renderer')
+        start = PAGE.index('const SILHOUETTE =')
+        functions = PAGE[start:PAGE.index('// The genetics ring', start)]
+        script = "const assert=require('node:assert/strict');const window={};const esc=String,t=k=>k;const DSTAT={good:'green',warning:'orange',critical:'red',nodata:'grey'};const genRingTip=()=>'',genRingSVG=()=>'';\n"+functions+"\n"
+        self.addCleanup(i18n.set_lang, getattr(i18n._state, 'current', None))
+        labels = []
+        for language in ('en', 'ru'):
+            i18n.set_lang(language)
+            labels.append(i18n.t('radar.domain.thyroid'))
+        script += "const labels=" + json.dumps(labels) + ";\n"
+        script += """
+for(const sex of ['male','female'])for(const label of labels){
+ const input=[{key:'thyroid',label,score:58,status:'warning',measured:3,total:4,
+  place:{system_anchor:'thyroid',parts:[{place:'pituitary',label:'Synthetic TSH',score:100,measured:1,total:1},
+    {place:'thyroid',label:'Synthetic T4',score:90,measured:2,total:3}]}}];
+ const before=JSON.stringify(input), radar=bodySVG(input,sex),today=bodySVG(input,sex,true);
+ assert.equal(radar,today);assert.equal(before,JSON.stringify(input));
+ assert.equal((radar.match(/data-dom="thyroid"/g)||[]).length,1);
+ assert.ok(radar.includes('aria-label="'+label+'"'));assert.ok(radar.includes('58/100'));
+ assert.ok(!radar.includes('Synthetic TSH'));assert.ok(!radar.includes('Synthetic T4'));
+ const y=(14+.250*440).toFixed(1);assert.ok(radar.includes('cy="'+y+'"'));
+ const detailed=bodySVG(input,sex,false);assert.ok(detailed.includes('Synthetic TSH'));
+ assert.ok(detailed.includes('Synthetic T4'));
+}
+"""
+        result = subprocess.run([node,'-e',script],text=True,encoding='utf-8',capture_output=True,
+                                stdin=subprocess.DEVNULL,timeout=30)
+        self.assertEqual(0,result.returncode,result.stderr)
+        for entry in BODY_MAP['places'].values():
+            if entry.get('by_marker'):
+                self.assertIn(entry['system_anchor'],BODY_MAP['vocabulary'])
+                self.assertIn(entry['system_anchor'],entry['by_marker'].values())
+                self.assertTrue(entry['system_anchor_note'])
 
 
 class _Demo(unittest.TestCase):

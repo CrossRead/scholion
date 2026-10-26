@@ -4,16 +4,32 @@
     "provenance": "Assembled on 2026-08-14 from the literature review «the direction of the alleles» (7 parallel reviews by PMID, 12.07.2026) + the KNOWN dictionary from longevity_report.py. The direction of an allele often depends on the population and on the linkage chain — where it cannot be resolved confidently, the variant sits in the unresolved section rather than here.",
     "how_to_extend": "A new entry — only with a PMID and an explicit favorable allele according to the primary source. Aggregate gene-based associations (SKAT and the like) have no direction at the SNP level — their place is in unresolved.",
     "schema": "directions[rsid] = {gene, favorable (an allele or null), label, confidence high/medium/low, zygosity_note?, population_caveat?, pmids[], action?, verdict_by_copies? {0:.., 1:.., 2:..}}",
-    "updated": "2026-10-11",
-    "source_tier": "primary_literature"
+    "updated": "2026-10-23",
+    "source_tier": "primary_literature",
+    "reviewed_positions_228": [
+      "rs429358",
+      "rs7412",
+      "rs2802292",
+      "rs12206094",
+      "rs4946935",
+      "rs2253310",
+      "rs2764264",
+      "rs13217795",
+      "rs2075650"
+    ],
+    "source_corrections_2026_10_23": {
+      "rs12206094": "Previous PMID29255262 describes SELENBP1 and is not FOXO3 evidence; replaced by29234056.",
+      "rs4946935": "The direct functional study is29234056; gene-level aging evidence is not substituted for this variant.",
+      "rs2075650": "Previous Alzheimer GWAS19734902 does not establish an independent longevity effect; conditional longevity source21418511 used."
+    }
   },
   "directions": {
     "rs429358": {
       "gene": "APOE",
       "favorable": null,
       "label": {
-        "en": "a component of the ε-status: C = ε4 (a risk of Alzheimer's disease, a shorter life expectancy); T = not-ε4",
-        "ru": "компонент ε-статуса: C = ε4 (риск Альцгеймера, меньшая продолжительность жизни); T = не-ε4"
+        "en": "APOE rs429358: read together with the other defining SNP to establish the ε combination; this position alone has no separate longevity verdict.",
+        "ru": "APOE rs429358: читается совместно со второй определяющей позицией для установления сочетания ε; отдельного вывода о долголетии по этой позиции нет."
       },
       "confidence": "high",
       "pmids": [
@@ -25,14 +41,45 @@
       "action": {
         "en": "part of the APOE block, do not interpret it separately",
         "ru": "входит в блок APOE, отдельно не интерпретировать"
+      },
+      "level": "B",
+      "source": "PMID:31356640; PMID:32511104; PMID:30060062",
+      "curated_on": "2026-10-23",
+      "personal_effect_permitted": false,
+      "ld_group": "APOE_region",
+      "mechanism": {
+        "en": "The two defining variants establish APOE protein isoforms; unknown phase is retained.",
+        "ru": "Две определяющие позиции задают формы белка APOE; неизвестная фаза сохраняется."
+      },
+      "population_caveat": {
+        "en": "Human survival cohorts, predominantly European ancestry; effects depend on the combined genotype.",
+        "ru": "Когорты выживаемости людей преимущественно европейского происхождения; эффекты зависят от сочетания генотипов."
+      },
+      "evidence_reason": {
+        "en": "The individual position is a component of the combined APOE reading, not a second independent result.",
+        "ru": "Отдельная позиция — часть совместного чтения APOE, а не второй независимый результат."
+      },
+      "text": {},
+      "verdict_by_copies": {},
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion paraphrases. Combined APOE interpretation retained from the accepted catalogue.",
+        "license": "CC BY4.0 for original Scholion descriptions; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "rs429358+rs7412; one combined APOE result; TOMM40 is not an independent addition."
       }
     },
     "rs7412": {
       "gene": "APOE",
       "favorable": "T",
       "label": {
-        "en": "a component of the ε-status: T = ε2 (favourable for longevity; but it raises TG/remnants)",
-        "ru": "компонент ε-статуса: T = ε2 (благоприятен для долголетия; но повышает ТГ/ремнанты)"
+        "en": "APOE rs7412: read together with the other defining SNP to establish the ε combination; this position alone has no separate longevity verdict.",
+        "ru": "APOE rs7412: читается совместно со второй определяющей позицией для установления сочетания ε; отдельного вывода о долголетии по этой позиции нет."
       },
       "confidence": "high",
       "pmids": [
@@ -44,32 +91,107 @@
       "action": {
         "en": "part of the APOE block; with ε2 keep an eye on the triglycerides/remnants",
         "ru": "входит в блок APOE; при ε2 следить за триглицеридами/ремнантами"
+      },
+      "level": "B",
+      "source": "PMID:31356640; PMID:32511104; PMID:30060062",
+      "curated_on": "2026-10-23",
+      "personal_effect_permitted": false,
+      "ld_group": "APOE_region",
+      "mechanism": {
+        "en": "The two defining variants establish APOE protein isoforms; unknown phase is retained.",
+        "ru": "Две определяющие позиции задают формы белка APOE; неизвестная фаза сохраняется."
+      },
+      "population_caveat": {
+        "en": "Human survival cohorts, predominantly European ancestry; effects depend on the combined genotype.",
+        "ru": "Когорты выживаемости людей преимущественно европейского происхождения; эффекты зависят от сочетания генотипов."
+      },
+      "evidence_reason": {
+        "en": "The individual position is a component of the combined APOE reading, not a second independent result.",
+        "ru": "Отдельная позиция — часть совместного чтения APOE, а не второй независимый результат."
+      },
+      "text": {},
+      "verdict_by_copies": {},
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion paraphrases. Combined APOE interpretation retained from the accepted catalogue.",
+        "license": "CC BY4.0 for original Scholion descriptions; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "rs429358+rs7412; one combined APOE result; TOMM40 is not an independent addition."
       }
     },
     "rs2075650": {
       "gene": "TOMM40",
       "favorable": "A",
       "label": {
-        "en": "G is linked to the ε4 haplotype (risk); A/A = the risk allele is absent (neutral-to-good, not a plus in its own right)",
-        "ru": "G сцеплен с ε4-гаплотипом (риск); A/A = риск-аллеля нет (нейтрально-хорошо, не самостоятельный плюс)"
+        "en": "TOMM40 rs2075650 tags variation near APOE. Its longevity association did not remain independent after adjustment for APOE in the cited study.",
+        "ru": "TOMM40 rs2075650 маркирует вариацию рядом с APOE. В указанном исследовании связь с долголетием не сохранилась как независимая после учёта APOE."
       },
-      "confidence": "medium",
+      "confidence": "curated",
       "population_caveat": {
-        "en": "a proxy for ε4, it has almost no meaning of its own",
-        "ru": "прокси ε4, самостоятельного смысла почти нет"
+        "en": "European nonagenarian cohorts and younger controls; conditional analyses included both APOE defining SNPs.",
+        "ru": "Европейские когорты людей старше90 лет и более молодые контроли; условный анализ учитывал обе позиции APOE."
       },
       "pmids": [
-        "19734902"
+        "21418511"
       ],
       "action": {
-        "en": "read it together with APOE, not separately",
-        "ru": "читать вместе с APOE, не отдельно"
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
       },
-      "verdict_by_copies": {
-        "0": "flag",
-        "1": "neutral",
-        "2": "neutral"
-      }
+      "verdict_by_copies": {},
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:21418511",
+      "mechanism": {
+        "en": "Linkage with the neighbouring APOE locus; no independent TOMM40 survival mechanism is assigned.",
+        "ru": "Связь с соседним локусом APOE; самостоятельный механизм влияния TOMM40 на выживание не приписывается."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "G",
+        "A"
+      ],
+      "study_allele": "A",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "APOE_region",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/21418511/"
+        ],
+        "population": {
+          "en": "European nonagenarian cohorts and younger controls; conditional analyses included both APOE defining SNPs.",
+          "ru": "Европейские когорты людей старше90 лет и более молодые контроли; условный анализ учитывал обе позиции APOE."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "APOE_region"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs2802292": {
       "gene": "FOXO3",
@@ -151,86 +273,346 @@
       "gene": "FOXO3",
       "favorable": "T",
       "label": {
-        "en": "a functional enhancer of FOXO3 — a causal variant (Grossi/Flachsbart, Nat Commun 2017), T raises expression",
-        "ru": "функциональный энхансер FOXO3 — каузальный вариант (Grossi/Flachsbart, Nat Commun 2017), T повышает экспрессию"
+        "en": "FOXO3 rs12206094: the T allele was associated with longevity in European cohorts; this does not give an individual lifespan estimate.",
+        "ru": "FOXO3 rs12206094: аллель T связан с долголетием в европейских когортах; личную продолжительность жизни это не определяет."
       },
-      "confidence": "high",
+      "confidence": "curated",
       "pmids": [
-        "29255262"
+        "29234056"
       ],
       "action": {
-        "en": "it strengthens the reading of rs2802292: the carrier has not merely a tag but a causal allele",
-        "ru": "усиливает чтение rs2802292: носитель — не просто tag, а причинный аллель"
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
       },
-      "verdict_by_copies": {
-        "0": "neutral",
-        "1": "plus_partial",
-        "2": "plus"
-      }
+      "verdict_by_copies": {},
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:29234056",
+      "mechanism": {
+        "en": "Allele-dependent enhancer activity was observed experimentally.",
+        "ru": "В эксперименте показана зависимая от аллеля активность энхансера."
+      },
+      "population_caveat": {
+        "en": "German, French and Danish longevity case-control cohorts; effects vary by sex.",
+        "ru": "Немецкая, французская и датская выборки долгожителей; эффект различается по полу."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "C",
+        "T"
+      ],
+      "study_allele": "T",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "FOXO3_locus",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/29234056/"
+        ],
+        "population": {
+          "en": "German, French and Danish longevity case-control cohorts; effects vary by sex.",
+          "ru": "Немецкая, французская и датская выборки долгожителей; эффект различается по полу."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "FOXO3_locus"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs2253310": {
       "gene": "FOXO3",
       "favorable": "C",
       "label": {
-        "en": "a perfect proxy for rs2802292 (r²=1.0)",
-        "ru": "идеальный прокси rs2802292 (r²=1.0)"
+        "en": "FOXO3 rs2253310 belongs to a linked longevity-associated region. An expression association is not proof of a direct survival mechanism.",
+        "ru": "FOXO3 rs2253310 относится к связанному с долголетием участку. Ассоциация с экспрессией не доказывает прямого механизма влияния на выживание."
       },
-      "confidence": "high",
+      "confidence": "curated",
       "pmids": [
-        "18765803"
+        "28977569"
       ],
       "action": {
-        "en": "duplicates rs2802292",
-        "ru": "дублирует rs2802292"
-      }
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
+      },
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:28977569",
+      "mechanism": {
+        "en": "An association with FOXO3 expression in brain tissue was reported; causality is unresolved.",
+        "ru": "Описана ассоциация с экспрессией FOXO3 в ткани мозга; причинность не установлена."
+      },
+      "population_caveat": {
+        "en": "Four extreme-longevity cohorts, cases aged96–119. Association with reaching extreme age did not establish reduced mortality thereafter.",
+        "ru": "Четыре когорты исключительного долголетия, возраст96–119 лет. Связь с достижением такого возраста не установила снижения смертности после него."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "G",
+        "C"
+      ],
+      "study_allele": "C",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "verdict_by_copies": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "FOXO3_locus",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/28977569/"
+        ],
+        "population": {
+          "en": "Four extreme-longevity cohorts, cases aged96–119. Association with reaching extreme age did not establish reduced mortality thereafter.",
+          "ru": "Четыре когорты исключительного долголетия, возраст96–119 лет. Связь с достижением такого возраста не установила снижения смертности после него."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "FOXO3_locus"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs4946935": {
       "gene": "FOXO3",
       "favorable": "A",
       "label": {
-        "en": "a distal functional variant of the FOXO3 haplotype",
-        "ru": "дистальный функциональный вариант гаплотипа FOXO3"
+        "en": "FOXO3 rs4946935: the A allele showed a longevity association and regulatory activity; it is not an independent personal survival prediction.",
+        "ru": "FOXO3 rs4946935: для аллеля A описаны ассоциация с долголетием и регуляторная активность; отдельного личного прогноза выживания это не даёт."
       },
-      "confidence": "medium",
+      "confidence": "curated",
       "pmids": [
-        "38459055"
+        "29234056"
       ],
       "action": {
-        "en": "its absence when the proximal ones are carried = a recombinant (partial) haplotype",
-        "ru": "отсутствие при носительстве проксимальных = рекомбинантный (частичный) гаплотип"
-      }
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
+      },
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:29234056",
+      "mechanism": {
+        "en": "The A allele creates an SRF binding site in cellular experiments.",
+        "ru": "Аллель A создаёт участок связывания SRF в клеточных экспериментах."
+      },
+      "population_caveat": {
+        "en": "European longevity cohorts; Danish replication was not significant for this SNP.",
+        "ru": "Европейские когорты долгожителей; датское воспроизведение для этого SNP не было значимым."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "G",
+        "A"
+      ],
+      "study_allele": "A",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "verdict_by_copies": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "FOXO3_locus",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/29234056/"
+        ],
+        "population": {
+          "en": "European longevity cohorts; Danish replication was not significant for this SNP.",
+          "ru": "Европейские когорты долгожителей; датское воспроизведение для этого SNP не было значимым."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "FOXO3_locus"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs2764264": {
       "gene": "FOXO3",
       "favorable": "C",
       "label": {
-        "en": "a distal marker of the FOXO3 haplotype",
-        "ru": "дистальный маркёр гаплотипа FOXO3"
+        "en": "FOXO3 rs2764264 was associated with reaching old age in Danish case-control data; later survival was not confirmed after multiple-testing correction.",
+        "ru": "FOXO3 rs2764264 связан с достижением старшего возраста в датском исследовании случай–контроль; последующая выживаемость не подтверждена после поправки на множественные проверки."
       },
-      "confidence": "medium",
+      "confidence": "curated",
       "pmids": [
         "20849522"
       ],
       "action": {
-        "en": "read it as part of the haplotype",
-        "ru": "читать в составе гаплотипа"
-      }
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
+      },
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:20849522",
+      "mechanism": {
+        "en": "The variant marks the FOXO3 locus; a separate causal molecular mechanism was not established.",
+        "ru": "Вариант маркирует локус FOXO3; отдельный причинный молекулярный механизм не установлен."
+      },
+      "population_caveat": {
+        "en": "Danish1905 birth cohort and middle-aged controls; ascertainment by survival to old age.",
+        "ru": "Датская когорта1905 года рождения и участники среднего возраста; отбор по дожитию до старшего возраста."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "T",
+        "C"
+      ],
+      "study_allele": "C",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "verdict_by_copies": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "FOXO3_locus",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/20849522/"
+        ],
+        "population": {
+          "en": "Danish1905 birth cohort and middle-aged controls; ascertainment by survival to old age.",
+          "ru": "Датская когорта1905 года рождения и участники среднего возраста; отбор по дожитию до старшего возраста."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "FOXO3_locus"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs13217795": {
       "gene": "FOXO3",
       "favorable": "C",
       "label": {
-        "en": "a distal marker of the FOXO3 haplotype",
-        "ru": "дистальный маркёр гаплотипа FOXO3"
+        "en": "FOXO3 rs13217795 showed a longevity association in Danish data; it does not establish a separate benefit beyond other linked FOXO3 markers.",
+        "ru": "FOXO3 rs13217795 показал ассоциацию с долголетием в датской выборке; отдельная польза сверх связанных маркеров FOXO3 не установлена."
       },
-      "confidence": "medium",
+      "confidence": "curated",
       "pmids": [
         "20849522"
       ],
       "action": {
-        "en": "read it as part of the haplotype",
-        "ru": "читать в составе гаплотипа"
-      }
+        "en": "No genotype-specific testing, supplement, dose or lifespan estimate follows.",
+        "ru": "Специальные анализы, добавки, дозировки или прогноз лет жизни из этого генотипа не следуют."
+      },
+      "level": "C",
+      "curated_on": "2026-10-23",
+      "source": "PMID:20849522",
+      "mechanism": {
+        "en": "The marker is associated with the locus; the individual variant mechanism remains unresolved.",
+        "ru": "Маркер связан с локусом; механизм отдельного варианта остаётся неустановленным."
+      },
+      "population_caveat": {
+        "en": "Danish older and middle-aged cohorts. Corrected prospective survival results were not significant.",
+        "ru": "Датские когорты старшего и среднего возраста. Проспективные результаты выживания после поправки не были значимы."
+      },
+      "evidence_reason": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "study_alleles": [
+        "T",
+        "C"
+      ],
+      "study_allele": "C",
+      "personal_effect_permitted": false,
+      "personal_effect_reason": "Literature reference only: no calibrated individual effect; studied allele identity is not borrowed from a coordinate-only reading.",
+      "text": {},
+      "verdict_by_copies": {},
+      "zygosity_note": {
+        "en": "A population association does not predict lifespan or establish a treatment response. Linked FOXO3 variants are not independent benefits.",
+        "ru": "Популяционная ассоциация не предсказывает продолжительность жизни или ответ на лечение. Связанные варианты FOXO3 не являются независимыми преимуществами."
+      },
+      "ld_group": "FOXO3_locus",
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Original Scholion reference paraphrases; no article text or dataset copied.",
+        "license": "CC BY4.0 for original Scholion descriptions; cited articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/20849522/"
+        ],
+        "population": {
+          "en": "Danish older and middle-aged cohorts. Corrected prospective survival results were not significant.",
+          "ru": "Датские когорты старшего и среднего возраста. Проспективные результаты выживания после поправки не были значимы."
+        },
+        "outcome": {
+          "en": "Reaching the study longevity threshold; not predicted years of life.",
+          "ru": "Достижение возрастного порога исследования; не предсказанные годы жизни."
+        },
+        "sex": {
+          "en": "Population/sex-specific results, not a sex-invariant individual estimate.",
+          "ru": "Результаты зависят от популяции и пола; универсальная личная оценка не установлена."
+        },
+        "effect": "No numerical individual effect assigned",
+        "dependence": "FOXO3_locus"
+      },
+      "legacy_direction_not_a_personal_prediction": true
     },
     "rs1042522": {
       "gene": "TP53",
@@ -615,6 +997,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     },
     "ε2/ε2": {
@@ -636,6 +1030,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     },
     "ε3/ε3": {
@@ -657,6 +1063,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     },
     "ε3/ε4": {
@@ -678,6 +1096,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     },
     "ε4/ε4": {
@@ -699,6 +1129,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     },
     "ε2/ε4": {
@@ -720,6 +1162,18 @@
       "evidence_reason": {
         "en": "Replicated APOE isoform associations in independent population cohorts with measured effects; this level does not mean validated personal longevity prediction.",
         "ru": "Ассоциации форм APOE воспроизводились в независимых популяционных когортах с измеренными эффектами; этот уровень не означает валидированный личный прогноз долголетия."
+      },
+      "source_passport": {
+        "version": "curation-2026-10-23",
+        "accessed": "2026-10-23",
+        "content": "Accepted original Scholion APOE summary retained; no article text copied.",
+        "license": "CC BY4.0 for original Scholion summaries; articles retain their own rights.",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/31356640/",
+          "https://pubmed.ncbi.nlm.nih.gov/32511104/",
+          "https://pubmed.ncbi.nlm.nih.gov/30060062/"
+        ],
+        "dependence": "One phase-aware rs429358+rs7412 result; no addition of a TOMM40 benefit."
       }
     }
   }

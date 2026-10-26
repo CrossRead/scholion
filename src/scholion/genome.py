@@ -675,6 +675,12 @@ def locus_position(loc: Dict[str, Any], assembly: Optional[str]) -> Optional[int
 
 def locus_alleles(loc: Dict[str, Any], assembly: Optional[str]) -> Dict[str, Any]:
     """Use a source-checked allele pair for this build, without changing its effect."""
+    literal = _literal_snp_identity(loc, assembly)
+    if literal:
+        alternatives = literal["alternatives"]
+        return {**loc, "ref": literal["reference"],
+                "alt": alternatives[0] if len(alternatives) == 1 else "",
+                "reading_alternatives": alternatives}
     mapping = (loc.get("assembly_alleles") or {}).get(assembly or "") or {}
     if (mapping.get("position") == locus_position(loc, assembly) and mapping.get("source")
             and {mapping.get("ref"), mapping.get("alt")} == {loc.get("ref"), loc.get("alt")}):
@@ -1520,6 +1526,81 @@ def contig_name(vcf: str, chrom: str) -> Optional[str]:
     return hit
 
 
+@core.memo_in_reading
+def _prefetch_catalogue_rows() -> None:
+    """Warm the existing row cache with bounded SNP-only indexed reads.
+
+    A complex/overlapping record, malformed output, failed process or changing
+    file leaves that batch uncached. Ordinary readers then make the same
+    individual query and apply every existing genotype/quality check.
+    """
+    if engine_pin() == "linear" or not _have_bcftools():
+        return
+    main = vcf_path()
+    if not main:
+        return
+    loci = (core.loci().get("loci") or {}).values()
+    for vcf in dict.fromkeys([str(main), *_sites_vcfs()]):
+        if not _index_usable(vcf):
+            continue
+        assembly = assembly_of(vcf)
+        if assembly not in ("GRCh37", "GRCh38"):
+            continue
+        wanted = {}
+        for loc in loci:
+            if not isinstance(loc, dict) or not loc.get("chrom"):
+                continue
+            try:
+                pos = locus_position(loc, assembly)
+            except (TypeError, ValueError):
+                continue  # quiet: an invalid coordinate is left to the ordinary locus reader
+            if not pos or pos < 1 or _indel_event(loc):
+                continue
+            chrom = contig_name(vcf, str(loc.get("chrom") or ""))
+            if not chrom:
+                continue
+            region = f"{chrom}:{pos}-{pos}"
+            key = _region_key(vcf, region)
+            if key is not None and key not in _REGION_CACHE:
+                wanted[(chrom, pos)] = (region, key)
+        positions = list(wanted)
+        for offset in range(0, len(positions), 128):
+            batch = {point: wanted[point] for point in positions[offset:offset + 128]}
+            try:
+                result = subprocess.run(["bcftools", "view", "-H", "-r",
+                    ",".join(region for region, key in batch.values()), vcf],
+                    capture_output=True, text=True, timeout=60)
+            except (OSError, subprocess.SubprocessError):
+                continue  # quiet: prefetch supplies no answer; the ordinary reader owns errors
+            if result.returncode != 0:
+                continue
+            rows: Dict[tuple, list] = {point: [] for point in batch}
+            valid = True
+            for line in result.stdout.splitlines():
+                if not line.strip():
+                    continue
+                fields = line.split("\t")
+                # bcftools regions include overlapping records. Only unit-length
+                # records can be assigned by POS without reconstructing HTS spans.
+                if (len(fields) < 8 or not fields[1].isdigit()
+                        or len(fields[3]) != 1 or fields[3] not in "ACGTN"
+                        or any(len(a) != 1 or a not in "ACGTN.*" for a in fields[4].split(","))
+                        or any(part.split("=", 1)[0] == "END" for part in fields[7].split(";"))):
+                    valid = False
+                    break
+                point = (fields[0], int(fields[1]))
+                if point not in rows:
+                    valid = False
+                    break
+                rows[point].append(tuple(fields))
+            if not valid or any(_region_key(vcf, region) != key for region, key in batch.values()):
+                continue
+            if len(_REGION_CACHE) > 20000:
+                _REGION_CACHE.clear()
+            for point, (region, key) in batch.items():
+                _REGION_CACHE[key] = tuple(rows[point])
+
+
 def _query_region(vcf: str, chrom: str, pos: int) -> List[List[str]]:
     """VCF rows at the position (bcftools). Empty = the site is not variant (reference).
 
@@ -2012,7 +2093,47 @@ def _other_snp_observations(rows: List[list], col: int, assembly: str,
     return observed
 
 
+def _literal_snp_identity(loc: Dict[str, Any], assembly: Optional[str]) -> Optional[Dict[str, Any]]:
+    """A verified literal-reading passport carries no selected association allele."""
+    identity = loc.get("allele_identity") or {}
+    if identity.get("scope") != "literal_genotype_only":
+        return None
+    entry = (identity.get("builds") or {}).get(assembly or "") or {}
+    ref, alternatives = entry.get("reference"), entry.get("alternatives")
+    if (not isinstance(ref, str) or ref not in ("A", "C", "G", "T")
+            or not isinstance(alternatives, list) or not alternatives
+            or any(not isinstance(a, str) for a in alternatives)
+            or len(set(alternatives)) != len(alternatives)
+            or any(a not in ("A", "C", "G", "T") or a == ref for a in alternatives)
+            or str(entry.get("chrom")) != str(loc.get("chrom"))
+            or entry.get("position") != locus_position(loc, assembly)
+            or not entry.get("source") or not entry.get("sequence_source")
+            or entry.get("sequence_reference") != ref or not entry.get("checked_on")):
+        return None
+    if assembly == "GRCh38" and (loc.get("ref") != ref or
+            set(loc.get("reading_alternatives") or []) != set(alternatives)):
+        return None
+    return entry
+
+
 def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Literal-only records can answer a reading, never an association effect."""
+    literal = (loc.get("allele_identity") or {}).get("scope") == "literal_genotype_only"
+    if literal and not all(_literal_snp_identity(loc, build) for build in ("GRCh37", "GRCh38")):
+        return {"genotype": None, "confidence": "alleles_not_comparable", "source": "catalogue",
+                "interpretation_applicable": False,
+                "note": _t("genome.literal_passport_incomplete")}
+    result = _read_gt_at(loc)
+    if literal and result:
+        if result.get("source") == "vcf" and result.get("genotype") and not result.get("assembly"):
+            return {"genotype": None, "confidence": "no_coordinates_for_assembly", "source": "vcf",
+                    "interpretation_applicable": False,
+                    "note": _t("genome.no_coordinates_for_assembly", assembly="?", rsid=loc.get("rsid") or "")}
+        result = {**result, "interpretation_applicable": False}
+    return result
+
+
+def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """The patient's genotype at a resolved locus — from the VCF, or from an array.
 
     The array branch never reaches the reference assumptions below it, and that
@@ -2029,7 +2150,8 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     # comparing a genotype against a guess is worse than not comparing. The
     # refusal is the answer: the coordinate is known, the observed alleles are
     # named, and no verdict is offered.
-    if loc.get("alleles_observed") and not (loc.get("alt") or ""):
+    if (loc.get("alleles_observed") and not (loc.get("alt") or "")
+            and not _literal_snp_identity(loc, "GRCh38")):
         return {"confidence": "multiallelic", "source": "catalogue",
                 "note": _t("genome.refused.multiallelic",
                            alleles="/".join(str(a) for a in loc["alleles_observed"]),
@@ -2152,6 +2274,8 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             dp = ev.get("depth")
             out = {"genotype": ev.get("genotype") or f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
                    "depth": dp, "evidence_file": ev.get("evidence_file"),
+                   "assembly": ev.get("assembly"),
+                   "read_pos": locus_position(catalogue_loc, ev.get("assembly")),
                    "note": _t("genome.confirmed_ref")}
             if dp is not None and dp < _MIN_DEPTH:
                 out["note"] += _t("genome.low_depth_suffix", depth=dp)
@@ -2618,6 +2742,8 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     rows.sort(key=lambda r: r["_rank"])
     for r in rows:
         r.pop("_rank", None)
+    from .finding_context import attach as attach_context
+    personal_counts = attach_context(rows)
     counts = {k: 0 for k in _CLINVAR_TIERS}
     for r in rows:
         counts[r["tier"]] = counts.get(r["tier"], 0) + 1
@@ -2626,7 +2752,10 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
              for k in _CLINVAR_TIERS if counts.get(k, 0)]
     actionable = counts["pathogenic"] + counts["drug"] + counts["risk"] + counts["protective"]
     low_conf = sum(1 for r in rows if r.get("low_confidence"))
+    from .panel_reference import attach_finding_biology
+    attach_finding_biology(rows[:limit])
     return {"status": "ok", "count": len(rows), "actionable": actionable,
+            "personal_context_counts": personal_counts,
             "counts": counts, "tiers": tiers, "low_confidence": low_conf,
             "hits": rows[:limit], "source": str(f)}
 
@@ -2819,7 +2948,12 @@ def acmg_sf_findings() -> Dict[str, Any]:
     refusal = _acmg.table_refusal(f, prov, vp, content)
     if refusal:
         return _acmg_unverified(refusal, meta, prov, f)
+    from .finding_context import attach as attach_context
+    personal_counts = attach_context(rows, cat)
+    from .panel_reference import attach_finding_biology
+    attach_finding_biology(rows)
     return {"status": "ok", "version": meta.get("version"), "published": meta.get("published"),
+            "personal_context_counts": personal_counts,
             # What the table says about itself: which builds it was matched in
             # and when. None for a table written before the sidecar existed —
             # and that absence is flagged, because a table that cannot say which

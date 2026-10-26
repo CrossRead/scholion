@@ -30,6 +30,9 @@ WHAT IS DELIBERATELY NOT DONE HERE:
 from __future__ import annotations
 
 import json
+import hashlib
+import math
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -112,13 +115,37 @@ def profile_facts(bundle: Dict[str, Any]) -> Dict[str, Any]:
 
 def read_bundle(path: Path) -> Dict[str, Any]:
     try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        payload = Path(path).read_bytes()
+        data = json.loads(payload)
     except (OSError, ValueError) as e:
         return {"ok": False, "error": _t("fhir.unreadable", path=str(path), error=str(e))}
     if not isinstance(data, dict) or data.get("resourceType") != "Bundle":
         kind = (data or {}).get("resourceType") if isinstance(data, dict) else type(data).__name__
         return {"ok": False, "error": _t("fhir.not_a_bundle", kind=str(kind))}
-    return {"ok": True, "bundle": data}
+    return {"ok": True, "bundle": data, "source_sha256": hashlib.sha256(payload).hexdigest()}
+
+
+def _measurements(bundle: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Flatten component measurements without losing their parent identity."""
+    out = []
+    for entry in bundle.get("entry") or []:
+        parent = entry.get("resource") or {}
+        if parent.get("resourceType") != "Observation":
+            continue
+        components = parent.get("component") or []
+        if not components or any(k.startswith("value") for k in parent):
+            out.append(parent)
+        for index, component in enumerate(components):
+            inherited = {k: parent[k] for k in (
+                "id", "status", "effectiveDateTime", "effectiveInstant", "effectivePeriod",
+                "issued", "subject", "specimen", "method") if k in parent}
+            out.append({**inherited, **component, "_component": index})
+    return out
+
+
+def _mapping_context(key: str, code: str) -> Dict[str, Any]:
+    meta = (core.lab_test_meta().get("tests") or {}).get(key) or {}
+    return (meta.get("loinc_context") or {}).get(code) or {}
 
 
 def plan(path: Path) -> Dict[str, Any]:
@@ -132,6 +159,7 @@ def plan(path: Path) -> Dict[str, Any]:
     if not got.get("ok"):
         return got
     bundle = got["bundle"]
+    source_sha256 = got.get("source_sha256")
     index = core.loinc_index()
     points: List[Dict[str, Any]] = []
     skipped: List[Dict[str, Any]] = []
@@ -140,10 +168,8 @@ def plan(path: Path) -> Dict[str, Any]:
     # accepted it — from the command line and from the page. Dropping it because
     # it arrived in a bundle was a hole, not a policy.
     metrics: List[Dict[str, Any]] = []
-    for entry in (bundle.get("entry") or []):
-        res = entry.get("resource") or {}
-        if res.get("resourceType") != "Observation":
-            continue
+    measurements = _measurements(bundle)
+    for res in measurements:
         label = ((res.get("code") or {}).get("text")
                  or (((res.get("code") or {}).get("coding") or [{}])[0]).get("display")
                  or res.get("id") or "?")
@@ -155,6 +181,13 @@ def plan(path: Path) -> Dict[str, Any]:
         if not isinstance(qty, dict) or qty.get("value") is None:
             skipped.append({"label": label, "reason": "no_quantity",
                             "detail": next((k for k in res if k.startswith("value")), "none")})
+            continue
+        try:
+            value = float(qty["value"])
+            if isinstance(qty["value"], bool) or not math.isfinite(value):
+                raise ValueError("not finite")
+        except (ValueError, TypeError, OverflowError):
+            skipped.append({"label": label, "reason": "invalid_quantity"})
             continue
         if qty.get("comparator"):
             skipped.append({"label": label, "reason": "quantity_is_a_bound_not_an_exact_value",
@@ -168,13 +201,37 @@ def plan(path: Path) -> Dict[str, Any]:
         if not codes:
             skipped.append({"label": label, "reason": "no_loinc"})
             continue
-        key = next((index[c] for c in codes if c in index), None)
+        matched = {index[c] for c in codes if c in index}
+        if len(matched) > 1:
+            skipped.append({"label": label, "reason": "ambiguous_loinc", "detail": ", ".join(codes)})
+            continue
+        key = next(iter(matched), None)
+        code = next((c for c in codes if index.get(c) == key), None) if key else None
+        when = _effective(res)
+        if when:
+            try:
+                datetime.fromisoformat(when.replace("Z", "+00:00"))
+            except (TypeError, ValueError, AttributeError):
+                skipped.append({"label": label, "reason": "invalid_date", "detail": str(when)})
+                continue
+        origin = {"format": "FHIR R4", "path": str(Path(path).resolve()),
+                  "resource_id": res.get("id"), "component": res.get("_component"),
+                  "loinc_codes": codes, "status": status, "effective": when,
+                  "source_sha256": source_sha256, "reported_method": res.get("method"),
+                  "date_role": "effective" if any(res.get(k) for k in
+                      ("effectiveInstant", "effectiveDateTime", "effectivePeriod")) else "issued"}
+
         if not key:
             # A body measurement is not an analyte the dictionary is missing —
             # it is a value that belongs somewhere else entirely. Saying «the
             # code is not in the dictionary» about a body weight sends the
             # reader looking for an entry that should never exist there.
-            metric = next((c for c in codes if c in _body_metrics()), None)
+            candidates = [c for c in codes if c in _body_metrics()]
+            metric_keys = {_body_metrics()[c].get("ours") for c in candidates}
+            if len(metric_keys) > 1:
+                skipped.append({"label": label, "reason": "ambiguous_loinc", "detail": ", ".join(codes)})
+                continue
+            metric = max(candidates, key=lambda c: _body_metrics()[c].get("specificity", 0)) if candidates else None
             if metric:
                 known = _body_metrics()[metric]
                 mine, want = known.get("ours"), (known.get("unit") or "").strip()
@@ -196,27 +253,44 @@ def plan(path: Path) -> Dict[str, Any]:
                 else:
                     metrics.append({"metric": mine, "label": label,
                                     "date": _stamp(when), "value": float(qty["value"]),
-                                    "unit": want, "loinc": metric})
+                                    "unit": want, "loinc": metric,
+                                    "labels": known.get("display_name"),
+                                    "source_record": {**origin, "matched_loinc": metric,
+                                                      "mapping_source": known.get("source"),
+                                                      "method": known.get("method")}})
                 continue
             # NOT matched by display text — see the module docstring. This is the
             # list that says what the dictionary is missing, and it is the same
             # kind of material a dictionary proposal is built from.
-            skipped.append({"label": label, "reason": "loinc_not_in_catalogue",
-                            "detail": ", ".join(codes)})
+            known_refusals = core.lab_test_meta().get("known_unmapped_observations") or {}
+            known = next((known_refusals[c] for c in codes if c in known_refusals), None)
+            skipped.append({"label": label, "reason": known["reason"] if known else "loinc_not_in_catalogue",
+                            "detail": ", ".join(codes),
+                            **({"basis": known.get("why"), "source": known.get("source")} if known else {})})
             continue
         when = _effective(res)
         if not when:
             skipped.append({"label": label, "reason": "no_date"})
             continue
+        unit = qty.get("code") or qty.get("unit")
+        if any(bound.get("code", bound.get("unit", unit)) != unit
+               for interval in ranges for bound in (interval.get("low") or {}, interval.get("high") or {})
+               if bound.get("value") is not None):
+            skipped.append({"label": label, "reason": "reference_unit_mismatch"})
+            continue
         low, high = _range(res)
+        assert code is not None
+        mapping = _mapping_context(key, code)
         points.append({"key": key, "label": label, "date": _stamp(when),
                        "value": float(qty["value"]),
                        "unit": qty.get("code") or qty.get("unit"),
                        "ref_low": low, "ref_high": high,
-                       "loinc": codes[0]})
+                       "loinc": code, "context": {k: mapping[k] for k in ("specimen", "method", "fasting") if k in mapping},
+                       "source_record": {**origin, "matched_loinc": code,
+                                         "mapping_source": mapping.get("source")}})
     return {"ok": True, "path": str(path), "points": points, "metrics": metrics,
             "skipped": skipped,
-            "profile_facts": profile_facts(bundle),
+            "profile_facts": profile_facts(bundle), "measurement_entries": len(measurements),
             "observations": sum(1 for e in (bundle.get("entry") or [])
                                 if (e.get("resource") or {}).get("resourceType") == "Observation")}
 
@@ -228,7 +302,7 @@ def _body_metrics() -> Dict[str, Any]:
     with the sentence that says where the value belongs — and `ours` names our
     own metric only where the two are the same quantity in the same unit.
     """
-    return {k: v for k, v in (core.lab_test_meta().get("body_metrics") or {}).items()
+    return {k: v for k, v in (core._read_knowledge_raw("lab_test_meta.json").get("body_metrics") or {}).items()
             if isinstance(v, dict)}
 
 
@@ -247,7 +321,9 @@ def ingest(path: str, dry_run: bool = False) -> Dict[str, Any]:
         # the draw itself, not a stand-in for it.
         r = store.add_lab_point(p["key"], p["date"], p["value"], name=p["label"],
                                 unit=p["unit"], ref_low=p["ref_low"], ref_high=p["ref_high"],
-                                date_source="form", subject="owner")
+                                date_source="issued" if p["source_record"]["date_role"] == "issued" else "form",
+                                subject="owner", reference_context={**p.get("context", {}),
+                                    "source_record": p["source_record"]})
         if r.get("ok"):
             added.append(p["key"])
         else:
@@ -261,7 +337,8 @@ def ingest(path: str, dry_run: bool = False) -> Dict[str, Any]:
     added_metrics = []
     for m in res.get("metrics") or []:
         r = store.add_metric_point(m["metric"], m["date"], m["value"],
-                                   name=m["label"], unit=m["unit"], subject="owner")
+                                   name=m["label"], unit=m["unit"], subject="owner",
+                                   source_context={"source_record": m["source_record"], "labels": m.get("labels")})
         if r.get("ok"):
             added_metrics.append(m["metric"])
         else:

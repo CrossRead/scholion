@@ -10,6 +10,7 @@ from .i18n import plural as _plural, t as _t  # noqa: F401
 from .format_primitives import _coverage_line, recompute_why, subclaim_lines
 from .genome_routes import route_text
 from .clinical_claims import basis_lines
+from .core import unit_label
 
 
 def _refused_head(value: Optional[str]) -> str:
@@ -34,8 +35,9 @@ def _refused_head(value: Optional[str]) -> str:
 
 
 def _gene_reading_frame(r: Dict[str, Any]) -> str:
+    from .panel_reference import reference_lines
     cov = r.get("coverage") or {}
-    lines = []
+    lines = reference_lines(r)
     if cov.get("source") == "bam":
         for key, label in (("gene", _t("gene.whole")), ("cds", _t("gene.cds"))):
             stats = cov.get(key)
@@ -65,6 +67,8 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
         # told nothing at all — while the build ships the 84 symbols of the ACMG
         # panel and can say, with no network, that BRCA1 is one of them.
         lines = ["\u26a0\ufe0f " + r.get("message", ""), ""]
+        from .panel_reference import reference_lines
+        lines.extend(reference_lines(r))
         if r.get("searched"):
             lines.append("\u00b7 " + "\n\u00b7 ".join(r["searched"][:8]))
         if r.get("fix"):
@@ -164,6 +168,8 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
         for h in hits[:20]:
             lines.append(f"• {h.get('chrom')}:{h.get('pos')} {h.get('rsid') or ''} "
                          f"{h.get('genotype') or ''} — {h.get('clnsig')}")
+            from .finding_context import lines as context_lines
+            lines.extend('  ' + line for line in context_lines(h))
     gaps = r.get("gaps") or []
     if gaps:
         lines += ["", _t("gene.gaps")]
@@ -205,6 +211,8 @@ def genome_report(r: Dict[str, Any]) -> str:
         head = (f"⚪ {r.get('rsid')} ({gene}, {where}) — "
                 + _refused_head(r.get("reason")))
         lines = [head, f"_{r.get('message','')}_"]
+        from .panel_reference import reference_lines
+        lines.extend(reference_lines(r))
         amb = r.get("ambiguous") or {}
         if amb.get("choices"):
             lines.append("· " + "\n· ".join(str(c) for c in amb["choices"][:8]))
@@ -571,12 +579,14 @@ def clinvar_report(r: Dict[str, Any]) -> str:
     if r.get("indel_caveat"):
         lines += [r["indel_caveat"], ""]
     for h in r["hits"]:
+        from .finding_context import lines as context_lines
         from .panel_reference import reference_lines
         for context in h.get("gene_contexts") or []:
             lines.append("  " + str(context.get("gene") or ""))
             lines.extend("    " + line for line in reference_lines(context))
+        lines.extend(context_lines(h))
         sig = (h.get("clnsig") or "").replace("_", " ")
-        icon = "🔴" if "pathogenic" in (h.get("clnsig", "").lower()) else "🟠"
+        icon = "⚪️" if (h.get('personal_context') or {}).get('status') == 'carrier_context' else "🟠"
         cond = (h.get("clndn") or "").replace("|", " / ").replace("_", " ")
         stars = h.get("stars")
         star_mark = (" " + "★" * stars + "☆" * (4 - stars)) if isinstance(stars, int) else ""
@@ -637,6 +647,11 @@ def acmg_report(r: Dict[str, Any]) -> str:
         for h in rep:
             out.append(f"- **{h.get('gene')}** {h.get('rsid','')} [{h.get('zygosity')}] — "
                        f"{h.get('phenotype','')} · {(h.get('clnsig') or '').replace('_',' ')}")
+            from .finding_context import lines as context_lines
+            from .panel_reference import reference_lines
+            for context in h.get("gene_contexts") or []:
+                out.extend('  ' + line for line in reference_lines(context))
+            out.extend('  ' + line for line in context_lines(h))
         out.append("")
     else:
         out.append("✅ " + _t("acmg.no_reportable"))
@@ -654,6 +669,11 @@ def acmg_report(r: Dict[str, Any]) -> str:
         for h in car:
             out.append(f"- {h.get('gene')} {h.get('rsid','')} [{h.get('zygosity')}] — "
                        f"{h.get('phenotype','')} ({h.get('inheritance')})")
+            from .finding_context import lines as context_lines
+            from .panel_reference import reference_lines
+            for context in h.get("gene_contexts") or []:
+                out.extend('  ' + line for line in reference_lines(context))
+            out.extend('  ' + line for line in context_lines(h))
         out.append("")
     pen = r.get("penetrance") or {}
     if pen.get("one_line"):
@@ -1260,11 +1280,39 @@ def panel_report(r: Dict[str, Any]) -> str:
     if "systems" in r and "positions" not in r:
         L = ["**" + _t("panel.list_h") + "**"]
         for s_ in r["systems"]:
+            if s_.get("thematic"):
+                L.append("· " + _t("thematic.list_row", label=s_["label"], key=s_["key"], n=s_["genes"]))
+                continue
             L.append("· " + _t("panel.list_row", label=s_.get("label"), key=s_.get("key"),
                                positions=_plural(int(s_.get("positions") or 0), "count.positions"),
                                unreadable=s_.get("unreadable") or 0))
         return "\n".join(L)
     c = r.get("counts") or {}
+    if r.get("thematic"):
+        L = ["**" + str(r["label"]) + "**", r["reading_note"],
+             _t("thematic.genes", n=c.get("genes") or 0)]
+        if c.get("regions"):
+            L.append(_t("thematic.regions", n=c["regions"]))
+        if r.get("patient_readings"):
+            L.append(_t("thematic.positions", read=c.get("read") or 0, total=c.get("positions") or 0))
+        for gene in r["genes"] + (r.get("regions") or []):
+            L += ["", "**" + str(gene["gene"]) + "**", *reference_lines(gene)]
+            comparison=gene.get('personal_comparison') or {}
+            if comparison.get('observations'):
+                L += [_t('thematic.comparison'),comparison['note']]
+                for measured in comparison['observations']:
+                    L.append(str(measured['name'])+': '+str(measured.get('censored') or '')+str(measured['value'])+' '+
+                             unit_label(measured.get('unit') or '')+' · '+str(measured['date']))
+            for position in gene["positions"]:
+                L += ["", str(position["rsid"])]
+                if position.get("reading"):
+                    L.append(position["reading"]["message"])
+                L += reference_lines(position)
+            if not gene["positions"]:
+                L.append(_t("thematic.no_positions"))
+            if gene.get("reading_request"):
+                L.append(_t("thematic.read_gene_command", gene=gene["reading_request"]["gene"]))
+        return "\n".join(L)
     L = ["**" + _t("panel.title", label=r.get("label") or r.get("key")) + "**",
          _t("panel.counts", positions=_plural(int(c.get("positions") or 0), "count.positions"),
             genes=_plural(int(c.get("genes") or 0), "count.genes"), with_study=c.get("with_study") or 0,

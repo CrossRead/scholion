@@ -139,32 +139,20 @@ def _clinvar_in_region(chrom: str, start: int, end: int) -> List[Dict[str, Any]]
     annotated variant, so an empty result here means «no flagged finding», never
     «no variant». The distinction is carried in the report, not left to the reader.
     """
+    from . import genome
+    # Reuse the complete findings layer, including allele/inheritance context.
+    # Filtering a display page could conceal a second allele in this gene.
     out: List[Dict[str, Any]] = []
-    bare = chrom[3:] if chrom.startswith("chr") else chrom
-    for base in core.genome_bases():
-        f = base / "clinvar_hits.tsv"
-        if not f.exists():
+    bare = chrom.lower().removeprefix("chr")
+    for rec in genome.clinvar_hits(limit=1_000_000).get("hits") or []:
+        if str(rec.get("chrom") or "").lower().removeprefix("chr") != bare:
             continue
         try:
-            with f.open(encoding="utf-8", errors="replace") as fh:
-                head = fh.readline().rstrip("\n").split("\t")
-                for line in fh:
-                    v = line.rstrip("\n").split("\t")
-                    if len(v) < len(head):
-                        continue
-                    rec = dict(zip(head, v))
-                    c = rec.get("chrom", "")
-                    if (c.startswith("chr") and c[3:] or c) != bare:
-                        continue
-                    try:
-                        p = int(rec.get("pos", ""))
-                    except ValueError:
-                        continue
-                    if start <= p <= end:
-                        out.append(rec)
-        except OSError:
+            pos = int(rec.get("pos") or "")
+        except ValueError:
             continue
-        break
+        if start <= pos <= end:
+            out.append(rec)
     return out
 
 

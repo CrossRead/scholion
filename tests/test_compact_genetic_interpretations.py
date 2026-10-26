@@ -110,7 +110,7 @@ for(const register of ['patient','clinician']){
         positions = set()
         for language in ("en", "ru"):
             i18n.set_lang(language)
-            keys = [s["key"] for s in panel_description()["systems"]]
+            keys = list(core._read_knowledge("system_gene_panels.json")["systems"]) + ["author_list"]
             keys += list(core._read_knowledge("on_demand_panels.json")["panels"])
             for key in keys:
                 for original in panel_description(key)["positions"]:
@@ -210,7 +210,7 @@ for(const c of cases)for(const register of ['patient','clinician']){
             self.assertIn("A–E", boundary)
             self.assertNotIn("only at levels", boundary)
             self.assertNotIn("\u0412\u044b\u0432\u043e\u0434 \u043f\u0435\u0447\u0430\u0442\u0430\u0435\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e", boundary)
-            keys = [s["key"] for s in panel_description()["systems"]]
+            keys = list(core._read_knowledge("system_gene_panels.json")["systems"]) + ["author_list"]
             keys += list(core._read_knowledge("on_demand_panels.json")["panels"])
             for key in keys:
                 for p in panel_description(key)["positions"]:

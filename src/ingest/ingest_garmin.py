@@ -261,6 +261,16 @@ def build(gdir: str) -> dict:
                 "respiration": r.get("averageRespiration"), "naps": len(r.get("napList") or []),
                 "confirm": r.get("sleepWindowConfirmationType"),
             })
+            try:
+                begin = datetime.fromisoformat(r["sleepStartTimestampGMT"].replace("Z", "+00:00"))
+                end = datetime.fromisoformat(r["sleepEndTimestampGMT"].replace("Z", "+00:00"))
+                begin = begin.replace(tzinfo=timezone.utc) if begin.tzinfo is None else begin
+                end = end.replace(tzinfo=timezone.utc) if end.tzinfo is None else end
+                if end > begin:
+                    nightly[-1].update(started_at=begin.isoformat(), ended_at=end.isoformat(),
+                                       source="Garmin sleep export", sleep_kind="main_sleep")
+            except (KeyError, ValueError, TypeError, AttributeError):
+                pass  # Neither duration nor the old local bedtime supplies an exact interval.
             if cal and cal >= PHASES_FROM:
                 deep[y].append(d_ / 60.0)
                 rem[y].append(m_ / 60.0)

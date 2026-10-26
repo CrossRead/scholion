@@ -929,16 +929,16 @@ class TestTheGeneratedDemoTravels(unittest.TestCase):
                 "import argparse,json\nfrom pathlib import Path\n"
                 "p=argparse.ArgumentParser();p.add_argument('--out');p.add_argument('--quiet',action='store_true')\n"
                 "out=Path(p.parse_args().out);out.mkdir(parents=True)\n"
-                "(out/'labs.json').write_text(json.dumps({'_meta':{'synthetic':True}}))\n"
-                "(out/'index.md').write_text('SYNTHETIC demo')\n", encoding='utf-8')
+                "(out/'labs.json').write_text(json.dumps({'_meta':{'synthetic':True}}),encoding='utf-8')\n"
+                "(out/'index.md').write_text('SYNTHETIC demo',encoding='utf-8')\n", encoding='utf-8')
             delivery = Path(folder).resolve() / 'delivery'
             with patch.object(ms, '_IGNORED_ABS', {private.resolve()}):
                 ms._build_demo(repo, delivery)
             profile = delivery / 'demo' / 'profile'
             self.assertEqual({'labs.json', 'index.md'}, {p.name for p in profile.iterdir()})
-            self.assertTrue(json.loads((profile / 'labs.json').read_text())['_meta']['synthetic'])
+            self.assertTrue(json.loads((profile / 'labs.json').read_text(encoding='utf-8'))['_meta']['synthetic'])
             self.assertFalse((profile / 'personal.json').exists())
-            self.assertEqual('{"unmarked": "local input"}', private.read_text())
+            self.assertEqual('{"unmarked": "local input"}', private.read_text(encoding='utf-8'))
 
     def test_a_failed_generator_stops_the_build_instead_of_omitting_the_demo(self):
         import subprocess

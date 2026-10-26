@@ -439,6 +439,22 @@ def _build_demo(repo: Path, shared: Path) -> None:
               "travels with no way to look at the product before loading one\'s own data")
 
 
+def _build_docs(repo: Path, shared: Path) -> None:
+    """Keep public reading links usable outside the internal source tree."""
+    names = ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md",
+             "CONNECTING-AN-AGENT.md", "FOR-CLINICIANS.md", "FOR-CLINICIANS-DETAILS.md",
+             "CONTAINER-LIFECYCLE.md", "DATA-LAYOUT.md", "EVIDENCE-LEVELS.md",
+             "FOLATE-HISTAMINE-REDOX-CHOLINE.md", "CROSSREAD.md",
+             "SHORTCUTS-macOS.md", "just-prs-setup.md",
+             "LOADING-DATA.md", "PREPARING-THE-GENOME.md")
+    for source in ([repo / "docs" / name for name in names] +
+                   [repo / "share" / name for name in
+                    ("LOADING-DATA.md", "PREPARING-THE-GENOME.md")]):
+        if source.is_file():
+            (shared / "docs").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, shared / "docs" / source.name)
+
+
 def build(repo: Path, out: Path) -> Path:
     share = repo / "share"
     if not share.is_dir():
@@ -498,12 +514,7 @@ def build(repo: Path, out: Path) -> Path:
     # on a command line. It also travels inside the package, where
     # `scholion doc connecting-an-agent` prints it — both, because the two
     # readers arrive by different roads and neither knows about the other.
-    for _name in ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md",
-                  "CONNECTING-AN-AGENT.md"):
-        _doc = repo / "docs" / _name
-        if _doc.exists():
-            (shared / "docs").mkdir(parents=True, exist_ok=True)
-            shutil.copy2(_doc, shared / "docs" / _name)
+    _build_docs(repo, shared)
 
     # The skill, downloadable from the published page. A person whose only tool
     # is a chat model should not need `python3 src/tools/...` to obtain the one

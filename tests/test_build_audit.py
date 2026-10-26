@@ -949,3 +949,33 @@ class TestTheGeneratedDemoTravels(unittest.TestCase):
             generator.write_text('raise SystemExit(4)\n', encoding='utf-8')
             with self.assertRaises(subprocess.CalledProcessError):
                 ms._build_demo(repo, Path(folder).resolve() / 'delivery')
+
+
+@unittest.skipIf(ms is None, "make_shareable.py is not part of this build")
+class TestPublicDocumentationLinks(unittest.TestCase):
+    def test_readme_document_links_exist_in_the_clean_delivery(self):
+        with tempfile.TemporaryDirectory() as folder:
+            delivery = Path(folder).resolve()
+            ms._build_docs(support.ROOT, delivery)
+            text = (support.ROOT / 'README.md').read_text(encoding='utf-8')
+            links = re.findall(r'\]\((docs/[^)#]+)(?:#[^)]*)?\)', text)
+            self.assertTrue(links)
+            for link in links:
+                with self.subTest(link=link):
+                    self.assertTrue((delivery / link).is_file(), link)
+
+    def test_only_named_public_documents_are_exported_without_local_notes(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder).resolve()
+            repo, delivery = root / 'source', root / 'delivery'
+            (repo / 'docs').mkdir(parents=True)
+            (repo / 'share').mkdir()
+            for directory, name in [('docs', 'FOR-CLINICIANS.md'),
+                                    ('share', 'LOADING-DATA.md')]:
+                (repo / directory / name).write_text('Synthetic public document', encoding='utf-8')
+            (repo / 'docs' / 'private.owner.md').write_text('Local note', encoding='utf-8')
+            ms._build_docs(repo, delivery)
+            self.assertEqual({'FOR-CLINICIANS.md', 'LOADING-DATA.md'},
+                             {p.name for p in (delivery / 'docs').iterdir()})
+            self.assertEqual('Synthetic public document',
+                             (delivery / 'docs' / 'FOR-CLINICIANS.md').read_text(encoding='utf-8'))

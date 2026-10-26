@@ -910,3 +910,42 @@ class TestWhatGitIgnoresDoesNotShip(unittest.TestCase):
             finally:
                 ms._IGNORED_ABS = saved
             self.assertEqual(["code.py"], sorted(p.name for p in out.iterdir()))
+
+
+@unittest.skipIf(ms is None, "make_shareable.py is not part of this build")
+class TestTheGeneratedDemoTravels(unittest.TestCase):
+    def test_ignored_local_examples_are_replaced_by_fresh_synthetic_output(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as folder:
+            repo = Path(folder).resolve() / 'source'
+            local = repo / 'demo' / 'profile'
+            local.mkdir(parents=True)
+            private = local / 'personal.json'
+            private.write_text('{"unmarked": "local input"}', encoding='utf-8')
+            (repo / '.gitignore').write_text('demo/\n', encoding='utf-8')
+            generator = repo / 'src' / 'tools' / 'make_demo_profile.py'
+            generator.parent.mkdir(parents=True)
+            generator.write_text(
+                "import argparse,json\nfrom pathlib import Path\n"
+                "p=argparse.ArgumentParser();p.add_argument('--out');p.add_argument('--quiet',action='store_true')\n"
+                "out=Path(p.parse_args().out);out.mkdir(parents=True)\n"
+                "(out/'labs.json').write_text(json.dumps({'_meta':{'synthetic':True}}))\n"
+                "(out/'index.md').write_text('SYNTHETIC demo')\n", encoding='utf-8')
+            delivery = Path(folder).resolve() / 'delivery'
+            with patch.object(ms, '_IGNORED_ABS', {private.resolve()}):
+                ms._build_demo(repo, delivery)
+            profile = delivery / 'demo' / 'profile'
+            self.assertEqual({'labs.json', 'index.md'}, {p.name for p in profile.iterdir()})
+            self.assertTrue(json.loads((profile / 'labs.json').read_text())['_meta']['synthetic'])
+            self.assertFalse((profile / 'personal.json').exists())
+            self.assertEqual('{"unmarked": "local input"}', private.read_text())
+
+    def test_a_failed_generator_stops_the_build_instead_of_omitting_the_demo(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as folder:
+            repo = Path(folder).resolve() / 'source'
+            generator = repo / 'src' / 'tools' / 'make_demo_profile.py'
+            generator.parent.mkdir(parents=True)
+            generator.write_text('raise SystemExit(4)\n', encoding='utf-8')
+            with self.assertRaises(subprocess.CalledProcessError):
+                ms._build_demo(repo, Path(folder).resolve() / 'delivery')

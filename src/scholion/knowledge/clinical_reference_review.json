@@ -9,7 +9,7 @@
       "proxy_not_hla_typing": 3,
       "gene_validity_not_variant_mechanism": 30
     },
-    "updated": "2026-10-24",
+    "updated": "2026-10-27",
     "source_tier": "curated_reference"
   },
   "positions": {
@@ -5261,9 +5261,10 @@
           }
         }
       },
-      "record_sha256": "5f218120fca2bf151dc3d466e1d6c71188621e60d246a0fdb79dadcd35d2e61b",
+      "record_sha256": "a1977f1ab4cd30d5bdf02cc1789f41d394fdfc7000b66377221bf044ebff6ce0",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "5f218120fca2bf151dc3d466e1d6c71188621e60d246a0fdb79dadcd35d2e61b"
     },
     "system_gene_panels.json|lipids|APOE|rs429358": {
       "file": "system_gene_panels.json",
@@ -5298,9 +5299,11 @@
           }
         }
       },
-      "record_sha256": "36a41e58b5fce7eb9e7d0a2fd3b5d776157c3792ba55568ed5cb9d826653ae85",
+      "record_sha256": "60ee7833bb61a9133ac63476d00fe6a884473e61f6046b658ec41b8143be052c",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "36a41e58b5fce7eb9e7d0a2fd3b5d776157c3792ba55568ed5cb9d826653ae85",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|lipids|APOE|rs7412": {
       "file": "system_gene_panels.json",
@@ -5335,9 +5338,11 @@
           }
         }
       },
-      "record_sha256": "e183162eb59af9f949caba482ab9193c9fe6ab799e634e22cd606babe2f7177c",
+      "record_sha256": "3a2ea67a53fbaa9d70d7715dc570a86b9a9288ef66b86e3f3a52d43995ddc719",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "e183162eb59af9f949caba482ab9193c9fe6ab799e634e22cd606babe2f7177c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|cardio|VKORC1|rs9923231": {
       "file": "system_gene_panels.json",
@@ -5586,9 +5591,11 @@
           }
         }
       },
-      "record_sha256": "7d5242778562fc216fa428c65ac3bdbdcabc3805b803c665f5e8887c57f5aa29",
+      "record_sha256": "57bee90c5991aba226d077a52c84327ed1365261e625948ad42496ec17128afd",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "7d5242778562fc216fa428c65ac3bdbdcabc3805b803c665f5e8887c57f5aa29",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|cardio|LPA|rs3798220": {
       "file": "system_gene_panels.json",
@@ -5621,9 +5628,11 @@
           }
         }
       },
-      "record_sha256": "d1237568d28acc48013fbc6b9baca3c902d82a4b6ae7938e5a56bf1a39d75fe4",
+      "record_sha256": "4921050b63a02e651e691d5c82be97d8a40f5e7b100eae5b21cc4686c7ce1417",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "d1237568d28acc48013fbc6b9baca3c902d82a4b6ae7938e5a56bf1a39d75fe4",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|cardio|F13A1|rs5985": {
       "file": "system_gene_panels.json",
@@ -5691,9 +5700,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "04f916ce0915d1d5962807c2b4fa2b39bf9fe8562c08887f7c23b815ecf3af9d",
+      "record_sha256": "0dea54b3dbaa0d414e16d3d720aeeb4e78bd1f0d5b1db0ceb46b20e74de7f839",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "04f916ce0915d1d5962807c2b4fa2b39bf9fe8562c08887f7c23b815ecf3af9d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|cardio|ITGB3|rs5918": {
       "file": "system_gene_panels.json",
@@ -5781,9 +5792,11 @@
           }
         }
       },
-      "record_sha256": "74f5ad76963c5bddbbee285c6ee1eefc5eb42a442ad8fc918d66497b5fe280d4",
+      "record_sha256": "fac0d41304c2818e5f9c2b5a1637e6a3952093a4122b701df487e10071cbef04",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "74f5ad76963c5bddbbee285c6ee1eefc5eb42a442ad8fc918d66497b5fe280d4",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|G6PD|rs1050828": {
       "file": "system_gene_panels.json",
@@ -5884,9 +5897,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "7c618de18f8b64d5267ac3ac9d77a566e57b674e7e21f4e3afd42f2cf4cd0ba5",
+      "record_sha256": "30e6edc42ad01a3058b06ecb4dcc79d94671884d950ab49b3994e69a2f04aec0",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "7c618de18f8b64d5267ac3ac9d77a566e57b674e7e21f4e3afd42f2cf4cd0ba5",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|GCKR|rs1260326": {
       "file": "system_gene_panels.json",
@@ -5921,9 +5936,11 @@
           }
         }
       },
-      "record_sha256": "599ba5590af4aae17b3a2806c06381d7475364e549877870ccd08e88ab645f34",
+      "record_sha256": "f9be5b32a5d503d6aa4cf322bcbf6ae6e428246dc04dde02c15e44185b497561",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "599ba5590af4aae17b3a2806c06381d7475364e549877870ccd08e88ab645f34",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|PPARG|rs1801282": {
       "file": "system_gene_panels.json",
@@ -5944,9 +5961,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "5bdbcb999222a29c66667e615d36ec94b663682eaeb3e6bfc2dbf070c0d470d6",
+      "record_sha256": "213ea655c037dda695be46b65643cdeff0f7b1c0338d24fb301b219036f62fd0",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "5bdbcb999222a29c66667e615d36ec94b663682eaeb3e6bfc2dbf070c0d470d6",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|ADIPOQ|rs1501299": {
       "file": "system_gene_panels.json",
@@ -6020,9 +6039,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "86579a3dc503872bab918e1b938cbf810d42bb88946d15a845df89e37089fef5",
+      "record_sha256": "4c69c4a4f6de683dd36047e4ebd0fad142e579475205f5a6f3d08e82770bea04",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "86579a3dc503872bab918e1b938cbf810d42bb88946d15a845df89e37089fef5",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|CDKAL1|rs7754840": {
       "file": "system_gene_panels.json",
@@ -6160,9 +6181,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "9730b598f20b3216b3d19eee0365e593ef8e1124200809177ae9becb965b14c9",
+      "record_sha256": "c9925a20359049ede1034a3f8f279a9ca7c82e754c71b27a7374bcd3c48e0566",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "9730b598f20b3216b3d19eee0365e593ef8e1124200809177ae9becb965b14c9",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|FTO|rs1421085": {
       "file": "system_gene_panels.json",
@@ -6230,9 +6253,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "e13d04a0ec77d0224a5752acbb634f61d1c981f2d6c02d0fbe51b33b5b22f84f",
+      "record_sha256": "48714becf6aa8bdc4544e0da75b386e5037e822009b9ebb68e8dfcf621171883",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "e13d04a0ec77d0224a5752acbb634f61d1c981f2d6c02d0fbe51b33b5b22f84f",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|FTO|rs9939609": {
       "file": "system_gene_panels.json",
@@ -6323,9 +6348,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "a1de3f88fb37fab6955c7162db77dc1b12482065bef1de8206af3affd5c54f69",
+      "record_sha256": "9ae7d0cfdf25996f92fdfc2815c39f025fb4c695097ba847c5e28bc55757bcbc",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a1de3f88fb37fab6955c7162db77dc1b12482065bef1de8206af3affd5c54f69",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|MC4R|rs17782313": {
       "file": "system_gene_panels.json",
@@ -6489,9 +6516,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "3bf64e3dc6f4453189c0976b194831bdf88959356c1538819b49254ee9b5c0af",
+      "record_sha256": "393bb61524a706fc784be70e640dc99e185482ad3c5a97909aafa8c33f234f53",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "3bf64e3dc6f4453189c0976b194831bdf88959356c1538819b49254ee9b5c0af",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|glucose|TCF7L2|rs7901695": {
       "file": "system_gene_panels.json",
@@ -6596,9 +6625,11 @@
           }
         }
       },
-      "record_sha256": "de843d92016845d6c7ce0fcafd2372d4e52e68967715913ee12b9392ff71fa13",
+      "record_sha256": "7f3605c1983cab82e3b512d61544bc8ac684764f7c99ccdf466d266c8d48d82f",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "de843d92016845d6c7ce0fcafd2372d4e52e68967715913ee12b9392ff71fa13",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|inflammation|TPMT|rs1800462": {
       "file": "system_gene_panels.json",
@@ -6772,9 +6803,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "ed8ae092b4dc675cee9d1f2404efcaae3db5638510063406547f1f30b33498ce",
+      "record_sha256": "cb37431615d2b696718af4f5d0ddd94deb2bfa59f142df6e316fb1009694e437",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "ed8ae092b4dc675cee9d1f2404efcaae3db5638510063406547f1f30b33498ce",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|inflammation|IL6R|rs2228145": {
       "file": "system_gene_panels.json",
@@ -6795,9 +6828,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "e57c463481a56df41eefb57d8f135f0ce7d938701ef5298c4eb2f05e3890a142",
+      "record_sha256": "5c4e91398937e944d1ae9254e1f2ad2a9df94c3b113bc55d1d44d90e8792f0b3",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "e57c463481a56df41eefb57d8f135f0ce7d938701ef5298c4eb2f05e3890a142",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|thyroid|DIO1|rs2235544": {
       "file": "system_gene_panels.json",
@@ -6818,9 +6853,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "f34254510bf9d655b570d0d0051f33044cfdbcef389bfb993bfd6f3fbd57f3ee",
+      "record_sha256": "d16af0e05b907d6904a1fec37145b320760eba5f207ac50600a546906adfaacb",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "f34254510bf9d655b570d0d0051f33044cfdbcef389bfb993bfd6f3fbd57f3ee",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|thyroid|SECISBP2|rs119461976": {
       "file": "system_gene_panels.json",
@@ -7030,9 +7067,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "7b35817c63a514140c22a18ef2ae306cd5e63c2eb9cc6b0ad397ed72f95cffe8",
+      "record_sha256": "22cc6e059eedc4b84555e00ca93c7730eee08e2393a078b8d16d848abfd628fc",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "7b35817c63a514140c22a18ef2ae306cd5e63c2eb9cc6b0ad397ed72f95cffe8",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|thyroid|TPO|rs2071403": {
       "file": "system_gene_panels.json",
@@ -7085,9 +7124,11 @@
           }
         }
       },
-      "record_sha256": "d8dabea953d8c806baaef8ef43e232367cc1f6d40f00620b304abb51a951932d",
+      "record_sha256": "a46241e3b8696fabbe32c1f22f46cb025f3d317217650a09c23b042bd2815689",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "d8dabea953d8c806baaef8ef43e232367cc1f6d40f00620b304abb51a951932d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|SHBG|rs1799941": {
       "file": "system_gene_panels.json",
@@ -7122,9 +7163,11 @@
           }
         }
       },
-      "record_sha256": "1f3cc08b1d265d39192fe124774b9b09cb354b91b504228e61870047cf8fb012",
+      "record_sha256": "9ea35b964214f8199875f38b19e6d0a6e5e014d0d28d922ddc4b5b34a53e349c",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "1f3cc08b1d265d39192fe124774b9b09cb354b91b504228e61870047cf8fb012",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|SHBG|rs6258": {
       "file": "system_gene_panels.json",
@@ -7159,9 +7202,11 @@
           }
         }
       },
-      "record_sha256": "7e47e4c3661ad94aa9165e713bd4f5aa868598f32149a409b537bd655e8a7398",
+      "record_sha256": "f2d17164b626cad21da72d1e289a53f6670989809e6bb94ea252f81766281552",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "7e47e4c3661ad94aa9165e713bd4f5aa868598f32149a409b537bd655e8a7398",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|F5|rs6025": {
       "file": "system_gene_panels.json",
@@ -7248,9 +7293,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "964cf78f8dc8cee2d97e4a27c555502375336ddd16b63c8eff5855726b8a6a8d",
+      "record_sha256": "3874ecf9fb6b63dfa041d9ccd40c155d1038e85f6666623c3596935f07bfc2ed",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "964cf78f8dc8cee2d97e4a27c555502375336ddd16b63c8eff5855726b8a6a8d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|GREB1|rs13394619": {
       "file": "system_gene_panels.json",
@@ -7277,9 +7324,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "b5238651dcf8488c6d3aa64a3a077fc08c6244d199610a11ea45ad6c2abe3d99",
+      "record_sha256": "54aed3a6c8ab5c4bd72cda208964a64ea45703838fdddcb16f7d10ab6135f429",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "b5238651dcf8488c6d3aa64a3a077fc08c6244d199610a11ea45ad6c2abe3d99",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|CYP17A1|rs743572": {
       "file": "system_gene_panels.json",
@@ -7318,9 +7367,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "85a9795f55fe57c8ffebec923760bc8de34b75b52aba23aa5c0d5c1a9de13fd4",
+      "record_sha256": "16cb83178368ad2f630c4e1148a4093cb63c171fcc2424d646b5752c749919a1",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "85a9795f55fe57c8ffebec923760bc8de34b75b52aba23aa5c0d5c1a9de13fd4",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|CYP19A1|rs2470152": {
       "file": "system_gene_panels.json",
@@ -7414,9 +7465,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "04b0cb26bad53bf7cabb720559435c40614a98bb77def8fd8dee73b390ebbf77",
+      "record_sha256": "83cf98529aef2562b4e0078c32253dfe4c4c944b97b52dfc7c68c885cafe02b0",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "04b0cb26bad53bf7cabb720559435c40614a98bb77def8fd8dee73b390ebbf77",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|PGR|rs1042838": {
       "file": "system_gene_panels.json",
@@ -7455,9 +7508,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "1dcc4da4b4a12b5da82ebe45bfa06c8dea206f665a32f968d2c29a45b3893eb4",
+      "record_sha256": "f435471bdbba4d696902b13efe6b201135e2d121ee673c4cb603ce2d35df2867",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "1dcc4da4b4a12b5da82ebe45bfa06c8dea206f665a32f968d2c29a45b3893eb4",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|PGR|rs10895068": {
       "file": "system_gene_panels.json",
@@ -7496,9 +7551,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "1cd9154be6d26c41a0eb65022f6e87e54f36c3bbeddab7340b5ad4e2fee25e12",
+      "record_sha256": "b445aade7c33c04019b8738e88e6bc63eb056180950a8494ae82a4eee784efb5",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "1cd9154be6d26c41a0eb65022f6e87e54f36c3bbeddab7340b5ad4e2fee25e12",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|SHBG|rs12150660": {
       "file": "system_gene_panels.json",
@@ -7566,9 +7623,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "864a164913a31cd44f434600fc1801a9029756677ce5308371c10371a73c83e6",
+      "record_sha256": "7b519647be95bead178eab53350c8359658a0938846b721e70ca57282c74ed2e",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "864a164913a31cd44f434600fc1801a9029756677ce5308371c10371a73c83e6",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|ZKSCAN5|rs11761528": {
       "file": "system_gene_panels.json",
@@ -7601,9 +7660,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "41bc697d25537100c98fb4525a97192cb9c7ef7ea71123f13f93798c5559a157",
+      "record_sha256": "1d1337c5a7edf7985565f6d58170a88c902cb576f87514ade431ff1d318e3740",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "41bc697d25537100c98fb4525a97192cb9c7ef7ea71123f13f93798c5559a157",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|gonads|FAM9B|rs5934505": {
       "file": "system_gene_panels.json",
@@ -7659,9 +7720,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "1b9a6529e7cd1daeb9957cf2a5f71f14906a02120fe7745acd1434b2506c47ab",
+      "record_sha256": "887dbb13766b5d0e1e8beff23766abee316a15cd3a1e46a7d9a28543166c9f71",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "1b9a6529e7cd1daeb9957cf2a5f71f14906a02120fe7745acd1434b2506c47ab",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|pancreas|PRSS1|rs111033565": {
       "file": "system_gene_panels.json",
@@ -7709,9 +7772,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "62155cf5dfc922a483eaef7544fe14e9303eef84e42a91bdeee2c3a96cac35b0",
+      "record_sha256": "84052f06a85f8d1f95697f24ce5ed6963e207ac2d62fed3bf962f874f15f15c2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "62155cf5dfc922a483eaef7544fe14e9303eef84e42a91bdeee2c3a96cac35b0",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|pancreas|PRSS1|rs111033566": {
       "file": "system_gene_panels.json",
@@ -7773,9 +7838,11 @@
           }
         }
       },
-      "record_sha256": "472bbcef4ab631beb980d36eb58181f69992868db816473f14d49a956044c9cc",
+      "record_sha256": "86b353ad32ce5ecf21a4ca653aeaa794e4be242d668b81a9242fb413fb7dd964",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "472bbcef4ab631beb980d36eb58181f69992868db816473f14d49a956044c9cc",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|liver|TM6SF2|rs58542926": {
       "file": "system_gene_panels.json",
@@ -7796,9 +7863,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "c7fd9d54910bc3b7b70602ba5c9f856718a0504b392a8bebe9653c73649dedce",
+      "record_sha256": "47306b3343fccb85c4921889f931d408610eb202cbc345f109b2be64f74cc1c3",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "c7fd9d54910bc3b7b70602ba5c9f856718a0504b392a8bebe9653c73649dedce",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|liver|HFE|rs1800562": {
       "file": "system_gene_panels.json",
@@ -8023,9 +8092,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "dcd98b5d0074a184a4ee3b403e96ca61243c37be352fca4b260a644b12de1c09",
+      "record_sha256": "84052f06a85f8d1f95697f24ce5ed6963e207ac2d62fed3bf962f874f15f15c2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "dcd98b5d0074a184a4ee3b403e96ca61243c37be352fca4b260a644b12de1c09",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|GC|rs2282679": {
       "file": "system_gene_panels.json",
@@ -8060,9 +8131,11 @@
           }
         }
       },
-      "record_sha256": "c57c61c067c53804f3948dfdecb47a28175cc9c0d880b6041fe4c00e36bbf40d",
+      "record_sha256": "82f9d070b916ef2278f434de7b7d8b3c021157b5456534d3ec508c823154c3ae",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "c57c61c067c53804f3948dfdecb47a28175cc9c0d880b6041fe4c00e36bbf40d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|CYP2R1|rs10741657": {
       "file": "system_gene_panels.json",
@@ -8097,9 +8170,11 @@
           }
         }
       },
-      "record_sha256": "0f1ea238e0bf5c122190564c37345dae28af120d6ee5f41eebf0680ca870df8e",
+      "record_sha256": "aaf6186d3e288665453686220321eb4fbdcd865b60607b774f8dfa349372c060",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "0f1ea238e0bf5c122190564c37345dae28af120d6ee5f41eebf0680ca870df8e",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|DHCR7|rs12785878": {
       "file": "system_gene_panels.json",
@@ -8134,9 +8209,11 @@
           }
         }
       },
-      "record_sha256": "3e4c1a6bb91d43cc4b3801485d369c7767568df2bfd9fc4c5fdea119017db49a",
+      "record_sha256": "f9ed6836d3aaf793897d8b4eab7882b9c34e25963b449da5090febdbe7dfb331",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "3e4c1a6bb91d43cc4b3801485d369c7767568df2bfd9fc4c5fdea119017db49a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|FUT2|rs601338": {
       "file": "system_gene_panels.json",
@@ -8171,9 +8248,11 @@
           }
         }
       },
-      "record_sha256": "0c2ad971c3e2e4e8a2606c1abd45e0814bc8997c3887c4da626018e0bde4675a",
+      "record_sha256": "223bac1d594ba01487b41820557f2ea0ed1b5b1acc468653ff1cb427772d59a3",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "0c2ad971c3e2e4e8a2606c1abd45e0814bc8997c3887c4da626018e0bde4675a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|HFE|rs1800562": {
       "file": "system_gene_panels.json",
@@ -8254,9 +8333,11 @@
           }
         }
       },
-      "record_sha256": "c00c667affbc74ded8b33872a88498b89192aac5bf5880ca97e6c1685b93a532",
+      "record_sha256": "61521a5fbee1d1412a0a671453472fb5aa97e76c11ee7e5ee019f9677ae090f9",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "c00c667affbc74ded8b33872a88498b89192aac5bf5880ca97e6c1685b93a532",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|FADS1|rs174546": {
       "file": "system_gene_panels.json",
@@ -8291,9 +8372,11 @@
           }
         }
       },
-      "record_sha256": "a02423cf6cee6653c6cc6de557f36671bce7e541f27628c14bca9718663fb139",
+      "record_sha256": "4e22198ebe1283b943f6f0d49de86aeb5ea403074f839dd277d247d540354054",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a02423cf6cee6653c6cc6de557f36671bce7e541f27628c14bca9718663fb139",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|FADS1|rs174537": {
       "file": "system_gene_panels.json",
@@ -8314,9 +8397,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "09f81cc265290f1c648c0ed1d983edffe6f43c294f93885f43de5b647e59b00b",
+      "record_sha256": "5a265a05b5d14edeaef3f36737d37869735a2189f867e2d76b04e818124116a2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "09f81cc265290f1c648c0ed1d983edffe6f43c294f93885f43de5b647e59b00b",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|micronutrients|MCM6|rs4988235": {
       "file": "system_gene_panels.json",
@@ -8337,9 +8422,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "2446c74985342078dad862952a461e32e72f5159b113d70e3d01debacf029955",
+      "record_sha256": "c56cc0e44e93981fe508c7401e5b17092c6c2336007b354368e556e96dc4373e",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "2446c74985342078dad862952a461e32e72f5159b113d70e3d01debacf029955",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|ABCG2|rs2231142": {
       "file": "system_gene_panels.json",
@@ -8417,9 +8504,11 @@
           }
         }
       },
-      "record_sha256": "a806bf2b1483fdc09a2363fab266a27dbee54d51baa3f3a3769a543367116e07",
+      "record_sha256": "27ef91ac20f6eefadd9404eb3797af1178ff7d59682c65713a5224cd013d9d37",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a806bf2b1483fdc09a2363fab266a27dbee54d51baa3f3a3769a543367116e07",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|HLA-B|rs9263726": {
       "file": "system_gene_panels.json",
@@ -8440,9 +8529,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "537e1b73d22c66b4355bce115bc9817513c6644a9dac751143e66dabce278b47",
+      "record_sha256": "91c22f73dc597cadff4d8cf32a4ba8ad47ba48dc7798d44f31fba8dbefd5ce45",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "537e1b73d22c66b4355bce115bc9817513c6644a9dac751143e66dabce278b47",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|UMOD|rs12917707": {
       "file": "system_gene_panels.json",
@@ -8463,9 +8554,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "da60ea389e40818fc1046431dbf7bb59bb1e3865e1776b2281d875e977481f6a",
+      "record_sha256": "b50a6f1c15940f316aacc22a1d84c9764e8d09d31b219c554cb9e3c7d7b475a2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "da60ea389e40818fc1046431dbf7bb59bb1e3865e1776b2281d875e977481f6a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|APOL1|rs73885319": {
       "file": "system_gene_panels.json",
@@ -8486,9 +8579,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "39c0a9c889a199dc4dea338cad4367af506b35d86e1f08c9dff4df7a9c95bd07",
+      "record_sha256": "a5d7cbf508eda6cc7946a6c594459aead3882c5c44a4bdeda9548620f1f662ca",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "39c0a9c889a199dc4dea338cad4367af506b35d86e1f08c9dff4df7a9c95bd07",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|APOL1|rs60910145": {
       "file": "system_gene_panels.json",
@@ -8509,9 +8604,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "e5bbb4994ecc796db86a132f33c043c29630fe38d8f9593f4f849af31ddf81bc",
+      "record_sha256": "eed92c2741dff95d6c2d4906e2da28824b2841163e1aa441f8284d9d93f649bd",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "e5bbb4994ecc796db86a132f33c043c29630fe38d8f9593f4f849af31ddf81bc",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|renal|CYP2C9|rs1799853": {
       "file": "system_gene_panels.json",
@@ -8586,9 +8683,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "56344cb23e090ca0720930c2529a86dc944c6bc496f2e7b5e978675a542d60ab",
+      "record_sha256": "3ffd86655b1f5b8f010c38bf84fc814559bf4260c351265926cf411cb3535524",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "56344cb23e090ca0720930c2529a86dc944c6bc496f2e7b5e978675a542d60ab",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|PTPN22|rs2476601": {
       "file": "system_gene_panels.json",
@@ -8861,9 +8960,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "4d1ecdb71fa4ae46e9d20113d16e1dc1185af9aff7d43f99a89c12ffcdfe7528",
+      "record_sha256": "3d7066af2014aed703908ae3a057bcb020f1866eb23f1a8d686cd80eb35e3fe2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "4d1ecdb71fa4ae46e9d20113d16e1dc1185af9aff7d43f99a89c12ffcdfe7528",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|CTLA4|rs1357409506": {
       "file": "system_gene_panels.json",
@@ -8884,9 +8985,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "c25220fd6b66a155429b5db2a04598ff2414eb54c4d4fe257a7b3af3f4d9af1d",
+      "record_sha256": "11cd79e8c06b89526e9e1ea7eef5823c409fc0c2c94125822d165c6359064894",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "c25220fd6b66a155429b5db2a04598ff2414eb54c4d4fe257a7b3af3f4d9af1d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|FAS|rs778993919": {
       "file": "system_gene_panels.json",
@@ -8907,9 +9010,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "3d717210ebcee18d3bd9ae2cef1360d6db47c069dcc3992f3826e2b50924d3d5",
+      "record_sha256": "6078153ed6c89eddc2733f60b36fbe1806bf6341d3ca99fc5a3a6c4279ac7f30",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "3d717210ebcee18d3bd9ae2cef1360d6db47c069dcc3992f3826e2b50924d3d5",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|IFIH1|rs587777446": {
       "file": "system_gene_panels.json",
@@ -8930,9 +9035,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "25bbc20961a5568d56d1f702823f506cc750ceeb4a29409ba4e38ab384f1b9ea",
+      "record_sha256": "79c4ba7b130f14afb7690ebce3fd151d0e08fc1b8c7ed3f1130bfd8a2fa0d8e1",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "25bbc20961a5568d56d1f702823f506cc750ceeb4a29409ba4e38ab384f1b9ea",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|IFNGR1|rs1236009877": {
       "file": "system_gene_panels.json",
@@ -8953,9 +9060,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "562dc9ca77f274ba3dfe5e81bfc88c1762570b2b3ee2e3165e45a2afcf8ac2ec",
+      "record_sha256": "d8c3629d5b606f134932a3cd61de357f31860d173f0134a43010f8425b0da2ce",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "562dc9ca77f274ba3dfe5e81bfc88c1762570b2b3ee2e3165e45a2afcf8ac2ec",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|IKZF1|rs530073586": {
       "file": "system_gene_panels.json",
@@ -8976,9 +9085,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "438b1a0a44dd7905a4eaf9e4d4788df3fc91a12ada52cc6c27c6752d716b9c3c",
+      "record_sha256": "7a3ccced88a9fb195f339627e5a7e89f251704a79b1da7bceaaeb456cf6bd884",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "438b1a0a44dd7905a4eaf9e4d4788df3fc91a12ada52cc6c27c6752d716b9c3c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|IL36RN|rs387906914": {
       "file": "system_gene_panels.json",
@@ -8999,9 +9110,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "103a1d29883c7f36e754a952bc24dfe3f46453ad31f91b3fa2d24e50df9e9ac9",
+      "record_sha256": "b57adaaf3e646fc0db1e9e4b2d57296e86207716c830d7e029b9a157616c3d6e",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "103a1d29883c7f36e754a952bc24dfe3f46453ad31f91b3fa2d24e50df9e9ac9",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|MEFV|rs28940579": {
       "file": "system_gene_panels.json",
@@ -9022,9 +9135,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "64c08ff9725c2923882a3b08cb65b729c1fcbb1bf58865999985e5ea49526f95",
+      "record_sha256": "fae5964e60cb450997ece8eecc51ec040d5f92c0d027b5ec7121722de77f3314",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "64c08ff9725c2923882a3b08cb65b729c1fcbb1bf58865999985e5ea49526f95",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|NFKB2|rs397514332": {
       "file": "system_gene_panels.json",
@@ -9045,9 +9160,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "40859200a95ab190b325ee1b76fa2944070ec57badf6746359fd233dcedf18f6",
+      "record_sha256": "547488e826a244b4a9d66242a8aa233abecaac6f2a4739f4beb8002f9dfc75be",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "40859200a95ab190b325ee1b76fa2944070ec57badf6746359fd233dcedf18f6",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|NLRC4|rs587781260": {
       "file": "system_gene_panels.json",
@@ -9068,9 +9185,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "a0511285b8e6467d46426952a5d5081a5073e774d624cc41063111b177770b18",
+      "record_sha256": "6cbadf8a1d5bb22b1713b09be625b6eb6d7cce8a407da7d6d926a34a28f11aa3",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a0511285b8e6467d46426952a5d5081a5073e774d624cc41063111b177770b18",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|NLRP12|rs1404302953": {
       "file": "system_gene_panels.json",
@@ -9091,9 +9210,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "478e18853fe0bc72254a75254523aac29922bfcbd8f522c3b7ccb9421c508458",
+      "record_sha256": "cb42b3da69765c4efb48527f758307738a9d7af490a68123ed039159efc1666e",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "478e18853fe0bc72254a75254523aac29922bfcbd8f522c3b7ccb9421c508458",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|NLRP3|rs121908150": {
       "file": "system_gene_panels.json",
@@ -9114,9 +9235,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "4756a4318b88a53b5934203b3747d491cc172eb94e8929555db05d05797e8332",
+      "record_sha256": "732bbae37a0f7ef3650da23edd148d3f434e31b8f1b027ce194f2a726cbd66f2",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "4756a4318b88a53b5934203b3747d491cc172eb94e8929555db05d05797e8332",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|NOD2|rs104895477": {
       "file": "system_gene_panels.json",
@@ -9137,9 +9260,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "f2eeafbe28b264d56e309b6e554d1ac10945698e7d336e72a4068609c8af5bd7",
+      "record_sha256": "f8593d7a5247ebdf597b48456eb7bc1d8b49cdef4437072ac808c02df2867bdc",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "f2eeafbe28b264d56e309b6e554d1ac10945698e7d336e72a4068609c8af5bd7",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|PIK3CD|rs397518423": {
       "file": "system_gene_panels.json",
@@ -9160,9 +9285,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "16d3cad81b290c91aa46fe6b5d1d868ac247626e258720291f4491c15436198c",
+      "record_sha256": "12a9105463e8c0eff25734e2b532e502328b322530a7ab942050481eb9605f29",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "16d3cad81b290c91aa46fe6b5d1d868ac247626e258720291f4491c15436198c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|PIK3R1|rs587777709": {
       "file": "system_gene_panels.json",
@@ -9183,9 +9310,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "9d01a147f8bf90e3b95e816fcf2f37303aeeb9a486d52245ab4ed78da6676f3a",
+      "record_sha256": "8d001df9991eafcbc3bce23211e327434fd8de3ab248bff03eb80adf66007d4f",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "9d01a147f8bf90e3b95e816fcf2f37303aeeb9a486d52245ab4ed78da6676f3a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|PSTPIP1|rs28939089": {
       "file": "system_gene_panels.json",
@@ -9206,9 +9335,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "9e8f426e2eb4d9d11f9194166c1af794944b1e7c528d11b169555e36f8ee925c",
+      "record_sha256": "270171c05bb2adeb8e72ff1885d31096174e63b857456ccf77df2b2d56c10fb5",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "9e8f426e2eb4d9d11f9194166c1af794944b1e7c528d11b169555e36f8ee925c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|STAT1|rs587777630": {
       "file": "system_gene_panels.json",
@@ -9229,9 +9360,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "6e544381f823b08d14af73b53490fa11127db39673b365555b4d6458d23b1913",
+      "record_sha256": "34105a4546337a6f4da5f0d476672821efed0b7d404117d36d8402ddfbd135cf",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "6e544381f823b08d14af73b53490fa11127db39673b365555b4d6458d23b1913",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|STAT3|rs869312892": {
       "file": "system_gene_panels.json",
@@ -9252,9 +9385,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "b3e3e36baee55d34487bdbe644535b60754280640ac871fe57ccd1407d5cd5e6",
+      "record_sha256": "a294db37a249646ed72ce5e6ee6ad2b09b94b31086e9173ab2abc79769237128",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "b3e3e36baee55d34487bdbe644535b60754280640ac871fe57ccd1407d5cd5e6",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|TNFAIP3|rs864321626": {
       "file": "system_gene_panels.json",
@@ -9275,9 +9410,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "83c83f4a1224f901d04759065cb98af0ee1646fcd3cd59fa258c5416abae608a",
+      "record_sha256": "741809cd206c3eeff73224e3006fd503c993ab2863e7b879e9132c50f533efbf",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "83c83f4a1224f901d04759065cb98af0ee1646fcd3cd59fa258c5416abae608a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|immune|TNFRSF1A|rs104895217": {
       "file": "system_gene_panels.json",
@@ -9298,9 +9435,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "0093074d6b5d7d2798a1c3ca57fcb0fae3ecb7eb8aaee82c0e7d35f423620746",
+      "record_sha256": "26dc2495473f7aafe7e92dd9d67f49e812b2ca2548a5cafca2b22b6f4094349f",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "0093074d6b5d7d2798a1c3ca57fcb0fae3ecb7eb8aaee82c0e7d35f423620746",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|musculoskeletal|OPTN|rs1561570": {
       "file": "system_gene_panels.json",
@@ -9333,9 +9472,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "559e6b3dabce8436f9fb92fe2c6e727530bd7f91f9d4abf9181be8a6ab9eda8c",
+      "record_sha256": "09ebc90cc590359b02a34a951f51895ec0b718f98c8f1ee59fae0f7a33157753",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "559e6b3dabce8436f9fb92fe2c6e727530bd7f91f9d4abf9181be8a6ab9eda8c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|musculoskeletal|COL1A1|rs1800012": {
       "file": "system_gene_panels.json",
@@ -9368,9 +9509,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "324251f73f647215bc3d12168f49e8e5c20a7cc4dbbb739a13faf7b810e3a8d8",
+      "record_sha256": "d84dfadec55b76352d833d356b59c9fe80e77dc3ac3c518e2977399d305196d8",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "324251f73f647215bc3d12168f49e8e5c20a7cc4dbbb739a13faf7b810e3a8d8",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|musculoskeletal|LRP5|rs3736228": {
       "file": "system_gene_panels.json",
@@ -9471,9 +9614,11 @@
           }
         }
       },
-      "record_sha256": "dd95d6081d45932d487394692e92b5880787983c03f5213063e7dcfe86e7d61a",
+      "record_sha256": "1d53efc3d79b3dfd3ed4d86d891769e4c188d3e4c530301260cf1889109cbc73",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "dd95d6081d45932d487394692e92b5880787983c03f5213063e7dcfe86e7d61a",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|PPM1K|rs1440581": {
       "file": "system_gene_panels.json",
@@ -9527,9 +9672,11 @@
           }
         }
       },
-      "record_sha256": "fe16d47a45e822debc56ca61983ee0b00f86004066215deec87b113ad218268d",
+      "record_sha256": "7051894894b045c47baed09e1433fdd3389850a36d663a28c09fd2ebcffae461",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "fe16d47a45e822debc56ca61983ee0b00f86004066215deec87b113ad218268d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|ASPG|rs1744297": {
       "file": "system_gene_panels.json",
@@ -9570,9 +9717,11 @@
           }
         }
       },
-      "record_sha256": "f4bd7a59a3231f96c05626f12cc09a5c018313bfe9cd818e4f5e74340cb9608c",
+      "record_sha256": "a93d23a957cc3c72cbf6df70844ed6305ce8ec7579334441ad1e3a96966c171c",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "f4bd7a59a3231f96c05626f12cc09a5c018313bfe9cd818e4f5e74340cb9608c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|AGXT2|rs37369": {
       "file": "system_gene_panels.json",
@@ -9613,9 +9762,11 @@
           }
         }
       },
-      "record_sha256": "4c372b4d113dc588d98d3f48e8e18ce11a4b6a12d1cf2483835cdb42e2adac1c",
+      "record_sha256": "1753f34262d3c99f24f028c5dd244b96eb37f316ffe8639ffec887e55d2fbb56",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "4c372b4d113dc588d98d3f48e8e18ce11a4b6a12d1cf2483835cdb42e2adac1c",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|SLC22A12|rs505802": {
       "file": "system_gene_panels.json",
@@ -9675,9 +9826,11 @@
           }
         }
       },
-      "record_sha256": "93e260a4bd515eedda32008cc3c590408f115546f07bc19163234fb8b9392605",
+      "record_sha256": "08fb1bd44217f0bb20c5e54f1408b0f1d77338cceef041421c23449e37b80495",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "93e260a4bd515eedda32008cc3c590408f115546f07bc19163234fb8b9392605",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|SLC2A9|rs734553": {
       "file": "system_gene_panels.json",
@@ -9737,9 +9890,11 @@
           }
         }
       },
-      "record_sha256": "17ed2867112172853861ff6d451e75edc5b07dce467006aa5608d6da1c64dc8d",
+      "record_sha256": "a0e28bc6bdfbd73fa11cf3c3458fca29cb029089f2061c462191e805d4ebe916",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "17ed2867112172853861ff6d451e75edc5b07dce467006aa5608d6da1c64dc8d",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|SHMT1|rs10934753": {
       "file": "system_gene_panels.json",
@@ -9823,9 +9978,11 @@
           }
         }
       },
-      "record_sha256": "28dfa42dc91776e96396e9f3d52c79aab155b7dc03c019034c99507137f776b9",
+      "record_sha256": "4432be1b845831b1a6df924f9d718d536860348ee84db84c816e2f9f448d93c3",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "28dfa42dc91776e96396e9f3d52c79aab155b7dc03c019034c99507137f776b9",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|CBS|rs5742905": {
       "file": "system_gene_panels.json",
@@ -9886,9 +10043,11 @@
           }
         }
       },
-      "record_sha256": "0f753a566122312d73469ed27dd6891384fa84cdaaafd1b5b0ebf70deffaaac2",
+      "record_sha256": "4d3f300b0763ceaeabdb6f03f129741315304b818241772a90a7070bdb22e6ba",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "0f753a566122312d73469ed27dd6891384fa84cdaaafd1b5b0ebf70deffaaac2",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|ABCG2|rs2231142": {
       "file": "system_gene_panels.json",
@@ -9996,9 +10155,11 @@
           }
         }
       },
-      "record_sha256": "885b7f32ebbf4bf881a06ef8532f8d81db4ea1783d899b932781bd5574be16e8",
+      "record_sha256": "b729bba141cdfcfb0521e282aecab44f057c7ad9e7b0945b5960fb5fc6c9dbda",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "885b7f32ebbf4bf881a06ef8532f8d81db4ea1783d899b932781bd5574be16e8",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|PPM1K|rs7678928": {
       "file": "system_gene_panels.json",
@@ -10057,9 +10218,11 @@
           }
         }
       },
-      "record_sha256": "2fc2479910fa9253922e2b6dd5ad50119ff0e229f9c49eea49709312d1726239",
+      "record_sha256": "73595392d37ad6b79131c86fdb81147d57a11cb8f79949e49d998e110e4f3983",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "2fc2479910fa9253922e2b6dd5ad50119ff0e229f9c49eea49709312d1726239",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|GLS2|rs7302925": {
       "file": "system_gene_panels.json",
@@ -10106,9 +10269,11 @@
           }
         }
       },
-      "record_sha256": "38a185d64bbf8be5e01fa42170a7008366415f006e6890cc35994c416f7742cc",
+      "record_sha256": "186808c4b7d0b6a2bafdf2b80bf62d126e9a2b7edf556ceae4379cc7a7abb3be",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "38a185d64bbf8be5e01fa42170a7008366415f006e6890cc35994c416f7742cc",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|NAT8|rs13538": {
       "file": "system_gene_panels.json",
@@ -10167,9 +10332,11 @@
           }
         }
       },
-      "record_sha256": "91f92a94b6b7c23670a23e998ff844e15165b9003f112e37f54abbc6cb6cbc6e",
+      "record_sha256": "2ba9c920075ad5796af4aaa34ccd92c697a4367893ee4623702efd6926ee9b06",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "91f92a94b6b7c23670a23e998ff844e15165b9003f112e37f54abbc6cb6cbc6e",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "system_gene_panels.json|amino_acids|GCKR|rs1260326": {
       "file": "system_gene_panels.json",
@@ -10228,9 +10395,11 @@
           }
         }
       },
-      "record_sha256": "82c4ed9f04cae822a681b8d672bd4b04fe9088c9d43082dab0d5f0d5636da3c8",
+      "record_sha256": "bf2472a5293baeb079ac600b5bcd25dcf45c9ffcb947e31fd6b77947e23e2b87",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "82c4ed9f04cae822a681b8d672bd4b04fe9088c9d43082dab0d5f0d5636da3c8",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|BDNF|rs6265": {
       "file": "on_demand_panels.json",
@@ -10333,9 +10502,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "bdf8a403271aadd6eb28fe4faf35a13cd21bfe3321bb65da477cdc61a6578a14",
+      "record_sha256": "8b15ce28a08f4d8400b7791b5a5c4d48a1dcad4d0ef0a539d23f937777c39132",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "bdf8a403271aadd6eb28fe4faf35a13cd21bfe3321bb65da477cdc61a6578a14",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|HTR2A|rs6311": {
       "file": "on_demand_panels.json",
@@ -10362,9 +10533,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "33f6b88a6ad2192e130bf16f728dd122ebe58fd71a0f63e6dedc3c7341512eb5",
+      "record_sha256": "e81a41ef7bca2e3d1f35b0b16d614ce44729292e3ee384a9b9aea34668bfc610",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "33f6b88a6ad2192e130bf16f728dd122ebe58fd71a0f63e6dedc3c7341512eb5",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|HTR2A|rs6314": {
       "file": "on_demand_panels.json",
@@ -10397,9 +10570,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "6770a42a14ab9fe0823dc4ab60f7c59be2f4ab4f58451f4d4b7d96d3f6854e55",
+      "record_sha256": "99e587bd810d8a4d2f89a416349a6e2f42fdccfe29b79c53a014211592b4ae1a",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "6770a42a14ab9fe0823dc4ab60f7c59be2f4ab4f58451f4d4b7d96d3f6854e55",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|OXTR|rs2254298": {
       "file": "on_demand_panels.json",
@@ -10426,9 +10601,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "a72f0d001b70b68628ba62ab188d0b91dfe182f30949fe8d0e615d572d07ec9f",
+      "record_sha256": "67dc431d184fa1a14ef42ae1897ddc4fe5496ae086cb804e21843679e13cb715",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a72f0d001b70b68628ba62ab188d0b91dfe182f30949fe8d0e615d572d07ec9f",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|OXTR|rs53576": {
       "file": "on_demand_panels.json",
@@ -10461,9 +10638,11 @@
         }
       ],
       "subclaims": {},
-      "record_sha256": "1eebc2e238db8e9f1a7bdc2074c8028d4217a64d9f397f83c0521b78364dc8e7",
+      "record_sha256": "f83ccad23dc7cc9b746384178ac93ca4e762ba408c802d0a64969ff100588b34",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "1eebc2e238db8e9f1a7bdc2074c8028d4217a64d9f397f83c0521b78364dc8e7",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     },
     "on_demand_panels.json|behaviour|PRKN|rs34424986": {
       "file": "on_demand_panels.json",
@@ -10507,9 +10686,11 @@
       "unchanged_from_published_base": true,
       "primary_bibliography": [],
       "subclaims": {},
-      "record_sha256": "a6f9eb193d12294cb0f750974473e29a7039307b5f16904718e80559a7033785",
+      "record_sha256": "ea5ac59b7a061b92903a44ea686e493caa037c198ef5e37925945d441a0a527a",
       "automatic_eligibility_changed": false,
-      "reference_context_retained": true
+      "reference_context_retained": true,
+      "previous_record_sha256": "a6f9eb193d12294cb0f750974473e29a7039307b5f16904718e80559a7033785",
+      "source_continuity_note": "Updated reference/wording disposition is recorded in variant_scientific_review.json; clinical eligibility is still checked independently."
     }
   }
 }

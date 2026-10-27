@@ -105,10 +105,8 @@ class TestNoFaceCallsItReference(unittest.TestCase):
     def test_the_page_maps_the_state_to_a_phrase_of_its_own(self):
         from pathlib import Path
         from scholion import engine
-        page = (Path(engine.__file__).resolve().parent.parent
-                / "web" / "index.html").read_text(encoding="utf-8")
-        m = re.search(r"assumed_ref:'([\w.]+)'", page)
-        self.assertIsNotNone(m, "the page no longer names a phrase for this state")
+        m = re.search(r"assumed_ref:'([\w.]+)'", (Path(engine.__file__).resolve().parent.parent / "web" / "gene-cards.js").read_text(encoding="utf-8"))
+        self.assertIsNotNone(m, "the shared card no longer names a phrase for this state")
         self.assertIn(m.group(1), en.MESSAGES)
         self.assertIn(m.group(1), ru.MESSAGES)
 
@@ -179,21 +177,33 @@ class TestThePageDoesNotPrintAGenotypeForAMissingRow(unittest.TestCase):
 
     def test_the_answer_slot_is_guarded_on_a_single_locus(self):
         card = self.card()
-        slot = [l for l in card.split("\n") if 'class="value"' in l]
-        self.assertEqual(1, len(slot), card)
-        self.assertNotIn("res.genotype", slot[0],
-                         "the answer slot reads the genotype straight from the result")
-        self.assertRegex(card, r"res\.confidence==='assumed_ref'\?'—':",
-                         "no branch chooses «—» for a position with no row")
+        self.assertIn('return geneDisplayCard(r,', card)
+        self.assert_shared_refusal()
 
     def test_the_gene_listing_is_guarded_too(self):
-        """The list keeps one line per locus, and it printed the genotype of
-        every locus whatever its state — the DPYD case, on the page."""
-        card = self.card()
-        listing = [l for l in card.split("\n") if "r.loci.map" in l]
-        self.assertEqual(1, len(listing), card)
-        self.assertIn("confidence==='assumed_ref'?null", listing[0],
-                      "a locus with no row is listed with a genotype")
+        self.assertIn('reading:x.result', self.card())
+        self.assert_shared_refusal()
+
+    def assert_shared_refusal(self):
+        import json
+        import shutil
+        import subprocess
+        from pathlib import Path
+        if not shutil.which('node'):
+            self.skipTest('requires node for the shipped renderer')
+        source = Path(__file__).resolve().parents[1] / 'src/scholion/web/gene-cards.js'
+        script = 'const card=require('+json.dumps(str(source))+');'+"""
+const options={t:k=>k,escape:String,grade:String};
+for(const field of ['reading','result']){
+ const p={gene:'GENE',rsid:'rs123',[field]:{genotype:'CC',confidence:'assumed_ref',note:'Site not read'}};
+ const html=card.render(p,options);
+ if(html.includes('>CC<')||!html.includes('Site not read')||!html.includes('web.genome.assumed_ref'))process.exit(1);
+ const read=card.render({...p,[field]:{genotype:'CC',confidence:'confirmed_ref'}},options);
+ if(!read.includes('>CC<')||!read.includes('genome.confirmed_ref_short'))process.exit(2);
+}
+"""
+        result = subprocess.run([shutil.which('node')],input=script,text=True,capture_output=True,timeout=10)
+        self.assertEqual(0,result.returncode,result.stderr)
 
 
 if __name__ == "__main__":

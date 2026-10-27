@@ -24,7 +24,7 @@ class TestReviewedReferenceBoundaries(unittest.TestCase):
      self.assertEqual(set(adjacent),set(review['subclaims']))
      for key,claim in adjacent.items():
       if claim['status']!='complete':self.assertEqual(review['subclaims'][key]['outcome'],'no_independent_instruction')
-  self.assertEqual(count,160);self.assertEqual(subcount,57)
+  self.assertEqual(count,139);self.assertEqual(subcount,56)
 
  def test_nat2_does_not_claim_that_no_guideline_exists_or_infer_a_diplotype(self):
   book=core._read_knowledge_raw('system_gene_panels.json')

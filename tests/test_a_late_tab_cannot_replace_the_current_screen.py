@@ -57,7 +57,7 @@ const assert=require('node:assert/strict');
 const handlers={},window={addEventListener:(name,fn)=>handlers[name]=fn};
 const rows=[{open:true},{open:false},{open:false}];
 const document={querySelectorAll:selector=>{
-  assert.equal(selector,'#view [data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view [data-thematic-gene] details:not([open]), #view [data-thematic-gene]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])');
+  assert.equal(selector,'#view .gene-card details:not([open]), #view details[data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view [data-thematic-gene] details:not([open]), #view [data-thematic-gene]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])');
   return rows.filter(r=>!r.open);
 }};
 """ + functions + r"""

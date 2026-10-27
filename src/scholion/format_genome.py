@@ -134,10 +134,10 @@ def _gene_region_report(r: Dict[str, Any]) -> str:
     lines.extend(reference_lines(r))
     v = r.get("variants") or {}
     conseq = v.get("consequential")
-    lines.append(_t("gene.counts", total=v.get("total", 0), coding=v.get("coding", 0),
+    lines.append(_t("gene.counts", total=v.get("total", 0), coding=_t("gene.not_computed") if v.get("coding") is None else v["coding"],
                     consequential=_t("gene.not_computed") if conseq is None else conseq))
-    rows = (v.get("coding_rows") or []) + (v.get("noncoding_rows") or [])
-    if not rows:
+    rows = (v.get("coding_rows") or []) + (v.get("noncoding_rows") or []) + (v.get("unannotated_rows") or [])
+    if not rows and v.get("coding") is not None:
         lines.append("_" + _t("gene.coding_none") + "_")
     for row in rows:
         p = row.get("protein") or {}
@@ -1308,7 +1308,11 @@ def panel_report(r: Dict[str, Any]) -> str:
                 if position.get("reading"):
                     L.append(position["reading"]["message"])
                 L += reference_lines(position)
-            if not gene["positions"]:
+            region = gene.get("region_reading")
+            if region:
+                L.append(_t("thematic.region_reading"))
+                L.append(_gene_region_report({**region, "reference_context": gene.get("reference_context")}))
+            elif not gene["positions"]:
                 L.append(_t("thematic.no_positions"))
             if gene.get("reading_request"):
                 L.append(_t("thematic.read_gene_command", gene=gene["reading_request"]["gene"]))

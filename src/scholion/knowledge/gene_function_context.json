@@ -12,7 +12,7 @@
     "go_attribution": "Gene Ontology Consortium, The Gene Ontology resource; https://geneontology.org/ ; CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ ; selected annotations condensed and translated; provided without warranty. Ontology release 2026-07-26.",
     "go_release_url": "https://purl.obolibrary.org/obo/go/releases/2026-07-26/go.owl",
     "method": "Human NCBI Gene records. Supported GO is_a/part_of ancestors only; NOT and ND excluded, NOT ancestor claims blocked. Upstream/regulation edges and contributes_to do not establish an intrinsic activity. At most one selected molecular role and one biological process. Descriptions translated and condensed; partial function context, not an exhaustive gene review. Pseudogene and withdrawn identity is retained without a protein-function inference.",
-    "updated": "2026-10-26",
+    "updated": "2026-10-27",
     "source_tier": "curated_reference",
     "identity_aliases": {
       "ARNTL": {
@@ -38,6 +38,18 @@
         "ncbi_id": "105374344",
         "source": "https://www.ncbi.nlm.nih.gov/gene/105374344",
         "retrieved": "2026-10-26"
+      },
+      "LOC105378525": {
+        "canonical_symbol": "HTRA1-AS1",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/105378525",
+        "checked_on": "2026-10-27",
+        "scope": "Exact official record identity; not a variant-effect assignment"
+      },
+      "LOC124902638": {
+        "canonical_symbol": "PDE3B",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/124902638; https://www.ncbi.nlm.nih.gov/gene/5140",
+        "checked_on": "2026-10-27",
+        "scope": "Exact official record identity; not a variant-effect assignment"
       }
     },
     "summary_curation": "Additional human gene summaries condensed and translated; identified through HGNC GeneID. Source record digests identify the underlying annotation, not a personal genotype.",
@@ -45523,7 +45535,11 @@
         "ru": "Ядерный рецептор участвует в регуляции транскрипции и липидного обмена."
       },
       "canonical_symbol": "PPARG",
-      "symbol_resolution": "PPARG2 denotes a PPARG isoform; gene-level function only"
+      "symbol_resolution": "PPARG2 denotes a PPARG isoform; gene-level function only",
+      "ncbi_id": "5468",
+      "tax_id": "9606",
+      "gene_type": "PROTEIN_CODING",
+      "hgnc_id": "HGNC:9236"
     },
     "HHEX-IDE": {
       "scope": "gene_function",
@@ -51154,6 +51170,139 @@
       "caveat": {
         "en": "This annotation describes the locus or transcript, not the effect of the recorded allele in a person. Regulatory-assay results do not establish activity in that person.",
         "ru": "Аннотация описывает участок или транскрипт, а не влияние прочитанного аллеля у человека. Результат регуляторного эксперимента не устанавливает активность участка у этого человека."
+      }
+    },
+    "ADGRG5": {
+      "scope": "gene_function",
+      "canonical_symbol": "ADGRG5",
+      "ncbi_id": "221188",
+      "tax_id": "9606",
+      "gene_type": "PROTEIN_CODING",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/221188",
+      "description": {
+        "en": "Encodes a member of the adhesion family of G-protein-coupled receptors. The source proposes immune and nervous-system roles for this receptor family; it does not establish an individual variant effect.",
+        "ru": "Кодирует рецептор адгезионного семейства, сопряжённый с G-белком. Источник предполагает участие этого семейства в иммунной и нервной системах; действие отдельного варианта этим не устанавливается."
+      },
+      "function_status": "curated_function",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "07556a4e3903f797a8b7d337ca466b60efcb0b1824394a436c6ca0b3c478a1bb",
+      "function_support": []
+    },
+    "MIR4713": {
+      "scope": "gene_function",
+      "canonical_symbol": "MIR4713",
+      "ncbi_id": "100616369",
+      "tax_id": "9606",
+      "gene_type": "ncRNA",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/100616369",
+      "description": {
+        "en": "A predicted microRNA precursor. The source describes the general post-transcriptional regulatory role of microRNAs, without establishing targets specific to this sequence.",
+        "ru": "Предсказанный предшественник микроРНК. Источник описывает общую роль микроРНК в регуляции экспрессии генов, но не устанавливает специфические мишени этой последовательности."
+      },
+      "function_status": "noncoding_identity",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "760f97f33f373d6f8603215827c08b59af268ce12761761fc537013f37a10638",
+      "function_support": []
+    },
+    "RTEL1-TNFRSF6B": {
+      "scope": "gene_function",
+      "canonical_symbol": "RTEL1-TNFRSF6B",
+      "ncbi_id": "100533107",
+      "tax_id": "9606",
+      "gene_type": "ncRNA",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/100533107",
+      "description": {
+        "en": "A read-through transcript spanning neighbouring RTEL1 and TNFRSF6B. RefSeq describes it as a candidate for nonsense-mediated RNA decay and unlikely to produce a protein.",
+        "ru": "Транскрипт, образующийся при сквозной транскрипции соседних RTEL1 и TNFRSF6B. Согласно RefSeq, он может подвергаться нонсенс-опосредованному распаду РНК; образование белкового продукта маловероятно."
+      },
+      "function_status": "noncoding_identity",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "1bddd64169a3d429982e5aa844cc5165338bae045c5e99981ce6fdd449d31c98",
+      "function_support": []
+    },
+    "LOC105378525": {
+      "scope": "gene_function",
+      "canonical_symbol": "HTRA1-AS1",
+      "ncbi_id": "105378525",
+      "tax_id": "9606",
+      "gene_type": "ncRNA",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/105378525",
+      "description": {
+        "en": "HTRA1-AS1 is an antisense non-coding RNA locus. The identified NCBI record has no functional summary; a specific biological role is not curated here.",
+        "ru": "HTRA1-AS1 — локус антисмысловой некодирующей РНК. В идентифицированной записи NCBI нет функционального резюме; конкретная биологическая роль здесь не курирована."
+      },
+      "function_status": "noncoding_identity",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "e7c35564f4278f6bef1aaf7cdccf9f0a7aafb7c191b71cb2309712201d2637a4",
+      "function_support": []
+    },
+    "LOC124900511": {
+      "scope": "gene_function",
+      "canonical_symbol": "LOC124900511",
+      "ncbi_id": "124900511",
+      "tax_id": "9606",
+      "gene_type": "ncRNA",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/124900511",
+      "description": {
+        "en": "An identified non-coding RNA locus. The NCBI record has no functional summary; a specific biological role is not curated here.",
+        "ru": "Идентифицированный локус некодирующей РНК. В записи NCBI нет функционального резюме; конкретная биологическая роль здесь не курирована."
+      },
+      "function_status": "noncoding_identity",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "5a0e8f194fc1bfc8b9b190ee161565a5188a32dc154b0434d9daff39459f9666",
+      "function_support": []
+    },
+    "LOC124902638": {
+      "scope": "gene_function",
+      "canonical_symbol": "PDE3B",
+      "ncbi_id": "5140",
+      "tax_id": "9606",
+      "gene_type": "PROTEIN_CODING",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/124902638; https://www.ncbi.nlm.nih.gov/gene/5140",
+      "description": {
+        "en": "The historical GeneID has been merged into PDE3B. The current gene product has cyclic-AMP phosphodiesterase activity; this gene-level annotation does not establish an effect of a variant carrying the historical label.",
+        "ru": "Исторический GeneID объединён с PDE3B. Продукт действующего гена обладает фосфодиэстеразной активностью в отношении циклического АМФ; эта геновая аннотация не устанавливает действие варианта с исторической меткой."
+      },
+      "function_status": "curated_function",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "8d07f6220aa8aff5f8453b6f5146e5a3ecad46ce93b27e46b214ed1f55ca0a0c",
+      "function_support": [],
+      "identity_resolution": {
+        "original_ncbi_id": "124902638",
+        "current_ncbi_id": "5140",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/124902638",
+        "status": "merged",
+        "retrieved": "2026-10-27"
+      }
+    },
+    "PDE3B": {
+      "scope": "gene_function",
+      "canonical_symbol": "PDE3B",
+      "ncbi_id": "5140",
+      "tax_id": "9606",
+      "gene_type": "PROTEIN_CODING",
+      "retrieved": "2026-10-27",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/124902638; https://www.ncbi.nlm.nih.gov/gene/5140",
+      "description": {
+        "en": "The historical GeneID has been merged into PDE3B. The current gene product has cyclic-AMP phosphodiesterase activity; this gene-level annotation does not establish an effect of a variant carrying the historical label.",
+        "ru": "Исторический GeneID объединён с PDE3B. Продукт действующего гена обладает фосфодиэстеразной активностью в отношении циклического АМФ; эта геновая аннотация не устанавливает действие варианта с исторической меткой."
+      },
+      "function_status": "curated_function",
+      "curation_method": "Source-bound bilingual paraphrase of the exact current human NCBI record; identity-only when function is not supplied; no variant or personal effect inferred.",
+      "source_record_sha256": "8d07f6220aa8aff5f8453b6f5146e5a3ecad46ce93b27e46b214ed1f55ca0a0c",
+      "function_support": [],
+      "identity_resolution": {
+        "original_ncbi_id": "124902638",
+        "current_ncbi_id": "5140",
+        "source": "https://www.ncbi.nlm.nih.gov/gene/124902638",
+        "status": "merged",
+        "retrieved": "2026-10-27"
       }
     }
   },

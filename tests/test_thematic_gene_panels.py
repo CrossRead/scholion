@@ -7,6 +7,7 @@ import unittest
 from unittest import mock
 
 import support
+import gene_card_support
 from scholion import core, genome, i18n
 from scholion.engine import panel_description, system
 from scholion.engine import thematic_panels
@@ -151,7 +152,7 @@ class TestThematicGenePanels(unittest.TestCase):
         script = """
 const assert=require('node:assert/strict');
 const esc=x=>String(x??''), t=(k,a)=>k+' '+Object.values(a||{}).join(' ');
-const pageHead=(h,n,f)=>h+n+f.join(''),factHtml=(v,n)=>v+n;
+const pageHead=(h,n,f)=>h+n+f.join(''),factHtml=(v,n)=>v+n,levelChip=String,geneticBriefHtml=()=>'';
 const referenceContextHtml=g=>g.reference_context.gene_source;
 const genomeGeneTable=rows=>rows.map(row=>JSON.stringify({rsid:row.rsid,genotype:row.genotype,note:row.reading?.note})).join('');
 """ + '\n'.join(functions) + """
@@ -159,12 +160,15 @@ const gene={gene:'SYNTHETIC',reference_context:{gene_function:'Known function',g
  reading_request:{gene:'CANONICAL'},
  positions:[{rsid:'rsSynthetic',reading:{read:false,genotype:'AA',message:'Not read'}}]};
 const html=renderThematicPanel({label:'Topic',counts:{genes:1},genes:[gene]});
-assert.ok(html.indexOf('Known function')<html.indexOf('rsSynthetic'));
-assert.ok(!html.includes('"genotype":"AA"'));
+assert.ok(html.includes('Known function')&&html.includes('rsSynthetic'));
+assert.ok(html.indexOf('gene-card-reading')<html.indexOf('gene-card-description'));
+assert.ok(!html.includes('>AA<'));
 assert.ok(html.includes('data-thematic-gene="SYNTHETIC"'));
 assert.ok(html.includes('data-read-gene="CANONICAL"'));
 const links=thematicPanelLinks([{key:'methylation',label:'Methylation',genes:44}]);
-assert.ok(links.includes('data-panel="methylation"'));
+assert.ok(links.includes('data-system="methylation"'));
+assert.ok(!links.includes('data-panel="methylation"'));
 """
-        result = subprocess.run([shutil.which('node'), '-e', script], capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=10)
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)

@@ -1,6 +1,8 @@
 """The remaining reproducible defects of the release audit, on synthetic inputs."""
 from __future__ import annotations
 
+import gene_card_support
+
 import os
 import json
 import re
@@ -467,7 +469,8 @@ class BrowserRefusals(unittest.TestCase):
         return page[start:start + 10 + end.start()] if end else page[start:]
 
     def run_js(self, script):
-        result = subprocess.run([shutil.which("node"), "-e", script], capture_output=True,
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, capture_output=True,
                                 text=True, stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
 

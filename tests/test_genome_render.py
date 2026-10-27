@@ -93,10 +93,10 @@ class TestTheWarningAboutThisReadIsPrinted(unittest.TestCase):
         defect spread in the first place: it survives in two channels out of
         five, and every new channel inherits the loss by default.
         """
-        page = (support.ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("res.note", page,
+        shared = (support.ROOT / "src/scholion/web/gene-cards.js").read_text(encoding="utf-8")
+        self.assertIn("text(reading.note", shared,
                       "the web page never reads the note about the read itself")
-        self.assertIn("confirmed_ref", page,
+        self.assertIn("confirmed_ref", shared,
                       "the web page has no label for the strongest confidence level")
 
 

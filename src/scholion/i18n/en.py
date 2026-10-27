@@ -256,7 +256,7 @@ MESSAGES = {
     "interpretation.gaps": "Support gaps: {missing}. Consider these when assessing the interpretation.",
     "web.gen.col_reading": "Reading",
     "conclusion.withheld": "Support for an automatic conclusion is incomplete: missing {missing}. Reading status is retained.",
-    "conclusion.missing.source_identifier": "a source with a PMID/DOI",
+    "conclusion.missing.source_identifier": "an identifiable source or a suitable source passport",
     "conclusion.missing.mechanism": "a mechanism",
     "conclusion.missing.evidence_level": "evidence at level A or B",
     "conclusion.missing.parent_basis": "support for the parent interpretation",
@@ -2032,7 +2032,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "panel.signed.open": "Clinical review not recorded; curated {curated}",
     "panel.unreadable": "a short read cannot read it — {reason} (source: {source})",
     "panel.for_clinician_note": "This page describes the panel itself — the knowledge, not the person: no genome or laboratory result is read here. The reading of this panel against the genome is on the radar and on the system's card.",
-    "web.panel.open": "Panel and its studies — for the clinician",
+    "web.panel.open": "Panel reference — without personal readings",
     "web.panel.open_hint": "What each position of this panel is, the guideline or study it rests on, and who signed it — the knowledge, not your genome",
     "web.second.open_card": "System card",
     "web.second.open_card_hint": "All seven layers of this system on one page: laboratory, movement, genetics, prescriptions, target, what to test, questions",
@@ -2089,7 +2089,7 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.genetics.groups": "groups: {n}, each printed as one row that opens into its positions",
     "labs.genetics_line": "the genetics of this marker: {positions}",
     "web.gen.col_row": "Gene / position",
-    "web.panel.gene_hint": 'Open the panel reference for {gene}',
+    "web.panel.gene_hint": 'Open the reading and reference for {gene}',
     "web.gen.col_level": "Evidence A–E",
     "web.gen.col_state": "State",
     "web.gen.col_link": "Link",
@@ -5244,3 +5244,95 @@ MESSAGES.update({
 })
 
 MESSAGES.update({'reference.region': 'Locus description: {text}', 'reference.region_source': 'Annotation source: {source}'})
+
+# Shared presentation of existing gene and variant results.
+MESSAGES.update({
+    "web.gene_card.reference_reading": "Reference mode: a personal reading has not been requested.",
+    "web.gene_card.no_position": "No catalogue positions are selected for this gene.",
+    "web.gene_card.not_read": "No personal reading is available.",
+
+    "web.gene_card.review_stars": 'ClinVar review stars: {n}',
+    "web.gene_card.gene_inheritance": 'Gene–condition reference; this does not establish personal inheritance or a diagnosis.',
+    "web.gene_card.confidence": "Confidence",
+    "web.gene_card.identity": "Gene / position",
+    "web.gene_card.reading": "Your reading",
+    "web.gene_card.meaning": "Function and personal meaning",
+    "web.gene_card.variant_scope": "Scholion interpretation",
+    "web.gene_card.annotations": "Database annotations and sources",
+    "web.gene_card.details": "Inheritance and reading details",
+    "web.gene_card.inheritance": "Inheritance",
+    "web.gene_card.inheritance_unknown": "Inheritance is not established for this variant. Gene-level inheritance depends on the condition.",
+    "web.gene_card.quality": "Reading and limitations",
+    "web.gene_card.quality_unknown": "Reading quality has not been supplied.",
+    "web.gene_card.unread_status": "Personal reading unavailable",
+    "web.gene_card.reference": "Reference information",
+    "web.gene_card.combination": "Joint combination of positions",
+    "web.gene_card.no_personal_reading": "No personal genotype is supplied",
+    "web.gene_card.copies": "Copies of the specified allele: {n}",
+    "web.gene_card.association_scope": "Confidence in the gene–measurement association",
+})
+
+
+# Compact web wording; full clinical context stays available in the disclosure.
+MESSAGES.update({
+    'web.gene_card.source_records': 'Source records: {n}',
+    'web.gene_card.variant_unresolved': 'A variant-specific effect has not been curated in this reference.',
+    'web.gene_card.meaning.carrier_context': 'One copy: recessive carriage; disease is not established.',
+    'web.gene_card.meaning.phase_unresolved': 'Phase is unknown; neither a diagnosis nor isolated carriage is established.',
+    'web.gene_card.meaning.recessive_review': 'Two copies; clinical significance needs confirmation. This is not a diagnosis.',
+    'web.gene_card.meaning.dominant_review': 'One copy may matter; clinical review is needed. This is not a diagnosis.',
+    'web.gene_card.meaning.x_linked_review': 'Clinical review is needed; asymptomatic carriage is not established.',
+    'web.gene_card.meaning.inheritance_mixed': 'The inheritance model needs clarification for personal interpretation.',
+    'web.gene_card.meaning.inheritance_unknown': 'The inheritance model for interpreting this reading is not confirmed.',
+    'web.gene_card.meaning.reading_unresolved': 'This reading does not reliably establish carriage of the specified allele.',
+    'web.gene_card.meaning.variant_class_review': 'The required variant class is not confirmed; a secondary finding is not established.',
+    'web.gene_card.meaning.inheritance_review': 'Personal meaning cannot be established from this saved reading alone.',
+})
+
+MESSAGES.update({
+    'web.gene_card.comparison_not_applicable': 'This comparison is not applicable under the recorded conditions.',
+    'web.gene_card.comparison_conditions': 'Conditions and limitations',
+})
+
+# Scope missing support fields to the claim, not to all sources on the card.
+MESSAGES.update({
+    'web.gene_card.personal_conclusion': 'Personal variant conclusion',
+    'web.gene_card.support_scope': 'Support for automatic clinical conclusions: each check applies to its own statement, not to every source on this card.',
+    'web.gene_card.reference_separate': 'The sources of the reference description do not automatically establish a personal effect or a treatment rule. The reading and reference interpretation remain available.',
+    'web.gene_card.catalogue_gaps': 'The catalogue support record is incomplete: {missing}. The reference interpretation remains available.',
+})
+
+MESSAGES.update({'web.gene_card.support_missing_fields': 'Unfilled support fields: {missing}.'})
+
+# A gene-screening state is not an unread single-variant genotype.
+MESSAGES.update({
+    'web.gene_card.screen_state.checked': 'Screening check completed',
+    'web.gene_card.screen_state.limited': 'Reading has limitations',
+    'web.gene_card.screen_state.unknown': 'Screening status is not established',
+    'web.gene_card.screen_scope': 'Gene-level saved screening, not the genotype of one position.',
+    'web.gene_card.screen_reason.low': 'The saved coverage assessment reports limited coverage.',
+    'web.gene_card.screen_reason.not_measured': 'Coverage has not been measured.',
+    'web.gene_card.screen_reason.not_in_table': 'This gene has no entry in the saved coverage table.',
+    'web.gene_card.screen_reason.unavailable': 'The coverage assessment is unavailable.',
+    'web.gene_card.screen_reason_code': 'Recorded reason: {reason}.',
+})
+
+MESSAGES.update({'web.gene_card.reference_status': 'Panel reference — personal reading not requested'})
+
+MESSAGES.update({'thematic.coverage_preview': 'Panel opening reads existing VCF records only; BAM coverage is not remeasured. Saved screening coverage is shown separately where available.', 'thematic.region_reading': 'Existing records in the gene region', 'thematic.region_checked': 'Regional records queried', 'thematic.region_unavailable': 'Gene region could not be read', 'thematic.region_counts': 'Alternative: {n}; explicit reference: {ref}.'})
+
+MESSAGES.update({'science.scope.gene_function': 'Gene function', 'science.scope.gene_disease': 'Gene–disease relationship', 'science.scope.variant': 'Evidence for the variant', 'science.function_recorded': 'A source for gene biology is recorded. It does not establish the effect of this particular variant.', 'science.function_missing': 'The installed reference has no sourced function description for this gene. This is an unfilled reference entry, not evidence that the function is unknown to science.', 'science.gene_disease': 'The database reports gene–disease assertions with their own classifications and inheritance. They do not establish the effect of every variant in this gene.', 'science.variant_not_reviewed': 'The scientific basis of this specific variant statement has not yet been verified in this project. A source on the card is not itself confirmation of an individual effect.', 'science.gene_grade': 'Gene reference'})
+
+MESSAGES.update({'science.review_stale': 'The saved review no longer matches the current source entry. Its conclusions require rechecking; this does not mean that supporting literature is absent.'})
+
+MESSAGES.update({'science.function_missing_compact': 'The gene function description has not been filled in this reference.'})
+
+MESSAGES.update({'science.scope.gene_identity': 'Gene or region identity', 'science.identity_only': 'The source identifies this gene, RNA or region. A specific molecular function or personal variant effect does not follow from identity alone.', 'science.withdrawn_model': 'This gene model was withdrawn by the source database. Its historical label is retained; it is not treated as a current protein-coding gene.'})
+
+MESSAGES.update({'science.retained_curation': 'A previously curated literature interpretation is retained with its source passport. It is a research context, not a personal risk estimate or a new clinical validation.', 'science.study_membership': 'The external literature catalogue lists this position in a study. Study membership, including non-significant results, does not establish a gene-specific causal effect or an individual longevity estimate.'})
+
+MESSAGES.update({'gene.unannotated_rows': 'Records without coding-region annotation: {n}'})
+
+MESSAGES.update({'gene.cds_not_annotated': 'This interval reference does not provide a coding-region annotation.'})
+
+MESSAGES.update({'thematic.region_scope': 'VCF records; whole-gene coverage is not established.'})

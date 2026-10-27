@@ -3,11 +3,11 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 import unittest
 from unittest import mock
 
 import support
+import gene_card_support
 from scholion import core, i18n
 from scholion.panel_reference import gene_reference_context, genome_context, reference_context, reference_lines
 
@@ -249,7 +249,7 @@ assert.ok(referenceContextHtml(unknown).includes('Function unavailable'));
 for(const data of [row,{...row,status:'no_genome',locus:{gene:'TERC'}},
  {...row,loci:[{...row,result:{confidence:'assumed_ref',genotype:'AA',depth:0}}]}]){
  const html=genomeCard(data);
- assert.ok(html.includes('<strong>'+row.reference_context.gene_function+'</strong>'));
+ assert.ok(html.includes('<strong class="gene-card-function">'+row.reference_context.gene_function+'</strong>'));
  assert.ok(html.includes('data-gene-description'));
  if(data.loci)assert.ok(!html.includes('>AA<'));
 }
@@ -259,8 +259,9 @@ assert.equal((html.match(/summary class="cr-btn"/g)||[]).length,2);
 assert.ok(!html.includes('Literature catalogue'));
 assert.ok(html.includes('data-gene-description'));
 const geneOnly=genomeGeneTable([row]);
-assert.ok(geneOnly.includes('<td>—</td>'));
+assert.ok(geneOnly.includes('web.gene_card.no_position'));
 """
-        result = subprocess.run([shutil.which("node"), "-e", script], input=json.dumps(context),
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, input=json.dumps(context),
                                 capture_output=True, text=True, timeout=15)
         self.assertEqual(result.returncode, 0, result.stderr)

@@ -1,9 +1,8 @@
 """Shared gene-reference topics within the existing body systems.
 
-Membership is navigation, never a radar dimension or permission to interpret an
-unclassified variant. Opening a topic reads its catalogue positions only. Each
-gene also names the existing region-reading operation, explicitly requested by
-the user; opening the topic never starts that operation or genome preparation.
+Membership is navigation, never permission to interpret an unclassified variant.
+Personal topics join existing indexed VCF intervals without BAM depth scans or
+protein prediction. The separate gene lookup can measure additional detail.
 """
 from __future__ import annotations
 
@@ -84,6 +83,16 @@ def thematic_readings(key: str, register: str) -> dict[str, Any]:
     from .labs import analyze_labs
     measured={m['key']:m for m in analyze_labs()['markers']}
     for gene in book['genes']+book['regions']:
+        if gene.get('reading_request'):
+            if state.get('ready'):
+                from .. import gene_region
+                region = gene_region.preview(gene['reading_request']['gene'])
+            else:
+                region = {'status': 'no_genome', 'gene': gene['gene'],
+                          'message': t('genome.refused.' + (state.get('reason') or 'no_file'))}
+            # An actual regional result travels through CLI, web and agent tools.
+            # A gene has no single genotype; retain each position and its quality.
+            gene['region_reading'] = region
         contexts=[gene['reference_context']]+[p['reference_context'] for p in gene['positions']]
         patterns={p['association_id']:p for c in contexts for p in c.get('mechanistic_hypotheses') or []}
         wanted={m for p in patterns.values() for m in p.get('markers') or []}

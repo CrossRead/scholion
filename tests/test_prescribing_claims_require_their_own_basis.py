@@ -13,6 +13,7 @@ import unittest
 from unittest import mock
 
 import support
+import gene_card_support
 from scholion import cli, core, drugsource, engine, format as fmt, i18n, mcp_server, ouroboros_tools, sources
 from scholion.engine import pgx
 from scholion.prescribing_basis import _guard_guidance, _guard_gene_role, _quote_digest
@@ -263,6 +264,7 @@ class TestPrescribingOutput(_Demo):
         script = "const assert=require('node:assert/strict'),esc=x=>String(x??''),t=(k,a)=>k+JSON.stringify(a||{}),badge=()=>'',LEVEL={unknown:{},low:{}};\n"
         script += "\n".join(functions) + "\nconst data=" + json.dumps(data) + ";\n"
         script += "const good=pgxCard(data[0]),held=pgxCard(data[1]);for(const s of ['OWN_MECHANISM','QUOTE_MECHANISM','Synthetic PMID:2','Synthetic PMID:3','SYNTHETIC_QUOTATION','*2A/*2A','Synthetic fixture','data-called-diplotype'])assert.ok(good.includes(s));assert.ok(!held.includes('NEVER_PRINT'));assert.ok(held.includes('data-quote-withheld'));"
-        result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
+        script = gene_card_support.javascript() + "const levelChip=String,geneticBriefHtml=()=>'';\n" + script
+        result = gene_card_support.run(script, text=True, capture_output=True,
                                 stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(0, result.returncode, result.stderr)

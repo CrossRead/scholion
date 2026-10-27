@@ -139,6 +139,7 @@
     "src/scholion/redact.py": 74.7,
     "src/scholion/reference_tables.py": 100.0,
     "src/scholion/reported_response.py": 97.9,
+    "src/scholion/scientific_review.py": 100.0,
     "src/scholion/server.py": 86.1,
     "src/scholion/sites.py": 84.6,
     "src/scholion/sources.py": 90.4,

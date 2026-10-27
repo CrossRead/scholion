@@ -16,7 +16,7 @@
       "MT-TK"
     ],
     "boundary": "Gene biology does not establish the effect of a variant. GenCC classifications remain per assertion in gencc_gene_disease.json; no Scholion grade is assigned to a whole gene.",
-    "updated": "2026-10-24",
+    "updated": "2026-10-27",
     "checked_on": "2026-10-24",
     "review_scope": "All 1469 existing identities and their stored bilingual function descriptions compared with current human NCBI Gene records. Existing sourced corrections retained; missing tRNA summaries do not supply variant effects.",
     "review_counts": {
@@ -1834,8 +1834,8 @@
       "ncbi_id": "8659",
       "retrieved": "2026-10-07",
       "description": {
-        "en": "This protein belongs to the aldehyde dehydrogenase family of proteins. This enzyme is a mitochondrial matrix NAD-dependent dehydrogenase which catalyzes the second step of the proline degradation pathway, converting pyrroline-5-carboxylate to glutamate. Deficiency of this enzyme is associated with type II hyperprolinemia, an autosomal recessive disorder characterized by accumulation of delta-1-pyrroline-5-carboxylate (P5C) and proline. Alternatively spliced transcript variants encoding different isoforms have been identified for this gene. [provided by RefSeq, Jun 2009]",
-        "ru": "Кодирует митохондриальную НАД-зависимую дегидрогеназу матрикса, обеспечивающую второй ферментативный этап последовательного катаболизма пролина с образованием глутамата. Фермент превращает пирролин-5-карбоксилат в глутамат; его недостаточность сопровождается патологическим накоплением метаболитов пирролин-5-карбоксилата и аминокислоты пролина."
+        "en": "Encodes a mitochondrial enzyme that converts pyrroline-5-carboxylate to glutamate during proline breakdown.",
+        "ru": "Кодирует митохондриальный фермент, который превращает пирролин-5-карбоксилат в глутамат при расщеплении пролина."
       },
       "caveat": {
         "en": "This describes gene biology, not the effect of a specific variant, a diagnosis or an individual risk.",
@@ -2339,14 +2339,14 @@
       "ncbi_id": "275",
       "retrieved": "2026-10-07",
       "description": {
-        "en": "This gene encodes one of four critical components of the glycine cleavage system. Mutations in this gene have been associated with glycine encephalopathy. Multiple transcript variants encoding different isoforms have been found for this gene. [provided by RefSeq, Sep 2011]",
-        "ru": "Кодирует один из четырёх основных компонентов системы расщепления глицина, необходимой для нормального катаболизма этой аминокислоты. Белок действует в многокомпонентной системе расщепления глицина; подробная каталитическая роль отдельного компонента в предоставленном резюме не раскрыта."
+        "en": "Encodes the mitochondrial T-protein of the glycine cleavage system. It transfers a one-carbon group to tetrahydrofolate, producing 5,10-methylenetetrahydrofolate and ammonium.",
+        "ru": "Кодирует митохондриальный T-белок системы расщепления глицина. Он переносит одноуглеродный фрагмент на тетрагидрофолат с образованием 5,10-метилентетрагидрофолата и аммония."
       },
       "caveat": {
         "en": "This describes gene biology, not the effect of a specific variant, a diagnosis or an individual risk.",
         "ru": "Описание относится к гену и его продукту; оно не определяет действие отдельного варианта, диагноз или индивидуальный риск."
       },
-      "source": "https://www.ncbi.nlm.nih.gov/gene/275; https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:473",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/275; https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:473; https://www.uniprot.org/uniprotkb/P48728/entry",
       "diseases": {
         "atypical glycine encephalopathy": {
           "label": {
@@ -2390,9 +2390,16 @@
         "scope": "gene_function_not_variant_effect",
         "identity_status": "exact_hgnc_and_ncbi_match",
         "ncbi_record_sha256": "18a1d224f4c88de556283469bec5797c9ce1edbd8ebbf1809d8621d76dad084e",
-        "summary_status": "source_summary_unchanged",
+        "summary_status": "retained_sourced_correction",
         "source_summary_sha256": "5c22de25888c8dac52c78a86df18294d747d97487885626c87ed313950bbd906",
-        "ncbi_annotation_release": "RS_2025_08"
+        "ncbi_annotation_release": "RS_2025_08",
+        "additional_record": {
+          "source": "https://www.uniprot.org/uniprotkb/P48728/entry",
+          "sha256": "cf4306febb361319257aecdc9a22753796f232b2741944b478b055eac09286bc",
+          "checked_on": "2026-10-27",
+          "entry_version": 212,
+          "claim_scope": "human AMT gene-product catalytic function, not a specific variant or personal effect"
+        }
       }
     },
     "ANGPTL3": {

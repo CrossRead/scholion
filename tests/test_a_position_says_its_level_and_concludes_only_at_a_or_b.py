@@ -130,11 +130,13 @@ class TestTheShippedLevels(unittest.TestCase):
                        or (p["mode"] == "monogenic" and p.get("classification") in ("Definitive", "Strong")))
             with self.subTest(rsid=p["rsid"], gene=p["gene"]):
                 self.assertIn(ev.get("level"), ("A", "B", "C", "D", "E"))
-                if decided:
+                if decided and ev.get("by_rule"):
                     self.assertEqual("A", ev["level"])
                     self.assertTrue(ev.get("by_rule"))
                     self.assertNotIn("judged", ev)
                 else:
+                    if decided and ev.get("basis") != "variant_publications":
+                        self.assertIn(ev["level"], ("C", "D", "E"), "gene validity or a proxy is not direct variant evidence")
                     self.assertTrue(ev.get("judged"), "a judged letter with no word on what it rests on")
                     self.assertNotIn("by_rule", ev)
 
@@ -156,8 +158,10 @@ class TestThePageShowsTheLevel(unittest.TestCase):
 
     def test_the_position_cards_draw_the_chip_and_the_ladder(self):
         page = (support.ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("${levelChip(p.level,p.level_short)}${systemGeneLink(p.gene,card.key)}", page)
-        self.assertIn("${levelNoteHtml(p)}${routeHtml(p)}${underLoadHtml(p)}${ladderHtml(p)}", page)
+        shared = (support.SRC / "scholion/web/gene-cards.js").read_text(encoding="utf-8")
+        self.assertIn("options.grade(model.level, input.level_short)", shared)
+        self.assertIn("geneHtml:systemGeneLink(row.gene,card.key)", page)
+        self.assertIn("levelNoteHtml(row)+routeHtml(row)+underLoadHtml(row)+ladderHtml(row)", page)
 
 
 if __name__ == "__main__":

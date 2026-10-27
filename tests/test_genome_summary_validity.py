@@ -7,6 +7,7 @@ import subprocess
 import unittest
 
 import support
+import gene_card_support
 
 
 @unittest.skipUnless(shutil.which("node"), "Node is needed for renderer probes")
@@ -17,7 +18,8 @@ class GenomeSummary(unittest.TestCase):
         return page[start:page.index("\n}", start) + 2]
 
     def execute(self, script):
-        result = subprocess.run([shutil.which("node"), "-e", script],
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script,
                                 capture_output=True, text=True, timeout=20,
                                 stdin=subprocess.DEVNULL)
         self.assertEqual(0, result.returncode, result.stderr)
@@ -26,7 +28,7 @@ class GenomeSummary(unittest.TestCase):
     def test_unknown_direction_is_not_a_negative_carrier_result_in_findings(self):
         script = """
 const t=k=>k, esc=x=>String(x), badge=(cls,text)=>text;
-const genomeGeneTable=()=>'', isRsid=()=>true;
+const genomeGeneTable=()=>'', isRsid=()=>true,levelChip=x=>x,geneticBriefHtml=()=>'';
 """ + self.function("genomeFindings") + """
 const variants=[null,false,true].map((carrier,i)=>({carrier,status:'read',gene:'PCSK9',rsid:'rs'+i}));
 console.log(JSON.stringify(variants.map(x=>genomeFindings(null,null,null,{status:'ok',pcsk9:[x]}))));

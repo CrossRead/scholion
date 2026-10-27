@@ -57,6 +57,7 @@ def environment() -> dict:
     # happens to lie next to it.
     e["SCHOLION_GENOME_VCF"] = str(ROOT / "tests" / "fixtures" / "no-such-file.vcf.gz")
     e["SCHOLION_GENOME_DIR"] = str(ROOT / "tests" / "fixtures" / "no-genome")
+    e["SCHOLION_GENE_GFF3"] = str(ROOT / "tests" / "fixtures" / "no-annotation.gff3")
     e["SCHOLION_WORKSTATION"] = str(ROOT / "tests" / "fixtures" / "no-workstation.json")
     return e
 

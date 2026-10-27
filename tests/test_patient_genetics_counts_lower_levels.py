@@ -6,6 +6,7 @@ import subprocess
 import unittest
 
 import support
+import gene_card_support
 
 
 @unittest.skipUnless(shutil.which("node"), "needs node for the page's JavaScript")
@@ -108,6 +109,7 @@ assert.ok(stepHtml.includes('OWN_STEP_SOURCE'));assert.equal(JSON.stringify(next
 """
         # stdin avoids the Windows command-line size limit; shared runners can
         # also take longer than ten seconds merely to start Node.
+        script = gene_card_support.javascript() + script
         result = subprocess.run([shutil.which("node")], input=script, text=True,
                                 capture_output=True, timeout=30)
         self.assertEqual(0, result.returncode, result.stderr)

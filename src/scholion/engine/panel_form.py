@@ -169,6 +169,8 @@ def gene_row(gene: str, entry: Optional[Dict[str, Any]] = None,
             row["reference_context"] = reference
             row.setdefault("level", context["level"])
     row.setdefault("pending", not bool(row.get("text")))
+    if scan is not None:
+        row["scan_status"] = scan.get("status")
     if scan is not None and scan.get("status") != "ok":
         row["variant_state"] = None
         row["coverage"] = None

@@ -68,6 +68,31 @@ their own support and applicability checks. Patient and clinician registers
 share these facts; presentation may condense detail without removing the
 reference positions. Catalogue panels need no connected genome.
 
+Personal thematic topics query existing indexed VCF intervals as well as their
+selected catalogue positions. The panel preview disables alignment depth scans,
+protein prediction and network coordinate resolution. Missing coordinates,
+index, sample selection or assembly compatibility are explicit refusals.
+A gene has no single genotype: previews retain the individual records and their
+quality, and an empty variant list does not establish reference identity.
+The process cache keys include profile, input/index/annotation identity, sample
+and language; each caller receives a copy. The detailed gene lookup remains a
+separate operation with its own coverage and annotation results.
+The packaged NCBI interval reference is an exact-identity GRCh38 fallback. It
+provides gene envelopes, not CDS annotations: without coding exons the coding
+count remains uncomputed and called records remain unannotated rather than
+being labelled noncoding. Legacy and ambiguous names are not fuzzy-matched.
+
+`scientific_review` is reference provenance, not a clinical guard. It names the
+claim role and distinguishes source metadata, association, molecular evidence,
+conflict and incomplete project curation. A saved review is tied to exact source
+record digests. Neither a bibliographic repair nor a gene-level assertion fills
+a missing clinical mechanism or changes eligibility. New ClinVar genes retain
+generic reference/unknown states rather than receiving fabricated interpretation.
+`conclusion_basis` also accepts typed publication, database and guideline
+passports with explicit assertion scope. Database assertions require accession
+and snapshot/version; guideline passports require issuer and version. Neither
+can borrow a gene-function or classification scope for a personal inference.
+
 ## The four faces — one capability, one tick
 
 A capability that lands in one face and not the others is the project's

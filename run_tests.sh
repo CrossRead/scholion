@@ -21,6 +21,7 @@ export SCHOLION_LANG=en
 # is not connected", which is the same for everybody.
 export SCHOLION_GENOME_VCF="$ROOT/tests/fixtures/no-such-file.vcf.gz"
 export SCHOLION_GENOME_DIR="$ROOT/tests/fixtures/no-genome"
+export SCHOLION_GENE_GFF3="$ROOT/tests/fixtures/no-annotation.gff3"
 # The workstation is switched off the same way (task 192). On a clinician's
 # machine the real one names patients' containers, and a test that dropped the
 # profile pin would otherwise be reading whichever patient is active.

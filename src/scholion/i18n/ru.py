@@ -235,7 +235,7 @@ MESSAGES = {
     "interpretation.gaps": "Пробелы основания: {missing}. Учитывайте их при оценке интерпретации.",
     "web.gen.col_reading": "Чтение",
     "conclusion.withheld": "Основание автоматического вывода неполно: отсутствует {missing}. Результат чтения сохранён.",
-    "conclusion.missing.source_identifier": "источник с PMID/DOI",
+    "conclusion.missing.source_identifier": "проверяемый источник или подходящий паспорт источника",
     "conclusion.missing.mechanism": "механизм",
     "conclusion.missing.evidence_level": "доказательность уровня A или B",
     "conclusion.missing.parent_basis": "основание основной интерпретации",
@@ -1979,7 +1979,7 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "panel.signed.open": "Клиническая проверка не записана; внесено {curated}",
     "panel.unreadable": "короткое чтение его не читает — {reason} (источник: {source})",
     "panel.for_clinician_note": "Эта страница описывает саму панель — знание, а не человека: ни геном, ни анализы здесь не читаются. Чтение этой панели по геному — на «Радаре» и на карточке системы.",
-    "web.panel.open": "Панель и исследования — для врача",
+    "web.panel.open": "Справочник панели — без личных чтений",
     "web.panel.open_hint": "Что такое каждая позиция панели, на какое руководство или исследование она опирается и кто её подписал — знание, а не ваш геном",
     "web.second.open_card": "Карточка системы",
     "web.second.open_card_hint": "Все семь слоёв системы на одной странице: анализы, динамика, генетика, назначения, цель, что сдать, вопросы",
@@ -2036,7 +2036,7 @@ python3 src/ingest/draw_checklist.py           бланк следующего �
     "system.genetics.groups": "групп: {n}, каждая печатается одной строкой и раскрывается в свои позиции",
     "labs.genetics_line": "генетика этого показателя: {positions}",
     "web.gen.col_row": "Ген / позиция",
-    "web.panel.gene_hint": 'Открыть подробное описание {gene} в панели',
+    "web.panel.gene_hint": 'Открыть чтение и справку для {gene}',
     "web.gen.col_level": "Доказательность A–E",
     "web.gen.col_state": "Состояние",
     "web.gen.col_link": "Звено",
@@ -5136,3 +5136,95 @@ MESSAGES.update({
 })
 
 MESSAGES.update({'reference.region': 'Описание участка: {text}', 'reference.region_source': 'Источник аннотации: {source}'})
+
+# Shared presentation of existing gene and variant results.
+MESSAGES.update({
+    "web.gene_card.reference_reading": "Справочный режим: личное чтение не запрашивалось.",
+    "web.gene_card.no_position": "В каталоге для этого гена не выбраны позиции.",
+    "web.gene_card.not_read": "Личное чтение не получено.",
+
+    "web.gene_card.review_stars": 'Звёзды проверки ClinVar: {n}',
+    "web.gene_card.gene_inheritance": 'Справка о связи гена и заболевания; она не устанавливает личный тип наследования или диагноз.',
+    "web.gene_card.confidence": "Доверие",
+    "web.gene_card.identity": "Ген / позиция",
+    "web.gene_card.reading": "Ваше чтение",
+    "web.gene_card.meaning": "Функция и личный смысл",
+    "web.gene_card.variant_scope": "Интерпретация Scholion",
+    "web.gene_card.annotations": "Аннотации баз и источники",
+    "web.gene_card.details": "Наследование и подробности чтения",
+    "web.gene_card.inheritance": "Наследование",
+    "web.gene_card.inheritance_unknown": "Наследование для этого варианта не установлено. На уровне гена оно зависит от заболевания.",
+    "web.gene_card.quality": "Чтение и ограничения",
+    "web.gene_card.quality_unknown": "Сведения о качестве чтения не переданы.",
+    "web.gene_card.unread_status": "Личное чтение недоступно",
+    "web.gene_card.reference": "Справочная информация",
+    "web.gene_card.combination": "Совместная комбинация позиций",
+    "web.gene_card.no_personal_reading": "Личный генотип не передан",
+    "web.gene_card.copies": "Копий указанного аллеля: {n}",
+    "web.gene_card.association_scope": "Доверие к связи гена и измерения",
+})
+
+
+# Compact web wording; full clinical context stays available in the disclosure.
+MESSAGES.update({
+    'web.gene_card.source_records': 'Записи источников: {n}',
+    'web.gene_card.variant_unresolved': 'В этом справочнике влияние конкретного варианта ещё не курировано.',
+    'web.gene_card.meaning.carrier_context': 'Одна копия: рецессивное носительство; заболевание не установлено.',
+    'web.gene_card.meaning.phase_unresolved': 'Фаза неизвестна; ни диагноз, ни изолированное носительство не установлены.',
+    'web.gene_card.meaning.recessive_review': 'Две копии; клиническое значение требует подтверждения. Это не диагноз.',
+    'web.gene_card.meaning.dominant_review': 'Одна копия может иметь значение; нужна клиническая оценка. Это не диагноз.',
+    'web.gene_card.meaning.x_linked_review': 'Нужна клиническая оценка; бессимптомное носительство не установлено.',
+    'web.gene_card.meaning.inheritance_mixed': 'Для личной интерпретации нужно уточнить модель наследования.',
+    'web.gene_card.meaning.inheritance_unknown': 'Модель наследования для интерпретации этого чтения не подтверждена.',
+    'web.gene_card.meaning.reading_unresolved': 'Чтение не позволяет надёжно установить носительство указанного аллеля.',
+    'web.gene_card.meaning.variant_class_review': 'Нужный класс варианта не подтверждён; вторичная находка не установлена.',
+    'web.gene_card.meaning.inheritance_review': 'Личный смысл нельзя установить по одному сохранённому чтению.',
+})
+
+MESSAGES.update({
+    'web.gene_card.comparison_not_applicable': 'Сопоставление неприменимо при записанных условиях.',
+    'web.gene_card.comparison_conditions': 'Условия и ограничения',
+})
+
+# Scope missing support fields to the claim, not to all sources on the card.
+MESSAGES.update({
+    'web.gene_card.personal_conclusion': 'Личный вывод по варианту',
+    'web.gene_card.support_scope': 'Основание автоматических клинических выводов: проверки относятся к конкретным утверждениям, а не ко всем источникам на карточке.',
+    'web.gene_card.reference_separate': 'Источники справочного описания не устанавливают автоматически личный эффект или правило лечения. Чтение и справочная интерпретация сохранены.',
+    'web.gene_card.catalogue_gaps': 'В записи основания каталога не заполнено: {missing}. Справочная интерпретация показана.',
+})
+
+MESSAGES.update({'web.gene_card.support_missing_fields': 'В основании не заполнено: {missing}.'})
+
+# A gene-screening state is not an unread single-variant genotype.
+MESSAGES.update({
+    'web.gene_card.screen_state.checked': 'Проверка скрининга выполнена',
+    'web.gene_card.screen_state.limited': 'Чтение имеет ограничения',
+    'web.gene_card.screen_state.unknown': 'Статус скрининга не установлен',
+    'web.gene_card.screen_scope': 'Сохранённый скрининг гена, а не генотип одной позиции.',
+    'web.gene_card.screen_reason.low': 'В сохранённой оценке отмечено ограниченное покрытие.',
+    'web.gene_card.screen_reason.not_measured': 'Покрытие не измерено.',
+    'web.gene_card.screen_reason.not_in_table': 'В сохранённой таблице нет оценки покрытия этого гена.',
+    'web.gene_card.screen_reason.unavailable': 'Оценка покрытия недоступна.',
+    'web.gene_card.screen_reason_code': 'Записанная причина: {reason}.',
+})
+
+MESSAGES.update({'web.gene_card.reference_status': 'Справочник — личное чтение не запрашивалось'})
+
+MESSAGES.update({'thematic.coverage_preview': 'При открытии панели читаются готовые записи VCF; покрытие из BAM заново не измеряется. Сохранённая оценка покрытия скрининга показывается отдельно при наличии.', 'thematic.region_reading': 'Записи по области гена', 'thematic.region_checked': 'Просмотрены записи участка', 'thematic.region_unavailable': 'Область гена прочитать не удалось', 'thematic.region_counts': 'Альтернативных: {n}; референсных: {ref}.'})
+
+MESSAGES.update({'science.scope.gene_function': 'Функция гена', 'science.scope.gene_disease': 'Связь гена с заболеванием', 'science.scope.variant': 'Основание для варианта', 'science.function_recorded': 'Источник биологии гена указан. Он не устанавливает влияние конкретного варианта.', 'science.function_missing': 'В установленном справочнике не заполнено описание функции этого гена с источником. Это пробел справочника, а не отсутствие научных знаний о функции.', 'science.gene_disease': 'База сообщает связи гена с заболеваниями со своими классификациями и наследованием. Они не устанавливают влияние каждого варианта этого гена.', 'science.variant_not_reviewed': 'Основание именно этого утверждения о варианте ещё не проверено в проекте. Наличие источника на карточке само по себе не подтверждает личный эффект.', 'science.gene_grade': 'Генная справка'})
+
+MESSAGES.update({'science.review_stale': 'Сохранённая проверка больше не соответствует текущей записи. Её выводы требуют сверки; это не означает отсутствия исследований.'})
+
+MESSAGES.update({'science.function_missing_compact': 'Описание функции гена в этом справочнике пока не заполнено.'})
+
+MESSAGES.update({'science.scope.gene_identity': 'Идентичность гена или области', 'science.identity_only': 'Источник идентифицирует ген, РНК или область. Из одной идентичности не следует конкретная молекулярная функция или личное действие варианта.', 'science.withdrawn_model': 'Эта генная модель отозвана базой-источником. Историческое обозначение сохранено; оно не считается действующим белок-кодирующим геном.'})
+
+MESSAGES.update({'science.retained_curation': 'Сохранена ранее курированная интерпретация литературы с паспортом источника. Это исследовательский контекст, а не личная оценка риска или новая клиническая валидация.', 'science.study_membership': 'Внешний литературный каталог включает эту позицию в исследование. Участие в исследовании, в том числе с незначимым результатом, не устанавливает причинного действия через данный ген или личного прогноза долголетия.'})
+
+MESSAGES.update({'gene.unannotated_rows': 'Позиции без аннотации кодирующей области: {n}'})
+
+MESSAGES.update({'gene.cds_not_annotated': 'В этом источнике координат нет аннотации кодирующей области.'})
+
+MESSAGES.update({'thematic.region_scope': 'Записи VCF; полнота покрытия гена не установлена.'})

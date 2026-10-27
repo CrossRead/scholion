@@ -6,6 +6,7 @@ import subprocess
 import unittest
 
 import support
+import gene_card_support
 from scholion import i18n
 from scholion.engine import class_genotype, system_panels
 from scholion.format_prescription import medications_report
@@ -61,7 +62,7 @@ class TestSharedGeneCard(unittest.TestCase):
         script="""
 const assert=require('node:assert/strict');
 const esc=x=>String(x??''),t=(k,a)=>k+' '+Object.values(a||{}).join(' ');
-const DISPLAY_MODE='patient',geneticBriefHtml=r=>r.reference_context.gene_function;
+const DISPLAY_MODE='patient',levelChip=x=>x,geneticBriefHtml=r=>r.reference_context.gene_function;
 """+function+"""
 const html=geneRegionCard({gene:'SYNTHETIC',reference_context:{gene_function:'Known function'},
  location:{},coverage:{source:null},variants:{total:2,coding:1,
@@ -74,7 +75,8 @@ assert.ok(html.includes('p.A1G')&&html.includes('1:456')&&html.includes('T/T'));
 assert.match(html,/<details class="fold"><summary>gene.noncoding_rows 1/);
 assert.ok(html.includes('Coverage explicitly unknown')&&html.includes('gene.annotation_scope'));
 """
-        completed=subprocess.run([shutil.which('node'),'-e',script],capture_output=True,text=True,
+        script = gene_card_support.javascript() + script
+        completed=gene_card_support.run(script,capture_output=True,text=True,
                                  stdin=subprocess.DEVNULL,timeout=10)
         self.assertEqual(completed.returncode,0,completed.stderr)
 
@@ -96,10 +98,12 @@ const r={rsid:'rsSynthetic',gene:'SYNTHETIC',chrom:'1',pos:1,level:'E',
  reference_context:{gene_function:'Known gene function',variant_status:'unknown',level:'E'},
  result:{genotype:'GG',confidence:'confirmed_ref',depth:31}};
 const html=genomeCard(r);
-assert.ok(html.indexOf('Known gene function')<html.indexOf('GG'));
-assert.ok(html.indexOf('GG')<html.indexOf('data-genetic-context'));
+assert.ok(html.includes('Known gene function')&&html.includes('GG'));
+assert.ok(html.indexOf('gene-card-reading')<html.indexOf('gene-card-description'));
+assert.ok(html.indexOf('GG')<html.indexOf('data-gene-annotations'));
 assert.equal((html.match(/data-gene-description/g)||[]).length,1);
 """
-        completed=subprocess.run([shutil.which('node'),'-e',script],capture_output=True,text=True,
+        script = gene_card_support.javascript() + script
+        completed=gene_card_support.run(script,capture_output=True,text=True,
                                  stdin=subprocess.DEVNULL,timeout=10)
         self.assertEqual(completed.returncode,0,completed.stderr)

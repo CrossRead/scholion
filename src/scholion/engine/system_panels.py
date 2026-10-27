@@ -647,7 +647,7 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
                 # or a lower one, keeps its value and loses the verdict (task 199).
                 finding, not_why = 0, "level"
         row = {"unit": "position", "origin": "curated", "gene": gene, "state": state,
-               **lv, "evidence": p.get("evidence"),
+               **lv, "evidence": p.get("evidence"), "source_passport": p.get("source_passport"),
                "ladder": (_pg.hemizygous_ladder(panel_gate.ladder(p)) if geno.get("hemizygous")
                           else panel_gate.ladder(p)),
                "ladder_refused": p.get("ladder") == "refused",
@@ -1445,7 +1445,7 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
 
 # ---- registers --------------------------------------------------------------
 _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification", "state", "kind",
-                "classifications", "moi_codes",
+                "classifications", "moi_codes", "scan_status",
                 "text", "pending", "pending_why", "findings", "not_a_finding_why",
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",

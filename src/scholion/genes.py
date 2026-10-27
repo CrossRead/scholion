@@ -7,13 +7,14 @@ one — but until now a question about a gene outside it («is there an activati
 variant in CASR?») met «Gene CASR is not in the coordinate reference», which reads
 as an answer about the genome when it is an answer about a lookup table.
 
-Three sources, in this order, and the answer always says which one spoke:
+Four sources, in this order, and the answer always says which one spoke:
   1. the cache, written by whichever of the two below answered first;
   2. a local Ensembl GFF3, if the machine has one — the same annotation the
      project's own `csq` step already downloads, so on the owner's machine this
      path needs no network at all;
   3. Ensembl REST, live.
-When all three are silent the answer is not an empty result but a named absence:
+  4. the packaged NCBI GRCh38 gene intervals, without inferred coding exons.
+When all sources are silent the answer is not an empty result but a named absence:
 what is missing, and what would fix it. A gene symbol is public information; the
 owner's genotypes take no part in resolving it and are never sent anywhere.
 """
@@ -220,6 +221,17 @@ def from_ensembl(symbol: str) -> Optional[Dict[str, Any]]:
             "source": "ensembl", "assembly": ASSEMBLY}
 
 
+
+def _portable_region(symbol: str) -> Optional[Dict[str, Any]]:
+    """An exact public gene interval; never infer coding exons from an envelope."""
+    row = (core._read_knowledge('gene_reference_regions.json').get('genes') or {}).get(symbol.upper())
+    if not isinstance(row, dict) or row.get('assembly') != ASSEMBLY:
+        return None
+    from .knowledge_provenance import record
+    witness = record('gene_reference_regions.json', 'genes', symbol.upper())
+    return {**row, 'source': 'ncbi_reference', 'reference_record_digest': witness['record_digest']}
+
+
 def resolve(symbol: str, allow_network: bool = True) -> Optional[Dict[str, Any]]:
     """Coordinates and coding exons of a gene, or None.
 
@@ -237,6 +249,10 @@ def resolve(symbol: str, allow_network: bool = True) -> Optional[Dict[str, Any]]
     # 209): not trusted from the cache, asked again. A gene with no canonical
     # transcript keeps its entry.
     stale = bool(hit and hit.get("source") == "ensembl" and hit.get("transcript") and not hit.get("cds"))
+    if hit and hit.get('source') == 'ncbi_reference':
+        portable = _portable_region(key)
+        stale = (not portable or hit.get('reference_record_digest') != portable.get('reference_record_digest')
+                 or bool(allow_network and hit.get('gene_type') == 'PROTEIN_CODING' and not hit.get('cds')))
     if hit and not stale:
         return {**hit, "source": "cache", "resolved_by": hit.get("source", "cache")}
     for path in gff3_candidates():
@@ -257,6 +273,11 @@ def resolve(symbol: str, allow_network: bool = True) -> Optional[Dict[str, Any]]
             cache[key] = rec
             _save_cache(cache)
             return rec
+    portable = _portable_region(key)
+    if portable:
+        cache[key] = portable
+        _save_cache(cache)
+        return portable
     return None
 
 

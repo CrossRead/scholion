@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-10-06",
+    "updated": "2026-10-27",
     "purpose": "Reference gene biology and variant context, separate from personalised conclusions. Gene function does not establish an allele effect. Evidence levels remain those of the curated position; this file grants no analytical permission.",
     "sources": [
       "NCBI Gene / RefSeq gene summaries, retrieved 2026-10-06; bilingual functional paraphrases",
@@ -1525,10 +1525,10 @@
     "rs5742904": {
       "gene": "APOB",
       "description": {
-        "en": "R3527Q (R3500Q in mature apoB-100) disrupts LDL receptor binding, reducing receptor-mediated clearance of LDL.",
-        "ru": "R3527Q (R3500Q зрелого apoB-100) нарушает связывание с рецептором ЛПНП, снижая рецепторный клиренс ЛПНП."
+        "en": "APOB R3500Q was included among familial-hypercholesterolaemia variants in a population study and examined in a founder-population lipidome study. Grouped variant results do not supply a separate personal probability, penetrance or therapeutic rule for this reading.",
+        "ru": "APOB R3500Q включён в набор вариантов семейной гиперхолестеринемии в популяционной работе и изучен в исследовании липидома популяции основателей. Групповой результат по нескольким вариантам не задаёт отдельную личную вероятность, пенетрантность или правило лечения для данного чтения."
       },
-      "source": "LDL receptor-binding functional study 1998; DOI:10.1172/JCI1847"
+      "source": "PMID:29593013; PMID:35393526"
     },
     "rs429358": {
       "description": {
@@ -1820,7 +1820,7 @@
         "ru": "Аллель T связан с диабетом 2 типа в курируемой литературе. TCF7L2 регулирует транскрипцию в путях глюкозы и инкретинов; ассоциация не устанавливает секрецию инсулина у человека."
       },
       "gene": "TCF7L2",
-      "source": "Grant 2006 Nat Genet"
+      "source": "Grant 2006 Nat Genet; PMID:16415884; DOI:10.1038/ng1732"
     },
     "rs1260326": {
       "description": {
@@ -1836,23 +1836,23 @@
         "ru": "PPARG Pro12Ala относится к регулятору дифференцировки адипоцитов и обмена; Ala12 связан с умеренно более низкой ассоциацией с диабетом 2 типа в курируемой литературе."
       },
       "gene": "PPARG",
-      "source": "Altshuler 2000 Nat Genet (PPARG Pro12Ala)"
+      "source": "Altshuler 2000 Nat Genet; PMID:10973253; DOI:10.1038/79216"
     },
     "rs12208357": {
       "description": {
-        "en": "SLC22A1 R61C is described as a reduced-function OCT1 allele. Studies disagree on the clinical metformin response; transporter function alone does not select a medicine or dose.",
-        "ru": "SLC22A1 R61C описан как аллель со сниженной функцией OCT1. Исследования клинического ответа на метформин расходятся; функция транспортёра сама не выбирает препарат или дозу."
+        "en": "R61C was among reduced-function OCT1 alleles studied together for metformin pharmacokinetics in healthy volunteers. The pooled result does not identify an individual clinical response or dose.",
+        "ru": "R61C входил в группу аллелей OCT1 со сниженной функцией, совместно изученных при исследовании фармакокинетики метформина у здоровых добровольцев. Общий результат группы аллелей не определяет индивидуальный ответ на лечение или дозу."
       },
       "gene": "SLC22A1",
-      "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline"
+      "source": "PMID:17609683"
     },
     "rs34130495": {
       "description": {
-        "en": "SLC22A1 G401S is described as a reduced-function OCT1 allele. A reproducible clinical effect on metformin response has not been established by the curated evidence.",
-        "ru": "SLC22A1 G401S описан как аллель со сниженной функцией OCT1. Курируемые данные не устанавливают воспроизводимый клинический эффект на ответ на метформин."
+        "en": "G401S was among reduced-function OCT1 alleles studied together for metformin pharmacokinetics. A pooled allele analysis does not establish a G401S-specific clinical response or prescription.",
+        "ru": "G401S входил в группу аллелей OCT1 со сниженной функцией, совместно изученных при исследовании фармакокинетики метформина. Совместный анализ аллелей не устанавливает отдельный клинический эффект G401S или назначение."
       },
       "gene": "SLC22A1",
-      "source": "PharmGKB level 2B (OCT1 and metformin); no CPIC guideline"
+      "source": "PMID:17609683"
     },
     "rs1501299": {
       "description": {
@@ -2184,7 +2184,7 @@
     },
     "rs2228145": {
       "gene": "IL6R",
-      "source": "DOI:10.1371/journal.pgen.1003444 https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1003444",
+      "source": "PMID:23593036; PMID:22421339",
       "description": {
         "en": "A>C; Asp358Ala, C encodes Ala358. Ala358 was associated with more soluble and less cell-surface IL-6 receptor and weaker classical STAT1/STAT3 responses in the studied immune cells. Classical signalling and trans-signalling differ. This is not a universal anti-inflammatory genotype or proof of absent inflammation.",
         "ru": "A>C; Asp358Ala; C кодирует Ala358. Ala358 связан с меньшим поверхностным IL-6R и большей растворимой формой; в проверенных иммунных клетках ослаблен классический ответ STAT1/STAT3 на IL-6. Направление изменения зависит от компонента пути и заболевания: нельзя называть этот генотип универсально «противовоспалительным». Более низкий CRP не означает отсутствия воспаления."
@@ -2281,16 +2281,16 @@
     },
     "rs179247": {
       "description": {
-        "en": "The curated literature links this TSHR locus to Graves' disease; this does not establish a receptor-function effect or a diagnosis from this SNP.",
-        "ru": "Курируемая литература связывает этот локус TSHR с болезнью Грейвса; это не устанавливает эффект на функцию рецептора или диагноз по этому SNP."
+        "en": "This intron-1 TSHR marker was associated with Graves disease in a case-control study. Association does not diagnose disease or measure personal receptor activity.",
+        "ru": "Этот маркер первого интрона TSHR был связан с болезнью Грейвса в исследовании случай–контроль. Ассоциация не устанавливает диагноз или активность рецептора у человека."
       },
       "gene": "TSHR",
-      "source": "Brand 2009 Hum Mol Genet (TSHR intron 1 and Graves' disease)"
+      "source": "PMID:19244275"
     },
     "rs2071403": {
       "description": {
-        "en": "The curated literature links this TPO position to thyroid peroxidase antibodies and autoimmune thyroid traits. A causal effect on peroxidase activity is not established here.",
-        "ru": "Курируемая литература связывает эту позицию TPO с антителами к тиреопероксидазе и аутоиммунными тиреоидными признаками. Причинный эффект на активность пероксидазы здесь не установлен."
+        "en": "TPO rs2071403 findings depend on population: associations were reported in Korean and Japanese studies, while the Polish study found no significant single-SNP association. This does not diagnose thyroid autoimmunity.",
+        "ru": "Результаты TPO rs2071403 зависят от популяции: связь описана в корейском и японском исследованиях, а польская работа не выявила значимой связи отдельного SNP. Это не диагноз аутоиммунного заболевания щитовидной железы."
       },
       "gene": "TPO",
       "source": "PMID 24722205 (Kwak 2014: GWAS on thyroid function and anti-TPO antibodies in Koreans); PMID 28845025 (Tomari 2017: TPO polymorphisms and AITD); PMID 38542286 (Lacka 2024)"
@@ -2337,11 +2337,11 @@
     },
     "rs1799941": {
       "description": {
-        "en": "This SHBG position is linked to SHBG and total testosterone concentrations in the curated literature. Total concentration and free hormone are different quantities; no personal value follows from this SNP.",
-        "ru": "Эта позиция SHBG связана с концентрациями ГСПГ и общего тестостерона в курируемой литературе. Общая концентрация и свободный гормон — разные величины; личное значение из SNP не следует."
+        "en": "The A allele was associated with higher SHBG and total testosterone in studied male cohorts. This does not identify an individual free-testosterone level or explain a particular laboratory result.",
+        "ru": "Аллель A был связан с более высокими ГСПГ и общим тестостероном в изученных мужских выборках. Это не определяет личный уровень свободного тестостерона и не объясняет конкретный анализ."
       },
       "gene": "SHBG",
-      "source": "Ohlsson 2011 PLoS Genet (SHBG variants and testosterone)"
+      "source": "PMID:29264510"
     },
     "rs6258": {
       "description": {
@@ -2349,15 +2349,15 @@
         "ru": "SHBG P156L относится к сродству связывания тестостерона; курируемая литература описывает изменение связывания. Свойство связывания не измеряет свободный гормон человека."
       },
       "gene": "SHBG",
-      "source": "Ohlsson 2011 PLoS Genet"
+      "source": "Ohlsson 2011 PLoS Genet; PMID:21998597; DOI:10.1371/journal.pgen.1002313"
     },
     "rs7521902": {
       "description": {
-        "en": "The WNT4 region has an endometriosis association in the curated literature; a locus association does not establish this SNP's molecular mechanism.",
-        "ru": "Для области WNT4 в курируемой литературе описана ассоциация с эндометриозом; ассоциация локуса не устанавливает молекулярный механизм этого SNP."
+        "en": "The WNT4-region marker has an endometriosis association in pooled studies. The reviewed synthesis does not establish a universal per-allele personal multiplier or a causal SNP mechanism.",
+        "ru": "Для маркера области WNT4 описана ассоциация с эндометриозом в объединённых исследованиях. Проверенный обзор не устанавливает универсальный личный множитель на аллель или причинный механизм SNP."
       },
       "gene": "WNT4",
-      "source": "PMID 38354602 (Eur J Obstet Gynecol Reprod Biol 2024); Nyholt 2012 Nat Genet"
+      "source": "PMID:38354602"
     },
     "rs13394619": {
       "description": {
@@ -2369,11 +2369,11 @@
     },
     "rs13429458": {
       "description": {
-        "en": "The THADA locus has a polycystic ovary syndrome association in some populations and not others. A specific causal pathway for this SNP is not established here.",
-        "ru": "Для локуса THADA описана ассоциация с синдромом поликистозных яичников в одних популяциях и её отсутствие в других. Конкретный причинный путь этого SNP здесь не установлен."
+        "en": "The meta-analysis reported a PCOS association in Asian populations and not in non-Asian populations. The result is population-dependent; no personal diagnosis or treatment follows.",
+        "ru": "Метаанализ сообщил об ассоциации с СПКЯ в азиатских популяциях и её отсутствии в неазиатских. Результат зависит от популяции; личный диагноз или лечение из него не следуют."
       },
       "gene": "THADA",
-      "source": "PMID 31487746 (Geburtshilfe Frauenheilkd 2019)"
+      "source": "PMID:31487746"
     },
     "rs1204038": {
       "description": {
@@ -2417,16 +2417,16 @@
     },
     "rs1042838": {
       "description": {
-        "en": "PGR PROGINS has an endometriosis association in the curated meta-analysis; this is not a diagnosis of progesterone resistance.",
-        "ru": "Для PGR PROGINS описана ассоциация с эндометриозом в курируемом метаанализе; это не диагноз резистентности к прогестерону."
+        "en": "PROGINS/endometriosis results differ by study and population; the cited meta-analysis did not show a significant pooled overall association. This reading does not establish progesterone resistance.",
+        "ru": "Результаты связи PROGINS с эндометриозом различаются между исследованиями и популяциями; общий эффект цитируемого метаанализа не был значимым. Чтение не устанавливает резистентность к прогестерону."
       },
       "gene": "PGR",
       "source": "PMID 11821088 (Wieser 2002: PROGINS and endometriosis); PMID 24943061 (Pabalan 2014: PROGINS and endometriosis, meta-analysis); PMID 20719308"
     },
     "rs10895068": {
       "description": {
-        "en": "The PGR +331G/A promoter variant is described as favouring the PR-B isoform and has an endometriosis association; this does not predict an individual's disease outcome.",
-        "ru": "Промоторный вариант PGR +331G/A описан как способствующий изоформе PR-B и имеет ассоциацию с эндометриозом; это не предсказывает исход заболевания человека."
+        "en": "PGR +331 variant studies reported lower endometriosis prevalence in some cohorts and no disease association in another. PR-B expression findings do not establish an individual hormone response.",
+        "ru": "Для варианта PGR +331 в части выборок описана меньшая частота эндометриоза, в другой связи с заболеванием не выявлено. Данные об экспрессии PR-B не устанавливают личный ответ на гормоны."
       },
       "gene": "PGR",
       "source": "PMID 16920727 (van Kaam 2007: PR +331G/A and a decreased risk of deep infiltrating endometriosis); PMID 20719308 (Near 2011); PMID 31435600"
@@ -2441,27 +2441,27 @@
     },
     "rs2637125": {
       "description": {
-        "en": "The SULT2A1 locus is associated with DHEA-S; DHEA sulfation is the relevant gene pathway, not a measured enzyme activity from this SNP.",
-        "ru": "Локус SULT2A1 связан с ДГЭА-С; значимый путь гена — сульфатирование ДГЭА, а не измеренная по SNP активность фермента."
+        "en": "A DHEAS GWAS association was reported, but a targeted genotype study did not confirm an effect on DHEAS or the DHEA/DHEAS ratio. Neither allele count nor gene function supplies a reliable personal hormone or enzyme-activity estimate.",
+        "ru": "В GWAS обнаружена ассоциация с ДГЭА-С, но направленное исследование генотипов не подтвердило эффект на ДГЭА-С или отношение ДГЭА/ДГЭА-С. Ни число аллелей, ни функция гена не дают надёжной личной оценки гормона или активности фермента."
       },
       "gene": "SULT2A1",
-      "source": "PMID 21533175 (Zhai 2011, PLoS Genet: eight common variants and serum DHEAS); PMID 23132913 (Haring 2013: the SULT2A1 variant and DHEAS)"
+      "source": "PMID:21533175; PMID:23132913"
     },
     "rs11761528": {
       "description": {
-        "en": "This ZKSCAN5-region position is associated with DHEA-S in the curated literature; a specific causal mechanism is not established here.",
-        "ru": "Эта позиция области ZKSCAN5 связана с ДГЭА-С в курируемой литературе; конкретный причинный механизм здесь не установлен."
+        "en": "The locus was associated with DHEAS in a GWAS; a subsequent study examined a rheumatoid-arthritis context. Association across study contexts does not guarantee a hormone direction or amount for an individual.",
+        "ru": "Локус был связан с ДГЭА-С в GWAS; последующее исследование рассматривало контекст ревматоидного артрита. Ассоциация в разных исследовательских контекстах не гарантирует направление или величину уровня гормона у человека."
       },
       "gene": "ZKSCAN5",
-      "source": "PMID 21533175 (Zhai 2011, PLoS Genet: DHEAS GWAS meta-analysis); PMID 28712091 (Vernerova 2018: genetic factors and lower DHEAS)"
+      "source": "PMID:21533175; PMID:28712091"
     },
     "rs1691053": {
       "description": {
-        "en": "This position is near SRD5A1, which converts testosterone to DHT. Replicated evidence that C or CC increases enzyme activity or DHT is absent from the curated evidence.",
-        "ru": "Эта позиция находится рядом с SRD5A1, превращающим тестостерон в ДГТ. В курируемых данных нет воспроизведённых доказательств, что C или CC повышает активность фермента или ДГТ."
+        "en": "This marker has been studied in dysglycaemia and prostate-disease association studies. Those outcomes do not validate a C-to-CC ladder for enzyme activity, DHT, hyperandrogenism or drug selection.",
+        "ru": "Маркер изучали в исследованиях ассоциаций с нарушениями гликемии и заболеваниями простаты. Эти исходы не подтверждают лестницу C–CC по активности фермента, ДГТ, гиперандрогении или выбору препарата."
       },
       "gene": "SRD5A1",
-      "source": "the panel author's review of 17.09.2026: no reproducible PMID or DOI supports a C → CC ladder for rs1691053"
+      "source": "PMID:31870594; PMID:20056642"
     },
     "rs5934505": {
       "description": {
@@ -2473,11 +2473,11 @@
     },
     "rs17107315": {
       "description": {
-        "en": "SPINK1 N34S is associated with chronic pancreatitis in the curated literature. SPINK1 inhibits pancreatic trypsin; that gene function does not prove the specific N34S mechanism.",
-        "ru": "SPINK1 N34S связан с хроническим панкреатитом в курируемой литературе. SPINK1 ингибирует трипсин поджелудочной железы; эта функция гена не доказывает конкретный механизм N34S."
+        "en": "N34S was associated with chronic pancreatitis in the primary case-control study. The cited study does not establish a personal odds multiplier, diagnosis, alcohol instruction or lipase-triggered management rule.",
+        "ru": "N34S был связан с хроническим панкреатитом в первичном исследовании случай–контроль. Цитируемая работа не устанавливает личный множитель шансов, диагноз, указание об алкоголе или правило действий по липазе."
       },
       "gene": "SPINK1",
-      "source": "Witt 2000 Nat Genet (SPINK1 N34S and chronic pancreatitis)"
+      "source": "PMID:10835640"
     },
     "rs111033565": {
       "gene": "PRSS1",
@@ -2501,15 +2501,15 @@
         "ru": "PNPLA3 I148M относится к переработке липидов печени и имеет ассоциации с жиром печени в курируемой литературе. Он не устанавливает текущий фиброз или причину конкретного АЛТ."
       },
       "gene": "PNPLA3",
-      "source": "Romeo 2008 Nat Genet (PNPLA3 I148M and hepatic fat)"
+      "source": "Romeo 2008 Nat Genet; PMID:18820647; DOI:10.1038/ng.257"
     },
     "rs58542926": {
       "description": {
-        "en": "TM6SF2 E167K is linked to hepatic fat retention and lower circulating lipids in the curated literature. A low LDL-C cannot be read as a measure of liver fat from this SNP.",
-        "ru": "TM6SF2 E167K связан с удержанием жира в печени и более низкими циркулирующими липидами в курируемой литературе. Низкий ЛПНП нельзя считать измерением жира печени по этому SNP."
+        "en": "E167K was associated with greater hepatic fat and lower circulating lipids; experiments examined lipid secretion. A genotype does not measure personal liver fat or a fixed LDL-C change.",
+        "ru": "E167K был связан с большим содержанием жира в печени и более низкими липидами крови; эксперименты изучали секрецию липидов. Генотип не измеряет жир печени человека или фиксированное изменение ЛПНП."
       },
       "gene": "TM6SF2",
-      "source": "Kozlitina 2014 Nat Genet (TM6SF2 E167K)"
+      "source": "PMID:24531328"
     },
     "rs1800562": {
       "gene": "HFE",
@@ -2707,22 +2707,22 @@
     },
     "rs855791": {
       "gene": "TMPRSS6",
-      "source": "PMID:21873547 DOI:10.1182/blood-2011-06-364034 https://pubmed.ncbi.nlm.nih.gov/21873547/; PMID:33054130 DOI:10.3324/haematol.2020.264556 https://haematologica.org/article/view/10038; https://www.ncbi.nlm.nih.gov/clinvar/RCV001723861.11/",
+      "source": "PMID:21873547; PMID:33054130",
       "description": {
-        "en": "GRCh38 chr22:37066896 A>G; NM_001374504.1:c.2180T>C, Val727Ala; historical Val736Ala. The Ala form suppressed hepcidin more efficiently in experiments. Human iron effects depend on iron status and the endpoint. A stable-isotope study in 79 non-anaemic Taiwanese women found absorption differences. This common SNP is not IRIDA and does not select oral versus intravenous treatment.",
-        "ru": "GRCh38 chr22:37066896 A>G. NM_001374504.1:c.2180T>C; p.Val727Ala; историческое Val736Ala. Val727Ala в актуальном транскрипте соответствует историческому Val736Ala. В экспериментах Ala сильнее подавлял гепсидин; наблюдаемые эффекты зависят от статуса железа и измеряемого показателя. Общий вариант связан с железными показателями; в 79 тайваньских женщинах без анемии наблюдались различия всасывания меченого железа. Это не диагноз IRIDA и не правило выбора пути лечения."
+        "en": "The TMPRSS6 variant has experimental hepcidin-regulation evidence and genotype-associated differences in oral iron absorption in one controlled study of nonanaemic women. This does not predict an individual iron level or treatment response.",
+        "ru": "Для варианта TMPRSS6 есть экспериментальные данные о регуляции гепсидина и различиях всасывания железа между генотипами в контролируемом исследовании женщин без анемии. Это не прогноз личного уровня железа или ответа на лечение."
       },
       "reading": {
-        "en": "GRCh38 chr22:37066896 A>G; NM_001374504.1:c.2180T>C, Val727Ala; historical Val736Ala.",
-        "ru": "GRCh38 chr22:37066896 A>G. NM_001374504.1:c.2180T>C; p.Val727Ala; историческое Val736Ala."
+        "en": "The TMPRSS6 variant has experimental hepcidin-regulation evidence and genotype-associated differences in oral iron absorption in one controlled study of nonanaemic women. This does not predict an individual iron level or treatment response.",
+        "ru": "Для варианта TMPRSS6 есть экспериментальные данные о регуляции гепсидина и различиях всасывания железа между генотипами в контролируемом исследовании женщин без анемии. Это не прогноз личного уровня железа или ответа на лечение."
       },
       "mechanism": {
-        "en": "The Ala form suppressed hepcidin more efficiently in experiments. Human iron effects depend on iron status and the endpoint.",
-        "ru": "Val727Ala в актуальном транскрипте соответствует историческому Val736Ala. В экспериментах Ala сильнее подавлял гепсидин; наблюдаемые эффекты зависят от статуса железа и измеряемого показателя."
+        "en": "",
+        "ru": ""
       },
       "possible_influence": {
-        "en": "A stable-isotope study in 79 non-anaemic Taiwanese women found absorption differences. This common SNP is not IRIDA and does not select oral versus intravenous treatment.",
-        "ru": "Общий вариант связан с железными показателями; в 79 тайваньских женщинах без анемии наблюдались различия всасывания меченого железа. Это не диагноз IRIDA и не правило выбора пути лечения."
+        "en": "",
+        "ru": ""
       },
       "references": [
         {
@@ -2848,11 +2848,11 @@
     },
     "rs16890979": {
       "description": {
-        "en": "The SLC2A9 locus is associated with urate handling and serum urate in the curated literature; effect depends on sex and other factors.",
-        "ru": "Локус SLC2A9 связан с транспортом урата и уратом сыворотки в курируемой литературе; эффект зависит от пола и других факторов."
+        "en": "This SLC2A9 marker was associated with urate-related traits in population research. Sex and study context matter; the association does not measure individual excretion or a fixed serum change.",
+        "ru": "Этот маркер SLC2A9 был связан с признаками обмена урата в популяционном исследовании. Важны пол и контекст исследования; ассоциация не измеряет личное выведение или фиксированное изменение урата крови."
       },
       "gene": "SLC2A9",
-      "source": "Vitart 2008 Nat Genet (SLC2A9 and urate)"
+      "source": "PMID:18327257"
     },
     "rs9263726": {
       "gene": "HLA-B",
@@ -2885,11 +2885,11 @@
     },
     "rs12917707": {
       "description": {
-        "en": "The UMOD locus is associated with kidney-function traits in the curated literature; this association does not establish an individual's renal function.",
-        "ru": "Локус UMOD связан с признаками функции почек в курируемой литературе; ассоциация не устанавливает функцию почек человека."
+        "en": "The UMOD locus was associated with kidney-function and chronic-kidney-disease traits. The cohort association is not a personal renal-function measurement or universal odds ratio.",
+        "ru": "Локус UMOD был связан с признаками функции почек и хронической болезни почек. Ассоциация выборки не является личным измерением функции почек или универсальным отношением шансов."
       },
       "gene": "UMOD",
-      "source": "Köttgen 2009 Nat Genet (UMOD and CKD)"
+      "source": "PMID:19430482; PMID:19959715"
     },
     "rs73885319": {
       "description": {
@@ -2957,19 +2957,19 @@
     },
     "rs2240340": {
       "description": {
-        "en": "PADI4 is involved in protein citrullination. The rheumatoid-arthritis association for this position differs between East Asian and European populations.",
-        "ru": "PADI4 участвует в цитруллинировании белков. Ассоциация этой позиции с ревматоидным артритом различается между восточноазиатскими и европейскими популяциями."
+        "en": "The Singapore case-control study and Asian meta-analysis reported a rheumatoid-arthritis association. Association depends on population; no personal disease prediction follows.",
+        "ru": "Сингапурское исследование случай–контроль и азиатский метаанализ сообщили об ассоциации с ревматоидным артритом. Ассоциация зависит от популяции; личный прогноз болезни из неё не следует."
       },
       "gene": "PADI4",
-      "source": "PMID 28653215 (meta-analysis); PMID 18087673; PMID 19470526 (European population)"
+      "source": "PMID:28653215"
     },
     "rs1561570": {
       "description": {
-        "en": "The OPTN locus has a Paget-disease association in the curated literature; the exact causal mechanism of this SNP is not established here.",
-        "ru": "Локус OPTN имеет ассоциацию с болезнью Педжета в курируемой литературе; точный причинный механизм этого SNP здесь не установлен."
+        "en": "The Paget-disease GWAS has experimental follow-up on allele-associated methylation, OPTN expression and osteoclast signalling. Experimental results do not establish an individual diagnosis, penetrance or fixed risk multiplier.",
+        "ru": "За GWAS болезни Педжета последовало экспериментальное исследование связи аллеля с метилированием, экспрессией OPTN и сигнализацией остеокластов. Эксперименты не устанавливают личный диагноз, пенетрантность или фиксированный множитель риска."
       },
       "gene": "OPTN",
-      "source": "PMID 20436471 (Albagha 2010, Nat Genet); PMID 29782529"
+      "source": "PMID:20436471; PMID:29782529"
     },
     "rs1256328": {
       "description": {
@@ -3021,11 +3021,11 @@
     },
     "rs1440581": {
       "description": {
-        "en": "The PPM1K locus is associated with branched-chain amino acids; PPM1K regulates their breakdown. An association does not measure an individual's concentrations.",
-        "ru": "Локус PPM1K связан с аминокислотами с разветвлённой цепью; PPM1K регулирует их расщепление. Ассоциация не измеряет концентрации человека."
+        "en": "Population metabolite studies associate the PPM1K region with branched-chain amino acids. The checked scope does not validate a personal concentration or a stronger two-copy effect for this marker.",
+        "ru": "Популяционные исследования метаболитов связывают область PPM1K с аминокислотами с разветвлённой цепью. Проверенная область данных не подтверждает личную концентрацию или более сильный эффект двух копий этого маркера."
       },
       "gene": "PPM1K",
-      "source": "PMID 33414548 (Lotta 2021, Nat Genet); Lotta 2016 PLoS Med"
+      "source": "PMID:27898682; PMID:33414548"
     },
     "rs1744297": {
       "description": {
@@ -3045,11 +3045,11 @@
     },
     "rs56335308": {
       "description": {
-        "en": "The SLC7A2 locus has arginine associations, but the curated studies disagree on direction; transporter biology cannot supply the missing direction.",
-        "ru": "Локус SLC7A2 имеет ассоциации с аргинином, но курируемые исследования расходятся в направлении; биология транспортёра не заменяет отсутствующее направление."
+        "en": "The Japanese amino-acid GWAS directly reported rs56335308 associations with amino-acid concentrations. Different allele notation is not proof of biological conflict; direction is withheld until strand and effect-allele alignment.",
+        "ru": "Японское GWAS аминокислот непосредственно сообщило об ассоциациях rs56335308 с концентрациями аминокислот. Разные обозначения аллелей не доказывают биологическое противоречие; направление удерживается до сверки цепи и аллеля эффекта."
       },
       "gene": "SLC7A2",
-      "source": "PMID 30659259 (Imaizumi 2019); PMID 33414548 (Lotta 2021); PMID 36357675 (Surendran 2022)"
+      "source": "PMID:30659259"
     },
     "rs505802": {
       "description": {
@@ -3061,11 +3061,11 @@
     },
     "rs734553": {
       "description": {
-        "en": "The SLC2A9 locus is associated with serum urate in the curated literature; the direction and magnitude cannot be converted into a personal laboratory value.",
-        "ru": "Локус SLC2A9 связан с уратом сыворотки в курируемой литературе; направление и величину нельзя превратить в личное значение анализа."
+        "en": "The SLC2A9 marker is associated with serum urate in population research. A universal per-allele personal laboratory increment was not verified; sex and study context affect estimates.",
+        "ru": "Маркер SLC2A9 связан с уратом сыворотки в популяционном исследовании. Универсальная личная прибавка анализа на аллель не подтверждена; оценки зависят от пола и контекста."
       },
       "gene": "SLC2A9",
-      "source": "PMID 19503597 (Kolz 2009, PLoS Genet); PMID 21983786 (Sulem 2011, Nat Genet)"
+      "source": "PMID:19503597"
     },
     "rs10934753": {
       "description": {
@@ -3081,7 +3081,7 @@
         "ru": "Область PRSS1 имеет ассоциацию с хроническим панкреатитом; функция пищеварительного фермента области отделена от персонального предсказания заболевания."
       },
       "gene": "PRSS1",
-      "source": "Whitcomb 2012 Nat Genet (PRSS1–PRSS2 and chronic pancreatitis)"
+      "source": "Whitcomb 2012 Nat Genet; PMID:23143602; DOI:10.1038/ng.2466"
     },
     "rs1805087": {
       "description": {
@@ -3117,11 +3117,11 @@
     },
     "rs7678928": {
       "description": {
-        "en": "This upstream PPM1K position has a branched-chain amino-acid association; regulation of breakdown is the gene pathway, not a proven SNP-specific mechanism.",
-        "ru": "Эта позиция выше PPM1K имеет ассоциацию с аминокислотами с разветвлённой цепью; регуляция расщепления — путь гена, а не доказанный механизм отдельного SNP."
+        "en": "Studies associate the upstream PPM1K region with branched-chain amino acids. A locus association does not prove the index SNP mechanism or an individual genotype-dose ladder.",
+        "ru": "Исследования связывают область выше PPM1K с аминокислотами с разветвлённой цепью. Ассоциация локуса не доказывает механизм индексного SNP или индивидуальную лестницу по числу аллелей."
       },
       "gene": "PPM1K",
-      "source": "PMID 33414548 (Lotta 2021: valine, leucine); PMID 36357675 (Surendran 2022); PMID 38448586 (2024, multi-ancestry: valine); PMID 27898682 (Lotta 2016: 21 kb upstream of PPM1K)"
+      "source": "PMID:27898682; PMID:33414548; PMID:36357675; PMID:38448586"
     },
     "rs7302925": {
       "description": {
@@ -3149,19 +3149,19 @@
     },
     "rs13244654": {
       "description": {
-        "en": "The PSPH region was linked to plasma serine in one study; the gene's serine-synthesis function does not prove this SNP's mechanism.",
-        "ru": "Область PSPH была связана с серином плазмы в одном исследовании; функция гена в синтезе серина не доказывает механизм SNP."
+        "en": "The Japanese amino-acid GWAS reported an rs13244654 association with serine. The gene pathway does not prove the index SNP mechanism; no personal amount is assigned without harmonised allele estimates.",
+        "ru": "Японское GWAS аминокислот сообщило об ассоциации rs13244654 с серином. Путь гена не доказывает механизм индексного SNP; без согласованных оценок аллеля личная величина не назначается."
       },
       "gene": "PSPH",
-      "source": "PMID 30659259 (Imaizumi 2019: serine −0.28 SD per T)"
+      "source": "PMID:30659259"
     },
     "rs2238732": {
       "description": {
-        "en": "The PRODH locus has proline associations, but the curated studies disagree on the allele direction; the missing direction must not be inferred from gene function.",
-        "ru": "Локус PRODH имеет ассоциации с пролином, но курируемые исследования расходятся в направлении эффекта аллеля; отсутствующее направление нельзя вывести из функции гена."
+        "en": "The Japanese GWAS directly reported rs2238732 associations, including proline. Contrasting allele labels are not sufficient to conclude biological conflict; effect direction needs allele and strand alignment.",
+        "ru": "Японское GWAS непосредственно сообщило об ассоциациях rs2238732, включая пролин. Различий в метках аллелей недостаточно для вывода о биологическом противоречии; нужна сверка аллелей эффекта и цепи."
       },
       "gene": "PRODH",
-      "source": "PMID 30659259 (Imaizumi 2019: C raises proline); PMID 26068415 (Draisma 2015: T raises proline)"
+      "source": "PMID:30659259; PMID:26068415"
     },
     "rs11174811": {
       "description": {
@@ -3261,51 +3261,51 @@
     },
     "rs6198": {
       "description": {
-        "en": "The source held for this NR3C1 position describes a different variant; a mechanism or effect for rs6198 cannot be borrowed from it.",
-        "ru": "Источник, сохранённый для этой позиции NR3C1, описывает другой вариант; механизм или эффект rs6198 нельзя заимствовать из него."
+        "en": "A primary study of the NR3C1 exon9β AU-rich-motif variant found increased GRβ mRNA stability in cells. The catalogue’s promoter citation was not the direct source for this mechanism. This does not predict personal stress, cortisol or glucocorticoid response.",
+        "ru": "Первичная работа по варианту AU-богатого мотива экзона9β NR3C1 показала увеличение стабильности мРНК GRβ в клетках. Ссылка каталога на промотор не была прямым источником этого механизма. Это не прогноз личного стресса, кортизола или ответа на глюкокортикоиды."
       },
       "gene": "NR3C1",
-      "source": "PMID 18663733 (Kumsta 2009: a glucocorticoid receptor promoter polymorphism — not the 3'UTR variant this position is)"
+      "source": "DeRijk 2001 J Rheumatol; PMID:11708406; https://pubmed.ncbi.nlm.nih.gov/11708406/"
     },
     "rs1042778": {
       "description": {
-        "en": "One curated OXTR study concerns interaction with family environment; this does not establish a personal social or behavioural characteristic.",
-        "ru": "Одно курируемое исследование OXTR относится к взаимодействию с семейной средой; это не устанавливает социальную или поведенческую характеристику человека."
+        "en": "The cited study examined interaction of rs1042778 with family environment in perceived social support over time. The exact stronger-T interaction direction was not corroborated from accessible results and must not be asserted as a personal trait.",
+        "ru": "Цитируемая работа изучала взаимодействие rs1042778 с семейной средой в изменениях воспринимаемой социальной поддержки. Точное направление «сильнее для T» не подтверждено доступными результатами и не должно подаваться как личная черта."
       },
       "gene": "OXTR",
-      "source": "PMID 29680729 (Dobewall 2018: OXTR rs1042778 moderates the influence of family environment)"
+      "source": "PMID:29680729"
     },
     "rs2254298": {
       "description": {
-        "en": "The curated OXTR meta-analysis finds small social-behaviour associations at most; the gene's oxytocin pathway does not turn these into a personal trait.",
-        "ru": "Курируемый метаанализ OXTR описывает не более чем малые ассоциации с социальным поведением; окситоциновый путь гена не превращает их в свойство человека."
+        "en": "The cited OXTR rs2254298 meta-analysis found no significant pooled association with the assessed behavioural domains. This reading does not describe personal social traits.",
+        "ru": "Метаанализ OXTR rs2254298 не обнаружил значимой суммарной связи с изученными поведенческими признаками. Чтение не описывает личные социальные качества."
       },
       "gene": "OXTR",
       "source": "PMID 23921259 (Bakermans-Kranenburg 2014: a sociability gene? meta-analysis of oxytocin receptor genotype effects)"
     },
     "rs53576": {
       "description": {
-        "en": "The curated OXTR meta-analyses concern small sociality-related effects; a genotype does not determine empathy, personality or social behaviour.",
-        "ru": "Курируемые метаанализы OXTR относятся к малым связанным с социальностью эффектам; генотип не определяет эмпатию, личность или социальное поведение."
+        "en": "OXTR rs53576 findings differ between meta-analyses: one was null, while another found a small general-sociality association and no close-relationship association. The genotype does not predict personal behaviour.",
+        "ru": "Результаты по OXTR rs53576 различаются: один метаанализ дал нулевой результат, другой — небольшую связь с общей социальностью, но не с близкими отношениями. Генотип не предсказывает личное поведение."
       },
       "gene": "OXTR",
       "source": "PMID 26121678 (Li 2015: OXTR rs53576 and sociality, meta-analysis); PMID 23921259 (Bakermans-Kranenburg 2014: oxytocin receptor genotype effects, meta-analysis)"
     },
     "rs5569": {
       "description": {
-        "en": "The curated SLC6A2 studies address different traits without replication of a shared effect; noradrenaline transport is the gene pathway, not a measured SNP effect.",
-        "ru": "Курируемые исследования SLC6A2 относятся к разным признакам без воспроизведения общего эффекта; транспорт норадреналина — путь гена, а не измеренный эффект SNP."
+        "en": "The cited meta-analysis examined methylphenidate response in childhood ADHD, including rs5569. A separate study concerns suicide in depression; neither justifies a personal noradrenaline estimate or a blanket claim of no replicated research.",
+        "ru": "Цитируемый метаанализ изучал ответ на метилфенидат при СДВГ у детей, включая rs5569. Другая работа касается суицида при депрессии; ни одна не даёт личной оценки норадреналина и не обосновывает общее заявление об отсутствии воспроизведённых исследований."
       },
       "gene": "SLC6A2",
-      "source": "PMID 29230023 (Myer 2018: pharmacogenetic predictors of methylphenidate efficacy); PMID 24655776 (Kim 2014: SLC6A2 polymorphisms and suicide in MDD)"
+      "source": "PMID:29230023; PMID:24655776"
     },
     "rs6356": {
       "description": {
-        "en": "TH Val81Met is a functional candidate in tyrosine hydroxylase; associations are nominal. It does not establish high or low dopamine or select a dopaminergic agent.",
-        "ru": "TH Val81Met — функциональный кандидат тирозингидроксилазы; ассоциации номинальные. Он не устанавливает высокий или низкий дофамин и не выбирает дофаминергический препарат."
+        "en": "Val81Met was studied for motor phenotypes and freezing of gait in Parkinson disease cohorts. These associations do not measure individual brain dopamine or select dopaminergic treatment.",
+        "ru": "Val81Met изучали в связи с двигательными фенотипами и застыванием при ходьбе в выборках болезни Паркинсона. Эти ассоциации не измеряют личный дофамин мозга и не выбирают дофаминергическое лечение."
       },
       "gene": "TH",
-      "source": "PMID 23596382 (Greenbaum 2013, Front Neurosci: variants associated with dopaminergic compensation in early Parkinson's disease)"
+      "source": "PMID:23596382; PMID:26732803"
     },
     "rs34424986": {
       "description": {
@@ -3961,6 +3961,294 @@
         "ru": "FOXO3 rs2802292: ассоциация с долголетием при противоречивом воспроизведении."
       },
       "source": "PMID:18765803; PMID:27071935; PMID:27621247; PMID:29733381"
+    },
+    "rs6725887": {
+      "gene": "WDR12",
+      "source": "Myocardial Infarction Genetics Consortium 2009; PMID:19198609; DOI:10.1038/ng.327",
+      "description": {
+        "en": "The WDR12-region rs6725887 variant was associated with early-onset myocardial infarction in a GWAS. The association does not establish a causal molecular mechanism or personal risk.",
+        "ru": "Вариант rs6725887 области WDR12 связан с ранним инфарктом в GWAS. Ассоциация не устанавливает причинный молекулярный механизм или личный риск."
+      }
+    },
+    "rs732609": {
+      "gene": "TPO",
+      "description": {
+        "en": "A study in West Bengal reported an association of T725P with adult hypothyroidism. Benign classification concerns Mendelian pathogenicity; it does not prove absence of every statistical association or a personal effect.",
+        "ru": "Исследование в Западной Бенгалии обнаружило ассоциацию T725P с гипотиреозом взрослых. Доброкачественная классификация относится к менделевской патогенности; она не доказывает отсутствие любых статистических ассоциаций или личный эффект."
+      },
+      "source": "https://doi.org/10.1507/endocrj.EJ13-0237"
+    },
+    "rs2076740": {
+      "gene": "TG",
+      "description": {
+        "en": "A meta-analysis found a model-dependent association with autoimmune thyroid disease; results varied by study characteristics. No individual thyroid-function estimate or treatment rule was established.",
+        "ru": "Метаанализ обнаружил зависящую от модели ассоциацию с аутоиммунными болезнями щитовидной железы; результаты зависели от особенностей исследований. Индивидуальная оценка функции щитовидной железы или правило лечения не установлены."
+      },
+      "source": "https://doi.org/10.1038/s41435-018-0042-z"
+    },
+    "rs2069550": {
+      "gene": "TG",
+      "description": {
+        "en": "A meta-analysis did not find an overall association with autoimmune thyroid disease; subgroup and sensitivity results varied. A synonymous annotation alone does not establish zero biological effect.",
+        "ru": "Метаанализ не выявил общей ассоциации с аутоиммунными болезнями щитовидной железы; результаты подгрупп и анализа чувствительности различались. Синонимичность сама по себе не устанавливает отсутствие биологического эффекта."
+      },
+      "source": "https://doi.org/10.1038/s41435-018-0042-z"
+    },
+    "rs180223": {
+      "gene": "TG",
+      "description": {
+        "en": "A meta-analysis found no significant overall association with autoimmune thyroid disease. This is a result for the studied outcome, not proof that every effect is absent.",
+        "ru": "Метаанализ не обнаружил значимой общей ассоциации с аутоиммунными болезнями щитовидной железы. Это результат для изученного исхода, а не доказательство отсутствия любых эффектов."
+      },
+      "source": "https://doi.org/10.1038/s41435-018-0042-z"
+    },
+    "rs853326": {
+      "gene": "TG",
+      "description": {
+        "en": "A meta-analysis found no significant overall autoimmune-thyroid-disease association; sensitivity analyses varied. No personal effect estimate follows from this evidence.",
+        "ru": "Метаанализ не обнаружил значимой общей ассоциации с аутоиммунными болезнями щитовидной железы; анализ чувствительности давал разные результаты. Личная оценка эффекта из этих данных не следует."
+      },
+      "source": "https://doi.org/10.1038/s41435-018-0042-z"
+    },
+    "rs590688": {
+      "gene": "PGR",
+      "description": {
+        "en": "A case-control study examined rs590688 in recurrent pregnancy loss and reported a candidate association. This does not establish progesterone sensitivity, a personal cause of pregnancy loss or a hormone dose.",
+        "ru": "Исследование случай–контроль изучило rs590688 при повторных потерях беременности и сообщило о кандидатной ассоциации. Это не устанавливает чувствительность к прогестерону, личную причину потерь беременности или дозу гормона."
+      },
+      "source": "PMID:28972310"
+    },
+    "rs9514089": {
+      "gene": "SLC10A2",
+      "description": {
+        "en": "An initial gallstone association was not confirmed by subsequent larger studies. The larger GWAS was null for this marker; a personal gallstone-risk claim is not justified by the initial report.",
+        "ru": "Первичная ассоциация с желчнокаменной болезнью не подтвердилась в последующих более крупных исследованиях. Более крупное GWAS дало нулевой результат для маркера; первичное сообщение не обосновывает личный риск камней."
+      },
+      "source": "PMID:19823678; https://doi.org/10.1038/s41467-018-07460-y"
+    },
+    "rs759330": {
+      "gene": "PAQR6",
+      "description": {
+        "en": "A candidate study reported a kidney-stone association at rs759330. A proposed microRNA-binding explanation was a hypothesis, not a demonstrated causal mechanism or personal risk estimate.",
+        "ru": "Кандидатное исследование сообщило об ассоциации rs759330 с камнями почек. Предложенное объяснение через связывание микроРНК было гипотезой, а не доказанным механизмом или личной оценкой риска."
+      },
+      "source": "https://doi.org/10.1186/1471-2350-15-50"
+    },
+    "rs4293393": {
+      "gene": "UMOD",
+      "description": {
+        "en": "Promoter-variant research linked UMOD expression with salt-sensitive blood-pressure and kidney phenotypes, including experiments. This does not select a personal salt target, medicine, dose or blood-pressure prediction.",
+        "ru": "Исследование промоторных вариантов связало экспрессию UMOD с солечувствительным давлением и почечными фенотипами, включая эксперименты. Это не выбирает личную норму соли, препарат, дозу или прогноз давления."
+      },
+      "source": "PMID:24185693"
+    },
+    "rs2066844": {
+      "gene": "NOD2",
+      "description": {
+        "en": "A Crohn-disease cohort study associated rs2066844 with ileal involvement and age at diagnosis. A phenotype association among patients does not establish general-population disease probability or a diagnosis.",
+        "ru": "Исследование выборки с болезнью Крона связало rs2066844 с поражением подвздошной кишки и возрастом постановки диагноза. Ассоциация фенотипов среди пациентов не устанавливает вероятность болезни в общей популяции или диагноз."
+      },
+      "source": "PMID:23300620"
+    },
+    "rs10488631": {
+      "gene": "TNPO3",
+      "description": {
+        "en": "This marker was investigated as part of an IRF5-region susceptibility haplotype for systemic lupus erythematosus. A nearby TNPO3 catalogue label does not prove a TNPO3-specific causal mechanism.",
+        "ru": "Маркер исследовали в составе гаплотипа восприимчивости к системной красной волчанке в области IRF5. Соседняя метка TNPO3 в каталоге не доказывает причинный механизм через TNPO3."
+      },
+      "source": "PMID:17568788"
+    },
+    "rs1800629": {
+      "gene": "TNF",
+      "description": {
+        "en": "Promoter-reporter experiments examined the TNF −308 variant and transcriptional activation. An experimental promoter result does not measure personal TNF, inflammation or treatment response.",
+        "ru": "Эксперименты с репортёром промотора изучали вариант TNF −308 и активацию транскрипции. Экспериментальный результат промотора не измеряет личный ФНО, воспаление или ответ на лечение."
+      },
+      "source": "PMID:9096369"
+    },
+    "rs532098": {
+      "gene": "TNF",
+      "description": {
+        "en": "An MHC-region study listed rs532098 near HCG9 in paediatric liver-transplant rejection research. This does not establish a TNF-specific effect or a general inflammation prediction.",
+        "ru": "Исследование области MHC указало rs532098 рядом с HCG9 при изучении отторжения трансплантата печени у детей. Это не устанавливает специфический эффект TNF или общий прогноз воспаления."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2956436/"
+    },
+    "rs1544410": {
+      "gene": "VDR",
+      "description": {
+        "en": "The supplementation-response meta-analysis did not find a significant BsmI association. This outcome-specific null does not prove every VDR effect absent or select a personal vitamin-D dose.",
+        "ru": "Метаанализ ответа на добавки не обнаружил значимой ассоциации BsmI. Нулевой результат для этого исхода не доказывает отсутствие любых эффектов VDR и не выбирает личную дозу витамина D."
+      },
+      "source": "PMID:35057541"
+    },
+    "rs731236": {
+      "gene": "VDR",
+      "description": {
+        "en": "The supplementation-response meta-analysis reported differences between TaqI genotype groups. The pooled result does not establish a universal personal response, deficiency diagnosis or dose.",
+        "ru": "Метаанализ ответа на добавки сообщил о различиях между группами генотипов TaqI. Общий результат не устанавливает универсальный личный ответ, диагноз дефицита или дозу."
+      },
+      "source": "PMID:35057541"
+    },
+    "rs3134069": {
+      "gene": "TNFRSF11B",
+      "description": {
+        "en": "A Taiwan Biobank candidate validation reported a borderline nominal osteoporosis association. A borderline cohort result does not establish a personal bone-density estimate or treatment rule.",
+        "ru": "Проверка кандидатных вариантов в Taiwan Biobank сообщила о пограничной номинальной ассоциации с остеопорозом. Пограничный результат выборки не устанавливает личную плотность костей или правило лечения."
+      },
+      "source": "PMID:42807304"
+    },
+    "rs2109505": {
+      "gene": "ABCB4",
+      "description": {
+        "en": "Studied in primary biliary cholangitis and primary sclerosing cholangitis cohorts; associations differed between those diseases. Disease-cohort evidence does not establish a general personal liver injury prediction.",
+        "ru": "Изучался в когортах первичного билиарного и первичного склерозирующего холангита; результаты различались между заболеваниями. Результат в когорте конкретного заболевания не задаёт общего личного прогноза повреждения печени."
+      },
+      "source": "PMID:36397154"
+    },
+    "rs699": {
+      "gene": "AGT",
+      "description": {
+        "en": "Blood-pressure associations were examined in a Japanese replication cohort and a joint meta-analysis. Ancestry, genetic model and measured outcome matter; this does not determine an individual pressure or treatment.",
+        "ru": "Связи с артериальным давлением изучались в японской репликационной когорте и совместном метаанализе. Важны популяция, генотипная модель и исход; это не определяет личное давление или лечение."
+      },
+      "source": "PMID:22456346"
+    },
+    "rs6738028": {
+      "gene": "BCL2L11",
+      "description": {
+        "en": "A genome-wide study associated this locus with serum DHEAS concentration. A locus association is not proof of a BCL2L11 mechanism, an individual hormone level or a longevity effect.",
+        "ru": "Геномное исследование выявило связь этой позиции с концентрацией ДГЭА-С в крови. Ассоциация позиции не доказывает механизм через BCL2L11, личный уровень гормона или эффект долголетия."
+      },
+      "source": "PMID:21533175"
+    },
+    "rs7181230": {
+      "gene": "BMF",
+      "description": {
+        "en": "A genome-wide study associated this locus with serum DHEAS concentration. This does not measure BMF activity, individual DHEAS or response to supplementation.",
+        "ru": "Геномное исследование выявило связь этой позиции с концентрацией ДГЭА-С в крови. Это не измеряет активность BMF, личный ДГЭА-С или ответ на добавку."
+      },
+      "source": "PMID:21533175"
+    },
+    "rs2287845": {
+      "gene": "C3",
+      "description": {
+        "en": "A candidate-gene study reported a nominal association with severe pre-eclampsia. The pregnancy-specific cohort and nominal result cannot be generalised to overall complement activity or an individual immune state.",
+        "ru": "Исследование гена-кандидата сообщило номинальную ассоциацию с тяжёлой преэклампсией. Когорту беременности и номинальный результат нельзя переносить на общую активность комплемента или личное состояние иммунитета."
+      },
+      "source": "PMID:28611769"
+    },
+    "rs7639618": {
+      "gene": "COL6A4P1",
+      "description": {
+        "en": "The position was studied under the historical DVWA label in osteoarthritis cohorts and meta-analyses. Population and allele orientation must be kept explicit; the current COL6A4P1 label does not prove an active collagen-protein mechanism.",
+        "ru": "Позиция изучалась под историческим обозначением DVWA в когортах остеоартроза и метаанализах. Нужно учитывать популяцию и ориентацию аллелей; нынешнее обозначение COL6A4P1 не доказывает механизм через активный белок коллагена."
+      },
+      "source": "PMID:38672138; PMID:26886631"
+    },
+    "rs2294512": {
+      "gene": "DIO1",
+      "description": {
+        "en": "An observational study examined psychological well-being in Korean patients with hypothyroidism. This clinical-cohort association does not establish enzyme activity, an individual thyroid-hormone level or a dosing rule.",
+        "ru": "Наблюдательная работа изучала психологическое самочувствие корейских пациентов с гипотиреозом. Ассоциация в клинической когорте не устанавливает активность фермента, личный уровень тиреоидных гормонов или правило дозирования."
+      },
+      "source": "PMID:28466400"
+    },
+    "rs4926616": {
+      "gene": "DIO1",
+      "description": {
+        "en": "An observational study examined psychological well-being in Korean patients with hypothyroidism. This is not a proven individual enzyme effect or a rule for choosing thyroid treatment.",
+        "ru": "Наблюдательная работа изучала психологическое самочувствие корейских пациентов с гипотиреозом. Это не доказанный индивидуальный эффект фермента и не правило выбора тиреоидного лечения."
+      },
+      "source": "PMID:28466400"
+    },
+    "rs16879765": {
+      "gene": "EPDR1",
+      "description": {
+        "en": "Studies associated the region with Dupuytren disease and investigated SFRP4-linked inflammatory signalling. EPDR1 and SFRP4 regional attributions in these sources must not be converted into a proven EPDR1 mechanism or a personal diagnosis.",
+        "ru": "Работы связывали область с болезнью Дюпюитрена и изучали воспалительную передачу сигнала, связанную с SFRP4. Региональные обозначения EPDR1 и SFRP4 в этих источниках не превращаются в доказанный механизм EPDR1 или личный диагноз."
+      },
+      "source": "PMID:24089297; PMID:36719100"
+    },
+    "rs27044": {
+      "gene": "ERAP1",
+      "description": {
+        "en": "A Tunisian spondyloarthritis study found no association with disease susceptibility, with some clinical associations conditional on HLA-B27. This result is specific to the population, disease context and joint genotype; it is not a general personal immune prediction.",
+        "ru": "В тунисской работе по спондилоартриту связь с восприимчивостью к заболеванию не выявлена; часть клинических ассоциаций зависела от HLA-B27. Результат относится к определённой популяции, заболеванию и совместному генотипу, а не к общему личному прогнозу иммунитета."
+      },
+      "source": "PMID:42768844"
+    },
+    "rs2987983": {
+      "gene": "ESR2",
+      "description": {
+        "en": "Candidate studies examined ovarian and breast cancer susceptibility with differing results in specific populations. A cancer-cohort association is not a measurement of estrogen levels, receptor activity or an individual hormonal phenotype.",
+        "ru": "Работы по генам-кандидатам изучали восприимчивость к раку яичников и молочной железы и дали различающиеся результаты в конкретных популяциях. Ассоциация в онкологической когорте не измеряет эстроген, активность рецептора или личный гормональный фенотип."
+      },
+      "source": "PMID:24881814; PMID:24430361"
+    },
+    "rs4986938": {
+      "gene": "ESR2",
+      "description": {
+        "en": "A reproductive-outcome meta-analysis reported heterogeneous results; a childhood-puberty cohort found no significant AluI association. Outcome-specific null or heterogeneous results do not establish a universal absence of biology or a personal hormonal effect.",
+        "ru": "Метаанализ репродуктивных исходов сообщил неоднородность результатов; в когорте девочек с ранним половым созреванием значимая связь AluI не обнаружена. Нулевой или неоднородный результат по отдельному исходу не означает отсутствия биологии вообще и не устанавливает личный гормональный эффект."
+      },
+      "source": "PMID:42248903; PMID:42388880"
+    },
+    "rs7850258": {
+      "gene": "FOXE1",
+      "description": {
+        "en": "Primary studies reported thyroid-related associations and allele-dependent enhancer activity near FOXE1 in cell models. The experiments and cohort associations do not determine an individual diagnosis, hormone concentration or treatment.",
+        "ru": "Первичные работы сообщили тиреоидные ассоциации и различия активности энхансера возле FOXE1 между аллелями в клеточных моделях. Клеточные эксперименты и когортные ассоциации не определяют личный диагноз, уровень гормона или лечение."
+      },
+      "source": "PMID:25652407; PMID:21981779"
+    },
+    "rs20541": {
+      "gene": "IL13",
+      "description": {
+        "en": "A small asthma case-control study examined this variant, total IgE and cytokine measurements. A disease-specific cohort cannot establish an individual allergy diagnosis, severity or treatment response.",
+        "ru": "Небольшое исследование случай–контроль при астме изучало этот вариант, общий IgE и цитокины. Когорта конкретного заболевания не устанавливает личный диагноз аллергии, тяжесть или ответ на лечение."
+      },
+      "source": "PMID:42428339"
+    },
+    "rs3118470": {
+      "gene": "IL2RA",
+      "description": {
+        "en": "Alopecia-areata meta-analysis and a separate population study reported differing associations. The heterogeneous disease association does not measure general T-cell function or a personal autoimmune outcome.",
+        "ru": "Метаанализ очаговой алопеции и отдельная популяционная работа сообщили различающиеся результаты. Неоднородная ассоциация с заболеванием не измеряет общую функцию T-клеток или личный аутоиммунный исход."
+      },
+      "source": "PMID:38394507; PMID:36248775"
+    },
+    "rs4988321": {
+      "gene": "LRP5",
+      "description": {
+        "en": "V667M was studied in bone-density cohorts and a risedronate trial, without a demonstrated genotype–treatment interaction in that trial. This does not exclude other biological associations or justify a personal fracture estimate or drug choice.",
+        "ru": "V667M изучен в когортах минеральной плотности кости и испытании ризедроната; в этом испытании взаимодействие генотипа с лечением не показано. Это не исключает другие биологические ассоциации и не обосновывает личный прогноз переломов или выбор препарата."
+      },
+      "source": "PMID:19148563; PMID:41069541"
+    },
+    "rs201420507": {
+      "gene": "DIO1",
+      "description": {
+        "en": "ClinVar records a classification for this exact variant. Its review status and disease context must be retained; the database classification alone is not a personal diagnosis.",
+        "ru": "В ClinVar есть классификация именно этого варианта. Нужно сохранять статус проверки и контекст заболевания; одна классификация базы не является личным диагнозом."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/1686839/"
+    },
+    "rs754694815": {
+      "gene": "DIO1",
+      "description": {
+        "en": "ClinVar records a classification for this exact variant. Its review status and disease context must be retained; the database classification alone is not a personal diagnosis.",
+        "ru": "В ClinVar есть классификация именно этого варианта. Нужно сохранять статус проверки и контекст заболевания; одна классификация базы не является личным диагнозом."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/1686838/"
+    },
+    "rs151261408": {
+      "gene": "DUOX2",
+      "description": {
+        "en": "ClinVar records a classification for this exact variant. Its review status and disease context must be retained; the database classification alone is not a personal diagnosis.",
+        "ru": "В ClinVar есть классификация именно этого варианта. Нужно сохранять статус проверки и контекст заболевания; одна классификация базы не является личным диагнозом."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/260328/"
     }
   }
 }

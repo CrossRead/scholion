@@ -92,6 +92,11 @@ def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[
     # Keep every submitter and every class, including disagreement.
     if supplement:
         assertions = supplement.get("submissions") or []
+    inheritance_book = core._read_knowledge('gencc_inheritance.json') if not assertions else {}
+    inherited = (inheritance_book.get('genes') or {}).get(canonical.upper()) or {}
+    using_inheritance = not assertions and bool(inherited.get('submissions'))
+    if using_inheritance:
+        assertions = inherited['submissions']
     diseases = {**(entry.get("diseases") or {}), **(supplement.get("diseases") or {})}
     associations = []
     for assertion in assertions:
@@ -104,8 +109,10 @@ def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[
         associations.append({**assertion,
             "disease_label": core._localized(label, lang()) or disease,
             "classification_label": t(class_key) if class_key in CATALOGUES[lang()] else classification,
-            "moi_label": t(moi_key) if moi_key in CATALOGUES[lang()] else moi})
-    return {"scope": "reference_only", "level": None,
+            "moi_label": t('finding.mode.' + assertion['moi_code'])
+                         if using_inheritance and 'finding.mode.' + str(assertion.get('moi_code')) in CATALOGUES[lang()]
+                         else t(moi_key) if moi_key in CATALOGUES[lang()] else moi})
+    context = {"scope": "reference_only", "level": None,
             "mechanistic_hypotheses": reference_patterns(gene),
             **_function_fields(gene),
             "variant_context": t("reference.variant_not_supplied"),
@@ -113,9 +120,11 @@ def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[
             "gencc_assertions": associations,
             "gencc_status": supplement.get("snapshot_status") or ("assertions_recorded" if associations else "not_available"),
             "gencc_source": "https://thegencc.org/",
-            "gencc_version": (additional.get("_meta", {}).get("export_last_modified")
+            "gencc_version": ((inheritance_book.get('_meta') or {}).get('snapshot') if using_inheritance else
+                              additional.get("_meta", {}).get("export_last_modified")
                               if supplement else book.get("_meta", {}).get("gencc_export_version")),
             "notice": t("reference.notice")}
+    return _scientific_context(gene, "", context)
 
 
 def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
@@ -140,13 +149,14 @@ def reference_context(spec: Dict[str, Any], level: Any) -> Dict[str, Any]:
         source = spec.get("source") or (spec.get("evidence") or {}).get("source")
     if not isinstance(description, str) or not isinstance(source, str) or level == "E":
         description, source = None, None
-    return {"scope": "reference_only", "level": level,
+    context = {"scope": "reference_only", "level": level,
             "allele_note": core._localized(spec.get("allele_note"), lang()),
             "mechanistic_hypotheses": reference_patterns(gene, spec.get("rsid")),
             **_function_fields(gene, spec.get("rsid") or ""),
             "variant_context": description or t("reference.variant_unknown"),
             "variant_source": source, "variant_status": "described" if description else "not_curated",
             "notice": t("reference.notice")}
+    return _scientific_context(gene, str(spec.get("rsid") or ""), context)
 
 
 def reference_lines(row: Dict[str, Any]) -> List[str]:
@@ -197,6 +207,11 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     if context.get("gencc_assertions"):
         lines.append(t("gencc.source", version=context.get("gencc_version") or "—",
                        source=context.get("gencc_source")))
+    for review in context.get('scientific_review') or []:
+        lines.append(review['label'] + ': ' + str(review.get('summary') or ''))
+        if review.get('limitations'):
+            lines.append(str(review['limitations']))
+        lines.extend(str(source) for source in review.get('sources') or [] if source)
     if context.get("gene_source"):
         lines.append(t("reference.gene_source", source=context["gene_source"]))
     for source in context.get("gene_additional_sources") or []:
@@ -325,6 +340,11 @@ def attach_finding_biology(rows: List[Dict[str, Any]]) -> None:
         row["gene_contexts"] = contexts
 
 
+def _scientific_context(gene: str, rsid: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    from .scientific_review import context_review
+    return {**context, 'scientific_review': context_review(gene, rsid, context)}
+
+
 def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
     """Reuse system-panel knowledge, without turning an annotation into an effect.
 
@@ -393,4 +413,5 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
     review=(core._read_knowledge('clinical_reference_review.json').get('positions') or {}).get(gene+'|'+rsid)
     if review and review.get('outcome') != 'existing_supported_basis':
         context['clinical_review']={k:review[k] for k in ('reviewed_on','outcome','limitations','subclaims')}
-    return {"gene": gene, "rsid": rsid, "level": context["level"], "reference_context": context}
+    return {"gene": gene, "rsid": rsid, "level": context["level"],
+            "reference_context": _scientific_context(gene, rsid, context)}

@@ -6,6 +6,7 @@ import subprocess
 import unittest
 
 import support
+import gene_card_support
 from scholion import i18n
 from scholion.conclusion_basis import guard_position
 from scholion.panel_reference import interpretation_context, interpretation_lines
@@ -71,13 +72,13 @@ for(const register of ['patient','clinician']){
  positions.push({...positions[0],gene:'UNREAD',read:false,state:null});
  const gen={positions,rows:positions},before=JSON.stringify(gen);
  const html=genSummaryHtml(gen,{key:'synthetic',register});
- const table=html.slice(html.indexOf('<tbody>'),html.indexOf('</tbody>'));
- assert.equal((table.match(/<tr>/g)||[]).length,5);
+ const table=html.slice(html.indexOf('<div class="gene-card-list"'),html.indexOf('<p class="cr-caption" data-interpretation-notice>'));
+ assert.equal((table.match(/data-gene-card /g)||[]).length,5);
  assert.ok(!table.includes('ABSENT'));assert.ok(!table.includes('UNREAD'));
  for(const level of ['A','B','C','D','E']){
   assert.ok(table.includes('INTERPRETATION_'+level));assert.ok(table.includes('FUNCTION_'+level));
   assert.ok(table.includes('data-panel-gene="GENE_'+level+'"'));assert.ok(table.includes('data-level="'+level+'"'));
-  const disclosure=table.match(new RegExp('<details class="gen-context"[^>]*>','g'));
+  const disclosure=table.match(new RegExp('<details class="gene-card-fold" data-gene-annotations[^>]*>','g'));
   assert.equal(disclosure.length,5);assert.ok(!disclosure.some(x=>x.includes(' open')));
   assert.ok(!table.includes('system.hyp.no_sentence'));
   assert.ok(table.includes('GAP_'+level));assert.ok(table.includes('SOURCE_'+level));
@@ -87,7 +88,8 @@ for(const register of ['patient','clinician']){
  assert.equal(JSON.stringify(gen),before);
 }
 """
-        result = subprocess.run([shutil.which("node"), "-e", script], capture_output=True, text=True,
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, capture_output=True, text=True,
                                 stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -148,12 +150,16 @@ for(const c of cases)for(const register of ['patient','clinician']){
  const p=c.row,before=JSON.stringify(p);
  const gen={positions:c.kind==='position'?[p]:[],rows:[p]},card={key:c.key,register};
  const html=genTableHtml(gen,card,register),id=(c.kind==='position'?'p:'+p.gene+':'+p.rsid:'g:'+p.gene);
- assert.ok(html.includes('data-gendet="'+esc(id)+'" hidden'),id);
+ assert.equal((html.match(/data-gene-card /g)||[]).length,1,id);
  assert.ok(html.includes('data-panel-gene="'+esc(p.gene)+'"'),id);
- const detail=html.slice(html.indexOf('data-gendet='));
+ const detail=html;
  const context=p.reference_context;
- for(const field of ['gene_function','variant_context','gene_source','variant_source','limitations'])
+ for(const field of ['gene_function','variant_context','gene_source','limitations'])
   if(context[field])assert.ok(detail.includes(esc(context[field])),id+' '+field);
+ if(context.variant_source && !detail.includes(esc(context.variant_source))){
+  const sources=(context.scientific_review||[]).filter(r=>r.scope==='variant').flatMap(r=>r.sources||[]);
+  assert.ok(sources.length && sources.every(source=>detail.includes(esc(source))),id+' variant source scope lost');
+ }
  if(c.kind==='position'){
   if(p.level)assert.ok(html.includes('data-level="'+p.level+'"'),id);
   const sentence=p.interpretation.summary;
@@ -175,7 +181,7 @@ for(const c of cases)for(const register of ['patient','clinician']){
   }
   assert.ok(!brief.includes('data-genetic-context open'),id);
  }else{
-  assert.ok(html.includes('GenCC:'),id);
+  assert.ok(html.includes('data-gene-db="GenCC"'),id);
   for(const a of context.gencc_assertions){
    for(const field of ['disease_label','classification_label','moi_label','submitter','curated_on'])
     if(a[field])assert.ok(detail.includes(esc(a[field])),id+' '+field);
@@ -191,7 +197,8 @@ for(const c of cases)for(const register of ['patient','clinician']){
  assert.equal(JSON.stringify(p),before,id+' mutated input');
 }
 """
-        result = subprocess.run([shutil.which("node"), "-e", script], input=json.dumps(cases),
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, input=json.dumps(cases),
                                 capture_output=True, text=True, stdin=None, timeout=45)
         self.assertEqual(result.returncode, 0, result.stderr[-2500:])
 
@@ -234,6 +241,7 @@ for(const kind of ['plain','fold','native','link']){
  if(!detail.hidden){click(event);assert.equal(detail.hidden,true,kind+' close');}
 }
 """
-        result = subprocess.run([shutil.which("node"), "-e", script], capture_output=True, text=True,
+        script = gene_card_support.javascript() + script
+        result = gene_card_support.run(script, capture_output=True, text=True,
                                 stdin=subprocess.DEVNULL, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)

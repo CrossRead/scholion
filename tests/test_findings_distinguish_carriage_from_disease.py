@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 
 import support
+import gene_card_support
 from scholion import finding_context as context, genome, i18n
 from scholion.format_genome import clinvar_report
 
@@ -180,7 +180,8 @@ const flagsHTML=()=>'',doseHTML=()=>'',ctxCount=()=>0,contextHtml=()=>'';
 """+'\n'.join(functions)+"""
 console.log(JSON.stringify([genomeFindings(cv,null,null,null),renderClinvar(cv),renderACMG({status:'ok',carriers:cv.hits}),rxCard({status:'ok',drug:'Synthetic drug',clinvar:cv})]));
 """
-            result = subprocess.run([shutil.which('node'), '-e', script], input=json.dumps(payload),
+            script = gene_card_support.javascript() + script
+            result = gene_card_support.run(script, input=json.dumps(payload),
                                     text=True, capture_output=True, timeout=20)
             self.assertEqual(0, result.returncode, result.stderr)
             for html in json.loads(result.stdout):
@@ -191,7 +192,10 @@ console.log(JSON.stringify([genomeFindings(cv,null,null,null),renderClinvar(cv),
                 self.assertIn(biology, html)
                 self.assertLess(html.index(biology), html.index(rows[0]['personal_context']['inclusion_reason']))
                 self.assertLess(html.index(rows[0]['personal_context']['inclusion_reason']), html.index(rows[0]['personal_context']['summary']))
-                self.assertNotIn('<p>'+rows[0]['personal_context']['summary']+'</p>', html)
+                self.assertEqual(1, html.count(rows[0]['personal_context']['summary']))
+                primary = html.split('data-gene-description>')[1].split('</div></div>')[0]
+                self.assertNotIn(rows[0]['personal_context']['inclusion_reason'], primary)
+                self.assertIn(i18n.t('web.gene_card.meaning.carrier_context'), primary)
 
     def test_inheritance_snapshot_is_public_and_retains_all_source_witnesses(self):
         book = context.core._read_knowledge('gencc_inheritance.json')

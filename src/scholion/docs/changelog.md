@@ -40,6 +40,53 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.3 — 27.10.2026
+
+### What this changes in the conclusions
+
+Gene and variant cards now use the same layout across genome findings,
+disease screening, gene panels, body-system views, laboratory and medication
+context, and visit sheets. Each card separates interpretation confidence,
+gene/position, personal reading with zygosity, and biological function and
+personal meaning. Open the local interface with `scholion serve`. Personal inheritance status remains distinct from a database
+classification. Database annotations and inheritance details open separately.
+
+Personal gene topics now read existing records from each gene interval when an
+indexed genome and compatible gene coordinates are available, including genes without a
+selected catalogue SNP. They retain each recorded allele and distinguish a
+failed query from an empty result. Opening a topic does not call new variants
+or remeasure BAM coverage. Cached results are bound to the selected profile,
+input files, index, annotation and sample.
+Packaged public GRCh38 intervals provide an offline coordinate fallback. They
+do not invent coding exons or protein effects when transcript annotation is absent.
+
+Scientific context separates gene function, gene–disease validity, a variant
+association and individual applicability. References with verified missing
+bibliography have been repaired. Incomplete project curation, conflicting
+studies, an unverified individual estimate and absence of a source are separate
+states; an unfilled field is not described as absence of scientific research.
+Versioned database and guideline sources can support their own assertion types
+without a publication identifier; they do not inherit permission for personal
+clinical conclusions.
+
+### What is retracted
+
+Several positive or individual-effect descriptions overstated the cited evidence:
+null pooled results, population-specific findings and genotype models were
+previously presented too broadly. These descriptions and unsupported numerical
+predictions have been corrected. Interpretation confidence is lower where the
+sources conflict or only establish a gene–disease relationship. Database
+classifications and actual recorded genotypes remain separate and unchanged.
+Adding a reference never automatically enables a clinical recommendation.
+
+### What needs recomputing
+
+Nothing needs new genome calling, BAM preparation or polygenic scoring.
+Existing readings remain valid. Reopen the affected panels to use the corrected
+reference interpretations and gene-interval display. No personal data need to
+be uploaded or reimported.
+
+
 ## v0.7.2 — 26.10.2026
 
 **Carrier status is distinguished from disease.** Genome findings now show

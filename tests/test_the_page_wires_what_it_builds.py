@@ -34,7 +34,9 @@ class TestThePage(unittest.TestCase):
         self.assertIn("bindScreen();", PAGE)
 
     def test_a_variant_row_opens_the_variant(self):
-        self.assertIn("data-rs-open", _function("genomeFindings"))
+        self.assertIn("geneFindingCards(r.finding)", _function("genomeFindings"))
+        shared = (support.ROOT / "src/scholion/web/gene-cards.js").read_text(encoding="utf-8")
+        self.assertIn("data-rs-open", shared)
         self.assertIn("[data-rs-open]", PAGE)
 
     def test_the_genome_chooser_is_not_the_folder_picker(self):

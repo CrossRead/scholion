@@ -1,6 +1,8 @@
 """The structural minimum for a product interpretation, not clinical validation.
 
-A PMID/DOI must still be checked against the sentence during curation. This
+A publication identifier or typed source passport must still be checked against
+the exact sentence during curation. Database and guideline identities do not
+require a PMID; their claim scope and version remain mandatory. This
 offline check never claims that an identifier proves an effect or applicability.
 Raw bilingual mechanisms must have both languages; already-localised callers
 are also supported, with raw catalogue completeness held by regression tests.
@@ -23,7 +25,38 @@ def source_has_identifier(source: Any) -> bool:
     return isinstance(source, str) and bool(_PMID.search(source) or _PUBMED.search(source) or _DOI.search(source))
 
 
-def conclusion_basis(spec: Any) -> Dict[str, Any]:
+def _source_passport(source: Any, claim_type: str) -> bool:
+    """Structural source identity and scope, never scientific approval by URL."""
+    if not isinstance(source, dict):
+        return False
+    kind = source.get('source_type')
+    scopes = source.get('claim_scopes') or []
+    reviewed_on = source.get('reviewed_on')
+    if not isinstance(scopes, list) or claim_type not in scopes or not isinstance(reviewed_on, str) or not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', reviewed_on):
+        return False
+    url = source.get('url')
+    ident = source.get('identifier')
+    if not isinstance(url, str) or not url.startswith('https://') or not isinstance(ident, str) or not ident.strip():
+        return False
+    if kind == 'publication':
+        return source_has_identifier(ident) or bool(ident.startswith('https://') and source.get('title'))
+    if not source.get('version'):
+        return False
+    if kind == 'guideline':
+        return bool(source.get('issuer') and source.get('title'))
+    if kind == 'database_assertion':
+        # A gene-level or classification assertion cannot supply a clinical rule.
+        if claim_type not in ('gene_function', 'gene_disease_validity', 'variant_classification', 'sequence_annotation'):
+            return False
+        patterns = {'ClinVar': r'(?:VCV|RCV|SCV)[0-9]+(?:\.[0-9]+)?',
+                    'GenCC': r'SGC-[0-9]+', 'UniProt': r'[A-Z0-9]{6,10}',
+                    'GO': r'GO:[0-9]{7}', 'NCBI Gene': r'[0-9]+'}
+        pattern = patterns.get(str(source.get('database') or ''))
+        return bool(pattern and re.fullmatch(pattern, ident))
+    return False
+
+
+def conclusion_basis(spec: Any, *, claim_type: str = 'personal_inference') -> Dict[str, Any]:
     """A row's own support and named gaps, without mutation or a system fallback."""
     spec = spec if isinstance(spec, dict) else {}
     evidence = spec.get("evidence")
@@ -35,12 +68,15 @@ def conclusion_basis(spec: Any) -> Dict[str, Any]:
     mechanism = raw.get(lang()) if bilingual else raw if isinstance(raw, str) else None
     mechanism = mechanism.strip() if isinstance(mechanism, str) else None
     missing = []
-    if not source_has_identifier(source):
+    passport = spec.get('source_passport')
+    passport_valid = _source_passport(passport, claim_type)
+    if not source_has_identifier(source) and not passport_valid:
         missing.append("source_identifier")
-    if not mechanism:
+    if not mechanism and claim_type not in ('gene_function', 'gene_disease_validity', 'variant_classification', 'sequence_annotation'):
         missing.append("mechanism")
     return {"status": "incomplete" if missing else "complete", "missing": missing,
-            "source": source if isinstance(source, str) else None,
+            "source": source if isinstance(source, str) else passport.get('url') if passport_valid else None,
+            "source_kind": passport.get('source_type') if passport_valid else 'publication_identifier' if source_has_identifier(source) else None,
             "mechanism": mechanism or None,
             "reason": t("conclusion.withheld", missing=", ".join(t("conclusion.missing." + k)
                                                                     for k in missing)) if missing else None}

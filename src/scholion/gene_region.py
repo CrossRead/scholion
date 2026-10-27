@@ -31,6 +31,7 @@ happened was «nothing looked».
 from __future__ import annotations
 
 import os
+from functools import lru_cache as _lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -253,8 +254,8 @@ def reference_region(location):
 
 
 # ----------------------------------------------------------------------- report
-def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
-    """Everything the owner's own data can say about one gene, gaps included."""
+def report(gene: str, allow_network: bool = True, *, panel_preview: bool = False) -> Dict[str, Any]:
+    """Read an existing VCF interval; panel previews never scan BAM or annotate protein."""
     from . import genome
     from . import linear as _lin
     gaps: List[Dict[str, str]] = []
@@ -278,8 +279,9 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
     out: Dict[str, Any] = {"status": "ok", "region": True, "gene": loc["gene"],
                            "location": loc, "genome_ready": st["ready"],
                            "reference_region": reference_region(loc),
-                           "coverage": _coverage(loc["chrom"], loc["start"], loc["end"],
-                                                 loc["cds"], loc.get("assembly"))}
+                           "coverage": ({"source": None, "why": _t("thematic.coverage_preview")}
+                                        if panel_preview else _coverage(loc["chrom"], loc["start"], loc["end"],
+                                                 loc["cds"], loc.get("assembly")))}
     if not st["ready"]:
         out["status"] = "no_genome"
         out["reason"] = st.get("reason")
@@ -374,9 +376,9 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
         gaps.append(_gap(_t("gene.uncalled_rows", count=uncalled), ""))
     for v in variants:
         v["coding"] = _in_cds(v["pos"], loc["cds"])
-    if loc["cds"]:
+    if loc["cds"] and not panel_preview:
         _protein(loc, variants, gaps)
-    else:
+    elif not loc["cds"]:
         gaps.append(_gap(_t("gene.no_cds", gene=loc["gene"]), ""))
 
     coding = [v for v in variants if v.get("coding")]
@@ -392,10 +394,12 @@ def report(gene: str, allow_network: bool = True) -> Dict[str, Any]:
                          not in ("synonymous", "not_coding", "not_substitution",
                                  "reference_mismatch", "error", None))
                      if computed else None)
-    out["variants"] = {"total": len(variants), "coding": len(coding),
-                       "coding_rows": coding, "consequential": consequential,
-                       "consequence_computed": computed, "uncalled_rows": uncalled,
-                       "noncoding_rows": [v for v in variants if not v.get("coding")],
+    cds_known = bool(loc['cds'])
+    out["variants"] = {"total": len(variants), "coding": len(coding) if cds_known else None,
+                       "coding_rows": coding, "consequential": consequential if cds_known else None,
+                       "consequence_computed": computed and cds_known, "uncalled_rows": uncalled,
+                       "noncoding_rows": [v for v in variants if not v.get("coding")] if cds_known else [],
+                       "unannotated_rows": variants if not cds_known else [],
                        "reference_calls": reference_calls}
     out["clinvar"] = _clinvar_in_region(loc["chrom"], loc["start"], loc["end"])
     out["reading_summary"] = reading_summary(loc, out["variants"], out["coverage"])
@@ -423,3 +427,45 @@ def attach_reading(answer: Dict[str, Any], gene: str) -> None:
         region["catalogue_loci"] = answer.get("loci") or []
         region["layers"] = answer.get("layers")
         answer["region_report"] = region
+
+
+# Only read-only interval previews are cached. The signature includes the
+# selected container and all local input witnesses; callers receive copies.
+def _preview_file(path) -> tuple:
+    if not path:
+        return ()
+    value = Path(path).resolve()
+    try:
+        stat = value.stat()
+        return (str(value), stat.st_size, stat.st_mtime_ns)
+    except OSError:
+        return (str(value), None, None)
+
+
+def preview(gene: str) -> Dict[str, Any]:
+    """Read a panel interval once per selected person/input, without BAM work."""
+    import copy
+    from . import genome
+    from .i18n import lang
+    files = []
+    vcf = genome.vcf_path()
+    if vcf:
+        files.extend([vcf, str(vcf) + '.tbi', str(vcf) + '.csi'])
+    files.extend(genes.gff3_candidates())
+    files.append(core.knowledge_path('gene_reference_regions.json'))
+    # Prime only this symbol's coordinate cache; another gene being added must
+    # not invalidate all previously read intervals.
+    genes.resolve(gene, allow_network=False)
+    from .knowledge_provenance import digest
+    location_signature = digest(genes._load_cache().get(gene.upper()))
+    for base in core.genome_bases():
+        files.extend(sorted(Path(base).glob('clinvar*')))
+    signature = (str(core.profile_dir().resolve()), lang(),
+                 os.environ.get('SCHOLION_VCF_SAMPLE'),
+                 tuple(_preview_file(path) for path in files), location_signature, id(report))
+    return copy.deepcopy(_cached_preview(signature, gene.upper()))
+
+
+@_lru_cache(maxsize=2048)
+def _cached_preview(signature: tuple, gene: str) -> Dict[str, Any]:
+    return report(gene, allow_network=False, panel_preview=True)

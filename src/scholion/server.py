@@ -406,6 +406,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(_WEB / "icon.svg", "image/svg+xml")
             if p == "/dna.svg":
                 return self._file(_WEB / "dna.svg", "image/svg+xml")
+            if p == "/gene-cards.js":
+                return self._file(_WEB / "gene-cards.js", "application/javascript; charset=utf-8")
             if p == "/chart.min.js":
                 return self._file(_WEB / "chart.min.js", "application/javascript; charset=utf-8")
             if p in ("/body-male.webp", "/body-female.webp"):

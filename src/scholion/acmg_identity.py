@@ -75,7 +75,7 @@ def knowledge(meta: dict) -> dict:
         result['reason'] = 'knowledge_changed'
         return result
     from .coverage import clinvar_path
-    from .acmg_scan import source_identity
+    from .acmg_scan import source_identity, identity_matches
     local = clinvar_path()
     if local is None:
         candidate = Path(meta.get('clinvar_path') or '.')
@@ -83,7 +83,7 @@ def knowledge(meta: dict) -> dict:
     result['local_clinvar_available'] = local is not None
     if local is not None and meta.get('clinvar_identity'):
         try:
-            if source_identity(local) != meta['clinvar_identity']:
+            if not identity_matches(meta['clinvar_identity'], source_identity(local), meta.get('clinvar_sha256')):
                 result['status'] = 'verification_required'
                 result['reason'] = 'clinvar_verification_needed'
         except OSError:

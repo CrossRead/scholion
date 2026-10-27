@@ -441,7 +441,7 @@ def _build_demo(repo: Path, shared: Path) -> None:
 
 def _build_docs(repo: Path, shared: Path) -> None:
     """Keep public reading links usable outside the internal source tree."""
-    names = ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "VERSIONING.md",
+    names = ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "GENE-CARD.md", "VERSIONING.md",
              "CONNECTING-AN-AGENT.md", "FOR-CLINICIANS.md", "FOR-CLINICIANS-DETAILS.md",
              "CONTAINER-LIFECYCLE.md", "DATA-LAYOUT.md", "EVIDENCE-LEVELS.md",
              "FOLATE-HISTAMINE-REDOX-CHOLINE.md", "CROSSREAD.md",
@@ -602,7 +602,7 @@ def build(repo: Path, out: Path) -> Path:
                   "check_test_reach.py", "test_reach_baseline.json",
                   "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
                   "check_quiet_excepts.py", "test_the_artefact.sh",
-                  "check_types.py", "types_baseline.json"):
+                  "check_types.py", "types_baseline.json", "check_ouroboros_host.py"):
         _src = repo / "src" / "tools" / _name
         if _src.exists():
             shutil.copy2(_src, shared / "src" / "tools" / _name)

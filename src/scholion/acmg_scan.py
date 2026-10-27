@@ -62,7 +62,7 @@ from .i18n import t as _t
 
 PATHO_TOKENS = ("Pathogenic", "Likely_pathogenic")
 INFO_RE = {k: re.compile(rf"(?:^|;){k}=([^;]*)")
-           for k in ("GENEINFO", "CLNSIG", "CLNREVSTAT", "CLNDN", "RS")}
+           for k in ("GENEINFO", "CLNSIG", "CLNREVSTAT", "CLNDN", "RS", "CLNALLE")}
 
 #: Where the published file for each build lives. Named here rather than left to
 #: the reader, because «download ClinVar» is the instruction that produced the
@@ -156,35 +156,12 @@ def _clinvar_header(path: str) -> Dict[str, Optional[str]]:
     `##reference=` line is what somebody wrote, accepted only where no length
     was found.
     """
-    from .genome import _LENGTH_TO_ASSEMBLY   # one table of lengths, not two
-    out: Dict[str, Optional[str]] = {"assembly": None, "file_date": None}
-    by_line: Optional[str] = None
+    from .clinvar_reference import header_metadata
     try:
         with gzip.open(str(path), "rt", encoding="utf-8", errors="replace") as fh:
-            for line in fh:
-                if line[0] != "#":
-                    break
-                if line.startswith("##contig=") and "length=" in line:
-                    try:
-                        length = int(line.split("length=", 1)[1].split(",")[0].split(">")[0])
-                    except (ValueError, IndexError):
-                        continue
-                    hit = _LENGTH_TO_ASSEMBLY.get(length)
-                    if hit and not out["assembly"]:
-                        out["assembly"] = hit
-                elif line.startswith("##reference=") and by_line is None:
-                    value = line.split("=", 1)[1]
-                    if "GRCh38" in value or "hg38" in value:
-                        by_line = "GRCh38"
-                    elif "GRCh37" in value or "hg19" in value:
-                        by_line = "GRCh37"
-                elif line.startswith("##fileDate="):
-                    out["file_date"] = line.split("=", 1)[1].strip() or None
+            return header_metadata(fh)
     except (OSError, EOFError):
-        return out
-    if not out["assembly"]:
-        out["assembly"] = by_line
-    return out
+        return {"assembly": None, "file_date": None}
 
 
 def clinvar_assembly(path: str) -> Optional[str]:
@@ -207,8 +184,13 @@ def _index(clinvar_vcf: str, genes: Dict[str, Any]):
     """ClinVar P/LP variants in the listed genes → {(chrom,pos,ref,alt): record}."""
     idx: Dict[tuple, Dict[str, str]] = {}
     scanned = 0
+    numbers = {}
     with gzip.open(clinvar_vcf, "rt", encoding="utf-8", errors="replace") as fh:
         for line in fh:
+            if line.startswith("##INFO="):
+                match = re.search(r"ID=([^,]+),Number=([^,]+)", line)
+                if match:
+                    numbers[match[1]] = match[2]
             if line[0] == "#":
                 continue
             scanned += 1
@@ -218,18 +200,41 @@ def _index(clinvar_vcf: str, genes: Dict[str, Any]):
             if len(f) < 8:
                 continue
             info = f[7]
-            sig = _info(info, "CLNSIG")
-            if not _is_plp(sig):
-                continue
-            hit = {p.split(":")[0] for p in _info(info, "GENEINFO").split("|") if p} & genes.keys()
+            hit = {p.split(":")[0] for p in re.split(r"[|,]", _info(info, "GENEINFO")) if p} & genes.keys()
             if not hit:
                 continue
-            chrom, pos, ref, alt = _variant_key(f[0], f[1], f[3], f[4])
-            idx[(chrom, pos, ref, alt)] = {
-                "genes": sorted(hit), "clnsig": sig,
-                "review": _info(info, "CLNREVSTAT"),
-                "clndn": _info(info, "CLNDN"),
-                "rsid": ("rs" + _info(info, "RS")) if _info(info, "RS") else ""}
+            alts = f[4].split(",")
+            fields = {key: _info(info, key) for key in ("CLNSIG", "CLNREVSTAT", "CLNDN", "RS", "GENEINFO")}
+            assigned = _info(info, "CLNALLE")
+            single_assignment = int(assigned) - 1 if assigned.isdigit() else None
+            if len(alts) > 1 and numbers.get("CLNSIG") != "A" and not (
+                    single_assignment is not None and 0 <= single_assignment < len(alts)):
+                # A single CLNALLE explicitly scopes the whole assertion. For
+                # other layouts require Number=A, never spread a site assertion.
+                raise ValueError("clinvar_allele_ambiguous")
+            for allele, alt in enumerate(alts):
+                if single_assignment is not None and allele != single_assignment:
+                    continue
+                values = dict(fields)
+                for key, value in fields.items():
+                    if numbers.get(key) == "A":
+                        parts = value.split(",")
+                        if len(parts) != len(alts):
+                            raise ValueError("clinvar_allele_ambiguous")
+                        values[key] = parts[allele]
+                    elif len(alts) > 1 and single_assignment is None and key not in ("CLNSIG", "RS", "GENEINFO"):
+                        # Do not attach a site-wide review or condition to an ALT.
+                        values[key] = ""
+                allele_genes = {p.split(":")[0] for p in values["GENEINFO"].split("|") if p} & genes.keys()
+                if not allele_genes or not _is_plp(values["CLNSIG"]):
+                    continue
+                if not re.fullmatch("[ACGTNacgtn]+", alt):
+                    raise ValueError("clinvar_allele_ambiguous")
+                chrom, pos, ref, variant = _variant_key(f[0], f[1], f[3], alt)
+                idx[(chrom, pos, ref, variant)] = {
+                    "genes": sorted(allele_genes), "clnsig": values["CLNSIG"],
+                    "review": values["CLNREVSTAT"], "clndn": values["CLNDN"],
+                    "rsid": ("rs" + values["RS"]) if values["RS"] else ""}
     return idx, scanned
 
 
@@ -339,9 +344,10 @@ def _windows_change_time(fd: int) -> int:
 def source_identity(path) -> Dict[str, Any]:
     """A readable local-file witness, without hashing a multi-gigabyte genome.
 
-    Path, inode, size, mtime and ctime bind the derived table to this input.
-    Restoring mtime after an edit does not restore ctime. Moving or replacing
-    a source deliberately requires a new scan; this is not a content hash.
+    Small sources also carry a full digest: timestamp granularity cannot hide
+    a same-size edit. For large sources this remains a stat witness, not proof
+    of byte equality; an explicit content verification establishes that proof.
+    Moving or replacing a source requires verification of the saved full digest.
     """
     p = Path(path).resolve(strict=True)
     with p.open("rb") as stream:
@@ -349,7 +355,12 @@ def source_identity(path) -> Dict[str, Any]:
         change = _windows_change_time(stream.fileno()) if os.name == "nt" else None
         if not stat.S_ISREG(before.st_mode):
             raise OSError("not a regular source file")
-        stream.read(1)
+        # Small inputs get a complete witness even on filesystems with coarse
+        # timestamps. Large genomes retain the bounded stat check; their full
+        # content witness is established by the explicit verification operation.
+        digest = hashlib.sha256(stream.read(before.st_size + 1)).hexdigest() if before.st_size <= 8 * 1024 * 1024 else None
+        if digest is None:
+            stream.read(1)
         after = os.fstat(stream.fileno())
         if os.name == "nt" and change != _windows_change_time(stream.fileno()):
             raise OSError("source changed while checking it")
@@ -368,7 +379,22 @@ def source_identity(path) -> Dict[str, Any]:
     if witness != {k: getattr(after, k) for k in fields} or witness != {
             k: getattr(current, k) for k in fields}:
         raise OSError("source changed while checking it")
-    return {"path": str(p), "change_time": change, **witness}
+    result = {"path": str(p), "change_time": change, **witness}
+    if digest is not None:
+        result["sha256"] = digest
+    return result
+
+
+def identity_matches(recorded, current, content_digest=None):
+    """Compare old stat-only sidecars using their already recorded full digest."""
+    if not isinstance(recorded, dict):
+        return False
+    expected = dict(recorded)
+    if "sha256" in current and "sha256" not in expected:
+        if not content_digest:
+            return False
+        expected["sha256"] = content_digest
+    return expected == current
 
 
 def table_refusal(table: Path, meta: Optional[Dict[str, Any]], personal,
@@ -385,7 +411,7 @@ def table_refusal(table: Path, meta: Optional[Dict[str, Any]], personal,
         return "source_unavailable"
     if not meta.get("personal_identity") or not meta.get("table_sha256"):
         return "metadata_unverified"
-    if meta.get("personal_path") != identity["path"] or meta["personal_identity"] != identity:
+    if meta.get("personal_path") != identity["path"] or not identity_matches(meta["personal_identity"], identity, meta.get("personal_sha256")):
         return "source_verification_needed" if meta.get("personal_sha256") else "source_changed"
     try:
         current_digest = hashlib.sha256(table.read_bytes()).hexdigest()
@@ -512,7 +538,11 @@ def scan(personal_vcf: Optional[str] = None, clinvar_vcf: Optional[str] = None,
     clinical_before = source_identity(clinvar_vcf)
     from .acmg_identity import catalogue_digest as _catalogue_digest
     catalogue_before = _catalogue_digest()
-    idx, cv_scanned = _index(clinvar_vcf, genes)
+    try:
+        idx, cv_scanned = _index(clinvar_vcf, genes)
+    except ValueError:
+        return {"status": "clinvar_allele_ambiguous",
+                "message": _t("acmg_scan.clinvar_allele_ambiguous")}
     if not idx:
         return {"status": "clinvar_empty", "clinvar_scanned": cv_scanned,
                 "message": _t("acmg_scan.clinvar_empty")}

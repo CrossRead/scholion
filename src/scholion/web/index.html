@@ -798,54 +798,8 @@ details.longevity-disclosure > summary.cr-btn{display:flex;justify-content:flex-
 }
 
 
-/* Shared gene/variant card: identity stays the same on every surface. */
-.gene-card{--gene-card-body:var(--t-s);--gene-card-label:12px;--gene-card-emphasis:var(--t-m);font-family:var(--font-sans);font-size:var(--gene-card-body);line-height:1.45;border:1px solid var(--grid);border-radius:12px;padding:20px;margin:12px 0;background:var(--surface,transparent);min-width:0;break-inside:avoid}
-.gene-card :is(.why,.meta,.small,.spec,.glink,.cr-caption,.cr-source,.row-l,.cr-h3,.cr-body,.gen-context-body,.cr-table,.cr-table th,.cr-table td,summary){font-family:inherit;font-size:inherit;line-height:inherit}
-.gene-card :is(h2,h3,h4,h5){font-family:inherit;font-size:inherit;line-height:inherit;font-weight:600}
-.gene-card-tags{margin-bottom:16px}
-.gene-card-grid{display:grid;grid-template-columns:86px minmax(125px,.9fr) minmax(170px,1.1fr) minmax(0,3.4fr);gap:20px;align-items:start}
-.gene-card-grid>div{min-width:0;overflow-wrap:anywhere}
-.gene-card .gene-card-identity>:is(a,strong){font-size:var(--gene-card-emphasis);font-weight:650}
-.gene-card-label{font-size:var(--gene-card-label);line-height:1.4;color:var(--muted);margin-bottom:10px}
-.gene-card-grid p{margin:6px 0;overflow-wrap:anywhere}
-.gene-card-genotype{display:inline-block;font-weight:650;font-size:var(--gene-card-emphasis);line-height:1.4;color:var(--ink);border:1px solid var(--grid);border-radius:20px;padding:3px 12px}
-.gene-card-no-reading{color:var(--muted)}
-.gene-card-zygosity{margin-top:8px}
-.gene-card-description{font-size:inherit;line-height:inherit}
-.gene-card-function{display:block;line-height:1.45}
-.gene-card-description p{line-height:1.45}
-.gene-card-fold{margin:14px 0 0;border-top:1px solid var(--grid);padding-top:12px}
-.gene-card-fold>summary{color:var(--accent);cursor:pointer}
-.gene-card-fold-body{margin-top:12px;overflow-wrap:anywhere}
-.gene-card-fold-body p{margin:6px 0}
-.gene-card .cr-source{white-space:normal;overflow-wrap:anywhere}
-.gene-support-fields{margin:10px 0}
-.gene-support-fields>div{display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,3fr);gap:8px 20px;border-top:1px solid var(--grid);padding:8px 0}
-.gene-support-fields dt{font-weight:600}
-.gene-support-fields dd{margin:0;overflow-wrap:anywhere}
-.gene-card-db{display:grid;grid-template-columns:100px minmax(0,1fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--grid)}
-.gene-card-inheritance,.gene-card-quality{margin-bottom:16px}
-.gene-card-witness{padding:8px 0;border-bottom:1px solid var(--grid)}
-.gene-card-db details>summary{font-size:inherit;color:var(--accent);cursor:pointer}
-.gene-card-context{margin-top:16px;padding-top:14px;border-top:1px solid var(--grid)}
-.genlab-comparison{font-size:inherit;line-height:inherit}
-.genlab-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:10px}
-.genlab-heading h4,.genlab-heading p{margin:0}
-.genlab-status{font-weight:650;margin:8px 0}
-.genlab-conditions{margin:12px 0}
-.genlab-conditions ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:6px 24px;margin:6px 0;padding-left:18px}
-.genlab-measurements{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px 24px;margin:14px 0}
-.genlab-measurements>div{padding:8px 0;border-top:1px solid var(--grid);min-width:0;overflow-wrap:anywhere}
-.genlab-measurements dt{color:var(--muted)}
-.genlab-measurements dd{margin:3px 0 0}
-.genlab-measurements time{display:block;color:var(--muted)}
-.genlab-details{margin-top:12px}
-.genlab-details p{margin:6px 0}
-.gene-card .gene-card-confidence .cr-caption{font-size:var(--gene-card-label);margin-top:8px}
-@media(max-width:760px){.gene-card{padding:16px}.gene-card-grid{grid-template-columns:65px minmax(85px,1fr) minmax(110px,1.2fr);gap:12px}.gene-card-description{grid-column:1/-1;border-top:1px solid var(--grid);padding-top:12px}.gene-card-db{grid-template-columns:75px minmax(0,1fr);gap:10px}.gene-support-fields>div{grid-template-columns:1fr;gap:4px}}
-@media(max-width:380px){.gene-card-grid{grid-template-columns:50px minmax(70px,1fr) minmax(100px,1.2fr);gap:8px}.gene-card{padding:12px}.gene-card-genotype{padding:3px 8px}}
-@media print{.gene-card-fold>summary{color:var(--ink)}.gene-card-fold-body{display:block!important}.gene-card{--gene-card-label:9pt;--gene-card-emphasis:10pt;break-inside:auto;font-size:10pt;line-height:1.35}.gene-card-context{break-inside:avoid}}
 </style>
+<link rel="stylesheet" href="/gene-cards.css">
 <script>
 /* The theme follows the system unless the menu pinned one. Applied before the
    first paint, so a pinned light page never flashes dark. */
@@ -2694,76 +2648,29 @@ function clinicalBasisHTML(p,compact=false){
   const summary=held.length?`<div class="why muted" data-clinical-summary>${esc(t('clinical.summary',{fields:held.map(([name])=>name).join(', '),missing}))}</div>`:'';
   return summary+bases.filter(([name])=>!held.some(([h])=>h===name)).map(([field,b])=>`<div class="why muted" data-clinical-basis="${esc(field)}">${esc(t('clinical.basis',{field,detail:b.status==='complete'?b.source+' · '+b.mechanism:b.reason}))}</div>`).join('');
 }
-function referenceContextHtml(p,cardDetails=false){
-  const c=p.reference_context;
-  if(!c) return '';
-  return `<div class="why" data-reference-context>${cardDetails||c.function_status==='not_curated'?'':`<div><strong>${esc(c.gene_function)}</strong></div>`}`
-    +`${cardDetails?'':`<div>${esc(t('reference.variant',{text:c.variant_context}))}</div>`}`
-    +`${c.canonical_symbol&&p.gene&&c.canonical_symbol.toUpperCase()!==p.gene.toUpperCase()?`<p class="cr-caption">${esc(t('reference.resolved_gene',{gene:c.canonical_symbol}))}</p>`:''}`
-    +`${c.gene_source&&!(cardDetails&&c.scientific_review?.length)?`<div class="why muted">${esc(t(c.gene_source_scope==='genomic_annotation'?'reference.region_source':'reference.gene_source',{source:c.gene_source}))}</div>`:''}`
-    +`${(c.gene_additional_sources||[]).filter(u=>/^https:\/\//.test(u)).map(u=>`<div class="why muted"><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))}</a></div>`).join('')}`
-    +`${c.reference_identity?`<details class="fold"><summary>${esc(c.reference_identity.rsid)} · ${esc(c.reference_identity.variant_class)}</summary><p>${esc(c.reading_limit)}</p>${Object.entries(c.reference_identity.builds).map(([build,v])=>`<p class="cr-caption">${esc(t('reference.spdi',{build,accession:v.accession,start:v.position_zero_based,ref:v.reference,alt:v.alternatives.join('/')}))}</p>`).join('')}<a class="cr-source" href="${esc(c.reference_identity.source)}" target="_blank" rel="noopener">${esc(t('genlab.source'))}</a></details>`:''}`
-    +`${c.variant_source&&!(cardDetails&&c.scientific_review?.some(row=>['variant','literature_direction','study_membership'].includes(row.scope)&&row.sources?.length))?`<div class="why muted">${esc(t('reference.variant_source',{source:c.variant_source}))}</div>`:''}`
-    +`${(c.mechanistic_hypotheses||[]).length?`<details class="fold" data-mechanistic-hypotheses><summary>${esc(t('genlab.reference_patterns'))}</summary>${c.mechanistic_hypotheses.map(h=>`<p>${levelChip(h.association_level)} ${h.level_scope==='mechanism_reference_not_personal_variant'?esc(t('genlab.mechanism_level')):''}</p><p>${esc(h.summary)}</p><p class="meta">${esc(h.limitations)}</p><p>${(h.source_links||[]).filter(u=>/^https:\/\//.test(u)).map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))} ${i+1}</a>`).join(' · ')}</p>`).join('')}</details>`:''}`
-    +`${c.disease_context?`<p><strong>${esc(c.disease_context.label)}</strong>: ${esc(c.disease_context.name)}</p><p class="cr-caption">${esc(c.disease_context.limitations)}</p><p><a class="cr-source" href="${esc(c.disease_context.source)}" target="_blank" rel="noopener">${esc(t('genlab.source'))}</a></p>`:''}`
-    +`${c.limitations?`<div class="why muted">${esc(c.limitations)}</div>`:''}`
-    +`${c.clinical_review?`<p class="cr-caption">${esc(c.clinical_review.limitations)}</p>`:''}`
-    +`${(cardDetails?[]:c.gencc_assertions||[]).map(a=>`<div class="why" data-gencc-assertion>${esc(t('gencc.assertion',{disease:a.disease_label,classification:a.classification_label,moi:a.moi_label,submitter:a.submitter||'—',date:a.curated_on||'—'}))}</div>`).join('')}`
-    +`${c.gencc_status==='no_assertions_in_snapshot'?`<div class="why muted">${esc(t('reference.gencc_not_in_snapshot',{version:c.gencc_version||'—'}))}</div>`:''}`
-    +`${!cardDetails&&c.gencc_assertions?.length?`<div class="why muted">${esc(t('gencc.source',{version:c.gencc_version||'—',source:c.gencc_source}))}</div>`:''}`
-    +`${c.function_status==='not_curated'?`<p class="cr-caption">${esc(c.gene_function)}</p>`:''}`
-    +`<p class="cr-caption">${esc(c.variant_status==='not_supplied'?t('reference.gene_level'):t('reference.level',{level:c.level||'—'}))}</p></div>`;
+// Presentation services are bound once; the current register is read on each render.
+const geneCards=ScholionGeneCards.create({t,escape:esc,grade:levelChip,formatDate:fmtDate,
+  register:()=>DISPLAY_MODE,passport:passportHtml,authorNote:authorNoteHtml,clinicalBasis:clinicalBasisHTML});
+function referenceContextHtml(...args){
+  return geneCards.reference(...args);
 }
-function mechanismHtml(p,cardDetails=false){
-  const assertion=p.interpretation?.database_assertion;
-  const identity=(assertion?.description?`<p class="cr-caption">${esc(assertion.description)}</p>`:'')+(p.transcript?`<p class="cr-caption">${esc(p.transcript)} · ${esc(p.hgvs||'')}</p>`:'');
-  const reference=identity+referenceContextHtml(p,cardDetails);
-  const r=p.decision_route,workflow=r?`<div class="why muted" data-decision-route="${esc(r.kind)}">${esc(t('genome.route.line',{label:r.label,reason:r.reason}))}<div>${esc(r.notice)}</div></div>`:'';
-  const fields=b=>b.missing?.length?t('web.gene_card.support_missing_fields',{missing:b.missing.map(k=>t('conclusion.missing.'+k)).join(', ')}):b.reason||'';
-  const main=p.conclusion_basis?.status==='incomplete'?`<div data-conclusion-withheld><dt>${esc(t('web.gene_card.personal_conclusion'))}</dt><dd>${esc(fields(p.conclusion_basis))}</dd></div>`:'';
-  const sub=Object.entries(p.subclaim_basis||{}).map(([name,b])=>`<div data-subclaim-basis><dt>${esc(t('conclusion.subclaim.'+name))}</dt><dd>${esc(b.status==='incomplete'?fields(b):b.mechanism+' — '+b.source)}</dd></div>`).join('');
-  let clinical=(main||sub?`<div class="gene-support"><p>${esc(t('web.gene_card.support_scope'))}</p><dl class="gene-support-fields">${main}${sub}</dl>${main?`<p>${esc(t('web.gene_card.reference_separate'))}</p>`:''}</div>`:'')+workflow;
-  if(!main&&p.mechanism&&p.source&&!reference) clinical=`<div class="why" data-mechanism>${esc(t('system.row.mechanism',{text:p.mechanism}))}</div>`
-    +`<div class="why muted">${esc(t('decision.source',{source:p.source}))}</div>`+clinical;
-  return reference+(reference&&clinical?`<details data-clinical-checks><summary>${esc(t('reference.analytics'))}</summary>${clinical}</details>`:clinical);
+function mechanismHtml(...args){
+  return geneCards.mechanism(...args);
 }
-
-function geneticPreviewHtml(p,fallback=''){
-  const c=p.reference_context, i=p.interpretation;
-  const sentence=typeof i?.summary==='string'&&i.summary?i.summary:(p.text||p.passport?.reported||c?.variant_context||fallback||'');
-  const parts=[...new Set([c?.function_status==='not_curated'?null:c?.gene_function,sentence].filter(Boolean))];
-  return `<span class="gen-context-preview">${parts.map((x,j)=>j===0&&(c?.function_status!=='not_curated'||i?.summary||p.text)?`<strong>${esc(x)}</strong>`:`<span>${esc(x)}</span>`).join(' ')}</span>`;
+function geneticPreviewHtml(...args){
+  return geneCards.preview(...args);
 }
-function geneticBriefHtml(p,register='patient',fallback='',detailOnly=false,readingHtml='',cardDetails=false){
-  const i=p.interpretation;
-  const catalogueGaps=(i?.missing||[]).filter(k=>!(p.conclusion_basis?.status==='incomplete'&&p.conclusion_basis.missing?.includes(k)));
-  const interpretation=typeof i?.summary==='string'&&i.summary?`<div data-catalogue-interpretation>${cardDetails?'':esc(i.summary)}${i.mechanism&&!i.summary.includes(i.mechanism)&&!p.reference_context?.variant_context?.includes(i.mechanism)?`<div class="why">${esc(t('system.row.mechanism',{text:i.mechanism}))}</div>`:''}<div class="why muted">${esc(i.notice||t('interpretation.notice'))}</div>${['evidence_reason','population','study_effect','reading_note'].map(k=>i[k]?`<p class="cr-caption">${esc(i[k])}</p>`:'').join('')}${i.source?`<div class="why muted">${esc(t('decision.source',{source:i.source}))}</div>`:''}${catalogueGaps.length?`<div class="why muted" data-catalogue-support>${esc(t('web.gene_card.catalogue_gaps',{missing:catalogueGaps.map(k=>t('conclusion.missing.'+k)).join(', ')}))}</div>`:''}</div>`:'';
-  const text=!p.reference_context&&!interpretation&&(p.text||fallback)?`<div>${esc(p.text||fallback)}</div>`:'';
-  const body=`<div class="gen-context-body">${interpretation}${text}${mechanismHtml(p,cardDetails)}${p.passport?passportHtml(p,register,!!i?.summary):''}${authorNoteHtml(p,register)}${clinicalBasisHTML(p,true)}</div>`;
-  const c=p.reference_context, level=i?.level||(c?.variant_status==='not_supplied'?null:(p.level||c?.level));
-  return detailOnly?body:`<div class="gen-description" data-gene-description>${geneticPreviewHtml(p,fallback)}${readingHtml}
-    ${level?`<div class="gen-evidence">${esc(t('web.gen.evidence_link'))} ${levelChip(level)}</div>`:''}
-    <details class="gen-context" data-genetic-context><summary>${esc(t('web.gen.context_details'))}</summary>${body}</details></div>`;
+function geneticBriefHtml(...args){
+  return geneCards.brief(...args);
 }
-function geneDisplayCard(p,options={}){
-  const register=options.register||DISPLAY_MODE;
-  return ScholionGeneCards.render(p,{t,escape:esc,grade:levelChip,
-    geneHtml:p.gene?`<a href="#gene/${encodeURIComponent(p.gene)}" data-gene-open="${esc(p.gene)}">${esc(p.gene)}</a>`:'',
-    detailHtml:geneticBriefHtml(p,register,options.fallback||'',true,'',true),...options});
+function geneDisplayCard(...args){
+  return geneCards.render(...args);
 }
-function geneFindingCards(hit,options={}){
-  const rows=hit.gene_contexts?.length?hit.gene_contexts:[{gene:hit.gene||'',reference_context:hit.reference_context}];
-  return rows.map(row=>geneDisplayCard({...hit,...row,genotype:hit.genotype,personal_context:hit.personal_context,
-    clnsig:hit.clnsig,disease:hit.disease||hit.clndn,review:hit.review,review_confidence:hit.review_confidence},options)).join('');
+function geneFindingCards(...args){
+  return geneCards.findings(...args);
 }
-function geneReferenceExtras(p){
-  const summaries=typeof p.interpretation?.summary==='object'?p.interpretation.summary:typeof p.text==='object'?p.text:{};
-  return ['het','hom','hemi'].filter(key=>summaries[key]).map(key=>`<p><b>${esc(t('panel.state.'+key))}</b>: ${esc(summaries[key])}</p>`).join('')
-    +(p.expect?`<p>${esc(t('panel.expect',{marker:p.expect.marker||'—',direction:t('system.panel.dir.'+(p.expect.direction||'lower')),note:p.expect.note||'—'}))}</p>`:'')
-    +(p.effect_size?`<p>${esc(t('panel.effect',{effect:p.effect_size}))}</p>`:'')
-    +(p.source?`<p class="cr-caption">${esc(t('panel.source_row',{source:p.source,study:p.study||'—'}))}</p>`:'')
-    +(p.disposition?`<p>${esc(t('panel.intake.'+p.disposition))}${p.reason?' — '+esc(p.reason):''}</p>`:'')
-    +(p.signature?`<p class="cr-caption">${esc(t('panel.signed.'+p.signature,{on:fmtDate(p.signed_on)||'—',curated:fmtDate(p.curated_on)||'—'}))}</p>`:'');
+function geneReferenceExtras(...args){
+  return geneCards.referenceExtras(...args);
 }
 function geneticCatalogueFold(gen,card){
   const table=genTableHtml(gen,card,card.register);
@@ -4452,6 +4359,7 @@ function renderClinvar(cv){
   // route is written down. The old second sentence repeated it and named a script
   // that does not exist in an installed package.
   if(!cv||cv.status==='not_run')return `<div class="cr-card card muted">${esc((cv&&cv.message)||t('web.clinvar.not_run'))}</div>`;
+  if(cv.status==='table_unverified')return `<div class="cr-card card muted">${esc(cv.message||'')}</div>`;
   if(cv.status!=='ok'||!cv.count)return `<div class="cr-card card muted">${esc(t('web.clinvar.nothing'))}${cv.message?': '+esc(cv.message):''}.</div>`;
   const TCLS={pathogenic:'b-warning',drug:'b-warning',risk:'b-warning',protective:'b-good',association:'b-unknown',uncertain:'b-unknown'};
   const byTier={};(cv.hits||[]).forEach(h=>{(byTier[h.tier]=byTier[h.tier]||[]).push(h);});

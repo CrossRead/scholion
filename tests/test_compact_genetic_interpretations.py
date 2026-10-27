@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import unittest
 
-import support
 import gene_card_support
 from scholion import i18n
 from scholion.conclusion_basis import guard_position
@@ -50,7 +49,7 @@ class TestInterpretationConfidence(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("node"), "requires node for actual JavaScript renderers")
     def test_called_held_variants_stay_in_the_table_in_both_registers(self):
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         functions = []
         for name in ("systemGeneLink", "shownGenetics", "hypothesisCountHtml", "clinicalBasisHTML", "referenceContextHtml",
                      "mechanismHtml", "passportHtml", "geneticPreviewHtml", "geneticBriefHtml", "geneticComparisonHTML", "genSummaryHtml"):
@@ -99,7 +98,7 @@ for(const register of ['patient','clinician']){
         from scholion import core
         from scholion.panel_reference import gene_reference_context
         from scholion.engine.panel_catalogue import panel_description
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         names = ("systemGeneLink", "shownGenetics", "clinicalBasisHTML", "referenceContextHtml", "mechanismHtml",
                  "geneticPreviewHtml", "passportHtml", "authorNoteHtml", "geneticBriefHtml",
                  "genTableRow", "genTableHtml", "geneRowDetail", "geneStateBadge", "pnlStateBadge")
@@ -226,7 +225,7 @@ for(const c of cases)for(const register of ['patient','clinician']){
 
     @unittest.skipUnless(shutil.which("node"), "requires node for the click handler")
     def test_catalogue_rows_open_inside_a_fold_without_intercepting_native_controls(self):
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         start = page.index("document.addEventListener('click',e=>{", page.index("// A row of the genetic table"))
         code = page[start:page.index("\nfunction renderChrome", start)]
         script = r"""

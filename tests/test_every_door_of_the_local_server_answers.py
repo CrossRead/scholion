@@ -281,6 +281,7 @@ class TestWhatThePageItselfIsServed(_Live):
         for path, kind in (("/", "text/html"), ("/index.html", "text/html"),
                            ("/icon.svg", "image/svg+xml"), ("/dna.svg", "image/svg+xml"),
                            ("/chart.min.js", "javascript"), ("/crossread.css", "text/css"),
+                           ("/gene-cards.js", "javascript"), ("/gene-cards.css", "text/css"),
                            # the two silhouettes the Overview draws its figure from
                            ("/body-male.webp", "image/webp"), ("/body-female.webp", "image/webp")):
             with self.subTest(path=path):
@@ -291,7 +292,7 @@ class TestWhatThePageItselfIsServed(_Live):
     def test_the_style_layer_is_served_from_here_and_not_from_the_internet(self):
         """Vendored on purpose: the interface has to keep working with no network
         reachable at all."""
-        for path in ("/crossread.css",):
+        for path in ("/crossread.css", "/gene-cards.css"):
             with self.subTest(path=path):
                 code, body = self.call(path)
                 self.assertEqual(200, code)

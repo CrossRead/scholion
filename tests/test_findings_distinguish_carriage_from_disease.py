@@ -8,7 +8,6 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import support
 import gene_card_support
 from scholion import finding_context as context, genome, i18n
 from scholion.format_genome import clinvar_report
@@ -155,7 +154,7 @@ class FindingMeaning(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which('node'), 'Node is required for real renderer probes')
     def test_findings_and_clinvar_render_the_engine_context_without_red_carrier_badges(self):
-        page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+        page = gene_card_support.source()
         functions = []
         for name in ('findingContextHtml', 'geneticPreviewHtml', 'geneticBriefHtml', 'genomeGeneTable', 'genomeFindings', 'renderClinvar', 'renderACMG', 'rxCard'):
             start = page.index('function '+name+'(')

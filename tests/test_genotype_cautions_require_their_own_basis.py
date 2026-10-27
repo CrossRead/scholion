@@ -8,7 +8,7 @@ import subprocess
 import unittest
 from unittest import mock
 
-import support
+import gene_card_support
 from scholion import engine, format as fmt, i18n
 from scholion.engine import class_genotype as CG
 from scholion.format_prescription import caution_lines
@@ -85,7 +85,7 @@ class TestCautionBasis(_Demo):
         held = {**good, "interpretation_withheld": True, "severity": "caution", "factor": None,
                 "why_it_matters": None, "action": None, "mechanism": None, "uncertainty": "NO_BASIS"}
         lower = {**held, "level": "C", "gene": "LOWER_GENE", "rsid": "rsLOWER"}
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         functions = []
         for name in ("referenceContextHtml", "mechanismHtml", "cautionsHtml", "flagsHTML"):
             start = page.index("function " + name + "(")

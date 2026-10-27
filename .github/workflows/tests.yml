@@ -202,3 +202,20 @@ jobs:
         # there. `publish_share.sh` runs this too, before it publishes; this job
         # answers on every push instead of at the moment of release.
         run: cd /tmp/pkg && ./run_tests.sh
+
+  ouroboros-host:
+    name: Supported Ouroboros host contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/checkout@v4
+        with:
+          repository: razzant/ouroboros
+          ref: d6971d2eb91143f392c47c42e80a05af39260b15
+          path: .host-ouroboros
+          persist-credentials: false
+      - name: Real host context, MCP protocols, synthetic writes and refusals
+        run: python src/tools/check_ouroboros_host.py .host-ouroboros

@@ -110,7 +110,7 @@ class TestPicoIsFenced(unittest.TestCase):
     def test_the_page_carries_crossread_and_only_the_fenced_pico(self):
         links = re.findall(r'<link rel="stylesheet" href="([^"]+)">', _page())
         self.assertIn("/crossread.css", links)
-        self.assertEqual({"/crossread.css"}, set(links))
+        self.assertEqual({"/crossread.css", "/gene-cards.css"}, set(links))
         self.assertFalse((WEB / "pico.min.css").exists(), "the unfenced Pico is still packaged")
         server = (support.SRC / "scholion" / "server.py").read_text(encoding="utf-8")
         self.assertNotIn('"/pico.min.css"', server)

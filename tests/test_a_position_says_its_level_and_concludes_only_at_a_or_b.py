@@ -159,7 +159,7 @@ class TestThePageShowsTheLevel(unittest.TestCase):
     def test_the_position_cards_draw_the_chip_and_the_ladder(self):
         page = (support.ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
         shared = (support.SRC / "scholion/web/gene-cards.js").read_text(encoding="utf-8")
-        self.assertIn("options.grade(model.level, input.level_short)", shared)
+        self.assertIn("options.grade(model.level, model.levelShort)", shared)
         self.assertIn("geneHtml:systemGeneLink(row.gene,card.key)", page)
         self.assertIn("levelNoteHtml(row)+routeHtml(row)+underLoadHtml(row)+ladderHtml(row)", page)
 

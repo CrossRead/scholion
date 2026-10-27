@@ -5,7 +5,6 @@ import shutil
 import subprocess
 import unittest
 
-import support
 import gene_card_support
 from scholion import i18n
 from scholion.engine import class_genotype, system_panels
@@ -56,7 +55,7 @@ class TestRegimenContext(_Pinned):
 class TestSharedGeneCard(unittest.TestCase):
     @unittest.skipUnless(shutil.which('node'),'node is needed for the actual renderer')
     def test_region_readings_keep_function_first_and_noncoding_variants_folded(self):
-        text=(support.SRC/'scholion/web/index.html').read_text(encoding='utf-8')
+        text=gene_card_support.source()
         start=text.index('function geneRegionCard(')
         function=text[start:text.index('\n}\n',start)+2]
         script="""
@@ -82,7 +81,7 @@ assert.ok(html.includes('Coverage explicitly unknown')&&html.includes('gene.anno
 
     @unittest.skipUnless(shutil.which('node'),'node is needed for the actual renderer')
     def test_locus_card_puts_known_function_before_the_reading_and_support(self):
-        text=(support.SRC/'scholion/web/index.html').read_text(encoding='utf-8')
+        text=gene_card_support.source()
         functions=[]
         for name in ('geneticPreviewHtml','geneticBriefHtml','genomeCard'):
             start=text.index('function '+name+'(')

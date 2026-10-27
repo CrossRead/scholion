@@ -1,0 +1,47 @@
+/* Shared gene/variant card: identity stays the same on every surface. */
+.gene-card{--gene-card-body:var(--t-s);--gene-card-label:12px;--gene-card-emphasis:var(--t-m);font-family:var(--font-sans);font-size:var(--gene-card-body);line-height:1.45;border:1px solid var(--grid);border-radius:12px;padding:20px;margin:12px 0;background:var(--surface,transparent);min-width:0;break-inside:avoid}
+.gene-card :is(.why,.meta,.small,.spec,.glink,.cr-caption,.cr-source,.row-l,.cr-h3,.cr-body,.gen-context-body,.cr-table,.cr-table th,.cr-table td,summary){font-family:inherit;font-size:inherit;line-height:inherit}
+.gene-card :is(h2,h3,h4,h5){font-family:inherit;font-size:inherit;line-height:inherit;font-weight:600}
+.gene-card-tags{margin-bottom:16px}
+.gene-card-grid{display:grid;grid-template-columns:86px minmax(125px,.9fr) minmax(170px,1.1fr) minmax(0,3.4fr);gap:20px;align-items:start}
+.gene-card-grid>div{min-width:0;overflow-wrap:anywhere}
+.gene-card .gene-card-identity>:is(a,strong){font-size:var(--gene-card-emphasis);font-weight:650}
+.gene-card-label{font-size:var(--gene-card-label);line-height:1.4;color:var(--muted);margin-bottom:10px}
+.gene-card-grid p{margin:6px 0;overflow-wrap:anywhere}
+.gene-card-genotype{display:inline-block;font-weight:650;font-size:var(--gene-card-emphasis);line-height:1.4;color:var(--ink);border:1px solid var(--grid);border-radius:20px;padding:3px 12px}
+.gene-card-no-reading{color:var(--muted)}
+.gene-card-zygosity{margin-top:8px}
+.gene-card-description{font-size:inherit;line-height:inherit}
+.gene-card-function{display:block;line-height:1.45}
+.gene-card-description p{line-height:1.45}
+.gene-card-fold{margin:14px 0 0;border-top:1px solid var(--grid);padding-top:12px}
+.gene-card-fold>summary{color:var(--accent);cursor:pointer}
+.gene-card-fold-body{margin-top:12px;overflow-wrap:anywhere}
+.gene-card-fold-body p{margin:6px 0}
+.gene-card .cr-source{white-space:normal;overflow-wrap:anywhere}
+.gene-support-fields{margin:10px 0}
+.gene-support-fields>div{display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,3fr);gap:8px 20px;border-top:1px solid var(--grid);padding:8px 0}
+.gene-support-fields dt{font-weight:600}
+.gene-support-fields dd{margin:0;overflow-wrap:anywhere}
+.gene-card-db{display:grid;grid-template-columns:100px minmax(0,1fr);gap:16px;padding:10px 0;border-bottom:1px solid var(--grid)}
+.gene-card-inheritance,.gene-card-quality{margin-bottom:16px}
+.gene-card-witness{padding:8px 0;border-bottom:1px solid var(--grid)}
+.gene-card-db details>summary{font-size:inherit;color:var(--accent);cursor:pointer}
+.gene-card-context{margin-top:16px;padding-top:14px;border-top:1px solid var(--grid)}
+.genlab-comparison{font-size:inherit;line-height:inherit}
+.genlab-heading{display:flex;align-items:baseline;justify-content:space-between;gap:8px 20px;flex-wrap:wrap;margin-bottom:10px}
+.genlab-heading h4,.genlab-heading p{margin:0}
+.genlab-status{font-weight:650;margin:8px 0}
+.genlab-conditions{margin:12px 0}
+.genlab-conditions ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:6px 24px;margin:6px 0;padding-left:18px}
+.genlab-measurements{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px 24px;margin:14px 0}
+.genlab-measurements>div{padding:8px 0;border-top:1px solid var(--grid);min-width:0;overflow-wrap:anywhere}
+.genlab-measurements dt{color:var(--muted)}
+.genlab-measurements dd{margin:3px 0 0}
+.genlab-measurements time{display:block;color:var(--muted)}
+.genlab-details{margin-top:12px}
+.genlab-details p{margin:6px 0}
+.gene-card .gene-card-confidence .cr-caption{font-size:var(--gene-card-label);margin-top:8px}
+@media(max-width:760px){.gene-card{padding:16px}.gene-card-grid{grid-template-columns:65px minmax(85px,1fr) minmax(110px,1.2fr);gap:12px}.gene-card-description{grid-column:1/-1;border-top:1px solid var(--grid);padding-top:12px}.gene-card-db{grid-template-columns:75px minmax(0,1fr);gap:10px}.gene-support-fields>div{grid-template-columns:1fr;gap:4px}}
+@media(max-width:380px){.gene-card-grid{grid-template-columns:50px minmax(70px,1fr) minmax(100px,1.2fr);gap:8px}.gene-card{padding:12px}.gene-card-genotype{padding:3px 8px}}
+@media print{.gene-card-fold>summary{color:var(--ink)}.gene-card-fold-body{display:block!important}.gene-card{--gene-card-label:9pt;--gene-card-emphasis:10pt;break-inside:auto;font-size:10pt;line-height:1.35}.gene-card-context{break-inside:avoid}}

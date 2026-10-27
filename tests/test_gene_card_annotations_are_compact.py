@@ -6,7 +6,6 @@ import shutil
 import unittest
 
 import gene_card_support
-import support
 from scholion import finding_context, i18n
 from scholion.panel_reference import attach_finding_biology
 
@@ -14,7 +13,7 @@ from scholion.panel_reference import attach_finding_biology
 @unittest.skipUnless(shutil.which('node'), 'requires the shipped card renderer')
 class CompactAnnotations(unittest.TestCase):
     def test_comparison_separates_observations_conditions_and_reference_explanation(self):
-        page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+        page = gene_card_support.source()
         start = page.index('function geneticComparisonHTML(')
         function = page[start:page.index('\n}\n', start) + 2]
         script = r'''
@@ -57,7 +56,7 @@ assert.equal(JSON.stringify(row),before);
             finding_context.attach([row])
             attach_finding_biology([row])
             cases.append({'row': row, 'messages': i18n.CATALOGUES[language]})
-        page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+        page = gene_card_support.source()
         functions = []
         for name in ('referenceContextHtml', 'mechanismHtml', 'geneticBriefHtml'):
             start = page.index('function ' + name + '(')

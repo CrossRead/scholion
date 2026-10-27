@@ -6,13 +6,11 @@ import io
 import json
 import os
 from contextlib import redirect_stdout
-from pathlib import Path
 import shutil
 import subprocess
 import unittest
 from unittest import mock
 
-import support
 import gene_card_support
 from scholion import cli, core, drugsource, engine, format as fmt, i18n, mcp_server, ouroboros_tools, sources
 from scholion.engine import pgx
@@ -253,7 +251,7 @@ class TestPrescribingOutput(_Demo):
     def test_actual_browser_renderer_keeps_supported_basis_and_never_prints_a_withheld_quote(self):
         good = _guard_guidance(_supported())
         held = _guard_guidance({**_supported(), "source": None, "cpic": {"recommendation": "NEVER_PRINT"}})
-        page = (Path(support.SRC) / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         functions = []
         for name in ("pgxCard", "referenceContextHtml", "mechanismHtml"):
             start = page.index("function " + name + "(")

@@ -116,7 +116,17 @@ def clinvar_path() -> Optional[Path]:
     if not os.environ.get("SCHOLION_GENOME_DIR"):
         cache = os.environ.get("SCHOLION_CLINVAR_CACHE")
         bases.append(Path(cache).expanduser() if cache else Path.home() / "genomic_work" / "clinvar")
+    from .clinvar_reference import cached_reference
+    from . import genome
+    personal = genome.vcf_path()
+    assembly = genome.assembly_of(str(personal)) if personal else None
     for base in bases:
+        cached = cached_reference(base, assembly)
+        if cached is not None:
+            return cached
+        pointer = base / assembly / "current.json" if assembly in ("GRCh37", "GRCh38") else base / "current.json"
+        if pointer.exists():
+            continue
         for name in ("clinvar.vcf.gz", "clinvar.chr.vcf.gz"):
             if (base / name).exists():
                 return base / name

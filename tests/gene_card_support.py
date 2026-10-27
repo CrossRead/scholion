@@ -8,10 +8,18 @@ from pathlib import Path
 import support
 
 
+def source() -> str:
+    """Locate presentation helpers in their owning component before page bridges."""
+    web = support.SRC / 'scholion/web'
+    return '\n'.join((web / name).read_text(encoding='utf-8')
+                     for name in ('gene-cards.js', 'index.html'))
+
+
 def javascript() -> str:
-    page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+    page = source()
     parts = ["globalThis.DISPLAY_MODE='patient';",
-             'const ScholionGeneCards=require(' + json.dumps(str(support.SRC / 'scholion/web/gene-cards.js')) + ');']
+             'const ScholionGeneCards=require(' + json.dumps(str(support.SRC / 'scholion/web/gene-cards.js')) + ');',
+             'const renderCard=ScholionGeneCards.render, getRegister=()=>DISPLAY_MODE;']
     for name in ('geneDisplayCard', 'geneFindingCards', 'geneReferenceExtras'):
         start = page.index('function ' + name + '(')
         parts.append(page[start:page.index('\n}\n', start) + 2])

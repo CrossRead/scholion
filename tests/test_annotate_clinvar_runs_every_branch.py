@@ -20,6 +20,7 @@ import os
 import shutil
 import stat
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -32,10 +33,11 @@ _BCFTOOLS = r'''#!/bin/sh
 # view -h FILE: a header. The personal VCF carries chr contigs when CHR_PREFIX=1.
 if [ "$1" = "view" ] && [ "$2" = "-h" ]; then
   case "$3" in
-    *clinvar*) echo '##fileformat=VCFv4.2'; echo '##fileDate=2026-08-29'; echo '##contig=<ID=1>' ;;
+    *clinvar*) echo '##fileformat=VCFv4.2'; echo '##fileDate=2026-08-29'; echo '##contig=<ID=1,length=248956422>' ;;
     *) echo '##fileformat=VCFv4.2'
-       if [ "${CHR_PREFIX:-0}" = "1" ]; then echo '##contig=<ID=chr1>'; else echo '##contig=<ID=1>'; fi ;;
+       if [ "${CHR_PREFIX:-0}" = "1" ]; then echo '##contig=<ID=chr1,length=248956422>'; else echo '##contig=<ID=1,length=248956422>'; fi ;;
   esac
+  printf '#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tME\n'
   if [ "${LONG_HEADER:-0}" = "1" ]; then
     i=0
     while [ "$i" -lt 5000 ]; do
@@ -46,7 +48,7 @@ if [ "$1" = "view" ] && [ "$2" = "-h" ]; then
   exit 0
 fi
 # view -i ... FILE (the extraction) and query: one significant row
-if [ "$1" = "view" ]; then echo 'row'; exit 0; fi
+if [ "$1" = "view" ] && [ "$2" != "-s" ]; then echo 'row'; exit 0; fi
 if [ "$1" = "query" ]; then cat >/dev/null; printf 'chr1\t100\tA\tG\t0/1\trs1\tPathogenic\tx\ty\n'; exit 0; fi
 # anything with -o OUT: write OUT
 out=""; prev=""
@@ -61,7 +63,7 @@ for a in "$@"; do [ "$prev" = "-o" ] && out="$a"; prev="$a"; done
 [ -n "$out" ] && : > "$out"
 exit 0
 '''
-_TABIX = "#!/bin/sh\nexit 0\n"
+_TABIX = "#!/bin/sh\nif [ \"$1\" = \"-l\" ]; then echo 17; exit 0; fi\nfor a in \"$@\"; do last=\"$a\"; done\n: > \"$last.tbi\"\nexit 0\n"
 
 
 def _stubs_run_here() -> bool:
@@ -97,7 +99,7 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.root, True)
         self.bin = self.root / "bin"
         self.bin.mkdir()
-        for name, body in (("bcftools", _BCFTOOLS), ("curl", _CURL), ("tabix", _TABIX)):
+        for name, body in (("bcftools", _BCFTOOLS), ("curl", _CURL), ("tabix", _TABIX), ("gzip", "#!/bin/sh\nexit 0\n")):
             p = self.bin / name
             p.write_text(body, encoding="utf-8")
             p.chmod(p.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
@@ -112,6 +114,7 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
         if reference:
             (self.genome / "GRCh38.fa").write_text(">chr1\nACGT\n", encoding="utf-8")
         env = {"PATH": f"{self.bin}{os.pathsep}/usr/bin{os.pathsep}/bin", "HOME": str(self.root),
+               "SCHOLION_PYTHON": sys.executable, "SCHOLION_CLINVAR_HELPER": str(support.ROOT / "src/scholion/clinvar_reference.py"),
                "SCHOLION_REPO_DIR": str(self.root), "SCHOLION_GENOME_DIR": str(self.genome),
                "SCHOLION_CLINVAR_CACHE": str(self.root / "cache"), "CALLS": str(self.calls),
                "CHR_PREFIX": "1" if chr_prefix else "0", "LONG_HEADER": "1" if long_header else "0", "LC_ALL": "C"}
@@ -155,6 +158,7 @@ class TestEveryBranchRunsToTheEnd(unittest.TestCase):
         self.assertNotEqual(text, SCRIPT.read_text(encoding="utf-8"), "the line the leak was on has moved")
         broken.write_text(text, encoding="utf-8")
         env = {"PATH": f"{self.bin}{os.pathsep}/usr/bin{os.pathsep}/bin", "HOME": str(self.root),
+               "SCHOLION_PYTHON": sys.executable, "SCHOLION_CLINVAR_HELPER": str(support.ROOT / "src/scholion/clinvar_reference.py"),
                "SCHOLION_REPO_DIR": str(self.root), "SCHOLION_GENOME_DIR": str(self.genome),
                "SCHOLION_CLINVAR_CACHE": str(self.root / "cache"), "CHR_PREFIX": "1", "LC_ALL": "C"}
         p = subprocess.run([support.posix_shell("bash"), str(broken)], env=env, capture_output=True, text=True, encoding="utf-8",

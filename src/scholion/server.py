@@ -289,6 +289,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def _read_body(self):
         """The request body as an object. `None` — the body was rejected, a reply was already sent."""
+        lengths = (self.headers.get_all("Content-Length", [])
+                   if hasattr(self.headers, "get_all") else
+                   [self.headers["Content-Length"]] if "Content-Length" in self.headers else [])
+        if "Transfer-Encoding" in self.headers or len(lengths) > 1:
+            # Unsupported framing must never become an empty mutating request.
+            self.close_connection = True
+            self._json({"error": _t("server.bad_body")}, 400)
+            return None
         raw = self.headers.get("Content-Length", "")
         try:
             n = int(raw or 0)
@@ -408,6 +416,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(_WEB / "dna.svg", "image/svg+xml")
             if p == "/gene-cards.js":
                 return self._file(_WEB / "gene-cards.js", "application/javascript; charset=utf-8")
+            if p == "/gene-cards.css":
+                return self._file(_WEB / "gene-cards.css", "text/css; charset=utf-8")
             if p == "/chart.min.js":
                 return self._file(_WEB / "chart.min.js", "application/javascript; charset=utf-8")
             if p in ("/body-male.webp", "/body-female.webp"):

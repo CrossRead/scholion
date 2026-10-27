@@ -57,6 +57,11 @@ repeat these rules at the moment they are broken.
 
 ## Reference gene panels and personalised interpretation
 
+The reusable web gene card has one presentation owner: `web/gene-cards.js`
+and `web/gene-cards.css`. Its normalized model, composition services, slots and
+extension rules are documented in [GENE-CARD.md](GENE-CARD.md). Page renderers
+choose data and contextual additions; they do not copy the card layout or styles.
+
 Panels carry an independent `reference_context` at every A–E evidence level.
 Gene-function annotation names its gene-level source; variant descriptions name
 separate literature support. They remain visible with unread positions and
@@ -442,3 +447,22 @@ to an application-version change. Legacy calibrated numbers without that evidenc
 remain diagnostic. Existing scoring-site calls are reused; missing reference
 calibration never justifies re-reading BAM. Partial report merges retain per-model
 input identity instead of assigning the latest VCF to the whole report.
+
+### Reference identity and host invocation
+
+ClinVar refreshes stage and validate a reference and its locally built index
+before promoting a complete generation. GRCh37 and GRCh38 have separate cache
+pointers. The reader also accepts legacy cache paths. A saved findings table
+carries its assembly, selected sample and digest; contradictory provenance is
+not a negative result. Failed refreshes preserve the previous generation.
+
+ACMG small-file witnesses include a full digest. Large-file witnesses are bounded
+filesystem checks, not proof of byte equality: explicit content verification uses
+the saved full digest without repeating clinical interpretation. Multi-allelic
+reference assertions need an explicit allele scope (`Number=A` or a single
+`CLNALLE`); an ambiguous relevant assertion refuses the scan before replacement.
+
+MCP owns its minimal invocation context. Ouroboros supplies its own host context
+to registered handlers; its constructor is not called by MCP. The pinned host
+contract in CI checks real registration, both MCP result forms and synthetic
+writes without starting a model.

@@ -391,11 +391,7 @@ def sample_index(vcf: str) -> Optional[int]:
 #: the reference rather than a claim in a header somebody may have edited. chr1 is
 #: enough on its own; chr2 and chrX are here for files whose header lists only a
 #: few contigs. The numbers are the lengths in the primary assembly of each build.
-_LENGTH_TO_ASSEMBLY = {
-    249250621: "GRCh37", 248956422: "GRCh38", 248387328: "T2T-CHM13v2.0",   # chr1
-    243199373: "GRCh37", 242193529: "GRCh38", 242696752: "T2T-CHM13v2.0",   # chr2
-    155270560: "GRCh37", 156040895: "GRCh38", 154259566: "T2T-CHM13v2.0",   # chrX
-}
+from .clinvar_reference import LENGTH_TO_ASSEMBLY as _LENGTH_TO_ASSEMBLY
 
 #: Only as a fallback: a `##reference=` line says what somebody wrote there, and
 #: people write the path to a file they no longer have. A contig length cannot lie.
@@ -2642,20 +2638,18 @@ def _review_confidence(review: str) -> Optional[str]:
 @core.memo_in_reading
 def _clinvar_local_gene_map() -> Dict[tuple, str]:
     """Local annotation only: no genome data is sent to a reference service."""
-    path = Path(os.environ.get("SCHOLION_CLINVAR_CACHE", str(Path.home() / "genomic_work/clinvar"))) / "clinvar.vcf.gz"
+    from .clinvar_reference import cached_reference
+    cache = Path(os.environ.get("SCHOLION_CLINVAR_CACHE", str(Path.home() / "genomic_work/clinvar")))
+    personal = vcf_path()
+    path = cached_reference(cache, assembly_of(str(personal)) if personal else None)
+    if path is None:
+        return {}
     if not path.exists() or not Path(str(path) + ".tbi").exists() or not _have_bcftools():
         return {}
-    try:
-        import gzip
-        with gzip.open(path, "rt", encoding="utf-8") as handle:
-            headers = []
-            for line in handle:
-                if not line.startswith("#"):
-                    break
-                headers.append(line)
-        if "##reference=GRCh38\n" not in headers:
-            return {}
-    except (OSError, EOFError, UnicodeError):
+    from .acmg_scan import clinvar_assembly
+    from .clinvar_reference import table_assembly
+    reference_build = clinvar_assembly(str(path))
+    if reference_build is None:
         return {}
     positions = set()
     for base in core.genome_bases():
@@ -2665,7 +2659,7 @@ def _clinvar_local_gene_map() -> Dict[tuple, str]:
                 metadata = json.loads((base / "clinvar_meta.json").read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 return {}
-            if not isinstance(metadata, dict) or "/vcf_GRCh38/" not in str(metadata.get("url") or ""):
+            if table_assembly(metadata) != reference_build:
                 return {}
             lines = table.read_text(encoding="utf-8").splitlines()
             header = lines[0].split("\t") if lines else []
@@ -2706,9 +2700,46 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
         return {"status": "not_run", "hits": [], "tiers": [],
                 "message": _t("genome.clinvar_not_run")}
     try:
-        lines = f.read_text(encoding="utf-8").splitlines()
+        content = f.read_bytes()
+        lines = content.decode("utf-8").splitlines()
     except Exception as e:
         return {"status": "error", "message": str(e), "hits": []}
+    from .clinvar_reference import table_assembly
+    try:
+        metadata = json.loads((f.parent / "clinvar_meta.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        metadata = {}
+    if not isinstance(metadata, dict):
+        metadata = {}
+    personal = vcf_path()
+    personal_build = assembly_of(str(personal)) if personal else None
+    recorded_build = table_assembly(metadata)
+    refusal = None
+    if (recorded_build and personal_build and recorded_build != personal_build
+            or metadata.get("assembly") and recorded_build is None):
+        refusal = "assembly_mismatch"
+    if metadata.get("sample") and personal:
+        column = sample_index(str(personal))
+        names = samples_of(str(personal))
+        if column is None or column >= len(names) or names[column] != metadata["sample"]:
+            refusal = "sample_changed"
+    if metadata.get("table_sha256"):
+        import hashlib
+        if (hashlib.sha256(content).hexdigest() != metadata["table_sha256"]
+                or hashlib.sha256(f.read_bytes()).hexdigest() != metadata["table_sha256"]):
+            refusal = "table_changed"
+    if metadata.get("personal_identity") and personal:
+        try:
+            current = Path(personal).stat()
+            if any(getattr(current, key) != value for key, value in metadata["personal_identity"].items()):
+                refusal = "source_changed"
+        except OSError:
+            refusal = "source_unavailable"
+    if refusal:
+        fields = lines[0].split("\t") if lines else []
+        return {"status": "table_unverified", "reason": refusal, "hits": [], "tiers": [],
+                "saved_hits": [dict(zip(fields, line.split("\t"))) for line in lines[1:] if line],
+                "source": str(f), "message": _t("genome.clinvar_table_unverified")}
     header = lines[0].split("\t") if lines else []
     rows: List[Dict[str, Any]] = []
     genes = _clinvar_local_gene_map()

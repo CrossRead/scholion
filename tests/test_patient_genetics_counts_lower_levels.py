@@ -5,14 +5,13 @@ import shutil
 import subprocess
 import unittest
 
-import support
 import gene_card_support
 
 
 @unittest.skipUnless(shutil.which("node"), "needs node for the page's JavaScript")
 class TestPatientPresentation(unittest.TestCase):
     def test_all_three_renderers_hide_rows_without_mutating_the_reply(self):
-        page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         functions = []
         for name in ("systemGeneLink", "shownGenetics", "hypothesisCountHtml", "clinicalBasisHTML", "referenceContextHtml", "mechanismHtml", "geneticPreviewHtml", "geneticBriefHtml", "genTableRow", "genTableHtml",
                      "panelHtml", "geneticComparisonHTML", "genSummaryHtml", "markerGeneticsRow", "basketRowHtml"):

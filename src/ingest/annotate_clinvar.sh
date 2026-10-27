@@ -25,7 +25,8 @@ set -euo pipefail
 REPO_DIR="${SCHOLION_REPO_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 GENOME_DIR="${SCHOLION_GENOME_DIR:-$REPO_DIR/genome}"
 CACHE_DIR="${SCHOLION_CLINVAR_CACHE:-$HOME/genomic_work/clinvar}"
-CLINVAR_URL="${CLINVAR_URL:-https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz}"
+HELPER="${SCHOLION_CLINVAR_HELPER:-$(cd "$(dirname "$0")/../scholion" && pwd)/clinvar_reference.py}"
+PYTHON="${SCHOLION_PYTHON:-python3}"
 
 # your full VCF: env SCHOLION_GENOME_VCF, or the first *.vcf.gz in genome/ (excluding the already annotated one)
 VCF="${SCHOLION_GENOME_VCF:-}"
@@ -54,22 +55,64 @@ if [ "$SIZE" -lt 10000000 ]; then
   exit 2
 fi
 SAMPLE="$(basename "$VCF" | sed 's/\..*//')"
-OUT_VCF="$GENOME_DIR/$SAMPLE.clinvar.vcf.gz"
-OUT_TSV="$GENOME_DIR/clinvar_hits.tsv"
+FINAL_VCF="$GENOME_DIR/$SAMPLE.clinvar.vcf.gz"
+FINAL_TSV="$GENOME_DIR/clinvar_hits.tsv"
 
 for tool in bcftools tabix curl; do
   command -v "$tool" >/dev/null 2>&1 || { echo "❌ $tool is required (brew install bcftools htslib curl)"; exit 1; }
 done
 
 mkdir -p "$CACHE_DIR" "$GENOME_DIR"
-CLINVAR_VCF="$CACHE_DIR/clinvar.vcf.gz"
+# All work is private until the download, annotation and extraction succeed.
+WORK="$(mktemp -d "$GENOME_DIR/.clinvar-work.XXXXXX")"
+CACHE_WORK="$(mktemp -d "$CACHE_DIR/.clinvar-download.XXXXXX")"
+SUCCESS=false
+cleanup() {
+  result=$?
+  if [ "$SUCCESS" != true ] && [ "$result" -eq 0 ]; then result=1; fi
+  rm -rf "$WORK" "$CACHE_WORK"
+  exit "$result"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+OUT_VCF="$WORK/$SAMPLE.clinvar.vcf.gz"
+OUT_TSV="$WORK/clinvar_hits.tsv"
+CLINVAR_VCF="$CACHE_WORK/clinvar.vcf.gz"
+bcftools view -h "$VCF" > "$WORK/personal.header"
+ASSEMBLY="$("$PYTHON" "$HELPER" "$WORK/personal.header")"
+SAMPLE_NAME="$("$PYTHON" "$HELPER" --sample "$WORK/personal.header" "${SCHOLION_GENOME_SAMPLE:-}")"
+case "$ASSEMBLY" in GRCh37|GRCh38) ;; *) echo "Unsupported assembly: $ASSEMBLY" >&2; exit 2 ;; esac
+CACHED="$("$PYTHON" "$HELPER" --cached "$CACHE_DIR" "$ASSEMBLY")"
+CLINVAR_URL="${CLINVAR_URL:-https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_$ASSEMBLY/clinvar.vcf.gz}"
 
-# --- 1. a fresh ClinVar (re-downloaded only if the server copy is newer) ------
-echo "→ Checking/downloading a fresh ClinVar (GRCh38) …"
-curl -fsSL -z "$CLINVAR_VCF" -o "$CLINVAR_VCF" "$CLINVAR_URL"
-curl -fsSL -z "$CLINVAR_VCF.tbi" -o "$CLINVAR_VCF.tbi" "$CLINVAR_URL.tbi" || tabix -f -p vcf "$CLINVAR_VCF"
-# Consume the complete header: an early-closing grep can SIGPIPE bcftools.
-CLINVAR_DATE="$(bcftools view -h "$CLINVAR_VCF" | awk -F= '/^##fileDate=/{if (!seen++) print $2}')"
+# --- 1. stage a complete validated reference; never download over the cache --
+echo "→ Checking/downloading a fresh ClinVar ($ASSEMBLY) …"
+CACHED_BUILD=""
+if [ -f "$CACHED" ]; then
+  if bcftools view -h "$CACHED" > "$WORK/cached.header"; then
+    CACHED_BUILD="$("$PYTHON" "$HELPER" "$WORK/cached.header" 2>/dev/null || true)"
+  fi
+fi
+if [ "$CACHED_BUILD" = "$ASSEMBLY" ]; then
+  HTTP_CODE="$(curl -fsSL -z "$CACHED" -o "$CLINVAR_VCF" -w '%{http_code}' "$CLINVAR_URL")"
+  # A successful conditional request may leave the destination absent (304).
+  if [ "$HTTP_CODE" = "304" ]; then cp "$CACHED" "$CLINVAR_VCF"; fi
+else
+  curl -fsSL -o "$CLINVAR_VCF" "$CLINVAR_URL"
+fi
+gzip -t "$CLINVAR_VCF"
+bcftools view -h "$CLINVAR_VCF" > "$WORK/clinvar.header"
+CLINVAR_BUILD="$("$PYTHON" "$HELPER" "$WORK/clinvar.header")"
+if [ "$CLINVAR_BUILD" != "$ASSEMBLY" ]; then
+  echo "Assembly mismatch: personal $ASSEMBLY, ClinVar $CLINVAR_BUILD. Previous results preserved." >&2
+  exit 2
+fi
+# Build the index from these exact bytes, never from a second HTTP generation.
+tabix -f -p vcf "$CLINVAR_VCF"
+tabix -l "$CLINVAR_VCF" > "$WORK/index-contigs.txt"
+[ -s "$WORK/index-contigs.txt" ] || { echo "Empty or invalid ClinVar index" >&2; exit 2; }
+CLINVAR_DATE="$(awk -F= '/^##fileDate=/{if (!seen++) print $2}' "$WORK/clinvar.header")"
 CLINVAR_DATE="${CLINVAR_DATE:-?}"
 echo "  ClinVar version (fileDate): $CLINVAR_DATE"
 
@@ -79,9 +122,9 @@ if bcftools view -h "$VCF" | grep '##contig=<ID=chr' >/dev/null; then PREF="chr"
 ANNOT="$CLINVAR_VCF"
 if [[ "$PREF" == "chr" ]]; then
   echo "→ The personal VCF uses the 'chr' prefix — renaming the ClinVar contigs to match…"
-  MAP="$CACHE_DIR/chr_map.txt"
+  MAP="$CACHE_WORK/chr_map.txt"
   { for c in $(seq 1 22) X Y; do echo "$c chr$c"; done; echo "MT chrM"; } > "$MAP"
-  ANNOT="$CACHE_DIR/clinvar.chr.vcf.gz"
+  ANNOT="$CACHE_WORK/clinvar.chr.vcf.gz"
   if [[ ! -f "$ANNOT" || "$CLINVAR_VCF" -nt "$ANNOT" ]]; then
     bcftools annotate --rename-chrs "$MAP" "$CLINVAR_VCF" -Oz -o "$ANNOT"
     tabix -f -p vcf "$ANNOT"
@@ -114,21 +157,23 @@ if [ -z "$REF_FASTA" ]; then
     [ -f "$cand" ] && { REF_FASTA="$cand"; break; }
   done
 fi
-NORM_VCF="$GENOME_DIR/.normalised.vcf.gz"
+NORM_VCF="$WORK/.normalised.vcf.gz"
+SELECTED="$WORK/selected.vcf.gz"
+bcftools view -s "$SAMPLE_NAME" "$VCF" -Oz -o "$SELECTED"
 if [ -n "$REF_FASTA" ] && [ -f "$REF_FASTA" ]; then
   echo "→ Normalising (split multiallelics, left-align indels) against $(basename "$REF_FASTA")…"
-  bcftools norm -m -any -f "$REF_FASTA" "$VCF" -Oz -o "$NORM_VCF"
+  bcftools norm -m -any -f "$REF_FASTA" "$SELECTED" -Oz -o "$NORM_VCF"
   LEFT_ALIGNED=true
 else
   echo "⚠ No reference FASTA found — splitting multiallelics only. Indels will NOT be"
   echo "  left-aligned, so an indel spelled differently from ClinVar's copy may be missed."
   echo "  Set SCHOLION_REFERENCE_FASTA to the FASTA to close this."
-  bcftools norm -m -any "$VCF" -Oz -o "$NORM_VCF"
+  bcftools norm -m -any "$SELECTED" -Oz -o "$NORM_VCF"
   LEFT_ALIGNED=false
 fi
 tabix -f -p vcf "$NORM_VCF"
 printf '{"left_aligned": %s, "reference": "%s", "normalised": true}\n' \
-  "$LEFT_ALIGNED" "${REF_FASTA:-}" > "$GENOME_DIR/clinvar_norm.json"
+  "$LEFT_ALIGNED" "${REF_FASTA:-}" > "$WORK/clinvar_norm.json"
 
 echo "→ Annotating your VCF with the ClinVar fields (CLNSIG, CLNDN, CLNREVSTAT, RS)…"
 bcftools annotate -a "$ANNOT" \
@@ -149,8 +194,24 @@ N=$(( $(wc -l < "$OUT_TSV") - 1 ))
 
 # --- 5. write the source metadata (for the «source/updated» marks in the app) ---
 TODAY="$(date +%Y-%m-%d)"
-printf '{\n  "clinvar_date": "%s",\n  "synced": "%s",\n  "hits": %s,\n  "url": "%s"\n}\n' \
-  "$CLINVAR_DATE" "$TODAY" "$N" "$CLINVAR_URL" > "$GENOME_DIR/clinvar_meta.json"
+"$PYTHON" - "$WORK" "$CLINVAR_DATE" "$TODAY" "$N" "$CLINVAR_URL" "$ASSEMBLY" "$VCF" "$SAMPLE_NAME" <<'PYMETA'
+import hashlib, json, os, sys
+from pathlib import Path
+work, date, today, count, url, assembly, personal, sample = sys.argv[1:]
+root = Path(work)
+info = os.stat(personal)
+meta = {"clinvar_date": date, "synced": today, "hits": int(count), "url": url,
+        "assembly": assembly, "sample": sample, "personal_assembly": assembly, "clinvar_assembly": assembly,
+        "table_sha256": hashlib.sha256((root / "clinvar_hits.tsv").read_bytes()).hexdigest(),
+        "personal_identity": {key: getattr(info, key) for key in
+                              ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")}}
+(root / "clinvar_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+PYMETA
+# Keep the old generation for rollback if any promotion fails. Metadata is last,
+# so a reader can detect an interrupted promotion through its table digest.
+"$PYTHON" "$HELPER" --promote "$CACHE_WORK" "$CACHE_DIR" "$WORK" "$GENOME_DIR" "$SAMPLE"
+OUT_VCF="$FINAL_VCF"
+OUT_TSV="$FINAL_TSV"
 
 echo ""
 echo "✅ Done."
@@ -159,3 +220,5 @@ echo "   Significant hits:   $N  →  $OUT_TSV"
 echo "   ClinVar dated:      $CLINVAR_DATE (a repeat run will pull a newer one)"
 echo ""
 echo "The application: the «Genome» tab will show the findings. Skill: the genome/clinvar tool."
+
+SUCCESS=true

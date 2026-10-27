@@ -40,6 +40,42 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.4 — 27.10.2026
+
+### What this changes in the conclusions
+
+Gene cards retain the same information, reading states, scientific qualifications
+and appearance across Genome, Radar, screening, gene panels and visit reports.
+Their presentation is maintained together so future improvements can remain
+consistent across these views. Navigation, expandable annotations, inheritance
+details, laboratory comparisons and printing keep their existing behavior.
+
+MCP tools also work when Ouroboros is installed alongside Scholion, including
+clients using older MCP protocols. ClinVar annotation selects the reference for
+the genome's assembly and preserves previous results if a refresh fails.
+Unsupported or ambiguous HTTP request framing is rejected before changing data.
+
+### What is retracted
+
+A negative ACMG screen cannot be established from a multi-allelic reference whose
+classification cannot be assigned to a particular allele. Explicit per-allele
+classifications are matched to the allele actually carried. Saved ClinVar tables
+with conflicting assemblies or altered recorded contents are preserved but no
+longer used as current findings. Small ACMG source files receive a content check
+even when their filesystem timestamps coincide.
+
+### What needs recomputing
+
+Nothing is required for unchanged valid data. No general genome reimport or
+PGS recalculation is required. Unchanged valid
+reports and normal workflows retain their behavior. If a saved ClinVar result
+was produced against a different assembly, refresh that annotation using the
+matching reference. An ACMG screen refused for ambiguous reference alleles needs
+an allele-specific reference; the previous result stays on disk. Verification
+of a large genome's full contents remains an explicit operation, separate from
+the quick file-identity check used when opening a saved report. Use
+`scholion acmg-scan --verify-only` when that full verification is needed.
+
 ## v0.7.3 — 27.10.2026
 
 ### What this changes in the conclusions

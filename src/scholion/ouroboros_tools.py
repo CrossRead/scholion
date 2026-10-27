@@ -18,13 +18,12 @@ from .i18n import t as _t
 
 # --- soft import of the Ouroboros types -----------------------------------
 try:
-    from ouroboros.tools.registry import ToolEntry, ToolContext  # type: ignore
+    from ouroboros.tools.registry import ToolEntry  # type: ignore
     _HAVE_OURO = True
-except Exception:  # standalone mode (tests / development outside Ouroboros)
+except ModuleNotFoundError as exc:  # standalone mode, not a broken host
+    if exc.name not in {"ouroboros", "ouroboros.tools", "ouroboros.tools.registry"}:
+        raise
     _HAVE_OURO = False
-
-    class ToolContext:  # a minimal stub
-        pass
 
     class ToolEntry:  # repeats the Ouroboros signature
         def __init__(self, name, schema, handler, is_code_tool=False,
@@ -33,6 +32,14 @@ except Exception:  # standalone mode (tests / development outside Ouroboros)
             self.is_code_tool = is_code_tool
             self.timeout_sec = timeout_sec
             self.mutates_worktree = mutates_worktree
+
+
+class ToolContext:
+    """Local invocation context; independent of the host's constructor ABI.
+
+    Ouroboros supplies its own context to registered handlers. MCP has no host
+    repository or drive roots and must not manufacture a host context.
+    """
 
 
 # --- handlers (ctx is ignored; the profile is read from SCHOLION_PROFILE_DIR) ---

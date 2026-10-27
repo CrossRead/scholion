@@ -6,7 +6,6 @@ import shutil
 import unittest
 
 import gene_card_support
-import support
 from scholion import core, i18n
 from scholion.conclusion_basis import guard_position
 from scholion.panel_reference import interpretation_context, reference_context
@@ -34,7 +33,7 @@ class ScopedSupport(unittest.TestCase):
             self.assertEqual(0, row['findings'])
             self.assertIn('PMID:20541252', row['reference_context']['variant_source'])
             cases.append({'row': row, 'messages': i18n.CATALOGUES[language]})
-        page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+        page = gene_card_support.source()
         functions = []
         for name in ('referenceContextHtml', 'mechanismHtml', 'geneticBriefHtml'):
             start = page.index('function ' + name + '(')

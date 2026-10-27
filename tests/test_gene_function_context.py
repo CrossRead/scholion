@@ -6,7 +6,6 @@ import shutil
 import unittest
 from unittest import mock
 
-import support
 import gene_card_support
 from scholion import core, i18n
 from scholion.panel_reference import gene_reference_context, genome_context, reference_context, reference_lines
@@ -229,7 +228,7 @@ class TestSourcedGeneFunctions(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("node"), "requires node for the actual page renderers")
     def test_genome_cards_and_longevity_disclosures_use_shared_format(self):
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
+        page = gene_card_support.source()
         names = ("referenceContextHtml", "geneticPreviewHtml", "geneticBriefHtml", "genomeGeneTable", "genomeCard", "renderLongevity")
         functions = []
         for name in names:

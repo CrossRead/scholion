@@ -21,6 +21,7 @@
     "src/scholion/cli.py": 82.1,
     "src/scholion/clinical_claims.py": 100.0,
     "src/scholion/clinical_estimates.py": 88.8,
+    "src/scholion/clinvar_reference.py": 86.8,
     "src/scholion/conclusion_basis.py": 100.0,
     "src/scholion/console.py": 86.4,
     "src/scholion/container.py": 94.0,

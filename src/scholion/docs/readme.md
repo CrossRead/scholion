@@ -11,7 +11,7 @@ Use the local web application, the command line, or an assistant connected throu
 MCP, a skill or an Ouroboros plugin. They share the same analysis core and selected
 profile. English and Russian interfaces are included.
 
-**Current source version: 0.7.3.** See [published releases](https://github.com/CrossRead/scholion/releases)
+**Current source version: 0.7.4.** See [published releases](https://github.com/CrossRead/scholion/releases)
 and [PyPI](https://pypi.org/project/scholion/) for the version available to install.
 Scholion is not a medical device, does not diagnose and does not change treatment.
 

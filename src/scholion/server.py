@@ -35,6 +35,11 @@ from .i18n import t as _t
 # The request body limit. Everything the application accepts over POST is a lab point,
 # a drug or a path to a folder: kilobytes. Without a limit, `rfile.read(n)` will allocate
 # as much memory as the header asks for.
+def _profile_identity() -> str:
+    """Opaque profile identity, stable across edits and distinct across roots."""
+    return hashlib.sha256(str(core.profile_dir().resolve()).encode()).hexdigest()
+
+
 def _profile_revision() -> str:
     """Opaque local input identity; no paths or health values leave this endpoint."""
     root = core.profile_dir().resolve()
@@ -193,6 +198,23 @@ class Handler(BaseHTTPRequestHandler):
     # string like this is ever wrong.
     server_version = f"Scholion/{VERSION}"
 
+    def handle(self):
+        try:
+            return super().handle()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            # Only transport errors escape the route's own error handling.
+            # A tab may close while headers or the next request are being read.
+            self.close_connection = True
+
+    def _send_body(self, body: bytes):
+        try:
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            # The response has no recipient. Never try to send an error response
+            # on the same closed socket, and never cancel an already saved write.
+            self.close_connection = True
+
     # ---- utilities ----
     def _json(self, obj, code=200):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -203,8 +225,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
-        self.end_headers()
-        self.wfile.write(body)
+        self._send_body(body)
 
     def _download(self, text: str, filename: str):
         """A text file the browser saves rather than shows (a BED for a laboratory)."""
@@ -216,8 +237,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
         self.send_header("Content-Length", str(len(raw)))
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
-        self.end_headers()
-        self.wfile.write(raw)
+        self._send_body(raw)
 
     def _html(self, text: str):
         """A page this build composed, as opposed to a file it hands over."""
@@ -227,8 +247,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
+        self._send_body(raw)
 
     def _file(self, path: Path, ctype: str):
         if not path.exists():
@@ -239,8 +258,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate")
-        self.end_headers()
-        self.wfile.write(body)
+        self._send_body(body)
 
     def _lang(self, query: dict) -> str:
         """Fix the language of THIS request from `?lang=`, and answer with the code chosen.
@@ -350,6 +368,10 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *a):  # quieter in the console
         pass
 
+    def _wrong_view_profile(self) -> bool:
+        expected = self.headers.get("X-Scholion-View-Profile")
+        return bool(expected and expected != _profile_identity())
+
     # ---- routes ----
     def do_GET(self):
         from . import container
@@ -376,6 +398,8 @@ class Handler(BaseHTTPRequestHandler):
                                                 "/api/prescription-check", "/api/genome")))
         if deny:
             return self._json({"error": deny}, 403)
+        if p.startswith('/api/') and p not in ('/api/ping', '/api/i18n') and self._wrong_view_profile():
+            return self._json({"ok": False, "error": _t("web.context.changed"), "reason": "profile_changed"}, 409)
         try:
             if p.startswith('/api/') and p != '/api/i18n':
                 from . import lifecycle
@@ -385,7 +409,8 @@ class Handler(BaseHTTPRequestHandler):
                 # EVERY tab, not only where /api/overview happens to be fetched. A demo
                 # that does not announce itself is a demo somebody mistakes for themselves.
                 return self._json({"app": "Scholion", "ok": True, "version": VERSION,
-                                   "synthetic": core.profile_is_synthetic(), "profile_revision": _profile_revision()})
+                                   "synthetic": core.profile_is_synthetic(), "profile_revision": _profile_revision(),
+                                   "profile_identity": _profile_identity()})
             if p == "/api/i18n":
                 # The whole catalogue in one reply: the page renders its own labels
                 # from the same source the reports are rendered from, so a phrase
@@ -414,6 +439,14 @@ class Handler(BaseHTTPRequestHandler):
                 return self._file(_WEB / "icon.svg", "image/svg+xml")
             if p == "/dna.svg":
                 return self._file(_WEB / "dna.svg", "image/svg+xml")
+            if p == "/view-lifecycle.js":
+                return self._file(_WEB / "view-lifecycle.js", "application/javascript; charset=utf-8")
+            if p == "/system-views.js":
+                return self._file(_WEB / "system-views.js", "application/javascript; charset=utf-8")
+            if p == "/system-views.css":
+                return self._file(_WEB / "system-views.css", "text/css; charset=utf-8")
+            if p == "/measurements.js":
+                return self._file(_WEB / "measurements.js", "application/javascript; charset=utf-8")
             if p == "/gene-cards.js":
                 return self._file(_WEB / "gene-cards.js", "application/javascript; charset=utf-8")
             if p == "/gene-cards.css":
@@ -578,6 +611,8 @@ class Handler(BaseHTTPRequestHandler):
         deny = self._deny(state_changing=True)
         if deny:
             return self._json({"error": deny}, 403)
+        if u.path not in ("/api/use", "/api/export", "/api/erase") and self._wrong_view_profile():
+            return self._json({"ok": False, "error": _t("web.context.changed"), "reason": "profile_changed"}, 409)
         body = self._read_body()
         if body is None:
             return None

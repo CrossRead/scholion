@@ -21,6 +21,18 @@ NO_TABLE = {"coverage_not_measured", "coverage_gene_not_in_table", "coverage_una
             "coverage_unmeasured", "coverage_absent"}
 
 
+def _coverage_step(gene: str, coverage: Dict[str, Any]) -> Dict[str, Any]:
+    """Describe a measured interval with its own ploidy and comparison baseline."""
+    depth = 10 if coverage.get("copies") == 1 else 20
+    pct = coverage.get(f"pct_{depth}x")
+    median = coverage.get(f"median_pct_{depth}x")
+    return {"origin": "coverage", "gene": gene, "why": "coverage_low",
+            "coverage": coverage,
+            "text": _t("system.next.coverage", gene=gene, depth=depth,
+                       pct=pct if pct is not None else "—",
+                       median=median if median is not None else "—")}
+
+
 def read_state(read: bool, why: Optional[str]) -> str:
     """`read` · `file_only` · `presumed` · `unread` — four answers where there were two.
 
@@ -105,25 +117,30 @@ def _unread_breakdown(counts: Dict[str, int]) -> str:
 
 
 def unread_line(v: Dict[str, Any]) -> Optional[str]:
-    """What is in the way of reading the rest, and what closes it — beside the
-    verdict, never inside it.
-
-    The verdict is ONE sentence for one state across the three entries (task
-    171), and the three do not all know why a row was not read. The reason is a
-    second line, printed where it is known: a reader who has just run every
-    recompute the product offered is owed the next step, and the next step
-    differs — deeper sequencing for a gene read too thinly, the alignment for a
-    position with no row in the file.
-    """
+    """Explain the limitations that apply to the rows beside the verdict."""
     counts = (v or {}).get("why_counts") or {}
     presumed = int((v or {}).get("presumed") or 0)
     if not counts and not presumed:
         return None
     parts = []
-    if counts:
+    if len(counts) == 1 and counts.get("thin") and v.get("total"):
+        parts.append(_plural(v["total"], "screen.unread_thin_panel", affected=counts["thin"]))
+    elif counts:
         parts.append(_t("screen.unread_next", why=_unread_breakdown(counts)))
     if presumed:
         # Its own counter, outside the reasons (task 201): these are not gaps
         # in the file, and they are not readings either.
         parts.append(_t("screen.and_presumed", rows=_plural(presumed, "count.rows")))
     return "; ".join(parts)
+
+
+def _read_why_text(code) -> Optional[str]:
+    """The reason a gene or a position was not read, as a sentence in the
+    reader's language — the code (`clinvar_not_run`) printed as such on every
+    row and every basket line until 13.09.2026."""
+    if not code:
+        return None
+    text = _t("system.read_why." + str(code))
+    if text.startswith("⟦"):
+        text = _t("genome.refused_head." + str(code))
+    return _t("system.read_why.unknown") if text.startswith("⟦") else text

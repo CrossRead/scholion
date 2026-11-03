@@ -100,6 +100,8 @@ rows that say something — finding, carrier, pending — and the counts):
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
+from .panel_reading import _read_why_text
+
 
 from ..pgs_validation import percentile_label
 from .. import core
@@ -1163,16 +1165,6 @@ def _genetics_layer(dom: Dict[str, Any], by_key: Dict[str, Any]) -> Dict[str, An
             "verdict": v, "verdict_line": panel_form.verdict_line(v)}
 
 
-def _read_why_text(code) -> Optional[str]:
-    """The reason a gene or a position was not read, as a sentence in the
-    reader's language — the code (`clinvar_not_run`) printed as such on every
-    row and every basket line until 13.09.2026."""
-    if not code:
-        return None
-    text = _t("system.read_why." + str(code))
-    return str(code) if text.startswith("⟦") else text
-
-
 def _closes_text(code) -> Optional[str]:
     """What closes a reason, when a step is known for it."""
     if not code:
@@ -1402,17 +1394,19 @@ def _next(dom: Dict[str, Any], gen: Dict[str, Any], labs: Dict[str, Any],
                                    "text": _t("system.next.unread", gene=r["gene"],
                                               rsid=r.get("rsid"),
                                               why=_read_why_text(r.get("read_why")) or "—")})
-                else:
+                elif not (r.get("read_why") == "coverage_low"
+                          and (r.get("coverage") or {}).get("state") == "low"):
                     groups.setdefault(str(r.get("read_why") or "unknown"), []).append(r["gene"])
             cov = r.get("coverage") or {}
             if cov.get("state") == "low" and r.get("unit") == "gene":
-                genome.append({"origin": "coverage", "gene": r["gene"],
-                               "text": _t("system.next.coverage", gene=r["gene"],
-                                          pct=cov.get("pct_20x"))})
+                from .panel_reading import _coverage_step
+                genome.append(_coverage_step(r["gene"], cov))
             ns = r.get("next_step")
             if ns and ns.get("kind") == "genome":
                 genome.append(step(r))
-        # One line per reason, after the individual rows have been assessed.
+        if any(r.get("origin") == "coverage" for r in genome):
+            genome.append({"origin": "coverage_context", "text": _t("system.next.coverage_context")})
+        # Coverage already has one measured row per gene; do not list it twice.
         for code, genes in groups.items():
             shown = ", ".join(genes[:12]) + (" …" if len(genes) > 12 else "")
             genome.append({"origin": "unread_group", "why": code, "genes": genes, "n": len(genes),

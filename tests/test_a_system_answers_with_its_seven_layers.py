@@ -571,6 +571,41 @@ class TestTheBasketsAndTheQuestions(unittest.TestCase):
         self.assertIn("2020-01", n["lab"]["rows"][0]["text"])
 
 
+class TestNextStepsCoverage(unittest.TestCase):
+    def test_measured_limits_keep_their_depth_and_do_not_repeat_as_unread_groups(self):
+        from scholion import i18n
+        previous = i18n.lang()
+        self.addCleanup(i18n.set_lang, previous)
+        rows = [
+            {"unit": "gene", "gene": "SYNTHX", "read": False, "read_why": "coverage_low",
+             "coverage": {"state": "low", "copies": 1, "pct_10x": 42.0, "median_pct_10x": 83.0}},
+            {"unit": "gene", "gene": "SYNTHA", "read": False, "read_why": "coverage_low",
+             "coverage": {"state": "low", "copies": 2, "pct_20x": 0.0, "median_pct_20x": 45.0}},
+            {"unit": "gene", "gene": "SYNTHB", "read": False, "read_why": "clinvar_not_run",
+             "coverage": {"state": "low", "copies": 2, "pct_20x": 30.0}},
+            {"unit": "position", "gene": "SYNTHC", "rsid": "rsTEST", "read": False,
+             "read_why": "other_variant_at_position"}]
+        for language in ("ru", "en"):
+            i18n.set_lang(language)
+            with self.subTest(language=language):
+                result = SP._next({"source": "labs"},
+                                  {"status": "composed", "scan": {"status": "ok"}, "rows": rows},
+                                  {}, {}, {})["genome"]["rows"]
+                coverage = [r for r in result if r["origin"] == "coverage"]
+                self.assertEqual(len(coverage), 3)
+                self.assertIn("42.0", coverage[0]["text"])
+                self.assertIn("≥10×", coverage[0]["text"])
+                self.assertIn("0.0", coverage[1]["text"])
+                self.assertIn("≥20×", coverage[1]["text"])
+                groups = [r for r in result if r["origin"] == "unread_group"]
+                self.assertEqual([r["why"] for r in groups], ["clinvar_not_run"])
+                self.assertEqual(sum(r["origin"] == "coverage_context" for r in result), 1)
+                for r in result:
+                    for invalid in ("None", "⟦", "other_variant_at_position"):
+                        self.assertNotIn(invalid, r["text"])
+                self.assertNotEqual(SP._read_why_text("future_internal_code"), "future_internal_code")
+
+
 class TestTheAddressOfAPosition(unittest.TestCase):
 
     def test_a_refseq_snv_becomes_a_locus_and_an_indel_does_not(self):

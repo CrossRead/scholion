@@ -39,6 +39,17 @@ Pass the complete guarded result, retaining its reference and personal context.
 The normalizer handles existing flat catalogue rows, `reading`, `result` and
 object-valued `genotype` shapes. Do not duplicate their precedence at call sites.
 
+When a reading carries `reading_record.schema == 1`, it is the result of the
+shared observation resolver (see [Variant readings](VARIANT-READINGS.md)). Its
+selected genotype and quality take precedence over legacy outer display fields;
+missing depth must not be filled from a different observation. The card does not
+select a source, validate a call or recompute an effect. It displays the core's
+conflict/applicability restriction next to the reading and suppresses allele-copy
+claims when that restriction is present. Gene function, reference information and
+database assertions remain available. Source observations, including underlying
+scoring-site calls, are accessible in the reading-details disclosure. Hashes and
+internal profile identifiers are not displayed.
+
 | View-model group | Responsibility |
 | --- | --- |
 | `gene`, `position`, `coordinate`, `protein` | Identity, including gene-only results |
@@ -102,3 +113,19 @@ bound API. Existing gene-card, scientific-support, panel and screening tests
 retain semantic coverage. An architectural refactor also needs before/after
 HTML and computed-style comparison, plus a check that the sanitized installed
 wheel serves both component assets.
+
+## Repeatable gallery
+
+Build the offline synthetic gallery with
+`PYTHONPATH=src:tests python3 tests/ui_gallery.py --out /tmp/scholion-gallery`.
+Install development-only browser tooling using `npm ci --prefix tests/browser`,
+then `tests/browser/node_modules/.bin/playwright install chromium`.
+Run `node tests/browser/check-gallery.cjs /tmp/scholion-gallery/index.html
+/tmp/scholion-gallery-check`. An optional third argument points at a previous
+check directory for exact HTML/computed-style/geometry comparison. A browser
+check fails if its browser cannot start. It does not silently count as accepted.
+
+The gallery imports the actual component, actual CSS and translation catalogues.
+Synthetic services isolate the component contract; surrounding page adapters and
+clinical support helpers retain their separate tests. The generated HTML can be
+opened for visual review. It is not a product route and never reads a profile.

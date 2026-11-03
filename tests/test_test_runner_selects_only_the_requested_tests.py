@@ -112,3 +112,28 @@ class TestRunnerSelection(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Ran 2 tests", result.stderr)
         self.assertNotIn("AFTER_SUITE_GATE", result.stdout)
+
+    def test_full_source_measures_once_and_a_failed_measurement_stops_acceptance(self):
+        (self.root / "share").mkdir()
+        tool = self.root / "src/tools/check_test_reach.py"
+        tool.write_text("import subprocess,sys\nprint('MEASURED_SUITE',flush=True)\n"
+                        "raise SystemExit(subprocess.run([sys.executable,'-m','unittest','discover','-s','tests','-t','.'],stdin=subprocess.DEVNULL).returncode)\n", encoding="utf-8")
+        result = self.run_runner("shell", [], {"SCHOLION_SKIP_REACH": "0"})
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertEqual(1, result.stdout.count('SELECTED_ONE'))
+        self.assertEqual(1, result.stdout.count('MEASURED_SUITE'))
+        self.assertIn('AFTER_SUITE_GATE', result.stdout)
+        tool.write_text("raise SystemExit(7)\n", encoding="utf-8")
+        result = self.run_runner("shell", [], {"SCHOLION_SKIP_REACH": "0"})
+        self.assertEqual(7, result.returncode)
+        self.assertNotIn('SELECTED_ONE', result.stdout)
+        self.assertNotIn('AFTER_SUITE_GATE', result.stdout)
+
+    def test_preflight_failure_stops_before_running_tests_on_both_runners(self):
+        tool = self.root / "src/tools/sync_manifest.py"
+        tool.write_text("raise SystemExit(8)\n", encoding="utf-8")
+        for face in ('python', 'shell'):
+            result = self.run_runner(face, [])
+            self.assertEqual(8, result.returncode)
+            self.assertNotIn('SELECTED_ONE', result.stdout)
+            self.assertNotIn('AFTER_SUITE_GATE', result.stdout)

@@ -7,7 +7,7 @@ import subprocess
 import unittest
 from unittest import mock
 
-import support
+import system_view_support
 from scholion import core, i18n
 from scholion.engine import system_panels as panels
 
@@ -44,10 +44,7 @@ class TestClinicalAgenda(unittest.TestCase):
 
     @unittest.skipUnless(shutil.which("node"), "requires node for the shared renderer")
     def test_medication_uncertainty_is_folded_and_never_rendered_as_a_class_code_link(self):
-        page = (support.SRC / "scholion/web/index.html").read_text(encoding="utf-8")
-        start = page.index("function systemMedicationsHtml(")
-        function = page[start:page.index("\n}\n", start)+2]
-        script = "const assert=require('node:assert/strict');const esc=x=>String(x??'');const t=(k,a)=>k+JSON.stringify(a||{});\n" + function
+        script = "const assert=require('node:assert/strict');const esc=x=>String(x??'');const t=(k,a)=>k+JSON.stringify(a||{});\n" + system_view_support.javascript()
         script += """
 const med={rows:[{name:'MAPPED',dose:'Recorded regimen',via:['RAW_CLASS'],via_labels:['Readable class']}],
  unmapped:[{name:'UNMAPPED',dose:'Other regimen',classes:['RAW_UNMAPPED'],class_labels:['Other class']}],

@@ -135,6 +135,71 @@ class FindingMeaning(unittest.TestCase):
             self.assertNotIn('⟦', text)
             self.assertNotIn('🔴', text)
 
+    def test_clinvar_prioritizes_supported_homozygotes_within_tiers_before_limit(self):
+        expert = 'reviewed_by_expert_panel'
+        single = 'criteria_provided,_single_submitter'
+        rows = [
+            hit('0/1', rsid='rsHet', review=expert),
+            hit('2/2', rsid='rsUnknownAlt', review=single),
+            hit('1/1', rsid='rsFiltered', review=single, filter='LowQual'),
+            hit('1|1', rsid='rsHomSingle', review=single),
+            hit('1/1', rsid='rsHomExpert', review=expert),
+            hit('1/1', rsid='rsRisk', review=expert, clnsig='risk_factor'),
+        ]
+        fields = [*rows[0], 'filter']
+        with tempfile.TemporaryDirectory() as folder:
+            Path(folder, 'clinvar_hits.tsv').write_text('\t'.join(fields) + '\n' +
+                '\n'.join('\t'.join(r.get(k, 'PASS') for k in fields) for r in rows) + '\n',
+                encoding='utf-8')
+            with mock.patch.object(genome.core, 'genome_bases', return_value=[Path(folder)]), \
+                    mock.patch.object(genome, '_clinvar_local_gene_map', return_value={}), \
+                    mock.patch.object(context, '_reference', return_value={'GENE': [assertion()]}):
+                result = genome.clinvar_hits(limit=4)
+        self.assertEqual(6, result['count'])
+        self.assertEqual(['rsHomExpert', 'rsHet', 'rsHomSingle', 'rsUnknownAlt'],
+                         [h['rsid'] for h in result['hits']])
+
+    def test_xg_phenotype_is_reference_context_for_the_documented_allele_only(self):
+        from scholion.panel_reference import attach_finding_biology
+
+        descriptions = []
+        for language in ('ru', 'en'):
+            i18n.set_lang(language)
+            matching = {**hit('1/1', gene=''), 'rsid': 'rs311103', 'ref': 'G', 'alt': 'C'}
+            other = {**matching, 'alt': 'A'}
+            context.attach([matching, other])
+            attach_finding_biology([matching, other])
+            self.assertEqual('XG', matching['gene_contexts'][0]['gene'])
+            function = matching['gene_contexts'][0]['reference_context']['gene_function']
+            self.assertIsInstance(function, str)
+            self.assertTrue(function.strip())
+            descriptions.append(function)
+            self.assertIn('Xg(a−)', matching['clinvar_phenotype']['phenotype'])
+            self.assertFalse(matching['personal_context']['diagnosis_established'])
+            self.assertEqual('inheritance_unknown', matching['personal_context']['status'])
+            self.assertNotIn('clinvar_phenotype', other)
+            self.assertEqual([], other['gene_contexts'])
+        self.assertNotEqual(*descriptions)
+
+    def test_curated_clinvar_loci_fill_display_context_without_assigning_inheritance(self):
+        from scholion.panel_reference import attach_finding_biology
+
+        for rsid, ref, alt, gene in (
+                ('rs11185644', 'T', 'C', 'RXRA'),
+                ('rs6548238', 'T', 'C', 'TMEM18'),
+                ('rs7138803', 'G', 'A', 'FAIM2'),
+                ('rs7675998', 'A', 'G', 'NAF1'),
+                ('rs7711080', 'T', 'G', None)):
+            with self.subTest(rsid=rsid):
+                row = {**hit(gene=''), 'rsid': rsid, 'ref': ref, 'alt': alt, 'clnsig': 'association'}
+                context.attach([row])
+                before = dict(row['personal_context'])
+                attach_finding_biology([row])
+                self.assertEqual([gene] if gene else [], [c['gene'] for c in row['gene_contexts']])
+                self.assertEqual('', row['gene'])
+                self.assertEqual(before, row['personal_context'])
+                self.assertTrue(row['clinvar_phenotype']['study'].startswith('https://'))
+
     def test_drug_lookup_keeps_the_context_from_the_full_findings_list(self):
         from scholion.engine.pgx import clinvar_for_drug
         from scholion.format_primitives import _clinvar_block
@@ -166,9 +231,13 @@ class FindingMeaning(unittest.TestCase):
             from scholion.panel_reference import attach_finding_biology
             attach_finding_biology(rows)
             cv = dict(status='ok', count=1, hits=rows, counts={}, actionable=1)
-            payload = {'cv': cv, 'messages': i18n.CATALOGUES[language]}
+            xg = {**hit('1/1', gene='', tier='pathogenic', stars=0),
+                  'rsid': 'rs311103', 'ref': 'G', 'alt': 'C',
+                  'review': 'no_assertion_criteria_provided'}
+            context.attach([xg]); attach_finding_biology([xg])
+            payload = {'cv': cv, 'xg': xg, 'messages': i18n.CATALOGUES[language]}
             script = """
-const fs=require('fs'),{cv,messages}=JSON.parse(fs.readFileSync(0,'utf8'));
+const fs=require('fs'),{cv,xg,messages}=JSON.parse(fs.readFileSync(0,'utf8'));
 const esc=x=>String(x??'').replaceAll('<','&lt;').replaceAll('"','&quot;');
 const t=(k,a={})=>Object.entries(a).reduce((s,[k,v])=>s.replaceAll('{'+k+'}',v),messages[k]||k);
 const badge=(c,x)=>`<span class="${c}">${x}</span>`,isRsid=()=>true,clnsigText=x=>x,diseaseText=x=>x;
@@ -177,13 +246,20 @@ const mechanismHtml=()=>'',passportHtml=()=>'',authorNoteHtml=()=>'',clinicalBas
 const SEV={unknown:{cls:'b-unknown',key:'common.unknown'}},rxFold=(a,b,c)=>c||'';
 const flagsHTML=()=>'',doseHTML=()=>'',ctxCount=()=>0,contextHtml=()=>'';
 """+'\n'.join(functions)+"""
-console.log(JSON.stringify([genomeFindings(cv,null,null,null),renderClinvar(cv),renderACMG({status:'ok',carriers:cv.hits}),rxCard({status:'ok',drug:'Synthetic drug',clinvar:cv})]));
+console.log(JSON.stringify([geneFindingCards(xg),genomeFindings(cv,null,null,null),renderClinvar(cv),renderACMG({status:'ok',carriers:cv.hits}),rxCard({status:'ok',drug:'Synthetic drug',clinvar:cv})]));
 """
             script = gene_card_support.javascript() + script
             result = gene_card_support.run(script, input=json.dumps(payload),
                                     text=True, capture_output=True, timeout=20)
             self.assertEqual(0, result.returncode, result.stderr)
-            for html in json.loads(result.stdout):
+            xg_html, *findings_html = json.loads(result.stdout)
+            visible = xg_html.split('data-gene-annotations')[0]
+            self.assertIn('data-gene="XG"', visible)
+            self.assertIn(xg['clinvar_phenotype']['phenotype'], visible)
+            self.assertIn(i18n.t('web.gene_card.review_stars', n=0), visible)
+            self.assertIn(xg['clinvar_phenotype']['source'], xg_html)
+            self.assertNotIn('no_assertion_criteria_provided', xg_html)
+            for html in findings_html:
                 self.assertIn(rows[0]['personal_context']['summary'], html)
                 self.assertIn(i18n.t('finding.zygosity.heterozygous'), html)
                 self.assertNotIn('b-critical', html)

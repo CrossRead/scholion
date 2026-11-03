@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import gene_card_support
+import system_view_support
 
 import importlib
 import json
@@ -314,7 +315,7 @@ class FocusedVisit(TableCase):
 const assert=require('node:assert/strict');
 const esc=x=>String(x??'').replaceAll('<','&lt;'),t=k=>k,fmtDate=String,fmtNum=String;
 const systemGeneLink=esc,levelChip=esc,cautionsHtml=()=>'',visitSourceLinks=esc,geneticBriefHtml=()=>'';
-""" + functions + '\nconst html=visitDocumentHTML(' + json.dumps(data) + ");\n" + """
+""" + system_view_support.javascript(bind=False) + functions + '\nconst html=visitDocumentHTML(' + json.dumps(data) + ");\n" + """
 for(const text of ['Synthetic qualified association','Synthetic uncertainty','1:123 A&gt;G',
                    'Synthetic classification','Synthetic incomplete support']) assert.ok(html.includes(text),text);
 """
@@ -424,7 +425,7 @@ for(const text of ['Synthetic qualified association','Synthetic uncertainty','1:
 const assert=require('node:assert/strict');
 const esc=x=>String(x??''),t=k=>k,fmtDate=String,fmtNum=String;
 const systemGeneLink=esc,levelChip=esc,cautionsHtml=()=>'',visitSourceLinks=esc,controlsHtml=()=>'';
-""" + functions + '\nconst html=visitDocumentHTML(' + json.dumps(result) + ");\n" + """
+""" + system_view_support.javascript(bind=False) + functions + '\nconst html=visitDocumentHTML(' + json.dumps(result) + ");\n" + """
 for(const unwanted of ['visit.report.plan','visit.report.response','visit.empty',
                        'visit.report.no_plan','visit.focus.no_measurements']) assert.ok(!html.includes(unwanted),unwanted);
 """

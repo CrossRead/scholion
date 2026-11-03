@@ -18,6 +18,102 @@
       }
     }
   },
+  "clinvar_phenotypes": {
+    "rs311103": {
+      "gene": "XG",
+      "ref": "G",
+      "alt": "C",
+      "phenotype": {
+        "en": "Xg(a−) blood group phenotype",
+        "ru": "Фенотип группы крови Xg(a−)"
+      },
+      "gene_function": {
+        "en": "XG encodes the protein that carries the Xgᵃ antigen on red blood cells.",
+        "ru": "XG кодирует белок, несущий антиген Xgᵃ на эритроцитах."
+      },
+      "description": {
+        "en": "The C allele weakens GATA1 binding in a regulatory region and reduces XG expression in red blood cells. The ClinVar classification refers to the Xg(a−) blood group phenotype.",
+        "ru": "Аллель C ослабляет связывание GATA1 в регуляторном участке и снижает экспрессию XG в эритроцитах. Классификация ClinVar относится к фенотипу группы крови Xg(a−)."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/2627030/",
+      "study": "https://pubmed.ncbi.nlm.nih.gov/29748255/"
+    },
+    "rs11185644": {
+      "gene": "RXRA",
+      "ref": "T",
+      "alt": "C",
+      "phenotype": {"en": "Levothyroxine response", "ru": "Ответ на левотироксин"},
+      "gene_function": {
+        "en": "RXRA encodes retinoid X receptor alpha, a nuclear receptor involved in regulating gene expression.",
+        "ru": "RXRA кодирует ретиноидный X-рецептор альфа, который участвует в регуляции экспрессии генов."
+      },
+      "description": {
+        "en": "A cross-sectional study examined this RXRA locus in relation to levothyroxine dose requirements. The finding has no validated individual dosing rule.",
+        "ru": "В поперечном исследовании этот локус RXRA изучали в связи с потребностью в левотироксине. Проверенного правила подбора индивидуальной дозы для этого варианта нет."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6256",
+      "study": "https://doi.org/10.1186/s12902-023-01425-z"
+    },
+    "rs6548238": {
+      "gene": "TMEM18",
+      "ref": "T",
+      "alt": "C",
+      "phenotype": {"en": "Obesity", "ru": "Ожирение"},
+      "gene_function": {
+        "en": "TMEM18 encodes transmembrane protein 18.",
+        "ru": "TMEM18 кодирует трансмембранный белок 18."
+      },
+      "description": {
+        "en": "This variant lies near TMEM18. Population studies link the locus to BMI and obesity. The association leaves the causal gene and individual risk unresolved.",
+        "ru": "Вариант расположен рядом с TMEM18. В популяционных исследованиях локус связывали с ИМТ и ожирением. Причинный ген и индивидуальный риск по этой связи не установлены."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV001007461/",
+      "study": "https://pubmed.ncbi.nlm.nih.gov/19079261/"
+    },
+    "rs7138803": {
+      "gene": "FAIM2",
+      "ref": "G",
+      "alt": "A",
+      "phenotype": {"en": "Obesity", "ru": "Ожирение"},
+      "gene_function": {
+        "en": "FAIM2 encodes a protein involved in regulating programmed cell death.",
+        "ru": "FAIM2 кодирует белок, участвующий в регуляции программируемой гибели клеток."
+      },
+      "description": {
+        "en": "Population studies associate the region near FAIM2 and BCDIN3D with BMI. Both names describe the locus, and the causal gene remains unresolved.",
+        "ru": "В популяционных исследованиях участок рядом с FAIM2 и BCDIN3D связан с ИМТ. Оба названия относятся к локусу, а причинный ген не установлен."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/274030856/",
+      "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11992084/"
+    },
+    "rs7675998": {
+      "gene": "NAF1",
+      "ref": "A",
+      "alt": "G",
+      "phenotype": {"en": "Chronic osteomyelitis", "ru": "Хронический остеомиелит"},
+      "gene_function": {
+        "en": "NAF1 helps assemble RNA–protein complexes, including telomerase.",
+        "ru": "NAF1 участвует в сборке комплексов РНК с белками, в том числе теломеразы."
+      },
+      "description": {
+        "en": "The region near NAF1 has been associated with telomere length. That research leaves the role of NAF1 in the osteomyelitis association recorded in ClinVar unresolved.",
+        "ru": "Участок рядом с NAF1 связывали с длиной теломер. Эти исследования не устанавливают роль NAF1 в ассоциации с остеомиелитом, указанной в ClinVar."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/gene/92345",
+      "study": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4006270/"
+    },
+    "rs7711080": {
+      "ref": "T",
+      "alt": "G",
+      "phenotype": {"en": "Colorectal cancer", "ru": "Колоректальный рак"},
+      "description": {
+        "en": "This variant was studied in relation to metastasis in people with colorectal cancer. A gene responsible for this association has not been established for this entry.",
+        "ru": "Вариант изучали в связи с метастазированием у людей с колоректальным раком. Ген, ответственный за эту ассоциацию, для записи не установлен."
+      },
+      "source": "https://jmg.bmj.com/content/jmedgenet/61/3/276/DC7/embed/inline-supplementary-material-7.pdf?download=true",
+      "study": "https://pubmed.ncbi.nlm.nih.gov/37890997/"
+    }
+  },
   "genes": {
     "ABCB4": {
       "source": "https://www.ncbi.nlm.nih.gov/gene/5244",

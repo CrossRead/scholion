@@ -294,6 +294,7 @@ def genome_report(r: Dict[str, Any]) -> str:
             "called_array": _t("genome.called_array"),
             "called_array_ambiguous": _t("genome.called_array_ambiguous"),
             "confirmed_ref": _t("genome.confirmed_ref_short"),
+            "reported": _t("genome.refused_head.reported"),
             "assumed_ref": _t("genome.assumed_ref")}.get(res.get("confidence"), "")
     # An imputed genotype is the output of a model over a reference panel, not a
     # base anybody observed in this person. One corpus file was 98.8 % imputed
@@ -321,8 +322,9 @@ def genome_report(r: Dict[str, Any]) -> str:
     # finding in itself; this is the last mile for the one task 64 added.
     if res.get("conflict"):
         c = res["conflict"]
-        line += "\n⚠️ " + _t("genome.conflict", reported=c.get("reported"),
-                             called=c.get("called"))
+        line += " ⚠️ " + (_t("genome.conflict", reported=c["reported"], called=c["called"])
+                            if c.get("reported") and c.get("called")
+                            else _t("genome.source_conflict"))
     elif res.get("confirmed_by") == "profile":
         line += "\n" + _t("genome.confirmed_by_report")
     cs = r.get("clinical_significance")
@@ -1164,6 +1166,8 @@ def lipid_genetics_report(r: Dict[str, Any]) -> str:
         else:
             mark = _t("lipidgen.direction_unknown" if x["carrier"] is None else "lipidgen.carrier" if x["carrier"] else "lipidgen.not_carrier")
             L.append(f"- `{x['rsid']}` {x['gene']} {x['genotype']} — **{mark}**")
+        if (x.get("reading") or {}).get("conflict"):
+            L.append("  " + _t("genome.source_conflict"))
         from .panel_reference import reference_lines
         L.extend("  " + detail for detail in reference_lines(x))
         if x.get("verdict"):

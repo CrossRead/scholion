@@ -303,7 +303,7 @@ class TestAListingMarksWhatIsNotCurrent(_Profile):
                 / "web" / "index.html").read_text(encoding="utf-8")
         # Task 195: «Drugs» and «Prescriptions» are one tab, «Medicines», and a
         # stopped entry carries its status as words and a date on a badge.
-        item = page[page.index("function medItem"):page.index("function metricOrigin")]
+        item = (support.SRC / "scholion/web/system-views.js").read_text(encoding="utf-8")
         self.assertIn("m.current===false", item, "the page does not look at the verdict")
         self.assertIn("medStatusText(m.status)", item)
         form = page[page.index("async function viewMedicines"):page.index("function bindRemove")]

@@ -45,6 +45,10 @@ ALSO = ("src/ingest/ingest_garmin.py", "src/ingest/ingest_whoop.py")
 #: Accepted places, with the reason each is not a defect. A path here is not
 #: «ignore this file» — it is one call, at one line, that somebody looked at.
 ACCEPTED = {
+    # importlib.metadata.Distribution.read_text is a UTF-8 metadata API with no
+    # encoding argument, not Path.read_text. The candidate check regression
+    # reads real non-ASCII distribution metadata and verifies its exact digest.
+    "src/tools/candidate_evidence.py:76",
     # Not a file at all: `urllib`'s opener, reached through a call rather than a
     # name, so the walk cannot see what it is. `.open(request)` here returns an
     # HTTP response, which has no encoding to state.

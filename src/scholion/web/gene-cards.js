@@ -9,6 +9,12 @@
     : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(k => [k, canonical(value[k])])) : value;
   const normal = value => text(value).trim().replace(/\s+/g, ' ').toLowerCase();
 
+  function readingObservations(rows) {
+    return list(rows).flatMap(row => [{source:text(object(row.source).file || row.evidence_file),
+      genotype:text(row.genotype), depth:object(row.quality).depth ?? row.depth, date:text(row.date)},
+      ...readingObservations(row.underlying_observations)]);
+  }
+
   function groupAssertions(assertions) {
     const groups = new Map();
     for (const assertion of assertions) {
@@ -35,16 +41,22 @@
     const p = input || {}, context = object(p.personal_context), reference = object(p.reference_context);
     const reading = Object.keys(object(p.reading)).length ? p.reading
       : Object.keys(object(p.result)).length ? p.result : object(p.genotype);
+    const record = object(reading.reading_record || p.reading_record);
+    const resolved = record.schema === 1;
+    const selected = resolved && reading.reading_record ? reading : p;
+    const conflict = !!(reading.conflict || p.conflict || record.conflict);
+    const interpretationBlocked = conflict || reading.interpretation_applicable === false
+      || p.interpretation_applicable === false || record.interpretation_applicable === false;
     const compound = !!(options.compound || p.epsilon || p.diplotype || p.rs429358 || p.rs7412);
     const position = text(p.rsid || p.hgvs || (p.chrom && p.pos ? p.chrom + ':' + p.pos : ''));
     const isVariant = !!(position || Object.keys(context).length || compound);
     const confidence = reading.confidence || p.confidence;
     const unavailable = p.status === 'no_genome' || p.read === false || reading.read === false || p.presumed === true || confidence === 'assumed_ref';
-    const genotype = unavailable || !isVariant ? '' : text(p.display_genotype || p.epsilon || p.diplotype
+    const genotype = unavailable || !isVariant ? '' : resolved && !compound ? text(selected.genotype) : text(p.display_genotype || p.epsilon || p.diplotype
       || (typeof p.genotype === 'string' ? p.genotype : '') || reading.genotype || context.genotype);
     const state = text(p.state || reading.state || p.zygosity);
-    let zygosity = text(context.zygosity);
-    if (!zygosity) zygosity = ({het:'heterozygous',hom:'homozygous',hemi:'haploid',absent:'reference'})[state] || '';
+    let zygosity = resolved ? '' : text(context.zygosity);
+    if (!zygosity && !resolved) zygosity = ({het:'heterozygous',hom:'homozygous',hemi:'haploid',absent:'reference'})[state] || '';
     // Technical zygosity may be read from an explicit call, never from absence.
     if (!zygosity && genotype && !compound) {
       const parts = /[/|]/.test(genotype) ? genotype.split(/[/|]/) : /^[ACGT]{1,2}$/i.test(genotype) ? genotype.split('') : [];
@@ -60,7 +72,7 @@
       copies = ({het:1,hom:2,hemi:1,absent:0})[state];
     }
     if (p.copies != null && copies == null && context.allele_identity_supported !== false && !unavailable) copies = p.copies;
-    if (unavailable || !isVariant || compound) copies = null;
+    if (unavailable || !isVariant || compound || interpretationBlocked) copies = null;
     const interpretation = object(p.interpretation);
     const summary = [interpretation.summary,p.summary,p.text,p.note,p.label,reference.variant_context,options.fallback].map(text).find(Boolean) || '';
     const hasVariantGrade = isVariant && reference.variant_status !== 'not_supplied';
@@ -72,18 +84,29 @@
       : list(p.assertions).length ? p.assertions : list(p.gencc);
     const modes = unique([text(context.inheritance_label), ...(!Object.keys(context).length
       ? [text(p.inheritance), text(p.moi), ...list(p.moi_codes)] : [])]);
-    const quality = unique([text(reading.note || reading.message), text(p.depth_note), text(p.read_why_text),
+    const quality = unique([text(reading.note || reading.message || (resolved ? selected.note : '')), text(p.depth_note), text(p.read_why_text),
       text(p.reading_note), text(p.file_says_text), text(p.read_why_text ? '' : p.read_why), text(p.verdict_label)]);
+    const qualityReading = resolved || !Object.keys(reading).length ? selected : reading;
+    const flags = {...object(qualityReading.quality), ...qualityReading};
+    const qualityKeys = unique(Object.entries({low_depth:'genlab.quality.low_depth',
+      filtered:'genlab.quality.filtered', imputed:'genlab.quality.imputed',
+      unverified_locus:'genlab.quality.locus', needs_confirmation:'genlab.quality.confirmation',
+      strand_ambiguous:'genlab.quality.confirmation', depth_unverified:'genome.depth_unverified'})
+      .filter(([key]) => (resolved || key === 'low_depth') && flags[key] === true).map(([,key]) => key));
     return {gene:text(p.gene || object(p.locus).gene || reference.canonical_symbol), position, compound, genotype, zygosity, copies,
       geneScreen:!isVariant && options.geneScreen ? object(options.geneScreen) : null,
       geneRegion:!isVariant && options.geneRegion ? object(options.geneRegion) : null,
       unavailable, isVariant, referenceOnly:options.referenceOnly === true,
       level, status, statusLabel, functionText:reference.function_status === 'not_curated' ? '' : text(reference.gene_function || p.function),
       summary, inclusionReason:text(context.inclusion_reason), personalMeaning:text(context.summary),
+      clinvarPhenotype:object(p.clinvar_phenotype),
       classification:text(p.clnsig || p.classification || (typeof p.clinvar === 'string' ? p.clinvar : (object(p.clinvar).classification || object(p.clinvar).clinical_significance))),
       condition:text(p.disease || p.phenotype || p.clndn || reference.disease_context?.name),
-      assertions, modes, quality, depth:reading.depth ?? p.depth,
-      source:text(reading.source || p.reading_source), confidence, review:text(p.review_confidence || p.review),
+      assertions, modes, quality, qualityKeys, depth:resolved ? selected.depth : reading.depth ?? p.depth,
+      source:resolved ? text(selected.from_profile || object(selected.source_identity).file || selected.source)
+        : text(reading.source || p.reading_source),
+      conflict, interpretationBlocked, observations:readingObservations(record.observations),
+      confidence, review:text(p.review_confidence || p.review), reviewCode:text(p.review),
       coordinate:p.chrom && p.pos ? text(p.chrom) + ':' + text(p.pos) : '',
       protein:text(p.protein || p.star), readingMessage:text(p.reading_label),
       inheritance:object(context.inheritance), context, reference,
@@ -117,17 +140,29 @@
       : model.referenceOnly ? t('web.gene_card.reference_reading') : t('web.gene_card.not_read');
     const readingKind = region ? 'gene_region' : screen ? 'gene_screen' : model.genotype ? 'called' : !model.isVariant ? 'gene' : model.referenceOnly ? 'reference' : 'unread';
     const copies = model.copies != null ? t('web.gene_card.copies', {n:model.copies}) : '';
-    const gene = options.geneHtml || `<strong>${e(model.gene || '—')}</strong>`;
+    const gene = options.geneHtml || `<strong>${e(model.gene || (model.classification ? t('web.gene_card.gene_unassigned') : '—'))}</strong>`;
     const level = model.level ? options.grade(model.level, model.levelShort) : !model.isVariant ? e(t('science.gene_grade')) : '—';
     const inheritance = model.modes.length ? model.modes.join('; ') : t('web.gene_card.inheritance_unknown');
     const compactKey = 'web.gene_card.meaning.' + model.status;
-    const compactMeaning = model.personalMeaning && t(compactKey) !== compactKey ? t(compactKey) : model.personalMeaning;
+    const translatedMeaning = t(compactKey);
+    const compactMeaning = model.personalMeaning && translatedMeaning !== compactKey && !translatedMeaning.startsWith('⟦')
+      ? translatedMeaning : model.personalMeaning;
     const genericSummary = ['not_curated','not_supplied'].includes(model.reference.variant_status)
       && model.summary === model.reference.variant_context;
-    const visibleMeaning = unique([genericSummary ? (compactMeaning || !model.isVariant ? '' : t('web.gene_card.variant_unresolved')) : model.summary,
+    const visibleMeaning = unique([model.clinvarPhenotype?.description,
+      genericSummary ? (compactMeaning || !model.isVariant ? '' : t('web.gene_card.variant_unresolved')) : model.summary,
       compactMeaning]).filter(value => value !== model.functionText).map(value => para(value, 'gene-card-personal')).join('');
+    const translated = (key, fallback) => {
+      const value = t(key);
+      return value === key || value.startsWith('⟦') ? fallback : value;
+    };
+    const classification = model.classification ? translated('clinvar.sig.' + normal(model.classification).replace(/[\s-]+/g,'_'), model.classification) : '';
+    const condition = model.clinvarPhenotype?.phenotype || model.condition;
+    const review = model.reviewCode ? translated('insight.database.' + model.reviewCode.replace(/,+/g,''), model.review) : model.review;
+    const clinvarSummary = classification && (model.stars === 0 || !model.functionText || model.clinvarPhenotype?.phenotype)
+      ? para([`ClinVar: ${classification}`,condition,model.stars!=null?t('web.gene_card.review_stars',{n:model.stars}):''].filter(Boolean).join(' · '), 'cr-caption') : '';
     const witnesses = list(model.inheritance.assertions).map(a => `<div data-inheritance-witness>${para(a.disease)}${para(a.mode)}${para(a.classification)}${link(a.source || '')}${para(a.date)}</div>`).join('');
-    const baseAnnotations = (model.classification ? `<div class="gene-card-db" data-gene-db="ClinVar"><b>ClinVar</b><div>${para(model.classification)}${para(model.condition)}${para(model.review)}${model.stars!=null?para(t('web.gene_card.review_stars',{n:model.stars})):''}${para(model.snapshot)}</div></div>` : '')
+    const baseAnnotations = (classification ? `<div class="gene-card-db" data-gene-db="ClinVar"><b>ClinVar</b><div>${para(classification)}${para(condition)}${para(review)}${model.stars!=null?para(t('web.gene_card.review_stars',{n:model.stars})):''}${para(model.snapshot)}${link(model.clinvarPhenotype?.source)}${link(model.clinvarPhenotype?.study)}</div></div>` : '')
       + groupAssertions(model.assertions).map(({claim:a,witnesses:rows}) => `<div class="gene-card-db" data-gene-db="GenCC"><b>GenCC</b><div>${para(a.disease_label || a.disease)}${para([a.classification_label || a.classification,a.moi_label || a.moi_code || a.moi].filter(Boolean).join(' · '))}<details data-gencc-submissions><summary>${e(t('web.gene_card.source_records',{n:rows.length}))}</summary>${rows.map(row=>`<div class="gene-card-witness" data-gencc-witness>${para(row.submitter)}${para(row.curated_on)}${unique([row.source,row.public_report]).filter(Boolean).map(value=>`<p>${link(value)}</p>`).join('')}${row.submission_ids?para(list(row.submission_ids).join(' · ') || text(row.submission_ids)):''}</div>`).join('')}</details></div></div>`).join('')
       + (model.reference.gencc_version ? para(model.reference.gencc_version) : '')
       + (model.reference.gencc_source ? link(model.reference.gencc_source) : '')
@@ -136,19 +171,38 @@
     const annotations = baseAnnotations + science + (options.annotationHtml || '') + (options.detailHtml || '');
     const confidenceKeys={called:'genome.called',confirmed_ref:'genome.confirmed_ref_short',assumed_ref:'web.genome.assumed_ref'};
     const confidenceText=confidenceKeys[model.confidence]?t(confidenceKeys[model.confidence]):'';
-    const readingNotes = model.quality.map(q => para(q, 'cr-caption')).join('')
+    const quality = unique([...model.quality, ...model.qualityKeys.map(key=>t(key))]);
+    const lowDepth = model.qualityKeys.includes('genlab.quality.low_depth');
+    const showDepth = model.depth != null && !model.unavailable;
+    const depthLine = showDepth ? t(lowDepth ? 'web.gene_card.low_depth' : 'web.gene_card.depth', {value:model.depth})
+      : lowDepth ? t('genlab.quality.low_depth') : '';
+    // Keep the original note in the disclosure. A VCF note can also include
+    // independent information, so remove only its duplicate depth fragment.
+    const visibleQuality = lowDepth ? unique(quality.map(note => {
+      if (note === t('genlab.quality.low_depth')) return '';
+      if (model.depth == null) return note;
+      return note.replace(t('genome.low_depth_suffix', {depth:model.depth}), '')
+        .replace(t('genome.low_depth', {depth:model.depth}), '').trim();
+    })) : quality;
+    const readingWarning = model.conflict ? t('genome.source_conflict')
+      : model.interpretationBlocked ? t('web.gene_card.interpretation_blocked') : '';
+    const warning = readingWarning && !visibleQuality.some(q => q.includes(readingWarning))
+      ? para(readingWarning, 'cr-caption') : '';
+    const observations = model.observations.length ? `<details data-reading-observations><summary>${label('observations')}</summary>${model.observations.map(row =>
+      `<div data-reading-observation>${para(row.source)}${para(row.genotype || t('web.gene_card.not_read'))}${row.depth != null ? para(t('web.genome.coverage',{value:row.depth}),'cr-caption') : ''}${para(row.date,'cr-caption')}</div>`).join('')}</details>` : '';
+    const readingNotes = quality.map(q => para(q, 'cr-caption')).join('')
       + (model.depth != null && !model.unavailable ? para(t('web.genome.coverage', {value:model.depth}), 'cr-caption') : '')
       + para(region?.reading_summary?.message, 'cr-caption') + para(model.source, 'cr-caption') + para(model.coordinate, 'cr-caption') + para(model.readingMessage, 'cr-caption');
     const referenceInheritance=!Object.keys(model.context).length?model.assertions.filter(a=>a.moi_label||a.moi_code||a.moi).map(a=>para([a.disease_label||a.disease,a.moi_label||a.moi_code||a.moi,a.classification_label||a.classification].filter(Boolean).join(' · '))).join(''):'';
     const details = `<div class="gene-card-inheritance"><b>${label('inheritance')}</b>${para(inheritance)}${unique([model.inclusionReason,model.personalMeaning,genericSummary?model.summary:'',model.reference.variant_context!==model.summary?model.reference.variant_context:'']).filter(Boolean).map(value=>para(value)).join('')}${para(model.context.scope_note)}${para(model.context.limitations)}${link(model.inheritance.source || '')}${para(model.inheritance.snapshot)}${witnesses}${referenceInheritance?para(t('web.gene_card.gene_inheritance'))+referenceInheritance:''}</div>`
-      + `<div class="gene-card-quality"><b>${label('quality')}</b>${readingNotes || para(t('web.gene_card.quality_unknown'))}</div>`
+      + `<div class="gene-card-quality"><b>${label('quality')}</b>${readingNotes || para(t('web.gene_card.quality_unknown'))}${observations}</div>`
       + (options.extraHtml || '');
     return `<article class="gene-card" ${model.calledDiplotype?'data-called-diplotype ':''}data-gene-card data-gene="${e(model.gene)}" data-position="${e(model.position)}" data-reading-kind="${readingKind}" data-card-kind="${model.compound ? 'combination' : model.isVariant ? 'variant' : 'gene'}">`
       + (status ? `<div class="gene-card-tags"><span class="cr-badge cr-badge--plain" data-personal-status="${e(model.status || 'unread')}">${e(status)}</span></div>` : '')
       + `<div class="gene-card-grid"><div class="gene-card-confidence"><div class="gene-card-label">${label('confidence')}</div>${level}${model.level ? `<div class="cr-caption">${label('variant_scope')}</div>` : ''}</div>`
       + `<div class="gene-card-identity"><div class="gene-card-label">${label('identity')}</div>${gene}${/^rs\d+$/.test(model.position) ? `<p class="cr-caption"><a href="#variant/${e(model.position)}" data-rs-open="${e(model.position)}">${e(model.position)}</a></p>` : para(model.position, 'cr-caption')}${para(model.protein, 'cr-caption')}</div>`
-      + `<div class="gene-card-reading"><div class="gene-card-label">${label('reading')}</div><span class="${model.genotype && !screen ? 'gene-card-genotype' : 'gene-card-no-reading'}">${e(genotype)}</span><div class="gene-card-zygosity">${e(zygosity)}</div>${screen ? para(screenReason,'cr-caption') + (screen.scanStatus==='ok' && Number.isInteger(screen.findings) ? para(t('screen.gene_findings',{n:screen.findings}),'cr-caption') : '') : ''}${region?.status==='ok' ? para(t('thematic.region_scope'),'cr-caption') : ''}${para(copies, 'cr-caption')}${para(confidenceText, 'cr-caption')}${model.quality.map(q=>para(q,'cr-caption')).join('')}${model.depth != null && !model.unavailable ? para(t('web.genome.coverage',{value:model.depth}),'cr-caption') : ''}</div>`
-      + `<div class="gene-card-description" data-gene-description><div class="gene-card-label">${label('meaning')}</div>${model.functionText ? `<strong class="gene-card-function">${e(model.functionText)}</strong>` : para(t('science.function_missing_compact'))}${visibleMeaning}</div></div>`
+      + `<div class="gene-card-reading"><div class="gene-card-label">${label('reading')}</div><span class="${model.genotype && !screen ? 'gene-card-genotype' : 'gene-card-no-reading'}">${e(genotype)}</span><div class="gene-card-zygosity">${e(zygosity)}</div>${screen ? para(screenReason,'cr-caption') + (screen.scanStatus==='ok' && Number.isInteger(screen.findings) ? para(t('screen.gene_findings',{n:screen.findings}),'cr-caption') : '') : ''}${region?.status==='ok' ? para(t('thematic.region_scope'),'cr-caption') : ''}${para(copies, 'cr-caption')}${para(confidenceText, 'cr-caption')}${warning}${para(depthLine,'cr-caption')}${visibleQuality.map(q=>para(q,'cr-caption')).join('')}</div>`
+      + `<div class="gene-card-description" data-gene-description><div class="gene-card-label">${label('meaning')}</div>${model.functionText ? `<strong class="gene-card-function">${e(model.functionText)}</strong>` : clinvarSummary ? '' : para(t('science.function_missing_compact'))}${clinvarSummary}${visibleMeaning}</div></div>`
       + (annotations ? `<details class="gene-card-fold" data-gene-annotations><summary>${label('annotations')}</summary><div class="gene-card-fold-body">${annotations}</div></details>` : '')
       + `<details class="gene-card-fold" data-gene-inheritance><summary>${label('details')}</summary><div class="gene-card-fold-body">${details}</div></details>`
       + (options.contextHtml ? `<section class="gene-card-context">${options.contextHtml}</section>` : '') + '</article>';

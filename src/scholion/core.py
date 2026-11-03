@@ -908,7 +908,7 @@ LOCALIZABLE_FIELDS = {
     "zygosity_note", "loinc_note", "common_pitfalls", "hypothesis", "evidence",
     "text", "rule", "summary", "description",
     # Separate reference catalogue fields, never personal readings or findings.
-    "reading", "possible_influence",
+    "reading", "possible_influence", "gene_function",
     # A phrase keyed by GENOTYPE STATE (system_gene_panels.json): `text` there is
     # not one language map but three — `text.absent`, `text.het`, `text.hom` —
     # each an author's sentence in both languages. The state names are curated
@@ -2522,36 +2522,14 @@ def genome_gaps() -> List[str]:
 
 
 def profile_genotypes() -> Dict[str, Dict[str, Any]]:
-    """Genotypes the profile already RECORDS, by rsID, with the file each came from.
+    """Recorded PGx/longevity observations, including duplicates and conflicts.
 
-    Two files hold them: `pharmacogenomics.json` (`genotypes[]`, what a PGx
-    report or the owner wrote down) and `longevity_findings.json` (the APOE pair
-    and the curated positions). Until 0.6.0 the system panels read positions
-    only out of a VCF, so on a profile without one F5, CYP2C19, MTHFR and APOE
-    printed «not read» on the radar while the same page showed them two tabs
-    away (the interface review of 25.09.2026). A genotype written in the
-    profile is a reading; it says where it came from, and a VCF that reads the
-    position wins over it.
+    The flat fields are compatibility projections; ``observations`` retains
+    source quality and provenance. Selection against current reads belongs to
+    variant_readings.resolve, never to the screen that displays the result.
     """
-    out: Dict[str, Dict[str, Any]] = {}
-
-    def put(rsid, genotype, gene, source):
-        g = str(genotype or "").strip()
-        r = str(rsid or "").strip()
-        if r.startswith("rs") and g and r not in out:
-            out[r] = {"genotype": g, "gene": str(gene or "").upper(), "source": source}
-
-    for g in pharmacogenomics().get("genotypes") or []:
-        if isinstance(g, dict):
-            put(g.get("rsid"), g.get("genotype"), g.get("gene"), "pharmacogenomics.json")
-    lf = read_profile_json(profile_dir() / "longevity_findings.json")
-    apoe: Dict[str, Any] = lf["apoe"] if isinstance(lf.get("apoe"), dict) else {}
-    for rs in ("rs429358", "rs7412"):
-        put(rs, apoe.get(rs), "APOE", "longevity_findings.json")
-    for k in lf.get("known") or []:
-        if isinstance(k, dict):
-            put(k.get("rsid"), k.get("genotype"), k.get("gene"), "longevity_findings.json")
-    return out
+    from .variant_readings import recorded_genotypes
+    return recorded_genotypes()
 
 
 def markers_for_gene(gene: str) -> List[Dict[str, str]]:
@@ -2570,76 +2548,21 @@ def markers_for_gene(gene: str) -> List[Dict[str, str]]:
 
 
 def genotype_status(rsid: str) -> Optional[Dict[str, Any]]:
-    """The genotype at an rsID TOGETHER with how it is known.
+    """Resolve current and recorded readings through the common source policy.
 
-    The companion this module was missing. `genotype_at` returns the string and
-    drops everything that says what the string is worth — and one of the values
-    it drops is `assumed_ref`, which does not mean "reference" but "there is no
-    row at this position: either the reference, or nothing was read there".
-
-    That distinction is the whole of the strongest failure the audit found. With
-    a VCF connected and the DPYD positions never called, the string came back
-    "CC", counted as zero variant copies, and a possible carrier of `*2A` was
-    told the drug looked normal — while the same person WITHOUT a genome was told
-    the status was unknown and the test was required. Connecting more data made
-    the answer less cautious.
-
-    `source` is `profile` for a genotype typed in from a laboratory report,
-    `vcf` for one resolved from the person's own file.
-
-    WHICH SOURCE WINS, and why it is not the one that used to (task 64). This
-    function returned the profile entry the moment it found one and never reached
-    the VCF. So `rs4988235`, `rs1801133` and `rs429358` came back as
-    `reported/profile/depth=None` — copied off a laboratory's summary sheet —
-    while the person's own aligned reads sat unread in a file on the same disk.
-    `scholion genome rs4988235` meanwhile read the VCF and answered «reference
-    confirmed by a call (0/0), coverage 32». Two routes to one fact, disagreeing.
-
-    A read outranks a report: it carries a depth, it can be re-examined, and it
-    is the thing the report was made from. But only a GENUINE read does. A
-    missing row in a -mv VCF comes back as `assumed_ref`, which does not mean
-    reference — it means «either the reference, or nothing was looked at there» —
-    and letting that overrule a laboratory's positive finding would be the
-    project's oldest defect wearing new clothes: more data producing a less
-    cautious answer.
-
-    A disagreement is never resolved silently. Both values travel in `conflict`,
-    so the layer above can say that the report and the reads do not agree rather
-    than quietly print one of them.
-
-    Why this was not caught by the seventeen known disagreements between the
-    Evogen report and the reads: `genotype_status` answered `None` for all of
-    them — those rsIDs are not in the catalogue, so the priority was never
-    exercised where it is dangerous. The absence of an error there proved nothing,
-    and the test below builds the collision by hand rather than waiting for one.
+    Positive calls (including confirmed reference) are selected for display;
+    absence never erases a recorded finding. Conflicts retain every observation
+    and withhold automatic interpretation. The variant_readings module owns
+    the source-resolution contract.
     """
-    reported = None
-    for g in pharmacogenomics().get("genotypes", []):
-        if g.get("rsid", "").lower() == rsid.lower():
-            reported = {"genotype": g.get("genotype", ""), "confidence": "reported",
-                        "source": "profile"}
-            break
-
-    from . import genome  # lazy import
+    from . import genome
+    from .variant_readings import resolve
+    recorded = profile_genotypes().get(rsid.lower())
     try:
         called = genome.genotype_from_vcf(rsid)
     except Exception:                                        # noqa: BLE001
         called = None
-
-    if reported is None:
-        return called
-    # A row that was never read cannot overrule a laboratory that did read it.
-    if not called or not called.get("genotype") or called.get("confidence") != "called":
-        return reported
-
-    if _same_genotype(called.get("genotype"), reported.get("genotype")):
-        # Agreement is worth saying: two independent routes to the same call is a
-        # stronger statement than either of them alone.
-        return {**called, "confirmed_by": "profile",
-                "also_reported": reported.get("genotype")}
-    return {**called, "conflict": {"reported": reported.get("genotype"),
-                                   "called": called.get("genotype"),
-                                   "resolved_to": "called"}}
+    return resolve(rsid, called, recorded)
 
 
 def _same_genotype(a: Optional[str], b: Optional[str]) -> bool:
@@ -2649,10 +2572,8 @@ def _same_genotype(a: Optional[str], b: Optional[str]) -> bool:
     treated them as three would report a disagreement on every second marker and
     train the reader to ignore the flag.
     """
-    def norm(x):
-        x = (x or "").replace("|", "").replace("/", "").strip().upper()
-        return "".join(sorted(x))
-    return bool(norm(a)) and norm(a) == norm(b)
+    from .variant_readings import same_genotype
+    return same_genotype(a, b)
 
 
 def genotype_at(rsid: str) -> Optional[str]:
@@ -2662,7 +2583,8 @@ def genotype_at(rsid: str) -> Optional[str]:
     confidence, and this function cannot show it.
     """
     st = genotype_status(rsid)
-    return st.get("genotype") if st else None
+    from .variant_readings import permits_interpretation
+    return st.get("genotype") if st and permits_interpretation(st) else None
 
 
 def reset_cache() -> None:

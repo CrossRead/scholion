@@ -1,6 +1,7 @@
 """Run the page's actual mount/cache functions with deliberately reordered replies."""
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import unittest
@@ -9,6 +10,15 @@ import support
 
 # These check correctness, not process-startup latency on hosted Windows runners.
 NODE_TIMEOUT = 60
+
+LIFECYCLE = ('const ScholionViewLifecycle=require(' + json.dumps(str(support.SRC / 'scholion/web/view-lifecycle.js')) + ');\n')
+OWNER = LIFECYCLE + r"""
+const viewLifecycle=ScholionViewLifecycle.create({context:()=>({profile:'synthetic'})});
+const beginView=key=>viewLifecycle.begin(visible,key);
+const refreshProfileAnswers=async()=>false;
+let _profileSwitchPending=false;
+"""
+
 
 
 @unittest.skipUnless(shutil.which("node"), "needs node for the page's JavaScript")
@@ -27,6 +37,7 @@ const api=url=>url.startsWith('/api/overview')?new Promise(resolve=>finishContex
 const t=x=>x, esc=x=>x, pageHead=()=>'',firstTabLabel=()=>'',bodySVG=()=>'',radarSVG=()=>'',responseForm=()=>'';
 const wireSystems=()=>{},renderGoal=()=>goalPaints++,lazyOverviewBlock=()=>{},bindTabLinks=()=>{},plural=()=>'';
 let visits=0;const viewVisitSheet=async()=>{visits++;};
+const viewPost=()=>()=>Promise.resolve({});
 const attentionHTML=()=> 'LATE INSIGHTS',visitSelection=new Set();let visitSelectionTouched=false;
 """ + function + r"""
 (async()=>{
@@ -56,7 +67,9 @@ const attentionHTML=()=> 'LATE INSIGHTS',visitSelection=new Set();let visitSelec
 const assert=require('node:assert/strict');
 const handlers={},window={addEventListener:(name,fn)=>handlers[name]=fn};
 const rows=[{open:true},{open:false},{open:false}];
+let regionExpansions=0;
 const document={querySelectorAll:selector=>{
+  if(selector==='#view [data-panel-region]')return [{dispatchEvent:e=>{assert.equal(e.type,'scholion:expand');regionExpansions++;}}];
   assert.equal(selector,'#view .gene-card details:not([open]), #view details[data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view [data-thematic-gene] details:not([open]), #view [data-thematic-gene]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])');
   return rows.filter(r=>!r.open);
 }};
@@ -65,6 +78,7 @@ for(let i=0;i<2;i++){
   handlers.beforeprint();assert.deepEqual(rows.map(r=>r.open),[true,true,true]);
   handlers.afterprint();assert.deepEqual(rows.map(r=>r.open),[true,false,false]);
 }
+assert.equal(regionExpansions,2,'region contents are available before printing');
 """
         result = subprocess.run([shutil.which("node"), "-e", script], text=True, capture_output=True,
                                 stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
@@ -82,12 +96,13 @@ function node(){return {innerHTML:'',isConnected:true,cloneNode:()=>node(),
   replaceWith(next){this.isConnected=false;visible=next;}};}
 const $=()=>visible,showLoader=()=>{},api=()=>new Promise(resolve=>{resolveRead=resolve;});
 const viewPanel=()=>{opened++;visible.innerHTML='OLD LIST';};
-""" + function + r"""
+""" + OWNER + function + r"""
 (async()=>{
   for(const kind of ['reference_only','patient_readings']){
     visible=node();
     const old=visible,pending=viewSystem('author_list','clinician');
     assert.notEqual(old,visible,'a subview must own a fresh node');
+    await new Promise(setImmediate);
     visible.replaceWith(node());visible.innerHTML='NEW SCREEN';
     resolveRead({status:'ok',[kind]:true});await pending;
     assert.equal(opened,0);assert.equal(visible.innerHTML,'NEW SCREEN');
@@ -109,10 +124,10 @@ function node(){return {innerHTML:'',isConnected:true,cloneNode:()=>node(),
   replaceWith(next){this.isConnected=false;visible=next;}};}
 const $=()=>visible,showLoader=()=>{},api=()=>new Promise(resolve=>replies.push(resolve));
 const t=(key,args)=>args.key,errorHtml=x=>x;
-""" + function + r"""
+""" + OWNER + function + r"""
 (async()=>{
-  visible=node();const a=viewPanel('FIRST'),first=visible;
-  const b=viewPanel('SECOND');assert.notEqual(first,visible);
+  visible=node();const a=viewPanel('FIRST'),first=visible;await new Promise(setImmediate);
+  const b=viewPanel('SECOND');assert.notEqual(first,visible);await new Promise(setImmediate);
   replies[1]({status:'unknown_system',systems:[]});await b;
   replies[0]({status:'unknown_system',systems:[]});await a;
   assert.equal(visible.innerHTML,'SECOND');
@@ -134,12 +149,12 @@ let current=0, visible;
 function node(){return {innerHTML:'',isConnected:true,cloneNode:()=>node(),
   replaceWith(next){this.isConnected=false;visible=next;}};}
 const $=()=>visible,document={querySelectorAll:()=>[]};
-const showLoader=()=>{},errorHtml=x=>x,t=x=>x,refreshProfileAnswers=async()=>false;
+const showLoader=()=>{},errorHtml=x=>x,t=x=>x;
 let first,second,fail=false;
 const TABS=[['a',v=>new Promise((resolve,reject)=>{first=()=>{
   if(fail)reject(Error('old failure'));else {v.innerHTML='A';resolve();}
 };})],['b',v=>new Promise(resolve=>{second=()=>{v.innerHTML='B';resolve();};})]];
-""" + function + r"""
+""" + OWNER + function + r"""
 (async()=>{
   for(fail of [false,true]){
     visible=node();
@@ -161,7 +176,7 @@ const assert=require('node:assert/strict');
 const API='',withLang=x=>x,t=x=>x,_net={started:0,done:0};
 let resolveRead;
 const fetch=()=>new Promise(resolve=>{resolveRead=resolve;});
-""" + functions + r"""
+""" + LIFECYCLE + "let _profileIdentity=null,_sources=null,_systems=null;\n" + functions + r"""
 (async()=>{
   const pending=api('/api/labs');forgetAnswers();
   resolveRead({ok:true,json:async()=>({value:'old'})});await pending;
@@ -173,13 +188,13 @@ const fetch=()=>new Promise(resolve=>{resolveRead=resolve;});
 
     def test_external_import_invalidates_answers_without_discarding_unchanged_cache(self):
         page=(support.ROOT / 'src/scholion/web/index.html').read_text(encoding='utf-8')
-        start=page.index('let _profileRevision=null;')
+        start=page.index('let _profileRevision=null,')
         code=page[start:page.index('function mount(i){',start)]
         script=r"""
 const assert=require('node:assert/strict');
 let _answerEpoch=0,_sources='sources',_systems='systems',cleared=0,revision='first',reply;
 const api=async()=>({profile_revision:revision});
-const forgetAnswers=()=>{_answerEpoch++;cleared++;};
+const forgetAnswers=()=>{_answerEpoch++;cleared++;_sources=null;_systems=null;};
 """+code+r"""
 (async()=>{
  assert.equal(await refreshProfileAnswers(),false);

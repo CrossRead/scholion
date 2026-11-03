@@ -245,8 +245,8 @@ MESSAGES = {
     "web.system.med_dose": "Recorded dose / regimen",
     "web.system.med_name": "Prescription",
     "web.gen.col_confidence": "Confidence",
-    "interpretation.automatic_count": "rows with incomplete support for automatic clinical findings: {n}",
-    "interpretation.automatic_held": "Some automatic clinical findings cannot be established from the recorded support. Available interpretations are shown with their confidence.",
+    "interpretation.automatic_count": "entries with insufficient evidence for a clinical conclusion: {n}",
+    "interpretation.automatic_held": "Available interpretations are shown with their confidence levels.",
     "web.gen.context_reference": "Catalogue interpretation",
     "web.gen.context_lower": "Interpretation with limited confidence",
     "web.gen.context_details": "Details and sources",
@@ -542,7 +542,10 @@ MESSAGES = {
     "screen.unread.clinvar": "{rows} the ClinVar annotation did not reach — annotating the file closes that",
     "screen.unread.no_row": "{rows} with no row in the genome file — genotyping them from the alignment closes that",
     "screen.unread.no_table": "{rows} with the depth never measured — a coverage table from the alignment closes that",
-    "screen.unread_all.thin": "all of them read too thinly to decide — deeper sequencing closes that",
+    "screen.unread_all.thin": "insufficient sequencing data for a confident assessment",
+    "screen.unread_thin_panel.one": "There are insufficient sequencing data to confidently assess {affected} of {n} entry in the genetic panel.",
+    "screen.unread_thin_panel.few": "There are insufficient sequencing data to confidently assess {affected} of {n} entries in the genetic panel.",
+    "screen.unread_thin_panel.many": "There are insufficient sequencing data to confidently assess {affected} of {n} entries in the genetic panel.",
     "screen.unread_all.no_table": "the depth of reading is unmeasured for all of them — a coverage table from the alignment closes that",
     "screen.unread_all.no_row": "none of them has a row in the genome file — genotyping them from the alignment closes that",
     "screen.unread_all.clinvar": "the ClinVar annotation reached none of them — annotating the file closes that",
@@ -552,8 +555,8 @@ MESSAGES = {
     "count.rows.many": "{n} rows",
     "screen.unread.build": "{rows} where the build of the genome file is not established — naming it settles them",
     "screen.unread_all.build": "for all of them the build of the genome file is not established — naming it settles them",
-    "screen.unread.thin": "{rows} read too thinly to decide — deeper sequencing closes that",
-    "screen.and_carriers": "rows where one copy of a recessive allele was found, which is carriership and not a finding about the person's own risk: {n} — see the questions",
+    "screen.unread.thin": "{rows} with insufficient coverage for a confident assessment",
+    "screen.and_carriers": "entries reporting one copy of a recessive variant (carrier status): {n}",
     "screen.not_determined": "this build cannot answer for this list — {why}",
     "screen.why.not_ready": "the genome is not readable on this profile — see the genome status",
     "screen.why.unavailable": "the genome could not be opened — see the genome status",
@@ -1968,6 +1971,9 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.why.no_rule_fired": "no rule of the test list touches a marker of this system on this profile",
     "system.why.nothing_open": "No additional questions for this system from the available data.",
     "system.next.stale": "{marker}: last measured {date}, more than {months} months ago",
+    'system.next.coverage_context': 'These are coverage limits of the measured intervals, not unread genotypes at every position. The flag uses a comparison with the file and an internal coverage floor; it is not a clinical requirement. Check the particular variant and its reading quality when it matters to the clinical question. This list alone does not call for repeat sequencing.',
+    'system.read_why.unknown': 'the reading could not be confirmed; inspect the position details',
+    'system.read_why.other_variant_at_position': 'a row is present, but its alleles differ from the catalogue entry; check the catalogue and the variant representation',
     "system.next.unread": "{gene} {rsid}: not read in this file ({why})",
     "system.next.unread_gene": "{gene}: not read for this purpose ({why})",
     "system.kind.guideline": 'a guideline weighs it when a drug is chosen',
@@ -2183,11 +2189,11 @@ A reading is not a diagnosis but material for a conversation with the treating d
     "system.read_why.no_row": 'no row at the position, and whether that is the reference or a gap is not known',
     "system.closes.clinvar_not_run": 'closes it: the ClinVar annotation of the file — the step in `scholion doc preparing-the-genome`',
     "system.closes.coverage_gene_not_in_table": 'closes it: a coverage table computed over this list of genes — the table this profile has was computed for a different, shorter list',
-    "system.closes.coverage_low": 'closes it: deeper reads over this gene — a targeted panel, or resequencing',
+    'system.closes.coverage_low': 'Review the relevant positions and their read quality in the existing data; discuss further testing only if an unresolved clinical question requires it.',
     "system.closes.coverage_not_measured": 'closes it: the coverage table computed from the BAM — `scholion limits` names the step',
     "system.closes.coverage_weak": 'closes it: deeper reads over these genes — a targeted panel, or resequencing',
     "system.closes.coverage_unmeasured": 'closes it: the coverage table computed from the BAM — `scholion limits` names the step',
-    "system.next.coverage": "{gene}: read below the file's own middle ({pct} % of bases at 20×)",
+    'system.next.coverage': '{gene}: measured interval — {pct}% of bases at ≥{depth}×; median of comparable intervals in the file: {median}%',
     # the polygenic layer of a system (task 178): scores beside the list, never in the verdict
     "system.polygenic.title": "Common variation (polygenic scores)",
     "system.polygenic.line": "models the map places on this system: {mapped}; scored on this profile: {scored}; reliable and at or above the 80th percentile: {high}",
@@ -4185,6 +4191,7 @@ will go through them later.
     "web.system.fact_measured": "markers measured",
     "web.system.fact_found": "positions with the named allele",
     "web.system.genetics_detail": "The gene list, every position and the scores",
+    "web.system.genetic_summary": "Genetic panel summary",
     "web.system.next_h": "Next steps",
     "web.panel.fact_positions": "positions of the panel",
     "web.panel.fact_genes": "genes",
@@ -5266,6 +5273,9 @@ MESSAGES.update({
     "web.gene_card.inheritance_unknown": "Inheritance is not established for this variant. Gene-level inheritance depends on the condition.",
     "web.gene_card.quality": "Reading and limitations",
     "web.gene_card.quality_unknown": "Reading quality has not been supplied.",
+    "web.gene_card.gene_unassigned": "Gene not established",
+    "web.gene_card.depth": "Read depth: {value}×",
+    "web.gene_card.low_depth": "Low read depth: {value}×",
     "web.gene_card.unread_status": "Personal reading unavailable",
     "web.gene_card.reference": "Reference information",
     "web.gene_card.combination": "Joint combination of positions",
@@ -5338,3 +5348,13 @@ MESSAGES.update({'gene.unannotated_rows': 'Records without coding-region annotat
 MESSAGES.update({'gene.cds_not_annotated': 'This interval reference does not provide a coding-region annotation.'})
 
 MESSAGES.update({'thematic.region_scope': 'VCF records; whole-gene coverage is not established.'})
+
+MESSAGES["web.context.changed"] = 'The profile changed. Reopen this screen before continuing; nothing was read or written for the other person.'
+
+MESSAGES.update({'genome.source_conflict': 'Sources disagree about this genotype. The observations are retained; automatic interpretation is withheld until they are reconciled.', 'system.read_why.source_conflict': 'recorded and current readings disagree; compare their sources', 'genlab.quality.source_conflict': 'Conflicting genotype observations'})
+MESSAGES.update({
+    'web.gene_card.observations': 'Genotype observations and sources',
+    'web.gene_card.interpretation_blocked': 'This reading does not establish the effect of the catalogue allele. The gene description remains available.',
+})
+
+MESSAGES["genome.refused_head.position_not_resolved"] = 'The position has not been resolved'

@@ -1679,8 +1679,8 @@ def genotype_from_vcf(rsid: str) -> Optional[Dict[str, Any]]:
     """The patient's genotype by rsID out of the personal VCF.
 
     Returns {'genotype': 'GA', 'confidence': 'called'|'assumed_ref', 'source': 'vcf', ...}
-    or None when there is no database, engine or locus. A missing variant row while the
-    database is present = homozygous reference (a -mv VCF does not store reference sites).
+    or None when there is no database, engine or locus. An absent row in a
+    variants-only VCF does not distinguish reference from an unread position.
     """
     loc = resolve_rsid(rsid, allow_network=False) or locus(rsid)
     if not loc:
@@ -1783,6 +1783,7 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     different things and must not be conflated. Here the position is looked up in files
     called without -v; when 0/0 is there, the reference is confirmed and the depth is known.
     """
+    observations = []
     for vcf in _sites_vcfs():
         # Each sites file answers in its OWN build, exactly as the main VCF does.
         site_loc = locus_alleles(loc, assembly_of(vcf))
@@ -1806,17 +1807,38 @@ def _ref_evidence(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             gt_pos = fmt.index("GT") if "GT" in fmt else None
             gt_raw = sample[gt_pos] if gt_pos is not None and gt_pos < len(sample) else ""
             idx = gt_raw.replace("|", "/").split("/")
-            if len(idx) not in (1, 2) or any(i != "0" for i in idx):
-                continue          # not the reference — the main VCF decides
+            if len(idx) not in (1, 2) or any(not i.isdigit() for i in idx):
+                continue
+            alleles = [f[3]] + f[4].split(",")
+            if any(int(i) >= len(alleles) or alleles[int(i)] not in ("A", "C", "G", "T") for i in idx):
+                continue
+            genotype = "".join(alleles[int(i)] for i in idx)
             dp = None
             if "DP" in fmt:
                 try:
                     dp = int(sample[fmt.index("DP")])
                 except Exception:
                     dp = None
-            return {"depth": dp, "evidence_file": Path(vcf).name,
-                    "genotype": f[3] * len(idx), "assembly": assembly_of(vcf)}
-    return None
+            observations.append({"depth": dp, "evidence_file": Path(vcf).name,
+                                 "genotype": genotype, "assembly": assembly_of(vcf),
+                                 "read_pos": pos, "raw_genotype": gt_raw,
+                                 "phased": "|" in gt_raw,
+                                 "variant_identity": {"assembly": assembly_of(vcf),
+                                     "chrom": str(loc["chrom"]), "pos": pos,
+                                     "ref": f[3], "alt": f[4]},
+                                 "reference_call": all(i == "0" for i in idx)})
+    references = [r for r in observations if r["reference_call"]]
+    if not references:
+        return None
+    from .variant_readings import same_genotype
+    first = references[0]
+    if any(not same_genotype(first["genotype"], r["genotype"]) for r in observations):
+        return {"genotype": None, "confidence": "conflicting_calls", "source": "vcf",
+                "interpretation_applicable": False,
+                "conflict": {"kind": "sites_disagreement", "resolved_to": None},
+                "observations": observations, "note": _t("genome.source_conflict")}
+    selected = max(references, key=lambda r: r["depth"] if r["depth"] is not None else -1)
+    return {**selected, "observations": observations}
 
 
 #: Alternative alleles that are not a variant at all: a gVCF reference block, an
@@ -2120,6 +2142,22 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 "interpretation_applicable": False,
                 "note": _t("genome.literal_passport_incomplete")}
     result = _read_gt_at(loc)
+    if result and result.get("source") == "vcf":
+        path = vcf_path()
+        if path:
+            source_path = Path(path)
+            if result.get("evidence_file"):
+                source_path = source_path.parent / result["evidence_file"]
+            try:
+                stat = source_path.stat()
+                from .variant_readings import digest
+                result = {**result, "source_identity": {
+                    "file": source_path.name, "path_key": digest(str(source_path.resolve())),
+                    "sample_index": sample_index(str(source_path)),
+                    "revision_method": "filesystem_stat", "size": stat.st_size,
+                    "mtime_ns": stat.st_mtime_ns, "ctime_ns": stat.st_ctime_ns}}
+            except OSError:
+                pass  # A synthetic/inaccessible file is not assigned invented provenance.
     if literal and result:
         if result.get("source") == "vcf" and result.get("genotype") and not result.get("assembly"):
             return {"genotype": None, "confidence": "no_coordinates_for_assembly", "source": "vcf",
@@ -2267,11 +2305,15 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     if not lines:
         ev = _ref_evidence(catalogue_loc)
         if ev:
+            if ev.get("confidence") == "conflicting_calls":
+                return ev
             dp = ev.get("depth")
             out = {"genotype": ev.get("genotype") or f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
                    "depth": dp, "evidence_file": ev.get("evidence_file"),
+                   "observations": ev.get("observations", []),
                    "assembly": ev.get("assembly"),
                    "read_pos": locus_position(catalogue_loc, ev.get("assembly")),
+                   **{k: ev[k] for k in ("variant_identity", "raw_genotype", "phased") if k in ev},
                    "note": _t("genome.confirmed_ref")}
             if dp is not None and dp < _MIN_DEPTH:
                 out["note"] += _t("genome.low_depth_suffix", depth=dp)
@@ -2377,6 +2419,8 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                                    found=found)}
             out = {"genotype": f"{ref}{ref}", "confidence": "confirmed_ref", "source": "vcf",
                    "assembly": asm, "read_pos": pos, "depth": dp,
+                   "variant_identity": {"assembly": asm, "chrom": str(loc["chrom"]),
+                                        "pos": pos, "ref": block[3], "alt": block[4]},
                    "note": _t("genome.confirmed_ref")}
             if dp is not None and dp < _MIN_DEPTH:
                 out["note"] += _t("genome.low_depth_suffix", depth=dp)
@@ -2512,8 +2556,14 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_netw
     """Public lookup: by rsID (any — catalogue/cache/Ensembl) or by gene (catalogue loci)."""
     st = available()
     if rsid:
+        from .variant_readings import resolve
+        recorded = core.profile_genotypes().get(rsid.lower())
         loc = resolve_rsid(rsid, allow_network=allow_network)
         if not loc:
+            if recorded:
+                return {"status": "ok", "rsid": rsid, "gene": recorded.get("gene"),
+                        "genome_ready": st["ready"], "resolved_by": "recorded",
+                        "result": resolve(rsid, {"confidence": "position_not_resolved"}, recorded)}
             return {"status": "unknown_rsid", "rsid": rsid,
                     "message": _t("genome.rsid_unknown", rsid=rsid)}
         base = {"status": "ok", "rsid": rsid, "gene": loc.get("gene"), "chrom": loc.get("chrom"),
@@ -2521,6 +2571,11 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_netw
                 "clinical_significance": loc.get("clinical_significance"),
                 "consequence": loc.get("consequence"), "resolved_by": loc.get("source")}
         if not st["ready"]:
+            if recorded:
+                base["result"] = resolve(rsid, {"confidence": st.get("reason") or "no_file"}, recorded)
+                base["genome_ready"] = False
+                base["reason"] = st.get("reason")
+                return base
             base["status"] = "no_genome"
             # Task 64, second item. The locus command used to print one sentence
             # for every refusal — «put genome/*.vcf.gz + .tbi in place» — including
@@ -2534,13 +2589,14 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_netw
             base["foreign"] = st.get("foreign")
             base["message"] = _t("genome.refused." + (st.get("reason") or "no_file"))
             return base
-        base["result"] = _gt_at(loc)
+        base["result"] = resolve(rsid, _gt_at(loc), recorded)
         return base
     if gene:
         items = [rs for rs, l in loci().get("loci", {}).items() if l.get("gene", "").upper() == gene.upper()]
         if items:
             return {"status": "ok", "gene": gene,
-                    "loci": [lookup(rsid=rs, allow_network=allow_network) for rs in items] if st["ready"] else [{"rsid": rs, "locus": locus(rs)} for rs in items],
+                    "loci": [{**lookup(rsid=rs, allow_network=allow_network),
+                              **({"locus": locus(rs)} if not st["ready"] else {})} for rs in items],
                     "genome_ready": st["ready"]}
         # Task 127. The catalogue not holding the gene used to end the query —
         # «Gene CASR is not in the coordinate reference», a true sentence about
@@ -2689,7 +2745,9 @@ def _clinvar_local_gene_map() -> Dict[tuple, str]:
 def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     """The patient's clinically significant findings from genome/clinvar_hits.tsv, laid out
     by tiers of actionability: pathogenic → pharmacogenetics → risk factors → protective →
-    weak associations → uncertain. That way the list becomes useful instead of a «wall».
+    weak associations → uncertain. Within a tier, low-confidence records follow
+    better-reviewed records. Supported homozygous alternate calls lead within
+    each confidence group, with review status breaking ties.
 
     The file is prepared by annotate_clinvar.sh (fresh ClinVar × the personal VCF)."""
     for base in core.genome_bases():
@@ -2756,8 +2814,6 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
         elif ":" in rec["gene"]:
             rec["gene"] = "|".join(part.split(":")[0] for part in rec["gene"].split("|"))
         rec["disease"] = _primary_disease(rec.get("clndn", ""))
-        rec["_rank"] = (_TIER_ORDER.get(tier, 9),
-                        _REVIEW_RANK.get((rec.get("review") or "").strip(), 6))
         rec["stars"] = _review_stars(rec.get("review", ""))
         # `penetrance.json.confidence_modifiers` says, per ClinVar review status,
         # how much weight the classification carries. It was written, translated
@@ -2770,11 +2826,20 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
         # not yet support at the strength its tier implies — surfaced, not hidden.
         rec["low_confidence"] = rec["stars"] <= 1 and tier in ("pathogenic", "risk", "drug")
         rows.append(rec)
-    rows.sort(key=lambda r: r["_rank"])
-    for r in rows:
-        r.pop("_rank", None)
     from .finding_context import attach as attach_context
     personal_counts = attach_context(rows)
+
+    def rank(row: Dict[str, Any]) -> tuple[int, bool, bool, int]:
+        reading = row["personal_context"]
+        homozygous_alt = (reading["zygosity"] == "homozygous"
+                          and reading["allele_identity_supported"]
+                          and reading["alternative_copies"] == 2
+                          and row.get("filter") in (None, "", ".", "PASS")
+                          and row.get("reportable") != "filtered")
+        return (_TIER_ORDER.get(row["tier"], 9), row["low_confidence"], not homozygous_alt,
+                _REVIEW_RANK.get((row.get("review") or "").strip(), 6))
+
+    rows.sort(key=rank)
     counts = {k: 0 for k in _CLINVAR_TIERS}
     for r in rows:
         counts[r["tier"]] = counts.get(r["tier"], 0) + 1
@@ -3066,8 +3131,8 @@ def apoe_status():
     st = available()
     if not st["ready"]:
         return {"status": "no_genome"}
-    g1 = genotype_from_vcf("rs429358")
-    g2 = genotype_from_vcf("rs7412")
+    g1 = core.genotype_status("rs429358")
+    g2 = core.genotype_status("rs7412")
     return _apoe_from_readings(g1, g2)
 
 
@@ -3085,7 +3150,9 @@ def _apoe_from_readings(g1, g2):
             "source": g1.get("source"), "note": _t("genome.apoe_note")}
     base["confidence"] = {"rs429358": g1.get("confidence"),
                           "rs7412": g2.get("confidence")}
-    if any(g.get("confidence") not in ("called", "confirmed_ref") for g in (g1, g2)):
+    from .variant_readings import permits_interpretation
+    if any(g.get("confidence") not in ("called", "confirmed_ref")
+           or not permits_interpretation(g) for g in (g1, g2)):
         return dict(base, status="unconfirmed", message=_t("genome.apoe_unconfirmed"))
     if not readings:
         return dict(base, status="unexpected_genotypes",

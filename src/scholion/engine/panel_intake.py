@@ -42,6 +42,7 @@ def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = N
                     recorded: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     from .. import genome
     out: Dict[str, Any] = {"read": False, "genotype": None, "reason": None}
+    value: Dict[str, Any] = {}
     loc = genome.resolve_rsid(rsid, allow_network=False)
     if refusal == "indel_unsupported":
         out["reason"] = refusal
@@ -67,16 +68,22 @@ def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = N
             out.update(read=True, genotype=value["genotype"])
         else:
             out["reason"] = "not_positively_read"
-    if not out["read"] and recorded and recorded.get("genotype") and recorded.get("source"):
-        # C26: the absence of a current file call must not erase a sourced
-        # value already written in this container. It is NOT a fresh VCF call.
-        out.update(read=True, genotype=recorded["genotype"], confidence="profile",
-                   source=recorded["source"], depth=None, reader_refusal=out["reason"],
-                   reason=None, quality={})
-        out["message"] = _t("panel.reading.recorded", genotype=out["genotype"], source=out["source"])
+    from ..variant_readings import resolve
+    selected = resolve(rsid, value or {"confidence": out["reason"]}, recorded) or {}
+    out.update({k: selected[k] for k in ("reading_record", "conflict", "interpretation_applicable",
+                "variant_identity", "raw_genotype", "phased", "assembly", "read_pos", "note",
+                "source_identity", "from_profile") if k in selected})
+    if selected.get("confidence") in ("called", "confirmed_ref", "called_array", "reported") and selected.get("genotype"):
+        is_report = selected.get("confidence") == "reported"
+        out.update(read=True, genotype=selected["genotype"],
+                   confidence="profile" if is_report else selected.get("confidence"),
+                   source=selected.get("from_profile") if is_report else selected.get("source"),
+                   depth=selected.get("depth"), reader_refusal=out["reason"], reason=None)
+        out["quality"] = {k: selected[k] for k in ("low_depth", "depth_unverified", "filtered",
+                         "strand_ambiguous", "imputed", "confirmation_reasons") if k in selected}
+        out["message"] = (_t("panel.reading.recorded", genotype=out["genotype"], source=out["source"])
+                          if is_report else _t("system.row.genotype", genotype=out["genotype"],
+                            confidence=out["confidence"], depth=out["depth"] if out["depth"] is not None else "—"))
     else:
-        out["message"] = (_t("panel.reading." + out["reason"]) if out["reason"] else
-                      _t("system.row.genotype", genotype=out["genotype"],
-                         confidence=out.get("confidence") or "—",
-                         depth=out["depth"] if out.get("depth") is not None else "—"))
+        out["message"] = _t("panel.reading." + (out["reason"] or "not_positively_read"))
     return out

@@ -57,14 +57,25 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
             return {"state": "unread", "read": False, "why": "position_not_resolved"}
         try:
             res = genome._gt_at(loc) or {}
+            from ..variant_readings import resolve
+            res = resolve(rsid, res, recorded) or {}
         except Exception as exc:                                     # noqa: BLE001
             return {"state": "unread", "read": False, "why": type(exc).__name__}
     else:
         return {"state": "unread", "read": False, "why": r.get("status")}
     conf = res.get("confidence")
+    if conf == "reported":
+        return _from_profile(res, risk_allele, at)
     out = {"genotype": res.get("genotype"), "confidence": conf, "depth": res.get("depth"),
            **{k: res[k] for k in ("source", "assembly", "read_pos", "filter", "qual", "allele_fraction",
-               "low_depth", "filtered", "imputed", "unverified_locus", "needs_confirmation", "date", "observations", "variant_identity", "raw_genotype", "phased", "interpretation_applicable") if k in res}}
+               "low_depth", "filtered", "imputed", "unverified_locus", "needs_confirmation", "date", "observations", "variant_identity", "raw_genotype", "phased", "interpretation_applicable", "conflict", "reading_record",
+               "note", "source_identity", "confirmation_reasons", "strand_ambiguous", "depth_unverified") if k in res}}
+    if res.get("conflict"):
+        return {**out, "state": "risk_allele_not_declared", "read": bool(res.get("genotype")),
+                "why": "source_conflict"}
+    if res.get("interpretation_applicable") is False and res.get("genotype"):
+        return {**out, "state": "risk_allele_not_declared", "read": True,
+                "why": "effect_allele_not_applicable"}
     if res.get("depth_unverified"):
         # The reader's own word (`genome._mark_depth_unverified`): the row is in
         # the file, it states no depth, and no alignment is here to measure one.
@@ -72,9 +83,6 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
     m = _HGVS.match((hgvs or "").strip())
     ref = m.group(3) if m else None
     if conf == "called":
-        if res.get("interpretation_applicable") is False:
-            return {**out, "state": "risk_allele_not_declared", "read": True,
-                    "why": "effect_allele_not_applicable"}
         if not risk_allele:
             return {**out, "state": "risk_allele_not_declared", "read": True}
         # A genotype holding a letter that is not one of the two at this
@@ -138,8 +146,15 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
 def _from_profile(rec: Dict[str, Any], risk_allele: Optional[str], at=None) -> Dict[str, Any]:
     """A genotype the profile records (`core.profile_genotypes`), as a state.
     It is a reading with a named source rather than a call with a depth."""
-    out = {"genotype": rec["genotype"], "confidence": "profile", "depth": None,
-           "from_profile": rec.get("source")}
+    if "reading_record" not in rec:
+        from ..variant_readings import resolve
+        rec = resolve(rec.get("rsid") or "", None, rec) or rec
+    out = {**rec, "genotype": rec["genotype"], "confidence": "profile",
+           "from_profile": rec.get("from_profile") or rec.get("source")}
+    out.setdefault("depth", None)
+    if rec.get("conflict") or rec.get("interpretation_applicable") is False:
+        return {**out, "state": "risk_allele_not_declared", "read": True,
+                "why": "source_conflict" if rec.get("conflict") else "effect_allele_not_applicable"}
     if not risk_allele:
         return {**out, "state": "risk_allele_not_declared", "read": True}
     if not at:

@@ -32,6 +32,9 @@ def _state(rule: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     None when nothing reads it — a caution is never raised on a guess."""
     from . import panel_gate
     got = core.genotype_status(rule["rsid"]) or {}
+    from ..variant_readings import permits_interpretation
+    if not permits_interpretation(got):
+        return None
     if not got.get("genotype") or got.get("confidence") not in ("called", "reported"):
         return None
     loc = (core.loci().get("loci") or {}).get(rule["rsid"]) or {}

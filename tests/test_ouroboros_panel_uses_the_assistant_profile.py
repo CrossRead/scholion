@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import asyncio
 import os
+import json
+from unittest import mock
 from pathlib import Path
 import tempfile
 
@@ -80,6 +82,32 @@ class TestSharedConnection(HubSkillCase):
                 self.assertIn("Invalid local route", str(result.get("error")) if isinstance(result, dict) else result.body.decode(), path)
         finally:
             loop.close()
+
+    def test_cancelled_proxy_closes_connection_and_keeps_both_profile_guards(self):
+        self.register()
+        binding = self.plugin._binding_id(self.plugin._binding())
+        (self.state / "web-runtime.json").write_text(json.dumps({
+            "binding": binding, "port": 1546, "token": "synthetic-bridge"}), encoding="utf-8")
+        connection = mock.Mock()
+        connection.request.side_effect = asyncio.CancelledError()
+
+        class Request:
+            method = "POST"
+            headers = {"X-Scholion-Profile": binding, "X-Scholion-View-Profile": "synthetic-view"}
+            query_params = {"path": "/api/metrics"}
+
+            async def body(self):
+                return b'{}'
+
+        async def exercise():
+            with mock.patch("http.client.HTTPConnection", return_value=connection):
+                with self.assertRaises(asyncio.CancelledError):
+                    await self.host.routes["web"](Request())
+        asyncio.run(exercise())
+        headers = connection.request.call_args.kwargs["headers"]
+        self.assertEqual("synthetic-view", headers["X-Scholion-View-Profile"])
+        self.assertEqual("synthetic-bridge", headers["X-Scholion-Bridge"])
+        connection.close.assert_called_once()
 
     def test_catalogues_explain_the_shared_profile_in_both_languages(self):
         from scholion import i18n

@@ -450,22 +450,12 @@
   .route-item{border:1px solid var(--border);border-radius:var(--r);padding:var(--sp3);margin:var(--sp2) 0;font-size:var(--t-s);line-height:1.5;overflow-wrap:anywhere}
   .route-item p{margin:var(--sp2) 0 0}
   .route-support>div{color:var(--ink-2)}
-  .system-medications-table{table-layout:fixed}
-  .system-medications-table th,.system-medications-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}
-  .system-medications-table th:nth-child(1){width:30%}
-  .system-medications-table th:nth-child(2){width:45%}
   .lab-system-group{margin-bottom:var(--sp3)}
   .lab-system-group>summary{cursor:pointer;display:list-item;padding:var(--sp3)}
   .lab-system-group>summary .meta{margin-left:var(--sp2)}
-  .system-medication-unplaced{margin-top:var(--sp3)}
-  .syscard .layer{margin-top:var(--sp5)}
-  .syscard .layer h3{font-size:var(--t-m);font-weight:650;margin:0 0 8px;color:var(--ink);padding-bottom:6px;border-bottom:1px solid var(--grid)}
-  .syscard .layer h3 small{color:var(--muted);font-weight:400;margin-left:6px}
   .syscard .verdict,.sys-verdict-box{background:var(--surface);border:1px solid var(--border);
         border-left:3px solid var(--accent);border-radius:var(--r);padding:12px 16px;
         font-size:15px;line-height:1.55;margin:10px 0}
-  .syscard .basket{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:8px}
-  .syscard .basket h4{margin:0 0 6px;font-size:13.5px;color:var(--muted);font-weight:600}
   .syscard ol,.sysblock ol{margin:6px 0 0;padding-left:22px}
   .syscard ol li,.sysblock ol li{margin-bottom:6px;line-height:1.5;font-size:15px}
   .sysblock{border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:var(--sp4);background:var(--surface)}
@@ -643,48 +633,13 @@
 
 .today-lead{display:grid;grid-template-columns:minmax(230px,0.8fr) minmax(0,1.4fr);gap:var(--cr-space-5,24px);align-items:start}
 .today-lead .sysbox svg{max-height:300px}
-.attention-item{padding:8px 14px;margin-bottom:10px;overflow-wrap:anywhere}
 
-.insight-windows{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:10px 0}
-.insight-window{min-width:0;border-top:2px solid var(--border);padding-top:6px}
-.insight-chart{margin:8px 0;color:var(--muted)}
-.insight-chart[data-direction="toward"]{color:var(--good)}
-.insight-chart[data-direction="away"]{color:var(--warning)}
-.insight-chart figcaption{color:var(--ink);font-size:var(--t-s)}
-.insight-chart svg{width:100%;height:70px;display:block}
-.insight-chart .chart-dates{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
-.insight-chart .chart-dates strong{color:var(--ink);font-size:12px;font-weight:600}
-.insight-chart .chart-dates>span:last-child{text-align:right}
-.insight-chart .chart-meaning{font-size:var(--t-s);margin:4px 0}
-@media(max-width:480px){.insight-windows{grid-template-columns:1fr}.insight-chart svg{max-width:300px}}
 
-.today-view .attention-item>summary{cursor:pointer;color:var(--accent);padding:4px 0;line-height:1.5}
-.today-view .attention-item>summary .insight-title{text-decoration:underline;text-underline-offset:3px}
-.today-view .attention-item[open]>summary{margin-bottom:8px}
-.insight-context-links{margin-top:10px;gap:8px;flex-wrap:wrap}
-.attention-item ul{padding-left:20px}
-.attention-item p.small{margin:.3rem 0}
-.attention-item details.fold{margin-top:0}
-.attention-item details.fold>summary{padding:2px 0}
 .today-lead h2{margin-top:0}
 .today-lead .meta{font-size:var(--t-s)}
 @media(max-width:760px){.today-lead{grid-template-columns:1fr}.today-lead .sysbox{max-height:320px}}
 
 /* Today and visit use the same Crossread scale and controls. */
-.today-view .attention-item{padding:var(--cr-space-3);margin:0 0 var(--cr-space-2);font-size:14px;line-height:1.4;border-radius:var(--cr-radius-m)}
-.today-view .attention-item .insight-title{font-size:15px;line-height:1.35;display:inline}
-.today-view .insight-windows{gap:12px;margin:6px 0}
-.today-view .insight-chart{margin:4px 0;display:grid;grid-template-columns:minmax(0,1fr) 120px;column-gap:12px;align-items:center}
-.today-view .insight-chart svg{height:42px;grid-column:2;grid-row:1 / span 2}
-.today-view .insight-chart figcaption,.today-view .insight-chart .chart-meaning{font-size:13px}
-.today-view .insight-chart .chart-dates{grid-column:2;grid-row:3;font-size:10px;gap:2px;flex-wrap:wrap}
-.today-view .insight-chart figcaption{grid-column:1;grid-row:1}
-.today-view .insight-chart>.meta{grid-column:1;margin:2px 0}
-.today-view .insight-chart>span.meta{grid-row:3;align-self:start}
-.today-view .insight-chart .meta{font-size:11px}.today-view .attention-item .fold>summary{line-height:1.4}.today-view .insight-chart .chart-meaning{max-width:34em}
-.today-view .insight-chart .chart-meaning{margin:2px 0;grid-column:1;grid-row:2}
-.today-view .insight-window>.meta{font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-.today-view .attention-item details{font-size:13px}
 .today-actions .cr-btn{white-space:normal;height:auto;min-height:var(--cr-control-m);padding:10px 16px;text-align:center}
 .today-view .today-lead .sysbox svg{max-height:420px}
 .period-control{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0 16px;padding:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--cr-radius-m)}
@@ -799,6 +754,7 @@ details.longevity-disclosure > summary.cr-btn{display:flex;justify-content:flex-
 
 
 </style>
+<link rel="stylesheet" href="/system-views.css">
 <link rel="stylesheet" href="/gene-cards.css">
 <script>
 /* The theme follows the system unless the menu pinned one. Applied before the
@@ -807,6 +763,9 @@ try{const th=localStorage.getItem('scholion-theme'); if(th==='light'||th==='dark
 </script>
 <script src="/chart.min.js"></script>
 <script src="/gene-cards.js"></script>
+<script src="/measurements.js"></script>
+<script src="/system-views.js"></script>
+<script src="/view-lifecycle.js"></script>
 </head>
 <body class="cr-app">
 <!-- All application surfaces use Crossread components and local layout rules. -->
@@ -1005,13 +964,19 @@ function wantedLang(){
   try{stored=sessionStorage.getItem('scholion.lang')||localStorage.getItem('scholion.lang');}catch(e){}
   return (q||stored||'en').slice(0,2).toLowerCase();
 }
+let _languageRead=0, _languagePending=false;
 async function loadLang(code){
+  const read=++_languageRead;_languagePending=true;
+  try{
   const r=await fetch(API+'/api/i18n?lang='+encodeURIComponent(code));
   const d=await r.json();
+  if(read!==_languageRead)return false;
   LANG=d.lang||'en'; LANGS=d.available||[LANG]; MSG=d.messages||{};
   _levels=null;   // the legend is read in the page's language
   document.documentElement.lang=LANG;
   try{sessionStorage.setItem('scholion.lang',LANG);localStorage.setItem('scholion.lang',LANG);}catch(e){}
+  return true;
+  }finally{if(read===_languageRead)_languagePending=false;}
 }
 const withLang=(path)=>path+(path.indexOf('?')>=0?'&':'?')+'lang='+encodeURIComponent(LANG);
 // Every request is counted on the way out and on the way back, so a loading view
@@ -1025,14 +990,30 @@ const _net={started:0,done:0};
 const _apiCache=new Map();
 let _answerEpoch=0;
 const NO_CACHE=[/\/api\/update-status/,/\/api\/recompute(\/status)?(\?|$)/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/];
-function forgetAnswers(){_answerEpoch++;_apiCache.clear();}
+const viewLifecycle=ScholionViewLifecycle.create({
+  context:()=>({profile:_profileIdentity,revision:_profileRevision,language:LANG,mode:DISPLAY_MODE,epoch:_answerEpoch}),
+  dispose:()=>{destroyGoalCharts();if(_loaderTimer){clearInterval(_loaderTimer);_loaderTimer=null;}}
+});
+function beginView(key){const root=viewLifecycle.begin($('#view'),key);showLoader(root);return root;}
+function forgetAnswers(){_answerEpoch++;_apiCache.clear();_sources=null;_systems=null;}
+function viewPost(node){
+  const profile=viewLifecycle.context(node)?.profile;
+  return async(path,body)=>{
+    const valid=()=>viewLifecycle.current(node)&&profile===_profileIdentity;
+    if(!valid())return {ok:false,error:t('web.context.changed')};
+    const result=await post(path,body,profile);
+    return valid()?result:{ok:false,error:t('web.context.changed')};
+  };
+}
 async function api(path,opts){
   const epoch=_answerEpoch;
   const isGet=!opts||!opts.method||opts.method==='GET';
   const key=withLang(path);
   if(isGet&&_apiCache.has(key)){_net.started++;_net.done++;return JSON.parse(_apiCache.get(key));}
   _net.started++;
-  try{const r=await fetch(API+key,opts);
+  const headers=new Headers(opts?.headers||{});
+  if(_profileIdentity&&!headers.has('X-Scholion-View-Profile')&&!/^\/api\/(ping|i18n)(\?|$)/.test(path))headers.set('X-Scholion-View-Profile',_profileIdentity);
+  try{const r=await fetch(API+key,{...opts,headers});
     // A refusal or a crash is an answer with `error`, never data. A 403 or a 500
     // whose body was not the JSON the view expected used to throw inside the view
     // or be drawn as if it were a result.
@@ -1072,12 +1053,12 @@ function tickLoaders(){
   });
 }
 function showLoader(el){ if(!el) return; if(el.id==='view') el.className='application-view'; el.innerHTML=loaderHtml(); if(!_loaderTimer) _loaderTimer=setInterval(tickLoaders,150); }
-async function post(path,body){forgetAnswers();const r=await api(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});_sources=null;_systems=null;return r;}
+async function post(path,body,profile=_profileIdentity){forgetAnswers();const headers={'Content-Type':'application/json'};if(profile)headers['X-Scholion-View-Profile']=profile;const r=await api(path,{method:'POST',headers,body:JSON.stringify(body)});_sources=null;_systems=null;return r;}
 // The systems listing is read once per page state and shared: three tabs join
 // on it (marker → system, gene → systems, prescription → system) and none of
 // them re-derives the join. Dropped after any write and on a language switch.
 let _systems=null;
-async function systemsIndex(){ if(!_systems) _systems=await api('/api/systems'); return _systems; }
+async function systemsIndex(){if(_systems)return _systems;const stamp=viewLifecycle.snapshot(),data=await api('/api/systems');if(viewLifecycle.matches(stamp))_systems=data;return data;}
 function toast(m){const box=$('#toast');box.textContent=m;box.classList.add('show');setTimeout(()=>box.classList.remove('show'),2200);}
 // A demonstration profile erased by the first real measurement is not a toast.
 // A toast is gone in two seconds and this is the largest thing that can happen
@@ -1094,7 +1075,7 @@ function claimNotice(r){
 
 // ---------------- Data sources (date + provenance) ----------------
 let _sources=null;
-async function sources(){if(!_sources)_sources=await api('/api/sources');return _sources;}
+async function sources(){if(_sources)return _sources;const stamp=viewLifecycle.snapshot(),data=await api('/api/sources');if(viewLifecycle.matches(stamp))_sources=data;return data;}
 // labs.json is NOT picked by hand — it is assembled from the folder of studies (PDF).
 // Only the source folders are picked.
 const PICKABLE={medications:'medications',metrics:'metrics',genome_vcf:'genome'};
@@ -1142,79 +1123,36 @@ const LEVEL = {
 };
 const PRIO = {high:'b-critical', moderate:'b-warning', low:'b-good'};
 
+const measurements=ScholionMeasurements.create({t,esc,fmtNum,fmtDate,targetSpec:(...args)=>targetSpec(...args),flagOf:(...args)=>flagOf(...args),trendNote:(...args)=>trendNote(...args),badge:(...args)=>badge(...args),refText:(...args)=>refText(...args),targetText:(...args)=>targetText(...args),ownerNoteHtml:(...args)=>ownerNoteHtml(...args),systemLinkHtml:(...args)=>systemLinkHtml(...args),decisionNote:(...args)=>decisionNote(...args),noteHtml:(...args)=>noteHtml(...args),targetAsk:(...args)=>targetAsk(...args),srcTag:(...args)=>srcTag(...args),comparisonHTML:(...args)=>comparisonHTML(...args),flags:FLAG,line:(...args)=>gline(...args),colours:()=>CT});
+
 // `hint` is optional and, where it is given, carries the Guide's own wording
 // rather than a second explanation written beside the badge. Two texts for one
 // term drift, and the one on the badge is the one nobody maintains.
 function badge(cls,txt,hint){return `<span class="badge ${cls}"${hint?` title="${esc(hint)}" style="cursor:help"`:''}><span class="dot" style="background:currentColor"></span>${esc(txt)}</span>`;}
 
 // the chart window: the last ~3 years, but never fewer than the last 3 points
-function windowSeries(series){
-  if(!series||series.length<=3) return series||[];
-  const s=series.slice().sort((a,b)=>a.date<b.date?-1:(a.date>b.date?1:0));
-  const latest=s[s.length-1].date;
-  const cutoff=(parseInt(latest.slice(0,4),10)-3)+latest.slice(4);   // "2026-03" -> "2023-03"
-  const within=s.filter(p=>p.date>=cutoff).length;
-  return s.slice(-Math.max(3,within));
+function windowSeries(...args){
+  return measurements.windowSeries(...args);
 }
 // `marks` (task 170): {ref_low, ref_high, target} — drawn only when a clinician's
 // target exists, so every other sparkline stays exactly as it was. The corridor
 // is a faint solid band and the target a dashed band or line in another colour:
 // two kinds of «normal» on one chart must not share a stroke, or the reader
 // cannot tell the laboratory's range from the treatment's aim.
-function measurementLabel(p){
-  const src=p.measurement_source;
-  if(!src)return '';
-  return (src==='recorded'?t('web.phenotype.recorded'):t('web.life.device.'+src))+' · '+t(p.aggregation==='monthly_mean'?'web.life.monthly_mean':p.date?.length===7?'web.measurement.month_only':'web.life.dated_readings');
+function measurementLabel(...args){
+  return measurements.label(...args);
 }
-function measurementGroups(series){return [...new Set(series.map(p=>measurementLabel(p)))];}
-function bodyMassMetric(ref){return ['weight','bmi'].includes(String(ref||'').split(':').at(-1).toLowerCase());}
-function measurementDatasets(c,unified=false){
-  if(unified)return [{...gline(c.points?.map(p=>p.value)||c.v,CT.series),spanGaps:false}];
-  if(!c.points?.some(p=>p.measurement_source))return [gline(c.v,CT.series)];
-  return measurementGroups(c.points).map((label,i)=>({...gline(c.points.map(p=>measurementLabel(p)===label?p.value:null),i===0?CT.series:CT.ink2),label,spanGaps:true,borderDash:i?[3,3]:[]}));
+function measurementGroups(...args){
+  return measurements.groups(...args);
 }
-function sparkline(series,win,marks,unified=false){
-  if(win!==false) series=windowSeries(series);
-  if(!series||series.length<2) return '';
-  // A reporting limit is not an exact point to connect on a trend line.
-  if(series.some(p=>p.censored)) return '';
-  const w=168,h=40,pad=5;
-  const tg=marks&&marks.target;
-  const ys=series.map(p=>p.value);
-  // the scale stretches to the target so its line is on the chart, never to the
-  // corridor — a wide reference range would flatten the series to a stroke
-  const tv=tg?[tg.low,tg.high,tg.value].filter(v=>v!=null).map(Number):[];
-  const mn=Math.min(...ys,...tv),mx=Math.max(...ys,...tv),rng=(mx-mn)||1;
-  const groups=measurementGroups(series), annotated=series.some(p=>p.measurement_source);
-  const stamps=series.map(p=>Date.parse(p.date.length===7?p.date+'-01':p.date));
-  const X=i=>pad+(w-2*pad)*(annotated&&stamps.at(-1)>stamps[0]?(stamps[i]-stamps[0])/(stamps.at(-1)-stamps[0]):i/(series.length-1));
-  const color=p=>groups.indexOf(measurementLabel(p))===0?'var(--accent)':'var(--ink-2)';
-  const Y=v=>h-pad-(h-2*pad)*((v-mn)/rng);
-  const clampY=v=>Math.max(pad,Math.min(h-pad,Y(v)));
-  const lines=unified?`<polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${series.map((p,i)=>`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`).join(' ')}"/>`:groups.map((group,j)=>`<polyline fill="none" stroke="${j?'var(--ink-2)':'var(--accent)'}" stroke-width="2" ${j?'stroke-dasharray="3 3"':''} stroke-linejoin="round" stroke-linecap="round" points="${series.map((p,i)=>measurementLabel(p)===group?`${X(i).toFixed(1)},${Y(p.value).toFixed(1)}`:null).filter(Boolean).join(' ')}"/>`).join('');
-  // points with the date on hover — the date each measurement was taken
-  const dots=series.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.value).toFixed(1)}" r="${i===series.length-1?3.2:2.3}" fill="${unified?'var(--accent)':color(p)}"><title>${esc(fmtDate(p.date))}: ${esc(fmtNum(p.value))}${annotated?" · "+esc(measurementLabel(p)):""}</title></circle>`).join('');
-  let bands='', legend='';
-  if(tg){
-    const lo=marks.ref_low!=null?clampY(Number(marks.ref_low)):h-pad, hi=marks.ref_high!=null?clampY(Number(marks.ref_high)):pad;
-    if(marks.ref_low!=null||marks.ref_high!=null)
-      bands+=`<rect x="${pad}" y="${hi.toFixed(1)}" width="${w-2*pad}" height="${Math.max(0,lo-hi).toFixed(1)}" fill="var(--muted)" opacity=".14"/>`;
-    const dash=(v)=>`<line x1="${pad}" x2="${w-pad}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="var(--warning)" stroke-width="1.4" stroke-dasharray="4 3"/>`;
-    if(tg.low!=null&&tg.high!=null)
-      bands+=`<rect x="${pad}" y="${Y(Number(tg.high)).toFixed(1)}" width="${w-2*pad}" height="${Math.max(0,Y(Number(tg.low))-Y(Number(tg.high))).toFixed(1)}" fill="var(--warning)" opacity=".16"/>`;
-    [tg.low,tg.high,tg.value].filter(v=>v!=null).forEach(v=>bands+=dash(Number(v)));
-    legend=`<div class="sparkleg">${(marks.ref_low!=null||marks.ref_high!=null)?`<span class="lg-corr">▮ ${esc(t('web.target.lg_corridor'))}</span>`:''}<span class="lg-tg">╌ ${esc(t('web.target.lg_target'))} ${esc(targetSpec(tg))}</span></div>`;
-  }
-  const d0=series[0].date, dN=series[series.length-1].date;
-  return `<div class="sparkwrap">
-    <svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-      ${bands}
-      ${lines}
-      ${dots}
-    </svg>
-    <div class="sparkdates"><span>${esc(fmtDate(d0))}</span><span>${esc(fmtDate(dN))}</span></div>
-    ${legend}${annotated&&!unified?`<div class="sparkleg">${groups.map((label,i)=>`<span>${i?"╌":"━"} ${esc(label)}</span>`).join("")}</div>`:""}
-  </div>`;
+function bodyMassMetric(...args){
+  return measurements.isBodyMass(...args);
+}
+function measurementDatasets(...args){
+  return measurements.datasets(...args);
+}
+function sparkline(...args){
+  return measurements.sparkline(...args);
 }
 // The figures of a clinician's target as one token — «1–2», «≤2», «16.7» —
 // the same four shapes the report prints, from the same catalogue keys.
@@ -1367,6 +1305,7 @@ function gsProposal(p){
   </div>`;
 }
 async function renderGoalProposal(box){
+  const post=viewPost(box);
   showLoader(box);
   const d=await api('/api/goal-suggest');
   const list=(d.proposals||[]).map(gsProposal).join('');
@@ -1408,6 +1347,7 @@ function goalEntitiesHTML(entities){
   }).join('')}</section>`:'';
 }
 function bindGoalOrigins(root){
+  const post=viewPost(root);
   root.querySelectorAll('[data-goal-origin]').forEach(form=>form.onsubmit=async event=>{
     event.preventDefault();
     const button=form.querySelector('button'); button.disabled=true;
@@ -1420,18 +1360,15 @@ function bindGoalOrigins(root){
   });
 }
 function phenotypeTable(g){
-  const source=c=>['lab','recorded','derived'].includes(c.source)?t('web.phenotype.'+c.source):t('web.life.device.'+c.source);
-  const current=c=>c.value==null?'<span class="muted">—</span>':`${esc(fmtNum(c.value))} ${esc(c.unit_display??c.unit??'')}<div class="cr-caption">${esc(fmtDate(c.date)||'')} · ${esc(source(c))}</div>`;
-  const annualSeries=c=>{if(bodyMassMetric(c.ref)){const series=c.period?.series||c.series||[];if(series.length>1){const first=series[0],last=series.at(-1),unit=c.unit_display??c.unit??'';return sparkline(series,false,null,true)+`<div class="cr-caption">${esc(fmtNum(first.value))} ${esc(unit)} · ${esc(fmtDate(first.date))} → ${esc(fmtNum(last.value))} ${esc(unit)} · ${esc(fmtDate(last.date))}</div>`;}}if(c.period){const p=c.period;return p.delta==null?`${p.series?.length>1?sparkline(p.series,false,null,bodyMassMetric(c.ref)):''}<span class="muted small">${esc(t(p.series?.length>1?'insight.comparison_unavailable':c.reading_status==='within'?'insight.latest_within':p.series?.length?'insight.one_reading':'insight.no_readings'))}</span>`:`${sparkline(p.series,false,null,bodyMassMetric(c.ref))}<div class="cr-caption">${esc(fmtDate(p.from))} → ${esc(fmtDate(p.to))} · ${p.delta>0?'+':''}${esc(fmtNum(p.delta))} ${esc(c.unit_display??c.unit??'')}${p.statistic==='mean'?' · '+esc(t('insight.stat.mean')):''}${p.comparison_source?' · '+esc(p.comparison_source==='recorded'?t('web.phenotype.recorded'):t('web.life.device.'+p.comparison_source)):''}</div>`;}return c.year_delta==null?`<span class="muted small">${esc(t(c.reading_status==='within'?'insight.latest_within':c.value!=null?'insight.one_reading':'insight.no_readings'))}</span>`
-    :`${sparkline(c.series,false,null,bodyMassMetric(c.ref))}<div class="cr-caption">${esc(c.year_delta>0?'+':'')}${esc(fmtNum(c.year_delta))} ${esc(c.unit_display??c.unit??'')}</div>`;};
-  const annual=c=>{const primary=annualSeries(c);return !bodyMassMetric(c.ref)&&c.device_history?`${primary}<details class="fold"><summary>${esc(t('web.phenotype.device_history',{source:source(c.device_history)}))}</summary>${annualSeries(c.device_history)}</details>`:primary;};
   return `<div class="tblscroll"><table class="cr-table cr-table--compact tgt" data-phenotype-table><thead><tr>
     <th>${esc(t('web.goal.col_marker'))}</th><th>${esc(t('web.goal.col_now'))}</th><th>${esc(t('web.phenotype.year'))}</th>
     <th>${esc(t('web.goal.col_best'))}</th><th>${esc(t('web.goal.col_target'))}</th></tr></thead><tbody>
-    ${(g?.phenotype||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${r.components.map(c=>(r.components.length>1?`<div class="cr-caption">${esc(c.label||c.ref)}</div>`:'')+current(c)).join('<hr>')}</td><td>${r.components.map(annual).join('<hr>')}</td><td class="best">${esc(r.best||'—')}</td><td class="tgt">${esc(r.target||'—')}</td></tr>`).join('')}
+    ${(g?.phenotype||[]).map(r=>`<tr><td class="mk">${esc(r.label)}</td><td class="now">${r.components.map(c=>(r.components.length>1?`<div class="cr-caption">${esc(c.label||c.ref)}</div>`:'')+measurements.current(c)).join('<hr>')}</td><td>${r.components.map(measurements.annual).join('<hr>')}</td><td class="best">${esc(r.best||'—')}</td><td class="tgt">${esc(r.target||'—')}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
 function renderGoal(root, g){
+  if(!viewLifecycle.current(root))return;
+  destroyGoalCharts();
   if(!g||!g.available||!(g.targets||[]).length){
     root.innerHTML=`${phenotypeTable(g)}<details class="fold"><summary>${esc(t('web.goal.settings'))}</summary>${goalEntitiesHTML((g&&g.entities)||[])}</details>${g&&g.available?'':`<div class="muted">${esc((g&&g.message)||t('web.goal.not_set'))}</div>`}
       <div class="cr-card card" style="margin-top:12px">
@@ -1487,6 +1424,7 @@ function renderGoal(root, g){
   bindGoalOrigins(root);
 }
 function drawGoalCharts(C, root){
+  if(!viewLifecycle.current(root))return;
   if(!goalSetup()){ root.appendChild(el(`<div class="muted" style="font-size:12.5px;margin-top:8px">${esc(t('web.goal.charts_unavailable'))}</div>`)); return; }
   destroyGoalCharts();
   if(C.weight&&C.weight.l&&C.weight.l.length){
@@ -1531,47 +1469,45 @@ function bindTabLinks(root){root.querySelectorAll('[data-goto]').forEach(a=>a.on
   e.preventDefault();goTab(a.getAttribute('data-goto'));});}
 
 let visitSelection=new Set(),visitSelectionTouched=false;
-function insightFactHTML(f){
-  const target=f.target, bounds=target?(target.value!=null?target.value:(target.low??'—')+'–'+(target.high??'—')):null;
-  const value=target?esc(t('insight.target',{value:bounds,unit:target.unit||''})):f.percentile!=null?esc(t('insight.pgs',{model:f.pgs_id,value:f.percentile,population:f.reference_panel_ancestry})):f.genotype?esc((f.gene||'')+' '+(f.rsid||'')+': '+f.genotype):f.value==null?'':`${esc(f.censored||'')}${esc(String(f.value))} ${esc(f.unit_display||f.unit||'')}`;
-  const source=typeof f.source==='string'?f.source:(f.source?.path||f.record||'');
-  return `<li><time>${esc(f.date||'—')}</time> ${value}<span class="meta"> · ${esc(source)}</span>${f.ref_low!=null||f.ref_high!=null?`<span class="meta"> · ${esc(t('insight.reference',{low:f.ref_low??'—',high:f.ref_high??'—'}))}</span>`:''}</li>`;
+const systemViews=ScholionSystemViews.create({
+  t:(...args)=>t(...args),
+  esc:(...args)=>esc(...args),
+  fmtNum:(...args)=>fmtNum(...args),
+  fmtDate:(...args)=>fmtDate(...args),
+  measurementLabel:(...args)=>measurementLabel(...args),
+  levelChip:(...args)=>levelChip(...args),
+  geneticComparisonHTML:(...args)=>geneticComparisonHTML(...args),
+  genSummaryHtml:(...args)=>genSummaryHtml(...args),
+  geneticCatalogueFold:(...args)=>geneticCatalogueFold(...args),
+  panelLabsHtml:(...args)=>panelLabsHtml(...args),
+  fib4Html:(...args)=>fib4Html(...args),
+  badge:(...args)=>badge(...args),
+  sparkline:(...args)=>sparkline(...args),
+  bodyMassMetric:(...args)=>bodyMassMetric(...args),
+  genTableHtml:(...args)=>genTableHtml(...args),
+  systemPolygenicHtml:(...args)=>systemPolygenicHtml(...args),
+  thematicPanelLinks:(...args)=>thematicPanelLinks(...args),
+  correctionRoutesHtml:(...args)=>correctionRoutesHtml(...args),
+  visibleTestProposals:(...args)=>visibleTestProposals(...args),
+  testItem:(...args)=>testItem(...args),
+  basketRowHtml:(...args)=>basketRowHtml(...args),
+  systemLinkHtml:(...args)=>systemLinkHtml(...args),
+  noteHtml:(...args)=>noteHtml(...args),
+  visitReportGenes:(...args)=>visitReportGenes(...args),
+  flags:FLAG,selected:id=>visitSelection.has(id)
+});
+
+function insightFactHTML(...args){
+  return systemViews.insightFactHTML(...args);
 }
-function comparisonHTML(c){
-  if(!c)return '';
-  const lines=[];
-  if(['mean','median'].includes(c.statistic))lines.push(t('insight.stat.'+c.statistic));
-  if(c.delta!=null)lines.push(t('insight.delta')+': '+c.delta);
-  if(c.mdd!=null)lines.push(t('insight.mdd',{value:c.mdd}));
-  for(const key of ['before','after']){const p=c[key],s=p?.stats;if(s)lines.push(t('insight.coverage',{date:p.date,n:s.n,days:s.days,sd:s.sd}));}
-  if(c.before_dates)lines.push(t('insight.period_dates',{a:c.before_dates.map(x=>x.slice(0,10)).join(' — '),b:c.after_dates.map(x=>x.slice(0,10)).join(' — ')}));
-  if(c.before_range)lines.push(t('insight.period_ranges',{a:c.before_range.join('–'),b:c.after_range.join('–'),na:c.before_n,nb:c.after_n}));
-  if(c.method_recorded===false||(c.comparison&&c.comparison.method_recorded===false))lines.push(t('insight.method_unknown'));
-  return lines.map(x=>`<p class="meta">${esc(x)}</p>`).join('');
+function comparisonHTML(...args){
+  return systemViews.comparisonHTML(...args);
 }
-function insightChartHTML(change){
-  const points=(change.series||[]).map(p=>({x:Date.parse(String(p.date).length===7?p.date+'-01':p.date),y:p.value,date:p.date}))
-    .filter(p=>Number.isFinite(p.x)&&typeof p.y==='number'&&Number.isFinite(p.y)).sort((a,b)=>a.x-b.x);
-  if(points.length<2)return '';
-  const c=change.comparison||{}, b=change.basis||{}, limits=[b.low,b.high].filter(v=>typeof v==='number'&&Number.isFinite(v));
-  const min=Math.min(...points.map(p=>p.y),...limits),max=Math.max(...points.map(p=>p.y),...limits),span=max-min||1;
-  const x=p=>8+184*(p.x-points[0].x)/(points.at(-1).x-points[0].x||1),y=v=>54-44*(v-min)/span;
-  const path=points.map(p=>x(p).toFixed(2)+','+y(p.y).toFixed(2)).join(' ');
-  const meaning=t('insight.direction.'+change.status,{basis:t('insight.basis.'+(['target','reference'].includes(b.basis)?b.basis:'unknown'))});
-  const label=change.name+' · '+t('insight.window.'+change.window)+' · '+t('insight.arrow.'+c.direction);
-  const boundLines=limits.map(v=>`<path d="${esc('M8 '+y(v).toFixed(2)+' H192')}" stroke="currentColor" stroke-dasharray="3 4" opacity=".4"><title>${esc(t('insight.chart.range')+': '+fmtNum(v))}</title></path>`).join('');
-  return `<figure class="insight-chart" data-direction="${esc(change.status)}"><figcaption><b>${esc(change.name)}</b> <span>${esc(c.direction==='up'?'↗':'↘')} ${esc(t('insight.arrow.'+c.direction))}</span></figcaption>
-    <svg viewBox="0 0 200 64" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title>${boundLines}<polyline points="${esc(path)}" fill="none" stroke="currentColor" stroke-width="2"/>${points.map(p=>`<circle cx="${esc(x(p).toFixed(2))}" cy="${esc(y(p.y).toFixed(2))}" r="2.5" fill="currentColor"><title>${esc(p.date+': '+fmtNum(p.y))}</title></circle>`).join('')}</svg>
-    <div class="chart-dates"><span><strong>${esc(fmtNum(points[0].y))} ${esc(change.series[0].unit_display||change.series[0].unit||'')}</strong><br>${esc(fmtDate(points[0].date))}</span><span><strong>${esc(fmtNum(points.at(-1).y))} ${esc(change.series[0].unit_display||change.series[0].unit||'')}</strong><br>${esc(fmtDate(points.at(-1).date))}</span></div><p class="chart-meaning">${esc(meaning)}</p>
-    ${change.show_latest!==false&&b.latest_outside?`<p class="meta">${esc(t('insight.latest_outside'))}</p>`:''}${change.show_latest!==false&&b.latest_reversal?`<p class="meta">${esc(t('insight.latest_reversal'))}</p>`:''}
-    <span class="meta">${change.series[0]?.measurement_source?esc(measurementLabel(change.series[0]))+" · ":""}${esc(t('insight.chart.readings',{n:points.length,unit:change.series[0].unit_display||change.series[0].unit||''}))}</span></figure>`;
+function insightChartHTML(...args){
+  return systemViews.insightChartHTML(...args);
 }
-function insightWindowsHTML(item){
-  const changes=item.trajectory?.changes||[];
-  return changes.length?`<div class="insight-windows">${[365].map(window=>{
-    const rows=changes.filter(c=>c.window===window);if(!rows.length)return '';
-    return `<section class="insight-window"><b class="meta">${esc(t('insight.window.'+window))}</b>${rows.slice(0,1).map(c=>insightChartHTML({...c,show_latest:window===365||!changes.some(a=>a.marker===c.marker&&a.window===365)})).join('')}${rows.length>1?`<details class="fold"><summary>${esc(t('insight.more',{n:rows.length-1}))}</summary>${rows.slice(1).map(insightChartHTML).join('')}</details>`:''}</section>`;
-  }).join('')}</div>`:'';
+function insightWindowsHTML(...args){
+  return systemViews.insightWindowsHTML(...args);
 }
 
 function geneticComparisonHTML(rows,clinician=false,system='',positions=[]){
@@ -1593,19 +1529,13 @@ function geneticComparisonHTML(rows,clinician=false,system='',positions=[]){
         <p>${esc(t('genlab.checked',{date:r.knowledge?.checked_on||'—'}))}</p>${(r.source_links||[]).filter(u=>/^https:\/\//.test(u)).map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t('genlab.source'))} ${i+1}</a>`).join(' · ')}
         ${r.contrary_observations?.length?`<p>${esc(t('genlab.contrary'))}: ${r.contrary_observations.map(x=>`${esc(x.date)}: ${esc(x.value)} ${esc(x.unit_display||x.unit||'')}`).join('; ')}</p>`:''}
         ${(r.variant_readings||[]).flatMap(x=>x.variant_records||[]).map(v=>`<p>${esc(v.chrom||'')}:${esc(v.pos||'')} ${esc(v.ref||'')}&gt;${esc(v.alt||'')} · ${esc(v.zygosity||'—')} · ${esc(v.clnsig||v.classification||'—')}</p>`).join('')}<p>${esc(r.what_to_check||'')}</p>${r.question?`<p>${esc(r.question)}</p>`:''}<p>${esc(t('genlab.no_cause'))}</p></details></div>`;
-    const readings=r.variant_readings?.length?r.variant_readings:[positions.find(p=>p.gene===r.gene&&p.rsid===r.rsid)||{gene:r.gene,rsid:r.rsid,genotype:r.genotype,read:r.status!=='unread',state:r.state,level:r.variant_level}];
+    const readings=r.variant_readings?.length?r.variant_readings:[r.variant_reading||positions.find(p=>p.gene===r.gene&&p.rsid===r.rsid)||{gene:r.gene,rsid:r.rsid,genotype:r.genotype,read:r.status!=='unread',state:r.state,level:r.variant_level}];
     return readings.map((row,index)=>geneDisplayCard(row,{register:clinician?'clinician':'patient',geneHtml:systemGeneLink(row.gene,r.reference_system||system),contextHtml:index===0?context:''})).join('');
   }).join('');
 }
 
-function insightContextHTML(item){
-  const c=item.context||{}, genes=c.genetics||[], life=(c.lifestyle||[]).filter(r=>r.scope!=='patient_report');
-  const links=[];
-  if(genes.length||(c.comparisons||[]).length)links.push(item.system
-    ?`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#system/${encodeURIComponent(item.system)}" data-system="${esc(item.system)}">${esc(t('system.layer.genetics'))}</a>`
-    :`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#" data-goto="web.tab.genome">${esc(t('web.tab.genome'))}</a>`);
-  if(life.length||c.cgm)links.push(`<a class="cr-btn cr-btn--s cr-btn--ghost" href="#" data-goto="web.tab.lifestyle">${esc(t(c.cgm?'cgm.title':'web.tab.lifestyle'))}</a>`);
-  return links.length?`<nav class="toolbar insight-context-links" data-insight-context-links>${links.join('')}</nav>`:'';
+function insightContextHTML(...args){
+  return systemViews.insightContextHTML(...args);
 }
 
 function clinicalSummaryHTML(data){
@@ -1621,37 +1551,14 @@ function renderClinicalPanel(root,data){
   $('#clinical-back',root).onclick=()=>mount(0);$('#clinical-print',root).onclick=()=>window.print();wireSystems(root,[]);
 }
 
-function insightBasisHTML(item){
-  const b=item.provenance?.basis;if(!b)return '';
-  const seen=new Set(),rows=[];
-  (b.facts||[]).forEach(f=>{const key=JSON.stringify([f.source,f.date]);if(seen.has(key))return;seen.add(key);
-    rows.push(`<tr><td>${esc(t('insight.basis.fact'))}</td><td>${esc(f.date||'—')}</td><td>${esc(f.source||t('insight.basis.source_unknown'))}${f.availability==='unavailable'?`<p class="cr-caption">${esc(t('insight.basis.unavailable'))}</p>`:''}</td></tr>`);});
-  [...(b.knowledge||[]),...(b.rule_sources||[])].forEach(w=>rows.push(`<tr><td>${esc(t('insight.basis.knowledge'))}</td><td>${esc(w.checked_on||'—')} · ${esc(w.version||'—')}</td><td>${esc(w.source||t('insight.basis.source_unknown'))}</td></tr>`));
-  return `<details class="fold" data-insight-basis><summary>${esc(t('insight.basis.title'))}</summary><div class="tblwrap"><table class="cr-table cr-table--compact"><thead><tr><th></th><th>${esc(t('insight.basis.date'))}</th><th>${esc(t('insight.basis.source'))}</th></tr></thead><tbody>${rows.join('')}</tbody></table></div><p class="cr-caption">${esc(t('insight.basis.recorded'))}</p><p class="cr-caption">${esc(t('insight.basis.refresh'))}</p></details>`;
+function insightBasisHTML(...args){
+  return systemViews.insightBasisHTML(...args);
 }
-function attentionItemHTML(item, select=true){
-  const summaries=item.summaries||[], chartSummaries=new Set((item.trajectory?.changes||[]).map(c=>c.summary)), lead=summaries.filter(s=>!chartSummaries.has(s)).slice(0,2);
-  const detail=(item.events||[]).filter(e=>e.kind!=='genetic_phenotype').map(e=>{
-    const d=e.detail||{};
-    const texts=[d.action,d.factor,d.why_it_matters,d.mechanism,d.why,d.source,d.plan_source,d.study_limitations].filter(v=>typeof v==='string'&&v);
-    const comparison=d.trend||(d.before_range?d:d.comparison)||(d.statistic?d:null);
-    return `<div>${e.title!==item.title?`<p>${esc(e.title)}</p>`:''}${texts.map(v=>`<p>${esc(v)}</p>`).join('')}
-      ${comparisonHTML(comparison)}${d.trend&&d.comparison?comparisonHTML(d.comparison):''}
-      ${(e.limitations||[]).map(k=>`<p class="meta">${esc(t('insight.limit.'+k))}</p>`).join('')}</div>`;
-  }).join('');
-  return `<details class="cr-card attention-item" data-attention-card><summary><strong class="insight-title">${esc(item.title)}</strong> ${item.level?levelChip(item.level):''}</summary><div class="attention-body">
-    ${insightWindowsHTML(item)}${lead.map(s=>`<p class="small">${esc(s)}</p>`).join('')}
-    ${item.summaries?.length?'':`<div class="meta"><time>${esc(item.date||'')}</time>${item.reason?' · '+esc(item.reason):''}</div>`}
-    ${insightContextHTML(item)}<details class="fold" data-insight-detail><summary>${esc(t('insight.more_evidence'))}</summary>${summaries.filter(s=>!lead.includes(s)).map(s=>`<p>${esc(s)}</p>`).join('')}${(item.detail_summaries||[]).map(s=>`<p class="meta">${esc(s)}</p>`).join('')}<ul>${(item.facts||[]).filter(f=>f.record!=='genotype').map(insightFactHTML).join('')}</ul>${detail}
-      ${insightBasisHTML(item)}${item.system?`<a href="#" data-system="${esc(item.system)}">${esc(t('insight.panel_open'))}</a>`:`<a href="#" data-goto="web.tab.${esc(item.destination)}">${esc(t('insight.open'))}</a>`}
-      ${select?`<label class="cr-label"><input type="checkbox" data-visit-item="${esc(item.id)}" ${visitSelection.has(item.id)?'checked':''}> ${esc(t('insight.select'))}</label>`:''}</details></div></details>`;
+function attentionItemHTML(...args){
+  return systemViews.attentionItemHTML(...args);
 }
-function attentionHTML(feed){
-  const items=feed?.highlights??feed?.items??[], followUp=feed?.follow_up||[];
-  return `<h2 class="cr-h2">${esc(t('insight.title'))}</h2><p class="meta">${esc(t('web.phenotype.year'))}</p>
-    ${items.map(i=>attentionItemHTML(i)).join('')}
-    ${followUp.length?`<h3 class="cr-h3">${esc(t('insight.repeated_fold',{n:followUp.length}))}</h3>${followUp.map(i=>attentionItemHTML(i)).join('')}`:''}
-    ${!items.length&&!followUp.length?`<p>${esc(feed?.items?.length?t('insight.highlights_empty'):t('insight.empty'))}</p>`:''}`;
+function attentionHTML(...args){
+  return systemViews.attentionHTML(...args);
 }
 
 function reviewChangesHTML(c){
@@ -1678,6 +1585,7 @@ function lazyOverviewBlock(root,id,load){
   fold.ontoggle=async()=>{if(!fold.open||loaded)return;loaded=true;const box=fold.querySelector('[data-lazy-body]');box.textContent=t('web.common.loading');try{await load(box);}catch(error){box.textContent=t('web.common.error');loaded=false;}};
 }
 async function viewOverview(root){
+  const post=viewPost(root);
   if(DISPLAY_MODE==='clinician')return viewVisitSheet(root);
   const read=++overviewRead, valid=()=>root.isConnected&&read===overviewRead&&root.classList.contains('today-view');
   root.className='today-view';
@@ -1785,22 +1693,7 @@ function trendNote(m){
   return nearNote(m);
 }
 function markerCard(m){
-  const f = flagOf(m);
-  const tr=trendNote(m);
-  // Structured method and interval qualifications are product output. Legacy
-  // free-text drafts remain in the source data, not in the current conclusion.
-  const notes=[...(m.method_notes||[]),m.corridor_note].filter(Boolean).join(' · ');
-  return el(`<div class="cr-card card">
-    <div class="label">${esc(m.name)}</div>
-    <div class="value">${esc(m.censored||'')}${esc(fmtNum(m.value))} <small>${esc(m.unit_display??m.unit)}</small></div>
-    <div class="row">${badge(f.cls,t(f.key))}${m.date?`<span class="muted small" title="${esc(m.date)}">${esc(fmtDate(m.date))}</span>`:''}${tr}</div>
-    ${m.series&&m.series.length>1?sparkline(m.series,undefined,m.target?{ref_low:m.ref_low,ref_high:m.ref_high,target:m.target}:null):''}
-    <div class="meta">${esc(refText(m))}${targetText(m)}${m.genome_link?` · ${ownerNoteHtml(m)}`:''}${m.system?` · ${systemLinkHtml(m.system)}`:''}</div>
-    ${decisionNote(m,false)}
-    ${m.display_recency===false?`<div class="meta">${esc(t('labs.historical'))}</div>`:m.display_recency===null?`<div class="meta">${esc(t('labs.date_unknown'))}</div>`:''}
-    ${noteHtml(notes,'meta')}
-    ${targetAsk(m)}
-  </div>`);
+  return el(measurements.render(m,'lab'));
 }
 // A source link is optional; a missing source never becomes a fabricated URL.
 function visitSourceLinks(value){
@@ -1810,14 +1703,8 @@ function visitSourceLinks(value){
   for(const doi of text.matchAll(/DOI\s*:?\s*(10\.\d{4,9}\/[^\s;<>]+)/g))links.push('https://doi.org/'+doi[1]);
   return `${esc(text)} ${[...new Set(links)].map(url=>`<a class="cr-source" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`).join(' ')}`;
 }
-function visitInsightHTML(item,index){
-  const brief=item.visit_brief||{}, conclusions=brief.conclusions||item.summaries||[];
-  const point=p=>`${esc(p.censored||'')}${esc(fmtNum(p.value))} ${esc(p.unit_display||p.unit||'')}<br><span class="meta">${esc(fmtDate(p.date))}</span>`;
-  const readings=(brief.measurements||[]).map(m=>`<tr><th scope="row">${esc(m.name)}</th><td>${m.count>1?point(m.first):'—'}</td><td>${point(m.latest)}</td></tr>`).join('');
-  return `<article class="visit-topic"><header><span class="visit-number">${String(index+1).padStart(2,'0')}</span><span>${esc(item.title)}</span>${item.level?levelChip(item.level):''}</header>
-    <div class="visit-topic-body"><div><h3>${esc(t('web.visit.conclusion'))}</h3>${conclusions.map(x=>`<p>${esc(x)}</p>`).join('')}${(brief.support||[]).map(x=>`<p class="small">${esc(x)}</p>`).join('')}</div>
-    ${readings?`<div><h3>${esc(t('web.visit.support'))}</h3><table class="cr-table cr-table--compact"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.visit.before'))}</th><th>${esc(t('web.visit.latest'))}</th></tr></thead><tbody>${readings}</tbody></table></div>`:''}</div>
-    ${brief.comparisons?.length?`<div class="visit-topic-footer">${geneticComparisonHTML(brief.comparisons,true,item.system||'')}</div>`:''}${insightBasisHTML(item)}</article>`;
+function visitInsightHTML(...args){
+  return systemViews.visitInsightHTML(...args);
 }
 let visitFocusSystems=null,visitFocusPanels=[],visitFocusQuestion='';
 function visitFocusedHTML(r){
@@ -1836,19 +1723,8 @@ function visitFocusedHTML(r){
     ${v.questions.length?`<h2>${esc(t('visit.questions'))}</h2><ol>${v.questions.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>`:''}${v.other_topic_count?`<p class="meta">${esc(t('visit.focus.other',{n:v.other_topic_count}))}</p>`:''}<p class="cr-caption">${esc(r.disclaimer)}</p>`;
 }
 
-function visitReportChart(chart){
-  const source=chart.series||[], points=source.filter(p=>Number.isFinite(p.value));
-  if(!points.length)return '';
-  const dated=points.map(p=>({...p,stamp:Date.parse(String(p.date).length===7?p.date+'-01':p.date)})).filter(p=>Number.isFinite(p.stamp));
-  if(!dated.length)return '';
-  const values=dated.map(p=>p.value),lo=Math.min(...values),hi=Math.max(...values),pad=(hi-lo)*.18||Math.max(Math.abs(hi)*.05,1);
-  const start=Math.min(...dated.map(p=>p.stamp)),end=Math.max(...dated.map(p=>p.stamp));
-  const xy=p=>[20+(p.stamp-start)/(end-start||1)*280,100-(p.value-(lo-pad))/(hi-lo+2*pad)*65];
-  const connected=(chart.connect||chart.display_connect)&&new Set(dated.map(p=>p.unit||'')).size<=1;
-  const path=dated.map((p,i)=>`${i?'L':'M'}${xy(p).join(' ')}`).join(' ');
-  const selected=new Set([0,dated.length-1]);const middle=Math.floor((dated.length-1)/2);if(xy(dated[middle])[0]-xy(dated[0])[0]>45&&xy(dated.at(-1))[0]-xy(dated[middle])[0]>45)selected.add(middle);
-  const svg=chart.numeric_axis===false?'':`<svg viewBox="0 0 320 137" role="img" aria-label="${esc(chart.name)}">${connected&&dated.length>1?`<path d="${path}" class="visit-report-line"/>`:''}${dated.map((p,i)=>{const [x,y]=xy(p);return `<g><title>${esc(fmtDate(p.date))}: ${esc(fmtNum(p.value))} ${esc(p.unit_display||p.unit||'')}</title><circle cx="${x}" cy="${y}" r="3"/>${selected.has(i)?`<text x="${x}" y="${y-9}" text-anchor="${i===0?'start':i===dated.length-1?'end':'middle'}" class="visit-point-value">${esc(p.censored||'')}${esc(fmtNum(p.value))}</text>${i===0||i===dated.length-1?`<text x="${x}" y="126" text-anchor="${i===0?'start':i===dated.length-1?'end':'middle'}">${esc(fmtDate(p.date))}</text>`:''}`:''}</g>`;}).join('')}</svg>`;
-  return `<article class="visit-report-chart"><h3>${esc(chart.name)}</h3><p class="cr-caption">${esc(points.at(-1).unit_display||points.at(-1).unit||'')}</p>${svg}${chart.summary?`<p>${esc(chart.summary)}</p>`:''}${(dated.length>1&&!connected||chart.numeric_axis===false)?`<p class="cr-caption">${esc(t('visit.report.separate'))}</p>`:''}<details class="visit-point-details" ${chart.numeric_axis===false?'open':''}><summary>${esc(t('visit.report.points'))}</summary><table class="cr-table cr-table--compact"><tbody>${source.map(p=>`<tr><th>${esc(fmtDate(p.date))}</th><td>${esc(p.censored||'')}${esc(fmtNum(p.value))} ${esc(p.unit_display||p.unit||'')}</td><td>${esc(p.measurement_source||p.source?.path||(typeof p.source==='string'?p.source:'')||p.record||'')}</td></tr>`).join('')}</tbody></table></details></article>`;
+function visitReportChart(...args){
+  return systemViews.visitReportChart(...args);
 }
 function visitReportGenes(rows,key){
   if(!rows?.length)return '';
@@ -1856,21 +1732,8 @@ function visitReportGenes(rows,key){
     contextHtml:(g.visit_links||[]).map(l=>`<p class="visit-gene-reason"><b>${esc(t('visit.report.gene_reason'))}:</b> ${esc(l.reason)}${l.observation?` ${esc(l.observation.censored||'')}${esc(fmtNum(l.observation.value))} ${esc(l.observation.unit_display||l.observation.unit||'')} · ${esc(fmtDate(l.observation.date))}.`:''}<br>${esc(l.qualification||'')}${l.status_label?`<br>${esc(l.status_label)}`:''}${l.limitations?`<br>${esc(l.limitations)}`:''}${l.source?`<br>${visitSourceLinks(l.source)}`:''}</p>`).join('')+`<p class="cr-caption">${esc(t('visit.focus.separate_scales'))}</p>`,
     extraHtml:(g.variant_readings||[]).flatMap(r=>r.variant_records||[]).map(v=>`<p>${esc(v.chrom||'')}:${esc(v.pos||'')} ${esc(v.ref||'')}&gt;${esc(v.alt||'')} · ${esc(v.zygosity||'')} · ClinVar ${esc(v.classification||'')}</p>`).join('')+visitSourceLinks(g.source||g.reference_context?.gene_source||'')})).join('')}</div>`;
 }
-function visitReportSystem(s,short){
-  const measures=s.focus_measurements||[],genes=s.discussion_genetics||[],series=s.discussion_charts||[];
-  if(!measures.length&&!s.insights.length&&!genes.length)return '';
-  const shown=short?measures.slice(0,3):measures;
-  const charts=series;
-  const point=m=>`${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display||m.unit||'')}`;
-  const bounds=m=>m.ref_low!=null&&m.ref_high!=null?fmtNum(m.ref_low)+'–'+fmtNum(m.ref_high):m.ref_low!=null?'≥'+fmtNum(m.ref_low):m.ref_high!=null?'≤'+fmtNum(m.ref_high):'—';
-  const conclusions=[...new Set(s.insights.flatMap(i=>i.conclusions||[]))];
-  return `<article class="visit-report-system"><h3>${esc(s.label)}</h3>${(short?conclusions.slice(0,2):conclusions).map(c=>`<p>${esc(c)}</p>`).join('')}
-    ${shown.length?`<table class="cr-table cr-table--compact"><thead><tr><th>${esc(t('web.form.marker'))}</th><th>${esc(t('web.form.value'))}</th><th>${esc(t('visit.reference_bounds'))}</th></tr></thead><tbody>${shown.map(m=>`<tr><th>${esc(m.name)}</th><td>${point(m)} · ${esc(fmtDate(m.date))}</td><td>${esc(bounds(m))}</td></tr>`).join('')}</tbody></table>`:''}
-    ${measures.length>shown.length?`<p class="cr-caption">${esc(t('visit.report.more_markers',{n:measures.length-shown.length}))}</p>`:''}
-    ${charts.length?`<div class="visit-report-charts">${charts.map(c=>visitReportChart({...c,summary:conclusions.includes(c.summary)?'':c.summary})).join('')}</div>`:''}
-    ${genes.length?`<h4>${esc(t('visit.report.genetics'))}</h4>${visitReportGenes(genes,s.key)}`:''}
-    ${s.more_discussion_genetics?`<button class="cr-btn cr-btn--ghost cr-btn--s visit-actions" data-visit-open-system="${esc(s.key)}">${esc(t('visit.report.more_factors',{n:s.more_discussion_genetics}))}</button>`:''}
-    </article>`;
+function visitReportSystem(...args){
+  return systemViews.visitReportSystem(...args);
 }
 function visitReportRecords(r){
   const row=m=>`<tr><th>${esc(m.name)}</th><td>${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display||m.unit||'')} · ${esc(fmtDate(m.date))}</td><td>${esc(m.source_label||'')}<br>${esc(m.date_basis_label||m.recency_note||'')}</td></tr>`;
@@ -1911,6 +1774,9 @@ function visitDocumentHTML(r){
 }
 
 async function viewVisitSheet(root, reference=false, full=false){
+  if(!root.isConnected)return;
+  root=beginView('visit');
+  await refreshProfileAnswers(true);if(!root.isConnected)return;viewLifecycle.recontext(root);
   const read=++overviewRead;
   showLoader(root);
   const query=new URLSearchParams();if(visitSelectionTouched)query.set('selection','explicit');if(reference)query.set('reference','1');visitSelection.forEach(id=>query.append('item',id));
@@ -1999,6 +1865,7 @@ async function viewVisitSheet(root, reference=false, full=false){
 
 let labSystemToOpen=null;
 async function viewLabs(root){
+  const post=viewPost(root);
   const [d,catR,sb,cfgR,meds]=await Promise.all([api('/api/labs'),api('/api/markers'),sourceBar(['labs']),api('/api/source-config'),api('/api/medications')]);
   // the series for the sparklines are pulled from the catalogue
   const cat=catR.markers;
@@ -2070,6 +1937,7 @@ async function viewLabs(root){
   };
 }
 async function previewLabArchive(box, approval=''){
+  const post=viewPost(box);
   showLoader(box);
   const r=await post('/api/ingest-labs',approval?{approve_archive:approval}:{archive_preview:true});
   if(!r.preview){
@@ -2087,6 +1955,7 @@ async function previewLabArchive(box, approval=''){
   if(button)button.onclick=()=>{button.disabled=true;previewLabArchive(box,r.approval_token);};
 }
 function renderAddLab(box, cat){
+  const post=viewPost(box);
   const opts = cat.map(c=>`<option value="${esc(c.key)}">${esc(c.name)} (${esc(c.unit_display??c.unit)})</option>`).join('');
   box.innerHTML = `<div class="form">
     <div class="fr">
@@ -2122,6 +1991,7 @@ const num=v=>{v=(v||'').toString().replace(',','.').trim();return v===''?null:(i
 // look» abnormal list is not the place: that list is corridor deviations, and
 // a target is deliberately never one of those.
 async function renderTargets(box, cat){
+  const post=viewPost(box);
   const d=await api('/api/targets');
   const rows=(d.targets||[]).map(tg=>{
     const cur=tg.current;
@@ -2154,6 +2024,7 @@ async function renderTargets(box, cat){
   });
 }
 function renderTargetForm(box, cat){
+  const post=viewPost(box);
   const opts=cat.map(c=>`<option value="${esc(c.key)}" data-unit="${esc(c.canonical_unit||c.unit||'')}">${esc(c.name)} (${esc(c.unit_display??c.unit)})</option>`).join('');
   box.innerHTML=`<div class="form">
     <div class="so-h" style="margin:0 0 6px">${esc(t('web.target.form_h'))}</div>
@@ -2432,6 +2303,7 @@ function flagsHTML(flags){
 // was stopped, and the check of a new drug against the genome, the labs and the
 // list — which used to be two tabs, «Drugs» and «Prescriptions», for one subject.
 async function viewMedicines(root){
+  const post=viewPost(root);
   const [d,sys,sb]=await Promise.all([api('/api/medications'), systemsIndex().catch(()=>null),
     sourceBar(['medications','pgx','interactions','genome_vcf'])]);
   const cur=d.medications.filter(m=>m.current!==false), past=d.medications.filter(m=>m.current===false);
@@ -2893,107 +2765,13 @@ function correctionRoutesHtml(cr,register='patient'){
   return h;
 }
 
-function systemMedicationsHtml(med){
-  const head=`<thead><tr><th>${esc(t('web.system.med_name'))}</th><th>${esc(t('web.system.med_dose'))}</th><th>${esc(t('web.system.med_class'))}</th></tr></thead>`;
-  const table=rows=>`<div class="cr-table-wrap"><table class="cr-table system-medications-table">${head}<tbody>${rows}</tbody></table></div>`;
-  const row=(m,labels,reason='')=>`<tr><td><b>${esc(m.name||'')}</b></td><td>${esc(m.dose||'—')}</td><td>${esc(labels.join(', ')||reason||t((m.system_links||[]).length?'system.meds.named_substance':'prescription.class_undefined'))}${(m.system_links||[]).map(x=>`<p class="cr-caption">${esc(x.relation_label)}${x.note?' · '+esc(x.note):''}</p>`).join('')}${reason&&labels.length?`<div class="cr-caption">${esc(reason)}</div>`:''}</td></tr>`;
-  let h=med.rows?.length?table(med.rows.map(m=>row(m,m.via_labels||[])).join('')):'';
-  if(med.empty_reason) h+=`<p class="cr-caption">${esc(med.empty_reason)}</p>`;
-  const unplaced=(med.unmapped||[]).map(m=>row(m,m.class_labels||[],t('web.system.med_no_map')))
-    .concat((med.unclassified||[]).map(m=>row(m,[],t('web.system.med_no_class'))));
-  if(unplaced.length) h+=`<details class="fold system-medication-unplaced" data-medications-unplaced><summary>${esc(t('web.system.med_unplaced',{n:unplaced.length}))}</summary>${table(unplaced.join(''))}</details>`;
-  return h;
+function systemMedicationsHtml(...args){
+  return systemViews.systemMedicationsHtml(...args);
 }
 // The seven layers in the order of the brief, every one of them present — with
 // its rows or with the reason it is empty — and the three baskets after them.
-function systemCardHtml(r){
-  const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3 class="cr-h3">${n}. ${esc(t(key))}</h3>${body}</div>`);
-  if(r.on_demand){
-    // A panel without a radar domain (task 199 F): no score, no figure, the
-    // same rows through the same gate — and the reason at the top. The
-    // laboratory layers do not exist for it and are not drawn.
-    L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.on_demand.head'))}</h3><div class="why">${esc(t('system.on_demand.why',{why:r.why_no_domain||'—'}))}</div>`
-      +(r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:'')+`</div>`);
-    const gen=r.genetics||{};
-    let b=genSummaryHtml(gen,r)+geneticCatalogueFold(gen,r);
-    L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.layer.on_demand_genetics'))}</h3>${b}</div>`);
-    return L.join('');
-  }
-  const lab=r.labs||{};
-  let b='';
-  if(lab.status==='absent') b=`<div class="row-l">${esc(t('system.labs.absent'))}</div>`;
-  else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
-  else{
-    b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
-  }
-  if((lab.missing||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.missing',{markers:(lab.missing_names||lab.missing).join(', ')}))}</div>`;
-  if((lab.stale||[]).length) b+=`<div class="row-l muted">${esc(t('system.labs.stale',{markers:lab.stale.map(s=>s.name||s.key).join(', ')}))}</div>`;
-  if(lab.panel_term) b+=`<div class="row-l">${esc(t('system.panel_labs.term',{outside:lab.panel_term.outside,judged:lab.panel_term.judged,score:lab.panel_term.score}))}</div>`;
-  b+=panelLabsHtml(lab.panel);
-  b+=(r.validated_indices||[]).map(fib4Html).join('');
-  const readings=lab.current_markers||[];
-  const readingRows=readings.map(m=>`<div class="row-l">${badge((FLAG[m.flag]||FLAG.ok).cls,t((FLAG[m.flag]||FLAG.ok).key))} <b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display??m.unit??'')} <span class="meta">${esc(fmtDate(m.date))}</span>${m.series?.length>1?sparkline(m.series,undefined,null,bodyMassMetric(m.key)):''}</div>`).join('');
-  b=`<details class="fold system-current-labs"><summary>${esc(t('web.labs.group_counts',{measured:readings.length,abnormal:readings.filter(m=>m.abnormal).length}))}</summary>${readingRows}<button class="cr-btn cr-btn--ghost" data-lab-system="${esc(r.key)}">${esc(t('web.labs.open_system'))}</button>${b}</details>`;
-  if(r.cgm_link)b+=`<a class="cr-btn cr-btn--ghost" href="#lifestyle">${esc(r.cgm_link.label)}</a>`;
-  layer(1,'system.layer.labs',b);
-  const dyn=r.dynamics||{};
-  if(dyn.status==='ok'){
-    const d=dyn.delta||0;
-    b=`<div class="row-l">${esc(t('system.dynamics.line',{prev:dyn.prev_score,score:dyn.compared_score,delta:(d>0?'+':'')+d,date:fmtDate(dyn.prev_date)||'—',compared:dyn.compared||0}))}</div>`
-     +(dyn.moved||[]).map(m=>`<div class="row-l">· ${esc(t('system.dynamics.moved',{name:m.name,from_value:m.from_value,to_value:m.to_value,unit:m.unit_display??m.unit??''}))}</div>`).join('');
-  } else b=`<div class="row-l">${esc(t('system.dynamics.'+(dyn.status||'absent')))}</div>`;
-  layer(2,'system.layer.dynamics',b);
-  const gen=r.genetics||{};
-  // The genotype of the system first, in the words a person reads; the list it
-  // was composed from, every position's card and the scores fold under it —
-  // open in the clinician's register, where they are the point.
-  const summary=genSummaryHtml(gen,r);
-  b='';
-  if(gen.status==='composed'){
-    const base=gen.base||{};
-    b=`<div class="row-l">${esc(t('system.genetics.composed',{source:base.source||'—',version:base.version||'—',base_genes:base.genes||0,positions:(gen.curated||{}).positions||0,read_genes:gen.read_genes||0,read_positions:gen.read_positions||0,findings:gen.finding_count||0,carriers:gen.carrier_count||0,pending:gen.pending_count||0}))}</div>`
-      +(gen.signature_author_count?`<div class="row-l">${esc(t('system.genetics.signature_author',{n:gen.signature_author_count,date:gen.signature_author_date||'—'}))}</div>`:'')
-      +(gen.signature_open_count?`<div class="row-l">${esc(t('system.genetics.signature_open',{n:gen.signature_open_count}))}</div>`:'')
-      +(gen.level_counts?`<div class="row-l">${esc(t('system.genetics.levels',{levels:['A','B','C','D','E'].filter(k=>gen.level_counts[k]).map(k=>k+' — '+gen.level_counts[k]).join(', ')||'—',none:gen.level_counts.none||0}))}</div>`:'');
-    if(gen.withheld_by_classification) b+=`<div class="row-l muted">${esc(t('system.genetics.withheld',{n:gen.withheld_by_classification}))}</div>`;
-    if((gen.excluded||[]).length) b+=`<div class="row-l muted">${esc(t('system.genetics.excluded',{genes:gen.excluded.map(e=>e.gene).join(', ')}))}</div>`;
-    if((gen.refused||{}).total) b+=`<div class="row-l muted">${esc(t('system.genetics.refused',{n:gen.refused.total}))}</div>`;
-    (gen.unreadable||[]).forEach(u=>{ b+=`<div class="row-l">${esc(t('system.genetics.unreadable',{gene:u.gene,reason:u.reason||'—'}))}</div>`; });
-    b+=genTableHtml(gen,r,r.register);
-    if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
-  }
-  if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
-  b=summary+thematicPanelLinks(r.thematic_panels)+(b?`<details class="fold" data-genetic-catalogue><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
-  layer(3,'system.layer.genetics',b);
-  b=correctionRoutesHtml(r.correction_routes,r.register);
-  // Not a numbered layer: the seven layers are the brief's own frame, and this
-  // block answers a decision that is not the product's to make.
-  if(b) L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('system.routes.layer'))}</h3>${b}</div>`);
-  b=systemMedicationsHtml(r.medications||{});
-  layer(4,'system.layer.medications',b);
-  const tg=r.target||{};
-  b=(tg.rows||[]).map(x=>{
-    if(!x.current) return `<div class="row-l">· ${esc(t('system.target.no_value',{name:x.name,spec:x.spec,unit:x.unit||'',set_by:x.set_by||'',set_on:x.set_on||''}))}</div>`;
-    const side=x.outside_target?t(x.side==='above'?'target.side_above':'target.side_below'):t('system.target.within');
-    return `<div class="row-l">· ${esc(t('system.target.row',{name:x.name,spec:x.spec,unit:x.unit||'',set_by:x.set_by||'',set_on:x.set_on||'',value:x.current.value,date:x.current.date||'—',side:side}))}</div>`;
-  }).join('');
-  if(tg.empty_reason) b+=`<div class="row-l muted">${esc(tg.empty_reason)}</div>`;
-  layer(5,'system.layer.target',b);
-  const tests=r.tests||{};
-  b=visibleTestProposals(tests.rows).map(s=>testItem(s).outerHTML).join('');
-  if(!b) b=`<div class="row-l muted">${esc(t('web.tests.none_supported'))}</div>`;
-  layer(6,'system.layer.tests',b);
-  const qs=r.questions||{};
-  b=(qs.rows||[]).length?`<ol>${qs.rows.map(q=>`<li>${esc(q.text)}</li>`).join('')}</ol>`:'';
-  if(qs.empty_why) b+=`<div class="row-l muted">${esc(t('system.why.'+qs.empty_why))}</div>`;
-  layer(7,'system.layer.questions',b);
-  const nxt=r.next||{};
-  b=['lab','genome','ask'].map(k=>{const bk=nxt[k]||{};
-    const rows=(bk.rows||[]).map(basketRowHtml).join('');
-    const empty=bk.empty_reason||(!rows&&k==='lab'?t('web.tests.none_supported'):'');
-    return `<div class="basket"><h4>${esc(t('system.next.'+k))}</h4>${rows}${empty?`<div class="row-l muted"><i>${esc(empty)}</i></div>`:''}${(bk.full_genome&&bk.full_genome.text)?`<div class="row-l">${esc(bk.full_genome.text)}</div>`:''}</div>`;}).join('');
-  L.push(`<div class="layer"><h3 class="cr-h3">${esc(t('web.system.next_h'))}</h3>${b}</div>`);
-  return L.join('');
+function systemCardHtml(...args){
+  return systemViews.systemCardHtml(...args);
 }
 // The panel of a system as the catalogue describes it — the clinician's page:
 // every position with its sentence per genotype, the guideline or study it
@@ -3012,14 +2790,17 @@ function renderThematicPanel(r){
     ${[...(r.genes||[]),...(r.regions||[])].map(g=>`<section data-thematic-gene="${esc(g.gene)}"><h2 class="cr-h3">${esc(g.gene)}</h2>
       ${g.reference_context?.disease_context?`<p class="cr-caption">${esc(g.reference_context.disease_context.label)}: ${esc(g.reference_context.disease_context.name)}</p>`:''}
       ${!g.positions?.length?geneDisplayCard(g,{referenceOnly:r.reference_only,readingRequested:r.patient_readings,geneRegion:g.region_reading}):g.positions.map(p=>geneDisplayCard({...p,gene:p.gene||g.gene,reference_context:{...g.reference_context,...p.reference_context}},{referenceOnly:r.reference_only,readingRequested:r.patient_readings})).join('')}
-      ${g.region_reading?`<details class="gene-card-fold" data-panel-region><summary>${esc(t('thematic.region_reading'))}</summary>${geneRegionCard({...g.region_reading,reference_context:g.reference_context}).replace('id="gc-close"','data-close-gene')}</details>`:!g.positions?.length?`<p class="cr-caption">${esc(t('thematic.no_positions'))}</p>`:''}
+      ${g.region_reading?`<details class="gene-card-fold" data-panel-region="${esc(g.gene)}"><summary>${esc(t('thematic.region_reading'))}</summary><div data-panel-region-body></div></details>`:!g.positions?.length?`<p class="cr-caption">${esc(t('thematic.no_positions'))}</p>`:''}
       ${g.reading_request?`<div class="actions"><button class="cr-btn cr-btn--ghost cr-btn--s" data-read-gene="${esc(g.reading_request.gene)}">${esc(t('thematic.read_gene'))}</button></div><div data-gene-reading-result aria-live="polite"></div>`:''}
       ${g.personal_comparison?.observations.length?`<section><h3 class="cr-h3">${esc(t('thematic.comparison'))}</h3><p class="cr-caption">${esc(g.personal_comparison.note)}</p><table class="cr-table cr-table--compact"><tbody>${g.personal_comparison.observations.map(m=>`<tr><th>${esc(m.name)}</th><td>${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit||'')}</td><td>${esc(fmtDate(m.date))}</td></tr>`).join('')}</tbody></table></section>`:''}
     </section>`).join('')}`;
 }
 async function viewPanel(key,reading=null,focusGene=null){
-  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);showLoader(v);
-  const r=reading||await api('/api/panel?key='+encodeURIComponent(key));
+  const stamp=viewLifecycle.snapshot();
+  const v=beginView('panel:'+key);
+  await refreshProfileAnswers(true);if(!v.isConnected)return;viewLifecycle.recontext(v);
+  const route=reading?.patient_readings?'/api/system?key=':'/api/panel?key=';
+  const r=(viewLifecycle.matches(stamp)&&reading)||await api(route+encodeURIComponent(key));
   if(!v.isConnected) return;
   if(r.status!=='ok'){ v.innerHTML=errorHtml(t('system.unknown',{key:key,systems:(r.systems||[]).join(', ')})); return; }
   if(r.thematic){
@@ -3027,7 +2808,7 @@ async function viewPanel(key,reading=null,focusGene=null){
       ${r.patient_readings?`<button class="cr-btn cr-btn--ghost" data-panel="${esc(key)}">${esc(t('thematic.reference'))}</button>`:`<button class="cr-btn" data-system="${esc(key)}">${esc(t('thematic.readings'))}</button>`}
       <button class="cr-btn cr-btn--ghost" onclick="window.print()">${esc(t('system.print'))}</button></div>${renderThematicPanel(r)}`;
     $('#pnl-back',v).onclick=()=>mount(current);
-    bindPanelGeneReadings(v);
+    bindPanelGeneReadings(v,r);
     const target=Array.from(v.querySelectorAll('[data-thematic-gene]')).find(n=>n.dataset.thematicGene===focusGene);
     if(target){target.open=true;target.scrollIntoView({block:'start'});}else window.scrollTo({top:0});
     return;
@@ -3079,7 +2860,24 @@ async function viewPanel(key,reading=null,focusGene=null){
   }
   window.scrollTo({top:0});
 }
-function bindPanelGeneReadings(root){
+function bindPanelRegionDetails(root,report){
+  const genes=new Map([...(report.genes||[]),...(report.regions||[])].map(g=>[g.gene,g]));
+  root.querySelectorAll('[data-panel-region]').forEach(detail=>{
+    const gene=genes.get(detail.dataset.panelRegion);let rendered=false;
+    const expand=()=>{
+      if(rendered||!gene?.region_reading)return;
+      const body=detail.querySelector('[data-panel-region-body]');
+      body.innerHTML=geneRegionCard({...gene.region_reading,reference_context:gene.reference_context}).replace('id="gc-close"','data-close-gene');
+      const close=body.querySelector('[data-close-gene]');
+      if(close)close.onclick=()=>{detail.open=false;};
+      rendered=true;
+    };
+    detail.addEventListener('toggle',()=>{if(detail.open)expand();});
+    detail.addEventListener('scholion:expand',expand);
+  });
+}
+function bindPanelGeneReadings(root,report={}){
+  bindPanelRegionDetails(root,report);
   root.querySelectorAll('[data-read-gene]').forEach(button=>button.onclick=async()=>{
     const slot=button.closest('[data-thematic-gene]').querySelector('[data-gene-reading-result]');
     button.disabled=true;showLoader(slot);
@@ -3097,6 +2895,7 @@ function bindPanelGeneReadings(root){
 // that printing opened; the reader's own expanded rows stay expanded.
 let intakePrintOpened=[];
 window.addEventListener('beforeprint',()=>{
+  document.querySelectorAll('#view [data-panel-region]').forEach(d=>d.dispatchEvent(new Event('scholion:expand')));
   intakePrintOpened=Array.from(document.querySelectorAll('#view .gene-card details:not([open]), #view details[data-intake-detail]:not([open]), #view [data-genetic-context]:not([open]), #view [data-clinical-checks]:not([open]), #view [data-index-provenance]:not([open]), #view [data-thematic-gene] details:not([open]), #view [data-thematic-gene]:not([open]), #view.visit-sheet[data-full-print] [data-insight-detail]:not([open]), #view.visit-sheet[data-full-print] .visit-support:not([open])'));
   intakePrintOpened.forEach(d=>d.open=true);
 });
@@ -3107,8 +2906,8 @@ async function viewSystem(key, register){
   // An explicit professional reading also changes the visible global mode;
   // the header must not say Personal while this card is in the clinician register.
   if(['patient','clinician'].includes(register)&&register!==DISPLAY_MODE) setDisplayMode(register,false);
-  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);register=register||DISPLAY_MODE;
-  showLoader(v);
+  const v=beginView('system:'+key);register=register||DISPLAY_MODE;
+  await refreshProfileAnswers(true);if(!v.isConnected)return;viewLifecycle.recontext(v);
   const r=await api('/api/system?key='+encodeURIComponent(key)+'&register='+encodeURIComponent(register));
   if(!v.isConnected) return;
   if(r.clinical_estimates)return renderClinicalPanel(v,r);
@@ -3139,7 +2938,6 @@ async function viewSystem(key, register){
       ${st.length?`<button class="cr-btn cr-btn--ghost ghost" data-panel="${esc(r.key)}" title="${esc(t('web.panel.open_hint'))}">${esc(t('web.panel.open'))}</button>`:''}
     </div>
     ${pageHead(r.label||key,'',facts)}
-    <div class="verdict">${esc(r.verdict_line||'')}</div>${r.unread_line?`<div class="why muted">${esc(r.unread_line)}</div>`:''}
     ${systemCardHtml(r)}
     <div class="meta mt-4">${esc(r.disclaimer||'')}</div>
   </div>`;
@@ -3378,13 +3176,13 @@ async function renderSystems(box, radar, systemsAnswer=null){
   // The bar moves with the time waited and stops short of full: one request has
   // no parts to count, and a bar that reached the end and kept waiting would lie.
   const t0 = Date.now();
-  const timer = setInterval(()=>{
+  const stopTimer = viewLifecycle.interval(box,()=>{
     const f = box.querySelector('.ringload .dna-fill');
-    if(!f){ clearInterval(timer); return; }
+    if(!f){ stopTimer(); return; }
     f.style.width = (95*(1-Math.exp(-(Date.now()-t0)/2500))).toFixed(1)+'%';
   }, 150);
   const sys = await Promise.resolve(systemsAnswer||systemsIndex()).catch(()=>null);
-  clearInterval(timer);
+  stopTimer();
   if(!box.isConnected) return;                       // the reader has left the tab
   join(sys);
   draw(false);
@@ -3682,38 +3480,21 @@ async function viewSecond(root){
 // «acts on: system» comes from the class→system map through the systems
 // listing, joined by name; a current prescription the map does not place says
 // so rather than showing nothing.
-function actsOnHtml(m, sys){
-  if(m.current===false) return '';
-  const p=m.system_context||(sys?.prescriptions||[]).find(x=>x.name===m.name);
-  if(!p) return '';
-  const contexts=(p.system_links||[]).filter((x,i,all)=>all.findIndex(y=>y.relation===x.relation&&y.note===x.note)===i);
-  const support=contexts.length?`<details class="fold"><summary>${esc(t('system.meds.link_basis'))}</summary>${contexts.map(x=>`<p class="cr-caption">${esc(x.relation_label)}${x.note?' · '+esc(x.note):''}</p>`).join('')}</details>`:'';
-  if(p.systems&&p.systems.length)
-    return `<div class="why">${esc(t('system.acts_on',{systems:''}))}${p.systems.map(k=>systemLinkHtml(k,t('radar.domain.'+k))).join(', ')}</div>`+support;
-  if(p.outside_contexts?.length)return p.outside_contexts.map(x=>`<p class="cr-caption" data-medication-outside-system>${esc(x.note)}</p>`).join('');
-  return `<div class="why muted">${esc(t('system.acts_on_none',{status:p.map_status}))}</div>`;
+function actsOnHtml(...args){
+  return systemViews.actsOnHtml(...args);
 }
 // A status as words and a date — «stopped 10 Sep 2026» — never «stopped_2026-09-10».
-function medStatusText(s){
-  const m=String(s||'').match(/^([a-z_]*?)_?(\d{4}-\d{2}(?:-\d{2})?)?$/);
-  if(!m) return String(s||'—');
-  const word=m[1]?t('web.meds.status.'+m[1]):'';
-  const w=(!word||word.startsWith('⟦'))?String(m[1]||'').replace(/_/g,' '):word;
-  return [w,m[2]?fmtDate(m[2]):''].filter(Boolean).join(' ')||'—';
+function medStatusText(...args){
+  return systemViews.medStatusText(...args);
 }
-function controlsHtml(controls, overdueOnly=false){
-  if(!(controls||[]).length)return '';
-  return `<section class="cr-card card ${overdueOnly?'warnbox':''}" data-treatment-controls><b>${esc(t(overdueOnly?'treatment.overdue':'treatment.title'))}</b>${controls.map(c=>`<div class="list-item"><div>${esc(t('treatment.control',{name:c.name||'—',marker:c.marker||'—',start:c.from||'—',due:c.due||'—'}))}</div><b>${esc(t('treatment.status.'+c.status))}</b>${c.plan_source?`<div class="meta">${esc(t('treatment.plan_source',{source:c.plan_source}))}</div>`:`<div class="meta">${esc(t('treatment.unresolved'))}</div>`}</div>`).join('')}</section>`;
+function controlsHtml(...args){
+  return systemViews.controlsHtml(...args);
 }
-function treatmentHtml(data){
-  if(!data)return '';
-  return `${controlsHtml(data.current_controls??(data.controls||[]).filter(c=>c.current!==false))}${(data.historical_controls||[]).length?`<details class="fold" data-historical-controls><summary>${esc(t('treatment.history_controls'))}</summary>${controlsHtml(data.historical_controls)}</details>`:''}<details class="fold" data-treatment-timeline><summary>${esc(t('treatment.title'))}</summary><p class="meta">${esc(t('treatment.scope'))}</p><ol>${(data.events||[]).map(e=>`<li><time>${esc(e.date)}</time> · ${e.kind==='prescription_start'?`<b>${esc(t('treatment.start'))}: ${esc(e.name)}</b> ${esc(e.dose||'')}`:`${esc(e.name)}: ${esc(e.comparator||'')}${esc(e.value??'—')} ${esc(e.unit||'')}`}</li>`).join('')}</ol>${(data.undated||[]).map(e=>`<div class="meta">${esc(e.name)} · ${esc(t('treatment.undated'))}</div>`).join('')}</details>`;
+function treatmentHtml(...args){
+  return systemViews.treatmentHtml(...args);
 }
-function medItem(m, sys){
-  // `current` is the server's verdict by the one rule in core — the page does not
-  // re-decide which words mean «taking it».
-  const st=m.current===false?` ${badge('b-unknown',medStatusText(m.status))}`:'';
-  return `<div class="list-item"><div class="row"><b>${esc(m.name)}</b> ${m.dose?`<span class="muted">${esc(m.dose)}</span>`:''}${st} <button class="cr-btn cr-btn--ghost cr-btn--s ghost btn-sm ml-auto" data-rm="${esc(m.name)}">${esc(t('web.meds.remove'))}</button></div>${m.scheme_date?`<div class="meta">${esc(t('treatment.scheme_date'))}: ${esc(fmtDate(m.scheme_date))}</div>`:''}<div class="meta">${m.start_date?`${esc(t('treatment.intake_start'))}: ${esc(fmtDate(m.start_date))}`:esc(t('treatment.intake_start_missing'))}</div>${noteHtml(m.note)}${actsOnHtml(m,sys)}</div>`;
+function medItem(...args){
+  return systemViews.medItem(...args);
 }
 
 // ---------------- Personal health metrics ----------------
@@ -3722,30 +3503,11 @@ function medItem(m, sys){
 // other one is printed under it rather than instead of it: a weight entered by
 // hand on the 25th and a monthly mean from the scales are both true, and the
 // reader is the one who knows which they meant.
-function metricOrigin(m){
-  if(!m.origin) return '';
-  const dev = m.device&&t('web.life.device.'+m.device.source)||'';
-  const head = m.origin==='device'
-    ? t('web.metrics.from_device',{device:dev,date:m.device.date})
-    : t('web.metrics.from_hand',{date:(m.manual&&m.manual.date)||m.date});
-  const other = m.origin==='device'
-    ? (m.manual?t('web.metrics.also_hand',{value:m.manual.value,date:m.manual.date}):'')
-    : (m.device?t('web.metrics.also_device',{device:dev,value:m.device.value,date:m.device.date}):'');
-  return `<div class="meta">${esc(head)}${other?' · '+esc(other):''}</div>`;
+function metricOrigin(...args){
+  return measurements.origin(...args);
 }
 function metricCard(m){
-  const f = FLAG[m.flag]||FLAG.unknown;
-  const has = m.value!=null;
-  let tr='';
-  if(m.trend){const a={up:'↑',down:'↓',flat:'→'}[m.trend.direction];const pct=m.trend.pct!=null?` ${m.trend.pct>0?'+':''}${m.trend.pct}%`:'';tr=`<span class="trend">${a}${pct}</span>`;}
-  return el(`<div class="cr-card card">
-    <div class="label">${esc(m.name)}</div>
-    <div class="value">${has?esc(m.value):'—'} <small>${esc(m.unit)}</small></div>
-    <div class="row">${has?badge(f.cls==='b-good'||f.cls==='b-critical'||f.cls==='b-warning'?f.cls:'b-good', t(f.key)):badge('b-unknown',t('web.flag.unknown'))}${tr}</div>
-    ${m.series&&m.series.length>1?sparkline(m.series,undefined,null,bodyMassMetric(m.key)):''}
-    <div class="meta">${esc(refText(m))}${has&&m.date?` · ${esc(m.date)}`:''}</div>
-    ${metricOrigin(m)}
-  </div>`);
+  return el(measurements.render(m,'metric'));
 }
 // The person: who the data belong to, their own numbers, and the two forms that
 // change them. It was a tab of its own and had become the emptiest one — the
@@ -3753,6 +3515,7 @@ function metricCard(m){
 // only the file somebody types into. It belongs at the top of the first screen,
 // which is where the reader asks «who is this and where are they now».
 async function renderPerson(root, compact=false, supplied=null){
+  const post=viewPost(root);
   const d=supplied||await api('/api/metrics');
   const p=d.profile||{};
   const bmi=d.bmi;
@@ -3942,29 +3705,7 @@ function srcTag(m){
 }
 
 function lifeCard(m){
-  const ST={ok:{cls:'b-good',key:'web.life.ok'},warn:{cls:'b-warning',key:'web.life.warn'},
-            bad:{cls:'b-critical',key:'web.life.bad'},none:{cls:'b-unknown',key:'web.life.none'}};
-  const s=ST[m.status]||ST.none;
-  let trendTxt=m.trend?'→ '+t('web.life.stable'):'', tcol='var(--muted)';
-  if(m.trend&&m.trend.direction!=='flat'){
-    const ar=m.trend.direction==='up'?'↑':'↓';const dl=m.trend.delta;
-    trendTxt=m.measurement_kind?t('body.change',{delta:(dl>0?'+':'')+dl,unit:m.delta_unit||m.unit||'',start:fmtDate(m.trend.from),end:fmtDate(m.trend.to)}):`${ar} ${t('web.life.trend_3m',{delta:(dl>0?'+':'')+dl})}`;
-    tcol=m.trend_good===true?'var(--good)':(m.trend_good===false?'var(--critical)':'var(--ink-2)');
-  }
-  const statusBadge=(m.status&&m.status!=='none')?badge(s.cls,m.status_text||t(s.key)):'';
-  return el(`<div class="cr-card card">
-    <div class="label">${esc(m.label)}</div>
-    ${m.composition_note?`<div class="cr-caption">${esc(m.composition_note)}</div>`:''}
-    ${m.qualified_change_text?`<div class="cr-caption">${esc(m.qualified_change_text)}</div>`:''}
-    <div class="value">${esc(m.value==null?'—':m.value)} <small>${esc(m.unit)}</small></div>
-    <div class="row">${statusBadge} <span class="trend" style="color:${tcol};font-weight:600">${esc(trendTxt)}</span></div>
-    ${m.combined_history?sparkline(m.series,false,null,bodyMassMetric(m.key)):m.measurement_series?m.measurement_series.map(o=>`<div class="srcline">${esc(o.source?t('web.life.measured_by',{device:t('web.life.device.'+o.source)}):t('web.phenotype.recorded'))} · ${esc(o.aggregation==='monthly_mean'?t('web.life.monthly_mean'):t('web.life.dated_readings'))}</div>${o.series.length>1?sparkline(o.series,false):''}`).join(''):(m.series&&m.series.length>1?sparkline(m.series,false):'')}
-    ${srcTag(m)}
-    ${m.body_quality?.note?`<div class="cr-caption">${esc(m.body_quality.note)}</div>`:''}
-    ${m.body_quality?.invalid_note?`<details class="fold"><summary>${esc(t('body.invalid_h'))}</summary><p>${esc(m.body_quality.invalid_note)}</p>${(m.body_invalid_values||[]).map(x=>`<p>${esc(x.date)}: ${esc(x.raw_value)} ${esc(x.raw_unit)}</p>`).join('')}</details>`:''}
-    ${m.comparison?`<details class="fold"><summary>${esc(t('insight.details'))}</summary>${comparisonHTML(m.comparison)}${m.comparison.eligible&&m.comparison.distinguishable===true?'':`<p class="meta">${esc(t('insight.no_change_estimate'))}</p>`}${(m.comparison.limitations||[]).map(k=>`<p class="meta">${esc(t('insight.limit.'+k))}</p>`).join('')}</details>`:''}
-    <div class="meta">${esc(m.value_smooth==null?fmtDate(m.date):t('web.life.card_meta',{date:fmtDate(m.date),smooth:m.value_smooth,since:fmtDate(m.first_date)}))}${m.why?' · '+esc(m.why):''}</div>
-  </div>`);
+  return el(measurements.render(m,'lifestyle'));
 }
 
 // --- the sections of the brief ----------------------------------------------
@@ -4052,6 +3793,7 @@ function cgmCardHTML(data){
     <details class="fold"><summary>${esc(t('cgm.import'))}</summary><form id="cgm-import-form"><label>${esc(t('cgm.folder'))}<input class="cr-input" name="path" required></label><div class="toolbar"><button class="cr-btn" type="button" id="cgm-pick">${esc(t('cgm.pick'))}</button><button class="cr-btn" type="submit">${esc(t('cgm.preview'))}</button><button class="cr-btn cr-btn--primary" id="cgm-confirm" type="button" disabled>${esc(t('cgm.confirm'))}</button><button class="cr-btn cr-btn--ghost" id="cgm-cancel" type="button">${esc(t('cgm.cancel'))}</button></div><p role="status" id="cgm-import-status"></p></form></details></section>`;
 }
 function wireCGM(root,data){
+  const post=viewPost(root);
   const select=$('#cgm-report-select',root);if(select)select.onchange=()=>viewLifestyle(root,select.value);
   const form=$('#cgm-import-form',root);if(!form)return;
   const input=$('input[name="path"]',form),status=$('#cgm-import-status',form),apply=$('#cgm-confirm',form);let approval='',container=sourceContainer(),busy=false;
@@ -4069,6 +3811,7 @@ function wireCGM(root,data){
 }
 
 async function viewLifestyle(root,cgmReport=''){
+  const post=viewPost(root);
   const sb=await sourceBar(['lifestyle']);
   const [d,brief]=await Promise.all([
     api('/api/lifestyle'+(cgmReport?'?cgm_report='+encodeURIComponent(cgmReport):'')),
@@ -4209,8 +3952,7 @@ function genomeCard(r){
   if(r.status==='unknown_rsid'||r.status==='unknown_gene')return `<div class="cr-card card muted">${esc(r.message||t('web.genome.unknown_gene'))}</div>`;
   if(r.gene&&r.loci)return geneDisplayCard(r)+genomeGeneTable(r.loci.map(x=>({...x,gene:x.gene||r.gene,reading:x.result})));
   const res=r.result||{};
-  const context=(res.conflict?`<p class="c-critical">${esc(t('genome.conflict',{reported:res.conflict.reported,called:res.conflict.called}))}</p>`:'')
-    +(res.confirmed_by==='profile'?`<p>${esc(t('genome.confirmed_by_report'))}</p>`:'')+(r.message?`<p>${esc(r.message)}</p>`:'');
+  const context=(res.confirmed_by==='profile'?`<p>${esc(t('genome.confirmed_by_report'))}</p>`:'')+(r.message?`<p>${esc(r.message)}</p>`:'');
   return geneDisplayCard(r,{contextHtml:context});
 }
 function prsPercentile(p){return p==null?'—':Number(p.toFixed(2))>=100?'≥P99.99':Number(p.toFixed(2))<=0?'≤P0.01':'P'+String(Number(p.toFixed(2)));}
@@ -4325,7 +4067,7 @@ function renderLongevity(d){
 // is absent lets the reader conclude there was nothing to find.
 function renderLipidGenetics(d){
   if(!d||d.status!=='ok') return '';
-  const rows=(d.pcsk9||[]).map(x=>geneDisplayCard({...x,read:x.status==='read',summary:x.label||x.verdict||''},{contextHtml:[x.label,x.verdict,x.population_note,x.action,x.variant_note].filter(Boolean).map(v=>`<p>${esc(v)}</p>`).join(''),annotationHtml:(x.pmids||[]).map(id=>`<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(id)}/" target="_blank" rel="noopener">PMID ${esc(id)}</a>`).join(' · ')})).join('');
+  const rows=(d.pcsk9||[]).map(x=>geneDisplayCard({...x,read:x.read??x.status==='read',summary:x.label||x.verdict||''},{contextHtml:[x.label,x.verdict,x.population_note,x.action,x.variant_note].filter(Boolean).map(v=>`<p>${esc(v)}</p>`).join(''),annotationHtml:(x.pmids||[]).map(id=>`<a href="https://pubmed.ncbi.nlm.nih.gov/${esc(id)}/" target="_blank" rel="noopener">PMID ${esc(id)}</a>`).join(' · ')})).join('');
   const waiting=(d.pcsk9_waiting||[]).filter(w=>!(d.pcsk9||[]).some(x=>x.rsid===w.rsid)).map(w=>geneDisplayCard({...w,read:false,reading_note:w.why})).join('');
   const l=d.lpa||{}; const m=l.measured;
   const lpa = m
@@ -4386,13 +4128,15 @@ function renderUpdates(u){
   return h;
 }
 async function pollUpdate(root){
+  if(!viewLifecycle.current(root))return;
   const box=$('#upd-box',root);const btn=$('#upd-btn',root);
   const s=await api('/api/update-status');
+  if(!viewLifecycle.current(root))return;
   if(!btn) return;
   if(s.running){
     btn.disabled=true;btn.textContent=t('web.updates.in_progress');
     box.innerHTML=`<div class="meta">${esc(t('web.updates.downloading'))}</div><pre class="log">${esc((s.tail||'').slice(-800))}</pre>`;
-    setTimeout(()=>pollUpdate(root),3000);
+    viewLifecycle.timeout(root,()=>pollUpdate(root),3000);
   }else{
     forgetAnswers();                  // a finished refresh changes what the genome tab shows
     btn.disabled=false;btn.textContent=t('web.updates.check_btn');
@@ -4645,6 +4389,7 @@ function renderACMG(r){
 }
 
 async function viewGenome(root){
+  const post=viewPost(root);
   const [st,cv,prs,lng,upd,lip,scr,wb,meds,panels]=await Promise.all([
     api('/api/genome-status'),api('/api/clinvar'),api('/api/prs'),api('/api/longevity'),
     api('/api/genome-updates'),api('/api/lipid-genetics').catch(()=>null),
@@ -4770,6 +4515,7 @@ async function viewGenome(root){
 // every due review as soon as it has drawn.
 let _openBriefReview=false;
 async function viewAssistant(root){
+  const post=viewPost(root);
   const d=await api('/api/assistant');
   const a=d.audit||{};
   const col={ok:'b-good',ready:'b-near',missing:'b-unknown'};
@@ -4987,17 +4733,26 @@ function markCurrentTab(i){
     if(active) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current');
   });
 }
-let _profileRevision=null;
+let _profileRevision=null, _profileIdentity=null, _profileSwitchPending=false;
 let _revisionRead=null;
-async function refreshProfileAnswers(){
+async function refreshProfileAnswers(mounting=false){
   if(_revisionRead) return _revisionRead;
   const epoch=_answerEpoch;
   _revisionRead=(async()=>{
     const p=await api('/api/ping').catch(()=>null);
     if(epoch!==_answerEpoch||!p?.profile_revision) return false;
-    const changed=_profileRevision!==null&&_profileRevision!==p.profile_revision;
+    const switched=_profileIdentity!==null&&!!p.profile_identity&&_profileIdentity!==p.profile_identity;
+    const changed=switched||(_profileRevision!==null&&_profileRevision!==p.profile_revision);
+    _profileIdentity=p.profile_identity||_profileIdentity;
     _profileRevision=p.profile_revision;
-    if(changed){forgetAnswers();_sources=null;_systems=null;}
+    if(changed)forgetAnswers();
+    if(switched){
+      _profileSwitchPending=true;
+      visitSelection.clear();visitSelectionTouched=false;visitFocusSystems=null;visitFocusPanels=[];visitFocusQuestion='';
+      _synthetic=!!p.synthetic;renderDemoBanner();_patients=[];renderContainerStamp();renderPatients();
+      _recompute=null;_rcOpen=false;_rcDismissed=false;clearTimeout(_rcTimer);renderRecompute();loadPatients();loadRecompute();
+      if(!mounting)beginView('profile-changed');
+    }
     return changed;
   })();
   try{return await _revisionRead;}finally{_revisionRead=null;}
@@ -5007,8 +4762,8 @@ function mount(i){
   markCurrentTab(i);
   // Each render owns its node. A late response from the previous tab (or
   // language/theme) can only fill a detached node, never the current screen.
-  const old=$('#view'),v=old.cloneNode(false);old.replaceWith(v);showLoader(v);
-  return refreshProfileAnswers().then(()=>v.isConnected?TABS[i][1](v):null).catch(e=>{
+  const v=beginView('tab:'+TABS[i][0]);
+  return refreshProfileAnswers(true).then(()=>{if(!v.isConnected)return;viewLifecycle.recontext(v);_profileSwitchPending=false;return TABS[i][1](v);}).catch(e=>{
     if(v.isConnected) v.innerHTML=errorHtml(t('web.common.error_prefix')+e.message);
   });
 }
@@ -5017,7 +4772,7 @@ function mount(i){
 // that switching does not require a reload and does not lose the tab one is reading.
 window.addEventListener('focus',async()=>{
   if(await refreshProfileAnswers()){
-    if(!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus')) mount(current);
+    if(_profileSwitchPending||!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus')) mount(current);
   }
 });
 let _version=null;
@@ -5064,8 +4819,14 @@ function renderUpdateNote(){
 // The plan and the progress come from the server, and the progress is a file
 // there: a reload finds a running job where it left it, and a terminal running
 // `scholion recompute --status` sees the same numbers as this page.
-let _recompute=null, _rcOpen=false, _rcDismissed=false, _rcTimer=null;
-async function loadRecompute(){try{_recompute=await api('/api/recompute');}catch(e){_recompute=null;} renderRecompute();}
+let _recompute=null, _rcOpen=false, _rcDismissed=false, _rcTimer=null, _rcRequest=0;
+async function loadRecompute(){
+  const epoch=_answerEpoch,profile=_profileIdentity,read=++_rcRequest;
+  let r=null;try{r=await api('/api/recompute');}catch(e){}
+  if(read!==_rcRequest)return;
+  if(profile!==_profileIdentity||epoch!==_answerEpoch)return loadRecompute();
+  _recompute=r;renderRecompute();
+}
 function openRecompute(){_rcOpen=true; _rcDismissed=false; loadRecompute(); const b=$('#recomputebox'); if(b) b.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function rcClock(s){s=Math.round(s||0);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return h?`${h}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`:`${m}:${String(x).padStart(2,'0')}`;}
 function rcWhy(s){if(s.key==='scholion prs')return (s.detail||{}).message||''; if(!s.why) return ''; const d=s.detail||{};
@@ -5110,6 +4871,7 @@ function rcFingerprint(p){
 function rcSeen(){try{return localStorage.getItem('scholion.rc.seen')||'';}catch(e){return '';}}
 function rcRemember(p){try{localStorage.setItem('scholion.rc.seen',rcFingerprint(p));}catch(e){}}
 function renderRecompute(){
+  const profile=_profileIdentity;
   const box=$('#recomputebox'); if(!box) return; clearTimeout(_rcTimer);
   const p=_recompute;
   if(!p||!(_rcOpen||rcAttention(p))){box.hidden=true;box.innerHTML='';return;}
@@ -5133,20 +4895,30 @@ function renderRecompute(){
   box.hidden=false; box.innerHTML=h;
   const st=$('#rc-start'); if(st) st.onclick=async()=>{
     if(!await confirmAction(t('web.recompute.confirm',{steps:plural(p.ready,'count.steps')}))) return;
+    if(profile!==_profileIdentity||!st.isConnected)return;
     st.disabled=true;
-    const r=await post('/api/recompute',{confirm:true});
+    const r=await post('/api/recompute',{confirm:true},profile);
+    if(profile!==_profileIdentity)return;
     if(r&&r.started){_rcOpen=true; pollRecompute();}
     else{st.disabled=false; $('#rc-out').textContent=t(r&&r.reason==='busy'?'recompute.busy':'recompute.nothing_ready');}
   };
   const cl=$('#rc-close'); if(cl) cl.onclick=()=>{rcRemember(p); _rcOpen=false; _rcDismissed=true; box.hidden=true; box.innerHTML='';};
-  const sp=$('#rc-stop'); if(sp) sp.onclick=async()=>{sp.disabled=true; await post('/api/recompute/stop',{});};
+  const sp=$('#rc-stop'); if(sp) sp.onclick=async()=>{sp.disabled=true; await post('/api/recompute/stop',{},profile);};
   if(running) _rcTimer=setTimeout(pollRecompute,1500);
 }
 async function pollRecompute(){
+  const epoch=_answerEpoch,profile=_profileIdentity,read=++_rcRequest;
+  const valid=()=>read===_rcRequest&&profile===_profileIdentity;
   let j;
-  try{ j=await api('/api/recompute/status'); }catch(e){ _rcTimer=setTimeout(pollRecompute,3000); return; }
+  try{ j=await api('/api/recompute/status'); }catch(e){if(valid())_rcTimer=setTimeout(pollRecompute,3000);return;}
+  if(!valid())return;
+  if(epoch!==_answerEpoch)return loadRecompute();
   if(j.status==='running'){ _recompute=Object.assign({steps:[]},_recompute||{},{job:j}); renderRecompute(); return; }
-  try{ _recompute=await api('/api/recompute'); _update=await api('/api/version'); renderUpdateNote(); }catch(e){}
+  let updated,version;
+  try{[updated,version]=await Promise.all([api('/api/recompute'),api('/api/version')]);}catch(e){}
+  if(!valid())return;
+  if(epoch!==_answerEpoch)return loadRecompute();
+  if(updated)_recompute=updated;if(version){_update=version;renderUpdateNote();}
   _recompute=Object.assign({steps:[]},_recompute||{},{job:j}); _rcOpen=true; rcRemember(_recompute); renderRecompute();
   if(j.status==='finished'){ forgetAnswers(); _systems=null; _sources=null; try{ mount(current); }catch(e){} }
 }
@@ -5175,8 +4947,8 @@ function renderChrome(){
   $('#menubtn').setAttribute('aria-label',t('web.header.menu'));
 }
 async function switchLang(code){
-  if(code===LANG) return;
-  await loadLang(code);
+  if(code===LANG&&!_languagePending) return;
+  if(!await loadLang(code))return;
   const u=new URL(location.href); u.searchParams.set('lang',LANG);
   if(window.ScholionHost) window.ScholionHost.setLang(LANG);
   else history.replaceState(null,'',u.pathname+u.search+u.hash);
@@ -5194,7 +4966,7 @@ function sourceContainer(){return (_patients.find(p=>p.active)||{}).id||null;}
 function openSourceFolder(domain, trigger){
   const dialog=$('#source-folder-dialog');
   if(dialog.open){dialog.focus();return;}
-  const generation=++sourceFolderGeneration, container=sourceContainer();
+  const generation=++sourceFolderGeneration, container=sourceContainer(), profile=_profileIdentity;
   let busy=false, saving=false;
   dialog.innerHTML=`<form class="cr-dialog__body" id="source-folder-form">
     <h2 class="cr-h2 cr-dialog__title" id="source-folder-title">${esc(t('folder.title'))}</h2>
@@ -5206,7 +4978,7 @@ function openSourceFolder(domain, trigger){
     <div class="cr-dialog__foot"><button class="cr-btn cr-btn--ghost" type="button" id="source-folder-cancel">${esc(t('folder.cancel'))}</button><button class="cr-btn" type="submit" id="source-folder-save">${esc(t('folder.save'))}</button></div>
   </form>`;
   const input=$('#source-folder-path'), message=$('#source-folder-message');
-  const active=()=>dialog.open&&generation===sourceFolderGeneration&&container===sourceContainer();
+  const active=()=>dialog.open&&generation===sourceFolderGeneration&&container===sourceContainer()&&profile===_profileIdentity;
   const state=()=>{input.disabled=busy;$('#source-folder-native').disabled=busy;$('#source-folder-save').disabled=busy||!input.value.trim();$('#source-folder-cancel').disabled=saving;};
   input.oninput=state;
   $('#source-folder-cancel').onclick=()=>dialog.close();
@@ -5215,7 +4987,7 @@ function openSourceFolder(domain, trigger){
   $('#source-folder-native').onclick=async()=>{
     busy=true;state();message.textContent=t('web.common.opening_picker');
     try{
-      const result=await post('/api/pick-folder',{domain,preview:true,container_id:container});
+      const result=await post('/api/pick-folder',{domain,preview:true,container_id:container},profile);
       if(!active())return;
       if(result?.ok){input.value=result.path;message.textContent=t('folder.save_hint');}
       else message.textContent=result?.canceled?t('web.common.canceled'):(result?.error||t('folder.native_unavailable'));
@@ -5230,7 +5002,7 @@ function openSourceFolder(domain, trigger){
     if(!path){message.textContent=t('server.pick.empty_path');return;}
     busy=true;saving=true;state();message.textContent=t('folder.saving');
     try{
-      const result=await post('/api/pick-folder',{domain,path,container_id:container});
+      const result=await post('/api/pick-folder',{domain,path,container_id:container},profile);
       if(!active())return;
       if(result?.ok){dialog.close();toast(t('web.common.folder_chosen'));_sources=null;mount(current);}
       else message.textContent=result?.error||t('web.common.failed');
@@ -5273,7 +5045,7 @@ document.addEventListener('click',async e=>{
     openSourceFolder(pick.getAttribute('data-pick'),pick);
   }else if(clr){
     const domain=clr.getAttribute('data-clear');
-    const r=await post('/api/clear-folder',{domain});
+    const r=await viewPost(clr)('/api/clear-folder',{domain});
     if(r&&r.ok){toast(t('web.common.folder_reset'));_sources=null;mount(current);}
   }
 });
@@ -5303,7 +5075,7 @@ document.addEventListener('click',async e=>{
     let refreshPending=false;
     window.ScholionHost.refresh=async()=>{
       if(await refreshProfileAnswers()) refreshPending=true;
-      if(refreshPending&&!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus')){
+      if(refreshPending&&(_profileSwitchPending||!document.querySelector('#view input:focus,#view textarea:focus,#view select:focus'))){
         refreshPending=false;mount(current);
       }
     };
@@ -5344,9 +5116,10 @@ function renderContainerStamp(){
   $('#print-container-stamp').textContent=stamp;
 }
 async function loadPatients(){
-  const generation=++_patientsGeneration;
+  const generation=++_patientsGeneration,epoch=_answerEpoch;
   let r=null; try{ r=await api('/api/patients'); }catch(e){ return; }
-  if(generation!==_patientsGeneration) return;
+  if(generation!==_patientsGeneration)return;
+  if(epoch!==_answerEpoch)return loadPatients();
   _patients=(r&&r.containers)||[]; _hasWorkstation=!!(r&&r.workstation);
   renderContainerStamp(); renderPatients();
 }

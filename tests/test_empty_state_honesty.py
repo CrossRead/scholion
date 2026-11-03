@@ -73,7 +73,7 @@ class TestTheOutputLayerReachesForBoth(unittest.TestCase):
     """
 
     def test_attention_empty_state_makes_no_claim_of_health(self):
-        html = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        html = (support.ROOT / "src/scholion/web/system-views.js").read_text(encoding="utf-8")
         self.assertIn("t('insight.empty')", html)
         for lang in ("en", "ru"):
             self.assertNotEqual(_messages(lang)["insight.empty"], _messages(lang)["web.overview.no_red"])

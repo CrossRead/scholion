@@ -37,7 +37,7 @@ class ThematicReadingPresentation(unittest.TestCase):
         self.assertEqual(len(cases),30)
         page=(support.SRC/'scholion/web/index.html').read_text(encoding='utf-8')
         functions=[]
-        for name in ('thematicPanelLinks','renderThematicPanel','geneRegionCard'):
+        for name in ('thematicPanelLinks','renderThematicPanel','geneRegionCard','bindPanelRegionDetails'):
             start=page.index('function '+name+'(')
             functions.append(page[start:page.index('\n}\n',start)+2])
         script=r'''
@@ -90,6 +90,27 @@ const complex=renderThematicPanel({label:'Synthetic',counts:{},patient_readings:
 assert.ok(complex.includes('class="gene-card-genotype">AGG/A</span>'));
 assert.ok(complex.includes(t('finding.zygosity.unknown')));
 assert.ok(!complex.includes(t('web.gene_card.not_read')));
+// Closed gene intervals do not eagerly create thousands of variant cards.
+// The same renderer and all rows remain available on expansion and for print.
+const region={gene:'SYNTHETIC',positions:[],reference_context:{gene_function:'Synthetic function'},
+ region_reading:{status:'ok',gene:'SYNTHETIC',location:{chrom:'1',start:1,end:100},
+ variants:{unannotated_rows:Array.from({length:100},(_,i)=>({chrom:'1',pos:i+1,genotype:'0/1',personal_alleles:['A','G'],depth:22}))}}};
+const before=JSON.stringify(region),shell=renderThematicPanel({label:'Synthetic',counts:{},patient_readings:true,genes:[region]});
+assert.ok(shell.includes('data-panel-region-body'));
+assert.equal((shell.match(/data-gene-card /g)||[]).length,1);
+const handlers={},close={},body={innerHTML:'',querySelector:()=>close};
+const detail={open:false,dataset:{panelRegion:'SYNTHETIC'},querySelector:()=>body,addEventListener:(k,f)=>handlers[k]=f};
+bindPanelRegionDetails({querySelectorAll:()=>[detail]},{genes:[region]});
+assert.equal(body.innerHTML,'');handlers.toggle();assert.equal(body.innerHTML,'');
+detail.open=true;handlers.toggle();
+const expected=geneRegionCard({...region.region_reading,reference_context:region.reference_context}).replace('id="gc-close"','data-close-gene');
+assert.equal(body.innerHTML,expected);
+assert.equal((body.innerHTML.match(/data-gene-card /g)||[]).length,101);
+close.onclick();assert.equal(detail.open,false);
+body.innerHTML+='USER STATE';detail.open=true;handlers.toggle();handlers['scholion:expand']();
+assert.equal(body.innerHTML,expected+'USER STATE');
+assert.equal(JSON.stringify(region),before);
+
 '''
         result=gene_card_support.run(gene_card_support.javascript()+script,
                                      input=json.dumps(cases),text=True,capture_output=True,timeout=60)

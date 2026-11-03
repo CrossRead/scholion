@@ -18,6 +18,31 @@ from .labs import analyze_labs
 from .pgx_labels import phenotype_words, model_phenotype_words
 
 
+def _marker_cards(markers: List[Dict[str, Any]], gene: str) -> List[Dict[str, Any]]:
+    """Keep drug cards on the shared reference and literal-reading contract.
+
+    A called diplotype remains a compound result; a tag SNP cannot replace it.
+    This projection does not calculate a phenotype or change prescribing rules.
+    """
+    from ..panel_reference import genome_context
+    from ..variant_readings import permits_interpretation
+    cards = []
+    for marker in markers:
+        symbol = marker.get("gene") or gene
+        rsid = marker.get("rsid") or ""
+        card = {**genome_context(symbol, rsid), **marker, "gene": symbol}
+        if rsid and not marker.get("diplotype"):
+            reading = core.genotype_status(rsid)
+            if reading:
+                card.update(genotype=reading.get("genotype"), reading=reading,
+                            reading_record=reading.get("reading_record"),
+                            confidence=reading.get("confidence"), depth=reading.get("depth"))
+                if not permits_interpretation(reading):
+                    card.update(copies=None, interpretation="", function="")
+        cards.append(card)
+    return cards
+
+
 def name_matches(query: str, name: str) -> bool:
     """Whether a typed drug query names this catalogue drug.
 
@@ -167,7 +192,8 @@ def _copies_at_locus(st: Dict[str, Any], variant: str) -> Optional[int]:
     a call written on the opposite strand («A/A» where the locus is C/T). Each is
     now unread, which the phenotype reports as such, instead of absent.
     """
-    if st.get("confidence") == "called_array_ambiguous":
+    from ..variant_readings import permits_interpretation
+    if not permits_interpretation(st) or st.get("confidence") == "called_array_ambiguous":
         return None
     g = str(st.get("genotype") or "").replace("|", "").replace("/", "").strip().upper()
     v = str(variant or "").upper()
@@ -527,7 +553,7 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         # the audit found. Both are shown, each labelled as what it is.
         "cpic": flag.get("cpic") if explicit else None,
         "recommendation": flag["note"],
-        "markers_found": ph.get("found") or core.markers_for_gene(gene),
+        "markers_found": _marker_cards(ph.get("found") or core.markers_for_gene(gene), gene),
         "clinvar": clinvar_for_drug(drug, {"genes": [{"gene": gene}]}),
         "disclaimer": DISCLAIMER(),
     }
@@ -652,7 +678,7 @@ def _check_drug_online(drug: str) -> Dict[str, Any]:
                 "interpretation_withheld": flag.get("interpretation_withheld", False),
                 "source": flag.get("source"), "mechanism": flag.get("mechanism"),
                 "cpic": flag.get("cpic"), "cpic_basis": flag.get("cpic_basis"),
-                "markers_found": ph.get("found") or core.markers_for_gene(gene),
+                "markers_found": _marker_cards(ph.get("found") or core.markers_for_gene(gene), gene),
                 "resolved_by": "rxnorm", "reference": info.get("url"),
                 "disclaimer": DISCLAIMER()}
     # Found online, and no pharmacogene is known for its class. That is an

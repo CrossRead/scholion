@@ -27,6 +27,8 @@ def genotype_quality(row: dict) -> dict:
     from .genome import _MIN_DEPTH
     g = row.get('genotype') or {}
     reasons = []
+    if g.get('conflict'):
+        reasons.append('source_conflict')
     if row.get('read') is not True:
         reasons.append('unread')
     if row.get('presumed') or g.get('confidence') in ('assumed_ref', 'presumed_ref'):
@@ -228,6 +230,8 @@ def _compare_spec(row: dict, markers: dict, spec: dict) -> dict:
         'evidence_type': spec['evidence_type'], 'evidence_label': t('genlab.type.' + spec['evidence_type']),
         'knowledge_status': spec['status'], 'status': status, 'status_label': t('genlab.status.' + status),
         'genotype': row.get('genotype') or {},
+        'variant_reading': {k:v for k,v in row.items()
+                            if k not in ('comparisons', 'genetic_lab_comparison')},
         'display_genotype': (row.get('genotype') or {}).get('genotype') if quality['status'] != 'unread' and 'presumed' not in quality['reasons'] else None,
         'state': state, 'quality': quality,
         'marker': spec['marker'], 'expected_direction': spec['direction'],

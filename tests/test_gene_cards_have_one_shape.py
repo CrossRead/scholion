@@ -55,6 +55,14 @@ for(const lang of ['en','ru']){
  assert.ok(joint.includes(t('web.gene_card.combination'))&&!joint.includes(t('finding.zygosity.heterozygous')));
  const low=ScholionGeneCards.render({...base,reading:{genotype:'AG',confidence:'called',depth:4,note:'Low depth'}},options);
  assert.ok(low.indexOf('Low depth')<low.indexOf('data-gene-annotations'));
+ const longNote=t('genome.low_depth',{depth:7});
+ const compact=ScholionGeneCards.render({...base,reading:{genotype:'AG',confidence:'called',depth:7,low_depth:true,
+   note:'Source note'+t('genome.low_depth_suffix',{depth:7})}},options);
+ const [visible,details]=compact.split('data-gene-inheritance');
+ assert.equal(visible.split('7×').length,2);
+ assert.ok(visible.includes(t('web.gene_card.low_depth',{value:7}))&&visible.includes('Source note'));
+ assert.ok(!visible.includes(longNote)&&!visible.includes(t('genlab.quality.low_depth')+'</p>'));
+ assert.ok(details.includes(longNote));
  assert.ok(!/<details[^>]*\bopen(?:\s|>)/.test(plain));
  assert.equal(JSON.stringify(base),before);
 }
@@ -64,7 +72,7 @@ for(const lang of ['en','ru']){
         page = (support.SRC/'scholion/web/index.html').read_text(encoding='utf-8')
         names = ('genomeCard','genomeGeneTable','shownGenetics','hypothesisCountHtml',
                  'genSummaryHtml','genTableHtml','panelHtml','markerGeneticsRow',
-                 'renderClinvar','renderACMG','screenClassHtml','visitReportGenes')
+                 'renderClinvar','renderACMG','screenClassHtml','visitReportGenes','renderLipidGenetics')
         functions=[]
         for name in names:
             start=page.index('function '+name+'(')
@@ -95,4 +103,18 @@ for(const html of views){
  assert.ok(html.includes('Existing carriage')&&html.includes('Existing meaning'));
 }
 assert.equal(JSON.stringify(gen),before);
+const lipid=renderLipidGenetics({status:'ok',pcsk9:[{...row,status:'unread',read:true,copies:null,
+ reading:{genotype:'AG',depth:23,conflict:{kind:'source_disagreement'},interpretation_applicable:false}}]});
+assert.ok(lipid.includes('gene-card-genotype">AG</span>'));
+assert.ok(lipid.includes('genome.source_conflict'));
+
+// A conflict between sites files has no historical-report/current-call pair.
+// The shared card owns its notice; a page must not print missing pair fields.
+for(const conflict of [{kind:'sites_disagreement'},{kind:'recorded_disagreement'}]){
+ const hit={...row,result:{genotype:'AG',confidence:'called',conflict,interpretation_applicable:false}};
+ const html=genomeCard(hit);
+ assert.ok(html.includes('genome.source_conflict'));
+ assert.ok(!html.includes('genome.conflict'));
+ assert.ok(!html.includes('undefined'));
+}
 ''')

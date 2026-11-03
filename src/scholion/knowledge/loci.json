@@ -2028,7 +2028,37 @@
     "en": "IL13: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
     "ru": "IL13: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
    },
-   "pos_grch37": 131995964
+   "pos_grch37": 131995964,
+   "reading_alternatives": [
+    "C",
+    "G",
+    "T"
+   ],
+   "allele_identity": {
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/20541",
+    "checked_on": "2026-11-03",
+    "builds": {
+     "GRCh38": {
+      "sequence": "NC_000005.10",
+      "position": 132660272,
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ]
+     },
+     "GRCh37": {
+      "sequence": "NC_000005.9",
+      "position": 131995964,
+      "alternatives": [
+       "C",
+       "G",
+       "T"
+      ]
+     }
+    },
+    "scope": "Allele identity only; this does not verify an effect allele or clinical applicability."
+   }
   },
   "rs3118470": {
    "gene": "IL2RA",
@@ -2271,7 +2301,34 @@
     "en": "BCL2L11: a position of the panel author's list (29.06.2026) with no source named — level E, a value without a conclusion",
     "ru": "BCL2L11: позиция из списка автора панели (29.06.2026) без названного источника — уровень E, значение без вывода"
    },
-   "pos_grch37": 111949327
+   "pos_grch37": 111949327,
+   "reading_alternatives": [
+    "A",
+    "C"
+   ],
+   "allele_identity": {
+    "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6738028",
+    "checked_on": "2026-11-03",
+    "builds": {
+     "GRCh38": {
+      "sequence": "NC_000002.12",
+      "position": 111191750,
+      "alternatives": [
+       "A",
+       "C"
+      ]
+     },
+     "GRCh37": {
+      "sequence": "NC_000002.11",
+      "position": 111949327,
+      "alternatives": [
+       "A",
+       "C"
+      ]
+     }
+    },
+    "scope": "Allele identity only; this does not verify an effect allele or clinical applicability."
+   }
   },
   "rs7181230": {
    "gene": "BMF",

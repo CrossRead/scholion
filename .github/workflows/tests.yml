@@ -219,3 +219,31 @@ jobs:
           persist-credentials: false
       - name: Real host context, MCP protocols, synthetic writes and refusals
         run: python src/tools/check_ouroboros_host.py .host-ouroboros
+
+  component-browser:
+    name: Synthetic component gallery
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned browser tooling
+        run: |
+          npm ci --prefix tests/browser
+          tests/browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Build synthetic gallery and check real browser behavior
+        env:
+          PYTHONPATH: src:tests
+          SCHOLION_OFFLINE: '1'
+        run: |
+          python3 tests/ui_gallery.py --out /tmp/scholion-gallery
+          node tests/browser/check-gallery.cjs /tmp/scholion-gallery/index.html /tmp/scholion-gallery-check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: component-gallery
+          path: /tmp/scholion-gallery-check

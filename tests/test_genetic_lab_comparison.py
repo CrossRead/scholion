@@ -36,6 +36,18 @@ class GeneticComparisonTests(TestCase):
             self.assertFalse(any(h['eligible'] for h in r['horizons']))
             if status=='within':self.assertIsNone(r['question'])
 
+    def test_cross_system_comparison_retains_the_complete_card_without_recursion(self):
+        row = self.row(reference_context={'gene_function':'Synthetic transport function'},
+                       comparisons=[{'id':'previous'}], genetic_lab_comparison={'id':'legacy'})
+        before = deepcopy(row)
+        result = self.compare(row=row)
+        card = result['variant_reading']
+        self.assertEqual(card['reference_context'], row['reference_context'])
+        self.assertEqual(card['genotype'], row['genotype'])
+        self.assertNotIn('comparisons', card)
+        self.assertNotIn('genetic_lab_comparison', card)
+        self.assertEqual(row, before)
+
     def test_legacy_and_context_share_currentness_and_quality(self):
         exp={'marker':'uric_acid','direction':'higher'}
         cases=[{'date':'2000-01-01'}, {'date':(date.today()+timedelta(days=1)).isoformat()},

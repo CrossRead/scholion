@@ -452,6 +452,8 @@ def _web_routes(api: Any):
             conn = HTTPConnection("127.0.0.1", port, timeout=5)
             body = await request.body()
             headers = {"X-Scholion-Bridge": info["token"], "Content-Type": request.headers.get("content-type", "application/json")}
+            if request.headers.get("X-Scholion-View-Profile"):
+                headers["X-Scholion-View-Profile"] = request.headers["X-Scholion-View-Profile"]
             if request.headers.get("range"):
                 headers["Range"] = request.headers["range"]
             await asyncio.to_thread(conn.request, request.method, path, body=body, headers=headers)
@@ -460,6 +462,10 @@ def _web_routes(api: Any):
             if conn.sock is not None:
                 conn.sock.settimeout(None)
             reply = await asyncio.to_thread(conn.getresponse)
+        except asyncio.CancelledError:
+            if conn is not None:
+                conn.close()
+            raise
         except (OSError, ValueError, KeyError, HTTPException) as exc:
             if conn is not None:
                 conn.close()

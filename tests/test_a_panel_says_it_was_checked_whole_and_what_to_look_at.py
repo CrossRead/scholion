@@ -113,7 +113,8 @@ class TestThePageDrawsThePanelFromTheStates(unittest.TestCase):
         # rest — the block leads with its verdict, and the radar page went from
         # twelve screens to under four.
         self.assertIn("body+=genSummaryHtml(gen,card);", html, "and says what was found, inside the fold")
-        self.assertIn("b+=genTableHtml(gen,r,r.register);", html,
+        component = (ROOT / "src/scholion/web/system-views.js").read_text(encoding="utf-8")
+        self.assertIn("b+=genTableHtml(gen,r,r.register);", component,
                       "and so does the card page, in its register")
         self.assertNotIn("panel.map(x=>`<div class=\"row-l\">${systemGeneRow(x,'patient')}</div>`)", html,
                          "the radar no longer prints the panel as a paragraph per row")

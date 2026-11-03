@@ -158,6 +158,7 @@
     "src/scholion/vendor/genomi/detection.py": 91.1,
     "src/scholion/vendor/genomi/text_io.py": 72.4,
     "src/scholion/visit_focus.py": 100.0,
-    "src/scholion/wearables.py": 90.8
+    "src/scholion/wearables.py": 90.8,
+    "src/scholion/variant_readings.py": 95.5
   }
 }

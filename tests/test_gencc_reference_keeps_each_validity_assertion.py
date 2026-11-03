@@ -87,12 +87,12 @@ class TestGenCCReference(unittest.TestCase):
             i18n.set_lang(language)
             for symbol in entries:
                 original=gene_function_entry(symbol)
-                folded=gene_function_entry(symbol.upper())
+                folded=original if symbol == symbol.upper() else gene_function_entry(symbol.upper())
                 self.assertEqual(original['description'],folded['description'],symbol)
                 self.assertEqual(original['knowledge']['record_digest'],folded['knowledge']['record_digest'],symbol)
                 self.assertIsNotNone(folded['knowledge']['record_digest'],symbol)
                 original_context=genome_context(symbol)['reference_context']
-                folded_context=genome_context(symbol.upper())['reference_context']
+                folded_context=original_context if symbol == symbol.upper() else genome_context(symbol.upper())['reference_context']
                 self.assertEqual(original_context['gencc_assertions'],folded_context['gencc_assertions'],symbol)
                 self.assertTrue(folded_context['gencc_assertions'],symbol)
             base=core._read_knowledge('gencc_gene_disease.json')

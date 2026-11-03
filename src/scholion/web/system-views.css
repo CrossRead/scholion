@@ -1,0 +1,46 @@
+/* Shared presentation owns these rules; page layout remains in index.html. */
+  .system-medications-table{table-layout:fixed}
+  .system-medications-table th,.system-medications-table td{white-space:normal;overflow-wrap:anywhere;vertical-align:top}
+  .system-medications-table th:nth-child(1){width:30%}
+  .system-medications-table th:nth-child(2){width:45%}
+  .system-medication-unplaced{margin-top:var(--sp3)}
+  .syscard .layer{margin-top:var(--sp5)}
+  .syscard .layer h3{font-size:var(--t-m);font-weight:650;margin:0 0 8px;color:var(--ink);padding-bottom:6px;border-bottom:1px solid var(--grid)}
+  .syscard .layer h3 small{color:var(--muted);font-weight:400;margin-left:6px}
+  .syscard .basket{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:8px}
+  .syscard .basket h4{margin:0 0 6px;font-size:13.5px;color:var(--muted);font-weight:600}
+.attention-item{padding:8px 14px;margin-bottom:10px;overflow-wrap:anywhere}
+.insight-windows{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin:10px 0}
+.insight-window{min-width:0;border-top:2px solid var(--border);padding-top:6px}
+.insight-chart{margin:8px 0;color:var(--muted)}
+.insight-chart[data-direction="toward"]{color:var(--good)}
+.insight-chart[data-direction="away"]{color:var(--warning)}
+.insight-chart figcaption{color:var(--ink);font-size:var(--t-s)}
+.insight-chart svg{width:100%;height:70px;display:block}
+.insight-chart .chart-dates{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.insight-chart .chart-dates strong{color:var(--ink);font-size:12px;font-weight:600}
+.insight-chart .chart-dates>span:last-child{text-align:right}
+.insight-chart .chart-meaning{font-size:var(--t-s);margin:4px 0}
+@media(max-width:480px){.insight-windows{grid-template-columns:1fr}.insight-chart svg{max-width:300px}}
+.today-view .attention-item>summary{cursor:pointer;color:var(--accent);padding:4px 0;line-height:1.5}
+.today-view .attention-item>summary .insight-title{text-decoration:underline;text-underline-offset:3px}
+.today-view .attention-item[open]>summary{margin-bottom:8px}
+.insight-context-links{margin-top:10px;gap:8px;flex-wrap:wrap}
+.attention-item ul{padding-left:20px}
+.attention-item p.small{margin:.3rem 0}
+.attention-item details.fold{margin-top:0}
+.attention-item details.fold>summary{padding:2px 0}
+.today-view .attention-item{padding:var(--cr-space-3);margin:0 0 var(--cr-space-2);font-size:14px;line-height:1.4;border-radius:var(--cr-radius-m)}
+.today-view .attention-item .insight-title{font-size:15px;line-height:1.35;display:inline}
+.today-view .insight-windows{gap:12px;margin:6px 0}
+.today-view .insight-chart{margin:4px 0;display:grid;grid-template-columns:minmax(0,1fr) 120px;column-gap:12px;align-items:center}
+.today-view .insight-chart svg{height:42px;grid-column:2;grid-row:1 / span 2}
+.today-view .insight-chart figcaption,.today-view .insight-chart .chart-meaning{font-size:13px}
+.today-view .insight-chart .chart-dates{grid-column:2;grid-row:3;font-size:10px;gap:2px;flex-wrap:wrap}
+.today-view .insight-chart figcaption{grid-column:1;grid-row:1}
+.today-view .insight-chart>.meta{grid-column:1;margin:2px 0}
+.today-view .insight-chart>span.meta{grid-row:3;align-self:start}
+.today-view .insight-chart .meta{font-size:11px}.today-view .attention-item .fold>summary{line-height:1.4}.today-view .insight-chart .chart-meaning{max-width:34em}
+.today-view .insight-chart .chart-meaning{margin:2px 0;grid-column:1;grid-row:2}
+.today-view .insight-window>.meta{font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+.today-view .attention-item details{font-size:13px}

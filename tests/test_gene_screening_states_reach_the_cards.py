@@ -7,6 +7,7 @@ import unittest
 from unittest import mock
 
 import gene_card_support
+import system_view_support
 import support
 from scholion import i18n
 from scholion.engine import screening
@@ -34,7 +35,7 @@ class GeneScreeningCards(unittest.TestCase):
                             cases.append({'data': data, 'messages': i18n.CATALOGUES[language]})
         page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
         functions = []
-        for name in ('screenVerdictLine', 'screenClassHtml', 'systemGeneRow', 'systemGeneLink', 'insightContextHTML'):
+        for name in ('screenVerdictLine', 'screenClassHtml', 'systemGeneRow', 'systemGeneLink'):
             start = page.index('function ' + name + '(')
             functions.append(page[start:page.index('\n}\n', start) + 2])
         script = r'''
@@ -43,7 +44,7 @@ const esc=x=>String(x??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replac
 const levelChip=String,geneticBriefHtml=()=>'',ladderHtml=()=>'',geneRowDetail=()=>'';
 let messages={};
 const t=(k,a={})=>Object.entries(a).reduce((s,[k,v])=>s.replaceAll('{'+k+'}',v),messages[k]||k);
-''' + '\n'.join(functions) + r'''
+''' + '\n'.join(functions) + system_view_support.javascript() + r'''
 const cases=JSON.parse(fs.readFileSync(0,'utf8'));
 assert.equal(cases.length,24);
 for(const c of cases){

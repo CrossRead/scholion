@@ -40,6 +40,46 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.5 — 02.11.2026
+
+### What this changes in the conclusions
+
+Measurement cards and annual summaries retain their existing values, dates,
+source labels, trend qualifications and appearance across the application.
+Gene cards, system insights, visit reports and prescription views retain their
+existing content, navigation and expandable details.
+Closing a browser tab or cancelling a request no longer stops the local server.
+Screen changes release chart and polling resources, and delayed replies cannot
+restore stale screen caches. A form from a previous profile is refused before
+it can write to the newly selected profile.
+Genotype views now retain conflicting saved and current readings consistently.
+A confirmed reference call no longer loses to an older summary, and missing VCF
+rows do not erase stored findings. Conflicting readings remain visible but no
+longer support an automatic allele interpretation. Known alternative alleles at
+two curated positions can be shown without assigning them another allele's effect.
+Coverage messages distinguish single-copy and diploid intervals and no longer
+print missing percentages or duplicate lists. Low interval coverage is explained
+as a data limitation, not an automatic recommendation for more sequencing.
+System pages place the genetic panel summary after the main results. Gene cards
+combine read depth and any low-depth warning in one line, with the full note in
+the reading details. Within each ClinVar category, better-reviewed records lead
+and supported homozygous alternate calls come first among records of comparable
+review confidence. Selected previously unnamed entries now show a sourced gene
+or locus label and the studied trait. Where a gene cannot be established, the
+card says so and explains what the cited study assessed.
+Continue using `scholion serve` for the local application.
+
+### What is retracted
+
+Automatic allele interpretations based on conflicting source readings are withheld
+until the discrepancy is resolved; the original observations are retained.
+
+### What needs recomputing
+
+Nothing. Existing profiles, genome results and measurement histories remain
+compatible; no genome preparation or PGS recalculation is required.
+
+
 ## v0.7.4 — 27.10.2026
 
 ### What this changes in the conclusions

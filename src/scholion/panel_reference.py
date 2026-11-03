@@ -321,15 +321,29 @@ def longevity_interpretation(row: Dict[str, Any], spec: Dict[str, Any]) -> Dict[
 def attach_finding_biology(rows: List[Dict[str, Any]]) -> None:
     """Give every finding surface the same biology, including rows without rsIDs."""
     loci = core.loci().get("loci") or {}
+    phenotypes = core._read_knowledge("panel_reference_context.json").get("clinvar_phenotypes") or {}
     for row in rows:
         raw = str(row.get("rsid") or "")
         rsid = raw if raw.startswith("rs") and raw[2:].isdigit() else ""
+        phenotype = phenotypes.get(rsid)
+        if phenotype and (row.get("ref"), row.get("alt")) == (phenotype["ref"], phenotype["alt"]):
+            row["clinvar_phenotype"] = {key: phenotype[key] for key in ("phenotype", "description", "source", "study")}
+        else:
+            phenotype = None
         genes = list(dict.fromkeys(part.strip() for part in
                     str(row.get("gene") or (loci.get(rsid) or {}).get("gene") or "").replace(",", "|").split("|")
                     if part.strip() not in ("", ".", "—")))
+        if not genes and phenotype and phenotype.get("gene"):
+            genes = [phenotype["gene"]]
         contexts = []
         for gene in genes:
             item = genome_context(gene, rsid)
+            if phenotype and gene == phenotype.get("gene"):
+                item["reference_context"].update(
+                    gene_function=phenotype["gene_function"], gene_source=phenotype["study"],
+                    function_status="curated", variant_context=phenotype["description"],
+                    variant_source=phenotype["study"], variant_status="described",
+                )
             if not rsid:
                 # A named clinical-table position is still a variant, even when
                 # it has no rsID. Do not invent one or downgrade it to gene-only.

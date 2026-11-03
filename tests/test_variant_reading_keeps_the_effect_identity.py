@@ -11,6 +11,21 @@ from tests.test_a_row_at_the_position_is_not_the_locus import _Reader, row
 
 
 class TestLiteralObservations(_Reader):
+    def test_verified_panel_alternatives_are_read_without_borrowing_the_selected_effect(self):
+        for build in ('GRCh37', 'GRCh38'):
+            genome.assembly_of = lambda *_, build=build: build
+            for rsid, ref, alt in [('rs20541', 'A', 'G'), ('rs6738028', 'G', 'C')]:
+                with self.subTest(build=build, rsid=rsid):
+                    result = self.read([row(ref, alt, fmt='GT:DP', extra='0/1:31')], rsid=rsid)
+                    self.assertEqual(result['genotype'], ref + alt)
+                    self.assertEqual(result['confidence'], 'called')
+                    self.assertEqual(result['depth'], 31)
+                    self.assertFalse(result['interpretation_applicable'])
+                    with mock.patch.object(genome, 'lookup', return_value={'status': 'ok', 'result': result}):
+                        reading = panel_genotype._genotype(rsid, '', 'SYNTHETIC', ref, {'status': 'ok'})
+                    self.assertTrue(reading['read'])
+                    self.assertEqual(reading['state'], 'risk_allele_not_declared')
+
     def test_another_snp_is_retained_without_borrowing_a_leiden_effect(self):
         result = self.read([row('C', 'G', fmt='GT:DP', extra='0|1:35')])
         self.assertIsNone(result['genotype'])
@@ -136,7 +151,7 @@ class TestTheWholeCuratedCatalogue(unittest.TestCase):
                         self.assertIn(loc['alt'], identity['builds'][build]['alternatives'])
                 if not observation_only:
                     self.assertIn(loc['alt'], loc['reading_alternatives'])
-        self.assertEqual(checked, 7)
+        self.assertEqual(checked, 9)
         self.assertGreaterEqual(literal, 59)
 
     def test_r325w_is_ct_in_both_the_catalogue_and_the_curated_association(self):

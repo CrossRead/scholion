@@ -173,10 +173,12 @@ const forgetAnswers=()=>forgotten++,mount=()=>mounted++,setDisplayMode=m=>{DISPL
 const t=k=>k,esc=x=>String(x).replaceAll('<','&lt;'),fmtDate=String;
 const showLoader=r=>r.innerHTML='Loading',markCurrentTab=()=>{},wireSystems=()=>{};
 const cautionsHtml=()=>'',controlsHtml=()=>'',reviewChangesHTML=()=>'',visitInsightHTML=()=>'';
-const root={isConnected:true,innerHTML:'',className:''};
+let root;function node(){return {isConnected:true,innerHTML:'',className:'',cloneNode:()=>node(),replaceWith(next){this.isConnected=false;root=next;}};}root=node();
+const viewLifecycle=ScholionViewLifecycle.create({context:()=>({profile:'synthetic'})});
+const beginView=key=>viewLifecycle.begin(root,key),refreshProfileAnswers=async()=>false;
 let answer,requested;
 const api=async url=>{requested=url;if(answer instanceof Error)throw answer;return answer;};
-""" + function + r"""
+""".replace("const assert=", "const ScholionViewLifecycle=require(" + repr(str(support.SRC / "scholion/web/view-lifecycle.js")) + ");\nconst assert=", 1) + function + r"""
 (async()=>{
  for(const failure of [{error:'Changed <topic>'},new Error('network'),{},null]){
    answer=failure;await viewVisitSheet(root);

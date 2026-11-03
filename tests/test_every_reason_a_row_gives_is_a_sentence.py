@@ -73,8 +73,8 @@ class TestEveryReasonIsASentence(unittest.TestCase):
                 self.assertEqual(en.MESSAGES["system.read_why." + code], text)
 
     def test_the_fallback_still_answers_for_a_reason_nobody_has_written(self):
-        self.assertEqual("weather_on_mars", SP._read_why_text("weather_on_mars"),
-                         "a row must say something even when the reason is new")
+        self.assertEqual(en.MESSAGES["system.read_why.unknown"], SP._read_why_text("weather_on_mars"),
+                         "a new reason needs a readable fallback, not an internal code")
 
 
 if __name__ == "__main__":  # pragma: no cover

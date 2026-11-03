@@ -720,7 +720,19 @@ def main(argv=None) -> int:
     from . import container as _container
     _console.speak_utf8()
     try:
-        return _main(argv)
+        result = _main(argv)
+        sys.stdout.flush()
+        return result
+    except BrokenPipeError:
+        # A terminal consumer may stop reading (for example `skill | head`).
+        # Do not change process-wide SIGPIPE: this interpreter may also host an
+        # HTTP server. Redirect only the closed output stream before shutdown.
+        try:
+            with open(os.devnull, "wb") as sink:
+                os.dup2(sink.fileno(), sys.stdout.fileno())
+        except (OSError, ValueError):
+            pass  # A captured/in-memory stream has no descriptor to redirect.
+        return 1
     except VisitFocusInvalid as e:
         print(str(e), file=sys.stderr)
         return 2
@@ -1717,16 +1729,6 @@ _QUERIES = [
 
 
 def _main(argv=None) -> int:
-    # `scholion skill | head` is a natural command, and its output runs to nearly a hundred
-    # kilobytes. Without this, head closes the pipe and the person gets a BrokenPipeError
-    # traceback instead of text: it looks like a breakage even though everything worked.
-    # SIG_DFL gives the same behaviour as ordinary command-line utilities.
-    try:
-        import signal as _sig
-        _sig.signal(_sig.SIGPIPE, _sig.SIG_DFL)
-    except (ImportError, AttributeError, ValueError):
-        pass                      # Windows and a non-main thread: there is no SIGPIPE there
-
     p = build_parser()
     args = p.parse_args(argv)
     if not getattr(args, "cmd", None):

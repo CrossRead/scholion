@@ -1166,6 +1166,7 @@ def lipid_genetics() -> Dict[str, Any]:
     for Lp(a), once in a lifetime, in nmol/L, and before a therapy decision
     rather than after it.
     """
+    from ..variant_readings import permits_interpretation
     directions = (core.longevity_directions().get("directions") or {})
     loci = (core.loci().get("loci") or {})
 
@@ -1179,7 +1180,9 @@ def lipid_genetics() -> Dict[str, Any]:
         # position: either the reference, or nothing was read there. Counting it
         # as zero copies is the exact defect the answerability layer was built
         # after, so it is reported as unread instead.
-        unread = bool(st and st.get("confidence") == "assumed_ref")
+        unread = bool(st and (st.get("confidence") == "assumed_ref" or not permits_interpretation(st)))
+        reading_available = bool(gt and (st or {}).get("confidence") in (
+            "called", "confirmed_ref", "reported", "called_array"))
         # The catalogue stores a TOKEN per copy count, and the sentence lives in
         # the message catalogue. Prose inside a knowledge file prints raw into a
         # report the moment a field name is one the resolver does not know, and
@@ -1190,9 +1193,11 @@ def lipid_genetics() -> Dict[str, Any]:
         pcsk9.append(guard_fields(d, {
             "rsid": rsid, "gene": "PCSK9",
             "label": core._localized(d.get("label") or {}, _lang()) or "",
-            "genotype": None if unread else (gt or None),
+            "genotype": gt if reading_available else None,
+            "read": reading_available,
             "confidence": (st or {}).get("confidence"),
             "source": (st or {}).get("source"),
+            "reading": st, "reading_record": (st or {}).get("reading_record"),
             "favorable": d.get("favorable"),
             "copies": None if unread else copies,
             "carrier": None if (copies is None or unread) else copies > 0,
@@ -1202,7 +1207,7 @@ def lipid_genetics() -> Dict[str, Any]:
             "population_note": core._localized(d.get("population_caveat") or {}, _lang()) or None,
             "action": core._localized(d.get("action") or {}, _lang()) or None,
             "pmids": d.get("pmids") or [],
-            "status": "unread" if unread else ("read" if copies is not None else "no_data"),
+            "status": "read" if reading_available else ("unread" if unread else "no_data"),
         }, ('label', 'verdict', 'verdict_token', 'population_note', 'action')))
 
     from ..panel_reference import genome_context
@@ -1214,10 +1219,11 @@ def lipid_genetics() -> Dict[str, Any]:
         if rsid not in loci:
             continue
         st = core.genotype_status(rsid) or {}
-        reading_available = st.get("confidence") in ("called", "confirmed_ref") and bool(st.get("genotype"))
+        reading_available = st.get("confidence") in ("called", "confirmed_ref", "reported", "called_array") and bool(st.get("genotype"))
         variant = ((directions and core.longevity_directions().get("unresolved") or {}).get("variants") or {}).get(rsid) or {}
         item = {"rsid": rsid, "gene": "PCSK9", "genotype": st.get("genotype") if reading_available else None,
                 "confidence": st.get("confidence"), "source": st.get("source"),
+                "reading": st, "reading_record": st.get("reading_record"), "read": reading_available,
                 "status": "read" if reading_available else "unread", "carrier": None, "copies": None,
                 "interpretation_status": "direction_not_curated", "label": None,
                 "why": _t("lipidgen.direction_unknown"), "variant_note": variant.get("why")}

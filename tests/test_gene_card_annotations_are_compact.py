@@ -40,6 +40,11 @@ for(const text of [row.summary,row.comparison,row.limitations,row.source_links[0
 const applicable=geneticComparisonHTML([{...row,applicable:true,eligible:true}],true).split('<details class="fold genlab-details">')[0];
 assert.ok(applicable.includes(row.comparison));
 assert.equal(JSON.stringify(row),before);
+const full={gene:'HFE',rsid:'rs1800562',read:true,genotype:{genotype:'GA',depth:31},
+ reference_context:{gene_function:'Synthetic function from another system'}};
+const linked=geneticComparisonHTML([{...row,variant_reading:full}],true,'other',[]);
+assert.ok(linked.includes('Synthetic function from another system'));
+assert.ok(linked.includes('gene-card-genotype">GA</span>'));
 '''
         result = gene_card_support.run(gene_card_support.javascript() + script,
                                        text=True, capture_output=True, timeout=30)

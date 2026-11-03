@@ -32,6 +32,62 @@ aside               the ingest family (ingest_labs, reconcile, import_csv,
                     per command); net.py (the ONLY module that opens sockets).
 ```
 
+## Five acceptance levels
+
+1. **Core and data:** calculations, evidence, input identity and public schemas.
+2. **Components:** the real shared module, supplied states, text and actions.
+3. **Browser:** navigation, disclosure, language/register, layout and print.
+4. **Installed delivery:** sanitized wheel outside the source tree, packaged
+   assets and entry-point origins, supported operating systems.
+5. **Product interfaces:** equivalent affected scenarios through CLI, MCP,
+   plugins (including Ouroboros), and Web. Compare values, dates, sources,
+   qualifications, refusal states and actions, not renderer-specific wording.
+   The surface inventory comes from `contract.access()` and `PARITY`. Help and
+   structural parity alone do not establish an executable scenario. Record
+   unavailable native hosts and AI dialogue as untested, never as a pass.
+
+Use focused levels during implementation and the mandatory full acceptance
+checks on a stable candidate. Component fixtures are synthetic and deterministic;
+visual checks do not require genome preparation. Keep clinical semantics in the
+shared core. A changed component is tested through its public module interface,
+not by extracting its functions from page text. Preserve unique semantic tests.
+An extraction also compares old/new output and browser geometry before replacing
+its implementation. This does not authorize skipping existing release gates.
+
+See [INTERFACE-ACCEPTANCE.md](INTERFACE-ACCEPTANCE.md) for executable cross-interface
+scenarios and their installed-package use.
+
+See [TEST-SELECTION.md](TEST-SELECTION.md) for conservative dependency plans,
+exact-input evidence reuse and comparable timing. Neither tool weakens the full
+release gates or declares an untested acceptance level passed.
+
+## Shared system views and test cost
+
+System, insight, visit and prescription composition is described in
+[SYSTEM-VIEWS.md](SYSTEM-VIEWS.md). Extend shared objects before page delegates.
+
+A full source acceptance run executes the current interpreter's suite once under
+statement recording; that successful run supplies both functional and reach
+results. The oldest supported interpreter remains a separate run. Packages and
+narrowed selections still run ordinary unittest. Cheap metadata synchronization,
+release notes and version consistency are checked before the expensive suite.
+`SCHOLION_SKIP_REACH` retains its explicit skip behavior; it never means the tests
+were covered. No baseline is lowered by this pipeline change.
+
+The monitoring backend records each reached code location once. Later calls to
+the same location add no new statement-coverage information. Other branches,
+threads and subprocesses remain measured; the older-Python tracing backend is
+unchanged. This follows Python's documented `sys.monitoring.DISABLE` semantics.
+
+Use `python3 src/tools/test_inventory.py --out /tmp/test-inventory.json` to review
+discovery, identical bodies, overwritten methods and inherited repetitions. Add
+`--run` to measure every test, or name test modules for a focused measurement.
+Identical text is not evidence of identical setup or behavior. Preserve separate
+adapters, languages, profiles, failure modes and clinical assertions; share only
+unchanging preparation or genuinely repeated work. Reports separate total time
+from per-test setup/body/cleanup time. Never infer a full-suite speedup from a
+small selected subset or a single unqualified measurement.
+
 ## The engine package — hard rules
 
 Enforced by `tests/test_engine_stays_split.py`; the test's failure messages
@@ -466,3 +522,14 @@ MCP owns its minimal invocation context. Ouroboros supplies its own host context
 to registered handlers; its constructor is not called by MCP. The pinned host
 contract in CI checks real registration, both MCP result forms and synthetic
 writes without starting a model.
+
+### Screen lifetime
+
+Screen context, chart cleanup, polling and stale-answer guards use one owner.
+See [VIEW-LIFECYCLE.md](VIEW-LIFECYCLE.md) before adding asynchronous screen work.
+
+## Variant reading boundary
+
+See [VARIANT-READINGS.md](VARIANT-READINGS.md) for the shared observation and
+source-resolution contract. Extend that object before adding source-selection
+logic to a new screen or interface.

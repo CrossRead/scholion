@@ -147,6 +147,7 @@ SUITE_ENV = {
     "SCHOLION_LANG": "en",
     "SCHOLION_GENOME_VCF": str(ROOT / "tests" / "fixtures" / "no-such-file.vcf.gz"),
     "SCHOLION_GENOME_DIR": str(ROOT / "tests" / "fixtures" / "no-genome"),
+    "SCHOLION_GENE_GFF3": str(ROOT / "tests" / "fixtures" / "no-annotation.gff3"),
     "SCHOLION_WORKSTATION": str(ROOT / "tests" / "fixtures" / "no-workstation.json"),
 }
 
@@ -189,7 +190,9 @@ if _dir and _root:
             fn = code.co_filename
             if fn.startswith(_root):
                 _hits.setdefault(fn, set()).add(lineno)
-            return None
+            # Statement reach is a set: revisiting this location adds no data.
+            # LINE is a local event; other locations remain enabled.
+            return _mon.DISABLE
 
         try:
             _mon.use_tool_id(_TOOL, "scholion-reach")
@@ -301,7 +304,14 @@ def measure(argv=None) -> dict:
         proc = subprocess.run(cmd, cwd=str(ROOT), env=env,
                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                               text=True, stdin=subprocess.DEVNULL)
-        tail = proc.stdout.strip().splitlines()[-3:]
+        lines_out = proc.stdout.strip().splitlines()
+        tail = lines_out[-3:]
+        # Keep the complete unittest count/status visible even when tests print
+        # after its summary. A measured suite is also the primary source gate.
+        if proc.returncode == 0:
+            for line in lines_out:
+                if line.startswith(("Ran ", "OK")):
+                    print(line, file=sys.stderr)
         if proc.returncode:
             # Tests may print after unittest's failure summary. The last three
             # lines alone can hide the failing test and make this gate opaque.

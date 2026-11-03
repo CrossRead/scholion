@@ -90,6 +90,27 @@ class TestTheFileAnswersWithoutACoverageTable(unittest.TestCase):
         self.assertEqual("clinvar", panel_form.unread_class("clinvar_not_run"))
         self.assertEqual("other", panel_form.unread_class("something_new"))
 
+    def test_coverage_only_summary_names_the_affected_entries_and_panel_total(self):
+        from scholion import i18n
+        from scholion.engine import panel_form
+
+        self.addCleanup(i18n.set_lang, i18n.lang())
+        verdict = {"unread": 12, "total": 275, "why_counts": {"thin": 12}}
+        i18n.set_lang("ru")
+        self.assertEqual(
+            i18n.t("screen.unread_thin_panel.many", affected=12, n=275),
+            panel_form.unread_line(verdict),
+        )
+        self.assertEqual(
+            i18n.t("screen.unread_thin_panel.one", affected=1, n=21),
+            panel_form.unread_line({"total": 21, "why_counts": {"thin": 1}}),
+        )
+        i18n.set_lang("en")
+        self.assertEqual(
+            "There are insufficient sequencing data to confidently assess 12 of 275 entries in the genetic panel.",
+            panel_form.unread_line(verdict),
+        )
+
     def test_a_verdict_counts_the_depthless_rows_apart_from_the_unread_ones(self):
         from scholion.engine import panel_form
         rows = [{"gene": "A", "read": True, "read_state": "file_only", "findings": 0},

@@ -42,7 +42,7 @@ class TestTheToolAndTheRunnerAgree(unittest.TestCase):
             self.skipTest("this build does not carry the runner")
         text = script.read_text(encoding="utf-8")
         self.exported = {}
-        for m in re.finditer(r'^export (SCHOLION_[A-Z_]+)=(.+)$', text, re.M):
+        for m in re.finditer(r'^export (SCHOLION_[A-Z0-9_]+)=(.+)$', text, re.M):
             value = m.group(2).strip().strip('"')
             self.exported[m.group(1)] = value.replace("$ROOT", str(ROOT))
 
@@ -290,8 +290,10 @@ class _WithABaselineOfItsOwn(unittest.TestCase):
         import tempfile
         self.tmp = pathlib.Path(tempfile.mkdtemp())
         self.baseline = self.tmp / "test_reach_baseline.json"
-        self.present = reach.tree_modules()
-        self.assertGreater(len(self.present), 1, "nothing in the tree to measure")
+        # Baseline transition tests need two modules, not a fresh compilation
+        # of the entire product for every transition. The real-tree guard above
+        # separately checks the actual inventory and executable line reader.
+        self.present = {"src/scholion/example_a.py", "src/scholion/example_b.py"}
         self.victim = sorted(self.present)[-1]
         self.assertTrue(self.victim.endswith(".py"))
         self.others = {rel: 50.0 for rel in self.present if rel != self.victim}
@@ -322,6 +324,7 @@ class _WithABaselineOfItsOwn(unittest.TestCase):
         measure, seen = self._fake_measure(ok, percent)
         out = io.StringIO()
         with mock.patch.object(reach, "BASELINE", self.baseline), \
+                mock.patch.object(reach, "tree_modules", return_value=self.present), \
                 mock.patch.object(reach, "measure", side_effect=measure), \
                 contextlib.redirect_stdout(out):
             code = reach.main(argv)
@@ -333,6 +336,7 @@ class _WithABaselineOfItsOwn(unittest.TestCase):
         from unittest import mock
         out = io.StringIO()
         with mock.patch.object(reach, "BASELINE", self.baseline), \
+                mock.patch.object(reach, "tree_modules", return_value=self.present), \
                 mock.patch.object(reach, "measure",
                                   side_effect=AssertionError("the suite was measured")), \
                 contextlib.redirect_stdout(out):

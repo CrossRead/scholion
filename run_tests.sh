@@ -33,10 +33,22 @@ export SCHOLION_WORKSTATION="$ROOT/tests/fixtures/no-workstation.json"
 # refusal is spelled out in words.
 # Both entry points use the same selector validation in run_tests.py.
 
-echo "▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not depend on whether some external reference answers today)"
-# `< /dev/null`: no test may read the terminal. One that does passes on CI,
-# where stdin is closed, and hangs for whoever runs the suite by hand.
-python3 src/tools/run_tests.py --suite-only "$@" < /dev/null
+# Cheap metadata failures precede a costly suite. The Python runner owns the
+# same preflight on platforms without bash.
+if [ "$#" -eq 0 ]; then
+  python3 src/tools/run_tests.py --preflight-only < /dev/null
+fi
+REACH_RAN=0
+if [ "$#" -eq 0 ] && [ -d share ] && [ -f src/tools/check_test_reach.py ] \
+   && [ "${SCHOLION_SKIP_REACH:-}" != "1" ] && [ "${SCHOLION_SKIP_REACH:-}" != "true" ] \
+   && [ "${SCHOLION_SKIP_REACH:-}" != "yes" ]; then
+  echo "▶ full tests and statement reach in one run (synthetic profile, offline)"
+  python3 src/tools/check_test_reach.py --strict < /dev/null
+  REACH_RAN=1
+else
+  echo "▶ tests (SCHOLION_OFFLINE=1 — synthetic profile only)"
+  python3 src/tools/run_tests.py --suite-only "$@" < /dev/null
+fi
 echo "▶ backward compatibility of the public contract"
 python3 src/tools/check_compat.py
 # These steps run only if the tool is present in this build: the anonymised
@@ -195,10 +207,9 @@ if [ -f src/tools/check_types.py ]; then
   fi
 fi
 
-# The reach of the suite over the code, measured rather than assumed. It runs the
-# whole suite a second time under the interpreter's coverage hook, which costs
-# about a minute and a half — so it is the LAST step, after everything that can
-# fail cheaply has already had its say.
+# The reach of the suite over the code, measured rather than assumed. The full
+# source suite above already records it. Never execute that same suite again
+# merely to obtain coverage. Narrowed runs cannot replace full-suite evidence.
 #
 # Why it is here at all and not in CI: the matrix in .github/workflows/tests.yml
 # runs in the PUBLIC repository, which this tree reaches only through
@@ -210,12 +221,14 @@ fi
 # baseline taken from the whole would fail for the one reason that is not a
 # defect.
 if [ -f src/tools/check_test_reach.py ]; then
-  if [ "$#" -gt 0 ]; then
+  if [ "$REACH_RAN" = "1" ]; then
+    echo "▶ reach of the suite — passed with the primary full run"
+  elif [ "$#" -gt 0 ]; then
     echo "▶ reach of the suite — not measured: this run was narrowed to $*"
   elif [ "${SCHOLION_SKIP_REACH:-}" = "1" ] || [ "${SCHOLION_SKIP_REACH:-}" = "true" ] || [ "${SCHOLION_SKIP_REACH:-}" = "yes" ]; then
     echo "▶ reach of the suite — skipped by SCHOLION_SKIP_REACH"
   else
-    echo "▶ no module lost reach over the code (~90s; SCHOLION_SKIP_REACH=1 skips it)"
+    echo "▶ no module lost reach over the code (full suite; SCHOLION_SKIP_REACH=1 skips it)"
     python3 src/tools/check_test_reach.py --strict || exit 1
   fi
 fi

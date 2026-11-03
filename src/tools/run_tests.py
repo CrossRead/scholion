@@ -109,6 +109,26 @@ AFTER = (
 )
 
 
+def preflight(env: dict) -> int:
+    """Fail cheap shipping metadata checks before any expensive acceptance pass."""
+    for _title, tool, flags in AFTER:
+        if tool not in ("sync_docs.py", "sync_manifest.py", "sync_rules.py"):
+            continue
+        path = ROOT / "src" / "tools" / tool
+        if path.is_file():
+            result = subprocess.run([sys.executable, str(path), *flags], cwd=ROOT,
+                                    env=env, stdin=subprocess.DEVNULL)
+            if result.returncode:
+                return result.returncode
+    modules = [name for name in ("test_release_notes_exist", "test_licensing",
+               "test_a_shipped_page_never_says_a_number_the_build_does_not")
+               if (ROOT / "tests" / (name + ".py")).is_file()]
+    if not modules:
+        return 0
+    return subprocess.run([sys.executable, "-m", "unittest", *["tests." + n for n in modules]],
+                          cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
+
+
 def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     env = environment()
@@ -118,7 +138,13 @@ def main(argv=None) -> int:
         if hasattr(stream, "reconfigure"):
             stream.reconfigure(encoding="utf-8", errors="backslashreplace")
 
+    if argv == ["--preflight-only"]:
+        return preflight(env)
     test_args, suite_only = selection(argv)
+    if not suite_only and not argv:
+        status = preflight(env)
+        if status:
+            return status
 
     print("▶ tests (SCHOLION_OFFLINE=1 — the network is off: the result must not "
           "depend on whether some external reference answers today)")

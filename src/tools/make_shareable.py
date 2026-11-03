@@ -441,7 +441,7 @@ def _build_demo(repo: Path, shared: Path) -> None:
 
 def _build_docs(repo: Path, shared: Path) -> None:
     """Keep public reading links usable outside the internal source tree."""
-    names = ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "GENE-CARD.md", "VERSIONING.md",
+    names = ("TESTS-AND-COMPATIBILITY.md", "DEVELOPMENT.md", "GENE-CARD.md", "MEASUREMENT-COMPONENT.md", "SYSTEM-VIEWS.md", "VIEW-LIFECYCLE.md", "TEST-SELECTION.md", "INTERFACE-ACCEPTANCE.md", "VERSIONING.md",
              "CONNECTING-AN-AGENT.md", "FOR-CLINICIANS.md", "FOR-CLINICIANS-DETAILS.md",
              "CONTAINER-LIFECYCLE.md", "DATA-LAYOUT.md", "EVIDENCE-LEVELS.md",
              "FOLATE-HISTAMINE-REDOX-CHOLINE.md", "CROSSREAD.md",
@@ -599,7 +599,8 @@ def build(repo: Path, out: Path) -> Path:
     # have found it; `tests/test_a_workflow_runs_only_what_the_package_carries.py`
     # now reads the workflows themselves.
     for _name in ("scope_pico.py", "check_vendor.py", "check_coverage.py", "coverage_baseline.json",
-                  "check_test_reach.py", "test_reach_baseline.json",
+                  "check_test_reach.py", "test_reach_baseline.json", "test_inventory.py",
+                  "test_plan.py", "candidate_evidence.py", "check_interfaces.py",
                   "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
                   "check_quiet_excepts.py", "test_the_artefact.sh",
                   "check_types.py", "types_baseline.json", "check_ouroboros_host.py"):

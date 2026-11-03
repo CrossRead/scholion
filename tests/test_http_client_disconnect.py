@@ -31,27 +31,48 @@ class ClientDisconnect(unittest.TestCase):
             env['SCHOLION_PROFILE_DIR'] = str(profile)
             script = '''
 import sys,time,webbrowser
+from pathlib import Path
 from scholion import cli,server
 webbrowser.open=lambda *_:None
 server._startup_selfcheck=lambda *_:None
 server.warm_up=lambda:None
 original=server.Handler._json
+sync=Path(sys.argv[2])
 def slow_response(self,obj,code=200):
  if code==200 and (self.path.startswith('/api/markers') or (self.command=='POST' and self.path=='/api/metrics')):
-  time.sleep(.15)
+  ready=sync / (self.command + '-ready')
+  release=sync / (self.command + '-release')
+  done=sync / (self.command + '-done')
+  ready.touch()
+  deadline=time.monotonic()+10
+  while not release.exists():
+   if time.monotonic()>=deadline:
+    raise TimeoutError('test client did not close its socket')
+   time.sleep(.01)
   obj={**obj,'synthetic_padding':'x'*2000000}
+  try:
+   return original(self,obj,code)
+  finally:
+   done.touch()
  return original(self,obj,code)
 server.Handler._json=slow_response
 sys.exit(cli.main(['serve','--port',sys.argv[1]]))
 '''
             with (root / 'server.log').open('w', encoding='utf-8') as log:
-                process = subprocess.Popen([sys.executable, '-c', script, str(port)], env=env,
+                process = subprocess.Popen([sys.executable, '-c', script, str(port), str(root)], env=env,
                                            stdout=log, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
                 try:
                     base = f'http://127.0.0.1:{port}'
                     def get(path, headers=None):
                         with urllib.request.urlopen(urllib.request.Request(base + path, headers=headers or {}), timeout=5) as reply:
                             return json.load(reply)
+                    def wait_for_marker(name):
+                        deadline = time.monotonic() + 10
+                        while not (root / name).exists():
+                            if process.poll() is not None or time.monotonic() >= deadline:
+                                self.fail(f'Missing server marker {name}: ' +
+                                          (root / 'server.log').read_text(encoding='utf-8'))
+                            time.sleep(.01)
                     for _ in range(100):
                         try:
                             ping = get('/api/ping')
@@ -75,8 +96,12 @@ sys.exit(cli.main(['serve','--port',sys.argv[1]]))
                                 f'X-Scholion-View-Profile: {identity}\r\nConnection: close\r\n\r\n').encode()
                         with socket.create_connection(('127.0.0.1', port)) as client:
                             client.sendall(head + raw)
+                            # A reset immediately after sendall may discard the
+                            # request on Windows before the server can read it.
+                            wait_for_marker(method + '-ready')
                             client.setsockopt(socket.SOL_SOCKET, socket.SO_LINGER, struct.pack('HH' if os.name == 'nt' else 'ii', 1, 0))
-                        time.sleep(.35)
+                        (root / (method + '-release')).touch()
+                        wait_for_marker(method + '-done')
                         self.assertIsNone(process.poll(), (root / 'server.log').read_text(encoding='utf-8'))
                         self.assertTrue(get('/api/ping')['ok'])
                     self.assertIn('73.25', (profile / 'metrics.json').read_text(encoding='utf-8'))

@@ -140,7 +140,13 @@ def cli(arguments, env, as_json=True, allow_failure=False):
     if result.returncode and not allow_failure:
         raise RuntimeError('CLI process failed: ' + result.stderr[-1500:])
     if as_json:
-        return json.loads(result.stdout)
+        try:
+            return json.loads(result.stdout)
+        except json.JSONDecodeError as error:
+            raise RuntimeError(
+                f'CLI {arguments[0]} returned no valid JSON (exit {result.returncode}): '
+                + result.stderr[-1500:]
+            ) from error
     return result.stdout.strip()
 
 
@@ -254,8 +260,10 @@ def execute(root, commands, installed=False, agent_plugin=None):
         work = Path(directory).resolve()
         profile = work / 'profile'
         shutil.copytree(root / 'tests/fixtures/profile', profile)
-        # Storage creates this empty coordination file even when validation refuses.
-        (profile / '.write.lock').touch()
+        # POSIX retains the flock file after writing. Windows takes an exclusive
+        # lockfile, so precreating one there would block every fixture write.
+        if os.name == 'posix':
+            (profile / '.write.lock').touch()
         os.environ.update(SCHOLION_PROFILE_DIR=str(profile), SCHOLION_OFFLINE='1',
                           SCHOLION_GENOME_VCF=str(work / 'missing.vcf.gz'),
                           SCHOLION_GENOME_DIR=str(work / 'no-genome'),

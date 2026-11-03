@@ -44,7 +44,7 @@ def static_inventory(root: Path) -> dict:
             for method in cls.body:
                 if not isinstance(method, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     continue
-                name = f'{path.relative_to(root)}:{cls.name}.{method.name}'
+                name = f'{path.relative_to(root).as_posix()}:{cls.name}.{method.name}'
                 if method.name in seen:
                     overwritten.append(name)
                 seen.add(method.name)

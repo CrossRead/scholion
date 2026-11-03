@@ -61,6 +61,26 @@ def observation(rsid: str, value: dict, source: str, selector: str) -> dict:
     return result
 
 
+def identity_mismatches(a: dict, b: dict) -> list[str]:
+    """Compare known identity fields without treating missing metadata as disagreement."""
+    from .linear import norm_chrom
+
+    def normalize(key, value):
+        if value is None or value == '':
+            return None
+        if key == 'chrom':
+            return norm_chrom(value)
+        if key == 'alt':
+            alleles = value if isinstance(value, (list, tuple)) else str(value).split(',')
+            return tuple(sorted(str(allele).strip().upper() for allele in alleles))
+        return str(value).strip().upper()
+
+    pairs = [(key, normalize(key, a.get(key)), normalize(key, b.get(key)))
+             for key in ('assembly', 'chrom', 'pos', 'ref', 'alt')]
+    return [key for key, left, right in pairs
+            if left is not None and right is not None and left != right]
+
+
 def recorded_genotypes() -> dict[str, dict]:
     """Lossless adapters for PGx and longevity; no first-row-wins conflict loss."""
     from . import core
@@ -103,7 +123,8 @@ def recorded_genotypes() -> dict[str, dict]:
         result['gene'] = str(result.get('gene') or '').upper()
         result['rsid'] = rs
         result['observations'] = [v['observation'] for v in values]
-        if any(not same_genotype(first.get('genotype'), v.get('genotype')) for v in values[1:]):
+        if any(identity_mismatches(first['observation']['identity'], v['observation']['identity'])
+               or not same_genotype(first.get('genotype'), v.get('genotype')) for v in values[1:]):
             result['conflict'] = {'kind': 'recorded_disagreement',
                                   'values': [v.get('genotype') for v in values], 'resolved_to': None}
             result['interpretation_applicable'] = False
@@ -144,10 +165,20 @@ def resolve(rsid: str, called: dict | None, recorded: dict | None = None) -> dic
     observations = deepcopy(saved.get('observations') or [])
     if saved.get('genotype') and not observations:
         observations.append(observation(rsid, saved, saved.get('source') or 'profile', rsid))
-    if called:
-        observations.insert(0, observation(rsid, called, called.get('source') or 'current', rsid))
-    if positive and saved_valid:
-        if same_genotype(current.get('genotype'), saved.get('genotype')):
+    recorded_observations = list(observations)
+    current_observation = observation(rsid, called, called.get('source') or 'current', rsid) if called else None
+    if current_observation:
+        observations.insert(0, current_observation)
+    selected_observation = (recorded_observations[0] if recorded_observations else None
+                            ) if selected == 'recorded' else current_observation
+    if positive and saved_valid and current_observation:
+        mismatches = sorted({field for prior in recorded_observations
+                             for field in identity_mismatches(current_observation['identity'], prior['identity'])})
+        if mismatches:
+            result['conflict'] = {'kind': 'variant_identity_disagreement', 'fields': mismatches,
+                                  'resolved_to': None}
+            result['interpretation_applicable'] = False
+        elif same_genotype(current.get('genotype'), saved.get('genotype')) and not saved.get('conflict'):
             result.update(confirmed_by='profile', also_reported=saved['genotype'])
         else:
             result['conflict'] = {'reported': saved.get('genotype'), 'called': current.get('genotype'),
@@ -164,6 +195,7 @@ def resolve(rsid: str, called: dict | None, recorded: dict | None = None) -> dic
             result['note'] = ' '.join(filter(None, [result.get('note'), notice]))
     catalogue = (core.loci().get('loci') or {}).get(rsid) or {}
     result['reading_record'] = {'schema': 1, 'rsid': rsid, 'selected': selected,
+        'selected_observation': selected_observation['source']['record_digest'] if selected_observation else None,
         'profile_key': digest(str(core.profile_dir().resolve())),
         'observations': observations, 'catalogue_digest': digest(catalogue),
         'source_digest': digest(observations),

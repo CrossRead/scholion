@@ -195,6 +195,7 @@ MESSAGES = {
     'insight.reason.data': 'Изменились исходные наблюдения',
     'insight.reason.rules': 'Изменилось правило или знание',
     'insight.reason.both': 'Изменились данные и правила',
+    'insight.reason.date': 'Дата оценки сдвинула окно наблюдений',
     'insight.reason.unknown': 'Причину установить не удалось',
     'insight.agenda': 'Повестка приёма',
     'insight.select': 'Включить в повестку приёма',

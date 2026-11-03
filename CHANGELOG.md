@@ -40,6 +40,35 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.6 — 03.11.2026
+
+### What this changes in the conclusions
+
+Gene and prescription views use the same underlying reading and keep its
+source and quality visible. Matching allele letters at different known
+positions no longer confirm a reading. ClinVar and ACMG findings retain the
+source record and show the limits that apply to the reading.
+
+System summaries and the visit sheet show which measurements and dates
+support a conclusion. Comparisons keep distinct units and draws separate.
+A saved review can be compared with the current assessment to see whether
+the result changed after an update to the data, rules or evaluation date.
+The original review remains available. The assistant also reports where
+profile data came from.
+
+Run `scholion serve` to open the local application.
+
+### What is retracted
+
+Automatic interpretations based on incompatible genetic readings are
+withheld. The recorded readings remain visible.
+
+### What needs recomputing
+
+Nothing. Existing measurements, genome files and PGS results remain compatible.
+You can open a current review without regenerating genome data or scores.
+
+
 ## v0.7.5 — 02.11.2026
 
 ### What this changes in the conclusions

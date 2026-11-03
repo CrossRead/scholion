@@ -152,8 +152,22 @@ for(const {language,reading,expected} of cases){
   for(const shape of ['flat','reading','result','genotype']){
    const base={gene:'SYNTHETIC',rsid:'rs123',level:'B',reference_context:{gene_function:'Synthetic function'},
     personal_context:{alternative_copies:1},read:!!expected.genotype};
-   const input=shape==='flat'?{...base,...reading}:{...base,genotype:'TT',depth:999,[shape]:reading};
+   const input=shape==='flat'?{...base,...reading}:{...base,[shape]:reading};
    const before=JSON.stringify(input),model=cards.project(input),html=component.render(input);
+   if(expected.genotype){
+    const stale={...base,genotype:'TT',depth:999,read:false,reading,summary:'Stale personal effect'};
+    const repaired=cards.project(stale);
+    assert.equal(repaired.genotype,expected.genotype);
+    assert.equal(repaired.depth??null,expected.depth);
+    assert.equal(repaired.interpretationBlocked,true);
+    assert.equal(repaired.copies,null);
+    assert.ok(!component.render(stale).includes('Stale personal effect'));
+    const unknown={...stale,reading:{...reading,reading_record:{...reading.reading_record,schema:2}}};
+    const refused=cards.project(unknown);
+    assert.equal(refused.genotype,'');
+    assert.equal(refused.interpretationBlocked,true);
+    assert.ok(component.render(unknown).includes('Synthetic function'));
+   }
    assert.equal(model.genotype,expected.genotype,shape);
    assert.equal(model.depth??null,expected.depth,shape);
    assert.equal(model.conflict,expected.conflict);

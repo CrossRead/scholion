@@ -216,6 +216,10 @@ def load_ignored(repo: Path) -> set:
     checkout the set is empty and the private list is the only filter, as before.
     """
     try:
+        top = subprocess.run(["git", "-C", str(repo), "rev-parse", "--show-toplevel"],
+                             capture_output=True, timeout=10, stdin=subprocess.DEVNULL)
+        if top.returncode != 0 or Path(top.stdout.decode("utf-8").strip()).resolve() != repo.resolve():
+            return set()
         r = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--others",
                             "--ignored", "--exclude-standard"],
                            capture_output=True, timeout=60, stdin=subprocess.DEVNULL)
@@ -600,7 +604,7 @@ def build(repo: Path, out: Path) -> Path:
     # now reads the workflows themselves.
     for _name in ("scope_pico.py", "check_vendor.py", "check_coverage.py", "coverage_baseline.json",
                   "check_test_reach.py", "test_reach_baseline.json", "test_inventory.py",
-                  "test_plan.py", "candidate_evidence.py", "check_interfaces.py",
+                  "test_plan.py", "candidate_evidence.py", "check_interfaces.py", "check_registry.py",
                   "check_method_mixing.py", "fetch_gencc.py", "check_gencc_freshness.py",
                   "check_quiet_excepts.py", "test_the_artefact.sh",
                   "check_types.py", "types_baseline.json", "check_ouroboros_host.py"):

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import hmac
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from . import core, container
 from .engine.insight_events import _digest
@@ -19,6 +19,63 @@ def _read() -> dict:
     return data
 
 
+
+def _selection(item: dict) -> str:
+    """Identify the conclusions and their order without translating their meaning."""
+    events = [{k: event.get(k) for k in ("id", "kind", "priority", "level")}
+              for event in item.get("events") or []]
+    changes = (item.get("trajectory") or {}).get("changes") or []
+    return _digest({"priority": item.get("priority"), "events": events,
+                    "trajectory": [{k: row.get(k) for k in ("event_id", "window", "status", "basis")}
+                                   for row in sorted(changes, key=lambda row: str(row.get("event_id") or row.get("marker") or ""))]})
+
+
+_DATE_SENSITIVE = frozenset({"abnormal", "repeated_abnormal", "lab_change", "period_shift"})
+
+
+def _date_sensitive(item: dict) -> bool:
+    events = item.get("events") or []
+    return bool(events) and all(event["kind"] in _DATE_SENSITIVE
+                                and all(f.get("record") == "labs.json" for f in event.get("facts") or [])
+                                for event in events)
+
+
+def _date_cause(key: str, old: dict | None, new: dict | None,
+                previous: dict, current: dict) -> bool:
+    if previous.get("policy") != current.get("policy") or not all(
+            item.get("date_sensitive") is True for item in (old, new) if item is not None):
+        return False
+    before = previous.get("states", {}).get(key) or {}
+    after = current.get("states", {}).get(key) or {}
+    if not all(before.get(k) and before[k] == after.get(k) for k in ("data_digest", "rules_digest")):
+        return False
+    a, b = before.get("evaluation") or {}, after.get("evaluation") or {}
+    if (a.get("schema") != 1 or b.get("schema") != 1
+            or a.get("target_digest") != b.get("target_digest")):
+        return False
+    if (a.get("current"), a.get("windows")) == (b.get("current"), b.get("windows")):
+        return False
+    if old and new and (old.get("provenance") or {}).get("rules_digest") != (
+            new.get("provenance") or {}).get("rules_digest"):
+        return False
+    try:
+        return date.fromisoformat(previous["as_of"]) < date.fromisoformat(current["as_of"])
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
+def _changed_basis(old: dict, new: dict) -> tuple[bool, bool, bool]:
+    a, b = old.get("provenance") or {}, new.get("provenance") or {}
+    selection = bool(old.get("selection") and new.get("selection")
+                     and old["selection"] != new["selection"])
+    data = a.get("facts_digest") != b.get("facts_digest")
+    rules = a.get("rules_digest") != b.get("rules_digest")
+    return data, rules, selection
+
+
+def _changed_reason(data: bool, rules: bool) -> str:
+    return "both" if data and rules else "data" if data else "rules" if rules else "unknown"
+
 def _snapshot(feed: dict) -> dict:
     # No duplicate measurement store: references and fingerprints are sufficient
     # for the diff. The source records remain in their existing profile files.
@@ -27,16 +84,19 @@ def _snapshot(feed: dict) -> dict:
             "profile_identity": _digest(str(core.profile_dir().resolve())),
             "items": [{"id": i["id"], "name": i["name"], "title": i["title"],
                        "date": i["date"], "level": i.get("level"),
-                       "kinds": [e["kind"] for e in i["events"]],
+                       "kinds": [e["kind"] for e in i["events"]], "selection": _selection(i),
+                       "date_sensitive": _date_sensitive(i),
                        "provenance": i["provenance"]} for i in feed["items"]] + _reference_reviews(),
             "system_items": [{"id": i["id"], "name": i["name"], "title": i["title"],
                        "date": i["date"], "level": i.get("level"),
                        "member_ids": i.get("member_ids") or [i["id"]],
+                       "selection": _selection(i), "date_sensitive": _date_sensitive(i),
                        "provenance": i["provenance"]} for i in
                        (feed.get("highlights") or []) + (feed.get("follow_up") or [])],
             "states": {k: {f: v.get(f) for f in ("flag", "date", "current", "proposed",
                                                 "method", "unit", "ref_low", "ref_high",
                                                 "data_digest", "rules_digest")}
+                       | ({"evaluation": v["evaluation"]} if "evaluation" in v else {})
                        for k, v in feed.get("states", {}).items()}}
 
 
@@ -67,7 +127,8 @@ def compare_review(feed: dict, previous: dict | None = None) -> dict:
     if (not previous.get("container") and previous.get("profile_identity")
             and not same_profile):
         raise ValueError("Review belongs to another profile")
-    now = {i["id"]: i for i in _snapshot(feed)["items"]}
+    current = _snapshot(feed)
+    now = {i["id"]: i for i in current["items"]}
     before = {i["id"]: i for i in previous["items"]}
     diffs = []
     for key in sorted(set(now) | set(before)):
@@ -94,34 +155,44 @@ def compare_review(feed: dict, previous: dict | None = None) -> dict:
                     and state.get("rules_digest") != old_state["rules_digest"]):
                 status, reason = "withdrawn", "rules"
         else:
-            a, b = old.get("provenance") or {}, new.get("provenance") or {}
-            data = a.get("facts_digest") != b.get("facts_digest")
-            rules = a.get("rules_digest") != b.get("rules_digest")
-            if data or rules:
-                status = "changed"
-                reason = "both" if data and rules else "data" if data else "rules"
+            data, rules, selection = _changed_basis(old, new)
+            if data or rules or selection:
+                status, reason = "changed", _changed_reason(data, rules)
             if old.get("level") in ("A", "B") and new.get("level") not in ("A", "B", None):
-                status, reason = "withdrawn", "rules"
+                if rules or not data:
+                    status, reason = "withdrawn", "rules"
+        if status not in ("unchanged", "resolved", "withdrawn") and _date_cause(key, old, new, previous, current):
+            reason = "date"
         diffs.append({"id": key, "status": status, "reason": reason,
                       "label": t("insight.diff." + status), "reason_label": t("insight.reason." + reason),
-                      "previous": old, "current": new})
+                      "previous": old, "current": new, "basis_changes": _basis_changes(old, new)})
     diffs.sort(key=lambda d: (d["status"] != "withdrawn", d["status"] == "unchanged", d["id"]))
-    system_diffs = _compare_system_items(_snapshot(feed), previous)
-    covered = {key for diff in system_diffs for row in (diff.get("previous"), diff.get("current"))
+    system_diffs = _compare_system_items(current, previous, diffs)
+    covered = {key for diff in system_diffs if diff["status"] != "unchanged"
+               for row in (diff.get("previous"), diff.get("current"))
                if row for key in row.get("member_ids") or []}
+    covered_unchanged = {key for diff in system_diffs
+                         for row in (diff.get("previous"), diff.get("current"))
+                         if row for key in row.get("member_ids") or []}
     return {"available": True, "saved_at": previous.get("saved_at"), "items": diffs,
             "system_items": system_diffs,
-            "display_items": system_diffs + [diff for diff in diffs if diff["id"] not in covered],
+            "display_items": system_diffs + [diff for diff in diffs if diff["id"] not in
+                (covered_unchanged if diff["status"] == "unchanged" else covered)],
             "system_baseline": "system_items" in previous}
 
 
-def _compare_system_items(current: dict, previous: dict) -> list[dict]:
+
+def _context_digest(item: dict) -> str | None:
+    return (item.get("provenance") or {}).get("basis", {}).get("context_facts_digest")
+
+def _compare_system_items(current: dict, previous: dict, members: list[dict]) -> list[dict]:
     """A legacy snapshot has no system basis; do not invent its old sources."""
     if "system_items" not in previous:
         return []
     now = {i["id"]: i for i in current.get("system_items") or []}
     before = {i["id"]: i for i in previous.get("system_items") or []}
     changes = []
+    member_diffs = {row["id"]: row for row in members}
     for key in sorted(set(now) | set(before)):
         old, new = before.get(key), now.get(key)
         if not old:
@@ -129,13 +200,21 @@ def _compare_system_items(current: dict, previous: dict) -> list[dict]:
         elif not new:
             status, reason = "unavailable", "unknown"
         else:
-            a, b = old["provenance"], new["provenance"]
-            data = a.get("facts_digest") != b.get("facts_digest")
-            rules = a.get("rules_digest") != b.get("rules_digest")
-            status = "changed" if data or rules else "unchanged"
-            reason = "both" if data and rules else "data" if data else "rules" if rules else "unknown"
+            data, rules, selection = _changed_basis(old, new)
+            status = "changed" if data or rules or selection else "unchanged"
+            reason = _changed_reason(data, rules)
             if old.get("level") in ("A", "B") and new.get("level") not in ("A", "B", None):
-                status, reason = "withdrawn", "rules"
+                if rules or not data:
+                    status, reason = "withdrawn", "rules"
+        ids = set((old or {}).get("member_ids") or []) | set((new or {}).get("member_ids") or [])
+        causes = [member_diffs[i] for i in ids if i in member_diffs]
+        if (status not in ("unchanged", "withdrawn") and len(causes) == len(ids)
+                and all(item.get("date_sensitive") is True for item in (old, new) if item is not None)
+                and any(row["reason"] == "date" for row in causes)
+                and all(row["status"] == "unchanged" or row["reason"] == "date" for row in causes)
+                and (not old or not new or _context_digest(old) == _context_digest(new))
+                and (not old or not new or not _changed_basis(old, new)[1])):
+            reason = "date"
         changes.append({"id": key, "status": status, "reason": reason,
                         "label": t("insight.diff." + status), "reason_label": t("insight.reason." + reason),
                         "previous": old, "current": new,

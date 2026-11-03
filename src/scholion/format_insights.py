@@ -1,4 +1,6 @@
 """Readable facts from the shared feed, for CLI and agent transports."""
+import math
+
 from .i18n import t
 
 
@@ -61,12 +63,20 @@ def comparison_lines(comparison: dict) -> list[str]:
         lines.append(t("insight.delta") + ": " + str(comparison["delta"]))
     if comparison.get("mdd") is not None:
         lines.append(t("insight.mdd", value=comparison["mdd"]))
-    if comparison.get("before_dates"):
-        lines.append(t("insight.period_dates", a=" — ".join(comparison["before_dates"]),
-                       b=" — ".join(comparison["after_dates"])))
-    if comparison.get("before_range"):
-        lines.append(t("insight.period_ranges", a=comparison["before_range"], b=comparison["after_range"],
-                       na=comparison["before_n"], nb=comparison["after_n"]))
+    before_dates, after_dates = comparison.get("before_dates"), comparison.get("after_dates")
+    if (isinstance(before_dates, (list, tuple)) and isinstance(after_dates, (list, tuple))
+            and all(len(pair) == 2 and all(isinstance(value, str) and value for value in pair)
+                    for pair in (before_dates, after_dates))):
+        lines.append(t("insight.period_dates", a=" — ".join(before_dates),
+                       b=" — ".join(after_dates)))
+    before_range, after_range = comparison.get("before_range"), comparison.get("after_range")
+    before_n, after_n = comparison.get("before_n"), comparison.get("after_n")
+    if (all(isinstance(pair, (list, tuple)) and len(pair) == 2
+            and all(type(value) in (int, float) and math.isfinite(value) for value in pair)
+            for pair in (before_range, after_range))
+            and all(type(n) is int and n > 0 for n in (before_n, after_n))):
+        lines.append(t("insight.period_ranges", a=before_range, b=after_range,
+                       na=before_n, nb=after_n))
     for field in ("before", "after"):
         point = comparison.get(field) or {}
         stats = (point.get("stats") or {}) if isinstance(point, dict) else {}

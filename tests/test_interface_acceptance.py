@@ -18,7 +18,7 @@ import check_interfaces as checks  # noqa: E402
 class InterfaceAcceptance(unittest.TestCase):
     def test_selection_uses_routes_and_keeps_both_system_registers(self):
         selected, write = checks.select(['system'], contract.PARITY, contract.PLUGIN)
-        self.assertEqual({'system-patient', 'system-clinician'}, {s.name for s in selected})
+        self.assertEqual({'system-patient', 'system-clinician', 'systems-list'}, {s.name for s in selected})
         self.assertFalse(write)
         selected, write = checks.select(['focus-log'], contract.PARITY, contract.PLUGIN)
         self.assertEqual([], selected)

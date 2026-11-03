@@ -56,3 +56,22 @@ def _guard_gene_role(entry: Dict[str, Any]) -> Dict[str, Any]:
     spec = entry.get("gene_role_basis")
     row = _guard_guidance({**(spec if isinstance(spec, dict) else {}), "note": entry.get("why")})
     return {"basis": row["conclusion_basis"], "text": row["note"]}
+
+
+def decision_trace(selected_gene: str, phenotype: str, guidance_key: str | None,
+                   scope_status: str, inputs: dict[str, dict]) -> dict:
+    """Identify the selected guidance row and the exact readings that drove it."""
+    return {
+        "schema": 1, "selected_gene": selected_gene, "phenotype": phenotype,
+        "guidance_key": guidance_key,
+        "scope_status": scope_status,
+        "inputs": {symbol: {
+            "certainty": result.get("certainty"), "phenotype": result.get("phenotype"),
+            "readings": [{"rsid": marker.get("rsid"),
+                          "observation": ((marker.get("reading") or {}).get("reading_record") or {}
+                                          ).get("selected_observation"),
+                          "copies": marker.get("copies")}
+                         for marker in result.get("found") or [] if marker.get("rsid")],
+            "diplotype": result.get("diplotype"), "basis": result.get("basis")}
+            for symbol, result in inputs.items()},
+    }

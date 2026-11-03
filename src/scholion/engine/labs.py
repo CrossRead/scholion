@@ -533,6 +533,7 @@ def analyze_labs(markers: Optional[List[str]] = None) -> Dict[str, Any]:
             "date_source": latest.get("date_source") or "unrecorded",
             **{field: latest.get(field) for field in ("specimen", "biomaterial", "specimen_source",
                 "sample_id", "draw_id", "form_id", "method", "fasting", "source")},
+            **{field: latest[field] for field in ("source_record", "ingest_method") if field in latest},
             "ref_low": m.get("ref_low"), "ref_high": m.get("ref_high"),
             "flag": flag, "abnormal": abnormal, "direction_pref": direction_pref,
             "repeats": _reps,

@@ -81,6 +81,8 @@ class TestIndependentStatements(unittest.TestCase):
         names = {"A": {"names": ["HeldDrug", "OtherDrug"]}}
         rule = {**supported(), "drug_scope": {"A": {"names": ["HeldDrug"]}}}
         rows = matched_rows(rule, "Partner", ["B"], "A", ["HeldDrug 20 mg", "OtherDrug"], names, pgx.name_matches)
+        self.assertEqual([(r["scope_evidence"]["partners"], r["scope_evidence"]["matched_drug_scope"])
+                          for r in rows], [(["HeldDrug 20 mg"], True), (["OtherDrug"], False)])
         self.assertEqual(2, len(rows))
         self.assertEqual(["HeldDrug 20 mg"], rows[0]["with_meds"])
         self.assertEqual("high", rows[0]["severity"])

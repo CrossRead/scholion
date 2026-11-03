@@ -41,17 +41,31 @@
     const p = input || {}, context = object(p.personal_context), reference = object(p.reference_context);
     const reading = Object.keys(object(p.reading)).length ? p.reading
       : Object.keys(object(p.result)).length ? p.result : object(p.genotype);
-    const record = object(reading.reading_record || p.reading_record);
+    const rawRecord = reading.reading_record ?? p.reading_record;
+    const record = object(rawRecord);
     const resolved = record.schema === 1;
-    const selected = resolved && reading.reading_record ? reading : p;
+    const projection = reading.reading_record ? reading : p;
+    const observation = record.selected_observation == null ? null
+      : list(record.observations).find(row => row && object(row.source).record_digest === record.selected_observation);
+    const invalidRecord = rawRecord != null && (!resolved || (record.selected_observation != null && !observation));
+    const selected = observation ? {...observation, ...object(observation.quality),
+      confidence:record.selected === 'recorded' ? 'reported' : observation.confidence,
+      source:object(observation.source).file} : projection;
     const conflict = !!(reading.conflict || p.conflict || record.conflict);
-    const interpretationBlocked = conflict || reading.interpretation_applicable === false
+    const projectionDisagrees = !!observation && [projection, p].some(value =>
+      (typeof value.genotype === 'string' && value.genotype !== observation.genotype)
+      || (value.depth != null && value.depth !== object(observation.quality).depth)
+      || (value.read === false && !!observation.genotype));
+    const readingBlocked = invalidRecord || projectionDisagrees;
+    const interpretationBlocked = conflict || readingBlocked || reading.interpretation_applicable === false
       || p.interpretation_applicable === false || record.interpretation_applicable === false;
     const compound = !!(options.compound || p.epsilon || p.diplotype || p.rs429358 || p.rs7412);
     const position = text(p.rsid || p.hgvs || (p.chrom && p.pos ? p.chrom + ':' + p.pos : ''));
     const isVariant = !!(position || Object.keys(context).length || compound);
-    const confidence = reading.confidence || p.confidence;
-    const unavailable = p.status === 'no_genome' || p.read === false || reading.read === false || p.presumed === true || confidence === 'assumed_ref';
+    const confidence = resolved ? selected.confidence : reading.confidence || p.confidence;
+    const unavailable = invalidRecord || confidence === 'assumed_ref'
+      || (observation ? !observation.genotype
+        : p.status === 'no_genome' || p.read === false || reading.read === false || p.presumed === true);
     const genotype = unavailable || !isVariant ? '' : resolved && !compound ? text(selected.genotype) : text(p.display_genotype || p.epsilon || p.diplotype
       || (typeof p.genotype === 'string' ? p.genotype : '') || reading.genotype || context.genotype);
     const state = text(p.state || reading.state || p.zygosity);
@@ -74,17 +88,18 @@
     if (p.copies != null && copies == null && context.allele_identity_supported !== false && !unavailable) copies = p.copies;
     if (unavailable || !isVariant || compound || interpretationBlocked) copies = null;
     const interpretation = object(p.interpretation);
-    const summary = [interpretation.summary,p.summary,p.text,p.note,p.label,reference.variant_context,options.fallback].map(text).find(Boolean) || '';
+    const summary = readingBlocked ? text(reference.variant_context)
+      : [interpretation.summary,p.summary,p.text,p.note,p.label,reference.variant_context,options.fallback].map(text).find(Boolean) || '';
     const hasVariantGrade = isVariant && reference.variant_status !== 'not_supplied';
     const level = hasVariantGrade ? text(interpretation.level || p.level || reference.level) : '';
-    const status = text(context.status);
+    const status = readingBlocked ? '' : text(context.status);
     // `carrier` on catalogue rows means a named allele, not clinical carriage.
     const statusLabel = status && status !== 'classification_only' ? text(context.label) : '';
     const assertions = list(reference.gencc_assertions).length ? reference.gencc_assertions
       : list(p.assertions).length ? p.assertions : list(p.gencc);
     const modes = unique([text(context.inheritance_label), ...(!Object.keys(context).length
       ? [text(p.inheritance), text(p.moi), ...list(p.moi_codes)] : [])]);
-    const quality = unique([text(reading.note || reading.message || (resolved ? selected.note : '')), text(p.depth_note), text(p.read_why_text),
+    const quality = unique([text(reading.note || reading.message || (resolved ? projection.note : '')), text(p.depth_note), text(p.read_why_text),
       text(p.reading_note), text(p.file_says_text), text(p.read_why_text ? '' : p.read_why), text(p.verdict_label)]);
     const qualityReading = resolved || !Object.keys(reading).length ? selected : reading;
     const flags = {...object(qualityReading.quality), ...qualityReading};
@@ -98,14 +113,14 @@
       geneRegion:!isVariant && options.geneRegion ? object(options.geneRegion) : null,
       unavailable, isVariant, referenceOnly:options.referenceOnly === true,
       level, status, statusLabel, functionText:reference.function_status === 'not_curated' ? '' : text(reference.gene_function || p.function),
-      summary, inclusionReason:text(context.inclusion_reason), personalMeaning:text(context.summary),
+      summary, inclusionReason:text(context.inclusion_reason), personalMeaning:readingBlocked ? '' : text(context.summary),
       clinvarPhenotype:object(p.clinvar_phenotype),
       classification:text(p.clnsig || p.classification || (typeof p.clinvar === 'string' ? p.clinvar : (object(p.clinvar).classification || object(p.clinvar).clinical_significance))),
       condition:text(p.disease || p.phenotype || p.clndn || reference.disease_context?.name),
-      assertions, modes, quality, qualityKeys, depth:resolved ? selected.depth : reading.depth ?? p.depth,
-      source:resolved ? text(selected.from_profile || object(selected.source_identity).file || selected.source)
+      assertions, modes, quality, qualityKeys, depth:invalidRecord ? null : resolved ? selected.depth : reading.depth ?? p.depth,
+      source:invalidRecord ? '' : resolved ? text(selected.from_profile || object(selected.source_identity).file || selected.source)
         : text(reading.source || p.reading_source),
-      conflict, interpretationBlocked, observations:readingObservations(record.observations),
+      conflict, interpretationBlocked, observations:readingObservations(resolved ? record.observations : []),
       confidence, review:text(p.review_confidence || p.review), reviewCode:text(p.review),
       coordinate:p.chrom && p.pos ? text(p.chrom) + ':' + text(p.pos) : '',
       protein:text(p.protein || p.star), readingMessage:text(p.reading_label),

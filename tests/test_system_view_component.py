@@ -44,6 +44,9 @@ const freeze=o=>{if(o&&typeof o==='object'){Object.values(o).forEach(freeze);Obj
 freeze(ScholionSystemCases);const before=JSON.stringify(ScholionSystemCases);
 const component=ScholionSystemViews.create({...systemGalleryServices(),selected:()=>selected});
 for(language of ['en','ru'])for(selected of [false,true]){
+ const partial=component.comparisonHTML({before_dates:['2026-04-01','2026-05-01'],before_range:[4,6],delta:2});
+ assert.ok(partial.includes(esc(t('insight.delta')+': 2')));
+ assert.ok(!partial.includes('2026-04-01'));
  for(const c of ScholionSystemCases.cases){
   const html=component[c.method](...c.args);
   assert.equal(typeof html,'string',c.id);assert.ok(!html.includes('<script>unsafe'),c.id);

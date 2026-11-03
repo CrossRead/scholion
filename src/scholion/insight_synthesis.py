@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from datetime import date, timedelta
+import re
 from statistics import median
 
 from . import core
@@ -140,7 +141,7 @@ def enrich_system(group: dict) -> None:
             line += " " + t("insight.latest_outside")
         if a.get("latest_reversal"):
             line += " " + t("insight.latest_reversal")
-        changes.append({"marker": event["facts"][0]["key"], "name": event["name"], "status": status,
+        changes.append({"event_id": event["id"], "marker": event["facts"][0]["key"], "name": event["name"], "status": status,
                         "basis": a, "summary": line, "comparison": d, "window": d.get("window", 365),
                         "series": [f for f in event["facts"] if f.get("value") is not None]})
     reported = sorted([e for e in group["events"] if e["kind"] == "reported_response"],
@@ -174,3 +175,35 @@ def enrich_system(group: dict) -> None:
         if status in ("away", "mixed") or any(r["comparisons"] for r in responses) else [])
     if reported:
         group["questions"].insert(0, t("response.question", system=group["name"]))
+
+
+def treatment_context(marker: str, start: str, end: str) -> list[dict]:
+    """Recorded treatment chronology in the same system, without attribution."""
+    from .engine.treatment import _treatment_medications
+
+    domains = core._read_knowledge_raw("radar_domains.json").get("domains") or []
+    systems = {d["key"] for d in domains if marker in d.get("markers", [])}
+    context = []
+    for row in _treatment_medications():
+        med = row['medication']
+        if not systems.intersection(row['systems']):
+            continue
+        begin = str(med.get("start_date") or "")
+        stop = str(med.get("end_date") or "")
+        matched = re.fullmatch(r"(?:stopped|completed|discontinued)_(\d{4}-\d{2}(?:-\d{2})?)", str(med.get("status") or ""))
+        if not stop and matched:
+            stop = matched.group(1)
+        current = core.is_active_medication(med)
+        if any(stamp and observation_day(stamp + ("-01" if len(stamp) == 7 else "")) is None
+               for stamp in (begin, stop)):
+            continue
+        if stop and stop < begin[:len(stop)]:
+            continue
+        if not begin or begin > end or (stop and stop < start[:len(stop)]):
+            continue
+        if not current and not stop:
+            continue
+        context.append({"record": "medications.json", "drug": med.get("name"),
+                        "date": begin, "end_date": stop or None, "current": current,
+                        "state": med.get("status"), "source": "medications.json"})
+    return context

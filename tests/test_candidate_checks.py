@@ -13,6 +13,7 @@ from unittest import mock
 import support
 sys.path.insert(0, str(support.ROOT / 'src/tools'))
 import candidate_evidence as evidence  # noqa: E402
+import check_registry  # noqa: E402
 import test_plan  # noqa: E402
 
 
@@ -68,10 +69,50 @@ class CandidateChecks(unittest.TestCase):
                 self.assertEqual([], plan['tests'])
                 self.assertEqual('--suite-only', plan['command'][-1])
                 self.assertTrue(plan['fallback_reasons'])
+                self.assertEqual('all', plan['interface_scope'])
+                self.assertNotIn('--commands', plan['interface_command'])
 
     def test_mixed_unknown_change_cannot_be_hidden_by_a_known_component(self):
         plan = test_plan.plan(self.root, ['tests/helper.py', 'VERSION'])
         self.assertEqual('full', plan['mode'])
+
+    def test_registry_rejects_missing_semantic_checks_and_unknown_interface_paths(self):
+        from scholion import contract
+        report = check_registry.report(support.ROOT, contract.PARITY, contract.PLUGIN)
+        self.assertTrue(report['ok'], report['errors'])
+        self.assertFalse(report['release_acceptance'])
+        self.assertEqual(set(contract.PARITY), set(report['routes']))
+        self.assertEqual(11, len(report['families']))
+        extra = check_registry.report(support.ROOT, {**contract.PARITY, 'GET /api/new': 'new'},
+                                      contract.PLUGIN)
+        self.assertFalse(extra['ok'])
+        self.assertEqual(['GET /api/new'], extra['unclassified_routes'])
+        bad = check_registry.Family('unverified', ('variant_readings.py',),
+                                    ('missing_semantic_scenario',), ('unknown-scenario',))
+        failed = check_registry.report(support.ROOT, contract.PARITY, contract.PLUGIN,
+                                       (*check_registry.FAMILIES, bad))
+        self.assertFalse(failed['ok'])
+        self.assertIn('Missing registered file: tests/test_missing_semantic_scenario.py', failed['errors'])
+        self.assertIn('No executable scenario: unknown-scenario', failed['errors'])
+
+    def test_registered_reading_selects_regressions_and_real_interface_commands(self):
+        plan = test_plan.plan(support.ROOT, ['src/scholion/variant_readings.py'])
+        self.assertEqual('targeted', plan['mode'])
+        self.assertIn('tests.test_variant_readings', plan['tests'])
+        self.assertIn('tests.test_gene_card_component_boundary', plan['tests'])
+        self.assertIn('tests.test_prescribing_claims_require_their_own_basis', plan['tests'])
+        self.assertEqual(['acmg', 'clinvar', 'drug', 'genome', 'system'], plan['interface_commands'])
+        unknown = test_plan.plan(support.ROOT, ['src/scholion/conclusion_basis.py'])
+        self.assertEqual('full', unknown['mode'])
+        self.assertEqual(['review-and-composition'], unknown['families'])
+
+    def test_missing_registered_test_cannot_yield_a_narrow_pass(self):
+        path = 'src/scholion/variant_readings.py'
+        self.put(path, '')
+        self.put('tests/test_import.py', 'from scholion import variant_readings')
+        plan = test_plan.plan(self.root, [path])
+        self.assertEqual('full', plan['mode'])
+        self.assertTrue(any('Missing registered semantic test' in reason for reason in plan['fallback_reasons']))
 
     def test_external_and_absolute_paths_are_refused(self):
         for path in ('../outside.py', str(self.root / 'tests/helper.py')):
@@ -79,12 +120,47 @@ class CandidateChecks(unittest.TestCase):
                 test_plan.plan(self.root, [path])
 
     def test_git_selection_uses_null_delimiters_and_includes_untracked(self):
-        replies = [subprocess.CompletedProcess([], 0, b'tests/one space.py\0tests/a.py\0'),
+        replies = [subprocess.CompletedProcess([], 0, os.fsencode(self.root) + b'\n'),
+                   subprocess.CompletedProcess([], 0, b'tests/one space.py\0tests/a.py\0'),
                    subprocess.CompletedProcess([], 0, b'tests/new.py\0')]
         with mock.patch.object(test_plan.subprocess, 'run', side_effect=replies) as run:
             changed = test_plan.changed_files(self.root, 'HEAD')
         self.assertEqual(['tests/a.py', 'tests/new.py', 'tests/one space.py'], changed)
         self.assertIn('--no-optional-locks', run.call_args_list[0].args[0])
+
+    def test_git_selection_refuses_the_parent_repo_of_a_snapshot(self):
+        found = subprocess.CompletedProcess([], 0, os.fsencode(self.base) + b'\n')
+        with mock.patch.object(test_plan.subprocess, 'run', return_value=found) as run:
+            with self.assertRaisesRegex(ValueError, 'actual Git checkout root'):
+                test_plan.changed_files(self.root, 'HEAD')
+        run.assert_called_once()
+
+    def test_development_run_executes_selected_interfaces_and_keeps_their_result(self):
+        plan = test_plan.plan(support.ROOT, ['src/scholion/variant_readings.py'])
+        self.assertEqual('selected', plan['interface_scope'])
+
+        def run(command, **kwargs):
+            if command[1].endswith('check_interfaces.py'):
+                Path(command[-1]).write_text('{"ok": false}', encoding='utf-8')
+                return subprocess.CompletedProcess(command, 1)
+            return subprocess.CompletedProcess(command, 0)
+
+        with mock.patch.object(test_plan.subprocess, 'run', side_effect=run) as execution:
+            self.assertEqual(1, test_plan.run_plan(support.ROOT, plan))
+        commands = [call.args[0] for call in execution.call_args_list]
+        self.assertEqual(['check_registry.py', 'run_tests.py', 'check_interfaces.py'],
+                         [Path(command[1]).name for command in commands])
+        self.assertEqual(plan['interface_commands'], commands[-1][3:-2])
+        self.assertEqual('failed', plan['executed']['interfaces']['status'])
+        self.assertEqual({'ok': False}, plan['executed']['interfaces']['evidence'])
+
+    def test_development_run_stops_after_a_semantic_failure(self):
+        plan = test_plan.plan(support.ROOT, ['src/scholion/variant_readings.py'])
+        replies = [subprocess.CompletedProcess([], 0), subprocess.CompletedProcess([], 1)]
+        with mock.patch.object(test_plan.subprocess, 'run', side_effect=replies) as execution:
+            self.assertEqual(1, test_plan.run_plan(support.ROOT, plan))
+        self.assertEqual(2, execution.call_count)
+        self.assertEqual('blocked', plan['executed']['interfaces']['status'])
 
     def make_record(self, command=None, artifacts=None):
         out = self.base / 'check.json'

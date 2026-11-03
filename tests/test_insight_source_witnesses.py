@@ -113,6 +113,11 @@ class TestInsightSourceWitnesses(unittest.TestCase):
         self.assertEqual(witness['section']['index'], 2)
         other = fact_source({**fact, 'sample_id': 'another-draw'})
         self.assertNotEqual(witness['id'], other['id'])
+        first_form = fact_source({**fact, 'form_id': 'synthetic-form-1'})
+        second_form = fact_source({**fact, 'form_id': 'synthetic-form-2'})
+        self.assertEqual(first_form['form_id'], 'synthetic-form-1')
+        self.assertNotEqual(first_form['id'], second_form['id'])
+        self.assertNotIn('form_id', witness)
         self.assertNotIn('source_record', _fact('legacy', {'date': '2026-10-20', 'value': 1}, {}))
 
     def test_every_member_and_qualitative_context_affects_the_system_basis(self):

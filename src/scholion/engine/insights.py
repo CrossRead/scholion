@@ -6,23 +6,25 @@ from typing import Any
 
 from .. import core
 from ..i18n import t, lang
-from .insight_events import insight_events, _annual_events, _digest, _fact_identity, _fact
+from .insight_events import insight_events, _annual_events, _digest, _fact_identity
 
 
 @core.in_reading
 def attention_feed(labs: dict, cautions: list[dict], controls: list[dict],
-                   wearable: dict, suggestions: list[dict], period: int = 365) -> dict:
+                   wearable: dict, suggestions: list[dict], period: int = 365, *,
+                   today: date | None = None) -> dict:
     """Collapse only events about the same lab observation; retain all reasons."""
     if period not in (30, 90, 365):
         raise ValueError("period must be 30, 90 or 365")
     from .goals import goal_dashboard
     from ..period_summary import period_summary
+    now = today or date.today()
     phenotype = goal_dashboard().get("phenotype") or []
-    summary = period_summary(phenotype, period)
-    annual = summary if period == 365 else period_summary(phenotype, 365)
-    events = insight_events(labs, cautions, controls, wearable, suggestions)
+    summary = period_summary(phenotype, period, now)
+    annual = summary if period == 365 else period_summary(phenotype, 365, now)
+    events = insight_events(labs, cautions, controls, wearable, suggestions, now)
     for window in (365, 90, 30):
-        events.extend(_annual_events(annual, labs, window))
+        events.extend(_annual_events(annual, labs, window, now))
     from .insight_links import linked_pgs_events
     events.extend(linked_pgs_events(labs))
     from ..reported_response import events as reported_events
@@ -63,24 +65,19 @@ def attention_feed(labs: dict, cautions: list[dict], controls: list[dict],
             key = item["id"][4:]
             rule_identity = ["lab-attention-v5", marker_rules.get(key), thresholds.get(key),
                              [link for link in links if link.get("marker") == key],
-                             [e["rule"] for e in item["events"] if e["kind"] == "genetic_phenotype"]]
+                             [e["rule"] for e in item["events"] if e["kind"] in ("genetic_phenotype", "pgs_phenotype")]]
         item["provenance"] = {"facts_digest": _digest([_fact_identity(f) for f in item["facts"]]),
                               "rules_digest": _digest(rule_identity),
                               "rules": [e["rule"] for e in item["events"]]}
     items.sort(key=lambda r: (r["date"], r["id"]), reverse=True)
     items.sort(key=lambda r: r["priority"])
     visible = max(5, sum(i["priority"] == 0 for i in items))
-    states = {"lab:" + r["key"]: {"flag": r.get("flag"), "date": r.get("date"),
-              "current": r.get("display_recency"), "proposed": r.get("proposed_rule"),
-              "unit": r.get("unit"), "ref_low": r.get("ref_low"), "ref_high": r.get("ref_high"),
-              "method": (sorted(r.get("series") or [], key=lambda p: str(p.get("date") or ""))[-1:]
-                         or [{}])[0].get("method"),
-              "data_digest": _digest([_fact_identity(_fact(r["key"], p, r)) for p in r.get("series") or []]),
-              "rules_digest": _digest([marker_rules.get(r["key"]), thresholds.get(r["key"])]),
-              "value": r.get("value")} for r in labs.get("markers") or []}
+    from ..insight_basis import bind, lab_review_state
+    states = {"lab:" + r["key"]: lab_review_state(
+        r, marker_rules.get(r["key"]), thresholds.get(r["key"]), now)
+        for r in labs.get("markers") or []}
     synthesized = _highlights(items)
     attach_context(synthesized, context)
-    from ..insight_basis import bind
     for item in items:
         bind(item, preserve_existing=True)
     for item in synthesized:
@@ -91,9 +88,10 @@ def attention_feed(labs: dict, cautions: list[dict], controls: list[dict],
             "highlights": highlights, "highlight_count": len(highlights),
             "follow_up": follow_up,
             "observation_count": sum(all(e["kind"] == "abnormal" for e in i["events"]) for i in items),
-            "period": period, "summary": summary, "as_of": date.today().isoformat(), "states": states,
+            "period": period, "summary": summary, "as_of": now.isoformat(), "states": states,
             "title": t("insight.title"), "empty": t("insight.empty"),
             "policy": "attention-v5", "profile": core.profile_is_synthetic()}
+
 
 
 def _highlights(items: list[dict]) -> list[dict]:

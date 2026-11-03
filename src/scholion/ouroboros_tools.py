@@ -366,7 +366,8 @@ def _h_sources(ctx: "ToolContext") -> str:
     table was imported eight months ago» — which is the useful half.
     """
     from scholion import sources as _src  # noqa: E402
-    return fmt.sources_report({"sources": _src.state(), "results": []})
+    return fmt.sources_report({"sources": _src.state(), "results": [],
+                               "data_sources": engine.provenance()})
 
 
 def _h_rules(ctx: "ToolContext") -> str:

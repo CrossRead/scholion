@@ -124,6 +124,11 @@ class FindingMeaning(unittest.TestCase):
             self.assertEqual(1, len(result['hits']))
             self.assertEqual({'phase_unresolved': 2}, result['personal_context_counts'])
             self.assertEqual('phase_unresolved', result['hits'][0]['personal_context']['status'])
+            basis = result['hits'][0]['finding_trace']
+            self.assertEqual(basis['result'], 'phase_unresolved')
+            self.assertEqual(basis['line'], 2)
+            self.assertFalse(basis['table_digest_checked'])
+            self.assertIsNone(basis['reference_version'])
 
     def test_both_languages_keep_the_same_facts_and_no_untranslated_keys(self):
         for language in ('ru', 'en'):

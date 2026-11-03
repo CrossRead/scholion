@@ -7,9 +7,20 @@ from datetime import date, timedelta
 from .trend_qualification import comparable_observations, observation_day, _number
 
 
+def _in_window(point: dict, start: date, end: date) -> bool:
+    stamp = point.get("date")
+    if not isinstance(stamp, str) or not _number(point.get("value")):
+        return False
+    if len(stamp) == 7:
+        day = observation_day(stamp + "-01")
+        return day is not None and start.replace(day=1) <= day <= end
+    day = observation_day(stamp)
+    return day is not None and start <= day <= end
+
+
 def period_summary(rows: list[dict], days: int, today: date | None = None) -> list[dict]:
     now = today or date.today()
-    start = (now - timedelta(days=days)).isoformat()
+    start = now - timedelta(days=days)
     result = deepcopy(rows)
     for row in result:
         for original in row.get("components") or []:
@@ -17,9 +28,7 @@ def period_summary(rows: list[dict], days: int, today: date | None = None) -> li
                 if not c:
                     continue
                 series = c.get("series") or (c.get("period") or {}).get("series") or []
-                selected = [p for p in series if (observation_day(str(p.get("date") or "") + ("-01" if len(str(p.get("date") or "")) == 7 else "")) is not None)
-                            and _number(p.get("value")) and str(p.get("date") or "") >= start[:len(str(p.get("date") or ""))]
-                            and str(p.get("date") or "") <= now.isoformat()]
+                selected = [p for p in series if _in_window(p, start, now)]
                 selected.sort(key=lambda p: p["date"])
                 from .measurements import streams, current
                 groups = streams(selected)

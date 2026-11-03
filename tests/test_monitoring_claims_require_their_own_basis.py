@@ -95,9 +95,12 @@ class TestIndependentMonitoring(unittest.TestCase):
         self.assertNotIn(i18n.t("prescription.no_lab_control"), fmt.prescription_check({"status": "ok", "labs": out}))
 
     def test_crossed_observation_is_retained_without_borrowing_monitoring_support(self):
-        observed = {**OBS, "decisions": [{"crossed": True}]}
+        observed = {**OBS, "decisions": [{"crossed": True}],
+                    "source_record": {"resource_id": "synthetic-observation"}, "form_id": "synthetic-form"}
         out = monitoring_for(["X"], {"X": {"labs": ["creatinine"]}}, [observed], core.marker_name)
         self.assertEqual(out["markers"], out["crossed"])
+        self.assertEqual(out["crossed"][0]["source_record"], observed["source_record"])
+        self.assertEqual(out["crossed"][0]["form_id"], observed["form_id"])
         self.assertFalse(out["unresolved"])
 
 

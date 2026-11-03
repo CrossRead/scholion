@@ -2781,10 +2781,11 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
         names = samples_of(str(personal))
         if column is None or column >= len(names) or names[column] != metadata["sample"]:
             refusal = "sample_changed"
+    from hashlib import sha256
+    table_digest = sha256(content).hexdigest()
     if metadata.get("table_sha256"):
-        import hashlib
-        if (hashlib.sha256(content).hexdigest() != metadata["table_sha256"]
-                or hashlib.sha256(f.read_bytes()).hexdigest() != metadata["table_sha256"]):
+        if (table_digest != metadata["table_sha256"]
+                or sha256(f.read_bytes()).hexdigest() != metadata["table_sha256"]):
             refusal = "table_changed"
     if metadata.get("personal_identity") and personal:
         try:
@@ -2801,13 +2802,14 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     header = lines[0].split("\t") if lines else []
     rows: List[Dict[str, Any]] = []
     genes = _clinvar_local_gene_map()
-    for ln in lines[1:]:
+    for line_number, ln in enumerate(lines[1:], start=2):
         parts = ln.split("\t")
         if len(parts) < len(header):
             continue
         rec: Dict[str, Any] = dict(zip(header, parts))
         tier = _clinvar_tier(rec.get("clnsig", ""))
         rec["tier"] = tier
+        rec["finding_trace"] = {"line": line_number}
         if not rec.get("gene") or rec.get("gene") == ".":
             key = (rec.get("chrom", "").removeprefix("chr"), rec.get("pos"), rec.get("ref"), rec.get("alt"))
             rec["gene"] = genes.get(key) or None
@@ -2850,6 +2852,13 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     low_conf = sum(1 for r in rows if r.get("low_confidence"))
     from .panel_reference import attach_finding_biology
     attach_finding_biology(rows[:limit])
+    for row in rows[:limit]:
+        row["finding_trace"].update(
+            schema=1, table=f.name, table_sha256=table_digest,
+            table_digest_checked=bool(metadata.get("table_sha256")),
+            reference_version=metadata.get("clinvar_date"),
+            assembly=recorded_build, policy="clinvar-classification-and-context-v1",
+            result=row["personal_context"]["status"])
     return {"status": "ok", "count": len(rows), "actionable": actionable,
             "personal_context_counts": personal_counts,
             "counts": counts, "tiers": tiers, "low_confidence": low_conf,
@@ -2983,7 +2992,17 @@ def acmg_sf_findings() -> Dict[str, Any]:
     except Exception as e:
         return {"status": "error", "message": str(e), "hits": []}
     header = lines[0].split("\t") if lines else []
-    rows = [dict(zip(header, ln.split("\t"))) for ln in lines[1:] if ln.strip()]
+    assert prov is not None  # table_refusal admits only a checked table
+    rows = []
+    for line_number, line in enumerate(lines[1:], start=2):
+        if not line.strip():
+            continue
+        row: dict[str, Any] = dict(zip(header, line.split("\t")))
+        row["finding_trace"] = {"schema": 1, "table": f.name, "line": line_number,
+                                "table_sha256": prov.get("table_sha256"),
+                                "table_digest_checked": True, "assembly": table_asm,
+                                "recorded_result": row.get("reportable")}
+        rows.append(row)
     for r in rows:
         # The phenotype is printed, and the TSV keeps it in the language of the scan.
         # The catalogue is already resolved to the reader's language — take it from there.
@@ -3048,6 +3067,14 @@ def acmg_sf_findings() -> Dict[str, Any]:
     personal_counts = attach_context(rows, cat)
     from .panel_reference import attach_finding_biology
     attach_finding_biology(rows)
+    from .knowledge_provenance import record
+    witnesses: dict[str, dict] = {}
+    for hit in rows:
+        gene = hit.get("gene") or ""
+        if gene not in witnesses:
+            witnesses[gene] = record("acmg_sf.json", "genes", gene)
+        hit["finding_trace"].update(policy="acmg-reportability-v1", result=hit.get("reportable"),
+                                    rule=witnesses[gene], reference_version=meta.get("version"))
     return {"status": "ok", "version": meta.get("version"), "published": meta.get("published"),
             "personal_context_counts": personal_counts,
             # What the table says about itself: which builds it was matched in

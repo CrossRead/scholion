@@ -22,8 +22,14 @@ function comparisonHTML(c){
   if(c.delta!=null)lines.push(t('insight.delta')+': '+c.delta);
   if(c.mdd!=null)lines.push(t('insight.mdd',{value:c.mdd}));
   for(const key of ['before','after']){const p=c[key],s=p?.stats;if(s)lines.push(t('insight.coverage',{date:p.date,n:s.n,days:s.days,sd:s.sd}));}
-  if(c.before_dates)lines.push(t('insight.period_dates',{a:c.before_dates.map(x=>x.slice(0,10)).join(' — '),b:c.after_dates.map(x=>x.slice(0,10)).join(' — ')}));
-  if(c.before_range)lines.push(t('insight.period_ranges',{a:c.before_range.join('–'),b:c.after_range.join('–'),na:c.before_n,nb:c.after_n}));
+  const pair=(values,valid)=>Array.isArray(values)&&values.length===2&&values.every(valid);
+  if([c.before_dates,c.after_dates].every(values=>pair(values,value=>typeof value==='string'&&value.length>0))){
+    lines.push(t('insight.period_dates',{a:c.before_dates.map(x=>x.slice(0,10)).join(' — '),b:c.after_dates.map(x=>x.slice(0,10)).join(' — ')}));
+  }
+  if([c.before_range,c.after_range].every(values=>pair(values,Number.isFinite))
+     &&[c.before_n,c.after_n].every(n=>Number.isInteger(n)&&n>0)){
+    lines.push(t('insight.period_ranges',{a:c.before_range.join('–'),b:c.after_range.join('–'),na:c.before_n,nb:c.after_n}));
+  }
   if(c.method_recorded===false||(c.comparison&&c.comparison.method_recorded===false))lines.push(t('insight.method_unknown'));
   return lines.map(x=>`<p class="meta">${esc(x)}</p>`).join('');
 }

@@ -151,6 +151,12 @@ jobs:
       # suite a recipient runs asks nothing of them. Versions are pinned because a
       # new release of either changes what is counted; moving them is a commit of
       # its own, with `check_types.py --accept` if the count moves.
+      - name: Verify registered semantic and interface paths
+        run: python src/tools/check_registry.py
+
+      - name: Compare registered CLI, Web, MCP and plugin results
+        run: python src/tools/check_interfaces.py --out "${{ runner.temp }}/scholion-interfaces.json"
+
       - name: The tools
         run: python -m pip install "ruff==0.15.11" "mypy==1.20.2"
       - name: ruff — rule set F, zero findings

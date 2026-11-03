@@ -58,6 +58,8 @@ def monitoring_for(classes: List[str], catalogue: Dict[str, Any], observations: 
                              "flag": m["flag"] if m else "nodata",
                              **{k: m.get(k) if m else None for k in
                                 ("date", "date_source", "source", "near_limit", "personal_move", "ref_low", "ref_high")},
+                             **{k: m[k] for k in ("source_record", "ingest_method", "sample_id", "draw_id",
+                                                  "form_id", "method", "censored") if m is not None and k in m},
                              "decisions": m.get("decisions") or [] if m else [], "monitoring_basis": []}
             rows[key]["monitoring_basis"].append(selection)
         proposals.append({"class": cls, "reason": reason, "conclusion_basis": basis, "selections": selections})

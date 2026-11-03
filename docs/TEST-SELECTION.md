@@ -10,30 +10,65 @@ test. No test is removed, disabled or deduplicated by this selector.
 ```sh
 python3 src/tools/test_plan.py --changed src/scholion/web/measurements.js --out /tmp/measurement-plan.json
 python3 src/tools/test_plan.py --changed src/scholion/web/measurements.js --run
-python3 src/tools/test_plan.py --since HEAD --out /tmp/working-tree-plan.json
+python3 src/tools/test_plan.py --since HEAD --run --out /tmp/working-tree-check.json
 ```
 
 `--since` includes tracked changes relative to that revision, the staging area,
-working edits and untracked files. With multiple unpublished stages, explicit
-`--changed` paths can describe the current edit; they do not certify other edits.
+working edits and untracked files in the actual Git checkout. In an archive or
+an isolated snapshot without Git, pass repository-relative paths with
+`--changed`. With several unpublished stages, those paths describe the current
+edit only.
 
 The narrow boundary is the shared gene, measurement, system-view and lifecycle
-assets, plus Python tests and their helpers. Dependencies include direct and
+assets, reviewed result producers listed below, plus Python tests and their helpers. Dependencies include direct and
 relative imports, inherited test modules, literal file references and transitive
 helpers. Shared assets also select all tests referring to the containing page,
 so links, delegation and styles remain covered. Dynamic test imports are always
 included. The plan explains each selected dependency.
 
 This is deliberately conservative, not a general static proof of every Python or
-JavaScript dependency. Core code, catalogues, build configuration, fixtures,
+JavaScript dependency. Unclassified core code, catalogues, build configuration, fixtures,
 unknown assets, removed files or a change with no matching test require full
 discovery. Syntax errors stop planning. Adding a new narrow boundary requires
 reviewing its consumers and a selection regression first. Runtime imports or
 new nonliteral file dependencies must not be assumed detectable from text.
 
-`--run` executes the plan through the isolated Python runner (synthetic fixture,
-offline, stub genome). It does not run or replace the full release checks.
-The JSON lists all five levels without declaring any unexecuted level passed.
+Run this check at the end of each development block that changes a registered
+result, its inputs or one of its consumers. `--run` verifies the registry,
+runs semantic tests and runs the affected interface scenarios in one command.
+The checks use synthetic data, offline mode and a stub genome. A failure
+returns a nonzero status. An unknown dependency selects full test discovery
+and all shared interface scenarios. The JSON records which steps ran and their
+results. Browser and installed-package acceptance are separate checks.
+
+## Reviewed result paths
+
+Run `python3 src/tools/check_registry.py` to see the producer files, semantic
+tests and executable interface scenarios across the eleven reviewed result
+families. Every CLI/HTTP parity route has a coverage disposition. A new route
+without a disposition fails the check. Shared scenarios compare the supported
+entry points. Dedicated tests cover stored outcomes and operation-specific
+failures. Boundary checks identify operations that depend on an external
+service or a native dialog. Run the listed semantic test modules and the
+interface driver to collect results. Registry membership alone says nothing
+about a run, the installed wheel, or native host acceptance.
+
+Changes to the exact variant resolution, PGS validation and review-history
+modules have reviewed development selections. A registered producer outside
+that narrow list still requests full discovery. The selector includes named
+family tests and Python imports of reviewed producers, then walks test
+dependencies. The report's `interface_commands` lists the affected shared scenarios by CLI
+command. The GitHub test workflow also runs all shared interface scenarios on
+pull requests alongside the test matrix, so development review catches
+regressions even if a contributor skips the local command. For example:
+
+```sh
+python3 src/tools/test_plan.py --changed src/scholion/variant_readings.py --run --out /tmp/reading-check.json
+```
+
+Use `candidate_evidence.py` when reusing a previous result. Bind installed
+checks to the actual wheel. Keep the full source and built-package gates for
+release acceptance.
 
 ## Recording and checking evidence
 

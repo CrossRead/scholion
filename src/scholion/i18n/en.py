@@ -216,6 +216,7 @@ MESSAGES = {
     'insight.reason.data': 'Input observations changed',
     'insight.reason.rules': 'Rule or knowledge changed',
     'insight.reason.both': 'Observations and rules changed',
+    'insight.reason.date': 'The evaluation date moved the observation window',
     'insight.reason.unknown': 'Reason cannot be established',
     'insight.agenda': 'Visit agenda',
     'insight.select': 'Include in the visit agenda',

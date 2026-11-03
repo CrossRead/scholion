@@ -109,6 +109,10 @@ class TestACrossedTableIsNotReadAsFindings(_Table):
         found = genome.acmg_sf_findings()
         self.assertEqual(found["status"], "ok", found.get("message"))
         self.assertEqual([r["gene"] for r in found["reportable"]], ["BRCA1"])
+        basis = found["reportable"][0]["finding_trace"]
+        self.assertEqual((basis["line"], basis["table_sha256"]), (2, meta["table_sha256"]))
+        self.assertEqual(basis["rule"]["selector"], ["genes", "BRCA1"])
+        self.assertEqual(basis["result"], "yes")
         self.assertEqual(found["table_provenance"], meta)
         self.assertFalse(found["table_provenance_missing"])
 
@@ -160,6 +164,9 @@ class TestAFilteredRowIsNeitherAFindingNorACarrierState(_Table):
                     hit("MUTYH", "yes", pos="3001", rsid="rs4")], self.META)
         found = genome.acmg_sf_findings()
         self.assertEqual(len(found["needs_phase"]), 2)
+        self.assertEqual([r["finding_trace"]["line"] for r in found["needs_phase"]], [2, 3])
+        self.assertTrue(all(r["finding_trace"]["recorded_result"] == "yes"
+                            and r["finding_trace"]["result"] == "needs_phase" for r in found["needs_phase"]))
         self.assertEqual(found["reportable"], [])
 
 

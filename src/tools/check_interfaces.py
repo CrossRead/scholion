@@ -30,6 +30,8 @@ class Scenario:
     route: str
     arguments: dict
     query: str = ''
+    expected_refusal: str | None = None
+    web_field: str | None = None
 
 
 READS = (
@@ -47,7 +49,31 @@ READS = (
     Scenario('clinvar', ('clinvar',), 'GET /api/clinvar', {}),
     Scenario('genome-recorded', ('genome', 'rs1801133'), 'GET /api/genome',
              {'rsid': 'rs1801133'}, 'rsid=rs1801133'),
+    Scenario('drug', ('drug', 'clopidogrel'), 'GET /api/drug',
+             {'drug': 'clopidogrel'}, 'name=clopidogrel'),
+    Scenario('prescription', ('prescription', 'clopidogrel'), 'GET /api/prescription-check',
+             {'drug': 'clopidogrel'}, 'name=clopidogrel'),
+    Scenario('acmg', ('acmg',), 'GET /api/acmg', {}),
+    Scenario('insight-review-preview', ('insight-snapshot',), 'GET /api/insight-snapshot', {}),
     Scenario('prs', ('prs',), 'GET /api/prs', {}),
+    Scenario('goal', ('goal',), 'GET /api/goal', {}),
+    Scenario('goal-suggest', ('goal-suggest',), 'GET /api/goal-suggest', {}),
+    Scenario('focus', ('focus',), 'GET /api/focus', {}),
+    Scenario('brief', ('brief',), 'GET /api/lifestyle-brief', {}),
+    Scenario('suggest-tests', ('suggest-tests',), 'GET /api/suggest-tests', {}),
+    Scenario('second-opinion', ('second-opinion',), 'GET /api/second-opinion', {}),
+    Scenario('radar', ('radar',), 'GET /api/radar', {}),
+    Scenario('systems-list', ('system',), 'GET /api/systems', {}),
+    Scenario('limits', ('limits',), 'GET /api/limits', {}),
+    Scenario('limits-bed', ('limits', '--bed', '--panel', 'ACMG'), 'GET /api/limits/bed',
+             {'bed': True, 'panel': 'ACMG'}, 'panel=ACMG', expected_refusal='never_computed'),
+    Scenario('screen', ('screen',), 'GET /api/screen', {}),
+    Scenario('screen-cardio', ('screen', 'cardio'), 'GET /api/screen',
+             {'disease_class': 'cardio'}, 'class=cardio'),
+    Scenario('longevity', ('longevity',), 'GET /api/longevity', {}),
+    Scenario('lipid-genetics', ('lipid-genetics',), 'GET /api/lipid-genetics', {}),
+    Scenario('genome-status', ('genome-status',), 'GET /api/genome-status', {}),
+    Scenario('sources', ('sources',), 'GET /api/sources', {}, web_field='data_sources'),
     Scenario('recompute-preview', ('recompute',), 'GET /api/recompute', {}),
 )
 
@@ -62,6 +88,8 @@ def select(commands, parity, plugins):
     mappings = [(s.route, s.command[0]) for s in cases]
     if 'focus-log' in requested:
         mappings.append(('POST /api/focus/log', 'focus-log'))
+    if 'insight-snapshot' in requested:
+        mappings.append(('POST /api/insight-snapshot', 'insight-snapshot'))
     for route, command in mappings:
         if parity.get(route) != command or command not in plugins:
             raise ValueError('Scenario no longer matches contract: ' + route)
@@ -138,7 +166,7 @@ def cli(arguments, env, as_json=True, allow_failure=False):
                              *(['--json'] if as_json else [])], env=env, stdin=subprocess.DEVNULL,
                             text=True, encoding='utf-8', capture_output=True, timeout=90)
     if result.returncode and not allow_failure:
-        raise RuntimeError('CLI process failed: ' + result.stderr[-1500:])
+        raise RuntimeError('CLI process failed (' + ' '.join(arguments) + '): ' + result.stderr[-1500:])
     if as_json:
         try:
             return json.loads(result.stdout)
@@ -152,7 +180,9 @@ def cli(arguments, env, as_json=True, allow_failure=False):
 
 def read_case(case, base, env, plugin_entries, agent_command):
     from scholion import contract, i18n, mcp_server, ouroboros_tools
-    data = cli(case.command, env)
+    data = cli(case.command, env, allow_failure=case.expected_refusal is not None)
+    if case.expected_refusal is not None:
+        equal((data.get('ok'), data.get('reason')), (False, case.expected_refusal), case.name + ' CLI refusal')
     if data.get('error'):
         raise AssertionError(case.name + ': CLI returned an error')
     if case.command[0] in ('metrics', 'lifestyle') and not data.get('metrics'):
@@ -160,7 +190,7 @@ def read_case(case, base, env, plugin_entries, agent_command):
     route = case.route.split(' ', 1)[1] + '?' + case.query + '&lang=' + env['SCHOLION_LANG']
     status, web = request(base, route)
     equal(status, 200, 'HTTP status')
-    equal(payload(web), payload(data), case.name + ' CLI/Web')
+    equal(payload(web), payload(data[case.web_field] if case.web_field else data), case.name + ' CLI/Web')
     if 'container' in web:
         equal(web['container']['id'], data['container']['id'], 'Web container identity')
     name = contract.PLUGIN[case.command[0]]
@@ -176,7 +206,7 @@ def read_case(case, base, env, plugin_entries, agent_command):
         if 'container' in structured:
             equal(structured['container']['id'], data['container']['id'], 'MCP container identity')
         equal(payload(structured), payload(data), case.name + ' MCP/CLI structure')
-    text = cli(case.command, env, as_json=False)
+    text = cli(case.command, env, as_json=False, allow_failure=case.expected_refusal is not None)
     suffix = '\n\n' + i18n.t('tool.container_line', id=data['container']['id'])
     if not plugin.endswith(suffix):
         raise AssertionError('Plugin container identity missing or different')
@@ -245,6 +275,58 @@ def write_cases(base, env, entries, agent_command, profile):
             'equal_persisted_records': True, 'stale_view_preserved': True}
 
 
+def review_writes(base, env, entries, agent_command, profile):
+    from scholion import core, insight_history, mcp_server, ouroboros_tools
+
+    original = hashes(profile)
+    path = profile / insight_history.FILENAME
+    _, preview = request(base, '/api/insight-snapshot?lang=' + env['SCHOLION_LANG'])
+    confirmation = preview['confirmation']
+    name = 'sch_insight_snapshot'
+    context = ouroboros_tools.ToolContext()
+    tool = entries[name].handler
+    expected = None
+    surfaces = {
+        'cli': lambda token: cli(['insight-snapshot', '--confirm', token], env, allow_failure=True),
+        'web': lambda token: request(base, '/api/insight-snapshot?lang=' + env['SCHOLION_LANG'],
+                                     {'confirm': token})[1],
+        'mcp': lambda token: rpc([sys.executable, '-m', 'scholion', 'mcp'], name,
+                                 {'confirm': token}, env),
+    }
+    if agent_command:
+        surfaces['agent_launcher'] = lambda token: rpc(agent_command, name, {'confirm': token}, env)
+    for surface, call in surfaces.items():
+        invalid = call('stale-synthetic-fingerprint')
+        result = invalid.get('structuredContent', invalid)
+        equal((result['ok'], result['saved']), (False, False), surface + ' stale confirmation')
+        equal(hashes(profile), original, surface + ' stale confirmation preserved bytes')
+        valid = call(confirmation)
+        result = valid.get('structuredContent', valid)
+        equal((result['ok'], result['saved']), (True, True), surface + ' confirmation')
+        if 'content' in valid:
+            # Repeating a confirmation through the host handler must be idempotent.
+            committed = hashes(profile)
+            equal(tool(context, confirm=confirmation), valid['content'][0]['text'],
+                  surface + ' confirmation matches host handler')
+            equal(hashes(profile), committed, 'Repeated confirmation preserved bytes')
+            report = result.get(mcp_server.REPORT_FIELD)
+            if not report:
+                raise AssertionError('Snapshot lost its assistant report')
+        history = json.loads(path.read_text(encoding='utf-8'))['reviews']
+        equal(len(history), 1, surface + ' stored exactly one review')
+        review = dict(history[0])
+        review.pop('saved_at')
+        if expected is None:
+            expected = review
+        equal(review, expected, surface + ' persisted review')
+        path.unlink()
+        core.reset_cache()
+        equal(hashes(profile), original, surface + ' only review history changed')
+    return {'scenario': 'insight-review-save', 'language': env['SCHOLION_LANG'],
+            'surfaces': [*surfaces, 'plugin'], 'stale_confirmation_preserved': True,
+            'equal_persisted_reviews': True}
+
+
 def execute(root, commands, installed=False, agent_plugin=None):
     # Clear inherited user state before importing any product module.
     for key in list(os.environ):
@@ -305,6 +387,8 @@ def execute(root, commands, installed=False, agent_plugin=None):
                 equal(hashes(profile), before, 'Read-only scenarios preserved profile')
                 if write:
                     checks.append(write_cases(base, env, entries, agent_command, profile))
+                if any(case.name == 'insight-review-preview' for case in cases):
+                    checks.append(review_writes(base, env, entries, agent_command, profile))
         core.reset_cache()
         selected = sorted({s.command[0] for s in cases} | ({'focus-log'} if write else set()))
         return {'origin': str(origin), 'python': sys.executable, 'version': scholion.__version__,

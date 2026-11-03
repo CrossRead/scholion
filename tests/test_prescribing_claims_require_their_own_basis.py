@@ -161,6 +161,10 @@ class TestPrescribingOutput(_Demo):
         with (mock.patch.object(core, "cpic_kb", return_value=book),
               mock.patch.object(pgx, "compute_phenotype", side_effect=lambda g: _phenotype(g, {}))):
             row = pgx.check_drug_gene("codeine")
+        basis = row["decision_trace"]
+        self.assertEqual((basis["selected_gene"], basis["guidance_key"]), ("CYP2D6", "NM"))
+        self.assertEqual(basis["inputs"]["CYP2D6"]["phenotype"], "NM")
+        self.assertEqual(basis["scope_status"], "applicable")
         text = fmt.drug_check(row)
         for field in ("OWN_MECHANISM", "Synthetic PMID:2", "QUOTE_MECHANISM", "Synthetic PMID:3", "SYNTHETIC_QUOTATION"):
             self.assertIn(field, text)

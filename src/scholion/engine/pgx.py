@@ -9,7 +9,7 @@ import re
 from typing import Any, Dict, List, Optional
 from .. import core
 from ..i18n import t as _t
-from ..prescribing_basis import _guard_guidance, _guard_gene_role
+from ..prescribing_basis import _guard_guidance, _guard_gene_role, decision_trace
 from ..interaction_basis import matched_rows as _interaction_rows
 from ..monitoring_basis import monitoring_for
 from ._helpers import (_active_names_by_class, _basis, _basis_note,
@@ -32,7 +32,9 @@ def _marker_cards(markers: List[Dict[str, Any]], gene: str) -> List[Dict[str, An
         rsid = marker.get("rsid") or ""
         card = {**genome_context(symbol, rsid), **marker, "gene": symbol}
         if rsid and not marker.get("diplotype"):
-            reading = core.genotype_status(rsid)
+            reading = marker.get("reading")
+            if reading is None and marker.get("copies") is None:
+                reading = core.genotype_status(rsid)
             if reading:
                 card.update(genotype=reading.get("genotype"), reading=reading,
                             reading_record=reading.get("reading_record"),
@@ -311,7 +313,8 @@ def compute_phenotype(gene: str) -> Dict[str, Any]:
             func_counts[m["function"]] = func_counts.get(m["function"], 0) + copies
         found.append({"rsid": m["rsid"], "star": m.get("star", ""), "genotype": gt,
                       "copies": copies, "function": m["function"], "haplotype": hap,
-                      "confidence": st.get("confidence"), "depth": st.get("depth")})
+                      "confidence": st.get("confidence"), "depth": st.get("depth"),
+                      "reading": st})
 
     basis = _basis(gene, gdef, found)
     if unread:
@@ -406,6 +409,7 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     # check below refuses the unsupported compound-IM state.
     _SEVERITY = {"PM": 3, "IM": 2, "RM": 2, "UM": 2, "NM": 1}
     co_genes = []
+    phenotype_inputs = {gene: ph}
     worst_gene, worst_ph, worst_rank = gene, phenotype, _SEVERITY.get(phenotype, 0)
     # A co-gene that could not be read is not a co-gene that is normal. Its rank
     # used to be zero, so an unread NUDT15 disappeared from the azathioprine
@@ -415,6 +419,7 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
     unresolved_co: List[str] = []
     for g2 in match.get("also_genes", []):
         ph2 = compute_phenotype(g2)
+        phenotype_inputs[g2] = ph2
         co_genes.append({"gene": g2, "phenotype": ph2["phenotype"],
                          "phenotype_label": ph2.get("label", ""),
                          "certainty": ph2.get("certainty")})
@@ -540,6 +545,9 @@ def check_drug_gene(drug: str) -> Dict[str, Any]:
         "guidance_gap": gap,
         "guidance_gap_reason": flag.get("gap_reason"),
         "guidance_applicability": applicability,
+        "decision_trace": decision_trace(driving_gene, guidance_phenotype,
+            guidance_phenotype if explicit else "default" if selected else None,
+            applicability["status"], phenotype_inputs),
         "conclusion_basis": flag.get("conclusion_basis"),
         "interpretation_withheld": flag.get("interpretation_withheld", False),
         "source": flag.get("source"), "mechanism": flag.get("mechanism"),

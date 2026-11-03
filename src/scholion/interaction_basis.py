@@ -87,5 +87,8 @@ def matched_rows(rule: Dict[str, Any], drug: str, classes: List[str], pair: str,
         groups.setdefault(new_held and held(name, pair), []).append(name)
     if not groups:
         groups[False if pair in scope else new_held] = []
-    return [{**_guard(rule, applies), "with_class": pair, "with_meds": names}
+    return [{**_guard(rule, applies), "with_class": pair, "with_meds": names,
+             "scope_evidence": {"requested_drug": drug, "requested_classes": sorted(classes),
+                                "partner_class": pair, "partners": list(names),
+                                "matched_drug_scope": applies}}
             for applies, names in groups.items()]

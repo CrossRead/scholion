@@ -18,8 +18,9 @@ class TestStoredObservations(unittest.TestCase):
         reading = vr.resolve('rs1801133',
                              {'genotype': 'CT', 'confidence': 'called', 'depth': 23},
                              {'genotype': 'CC', 'source': 'pharmacogenomics.json'})
-        with patch.object(core, 'genotype_status', return_value=reading):
-            card = pgx._marker_cards(markers, 'MTHFR')[0]
+        with patch.object(core, 'genotype_status') as lookup:
+            card = pgx._marker_cards([{**markers[0], 'reading': reading}], 'MTHFR')[0]
+        lookup.assert_not_called()
         self.assertEqual(card['genotype'], 'CT')
         self.assertEqual(card['depth'], 23)
         self.assertEqual(card['reading_record'], reading['reading_record'])
@@ -34,6 +35,33 @@ class TestStoredObservations(unittest.TestCase):
         lookup.assert_not_called()
         self.assertEqual(card['diplotype'], '*1/*2')
         self.assertTrue(card['reference_context']['gene_function'])
+
+    def test_same_letters_at_incompatible_known_positions_do_not_confirm(self):
+        called = {'genotype': 'AG', 'confidence': 'called', 'depth': 23,
+                  'variant_identity': {'assembly': 'GRCh38', 'chrom': 'chr1', 'pos': 100}}
+        saved = {'genotype': 'GA', 'source': 'pharmacogenomics.json',
+                 'variant_identity': {'assembly': 'GRCh38', 'chrom': '1', 'pos': '101'}}
+        row = vr.resolve('rs1', called, saved)
+        self.assertNotIn('confirmed_by', row)
+        self.assertEqual(row['conflict']['fields'], ['pos'])
+        self.assertFalse(vr.permits_interpretation(row))
+        record = row['reading_record']
+        self.assertEqual(record['selected_observation'],
+                         record['observations'][0]['source']['record_digest'])
+        saved['variant_identity'].pop('pos')
+        self.assertEqual(vr.resolve('rs1', called, saved)['confirmed_by'], 'profile')
+
+    def test_drug_card_reuses_the_reading_that_produced_allele_copies(self):
+        marker = {'rsid': 'rs1801133', 'variant_allele': 'T', 'function': 'decreased'}
+        reading = vr.resolve(marker['rsid'], {'genotype': 'CT', 'confidence': 'called', 'depth': 23})
+        later = {'genotype': 'TT', 'confidence': 'called', 'depth': 99}
+        with patch.object(core, 'cpic_kb', return_value={'genes': {'MTHFR': {'markers': [marker]}}}), \
+                patch.object(core, 'genome_gaps', return_value=[]), \
+                patch.object(core, 'genotype_status', side_effect=[reading, later]) as lookup:
+            model = pgx.compute_phenotype('MTHFR')
+            card = pgx._marker_cards(model['found'], 'MTHFR')[0]
+        self.assertEqual(lookup.call_count, 1)
+        self.assertEqual((card['genotype'], card['copies'], card['depth']), ('CT', 1, 23))
 
     def test_a_saved_conflict_is_not_a_drug_caution_or_a_panel_allele_effect(self):
         from scholion.engine import class_genotype

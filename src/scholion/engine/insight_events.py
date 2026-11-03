@@ -1,12 +1,11 @@
 """Identify events from existing calculators; no ranking, persistence or rendering."""
 from __future__ import annotations
 
-import re
 from datetime import date
 from typing import Any
 
 from .. import core
-from .treatment import _treatment_medications
+from ..insight_synthesis import treatment_context as _treatment_context
 from ..i18n import t
 from ..knowledge_provenance import digest as _digest
 from ..trend_qualification import comparable_observations, observation_day
@@ -20,7 +19,8 @@ def _fact_identity(fact: dict) -> dict:
         "source", "date_source", "method", "unit", "stats", "drug", "rsid", "genotype", "state",
         "genotype_source", "gene", "recorded_reference", "ref_low", "ref_high", "ref_origin", "reference_withheld", "marker", "from", "due", "plan_source", "dose", "target",
         "system", "aspect", "change", "note", "during_recorded_course", "pgs_id", "percentile", "reference_panel_ancestry", "computed", "class", "end_date", "current",
-        "source_record", "ingest_method", "sample_id", "draw_id", "variants", "diplotype") if k in fact}
+        "source_record", "ingest_method", "sample_id", "draw_id", "form_id", "measurement_source",
+        "aggregation", "device", "variants", "diplotype", "scoring_trace") if k in fact}
     observed_genotype=identity.get("genotype")
     if isinstance(observed_genotype, dict):
         identity["genotype"] = {k: v for k, v in observed_genotype.items()
@@ -43,8 +43,10 @@ def _event(kind: str, key: str, name: str, facts: list[dict], *, priority: int =
 def _fact(key: str, point: dict, row: dict) -> dict:
     return {"record": "labs.json", "key": key, **{k: point.get(k) for k in (
         "date", "value", "censored", "comparator", "source", "date_source", "method")},
-        **{k: point[k] for k in ("source_record", "ingest_method", "sample_id", "draw_id") if k in point},
-        "unit": row.get("unit"), "unit_display": row.get("unit_display"),
+        **{k: point[k] for k in ("source_record", "ingest_method", "sample_id", "draw_id", "form_id") if k in point},
+        "unit": point.get("unit") or row.get("unit"),
+        "unit_display": point.get("unit_display") or (row.get("unit_display") if not point.get("unit")
+                                                        or point["unit"] == row.get("unit") else point["unit"]),
         "ref_low": point.get("ref_low", row.get("ref_low")),
         "ref_high": point.get("ref_high", row.get("ref_high")),
         "ref_origin": "form" if any(point.get(k) is not None for k in ("ref_low", "ref_high")) else row.get("ref_origin"),
@@ -69,7 +71,8 @@ def _lab_events(rows: list[dict], today: date) -> list[dict]:
     events = []
     for row in rows:
         key = row["key"]
-        points = sorted(row.get("series") or [], key=lambda p: str(p.get("date") or ""))
+        points = sorted(({**p, "unit": p.get("unit") or row.get("unit")}
+                         for p in row.get("series") or []), key=lambda p: str(p.get("date") or ""))
         if not points or not _current(points[-1], today) or row.get("proposed_rule"):
             continue
         current = points[-1]
@@ -116,10 +119,19 @@ def _lab_events(rows: list[dict], today: date) -> list[dict]:
                 if delta and trend.get("distinguishable") is True:
                     target_identity = {k: target.get(k) for k in
                                        ("low", "high", "value", "unit", "set_by", "set_on")}
-                    events.append(_event("goal_toward" if delta < 0 else "goal_away", key,
-                        row["name"], [_fact(key, p, row) for p in points[-2:]] +
-                        [{"record": "clinician_targets.json", "key": key, "target": target_identity}],
-                        detail={"target": target, "comparison": trend}, rule="explicit-target-distance-v1"))
+                    # The pair supplies the distance change. The full series
+                    # supplies the own-history floor that qualifies that change.
+                    facts = [_fact(key, p, row) for p in points]
+                    target_index = len(facts)
+                    facts.append({"record": "clinician_targets.json", "key": key, "target": target_identity})
+                    event = _event("goal_toward" if delta < 0 else "goal_away", key, row["name"], facts,
+                                   detail={"target": target, "comparison": trend},
+                                   rule="explicit-target-distance-v1")
+                    event["inputs"] = {"schema": 1, "fact_indices": {
+                        "history": list(range(target_index)),
+                        "distance_pair": [target_index - 2, target_index - 1],
+                        "target": [target_index]}}
+                    events.append(event)
     return events
 
 
@@ -173,7 +185,8 @@ def insight_events(labs: dict, cautions: list[dict], controls: list[dict],
     return events
 
 
-def _annual_events(summary: list[dict], labs: dict, window: int = 365) -> list[dict]:
+def _annual_events(summary: list[dict], labs: dict, window: int = 365,
+                   today: date | None = None) -> list[dict]:
     """Longitudinal observations for the person's existing phenotype summary."""
     from ..trend_qualification import period_shift
     from ..period_summary import period_summary
@@ -183,7 +196,7 @@ def _annual_events(summary: list[dict], labs: dict, window: int = 365) -> list[d
     extra = [{"label": r.get("name") or core.marker_name({"key": key}), "components": [{"ref": "lab:" + key,
               "series": r.get("series") or [], "aggregation": "observation"}]}
              for key, r in rows.items() if "lab:" + key not in supplied]
-    summary = period_summary(summary + extra, window)
+    summary = period_summary(summary + extra, window, today)
     events = []
     seen = set()
     for row in summary:
@@ -198,6 +211,8 @@ def _annual_events(summary: list[dict], labs: dict, window: int = 365) -> list[d
                 continue
             period = component.get("period") or {}
             points = period.get("series" if lab else "comparison_series") or []
+            if lab:
+                points = [{**p, "unit": p.get("unit") or lab.get("unit")} for p in points]
             from ..measurements import streams
             candidates = [(group, period_shift(group, component.get("aggregation") == "monthly_mean" or all(p.get("aggregation") == "monthly_mean" for p in group), window))
                           for group in streams(points)]
@@ -214,43 +229,19 @@ def _annual_events(summary: list[dict], labs: dict, window: int = 365) -> list[d
             name = (lab.get("name") or core.marker_name({"key": key})) if lab else row["label"]
             event = _event("period_shift", ref if window == 365 else ref + ":" + str(window), name, facts, priority=2,
                            destination="labs" if lab else "lifestyle", rule=shift["policy"], detail=shift)
+            event["inputs"] = {"schema": 1, "fact_indices": {
+                "before": list(range(shift["before_n"])),
+                "after": list(range(shift["before_n"], len(facts)))}}
             if lab:
                 from ..insight_synthesis import assess_direction
                 event["detail"]["assessment"] = assess_direction(shift, lab, points)
                 context = _treatment_context(key, shift["from"], shift["to"])
                 event["detail"]["treatment_context"] = context
+                measurement_count = len(event["facts"])
                 event["facts"].extend(context)
+                event["inputs"]["fact_indices"]["treatment_context"] = list(
+                    range(measurement_count, len(event["facts"])))
                 event["facts_digest"] = _digest([_fact_identity(f) for f in event["facts"]])
             event["limitations"] = ["descriptive_periods", "not_clinical_significance"]
             events.append(event)
     return events
-
-
-def _treatment_context(marker: str, start: str, end: str) -> list[dict]:
-    """Recorded treatment chronology in the same system, without attribution."""
-    domains = core._read_knowledge_raw("radar_domains.json").get("domains") or []
-    systems = {d["key"] for d in domains if marker in d.get("markers", [])}
-    context = []
-    for row in _treatment_medications():
-        med = row['medication']
-        if not systems.intersection(row['systems']):
-            continue
-        begin = str(med.get("start_date") or "")
-        stop = str(med.get("end_date") or "")
-        matched = re.fullmatch(r"(?:stopped|completed|discontinued)_(\d{4}-\d{2}(?:-\d{2})?)", str(med.get("status") or ""))
-        if not stop and matched:
-            stop = matched.group(1)
-        current = core.is_active_medication(med)
-        if any(stamp and observation_day(stamp + ("-01" if len(stamp) == 7 else "")) is None
-               for stamp in (begin, stop)):
-            continue
-        if stop and stop < begin[:len(stop)]:
-            continue
-        if not begin or begin > end or (stop and stop < start[:len(stop)]):
-            continue
-        if not current and not stop:
-            continue
-        context.append({"record": "medications.json", "drug": med.get("name"),
-                        "date": begin, "end_date": stop or None, "current": current,
-                        "state": med.get("status"), "source": "medications.json"})
-    return context

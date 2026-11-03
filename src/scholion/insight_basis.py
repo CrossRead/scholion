@@ -1,6 +1,7 @@
 """Source witnesses of displayed insights, without a second fact database."""
 from __future__ import annotations
 
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -27,9 +28,13 @@ def fact_source(fact: dict[str, Any]) -> dict[str, Any]:
                                 if k in witness},
             'section': (fact.get('ingest_method') or {}).get('section'),
             'sample_id': fact.get('sample_id'), 'draw_id': fact.get('draw_id'),
+            **({'form_id': fact['form_id']} if fact.get('form_id') else {}),
             'verification': 'recorded_witness_not_current_content_verification'}
-    result['id'] = digest({k: result[k] for k in ('record', 'key', 'date', 'method', 'source',
-                                               'source_identity', 'section', 'sample_id', 'draw_id')})
+    identity = {k: result[k] for k in ('record', 'key', 'date', 'method', 'source',
+                                     'source_identity', 'section', 'sample_id', 'draw_id')}
+    if 'form_id' in result:
+        identity['form_id'] = result['form_id']
+    result['id'] = digest(identity)
     return result
 
 
@@ -92,3 +97,24 @@ def bind(item: dict[str, Any], preserve_existing: bool = False) -> None:
                   'refresh': {'kind': 'computed_on_read', 'command': 'scholion overview --json',
                               'writes_profile': False, 'requires_genome_preparation': False,
                               'requires_pgs_calculation': False}}}
+
+
+def lab_review_state(row: dict, marker_rule: Any, threshold_rule: Any, now: date) -> dict:
+    """Keep the whole input identity separate from today's window selection."""
+    from .engine.insight_events import _current, _fact, _fact_identity
+    from .period_summary import _in_window
+    series = sorted(row.get("series") or [], key=lambda p: str(p.get("date") or ""))
+    latest = series[-1] if series else {}
+    target = row.get("clinician_target") or row.get("target")
+    return {"flag": row.get("flag"), "date": row.get("date"),
+            "current": row.get("display_recency"), "proposed": row.get("proposed_rule"),
+            "unit": row.get("unit"), "ref_low": row.get("ref_low"), "ref_high": row.get("ref_high"),
+            "method": latest.get("method"), "value": row.get("value"),
+            "data_digest": digest([_fact_identity(_fact(row["key"], p, row)) for p in series]),
+            "rules_digest": digest([marker_rule, threshold_rule]),
+            "evaluation": {"schema": 1,
+                           "target_digest": digest(target),
+                           "current": _current(latest, now),
+                           "windows": {str(days): digest([p["date"] for p in series
+                                                              if _in_window(p, now - timedelta(days=days), now)])
+                                       for days in (30, 90, 365)}}}

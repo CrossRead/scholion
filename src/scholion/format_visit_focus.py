@@ -5,6 +5,14 @@ from .i18n import t
 from .format_primitives import _n
 
 
+def _gene_lines(row: dict) -> list[str]:
+    from .personal_meaning import lines as meaning_lines
+    meaning = meaning_lines(row, include_level=False)
+    if meaning:
+        return ([str(row['function'])] if row.get('function') else []) + meaning + ([row['reading_note']] if row.get('reading_note') else [])
+    return [str(row[k]) for k in ('function', 'summary', 'reading_note', 'source') if row.get(k)]
+
+
 def report(data: dict) -> str:
     if data.get('document'):
         return _document_report(data)
@@ -52,7 +60,7 @@ def report(data: dict) -> str:
         for row in section['genetics']:
             lines.append(f"• {row['gene']} {row['rsid']}: {row.get('genotype') or '—'} · "
                          + t('visit.focus.level', level=row.get('level') or '—'))
-            lines.extend(str(row[k]) for k in ('function', 'summary', 'reading_note', 'source') if row.get(k))
+            lines.extend(_gene_lines(row))
             for assertion in row['gencc']:
                 lines.append(t('gencc.assertion', disease=assertion.get('disease_label') or assertion.get('disease') or '—',
                     classification=assertion.get('classification_label') or assertion.get('classification') or '—', moi=assertion.get('moi_label') or assertion.get('moi') or '—',
@@ -109,7 +117,7 @@ def _document_report(data: dict) -> str:
                 lines.append(t('visit.report.separate'))
         for gene in section['discussion_genetics']:
             lines += [f"{gene['gene']} {gene['rsid']}: {gene.get('genotype') or '—'} · Scholion {gene.get('level') or '—'}"]
-            lines.extend(str(gene[k]) for k in ('function', 'summary', 'reading_note', 'source') if gene.get(k))
+            lines.extend(_gene_lines(gene))
             for link in gene['visit_links']:
                 lines.extend([t('visit.report.gene_reason')+': '+link['reason'], link['qualification']])
                 if link.get('source'):
@@ -136,7 +144,7 @@ def _document_report(data: dict) -> str:
             lines.extend(['', panel['label'], panel['note']])
         for gene in panel['readings']:
             lines.append(f"{gene['gene']} {gene['rsid']}: {gene.get('genotype') or '—'} · Scholion {gene.get('level') or '—'}")
-            lines.extend(str(gene[k]) for k in ('function', 'summary', 'reading_note', 'source') if gene.get(k))
+            lines.extend(_gene_lines(gene))
     for estimate in doc['clinical_estimates']:
         lines.extend([estimate['name']+': '+str(estimate['value'])+' '+estimate['unit']+' · '+str(estimate['date']),
                       estimate.get('interpretation') or '', estimate['source']])

@@ -85,3 +85,10 @@ the Gene Ontology Consortium (https://geneontology.org/), under CC BY 4.0
 The annotations are provided without warranty. Gene-level biology does not
 establish the effect of a particular variant. Source records and annotation
 evidence codes accompany the selected descriptions in gene_function_context.json.
+
+Selected human Swiss-Prot functional annotations are derived from UniProtKB,
+attributed to the UniProt Consortium (https://www.uniprot.org/), under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). Statements are selected,
+adapted and translated. Each record links to its upstream accession. The
+annotation is at gene or protein level and supplies no individual clinical
+interpretation.

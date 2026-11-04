@@ -13,11 +13,13 @@ from ..clinical_claims import guard_fields
 from ._helpers import DISCLAIMER
 
 
-def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dict[str, Any]:
+def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *,
+                  allow_network: bool = True) -> Dict[str, Any]:
     """Lookup of any locus in the personal full VCF (through the coordinate reference)."""
     from .. import genome
-    r = genome.lookup(rsid=rsid, gene=gene)
+    r = genome.lookup(rsid=rsid, gene=gene, verify_missing=True, allow_network=allow_network)
     from ..panel_reference import genome_context
+    from ..personal_meaning import attach as attach_meaning
     context_gene = r.get("gene") or (r.get("locus") or {}).get("gene")
     if context_gene:
         r.update(genome_context(context_gene, r.get("rsid") or ""))
@@ -49,17 +51,24 @@ def genome_lookup(rsid: Optional[str] = None, gene: Optional[str] = None) -> Dic
     # assistant to supply the meaning out of its own general knowledge, which is
     # how a reader came to be told about a locus this build does not interpret.
     if r.get("rsid"):
+        r.setdefault("result", None)
         r["basis"] = locus_basis(r["rsid"])
     for _item in (r.get("loci") or []):
         if isinstance(_item, dict) and _item.get("rsid"):
             _item["basis"] = locus_basis(_item["rsid"])
     if gene and not rsid:
         from ..gene_region import attach_reading
-        attach_reading(r, gene)
+        attach_reading(r, gene, allow_network=allow_network)
         for answer in (r, r.get("region_report")):
             if isinstance(answer, dict):
                 context = genome_context(answer.get("gene") or gene)
                 answer.update({key: context[key] for key in ("reference_context", "level")})
+    from .labs import analyze_labs
+    candidates = [r, *(r.get("loci") or [])]
+    linked = {entry["rsid"] for entry in core._read_knowledge("genetic_lab_links.json").get("links") or []}
+    markers = {m["key"]: m for m in analyze_labs()["markers"]} if any(item.get("rsid") in linked for item in candidates) else None
+    for item in candidates:
+        attach_meaning(item, markers)
     r["disclaimer"] = DISCLAIMER()
     return r
 
@@ -939,6 +948,9 @@ def prs_findings() -> Dict[str, Any]:
         "term", (("label", "label"), ("category", "category")), extra_key="label")
     _annotate_prs_evidence(traits)
     _annotate_prs_measurement(traits)
+    from ..pgs_applicability import annotate as annotate_applicability
+    panel = _panel_facts(data)
+    annotate_applicability(traits, panel["ancestry_determined"])
     cats: Dict[str, List[Dict[str, Any]]] = {}
     order: List[str] = []
     for t in traits:
@@ -980,7 +992,7 @@ def prs_findings() -> Dict[str, Any]:
         # part of what this number means.
         "method_caveats": prs_method_caveats() + _panel_caveat(data),
         "stats": {"total": len(traits), "reliable": len(reliable),
-                  "high": len(high), **_panel_facts(data),
+                  "high": len(high), **panel,
                   "updated": (data.get("_meta") or {}).get("updated")},
         "disclaimer": PRS_DISCLAIMER(),
     }
@@ -1070,7 +1082,8 @@ def longevity_findings() -> Dict[str, Any]:
     genes = sorted(sig.keys(), key=lambda g: (famous.index(g) if g in famous else 999, g))
     sig = {g: [{**v, "note": _t("longevity.catalogue_variant"),
                  "catalogue_source": "LongevityMap (HAGR)"} for v in variants] for g, variants in sig.items()}
-    sig_genes = [{"gene": g, "variants": [{**v, **genome_context(g, v.get("rsid") or "")} for v in sig[g]],
+    from ..personal_meaning import attach as attach_meaning
+    sig_genes = [{"gene": g, "variants": [attach_meaning({**v, **genome_context(g, v.get("rsid") or "")}) for v in sig[g]],
                   **genome_context(g)} for g in genes]
     meta = data.get("_meta", {})
     apoe_reading = apoe()
@@ -1211,8 +1224,10 @@ def lipid_genetics() -> Dict[str, Any]:
         }, ('label', 'verdict', 'verdict_token', 'population_note', 'action')))
 
     from ..panel_reference import genome_context
+    from ..personal_meaning import attach as attach_meaning
     for item in pcsk9:
         item.update(genome_context("PCSK9", item["rsid"]))
+        attach_meaning(item)
 
     waiting = []
     for rsid in _PCSK9_WAITING:
@@ -1228,6 +1243,7 @@ def lipid_genetics() -> Dict[str, Any]:
                 "interpretation_status": "direction_not_curated", "label": None,
                 "why": _t("lipidgen.direction_unknown"), "variant_note": variant.get("why")}
         item.update(genome_context("PCSK9", rsid))
+        attach_meaning(item)
         waiting.append(item)
     pcsk9.extend(waiting)
 

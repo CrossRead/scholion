@@ -27,6 +27,7 @@ Standard library only; `bcftools` is an external program.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import shutil
@@ -52,13 +53,32 @@ class Stopped(Exception):
 
 
 def catalogue() -> Dict[str, Any]:
-    """The locus catalogue this build reads, with its size and its date."""
+    """One batch catalogue for core loci and supported thematic positions."""
     from . import core
-    data = json.loads(Path(core.knowledge_path("loci.json")).read_text(encoding="utf-8"))
-    meta = data.get("_meta") or {}
-    loci = data.get("loci") or {}
-    stamp = str(meta.get("catalog_updated") or meta.get("updated") or "")[:10]
-    return {"loci": loci, "positions": len(loci), "updated": stamp or None}
+    data = core._read_knowledge_raw("loci.json")
+    thematic = core._read_knowledge_raw("thematic_variant_annotations.json")
+    loci = dict(data.get("loci") or {})
+    excluded = []
+    for rsid, entry in (thematic.get("variants") or {}).items():
+        if rsid in loci:
+            continue
+        if (entry.get("personal_call_supported") is not True
+                or entry.get("ref") not in {"A", "C", "G", "T"}
+                or entry.get("alt") not in {"A", "C", "G", "T"}):
+            excluded.append({"rsid": rsid, "gene": entry.get("gene"),
+                             "reason": "unsupported_variant_type"})
+            continue
+        loci[rsid] = entry
+    stamps = [str((book.get("_meta") or {}).get("catalog_updated")
+                  or (book.get("_meta") or {}).get("updated") or "")[:10]
+              for book in (data, thematic)]
+    # Description/source edits do not require reading the alignment again.
+    identities = {rsid: {key: row.get(key) for key in
+                        ("chrom", "pos", "pos_grch37", "ref", "alt", "assembly_alleles")}
+                  for rsid, row in loci.items()}
+    fingerprint = hashlib.sha256(json.dumps(identities, sort_keys=True).encode()).hexdigest()
+    return {"loci": loci, "positions": len(loci), "updated": max(stamps) or None,
+            "fingerprint": fingerprint, "excluded": excluded}
 
 
 def requirements() -> Dict[str, Optional[str]]:
@@ -119,6 +139,7 @@ def state() -> Dict[str, Any]:
     out = out_path(req.get("vcf"))
     res: Dict[str, Any] = {"catalogue_positions": cat["positions"],
                            "catalogue_updated": cat["updated"],
+                           "excluded": cat.get("excluded", []),
                            "path": str(out) if out else None,
                            "refusal": refusal(req), "record": None}
     if out is None:
@@ -132,7 +153,9 @@ def state() -> Dict[str, Any]:
         res["record"] = rec
         held = int(rec.get("catalogue_positions") or 0)
         res["positions_held"] = held
-        same = held >= cat["positions"] and (rec.get("catalogue_updated") or None) == cat["updated"]
+        same = (rec.get("catalogue_fingerprint") == cat["fingerprint"]
+                if cat.get("fingerprint") else
+                held >= cat["positions"] and (rec.get("catalogue_updated") or None) == cat["updated"])
         res["status"] = "current" if same else "older_than_catalogue"
         return res
     made = date.fromtimestamp(out.stat().st_mtime).isoformat()
@@ -195,6 +218,88 @@ def _run_pipeline(cmds: List[List[str]]) -> Dict[str, Any]:
         err.close()
     rc = next((c for c in codes if c != 0), 0)
     return {"rc": rc, "stderr": "\n".join(t for t in tail if t.strip())}
+
+
+def verify_position(loc: Dict[str, Any], assembly: str, bam: Path) -> Dict[str, Any]:
+    """Call one diploid autosomal SNP from local reads, without writing genome files."""
+    from . import fastalite, gene_region, genome
+    from .variant_readings import digest
+
+    inputs = {**requirements(), "bam": str(bam)}
+    why = refusal(inputs)
+    if why:
+        return {"reason": why}
+    pos = genome.locus_position(loc, assembly)
+    loc = genome.locus_alleles(loc, assembly)
+    chrom = str(loc.get("chrom") or "").removeprefix("chr")
+    ref, alt = loc.get("ref"), loc.get("alt")
+    if (not pos or chrom not in _CANON[:22] or ref not in {"A", "C", "G", "T"}
+            or alt not in {"A", "C", "G", "T"} or ref == alt):
+        return {"reason": "unsupported_locus"}
+    vcf = str(inputs["vcf"])
+    sample_index = genome.sample_index(vcf)
+    samples = genome.samples_of(vcf)
+    if sample_index is None or sample_index >= len(samples):
+        return {"reason": "sample_mismatch"}
+    reference = str(inputs["reference"])
+    try:
+        build = alignment_build(str(bam))
+        fa = fastalite.Fasta(reference)
+        contig = build["prefix"] + chrom
+        fasta_build = _CHR1.get((fa.index.get("chr1") or fa.index.get("1") or (0,))[0])
+        if build["assembly"] != assembly or fasta_build != assembly:
+            return {"reason": "build_mismatch"}
+        if contig not in build["contigs"] or contig not in fa.index or fa.fetch(contig, pos, pos) != ref:
+            return {"reason": "reference_mismatch"}
+        stat = bam.stat()
+        tool = str(inputs["bcftools"])
+        pileup = subprocess.run([tool, "mpileup", "-r", f"{contig}:{pos}-{pos}", "-f", reference,
+                                "-a", "FORMAT/DP", "-Ou", str(bam)], capture_output=True, check=True, timeout=20)
+        called = subprocess.run([tool, "call", "-m", "--keep-unseen-allele", "-a", "FORMAT/GQ", "-Ov"],
+                                input=pileup.stdout, capture_output=True, check=True, timeout=20)
+        lines = called.stdout.decode("utf-8").splitlines()
+        header = next((line.split("\t") for line in lines if line.startswith("#CHROM")), [])
+        if header[9:] != [samples[sample_index]]:
+            return {"reason": "sample_mismatch"}
+        rows = [line.split("\t") for line in lines if line and not line.startswith("#")]
+        if len(rows) != 1 or rows[0][0] != contig or int(rows[0][1]) != pos:
+            return {"reason": "no_call"}
+        row = gene_region._parse_row(rows[0])
+        raw = row.get("genotype") or ""
+        alleles = [ref, *row["alt"].split(",")]
+        gt = raw.replace("|", "/").split("/")
+        if (row["ref"] != ref or len(gt) != 2
+                or any(not a.isdigit() or int(a) >= len(alleles) or alleles[int(a)] not in (ref, alt)
+                       for a in gt)):
+            return {"reason": "no_call"}
+        quality = row.get("genotype_quality")
+        likelihood_gap = None
+        if gt == ["0", "0"] and quality is None:
+            # bcftools omits GQ on reference calls. Keep the unobserved allele
+            # and require likelihood separation from every alternative GT.
+            fields = dict(zip(rows[0][8].split(":"), rows[0][9].split(":")))
+            pl = fields.get("PL", "").split(",")
+            if len(pl) >= 3 and all(value.isdigit() for value in pl):
+                likelihood_gap = min(map(int, pl[1:])) - int(pl[0])
+        if (row["filter"] not in ("PASS", ".") or (row.get("depth") or 0) < 10
+                or ((quality if quality is not None else likelihood_gap) or 0) < 20):
+            return {"reason": "low_quality"}
+        after = bam.stat()
+        if (after.st_ino, after.st_size, after.st_mtime_ns, after.st_ctime_ns) != (
+                stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns):
+            return {"reason": "read_failed"}
+    except (OSError, ValueError, KeyError, IndexError, subprocess.SubprocessError):
+        return {"reason": "read_failed"}
+    return {"genotype": "".join(alleles[int(a)] for a in gt), "raw_genotype": raw,
+            "phased": "|" in raw, "confidence": "confirmed_ref" if gt == ["0", "0"] else "called",
+            "source": "bam", "assembly": assembly, "read_pos": pos,
+            "depth": row["depth"], "genotype_quality": quality,
+            "likelihood_gap_phred": likelihood_gap,
+            "variant_identity": {"assembly": assembly, "chrom": contig, "pos": pos,
+                                 "ref": ref, "alt": alt},
+            "source_identity": {"file": bam.name, "path_key": digest(str(bam.resolve())),
+                                "revision_method": "filesystem_stat", "size": stat.st_size,
+                                "mtime_ns": stat.st_mtime_ns, "ctime_ns": stat.st_ctime_ns}}
 
 
 def genotype(progress: Optional[Progress] = None, out: Optional[str] = None,
@@ -263,7 +368,8 @@ def genotype(progress: Optional[Progress] = None, out: Optional[str] = None,
         os.replace(merged, target)
         os.replace(str(merged) + ".tbi", str(target) + ".tbi")
         record = {"engine": __version__, "catalogue_positions": cat["positions"],
-                  "catalogue_updated": cat["updated"], "positions_written": written,
+                  "catalogue_updated": cat["updated"], "catalogue_fingerprint": cat.get("fingerprint"),
+                  "excluded": cat.get("excluded", []), "positions_written": written,
                   "assembly": build["assembly"], "alignment": Path(bam).name,
                   "written": date.today().isoformat()}
         tmp = target.parent / f".{RECORD_NAME}.tmp-{os.getpid()}"

@@ -51304,6 +51304,61 @@
         "status": "merged",
         "retrieved": "2026-10-27"
       }
+    },
+    "FAIM2": {
+      "description": {
+        "en": "FAIM2 is a membrane protein that inhibits programmed cell death initiated through the Fas receptor. The association of a nearby DNA marker with body mass does not assign that association to FAIM2.",
+        "ru": "Мембранный белок FAIM2 подавляет программируемую гибель клеток, запускаемую через рецептор Fas. Связь соседнего маркера с массой тела сама по себе не указывает на FAIM2 как на её причину."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/gene/23017/",
+      "retrieved": "2026-11-04",
+      "scope": "gene_function",
+      "function_status": "curated_function",
+      "tax_id": "9606"
+    },
+    "NAF1": {
+      "description": {
+        "en": "NAF1 assists assembly of H/ACA ribonucleoprotein complexes. This includes the complex containing telomerase RNA, which serves as a template for adding telomeric repeats.",
+        "ru": "NAF1 участвует в сборке рибонуклеопротеиновых комплексов H/ACA. К ним относится комплекс с РНК теломеразы, служащей матрицей для добавления теломерных повторов."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/gene/92345/",
+      "retrieved": "2026-11-04",
+      "scope": "gene_function",
+      "function_status": "curated_function",
+      "tax_id": "9606"
+    },
+    "RXRA": {
+      "description": {
+        "en": "Retinoid X receptor alpha is a nuclear transcription factor. It can pair with other nuclear receptors, such as the vitamin D receptor, and the resulting complex regulates transcription at specific DNA sequences.",
+        "ru": "Ретиноидный X-рецептор α — ядерный фактор транскрипции. Он образует пары с другими ядерными рецепторами, например с рецептором витамина D. Такой комплекс регулирует транскрипцию на определённых участках ДНК."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/gene/6256",
+      "retrieved": "2026-11-04",
+      "scope": "gene_function",
+      "function_status": "curated_function",
+      "tax_id": "9606"
+    },
+    "TMEM18": {
+      "description": {
+        "en": "The TMEM18 protein localises to the nuclear membrane. Association studies at the nearby locus do not establish a molecular mechanism for the effect of rs6548238 on body mass.",
+        "ru": "Белок TMEM18 локализуется в ядерной мембране. Ассоциации соседнего локуса с ИМТ не устанавливают молекулярный механизм влияния rs6548238 на массу тела."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/datasets/gene/129787/",
+      "retrieved": "2026-11-04",
+      "scope": "gene_function",
+      "function_status": "curated_function",
+      "tax_id": "9606"
+    },
+    "XG": {
+      "description": {
+        "en": "The XG membrane glycoprotein carries the Xgᵃ antigen on the surface of erythrocytes.",
+        "ru": "Мембранный гликопротеин XG несёт антиген Xgᵃ на поверхности эритроцитов."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/29748255/",
+      "retrieved": "2026-11-04",
+      "scope": "gene_function",
+      "function_status": "curated_function",
+      "tax_id": "9606"
     }
   },
   "disease_contexts": {

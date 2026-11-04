@@ -23,14 +23,16 @@ def _reading_row(row: dict, disease_ids: set[str] | None = None) -> dict:
         if not reference.get(key):
             reference[key] = gene_reference.get(key)
     interpretation = row.get('interpretation') or {}
+    meaning = row.get('personal_meaning') or {}
     genotype = row.get('genotype') or {}
     assertions = reference.get('gencc_assertions') or []
     focused_assertions = assertions if disease_ids is None else [a for a in assertions if a.get('disease_id') in disease_ids]
     return {'gene': row.get('gene'), 'rsid': row.get('rsid'),
             'function': reference.get('gene_function'),
-            'genotype': genotype.get('genotype'), 'quality': genotype,
+            'genotype': genotype.get('genotype'), 'quality': genotype, 'reading': genotype,
+            'personal_meaning': meaning,
             'reading_note': row.get('depth_note') or row.get('read_why_text') or (t('visit.focus.depth', depth=genotype['depth']) if genotype.get('depth') is not None else t('visit.focus.depth_unknown')),
-            'summary': interpretation.get('summary') or row.get('summary') or reference.get('variant_context'),
+            'summary': meaning.get('summary') or interpretation.get('summary') or row.get('summary') or reference.get('variant_context'),
             'mechanism': row.get('mechanism') or (row.get('passport') or {}).get('mechanism'),
             'level': row.get('level'), 'source': interpretation.get('source') or row.get('source'),
             'gencc': focused_assertions, 'other_gencc_count': len(assertions)-len(focused_assertions),

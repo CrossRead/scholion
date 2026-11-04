@@ -2,8 +2,8 @@
   "_meta": {
     "reviewed_on": "2026-10-27",
     "scope": "Claim-specific source and wording review; no automatic clinical eligibility",
-    "variant_count": 242,
-    "updated": "2026-10-27",
+    "variant_count": 271,
+    "updated": "2026-11-04",
     "source_tier": "curated_reference"
   },
   "variants": {
@@ -927,6 +927,10 @@
       "rsid": "rs1744297"
     },
     "AVPR1A|rs11174811": {
+      "patient_summary": {
+        "en": "In postmortem brain samples, carriers of the less common allele had more AVPR1A RNA on average than participants with two copies of the common allele. The study also reported a group-level association with substance use disorders.",
+        "ru": "В посмертных образцах мозга у носителей менее частого аллеля в среднем было больше РНК AVPR1A, чем у участников с двумя копиями частого аллеля. Исследование также обнаружило групповую связь с расстройствами, связанными с употреблением веществ."
+      },
       "status": "association_only",
       "summary": {
         "en": "The source supports the stated research or molecular context; individual applicability is a separate question.",
@@ -1457,6 +1461,10 @@
       "rsid": "rs7639618"
     },
     "COMT|rs4680": {
+      "patient_summary": {
+        "en": "In tissue studies, one version of COMT made a less active enzyme. These studies measured enzyme activity, while responses to stress were outside their scope.",
+        "ru": "В исследованиях тканей одна версия COMT была связана с менее активной работой фермента. В этих работах измеряли активность фермента, а реакция на стресс была за пределами исследования."
+      },
       "status": "association_only",
       "summary": {
         "en": "The source supports the stated research or molecular context; individual applicability is a separate question.",
@@ -2434,6 +2442,11 @@
       "rsid": "rs686"
     },
     "DRD2|rs1800497": {
+      "physical_gene": "ANKK1",
+      "patient_summary": {
+        "en": "Taq1A is in ANKK1, near DRD2. Brain imaging studies compared dopamine receptor binding between allele groups. The DNA reading does not measure your receptor binding.",
+        "ru": "Taq1A находится в ANKK1 рядом с DRD2. В исследованиях с визуализацией мозга сравнивали связывание дофаминовых рецепторов у носителей разных аллелей. Генотип сам по себе не измеряет связывание ваших рецепторов."
+      },
       "status": "association_only",
       "summary": {
         "en": "The source supports the stated research or molecular context; individual applicability is a separate question.",
@@ -2468,6 +2481,11 @@
             "rs1800497"
           ],
           "digest": "62bb0ba5183fa3949cf013b85a4361d566ada87b5b9b47c16c50bcb5571f8ee5"
+        },
+        {
+          "file": "loci.json",
+          "selector": ["loci", "rs1800497"],
+          "digest": "f9086c2be5f0d4b2744e8142b3b3da7e48724694700b9119ffed95a52d1cffc1"
         }
       ],
       "clinical_eligibility_upgrade": false,
@@ -2475,6 +2493,10 @@
       "rsid": "rs1800497"
     },
     "DRD2|rs6277": {
+      "patient_summary": {
+        "en": "A brain imaging study compared dopamine receptor binding across groups. The relationship differed by brain region, so one DNA reading does not give a single measure of how your receptors work.",
+        "ru": "В исследовании со снимками мозга сравнивали связывание дофаминовых рецепторов у разных групп людей. Результат зависел от области мозга. Связывание у конкретного человека измеряют отдельно."
+      },
       "status": "association_only",
       "summary": {
         "en": "The source supports the stated research or molecular context; individual applicability is a separate question.",
@@ -2515,6 +2537,10 @@
       "rsid": "rs6277"
     },
     "DRD4|rs1800955": {
+      "patient_summary": {
+        "en": "In one study, two copies of C were more common among participants who already smoked. The study compared existing smoking habits, and the catalogue and study name different alleles. Both limit what this reading says about personal risk.",
+        "ru": "В одном исследовании две копии C чаще встречались у участников, которые уже курили. Учёные сравнивали людей по уже сложившейся привычке. Кроме того, в каталоге и исследовании указаны разные буквы ДНК. Поэтому по этому чтению личную склонность к курению оценить нельзя."
+      },
       "status": "allele_identity_unresolved",
       "summary": {
         "en": "The source supports the stated research or molecular context; individual applicability is a separate question.",
@@ -10131,6 +10157,1155 @@
       "clinical_eligibility_upgrade": false,
       "gene": "PEMT",
       "rsid": "rs12325817"
+    },
+    "CLOCK|rs1801260": {
+      "gene": "CLOCK",
+      "rsid": "rs1801260",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The 3′-UTR substitution altered CLOCK expression in a cell model. Human studies disagree on its association with chronotype.",
+        "ru": "Замена в 3′-нетранслируемой области меняла экспрессию CLOCK в клеточной модели. Результаты исследований связи с хронотипом расходятся."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/9779516/",
+        "https://pubmed.ncbi.nlm.nih.gov/12464098/",
+        "https://pubmed.ncbi.nlm.nih.gov/27148095/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801260"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs1801260"
+          ],
+          "digest": "2a263d1e700efd4374bc2633fc533d8f119f6ad7e0445c2642c76c12663659a1"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs1801260"
+          ],
+          "digest": "23cc0a3b4dce035699cad356a0b71442a9c9ada3c004b948a7f24979d8b3efa9"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "DRD3|rs6280": {
+      "gene": "DRD3",
+      "rsid": "rs6280",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "A small PET study reported differences in reward-associated striatal dopamine release across genotypes.",
+        "ru": "В небольшом исследовании с ПЭТ генотипы различались по высвобождению дофамина в стриатуме в ответ на вознаграждение."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/23365649/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6280"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs6280"
+          ],
+          "digest": "a518f2dcfe14eb7a853202fc89f25bdc62462f3eb4aaf264024db21de8e11025"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs6280"
+          ],
+          "digest": "0bf6eecf88b141cf800866843eb46c6d7e069fbc7a0bac651ef689b1235f91c0"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CRY1|rs184039278": {
+      "gene": "CRY1",
+      "rsid": "rs184039278",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The substitution causes exon 11 skipping and was associated with delayed sleep timing in studied families. The magnitude is not transferable to an individual.",
+        "ru": "Замена вызывает пропуск экзона 11 и была связана с более поздним временем сна в изученных семьях. Величину эффекта для конкретного человека по ней определить нельзя."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/28388406/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC8505610/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/184039278"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs184039278"
+          ],
+          "digest": "f02084b5a01e764e8442affdcbbd0b19a7c7eee0523446aa5d10199964f6d505"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs184039278"
+          ],
+          "digest": "ac450e39886d2ac9ccd815f192bacbb5ed9b79dfafdb0980fd2b551f549fcda1"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CRY2|rs201220841": {
+      "gene": "CRY2",
+      "rsid": "rs201220841",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The change promoted CRY2 degradation in experimental models. Early sleep timing was reported in one family with variable expression.",
+        "ru": "В экспериментальных моделях замена ускоряла распад CRY2. В одной семье описана связь с ранним временем сна, проявления различались."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/27529127/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/201220841"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs201220841"
+          ],
+          "digest": "1f1449dce529f2203f7dc5ca54e4b54b2b56ab4b2298329fc59ffe88c1fad556"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs201220841"
+          ],
+          "digest": "e42e49016563d7d65dd2f08903b537903a0baddedc00550f10194a3b458559e4"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "PER2|rs121908635": {
+      "gene": "PER2",
+      "rsid": "rs121908635",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The change reduced PER2 phosphorylation in vitro and segregated with early sleep timing in the studied family.",
+        "ru": "Замена снижала фосфорилирование PER2 in vitro и наследовалась вместе с ранним временем сна в изученной семье."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/11232563/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/121908635"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs121908635"
+          ],
+          "digest": "8afce18169a4f8bb2bc3e6faadbe156ac202d82f201afee8e2454e4f81bd3102"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs121908635"
+          ],
+          "digest": "735b2a89db55ea788bc2a8e6b8df6cfa0abf4b910a457cda3d22671e51c7d8d6"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "PER3|rs228697": {
+      "gene": "PER3",
+      "rsid": "rs228697",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "One Japanese study associated this variant with diurnal preference. It does not establish individual chronotype or the PER3 tandem repeat.",
+        "ru": "В одном японском исследовании вариант был связан с предпочтительным временем сна. По нему нельзя определить личный хронотип или число повторов PER3."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/25201053/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/228697"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs228697"
+          ],
+          "digest": "f734984d939486cfcd35254df5a693628b665066bb1baf510e941eff44cd631b"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs228697"
+          ],
+          "digest": "55739759d293c4100be878f29bfd1fbd99bb4f85e1a73d10f230fa3c6bcf640a"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "PER1|rs2735611": {
+      "gene": "PER1",
+      "rsid": "rs2735611",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "A candidate-gene study associated this synonymous variant with extreme diurnal preference. A direct mechanism was not established.",
+        "ru": "В исследовании генов-кандидатов синонимический вариант был связан с крайними вариантами хронотипа. Прямой механизм не установлен."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/17051316/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2735611"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs2735611"
+          ],
+          "digest": "6e180a3b6b6f94356342d12f90e1bc4a9868320e843231c6e3403131418aa812"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs2735611"
+          ],
+          "digest": "71ef1a33fe56f42ca7df924ff59ae21bf538e4dd86ccf5a0932f8f75a2fd9bd9"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "HTR2C|rs6318": {
+      "gene": "HTR2C",
+      "rsid": "rs6318",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Cys23Ser altered receptor localization and signaling in vitro. This X-linked position does not determine personal serotonin signaling or treatment response.",
+        "ru": "Cys23Ser менял локализацию рецептора и передачу сигнала in vitro. Эта позиция на X-хромосоме не определяет личную серотониновую активность или ответ на лечение."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/31723224/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6318"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs6318"
+          ],
+          "digest": "c7b71d7ca75f563f73fee6b0be13ca544c969e60cd2c121cec80275ff782486e"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs6318"
+          ],
+          "digest": "a17d1e070b674f83779e1da0fcd4160abbee6e98e1c98aedc92783126e331e96"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CYP2B6|rs3745274": {
+      "gene": "CYP2B6",
+      "rsid": "rs3745274",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The substitution affects splicing and contributes to reduced expression. Interpretation for efavirenz in CPIC uses the CYP2B6 diplotype and clinical context.",
+        "ru": "Замена влияет на сплайсинг и способствует снижению экспрессии. Интерпретация для эфавиренза по CPIC опирается на диплотип CYP2B6 и клинический контекст."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/31006110/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3745274"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs3745274"
+          ],
+          "digest": "2ef89feae70c0fffacce78e954ca6e3cef0151e10ffbafba78143f769c0ffc22"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs3745274"
+          ],
+          "digest": "89cd51d63820fd1df7d54ebffbb13128f1bebb17a07995d20825ca5a39f1abf0"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "NR3C2|rs5522": {
+      "gene": "NR3C2",
+      "rsid": "rs5522",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Ile180Val showed different cortisol-dependent activity in vitro. Studies of the physiological stress response gave different results.",
+        "ru": "Ile180Val менял активность рецептора при действии кортизола in vitro. Результаты исследований физиологической реакции на стресс расходятся."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/17018659/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC3044823/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/5522"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs5522"
+          ],
+          "digest": "7261de907dba58949cf8b3e85c4368e2117039938a2efc6e5e960b9a3f5823bf"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs5522"
+          ],
+          "digest": "df18aac6fc04d30f4ada5b940a9fe18bfd9e99cc39f490a99bbdf0d66d754399"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "SLC6A3|rs27072": {
+      "gene": "SLC6A3",
+      "rsid": "rs27072",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Allelic expression and cell assays support a regulatory effect in the studied models. The position does not type the transporter tandem repeat or establish a psychiatric phenotype.",
+        "ru": "Анализ экспрессии и клеточные эксперименты поддерживают регуляторный эффект в изученных моделях. Эта позиция не определяет число повторов транспортёра или психиатрический фенотип."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/21525861/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/27072"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs27072"
+          ],
+          "digest": "0e5e8e6e8f525192ca3924c09a4ce9b8f2dd06e127285a5dc5ea2fb50061a916"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs27072"
+          ],
+          "digest": "d77271cdc744cd75b310313011510f3358d59b9037835591a9cf42ad5fb2d204"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "LRRK2|rs34637584": {
+      "gene": "LRRK2",
+      "rsid": "rs34637584",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "This variant was reported in familial Parkinson disease and has incomplete, age-dependent penetrance. A single reading does not establish a diagnosis.",
+        "ru": "Вариант описан при семейной болезни Паркинсона. Проявления зависят от возраста и возникают не у всех носителей. Одного чтения для диагноза недостаточно."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/15726496/",
+        "https://pubmed.ncbi.nlm.nih.gov/18986508/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/34637584"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs34637584"
+          ],
+          "digest": "21c6ce99415905ff8785472212811b22c1a4d5891895efe26ec021a6810b45d5"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs34637584"
+          ],
+          "digest": "a21c98721cf033014a3a88dd13c76ed187734b2616e68ee47a7028766c387dda"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "SNCA|rs104893877": {
+      "gene": "SNCA",
+      "rsid": "rs104893877",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Ala53Thr co-segregated with Parkinson disease in studied families. Personal assessment requires clinical and family context.",
+        "ru": "В изученных семьях Ala53Thr наследовался вместе с болезнью Паркинсона. Для личной оценки нужны клинические и семейные данные."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/9197268/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893877"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs104893877"
+          ],
+          "digest": "fe07a499b3bd2630679d1fb1a5fffad02502c91facbe7a586b7b9142d0727c75"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs104893877"
+          ],
+          "digest": "f88034bd38a307b18c820eb0443f9c34eccc800435e3dd0b1c922a003b9cabda"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CYP3A4|rs35599367": {
+      "gene": "CYP3A4",
+      "rsid": "rs35599367",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "This intronic variant is associated with altered splicing and reduced hepatic expression. The observation does not supply a medication dose.",
+        "ru": "Интронный вариант связан с изменением сплайсинга и снижением экспрессии в печени. Из этого наблюдения нельзя вывести дозу лекарства."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/20386561/",
+        "https://pubmed.ncbi.nlm.nih.gov/26488616/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/35599367"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs35599367"
+          ],
+          "digest": "9e86bce56474b7f11832fa18dca358023f72a4f098cb78acf8c1de5d4af6c997"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs35599367"
+          ],
+          "digest": "825d0dd6c618cf644a76b3ff83f052e6616e4a253557663915e826ea6f824375"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "ATP7B|rs76151636": {
+      "gene": "ATP7B",
+      "rsid": "rs76151636",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The substitution affected ATP7B trafficking in experimental systems. Wilson disease is assessed in a recessive and clinical context.",
+        "ru": "В экспериментальных моделях замена нарушала внутриклеточный транспорт ATP7B. Болезнь Вильсона оценивают с учётом рецессивного наследования и клинических данных."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/35762218/",
+        "https://pubmed.ncbi.nlm.nih.gov/33288711/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/76151636"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs76151636"
+          ],
+          "digest": "2f80a10426785ceee6acbe52a276c7c551ac20b9b8c81f2a495b62f738e2b8ab"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs76151636"
+          ],
+          "digest": "df4bee566b397103c0b4f3ba4f7ebeb60c7f85a18a8377cbdda1110b45708e03"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "ACADM|rs77931234": {
+      "gene": "ACADM",
+      "rsid": "rs77931234",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "This substitution was identified in people with MCAD deficiency. A single position does not establish a recessive disorder or fatty-acid oxidation capacity.",
+        "ru": "Замена обнаружена у пациентов с дефицитом MCAD. Чтение одной позиции не определяет способность окислять жирные кислоты и не устанавливает рецессивное заболевание."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/2394825/",
+        "https://pubmed.ncbi.nlm.nih.gov/2393404/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/77931234"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs77931234"
+          ],
+          "digest": "dd2f7b11a78071dbfb4c295441ee62a8fd412890e2087ff9f48061fb357de141"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs77931234"
+          ],
+          "digest": "1ee9b207a00a3df1cd4477daa6c6437780059f364d95fc15e6214f6c89e7d500"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "ELOVL2|rs953413": {
+      "gene": "ELOVL2",
+      "rsid": "rs953413",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "A population GWAS associated this position with plasma EPA. It does not measure the person’s fatty acids or determine response to a supplement.",
+        "ru": "В популяционном исследовании позиция была связана с концентрацией ЭПК в плазме. По ней нельзя определить личный уровень жирных кислот или ответ на добавку."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/19148276/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/953413"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs953413"
+          ],
+          "digest": "904df4be6e74a0bdf8e23f77229e04ca8b00c63139d79749da2ef64c702cff21"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs953413"
+          ],
+          "digest": "a07db03da1e50b8193c2cb167358e26146e73e5446ff6568283504159499944a"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CASR|rs1801725": {
+      "gene": "CASR",
+      "rsid": "rs1801725",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "A meta-analysis associated Ala986Ser with a small difference in serum calcium. Measured calcium and clinical context remain necessary for assessment.",
+        "ru": "В метаанализе Ala986Ser был связан с небольшой разницей сывороточного кальция. Для оценки нужны фактический анализ и клинические данные."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/20661308/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801725"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs1801725"
+          ],
+          "digest": "ec208e9d13764c7492a3b69c501f62d3ae24083a459e99c912d713beb0d66481"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs1801725"
+          ],
+          "digest": "4830977ca00074d30e8f78015c6d9fea634710a1b31a9973fb8633e68d01a5c0"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "WNT16|rs2707466": {
+      "gene": "WNT16",
+      "rsid": "rs2707466",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Human studies associated this coding position with cortical thickness and bone mineral density. It does not estimate individual fracture risk.",
+        "ru": "В исследованиях у людей кодирующая позиция была связана с толщиной кортикальной кости и минеральной плотностью. Она не оценивает личный риск перелома."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/22792071/",
+        "https://pubmed.ncbi.nlm.nih.gov/23417354/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2707466"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs2707466"
+          ],
+          "digest": "e59630555a87a3b520898786ac6aa71aca07c1931d18cce483c9b4a59e589dc6"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs2707466"
+          ],
+          "digest": "b8589609a8b349ebf8349f04ae07239f8f7b9c162f282a9d55db4890ef8e681f"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CD40|rs1883832": {
+      "gene": "CD40",
+      "rsid": "rs1883832",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The C/T position affected CD40 translation in the studied assays and was investigated in Graves disease. It does not establish individual thyroid status.",
+        "ru": "Позиция C/T влияла на трансляцию CD40 в экспериментах и изучалась при болезни Грейвса. По ней нельзя определить индивидуальное состояние щитовидной железы."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/15731360/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1883832"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs1883832"
+          ],
+          "digest": "10a39ca0c099a6589d095dce93d93f34a0a72d255d8a223ec7666737c611ae8b"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs1883832"
+          ],
+          "digest": "891d9f385889275104d29411a8c15ecbc867397617dbed684679c05d5b477943"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "PAH|rs5030858": {
+      "gene": "PAH",
+      "rsid": "rs5030858",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Arg408Trp has been reported in PAH deficiency. Interpretation of this recessive condition requires the other allele and biochemical context.",
+        "ru": "Arg408Trp описан при дефиците фенилаланингидроксилазы. Для оценки этого рецессивного состояния важны второй аллель и биохимические данные."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000078507/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC10742057/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/5030858"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs5030858"
+          ],
+          "digest": "dcc7bc474193a8398efb993ab22613c5d35407414ec2983a91598b418bb5c2bf"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs5030858"
+          ],
+          "digest": "ec020eb70d3c290863ba48c52cc51f9aa5142c71a40836a1924733625f252266"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "GCK|rs1799884": {
+      "gene": "GCK",
+      "rsid": "rs1799884",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "This promoter position was associated with fasting glucose across population cohorts. The association does not establish diabetes or a monogenic GCK disorder.",
+        "ru": "Позиция промотора была связана с глюкозой натощак в нескольких популяционных когортах. По этой ассоциации нельзя установить диабет или моногенное нарушение GCK."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/17186458/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1799884"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs1799884"
+          ],
+          "digest": "4f5f5a926f160d8105c9602bb5a8c915f7c059230a5892b18c946f3c944fe912"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs1799884"
+          ],
+          "digest": "7828488d1d0a75eed72076c1b2708685682dd55e1f8e4e5883759c4813e3e78e"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "APOA5|rs662799": {
+      "gene": "APOA5",
+      "rsid": "rs662799",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "This regulatory position was associated with fasting triglycerides in several studied populations. It does not give an individual triglyceride value.",
+        "ru": "Регуляторная позиция была связана с триглицеридами натощак в нескольких изученных популяциях. Личное значение триглицеридов определяют по анализу."
+      },
+      "limitations": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/12951359/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC2987477/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/662799"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; association or functional/clinical literature context only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs662799"
+          ],
+          "digest": "42006c96a0c0583ffdc27f0daf727c676aa54919d946859bc5f2544f4085a142"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs662799"
+          ],
+          "digest": "ef049241e236f295cd8c3a69797f6d47cd7085845decd1f555ae045a2d268c68"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "CYP24A1|rs6068812": {
+      "gene": "CYP24A1",
+      "rsid": "rs6068812",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Experimental assays showed reduced vitamin D catabolism for this substitution.",
+        "ru": "Эксперименты показали снижение активности распада метаболитов витамина D при этой замене."
+      },
+      "limitations": {
+        "en": "The variant has been reported in infantile hypercalcemia. Interpretation requires recessive inheritance and biochemical findings.",
+        "ru": "Вариант описан при младенческой гиперкальциемии. Для оценки нужны биохимические данные и учёт рецессивного наследования."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/21675912/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/29680/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6068812"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs6068812"
+          ],
+          "digest": "6214c3d8ad1ad82f13444bc51e234c4149952a4dd166143b4ab6e66632c03c1c"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs6068812"
+          ],
+          "digest": "413e0f354fc21707dc72ac60db47fd7a0a0d9a68ffa9411541ab92b02cd38806"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "BCKDHA|rs137852870": {
+      "gene": "BCKDHA",
+      "rsid": "rs137852870",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The substitution affects the E1α subunit of the complex that degrades branched-chain amino acids.",
+        "ru": "Замена затрагивает субъединицу E1α комплекса, расщепляющего аминокислоты с разветвлённой цепью."
+      },
+      "limitations": {
+        "en": "The variant is a documented cause of recessive maple syrup urine disease. Assessment uses the other allele and amino-acid measurements.",
+        "ru": "Вариант описан при рецессивной болезни кленового сиропа. Для оценки учитывают второй аллель и уровни аминокислот."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/12888983/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/100009/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/137852870"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs137852870"
+          ],
+          "digest": "f067280dfb08ddb6f28529c82c386b724fb27f6098ea7bd5a8df75ce0c96efaa"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs137852870"
+          ],
+          "digest": "4a45d2e40063ec6900248958d557eccfae1bc75e78ca0796ee127f088309b599"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "SLC46A1|rs80338770": {
+      "gene": "SLC46A1",
+      "rsid": "rs80338770",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The mutant protein reached the cell membrane but showed markedly impaired folate transport in a cell model.",
+        "ru": "В клеточной модели изменённый белок достигал мембраны, но переносил фолат значительно хуже."
+      },
+      "limitations": {
+        "en": "The variant was reported in recessive hereditary folate malabsorption. A single site cannot establish the cause of an individual’s folate level.",
+        "ru": "Вариант описан при наследственной рецессивной мальабсорбции фолата. По одной позиции нельзя установить причину уровня фолата у человека."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/18559978/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/59920344/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/80338770"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs80338770"
+          ],
+          "digest": "abba40696e64c4cdb9b97901e817ee088db64d6b2f8c7e2c2073b7d1699a9186"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs80338770"
+          ],
+          "digest": "6a0301e538dd6bf4740c13df240a01a3c445b1f297ce64c517980cfe7e5b15c4"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "PNPO|rs550423482": {
+      "gene": "PNPO",
+      "rsid": "rs550423482",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "Experimental assays showed reduced pyridox(am)ine 5′-phosphate oxidase activity.",
+        "ru": "В экспериментах выявлена сниженная активность пиридокс(ам)ин-5′-фосфатоксидазы."
+      },
+      "limitations": {
+        "en": "The variant was observed in recessive PNPO deficiency. A single site does not determine vitamin B6 status or treatment.",
+        "ru": "Вариант наблюдали при рецессивном дефиците PNPO. По одной позиции нельзя определить обеспеченность витамином B6 или выбрать лечение."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/24645144/",
+        "https://pubmed.ncbi.nlm.nih.gov/24658933/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000208779.2/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/550423482"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs550423482"
+          ],
+          "digest": "8e7907220887ca94d5bcc86e0c0d89c0a1aed4096d01205f749c56808a205a84"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs550423482"
+          ],
+          "digest": "28ee6f58d2ee29c34225cda43f10e11efe987c89492f05e526ec8d378898f69c"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "ABCG5|rs199689137": {
+      "gene": "ABCG5",
+      "rsid": "rs199689137",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "The substitution creates a premature stop in the ABCG5 sterol transporter.",
+        "ru": "Замена создаёт преждевременный стоп-кодон в транспортёре стеролов ABCG5."
+      },
+      "limitations": {
+        "en": "The variant was reported in sitosterolemia. Clinical assessment depends on the allele combination and measured plant sterols.",
+        "ru": "Вариант описан при ситостеролемии. Для оценки важны сочетание аллелей и измеренные уровни растительных стеролов."
+      },
+      "sources": [
+        "https://academic.oup.com/jcem/article/110/5/1358/7698176",
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000023442.30/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/199689137"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs199689137"
+          ],
+          "digest": "93cad13c542a9edee4c7bc64d1994f6ac2b4a138d9a757aea0edacebb99b2be2"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs199689137"
+          ],
+          "digest": "7c166b55d9488bd873f084fb8b0d5e3f9195c6c65d552b3f879d70d3045f1bba"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
+    },
+    "GAD2|rs2236418": {
+      "gene": "GAD2",
+      "rsid": "rs2236418",
+      "status": "source_scoped_reference_available",
+      "summary": {
+        "en": "A reporter assay suggested altered promoter activity, with conflicting results in an independent experiment.",
+        "ru": "Эксперимент с репортёрным геном показал изменение активности промотора, но независимая работа дала другой результат."
+      },
+      "limitations": {
+        "en": "The initial association with severe obesity was not reproduced in the replication study. These data do not establish individual GABA levels or behavioural traits.",
+        "ru": "Первоначальная связь с тяжёлым ожирением не подтвердилась при независимой проверке. По этим данным нельзя определить личный уровень ГАМК или особенности поведения."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/14691540/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC1193520/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236418"
+      ],
+      "reviewed_on": "2026-11-04",
+      "checked_scope": "Exact study allele and public primary-assembly GRCh37/GRCh38 placement; reference literature only.",
+      "bibliography_status": "resolved_identifier",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs2236418"
+          ],
+          "digest": "6310ed051557103c45b8edf79a16f4b2be97759831bceeba884f8f7e3de5b7f0"
+        },
+        {
+          "file": "panel_reference_context.json",
+          "selector": [
+            "variants",
+            "rs2236418"
+          ],
+          "digest": "bd8cf8f0cd6d8f1084d6c45d139b8be8c0327293479b40d15eae806df7508112"
+        }
+      ],
+      "clinical_eligibility_upgrade": false
     }
   }
 }

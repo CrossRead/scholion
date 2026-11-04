@@ -120,7 +120,7 @@ class TestC5EveryAnswerNamesItsContainer(_Two):
         s = mcp_server.Session()
         self.rpc("initialize", {"protocolVersion": "2025-06-18"}, s)
         names = [t["name"] for t in self.rpc("tools/list", {}, s)["result"]["tools"]]
-        self.assertEqual(40, len(names))
+        self.assertEqual({tool.name for tool in ouroboros_tools.get_tools()}, set(names))
         for name in names:
             if name in WRITERS:
                 continue

@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "source_tier": "primary_literature",
+    "updated": "2026-11-04",
+    "scope": "Genotype-specific research hypotheses; not clinical eligibility or action rules"
+  },
+  "variants": {
+    "FOXO3|rs13217795": {
+      "level": "C",
+      "direction": "C-associated higher full-length transcript expression in blood",
+      "comparator": {
+        "en": "C carriers compared with TT",
+        "ru": "Носители C по сравнению с TT"
+      },
+      "study_scope": {
+        "en": "Peripheral blood RNA; tissue-dependent isoform associations",
+        "ru": "РНК периферической крови; связь с изоформами зависит от ткани"
+      },
+      "study_summary": {
+        "en": "C carriers had more full-length FOXO3 RNA in blood than TT participants.",
+        "ru": "У носителей C в крови было больше полноразмерной РНК FOXO3, чем у участников с TT."
+      },
+      "genotypes": {
+        "TT": {
+          "en": "With TT, you may produce less full-length FOXO3 RNA in blood than C carriers. You do not carry the C-associated molecular feature proposed to contribute to longevity.",
+          "ru": "При TT у вас может образовываться меньше полноразмерной РНК FOXO3 в крови, чем у носителей C. Связанная с C молекулярная особенность, предположительно участвующая в долголетии, у вас не представлена."
+        },
+        "CT": {
+          "en": "With CT, you carry the C-associated tendency toward more full-length FOXO3 RNA in blood than TT. This may be one molecular contributor to cellular stress responses and longevity.",
+          "ru": "При CT у вас есть аллель C, связанный с большей выработкой полноразмерной РНК FOXO3 в крови по сравнению с TT. Это может быть одной из молекулярных особенностей клеточного ответа на стресс и долголетия."
+        },
+        "CC": {
+          "en": "With CC, you carry the C-associated tendency toward more full-length FOXO3 RNA in blood than TT. The study does not establish twice the benefit of CT.",
+          "ru": "При CC у вас представлен аллель C, связанный с большей выработкой полноразмерной РНК FOXO3 в крови по сравнению с TT. Исследование не устанавливает удвоенное преимущество относительно CT."
+        }
+      },
+      "mechanism": {
+        "en": "The authors propose that the balance of full-length and truncated RNA forms may alter FOXO3 function; protein activity was not measured.",
+        "ru": "Авторы предполагают, что соотношение полноразмерных и укороченных форм РНК может менять работу FOXO3; активность белка не измеряли."
+      },
+      "limitations": {
+        "en": "TT does not establish impaired protection or faster ageing; C does not predict lifespan. Routine blood tests do not measure this expression.",
+        "ru": "TT не означает доказанного нарушения защиты или ускоренного старения; C не предсказывает срок жизни. Обычные анализы крови не измеряют эту экспрессию."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/34436732/",
+        "https://doi.org/10.1007/s11357-021-00431-0"
+      ],
+      "checked_on": "2026-11-04",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs13217795"
+          ],
+          "digest": "dfeeb1786acb3873d352e3a4292dc7de83be76750be0c89de7ca45a8ca85c6df"
+        }
+      ],
+      "allele_frame": "forward_genomic",
+      "clinical_eligibility_upgrade": false
+    },
+    "COMT|rs4680": {
+      "level": "C",
+      "direction": "Met-associated lower enzyme activity in studied tissues",
+      "comparator": {
+        "en": "Met (A) versus Val (G) forms",
+        "ru": "Формы Met (A) и Val (G)"
+      },
+      "study_scope": {
+        "en": "Postmortem human prefrontal cortex and experimental enzyme assays",
+        "ru": "Посмертные образцы префронтальной коры человека и эксперименты с ферментом"
+      },
+      "study_summary": {
+        "en": "Met was associated with lower COMT protein abundance and enzyme activity in studied tissues.",
+        "ru": "Met был связан с меньшим количеством белка COMT и меньшей активностью фермента в исследованных тканях."
+      },
+      "genotypes": {
+        "AG": {
+          "en": "Your Val/Met reading combines the more stable Val form with the less active Met form. Lower COMT activity than Val/Val is a plausible molecular tendency.",
+          "ru": "Ваш генотип Val/Met сочетает более стабильную форму Val с менее активной Met. Активность COMT может быть ниже, чем при Val/Val."
+        },
+        "AA": {
+          "en": "Your Met/Met reading corresponds to the less stable form, associated with lower COMT activity than Val/Val in tissue studies.",
+          "ru": "Ваше чтение Met/Met соответствует менее стабильной форме, связанной с меньшей активностью COMT по сравнению с Val/Val в исследованиях тканей."
+        },
+        "GG": {
+          "en": "Your Val/Val reading corresponds to the more stable form, associated with higher COMT activity than Met/Met in tissue studies.",
+          "ru": "Ваше чтение Val/Val соответствует более стабильной форме, связанной с большей активностью COMT по сравнению с Met/Met в исследованиях тканей."
+        }
+      },
+      "mechanism": {
+        "en": "COMT methylates catecholamines; the amino-acid substitution changes protein stability and activity.",
+        "ru": "COMT метилирует катехоламины; аминокислотная замена меняет стабильность и активность белка."
+      },
+      "limitations": {
+        "en": "This does not predict personality, stress response or a drug dose. Tissue findings do not measure your neurotransmitter concentrations.",
+        "ru": "Это не прогноз характера, реакции на стресс или дозы препарата. Результаты на тканях не измеряют вашу концентрацию нейромедиаторов."
+      },
+      "limitations_scope": "genome",
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/15457404/"
+      ],
+      "checked_on": "2026-11-04",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs4680"
+          ],
+          "digest": "b37a36589e16d8f21f968b8f036ab886e2da1c6f410cc47bf10c7acc5e3908bb"
+        }
+      ],
+      "allele_frame": "forward_genomic",
+      "clinical_eligibility_upgrade": false
+    },
+    "ABCG2|rs2231142": {
+      "level": "B",
+      "direction": "T-associated higher serum urate",
+      "comparator": {
+        "en": "Q141K (T) carriers versus GG",
+        "ru": "Носители Q141K (T) по сравнению с GG"
+      },
+      "study_scope": {
+        "en": "Urate transport experiments and a population study",
+        "ru": "Эксперименты по транспорту урата и популяционное исследование"
+      },
+      "study_summary": {
+        "en": "Q141K reduced urate transport in experiments and was associated with higher blood urate and gout in a population study.",
+        "ru": "Q141K снижал транспорт урата в экспериментах и был связан с более высокой мочевой кислотой крови и подагрой в популяционном исследовании."
+      },
+      "genotypes": {
+        "GT": {
+          "en": "With one Q141K copy, you may have a tendency toward higher uric acid because urate transport is less effective. Your measured uric acid and its trend show whether this tendency is expressed now.",
+          "ru": "При одной копии Q141K у вас возможна склонность к более высокой мочевой кислоте из-за менее эффективного транспорта урата. Ваши анализы мочевой кислоты и её динамика показывают, проявляется ли эта склонность сейчас."
+        },
+        "TT": {
+          "en": "With two Q141K copies, higher uric acid is a relevant predisposition to compare with your measurements. A population association does not determine your current level.",
+          "ru": "При двух копиях Q141K склонность к более высокой мочевой кислоте стоит сопоставить с вашими анализами. Популяционная связь не определяет её текущий уровень."
+        },
+        "GG": {
+          "en": "Q141K was not found in this reading. This particular contributor to higher uric acid is absent; other genetic and lifestyle factors can still raise it.",
+          "ru": "В этом чтении Q141K не обнаружен. Этот конкретный фактор повышения мочевой кислоты отсутствует; другие генетические особенности и образ жизни всё равно могут влиять на её уровень."
+        }
+      },
+      "mechanism": {
+        "en": "ABCG2 carries urate out of cells. Q141K reduced transport in a functional experiment.",
+        "ru": "ABCG2 выводит урат из клеток. В функциональном эксперименте Q141K снижал этот транспорт."
+      },
+      "limitations": {
+        "en": "The experimental reduction is not your personal clearance percentage. This is not a gout diagnosis.",
+        "ru": "Снижение транспорта в эксперименте — не ваш личный процент выведения. Это не диагноз подагры."
+      },
+      "sources": [
+        "https://pubmed.ncbi.nlm.nih.gov/19506252/"
+      ],
+      "checked_on": "2026-11-04",
+      "source_records": [
+        {
+          "file": "loci.json",
+          "selector": [
+            "loci",
+            "rs2231142"
+          ],
+          "digest": "532e1bc32340e18beac7c7a7703230996073c51c546ca3ca77e952505db3850e"
+        }
+      ],
+      "allele_frame": "forward_genomic",
+      "clinical_eligibility_upgrade": false
+    }
+  }
+}

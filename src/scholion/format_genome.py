@@ -237,7 +237,13 @@ def genome_report(r: Dict[str, Any]) -> str:
             # SNP and cannot be read from this file at all. A caveat that
             # survives only in the single-locus view is a caveat the reader of a
             # gene never meets. It is reprinted here, indented, under its locus.
-            for _q in _locus_qualifier_lines(item):
+            qualifiers = _locus_qualifier_lines(item)
+            if item.get("catalogue_kind"):
+                qualifiers += reference_lines(item)
+            else:
+                from .personal_meaning import lines as meaning_lines
+                qualifiers += meaning_lines(item)
+            for _q in qualifiers:
                 lines.append("  " + _q)
         # And the verdict again, under the genotypes. Each locus line here is cut
         # to its first line, so anything a locus wants to add about itself is
@@ -277,25 +283,31 @@ def genome_report(r: Dict[str, Any]) -> str:
         _chrom = r.get("chrom") or loc.get("chrom")
         where = (f"{(_asm + ' ') if _asm else ''}{_chrom}:{_pos}"
                  if _chrom else _t("genome.no_coordinate"))
-        head = _refused_head(res.get("confidence") or "unreadable_file")
+        head = (_t("genome.reference_presumed") if res.get("reference_presumed")
+                else _refused_head(res.get("confidence") or "unreadable_file"))
         why = res.get("note") or _t("genome.refused.no_answer")
         observations = res.get("observations") or []
         if observations:
             why += " " + _t("genome.other_observation", genotypes=", ".join(
                 x["genotype"] for x in observations))
-        return f"⚪ {r.get('rsid')} ({r.get('gene') or '—'}, {where}) — {head}\n_{why}_"
+        line = f"⚪ {r.get('rsid')} ({r.get('gene') or '—'}, {where}) — {head}\n_{why}_"
+        if r.get("catalogue_kind"):
+            from .panel_reference import reference_lines
+            line += "\n" + "\n".join(reference_lines(r))
+        return line
     gt = res.get("genotype", "?")
     # All three levels of confidence are named. `confirmed_ref` had no line at
     # all, so the STRONGEST of them printed as an empty string and the sentence
     # came out as "(, depth 25)" — a dangling comma where the reassurance should
     # be, while the weaker `assumed_ref` was labelled properly. A reader
     # comparing two loci would have read the better-evidenced one as the vaguer.
-    conf = {"called": _t("genome.called"),
+    conf = (_t("genome.bam_check.called") if res.get("source") == "bam" else
+            {"called": _t("genome.called"),
             "called_array": _t("genome.called_array"),
             "called_array_ambiguous": _t("genome.called_array_ambiguous"),
             "confirmed_ref": _t("genome.confirmed_ref_short"),
             "reported": _t("genome.refused_head.reported"),
-            "assumed_ref": _t("genome.assumed_ref")}.get(res.get("confidence"), "")
+            "assumed_ref": _t("genome.assumed_ref")}.get(res.get("confidence"), ""))
     # An imputed genotype is the output of a model over a reference panel, not a
     # base anybody observed in this person. One corpus file was 98.8 % imputed
     # and every row of it read as «called from the VCF».
@@ -740,6 +752,18 @@ def _prs_measurement_line(t: Dict[str, Any]) -> str:
     return _t("prs.measure_line", stability=" · ".join(stab), informativeness=" · ".join(info))
 
 
+def _prs_applicability_lines(trait: Dict[str, Any]) -> List[str]:
+    evidence = trait.get("model_applicability") or {}
+    if not evidence:
+        return []
+    lines = [evidence["label"]]
+    if evidence.get("source"):
+        lines.extend((evidence["gwas_label"], evidence["training_label"], evidence["source"]))
+    lines.extend(" · ".join(filter(None, (row["label"], row.get("independence_label"), row["source"])))
+                 for row in evidence["evaluations"])
+    return lines
+
+
 def prs_report(r: Dict[str, Any]) -> str:
     """Polygenic risks (PGS): statistics + "above average" + by category."""
     from .pgs_validation import percentile_label
@@ -772,6 +796,7 @@ def prs_report(r: Dict[str, Any]) -> str:
                 lines.append(f"      {t['evidence_note']}")
             if t.get("validity_note"):
                 lines.append(f"      ⚠ {t['validity_note']}")
+            lines.extend("      " + line for line in _prs_applicability_lines(t)[:1])
             lines.append("      ↳ " + _prs_measurement_line(t))
         lines.append("")
     for c in (r.get("method_caveats") or []):
@@ -801,6 +826,7 @@ def prs_report(r: Dict[str, Any]) -> str:
                 lines.append("    " + t["reliability_note"])
             if t.get("reading_note"):
                 lines.append("    " + t["reading_note"])
+            lines.extend("    " + line for line in _prs_applicability_lines(t))
             lines.append("    ↳ " + _prs_measurement_line(t))
         lines.append("")
     lines.append(f"_{r.get('disclaimer','')}_")
@@ -1308,7 +1334,8 @@ def panel_report(r: Dict[str, Any]) -> str:
                     L.append(str(measured['name'])+': '+str(measured.get('censored') or '')+str(measured['value'])+' '+
                              unit_label(measured.get('unit') or '')+' · '+str(measured['date']))
             for position in gene["positions"]:
-                L += ["", str(position["rsid"])]
+                kind = position.get("catalogue_kind")
+                L += ["", *([_t("thematic.annotation." + kind)] if kind else []), str(position["rsid"])]
                 if position.get("reading"):
                     L.append(position["reading"]["message"])
                 L += reference_lines(position)

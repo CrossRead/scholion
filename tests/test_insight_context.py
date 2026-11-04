@@ -110,7 +110,7 @@ class ContextTests(TestCase):
         with mock.patch.object(genome,'available',return_value={'ready':False}), \
              mock.patch.object(genome,'resolve_rsid',return_value=None) as resolve:
             genome.lookup('rs999',allow_network=False)
-        resolve.assert_called_once_with('rs999',allow_network=False)
+        resolve.assert_called_once_with('rs999',allow_network=False,details={})
 
     def test_every_sourced_context_link_is_for_a_marker_in_its_system(self):
         from scholion.engine import system_panels

@@ -242,3 +242,13 @@ their Russian labels do not constitute a new validity assessment.
 * Sources: https://www.chartjs.org/ and https://github.com/kurkle/color.
 * Licence: **MIT** for both. The upstream copyright and licence banners are
   retained verbatim in the bundled file.
+
+## Gene function from UniProtKB
+
+UniProt Consortium, UniProtKB / Swiss-Prot, https://www.uniprot.org/.
+Copyrightable parts of the database are licensed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+Selected human gene-product annotations were extracted, adapted and translated.
+Each record in `src/scholion/knowledge/gene_curation.json` carries its exact
+upstream reference. Bilingual adaptations do not change any variant-level
+decision or clinical eligibility. See [UniProt's terms](https://www.uniprot.org/help/license).

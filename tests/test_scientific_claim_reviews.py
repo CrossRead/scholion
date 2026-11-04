@@ -7,7 +7,7 @@ from unittest import mock
 import support  # noqa: F401
 from scholion import i18n
 from scholion.conclusion_basis import conclusion_basis
-from scholion.panel_reference import genome_context, reference_lines
+from scholion.panel_reference import attach_finding_biology, genome_context, reference_lines
 from scholion.scientific_review import context_review
 
 
@@ -74,6 +74,12 @@ class ScientificScope(unittest.TestCase):
         for name, field in [('system_gene_panels.json', 'systems'), ('on_demand_panels.json', 'panels')]:
             for panel in core._read_knowledge_raw(name)[field].values():
                 expected.update(row['gene'].upper() + '|' + row['rsid'] for row in panel.get('positions', []))
+        loci = core._read_knowledge_raw('loci.json')['loci']
+        for rsid, row in core._read_knowledge_raw('panel_reference_context.json')['variants'].items():
+            if row.get('reference_level'):
+                self.assertEqual(row['gene'], loci[rsid]['gene'])
+                self.assertEqual('reference_only', row['scope'])
+                expected.add(row['gene'] + '|' + rsid)
         self.assertEqual(expected, set(book))
         for language in ('en', 'ru'):
             i18n.set_lang(language)
@@ -88,6 +94,24 @@ class ScientificScope(unittest.TestCase):
                 self.assertIsInstance(variant['summary'], str)
                 self.assertIsInstance(variant['limitations'], str)
                 self.assertFalse(variant['clinical_eligibility_upgrade'])
+
+    def test_a_finding_for_another_alt_does_not_inherit_the_selected_alleles_literature(self):
+        row = {'gene': 'CASR', 'rsid': 'rs1801725', 'chrom': 'chr3', 'pos': '122284910', 'ref': 'G'}
+        rows = [{**row, 'alt': 'T'}, {**row, 'alt': 'A'}, {**row, 'alt': 'T', 'pos': '122284911'}]
+        attach_finding_biology(rows)
+        matched, *other = [item['gene_contexts'][0] for item in rows]
+        self.assertEqual('B', matched['level'])
+        self.assertIn('20661308', matched['reference_context']['variant_source'])
+        wrong_build = {**row, "alt": "T"}
+        attach_finding_biology([wrong_build], "GRCh37")
+        for item in [*other, wrong_build["gene_contexts"][0]]:
+            self.assertEqual('rs1801725', item['rsid'])
+            self.assertEqual('E', item['level'])
+            context = item['reference_context']
+            self.assertTrue(context['gene_source'])
+            self.assertEqual('not_curated', context['variant_status'])
+            self.assertIsNone(context['variant_source'])
+            self.assertNotIn('variant', {r['scope'] for r in context['scientific_review']})
 
     def test_previous_longevity_curation_is_not_relabelled_as_new_or_missing_research(self):
         from scholion.scientific_review import _retained_literature

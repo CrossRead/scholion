@@ -54,7 +54,7 @@ class TestResearchedReferenceBoundaries(unittest.TestCase):
     def test_research_metadata_is_bilingual_and_never_a_review_or_grade_assignment(self):
         raw = core._read_knowledge_raw('panel_reference_context.json')
         revised = {k: v for k, v in raw['variants'].items() if v.get('curated_on')}
-        self.assertEqual(38, len(revised))
+        self.assertEqual(67, len(revised))
         for rsid, entry in revised.items():
             self.assertEqual('reference_only', entry['scope'])
             self.assertNotIn('review', entry)

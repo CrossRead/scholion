@@ -389,6 +389,10 @@ def _add_maintenance_commands(sub, common) -> None:
     sub.add_parser("radar", parents=[common],
                    help="the health index by body system (0–100) and how it moves")
     sub.add_parser("medications", parents=[common], help="the current treatment scheme (a list)")
+    mt = sub.add_parser("mitochondria", parents=[common],
+                        help="read or run the local mitochondrial BAM analysis")
+    mt.add_argument("--yes", action="store_true", help="run and save the analysis")
+    mt.add_argument("--cancel", action="store_true", help="stop the running analysis and retain the saved result")
     sub.add_parser("genome-status", parents=[common],
                    help="the state of the genome base: is the VCF connected, is there an index, gaps")
     sub.add_parser("genome-updates", parents=[common],
@@ -1479,6 +1483,11 @@ def _cmd_recompute(args) -> Any:
     return res, render
 
 
+def _cmd_mitochondria(args) -> Any:
+    from . import mitochondria
+    return mitochondria.analyze(args.yes, args.cancel), mitochondria.markdown
+
+
 def _cmd_coverage(args) -> Any:
     from . import coverage as _cov
     res = _cov.measure(progress=None if args.json else _coverage_echo)
@@ -1666,6 +1675,7 @@ _QUERIES = [
     (_is("radar"), _cmd_radar),
     (_is("medications"), _cmd_medications),
     (_is("genome-status"), _cmd_genome_status),
+    (_is("mitochondria"), _cmd_mitochondria),
     (_is("genome-updates"), _cmd_genome_updates),
     (_is("limits"), _cmd_limits),
     (_is("evidence-levels"), _cmd_evidence_levels),
@@ -1800,6 +1810,8 @@ def _dispatch(p, args) -> int:
         # rest of the folder was still processed — but a partial result is not
         # a clean one, and a script that chains on this command must be able to
         # tell the two apart without parsing the text (task 124).
+        return 1
+    if args.cmd == "mitochondria" and args.yes and res.get("status") != "analyzed":
         return 1
     if args.cmd in ("genotype-sites", "coverage") and not res.get("ok"):
         return 1

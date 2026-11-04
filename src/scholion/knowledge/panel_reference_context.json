@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "updated": "2026-10-27",
+    "updated": "2026-11-04",
     "purpose": "Reference gene biology and variant context, separate from personalised conclusions. Gene function does not establish an allele effect. Evidence levels remain those of the curated position; this file grants no analytical permission.",
     "sources": [
       "NCBI Gene / RefSeq gene summaries, retrieved 2026-10-06; bilingual functional paraphrases",
@@ -14,6 +14,48 @@
           "canonical_symbol": "CALCR",
           "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801197",
           "reason": "The submitted position is in CALCR. CALC is also a historical symbol for MICU1, so a global symbol alias must not override exact position identity."
+        }
+      },
+      "rs1107946": {
+        "COL1R1": {
+          "canonical_symbol": "COL1A1",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs1107946",
+          "reason": "Exact locus resolves the submitted catalogue label."
+        }
+      },
+      "rs1800012": {
+        "COL1R1": {
+          "canonical_symbol": "COL1A1",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs1800012",
+          "reason": "Exact locus resolves the submitted catalogue label."
+        }
+      },
+      "rs2412298": {
+        "COL1R1": {
+          "canonical_symbol": "COL1A1",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs2412298",
+          "reason": "Exact locus resolves the submitted catalogue label."
+        }
+      },
+      "rs5985": {
+        "F13": {
+          "canonical_symbol": "F13A1",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs5985",
+          "reason": "Exact locus resolves the submitted catalogue label."
+        }
+      },
+      "rs11172113": {
+        "LPR1": {
+          "canonical_symbol": "LRP1",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs11172113",
+          "reason": "Exact locus resolves the submitted catalogue label."
+        }
+      },
+      "rs3736228": {
+        "LRP": {
+          "canonical_symbol": "LRP5",
+          "source": "https://www.ncbi.nlm.nih.gov/snp/rs3736228",
+          "reason": "Exact locus resolves the submitted catalogue label."
         }
       }
     }
@@ -42,7 +84,10 @@
       "gene": "RXRA",
       "ref": "T",
       "alt": "C",
-      "phenotype": {"en": "Levothyroxine response", "ru": "Ответ на левотироксин"},
+      "phenotype": {
+        "en": "Levothyroxine response",
+        "ru": "Ответ на левотироксин"
+      },
       "gene_function": {
         "en": "RXRA encodes retinoid X receptor alpha, a nuclear receptor involved in regulating gene expression.",
         "ru": "RXRA кодирует ретиноидный X-рецептор альфа, который участвует в регуляции экспрессии генов."
@@ -58,7 +103,10 @@
       "gene": "TMEM18",
       "ref": "T",
       "alt": "C",
-      "phenotype": {"en": "Obesity", "ru": "Ожирение"},
+      "phenotype": {
+        "en": "Obesity",
+        "ru": "Ожирение"
+      },
       "gene_function": {
         "en": "TMEM18 encodes transmembrane protein 18.",
         "ru": "TMEM18 кодирует трансмембранный белок 18."
@@ -74,7 +122,10 @@
       "gene": "FAIM2",
       "ref": "G",
       "alt": "A",
-      "phenotype": {"en": "Obesity", "ru": "Ожирение"},
+      "phenotype": {
+        "en": "Obesity",
+        "ru": "Ожирение"
+      },
       "gene_function": {
         "en": "FAIM2 encodes a protein involved in regulating programmed cell death.",
         "ru": "FAIM2 кодирует белок, участвующий в регуляции программируемой гибели клеток."
@@ -90,7 +141,10 @@
       "gene": "NAF1",
       "ref": "A",
       "alt": "G",
-      "phenotype": {"en": "Chronic osteomyelitis", "ru": "Хронический остеомиелит"},
+      "phenotype": {
+        "en": "Chronic osteomyelitis",
+        "ru": "Хронический остеомиелит"
+      },
       "gene_function": {
         "en": "NAF1 helps assemble RNA–protein complexes, including telomerase.",
         "ru": "NAF1 участвует в сборке комплексов РНК с белками, в том числе теломеразы."
@@ -105,7 +159,10 @@
     "rs7711080": {
       "ref": "T",
       "alt": "G",
-      "phenotype": {"en": "Colorectal cancer", "ru": "Колоректальный рак"},
+      "phenotype": {
+        "en": "Colorectal cancer",
+        "ru": "Колоректальный рак"
+      },
       "description": {
         "en": "This variant was studied in relation to metastasis in people with colorectal cancer. A gene responsible for this association has not been established for this entry.",
         "ru": "Вариант изучали в связи с метастазированием у людей с колоректальным раком. Ген, ответственный за эту ассоциацию, для записи не установлен."
@@ -1600,6 +1657,93 @@
       },
       "source": "PMID:29733381; DOI:10.1093/nar/gky331"
     }
+  },
+  "patient_gene_roles": {
+    "COMT": {
+      "en": "COMT makes an enzyme that helps cells break down chemical signals such as dopamine and noradrenaline.",
+      "ru": "COMT даёт клеткам инструкцию для создания фермента, который помогает перерабатывать дофамин и норадреналин."
+    },
+    "DRD2": {
+      "en": "DRD2 makes the D2 receptor, one of the ways cells receive dopamine signals.",
+      "ru": "DRD2 даёт клеткам инструкцию для создания рецептора D2. Через него клетки воспринимают сигнал дофамина."
+    },
+    "DRD4": {
+      "en": "DRD4 makes the D4 receptor, one of the ways cells receive dopamine signals.",
+      "ru": "DRD4 даёт клеткам инструкцию для создания рецептора D4. Через него клетки воспринимают сигнал дофамина."
+    },
+    "ACTA2": {
+      "en": "ACTA2 makes a protein that helps muscles in blood vessel walls tighten.",
+      "ru": "ACTA2 помогает мышцам в стенках сосудов сокращаться."
+    },
+    "ACTC1": {
+      "en": "ACTC1 makes a protein that helps the heart muscle contract with each beat.",
+      "ru": "ACTC1 помогает сердечной мышце сокращаться при каждом ударе сердца."
+    },
+    "ALDH4A1": {
+      "en": "ALDH4A1 makes an enzyme that helps cells turn the amino acid proline into glutamate.",
+      "ru": "ALDH4A1 помогает клеткам превращать одну аминокислоту, пролин, в другую, глутамат."
+    },
+    "AMT": {
+      "en": "AMT makes an enzyme that helps cells break down the amino acid glycine.",
+      "ru": "AMT помогает клеткам расщеплять аминокислоту глицин."
+    },
+    "FAIM2": {
+      "en": "FAIM2 makes a protein that can slow one of the signals that tells a cell to die.",
+      "ru": "FAIM2 помогает клеткам ослаблять один из сигналов, запускающих их гибель."
+    },
+    "NAF1": {
+      "en": "NAF1 helps cells assemble telomerase, an enzyme that maintains the protective ends of chromosomes.",
+      "ru": "NAF1 помогает клеткам собирать теломеразу — фермент, который поддерживает защитные концы хромосом."
+    },
+    "RXRA": {
+      "en": "RXRA makes a receptor that helps cells turn other genes on or off in response to chemical signals.",
+      "ru": "RXRA кодирует рецептор, который помогает клеткам менять активность других генов в ответ на химические сигналы."
+    },
+    "TMEM18": {
+      "en": "TMEM18 makes a protein found in the membrane around the cell nucleus. Its precise role in weight regulation in humans is still uncertain.",
+      "ru": "TMEM18 кодирует белок оболочки клеточного ядра. Его точная роль в регуляции веса у людей пока не установлена."
+    },
+    "XG": {
+      "en": "XG makes a protein that carries a blood group marker on the surface of red blood cells.",
+      "ru": "XG кодирует белок, который несёт один из признаков группы крови на поверхности эритроцитов."
+    }
+  },
+  "gene_role_details": {
+    "ACTA2": {
+      "description": {
+        "en": "Smooth muscle alpha-actin polymerises into filaments. Their interaction with smooth muscle myosin generates contractile force in vascular smooth muscle cells.",
+        "ru": "Альфа-актин гладких мышц образует нити. При взаимодействии этих нитей с миозином гладкомышечные клетки сосудов развивают силу сокращения."
+      },
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4534267/",
+      "reviewed_on": "2026-11-04"
+    },
+    "ACTC1": {
+      "description": {
+        "en": "Cardiac alpha-actin forms the backbone of the thin filament in the sarcomere. Myosin pulls on these filaments to generate force and shorten the sarcomere.",
+        "ru": "Сердечный альфа-актин образует основу тонких нитей саркомера. Миозин тянет эти нити, создавая силу и укорачивая саркомер."
+      },
+      "source": "https://pubchem.ncbi.nlm.nih.gov/gene/70",
+      "reviewed_on": "2026-11-04"
+    },
+    "ALDH4A1": {
+      "description": {
+        "en": "In mitochondria, pyrroline-5-carboxylate dehydrogenase oxidises glutamate-5-semialdehyde, which is in equilibrium with pyrroline-5-carboxylate. It produces glutamate while reducing NAD+ to NADH.",
+        "ru": "В митохондриях пирролин-5-карбоксилатдегидрогеназа окисляет глутамат-5-полуальдегид, который находится в равновесии с пирролин-5-карбоксилатом. При этом образуется глутамат, а NAD⁺ восстанавливается до NADH."
+      },
+      "source": "https://www.uniprot.org/uniprotkb/P30038/entry",
+      "reviewed_on": "2026-11-04"
+    },
+    "AMT": {
+      "description": {
+        "en": "The mitochondrial T protein transfers a one-carbon unit from the aminomethyl group carried by the H protein to tetrahydrofolate. The reaction produces 5,10-methylenetetrahydrofolate and releases ammonia.",
+        "ru": "Митохондриальный белок T переносит одноуглеродный фрагмент с аминометильной группы, связанной с белком H, на тетрагидрофолат. Образуются 5,10-метилентетрагидрофолат и аммиак."
+      },
+      "source": "https://www.uniprot.org/uniprotkb/P48728/entry",
+      "reviewed_on": "2026-11-04"
+    }
+  },
+  "separate_repeats": {
+    "DRD4": "48 bp"
   },
   "variants": {
     "rs6025": {
@@ -4345,6 +4489,872 @@
         "ru": "В ClinVar есть классификация именно этого варианта. Нужно сохранять статус проверки и контекст заболевания; одна классификация базы не является личным диагнозом."
       },
       "source": "https://www.ncbi.nlm.nih.gov/clinvar/variation/260328/"
+    },
+    "rs1801260": {
+      "gene": "CLOCK",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/9779516/",
+      "description": {
+        "en": "3111T>C. The 3′-UTR substitution altered CLOCK expression in a cell model. Human studies disagree on its association with chronotype.",
+        "ru": "3111T>C. Замена в 3′-нетранслируемой области меняла экспрессию CLOCK в клеточной модели. Результаты исследований связи с хронотипом расходятся."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9779516/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12464098/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27148095/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "3111T>C.",
+        "ru": "3111T>C."
+      },
+      "mechanism": {
+        "en": "The 3′-UTR substitution altered CLOCK expression in a cell model.",
+        "ru": "Замена в 3′-нетранслируемой области меняла экспрессию CLOCK в клеточной модели."
+      },
+      "possible_influence": {
+        "en": "Human studies disagree on its association with chronotype.",
+        "ru": "Результаты исследований связи с хронотипом расходятся."
+      }
+    },
+    "rs6280": {
+      "gene": "DRD3",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/23365649/",
+      "description": {
+        "en": "Ser9Gly. A small PET study reported differences in reward-associated striatal dopamine release across genotypes. The study does not measure personal dopamine levels.",
+        "ru": "Ser9Gly. В небольшом исследовании с ПЭТ генотипы различались по высвобождению дофамина в стриатуме в ответ на вознаграждение. По этому исследованию нельзя определить личный уровень дофамина."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23365649/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "Ser9Gly.",
+        "ru": "Ser9Gly."
+      },
+      "mechanism": {
+        "en": "A small PET study reported differences in reward-associated striatal dopamine release across genotypes.",
+        "ru": "В небольшом исследовании с ПЭТ генотипы различались по высвобождению дофамина в стриатуме в ответ на вознаграждение."
+      },
+      "possible_influence": {
+        "en": "The study does not measure personal dopamine levels.",
+        "ru": "По этому исследованию нельзя определить личный уровень дофамина."
+      }
+    },
+    "rs184039278": {
+      "gene": "CRY1",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/28388406/",
+      "description": {
+        "en": "c.1657+3A>C. The substitution causes exon 11 skipping and was associated with delayed sleep timing in studied families. The magnitude is not transferable to an individual.",
+        "ru": "c.1657+3A>C. Замена вызывает пропуск экзона 11 и была связана с более поздним временем сна в изученных семьях. Величину эффекта для конкретного человека по ней определить нельзя."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/28388406/"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8505610/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "c.1657+3A>C.",
+        "ru": "c.1657+3A>C."
+      },
+      "mechanism": {
+        "en": "The substitution causes exon 11 skipping and was associated with delayed sleep timing in studied families.",
+        "ru": "Замена вызывает пропуск экзона 11 и была связана с более поздним временем сна в изученных семьях."
+      },
+      "possible_influence": {
+        "en": "The magnitude is not transferable to an individual.",
+        "ru": "Величину эффекта для конкретного человека по ней определить нельзя."
+      }
+    },
+    "rs201220841": {
+      "gene": "CRY2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/27529127/",
+      "description": {
+        "en": "p.Ala260Thr. The change promoted CRY2 degradation in experimental models. Early sleep timing was reported in one family with variable expression.",
+        "ru": "p.Ala260Thr. В экспериментальных моделях замена ускоряла распад CRY2. В одной семье описана связь с ранним временем сна, проявления различались."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/27529127/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "D",
+      "reading": {
+        "en": "p.Ala260Thr.",
+        "ru": "p.Ala260Thr."
+      },
+      "mechanism": {
+        "en": "The change promoted CRY2 degradation in experimental models.",
+        "ru": "В экспериментальных моделях замена ускоряла распад CRY2."
+      },
+      "possible_influence": {
+        "en": "Early sleep timing was reported in one family with variable expression.",
+        "ru": "В одной семье описана связь с ранним временем сна, проявления различались."
+      }
+    },
+    "rs121908635": {
+      "gene": "PER2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/11232563/",
+      "description": {
+        "en": "p.Ser662Gly. The change reduced PER2 phosphorylation in vitro and segregated with early sleep timing in the studied family. The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "p.Ser662Gly. Замена снижала фосфорилирование PER2 in vitro и наследовалась вместе с ранним временем сна в изученной семье. Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/11232563/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "D",
+      "reading": {
+        "en": "p.Ser662Gly.",
+        "ru": "p.Ser662Gly."
+      },
+      "mechanism": {
+        "en": "The change reduced PER2 phosphorylation in vitro and segregated with early sleep timing in the studied family.",
+        "ru": "Замена снижала фосфорилирование PER2 in vitro и наследовалась вместе с ранним временем сна в изученной семье."
+      },
+      "possible_influence": {
+        "en": "The sources support the described variant context. Personal interpretation requires a verified allele and its clinical context.",
+        "ru": "Источники обосновывают описание варианта. Для личной интерпретации нужны подтверждённый аллель и клинический контекст."
+      }
+    },
+    "rs228697": {
+      "gene": "PER3",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/25201053/",
+      "description": {
+        "en": "p.Pro864Ala. One Japanese study associated this variant with diurnal preference. It does not establish individual chronotype or the PER3 tandem repeat.",
+        "ru": "p.Pro864Ala. В одном японском исследовании вариант был связан с предпочтительным временем сна. По нему нельзя определить личный хронотип или число повторов PER3."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/25201053/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "D",
+      "reading": {
+        "en": "p.Pro864Ala.",
+        "ru": "p.Pro864Ala."
+      },
+      "mechanism": {
+        "en": "One Japanese study associated this variant with diurnal preference.",
+        "ru": "В одном японском исследовании вариант был связан с предпочтительным временем сна."
+      },
+      "possible_influence": {
+        "en": "It does not establish individual chronotype or the PER3 tandem repeat.",
+        "ru": "По нему нельзя определить личный хронотип или число повторов PER3."
+      }
+    },
+    "rs2735611": {
+      "gene": "PER1",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/17051316/",
+      "description": {
+        "en": "T2434C. A candidate-gene study associated this synonymous variant with extreme diurnal preference. A direct mechanism was not established.",
+        "ru": "T2434C. В исследовании генов-кандидатов синонимический вариант был связан с крайними вариантами хронотипа. Прямой механизм не установлен."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17051316/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "D",
+      "reading": {
+        "en": "T2434C.",
+        "ru": "T2434C."
+      },
+      "mechanism": {
+        "en": "A candidate-gene study associated this synonymous variant with extreme diurnal preference.",
+        "ru": "В исследовании генов-кандидатов синонимический вариант был связан с крайними вариантами хронотипа."
+      },
+      "possible_influence": {
+        "en": "A direct mechanism was not established.",
+        "ru": "Прямой механизм не установлен."
+      }
+    },
+    "rs6318": {
+      "gene": "HTR2C",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/31723224/",
+      "description": {
+        "en": "p.Cys23Ser. Cys23Ser altered receptor localization and signaling in vitro. This X-linked position does not determine personal serotonin signaling or treatment response.",
+        "ru": "p.Cys23Ser. Cys23Ser менял локализацию рецептора и передачу сигнала in vitro. Эта позиция на X-хромосоме не определяет личную серотониновую активность или ответ на лечение."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31723224/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "p.Cys23Ser.",
+        "ru": "p.Cys23Ser."
+      },
+      "mechanism": {
+        "en": "Cys23Ser altered receptor localization and signaling in vitro.",
+        "ru": "Cys23Ser менял локализацию рецептора и передачу сигнала in vitro."
+      },
+      "possible_influence": {
+        "en": "This X-linked position does not determine personal serotonin signaling or treatment response.",
+        "ru": "Эта позиция на X-хромосоме не определяет личную серотониновую активность или ответ на лечение."
+      }
+    },
+    "rs3745274": {
+      "gene": "CYP2B6",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/31006110/",
+      "description": {
+        "en": "c.516G>T. The substitution affects splicing and contributes to reduced expression. Interpretation for efavirenz in CPIC uses the CYP2B6 diplotype and clinical context.",
+        "ru": "c.516G>T. Замена влияет на сплайсинг и способствует снижению экспрессии. Интерпретация для эфавиренза по CPIC опирается на диплотип CYP2B6 и клинический контекст."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/31006110/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "c.516G>T.",
+        "ru": "c.516G>T."
+      },
+      "mechanism": {
+        "en": "The substitution affects splicing and contributes to reduced expression.",
+        "ru": "Замена влияет на сплайсинг и способствует снижению экспрессии."
+      },
+      "possible_influence": {
+        "en": "Interpretation for efavirenz in CPIC uses the CYP2B6 diplotype and clinical context.",
+        "ru": "Интерпретация для эфавиренза по CPIC опирается на диплотип CYP2B6 и клинический контекст."
+      }
+    },
+    "rs5522": {
+      "gene": "NR3C2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/17018659/",
+      "description": {
+        "en": "Ile180Val. Ile180Val showed different cortisol-dependent activity in vitro. Studies of the physiological stress response gave different results.",
+        "ru": "Ile180Val. Ile180Val менял активность рецептора при действии кортизола in vitro. Результаты исследований физиологической реакции на стресс расходятся."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17018659/"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3044823/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "Ile180Val.",
+        "ru": "Ile180Val."
+      },
+      "mechanism": {
+        "en": "Ile180Val showed different cortisol-dependent activity in vitro.",
+        "ru": "Ile180Val менял активность рецептора при действии кортизола in vitro."
+      },
+      "possible_influence": {
+        "en": "Studies of the physiological stress response gave different results.",
+        "ru": "Результаты исследований физиологической реакции на стресс расходятся."
+      }
+    },
+    "rs27072": {
+      "gene": "SLC6A3",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/21525861/",
+      "description": {
+        "en": "3′-UTR C>T. Allelic expression and cell assays support a regulatory effect in the studied models. The position does not type the transporter tandem repeat or establish a psychiatric phenotype.",
+        "ru": "3′-UTR C>T. Анализ экспрессии и клеточные эксперименты поддерживают регуляторный эффект в изученных моделях. Эта позиция не определяет число повторов транспортёра или психиатрический фенотип."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21525861/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "3′-UTR C>T.",
+        "ru": "3′-UTR C>T."
+      },
+      "mechanism": {
+        "en": "Allelic expression and cell assays support a regulatory effect in the studied models.",
+        "ru": "Анализ экспрессии и клеточные эксперименты поддерживают регуляторный эффект в изученных моделях."
+      },
+      "possible_influence": {
+        "en": "The position does not type the transporter tandem repeat or establish a psychiatric phenotype.",
+        "ru": "Эта позиция не определяет число повторов транспортёра или психиатрический фенотип."
+      }
+    },
+    "rs34637584": {
+      "gene": "LRRK2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/15726496/",
+      "description": {
+        "en": "p.Gly2019Ser. This variant was reported in familial Parkinson disease and has incomplete, age-dependent penetrance. A single reading does not establish a diagnosis.",
+        "ru": "p.Gly2019Ser. Вариант описан при семейной болезни Паркинсона. Проявления зависят от возраста и возникают не у всех носителей. Одного чтения для диагноза недостаточно."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15726496/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18986508/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Gly2019Ser.",
+        "ru": "p.Gly2019Ser."
+      },
+      "mechanism": {
+        "en": "This variant was reported in familial Parkinson disease and has incomplete, age-dependent penetrance.",
+        "ru": "Вариант описан при семейной болезни Паркинсона."
+      },
+      "possible_influence": {
+        "en": "A single reading does not establish a diagnosis.",
+        "ru": "Проявления зависят от возраста и возникают не у всех носителей. Одного чтения для диагноза недостаточно."
+      }
+    },
+    "rs104893877": {
+      "gene": "SNCA",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/9197268/",
+      "description": {
+        "en": "p.Ala53Thr. Ala53Thr co-segregated with Parkinson disease in studied families. Personal assessment requires clinical and family context.",
+        "ru": "p.Ala53Thr. В изученных семьях Ala53Thr наследовался вместе с болезнью Паркинсона. Для личной оценки нужны клинические и семейные данные."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/9197268/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Ala53Thr.",
+        "ru": "p.Ala53Thr."
+      },
+      "mechanism": {
+        "en": "Ala53Thr co-segregated with Parkinson disease in studied families.",
+        "ru": "В изученных семьях Ala53Thr наследовался вместе с болезнью Паркинсона."
+      },
+      "possible_influence": {
+        "en": "Personal assessment requires clinical and family context.",
+        "ru": "Для личной оценки нужны клинические и семейные данные."
+      }
+    },
+    "rs35599367": {
+      "gene": "CYP3A4",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20386561/",
+      "description": {
+        "en": "CYP3A4*22. This intronic variant is associated with altered splicing and reduced hepatic expression. The observation does not supply a medication dose.",
+        "ru": "CYP3A4*22. Интронный вариант связан с изменением сплайсинга и снижением экспрессии в печени. Из этого наблюдения нельзя вывести дозу лекарства."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20386561/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/26488616/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "CYP3A4*22.",
+        "ru": "CYP3A4*22."
+      },
+      "mechanism": {
+        "en": "This intronic variant is associated with altered splicing and reduced hepatic expression.",
+        "ru": "Интронный вариант связан с изменением сплайсинга и снижением экспрессии в печени."
+      },
+      "possible_influence": {
+        "en": "The observation does not supply a medication dose.",
+        "ru": "Из этого наблюдения нельзя вывести дозу лекарства."
+      }
+    },
+    "rs76151636": {
+      "gene": "ATP7B",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/35762218/",
+      "description": {
+        "en": "p.His1069Gln. The substitution affected ATP7B trafficking in experimental systems. Wilson disease is assessed in a recessive and clinical context.",
+        "ru": "p.His1069Gln. В экспериментальных моделях замена нарушала внутриклеточный транспорт ATP7B. Болезнь Вильсона оценивают с учётом рецессивного наследования и клинических данных."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/35762218/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/33288711/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.His1069Gln.",
+        "ru": "p.His1069Gln."
+      },
+      "mechanism": {
+        "en": "The substitution affected ATP7B trafficking in experimental systems.",
+        "ru": "В экспериментальных моделях замена нарушала внутриклеточный транспорт ATP7B."
+      },
+      "possible_influence": {
+        "en": "Wilson disease is assessed in a recessive and clinical context.",
+        "ru": "Болезнь Вильсона оценивают с учётом рецессивного наследования и клинических данных."
+      }
+    },
+    "rs77931234": {
+      "gene": "ACADM",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/2394825/",
+      "description": {
+        "en": "p.Lys329Glu. This substitution was identified in people with MCAD deficiency. A single position does not establish a recessive disorder or fatty-acid oxidation capacity.",
+        "ru": "p.Lys329Glu. Замена обнаружена у пациентов с дефицитом MCAD. Чтение одной позиции не определяет способность окислять жирные кислоты и не устанавливает рецессивное заболевание."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2394825/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/2393404/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Lys329Glu.",
+        "ru": "p.Lys329Glu."
+      },
+      "mechanism": {
+        "en": "This substitution was identified in people with MCAD deficiency.",
+        "ru": "Замена обнаружена у пациентов с дефицитом MCAD."
+      },
+      "possible_influence": {
+        "en": "A single position does not establish a recessive disorder or fatty-acid oxidation capacity.",
+        "ru": "Чтение одной позиции не определяет способность окислять жирные кислоты и не устанавливает рецессивное заболевание."
+      }
+    },
+    "rs953413": {
+      "gene": "ELOVL2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19148276/",
+      "description": {
+        "en": "EPA association. A population GWAS associated this position with plasma EPA. It does not measure the person’s fatty acids or determine response to a supplement.",
+        "ru": "EPA association. В популяционном исследовании позиция была связана с концентрацией ЭПК в плазме. По ней нельзя определить личный уровень жирных кислот или ответ на добавку."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/19148276/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "D",
+      "reading": {
+        "en": "EPA association.",
+        "ru": "EPA association."
+      },
+      "mechanism": {
+        "en": "A population GWAS associated this position with plasma EPA.",
+        "ru": "В популяционном исследовании позиция была связана с концентрацией ЭПК в плазме."
+      },
+      "possible_influence": {
+        "en": "It does not measure the person’s fatty acids or determine response to a supplement.",
+        "ru": "По ней нельзя определить личный уровень жирных кислот или ответ на добавку."
+      }
+    },
+    "rs1801725": {
+      "gene": "CASR",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/20661308/",
+      "description": {
+        "en": "p.Ala986Ser. A meta-analysis associated Ala986Ser with a small difference in serum calcium. Measured calcium and clinical context remain necessary for assessment.",
+        "ru": "p.Ala986Ser. В метаанализе Ala986Ser был связан с небольшой разницей сывороточного кальция. Для оценки нужны фактический анализ и клинические данные."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/20661308/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Ala986Ser.",
+        "ru": "p.Ala986Ser."
+      },
+      "mechanism": {
+        "en": "A meta-analysis associated Ala986Ser with a small difference in serum calcium.",
+        "ru": "В метаанализе Ala986Ser был связан с небольшой разницей сывороточного кальция."
+      },
+      "possible_influence": {
+        "en": "Measured calcium and clinical context remain necessary for assessment.",
+        "ru": "Для оценки нужны фактический анализ и клинические данные."
+      }
+    },
+    "rs2707466": {
+      "gene": "WNT16",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22792071/",
+      "description": {
+        "en": "Thr/Ile. Human studies associated this coding position with cortical thickness and bone mineral density. It does not estimate individual fracture risk.",
+        "ru": "Thr/Ile. В исследованиях у людей кодирующая позиция была связана с толщиной кортикальной кости и минеральной плотностью. Она не оценивает личный риск перелома."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/22792071/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/23417354/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "Thr/Ile.",
+        "ru": "Thr/Ile."
+      },
+      "mechanism": {
+        "en": "Human studies associated this coding position with cortical thickness and bone mineral density.",
+        "ru": "В исследованиях у людей кодирующая позиция была связана с толщиной кортикальной кости и минеральной плотностью."
+      },
+      "possible_influence": {
+        "en": "It does not estimate individual fracture risk.",
+        "ru": "Она не оценивает личный риск перелома."
+      }
+    },
+    "rs1883832": {
+      "gene": "CD40",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/15731360/",
+      "description": {
+        "en": "Kozak C/T. The C/T position affected CD40 translation in the studied assays and was investigated in Graves disease. It does not establish individual thyroid status.",
+        "ru": "Kozak C/T. Позиция C/T влияла на трансляцию CD40 в экспериментах и изучалась при болезни Грейвса. По ней нельзя определить индивидуальное состояние щитовидной железы."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/15731360/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "Kozak C/T.",
+        "ru": "Kozak C/T."
+      },
+      "mechanism": {
+        "en": "The C/T position affected CD40 translation in the studied assays and was investigated in Graves disease.",
+        "ru": "Позиция C/T влияла на трансляцию CD40 в экспериментах и изучалась при болезни Грейвса."
+      },
+      "possible_influence": {
+        "en": "It does not establish individual thyroid status.",
+        "ru": "По ней нельзя определить индивидуальное состояние щитовидной железы."
+      }
+    },
+    "rs5030858": {
+      "gene": "PAH",
+      "source": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000078507/",
+      "description": {
+        "en": "p.Arg408Trp. Arg408Trp has been reported in PAH deficiency. Interpretation of this recessive condition requires the other allele and biochemical context.",
+        "ru": "p.Arg408Trp. Arg408Trp описан при дефиците фенилаланингидроксилазы. Для оценки этого рецессивного состояния важны второй аллель и биохимические данные."
+      },
+      "references": [
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000078507/"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10742057/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Arg408Trp.",
+        "ru": "p.Arg408Trp."
+      },
+      "mechanism": {
+        "en": "Arg408Trp has been reported in PAH deficiency.",
+        "ru": "Arg408Trp описан при дефиците фенилаланингидроксилазы."
+      },
+      "possible_influence": {
+        "en": "Interpretation of this recessive condition requires the other allele and biochemical context.",
+        "ru": "Для оценки этого рецессивного состояния важны второй аллель и биохимические данные."
+      }
+    },
+    "rs1799884": {
+      "gene": "GCK",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/17186458/",
+      "description": {
+        "en": "−30G>A. This promoter position was associated with fasting glucose across population cohorts. The association does not establish diabetes or a monogenic GCK disorder.",
+        "ru": "−30G>A. Позиция промотора была связана с глюкозой натощак в нескольких популяционных когортах. По этой ассоциации нельзя установить диабет или моногенное нарушение GCK."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/17186458/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "−30G>A.",
+        "ru": "−30G>A."
+      },
+      "mechanism": {
+        "en": "This promoter position was associated with fasting glucose across population cohorts.",
+        "ru": "Позиция промотора была связана с глюкозой натощак в нескольких популяционных когортах."
+      },
+      "possible_influence": {
+        "en": "The association does not establish diabetes or a monogenic GCK disorder.",
+        "ru": "По этой ассоциации нельзя установить диабет или моногенное нарушение GCK."
+      }
+    },
+    "rs662799": {
+      "gene": "APOA5",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/12951359/",
+      "description": {
+        "en": "−1131T>C. This regulatory position was associated with fasting triglycerides in several studied populations. It does not give an individual triglyceride value.",
+        "ru": "−1131T>C. Регуляторная позиция была связана с триглицеридами натощак в нескольких изученных популяциях. Личное значение триглицеридов определяют по анализу."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12951359/"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2987477/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "−1131T>C.",
+        "ru": "−1131T>C."
+      },
+      "mechanism": {
+        "en": "This regulatory position was associated with fasting triglycerides in several studied populations.",
+        "ru": "Регуляторная позиция была связана с триглицеридами натощак в нескольких изученных популяциях."
+      },
+      "possible_influence": {
+        "en": "It does not give an individual triglyceride value.",
+        "ru": "Личное значение триглицеридов определяют по анализу."
+      }
+    },
+    "rs6068812": {
+      "gene": "CYP24A1",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/21675912/",
+      "description": {
+        "en": "p.Leu409Ser. Experimental assays showed reduced vitamin D catabolism for this substitution. The variant has been reported in infantile hypercalcemia. Interpretation requires recessive inheritance and biochemical findings.",
+        "ru": "p.Leu409Ser. Эксперименты показали снижение активности распада метаболитов витамина D при этой замене. Вариант описан при младенческой гиперкальциемии. Для оценки нужны биохимические данные и учёт рецессивного наследования."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/21675912/"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/29680/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Leu409Ser.",
+        "ru": "p.Leu409Ser."
+      },
+      "mechanism": {
+        "en": "Experimental assays showed reduced vitamin D catabolism for this substitution.",
+        "ru": "Эксперименты показали снижение активности распада метаболитов витамина D при этой замене."
+      },
+      "possible_influence": {
+        "en": "The variant has been reported in infantile hypercalcemia. Interpretation requires recessive inheritance and biochemical findings.",
+        "ru": "Вариант описан при младенческой гиперкальциемии. Для оценки нужны биохимические данные и учёт рецессивного наследования."
+      }
+    },
+    "rs137852870": {
+      "gene": "BCKDHA",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/12888983/",
+      "description": {
+        "en": "p.Tyr438Asn. The substitution affects the E1α subunit of the complex that degrades branched-chain amino acids. The variant is a documented cause of recessive maple syrup urine disease. Assessment uses the other allele and amino-acid measurements.",
+        "ru": "p.Tyr438Asn. Замена затрагивает субъединицу E1α комплекса, расщепляющего аминокислоты с разветвлённой цепью. Вариант описан при рецессивной болезни кленового сиропа. Для оценки учитывают второй аллель и уровни аминокислот."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/12888983/"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/variation/100009/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Tyr438Asn.",
+        "ru": "p.Tyr438Asn."
+      },
+      "mechanism": {
+        "en": "The substitution affects the E1α subunit of the complex that degrades branched-chain amino acids.",
+        "ru": "Замена затрагивает субъединицу E1α комплекса, расщепляющего аминокислоты с разветвлённой цепью."
+      },
+      "possible_influence": {
+        "en": "The variant is a documented cause of recessive maple syrup urine disease. Assessment uses the other allele and amino-acid measurements.",
+        "ru": "Вариант описан при рецессивной болезни кленового сиропа. Для оценки учитывают второй аллель и уровни аминокислот."
+      }
+    },
+    "rs80338770": {
+      "gene": "SLC46A1",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/18559978/",
+      "description": {
+        "en": "p.Arg113Cys. The mutant protein reached the cell membrane but showed markedly impaired folate transport in a cell model. The variant was reported in recessive hereditary folate malabsorption. A single site cannot establish the cause of an individual’s folate level.",
+        "ru": "p.Arg113Cys. В клеточной модели изменённый белок достигал мембраны, но переносил фолат значительно хуже. Вариант описан при наследственной рецессивной мальабсорбции фолата. По одной позиции нельзя установить причину уровня фолата у человека."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/18559978/"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/59920344/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Arg113Cys.",
+        "ru": "p.Arg113Cys."
+      },
+      "mechanism": {
+        "en": "The mutant protein reached the cell membrane but showed markedly impaired folate transport in a cell model.",
+        "ru": "В клеточной модели изменённый белок достигал мембраны, но переносил фолат значительно хуже."
+      },
+      "possible_influence": {
+        "en": "The variant was reported in recessive hereditary folate malabsorption. A single site cannot establish the cause of an individual’s folate level.",
+        "ru": "Вариант описан при наследственной рецессивной мальабсорбции фолата. По одной позиции нельзя установить причину уровня фолата у человека."
+      }
+    },
+    "rs550423482": {
+      "gene": "PNPO",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/24645144/",
+      "description": {
+        "en": "p.Arg225His. Experimental assays showed reduced pyridox(am)ine 5′-phosphate oxidase activity. The variant was observed in recessive PNPO deficiency. A single site does not determine vitamin B6 status or treatment.",
+        "ru": "p.Arg225His. В экспериментах выявлена сниженная активность пиридокс(ам)ин-5′-фосфатоксидазы. Вариант наблюдали при рецессивном дефиците PNPO. По одной позиции нельзя определить обеспеченность витамином B6 или выбрать лечение."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24645144/"
+        },
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/24658933/"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000208779.2/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Arg225His.",
+        "ru": "p.Arg225His."
+      },
+      "mechanism": {
+        "en": "Experimental assays showed reduced pyridox(am)ine 5′-phosphate oxidase activity.",
+        "ru": "В экспериментах выявлена сниженная активность пиридокс(ам)ин-5′-фосфатоксидазы."
+      },
+      "possible_influence": {
+        "en": "The variant was observed in recessive PNPO deficiency. A single site does not determine vitamin B6 status or treatment.",
+        "ru": "Вариант наблюдали при рецессивном дефиците PNPO. По одной позиции нельзя определить обеспеченность витамином B6 или выбрать лечение."
+      }
+    },
+    "rs199689137": {
+      "gene": "ABCG5",
+      "source": "https://academic.oup.com/jcem/article/110/5/1358/7698176",
+      "description": {
+        "en": "p.Arg446Ter. The substitution creates a premature stop in the ABCG5 sterol transporter. The variant was reported in sitosterolemia. Clinical assessment depends on the allele combination and measured plant sterols.",
+        "ru": "p.Arg446Ter. Замена создаёт преждевременный стоп-кодон в транспортёре стеролов ABCG5. Вариант описан при ситостеролемии. Для оценки важны сочетание аллелей и измеренные уровни растительных стеролов."
+      },
+      "references": [
+        {
+          "url": "https://academic.oup.com/jcem/article/110/5/1358/7698176"
+        },
+        {
+          "url": "https://www.ncbi.nlm.nih.gov/clinvar/RCV000023442.30/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "B",
+      "reading": {
+        "en": "p.Arg446Ter.",
+        "ru": "p.Arg446Ter."
+      },
+      "mechanism": {
+        "en": "The substitution creates a premature stop in the ABCG5 sterol transporter.",
+        "ru": "Замена создаёт преждевременный стоп-кодон в транспортёре стеролов ABCG5."
+      },
+      "possible_influence": {
+        "en": "The variant was reported in sitosterolemia. Clinical assessment depends on the allele combination and measured plant sterols.",
+        "ru": "Вариант описан при ситостеролемии. Для оценки важны сочетание аллелей и измеренные уровни растительных стеролов."
+      }
+    },
+    "rs2236418": {
+      "gene": "GAD2",
+      "source": "https://pubmed.ncbi.nlm.nih.gov/14691540/",
+      "description": {
+        "en": "−243 A>G. A reporter assay suggested altered promoter activity, with conflicting results in an independent experiment. The initial association with severe obesity was not reproduced in the replication study. These data do not establish individual GABA levels or behavioural traits.",
+        "ru": "−243 A>G. Эксперимент с репортёрным геном показал изменение активности промотора, но независимая работа дала другой результат. Первоначальная связь с тяжёлым ожирением не подтвердилась при независимой проверке. По этим данным нельзя определить личный уровень ГАМК или особенности поведения."
+      },
+      "references": [
+        {
+          "url": "https://pubmed.ncbi.nlm.nih.gov/14691540/"
+        },
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1193520/"
+        }
+      ],
+      "curated_on": "2026-11-04",
+      "scope": "reference_only",
+      "reference_level": "C",
+      "reading": {
+        "en": "−243 A>G.",
+        "ru": "−243 A>G."
+      },
+      "mechanism": {
+        "en": "A reporter assay suggested altered promoter activity, with conflicting results in an independent experiment.",
+        "ru": "Эксперимент с репортёрным геном показал изменение активности промотора, но независимая работа дала другой результат."
+      },
+      "possible_influence": {
+        "en": "The initial association with severe obesity was not reproduced in the replication study. These data do not establish individual GABA levels or behavioural traits.",
+        "ru": "Первоначальная связь с тяжёлым ожирением не подтвердилась при независимой проверке. По этим данным нельзя определить личный уровень ГАМК или особенности поведения."
+      }
     }
   }
 }

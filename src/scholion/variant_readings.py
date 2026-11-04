@@ -35,6 +35,17 @@ def same_genotype(a: str | None, b: str | None) -> bool:
     return bool(normalize(a)) and normalize(a) == normalize(b)
 
 
+def sample_quality(fields: dict[str, str]) -> dict:
+    """Preserve sample FORMAT values, including missing entries in ordered AD."""
+    ad = fields.get('AD')
+    return {
+        'depth': int(fields['DP']) if fields.get('DP', '').isdigit() else None,
+        'genotype_quality': int(fields['GQ']) if fields.get('GQ', '').isdigit() else None,
+        'allele_depth': [int(value) if value.isdigit() else None for value in ad.split(',')]
+        if ad and ad != '.' else None,
+    }
+
+
 def observation(rsid: str, value: dict, source: str, selector: str) -> dict:
     """An immutable-by-convention snapshot; never fill unknown source coordinates."""
     identity = deepcopy(value.get('variant_identity') or {})
@@ -42,7 +53,7 @@ def observation(rsid: str, value: dict, source: str, selector: str) -> dict:
         identity = {k: value.get(v) for k, v in (
             ('assembly', 'assembly'), ('chrom', 'chrom'), ('pos', 'read_pos'),
             ('ref', 'ref'), ('alt', 'alt'))}
-    quality_keys = ('depth', 'filter', 'qual', 'allele_fraction', 'low_depth',
+    quality_keys = ('depth', 'genotype_quality', 'likelihood_gap_phred', 'allele_depth', 'filter', 'qual', 'allele_fraction', 'low_depth',
                     'depth_unverified', 'filtered', 'imputed', 'strand_ambiguous',
                     'needs_confirmation', 'confirmation_reasons', 'unverified_locus')
     result: dict[str, Any] = {'rsid': rsid, 'identity': identity,
@@ -50,6 +61,7 @@ def observation(rsid: str, value: dict, source: str, selector: str) -> dict:
             'raw_recorded_genotype': value.get('raw_recorded_genotype'),
             'phased': value.get('phased'), 'confidence': value.get('confidence'),
             'interpretation_applicable': value.get('interpretation_applicable'),
+            'interpretation_restriction': value.get('interpretation_restriction'),
             'quality': {k: deepcopy(value[k]) for k in quality_keys if k in value},
             'source': {'file': source, 'selector': selector},
             'source_identity': deepcopy(value.get('source_identity')),

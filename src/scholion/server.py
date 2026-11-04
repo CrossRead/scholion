@@ -496,6 +496,9 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/genome":
                 return self._json(engine.genome_lookup(
                     rsid=(q.get("rsid") or [None])[0], gene=(q.get("gene") or [None])[0]))
+            if p == "/api/mitochondria":
+                from . import mitochondria
+                return self._json(mitochondria.report())
             if p == "/api/genome-status":
                 return self._json({**engine.genome_status(), "gaps": core.genome_gaps()})
             if p == "/api/second-opinion":
@@ -629,6 +632,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(lifecycle.erase(str(body.get("id") or ""),
                                                   confirm=str(body.get("confirm") or ""),
                                                   digest=str(body.get("digest") or ""), surface="web"))
+            if u.path == "/api/mitochondria":
+                from . import mitochondria
+                return self._json(mitochondria.analyze(body.get("confirm") is True,
+                                                     body.get("cancel") is True,
+                                                     annotations_only=body.get("annotations_only") is True))
             if u.path == "/api/labs":
                 return self._json(store.add_lab_point(
                     body.get("marker", ""), body.get("date", ""), body.get("value"),

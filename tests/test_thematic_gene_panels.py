@@ -77,6 +77,12 @@ class TestThematicGenePanels(unittest.TestCase):
         self.assertEqual(clinical['kind'], 'clinical_gene_disease_reference')
         self.assertIn('COMT', [r['gene'] for r in research['genes']])
         self.assertNotIn('GBA1', [r['gene'] for r in research['genes']])
+        positions = [p for p in research['positions'] if p['rsid'] == 'rs1800497']
+        self.assertEqual(['ANKK1'], [p['gene'] for p in positions])
+        self.assertEqual('DRD2', positions[0]['reference_context']['variant_catalogue_gene'])
+        with mock.patch.object(genome, 'available', return_value={'ready': False}):
+            lookup = genome.lookup(gene='ANKK1', allow_network=False)
+        self.assertEqual([('ANKK1', 'rs1800497')], [(p['gene'], p['rsid']) for p in lookup['loci']])
         for language in ('en', 'ru'):
             i18n.set_lang(language)
             clinical = panel_description('neuro_clinical')
@@ -92,6 +98,50 @@ class TestThematicGenePanels(unittest.TestCase):
                 self.assertTrue(a['curated_on'])
                 if language == 'ru':
                     self.assertRegex(a['disease_label'], '[А-Яа-я]')
+
+    def test_scoped_annotations_reach_all_panels_without_joining_the_decision_catalogue(self):
+        from scholion.panel_reference import catalogue_records
+        records = catalogue_records()
+        clinical = {rsid for rsid, row in records.items() if row["kind"] == "clinical"}
+        research = {rsid for rsid, row in records.items() if row["kind"] == "research"}
+        self.assertEqual(178, len({records[rsid]["gene"] for rsid in clinical}))
+        self.assertEqual({"rs11887534", "rs328", "rs2303790", "rs1801222"}, research)
+        self.assertFalse(set(records) & core.loci()["loci"].keys())
+        seen = set()
+        with mock.patch.object(genome, "available", side_effect=AssertionError("reference reads no genome")):
+            for key in thematic_panels.thematic_catalogue()["panels"]:
+                book = panel_description(key)
+                for gene in book["genes"]:
+                    for position in gene["positions"]:
+                        if not position.get("catalogue_kind"):
+                            continue
+                        annotation = position["reference_context"]["catalogue_annotation"]
+                        rsid = position["rsid"]
+                        seen.add(rsid)
+                        self.assertTrue(gene["reading_request"])
+                        self.assertFalse(position["interpretation_applicable"])
+                        self.assertTrue(annotation["sources"])
+                        self.assertNotIn("reading", position)
+                        if rsid in clinical:
+                            self.assertGreaterEqual(annotation["stars"], 2)
+                            self.assertTrue(annotation["conditions"])
+                            self.assertIn(annotation["rcv"], annotation["sources"][0])
+                        else:
+                            self.assertNotIn("classification", annotation)
+                            # Showing the same call in another topic must not broaden
+                            # the retained source annotation or decision applicability.
+                            self.assertEqual(records[rsid]["panels"], annotation["panels"])
+        self.assertEqual(set(records), seen)
+
+    def test_scoped_position_refuses_a_different_alternate_allele(self):
+        loc = genome.resolve_rsid("rs328", allow_network=False)
+        self.assertEqual(("C", "G"), (loc["ref"], loc["alt"]))
+        raw = {"genotype": "CA", "confidence": "called", "assembly": "GRCh38", "source": "vcf"}
+        with mock.patch.object(genome, "_read_gt_at", return_value=raw):
+            read = genome._gt_at(loc)
+        self.assertEqual("other_variant_at_position", read["confidence"])
+        self.assertIsNone(read["genotype"])
+        self.assertFalse(read["interpretation_applicable"])
 
     def test_only_positive_local_calls_are_rendered_as_genotypes(self):
         with mock.patch.object(genome, 'available', return_value={'ready': True}), \
@@ -122,7 +172,7 @@ class TestThematicGenePanels(unittest.TestCase):
         themes = [row for row in listed if row.get('thematic')]
         self.assertTrue(themes)
         self.assertTrue(all(r['positions'] is None and r['genes'] > 0 for r in themes))
-        self.assertEqual(len(domains()), 16)
+        self.assertEqual(len(domains()), 17)
         additional = panel_description('additional_genetics')
         self.assertNotIn('HHEX-IDE', [g['gene'] for g in additional['genes']])
         self.assertEqual(additional['regions'], [])
@@ -161,7 +211,7 @@ const gene={gene:'SYNTHETIC',reference_context:{gene_function:'Known function',g
  positions:[{rsid:'rsSynthetic',reading:{read:false,genotype:'AA',message:'Not read'}}]};
 const html=renderThematicPanel({label:'Topic',counts:{genes:1},genes:[gene]});
 assert.ok(html.includes('Known function')&&html.includes('rsSynthetic'));
-assert.ok(html.indexOf('gene-card-reading')<html.indexOf('gene-card-description'));
+assert.ok(html.indexOf('gene-card-description')<html.indexOf('gene-card-reading'));
 assert.ok(!html.includes('>AA<'));
 assert.ok(html.includes('data-thematic-gene="SYNTHETIC"'));
 assert.ok(html.includes('data-read-gene="CANONICAL"'));

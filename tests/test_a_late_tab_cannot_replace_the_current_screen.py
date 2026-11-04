@@ -206,3 +206,41 @@ const forgetAnswers=()=>{_answerEpoch++;cleared++;_sources=null;_systems=null;};
 """
         result=subprocess.run([shutil.which('node'),'-e',script],text=True,capture_output=True,stdin=subprocess.DEVNULL,timeout=NODE_TIMEOUT)
         self.assertEqual(0,result.returncode,result.stderr)
+
+    def test_genome_focus_keeps_reading_until_explicit_refresh_and_never_keeps_another_profile(self):
+        page = (support.ROOT / 'src/scholion/web/index.html').read_text(encoding='utf-8')
+        start = page.index('let _visibleProfileRefreshPending=false;')
+        code = page[start:page.index("window.addEventListener('focus',refreshVisibleProfile);", start)]
+        script = r"""
+const assert=require('node:assert/strict');
+let changed=false,_profileSwitchPending=false,_profileIdentity='first',current=0,mounts=0,selected=0,scrolls=0;
+const TABS=[['web.tab.genome'],['web.tab.labs']];
+const refreshProfileAnswers=async()=>{const value=changed;changed=false;return value;};
+let notice=null;
+const tab={dataset:{pane:'long'},click:()=>selected++};
+const root={querySelector:key=>key==='[data-profile-refresh]'?notice:tab,
+  querySelectorAll:()=>[tab],prepend:value=>{notice=value;}};
+const $=()=>root,t=x=>x,esc=x=>x;
+const viewLifecycle={current:node=>node===root};
+const window={scrollY:340,scrollTo:()=>scrolls++};
+const document={querySelector:()=>null,createElement:()=>{
+  const button={};return {dataset:{},setAttribute:()=>{},querySelector:()=>button};}};
+const mount=async()=>{mounts++;notice=null;};
+""" + code + r"""
+(async()=>{
+ await refreshVisibleProfile();assert.equal(mounts,0);assert.equal(notice,null);
+ changed=true;await refreshVisibleProfile();assert.equal(mounts,0);assert.ok(notice);
+ const first=notice;await refreshVisibleProfile();assert.equal(notice,first);
+ changed=true;await refreshVisibleProfile();assert.equal(notice,first);
+ await notice.querySelector('button').onclick();assert.equal(mounts,1);assert.equal(selected,1);assert.equal(scrolls,1);
+ changed=true;await refreshVisibleProfile();const old=notice;
+ changed=true;_profileSwitchPending=true;_profileIdentity='second';await refreshVisibleProfile();
+ assert.equal(mounts,2);assert.equal(notice,null);
+ await old.querySelector('button').onclick();assert.equal(mounts,2);
+ _profileSwitchPending=false;current=1;changed=true;await refreshVisibleProfile();assert.equal(mounts,3);
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        result = subprocess.run([shutil.which('node'), '-e', script], text=True,
+                                capture_output=True, stdin=subprocess.DEVNULL, timeout=NODE_TIMEOUT)
+        self.assertEqual(0, result.returncode, result.stderr)
+        self.assertIn('window.ScholionHost.refresh=refreshVisibleProfile;', page)

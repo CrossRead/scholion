@@ -75,16 +75,43 @@ each gene's reference annotation. `referenceExtras` renders catalogue-specific
 explanations. `reference`, `mechanism`, `preview` and `brief` also serve existing
 non-card presentations; their meaning and output remain shared.
 
+The component owns the gene title link on single cards and grouped positions.
+It opens an exact NCBI Gene or HGNC record when the reference supplies one,
+otherwise it searches NCBI Gene by the preferred human gene symbol.
+For grouped positions it checks all available references; changing the row
+order cannot change the title destination. Conflicting direct records use the
+symbol search only if the symbol is unambiguous.
+Unresolved gene sets and regions use a text title. Variant position links
+retain their local navigation.
+
+The explanation uses one heading. It presents the supplied meaning, direction
+and comparison, mechanism, relevant personal context, then limitations. It
+shows only applicable fields and leaves evidence and sources separately
+accessible. Research reference context does not substitute for a withheld
+personal interpretation.
+
+General cautions belong in the Genome tab's shared interpretation note. The
+card omits a research limitation explicitly scoped to that note
+(`limitations_scope: genome`); standalone reports retain the supplied text.
+Keep limitations specific to the study, variant or reading on the card.
+
 Options include `register`, `fallback`, `referenceOnly`, `compound`,
-`geneScreen` and `geneRegion`. Optional HTML slots are deliberate boundaries:
+`geneScreen` and `geneRegion`. A supplied `assessment` is a reading label
+for a gene assessment such as a drug phenotype; it is not a genotype.
+Use `comparisonText`, `contextTexts` and `limitationTexts` for existing
+view-specific explanation facts; the component escapes and places them in
+the same order as the corresponding fields of the result. Use
+`personalComparisonText` for a comparison tied to the reading; it is
+suppressed with `contextTexts` when personal interpretation is withheld.
+Optional HTML slots are deliberate boundaries:
 
 | Slot | Placement and caller responsibility |
 | --- | --- |
-| `geneHtml` | Identity link with a page-specific navigation context |
 | `annotationHtml` | Additional annotation content inside the annotation disclosure |
 | `detailHtml` | Override for composed reference/clinical details; normally supplied by the component |
 | `extraHtml` | Additional reading/inheritance details inside that disclosure |
-| `contextHtml` | Separate contextual section below the base card, e.g. a laboratory comparison |
+| `contextHtml` | Personal or screen context after the main explanation and before its limitations |
+| `readingHtml` | Additional reading facts, e.g. a prescription gene assessment's marker links and genotypes |
 
 Slots contain trusted application-rendered HTML, not raw user or API strings.
 Escape dynamic data before filling a slot. Ordinary text is escaped by the
@@ -114,6 +141,88 @@ retain semantic coverage. An architectural refactor also needs before/after
 HTML and computed-style comparison, plus a check that the sanitized installed
 wheel serves both component assets.
 
+## Gene curation and source review
+
+### Supported reference sources
+
+The following sources are supported for the stated curation purposes. The
+delivery column distinguishes a retained record, a local pipeline and a source
+consulted during curation. The runtime inventory and available import commands
+are shown by `scholion sources`.
+
+| Source | What to verify | How Scholion uses it |
+| --- | --- | --- |
+| [HGNC](https://hgnc.genenames.org/help/symbol-report/index.html) | Approved human symbol, HGNC ID, aliases, previous symbols and gene type | Curated identity and alias records |
+| [NCBI Gene / RefSeq](https://www.ncbi.nlm.nih.gov/guide/howto/find-func-gene/) | Human Gene ID, gene or RNA function and curated gene summary | Sourced gene descriptions retained in the catalogue |
+| [UniProtKB / Swiss-Prot](https://www.uniprot.org/help/uniprotkb) | Reviewed human protein accession, molecular activity, substrate or binding partner and evidence | Curated citations and checked protein-function descriptions |
+| [Gene Ontology](https://geneontology.org/docs/guide-go-evidence-codes/) | Term ID, evidence code, qualifier, taxon and supporting reference | Selected annotations with evidence and attribution retained |
+| [dbSNP / RefSNP](https://www.ncbi.nlm.nih.gov/snp/) | rsID status, assembly placement and reference and alternate alleles | Curated variant identity and coordinate references |
+| [MANE](https://www.ncbi.nlm.nih.gov/refseq/MANE/) and [Ensembl](https://rest.ensembl.org/) | Assembly, transcript accession and version or exact variant placement | Local reference and annotation pipeline; Ensembl REST for permitted public locus lookups |
+| [ClinVar](https://www.ncbi.nlm.nih.gov/clinvar/docs/review_status/) | Classification for the exact allele and condition, review status, conflicts and record version | Locally annotated findings and scoped catalogue annotations |
+| [GenCC](https://thegencc.org/) | Gene–disease relationship, disease identifier, inheritance, submitter and classification | Retained submissions from a dated export |
+| [ClinGen](https://www.clinicalgenome.org/docs/gene-disease-validity-classification-information/) | Relevant expert gene–disease assessment and its scope | Consult during curation and identify ClinGen as a submitter when citing its GenCC assertion |
+| [CPIC](https://cpicpgx.org/guidelines/) | Applicable gene–drug guideline, allele or diplotype, phenotype and guideline version | Retained pharmacogenetic guidance and supported data importer |
+| [LongevityMap](https://genomics.senescence.info/longevity/) | Membership in a published study and its cited literature | Local catalogue import; verify effect claims against the primary study |
+| [PubMed](https://pubmed.ncbi.nlm.nih.gov/) / [Europe PMC](https://europepmc.org/) | Find the primary article and verify its design, participants, allele, outcome and limits | Literature discovery. Cite the study by PMID, DOI or stable publisher link |
+
+### Checks for each new or changed entry
+
+1. Confirm human gene identity in HGNC and NCBI Gene. Resolve an ambiguous
+   label only when the exact locus, assembly or transcript identifies the
+   intended gene. Record the identifiers used.
+2. Check gene or RNA function in NCBI Gene / RefSeq. For a protein, consult
+   reviewed human UniProt when available. Use GO only with its evidence code
+   and qualifiers. Record which sources were checked, including unavailable
+   records and disagreements. Use the evidence that supports the actual
+   wording.
+3. For a variant, check exact alleles and assembly in RefSNP or the
+   corresponding reference record, and check MANE or Ensembl when the
+   explanation depends on a transcript. For a clinical classification, check
+   ClinVar. For a gene–disease or inheritance claim, check GenCC and an
+   applicable ClinGen expert assessment. For a gene–drug claim, check CPIC.
+   Verify a stated variant mechanism or measured effect in the primary study.
+4. Write a short patient explanation of the gene's role. Put the specific
+   mechanism and evidence scope in the clinician disclosure. Identify what
+   was measured, and state the concrete gap if evidence is missing. Keep
+   gene function, variant effect, database classification and individual
+   interpretation separate.
+
+### What a card must show
+
+In the shared **Database annotations and sources** disclosure, show the name of
+each database actually used, a link to the exact record or publication, and
+what the source supports. Separate the source of the patient and clinician gene
+descriptions from sources for variant effects, inheritance, classification or
+drug guidance. A source that only confirmed identity is labelled as such.
+Record the version or release when available and the date Scholion last
+verified the specific record against the claim. Group repeated references
+without hiding distinct submissions, conflicts or differences in scope.
+The backend supplies this provenance for every presentation.
+
+### When to offer a refresh
+
+Evaluate freshness for each source and claim from the most recent documented
+verification of the exact record and wording. The threshold is **more than
+three calendar months**. Add three months to the verification date, using the
+last day of the destination month if needed, and offer a refresh starting the
+following day. For example, a record checked on 4 November is due for a
+refresh on 5 February. An absent or invalid verification date calls for
+verification as well. Publication, export and import dates are separate
+metadata.
+
+When a check is due, the development agent proposes a refresh and the card
+should surface the same recommendation in its source disclosure. Name the
+source, exact entry, affected claim and date last checked. Keep the recorded
+version and its evidence scope available during the review. The procedure is
+to retrieve the current public record, compare it with the retained evidence
+and wording, review differences and conflicts, update the affected catalogue
+entries and rerun the registered checks on synthetic data. Record the reviewed
+version and new verification date after a successful check, including when the
+wording is still valid. An unreachable source leaves the review pending.
+Opening a card or offering a refresh performs no download or write. Use an
+existing importer where the inventory confirms it covers the source and
+review the resulting differences before accepting them.
+
 ## Repeatable gallery
 
 Build the offline synthetic gallery with
@@ -129,3 +238,39 @@ The gallery imports the actual component, actual CSS and translation catalogues.
 Synthetic services isolate the component contract; surrounding page adapters and
 clinical support helpers retain their separate tests. The generated HTML can be
 opened for visual review. It is not a product route and never reads a profile.
+
+## Curated positions before region summaries
+
+When a thematic gene has curated positions, pass those positions to the shared
+position-card component first, including their exact reading or explicit refusal.
+Do not prepend a gene-region reference card that appears to have no personal
+reading. Clinical and research group headings remain separate. Attach the region
+details once, after the final position group. Genes without curated positions
+retain a gene-level summary and the actual VCF records in details; never select
+an arbitrary variant as a genotype for the whole gene.
+
+A gene's known curated positions are retained across thematic topics, including
+positions first curated for another panel. The original annotation panel tags,
+condition, sources and explicit refusal of automatic interpretation remain
+unchanged. Reusing a factual genotype is not a new clinical association with the
+current topic. The region summary is used only when that gene has no curated
+position anywhere in the catalogue.
+
+## Genotype-specific research meaning
+
+`personal_meaning` is supplied by the shared core (`personal_meaning.py`). It
+separates a sourced genotype hypothesis from study context and from an action
+assessment. Every explanation uses “What this may mean for you”. It starts
+with the sourced summary, including direction and comparison when established.
+Mechanism, relevant personal observations and limitations follow when
+available. The text describes the scope of a study or reference when it has
+no genotype-specific interpretation. Source URLs stay in the source
+disclosure. The component does not count research alleles or infer effects.
+
+Authored genotype comparisons retain the exact allele frame and source witnesses
+in `research_interpretations.json`. Existing quantitative associations are reused
+from `genetic_lab_links.json`; they are not copied into a second rule catalogue.
+A missing studied allele does not imply protection or the reverse effect.
+Uncertain reading, identity conflict, an unstudied genotype or changed source
+identity keeps the study visible without applying its personal comparison.
+No hypothesis changes clinical findings, scores, prescriptions or eligibility.

@@ -160,7 +160,7 @@ class TestThePageShowsTheLevel(unittest.TestCase):
         page = (support.ROOT / "src" / "scholion" / "web" / "index.html").read_text(encoding="utf-8")
         shared = (support.SRC / "scholion/web/gene-cards.js").read_text(encoding="utf-8")
         self.assertIn("options.grade(model.level, model.levelShort)", shared)
-        self.assertIn("geneHtml:systemGeneLink(row.gene,card.key)", page)
+        self.assertNotIn("geneHtml:systemGeneLink", page)
         self.assertIn("levelNoteHtml(row)+routeHtml(row)+underLoadHtml(row)+ladderHtml(row)", page)
 
 

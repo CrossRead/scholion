@@ -103,7 +103,7 @@ placed on it, the prescriptions acting on it, a target the treating clinician
 set, what the test rules suggest, and the questions left open.
 
 **The genetic half is composed from a base with a version, not from anybody's
-memory.** 1469 genes across the fifteen systems, taken from the Gene Curation
+memory.** 1469 genes across the existing systems, taken from the Gene Curation
 Coalition export, with every submitter's assertion kept side by side: who
 asserted the gene–disease link, how strongly, under which mode of inheritance,
 and on what date. Two groups disagreeing about one gene are shown disagreeing
@@ -212,7 +212,7 @@ for each, whether anything in the person's own data could fix it.
 
 ## Current state, honestly
 
-This page ships with the build numbered 0.7.6. **There is still no clinical
+This page ships with the build numbered 0.7.7. **There is still no clinical
 validation study and no benchmark against existing systems.** What there is, is two external runs by
 people who are not the author, and both are worth stating plainly because both
 were useful and neither was flattering.

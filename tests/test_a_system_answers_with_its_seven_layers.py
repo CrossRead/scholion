@@ -408,6 +408,10 @@ class TestTheShippedFilesAnswerForEverySystem(unittest.TestCase):
                 if d["key"] == "fitness":
                     self.assertEqual("no_genetic_half", g["status"])
                     self.assertEqual("no_genetic_half", r["verdict"]["why"])
+                elif d["key"] == "mitochondria":
+                    self.assertEqual("mitochondrial", g["status"])
+                    self.assertIn("mitochondrial_context", r)
+                    self.assertIsNone(r["labs"]["score"])
                 else:
                     self.assertEqual("composed", g["status"])
                     self.assertGreater(g["base"]["genes"], 0)

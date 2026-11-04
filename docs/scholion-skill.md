@@ -179,12 +179,9 @@ other doors exist:
   its own.
 - **A Python entry point.** `import scholion.ouroboros_tools` → `get_tools()`.
 
-Six tools write: `sch_ingest_labs` transcribes forms, `sch_focus_log` records an
-event, `sch_lab_draw` records why one day has two draws, `sch_marker_propose`
-records a name awaiting confirmation. `sch_recompute` rebuilds derived files
-and `sch_update` installs an update, only with explicit confirmation.
-Never record a model's inference as a measurement or prescribe therapy.
-For other writes, let the person type the command or press the button.
+Before a write, follow the consent and source rules in INSTRUCTION.md.
+`sch_mitochondria` runs and saves a local BAM analysis only after explicit
+confirmation. Never record an inference as a measurement or prescribe therapy.
 
 `scholion doc connecting-an-agent` explains each.
 

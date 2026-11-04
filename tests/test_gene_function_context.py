@@ -124,7 +124,8 @@ class TestSourcedGeneFunctions(unittest.TestCase):
     def test_unindexed_gene_reading_retains_reference_biology(self):
         from scholion import genome, gene_region
         from scholion.engine.genomics import genome_lookup
-        def attach(answer, gene):
+        def attach(answer, gene, *, allow_network=True):
+            self.assertTrue(allow_network)
             answer["region_report"] = {"gene": gene, "status": "unindexed"}
         with mock.patch.object(genome, "lookup", return_value={"gene": "APOE", "loci": []}), mock.patch.object(gene_region, "attach_reading", side_effect=attach):
             answer = genome_lookup(gene="APOE")
@@ -146,7 +147,7 @@ class TestSourcedGeneFunctions(unittest.TestCase):
         self.assertTrue(context["gene_source"])
         self.assertEqual(context["variant_status"], "not_curated")
         unknown = reference_context({"gene": "COL1R1", "rsid": "rsSynthetic"}, "E")
-        self.assertEqual(unknown["function_status"], "not_curated")
+        self.assertEqual(unknown["function_status"], "identity_only")
 
     def test_annotations_have_human_identity_and_non_negated_provenance(self):
         entries = core._read_knowledge_raw("gene_function_context.json")["genes"]
@@ -179,7 +180,10 @@ class TestSourcedGeneFunctions(unittest.TestCase):
                 self.assertEqual(card["reference_context"]["variant_status"], "not_curated")
             # Family names and misspellings do not become official aliases.
             for unknown in ("F13", "LRP", "COL1R1", "LPR1"):
-                self.assertFalse(gene_function_entry(unknown), unknown)
+                record = gene_function_entry(unknown)
+                self.assertEqual(record["function_status"], "identity_only", unknown)
+                self.assertEqual(record["canonical_symbol"], unknown)
+                self.assertNotIn("identity_source", record)
 
     def test_expanded_functions_reach_both_languages_without_inventing_readings(self):
         for language, fragments in (("en", {"CNDP1": "carnosinase", "MICU1": "calcium",
@@ -249,16 +253,30 @@ for(const data of [row,{...row,status:'no_genome',locus:{gene:'TERC'}},
  {...row,loci:[{...row,result:{confidence:'assumed_ref',genotype:'AA',depth:0}}]}]){
  const html=genomeCard(data);
  assert.ok(html.includes('<strong class="gene-card-function">'+row.reference_context.gene_function+'</strong>'));
- assert.ok(html.includes('data-gene-description'));
+ const role=html.indexOf('class="gene-card-function"');
+ const meaning=html.indexOf('data-gene-description');
+ assert.ok(role<html.indexOf('class="gene-card-reading"'));
+ if(meaning>=0)assert.ok(role<meaning);
  if(data.loci)assert.ok(!html.includes('>AA<'));
 }
 const html=renderLongevity({available:true,known:[{...row,rsid:'rsSynthetic'}],
  significant_genes:[{...row,variants:[row]}],stats:{significant_genes:1,significant_carriers:1}});
 assert.equal((html.match(/summary class="cr-btn"/g)||[]).length,2);
 assert.ok(!html.includes('Literature catalogue'));
-assert.ok(html.includes('data-gene-description'));
+assert.ok(html.includes('class="gene-card-function"'));
+const apoe=ap=>renderLongevity({available:true,known:[],stats:{},apoe:ap});
+const partial=apoe({status:'no_data',rs429358:'CT'}).split('data-gene-inheritance')[0];
+assert.ok(partial.includes('rs429358: CT')&&partial.includes('rs7412: —'));
+assert.ok(!partial.includes('class="gene-card-genotype"'));
+const ambiguous=apoe({status:'ambiguous_without_phase',rs429358:'CT',rs7412:'CT',
+ candidates:['ε2/ε4','ε1/ε3'],message:'Two possible combinations'}).split('data-gene-inheritance')[0];
+assert.ok(ambiguous.includes('rs429358: CT')&&ambiguous.includes('rs7412: CT'));
+assert.ok(ambiguous.includes('web.gene_card.phase_unresolved')&&ambiguous.includes('Two possible combinations'));
+assert.ok(!ambiguous.includes('class="gene-card-genotype"'));
+const called=apoe({status:'ok',genotype:'ε2/ε3',rs429358:'TT',rs7412:'CT'});
+assert.ok(called.includes('class="gene-card-genotype">ε2/ε3')&&called.includes('rs429358: TT'));
 const geneOnly=genomeGeneTable([row]);
-assert.ok(geneOnly.includes('web.gene_card.no_position'));
+assert.ok(geneOnly.includes('web.gene_card.no_personal_reading'));
 """
         script = gene_card_support.javascript() + script
         result = gene_card_support.run(script, input=json.dumps(context),

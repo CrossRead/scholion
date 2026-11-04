@@ -36,6 +36,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 from . import core, genes
+from .variant_readings import sample_quality
 from .i18n import t as _t
 
 #: Read-depth thresholds reported for every region. 10× is the floor at which a
@@ -120,12 +121,9 @@ def _parse_row(row: List[str], sample: int = 0) -> Dict[str, Any]:
     fmt = (row[8].split(":") if len(row) > 8 else [])
     val = (row[9 + sample].strip().split(":") if len(row) > 9 + sample else [])
     call = dict(zip(fmt, val))
-    ad = call.get("AD")
     return {"chrom": row[0], "pos": int(row[1]), "ref": row[3], "alt": row[4],
             "qual": row[5], "filter": row[6], "genotype": call.get("GT"),
-            "genotype_quality": int(call["GQ"]) if call.get("GQ", "").isdigit() else None,
-            "depth": int(call["DP"]) if call.get("DP", "").isdigit() else None,
-            "allele_depth": [int(x) for x in ad.split(",") if x.isdigit()] if ad else None,
+            **sample_quality(call),
             "rsid": row[2] if len(row) > 2 and row[2] not in (".", "") else None}
 
 
@@ -227,14 +225,24 @@ def reading_summary(location, variants, coverage):
         state = "partial_coverage"
     else:
         state = "covered"
-    if total:
-        message = _t("gene.reading.variants", count=total)
-    elif state == "no_coverage":
-        message = _t("gene.reading.no_coverage")
+    reference_count = len(variants.get("reference_calls") or [])
+    uncalled = variants.get("uncalled_rows") or 0
+    if total or reference_count:
+        vcf_state = "calls_present"
+        vcf_message = _t("thematic.region_counts", n=total, ref=reference_count)
+    elif uncalled:
+        vcf_state = "no_valid_calls"
+        vcf_message = _t("gene.reading.no_valid_calls", count=uncalled)
     else:
-        message = _t("gene.reading.no_differences", assembly=location.get("assembly") or "—")
-    message += " " + _t("gene.reading." + state)
-    return {"state": state, "message": message,
+        vcf_state = "no_records"
+        vcf_message = _t("gene.reading.no_records")
+    whole_gene = coverage.get("gene") or {}
+    coverage_message = (_t("gene.reading.bam_depth", pct1=whole_gene["pct_1x"],
+                           pct20=whole_gene.get("pct_20x", "—"))
+                        if whole_gene.get("pct_1x") is not None else _t("gene.reading.coverage_unknown"))
+    message = vcf_message + " " + _t("gene.reading." + state)
+    return {"state": state, "message": message, "vcf_state": vcf_state,
+            "vcf_message": vcf_message, "coverage_message": coverage_message,
             "region": {k: location.get(k) for k in ("chrom", "start", "end", "assembly", "transcript")},
             "scope": "cds" if coverage.get("cds") else "gene",
             "coverage": stats, "reference_identity_confirmed": False,
@@ -413,7 +421,7 @@ def report(gene: str, allow_network: bool = True, *, panel_preview: bool = False
     return out
 
 
-def attach_reading(answer: Dict[str, Any], gene: str) -> None:
+def attach_reading(answer: Dict[str, Any], gene: str, *, allow_network: bool = True) -> None:
     """Join region calls and measured coverage to a retained catalogue answer."""
     from .engine.genomics import gene_layers
     try:
@@ -423,7 +431,7 @@ def attach_reading(answer: Dict[str, Any], gene: str) -> None:
         answer["layers"] = {"gene": gene.upper(), "status": "unavailable",
                             "reason": type(exc).__name__}
     if answer.get("loci") is not None:
-        region = report(gene)
+        region = report(gene, allow_network=allow_network)
         region["catalogue_loci"] = answer.get("loci") or []
         region["layers"] = answer.get("layers")
         answer["region_report"] = region
@@ -464,6 +472,34 @@ def preview(gene: str) -> Dict[str, Any]:
                  os.environ.get('SCHOLION_VCF_SAMPLE'),
                  tuple(_preview_file(path) for path in files), location_signature, id(report))
     return copy.deepcopy(_cached_preview(signature, gene.upper()))
+
+
+def verify_empty_preview(report: Dict[str, Any]) -> Dict[str, Any]:
+    """Measure a requested empty gene interval once per selected BAM revision."""
+    import copy
+    loc = report.get("location") or {}
+    if (report.get("reading_summary") or {}).get("vcf_state") != "no_records":
+        return report
+    bam = bam_path()
+    if bam is None:
+        return report
+    indexes = (str(bam) + ".bai", str(bam.with_suffix(".bai")), str(bam) + ".csi")
+    signature = tuple(_preview_file(path) for path in (bam, *indexes))
+    cds = tuple(tuple(exon) for exon in loc.get("cds") or ())
+    coverage = copy.deepcopy(_cached_empty_coverage(signature, loc["chrom"], loc["start"],
+                                                    loc["end"], cds, loc.get("assembly"), id(_coverage)))
+    previous_reason = (report.get("coverage") or {}).get("why")
+    gaps = [gap for gap in report.get("gaps") or [] if gap.get("what") != previous_reason]
+    if not coverage.get("source"):
+        gaps.append(_gap(coverage.get("why", ""), coverage.get("fix", "")))
+    return {**report, "coverage": coverage, "gaps": gaps,
+            "reading_summary": reading_summary(loc, report["variants"], coverage)}
+
+
+@_lru_cache(maxsize=256)
+def _cached_empty_coverage(signature: tuple, chrom: str, start: int, end: int,
+                           cds: tuple, assembly: Optional[str], reader_id: int) -> Dict[str, Any]:
+    return _coverage(chrom, start, end, list(cds), assembly)
 
 
 @_lru_cache(maxsize=2048)

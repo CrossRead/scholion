@@ -267,7 +267,7 @@ LINE_BUDGETS = {
     # Batched cards reuse one reading while retaining the existing index contract.
     # 18.10.2026: shared many-to-many prescription context adds recorded
     # ingredients and distinguishes monitored systems from possible effects.
-    "system_panels": 1680,
+    "system_panels": 1690,  # Saved mtDNA adapter; contextual composition lives in mitochondrial_system.
     "screening": 270,
     # 300 → 340 on 12.09.2026, task 168 step 7: a prescription's genes are no
     # longer a hand-written list but are inherited through the system its
@@ -337,7 +337,7 @@ LINE_BUDGETS = {
     # Patient readings of the intake ledger do not belong to the reference book.
     "panel_intake": 110,
     # Reference topics reuse the existing Systems and catalogue reader, without radar scoring.
-    "thematic_panels": 110,
+    "thematic_panels": 120,  # Prefer reviewed physical assignments inside a topic.
     "pgx_labels": 60,
     # The gate a curated panel row passes (task 199): the locus rule, the
     # impersonal review, the evidence legend — split out of system_panels.

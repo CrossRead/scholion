@@ -112,7 +112,8 @@ def _radar_keys() -> list:
     if p.exists():
         doms = (json.loads(p.read_text(encoding="utf-8")).get("domains") or [])
         keys = [x["key"] for x in doms
-                if isinstance(x, dict) and x.get("genetic_half", x.get("source") == "labs")]
+                if isinstance(x, dict) and x.get("genetic_half", x.get("source") == "labs")
+                and x.get("genetic_source", "gencc") == "gencc"]
         if keys:
             return keys
     import importlib

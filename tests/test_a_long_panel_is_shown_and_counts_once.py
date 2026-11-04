@@ -113,7 +113,7 @@ class TestAMarkerInTwoSystems(unittest.TestCase):
         home, every = SP.marker_systems(), SP.marker_systems_all()
         self.assertEqual("inflammation", home["homocysteine"])
         self.assertEqual(["inflammation", "amino_acids"], every["homocysteine"])
-        self.assertEqual(["renal", "amino_acids"], every["creatinine"])
+        self.assertEqual(["renal", "amino_acids", "mitochondria"], every["creatinine"])
         self.assertEqual(["micronutrients", "musculoskeletal"], every["vitamin_d"])
         self.assertEqual(["inflammation", "immune"], every["crp_hs"])
 

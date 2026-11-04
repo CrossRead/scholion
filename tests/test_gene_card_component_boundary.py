@@ -17,6 +17,7 @@ class ComponentOwnership(unittest.TestCase):
         page = (WEB / "index.html").read_text(encoding="utf-8")
         bridges = {"geneDisplayCard": "render", "geneFindingCards": "findings",
                    "geneReferenceExtras": "referenceExtras", "referenceContextHtml": "reference",
+                   "genePositionCards": "positions", "geneRegionRows": "regionRows",
                    "mechanismHtml": "mechanism", "geneticPreviewHtml": "preview",
                    "geneticBriefHtml": "brief"}
         for name, method in bridges.items():
@@ -72,9 +73,17 @@ for(language of ['en','ru']) for(register of ['patient','clinician']){
  const context='<p data-synthetic-context>Measured context</p>';
  const withContext=component.render(row,{contextHtml:context});
  assert.equal(withContext.replace('<section class="gene-card-context">'+context+'</section>',''),html);
- const custom=component.render(row,{geneHtml:'<b data-custom-link>Gene</b>',annotationHtml:'<p>Annotation slot</p>',
+ const sourced={...row,personal_meaning:{scope:'genotype_hypothesis',reading_binding:{status:'verified',genotype:'AG'},
+  summary:'Hypothesis for the recorded genotype.',comparator:'Comparator from the study.',mechanism:'Mechanism from the study.',
+  limitations:'Limitation from the study.'}};
+ const ordered=component.render(sourced,{contextHtml:context});
+ const sequence=[t('meaning.personal'),sourced.personal_meaning.summary,sourced.personal_meaning.comparator,
+  sourced.personal_meaning.mechanism,'Measured context',sourced.personal_meaning.limitations,'gene-card-grid'];
+ assert.ok(sequence.every((value,i)=>ordered.includes(value)&&(!i||ordered.indexOf(sequence[i-1])<ordered.indexOf(value))));
+ assert.equal(ordered.split(sourced.personal_meaning.comparator).length,2);
+ const custom=component.render(row,{annotationHtml:'<p>Annotation slot</p>',
   detailHtml:'<p>Explicit detail slot</p>',extraHtml:'<p>Extra slot</p>',register:register==='patient'?'clinician':'patient'});
- for(const text of ['data-custom-link','Annotation slot','Explicit detail slot','Extra slot'])assert.ok(custom.includes(text));
+ for(const text of ['Annotation slot','Explicit detail slot','Extra slot'])assert.ok(custom.includes(text));
  assert.ok(!custom.includes('Passport'));
  const hit={...row,gene_contexts:[{gene:'FIRST',genotype:'TT',reference_context:row.reference_context},
   {gene:'SECOND',genotype:'TT',reference_context:row.reference_context}]};
@@ -85,11 +94,68 @@ for(language of ['en','ru']) for(register of ['patient','clinician']){
  const model=cards.project(row);
  assert.equal(cards.render(row,{t,escape:esc,grade:esc}),cards.renderModel(model,{t,escape:esc,grade:esc}));
  assert.equal(JSON.stringify(row),before);
+ const cautions=component.render({...row,personal_context:{...row.personal_context,limitations:t('finding.limitations')},
+  interpretation:{...row.interpretation,notice:t('interpretation.notice')},
+  reference_context:{...row.reference_context,scientific_review:[{scope:'variant',status:'curated',
+    limitations:'Variant-specific study limit. '+t('web.gene_card.literature_caution')}]}});
+ assert.ok(cautions.includes(t('web.gene_card.finding_reading_limit')));
+ assert.ok(cautions.includes('Variant-specific study limit.'));
+ for(const key of ['finding.limitations','interpretation.notice','web.gene_card.literature_caution'])
+  assert.ok(!cautions.includes(t(key)),key);
  const missingKey=cards.create({...services,t:(key,args)=>messages[language][key]?t(key,args):'⟦'+key+'⟧'});
  const classification=missingKey.render({...row,personal_context:{status:'classification_only',summary:'Supplied classification context'}});
  assert.ok(classification.includes('Supplied classification context'));
  assert.ok(!classification.includes('⟦web.gene_card.meaning.classification_only⟧'));
 }
+const next={...row,rsid:'rs124',genotype:'CC',depth:21,level:'C',interpretation:{summary:'Other variant',source:'PMID:456'}};
+const count=(html,token)=>html.split(token).length-1;
+for(language of ['en','ru']) for(register of ['patient','clinician']){
+ const options={rowOptions:p=>({extraHtml:'<b>'+p.rsid+' detail</b>'})};
+ const grouped=component.positions([row,next,{...row}],options);
+ assert.equal(count(grouped,'data-gene-positions="SYNTHETIC"'),1);
+ assert.equal(count(grouped,'Supplied function'),1);
+ assert.equal(count(grouped,'data-position="rs123"'),1);
+ const search='https://www.ncbi.nlm.nih.gov/gene/?term='+encodeURIComponent('SYNTHETIC[PREF] AND 9606[taxid]');
+ assert.equal(count(grouped,'href="'+search+'"'),1);
+ assert.ok(grouped.indexOf(search)<grouped.indexOf('data-position="rs123"'));
+ assert.ok(!grouped.includes('data-gene-open'));
+ assert.ok(grouped.includes('data-rs-open="rs123"'));
+ const direct={...row,gene:'CYP2C19',reference_context:{gene_source:'https://www.ncbi.nlm.nih.gov/gene/1557'}};
+ const directCard=component.render(direct);
+ assert.ok(directCard.includes('href="https://www.ncbi.nlm.nih.gov/gene/1557" target="_blank" rel="noopener noreferrer">CYP2C19'));
+ const earlier={...next,gene:direct.gene};
+ for(const rows of [[direct,earlier],[earlier,direct]]){
+  const html=component.positions(rows);
+  assert.equal(count(html,'href="https://www.ncbi.nlm.nih.gov/gene/1557"'),1);
+ }
+ const disagreement=component.positions([direct,{...earlier,reference_context:{gene_source:'https://www.ncbi.nlm.nih.gov/gene/1234'}}]);
+ assert.ok(disagreement.includes(encodeURIComponent('CYP2C19[PREF] AND 9606[taxid]')));
+ assert.ok(!disagreement.includes('href="https://www.ncbi.nlm.nih.gov/gene/1557"'));
+ const alias={...row,gene:'BMAL1',reference_context:{canonical_symbol:'ARNTL'}};
+ assert.ok(component.render(alias).includes(encodeURIComponent('ARNTL[PREF] AND 9606[taxid]')+'" target="_blank"'));
+ const region={...row,gene:'HHEX-IDE',reference_context:{gene_source_scope:'genomic_annotation'}};
+ assert.ok(component.render(region).includes('<div class="gene-card-name"><strong>HHEX-IDE</strong></div>'));
+ for(const piece of ['>AG<','>CC<','PMID:123','PMID:456','rs123 detail','rs124 detail',t('web.gene_card.position')])
+  assert.ok(grouped.includes(piece),piece);
+ assert.equal(count(component.positions([row,next],{functionAbove:'Supplied function'}),'Supplied function'),0);
+ assert.equal(count(component.positions([row,{...row,interpretation:next.interpretation}]),'data-position="rs123"'),2);
+ const different=component.positions([row,{...next,reference_context:{gene_function:'Different function'}}]);
+ assert.equal(count(different,'Supplied function'),1);
+ assert.equal(count(different,'Different function'),1);
+}
+const call={chrom:'3',pos:123,rsid:'rs456',genotype:'1|2',personal_alleles:['A','T'],depth:0,genotype_quality:41};
+const region=component.regionRows([call,{...call,alt:'T'},{...call,pos:124,genotype:'0/0',personal_alleles:['G','G'],depth:null,protein:{hgvs_p:'p.Val2Gly'}}]);
+assert.equal(count(region,'<th scope="row">'),2);
+for(const piece of ['3:123','A|T','0×','41','3:124','G/G','rs456','p.Val2Gly'])assert.ok(region.includes(piece),piece);
+const curated={reading:{source:'vcf',genotype:'AG',raw_genotype:'0/1',depth:24,
+  variant_identity:{chrom:'4',pos:123,ref:'A',assembly:'GRCh38'}}};
+const same={chrom:'chr4',pos:123,ref:'A',genotype:'0/1',depth:24,personal_alleles:['A','G']};
+const rest=component.regionRows([same,{...same,personal_alleles:['A','T']},
+  {...same,genotype:'1/1',personal_alleles:['G','G']},{...same,pos:124}], [curated], 'GRCh38');
+assert.equal(count(rest,'<th scope="row">'),3);
+assert.ok(rest.includes('A/T')&&rest.includes('G/G')&&rest.includes('chr4:124'));
+assert.ok(!rest.includes('chr4:123</th><td>A/G'));
+assert.ok(component.regionRows([same], [curated], 'GRCh37').includes('A/G'));
 // No active-profile or language data is retained between renders/instances.
 const other=cards.create({...services,register:()=>'clinician'});
 assert.ok(!other.render({gene:'NEXT',rsid:'rs124',read:false}).includes('>AG<'));
@@ -173,7 +239,7 @@ for(const {language,reading,expected} of cases){
    assert.equal(model.conflict,expected.conflict);
    assert.equal(model.interpretationBlocked,expected.blocked);
    if(expected.blocked)assert.equal(model.copies,null);
-   if(reading.low_depth || reading.quality?.low_depth)assert.ok(html.includes(t('genlab.quality.low_depth')));
+   if(reading.low_depth || reading.quality?.low_depth)assert.ok(html.includes(expected.depth == null ? t('genlab.quality.low_depth') : t('web.gene_card.low_depth',{value:expected.depth})));
    assert.ok(html.includes('Synthetic function'));
    assert.ok(html.includes('data-reading-observations'));
    assert.ok(!html.includes('999'));
@@ -189,4 +255,78 @@ for(const {language,reading,expected} of cases){
 }
 '''
         result = gene_card_support.run(script, capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stderr[-4000:])
+
+    @unittest.skipUnless(shutil.which('node'), 'node is needed for the actual renderer')
+    def test_curated_catalogues_share_the_role_and_reading_order(self):
+        from scholion import core
+        from scholion.panel_reference import _function_fields, genome_context
+        from scholion.variant_readings import sample_quality
+
+        self.assertEqual({'depth': 21, 'genotype_quality': 42, 'allele_depth': [9, None, 12]},
+                         sample_quality({'DP': '21', 'GQ': '42', 'AD': '9,.,12'}))
+        genes = sorted({
+            gene for book in ('panel_reference_context.json', 'gencc_reference_context.json',
+                              'gene_function_context.json')
+            for gene, entry in core._read_knowledge_raw(book).get('genes', {}).items()
+            if entry.get('description') and entry.get('source')
+        })
+        self.assertGreater(len(genes), 1400)
+        previous = i18n.lang()
+        self.addCleanup(i18n.set_lang, previous)
+        cases = {}
+        for language in ('en', 'ru'):
+            i18n.set_lang(language)
+            examples = [genome_context(gene, rsid) for gene, rsid in (
+                ('COMT', 'rs4680'), ('DRD2', 'rs1800497'), ('DRD2', 'rs6277'), ('DRD4', 'rs1800955'),
+            )]
+            self.assertTrue(all(any(isinstance(row.get('patient_summary'), str) and row['patient_summary'] for row in
+                                    item['reference_context']['scientific_review']) for item in examples))
+            cases[language] = {'roles': [{'gene': gene, 'reference_context': _function_fields(gene)}
+                                         for gene in genes], 'examples': examples}
+        script = 'const cards=require(' + json.dumps(str(WEB / 'gene-cards.js')) + ');\n'
+        script += r'''
+const assert=require('node:assert/strict');
+const {cases,messages}=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+const esc=x=>String(x??'').replaceAll('<','&lt;').replaceAll('"','&quot;');
+for(const [lang,{roles,examples}] of Object.entries(cases)){
+ const t=(key,args={})=>Object.entries(args).reduce((s,[k,v])=>s.replaceAll('{'+k+'}',v),messages[lang][key]||key);
+ for(const register of ['patient','clinician']){
+  const component=cards.create({t,escape:esc,grade:esc,formatDate:esc,register:()=>register,
+   passport:()=>'',authorNote:()=>'',clinicalBasis:()=>''});
+  for(const role of roles){
+   const model=cards.project(role);
+   const html=component.render(role);
+   assert.ok(model.functionText, role.gene);
+   assert.ok(html.indexOf(esc(model.functionText)) < html.indexOf('gene-card-reading'), role.gene);
+   if(['ACTA2','ACTC1','ALDH4A1','AMT'].includes(role.gene)){
+    const detail=esc(role.reference_context.gene_role_detail);
+    assert.ok(detail.length>80, role.gene);
+    assert.ok(html.indexOf(detail)>html.indexOf('data-gene-inheritance'), role.gene);
+   }
+  }
+  for(const item of examples){
+   const row={...item,result:{genotype:'CC',confidence:'called',depth:123}};
+   const model=cards.project(row), html=component.render(row);
+   assert.ok(html.indexOf('gene-card-function') < html.indexOf('gene-card-description'));
+   assert.ok(html.indexOf('gene-card-description') < html.indexOf('gene-card-reading'));
+   const curated=row.reference_context.scientific_review.find(entry=>entry.patient_summary);
+   assert.equal(model.summary,curated.patient_summary);
+   assert.ok(html.includes(esc(curated.patient_summary)));
+   assert.equal(html.split('123×').length,2);
+   assert.ok(html.indexOf('gene-card-reading') < html.indexOf('123×'));
+   assert.ok(html.indexOf('123×') < html.indexOf('data-gene-inheritance'));
+   if(row.rsid==='rs1800497')assert.ok(html.includes('ANKK1'));
+   if(row.rsid==='rs1800955'){
+    const note=t('web.gene_card.separate_repeat');
+    assert.equal(html.split(note).length,2);
+    assert.ok(html.indexOf(note)>html.indexOf('gene-card-reading'));
+   }
+  }
+ }
+}
+'''
+        result = gene_card_support.run(script, input=json.dumps({
+            'cases': cases, 'messages': {k: i18n.CATALOGUES[k] for k in ('en', 'ru')},
+        }), capture_output=True, text=True, timeout=60)
         self.assertEqual(0, result.returncode, result.stderr[-4000:])

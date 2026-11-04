@@ -49,9 +49,10 @@ FIXTURE = ROOT / "tests" / "fixtures" / "profile"
 # are left out: their contract is the result of the operation, not the shape of a report.
 SNAPSHOT_CMDS = [
     ["insight-snapshot"],  # Preview only: no confirmation, no write.
+    ["mitochondria"],
     ["overview"], ["labs"], ["suggest-tests"], ["second-opinion"], ["radar"],
     ["medications"], ["markers"], ["metrics"], ["goal"], ["genome-status"],
-    ["genome-updates"], ["clinvar"], ["acmg"], ["prs"], ["longevity"],
+    ["genome-updates"], ["genome", "rs1801133"], ["clinvar"], ["acmg"], ["prs"], ["longevity"],
     ["profile"], ["assistant"], ["drug", "atorvastatin"],
     ["prescription", "atorvastatin"], ["phenoage", "--panels"],
 ]
@@ -95,7 +96,7 @@ PROFILE_FILES = [
     # A target the treating clinician set, beside the corridor (task 170). Its
     # own file, so a re-import of laboratory forms rewrites the series and
     # leaves the targets standing.
-    "clinician_targets.json",
+    "clinician_targets.json", "mitochondria.json",
 ]
 
 

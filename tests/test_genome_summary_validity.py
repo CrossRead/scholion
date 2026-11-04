@@ -42,7 +42,7 @@ console.log(JSON.stringify(variants.map(x=>genomeFindings(null,null,null,{status
     def test_pgs_accuracy_is_separate_and_reference_urls_are_checked(self):
         script = """
 const t=(k,args)=>k+JSON.stringify(args||{}), esc=x=>String(x);
-""" + self.function("prsModelDetails") + """
+""" + self.function("prsApplicability") + "\n" + self.function("prsModelDetails") + """
 const row={stability:{coverage_pct:100,weight_pct:95},informativeness:{auroc:0.7},reference_note:'Approximate reference',reference_validation:{source:'https://example.org/reference'}};
 console.log(JSON.stringify([prsModelDetails(row),prsModelDetails({}),prsModelDetails({...row,reference_validation:{source:'javascript:bad()'}})]));
 """
@@ -56,10 +56,47 @@ console.log(JSON.stringify([prsModelDetails(row),prsModelDetails({}),prsModelDet
         self.assertNotIn("javascript:", rows[2])
 
     def test_missing_genotypes_have_vcf_help_in_calculation_details(self):
-        script = "const t=k=>k, esc=x=>String(x);\n" + self.function("prsModelDetails") + "\nconsole.log(JSON.stringify(prsModelDetails({reading_note:'VCF with called reference genotypes; BAM optional'})));"
+        script = "const t=k=>k, esc=x=>String(x);\n" + self.function("prsApplicability") + "\n" + self.function("prsModelDetails") + "\nconsole.log(JSON.stringify(prsModelDetails({reading_note:'VCF with called reference genotypes; BAM optional'})));"
         html = self.execute(script)
         self.assertIn('VCF with called reference genotypes', html)
         self.assertIn('<details', html)
+
+    def test_locus_search_reports_progress_and_keeps_the_latest_answer(self):
+        page = (support.ROOT / "src/scholion/web/index.html").read_text(encoding="utf-8")
+        start = page.index("  async function searchLocus(")
+        search = page[start:page.index("\n  }", start) + 4]
+        script = """
+const box=()=>({innerHTML:'',busy:false,setAttribute(){this.busy=true;},
+  removeAttribute(){this.busy=false;},scrollIntoView(){}});
+const card=box(),result=box(), t=k=>k, $=()=>null;
+const viewLifecycle={snapshot:()=>0,matches:()=>true,current:()=>true};
+const cv=null,lng=null,lip=null,systemsIndex=async()=>null;
+const showLoader=target=>{target.innerHTML='loading';};
+const errorHtml=text=>'error: '+text, genomeCard=data=>data.rsid, geneCard=data=>data.gene;
+const pending={};
+const api=path=>new Promise((resolve,reject)=>{pending[path]={resolve,reject};});
+let lookup=0;
+""" + search + """
+(async()=>{
+  const first=searchLocus('  drd2  ',result);
+  const loading=[result.innerHTML,result.busy];
+  const second=searchLocus(' RS1800955 ',result);
+  pending['/api/genome?rsid=rs1800955'].resolve({rsid:'rs1800955'});
+  await second;
+  pending['/api/genome?gene=DRD2'].resolve({gene:'DRD2'});
+  await first;
+  const latest=[result.innerHTML,result.busy,card.innerHTML];
+  const third=searchLocus('drd4',result);
+  pending['/api/genome?gene=DRD4'].reject(new Error('connection lost'));
+  await third;
+  console.log(JSON.stringify({loading,latest,failure:[result.innerHTML,result.busy]}));
+})();
+"""
+        self.assertEqual(self.execute(script), {
+            "loading": ["loading", True],
+            "latest": ["rs1800955", False, ""],
+            "failure": ["error: connection lost", False],
+        })
 
     def test_absence_summary_names_alleles_in_both_languages(self):
         from scholion import i18n

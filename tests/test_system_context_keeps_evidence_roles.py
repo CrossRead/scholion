@@ -64,13 +64,16 @@ const esc=x=>String(x??''),t=(k,a)=>k+' '+Object.values(a||{}).join(' ');
 const DISPLAY_MODE='patient',levelChip=x=>x,geneticBriefHtml=r=>r.reference_context.gene_function;
 """+function+"""
 const html=geneRegionCard({gene:'SYNTHETIC',reference_context:{gene_function:'Known function'},
- location:{},coverage:{source:null},variants:{total:2,coding:1,
+ location:{},coverage:{source:null},variants:{total:3,coding:2,
  coding_rows:[{chrom:'1',pos:123,ref:'A',alt:'G',genotype:'0/1',personal_alleles:['A','G'],depth:29,
- protein:{kind:'missense',hgvs_p:'p.A1G'}}],
+ protein:{kind:'missense',hgvs_p:'p.A1G'}},
+ {chrom:'1',pos:124,ref:'A',alt:'C',genotype:'0/1',personal_alleles:['A','C'],depth:28}],
  noncoding_rows:[{chrom:'1',pos:456,ref:'C',alt:'T',genotype:'1/1',personal_alleles:['T','T'],depth:25}]},
  reading_summary:{message:'Coverage explicitly unknown'}});
 assert.ok(html.indexOf('Known function')<html.indexOf('A/G'));
 assert.ok(html.includes('p.A1G')&&html.includes('1:456')&&html.includes('T/T'));
+assert.equal((html.match(/class="gene-card-function"/g)||[]).length,1);
+assert.ok(html.includes('data-gene-positions="SYNTHETIC"')&&html.includes('1:123')&&html.includes('1:124'));
 assert.match(html,/<details class="fold"><summary>gene.noncoding_rows 1/);
 assert.ok(html.includes('Coverage explicitly unknown')&&html.includes('gene.annotation_scope'));
 """
@@ -94,11 +97,11 @@ const mechanismHtml=()=>'',authorNoteHtml=()=>'',clinicalBasisHTML=()=>'';
 const levelChip=x=>x;
 """+'\n'.join(functions)+"""
 const r={rsid:'rsSynthetic',gene:'SYNTHETIC',chrom:'1',pos:1,level:'E',
- reference_context:{gene_function:'Known gene function',variant_status:'unknown',level:'E'},
+ reference_context:{gene_function:'Known gene function',variant_status:'not_curated',level:'E'},
  result:{genotype:'GG',confidence:'confirmed_ref',depth:31}};
 const html=genomeCard(r);
 assert.ok(html.includes('Known gene function')&&html.includes('GG'));
-assert.ok(html.indexOf('gene-card-reading')<html.indexOf('gene-card-description'));
+assert.ok(html.indexOf('gene-card-description')<html.indexOf('gene-card-reading'));
 assert.ok(html.indexOf('GG')<html.indexOf('data-gene-annotations'));
 assert.equal((html.match(/data-gene-description/g)||[]).length,1);
 """

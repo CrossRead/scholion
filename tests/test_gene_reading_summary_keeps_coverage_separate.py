@@ -57,6 +57,34 @@ class ReadingSummary(unittest.TestCase):
         self.assertFalse(result['reading_summary']['variant_search_complete'])
         self.assertIn('chr1:11 A>G', fmt.genome_report(result))
 
+    def test_empty_filtered_and_explicit_reference_records_are_distinct(self):
+        for language in ("en", "ru"):
+            with mock.patch.dict("os.environ", {"SCHOLION_LANG": language}):
+                empty = self.report([20, 20])["reading_summary"]
+                filtered = self.report(variants={"uncalled_rows": 2})["reading_summary"]
+                reference = self.report(variants={"reference_calls": [{"genotype": "0/0"}]})["reading_summary"]
+                self.assertEqual("no_records", empty["vcf_state"])
+                self.assertEqual("no_valid_calls", filtered["vcf_state"])
+                self.assertEqual("calls_present", reference["vcf_state"])
+                self.assertEqual(3, len({r["vcf_message"] for r in (empty, filtered, reference)}))
+                self.assertIn("100.0%", empty["coverage_message"])
+                self.assertFalse(empty["reference_identity_confirmed"])
+
+    def test_empty_preview_uses_bam_and_removes_stale_coverage_warning(self):
+        from pathlib import Path
+        original = self.report()
+        original["gaps"] = [{"what": original["coverage"]["why"]}]
+        measured = self.report([30, 30])["coverage"]
+        with mock.patch.object(gene_region, "bam_path", return_value=Path("/tmp/synthetic.bam")), \
+             mock.patch.object(gene_region, "_coverage", return_value=measured) as read:
+            result = gene_region.verify_empty_preview(original)
+            self.assertEqual(result, gene_region.verify_empty_preview(original))
+            read.assert_called_once()
+        self.assertEqual("no_records", result["reading_summary"]["vcf_state"])
+        self.assertEqual("covered", result["reading_summary"]["state"])
+        self.assertEqual([], result["gaps"])
+        self.assertIsNone(original["coverage"]["source"])
+
     def test_region_refusal_does_not_hide_previously_read_catalogue_positions(self):
         response = {'status': 'ok', 'gene': 'SYNTHETIC', 'loci': [
             {'status': 'ok', 'rsid': 'rs1', 'gene': 'SYNTHETIC', 'result': {'genotype': 'AG'}}],

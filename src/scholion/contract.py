@@ -40,6 +40,8 @@ PARITY: Dict[str, str] = {
     "GET /api/suggest-tests": "suggest-tests",
     "GET /api/genome": "genome",
     "GET /api/genome-status": "genome-status",
+    "GET /api/mitochondria": "mitochondria",
+    "POST /api/mitochondria": "mitochondria",
     "GET /api/genome-updates": "genome-updates",
     "GET /api/version": "version",
     "GET /api/version/check": "version",
@@ -329,6 +331,7 @@ PLUGIN: Dict[str, str] = {
     # the flag PLUGIN_ARGS names, so that the door stays short.
     "medications": "sch_medications",
     "genome-status": "sch_genome_status",
+    "mitochondria": "sch_mitochondria",
     "genome-updates": "sch_genome_status",
     "selfcheck": "sch_selfcheck",
     "reconcile": "sch_selfcheck",
@@ -497,7 +500,7 @@ OPEN_WORLD: Dict[str, Dict[str, Any]] = {
 }
 
 #: The writes that replace rather than add.
-DESTRUCTIVE = frozenset({"sch_update", "sch_recompute"})
+DESTRUCTIVE = frozenset({"sch_update", "sch_recompute", "sch_mitochondria"})
 
 
 def tool_commands(tool: str) -> List[str]:
@@ -852,7 +855,7 @@ WRITES = {
     "lab-draw", "marker",
     # Task 183: both rebuild what the person's own documents and alignment
     # already hold; neither decides a value.
-    "recompute", "genotype-sites", "coverage",
+    "recompute", "genotype-sites", "coverage", "mitochondria",
     # 0.5.2: installs a newer build into the environment — the program, not the data.
     "update",
     # Found when the reasons for a missing tool became checkable: each of the
@@ -923,7 +926,7 @@ DICTATED = {"focus-log", "target", "lab-draw", "marker", "brief-reviewed"}
 TRANSCRIBES = {"ingest-labs", "ingest-studies", "ingest-garmin", "ingest-wearable",
                "insight-snapshot",  # saves existing deterministic facts, never authors measurements
                "import-labs", "import-fhir",
-               "redact", "recompute", "genotype-sites", "coverage",
+               "redact", "recompute", "genotype-sites", "coverage", "mitochondria",
                # Rebuilds a table out of the person's own variant file, like the
                # two beside it; decides no value.
                "acmg-scan"}

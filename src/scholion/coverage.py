@@ -99,7 +99,7 @@ def genes() -> Dict[str, str]:
     return out
 
 
-def clinvar_path() -> Optional[Path]:
+def clinvar_path(assembly: Optional[str] = None) -> Optional[Path]:
     """The published ClinVar VCF, named or lying beside the genome."""
     from . import core
     env = os.environ.get("SCHOLION_CLINVAR_VCF")
@@ -118,8 +118,9 @@ def clinvar_path() -> Optional[Path]:
         bases.append(Path(cache).expanduser() if cache else Path.home() / "genomic_work" / "clinvar")
     from .clinvar_reference import cached_reference
     from . import genome
-    personal = genome.vcf_path()
-    assembly = genome.assembly_of(str(personal)) if personal else None
+    if assembly is None:
+        personal = genome.vcf_path()
+        assembly = genome.assembly_of(str(personal)) if personal else None
     for base in bases:
         cached = cached_reference(base, assembly)
         if cached is not None:

@@ -847,6 +847,7 @@ def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any
     """Genes important for the drug (the local base + CPIC by rxcui for ANY drug),
     assessed against the patient's genome."""
     from .. import genome, drugsource
+    from ..panel_reference import gene_reference_context
     genes: Dict[str, Dict[str, Any]] = {}
     q = (drug or "").lower()
     for entry in core.cpic_kb().get("drugs", []):
@@ -870,15 +871,10 @@ def _genome_for_drug(drug: str, info: Optional[Dict[str, Any]]) -> Dict[str, Any
     for gene, meta in genes.items():
         a = _assess_gene(gene)
         a["cpic_level"], a["actionable"] = meta["level"], meta["actionable"]
-        # How well this gene was read, beside the answer about it.
-        #
-        # The rule arrived in 0.4.11 and was wired to the gene question only. On
-        # THIS path the same sentence carries more weight, not less: «no
-        # pharmacogenetic findings» read here is read as permission to prescribe,
-        # and it is worth exactly as much of the gene as was read. On a variant
-        # file with no alignment beside it the honest answer is «not measured»,
-        # which is a fact about the input and not a shrug.
+        # A negative finding is limited to what was read. Without an alignment,
+        # coverage is not measured and must not imply prescribing is safe.
         a["coverage"] = _gene_coverage(gene)
+        a["reference_context"] = gene_reference_context(gene, [])
         assessed.append(a)
     assessed.sort(key=lambda a: (not a.get("actionable"), not a.get("computable")))
     return {"genes": assessed, "genome_ready": genome.available()["ready"],

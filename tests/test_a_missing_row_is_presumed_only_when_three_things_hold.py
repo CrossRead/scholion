@@ -90,6 +90,37 @@ class TestWhenItHasNoRight(_NoRow):
         self.assertEqual("risk_allele_not_declared", self.call(risk=None)["presumed_refused"])
 
 
+class ExplicitLookup(unittest.TestCase):
+    def test_bam_call_refusal_and_presumption_are_separate(self):
+        from pathlib import Path
+        from scholion import genome, gene_region, sites
+        from scholion.engine import panel_genotype
+        current = {**NO_ROW["result"], "assembly": "GRCh38", "missing_vcf_row": True}
+        state = {"ready": True, "input_profile": "whole_genome"}
+        loc = LOCI["loci"]["rs1"]
+        with mock.patch.object(gene_region, "bam_path", return_value=Path("/tmp/test.bam")), \
+             mock.patch.object(sites, "verify_position",
+                               side_effect=[{"genotype": "AA", "confidence": "confirmed_ref", "source": "bam"},
+                                            {"reason": "low_quality"}]):
+            called = genome._verify_missing_position("rs1", loc, current, state)
+            refused = genome._verify_missing_position("rs1", loc, current, state)
+        self.assertEqual(("AA", "confirmed_ref", "bam"), tuple(called[k] for k in ("genotype", "confidence", "source")))
+        self.assertIsNone(refused["genotype"])
+        self.assertEqual("low_quality", refused["bam_check"])
+        self.assertNotIn("reference_presumed", refused)
+        with mock.patch.object(gene_region, "bam_path", return_value=None), \
+             mock.patch.object(panel_genotype, "_reference_presumption_refusal", return_value=None):
+            presumed = genome._verify_missing_position("rs1", loc, current, state)
+            self.assertTrue(presumed["reference_presumed"])
+            self.assertIsNone(presumed["genotype"])
+            uncertain = genome._verify_missing_position("rs1", loc, NO_ROW["result"], state)
+            self.assertNotIn("reference_presumed", uncertain)
+            with mock.patch.object(genome, "vcf_path", return_value=Path("/tmp/synthetic.g.vcf.gz")):
+                gvcf = genome._verify_missing_position("rs1", loc, current, state)
+                self.assertNotIn("reference_presumed", gvcf)
+                self.assertIsNone(gvcf["genotype"])
+
+
 class TestARowThatIsThereIsReadAndSaysWhatItDoesNotKnow(unittest.TestCase):
     """The other side of the same question (owner, 18.09.2026): the row IS in
     the file, so the position is read — and where the row states no depth and

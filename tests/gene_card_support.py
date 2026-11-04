@@ -23,6 +23,8 @@ def javascript() -> str:
     for name in ('geneDisplayCard', 'geneFindingCards', 'geneReferenceExtras'):
         start = page.index('function ' + name + '(')
         parts.append(page[start:page.index('\n}\n', start) + 2])
+    parts.append('const genePositionCards=(...args)=>ScholionGeneCards.create({t,escape:esc,grade:levelChip,formatDate:typeof fmtDate==="function"?fmtDate:String,register:getRegister,passport:()=>"",authorNote:()=>"",clinicalBasis:()=>""}).positions(...args);')
+    parts.append('const geneRegionRows=(...args)=>ScholionGeneCards.create({t,escape:esc}).regionRows(...args);')
     return '\n'.join(parts) + '\n'
 
 

@@ -174,6 +174,13 @@ as unverified saved values, with a recalculation recommendation wherever they
 appear; do not delete them before a replacement report is saved successfully.
 Relay the explicit reason for withholding a confirmed percentile. A high calibrated percentile is still not a disease probability.
 
+For mitochondrial DNA, keep maternal lineage, the exact allele, read fraction
+and quality separate from clinical classification. Fraction describes reads
+from the sampled tissue. A haplogroup does not predict health. Uncertain calls,
+missing coverage and variant-only VCFs do not rule out a mitochondrial variant.
+Use `mitochondria` to read the saved report; start its BAM analysis only after
+the person explicitly agrees.
+
 **9. A threshold that fires on almost everything gets fixed, not explained.** A
 cheap check before any interpretation: what fraction of objects did the flag hit?
 If it hit almost all of them, it measures a property of the data rather than of
@@ -847,6 +854,8 @@ python3 -m scholion update                   # at the START of every session: is
                                              #   the person in one sentence and ask whether to install it
 python3 -m scholion update --yes             # INSTALLS the newer build into this environment — ONLY after the person said yes;
                                              #   then the session must be restarted, and a copied skill refreshed the way it was installed
+python3 -m scholion mitochondria            # saved mitochondrial report and BAM prerequisites
+python3 -m scholion mitochondria --yes      # WRITES: run locally and save after explicit consent
 python3 -m scholion recompute                # the plan after an update: what the releases since the data's version ask, and the
                                              #   genome steps the data lacks (catalogue positions never genotyped); each step says
                                              #   whether it will run, what it needs, or that it is for the person to do by hand
@@ -904,7 +913,7 @@ The journal is needed where two factors always coincide in time and passive data
 does not separate them.
 
 The Ouroboros tools and the MCP server are the same core through one registry —
-40 tools. One tool may answer for more than one command, the second behind a
+41 tools. One tool may answer for more than one command, the second behind a
 flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
 `updates=true` is `genome-updates`, `sch_analyze_labs` with `catalogue=true` is
 `markers`, `sch_rules` with `levels=true` is `evidence-levels`, `sch_overview` with
@@ -918,7 +927,8 @@ replace laboratory glucose or HbA1c. Four of them write what the person handed o
 sets a value; `sch_update` installs the program and `sch_recompute` rebuilds what the
 person's own files already hold, each only with `confirm=true` after the person's
 yes. `sch_insight_snapshot` saves a review only with its preview fingerprint in
-`confirm`; previewing does not write. The complete list is: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_insight_snapshot`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
+`confirm`; previewing does not write. `sch_mitochondria` runs the local BAM
+analysis and saves a derived report only with explicit confirmation. The complete list is: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_insight_snapshot`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_mitochondria`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
 `scholion capabilities --json` derives the list from the build, and is the one
 to trust when this paragraph and the build disagree.
 

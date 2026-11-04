@@ -309,3 +309,43 @@ are not reused when newer watched measurements have arrived. Missing diet or
 habit information is not inferred. These context fields are shared by overview,
 visit-sheet, CLI and MCP responses. No additional genotype calculation or
 external identifier lookup is started to build an insight.
+
+## Mitochondrial analysis from BAM
+
+Open **Genome → Mitochondria** to see prerequisites and saved results. Select
+a BAM from that section and keep its BAI or CSI index beside it. The
+command line offers the same preview with `scholion mitochondria` and runs
+and saves the analysis with `scholion mitochondria --yes`. In MCP and
+plugins the matching tool is `sch_mitochondria`, with `confirm: true` after
+the person approves. The report belongs to the selected profile and is saved
+locally in `profile/mitochondria.json`. Changes to the BAM, index, reference,
+tree, tools or analysis rules mark the earlier report as saved history. When
+only the local ClinVar snapshot changes, a confirmed update annotates the
+saved variants. View progress by reopening the report or running
+`scholion mitochondria` in another terminal. Stop a running job from the web
+view or with `scholion mitochondria --cancel`. Failure and cancellation preserve
+the earlier report.
+
+Install Java, samtools and the `scholion[genome]` extra. On Windows, use a Linux
+environment for the analysis because pysam does not provide native Windows
+wheels. In the Scholion data
+directory create `mtDNA-tools`. Copy the JAR from
+[Mutserve 2.0.3](https://github.com/seppinho/mutserve/releases/tag/v2.0.3) to
+`mtDNA-tools/mutserve.jar` and the JAR from
+[HaploGrep 3.3.2](https://github.com/genepi/haplogrep3/releases/tag/v3.3.2) to
+`mtDNA-tools/haplogrep3.jar`. Unpack
+[PhyloTree rCRS 17.3](https://github.com/genepi/phylotree-rcrs-17/releases/tag/17.3)
+into `mtDNA-tools/tree/` so that `tree.yaml` and `rcrs.fasta` are directly
+inside it alongside the rest of the tree files. Use `SCHOLION_MTDNA_TOOLS`
+to point to a shared installation. With multiple profiles, explicitly choose
+the BAM in each profile. For a single profile, `SCHOLION_GENOME_BAM` can
+point to a file for a local run.
+
+The screen uses mitochondrial alignments and filters on base and mapping
+quality. A reported fraction is a fraction of usable reads from this sample.
+The estimated maternal haplogroup uses well-read predominant alleles and
+PhyloTree. A local indexed GRCh38 ClinVar snapshot can add the classification
+of the exact alternate allele. It is optional and is never downloaded by this
+analysis. Large rearrangements and mitochondrial DNA copy number require
+different methods. See the [ClinGen mitochondrial interpretation
+specifications](https://pubmed.ncbi.nlm.nih.gov/32906214/) for clinical use.

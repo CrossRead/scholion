@@ -109,8 +109,8 @@ _h_analyze_labs = _with_second_reading(
 _h_suggest_tests = _reported(lambda: engine.suggest_tests(), lambda r: fmt.tests_report(r))
 
 
-def _h_genome(ctx: "ToolContext", rsid: str = "", gene: str = "") -> str:
-    return fmt.genome_report(engine.genome_lookup(rsid=rsid or None, gene=gene or None))
+_h_genome = _reported(lambda rsid="", gene="": engine.genome_lookup(rsid=rsid or None, gene=gene or None),
+                      lambda r: fmt.genome_report(r))
 
 
 _h_prescription = _reported(lambda drug="": engine.check_new_prescription(drug),
@@ -296,6 +296,19 @@ def _h_flag_rate(ctx: "ToolContext") -> str:
     """
     from scholion import prevalence as _pv  # noqa: E402
     return fmt.prevalence_report(_pv.report())
+
+
+def _mitochondrial_data(confirm: bool = False, cancel: bool = False):
+    from . import mitochondria
+    return mitochondria.analyze(confirm, cancel)
+
+
+def _mitochondrial_report(data):
+    from . import mitochondria
+    return mitochondria.markdown(data)
+
+
+_h_mitochondria = _reported(_mitochondrial_data, _mitochondrial_report)
 
 
 def _h_array(ctx: "ToolContext") -> str:
@@ -667,13 +680,14 @@ _TOOLS = (
     ("sch_recompute", ("confirm", "stop"), [], _h_recompute),
     ("sch_medications", (), [], _h_medications),
     ("sch_genome_status", ("updates",), [], _h_genome_status),
+    ("sch_mitochondria", ("confirm", "cancel"), [], _h_mitochondria),
     ("sch_selfcheck", ("full",), [], _h_selfcheck),
     ("sch_capabilities", (), [], _h_capabilities),
 )
 
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
-_PARAM_TYPE = {"force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean", "stop": "boolean",
+_PARAM_TYPE = {"cancel": "boolean", "force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean", "stop": "boolean",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
                "levels": "boolean", "compact": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 

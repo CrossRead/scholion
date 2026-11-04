@@ -149,6 +149,7 @@ def domains() -> List[Dict[str, Any]]:
             out.append({"key": str(d["key"]), "source": d.get("source") or "labs",
                         "genetic_half": bool(d.get("genetic_half")),
                         "markers": list(d.get("markers") or []), "why": d.get("why"),
+                        "score_policy": d.get("score_policy"),
                         "panel_markers": list(d.get("panel_markers") or []),
                         "derived": list(d.get("derived") or []),
                         # task 205 D, E: how the panel author reads the panel
@@ -721,6 +722,8 @@ def _curated_rows(key: str, spec: Dict[str, Any], markers: List[str],
         from ..genetic_comparison import compare_all
         row['comparisons'] = compare_all(row, by_key, key)
         row['genetic_lab_comparison'] = next(iter(row['comparisons']), None)
+        from ..personal_meaning import attach as attach_meaning
+        attach_meaning(row)
         rows.append(row)
     # What short reads cannot read in this system — a gene beside its
     # pseudogene, a repeat — named with the reason and a source; without a
@@ -831,7 +834,7 @@ def _polygenic_block(key: str, findings: Optional[Dict[str, Any]] = None) -> Dic
                "reliable": bool(t_.get("reliable"))}
         for k in ("validity_note", "integrity_note", "weight_mass_note", "evidence_note",
                   "model_changed_from", "saved_result", "calibration_note", "calibration", "reading",
-                  "build_validation", "percentile_method", "reference_validation"):
+                  "build_validation", "percentile_method", "reference_validation", "model_applicability"):
             if t_.get(k):
                 row[k] = t_[k]
         rows.append(row)
@@ -860,11 +863,12 @@ def _labs_layer(dom: Dict[str, Any], rd: Optional[Dict[str, Any]],
     stale = [{"key": k, "name": by_key[k].get("name"), "date": by_key[k].get("date")}
              for k in dom["markers"] if k in by_key
              and by_key[k].get("date") and not _recent(by_key[k].get("date"), STALE_MONTHS)]
-    return {"status": "nodata" if rd.get("score") is None else "ok",
+    return {"status": "context" if dom.get("score_policy") == "context_only" else "nodata" if rd.get("score") is None else "ok",
+            "score_note": rd.get("score_note"),
             "source": dom["source"], "score": rd.get("score"), "level": rd.get("status"),
             "ok": rd.get("ok"), "abnormal": rd.get("abnormal") or [],
             "measured": rd.get("measured"), "total": rd.get("total"),
-            "missing": rd.get("missing") or [],
+            "missing": [] if dom.get("score_policy") == "context_only" else rd.get("missing") or [],
             # The keys stay for the joins; the names are what a reader sees.
             # Layer 7 already printed names for the same gap while this layer
             # printed `cholesterol_total` — one card, two spellings of one fact.
@@ -1057,6 +1061,7 @@ def _position_state(r: Dict[str, Any]) -> Dict[str, Any]:
             "route": r.get("route"), "mechanism": r.get("mechanism"), "source": r.get("source"),
             "conclusion_basis": r.get("conclusion_basis"),
             "reference_context": r.get("reference_context"), "interpretation": r.get("interpretation"),
+            "personal_meaning": r.get("personal_meaning"),
             "decision_route": r.get("decision_route"),
             "subclaim_basis": r.get("subclaim_basis"),
             "not_a_finding_why": r.get("not_a_finding_why"), "needs_confirmation": r.get("needs_confirmation"),
@@ -1444,7 +1449,7 @@ _PATIENT_ROW = ("unit", "origin", "gene", "rsid", "mode", "moi", "classification
                 "needs_confirmation", "level", "level_short", "ladder", "carrier", "clinical_carrier", "caveat", "read", "read_state", "presumed", "closes_text", "depth_note", "read_why", "read_why_text", "expect_check", "local_note", "group",
                 "link", "link_text", "route", "under_load", "file_says", "file_says_text",
                 "signature", "signed_on", "mechanism", "source", "conclusion_basis", "subclaim_basis", "decision_route",
-                "reference_context", "interpretation", "genotype", "passport", "value_only", "author_note", "genetic_lab_comparison", "comparisons")
+                "reference_context", "interpretation", "personal_meaning", "genotype", "passport", "value_only", "author_note", "genetic_lab_comparison", "comparisons")
 #: A score in the patient's register: the trait, where it sits, whether it can
 #: be trusted. The model id, the evidence tier and the notes are the
 #: clinician's density.
@@ -1505,7 +1510,9 @@ def systems(register: Optional[str] = None) -> Dict[str, Any]:
             g = card.get("genetics") or {}
         b = base.get(d["key"]) if isinstance(base.get(d["key"]), dict) else None
         c = cur.get(d["key"]) if isinstance(cur.get(d["key"]), dict) else None
-        if not d["genetic_half"]:
+        if d["key"] == "mitochondria":
+            gstat = "mitochondrial"
+        elif not d["genetic_half"]:
             gstat = "no_genetic_half"
         elif (b and b.get("genes")) or (c and c.get("positions")):
             gstat = "composed"
@@ -1517,6 +1524,11 @@ def systems(register: Optional[str] = None) -> Dict[str, Any]:
         # not be refuted by any measurement (brief §4.2).
         read = unread = 0
         scan = None
+        if gstat == "mitochondrial":
+            from ..mitochondria import report
+            saved = report()
+            scan = "current" if saved["current"] else "saved" if saved["result"] else "not_analyzed"
+            read = sum(v.get("status") == "supported" for v in (saved.get("result") or {}).get("variants", []))
         if gstat == "composed":
             if register is None:
                 g = _genetics_layer(d, by_key)
@@ -1612,7 +1624,7 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
               for k in list(dom["markers"]) + list(dom.get("panel_markers") or []))
     route_rows = route_dependencies._observe(dom["key"], by_key, gen.get("rows") or [])
     correction = _routes.correction_routes_for(dom["key"], by_key, route_rows, off)
-    return {"status": "ok", "key": dom["key"], "label": _t("radar.domain." + dom["key"]),
+    result = {"status": "ok", "key": dom["key"], "label": _t("radar.domain." + dom["key"]),
             "labels": _labels(dom["key"]), "register": register,
             "source": dom["source"], "genetic_half": dom["genetic_half"],
             "markers": dom["markers"],
@@ -1629,6 +1641,10 @@ def system(key: str, register: str = "patient") -> Dict[str, Any]:
             "unread_line": panel_form.unread_line(gen["verdict"]),
             "unread": panel_form.unread_block(gen["verdict"]),
             "next": nxt, "disclaimer": DISCLAIMER()}
+    if key == "mitochondria":
+        from ..mitochondrial_system import attach
+        attach(result, by_key)
+    return result
 
 
 def composition(key: str) -> Dict[str, Any]:

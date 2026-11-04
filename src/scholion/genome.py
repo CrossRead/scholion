@@ -25,9 +25,8 @@ from .i18n import t as _t
 _ENSEMBL = "https://rest.ensembl.org/variation/human/{}?content-type=application/json"
 
 
-@lru_cache(maxsize=1)
 def loci() -> Dict[str, Any]:
-    return core._read_knowledge("loci.json")
+    return core.loci()
 
 
 def locus(rsid: str) -> Optional[Dict[str, Any]]:
@@ -77,45 +76,84 @@ def _mark_depth_unverified(out: Dict[str, Any]) -> None:
     out["note"] = (str(out["note"]).rstrip() + " " + note) if out.get("note") else note
 
 
-def resolve_rsid(rsid: str, allow_network: bool = True) -> Optional[Dict[str, Any]]:
-    """Coordinate + annotation for ANY rsID.
+def resolve_rsid(rsid: str, allow_network: bool = True, *,
+                 details: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """Resolve a public identifier; optional details distinguish failure causes.
 
-    Priority: 1) the curated catalogue loci.json (fast, pharmacogenetics);
-    2) the local cache; 3) Ensembl REST live (current ClinVar/dbSNP) → cache.
-    Offline or an error → None (then only the catalogue is used). An rsID is a public
-    identifier; the patient's genotype is NOT sent anywhere in the process.
+    The legacy return remains a locus or None. Only an explicit public rsID may
+    leave the machine. A failed request is never a successful empty catalogue.
     """
-    rsid = (rsid or "").strip()
-    if not rsid:
+    def state(status: str, reason: Optional[str] = None, **extra: Any) -> None:
+        if details is not None:
+            details.update(status=status, reason=reason, **extra)
+
+    rsid = (rsid or "").strip().lower()
+    if not re.fullmatch(r"rs[0-9]+", rsid):
+        state("refused", "invalid_identifier")
         return None
     loc = locus(rsid)
     if loc:
+        state("resolved", source="catalog")
         return {**loc, "rsid": rsid, "source": "catalog"}
+    from .panel_reference import catalogue_records
+    annotation = catalogue_records().get(rsid)
+    if annotation:
+        state("resolved", source="catalog")
+        return {**annotation, "rsid": rsid, "source": "catalog", "reference_annotation_only": True}
     cache = _load_cache()
     if rsid in cache:
+        state("resolved", source="cache", mapping_strand=cache[rsid].get("mapping_strand"))
         return {**cache[rsid], "rsid": rsid, "source": "cache"}
-    if not allow_network:
+    from . import net
+    if not allow_network or net.offline():
+        state("refused", "local_only")
         return None
     try:
-        from . import net
         data = net.get_json(_ENSEMBL.format(rsid))
+        if data is None:
+            state("unavailable", "source_unavailable")
+            return None
         if not data:
+            state("not_found", "not_found")
             return None
-        m = [x for x in data.get("mappings", []) if x.get("assembly_name") == "GRCh38"
-             and str(x.get("seq_region_name", "")) in _MAIN_CHR]
-        if not m:
+        if not isinstance(data, dict) or "error" in data:
+            state("unavailable", "invalid_response")
             return None
-        mm = m[0]
-        al = (mm.get("allele_string", "") or "").split("/")
-        rec = {"chrom": str(mm["seq_region_name"]), "pos": int(mm["start"]),
-               "ref": al[0] if al else None, "alt": "/".join(al[1:]) if len(al) > 1 else None,
+        mappings = [x for x in data.get("mappings", []) if isinstance(x, dict)
+                    and x.get("assembly_name") == "GRCh38"
+                    and str(x.get("seq_region_name", "")) in _MAIN_CHR]
+        if not mappings:
+            state("unresolved", "no_supported_mapping")
+            return None
+        identities = {(str(x.get("seq_region_name")), x.get("start"), x.get("end"),
+                       x.get("allele_string"), x.get("strand")) for x in mappings}
+        if len(identities) != 1:
+            state("unresolved", "ambiguous_mapping")
+            return None
+        mm = mappings[0]
+        if mm.get("strand") != 1:
+            state("unresolved", "orientation_unverified")
+            return None
+        al = (mm.get("allele_string", "") or "").upper().split("/")
+        position = int(mm["start"])
+        if position < 1 or len(al) < 2 or any(not value for value in al):
+            state("unavailable", "invalid_response")
+            return None
+        rec = {"chrom": str(mm["seq_region_name"]), "pos": position,
+               "ref": al[0], "alt": "/".join(al[1:]),
+               "mapping_strand": 1, "mapping_assembly": "GRCh38",
+               "coordinate_source": _ENSEMBL.format(rsid),
                "clinical_significance": data.get("clinical_significance", []),
-               "consequence": data.get("most_severe_consequence"),
-               "gene": None}
+               "consequence": data.get("most_severe_consequence"), "gene": None}
         cache[rsid] = rec
-        _save_cache(cache)
+        try:
+            _save_cache(cache)
+        except OSError:
+            state("resolved", cache_write_failed=True)
+        state("resolved", source="ensembl", mapping_strand=1)
         return {**rec, "rsid": rsid, "source": "ensembl"}
-    except Exception:  # quiet: None is refused as unknown_rsid / no genotype, never read at a position
+    except Exception:  # malformed or unreachable source; never fabricate a coordinate
+        state("unavailable", "source_unavailable")
         return None
 
 
@@ -2163,7 +2201,22 @@ def _gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             return {"genotype": None, "confidence": "no_coordinates_for_assembly", "source": "vcf",
                     "interpretation_applicable": False,
                     "note": _t("genome.no_coordinates_for_assembly", assembly="?", rsid=loc.get("rsid") or "")}
+        # A literal call can later be matched to an independently curated study
+        # pair. Keep the clinical prohibition and identify its narrower reason.
+        if result.get("interpretation_applicable") is not False:
+            result = {**result, "interpretation_restriction": "literal_catalogue_only"}
         result = {**result, "interpretation_applicable": False}
+    if result and loc.get("reference_annotation_only"):
+        result = {**result, "interpretation_applicable": False}
+        gt = result.get("genotype")
+        expected = locus_alleles(loc, result.get("assembly"))
+        if (gt and result.get("confidence") in ("called", "called_array")
+                and not set(gt) <= {expected.get("ref"), expected.get("alt")}):
+            from .variant_readings import observation
+            other = observation(loc["rsid"], result, result.get("source") or "current", loc["rsid"])
+            result.update(genotype=None, confidence="other_variant_at_position", observations=[other],
+                          note=_t("genome.other_variant_at_position",
+                                  expected=f"{expected['ref']}>{expected['alt']}", found=gt))
     return result
 
 
@@ -2340,7 +2393,7 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                     "assembly": asm, "read_pos": pos, "callset_class": _m.get("class"),
                     "note": _t("genome.not_in_this_callset")}
         return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf",
-                "assembly": asm, "read_pos": pos,
+                "assembly": asm, "read_pos": pos, "missing_vcf_row": True,
                 "note": _t("genome.assumed_ref_note")}
     # ── which of these rows is this locus? ───────────────────────────────────
     # Until this check the reader took «the first variant row at the position»
@@ -2462,7 +2515,10 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         sample = f[9 + col].split(":")
         # No GT field is no genotype. The first sample field used to stand in for
         # it, and in a FORMAT that opens with DP that is a depth read as alleles.
-        gt_raw = sample[fmt.index("GT")] if ("GT" in fmt and fmt.index("GT") < len(sample)) else ""
+        from .variant_readings import sample_quality
+        fields = dict(zip(fmt, sample))
+        gt_raw = fields.get("GT", "")
+        quality = sample_quality(fields)
         parts = gt_raw.replace("|", "/").split("/") if gt_raw else []
         idx = [i for i in parts if i.isdigit()]
         # A HALF call («./0», «1/.») is not a call either. It used to keep the one
@@ -2476,8 +2532,10 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # reader got ⟦genome.refused_head.called⟧ where a sentence belonged.
         if not idx:
             return {"genotype": None, "confidence": "no_call_in_vcf", "source": "vcf",
-                    "assembly": asm, "read_pos": pos, "filter": f[6],
-                    "note": _t("genome.no_call_in_vcf")}
+                    "assembly": asm, "read_pos": pos, "filter": f[6], "raw_genotype": gt_raw,
+                    "variant_identity": {"assembly": asm, "chrom": str(loc["chrom"]),
+                                         "pos": pos, "ref": vref, "alt": f[4]},
+                    **quality, "note": _t("genome.no_call_in_vcf")}
         alleles = _alleles_for_genotype(vref, valt, cref, calts, idx)
         if alleles is None:
             return {"genotype": None, "confidence": "alleles_not_comparable", "source": "vcf",
@@ -2491,20 +2549,17 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
             return {"genotype": None, "confidence": "malformed_genotype", "source": "vcf",
                     "assembly": asm, "read_pos": pos, "filter": f[6],
                     "note": _t("genome.malformed_genotype", value=gt_raw[:24])}
-        dp = None
-        if "DP" in fmt:
-            try:
-                dp = int(sample[fmt.index("DP")])
-            except Exception:
-                dp = None
+        dp = quality["depth"]
         out = {"genotype": gt, "confidence": "called", "source": "vcf",
-               "ref": vref, "alt": f[4], "depth": dp,
+               "ref": vref, "alt": f[4], **quality,
                "assembly": asm, "read_pos": pos, "filter": f[6],
                "raw_genotype": gt_raw, "phased": "|" in gt_raw,
                "variant_identity": {"assembly": asm, "chrom": str(loc["chrom"]),
                                     "pos": pos, "ref": cref, "alternatives": sorted(calts)}}
         if loc.get("reading_alternatives"):
             out["interpretation_applicable"] = set(gt) <= {cref, loc.get("alt")}
+            if _literal_snp_identity(catalogue_loc, asm):
+                out["interpretation_restriction"] = "literal_catalogue_only"
         # A row carrying more than one alternative answers for our locus AND for
         # something else at the same base; the genotype may legitimately name an
         # allele that is not ours, and the reader is told so rather than left to
@@ -2552,24 +2607,54 @@ def _read_gt_at(loc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     return {"genotype": f"{ref}{ref}", "confidence": "assumed_ref", "source": "vcf"}
 
 
-def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_network: bool = True) -> Dict[str, Any]:
+def _verify_missing_position(rsid, loc, current, state):
+    """Explicit lookup can spend one targeted call, never a catalogue rebuild."""
+    from . import gene_region, sites
+    from .engine.panel_genotype import _reference_presumption_refusal
+
+    if not current.get("missing_vcf_row"):
+        return current
+    bam = gene_region.bam_path()
+    assembly = current.get("assembly")
+    if bam is not None:
+        checked = sites.verify_position(loc, assembly, bam) if assembly else {"reason": "build_mismatch"}
+        if checked.get("genotype"):
+            return {**checked, "note": _t("genome.bam_check.called"),
+                    **({"interpretation_applicable": False} if current.get("interpretation_applicable") is False else {})}
+        reason = checked["reason"]
+        return {**current, "genotype": None, "bam_check": reason,
+                "note": _t("genome.bam_check.refused", reason=_t("genome.bam_check." + reason))}
+    candidate = current.get("genotype") or ""
+    vcf = vcf_path()
+    if (assembly and candidate in {"AA", "CC", "GG", "TT"} and not _is_gvcf(vcf)
+            and not _reference_presumption_refusal(rsid.lower(), loc.get("gene") or "", state, False)):
+        return {**current, "genotype": None, "reference_presumed": True,
+                "note": _t("genome.reference_presumed_note")}
+    return {**current, "genotype": None}
+
+
+def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_network: bool = True,
+           verify_missing: bool = False) -> Dict[str, Any]:
     """Public lookup: by rsID (any — catalogue/cache/Ensembl) or by gene (catalogue loci)."""
     st = available()
     if rsid:
         from .variant_readings import resolve
         recorded = core.profile_genotypes().get(rsid.lower())
-        loc = resolve_rsid(rsid, allow_network=allow_network)
+        resolution: Dict[str, Any] = {}
+        loc = resolve_rsid(rsid, allow_network=allow_network, details=resolution)
         if not loc:
             if recorded:
                 return {"status": "ok", "rsid": rsid, "gene": recorded.get("gene"),
-                        "genome_ready": st["ready"], "resolved_by": "recorded",
-                        "result": resolve(rsid, {"confidence": "position_not_resolved"}, recorded)}
-            return {"status": "unknown_rsid", "rsid": rsid,
-                    "message": _t("genome.rsid_unknown", rsid=rsid)}
+                        "genome_ready": st["ready"], "resolved_by": "recorded", "resolution": resolution,
+                        "result": resolve(rsid, {"confidence": "position_not_resolved",
+                            "note": _t("genome.resolve." + resolution["reason"]) if resolution.get("reason") else None}, recorded)}
+            return {"status": "unknown_rsid", "rsid": rsid, "resolution": resolution,
+                    "message": _t("genome.resolve." + resolution["reason"]) if resolution.get("reason")
+                    else _t("genome.rsid_unknown", rsid=rsid)}
         base = {"status": "ok", "rsid": rsid, "gene": loc.get("gene"), "chrom": loc.get("chrom"),
                 "pos": loc.get("pos"), "star": loc.get("star"), "note": loc.get("note"),
                 "clinical_significance": loc.get("clinical_significance"),
-                "consequence": loc.get("consequence"), "resolved_by": loc.get("source")}
+                "consequence": loc.get("consequence"), "resolved_by": loc.get("source"), "resolution": resolution}
         if not st["ready"]:
             if recorded:
                 base["result"] = resolve(rsid, {"confidence": st.get("reason") or "no_file"}, recorded)
@@ -2589,13 +2674,21 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_netw
             base["foreign"] = st.get("foreign")
             base["message"] = _t("genome.refused." + (st.get("reason") or "no_file"))
             return base
-        base["result"] = resolve(rsid, _gt_at(loc), recorded)
+        current = _gt_at(loc)
+        if verify_missing and current and current.get("confidence") == "assumed_ref":
+            current = _verify_missing_position(rsid, loc, current, st)
+        base["result"] = resolve(rsid, current, recorded)
         return base
     if gene:
+        from .panel_reference import catalogue_positions
+        from .scientific_review import physical_position_genes
         items = [rs for rs, l in loci().get("loci", {}).items() if l.get("gene", "").upper() == gene.upper()]
+        physical = [rs for rs, symbol in physical_position_genes().items() if symbol == gene.upper()]
+        items = list(dict.fromkeys(items + physical + catalogue_positions(gene)))
         if items:
             return {"status": "ok", "gene": gene,
-                    "loci": [{**lookup(rsid=rs, allow_network=allow_network),
+                    "loci": [{**lookup(rsid=rs, allow_network=False, verify_missing=verify_missing),
+                              **({"gene": gene.upper()} if rs in physical else {}),
                               **({"locus": locus(rs)} if not st["ready"] else {})} for rs in items],
                     "genome_ready": st["ready"]}
         # Task 127. The catalogue not holding the gene used to end the query —
@@ -2605,7 +2698,7 @@ def lookup(rsid: Optional[str] = None, gene: Optional[str] = None, *, allow_netw
         # reads, meanwhile, were there the whole time. So a miss here is no longer
         # a refusal but a second question, asked of the annotation and the VCF.
         from . import gene_region
-        return gene_region.report(gene)
+        return gene_region.report(gene, allow_network=allow_network)
     return {"status": "error", "message": _t("genome.need_rsid_or_gene")}
 
 
@@ -2851,7 +2944,7 @@ def clinvar_hits(limit: int = 400) -> Dict[str, Any]:
     actionable = counts["pathogenic"] + counts["drug"] + counts["risk"] + counts["protective"]
     low_conf = sum(1 for r in rows if r.get("low_confidence"))
     from .panel_reference import attach_finding_biology
-    attach_finding_biology(rows[:limit])
+    attach_finding_biology(rows[:limit], recorded_build or personal_build)
     for row in rows[:limit]:
         row["finding_trace"].update(
             schema=1, table=f.name, table_sha256=table_digest,
@@ -3066,7 +3159,7 @@ def acmg_sf_findings() -> Dict[str, Any]:
     from .finding_context import attach as attach_context
     personal_counts = attach_context(rows, cat)
     from .panel_reference import attach_finding_biology
-    attach_finding_biology(rows)
+    attach_finding_biology(rows, table_asm)
     from .knowledge_provenance import record
     witnesses: dict[str, dict] = {}
     for hit in rows:

@@ -159,6 +159,13 @@ as unverified saved values, with a recalculation recommendation wherever they
 appear; do not delete them before a replacement report is saved successfully.
 Relay the explicit reason for withholding a confirmed percentile. A high calibrated percentile is still not a disease probability.
 
+For mitochondrial DNA, keep maternal lineage, the exact allele, read fraction
+and quality separate from clinical classification. Fraction describes reads
+from the sampled tissue. A haplogroup does not predict health. Uncertain calls,
+missing coverage and variant-only VCFs do not rule out a mitochondrial variant.
+Use `mitochondria` to read the saved report; start its BAM analysis only after
+the person explicitly agrees.
+
 **9. A threshold that fires on almost everything gets fixed, not explained.** A
 cheap check before any interpretation: what fraction of objects did the flag hit?
 If it hit almost all of them, it measures a property of the data rather than of

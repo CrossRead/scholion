@@ -157,6 +157,9 @@ def _system_polygenic(poly: Any, register: str) -> List[str]:
             line += "\n     " + r["saved_result"]["note"]
         if r.get("calibration_note"):
             line += "\n     " + str(r["calibration_note"])
+        applicability = r.get("model_applicability") or {}
+        if applicability.get("label"):
+            line += "\n     " + applicability["label"]
         if register == "clinician":
             detail = [_t("system.polygenic.detail", pgs_id=r.get("pgs_id") or "—",
                          evidence=r.get("evidence_label") or r.get("evidence") or "—")]
@@ -335,7 +338,12 @@ def system_report(r: Dict[str, Any]) -> str:
     # 1 — the laboratory half
     lab = r.get("labs") or {}
     L.append("**1. " + _t("system.layer.labs") + "**")
-    if lab.get("status") == "absent":
+    if lab.get("status") == "context":
+        L += ["   " + _t("system.labs.context", measured=lab.get("measured") or 0),
+              "   " + str(lab.get("score_note") or "")]
+        for m in lab.get("current_markers") or []:
+            L.append(f"   {m.get('name')}: {m.get('value')} {m.get('unit_display') or m.get('unit', '')} ({m.get('date')})")
+    elif lab.get("status") == "absent":
         L.append("   " + _t("system.labs.absent"))
     elif lab.get("status") == "nodata":
         L.append("   " + _t("system.labs.nodata", total=lab.get("total") or 0))
@@ -451,12 +459,16 @@ def system_report(r: Dict[str, Any]) -> str:
         if gen.get("positions"):
             L += ["   " + ln for ln in genotype_conclusion_lines(gen["positions"])]
         L += ["   " + ln if ln else "" for ln in hypotheses_lines(all_gen, reg == "clinician")]
+    elif r.get("mitochondrial_context"):
+        from .mitochondrial_system import lines
+        L += lines(r["mitochondrial_context"])
     elif gen.get("status") == "not_composed":
         L.append("   " + _t("system.genetics.not_composed",
                             why=gen.get("why_empty") or _t("screen.why.no_panel")))
     else:
         L.append("   " + _t("screen.why.no_genetic_half"))
-    L += _system_polygenic(gen.get("polygenic"), reg)
+    if not r.get("mitochondrial_context"):
+        L += _system_polygenic(gen.get("polygenic"), reg)
     # 4 — the prescriptions acting here
     med = r.get("medications") or {}
     L += _correction_route_lines(r.get("correction_routes"), reg)
@@ -548,12 +560,16 @@ def systems_report(r: Dict[str, Any]) -> str:
         lab, gen = s.get("labs") or {}, s.get("genetics") or {}
         if not s.get("lab_half"):
             labs = _t("system.labs.absent")
+        elif lab.get("status") == "context":
+            labs = _t("system.labs.context", measured=lab.get("measured") or 0)
         elif lab.get("score") is None:
             labs = _t("common.no_data")
         else:
             labs = _t("systems.labs", score=lab.get("score"), measured=lab.get("measured") or 0,
                       total=lab.get("total") or 0)
-        if gen.get("status") == "composed":
+        if gen.get("status") == "mitochondrial":
+            g = _t("mt.system.index")
+        elif gen.get("status") == "composed":
             g = _t("systems.genetics.composed", n=gen.get("base_genes") or 0,
                    version=gen.get("base_version") or "—", positions=gen.get("curated_positions") or 0,
                    read=gen.get("read_count") or 0, unread=gen.get("unread_count") or 0)

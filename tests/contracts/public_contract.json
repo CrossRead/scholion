@@ -20,6 +20,7 @@
     "SCHOLION_LONGEVITY_OUT",
     "SCHOLION_LONGEVITY_RSMAP",
     "SCHOLION_LONGEVITY_VCF",
+    "SCHOLION_MTDNA_TOOLS",
     "SCHOLION_OFFLINE",
     "SCHOLION_PROFILE_DIR",
     "SCHOLION_PROG",
@@ -66,6 +67,7 @@
     "mcp",
     "medications",
     "metrics",
+    "mitochondria",
     "overview",
     "phenoage",
     "prescription",
@@ -161,6 +163,28 @@
       "peaks",
       "targets",
       "title"
+    ],
+    "genome": [
+      "ambiguous",
+      "basis",
+      "chrom",
+      "clinical_significance",
+      "consequence",
+      "coverage",
+      "disclaimer",
+      "foreign",
+      "gene",
+      "level",
+      "message",
+      "note",
+      "pos",
+      "reason",
+      "reference_context",
+      "resolved_by",
+      "result",
+      "rsid",
+      "star",
+      "status"
     ],
     "genome-status": [
       "array",
@@ -277,6 +301,20 @@
       "count",
       "ok",
       "saved"
+    ],
+    "mitochondria": [
+      "can_analyze",
+      "current",
+      "freshness_reasons",
+      "job",
+      "limits",
+      "links",
+      "message",
+      "missing",
+      "recalculation_required",
+      "result",
+      "status",
+      "tools_folder"
     ]
   },
   "profile_files": [
@@ -287,6 +325,7 @@
     "focus.json",
     "lifestyle_brief.json",
     "pharmacogenomics.json",
-    "experiments.json"
+    "experiments.json",
+    "mitochondria.json"
   ]
 }

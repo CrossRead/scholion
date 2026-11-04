@@ -3,7 +3,7 @@
     "purpose": "The body systems of the health radar, each with the laboratory panel that defines it. Read by engine/lifestyle.py (the laboratory half: score, coverage, dynamics) and by engine/system_panels.py (the genetic half and the questions for a clinician). One file, two readers, so that the two halves of a system cannot drift apart in silence.",
     "who_writes_this": "The project. Which markers a laboratory issues as one panel is reference knowledge, not a medical claim about a person; the composition was decided in 0.4.9 and is not reopened here.",
     "source_tier": "curated_reference",
-    "updated": "2026-09-17",
+    "updated": "2026-11-04",
     "why_cardio": "The thirteenth system, «Heart and vessels», was added on the owner's decision of 13.09.2026 so that the strongest pharmacogenetic pairs — warfarin with VKORC1/CYP2C9/CYP4F2, clopidogrel with CYP2C19, the beta-blockers, the anticoagulants and antiplatelets — and the cardiovascular polygenic scores have a system to stand on. Its laboratory panel is the cardiovascular-risk and coagulation markers a laboratory issues beside, not inside, the lipid panel: lipoprotein(a), apolipoproteins B and A1, fibrinogen, D-dimer. Lipids stay a separate system. The pulse and heart-rate variability the wearable records stay in fitness, because a domain has one source and this one's is the laboratory.",
     "why_four_endocrine_systems": "The endocrine system is not one system. «Hormones» averaged a thyroid marker, a gonadal one and a hepatic one into a single number, and the ring beside it measured how much of that mixture existed — a quantity nobody orders. Thyroid, adrenals, gonads and growth are the panels a laboratory actually issues, and they became four domains in 0.4.9. The composition is not to be changed by a later task: a system with a different marker set is a different system, and every stored radar score before the change would be measured against a panel that no longer exists.",
     "fitness": "The wearables system (the twelfth until 13.09.2026, the thirteenth since — see why_cardio) is not a laboratory panel: it is built from wearable metrics, its markers are whatever the device reports, and `health_radar` attaches it after the laboratory domains. It is listed here with `source: wearables` and `genetic_half: false` so that no reader counts the laboratory domains and loses it, and no reader attaches a genetic half to it by inattention.",
@@ -375,6 +375,27 @@
       "genetic_half": false,
       "markers": [],
       "why": "Built from wearable metrics by `lifestyle()` and attached to the radar after the laboratory domains; it has no laboratory panel and no genetic half. See _meta.fitness."
+    },
+    {
+      "key": "mitochondria",
+      "source": "labs",
+      "genetic_half": true,
+      "score_policy": "context_only",
+      "markers": [
+        "glucose",
+        "hba1c",
+        "c_peptide",
+        "ck",
+        "ldh",
+        "alt",
+        "ast",
+        "creatinine"
+      ],
+      "why": "Existing metabolic and tissue observations are context, not a validated mitochondrial function score. No required testing panel is implied. Genetics and sample quality remain separate.",
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC9905091/"
+      ],
+      "genetic_source": "mitochondrial_bam"
     }
   ]
 }

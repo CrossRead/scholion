@@ -40,6 +40,78 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.7 — 04.11.2026
+
+The new Mitochondria body system links saved mtDNA readings to dated laboratory
+observations, annual changes, related current prescriptions and recorded responses.
+It shares the same answer across the web, CLI and assistant interfaces. No overall
+mitochondrial health score or biological-age estimate is inferred. Opening the
+system reuses the saved BAM analysis; no genome recalculation is required.
+
+- Gene cards open with the role of the gene and then explain what the available reading can support. Reading depth and repeat information stay together. Genome lookup also returns the same structured result to compatible MCP clients. Existing saved readings are used directly.
+- Where the evidence supports a genotype comparison, cards explain the possible personal meaning, the comparison group and the proposed mechanism before the limitations. Relevant laboratory observations remain distinct from a measured genetic effect. Weak or conflicting readings keep the study explanation without assigning its effect to the person. These explanations update from saved readings without a new BAM or PGS calculation.
+- A failed coordinate lookup now distinguishes an unavailable reference, an empty result and an ambiguous placement. A local-only query stays local when it opens a gene's details.
+
+### What this changes in the conclusions
+
+All 71 included polygenic models show the populations reported for variant
+discovery, training and evaluation, with links to the PGS Catalog records. The
+summary distinguishes group-specific results, pooled evaluations, modified
+weights and the reported independence of the evaluation sample. Missing
+evidence remains explicit. The population comparison is separate from the reference panel used
+to calculate a percentile and cannot establish personal applicability.
+Open Genome → PGS in `scholion serve` or run `scholion prs`.
+
+Genome → Mitochondria can analyze an indexed BAM locally. It reports the
+estimated maternal haplogroup, mitochondrial variants with observed read
+fractions and strand support, and coverage across the mitochondrial genome.
+When an indexed ClinVar snapshot is available locally, it shows the annotation
+for the exact allele alongside the reading. The analysis is opt-in and is
+also available through the command line, MCP and plugins. Progress shows the
+current stage, and cancellation preserves the previous report. If only the
+ClinVar snapshot changes, annotations can be refreshed from saved variants.
+
+Genome locus search shows progress and places results or errors beneath the
+search field. Gene names and rsIDs work in either case. Search and gene
+panels group positions by gene and retain the reading, evidence level and
+sources for each position. Thematic panels show curated calls first and keep
+other VCF records in region details. New sourced positions cover circadian,
+neurological, metabolic and other thematic genes. The APOE
+card shows each available position reading and identifies unresolved phase.
+
+Thematic gene panels now separate 178 exact-allele ClinVar reference records
+from four additional research associations. Disease classifications retain
+their source condition or condition group, review status and versioned record.
+Existing region readings remain available. A different alternative allele at
+the same rsID is not treated as the selected allele; unsupported deletion
+readings remain unresolved rather than inferred.
+
+Gene descriptions show their sources and the recorded review date. Reference
+functions and literature associations remain distinct from an established
+personal variant effect. Source-review reminders do not trigger a network
+request or genome recalculation automatically.
+
+### What is retracted
+
+None.
+
+### What needs recomputing
+
+**Run `scholion genotype-sites` — when newly added catalogue positions are missing and an indexed BAM with its reference genome is available.**
+
+Previously stored PGS scores do not need recalculation for these catalogue and
+presentation changes. Existing exact VCF calls are used directly. To fill newly
+added supported positions that are absent from a variant-only VCF, run the
+catalogue-position update from an indexed BAM with its reference genome. The
+update now includes supported thematic-panel positions and preserves the prior
+file if calling fails or is cancelled. It does not recompute PGS. Once the saved
+site catalogue matches, explanation-only updates do not request another BAM run.
+Unsupported complex variants remain explicitly unresolved.
+
+The mitochondrial analysis requires a separate, explicitly requested first BAM
+run. Opening its results reuses the saved report.
+
+
 ## v0.7.6 — 03.11.2026
 
 ### What this changes in the conclusions

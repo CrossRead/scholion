@@ -45,11 +45,17 @@ def _gene_function_entry(gene: str, _language: str) -> Dict[str, Any]:
             return {**entry, "canonical_symbol": entry.get("canonical_symbol") or resolved,
                     "knowledge": record(name, "genes", resolved),
                     **({"identity_source": alias.get("source")} if alias else {})}
-    return {}
+    resolved, entry = _gene_entry(core._read_knowledge("gene_curation.json").get("genes") or {}, str(canonical))
+    if not entry:
+        return {}
+    from .knowledge_provenance import record
+    return {**entry, "canonical_symbol": resolved,
+            "knowledge": record("gene_curation.json", "genes", resolved)}
 
 
 def _function_fields(gene: str, rsid: str = "") -> Dict[str, Any]:
-    resolutions = core._read_knowledge("panel_reference_context.json").get("_meta", {}).get("position_label_resolutions") or {}
+    book = core._read_knowledge("panel_reference_context.json")
+    resolutions = book.get("_meta", {}).get("position_label_resolutions") or {}
     position_label = (resolutions.get(rsid) or {}).get(gene) or {}
     canonical = position_label.get("canonical_symbol") or gene
     entry = gene_function_entry(canonical)
@@ -68,16 +74,31 @@ def _function_fields(gene: str, rsid: str = "") -> Dict[str, Any]:
                      "scope": "genomic_annotation", "function_status": "intergenic_region",
                      "retrieved": (locus.get("allele_identity") or {}).get("checked_on"),
                      "knowledge": record("loci.json", "loci", rsid)}
+    symbol = entry.get("canonical_symbol") or canonical
+    repeat = (book.get("separate_repeats") or {}).get(symbol)
+    role = (book.get("patient_gene_roles") or {}).get(symbol) or entry.get("patient_summary")
+    if not role:
+        role = (core._read_knowledge("gene_curation.json").get("patient_gene_roles") or {}).get(symbol)
+    detail = (book.get("gene_role_details") or {}).get(symbol) or {}
+    additional_sources = list(entry.get("additional_sources") or [])
+    if detail.get("source") and detail["source"] not in additional_sources:
+        additional_sources.append(detail["source"])
     return {"gene_function": entry.get("description") or t("reference.gene_unknown"),
             "gene_source": entry.get("source"),
             "gene_source_scope": "genomic_annotation" if entry.get("scope") == "genomic_annotation" else "gene_function",
+            "gene_curation_status": entry.get("curation_status"),
             "retrieved": entry.get("retrieved"), "limitations": entry.get("caveat"),
+            "gene_checked_on": entry.get("checked_on"),
+            "gene_source_version": entry.get("source_version"),
             "canonical_symbol": entry.get("canonical_symbol") or canonical,
             "function_status": (entry.get("function_status") or "curated") if entry else "not_curated",
             "function_support": entry.get("function_support") or [],
             "gene_knowledge": entry.get("knowledge"),
             "disease_context": core._read_knowledge("gene_function_context.json").get("disease_contexts", {}).get(str(entry.get("canonical_symbol") or canonical)),
-            "gene_additional_sources": entry.get("additional_sources") or []}
+            "gene_additional_sources": additional_sources,
+            **({"gene_role_detail": detail["description"]} if detail.get("description") else {}),
+            **({"separate_repeat": repeat} if repeat else {}),
+            **({"gene_role": role} if role and entry.get("source") else {})}
 
 
 def gene_reference_context(gene: str, assertions: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -164,9 +185,11 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     context = row.get("reference_context")
     if not isinstance(context, dict):
         return []
+    from .personal_meaning import lines as meaning_lines
     description_key = "reference.region" if context.get("gene_source_scope") == "genomic_annotation" else "reference.gene"
     lines = [t(description_key, text=context.get("gene_function")),
              t("reference.variant", text=context.get("variant_context"))]
+    lines[1:1] = meaning_lines(row)
     disease = context.get("disease_context")
     if disease:
         lines.extend([disease["label"] + ": " + disease["name"],
@@ -209,15 +232,26 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
                        source=context.get("gencc_source")))
     for review in context.get('scientific_review') or []:
         lines.append(review['label'] + ': ' + str(review.get('summary') or ''))
+        if review.get('curation_notice'):
+            lines.append(review['curation_notice'])
         if review.get('limitations'):
             lines.append(str(review['limitations']))
         lines.extend(str(source) for source in review.get('sources') or [] if source)
+        for source in review.get('source_details') or []:
+            description = source.get('url') or source.get('citation')
+            lines.append(t('science.source_line', name=source['name'], record=description))
+            if source['checked_on']:
+                lines.append(t('science.source_checked', date=source['checked_on']))
+            if source['refresh_status'] != 'current':
+                lines.append(t('science.source_' + source['refresh_status']))
     if context.get("gene_source"):
         lines.append(t("reference.gene_source", source=context["gene_source"]))
     for source in context.get("gene_additional_sources") or []:
         lines.append(t("reference.gene_source", source=source))
     if context.get("variant_source"):
         lines.append(t("reference.variant_source", source=context["variant_source"]))
+    if context.get("catalogue_annotation"):
+        lines.extend(_catalogue_reference_lines(context["catalogue_annotation"]))
     lines.append(t("reference.gene_level") if context.get("variant_status") == "not_supplied"
                  else t("reference.level", level=context.get("level") or "—"))
     if context.get("scope") == "catalogue_gene_set":
@@ -307,7 +341,8 @@ def longevity_interpretation(row: Dict[str, Any], spec: Dict[str, Any]) -> Dict[
                    population=spec.get("population_caveat"),
                    study_effect=(spec.get("study") or {}).get("effect"),
                    notice=spec.get("action"), source_passport=spec.get("source_passport"))
-    return {**row, "level": spec["level"], "reading": reading, "read": bool(positive),
+    from .personal_meaning import attach as attach_meaning
+    return attach_meaning({**row, "level": spec["level"], "reading": reading, "read": bool(positive),
             "reading_quality": quality, "carries_named_allele": None,
             "source_passport": spec.get("source_passport"), "ld_group": spec.get("ld_group"),
             "joint_interpretation_pointer": "apoe" if row['rsid'] in ('rs429358','rs7412') else None,
@@ -315,13 +350,31 @@ def longevity_interpretation(row: Dict[str, Any], spec: Dict[str, Any]) -> Dict[
             "verdict_token": "see_apoe" if row["rsid"] in ("rs429358", "rs7412") else None,
             "verdict_label": t("longevity.verdict.see_apoe") if row["rsid"] in ("rs429358", "rs7412") else None,
             "genotype": reading.get("genotype") if positive else row.get("genotype"),
-            "stored_genotype": row.get("genotype")}
+            "stored_genotype": row.get("genotype")})
 
 
-def attach_finding_biology(rows: List[Dict[str, Any]]) -> None:
+def _matches_catalogue_allele(row: Dict[str, Any], locus: Dict[str, Any], assembly: str | None) -> bool:
+    from .genome import locus_alleles, locus_position
+
+    chrom = str(row.get("chrom") or "").lower().removeprefix("chr")
+    if not chrom or chrom != str(locus.get("chrom") or "").lower():
+        return False
+    for build in (assembly,) if assembly else ("GRCh38", "GRCh37"):
+        position = locus_position(locus, build)
+        if position is None or str(position) != str(row.get("pos")):
+            continue
+        expected = locus_alleles(locus, build)
+        if (row.get("ref"), row.get("alt")) == (expected.get("ref"), expected.get("alt")):
+            return True
+    return False
+
+
+def attach_finding_biology(rows: List[Dict[str, Any]], assembly: str | None = None) -> None:
     """Give every finding surface the same biology, including rows without rsIDs."""
     loci = core.loci().get("loci") or {}
-    phenotypes = core._read_knowledge("panel_reference_context.json").get("clinvar_phenotypes") or {}
+    reference = core._read_knowledge("panel_reference_context.json")
+    phenotypes = reference.get("clinvar_phenotypes") or {}
+    variants = reference.get("variants") or {}
     for row in rows:
         raw = str(row.get("rsid") or "")
         rsid = raw if raw.startswith("rs") and raw[2:].isdigit() else ""
@@ -335,21 +388,36 @@ def attach_finding_biology(rows: List[Dict[str, Any]]) -> None:
                     if part.strip() not in ("", ".", "—")))
         if not genes and phenotype and phenotype.get("gene"):
             genes = [phenotype["gene"]]
+        # A RefSNP can name several substitutions at one coordinate. New
+        # reference-only studies describe the selected pair, not its neighbours.
+        has_selected_pair = (variants.get(rsid) or {}).get("reference_level")
+        matches = not has_selected_pair or _matches_catalogue_allele(row, loci.get(rsid) or {}, assembly)
+        context_rsid = rsid if matches else ""
         contexts = []
         for gene in genes:
-            item = genome_context(gene, rsid)
+            item = genome_context(gene, context_rsid)
+            item["rsid"] = rsid
             if phenotype and gene == phenotype.get("gene"):
-                item["reference_context"].update(
-                    gene_function=phenotype["gene_function"], gene_source=phenotype["study"],
-                    function_status="curated", variant_context=phenotype["description"],
-                    variant_source=phenotype["study"], variant_status="described",
-                )
-            if not rsid:
-                # A named clinical-table position is still a variant, even when
-                # it has no rsID. Do not invent one or downgrade it to gene-only.
+                reference = item["reference_context"]
+                if reference.get("function_status") in ("not_curated", "identity_only"):
+                    reference.update(gene_function=phenotype["gene_function"], gene_source=phenotype["study"],
+                                     gene_checked_on=None, gene_source_version=None, function_status="curated",
+                                     gene_curation_status=None, gene_knowledge=None, gene_role=None)
+                reference.update(variant_context=phenotype["description"], variant_source=phenotype["study"],
+                                 variant_status="described")
+                item["reference_context"] = _scientific_context(gene, context_rsid, reference)
+            if not context_rsid:
+                # Keep the variant card when the row lacks a matching study.
                 item["reference_context"].update(variant_status="not_curated",
                                                  variant_context=t("reference.variant_unknown"))
             item.update({key: row.get(key) for key in ("genotype", "chrom", "pos", "ref", "alt")})
+            if context_rsid and _matches_catalogue_allele(row, loci.get(rsid) or {}, assembly):
+                from .personal_meaning import attach as attach_meaning
+                # Preserve the finding reader's observation. Numeric GT alone
+                # is not decoded into a research genotype by this projection.
+                item['reading'] = row.get('reading') or {key: row.get(key) for key in (
+                    'genotype', 'depth', 'filter', 'confidence', 'assembly', 'variant_identity', 'reading_record')}
+                attach_meaning(item)
             contexts.append(item)
         row["gene_contexts"] = contexts
 
@@ -378,7 +446,7 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
                    "variant_context": t("reference.gene_set_variant"),
                    "variant_status": "not_curated" if rsid else "not_supplied",
                    "limitations": t("reference.gene_set_variant")}
-        return {"gene": gene, "rsid": rsid, "level": "E", "reference_context": context,
+        return {"gene": gene, "rsid": rsid, "level": "E", "reference_context": _scientific_context(gene, rsid, context),
                 "catalogue_genes": members,
                 "gene_contexts": [genome_context(member) for member in members] if not rsid else []}
     spec = None
@@ -418,14 +486,88 @@ def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:
                     "gene_additional_sources", "gene_knowledge", "gene_source_scope", "disease_context")})
         context["level"] = "E"
         if rsid:
-            context["variant_status"] = "not_curated"
-            context["variant_context"] = t("reference.variant_unknown")
+            variant = (core._read_knowledge("panel_reference_context.json").get("variants") or {}).get(rsid) or {}
+            level = variant.get("reference_level")
+            if (variant.get("gene") == gene and variant.get("scope") == "reference_only"
+                    and level in ("B", "C", "D") and variant.get("source") and variant.get("description")):
+                # This is catalogue context only. No personal interpretation or clinical gate is added.
+                context.update(level=level, variant_status="described",
+                               variant_context=variant["description"], variant_source=variant["source"])
+            else:
+                context.update(variant_status="not_curated", variant_context=t("reference.variant_unknown"))
         # E concerns missing variant interpretation; GenCC status is its own field.
+    if rsid and not spec:
+        catalogue_gene = (core.loci().get("loci", {}).get(rsid) or {}).get("gene")
+        if catalogue_gene and catalogue_gene != gene:
+            from .scientific_review import physical_position_genes
+            if physical_position_genes().get(rsid) == gene:
+                original = genome_context(catalogue_gene, rsid)["reference_context"]
+                context.update({key: original[key] for key in
+                                ("level", "variant_status", "variant_context", "variant_source", "notice")
+                                if key in original})
+                context["variant_catalogue_gene"] = catalogue_gene
     identity=(core._read_knowledge('variant_reference_identity.json').get('variants') or {}).get(rsid)
     if identity and identity.get('gene') == gene:
         context.update(reference_identity=identity,reading_limit=t('reference.specialized_reading'))
     review=(core._read_knowledge('clinical_reference_review.json').get('positions') or {}).get(gene+'|'+rsid)
     if review and review.get('outcome') != 'existing_supported_basis':
         context['clinical_review']={k:review[k] for k in ('reviewed_on','outcome','limitations','subclaims')}
-    return {"gene": gene, "rsid": rsid, "level": context["level"],
-            "reference_context": _scientific_context(gene, rsid, context)}
+    return _annotate_catalogue_position({"gene": gene, "rsid": rsid, "level": context["level"],
+                     "reference_context": _scientific_context(gene, rsid, context)})
+
+
+def catalogue_records() -> dict[str, dict[str, Any]]:
+    return core._read_knowledge("thematic_variant_annotations.json").get("variants") or {}
+
+
+def catalogue_positions(gene: str, panel: str | None = None) -> list[str]:
+    return [rsid for rsid, entry in catalogue_records().items()
+            if entry["gene"].upper() == gene.upper()
+            and (panel is None or not entry.get("panels") or panel in entry["panels"])]
+
+
+def _annotate_catalogue_position(row: dict[str, Any]) -> dict[str, Any]:
+    """Project the database assertion and the research claim as separate references."""
+    rsid = row.get("rsid")
+    if not rsid:
+        return row
+    entry = catalogue_records().get(rsid.lower())
+    if not entry or entry["gene"] != row.get("gene"):
+        return row
+    context = row["reference_context"]
+    clinical = entry["kind"] == "clinical"
+    classification = entry.get("classification", "")
+    conditions = entry.get("conditions") or []
+    condition = (entry.get("condition") or {}).get("label") or " · ".join(c["name"] for c in conditions)
+    claim_key = "thematic.annotation.clinvar_group" if len(conditions) > 1 else "thematic.annotation.clinvar_claim"
+    claim = (t(claim_key, classification=t(
+        "thematic.annotation." + classification.lower().replace("/", "_").replace(" ", "_")),
+        disease=condition)
+        if clinical else entry["summary"])
+    details = [str(value) for value in (
+        (entry.get("inheritance") or {}).get("label"),
+        entry.get("mechanism"),
+        t("thematic.annotation." + entry["reading_note"]) if entry.get("reading_note") else None,
+        t("thematic.annotation.clinical_scope" if clinical else "thematic.annotation.research_scope"),
+    ) if value]
+    annotation = {**entry, "title": t("thematic.annotation." + entry["kind"]), "claim": claim,
+                  "details": details}
+    # ClinVar review status is not Scholion evidence. The external annotation
+    # gets no independent Scholion interpretation. The research rows have
+    # sourced association context, with no individual inference.
+    level = "E" if clinical else "C"
+    return {**row, **{key: entry[key] for key in ("chrom", "pos", "ref", "alt", "personal_call_supported")},
+            **({"hgvs": entry["hgvs"]} if entry.get("hgvs") else {}),
+            "level": level, "catalogue_kind": entry["kind"], "interpretation_applicable": False,
+            "reference_context": {**context, "level": level, "catalogue_annotation": annotation,
+                                  "variant_status": "described", "variant_context": claim}}
+
+
+def _catalogue_reference_lines(annotation: dict[str, Any]) -> list[str]:
+    if not annotation:
+        return []
+    review = t("web.gene_card.review_stars", n=annotation["stars"]) if annotation.get("stars") else ""
+    identity = f"GRCh38 · {annotation['chrom']}:{annotation['pos']} {annotation['ref']}>{annotation['alt']}"
+    return [line for line in (annotation["title"], identity, annotation.get("hgvs"), review,
+                              *annotation["details"], t("science.source_checked", date=annotation["checked_on"]),
+                              *annotation["sources"]) if line]

@@ -7,7 +7,7 @@
     "why_partial": "Class-name associations are retained. macrolide, ppi, nsaid, iodine and thiopurine have no action-system row; recorded laboratory monitoring can still relate them to a system. Sourced possible effects and monitoring are distinct from treatment indications. Unrecognised names remain unclassified.",
     "schema": "classes: { <med_classes.json class key>: { systems: [<radar_domains.json domain key>, ...], source: '<why this row is a fact>' } }",
     "source_tier": "curated_reference",
-    "updated": "2026-10-25",
+    "updated": "2026-11-04",
     "context_policy": "Nutrient/substance biology, research context, possible effect and monitoring remain separate. Out-of-model or formulation-dependent contexts are explicit, not forced into a System."
   },
   "classes": {
@@ -643,6 +643,29 @@
       },
       "scope": "navigation_context_not_personal_response_or_prescribing_rule",
       "disposition": "needs_formulation"
+    },
+    {
+      "names": [
+        "gentamicin",
+        "gentamicin sulfate",
+        "amikacin",
+        "tobramycin",
+        "streptomycin",
+        "gentamitsin",
+        "гентамицин",
+        "амикацин",
+        "тобрамицин",
+        "стрептомицин"
+      ],
+      "systems": [
+        "mitochondria"
+      ],
+      "relation": "monitoring",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8613315/",
+      "note": {
+        "en": "MT-RNR1-related hearing risk depends on an exact confirmed variant and exposure; this link does not prescribe or stop a drug.",
+        "ru": "Лекарственный риск для слуха при MT-RNR1 оценивают по точному подтверждённому варианту и экспозиции; связь не назначает и не отменяет препарат."
+      }
     }
   ]
 }

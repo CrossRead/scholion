@@ -48,13 +48,13 @@ KEYED = {
 #: lru_cache functions → the parameter that names the file, or «package» for a
 #: function of no arguments that reads only the catalogue every container shares.
 LRU = {
-    "genome.loci": "package",
     "genome.catalogue_assembly": "package",
     "genome._header": "vcf",
     "genome.samples_of": "vcf",
     "genome.assembly_evidence": "vcf",
     "genome._chr_prefix": "vcf",
     "tabixlite._index_cached": "vcf",
+    "mitochondria._digest": "filename",  # Tool path plus its filesystem witness; never a shared patient result.
 }
 
 DATA_PATHS = {"repo_dir", "profile_dir", "slot_dir", "raw_dir", "work_dir", "cache_dir",

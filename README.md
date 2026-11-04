@@ -11,7 +11,7 @@ Use the local web application, the command line, or an assistant connected throu
 MCP, a skill or an Ouroboros plugin. They share the same analysis core and selected
 profile. English and Russian interfaces are included.
 
-**Current source version: 0.7.6.** See [published releases](https://github.com/CrossRead/scholion/releases)
+**Current source version: 0.7.7.** See [published releases](https://github.com/CrossRead/scholion/releases)
 and [PyPI](https://pypi.org/project/scholion/) for the version available to install.
 Scholion is not a medical device, does not diagnose and does not change treatment.
 
@@ -80,7 +80,7 @@ reports of response have their own context. A normal recent result does not
 trigger a request for extra tests merely because there are too few points for a
 trend.
 
-The fifteen body systems retain their laboratory and genetic views; Fitness adds
+The sixteen body systems retain their laboratory and genetic views; Fitness adds
 wearable context. A system brings together current measurements, their history,
 relevant read variants and recorded prescriptions. Laboratory status and genetic
 reading coverage remain separate. Genetics is not added to the system's 0–100
@@ -97,7 +97,7 @@ actual genotype and reading quality, the known influence of the specific variant
 and applicable comparisons with laboratory data. Confidence and source details
 can be expanded.
 
-The reference contains **1469 genes across the fifteen systems** in the main
+The reference contains **1469 genes across the existing systems** in the main
 GenCC catalogue, with sourced English and Russian function descriptions.
 **525 distinct genes** also appear in thematic panels; the sets overlap. A
 separately labelled HHEX–IDE region is not counted as another gene. These are
@@ -348,7 +348,7 @@ selected profile. The host's own model setup is separate from the local engine.
 See [the connection guide](https://github.com/CrossRead/scholion/blob/main/docs/CONNECTING-AN-AGENT.md#the-embedded-ouroboros-interface)
 and the [plugin setup guide](https://github.com/CrossRead/scholion/blob/main/ouroboros_plugin/README.md).
 
-For a classic checkout, `scholion/ouroboros_tools.py` registers 40 `sch_*` tools. Install
+For a classic checkout, `scholion/ouroboros_tools.py` registers 41 `sch_*` tools. Install
 the engine in the interpreter used by Ouroboros, then place this import shim in
 its tools package, replacing `<ouroboros>` with the checkout path:
 

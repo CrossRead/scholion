@@ -73,6 +73,11 @@ READS = (
     Scenario('longevity', ('longevity',), 'GET /api/longevity', {}),
     Scenario('lipid-genetics', ('lipid-genetics',), 'GET /api/lipid-genetics', {}),
     Scenario('genome-status', ('genome-status',), 'GET /api/genome-status', {}),
+    Scenario('mitochondrial-system', ('system', 'mitochondria'), 'GET /api/system',
+             {'key': 'mitochondria'}, 'key=mitochondria'),
+    Scenario('mitochondrial-system-clinician', ('system', 'mitochondria', '--register', 'clinician'),
+             'GET /api/system', {'key': 'mitochondria', 'register': 'clinician'}, 'key=mitochondria&register=clinician'),
+    Scenario('mitochondria', ('mitochondria',), 'GET /api/mitochondria', {}),
     Scenario('sources', ('sources',), 'GET /api/sources', {}, web_field='data_sources'),
     Scenario('recompute-preview', ('recompute',), 'GET /api/recompute', {}),
 )

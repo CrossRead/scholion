@@ -138,6 +138,7 @@ packages = ["src/scholion"]
 # Without tests/ and run_tests.sh such a run is impossible in principle.
 [tool.hatch.build.targets.sdist]
 include = [
+    "/.gitattributes",
     "/docs",
     "/src/scholion",
     "/src/tools",

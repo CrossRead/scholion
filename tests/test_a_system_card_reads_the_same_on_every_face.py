@@ -67,7 +67,10 @@ class TestTheCommandLine(unittest.TestCase):
                     code, out = _main(["system", d["key"]])
                     self.assertEqual(0, code)
                     self.assertNotIn("nothing reportable was found", out.lower())
-                    if d["genetic_half"]:
+                    if d["key"] == "mitochondria":
+                        self.assertIn("mitochondrial BAM analysis is not recorded", out)
+                        self.assertNotIn("no genetic half by design", out)
+                    elif d["genetic_half"]:
                         self.assertIn("no genetic list for this system is in this build", out)
                     else:
                         self.assertIn("no genetic half by design", out)

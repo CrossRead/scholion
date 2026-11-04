@@ -10,7 +10,8 @@ from typing import Any
 
 from .. import core
 from ..i18n import t
-from ..panel_reference import genome_context
+from ..panel_reference import catalogue_positions, genome_context
+from ..scientific_review import physical_position_genes
 
 
 def thematic_catalogue() -> dict[str, Any]:
@@ -34,12 +35,17 @@ def thematic_reference(key: str) -> dict[str, Any]:
     spec = book["panels"][key]
     loci = core.loci().get("loci") or {}
     identities=core._read_knowledge('variant_reference_identity.json').get('variants') or {}
+    panel_genes = set(spec["genes"])
+    physical = physical_position_genes()
     genes = []
     regions = []
     for gene in spec["genes"] + (spec.get("regions") or []):
         row = genome_context(gene)
-        row["positions"] = [genome_context(gene, rsid) for rsid, loc in {**identities,**loci}.items()
-                            if loc.get("gene") == gene]
+        existing = [rsid for rsid, loc in {**identities, **loci}.items()
+                    if (physical[rsid] if physical.get(rsid) in panel_genes else loc.get("gene")) == gene]
+        # The same gene retains its known positions in every topic. Source
+        # panel tags scope the annotation, not whether a personal call exists.
+        row["positions"] = [genome_context(gene, rsid) for rsid in dict.fromkeys(existing + catalogue_positions(gene))]
         # A reference card describes a gene. E belongs to the uncurated variant
         # interpretation, not to how confidently we know the gene's function.
         row["level"] = row["reference_context"]["level"] = None
@@ -70,28 +76,32 @@ def thematic_reference(key: str) -> dict[str, Any]:
 @core.in_reading
 def thematic_readings(key: str, register: str) -> dict[str, Any]:
     """Positive catalogue readings only; a missing VCF row is not a negative."""
-    from .. import genome
+    from .. import genome, gene_region
     from .panel_intake import _intake_reading
 
     book = thematic_reference(key)
     state = genome.available()
     recorded = core.profile_genotypes()
+    has_bam = gene_region.bam_path() is not None
     for position in book["positions"]:
-        special=(position['reference_context'].get('reference_identity') or {}).get('personal_call_supported') is False
+        special = (position['reference_context'].get('reference_identity') or position).get('personal_call_supported') is False
         position["reading"] = _intake_reading(position["rsid"], state, 'indel_unsupported' if special else None,
-                                              recorded=recorded.get(position["rsid"]))
+                                              recorded=recorded.get(position["rsid"]),
+                                              verify_missing=not has_bam)
+    from ..personal_meaning import attach as attach_meaning
     from .labs import analyze_labs
     measured={m['key']:m for m in analyze_labs()['markers']}
+    for position in book["positions"]:
+        attach_meaning(position, measured)
     for gene in book['genes']+book['regions']:
         if gene.get('reading_request'):
             if state.get('ready'):
-                from .. import gene_region
                 region = gene_region.preview(gene['reading_request']['gene'])
+                if state.get('input_profile') == 'whole_genome' and all(p.get('catalogue_kind') for p in gene['positions']):
+                    region = gene_region.verify_empty_preview(region)
             else:
                 region = {'status': 'no_genome', 'gene': gene['gene'],
                           'message': t('genome.refused.' + (state.get('reason') or 'no_file'))}
-            # An actual regional result travels through CLI, web and agent tools.
-            # A gene has no single genotype; retain each position and its quality.
             gene['region_reading'] = region
         contexts=[gene['reference_context']]+[p['reference_context'] for p in gene['positions']]
         patterns={p['association_id']:p for c in contexts for p in c.get('mechanistic_hypotheses') or []}

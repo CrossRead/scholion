@@ -1,0 +1,150 @@
+{
+  "_meta": {
+    "source_tier": "curated_reference",
+    "reviewed": "2026-11-04",
+    "scope": "Exact-allele reference context. No penetrance, treatment, biological-age or lifespan calculator.",
+    "updated": "2026-11-04"
+  },
+  "pathways": [
+    {
+      "key": "mtrnr1",
+      "gene": "MT-RNR1",
+      "alleles": [
+        {
+          "position": 1555,
+          "ref": "A",
+          "alt": "G"
+        },
+        {
+          "position": 1494,
+          "ref": "C",
+          "alt": "T"
+        },
+        {
+          "position": 1095,
+          "ref": "T",
+          "alt": "C"
+        }
+      ],
+      "markers": [],
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC8613315/"
+      ],
+      "systems": [
+        "mitochondria"
+      ],
+      "level": "A",
+      "level_scope": "Clinical reference for the exact variant association, not evidence of disease in the person."
+    },
+    {
+      "key": "mttl1",
+      "gene": "MT-TL1",
+      "alleles": [
+        {
+          "position": 3243,
+          "ref": "A",
+          "alt": "G"
+        }
+      ],
+      "markers": [
+        "glucose",
+        "hba1c",
+        "c_peptide",
+        "creatinine"
+      ],
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK1233/"
+      ],
+      "systems": [
+        "glucose",
+        "pancreas",
+        "renal",
+        "mitochondria"
+      ],
+      "level": "A",
+      "level_scope": "Clinical reference for the exact variant association, not evidence of disease in the person."
+    },
+    {
+      "key": "lhon",
+      "gene": "MT-ND1 / MT-ND4 / MT-ND6",
+      "alleles": [
+        {
+          "position": 3460,
+          "ref": "G",
+          "alt": "A"
+        },
+        {
+          "position": 11778,
+          "ref": "G",
+          "alt": "A"
+        },
+        {
+          "position": 14484,
+          "ref": "T",
+          "alt": "C"
+        }
+      ],
+      "markers": [],
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK1174/"
+      ],
+      "systems": [
+        "mitochondria"
+      ],
+      "level": "A",
+      "level_scope": "Clinical reference for the exact variant association, not evidence of disease in the person."
+    },
+    {
+      "key": "mttk",
+      "gene": "MT-TK",
+      "alleles": [
+        {
+          "position": 8344,
+          "ref": "A",
+          "alt": "G"
+        }
+      ],
+      "markers": [
+        "ck",
+        "ldh"
+      ],
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK1520/"
+      ],
+      "systems": [
+        "fitness",
+        "mitochondria"
+      ],
+      "level": "A",
+      "level_scope": "Clinical reference for the exact variant association, not evidence of disease in the person."
+    },
+    {
+      "key": "mtatp6",
+      "gene": "MT-ATP6",
+      "alleles": [
+        {
+          "position": 8993,
+          "ref": "T",
+          "alt": "G"
+        },
+        {
+          "position": 8993,
+          "ref": "T",
+          "alt": "C"
+        }
+      ],
+      "markers": [
+        "ck"
+      ],
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/books/NBK1173/"
+      ],
+      "systems": [
+        "fitness",
+        "mitochondria"
+      ],
+      "level": "A",
+      "level_scope": "Clinical reference for the exact variant association, not evidence of disease in the person."
+    }
+  ]
+}

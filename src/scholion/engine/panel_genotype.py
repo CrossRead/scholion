@@ -28,6 +28,24 @@ def _has_alignment() -> bool:
     return bool(bam_path())
 
 
+def _reference_presumption_refusal(rsid: str, gene: str, scan: Dict[str, Any],
+                                  has_bam: bool) -> Optional[str]:
+    """A missing row can be qualified only for a known whole-genome locus."""
+    from .genomics import NARROW_INPUTS, gene_coverage
+
+    if has_bam:
+        return "alignment_at_hand"
+    if scan.get("input_profile") in NARROW_INPUTS:
+        return "narrow_input"
+    if scan.get("input_profile") != "whole_genome":
+        return "not_whole_genome"
+    if rsid not in (core.loci().get("loci") or {}):
+        return "not_in_catalogue"
+    if (gene_coverage(gene) or {}).get("state") in ("low", "gene_not_in_table"):
+        return "coverage_objects"
+    return None
+
+
 def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
               scan: Dict[str, Any], at=None, has_bam: Optional[bool] = None) -> Dict[str, Any]:
     """The person's genotype at one position, as a STATE of the named allele.
@@ -112,25 +130,10 @@ def _genotype(rsid: str, hgvs: str, gene: str, risk_allele: Optional[str],
         #    and no alignment is here to read it from — with one, the honest
         #    answer is «not read yet» and the step that reads it;
         #  · otherwise it stays `assumed_ref`: nothing to presume from.
-        from .genomics import NARROW_INPUTS, gene_coverage
         if has_bam is None:
             has_bam = _has_alignment()
-        why_not = None
-        if has_bam:
-            why_not = "alignment_at_hand"
-        elif scan.get("input_profile") in NARROW_INPUTS:
-            why_not = "narrow_input"
-        elif scan.get("input_profile") != "whole_genome":
-            # The rule says «whole-genome by its own breadth probe»; the check was a
-            # list of what is NOT allowed, so an exome and a file whose breadth was
-            # never classified passed it. Outside an exome's targets a missing row
-            # is a position nobody sequenced, not a reference.
-            why_not = "not_whole_genome"
-        elif rsid not in (core.loci().get("loci") or {}):
-            why_not = "not_in_catalogue"
-        elif (gene_coverage(gene) or {}).get("state") in ("low", "gene_not_in_table"):
-            why_not = "coverage_objects"
-        elif not risk_allele:
+        why_not = _reference_presumption_refusal(rsid, gene, scan, has_bam)
+        if not why_not and not risk_allele:
             why_not = "risk_allele_not_declared"
         if why_not:
             return {**out, "state": "unread", "read": False, "why": "assumed_ref", "presumed_refused": why_not}

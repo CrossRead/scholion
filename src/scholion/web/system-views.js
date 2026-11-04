@@ -132,6 +132,18 @@ function geneticPanelSummary(r){
   return lines.length?`<section class="layer" data-system-genetic-summary><h3 class="cr-h3">${esc(t('web.system.genetic_summary'))}</h3>${lines.map(line=>`<p class="muted">${esc(line)}</p>`).join('')}</section>`:'';
 }
 
+function mitochondrialContextHtml(c){
+  const group=c.haplogroup?.name||'—';
+  const source=s=>/^https:\/\//.test(s)?`<a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s)}</a>`:'';
+  const observations=p=>(p.observations||[]).map(m=>`<div class="row-l"><b>${esc(m.name)}</b>: ${esc(m.censored||'')}${esc(fmtNum(m.value))} ${esc(m.unit_display||m.unit||'')} <span class="meta">${esc(fmtDate(m.date))}</span>${m.series?.length>1?sparkline(m.series):''}</div>`).join('');
+  const reports=rows=>(rows||[]).map(e=>`<p>${esc(e.detail?.summary||'')}</p>`).join('');
+  return `<p>${esc(c.message)}</p>${c.status==='available'?`<p>${esc(t('mt.system.readings',{n:(c.variants||[]).length,group}))}</p>${!c.current?`<p class="cr-caption">${esc(t('mt.stale'))}</p>`:''}`:''}
+    <a class="cr-btn cr-btn--ghost" href="#genome/mito" data-genome-pane="mito">${esc(t('mt.system.open'))}</a>
+    ${(c.pathways||[]).map(p=>`<section class="cr-card card mt-2"><h4>${esc(p.title)}</h4><p><b>${esc(p.gene)} m.${esc(p.variant.position)}${esc(p.variant.ref)}&gt;${esc(p.variant.alt)}</b> · ${esc(fmtNum(p.variant.fraction*100))}%</p><p>${esc(p.summary)}</p><p class="cr-caption">${esc(p.status_text)}</p><p>${esc(p.clinical_context_text||'')}</p>${observations(p)}${(p.medications||[]).length?`<p>${esc(t('mt.system.related_treatment'))}: ${p.medications.map(m=>esc(m.name)).join(', ')}</p>`:''}${reports(p.reported_responses)}<details class="fold"><summary>${esc(t('mt.meaning'))}</summary>${levelChip(p.level)} <span>${esc(p.level_scope||'')}</span><p>${p.sources.map(source).join(' · ')}</p></details></section>`).join('')}
+    ${(c.lifestyle||[]).length||(c.responses||[]).length?`<details class="fold"><summary>${esc(t('mt.system.context'))}</summary>${reports(c.responses)}${(c.lifestyle||[]).map(l=>`<p>${esc(l.note||[l.label||l.key,l.value_display??l.value,l.unit_display,l.date].filter(x=>x!=null).join(' · '))}</p>`).join('')}</details>`:''}
+    <details class="fold"><summary>${esc(t('mt.meaning'))}</summary>${(c.limitations||[]).map(s=>`<p>${esc(s)}</p>`).join('')}</details>`;
+}
+
 function systemCardHtml(r){
   const L=[]; const layer=(n,key,body)=>L.push(`<div class="layer"><h3 class="cr-h3">${n}. ${esc(t(key))}</h3>${body}</div>`);
   if(r.on_demand){
@@ -146,7 +158,8 @@ function systemCardHtml(r){
   }
   const lab=r.labs||{};
   let b='';
-  if(lab.status==='absent') b=`<div class="row-l">${esc(t('system.labs.absent'))}</div>`;
+  if(lab.status==='context') b=`<p>${esc(t('system.labs.context',{measured:lab.measured||0}))}</p><p class="cr-caption">${esc(lab.score_note||'')}</p>`;
+  else if(lab.status==='absent') b=`<div class="row-l">${esc(t('system.labs.absent'))}</div>`;
   else if(lab.status==='nodata') b=`<div class="row-l">${esc(t('system.labs.nodata',{total:lab.total||0}))}</div>`;
   else{
     b=`<div class="row-l">${esc(t('system.labs.line',{score:lab.score,level:t('system.level.'+(lab.level||'nodata')),measured:lab.measured||0,total:lab.total||0}))}</div>`;
@@ -172,7 +185,7 @@ function systemCardHtml(r){
   // The genotype of the system first, in the words a person reads; the list it
   // was composed from, every position's card and the scores fold under it —
   // open in the clinician's register, where they are the point.
-  const summary=genSummaryHtml(gen,r);
+  const summary=r.mitochondrial_context?mitochondrialContextHtml(r.mitochondrial_context):genSummaryHtml(gen,r);
   b='';
   if(gen.status==='composed'){
     const base=gen.base||{};
@@ -187,7 +200,7 @@ function systemCardHtml(r){
     b+=genTableHtml(gen,r,r.register);
     if(gen.rows_withheld_as_detail) b+=`<div class="row-l muted">${esc(t('system.row.patient_withheld',{n:gen.rows_withheld_as_detail}))}</div>`;
   }
-  if(!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
+  if(!r.mitochondrial_context&&!(gen.positions||[]).length) b+=systemPolygenicHtml(gen.polygenic, r.register);
   b=summary+thematicPanelLinks(r.thematic_panels)+(b?`<details class="fold" data-genetic-catalogue><summary>${esc(t('web.system.genetics_detail'))}</summary>${b}</details>`:'');
   layer(3,'system.layer.genetics',b);
   b=correctionRoutesHtml(r.correction_routes,r.register);

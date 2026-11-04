@@ -69,6 +69,17 @@ for(language of ['en','ru'])for(selected of [false,true]){
   }
  }
 }
+for(language of ['en','ru']){
+ const c=ScholionSystemCases.cases.find(c=>c.id==='system');
+ const html=component.systemCardHtml({...c.args[0],mitochondrial_context:{
+   status:'available',current:false,message:'Saved',variants:[{}],haplogroup:{name:'H'},
+   pathways:[{title:'Exact allele',gene:'MT-TL1',variant:{position:3243,ref:'A',alt:'G',fraction:.2},
+     summary:'Reference',clinical_context_text:'Normal findings',observations:[],sources:['https://example.org/','javascript:bad'],
+     medications:[{name:'<script>unsafe'}]}],limitations:[]}});
+ assert.ok(html.includes('data-genome-pane="mito"'));
+ assert.ok(html.includes('Normal findings'));assert.ok(html.includes('https://example.org/'));
+ assert.ok(!html.includes('javascript:bad'));assert.ok(!html.includes('<script>unsafe'));
+}
 assert.equal(JSON.stringify(ScholionSystemCases),before);
 assert.equal(component.controlsHtml([]),'');assert.equal(component.treatmentHtml(null),'');
 '''

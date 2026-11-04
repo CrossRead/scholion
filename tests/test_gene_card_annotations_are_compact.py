@@ -77,7 +77,10 @@ for(const c of JSON.parse(fs.readFileSync(0,'utf8'))){
  messages=c.messages;
  const before=JSON.stringify(c.row),row=c.row,html=geneFindingCards(row);
  const visible=html.split('data-gene-description>')[1].split('</div></div>')[0];
- assert.ok(visible.includes(row.gene_contexts[0].reference_context.gene_function));
+ const geneFunction=esc(row.gene_contexts[0].reference_context.gene_function);
+ assert.ok(html.includes(geneFunction));
+ assert.ok(html.indexOf(geneFunction)<html.indexOf('data-gene-description'));
+ assert.ok(!visible.includes(geneFunction));
  assert.ok(!visible.includes(row.personal_context.inclusion_reason));
  assert.ok(!visible.includes(t('reference.variant_unknown')));
  assert.ok(html.includes(esc(row.personal_context.inclusion_reason)));

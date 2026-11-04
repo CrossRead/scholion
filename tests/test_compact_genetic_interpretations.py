@@ -76,7 +76,7 @@ for(const register of ['patient','clinician']){
  assert.ok(!table.includes('ABSENT'));assert.ok(!table.includes('UNREAD'));
  for(const level of ['A','B','C','D','E']){
   assert.ok(table.includes('INTERPRETATION_'+level));assert.ok(table.includes('FUNCTION_'+level));
-  assert.ok(table.includes('data-panel-gene="GENE_'+level+'"'));assert.ok(table.includes('data-level="'+level+'"'));
+  assert.ok(table.includes('>GENE_'+level+'</strong>'));assert.ok(table.includes('data-level="'+level+'"'));
   const disclosure=table.match(new RegExp('<details class="gene-card-fold" data-gene-annotations[^>]*>','g'));
   assert.equal(disclosure.length,5);assert.ok(!disclosure.some(x=>x.includes(' open')));
   assert.ok(!table.includes('system.hyp.no_sentence'));
@@ -150,15 +150,21 @@ for(const c of cases)for(const register of ['patient','clinician']){
  const gen={positions:c.kind==='position'?[p]:[],rows:[p]},card={key:c.key,register};
  const html=genTableHtml(gen,card,register),id=(c.kind==='position'?'p:'+p.gene+':'+p.rsid:'g:'+p.gene);
  assert.equal((html.match(/data-gene-card /g)||[]).length,1,id);
- assert.ok(html.includes('data-panel-gene="'+esc(p.gene)+'"'),id);
+ const symbol=p.gene||p.reference_context?.canonical_symbol;
+ if(symbol)assert.ok(html.includes('>'+esc(symbol)+'</a>')||html.includes('>'+esc(symbol)+'</strong>'),id);
+ else assert.ok(!html.includes('<div class="gene-card-name"><a'),id);
  const detail=html;
  const context=p.reference_context;
- for(const field of ['gene_function','variant_context','gene_source','limitations'])
+ for(const field of [context.gene_role_detail?'gene_role_detail':'gene_function','variant_context','limitations'])
   if(context[field])assert.ok(detail.includes(esc(context[field])),id+' '+field);
- if(context.variant_source && !detail.includes(esc(context.variant_source))){
-  const sources=(context.scientific_review||[]).filter(r=>r.scope==='variant').flatMap(r=>r.sources||[]);
-  assert.ok(sources.length && sources.every(source=>detail.includes(esc(source))),id+' variant source scope lost');
- }
+ const sourceVisible=(raw,scopes)=>{
+  if(!raw||detail.includes(esc(raw)))return true;
+  const links=(context.scientific_review||[]).filter(r=>scopes.includes(r.scope))
+   .flatMap(r=>r.source_details?.length?r.source_details.map(source=>source.url||source.citation):r.sources||[]);
+  return links.length && links.every(source=>detail.includes(esc(source)));
+ };
+ assert.ok(sourceVisible(context.gene_source,['gene_function','gene_identity']),id+' gene source scope lost');
+ assert.ok(sourceVisible(context.variant_source,['variant','literature_direction','study_membership']),id+' variant source scope lost');
  if(c.kind==='position'){
   if(p.level)assert.ok(html.includes('data-level="'+p.level+'"'),id);
   const sentence=p.interpretation.summary;

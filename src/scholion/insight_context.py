@@ -40,6 +40,7 @@ def _genetic_context(row: dict, markers: dict) -> dict | None:
     if not text:
         return None
     result = {k: row.get(k) for k in ('gene', 'rsid', 'state', 'level', 'read_state', 'depth_note', 'passport')}
+    result['personal_meaning'] = row.get('personal_meaning')
     result.update(genotype=genotype, interpretation=interpretation, reference_context=reference,
                   summary=text, status='context_only', causal=False,
                   source=interpretation.get('source') or reference.get('gene_source'))
@@ -62,6 +63,9 @@ def _genetic_context(row: dict, markers: dict) -> dict | None:
                 marker_basis={'source': joined['source'], 'mechanism': joined['summary'],
                               'knowledge': joined['knowledge'], 'status': 'complete'})
 
+    meaning = result.get('personal_meaning') or {}
+    if meaning.get('summary'):
+        result['summary'] = meaning['summary']
     return result
 
 

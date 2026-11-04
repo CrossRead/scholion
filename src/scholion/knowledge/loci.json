@@ -9,7 +9,7 @@
   "regions_note": "`regions` holds whole-gene windows for the alignment target. A point locus is padded from `loci` and needs nothing here; a gene lands here only when A POINT IS NOT ENOUGH — CYP2D6 is called from structural variation (Cyrius/PyPGx over the BAM), so the gene has to be in the target entire. Two entries would already be one too many: every window is a coordinate, and coordinates written twice drift. `src/ingest/fastq_to_vcf.sh` generates its BED from `loci` plus this section — it carries no table of its own.",
   "pending": "Not entered and requiring a separate tool: UGT1A1*28 (a TA repeat in the promoter — not a SNP, PyPGx or a targeted indel call is needed), CYP2D6 as a whole (structural variants — Cyrius/PyPGx on top of the BAM). CLOSED 17.08.2026 — DPYD *13 (rs55886062). It was held out because the coordinate the old script carried had never been checked against a primary source; chr1:97515787 A>C is now confirmed in dbSNP and the locus is in `loci` and in the interpretation model. The note stays instead of being deleted: what was withheld, and on what the withholding ended, is worth more than a clean list. CYP2D6 likewise now has a declared window in `regions` for the alignment target — the structural call on top of the BAM is still a separate tool. CLOSED 13.09.2026 — FADS1 rs174537 and rs174546: the coordinates were verified against Ensembl REST GRCh38 and NCBI dbSNP esummary while the radar-segment panels were composed, and both loci are in `loci` with the omega-3 conversion note the vitamins panel reads.",
   "celiac_hla_note": "The coeliac tag-SNP panel (Monsuur 2008): DQ2.5=rs2187668, DQ2.2=rs7775228+rs2395182(+rs4713586 to exclude DQ4), DQ8=rs7454108, DQ7.5=rs4639334. rs2187668 alone is NOT ENOUGH: it only sees DQ2.5 in the cis configuration. The combination DQ2.2 + DQ7.5 gives DQ2.5 in trans (the DR5/DR7 genotype) — a coeliac risk factor that a panel without rs4639334 misses (a false-negative result). Added on 14.08.2026.",
-  "updated": "2026-10-05",
+  "updated": "2026-11-04",
   "source_tier": "primary_literature",
   "assembly_secondary": "GRCh37",
   "assembly_secondary_note": {
@@ -40,6 +40,391 @@
   }
  },
  "loci": {
+ "rs6068812": {
+  "gene": "CYP24A1",
+  "chrom": "20",
+  "pos": 54158096,
+  "pos_grch37": 52774635,
+  "ref": "A",
+  "alt": "G",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6068812",
+  "note": {
+   "en": "p.Leu409Ser. Experimental assays showed reduced vitamin D catabolism for this substitution. The variant has been reported in infantile hypercalcemia. Interpretation requires recessive inheritance and biochemical findings.",
+   "ru": "p.Leu409Ser. Эксперименты показали снижение активности распада метаболитов витамина D при этой замене. Вариант описан при младенческой гиперкальциемии. Для оценки нужны биохимические данные и учёт рецессивного наследования."
+  }
+ },
+ "rs137852870": {
+  "gene": "BCKDHA",
+  "chrom": "19",
+  "pos": 41424582,
+  "pos_grch37": 41930487,
+  "ref": "T",
+  "alt": "A",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/137852870",
+  "note": {
+   "en": "p.Tyr438Asn. The substitution affects the E1α subunit of the complex that degrades branched-chain amino acids. The variant is a documented cause of recessive maple syrup urine disease. Assessment uses the other allele and amino-acid measurements.",
+   "ru": "p.Tyr438Asn. Замена затрагивает субъединицу E1α комплекса, расщепляющего аминокислоты с разветвлённой цепью. Вариант описан при рецессивной болезни кленового сиропа. Для оценки учитывают второй аллель и уровни аминокислот."
+  }
+ },
+ "rs80338770": {
+  "gene": "SLC46A1",
+  "chrom": "17",
+  "pos": 28405360,
+  "pos_grch37": 26732378,
+  "ref": "G",
+  "alt": "A",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/80338770",
+  "note": {
+   "en": "p.Arg113Cys. The mutant protein reached the cell membrane but showed markedly impaired folate transport in a cell model. The variant was reported in recessive hereditary folate malabsorption. A single site cannot establish the cause of an individual’s folate level.",
+   "ru": "p.Arg113Cys. В клеточной модели изменённый белок достигал мембраны, но переносил фолат значительно хуже. Вариант описан при наследственной рецессивной мальабсорбции фолата. По одной позиции нельзя установить причину уровня фолата у человека."
+  }
+ },
+ "rs550423482": {
+  "gene": "PNPO",
+  "chrom": "17",
+  "pos": 47946670,
+  "pos_grch37": 46024036,
+  "ref": "G",
+  "alt": "A",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/550423482",
+  "note": {
+   "en": "p.Arg225His. Experimental assays showed reduced pyridox(am)ine 5′-phosphate oxidase activity. The variant was observed in recessive PNPO deficiency. A single site does not determine vitamin B6 status or treatment.",
+   "ru": "p.Arg225His. В экспериментах выявлена сниженная активность пиридокс(ам)ин-5′-фосфатоксидазы. Вариант наблюдали при рецессивном дефиците PNPO. По одной позиции нельзя определить обеспеченность витамином B6 или выбрать лечение."
+  }
+ },
+ "rs199689137": {
+  "gene": "ABCG5",
+  "chrom": "2",
+  "pos": 43822924,
+  "pos_grch37": 44050063,
+  "ref": "G",
+  "alt": "A",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/199689137",
+  "note": {
+   "en": "p.Arg446Ter. The substitution creates a premature stop in the ABCG5 sterol transporter. The variant was reported in sitosterolemia. Clinical assessment depends on the allele combination and measured plant sterols.",
+   "ru": "p.Arg446Ter. Замена создаёт преждевременный стоп-кодон в транспортёре стеролов ABCG5. Вариант описан при ситостеролемии. Для оценки важны сочетание аллелей и измеренные уровни растительных стеролов."
+  }
+ },
+ "rs2236418": {
+  "gene": "GAD2",
+  "chrom": "10",
+  "pos": 26216567,
+  "pos_grch37": 26505496,
+  "ref": "A",
+  "alt": "G",
+  "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2236418",
+  "note": {
+   "en": "−243 A>G. A reporter assay suggested altered promoter activity, with conflicting results in an independent experiment. The initial association with severe obesity was not reproduced in the replication study. These data do not establish individual GABA levels or behavioural traits.",
+   "ru": "−243 A>G. Эксперимент с репортёрным геном показал изменение активности промотора, но независимая работа дала другой результат. Первоначальная связь с тяжёлым ожирением не подтвердилась при независимой проверке. По этим данным нельзя определить личный уровень ГАМК или особенности поведения."
+  }
+ },
+    "rs1801260": {
+      "gene": "CLOCK",
+      "chrom": "4",
+      "pos": 55435202,
+      "pos_grch37": 56301369,
+      "ref": "A",
+      "alt": "G",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801260",
+      "note": {
+        "en": "The 3′-UTR substitution altered CLOCK expression in a cell model. Human studies disagree on its association with chronotype.",
+        "ru": "Замена в 3′-нетранслируемой области меняла экспрессию CLOCK в клеточной модели. Результаты исследований связи с хронотипом расходятся."
+      }
+    },
+    "rs6280": {
+      "gene": "DRD3",
+      "chrom": "3",
+      "pos": 114171968,
+      "pos_grch37": 113890815,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6280",
+      "note": {
+        "en": "A small PET study reported differences in reward-associated striatal dopamine release across genotypes.",
+        "ru": "В небольшом исследовании с ПЭТ генотипы различались по высвобождению дофамина в стриатуме в ответ на вознаграждение."
+      }
+    },
+    "rs184039278": {
+      "gene": "CRY1",
+      "chrom": "12",
+      "pos": 106992962,
+      "pos_grch37": 107386740,
+      "ref": "T",
+      "alt": "G",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/184039278",
+      "note": {
+        "en": "The substitution causes exon 11 skipping and was associated with delayed sleep timing in studied families. The magnitude is not transferable to an individual.",
+        "ru": "Замена вызывает пропуск экзона 11 и была связана с более поздним временем сна в изученных семьях. Величину эффекта для конкретного человека по ней определить нельзя."
+      }
+    },
+    "rs201220841": {
+      "gene": "CRY2",
+      "chrom": "11",
+      "pos": 45867648,
+      "pos_grch37": 45889199,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/201220841",
+      "note": {
+        "en": "The change promoted CRY2 degradation in experimental models. Early sleep timing was reported in one family with variable expression.",
+        "ru": "В экспериментальных моделях замена ускоряла распад CRY2. В одной семье описана связь с ранним временем сна, проявления различались."
+      }
+    },
+    "rs121908635": {
+      "gene": "PER2",
+      "chrom": "2",
+      "pos": 238257003,
+      "pos_grch37": 239165644,
+      "ref": "T",
+      "alt": "C",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/121908635",
+      "note": {
+        "en": "The change reduced PER2 phosphorylation in vitro and segregated with early sleep timing in the studied family.",
+        "ru": "Замена снижала фосфорилирование PER2 in vitro и наследовалась вместе с ранним временем сна в изученной семье."
+      }
+    },
+    "rs228697": {
+      "gene": "PER3",
+      "chrom": "1",
+      "pos": 7827519,
+      "pos_grch37": 7887579,
+      "ref": "C",
+      "alt": "G",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/228697",
+      "note": {
+        "en": "One Japanese study associated this variant with diurnal preference. It does not establish individual chronotype or the PER3 tandem repeat.",
+        "ru": "В одном японском исследовании вариант был связан с предпочтительным временем сна. По нему нельзя определить личный хронотип или число повторов PER3."
+      }
+    },
+    "rs2735611": {
+      "gene": "PER1",
+      "chrom": "17",
+      "pos": 8144965,
+      "pos_grch37": 8048283,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2735611",
+      "note": {
+        "en": "A candidate-gene study associated this synonymous variant with extreme diurnal preference. A direct mechanism was not established.",
+        "ru": "В исследовании генов-кандидатов синонимический вариант был связан с крайними вариантами хронотипа. Прямой механизм не установлен."
+      }
+    },
+    "rs6318": {
+      "gene": "HTR2C",
+      "chrom": "X",
+      "pos": 114731326,
+      "pos_grch37": 113965735,
+      "ref": "C",
+      "alt": "G",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6318",
+      "note": {
+        "en": "Cys23Ser altered receptor localization and signaling in vitro. This X-linked position does not determine personal serotonin signaling or treatment response.",
+        "ru": "Cys23Ser менял локализацию рецептора и передачу сигнала in vitro. Эта позиция на X-хромосоме не определяет личную серотониновую активность или ответ на лечение."
+      },
+      "assembly_alleles": {
+        "GRCh37": {
+          "position": 113965735,
+          "ref": "G",
+          "alt": "C",
+          "source": "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/6318"
+        }
+      }
+    },
+    "rs3745274": {
+      "gene": "CYP2B6",
+      "chrom": "19",
+      "pos": 41006936,
+      "pos_grch37": 41512841,
+      "ref": "G",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/3745274",
+      "note": {
+        "en": "The substitution affects splicing and contributes to reduced expression. Interpretation for efavirenz in CPIC uses the CYP2B6 diplotype and clinical context.",
+        "ru": "Замена влияет на сплайсинг и способствует снижению экспрессии. Интерпретация для эфавиренза по CPIC опирается на диплотип CYP2B6 и клинический контекст."
+      }
+    },
+    "rs5522": {
+      "gene": "NR3C2",
+      "chrom": "4",
+      "pos": 148436323,
+      "pos_grch37": 149357475,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/5522",
+      "note": {
+        "en": "Ile180Val showed different cortisol-dependent activity in vitro. Studies of the physiological stress response gave different results.",
+        "ru": "Ile180Val менял активность рецептора при действии кортизола in vitro. Результаты исследований физиологической реакции на стресс расходятся."
+      }
+    },
+    "rs27072": {
+      "gene": "SLC6A3",
+      "chrom": "5",
+      "pos": 1394407,
+      "pos_grch37": 1394522,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/27072",
+      "note": {
+        "en": "Allelic expression and cell assays support a regulatory effect in the studied models. The position does not type the transporter tandem repeat or establish a psychiatric phenotype.",
+        "ru": "Анализ экспрессии и клеточные эксперименты поддерживают регуляторный эффект в изученных моделях. Эта позиция не определяет число повторов транспортёра или психиатрический фенотип."
+      }
+    },
+    "rs34637584": {
+      "gene": "LRRK2",
+      "chrom": "12",
+      "pos": 40340400,
+      "pos_grch37": 40734202,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/34637584",
+      "note": {
+        "en": "This variant was reported in familial Parkinson disease and has incomplete, age-dependent penetrance. A single reading does not establish a diagnosis.",
+        "ru": "Вариант описан при семейной болезни Паркинсона. Проявления зависят от возраста и возникают не у всех носителей. Одного чтения для диагноза недостаточно."
+      }
+    },
+    "rs104893877": {
+      "gene": "SNCA",
+      "chrom": "4",
+      "pos": 89828149,
+      "pos_grch37": 90749300,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/104893877",
+      "note": {
+        "en": "Ala53Thr co-segregated with Parkinson disease in studied families. Personal assessment requires clinical and family context.",
+        "ru": "В изученных семьях Ala53Thr наследовался вместе с болезнью Паркинсона. Для личной оценки нужны клинические и семейные данные."
+      }
+    },
+    "rs35599367": {
+      "gene": "CYP3A4",
+      "chrom": "7",
+      "pos": 99768693,
+      "pos_grch37": 99366316,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/35599367",
+      "note": {
+        "en": "This intronic variant is associated with altered splicing and reduced hepatic expression. The observation does not supply a medication dose.",
+        "ru": "Интронный вариант связан с изменением сплайсинга и снижением экспрессии в печени. Из этого наблюдения нельзя вывести дозу лекарства."
+      }
+    },
+    "rs76151636": {
+      "gene": "ATP7B",
+      "chrom": "13",
+      "pos": 51944145,
+      "pos_grch37": 52518281,
+      "ref": "G",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/76151636",
+      "note": {
+        "en": "The substitution affected ATP7B trafficking in experimental systems. Wilson disease is assessed in a recessive and clinical context.",
+        "ru": "В экспериментальных моделях замена нарушала внутриклеточный транспорт ATP7B. Болезнь Вильсона оценивают с учётом рецессивного наследования и клинических данных."
+      }
+    },
+    "rs77931234": {
+      "gene": "ACADM",
+      "chrom": "1",
+      "pos": 75761161,
+      "pos_grch37": 76226846,
+      "ref": "A",
+      "alt": "G",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/77931234",
+      "note": {
+        "en": "This substitution was identified in people with MCAD deficiency. A single position does not establish a recessive disorder or fatty-acid oxidation capacity.",
+        "ru": "Замена обнаружена у пациентов с дефицитом MCAD. Чтение одной позиции не определяет способность окислять жирные кислоты и не устанавливает рецессивное заболевание."
+      }
+    },
+    "rs953413": {
+      "gene": "ELOVL2",
+      "chrom": "6",
+      "pos": 11012626,
+      "pos_grch37": 11012859,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/953413",
+      "note": {
+        "en": "A population GWAS associated this position with plasma EPA. It does not measure the person’s fatty acids or determine response to a supplement.",
+        "ru": "В популяционном исследовании позиция была связана с концентрацией ЭПК в плазме. По ней нельзя определить личный уровень жирных кислот или ответ на добавку."
+      }
+    },
+    "rs1801725": {
+      "gene": "CASR",
+      "chrom": "3",
+      "pos": 122284910,
+      "pos_grch37": 122003757,
+      "ref": "G",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801725",
+      "note": {
+        "en": "A meta-analysis associated Ala986Ser with a small difference in serum calcium. Measured calcium and clinical context remain necessary for assessment.",
+        "ru": "В метаанализе Ala986Ser был связан с небольшой разницей сывороточного кальция. Для оценки нужны фактический анализ и клинические данные."
+      }
+    },
+    "rs2707466": {
+      "gene": "WNT16",
+      "chrom": "7",
+      "pos": 121339035,
+      "pos_grch37": 120979089,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2707466",
+      "note": {
+        "en": "Human studies associated this coding position with cortical thickness and bone mineral density. It does not estimate individual fracture risk.",
+        "ru": "В исследованиях у людей кодирующая позиция была связана с толщиной кортикальной кости и минеральной плотностью. Она не оценивает личный риск перелома."
+      }
+    },
+    "rs1883832": {
+      "gene": "CD40",
+      "chrom": "20",
+      "pos": 46118343,
+      "pos_grch37": 44746982,
+      "ref": "T",
+      "alt": "C",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1883832",
+      "note": {
+        "en": "The C/T position affected CD40 translation in the studied assays and was investigated in Graves disease. It does not establish individual thyroid status.",
+        "ru": "Позиция C/T влияла на трансляцию CD40 в экспериментах и изучалась при болезни Грейвса. По ней нельзя определить индивидуальное состояние щитовидной железы."
+      }
+    },
+    "rs5030858": {
+      "gene": "PAH",
+      "chrom": "12",
+      "pos": 102840493,
+      "pos_grch37": 103234271,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/5030858",
+      "note": {
+        "en": "Arg408Trp has been reported in PAH deficiency. Interpretation of this recessive condition requires the other allele and biochemical context.",
+        "ru": "Arg408Trp описан при дефиците фенилаланингидроксилазы. Для оценки этого рецессивного состояния важны второй аллель и биохимические данные."
+      }
+    },
+    "rs1799884": {
+      "gene": "GCK",
+      "chrom": "7",
+      "pos": 44189469,
+      "pos_grch37": 44229068,
+      "ref": "C",
+      "alt": "T",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1799884",
+      "note": {
+        "en": "This promoter position was associated with fasting glucose across population cohorts. The association does not establish diabetes or a monogenic GCK disorder.",
+        "ru": "Позиция промотора была связана с глюкозой натощак в нескольких популяционных когортах. По этой ассоциации нельзя установить диабет или моногенное нарушение GCK."
+      }
+    },
+    "rs662799": {
+      "gene": "APOA5",
+      "chrom": "11",
+      "pos": 116792991,
+      "pos_grch37": 116663707,
+      "ref": "G",
+      "alt": "A",
+      "coordinate_source": "NCBI RefSNP primary assembly placements, checked 2026-11-04: https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/662799",
+      "note": {
+        "en": "This regulatory position was associated with fasting triglycerides in several studied populations. It does not give an individual triglyceride value.",
+        "ru": "Регуляторная позиция была связана с триглицеридами натощак в нескольких изученных популяциях. Личное значение триглицеридов определяют по анализу."
+      }
+    },
   "rs121908529": {
    "gene": "AGXT",
    "chrom": "2",

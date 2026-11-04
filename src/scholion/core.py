@@ -898,8 +898,9 @@ def _read_text(path: Path) -> str:
 LOCALIZABLE_FIELDS = {
     # explanations and verdicts
     "note", "why", "reason", "action", "advice", "caveat", "comment",
-    "interpretation", "recommendation", "evidence_note", "validity_note",
+    "interpretation", "patient_summary", "recommendation", "evidence_note", "validity_note",
     "limitations", "evidence_reason", "allele_note",
+    "comparator", "study_scope", "study_summary",
     "meaning", "effect", "mechanism", "manage", "claim", "effect_size", "context",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
     "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",
@@ -984,7 +985,7 @@ def _localized(value: Any, lang: str) -> Any:
 # unit cannot be converted. A field-name rule cannot reach inside a map keyed by
 # data, which is what this set is for.
 LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status",
-                          "convert_refused",
+                          "convert_refused", "patient_gene_roles", "genotypes",
                           # Task 200, keyed by a name the code compares and a
                           # phrase the reader sees: the chain links of a system,
                           # the routes protein arrives by, what each route state
@@ -1009,7 +1010,8 @@ LOCALIZABLE_CONTAINERS = {"alternatives", "confidence_modifiers", "review_status
 # phenotype, reads to the language audit as a map of translations. It is declared
 # structural here — its values are objects, and the audit walks INTO them, so the
 # prose inside still has to sit in a curated field.
-STRUCTURAL_LANGUAGE_MAPS = {"labels", "guidance_gaps"}
+# Diploid letter pairs are data keys too; personal_meaning reads their prose.
+STRUCTURAL_LANGUAGE_MAPS = {"labels", "guidance_gaps", "genotypes"}
 
 
 def _localize_tree(node: Any, lang: str) -> Any:

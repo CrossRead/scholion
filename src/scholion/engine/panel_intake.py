@@ -32,6 +32,8 @@ def author_readings() -> Dict[str, Any]:
                                          recorded.get(row["rsid"]))
         row["value_only"] = row.get("level") == "E"
         row['decision_route'] = decision_route(row, markers)
+        from ..personal_meaning import attach as attach_meaning
+        attach_meaning(row, markers)
     book.update(reference_only=False, patient_readings=True, register="clinician",
                 reading_note=_t("panel.patient_readings_note"), genome_status=state)
     book["counts"]["read"] = sum(p["reading"]["read"] for p in book["positions"])
@@ -39,7 +41,8 @@ def author_readings() -> Dict[str, Any]:
 
 
 def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = None,
-                    recorded: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+                    recorded: Optional[Dict[str, Any]] = None, *,
+                    verify_missing: bool = False) -> Dict[str, Any]:
     from .. import genome
     out: Dict[str, Any] = {"read": False, "genotype": None, "reason": None}
     value: Dict[str, Any] = {}
@@ -58,6 +61,8 @@ def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = N
         except (OSError, ValueError):
             # A failed local read is shown as a refusal, never a reference call.
             value = {"confidence": "read_failed"}
+        if verify_missing and value.get("confidence") == "assumed_ref":
+            value = genome._verify_missing_position(rsid, loc, value, state)
         confidence = value.get("confidence")
         out["confidence"] = confidence
         out["source"] = value.get("source")
@@ -70,9 +75,9 @@ def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = N
             out["reason"] = "not_positively_read"
     from ..variant_readings import resolve
     selected = resolve(rsid, value or {"confidence": out["reason"]}, recorded) or {}
-    out.update({k: selected[k] for k in ("reading_record", "conflict", "interpretation_applicable",
+    out.update({k: selected[k] for k in ("reading_record", "conflict", "interpretation_applicable", "interpretation_restriction",
                 "variant_identity", "raw_genotype", "phased", "assembly", "read_pos", "note",
-                "source_identity", "from_profile") if k in selected})
+                "source_identity", "from_profile", "reference_presumed", "bam_check") if k in selected})
     if selected.get("confidence") in ("called", "confirmed_ref", "called_array", "reported") and selected.get("genotype"):
         is_report = selected.get("confidence") == "reported"
         out.update(read=True, genotype=selected["genotype"],
@@ -85,5 +90,6 @@ def _intake_reading(rsid: str, state: Dict[str, Any], refusal: Optional[str] = N
                           if is_report else _t("system.row.genotype", genotype=out["genotype"],
                             confidence=out["confidence"], depth=out["depth"] if out["depth"] is not None else "—"))
     else:
-        out["message"] = _t("panel.reading." + (out["reason"] or "not_positively_read"))
+        out["message"] = (out.get("note") if out.get("reference_presumed") or out.get("bam_check")
+                          else _t("panel.reading." + (out["reason"] or "not_positively_read")))
     return out

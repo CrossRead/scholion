@@ -652,6 +652,13 @@ def health_radar() -> Dict[str, Any]:
                         "total": 0, "measured": 0, "missing": [], "ok": 0, "abnormal": [],
                         "unread": type(exc).__name__})
 
+    policies = {d["key"]: d for d in core._read_knowledge("radar_domains.json").get("domains", [])}
+    for domain in domains:
+        if policies.get(domain["key"], {}).get("score_policy") == "context_only":
+            domain.update(score=None, prev_score=None, compared_score=None, delta=None,
+                          prev_date=None, compared=0, moved=[], missing=[],
+                          status="context", score_policy="context_only",
+                          score_note=_t("system.context_score"))
     scored = [d for d in domains if d["score"] is not None]
     overall = round(sum(d["score"] for d in scored) / len(scored)) if scored else None
     withprev = [d for d in scored if d.get("prev_score") is not None]

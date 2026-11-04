@@ -1,0 +1,5720 @@
+{
+  "_meta": {
+    "updated": "2026-11-04",
+    "checked_on": "2026-11-04",
+    "source_tier": "curated_reference",
+    "clinical_snapshot": "ClinVar variant_summary 2026-11-01 and versioned RCV records",
+    "scope": "Scoped database classifications and research associations, separate from automatic findings"
+  },
+  "variants": {
+    "rs146292819": {
+      "gene": "ABCA1",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 104794495,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 107556776,
+      "hgvs": "NM_005502.4(ABCA1):c.5398A>C (p.Asn1800His)",
+      "personal_call_supported": true,
+      "rcv": "RCV001537869.5",
+      "vcv": "VCV000364389.44",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hypoalphalipoproteinemia, primary, 1",
+          "db": "MedGen",
+          "id": "C5231558"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-11-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001537869.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/364389/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs146292819"
+      ]
+    },
+    "rs72558201": {
+      "gene": "ABCC2",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 99836193,
+      "ref": "A",
+      "alt": "T",
+      "pos_grch37": 101595950,
+      "hgvs": "NM_000392.5(ABCC2):c.3517A>T (p.Ile1173Phe)",
+      "personal_call_supported": true,
+      "rcv": "RCV000008929.14",
+      "vcv": "VCV000008418.17",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dubin-Johnson syndrome",
+          "db": "MedGen",
+          "id": "C0022350"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-04-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000008929.14/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/8418/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs72558201"
+      ]
+    },
+    "rs151344623": {
+      "gene": "ABCC8",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 17397055,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 17418602,
+      "hgvs": "NM_000352.6(ABCC8):c.3989-9G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000009656.18",
+      "vcv": "VCV000009088.56",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperinsulinemic hypoglycemia, familial, 1",
+          "db": "MedGen",
+          "id": "C2931832"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-05-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000009656.18/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/9088/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs151344623"
+      ]
+    },
+    "rs767795583": {
+      "gene": "ABCD4",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 74287858,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 74754561,
+      "hgvs": "NM_005050.4(ABCD4):c.1588C>T (p.Gln530Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000707417.12",
+      "vcv": "VCV000583152.11",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Methylmalonic acidemia with homocystinuria, type cblJ",
+          "db": "MedGen",
+          "id": "C3553915"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2017-10-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000707417.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/583152/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs767795583"
+      ]
+    },
+    "rs957176669": {
+      "gene": "ABCG8",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 43871975,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 44099114,
+      "hgvs": "NM_022437.3(ABCG8):c.965-1G>C",
+      "personal_call_supported": true,
+      "rcv": "RCV001784224.11",
+      "vcv": "VCV000546173.30",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Sitosterolemia 1",
+          "db": "MedGen",
+          "id": "C2749759"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001784224.11/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/546173/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs957176669"
+      ]
+    },
+    "rs11887534": {
+      "gene": "ABCG8",
+      "kind": "research",
+      "chrom": "2",
+      "pos": 43839108,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 44066247,
+      "panels": [
+        "hepatic_genetics"
+      ],
+      "summary": {
+        "en": "The C allele was associated with gallstone disease in several cohorts.",
+        "ru": "В нескольких когортах аллель C был связан с желчнокаменной болезнью."
+      },
+      "trait": "gallstone disease",
+      "checked_on": "2026-11-04",
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC4959966/",
+        "https://pubmed.ncbi.nlm.nih.gov/17626266/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/11887534"
+      ],
+      "personal_call_supported": true
+    },
+    "rs113994167": {
+      "gene": "ACADVL",
+      "kind": "clinical",
+      "chrom": "17",
+      "pos": 7222272,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 7125591,
+      "hgvs": "NM_000018.4(ACADVL):c.848T>C (p.Val283Ala)",
+      "personal_call_supported": true,
+      "rcv": "RCV000020081.75",
+      "vcv": "VCV000021025.114",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Very long chain acyl-CoA dehydrogenase deficiency",
+          "db": "MedGen",
+          "id": "C3887523"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2022-08-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000020081.75/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/21025/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs113994167"
+      ]
+    },
+    "rs387906592": {
+      "gene": "ACTA2",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 88941309,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 90701066,
+      "hgvs": "NM_001613.4(ACTA2):c.536G>A (p.Arg179His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000022437.61",
+      "vcv": "VCV000029598.104",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Multisystemic smooth muscle dysfunction syndrome",
+          "db": "MedGen",
+          "id": "C3151201"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-11-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000022437.61/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/29598/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs387906592"
+      ]
+    },
+    "rs121918608": {
+      "gene": "AHCY",
+      "kind": "clinical",
+      "chrom": "20",
+      "pos": 34292375,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 32880181,
+      "hgvs": "NM_000687.4(AHCY):c.428A>G (p.Tyr143Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000013819.39",
+      "vcv": "VCV000012953.22",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hypermethioninemia with deficiency of S-adenosylhomocysteine hydrolase",
+          "db": "MedGen",
+          "id": "C3151058"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-12",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000013819.39/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12953/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121918608"
+      ]
+    },
+    "rs182820353": {
+      "gene": "AKR1D1",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 138107522,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 137792268,
+      "hgvs": "NM_005989.4(AKR1D1):c.797G>A (p.Arg266Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV001374413.11",
+      "vcv": "VCV001064451.9",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Congenital bile acid synthesis defect 2",
+          "db": "MedGen",
+          "id": "C1856127"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001374413.11/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1064451/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs182820353"
+      ]
+    },
+    "rs78532707": {
+      "gene": "ALDH4A1",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 18881699,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 19208193,
+      "hgvs": "NM_003748.4(ALDH4A1):c.866+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000505674.21",
+      "vcv": "VCV000438800.17",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperprolinemia type 2",
+          "db": "MedGen",
+          "id": "C2931835"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000505674.21/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/438800/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs78532707"
+      ]
+    },
+    "rs121912708": {
+      "gene": "ALDH7A1",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 126583997,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 125919689,
+      "hgvs": "NM_001182.5(ALDH7A1):c.328C>T (p.Arg110Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000019611.50",
+      "vcv": "VCV000017995.71",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pyridoxine-dependent epilepsy",
+          "db": "MedGen",
+          "id": "C1849508"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-03-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000019611.50/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/17995/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121912708"
+      ]
+    },
+    "rs121917814": {
+      "gene": "AMACR",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 34007866,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 34007971,
+      "hgvs": "NM_014324.6(AMACR):c.154T>C (p.Ser52Pro)",
+      "personal_call_supported": true,
+      "rcv": "RCV000005858.18",
+      "vcv": "VCV000005523.30",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Alpha-methylacyl-CoA racemase deficiency",
+          "db": "MedGen",
+          "id": "C3280428"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005858.18/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5523/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121917814"
+      ]
+    },
+    "rs386834170": {
+      "gene": "AMN",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 102928424,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 103394761,
+      "hgvs": "NM_030943.4(AMN):c.208-2A>G",
+      "personal_call_supported": true,
+      "rcv": "RCV000005037.12",
+      "vcv": "VCV000056751.46",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Imerslund-Grasbeck syndrome type 2",
+          "db": "MedGen",
+          "id": "C4016948"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-05-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005037.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/56751/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs386834170",
+        "https://pubmed.ncbi.nlm.nih.gov/22078000/"
+      ],
+      "condition": {
+        "label": {
+          "en": "Imerslund-Grasbeck syndrome type 2",
+          "ru": "Синдром Имерслунда–Гресбека типа 2"
+        }
+      },
+      "inheritance": {
+        "label": {
+          "en": "Autosomal recessive",
+          "ru": "Аутосомно-рецессивное"
+        }
+      },
+      "mechanism": {
+        "en": "The change disrupts the splice acceptor and leads to exon 4 skipping with a frameshift.",
+        "ru": "Замена нарушает акцептор сплайсинга и приводит к пропуску экзона 4 со сдвигом рамки."
+      },
+      "panels": [
+        "vitamin_genetics"
+      ]
+    },
+    "rs121964985": {
+      "gene": "AMT",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 49417892,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 49455325,
+      "hgvs": "NM_000481.4(AMT):c.959G>A (p.Arg320His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000012759.52",
+      "vcv": "VCV000011979.76",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Glycine encephalopathy",
+          "db": "MedGen",
+          "id": "C0751748"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000012759.52/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/11979/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121964985"
+      ]
+    },
+    "rs121908405": {
+      "gene": "ANKH",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 14716715,
+      "ref": "GGAA",
+      "alt": "G",
+      "pos_grch37": 14716824,
+      "hgvs": "NM_054027.6(ANKH):c.1126TTC[1] (p.Phe377del)",
+      "personal_call_supported": false,
+      "rcv": "RCV000005501.5",
+      "vcv": "VCV000005191.13",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Craniometaphyseal dysplasia, autosomal dominant",
+          "db": "MedGen",
+          "id": "C1852502"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-09-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005501.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5191/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908405"
+      ],
+      "reading_note": "indel"
+    },
+    "rs199563828": {
+      "gene": "APOC2",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 44949217,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 45452474,
+      "hgvs": "NM_000483.5(APOC2):c.274C>T (p.Gln92Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV002249256.2",
+      "vcv": "VCV001685529.4",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial apolipoprotein C-II deficiency",
+          "db": "MedGen",
+          "id": "C1720779"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-05-04",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002249256.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1685529/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs199563828"
+      ]
+    },
+    "rs104894507": {
+      "gene": "APRT",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 88810450,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 88876858,
+      "hgvs": "NM_000485.3(APRT):c.294G>A (p.Trp98Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000033905.21",
+      "vcv": "VCV000018298.9",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Adenine phosphoribosyltransferase deficiency",
+          "db": "MedGen",
+          "id": "C0268120"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-09-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000033905.21/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/18298/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894507"
+      ]
+    },
+    "rs104893944": {
+      "gene": "ARG1",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 131576666,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 131897806,
+      "hgvs": "NM_000045.4(ARG1):c.61C>T (p.Arg21Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000002498.38",
+      "vcv": "VCV000002397.29",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Arginase deficiency",
+          "db": "MedGen",
+          "id": "C0268548"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002498.38/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2397/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104893944"
+      ]
+    },
+    "rs28941473": {
+      "gene": "ASL",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 66086751,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 65551738,
+      "hgvs": "NM_000048.4(ASL):c.532G>A (p.Val178Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000002503.28",
+      "vcv": "VCV000002402.47",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Argininosuccinate lyase deficiency",
+          "db": "MedGen",
+          "id": "C0268547"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-06-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002503.28/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2402/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs28941473"
+      ]
+    },
+    "rs770944877": {
+      "gene": "ASS1",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 130458575,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 133333962,
+      "hgvs": "NM_054012.4(ASS1):c.349G>A (p.Gly117Ser)",
+      "personal_call_supported": true,
+      "rcv": "RCV000671967.20",
+      "vcv": "VCV000556029.25",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Citrullinemia type I",
+          "db": "MedGen",
+          "id": "C4721769"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000671967.20/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/556029/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs770944877"
+      ]
+    },
+    "rs398124598": {
+      "gene": "BCKDHB",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 80203114,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 80912831,
+      "hgvs": "NM_183050.4(BCKDHB):c.853C>T (p.Arg285Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000169304.25",
+      "vcv": "VCV000096615.48",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Maple syrup urine disease",
+          "db": "MedGen",
+          "id": "C0024776"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-09-08",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000169304.25/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/96615/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs398124598"
+      ]
+    },
+    "rs121908144": {
+      "gene": "BSND",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 54999221,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 55464894,
+      "hgvs": "NM_057176.3(BSND):c.35T>C (p.Ile12Thr)",
+      "personal_call_supported": true,
+      "rcv": "RCV002281695.2",
+      "vcv": "VCV000004388.20",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Bartter syndrome",
+          "db": "MedGen",
+          "id": "C0004775"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-02-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002281695.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/4388/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908144"
+      ]
+    },
+    "rs767402215": {
+      "gene": "CA5A",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 87936357,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 87969963,
+      "hgvs": "NM_001739.2(CA5A):c.94C>T (p.Arg32Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000691071.8",
+      "vcv": "VCV000570252.7",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperammonemic encephalopathy due to carbonic anhydrase VA deficiency",
+          "db": "MedGen",
+          "id": "C4706871"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-26",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000691071.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/570252/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs767402215"
+      ]
+    },
+    "rs267607277": {
+      "gene": "CALM1",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 90404386,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 90870730,
+      "hgvs": "NM_006888.6(CALM1):c.293A>G (p.Asn98Ser)",
+      "personal_call_supported": true,
+      "rcv": "RCV000032977.44",
+      "vcv": "VCV000039758.17",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Catecholaminergic polymorphic ventricular tachycardia 4",
+          "db": "MedGen",
+          "id": "C3554047"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-09-21",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000032977.44/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/39758/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs267607277"
+      ]
+    },
+    "rs147785187": {
+      "gene": "CBLIF",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 59845374,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 59612847,
+      "hgvs": "NM_005142.3(CBLIF):c.79+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000688054.35",
+      "vcv": "VCV000439755.38",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hereditary intrinsic factor deficiency",
+          "db": "MedGen",
+          "id": "C2062370"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-12",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000688054.35/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/439755/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs147785187"
+      ]
+    },
+    "rs5742907": {
+      "gene": "CETP",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 56982238,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 57016150,
+      "hgvs": "NM_000078.3(CETP):c.1321+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000019076.37",
+      "vcv": "VCV000017524.10",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperalphalipoproteinemia 1",
+          "db": "MedGen",
+          "id": "C3149462"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000019076.37/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/17524/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs5742907"
+      ]
+    },
+    "rs2303790": {
+      "gene": "CETP",
+      "kind": "research",
+      "chrom": "16",
+      "pos": 56983380,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 57017292,
+      "panels": [
+        "vascular_genetics"
+      ],
+      "summary": {
+        "en": "The G allele was associated with higher HDL-C in the subset with lipid measurements of a Chinese cohort.",
+        "ru": "В китайской когорте аллель G был связан с более высоким HDL-C в подвыборке с измеренными липидами."
+      },
+      "trait": "HDL cholesterol",
+      "checked_on": "2026-11-04",
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC5833522/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/2303790"
+      ],
+      "personal_call_supported": true
+    },
+    "rs121909133": {
+      "gene": "CLCNKB",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 16051724,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 16378219,
+      "hgvs": "NM_000085.5(CLCNKB):c.1312C>T (p.Arg438Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000008031.6",
+      "vcv": "VCV000007593.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Bartter disease type 3",
+          "db": "MedGen",
+          "id": "C1846343"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-07-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000008031.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/7593/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121909133"
+      ]
+    },
+    "rs104893729": {
+      "gene": "CLDN16",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 190404787,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 190122576,
+      "hgvs": "NM_006580.4(CLDN16):c.243G>T (p.Leu81Phe)",
+      "personal_call_supported": true,
+      "rcv": "RCV000006297.16",
+      "vcv": "VCV000005934.58",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Primary hypomagnesemia",
+          "db": "MedGen",
+          "id": "C0268448"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000006297.16/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5934/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104893729"
+      ]
+    },
+    "rs118203979": {
+      "gene": "CLDN19",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 42740005,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 43205676,
+      "hgvs": "NM_148960.3(CLDN19):c.59G>A (p.Gly20Asp)",
+      "personal_call_supported": true,
+      "rcv": "RCV000001426.15",
+      "vcv": "VCV000001361.19",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Renal hypomagnesemia 5 with ocular involvement",
+          "db": "MedGen",
+          "id": "C4721891"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-11-11",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001426.15/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1361/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs118203979"
+      ]
+    },
+    "rs67865220": {
+      "gene": "COL1A2",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 94409795,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 94039107,
+      "hgvs": "NM_000089.4(COL1A2):c.1009G>A (p.Gly337Ser)",
+      "personal_call_supported": true,
+      "rcv": "RCV002279258.13",
+      "vcv": "VCV000425643.61",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Osteogenesis imperfecta",
+          "db": "MedGen",
+          "id": "C0029434"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-03-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002279258.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/425643/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs67865220"
+      ]
+    },
+    "rs397509370": {
+      "gene": "COL3A1",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 188994595,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 189859321,
+      "hgvs": "NM_000090.4(COL3A1):c.1347+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV001184539.7",
+      "vcv": "VCV000017202.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial thoracic aortic aneurysm and aortic dissection",
+          "db": "MedGen",
+          "id": "C4707243"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-01-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001184539.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/17202/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs397509370"
+      ]
+    },
+    "rs371334239": {
+      "gene": "COL4A3",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 227263845,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 228128561,
+      "hgvs": "NM_000091.5(COL4A3):c.1216C>T (p.Arg406Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000589718.6",
+      "vcv": "VCV000495548.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal recessive Alport syndrome",
+          "db": "MedGen",
+          "id": "C4746745"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2016-06-26",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000589718.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/495548/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs371334239"
+      ]
+    },
+    "rs35138315": {
+      "gene": "COL4A4",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 227052367,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 227917083,
+      "hgvs": "NM_000092.5(COL4A4):c.2906C>G (p.Ser969Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000763076.12",
+      "vcv": "VCV000449549.51",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal recessive Alport syndrome",
+          "db": "MedGen",
+          "id": "C4746745"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-04-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000763076.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/449549/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs35138315"
+      ]
+    },
+    "rs281874753": {
+      "gene": "COL4A5",
+      "kind": "clinical",
+      "chrom": "X",
+      "pos": 108696340,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 107939570,
+      "hgvs": "NM_033380.3(COL4A5):c.5038C>T (p.Arg1680Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000021665.15",
+      "vcv": "VCV000024785.21",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "X-linked Alport syndrome",
+          "db": "MedGen",
+          "id": "C4746986"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-07",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000021665.15/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/24785/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs281874753"
+      ]
+    },
+    "rs80356774": {
+      "gene": "CPT1A",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 68807622,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 68575090,
+      "hgvs": "NM_001876.4(CPT1A):c.298C>T (p.Gln100Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000009630.18",
+      "vcv": "VCV000009063.17",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Carnitine palmitoyl transferase 1A deficiency",
+          "db": "MedGen",
+          "id": "C1829703"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-02-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000009630.18/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/9063/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs80356774"
+      ]
+    },
+    "rs74315293": {
+      "gene": "CPT2",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 53213509,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 53679181,
+      "hgvs": "NM_000098.3(CPT2):c.1891C>T (p.Arg631Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000202472.21",
+      "vcv": "VCV000008952.46",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Carnitine palmitoyltransferase II deficiency",
+          "db": "MedGen",
+          "id": "C0342790"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000202472.21/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/8952/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs74315293"
+      ]
+    },
+    "rs1554790861": {
+      "gene": "CUBN",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 16904073,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 16946072,
+      "hgvs": "NM_001081.4(CUBN):c.7955C>A (p.Ser2652Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000625850.8",
+      "vcv": "VCV000522697.7",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Imerslund-Grasbeck syndrome",
+          "db": "MedGen",
+          "id": "C4551825"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-04-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000625850.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/522697/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1554790861"
+      ]
+    },
+    "rs1801222": {
+      "gene": "CUBN",
+      "kind": "research",
+      "chrom": "10",
+      "pos": 17114152,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 17156151,
+      "panels": [
+        "vitamin_genetics"
+      ],
+      "summary": {
+        "en": "In metformin users, AA and AG were associated with B12 deficiency compared with GG.",
+        "ru": "У пользователей метформина AA и AG были связаны с дефицитом B12 по сравнению с GG."
+      },
+      "trait": "vitamin B12 deficiency in metformin users",
+      "checked_on": "2026-11-04",
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12957035/",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC5886186/",
+        "https://api.ncbi.nlm.nih.gov/variation/v0/refsnp/1801222"
+      ],
+      "personal_call_supported": true
+    },
+    "rs755186597": {
+      "gene": "CYP11A1",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 74343924,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 74636265,
+      "hgvs": "NM_000781.3(CYP11A1):c.694C>T (p.Arg232Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001780600.7",
+      "vcv": "VCV001322181.9",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Congenital adrenal insufficiency with 46, XY sex reversal OR 46,XY disorder of sex development-adrenal insufficiency due to CYP11A1 deficiency",
+          "db": "MedGen",
+          "id": "C3151055"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-05-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001780600.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1322181/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs755186597"
+      ]
+    },
+    "rs146124466": {
+      "gene": "CYP11B1",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 142875767,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 143957183,
+      "hgvs": "NM_000497.4(CYP11B1):c.1066C>T (p.Gln356Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000050222.12",
+      "vcv": "VCV000056830.25",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Deficiency of steroid 11-beta-monooxygenase",
+          "db": "MedGen",
+          "id": "C0268292"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-05-29",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000050222.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/56830/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs146124466"
+      ]
+    },
+    "rs121912978": {
+      "gene": "CYP11B2",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 142915087,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 143996503,
+      "hgvs": "NM_000498.3(CYP11B2):c.554C>T (p.Thr185Ile)",
+      "personal_call_supported": true,
+      "rcv": "RCV000018377.32",
+      "vcv": "VCV000016881.56",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Corticosterone methyloxidase type 2 deficiency",
+          "db": "MedGen",
+          "id": "C3463917"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-11-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000018377.32/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/16881/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121912978"
+      ]
+    },
+    "rs28936700": {
+      "gene": "CYP1B1",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 38075207,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 38302350,
+      "hgvs": "NM_000104.4(CYP1B1):c.182G>A (p.Gly61Glu)",
+      "personal_call_supported": true,
+      "rcv": "RCV006255119.1",
+      "vcv": "VCV000007730.82",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "CYP1B1-related glaucoma with or without anterior segment dysgenesis",
+          "db": "MedGen",
+          "id": "CN375931"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2025-11-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV006255119.1/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/7730/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs28936700"
+      ]
+    },
+    "rs6445": {
+      "gene": "CYP21A2",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 32041006,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 32008783,
+      "hgvs": "NM_000500.9(CYP21A2):c.1360C>T (p.Pro454Ser)",
+      "personal_call_supported": true,
+      "rcv": "RCV000012943.29",
+      "vcv": "VCV000012159.56",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "21-Hydroxylase-Deficient Congenital Adrenal Hyperplasia",
+          "db": "MedGen",
+          "id": "C2936858"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000012943.29/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12159/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs6445"
+      ]
+    },
+    "rs587778777": {
+      "gene": "CYP27A1",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 218814188,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 219678911,
+      "hgvs": "NM_000784.4(CYP27A1):c.1184+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000056073.44",
+      "vcv": "VCV000065833.88",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cholestanol storage disease",
+          "db": "MedGen",
+          "id": "C0238052"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-16",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000056073.44/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/65833/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs587778777"
+      ]
+    },
+    "rs121908613": {
+      "gene": "CYP7B1",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 64615716,
+      "ref": "A",
+      "alt": "T",
+      "pos_grch37": 65528273,
+      "hgvs": "NM_004820.5(CYP7B1):c.825T>A (p.Tyr275Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000006479.17",
+      "vcv": "VCV000006105.63",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hereditary spastic paraplegia 5A",
+          "db": "MedGen",
+          "id": "C1849115"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-12-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000006479.17/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/6105/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908613"
+      ]
+    },
+    "rs74103423": {
+      "gene": "DBT",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 100216085,
+      "ref": "C",
+      "alt": "A",
+      "pos_grch37": 100681641,
+      "hgvs": "NM_001918.5(DBT):c.670G>T (p.Glu224Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000179397.26",
+      "vcv": "VCV000094009.35",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Maple syrup urine disease",
+          "db": "MedGen",
+          "id": "C0024776"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000179397.26/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/94009/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs74103423"
+      ]
+    },
+    "rs200362242": {
+      "gene": "DDC",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 50528133,
+      "ref": "T",
+      "alt": "A",
+      "pos_grch37": 50595831,
+      "hgvs": "NM_001082971.2(DDC):c.714+4A>T",
+      "personal_call_supported": true,
+      "rcv": "RCV001071116.23",
+      "vcv": "VCV000864024.27",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Deficiency of aromatic-L-amino-acid decarboxylase",
+          "db": "MedGen",
+          "id": "C1291564"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001071116.23/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/864024/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs200362242"
+      ]
+    },
+    "rs121964990": {
+      "gene": "DLD",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 107915506,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 107555951,
+      "hgvs": "NM_000108.5(DLD):c.685G>T (p.Gly229Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000012744.65",
+      "vcv": "VCV000011966.75",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Pyruvate dehydrogenase E3 deficiency",
+          "db": "MedGen",
+          "id": "C5574660"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000012744.65/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/11966/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121964990"
+      ]
+    },
+    "rs121908331": {
+      "gene": "DMGDH",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 79055859,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 78351682,
+      "hgvs": "NM_013391.3(DMGDH):c.326A>G (p.His109Arg)",
+      "personal_call_supported": true,
+      "rcv": "RCV000005008.6",
+      "vcv": "VCV000004742.8",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Dimethylglycine dehydrogenase deficiency",
+          "db": "MedGen",
+          "id": "C1853892"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-12-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005008.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/4742/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908331"
+      ]
+    },
+    "rs941713150": {
+      "gene": "DNAJB11",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 186582011,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 186299800,
+      "hgvs": "NM_016306.6(DNAJB11):c.616C>T (p.Arg206Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000664421.6",
+      "vcv": "VCV000549851.8",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Polycystic kidney disease 6 with or without polycystic liver disease",
+          "db": "MedGen",
+          "id": "C4748044"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-08-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000664421.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/549851/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs941713150"
+      ]
+    },
+    "rs370032864": {
+      "gene": "DNAJC12",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 67797189,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 69556947,
+      "hgvs": "NM_021800.3(DNAJC12):c.524G>A (p.Trp175Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001093705.8",
+      "vcv": "VCV000870655.13",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperphenylalaninemia due to DNAJC12 deficiency",
+          "db": "MedGen",
+          "id": "C4479270"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-15",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001093705.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/870655/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs370032864"
+      ]
+    },
+    "rs199473690": {
+      "gene": "DNMT1",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 10155017,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 10265693,
+      "hgvs": "NM_001130823.3(DNMT1):c.1532A>G (p.Tyr511Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000022529.42",
+      "vcv": "VCV000029682.17",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hereditary sensory neuropathy-deafness-dementia syndrome",
+          "db": "MedGen",
+          "id": "C3279885"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-10-08",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000022529.42/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/29682/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs199473690"
+      ]
+    },
+    "rs1352259738": {
+      "gene": "DNMT3A",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 25282462,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 25505331,
+      "hgvs": "NM_022552.5(DNMT3A):c.427C>T (p.Arg143Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV003584898.5",
+      "vcv": "VCV001027657.10",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Tatton-Brown-Rahman overgrowth syndrome",
+          "db": "MedGen",
+          "id": "C4014545"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003584898.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1027657/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1352259738"
+      ]
+    },
+    "rs121908940": {
+      "gene": "DNMT3B",
+      "kind": "clinical",
+      "chrom": "20",
+      "pos": 32807793,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 31395599,
+      "hgvs": "NM_006892.4(DNMT3B):c.2452G>A (p.Val818Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000007126.10",
+      "vcv": "VCV000006734.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Immunodeficiency-centromeric instability-facial anomalies syndrome 1",
+          "db": "MedGen",
+          "id": "C4551557"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-12-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000007126.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/6734/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908940"
+      ]
+    },
+    "rs1986951516": {
+      "gene": "DSC2",
+      "kind": "clinical",
+      "chrom": "18",
+      "pos": 31074713,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 28654679,
+      "hgvs": "NM_024422.6(DSC2):c.1858C>T (p.Gln620Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001783146.10",
+      "vcv": "VCV001322771.10",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Arrhythmogenic right ventricular dysplasia 11",
+          "db": "MedGen",
+          "id": "C1864850"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-03-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001783146.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1322771/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1986951516"
+      ]
+    },
+    "rs121913008": {
+      "gene": "DSG2",
+      "kind": "clinical",
+      "chrom": "18",
+      "pos": 31519858,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 29099821,
+      "hgvs": "NM_001943.5(DSG2):c.137G>A (p.Arg46Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV000018305.58",
+      "vcv": "VCV000016812.39",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Arrhythmogenic right ventricular dysplasia 10",
+          "db": "MedGen",
+          "id": "C1857777"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000018305.58/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/16812/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121913008"
+      ]
+    },
+    "rs794728124": {
+      "gene": "DSP",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 7581402,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 7581635,
+      "hgvs": "NM_004415.4(DSP):c.5212C>T (p.Arg1738Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV004556760.2",
+      "vcv": "VCV000199890.25",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Arrhythmogenic right ventricular dysplasia 8",
+          "db": "MedGen",
+          "id": "C1843896"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-10-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV004556760.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/199890/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs794728124"
+      ]
+    },
+    "rs4774518": {
+      "gene": "DUOXA2",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 45117274,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 45409472,
+      "hgvs": "NM_207581.4(DUOXA2):c.738C>G (p.Tyr246Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000473.13",
+      "vcv": "VCV000000444.13",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Thyroglobulin synthesis defect",
+          "db": "MedGen",
+          "id": "C0342196"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-26",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000473.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/444/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs4774518"
+      ]
+    },
+    "rs80338895": {
+      "gene": "FAH",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 80168263,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 80460605,
+      "hgvs": "NM_000137.4(FAH):c.554-1G>T",
+      "personal_call_supported": true,
+      "rcv": "RCV000012649.52",
+      "vcv": "VCV000011874.68",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Tyrosinemia type I",
+          "db": "MedGen",
+          "id": "C0268490"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000012649.52/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/11874/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs80338895"
+      ]
+    },
+    "rs794728208": {
+      "gene": "FBN1",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 48485374,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 48777571,
+      "hgvs": "NM_000138.5(FBN1):c.3712G>A (p.Asp1238Asn)",
+      "personal_call_supported": true,
+      "rcv": "RCV000659532.9",
+      "vcv": "VCV000200022.43",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Marfan syndrome",
+          "db": "MedGen",
+          "id": "C0024796"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2024-05-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000659532.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/200022/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs794728208"
+      ]
+    },
+    "rs760345680": {
+      "gene": "FDXR",
+      "kind": "clinical",
+      "chrom": "17",
+      "pos": 74863914,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 72860036,
+      "hgvs": "NM_024417.5(FDXR):c.1156C>T (p.Arg386Trp)",
+      "personal_call_supported": true,
+      "rcv": "RCV002470935.5",
+      "vcv": "VCV000520994.17",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Auditory neuropathy-optic atrophy syndrome",
+          "db": "MedGen",
+          "id": "C4521678"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-12-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002470935.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/520994/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs760345680"
+      ]
+    },
+    "rs193922702": {
+      "gene": "FGF23",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 4370563,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 4479729,
+      "hgvs": "NM_020638.3(FGF23):c.536G>A (p.Arg179Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV000029798.12",
+      "vcv": "VCV000036135.19",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal dominant hypophosphatemic rickets",
+          "db": "MedGen",
+          "id": "C0342642"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2013-12-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000029798.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/36135/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs193922702"
+      ]
+    },
+    "rs121909518": {
+      "gene": "FLNC",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 128858475,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 128498529,
+      "hgvs": "NM_001458.5(FLNC):c.8130G>A (p.Trp2710Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000019978.35",
+      "vcv": "VCV000018314.58",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Myofibrillar myopathy 5",
+          "db": "MedGen",
+          "id": "C1836050"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-01-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000019978.35/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/18314/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121909518"
+      ]
+    },
+    "rs121918405": {
+      "gene": "FOLR1",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 72195454,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 71906498,
+      "hgvs": "NM_016729.3(FOLR1):c.352C>T (p.Gln118Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000017643.45",
+      "vcv": "VCV000016255.21",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cerebral folate transport deficiency",
+          "db": "MedGen",
+          "id": "C2751584"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000017643.45/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/16255/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121918405",
+        "https://pubmed.ncbi.nlm.nih.gov/19732866/"
+      ],
+      "condition": {
+        "label": {
+          "en": "Cerebral folate transport deficiency",
+          "ru": "Церебральный дефицит транспорта фолата"
+        }
+      },
+      "inheritance": {
+        "label": {
+          "en": "Autosomal recessive",
+          "ru": "Аутосомно-рецессивное"
+        }
+      },
+      "mechanism": {
+        "en": "The stop-gain results in receptor loss of function. Assessment of the disorder also depends on the second allele.",
+        "ru": "Стоп-вариант приводит к потере функции рецептора. Для оценки заболевания важна и вторая аллель."
+      },
+      "panels": [
+        "vitamin_genetics"
+      ]
+    },
+    "rs886039373": {
+      "gene": "GABRA1",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 161882639,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 161309645,
+      "hgvs": "NM_001127644.2(GABRA1):c.641G>A (p.Arg214His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000417089.8",
+      "vcv": "VCV000265162.59",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Developmental and epileptic encephalopathy, 19",
+          "db": "MedGen",
+          "id": "C3810400"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-05-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000417089.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/265162/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs886039373"
+      ]
+    },
+    "rs1064794996": {
+      "gene": "GABRB2",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 161331058,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 160758065,
+      "hgvs": "NM_001371727.1(GABRB2):c.902A>G (p.Tyr301Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV006447255.3",
+      "vcv": "VCV000421234.52",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Developmental and epileptic encephalopathy 92",
+          "db": "MedGen",
+          "id": "C4693362"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV006447255.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/421234/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1064794996"
+      ]
+    },
+    "rs137853086": {
+      "gene": "GALNT3",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 165770217,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 166626727,
+      "hgvs": "NM_004482.4(GALNT3):c.484C>T (p.Arg162Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000008235.10",
+      "vcv": "VCV000007792.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Tumoral calcinosis, hyperphosphatemic, familial, 1",
+          "db": "MedGen",
+          "id": "C4692564"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000008235.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/7792/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137853086"
+      ]
+    },
+    "rs754785664": {
+      "gene": "GANAB",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 62634891,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 62402363,
+      "hgvs": "NM_198334.3(GANAB):c.490C>T (p.Arg164Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV002503278.3",
+      "vcv": "VCV001327722.11",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Polycystic kidney disease 3 with or without polycystic liver disease",
+          "db": "MedGen",
+          "id": "C3887964"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-07-11",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002503278.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1327722/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs754785664"
+      ]
+    },
+    "rs80356771": {
+      "gene": "GBA1",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 155235196,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 155204987,
+      "hgvs": "NM_000157.4(GBA1):c.1504C>T (p.Arg502Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000004528.31",
+      "vcv": "VCV000004295.87",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Gaucher disease type I",
+          "db": "MedGen",
+          "id": "C1961835"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-07-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000004528.31/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/4295/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs80356771"
+      ]
+    },
+    "rs988395114": {
+      "gene": "GCH1",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 54845787,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 55312505,
+      "hgvs": "NM_000161.3(GCH1):c.607G>A (p.Gly203Arg)",
+      "personal_call_supported": true,
+      "rcv": "RCV002283480.7",
+      "vcv": "VCV000381665.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dystonia 5",
+          "db": "MedGen",
+          "id": "C1851920"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002283480.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/381665/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs988395114"
+      ]
+    },
+    "rs386833587": {
+      "gene": "GLDC",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 6605186,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 6605186,
+      "hgvs": "NM_000170.3(GLDC):c.806C>T (p.Thr269Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000049513.24",
+      "vcv": "VCV000056104.30",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Glycine encephalopathy",
+          "db": "MedGen",
+          "id": "C0751748"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-09-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000049513.24/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/56104/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs386833587"
+      ]
+    },
+    "rs1131691970": {
+      "gene": "GLUL",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 182388737,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 182357872,
+      "hgvs": "NM_001033044.4(GLUL):c.1A>G (p.Met1Val)",
+      "personal_call_supported": true,
+      "rcv": "RCV004782761.5",
+      "vcv": "VCV001194257.10",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Developmental and epileptic encephalopathy 116",
+          "db": "MedGen",
+          "id": "C5935615"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV004782761.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1194257/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1131691970"
+      ]
+    },
+    "rs797045046": {
+      "gene": "GNAS",
+      "kind": "clinical",
+      "chrom": "20",
+      "pos": 58891760,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 57466815,
+      "hgvs": "NM_000516.7(GNAS):c.34C>T (p.Gln12Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV002051824.4",
+      "vcv": "VCV000209158.15",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pseudopseudohypoparathyroidism",
+          "db": "MedGen",
+          "id": "C0033835"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-04-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002051824.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/209158/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs797045046"
+      ]
+    },
+    "rs752927520": {
+      "gene": "GOT2",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 58716732,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 58750636,
+      "hgvs": "NM_002080.4(GOT2):c.784C>G (p.Arg262Gly)",
+      "personal_call_supported": true,
+      "rcv": "RCV000851527.6",
+      "vcv": "VCV000691280.7",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Developmental and epileptic encephalopathy",
+          "db": "MedGen",
+          "id": "C5779964"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2020-05-29",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000851527.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/691280/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs752927520"
+      ]
+    },
+    "rs1300685456": {
+      "gene": "GPIHBP1",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 143215024,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 144296899,
+      "hgvs": "NM_178172.6(GPIHBP1):c.193T>C (p.Cys65Arg)",
+      "personal_call_supported": true,
+      "rcv": "RCV002251224.7",
+      "vcv": "VCV001687542.4",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperlipoproteinemia, type 1D",
+          "db": "MedGen",
+          "id": "C4014767"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002251224.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1687542/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1300685456"
+      ]
+    },
+    "rs190315044": {
+      "gene": "GPT2",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 46897678,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 46931590,
+      "hgvs": "NM_133443.4(GPT2):c.274C>T (p.Arg92Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001782232.6",
+      "vcv": "VCV001324512.5",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Glutamate pyruvate transaminase 2 deficiency",
+          "db": "MedGen",
+          "id": "C4225388"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-04-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001782232.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1324512/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs190315044"
+      ]
+    },
+    "rs119490108": {
+      "gene": "GRHPR",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 37426545,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 37426542,
+      "hgvs": "NM_012203.2(GRHPR):c.295C>T (p.Arg99Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000005991.15",
+      "vcv": "VCV000005637.22",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Primary hyperoxaluria, type II",
+          "db": "MedGen",
+          "id": "C0268165"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-04-01",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005991.15/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5637/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs119490108"
+      ]
+    },
+    "rs797044925": {
+      "gene": "GRIN1",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 137163668,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 140058120,
+      "hgvs": "NM_007327.4(GRIN1):c.2443G>A (p.Gly815Arg)",
+      "personal_call_supported": true,
+      "rcv": "RCV003528151.5",
+      "vcv": "VCV000208743.10",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Neurodevelopmental disorder with or without hyperkinetic movements and seizures, autosomal dominant",
+          "db": "MedGen",
+          "id": "C3280282"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-06-11",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003528151.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/208743/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs797044925"
+      ]
+    },
+    "rs2141346170": {
+      "gene": "GRIN2A",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 9841099,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 9934956,
+      "hgvs": "NM_001134407.3(GRIN2A):c.1334C>A (p.Ser445Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000793732.9",
+      "vcv": "VCV000640659.7",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Landau-Kleffner syndrome",
+          "db": "MedGen",
+          "id": "C0282512"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2018-07-16",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000793732.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/640659/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs2141346170"
+      ]
+    },
+    "rs398122824": {
+      "gene": "GRIN2B",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 13570019,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 13722953,
+      "hgvs": "NM_000834.5(GRIN2B):c.2172-2A>G",
+      "personal_call_supported": true,
+      "rcv": "RCV000032863.35",
+      "vcv": "VCV000039659.7",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Intellectual disability, autosomal dominant 6",
+          "db": "MedGen",
+          "id": "C3151411"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2020-09-01",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000032863.35/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/39659/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs398122824"
+      ]
+    },
+    "rs137852771": {
+      "gene": "HADHA",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 26194581,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 26417450,
+      "hgvs": "NM_000182.5(HADHA):c.1678C>T (p.Arg560Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001729343.6",
+      "vcv": "VCV000008732.24",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Long chain 3-hydroxyacyl-CoA dehydrogenase deficiency",
+          "db": "MedGen",
+          "id": "C3711645"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-08",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001729343.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/8732/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137852771"
+      ]
+    },
+    "rs267606859": {
+      "gene": "HADHB",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 26285546,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 26508414,
+      "hgvs": "NM_000183.3(HADHB):c.1364T>G (p.Val455Gly)",
+      "personal_call_supported": true,
+      "rcv": "RCV000015974.38",
+      "vcv": "VCV000014849.13",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Mitochondrial trifunctional protein deficiency",
+          "db": "MedGen",
+          "id": "C1969443"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-06-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000015974.38/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/14849/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs267606859"
+      ]
+    },
+    "rs74315323": {
+      "gene": "HJV",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 146018399,
+      "ref": "C",
+      "alt": "A",
+      "hgvs": "NM_213653.4(HJV):c.959G>T (p.Gly320Val)",
+      "personal_call_supported": true,
+      "rcv": "RCV000002461.26",
+      "vcv": "VCV000002365.73",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hemochromatosis type 2A",
+          "db": "MedGen",
+          "id": "C1865614"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002461.26/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2365/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs74315323"
+      ]
+    },
+    "rs754728827": {
+      "gene": "HNF1A",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 120989032,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 121426835,
+      "hgvs": "NM_000545.8(HNF1A):c.526C>T (p.Gln176Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV002222031.3",
+      "vcv": "VCV000372380.34",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Monogenic diabetes",
+          "db": "MedGen",
+          "id": "C3888631"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2022-04-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002222031.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/372380/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs754728827"
+      ]
+    },
+    "rs1057517744": {
+      "gene": "HNF1B",
+      "kind": "clinical",
+      "chrom": "17",
+      "pos": 37739443,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 36099434,
+      "hgvs": "NM_000458.4(HNF1B):c.541C>T (p.Arg181Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000787179.7",
+      "vcv": "VCV000372381.29",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Renal cysts and diabetes syndrome",
+          "db": "MedGen",
+          "id": "C0431693"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-07-23",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000787179.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/372381/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1057517744"
+      ]
+    },
+    "rs587777732": {
+      "gene": "HNF4A",
+      "kind": "clinical",
+      "chrom": "20",
+      "pos": 44406195,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 43034835,
+      "hgvs": "NM_175914.5(HNF4A):c.187C>T (p.Arg63Trp)",
+      "personal_call_supported": true,
+      "rcv": "RCV003993659.2",
+      "vcv": "VCV000156152.37",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Monogenic diabetes",
+          "db": "MedGen",
+          "id": "C3888631"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2024-04-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003993659.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/156152/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs587777732"
+      ]
+    },
+    "rs185803104": {
+      "gene": "HOGA1",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 97600168,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 99359925,
+      "hgvs": "NM_138413.4(HOGA1):c.700+5G>T",
+      "personal_call_supported": true,
+      "rcv": "RCV000186492.30",
+      "vcv": "VCV000204285.62",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Primary hyperoxaluria type 3",
+          "db": "MedGen",
+          "id": "C3150878"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000186492.30/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/204285/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs185803104"
+      ]
+    },
+    "rs137852865": {
+      "gene": "HPD",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 121849726,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 122287632,
+      "hgvs": "NM_002150.3(HPD):c.479A>G (p.Tyr160Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV001297386.9",
+      "vcv": "VCV000001573.12",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hawkinsinuria",
+          "db": "MedGen",
+          "id": "C2931042"
+        },
+        {
+          "name": "Tyrosinemia type III",
+          "db": "MedGen",
+          "id": "C0268623"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-02-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001297386.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1573/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137852865"
+      ]
+    },
+    "rs28934592": {
+      "gene": "HSD11B2",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 67436101,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 67470004,
+      "hgvs": "NM_000196.4(HSD11B2):c.623G>A (p.Arg208His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000012877.9",
+      "vcv": "VCV000012096.8",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Apparent mineralocorticoid excess",
+          "db": "MedGen",
+          "id": "C0342488"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-10-04",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000012877.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12096/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs28934592"
+      ]
+    },
+    "rs201115371": {
+      "gene": "HSD17B3",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 96254864,
+      "ref": "T",
+      "alt": "A",
+      "pos_grch37": 99017146,
+      "hgvs": "NM_000197.2(HSD17B3):c.277+4A>T",
+      "personal_call_supported": true,
+      "rcv": "RCV000190594.20",
+      "vcv": "VCV000208587.39",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Testosterone 17-beta-dehydrogenase deficiency",
+          "db": "MedGen",
+          "id": "C0268296"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000190594.20/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/208587/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs201115371"
+      ]
+    },
+    "rs148200568": {
+      "gene": "HSD3B2",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 119422504,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 119965127,
+      "hgvs": "NM_000198.4(HSD3B2):c.1003C>T (p.Arg335Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001830636.11",
+      "vcv": "VCV000597649.21",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "3 beta-Hydroxysteroid dehydrogenase deficiency",
+          "db": "MedGen",
+          "id": "C0342471"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001830636.11/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/597649/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs148200568"
+      ]
+    },
+    "rs104894518": {
+      "gene": "HSD3B7",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 30986612,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 30997933,
+      "hgvs": "NM_025193.4(HSD3B7):c.439G>A (p.Glu147Lys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000003018.10",
+      "vcv": "VCV000002884.9",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Congenital bile acid synthesis defect 1",
+          "db": "MedGen",
+          "id": "C1843116"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000003018.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2884/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894518"
+      ]
+    },
+    "rs587776916": {
+      "gene": "IFITM5",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 299504,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 299504,
+      "hgvs": "NM_001025295.3(IFITM5):c.-14C>T",
+      "personal_call_supported": true,
+      "rcv": "RCV000030773.32",
+      "vcv": "VCV000037143.72",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Osteogenesis imperfecta type 5",
+          "db": "MedGen",
+          "id": "C2931093"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-03-26",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000030773.32/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/37143/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs587776916",
+        "https://pubmed.ncbi.nlm.nih.gov/22863190/",
+        "https://pubmed.ncbi.nlm.nih.gov/22863195/"
+      ],
+      "condition": {
+        "label": {
+          "en": "Osteogenesis imperfecta type 5",
+          "ru": "Несовершенный остеогенез V типа"
+        }
+      },
+      "inheritance": {
+        "label": {
+          "en": "Autosomal dominant",
+          "ru": "Аутосомно-доминантное"
+        }
+      },
+      "mechanism": {
+        "en": "The variant creates an upstream translation start and extends the protein N terminus by five amino acids.",
+        "ru": "Вариант создаёт дополнительный старт трансляции и удлиняет N-конец белка на пять аминокислот."
+      },
+      "panels": [
+        "bone_genetics"
+      ]
+    },
+    "rs1566778676": {
+      "gene": "INF2",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 104703337,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 105169674,
+      "hgvs": "NM_022489.4(INF2):c.550G>A (p.Glu184Lys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000735726.4",
+      "vcv": "VCV000599128.17",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Focal segmental glomerulosclerosis 5",
+          "db": "MedGen",
+          "id": "C2750475"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000735726.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/599128/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1566778676"
+      ]
+    },
+    "rs748749585": {
+      "gene": "INS",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 2161302,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 2182532,
+      "hgvs": "NM_000207.3(INS):c.-152C>A",
+      "personal_call_supported": true,
+      "rcv": "RCV005044743.2",
+      "vcv": "VCV000431442.20",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Diabetes mellitus, permanent neonatal 4",
+          "db": "MedGen",
+          "id": "C5394307"
+        },
+        {
+          "name": "Hyperproinsulinemia",
+          "db": "MedGen",
+          "id": "C0342283"
+        },
+        {
+          "name": "Maturity-onset diabetes of the young type 10",
+          "db": "MedGen",
+          "id": "C3150617"
+        },
+        {
+          "name": "Type 1 diabetes mellitus 2",
+          "db": "MedGen",
+          "id": "C1852092"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV005044743.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/431442/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs748749585"
+      ]
+    },
+    "rs121918140": {
+      "gene": "IYD",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 150394226,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 150715362,
+      "hgvs": "NM_203395.3(IYD):c.658G>A (p.Ala220Thr)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000776.7",
+      "vcv": "VCV000000740.6",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Iodotyrosine deiodination defect",
+          "db": "MedGen",
+          "id": "C0342195"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-06-16",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000776.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/740/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121918140"
+      ]
+    },
+    "rs9333649": {
+      "gene": "KCNH2",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 150951679,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 150648767,
+      "hgvs": "NM_000238.4(KCNH2):c.1714G>A (p.Gly572Ser)",
+      "personal_call_supported": true,
+      "rcv": "RCV000678923.13",
+      "vcv": "VCV000067248.66",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Long QT syndrome 2",
+          "db": "MedGen",
+          "id": "C3150943"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-04",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000678923.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/67248/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs9333649"
+      ]
+    },
+    "rs199469632": {
+      "gene": "KLHL3",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 137637317,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 136973006,
+      "hgvs": "NM_017415.3(KLHL3):c.1298G>A (p.Ser433Asn)",
+      "personal_call_supported": true,
+      "rcv": "RCV000023480.4",
+      "vcv": "VCV000030523.8",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pseudohypoaldosteronism type 2D",
+          "db": "MedGen",
+          "id": "C3469605"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-03-04",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000023480.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/30523/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs199469632"
+      ]
+    },
+    "rs754953201": {
+      "gene": "KYNU",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 142986022,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 143743591,
+      "hgvs": "NM_003937.3(KYNU):c.902+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV001808860.6",
+      "vcv": "VCV001333644.5",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Vertebral, cardiac, renal, and limb defects syndrome 2",
+          "db": "MedGen",
+          "id": "C4540014"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001808860.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1333644/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs754953201"
+      ]
+    },
+    "rs137929307": {
+      "gene": "LDLR",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 11116928,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 11227604,
+      "hgvs": "NM_000527.5(LDLR):c.1775G>A (p.Gly592Glu)",
+      "personal_call_supported": true,
+      "rcv": "RCV000172964.57",
+      "vcv": "VCV000161271.106",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypercholesterolemia, familial, 1",
+          "db": "MedGen",
+          "id": "C0745103"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2021-06-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000172964.57/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/161271/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137929307"
+      ]
+    },
+    "rs121908325": {
+      "gene": "LDLRAP1",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 25557214,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 25883705,
+      "hgvs": "NM_015627.3(LDLRAP1):c.406C>T (p.Gln136Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000005041.19",
+      "vcv": "VCV000004775.19",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypercholesterolemia, familial, 4",
+          "db": "MedGen",
+          "id": "C1863512"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-10-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005041.19/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/4775/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121908325"
+      ]
+    },
+    "rs768709895": {
+      "gene": "LMBRD1",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 69697642,
+      "ref": "C",
+      "alt": "A",
+      "pos_grch37": 70407534,
+      "hgvs": "NM_018368.4(LMBRD1):c.1339-1G>T",
+      "personal_call_supported": true,
+      "rcv": "RCV001783602.10",
+      "vcv": "VCV001323238.8",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Methylmalonic aciduria and homocystinuria type cblF",
+          "db": "MedGen",
+          "id": "C1848578"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-11-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001783602.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1323238/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs768709895"
+      ]
+    },
+    "rs587777626": {
+      "gene": "LMF1",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 869908,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 919908,
+      "hgvs": "NM_022773.4(LMF1):c.1391G>A (p.Trp464Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000133508.15",
+      "vcv": "VCV000143993.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Lipase deficiency, combined",
+          "db": "MedGen",
+          "id": "C1855498"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000133508.15/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/143993/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs587777626"
+      ]
+    },
+    "rs61672878": {
+      "gene": "LMNA",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 156136094,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 156105885,
+      "hgvs": "NM_170707.4(LMNA):c.1130G>A (p.Arg377His)",
+      "personal_call_supported": true,
+      "rcv": "RCV003319170.2",
+      "vcv": "VCV000014495.37",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dilated cardiomyopathy 1A",
+          "db": "MedGen",
+          "id": "C5979868"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-07-31",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003319170.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/14495/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs61672878"
+      ]
+    },
+    "rs118204060": {
+      "gene": "LPL",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 19954279,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 19811790,
+      "hgvs": "NM_000237.3(LPL):c.701C>T (p.Pro234Leu)",
+      "personal_call_supported": true,
+      "rcv": "RCV001253353.4",
+      "vcv": "VCV000001527.27",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperlipidemia, familial combined, LPL related",
+          "db": "MedGen",
+          "id": "C0020474"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-05-04",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001253353.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1527/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs118204060"
+      ]
+    },
+    "rs328": {
+      "gene": "LPL",
+      "kind": "research",
+      "chrom": "8",
+      "pos": 19962213,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 19819724,
+      "panels": [
+        "vascular_genetics"
+      ],
+      "summary": {
+        "en": "In three prospective cohorts the G allele was associated with lower triglycerides and higher HDL-C.",
+        "ru": "В трёх проспективных когортах аллель G связывали с более низкими триглицеридами и более высоким HDL-C."
+      },
+      "trait": "plasma triglycerides and HDL cholesterol",
+      "checked_on": "2026-11-04",
+      "sources": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC3183417/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs328"
+      ],
+      "personal_call_supported": true
+    },
+    "rs72558181": {
+      "gene": "MAT1A",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 80275177,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 82034933,
+      "hgvs": "NM_000429.3(MAT1A):c.791G>A (p.Arg264His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000001267.20",
+      "vcv": "VCV000001208.54",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hepatic methionine adenosyltransferase deficiency",
+          "db": "MedGen",
+          "id": "C0268621"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-09-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001267.20/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1208/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs72558181"
+      ]
+    },
+    "rs538329212": {
+      "gene": "MICU1",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 72551317,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 74311075,
+      "hgvs": "NM_001195518.2(MICU1):c.355C>T (p.Arg119Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV004579549.4",
+      "vcv": "VCV000431921.15",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Proximal myopathy with extrapyramidal signs",
+          "db": "MedGen",
+          "id": "C3810285"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV004579549.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/431921/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs538329212"
+      ]
+    },
+    "rs121918241": {
+      "gene": "MMACHC",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 45508329,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 45974001,
+      "hgvs": "NM_015506.3(MMACHC):c.394C>T (p.Arg132Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000001488.61",
+      "vcv": "VCV000001423.72",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cobalamin C disease",
+          "db": "MedGen",
+          "id": "C1848561"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001488.61/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1423/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121918241"
+      ]
+    },
+    "rs886039425": {
+      "gene": "MMADHC",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 149576443,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 150432957,
+      "hgvs": "NM_015702.3(MMADHC):c.472C>T (p.Arg158Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001833299.9",
+      "vcv": "VCV000265247.12",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Methylmalonic aciduria and homocystinuria type cblD",
+          "db": "MedGen",
+          "id": "C1848552"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-31",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001833299.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/265247/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs886039425"
+      ]
+    },
+    "rs397515907": {
+      "gene": "MYBPC3",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 47342697,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 47364248,
+      "hgvs": "NM_000256.3(MYBPC3):c.1505G>A (p.Arg502Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV000168303.25",
+      "vcv": "VCV000042541.82",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypertrophic cardiomyopathy",
+          "db": "MedGen",
+          "id": "C0007194"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2025-11-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000168303.25/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/42541/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs397515907"
+      ]
+    },
+    "rs397514037": {
+      "gene": "MYH11",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 15721421,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 15815278,
+      "hgvs": "NM_002474.3(MYH11):c.4578+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV003150197.3",
+      "vcv": "VCV000372759.22",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Familial thoracic aortic aneurysm and aortic dissection",
+          "db": "MedGen",
+          "id": "C4707243"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003150197.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/372759/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs397514037"
+      ]
+    },
+    "rs371898076": {
+      "gene": "MYH7",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 23426833,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 23896042,
+      "hgvs": "NM_000257.4(MYH7):c.1988G>A (p.Arg663His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000168409.27",
+      "vcv": "VCV000042875.64",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypertrophic cardiomyopathy",
+          "db": "MedGen",
+          "id": "C0007194"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2016-12-15",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000168409.27/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/42875/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs371898076"
+      ]
+    },
+    "rs144139747": {
+      "gene": "NADSYN1",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 71491856,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 71202902,
+      "hgvs": "NM_018161.5(NADSYN1):c.1717G>A (p.Ala573Thr)",
+      "personal_call_supported": true,
+      "rcv": "RCV001035449.20",
+      "vcv": "VCV000834710.59",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Vertebral, cardiac, renal, and limb defects syndrome 3",
+          "db": "MedGen",
+          "id": "C5394250"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-05-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001035449.20/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/834710/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs144139747"
+      ]
+    },
+    "rs104894605": {
+      "gene": "NAGS",
+      "kind": "clinical",
+      "chrom": "17",
+      "pos": 44007611,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 42084979,
+      "hgvs": "NM_153006.3(NAGS):c.1289T>C (p.Leu430Pro)",
+      "personal_call_supported": true,
+      "rcv": "RCV000002534.13",
+      "vcv": "VCV000002432.8",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperammonemia, type III",
+          "db": "MedGen",
+          "id": "C0268543"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002534.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2432/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894605"
+      ]
+    },
+    "rs267606919": {
+      "gene": "NPHS1",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 35831056,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 36321958,
+      "hgvs": "NM_004646.4(NPHS1):c.3478C>T (p.Arg1160Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000007276.41",
+      "vcv": "VCV000006873.52",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Finnish congenital nephrotic syndrome",
+          "db": "MedGen",
+          "id": "C0403399"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000007276.41/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/6873/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs267606919"
+      ]
+    },
+    "rs74315347": {
+      "gene": "NPHS2",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 179557227,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 179526362,
+      "hgvs": "NM_014625.4(NPHS2):c.538G>A (p.Val180Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000005699.38",
+      "vcv": "VCV000005368.36",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Nephrotic syndrome, type 2",
+          "db": "MedGen",
+          "id": "C1868672"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000005699.38/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5368/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs74315347"
+      ]
+    },
+    "rs886041091": {
+      "gene": "NTRK2",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 84751990,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 87366905,
+      "hgvs": "NM_006180.6(NTRK2):c.1301A>G (p.Tyr434Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000577864.10",
+      "vcv": "VCV000268204.58",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Developmental and epileptic encephalopathy, 58",
+          "db": "MedGen",
+          "id": "C4693367"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000577864.10/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/268204/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs886041091"
+      ]
+    },
+    "rs121965057": {
+      "gene": "OAT",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 124402930,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 126091499,
+      "hgvs": "NM_000274.4(OAT):c.897C>G (p.Tyr299Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000199.17",
+      "vcv": "VCV000000176.24",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Ornithine aminotransferase deficiency",
+          "db": "MedGen",
+          "id": "C0018425"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000199.17/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/176/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121965057"
+      ]
+    },
+    "rs72554308": {
+      "gene": "OTC",
+      "kind": "clinical",
+      "chrom": "X",
+      "pos": 38367332,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 38226585,
+      "hgvs": "NM_000531.6(OTC):c.119G>A (p.Arg40His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000011761.32",
+      "vcv": "VCV000011014.33",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Ornithine carbamoyltransferase deficiency",
+          "db": "MedGen",
+          "id": "C0268542"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2026-09-15",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000011761.32/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/11014/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs72554308"
+      ]
+    },
+    "rs121913015": {
+      "gene": "PCBD1",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 70883973,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 72643730,
+      "hgvs": "NM_000281.4(PCBD1):c.292C>T (p.Gln98Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000018290.43",
+      "vcv": "VCV000016799.21",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Pterin-4 alpha-carbinolamine dehydratase 1 deficiency",
+          "db": "MedGen",
+          "id": "C1849700"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000018290.43/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/16799/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121913015"
+      ]
+    },
+    "rs863224147": {
+      "gene": "PDHA1",
+      "kind": "clinical",
+      "chrom": "X",
+      "pos": 19359612,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 19377730,
+      "hgvs": "NM_000284.4(PDHA1):c.1132C>T (p.Arg378Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV001796726.3",
+      "vcv": "VCV000214936.28",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pyruvate dehydrogenase complex deficiency",
+          "db": "MedGen",
+          "id": "C0034345"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2021-10-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001796726.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/214936/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs863224147"
+      ]
+    },
+    "rs747573712": {
+      "gene": "PDHB",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 58431595,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 58417322,
+      "hgvs": "NM_000925.4(PDHB):c.301A>G (p.Met101Val)",
+      "personal_call_supported": true,
+      "rcv": "RCV001041351.12",
+      "vcv": "VCV000839569.50",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pyruvate dehydrogenase E1-beta deficiency",
+          "db": "MedGen",
+          "id": "C3279841"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001041351.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/839569/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs747573712"
+      ]
+    },
+    "rs137853271": {
+      "gene": "PHEX",
+      "kind": "clinical",
+      "chrom": "X",
+      "pos": 22212957,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 22231074,
+      "hgvs": "NM_000444.6(PHEX):c.1699C>T (p.Arg567Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000011569.21",
+      "vcv": "VCV000010822.59",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial X-linked hypophosphatemic vitamin D refractory rickets",
+          "db": "MedGen",
+          "id": "C0733682"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-10-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000011569.21/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/10822/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137853271"
+      ]
+    },
+    "rs2101198087": {
+      "gene": "PHGDH",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 119735321,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 120277944,
+      "hgvs": "NM_006623.4(PHGDH):c.670C>T (p.Gln224Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001958615.7",
+      "vcv": "VCV001455475.8",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "PHGDH deficiency",
+          "db": "MedGen",
+          "id": "C1866174"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-04-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001958615.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1455475/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs2101198087"
+      ]
+    },
+    "rs28940285": {
+      "gene": "PINK1",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 20645640,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 20972133,
+      "hgvs": "NM_032409.3(PINK1):c.1040T>C (p.Leu347Pro)",
+      "personal_call_supported": true,
+      "rcv": "RCV000002509.28",
+      "vcv": "VCV000002408.25",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal recessive early-onset Parkinson disease 6",
+          "db": "MedGen",
+          "id": "C1853833"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-05-07",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002509.28/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2408/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs28940285"
+      ]
+    },
+    "rs1389523126": {
+      "gene": "PKD1",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 2102272,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 2152273,
+      "hgvs": "NM_001009944.3(PKD1):c.9202-16G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV005250144.3",
+      "vcv": "VCV000930406.24",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal dominant polycystic kidney disease",
+          "db": "MedGen",
+          "id": "C0085413"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-05-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV005250144.3/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/930406/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1389523126"
+      ],
+      "reading_note": "pkd1_homology"
+    },
+    "rs755226061": {
+      "gene": "PKD2",
+      "kind": "clinical",
+      "chrom": "4",
+      "pos": 88074903,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 88996055,
+      "hgvs": "NM_000297.4(PKD2):c.2614C>T (p.Arg872Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000763531.16",
+      "vcv": "VCV000448036.62",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Polycystic kidney disease 2",
+          "db": "MedGen",
+          "id": "C2751306"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-05-15",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000763531.16/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/448036/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs755226061"
+      ]
+    },
+    "rs193922674": {
+      "gene": "PKP2",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 32802557,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 32955491,
+      "hgvs": "NM_001005242.3(PKP2):c.2014-1G>C",
+      "personal_call_supported": true,
+      "rcv": "RCV000007148.55",
+      "vcv": "VCV000006756.102",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Arrhythmogenic right ventricular dysplasia 9",
+          "db": "MedGen",
+          "id": "C1836906"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-04-21",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000007148.55/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/6756/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs193922674"
+      ]
+    },
+    "rs111033560": {
+      "gene": "PLN",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 118559037,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 118880200,
+      "hgvs": "NM_002667.5(PLN):c.116T>G (p.Leu39Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000014607.40",
+      "vcv": "VCV000013637.44",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dilated cardiomyopathy 1P",
+          "db": "MedGen",
+          "id": "C1835928"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000014607.40/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/13637/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs111033560"
+      ]
+    },
+    "rs121912974": {
+      "gene": "POR",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 75983548,
+      "ref": "G",
+      "alt": "C",
+      "pos_grch37": 75612866,
+      "hgvs": "NM_001395413.1(POR):c.850G>C (p.Ala284Pro)",
+      "personal_call_supported": true,
+      "rcv": "RCV000170457.12",
+      "vcv": "VCV000016902.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Congenital adrenal hyperplasia due to cytochrome P450 oxidoreductase deficiency",
+          "db": "MedGen",
+          "id": "C1860042"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000170457.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/16902/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121912974"
+      ]
+    },
+    "rs1456533664": {
+      "gene": "PROC",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 127426144,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 128183720,
+      "hgvs": "NM_000312.4(PROC):c.595C>T (p.Arg199Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001040855.13",
+      "vcv": "VCV000839161.51",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Thrombophilia due to protein C deficiency, autosomal dominant",
+          "db": "MedGen",
+          "id": "C2674321"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-10-31",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001040855.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/839161/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1456533664"
+      ]
+    },
+    "rs121918474": {
+      "gene": "PROS1",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 93905799,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 93624643,
+      "hgvs": "NM_000313.4(PROS1):c.586A>G (p.Lys196Glu)",
+      "personal_call_supported": true,
+      "rcv": "RCV000014246.33",
+      "vcv": "VCV000013318.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Thrombophilia due to protein S deficiency, autosomal dominant",
+          "db": "MedGen",
+          "id": "C3278211"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2017-04-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000014246.33/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/13318/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121918474"
+      ]
+    },
+    "rs370340361": {
+      "gene": "PTS",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 112230639,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 112101362,
+      "hgvs": "NM_000317.3(PTS):c.200C>T (p.Thr67Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000546150.41",
+      "vcv": "VCV000463151.31",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "6-Pyruvoyl-tetrahydrobiopterin synthase deficiency",
+          "db": "MedGen",
+          "id": "C0878676"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000546150.41/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/463151/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs370340361"
+      ]
+    },
+    "rs761619802": {
+      "gene": "QDPR",
+      "kind": "clinical",
+      "chrom": "4",
+      "pos": 17492231,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 17493854,
+      "hgvs": "NM_000320.3(QDPR):c.545+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV001885312.9",
+      "vcv": "VCV001335971.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dihydropteridine reductase deficiency",
+          "db": "MedGen",
+          "id": "C0268465"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-04-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001885312.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1335971/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs761619802"
+      ]
+    },
+    "rs267607003": {
+      "gene": "RBM20",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 110812310,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 112572068,
+      "hgvs": "NM_001134363.3(RBM20):c.1913C>T (p.Pro638Leu)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000292.22",
+      "vcv": "VCV000000268.30",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dilated cardiomyopathy 1DD",
+          "db": "MedGen",
+          "id": "C2750995"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-17",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000292.22/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/268/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs267607003"
+      ]
+    },
+    "rs75234356": {
+      "gene": "RET",
+      "kind": "clinical",
+      "chrom": "10",
+      "pos": 43120144,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 43615592,
+      "hgvs": "NM_020975.6(RET):c.2671T>G (p.Ser891Ala)",
+      "personal_call_supported": true,
+      "rcv": "RCV000014978.36",
+      "vcv": "VCV000013951.56",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Multiple endocrine neoplasia type 2A",
+          "db": "MedGen",
+          "id": "C0025268"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-01-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000014978.36/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/13951/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs75234356"
+      ]
+    },
+    "rs61751276": {
+      "gene": "RPE65",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 68449890,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 68915573,
+      "hgvs": "NM_000329.3(RPE65):c.11+5G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV003460766.1",
+      "vcv": "VCV000098825.76",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "RPE65-related recessive retinopathy",
+          "db": "MedGen",
+          "id": "CN305526"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2023-12-22",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV003460766.1/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/98825/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs61751276"
+      ]
+    },
+    "rs104893991": {
+      "gene": "RUNX2",
+      "kind": "clinical",
+      "chrom": "6",
+      "pos": 45438040,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 45405777,
+      "hgvs": "NM_001024630.4(RUNX2):c.674G>A (p.Arg225Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV002482851.2",
+      "vcv": "VCV000009302.33",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cleidocranial dysostosis",
+          "db": "MedGen",
+          "id": "C0008928"
+        },
+        {
+          "name": "Metaphyseal dysplasia-maxillary hypoplasia-brachydacty syndrome",
+          "db": "MedGen",
+          "id": "C3549874"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-02-18",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV002482851.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/9302/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104893991"
+      ]
+    },
+    "rs190140598": {
+      "gene": "RYR2",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 237445488,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 237608788,
+      "hgvs": "NM_001035.3(RYR2):c.1258C>T (p.Arg420Trp)",
+      "personal_call_supported": true,
+      "rcv": "RCV000219729.13",
+      "vcv": "VCV000201214.30",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Catecholaminergic polymorphic ventricular tachycardia",
+          "db": "MedGen",
+          "id": "C5574922"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-05-07",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000219729.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/201214/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs190140598"
+      ]
+    },
+    "rs72549410": {
+      "gene": "SCN5A",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 38606058,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 38647549,
+      "hgvs": "NM_000335.5(SCN5A):c.1231G>A (p.Val411Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000234790.9",
+      "vcv": "VCV000067651.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Long QT syndrome 3",
+          "db": "MedGen",
+          "id": "C1859062"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-02-07",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000234790.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/67651/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs72549410"
+      ]
+    },
+    "rs137852704": {
+      "gene": "SCNN1B",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 23380574,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 23391895,
+      "hgvs": "NM_000336.3(SCNN1B):c.1696C>T (p.Arg566Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000009378.7",
+      "vcv": "VCV000008830.17",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Liddle syndrome 1",
+          "db": "MedGen",
+          "id": "CN031472"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-03-11",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000009378.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/8830/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs137852704"
+      ]
+    },
+    "rs267607036": {
+      "gene": "SEPSECS",
+      "kind": "clinical",
+      "chrom": "4",
+      "pos": 25144799,
+      "ref": "T",
+      "alt": "C",
+      "pos_grch37": 25146421,
+      "hgvs": "NM_016955.4(SEPSECS):c.1001A>G (p.Tyr334Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000436.9",
+      "vcv": "VCV000018400.11",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pontocerebellar hypoplasia type 2D",
+          "db": "MedGen",
+          "id": "C3151140"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-19",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000436.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/18400/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs267607036"
+      ]
+    },
+    "rs121909551": {
+      "gene": "SERPINC1",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 173914743,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 173883881,
+      "hgvs": "NM_000488.4(SERPINC1):c.218C>T (p.Pro73Leu)",
+      "personal_call_supported": true,
+      "rcv": "RCV000019627.76",
+      "vcv": "VCV000018011.85",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hereditary antithrombin deficiency",
+          "db": "MedGen",
+          "id": "C0272375"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2023-09-21",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000019627.76/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/18011/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121909551"
+      ]
+    },
+    "rs1560667389": {
+      "gene": "SGMS2",
+      "kind": "clinical",
+      "chrom": "4",
+      "pos": 107895701,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 108816857,
+      "hgvs": "NM_001375905.1(SGMS2):c.148C>T (p.Arg50Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000786775.6",
+      "vcv": "VCV000635285.54",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Calvarial doughnut lesions-bone fragility syndrome",
+          "db": "MedGen",
+          "id": "C1852022"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-25",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000786775.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/635285/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1560667389"
+      ]
+    },
+    "rs773855120": {
+      "gene": "SLC12A1",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 48208101,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 48500298,
+      "hgvs": "NM_000338.3(SLC12A1):c.382C>T (p.Arg128Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV001775431.4",
+      "vcv": "VCV001320258.9",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Bartter disease type 1",
+          "db": "MedGen",
+          "id": "C1866495"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-03-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001775431.4/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1320258/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs773855120"
+      ]
+    },
+    "rs199974259": {
+      "gene": "SLC12A3",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 56902509,
+      "ref": "G",
+      "alt": "T",
+      "pos_grch37": 56936421,
+      "hgvs": "NM_001126108.2(SLC12A3):c.2856+1G>T",
+      "personal_call_supported": true,
+      "rcv": "RCV001271445.29",
+      "vcv": "VCV000372504.56",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial hypokalemia-hypomagnesemia",
+          "db": "MedGen",
+          "id": "C0268450"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-10-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV001271445.29/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/372504/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs199974259"
+      ]
+    },
+    "rs766773277": {
+      "gene": "SLC16A2",
+      "kind": "clinical",
+      "chrom": "X",
+      "pos": 74524723,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 73744558,
+      "hgvs": "NM_006517.5(SLC16A2):c.940C>T (p.Arg314Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000193469.9",
+      "vcv": "VCV000212186.13",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Allan-Herndon-Dudley syndrome",
+          "db": "MedGen",
+          "id": "C0795889"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2021-10-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000193469.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/212186/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs766773277"
+      ]
+    },
+    "rs57262206": {
+      "gene": "SLC22A5",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 132369824,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 131705516,
+      "hgvs": "NM_003060.4(SLC22A5):c.-149G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000022286.38",
+      "vcv": "VCV000025340.65",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Renal carnitine transport defect",
+          "db": "MedGen",
+          "id": "C0342788"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-02-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000022286.38/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/25340/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs57262206"
+      ]
+    },
+    "rs80338717": {
+      "gene": "SLC25A13",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 96193032,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 95822344,
+      "hgvs": "NM_014251.3(SLC25A13):c.615+5G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV004795933.5",
+      "vcv": "VCV000021517.63",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Citrullinemia, type II, adult-onset",
+          "db": "MedGen",
+          "id": "CN295299"
+        },
+        {
+          "name": "Neonatal intrahepatic cholestasis due to citrin deficiency",
+          "db": "MedGen",
+          "id": "C1853942"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-11",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV004795933.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/21517/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs80338717"
+      ]
+    },
+    "rs104894429": {
+      "gene": "SLC25A15",
+      "kind": "clinical",
+      "chrom": "13",
+      "pos": 40807376,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 41381512,
+      "hgvs": "NM_014252.4(SLC25A15):c.535C>T (p.Arg179Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000006360.24",
+      "vcv": "VCV000005994.23",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hyperornithinemia-hyperammonemia-homocitrullinuria syndrome",
+          "db": "MedGen",
+          "id": "C0268540"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000006360.24/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5994/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894429"
+      ]
+    },
+    "rs111033313": {
+      "gene": "SLC26A4",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 107683453,
+      "ref": "A",
+      "alt": "G",
+      "pos_grch37": 107323898,
+      "hgvs": "NM_000441.2(SLC26A4):c.919-2A>G",
+      "personal_call_supported": true,
+      "rcv": "RCV000169120.25",
+      "vcv": "VCV000004840.72",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Pendred syndrome",
+          "db": "MedGen",
+          "id": "C0271829"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2018-09-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000169120.25/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/4840/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs111033313"
+      ]
+    },
+    "rs200095793": {
+      "gene": "SLC34A1",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 177393764,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 176820765,
+      "hgvs": "NM_003052.5(SLC34A1):c.1006+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000223671.7",
+      "vcv": "VCV000234928.23",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hypercalcemia, infantile, 2",
+          "db": "MedGen",
+          "id": "C4310473"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-04-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000223671.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/234928/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs200095793"
+      ]
+    },
+    "rs199690076": {
+      "gene": "SLC34A3",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 137233223,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 140127675,
+      "hgvs": "NM_001177316.2(SLC34A3):c.575C>T (p.Ser192Leu)",
+      "personal_call_supported": true,
+      "rcv": "RCV000513414.22",
+      "vcv": "VCV000198610.49",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal recessive hypophosphatemic bone disease",
+          "db": "MedGen",
+          "id": "C1853271"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-08-06",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000513414.22/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/198610/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs199690076"
+      ]
+    },
+    "rs200483989": {
+      "gene": "SLC3A1",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 44286074,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 44513213,
+      "hgvs": "NM_000341.4(SLC3A1):c.808C>T (p.Arg270Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000332132.24",
+      "vcv": "VCV000336195.54",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cystinuria",
+          "db": "MedGen",
+          "id": "C0010691"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-10-03",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000332132.24/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/336195/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs200483989"
+      ]
+    },
+    "rs1060501102": {
+      "gene": "SLC40A1",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 189562125,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 190426851,
+      "hgvs": "NM_014585.6(SLC40A1):c.1469G>A (p.Gly490Asp)",
+      "personal_call_supported": true,
+      "rcv": "RCV000457416.9",
+      "vcv": "VCV000406376.10",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hemochromatosis type 4",
+          "db": "MedGen",
+          "id": "C1853733"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2022-03-12",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000457416.9/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/406376/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1060501102"
+      ]
+    },
+    "rs121912744": {
+      "gene": "SLC4A1",
+      "kind": "clinical",
+      "chrom": "17",
+      "pos": 44255707,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 42333075,
+      "hgvs": "NM_000342.4(SLC4A1):c.1766G>A (p.Arg589His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000019340.39",
+      "vcv": "VCV000017763.27",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Autosomal dominant distal renal tubular acidosis",
+          "db": "MedGen",
+          "id": "CN280572"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000019340.39/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/17763/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121912744"
+      ]
+    },
+    "rs121909180": {
+      "gene": "SLC5A5",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 17882160,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 17992969,
+      "hgvs": "NM_000453.3(SLC5A5):c.1183G>A (p.Gly395Arg)",
+      "personal_call_supported": true,
+      "rcv": "RCV000008109.6",
+      "vcv": "VCV000007670.12",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Thyroid dyshormonogenesis 1",
+          "db": "MedGen",
+          "id": "C1848805"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-04-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000008109.6/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/7670/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121909180"
+      ]
+    },
+    "rs142979576": {
+      "gene": "SLC6A19",
+      "kind": "clinical",
+      "chrom": "5",
+      "pos": 1216947,
+      "ref": "T",
+      "alt": "G",
+      "pos_grch37": 1217062,
+      "hgvs": "NM_001003841.3(SLC6A19):c.1173+2T>G",
+      "personal_call_supported": true,
+      "rcv": "RCV000002094.7",
+      "vcv": "VCV000449553.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Neutral 1 amino acid transport defect",
+          "db": "MedGen",
+          "id": "C0018609"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-01-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000002094.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/449553/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs142979576"
+      ]
+    },
+    "rs386833822": {
+      "gene": "SLC7A7",
+      "kind": "clinical",
+      "chrom": "14",
+      "pos": 22779925,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 23249134,
+      "hgvs": "NM_003982.4(SLC7A7):c.625+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000049787.33",
+      "vcv": "VCV000056374.34",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Lysinuric protein intolerance",
+          "db": "MedGen",
+          "id": "C0268647"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000049787.33/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/56374/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs386833822"
+      ]
+    },
+    "rs146815072": {
+      "gene": "SLC7A9",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 32830639,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 33321545,
+      "hgvs": "NM_014270.5(SLC7A9):c.1445C>T (p.Pro482Leu)",
+      "personal_call_supported": true,
+      "rcv": "RCV005028045.5",
+      "vcv": "VCV002060879.10",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Cystinuria",
+          "db": "MedGen",
+          "id": "C0010691"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-07",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV005028045.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2060879/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs146815072"
+      ]
+    },
+    "rs373707046": {
+      "gene": "SLCO1B3",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 20898501,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 21051435,
+      "hgvs": "NM_019844.4(SLCO1B3):c.1747+1G>A",
+      "personal_call_supported": true,
+      "rcv": "RCV000023445.13",
+      "vcv": "VCV000030488.13",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Rotor syndrome",
+          "db": "MedGen",
+          "id": "C0220991"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-08-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000023445.13/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/30488/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs373707046"
+      ]
+    },
+    "rs757106110": {
+      "gene": "SMAD3",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 67187457,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 67479795,
+      "hgvs": "NM_005902.4(SMAD3):c.1102C>T (p.Arg368Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000543020.16",
+      "vcv": "VCV000420088.51",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial thoracic aortic aneurysm and aortic dissection",
+          "db": "MedGen",
+          "id": "C4707243"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-27",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000543020.16/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/420088/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs757106110"
+      ]
+    },
+    "rs104894090": {
+      "gene": "STAR",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 38146051,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 38003569,
+      "hgvs": "NM_000349.3(STAR):c.562C>T (p.Arg188Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000009560.18",
+      "vcv": "VCV000008997.27",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Congenital lipoid adrenal hyperplasia due to STAR deficency",
+          "db": "MedGen",
+          "id": "C0342474"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-28",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000009560.18/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/8997/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894090"
+      ]
+    },
+    "rs118203960": {
+      "gene": "STRA6",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 74180153,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 74472494,
+      "hgvs": "NM_022369.4(STRA6):c.1931C>T (p.Thr644Met)",
+      "personal_call_supported": true,
+      "rcv": "RCV000001195.11",
+      "vcv": "VCV000001136.9",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Microphthalmia, syndromic 9",
+          "db": "MedGen",
+          "id": "C1832661"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-01-08",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000001195.11/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1136/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs118203960"
+      ]
+    },
+    "rs747461754": {
+      "gene": "SUOX",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 56004589,
+      "ref": "C",
+      "alt": "G",
+      "pos_grch37": 56398373,
+      "hgvs": "NM_001032386.2(SUOX):c.1200C>G (p.Tyr400Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000758701.24",
+      "vcv": "VCV000619593.14",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Sulfite oxidase deficiency",
+          "db": "MedGen",
+          "id": "C0268624"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-08-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000758701.24/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/619593/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs747461754"
+      ]
+    },
+    "rs118203914": {
+      "gene": "TAT",
+      "kind": "clinical",
+      "chrom": "16",
+      "pos": 71576247,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 71610150,
+      "hgvs": "NM_000353.3(TAT):c.169C>T (p.Arg57Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000000429.14",
+      "vcv": "VCV000000402.11",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Tyrosinemia type II",
+          "db": "MedGen",
+          "id": "C0268487"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-03-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000000429.14/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/402/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs118203914"
+      ]
+    },
+    "rs2467686025": {
+      "gene": "TET3",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 74099456,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 74326583,
+      "hgvs": "NM_001287491.2(TET3):c.3448C>T (p.Arg1150Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV004700762.2",
+      "vcv": "VCV001800783.3",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Beck-Fahrner syndrome",
+          "db": "MedGen",
+          "id": "C5394097"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-07-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV004700762.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/1800783/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs2467686025"
+      ]
+    },
+    "rs1051249273": {
+      "gene": "TFR2",
+      "kind": "clinical",
+      "chrom": "7",
+      "pos": 100626885,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 100224508,
+      "hgvs": "NM_003227.4(TFR2):c.2014C>T (p.Gln672Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000779521.21",
+      "vcv": "VCV000632495.29",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hemochromatosis type 3",
+          "db": "MedGen",
+          "id": "C1858664"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-03-05",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000779521.21/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/632495/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs1051249273"
+      ]
+    },
+    "rs113605875": {
+      "gene": "TGFBR1",
+      "kind": "clinical",
+      "chrom": "9",
+      "pos": 99149253,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 101911535,
+      "hgvs": "NM_004612.4(TGFBR1):c.1460G>A (p.Arg487Gln)",
+      "personal_call_supported": true,
+      "rcv": "RCV000013351.33",
+      "vcv": "VCV000012525.47",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Loeys-Dietz syndrome 1",
+          "db": "MedGen",
+          "id": "C4551955"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-09-30",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000013351.33/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12525/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs113605875"
+      ]
+    },
+    "rs104893816": {
+      "gene": "TGFBR2",
+      "kind": "clinical",
+      "chrom": "3",
+      "pos": 30674229,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 30715721,
+      "hgvs": "NM_003242.6(TGFBR2):c.1379G>A (p.Arg460His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000702388.16",
+      "vcv": "VCV000012515.20",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial thoracic aortic aneurysm and aortic dissection",
+          "db": "MedGen",
+          "id": "C4707243"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-11-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000702388.16/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12515/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104893816"
+      ]
+    },
+    "rs104894729": {
+      "gene": "TNNI3",
+      "kind": "clinical",
+      "chrom": "19",
+      "pos": 55151892,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 55663260,
+      "hgvs": "NM_000363.5(TNNI3):c.575G>A (p.Arg192His)",
+      "personal_call_supported": true,
+      "rcv": "RCV000629012.12",
+      "vcv": "VCV000012424.31",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypertrophic cardiomyopathy",
+          "db": "MedGen",
+          "id": "C0007194"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2025-11-13",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000629012.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12424/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894729"
+      ]
+    },
+    "rs727504247": {
+      "gene": "TNNT2",
+      "kind": "clinical",
+      "chrom": "1",
+      "pos": 201359217,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 201328345,
+      "hgvs": "NM_001276345.2(TNNT2):c.890G>A (p.Trp297Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000824774.7",
+      "vcv": "VCV000177636.40",
+      "classification": "Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hypertrophic cardiomyopathy",
+          "db": "MedGen",
+          "id": "C0007194"
+        }
+      ],
+      "review": "reviewed by expert panel",
+      "stars": 3,
+      "evaluated_on": "2025-11-14",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000824774.7/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/177636/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs727504247"
+      ]
+    },
+    "rs104894503": {
+      "gene": "TPM1",
+      "kind": "clinical",
+      "chrom": "15",
+      "pos": 63060899,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 63353098,
+      "hgvs": "NM_001018005.2(TPM1):c.523G>A (p.Asp175Asn)",
+      "personal_call_supported": true,
+      "rcv": "RCV000013272.33",
+      "vcv": "VCV000012456.55",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Hypertrophic cardiomyopathy 3",
+          "db": "MedGen",
+          "id": "C1861863"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-12-02",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000013272.33/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/12456/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs104894503"
+      ]
+    },
+    "rs121434394": {
+      "gene": "TRPC6",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 101453068,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 101323799,
+      "hgvs": "NM_004621.6(TRPC6):c.2683C>T (p.Arg895Cys)",
+      "personal_call_supported": true,
+      "rcv": "RCV000006530.8",
+      "vcv": "VCV000006155.20",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Focal segmental glomerulosclerosis 2",
+          "db": "MedGen",
+          "id": "C1858915"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-09-24",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000006530.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/6155/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121434394"
+      ]
+    },
+    "rs751502842": {
+      "gene": "TTN",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 178612442,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 179477169,
+      "hgvs": "NM_001267550.2(TTN):c.50083C>T (p.Arg16695Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV006697414.2",
+      "vcv": "VCV000202377.26",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Dilated cardiomyopathy 1G",
+          "db": "MedGen",
+          "id": "C1858763"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2026-04-01",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV006697414.2/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/202377/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs751502842"
+      ]
+    },
+    "rs121917851": {
+      "gene": "TTPA",
+      "kind": "clinical",
+      "chrom": "8",
+      "pos": 63066056,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 63978615,
+      "hgvs": "NM_000370.3(TTPA):c.400C>T (p.Arg134Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000055797.16",
+      "vcv": "VCV000009141.60",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Familial isolated deficiency of vitamin E",
+          "db": "MedGen",
+          "id": "C1848533"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-07-15",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000055797.16/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/9141/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121917851"
+      ]
+    },
+    "rs111033591": {
+      "gene": "WNK1",
+      "kind": "clinical",
+      "chrom": "12",
+      "pos": 868697,
+      "ref": "C",
+      "alt": "T",
+      "pos_grch37": 977863,
+      "hgvs": "NM_213655.5(WNK1):c.3226C>T (p.Arg1076Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000822434.12",
+      "vcv": "VCV000005168.18",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Neuropathy, hereditary sensory and autonomic, type 2A",
+          "db": "MedGen",
+          "id": "C2752089"
+        },
+        {
+          "name": "Pseudohypoaldosteronism type 2C",
+          "db": "MedGen",
+          "id": "C1840391"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2025-08-20",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000822434.12/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/5168/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs111033591"
+      ]
+    },
+    "rs121907906": {
+      "gene": "WT1",
+      "kind": "clinical",
+      "chrom": "11",
+      "pos": 32392717,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 32414263,
+      "hgvs": "NM_024426.6(WT1):c.1303C>T (p.Arg435Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000003671.8",
+      "vcv": "VCV000003497.25",
+      "classification": "Pathogenic",
+      "conditions": [
+        {
+          "name": "Wilms tumor 1",
+          "db": "MedGen",
+          "id": "CN033288"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2024-07-09",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": true,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000003671.8/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/3497/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs121907906"
+      ]
+    },
+    "rs119460972": {
+      "gene": "XDH",
+      "kind": "clinical",
+      "chrom": "2",
+      "pos": 31386525,
+      "ref": "G",
+      "alt": "A",
+      "pos_grch37": 31609391,
+      "hgvs": "NM_000379.4(XDH):c.682C>T (p.Arg228Ter)",
+      "personal_call_supported": true,
+      "rcv": "RCV000003088.5",
+      "vcv": "VCV000002954.12",
+      "classification": "Pathogenic/Likely pathogenic",
+      "conditions": [
+        {
+          "name": "Hereditary xanthinuria type 1",
+          "db": "MedGen",
+          "id": "C0268118"
+        }
+      ],
+      "review": "criteria provided, multiple submitters, no conflicts",
+      "stars": 2,
+      "evaluated_on": "2023-03-10",
+      "checked_on": "2026-11-04",
+      "gencc_condition_match": false,
+      "sources": [
+        "https://www.ncbi.nlm.nih.gov/clinvar/RCV000003088.5/",
+        "https://www.ncbi.nlm.nih.gov/clinvar/variation/2954/",
+        "https://www.ncbi.nlm.nih.gov/snp/rs119460972"
+      ]
+    }
+  }
+}

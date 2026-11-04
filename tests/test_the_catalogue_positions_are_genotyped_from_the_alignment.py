@@ -171,6 +171,25 @@ class TestTheWork(_Genome):
         self.assertEqual(r["positions"], sum(len(v.splitlines()) for v in seen.values()))
         self.assertLess(r["positions"], cat["positions"])
 
+    def test_every_supported_thematic_site_joins_both_builds_and_persists(self):
+        from scholion import core
+        thematic = core._read_knowledge_raw("thematic_variant_annotations.json")["variants"]
+        cat = sites.catalogue()
+        for rsid, entry in thematic.items():
+            if entry["personal_call_supported"]:
+                self.assertIn(rsid, cat["loci"])
+                for build, field in ((GRCH38, "pos"), (GRCH37, "pos_grch37")):
+                    rows = sites.bed_rows({rsid: cat["loci"][rsid]}, build)
+                    if entry.get(field):
+                        self.assertIn((entry[field], rsid + "|" + entry["gene"]), rows[entry["chrom"]])
+            else:
+                self.assertNotIn(rsid, cat["loci"])
+                self.assertIn(rsid, [row["rsid"] for row in cat["excluded"]])
+        self.assertTrue(self.genotype()["ok"])
+        self.assertEqual("current", sites.state()["status"])
+        record = json.loads((self.genome / sites.RECORD_NAME).read_text(encoding="utf-8"))
+        self.assertEqual(cat["fingerprint"], record["catalogue_fingerprint"])
+
     def test_a_failed_chromosome_leaves_the_previous_file_as_it_was(self):
         (self.genome / sites.OUT_NAME).write_text("old", encoding="utf-8")
         r = self.genotype(run=self.fake_run(fail_on="2"))
@@ -205,8 +224,15 @@ class TestTheState(_Genome):
                           encoding="utf-8")
         self.assertEqual("older_than_catalogue", sites.state()["status"])
         record.write_text(json.dumps({"catalogue_positions": cat["positions"],
-                                      "catalogue_updated": cat["updated"]}), encoding="utf-8")
+                                      "catalogue_updated": cat["updated"],
+                                      "catalogue_fingerprint": cat["fingerprint"]}), encoding="utf-8")
         self.assertEqual("current", sites.state()["status"])
+        # Same count and date cannot hide changed coordinates.
+        with mock.patch.object(sites, "catalogue", return_value={**cat, "fingerprint": "changed"}):
+            self.assertEqual("older_than_catalogue", sites.state()["status"])
+        # Updated explanatory text alone does not demand a BAM rerun.
+        with mock.patch.object(sites, "catalogue", return_value={**cat, "updated": "2099-01-01"}):
+            self.assertEqual("current", sites.state()["status"])
 
     def test_the_build_is_read_from_the_header_of_a_real_bam(self):
         header = b"BAM\x01" + struct.pack("<i", 0) + struct.pack("<i", 2)

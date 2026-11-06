@@ -32,7 +32,7 @@ the build — this table is the readable copy of it.
 | **MCP server** | `scholion mcp` | the assistant speaks the Model Context Protocol |
 | **Skill folder** | copy the skill folder to ~/.agents/skills/scholion/ | the host reads skills from that shared path and has no plugin mechanism of its own |
 | **Ouroboros tools module** | `import scholion.ouroboros_tools` | a classic Ouroboros checkout |
-| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus a **Scholion** tab on the Widgets page, which is where the owner is told what to load and where |
+| **Ouroboros Hub skill** | the `scholion` skill | Ouroboros Hub — plus the embedded **Scholion** web application on the Widgets page, using the same selected profile as the tools |
 | **Agent Plugins package** | import the folder agent-plugin/ into a client that reads Agent Plugins, or install it as a Claude plugin | ChatGPT desktop, Codex, Cursor, VS Code, GitHub Copilot, Kiro, Claude Code, Cowork — one import brings the tools and the instruction that governs them together |
 
 There is also `scholion serve` — a local web page for a person, bound to
@@ -40,6 +40,18 @@ There is also `scholion serve` — a local web page for a person, bound to
 
 All of them run the same engine, so an answer does not depend on which door it
 came through. Pick by what the host can do, not by what you want to ask.
+
+### The embedded Ouroboros interface
+
+The Scholion Widgets card can create a profile or explicitly connect an existing
+one, then opens the installed web application. Its visual interface is for the
+person; model tools keep their own declared permissions. A host-supervised local
+companion and the authenticated module bridge share the tools' saved profile
+connection. No browser, terminal, fixed port, separate copy of the medical data,
+or model connection is required by Scholion. The host's own model-setup screen
+can still apply. The panel refuses a mismatched profile rather than choosing a
+running Scholion instance elsewhere. Source links open through the host's external-link bridge; downloads go through
+the host. See the Hub skill's setup instructions.
 
 ### The skill folder
 
@@ -52,7 +64,8 @@ be reached.
 as they are; Claude Code and Hermes each keep their own folder and take the same
 single file. OpenClaw is also served through its own registry — that is the
 supported route there, and the `git:` form of its installer is not, because it
-expects a repository whose root is the skill. The README carries the table, with the date it was checked.
+expects a repository whose root is the skill. Use the host’s configured skill directory, or pass that directory explicitly to
+`scholion skill --install`.
 The directory has to be named `scholion` — the format requires the folder name
 and the `name` field to match.
 
@@ -324,3 +337,55 @@ scholion capabilities --json | python3 -c "import json,sys; print(json.load(sys.
   scholion genome-status      # what it can see of the genome, and why not
   scholion limits             # what it cannot say, and what would change that
   ```
+
+
+### Recalculating saved PGS through an assistant
+
+The installed MCP server's `sch_recompute` offers an executable, data-driven PGS
+step when stored scores need corrected allele scoring. Calling it without
+confirmation reads the plan and progress. After the person explicitly agrees,
+`confirm=true` starts the same packaged runner used by the web and
+`scholion prs --recalculate --yes`; subsequent calls read progress. Source-only
+preparation scripts are not required. The selected container and local input
+paths must match. A report copied from another machine cannot recreate an absent
+VCF or BAM; the plan identifies that gap. Failure or cancellation preserves the
+old report. Verified current results do not request this expensive operation
+merely because another application version was installed.
+
+A host that exits after each tool call starts confirmed PGS recalculation in a
+separate installed worker. The worker retains the captured container and checks
+its identity before writes; progress and cancellation use the same job files.
+It does not require a source checkout or a persistent chat process.
+
+### Trends and review history
+
+Use `sch_overview` for the complete attention feed, including its facts,
+limitations and source/rule identities. The first screen may show only its
+leading items; the tool returns all of them. Choose `period` 30, 90 or 365 for
+the phenotype summary. For a visit, supply `agenda_ids` from the current feed;
+an empty string selects none, and omission selects all current items.
+
+`sch_insight_snapshot` previews changes without writing. Save a review only
+when the person requests it, using the returned fingerprint as `confirm`.
+If the input changes, obtain and review a new preview. A missing or older
+observation is not evidence of recovery. These operations do not recalculate
+a genome or change treatment.
+
+
+### Pathway panels, clinical estimates and CGM
+
+Use `sch_system(key="clinical_estimates")` for the shared FIB-4 and PhenoAge
+panel. Both retain their own dated inputs and method sources; no clinical
+questionnaire is required. Missing inputs must not be invented or borrowed from
+a different draw.
+`sch_system(key="methylation")` and the other keys returned by `sch_panel`
+provide pathway readings. Reference-only panels do not require a genome.
+
+For a folder the person explicitly names, use
+`sch_ingest_labs(folder="...", kind="studies")` to preview instrumental studies
+and Lumiflex application CGM PDFs. After the person reviews the preview, call it
+again with its exact `approval_token` in `confirm`. Changed inputs invalidate the
+token. `sch_lifestyle(cgm_report="SOURCE_SHA256")` reads a saved revision; omit
+that parameter to read the latest report. The same registry serves MCP and
+Ouroboros. A graph-derived response is approximate, and a sensor GMI is not a
+laboratory HbA1c result. Import does not prepare a genome or recalculate PGS.

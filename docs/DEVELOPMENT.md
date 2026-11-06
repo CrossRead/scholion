@@ -32,6 +32,62 @@ aside               the ingest family (ingest_labs, reconcile, import_csv,
                     per command); net.py (the ONLY module that opens sockets).
 ```
 
+## Five acceptance levels
+
+1. **Core and data:** calculations, evidence, input identity and public schemas.
+2. **Components:** the real shared module, supplied states, text and actions.
+3. **Browser:** navigation, disclosure, language/register, layout and print.
+4. **Installed delivery:** sanitized wheel outside the source tree, packaged
+   assets and entry-point origins, supported operating systems.
+5. **Product interfaces:** equivalent affected scenarios through CLI, MCP,
+   plugins (including Ouroboros), and Web. Compare values, dates, sources,
+   qualifications, refusal states and actions, not renderer-specific wording.
+   The surface inventory comes from `contract.access()` and `PARITY`. Help and
+   structural parity alone do not establish an executable scenario. Record
+   unavailable native hosts and AI dialogue as untested, never as a pass.
+
+Use focused levels during implementation and the mandatory full acceptance
+checks on a stable candidate. Component fixtures are synthetic and deterministic;
+visual checks do not require genome preparation. Keep clinical semantics in the
+shared core. A changed component is tested through its public module interface,
+not by extracting its functions from page text. Preserve unique semantic tests.
+An extraction also compares old/new output and browser geometry before replacing
+its implementation. This does not authorize skipping existing release gates.
+
+See [INTERFACE-ACCEPTANCE.md](INTERFACE-ACCEPTANCE.md) for executable cross-interface
+scenarios and their installed-package use.
+
+See [TEST-SELECTION.md](TEST-SELECTION.md) for conservative dependency plans,
+exact-input evidence reuse and comparable timing. Neither tool weakens the full
+release gates or declares an untested acceptance level passed.
+
+## Shared system views and test cost
+
+System, insight, visit and prescription composition is described in
+[SYSTEM-VIEWS.md](SYSTEM-VIEWS.md). Extend shared objects before page delegates.
+
+A full source acceptance run executes the current interpreter's suite once under
+statement recording; that successful run supplies both functional and reach
+results. The oldest supported interpreter remains a separate run. Packages and
+narrowed selections still run ordinary unittest. Cheap metadata synchronization,
+release notes and version consistency are checked before the expensive suite.
+`SCHOLION_SKIP_REACH` retains its explicit skip behavior; it never means the tests
+were covered. No baseline is lowered by this pipeline change.
+
+The monitoring backend records each reached code location once. Later calls to
+the same location add no new statement-coverage information. Other branches,
+threads and subprocesses remain measured; the older-Python tracing backend is
+unchanged. This follows Python's documented `sys.monitoring.DISABLE` semantics.
+
+Use `python3 src/tools/test_inventory.py --out /tmp/test-inventory.json` to review
+discovery, identical bodies, overwritten methods and inherited repetitions. Add
+`--run` to measure every test, or name test modules for a focused measurement.
+Identical text is not evidence of identical setup or behavior. Preserve separate
+adapters, languages, profiles, failure modes and clinical assertions; share only
+unchanging preparation or genuinely repeated work. Reports separate total time
+from per-test setup/body/cleanup time. Never infer a full-suite speedup from a
+small selected subset or a single unqualified measurement.
+
 ## The engine package — hard rules
 
 Enforced by `tests/test_engine_stays_split.py`; the test's failure messages
@@ -57,6 +113,11 @@ repeat these rules at the moment they are broken.
 
 ## Reference gene panels and personalised interpretation
 
+The reusable web gene card has one presentation owner: `web/gene-cards.js`
+and `web/gene-cards.css`. Its normalized model, composition services, slots and
+extension rules are documented in [GENE-CARD.md](GENE-CARD.md). Page renderers
+choose data and contextual additions; they do not copy the card layout or styles.
+
 Panels carry an independent `reference_context` at every A–E evidence level.
 Gene-function annotation names its gene-level source; variant descriptions name
 separate literature support. They remain visible with unread positions and
@@ -67,6 +128,31 @@ action. The personalised interpretation and each adjacent clinical claim retain
 their own support and applicability checks. Patient and clinician registers
 share these facts; presentation may condense detail without removing the
 reference positions. Catalogue panels need no connected genome.
+
+Personal thematic topics query existing indexed VCF intervals as well as their
+selected catalogue positions. The panel preview disables alignment depth scans,
+protein prediction and network coordinate resolution. Missing coordinates,
+index, sample selection or assembly compatibility are explicit refusals.
+A gene has no single genotype: previews retain the individual records and their
+quality, and an empty variant list does not establish reference identity.
+The process cache keys include profile, input/index/annotation identity, sample
+and language; each caller receives a copy. The detailed gene lookup remains a
+separate operation with its own coverage and annotation results.
+The packaged NCBI interval reference is an exact-identity GRCh38 fallback. It
+provides gene envelopes, not CDS annotations: without coding exons the coding
+count remains uncomputed and called records remain unannotated rather than
+being labelled noncoding. Legacy and ambiguous names are not fuzzy-matched.
+
+`scientific_review` is reference provenance, not a clinical guard. It names the
+claim role and distinguishes source metadata, association, molecular evidence,
+conflict and incomplete project curation. A saved review is tied to exact source
+record digests. Neither a bibliographic repair nor a gene-level assertion fills
+a missing clinical mechanism or changes eligibility. New ClinVar genes retain
+generic reference/unknown states rather than receiving fabricated interpretation.
+`conclusion_basis` also accepts typed publication, database and guideline
+passports with explicit assertion scope. Database assertions require accession
+and snapshot/version; guideline passports require issuer and version. Neither
+can borrow a gene-function or classification scope for a personal inference.
 
 ## The four faces — one capability, one tick
 
@@ -133,6 +219,15 @@ compatibility (`check_compat.py`) holds command names, top-level `--json`
 fields and profile file names: they may grow and may not shrink. A change to
 `knowledge/` that alters results on unchanged input is a SERIES BREAK and is
 MINOR at minimum — `docs/VERSIONING.md` has the whole rule.
+
+For a bounded development check, both runners accept a module, class, method,
+or test file path. For example, `bash run_tests.sh tests.test_compat` runs that
+module; `python3 src/tools/run_tests.py tests.test_compat` selects the same tests
+on a machine without bash. Multiple names and `-k` filters are supported.
+Discovery patterns use `-p test_compat.py`; do not combine discovery options
+(`-s`, `-p`, `-t`) with explicit test names. Invalid names fail instead of
+falling back to the full suite. The post-suite checks still run; a bounded
+check is not full release acceptance. Run without selectors for that acceptance.
 
 **Test the artefact, not only the repository.** A check that agrees with the
 single environment its author sat in has cost this project five separate
@@ -378,3 +473,63 @@ clinical carrier counts, inheritance questions and verdicts use that field.
 Gene-level rows retain their existing clinical carrier meaning. Withholding a
 sentence preserves the reading and identifies `pending_why: conclusion_basis`;
 `no_text_for_state` means the sentence itself has not been written.
+
+## Reading radar cards together
+
+`scholion system --all --register clinician --json` and
+`GET /api/systems?register=clinician` read the same system cards in one reading.
+The unqualified systems listing remains unchanged. The batch adds `cards` keyed
+by system and derives its reading counts from those cards. Input discovery,
+coverage references and prescription classification are reused only within the
+reading, with copies returned to callers; no personal result persists between
+readings. The web paints the diagram before the batch returns and seeds its
+existing language/register cache only if the answer epoch still matches.
+
+## PGS dosage and repeat calculation
+
+The local scoring layer decodes both GT indices against the complete REF/ALT
+list, with case normalisation and a single-sample input requirement. Missing,
+partial, conflicting and unresolved calls are excluded; an absent scoring
+position is never imputed from a variant-only VCF. Strand reversal requires a
+known, non-palindromic SNP pair. Indels use exact allele representations.
+A private temporary disk index is shared across a report and then removed.
+Position coverage, absolute weight coverage, exclusion counts, algorithm identity
+and hashes of the model and input accompany the sum. Reference calibration is
+a separate check. A repeat run scores the pinned model first. Replacing a model
+requires an explicit model-change acceptance even if its old result was unusable.
+
+The recalculation proposal is bound to missing corrected scoring evidence, not
+to an application-version change. Legacy calibrated numbers without that evidence
+remain diagnostic. Existing scoring-site calls are reused; missing reference
+calibration never justifies re-reading BAM. Partial report merges retain per-model
+input identity instead of assigning the latest VCF to the whole report.
+
+### Reference identity and host invocation
+
+ClinVar refreshes stage and validate a reference and its locally built index
+before promoting a complete generation. GRCh37 and GRCh38 have separate cache
+pointers. The reader also accepts legacy cache paths. A saved findings table
+carries its assembly, selected sample and digest; contradictory provenance is
+not a negative result. Failed refreshes preserve the previous generation.
+
+ACMG small-file witnesses include a full digest. Large-file witnesses are bounded
+filesystem checks, not proof of byte equality: explicit content verification uses
+the saved full digest without repeating clinical interpretation. Multi-allelic
+reference assertions need an explicit allele scope (`Number=A` or a single
+`CLNALLE`); an ambiguous relevant assertion refuses the scan before replacement.
+
+MCP owns its minimal invocation context. Ouroboros supplies its own host context
+to registered handlers; its constructor is not called by MCP. The pinned host
+contract in CI checks real registration, both MCP result forms and synthetic
+writes without starting a model.
+
+### Screen lifetime
+
+Screen context, chart cleanup, polling and stale-answer guards use one owner.
+See [VIEW-LIFECYCLE.md](VIEW-LIFECYCLE.md) before adding asynchronous screen work.
+
+## Variant reading boundary
+
+See [VARIANT-READINGS.md](VARIANT-READINGS.md) for the shared observation and
+source-resolution contract. Extend that object before adding source-selection
+logic to a new screen or interface.

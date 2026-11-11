@@ -161,6 +161,8 @@ include = [
     "/VERSION",
 ]
 exclude = [
+    "/tests/fixtures/genome/cache",
+    "/tests/browser/node_modules",
     "**/__pycache__",
     "**/*.pyc",
     "**/.DS_Store",

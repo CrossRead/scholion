@@ -636,8 +636,8 @@ def _load_manifest() -> Dict[str, float]:
     return core.read_ingest_manifest("labs")
 
 
-def _save_manifest(d: Dict[str, float]) -> None:
-    core.write_ingest_manifest("labs", d)
+def _save_manifest(d: Dict[str, float], previous: Optional[Dict[str, float]] = None) -> None:
+    core.write_ingest_manifest("labs", d, previous)
 
 
 def _manifest_moved(loader: str) -> Optional[Dict[str, Any]]:
@@ -2046,6 +2046,7 @@ def ingest(folder: str, force: bool = False,
     # into the profile, and a refused call writes nothing.
     moved = _manifest_moved("labs")
     manifest = _load_manifest()
+    manifest_before = dict(manifest)
     out: Dict[str, Any] = {
            "ok": True, "engine": ex, "files_seen": len(files), "files_processed": 0,
            "observations_added": 0, "observation_conflicts": [],
@@ -2413,7 +2414,7 @@ def ingest(folder: str, force: bool = False,
         finally:
             # A host may kill this invocation before the whole folder finishes.
             # Every completed file is checkpointed; failed files stay retryable.
-            _save_manifest(manifest)
-    _save_manifest(manifest)
+            _save_manifest(manifest, manifest_before)
+    _save_manifest(manifest, manifest_before)
     core.reset_cache()
     return out

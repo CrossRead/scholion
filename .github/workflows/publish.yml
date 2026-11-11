@@ -44,14 +44,29 @@ jobs:
             exit 1
           fi
 
-      - name: The project's own tests
-        run: ./run_tests.sh
-
       - name: Build
         run: |
           python -m pip install --upgrade build twine
           python -m build
           python -m twine check dist/*
+
+      - name: Check the exact distribution files
+        run: python src/tools/check_distribution.py dist/* --out "${{ runner.temp }}/distribution-audit.json"
+
+      - name: Test the exact source distribution
+        run: |
+          python src/tools/check_distribution.py dist/*.tar.gz --extract-to "${{ runner.temp }}/source-archive"
+          version="$(tr -d '[:space:]' < VERSION)"
+          cd "${{ runner.temp }}/source-archive/scholion-$version"
+          python src/tools/run_tests.py
+
+      - name: Check the installed wheel outside the checkout
+        run: |
+          python -m venv "${{ runner.temp }}/installed"
+          "${{ runner.temp }}/installed/bin/python" -m pip install dist/*.whl
+          version="$(tr -d '[:space:]' < VERSION)"
+          cd "${{ runner.temp }}"
+          env -u PYTHONPATH installed/bin/python "source-archive/scholion-$version/src/tools/check_interfaces.py" --installed --out installed-interfaces.json
 
       - uses: actions/upload-artifact@v4
         with:

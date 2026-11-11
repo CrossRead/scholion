@@ -235,7 +235,7 @@ def _profile_lock(folder: Path) -> Iterator[None]:
     path = folder / 'profile/.write.lock'
     core.mkdir_private(path.parent)
     if core._fcntl is None:
-        with _strict_lock(path):
+        with core._exclusive_lockfile(path):
             yield
     else:
         fd = os.open(str(path), os.O_CREAT | os.O_RDWR | getattr(os, 'O_NOFOLLOW', 0), 0o600)

@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
+import tempfile
 import subprocess
 import sys
 from pathlib import Path
@@ -17,6 +19,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 FIXTURE_PROFILE = Path(__file__).resolve().parent / "fixtures" / "profile"
+
+
+def isolated_genome(test_case) -> Path:
+    """Give a reader its own writable directory, never the tracked VCF fixture."""
+    directory = tempfile.TemporaryDirectory(prefix="scholion-fixture-genome-")
+    test_case.addCleanup(directory.cleanup)
+    target = Path(directory.name).resolve()
+    source = ROOT / "tests" / "fixtures" / "genome"
+    for name in ("tiny.vcf.gz", "tiny.vcf.gz.tbi"):
+        shutil.copyfile(source / name, target / name)
+    return target / "tiny.vcf.gz"
 
 # Can this tree BUILD a package, or is it one?
 #

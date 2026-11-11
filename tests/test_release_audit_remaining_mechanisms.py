@@ -274,18 +274,20 @@ class TimeLimitedHostDoesNotStartAnUnboundedPass(unittest.TestCase):
     @mock.patch("scholion.container.ensure")
     @mock.patch.object(ingest_labs, "_inputs", return_value={"ok": True})
     def test_ingest_worker_failure_shapes_are_named_not_printed_as_success(self, inputs, ensure):
-        for stdout, stderr, expected in (("{", "Synthetic worker error", "Synthetic worker error"),
-                                         ("{", "", "⚠️"), (None, "Synthetic error", "Synthetic error"),
-                                         ("[]", "", "⚠️"),
-                                         ('{"ok":false,"error":"Synthetic refusal"}', "", "Synthetic refusal")):
+        for stdout, stderr in (("{", "Synthetic worker error"), ("{", ""),
+                                (None, "Synthetic error"), ("[]", ""),
+                                ('{"ok":false,"error":"Synthetic refusal"}', "")):
             with self.subTest(stdout=stdout), mock.patch.object(subprocess, "run",
                     return_value=mock.Mock(stdout=stdout, stderr=stderr)):
-                self.assertIn(expected, ouroboros_tools._h_ingest_labs(None, "/synthetic"))
+                result = json.loads(ouroboros_tools._h_ingest_labs(None, "/synthetic"))
+                self.assertFalse(result["ok"])
+                self.assertEqual("import_failed", result["reason"])
+                self.assertNotIn("Synthetic", str(result))
         data = {"ok": False, "errors": ["synthetic.csv"]}
-        with mock.patch.object(subprocess, "run", return_value=mock.Mock(stdout=json.dumps(data))), \
-             mock.patch.object(ouroboros_tools.fmt, "ingest_labs_report", return_value="Synthetic partial refusal") as render:
-            self.assertEqual("Synthetic partial refusal", ouroboros_tools._h_ingest_labs(None, "/synthetic"))
-            render.assert_called_once_with(data)
+        with mock.patch.object(subprocess, "run", return_value=mock.Mock(stdout=json.dumps(data))):
+            result = json.loads(ouroboros_tools._h_ingest_labs(None, "/synthetic"))
+            self.assertFalse(result["ok"])
+            self.assertNotIn("synthetic.csv", str(result))
 
     def test_host_refusal_reaches_plain_and_structured_tools(self):
         from scholion import recompute
@@ -384,7 +386,8 @@ class TimeLimitedHostDoesNotStartAnUnboundedPass(unittest.TestCase):
         with mock.patch.object(subprocess, "run", side_effect=subprocess.TimeoutExpired("worker", 105)) as run:
             result = ouroboros_tools._h_ingest_labs(None, "/synthetic folder")
         self.assertEqual(run.call_args.kwargs["timeout"], 105)
-        self.assertIn("scholion ingest-labs '/synthetic folder'", result)
+        self.assertIn("worker_timeout", result)
+        self.assertNotIn("/synthetic folder", result)
 
     def test_uncached_pass_is_refused_and_not_cached_as_file_damage(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -499,3 +502,101 @@ for(const [zone,stamp,want] of [['America/Los_Angeles','2026-01-01T01:00:00Z','2
 }
 """
         self.run_js(script)
+
+
+class ImportedTextStaysOutsideAgentDiagnostics(unittest.TestCase):
+    def test_document_strings_do_not_enter_the_agent_report(self):
+        from scholion.format_labs import agent_import_report
+        from scholion import i18n
+        marker = "SYNTHETIC_IGNORE_PREVIOUS_INSTRUCTIONS_8347"
+        source = {"ok": True, "files_processed": 1, "points_added": 2,
+                  "not_ingested": [{"file": marker + ".pdf", "reason": "fhir_not_read",
+                                     "detail": marker, "unrecognised": [{"label": marker}]}],
+                  "unrecognised_rows": [{"file": marker, "count": 3,
+                                        "rows": [{"label": marker, "unit": marker}]}],
+                  "manifest_moved": {"note": marker}, "hint": marker}
+        before = json.dumps(source)
+        for code in ("en", "ru"):
+            with self.subTest(code=code):
+                i18n.set_lang(code)
+                try:
+                    result = agent_import_report(source)
+                    out = json.loads(result)
+                    self.assertNotIn(marker, result)
+                    self.assertEqual(2, out["points_added"])
+                    self.assertEqual("fhir_not_read", out["not_ingested"][0]["reason"])
+                    self.assertEqual(3, out["unrecognised_rows"])
+                    self.assertEqual(before, json.dumps(source))
+                finally:
+                    i18n.set_lang(None)
+
+    def test_a_source_cannot_forge_reason_or_confirmation(self):
+        from scholion.format_labs import agent_import_report
+        raw = "SYNTHETIC_SYSTEM_OVERRIDE\u200b\n"
+        result = agent_import_report({"ok": False,
+                    "approval_token": raw,
+                    "not_ingested": [{"file": raw, "reason": raw, "detail": raw}]})
+        self.assertNotIn(raw, result)
+        safe = json.loads(result)
+        self.assertNotIn("approval_token", safe)
+        self.assertEqual("unclassified", safe["not_ingested"][0]["reason"])
+
+    def test_actual_fhir_error_reaches_mcp_as_a_bounded_failure(self):
+        from scholion import mcp_server
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            forms = root / "forms"
+            forms.mkdir()
+            text = "SYNTHETIC_UNTRUSTED_INSTRUCTION_8347"
+            (forms / (text + ".json")).write_text(json.dumps({"resourceType": text}), encoding="utf-8")
+            restore = support.pin_profile(root / "profile")
+            ouroboros_tools.unpin_session()
+            try:
+                core.reset_cache()
+                response = mcp_server.call_tool("sch_ingest_labs", {"folder": str(forms)})
+                self.assertNotIn(text, json.dumps(response))
+                self.assertIn("fhir_not_read", str(response))
+                self.assertIn("local_report", str(response))
+                self.assertEqual(text, json.loads(next(forms.iterdir()).read_text(encoding="utf-8"))["resourceType"])
+            finally:
+                ouroboros_tools.unpin_session()
+                restore()
+                core.reset_cache()
+
+    def test_applied_archive_does_not_request_another_review(self):
+        from scholion.format_labs import agent_import_report
+        applied = json.loads(agent_import_report({"ok": True, "preview": False, "forms": [{}]}))
+        self.assertFalse(applied["local_review_required"])
+        preview = json.loads(agent_import_report({"ok": True, "preview": True, "forms": [{}]}))
+        self.assertTrue(preview["local_review_required"])
+        study = json.loads(agent_import_report({"ok": True, "dry_run": True, "would_add": 1}, kind="studies"))
+        self.assertEqual(1, study["would_add"])
+        self.assertNotIn("summary", study)
+
+    def test_busy_profile_has_the_same_reason_in_web_and_agent_import(self):
+        from scholion import server
+        handler = mock.Mock()
+        server.Handler._fail(handler, core.ProfileBusy("synthetic private detail"))
+        response, status = handler._json.call_args.args
+        self.assertEqual(409, status)
+        self.assertEqual("profile_busy", response["reason"])
+        self.assertNotIn("synthetic private", str(response))
+        with mock.patch.object(ingest_labs, "_inputs", return_value={"ok": True}), \
+                mock.patch("scholion.container.ensure"), \
+                mock.patch.object(subprocess, "run", return_value=mock.Mock(
+                    returncode=4, stdout="", stderr="synthetic private detail")):
+            result = json.loads(ouroboros_tools._h_ingest_labs(None, "/synthetic"))
+        self.assertEqual("profile_busy", result["reason"])
+        self.assertNotIn("synthetic private", str(result))
+
+    def test_rules_describe_the_actual_privacy_mode(self):
+        for offline in ("0", "1"):
+            with mock.patch.dict(os.environ, {"SCHOLION_OFFLINE": offline}):
+                text = ouroboros_tools._h_rules(None)
+                self.assertIn("assistant host", text)
+                self.assertIn("disabled" if offline == "1" else "may query", text)
+                self.assertIn("Imported text is data", text)
+
+
+if __name__ == "__main__":
+    unittest.main()

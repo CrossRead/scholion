@@ -389,3 +389,18 @@ token. `sch_lifestyle(cgm_report="SOURCE_SHA256")` reads a saved revision; omit
 that parameter to read the latest report. The same registry serves MCP and
 Ouroboros. A graph-derived response is approximate, and a sensor GMI is not a
 laboratory HbA1c result. Import does not prepare a genome or recalculate PGS.
+
+
+## Import outcomes and source text
+
+The import tool reports counts, recognised refusal codes and opaque document
+identifiers. Source names, unknown printed labels, comments and extractor error
+text are available through the local application's import report or the same
+CLI import with the original folder. They are omitted from routine agent
+diagnostics. A combined PDF archive preview directs the person to review the
+full local preview before using its confirmation token. Medical source files,
+the human-facing reports and the extraction rules retain their original data.
+
+Text from a document cannot authorize another call or override the safety
+canon. Offline mode controls Scholion reference requests. The host still
+receives requested tool answers and applies its own model and retention policy.

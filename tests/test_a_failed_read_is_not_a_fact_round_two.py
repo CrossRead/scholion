@@ -148,8 +148,7 @@ class TestACompositionThatCouldNotBeReadIsUnmeasured(unittest.TestCase):
 
     def test_the_locus_is_refused_by_name_not_presumed_reference(self):
         old = os.environ.get("SCHOLION_GENOME_VCF")
-        os.environ["SCHOLION_GENOME_VCF"] = str(
-            support.ROOT / "tests" / "fixtures" / "genome" / "tiny.vcf.gz")
+        os.environ["SCHOLION_GENOME_VCF"] = str(support.isolated_genome(self))
         core.reset_cache()
 
         def restore():

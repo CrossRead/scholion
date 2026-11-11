@@ -430,8 +430,10 @@ class TestConnectingAGenomeCannotMakeTheAnswerLessCautious(_Base):
             # `test_one_file_one_person.py`; the case THIS test is about is a
             # readable file in a known build whose rows do not cover the
             # positions, and declaring the build is what makes it that case.
-            return {"SCHOLION_GENOME_VCF": str(GENOME_FIXTURE),
-                    "SCHOLION_GENOME_DIR": str(GENOME_FIXTURE.parent),
+            if not hasattr(self, "_isolated_genome"):
+                self._isolated_genome = support.isolated_genome(self)
+            return {"SCHOLION_GENOME_VCF": str(self._isolated_genome),
+                    "SCHOLION_GENOME_DIR": str(self._isolated_genome.parent),
                     "SCHOLION_GENOME_ASSEMBLY": "GRCh38"}
         return {"SCHOLION_GENOME_VCF": str(support.ROOT / "tests/fixtures/no-such-file.vcf.gz"),
                 "SCHOLION_GENOME_DIR": str(support.ROOT / "tests/fixtures/no-genome")}

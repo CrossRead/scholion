@@ -284,3 +284,24 @@ class TestTheManifest(unittest.TestCase):
 
 if __name__ == "__main__":                                   # pragma: no cover
     unittest.main()
+
+
+class TestConcurrentStudyImport(unittest.TestCase):
+    def test_a_different_study_written_during_extraction_survives(self):
+        with folder_of({"one.pdf": ULTRASOUND}) as tmp:
+            destination = tmp / "profile" / "studies.json"
+            def concurrent_write(path):
+                core.write_json(destination, {"studies": [
+                    {"id": "concurrent", "date": "2026-01-01",
+                     "kind": "Synthetic study", "conclusion": "Recorded by another process"}]})
+                return ULTRASOUND
+            with mock.patch.object(ingest_studies, "_read_pdf", side_effect=concurrent_write):
+                result = ingest_studies.ingest(str(tmp / "reports"))
+            self.assertTrue(result["ok"])
+            saved = studies_in(tmp)
+            self.assertEqual(2, len(saved))
+            self.assertIn("concurrent", {r["id"] for r in saved})
+
+
+if __name__ == "__main__":
+    unittest.main()

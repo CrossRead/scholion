@@ -62,6 +62,7 @@ from .format_labs import (  # noqa: F401
     wearable_ingest_report,
     profile_set_report,
     ingest_labs_report,
+    agent_import_report,
     ingest_studies_report,
     markers_local_report,
 )

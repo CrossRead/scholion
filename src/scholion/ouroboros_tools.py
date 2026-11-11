@@ -172,7 +172,6 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
                    approve_archive: str = "", force: bool = False, kind: str = "labs", confirm: str = "") -> str:
     import json
     import os
-    import shlex
     import subprocess
     import sys
     import tempfile
@@ -187,10 +186,10 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
         return "⚠️ " + _t("ingest.unknown_kind")
     if kind == "labs" and (archive_preview or approve_archive):
         from scholion import lab_archive
-        return fmt.ingest_labs_report(lab_archive.run(folder, approval=approve_archive))
+        return fmt.agent_import_report(lab_archive.run(folder, approval=approve_archive))
     inputs = ingest_labs._inputs(folder)
     if not inputs["ok"]:
-        return "⚠️ " + inputs["error"]
+        return fmt.agent_import_report({"ok": False})
     # The parent must witness the first naming itself: a child's lazy naming
     # is indistinguishable from somebody replacing the pinned container.
     container.gate()
@@ -212,21 +211,24 @@ def _h_ingest_labs(ctx: "ToolContext", folder: str = "", archive_preview: bool =
             env["SCHOLION_WORKSTATION"] = os.path.join(isolated, "no-workstation.json")
             worker = subprocess.run(command, capture_output=True, text=True, env=env, timeout=105)
     except subprocess.TimeoutExpired:
-        return "⚠️ " + _t("tool.host_ingest_timeout", command="scholion " + operation + " " + shlex.quote(folder))
+        return fmt.agent_import_report({"ok": False, "not_ingested": [
+            {"reason": "worker_timeout"}]})
+    if getattr(worker, "returncode", 0) == 4:
+        return fmt.agent_import_report({"ok": False, "reason": "profile_busy"})
     try:
         r = json.loads(worker.stdout)
     except (ValueError, TypeError):
-        return "⚠️ " + (worker.stderr.strip() or _t("web.common.error"))
+        return fmt.agent_import_report({"ok": False})
     core.reset_cache()
     if not isinstance(r, dict):
-        return "⚠️ " + _t("web.common.error")
+        return fmt.agent_import_report({"ok": False})
     if kind == "studies":
-        return json.dumps(r,ensure_ascii=False) if r.get("dry_run") or not r.get("ok") else fmt.ingest_studies_report(r)
+        return fmt.agent_import_report(r, kind="studies")
     if not r.get("ok"):
-        return fmt.ingest_labs_report(r) if r.get("errors") else f"⚠️ {r.get('error')}"
-    # The same report the command line prints — the per-file table used to be
-    # a private summary here, and it read a key (`date`) the engine never wrote.
-    return fmt.ingest_labs_report(r)
+        return fmt.agent_import_report(r)
+    # Keep document labels, names and reader errors in the local report.
+    # The host receives counts and known reason codes from the same result.
+    return fmt.agent_import_report(r)
 
 
 # --- the reports a model asks for ABOUT THE PERSON --------------------------
@@ -405,7 +407,9 @@ def _h_rules(ctx: "ToolContext") -> str:
         # An incomplete build. Saying nothing here would read as «this product has
         # no rules», which is the worst of the available untruths.
         return _t("skill.file_missing", path=str(path))
-    return text.rstrip("\n") + "\n" + _canon_through_this_door(text)
+    from . import net
+    privacy = _t("tool.privacy.offline" if net.offline() else "tool.privacy.online")
+    return text.rstrip("\n") + "\n" + _canon_through_this_door(text) + "\n" + privacy
 
 
 def _canon_through_this_door(text: str) -> str:

@@ -357,6 +357,8 @@ class Handler(BaseHTTPRequestHandler):
             # Which person's data a request may touch: a refusal the page shows,
             # with its code, so it can tell «the patient changed» from the rest.
             return self._json({"error": str(exc), "container": exc.code}, 409)
+        if isinstance(exc, core.ProfileBusy):
+            return self._json({"error": _t("server.profile_busy"), "reason": "profile_busy"}, 409)
         if isinstance(exc, core.SourcesUnreadable):
             # Not an internal error: the person's own settings file does not
             # read, and every answer would otherwise be about the wrong files.

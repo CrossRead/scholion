@@ -40,6 +40,26 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.8 — 11.11.2026
+
+Concurrent imports preserve independent profile changes and completed-file checkpoints. A write whose profile lock is unavailable is refused instead of proceeding without protection. Importing studies preserves other studies added while source documents are being read.
+
+Assistant import replies provide counts and recognised refusal codes. Document labels, filenames, medical comments and extractor errors remain available in the local import report. Imported text cannot authorize actions or override assistant rules. Offline reference access does not change the assistant host's model or retention policy.
+
+Installation archives exclude temporary test caches and browser dependencies. Checks run against the source archive and separately installed wheel that will be distributed.
+
+### What this changes in the conclusions
+
+Clinical calculations and saved genetic readings retain their meaning. Parallel imports no longer silently discard independent changes. An unavailable profile write reports a refusal in the command line, local application and assistant tools; retry after the other operation finishes. Routine assistant import diagnostics omit source text, while the full human-facing report and original documents remain available locally.
+
+### What is retracted
+
+None.
+
+### What needs recomputing
+
+Nothing needs recomputing. Existing laboratory data, genotype calls, mitochondrial reports and PGS results remain usable. After upgrading, restart running Scholion servers and connected assistant processes before writing to the same profile. Open `scholion serve` to continue using the local application. Retry any import that was refused or interrupted; completed measurements are retained and repeated imports do not duplicate them.
+
 ## v0.7.7 — 04.11.2026
 
 The new Mitochondria body system links saved mtDNA readings to dated laboratory

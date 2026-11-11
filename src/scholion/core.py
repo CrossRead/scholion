@@ -346,13 +346,23 @@ def manifest_lookup(files: Dict[str, float], path: Path) -> Tuple[str, Optional[
     return key, None
 
 
-def write_ingest_manifest(loader: str, files: Dict[str, float]) -> None:
-    try:
+def write_ingest_manifest(loader: str, files: Dict[str, float],
+                          previous: Optional[Dict[str, float]] = None) -> None:
+    """Merge this import's changes with checkpoints from other processes."""
+    with profile_write_lock():
+        current = read_ingest_manifest(loader)
+        before = previous or {}
+        for key in before.keys() - files.keys():
+            if current.get(key) == before[key]:
+                current.pop(key, None)
+        current.update({key: value for key, value in files.items()
+                        if key not in before or before[key] != value})
         write_json(ingest_manifest_path(loader),
                    {"_meta": {"shape": INGEST_MANIFEST_SHAPE, "loader": loader},
-                    "files": files}, indent=1)
-    except Exception:                                                # noqa: BLE001
-        pass          # quiet: a manifest not written costs one extra (idempotent) read next time
+                    "files": current}, indent=1)
+        if previous is not None:
+            previous.clear()
+            previous.update(files)
 
 
 def adopt_ingest_manifest(loader: str) -> Optional[Dict[str, Any]]:
@@ -444,14 +454,14 @@ import threading as _threading
 
 try:
     import fcntl as _fcntl
-except ImportError:                                   # Windows: see _exclusive_lockfile
+except ImportError:                                   # Windows uses msvcrt byte locking
     _fcntl = None
 
-#: How long a lockfile left behind by a process that died mid-write stays
-#: believed. A profile write is a few milliseconds; a minute is far beyond any
-#: honest one, and short enough that a crashed run does not lock somebody out of
-#: their own history until they find the file and delete it by hand.
-_LOCK_STALE_AFTER = 60.0
+_msvcrt: Any
+try:
+    import msvcrt as _msvcrt
+except ImportError:
+    _msvcrt = None
 
 #: How long to wait for a lock somebody else holds before refusing. Long enough
 #: to cover an ordinary write by the other process, short enough that a person
@@ -474,75 +484,66 @@ class ProfileBusy(RuntimeError):
 
 
 @_contextlib.contextmanager
-def _exclusive_lockfile(path: Path):
-    """A lock built out of «create this file, and fail if it is already there».
-
-    `O_CREAT | O_EXCL` is atomic on every filesystem this runs on, Windows
-    included, which is what makes it usable where `flock` is missing. What it
-    does NOT do is release itself when the holder dies — so a stale file would
-    lock the profile forever. Hence the age: a lock older than
-    `_LOCK_STALE_AFTER` is taken over rather than believed.
-
-    Liveness is deliberately judged by age alone. The obvious check — «is that
-    pid still running» — is `os.kill(pid, 0)`, and on Windows `os.kill` does not
-    send a signal: it calls `TerminateProcess`. The check for whether the other
-    writer is alive would kill it.
-    """
-    import time as _time
+def _native_write_lock(path: Path):
+    """Bounded OS lock, released by closing the handle even after process exit."""
+    import errno
+    import time
     path.parent.mkdir(parents=True, exist_ok=True)
-    deadline = _time.monotonic() + _LOCK_WAIT
-    fd = None
+    try:
+        fd = os.open(str(path), os.O_CREAT | os.O_RDWR, 0o600)
+    except OSError as exc:
+        raise ProfileBusy("Cannot open the profile write lock. No change was made.") from exc
+    deadline = time.monotonic() + _LOCK_WAIT
+    try:
+        while True:
+            try:
+                if _fcntl is not None:
+                    _fcntl.flock(fd, _fcntl.LOCK_EX | _fcntl.LOCK_NB)
+                else:
+                    os.lseek(fd, 0, os.SEEK_SET)
+                    _msvcrt.locking(fd, _msvcrt.LK_NBLCK, 1)
+                break
+            except OSError as exc:
+                if exc.errno not in (errno.EACCES, errno.EAGAIN, errno.EDEADLK):
+                    raise ProfileBusy("Cannot acquire the profile write lock. No change was made.") from exc
+                if time.monotonic() >= deadline:
+                    raise ProfileBusy("The profile is being updated by another process. Try again shortly.") from exc
+                time.sleep(0.05)
+        yield
+    finally:
+        # Closing releases flock and Windows byte locks. The persistent file
+        # must not be unlinked while another process may be waiting on it.
+        os.close(fd)
+
+
+@_contextlib.contextmanager
+def _exclusive_lockfile(path: Path):
+    """Windows uses an OS lock. An unsupported platform refuses stale files."""
+    import time
+    if _msvcrt is not None:
+        with _native_write_lock(path):
+            yield
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    deadline = time.monotonic() + _LOCK_WAIT
     while True:
         try:
             fd = os.open(str(path), os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
             break
-        except FileExistsError:
-            try:
-                age = _time.time() - path.stat().st_mtime
-            except OSError:
-                age = 0.0                      # it vanished — try again at once
-            if age > _LOCK_STALE_AFTER:
-                try:
-                    os.unlink(str(path))
-                except OSError:
-                    pass
-                continue
-            if _time.monotonic() >= deadline:
-                held = ""
-                try:
-                    held = path.read_text(encoding="utf-8").strip()[:60]
-                except OSError:
-                    pass
-                raise ProfileBusy(
-                    "another process is writing the profile (" + (held or "?") + ") "
-                    "and this one waited " + str(int(_LOCK_WAIT)) + "s for it. Nothing "
-                    "was changed. This platform has no flock, so writing anyway would "
-                    "erase the other change without a word. Close the other window — "
-                    "the local web application counts as one — and run it again. If "
-                    "nothing else is running, remove " + str(path) + "."
-                )
-            _time.sleep(0.05)
         except OSError as exc:
-            # Windows can deny access while another holder deletes the file.
-            # Retry within the same deadline; never enter the write unlocked.
-            if _time.monotonic() >= deadline:
+            if time.monotonic() >= deadline:
                 raise ProfileBusy(
-                    f"cannot acquire profile write lock {path}: {exc}. "
-                    "Nothing was changed."
-                ) from exc
-            _time.sleep(0.05)
+                    "Cannot acquire profile write lock " + str(path)
+                    + ". No change was made. If no writer is running, inspect "
+                    "and remove the abandoned lock before retrying.") from exc
+            time.sleep(0.05)
     try:
-        try:
-            os.write(fd, f"pid {os.getpid()}".encode("utf-8"))
-        except OSError:
-            pass
+        os.write(fd, f"pid {os.getpid()}".encode("utf-8"))
         yield
     finally:
         os.close(fd)
-        try:
-            os.unlink(str(path))
-        except OSError:
-            pass
+        path.unlink()
+
 
 _WRITE_TLOCK = _threading.RLock()
 _WRITE_DEPTH = _threading.local()
@@ -550,29 +551,14 @@ _WRITE_DEPTH = _threading.local()
 
 @_contextlib.contextmanager
 def profile_write_lock():
-    """Serialize a read-modify-write of the profile across threads AND processes.
-
-    The web server is a ThreadingHTTPServer: two requests that each read a file,
-    change one field and write it back run concurrently, and the later writer
-    silently drops the earlier one's change — a lost update, reproduced as five
-    failures out of eight parallel writes. The same race exists between a CLI
-    write and the running server. `write_json` makes a SINGLE write atomic; it
-    cannot make a read-and-then-write atomic, which is what this does.
-
-    A process-local RLock covers the server's own threads (and makes the lock
-    reentrant, so a mutator that calls another mutator does not deadlock). An
-    flock on a lockfile in the profile directory covers a separate CLI process.
-    flock is advisory and per-open-description, so a second os.open in the same
-    process would contend — the depth counter skips re-locking on reentry.
-    """
+    """Serialize the complete read-modify-write across threads and processes."""
     depth = getattr(_WRITE_DEPTH, "n", 0)
     if not depth:
-        # The integrity gate (task 192), before anything is touched: a mutator
-        # may clear demonstration files or move a file aside before it writes,
-        # and those are writes into a container too.
         from . import container as _container
         _container.gate()
-    with _WRITE_TLOCK:
+    if not _WRITE_TLOCK.acquire(timeout=_LOCK_WAIT):
+        raise ProfileBusy("The profile is being updated by another thread. Try again shortly.")
+    try:
         if depth:
             _WRITE_DEPTH.n = depth + 1
             try:
@@ -580,41 +566,15 @@ def profile_write_lock():
             finally:
                 _WRITE_DEPTH.n = depth
             return
-        if _fcntl is None:
-            # No flock on this platform. A lockfile taken exclusively gives the
-            # same protection between processes; where it cannot be taken, the
-            # write is refused rather than allowed to erase somebody else's.
-            _WRITE_DEPTH.n = depth + 1
-            try:
-                with _exclusive_lockfile(profile_dir() / ".write.lock"):
-                    yield
-            finally:
-                _WRITE_DEPTH.n = depth
-            return
-        try:
-            lockpath = profile_dir() / ".write.lock"
-            lockpath.parent.mkdir(parents=True, exist_ok=True)
-            fd = os.open(str(lockpath), os.O_CREAT | os.O_RDWR, 0o600)
-        except OSError:
-            # If the lockfile cannot be made, the RLock still serializes this
-            # process's own threads — better than nothing, and never a reason to
-            # refuse to write somebody's data.
-            _WRITE_DEPTH.n = depth + 1
+        lock = (_native_write_lock if _fcntl is not None else _exclusive_lockfile)
+        with lock(profile_dir() / ".write.lock"):
+            _WRITE_DEPTH.n = 1
             try:
                 yield
             finally:
-                _WRITE_DEPTH.n = depth
-            return
-        _WRITE_DEPTH.n = depth + 1
-        try:
-            _fcntl.flock(fd, _fcntl.LOCK_EX)
-            yield
-        finally:
-            _WRITE_DEPTH.n = depth
-            try:
-                _fcntl.flock(fd, _fcntl.LOCK_UN)
-            finally:
-                os.close(fd)
+                _WRITE_DEPTH.n = 0
+    finally:
+        _WRITE_TLOCK.release()
 
 
 def write_json(path: Path, data: Any, *, indent: int = 2) -> None:

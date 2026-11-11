@@ -82,7 +82,8 @@ class CandidateChecks(unittest.TestCase):
         self.assertTrue(report['ok'], report['errors'])
         self.assertFalse(report['release_acceptance'])
         self.assertEqual(set(contract.PARITY), set(report['routes']))
-        self.assertEqual(13, len(report['families']))
+        self.assertEqual(14, len(report['families']))
+        self.assertIn('profile-integrity', report['families'])
         self.assertEqual(['mitochondria'], report['families']['mitochondrial-bam']['scenarios'])
         extra = check_registry.report(support.ROOT, {**contract.PARITY, 'GET /api/new': 'new'},
                                       contract.PLUGIN)

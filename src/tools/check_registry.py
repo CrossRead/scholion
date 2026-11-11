@@ -20,6 +20,13 @@ class Family:
 
 
 FAMILIES = (
+    Family('profile-integrity',
+           ('core.py', 'store.py', 'lifecycle.py', 'ingest_labs.py', 'ingest_studies.py',
+            'format_labs.py', 'ouroboros_tools.py', 'mcp_server.py', 'server.py'),
+           ('a_second_writer_is_refused_not_ignored', 'a_study_that_was_done_is_not_called_not_done',
+            'release_audit_remaining_mechanisms', 'fhir_preserves_measurement_identity',
+            'cgm_reports_keep_measurement_kinds'),
+           ('labs', 'system', 'focus-log')),
     Family('mitochondrial-bam', ('mitochondria.py',), ('mitochondria',), ('mitochondria',)),
     Family('mitochondrial-context', ('mitochondrial_system.py', 'knowledge/mitochondrial_context.json'),
            ('mitochondrial_system',), ('system', 'radar')),

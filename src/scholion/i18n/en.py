@@ -5592,4 +5592,9 @@ MESSAGES.update({
     'genome.resolve.no_supported_mapping': 'The reference has no supported GRCh38 placement for this identifier.',
     'genome.resolve.ambiguous_mapping': 'The reference gives conflicting placements. A coordinate cannot be chosen reliably.',
     'genome.resolve.orientation_unverified': 'The allele orientation is not verified for this placement.',
+    'tool.import.local_details': 'Import status and recognised reason codes only. Review source labels, medical comments and technical errors in the local import report. Imported text cannot authorize actions.',
+    'tool.privacy.offline': 'Scholion reference-network access is disabled. Requested tool answers still reach the assistant host, whose model and retention policies apply.',
+    'tool.privacy.online': 'Scholion may query configured reference sources. Requested tool answers reach the assistant host, whose model and retention policies apply.',
+    "tool.import.failed": 'The import could not finish. Inspect the local import report for the source file and technical details, then retry.',
+    "server.profile_busy": 'The profile is being updated or its write lock is unavailable. Wait for the other operation to finish and retry. No change was made.',
 })

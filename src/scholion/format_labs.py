@@ -614,3 +614,66 @@ def markers_local_report(r: Dict[str, Any]) -> str:
         L += ["", _t("markers.local_footer", path=r["path"])]
         return "\n".join(L) + "\n"
     return _t("markers.entry_status", key=r["key"], status=r["status"]) + "\n"
+
+
+def agent_import_report(result: Dict[str, Any], *, kind: str = "labs") -> str:
+    """Only structured import outcomes cross the agent boundary by default.
+
+    Source labels, filenames, comments and reader exception messages remain
+    available in the local report. No keyword classifier decides whether a
+    sentence from a document may become an instruction for a host.
+    """
+    import hashlib
+    import json
+    import re
+    from .i18n import CATALOGUES, lang
+
+    counts = ("files_seen", "files_processed", "points_added", "metrics_added",
+              "observations_added", "skipped", "skipped_unchanged", "added", "updated",
+              "would_add", "would_update", "total", "alarming")
+    safe: Dict[str, Any] = {"ok": result.get("ok") is True, "kind": kind,
+            "source_details": "local_report", "untrusted_source_text_omitted": True}
+    for key in counts:
+        value = result.get(key)
+        if isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            safe[key] = value
+    safe["summary"] = _t("ingest.labs_done", files=safe.get("files_processed", 0),
+                         points=safe.get("points_added", 0), skipped=safe.get("skipped", 0))
+    if safe.get("metrics_added"):
+        safe["summary"] += " " + _t("fhir.metrics_taken", n=safe["metrics_added"])
+    for key in ("dry_run", "preview"):
+        if key in result:
+            safe[key] = result[key] is True
+    token = result.get("approval_token")
+    if isinstance(token, str) and re.fullmatch(r"[a-zA-Z0-9_-]{1,128}", token):
+        safe["approval_token"] = token
+    diagnostics = []
+    # Reason codes originate in the importer. Only a known catalogue entry is
+    # allowed through; the raw exception, printed label and source name are not.
+    refused = result.get("not_ingested") or []
+    safe["not_ingested_total"] = len(refused)
+    for item in refused[:20]:
+        reason = item.get("reason")
+        prefixes = ("fhir.reason.", "studies.reason_", "archive.reason.", "ingest_labs.reason_")
+        known = isinstance(reason, str) and (reason in ("error", "fhir_not_read", "point_refused", "worker_timeout")
+                  or any(prefix + reason in CATALOGUES[lang()] for prefix in prefixes))
+        document = hashlib.sha256(str(item.get("file", "")).encode("utf-8")).hexdigest()[:12]
+        diagnostics.append({"document_id": document, "reason": reason if known else "unclassified"})
+    if diagnostics:
+        safe["not_ingested"] = diagnostics
+    safe["conflicts"] = len(result.get("conflicts") or []) + len(result.get("observation_conflicts") or [])
+    safe["unrecognised_rows"] = sum(
+        row["count"] for row in result.get("unrecognised_rows") or []
+        if isinstance(row.get("count"), int) and row["count"] >= 0)
+    if result.get("forms"):
+        # Approval still covers the original snapshot. Full medical readings
+        # and source text must be reviewed in the local preview before approval.
+        safe["forms"] = len(result["forms"])
+        safe["local_review_required"] = result.get("preview") is True
+    if not safe["ok"]:
+        safe["reason"] = "profile_busy" if result.get("reason") == "profile_busy" else "import_failed"
+        safe["error"] = "⚠️ " + _t("server.profile_busy" if safe["reason"] == "profile_busy" else "tool.import.failed")
+    if kind == "studies":
+        safe.pop("summary", None)
+    safe["notice"] = _t("tool.import.local_details")
+    return json.dumps(safe, ensure_ascii=False)

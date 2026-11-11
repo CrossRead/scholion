@@ -31,8 +31,7 @@ class TestAHalfCallIsNotACall(unittest.TestCase):
 
     def setUp(self):
         self._old = os.environ.get("SCHOLION_GENOME_VCF")
-        os.environ["SCHOLION_GENOME_VCF"] = str(
-            support.ROOT / "tests" / "fixtures" / "genome" / "tiny.vcf.gz")
+        os.environ["SCHOLION_GENOME_VCF"] = str(support.isolated_genome(self))
         core.reset_cache()
 
     def tearDown(self):

@@ -88,6 +88,20 @@ unchanging preparation or genuinely repeated work. Reports separate total time
 from per-test setup/body/cleanup time. Never infer a full-suite speedup from a
 small selected subset or a single unqualified measurement.
 
+## Check what is distributed
+
+Build the wheel and sdist before exercising them. Run
+`python3 src/tools/check_distribution.py dist/*` to reject generated caches,
+private root directories, links and unsafe paths. It checks archive paths; the
+sanitizer's content and licensing audits remain separate requirements.
+
+The publication workflow runs the suite inside that exact extracted sdist,
+then compares the installed wheel's CLI, Web, MCP and plugin scenarios outside
+the checkout. It uploads the same files without rebuilding. Genome-reading
+tests copy the tiny fixture before allowing a reader to cache its pass; the
+tracked fixture is immutable. Neither a Git-only check nor a source-tree pass
+certifies the content of a built archive.
+
 ## The engine package — hard rules
 
 Enforced by `tests/test_engine_stays_split.py`; the test's failure messages

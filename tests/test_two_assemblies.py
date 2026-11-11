@@ -110,8 +110,7 @@ class TestReadingAGrch37File(unittest.TestCase):
         self._env = {k: os.environ.get(k) for k in
                      ("SCHOLION_GENOME_ASSEMBLY", "SCHOLION_GENOME_VCF")}
         os.environ["SCHOLION_GENOME_ASSEMBLY"] = "GRCh37"
-        os.environ["SCHOLION_GENOME_VCF"] = str(
-            support.ROOT / "tests" / "fixtures" / "genome" / "tiny.vcf.gz")
+        os.environ["SCHOLION_GENOME_VCF"] = str(support.isolated_genome(self))
 
     def tearDown(self):
         for k, v in self._env.items():

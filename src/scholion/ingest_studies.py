@@ -201,8 +201,8 @@ def _load_manifest() -> Dict[str, float]:
     return core.read_ingest_manifest("studies")
 
 
-def _save_manifest(d: Dict[str, float]) -> None:
-    core.write_ingest_manifest("studies", d)
+def _save_manifest(d: Dict[str, float], previous: Optional[Dict[str, float]] = None) -> None:
+    core.write_ingest_manifest("studies", d, previous)
 
 
 def _clean(s: str) -> str:
@@ -348,8 +348,11 @@ def ingest(folder: str, force: bool = False,
         "_meta": {"what": _t("studies.meta_what")},
         "studies": []}
     by_id: Dict[str, Dict[str, Any]] = {s.get("id"): s for s in data.get("studies") or []}
+    import copy
+    original_by_id = copy.deepcopy(by_id)
     moved = None if dry_run else _manifest_moved("studies")
     manifest = _load_manifest()
+    manifest_before = dict(manifest)
     files = sorted(root.rglob("*.pdf"))
     added: List[str] = []
     updated: List[str] = []
@@ -478,9 +481,21 @@ def ingest(folder: str, force: bool = False,
                 return {"ok":False,"error":_t("studies.preview_changed")}
         except OSError as exc:
             return {"ok":False,"error":_t("studies.preview_unreadable", detail=str(exc))}
-    if added or updated:
-        core.write_json(p, data, indent=1)
-    _save_manifest(manifest)
+    with core.profile_write_lock():
+        if added or updated:
+            current = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"studies": []}
+            merged = {row.get("id"): row for row in current.get("studies") or []}
+            for sid, row in by_id.items():
+                if row == original_by_id.get(sid):
+                    continue
+                if merged.get(sid) not in (None, original_by_id.get(sid), row):
+                    raise core.ProfileBusy("This study changed during import. Review it and retry.")
+                merged[sid] = row
+            current["studies"] = sorted(merged.values(), key=lambda row: (row.get("date") or "", row.get("id") or ""))
+            current.setdefault("_meta", {})["updated"] = _dt.date.today().isoformat()
+            core.write_json(p, current, indent=1)
+            data = current
+        _save_manifest(manifest, manifest_before)
     core.reset_cache()
     return {"ok": True, "files_seen": len(files), "skipped_unchanged": skipped,
             "added": len(added), "updated": len(updated), "total": len(data["studies"]),

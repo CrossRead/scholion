@@ -347,10 +347,9 @@ def execute(root, commands, installed=False, agent_plugin=None):
         work = Path(directory).resolve()
         profile = work / 'profile'
         shutil.copytree(root / 'tests/fixtures/profile', profile)
-        # POSIX retains the flock file after writing. Windows takes an exclusive
-        # lockfile, so precreating one there would block every fixture write.
-        if os.name == 'posix':
-            (profile / '.write.lock').touch()
+        # Native OS locks retain this control file on every supported platform.
+        # Seed it before the snapshot; invalid writes still compare ALL bytes.
+        (profile / '.write.lock').touch()
         os.environ.update(SCHOLION_PROFILE_DIR=str(profile), SCHOLION_OFFLINE='1',
                           SCHOLION_GENOME_VCF=str(work / 'missing.vcf.gz'),
                           SCHOLION_GENOME_DIR=str(work / 'no-genome'),

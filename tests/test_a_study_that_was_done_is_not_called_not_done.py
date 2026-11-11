@@ -282,10 +282,6 @@ class TestTheManifest(unittest.TestCase):
         self.assertTrue(next(iter(manifest)).endswith("u.pdf"))
 
 
-if __name__ == "__main__":                                   # pragma: no cover
-    unittest.main()
-
-
 class TestConcurrentStudyImport(unittest.TestCase):
     def test_a_different_study_written_during_extraction_survives(self):
         with folder_of({"one.pdf": ULTRASOUND}) as tmp:
@@ -301,6 +297,27 @@ class TestConcurrentStudyImport(unittest.TestCase):
             saved = studies_in(tmp)
             self.assertEqual(2, len(saved))
             self.assertIn("concurrent", {r["id"] for r in saved})
+
+
+    def test_a_conflicting_edit_refuses_without_overwriting_it_or_the_checkpoint(self):
+        with folder_of({"one.pdf": ULTRASOUND}) as tmp:
+            ingest_studies.ingest(str(tmp / "reports"))
+            destination = tmp / "profile" / "studies.json"
+            checkpoint = ingest_studies._manifest_file().read_bytes()
+            concurrent_bytes = []
+
+            def conflicting_write(path):
+                saved = json.loads(destination.read_text(encoding="utf-8"))
+                saved["studies"][0]["conclusion"] = "Synthetic concurrent clinical note."
+                core.write_json(destination, saved)
+                concurrent_bytes.append(destination.read_bytes())
+                return ULTRASOUND.replace("12", "6")
+
+            with mock.patch.object(ingest_studies, "_read_pdf", side_effect=conflicting_write):
+                with self.assertRaises(core.ProfileBusy):
+                    ingest_studies.ingest(str(tmp / "reports"), force=True)
+            self.assertEqual([destination.read_bytes()], concurrent_bytes)
+            self.assertEqual(checkpoint, ingest_studies._manifest_file().read_bytes())
 
 
 if __name__ == "__main__":

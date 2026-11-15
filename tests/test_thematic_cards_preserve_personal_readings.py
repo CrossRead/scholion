@@ -112,7 +112,7 @@ for(const c of cases){
   assert.equal((html.match(/data-panel-region=/g)||[]).length,1,gene.gene);
  }
 }
-assert.ok(called>0&&unread>0&&referenceRows>0);
+console.log(JSON.stringify({called,unread,referenceRows}));
 // A supplied flat reading must not be erased by a thematic presentation adapter.
 const flat=renderThematicPanel({label:'Synthetic',counts:{},patient_readings:true,
  genes:[{gene:'ALPL',positions:[{rsid:'rs1256328',genotype:'AG',read:true}]}]});
@@ -162,6 +162,18 @@ assert.equal(body.innerHTML,expected+'USER STATE');
 assert.equal(JSON.stringify(region),before);
 
 '''
-        result=gene_card_support.run(gene_card_support.javascript()+script,
-                                     input=json.dumps(cases),text=True,capture_output=True,timeout=60)
-        self.assertEqual(result.returncode,0,result.stderr[-4000:])
+        # Keep all real catalogue assertions, but bound each renderer process to
+        # one panel/language. The combined payload exceeds 300 MB and needlessly
+        # requires every panel's strings to be resident in Node at once.
+        totals = {'called': 0, 'unread': 0, 'referenceRows': 0}
+        for case in cases:
+            with self.subTest(panel=case['key'], language=case['language']):
+                result = gene_card_support.run(
+                    gene_card_support.javascript() + script,
+                    input=json.dumps([case]), text=True, capture_output=True, timeout=60)
+                self.assertEqual(result.returncode, 0, result.stderr[-4000:])
+                counts = json.loads(result.stdout)
+                for key in totals:
+                    totals[key] += counts[key]
+        for key, count in totals.items():
+            self.assertGreater(count, 0, key)

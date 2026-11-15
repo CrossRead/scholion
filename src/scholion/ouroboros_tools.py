@@ -113,6 +113,20 @@ _h_genome = _reported(lambda rsid="", gene="": engine.genome_lookup(rsid=rsid or
                       lambda r: fmt.genome_report(r))
 
 
+def _gene_knowledge(gene="", variant="", query="", kind="natural", offset=0, limit=20):
+    from scholion import variant_annotations
+    return variant_annotations.reference(gene, variant, query=query, kind=kind,
+                                         offset=offset, limit=limit)
+
+
+def _gene_knowledge_text(result):
+    from scholion import variant_annotations
+    return variant_annotations.report(result)
+
+
+_h_gene_knowledge = _reported(_gene_knowledge, _gene_knowledge_text)
+
+
 _h_prescription = _reported(lambda drug="": engine.check_new_prescription(drug),
                             lambda r: fmt.prescription_check(r))
 _h_metrics = _reported(lambda: engine.metrics_summary(), lambda r: fmt.metrics_report(r))
@@ -381,7 +395,9 @@ def _h_sources(ctx: "ToolContext") -> str:
     table was imported eight months ago» — which is the useful half.
     """
     from scholion import sources as _src  # noqa: E402
+    from scholion import reference_updates as _ref
     return fmt.sources_report({"sources": _src.state(), "results": [],
+                               "reference_updates": _ref.status(),
                                "data_sources": engine.provenance()})
 
 
@@ -647,6 +663,7 @@ _TOOLS = (
     ("sch_analyze_labs", ("markers", "catalogue"), [], _h_analyze_labs),
     ("sch_suggest_tests", (), [], _h_suggest_tests),
     ("sch_genome_lookup", ("rsid", "gene"), [], _h_genome),
+    ("sch_gene_knowledge", ("gene", "variant", "query", "kind", "offset", "limit"), ["gene"], _h_gene_knowledge),
     ("sch_check_prescription", ("drug",), ["drug"], _h_prescription),
     ("sch_health_metrics", (), [], _h_metrics),
     ("sch_lifestyle", ("cgm_report",), [], _h_lifestyle),
@@ -692,6 +709,7 @@ _TOOLS = (
 # The JSON type of every parameter. Kept next to the tools rather than inside the
 # catalogue: a type is a contract with the model's function-calling, not a phrase.
 _PARAM_TYPE = {"cancel": "boolean", "force": "boolean", "archive_preview": "boolean", "refresh": "boolean", "atenolol": "boolean", "late_meal": "boolean", "confirm": "boolean", "stop": "boolean",
+               "offset": "integer", "limit": "integer",
                "bed": "boolean", "catalogue": "boolean", "updates": "boolean", "full": "boolean",
                "levels": "boolean", "compact": "boolean", "snapshot": "boolean", "visit_sheet": "boolean", "include_reference": "boolean"}
 

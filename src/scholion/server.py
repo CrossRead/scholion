@@ -498,6 +498,13 @@ class Handler(BaseHTTPRequestHandler):
             if p == "/api/genome":
                 return self._json(engine.genome_lookup(
                     rsid=(q.get("rsid") or [None])[0], gene=(q.get("gene") or [None])[0]))
+            if p == "/api/gene-knowledge":
+                from . import variant_annotations
+                return self._json(variant_annotations.reference(
+                    (q.get("gene") or [""])[0], (q.get("variant") or [""])[0],
+                    offset=int((q.get("offset") or ["0"])[0]),
+                    limit=int((q.get("limit") or ["20"])[0]),
+                    kind=(q.get("kind") or ["natural"])[0], query=(q.get("query") or [""])[0]))
             if p == "/api/mitochondria":
                 from . import mitochondria
                 return self._json(mitochondria.report())
@@ -586,6 +593,18 @@ class Handler(BaseHTTPRequestHandler):
                                    "hint": _t(_UPD["hint"]) if _UPD["hint"] else ""})
             if p == "/api/sources":
                 return self._json(engine.provenance())
+            if p == "/api/reference-updates":
+                from . import reference_updates
+                from .net import reference_error
+                try:
+                    token = (q.get("token") or [""])[0]
+                    return self._json(reference_updates.diff(token,
+                        int((q.get("offset") or ["0"])[0]), int((q.get("limit") or ["20"])[0]))
+                        if token else reference_updates.status())
+                except core.ProfileBusy:
+                    raise
+                except (ValueError, RuntimeError) as exc:
+                    return self._json({"error": reference_error(exc)}, 400 if isinstance(exc, ValueError) else 409)
             if p == "/api/patients":
                 from . import container as _container
                 return self._json(_container.listing())
@@ -639,6 +658,24 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(mitochondria.analyze(body.get("confirm") is True,
                                                      body.get("cancel") is True,
                                                      annotations_only=body.get("annotations_only") is True))
+            if u.path == "/api/reference-updates":
+                from . import reference_updates
+                from .net import reference_error
+                try:
+                    action = body.get("action")
+                    if action == "check":
+                        return self._json(reference_updates.start())
+                    if action == "accept":
+                        return self._json(reference_updates.accept(str(body.get("token") or "")))
+                    if action in ("cancel", "discard"):
+                        return self._json(reference_updates.cancel(discard=action == "discard"))
+                    if action == "schedule":
+                        return self._json(reference_updates.configure(body.get("enabled"), body.get("interval_months", 3)))
+                    return self._json({"error": "Unknown reference update action"}, 400)
+                except core.ProfileBusy:
+                    raise
+                except (ValueError, RuntimeError) as exc:
+                    return self._json({"error": reference_error(exc)}, 400 if isinstance(exc, ValueError) else 409)
             if u.path == "/api/labs":
                 return self._json(store.add_lab_point(
                     body.get("marker", ""), body.get("date", ""), body.get("value"),
@@ -957,6 +994,8 @@ def serve(host: str = "127.0.0.1", port: int = 1521, open_browser: bool = True, 
     print(_t("server.profile", path=core.profile_dir()))
 
     threading.Thread(target=warm_up, daemon=True).start()
+    from . import reference_updates
+    reference_updates.start_scheduler()
     if open_browser:
         threading.Timer(1.0, lambda: webbrowser.open(url)).start()
     try:

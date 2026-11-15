@@ -279,6 +279,7 @@ def run_json(args, profile_dir: Path | None = None, lang: str | None = None):
 # Commands that need arguments in order to run: in the smoke pass we substitute
 # knowingly harmless ones. An absence of data is a legitimate answer, a crash is not.
 ARGS_FOR = {
+    "gene-knowledge": ["COMT", "--variant", "rs4680"],
     "drug": ["atorvastatin"],
     # Writes into the profile, and only for a day that already holds two draws.
     # A smoke sweep must not author profile content; covered in full by

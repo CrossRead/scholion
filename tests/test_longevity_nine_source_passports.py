@@ -31,7 +31,8 @@ class TestNinePositions(unittest.TestCase):
              patch.object(genomics,'apoe',return_value={'status':'no_genome'}):
             result=genomics.longevity_findings()
         self.assertTrue(result['available'])
-        self.assertEqual({r['rsid'] for r in result['known']},EXPECTED)
+        reviewed = core._read_knowledge_raw('longevity_directions.json')['_meta'].get('source_review_positions', [])
+        self.assertEqual({r['rsid'] for r in result['known']}, EXPECTED | set(reviewed))
         self.assertTrue(all(not r.get('read') and r.get('genotype') is None for r in result['known']))
         self.assertNotIn('score',result)
         pointers=[r['rsid'] for r in result['known'] if r.get('joint_interpretation_pointer')=='apoe']

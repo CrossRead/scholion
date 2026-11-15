@@ -4,7 +4,7 @@
     "provenance": "Assembled on 2026-08-14 from the literature review «the direction of the alleles» (7 parallel reviews by PMID, 12.07.2026) + the KNOWN dictionary from longevity_report.py. The direction of an allele often depends on the population and on the linkage chain — where it cannot be resolved confidently, the variant sits in the unresolved section rather than here.",
     "how_to_extend": "A new entry — only with a PMID and an explicit favorable allele according to the primary source. Aggregate gene-based associations (SKAT and the like) have no direction at the SNP level — their place is in unresolved.",
     "schema": "directions[rsid] = {gene, favorable (an allele or null), label, confidence high/medium/low, zygosity_note?, population_caveat?, pmids[], action?, verdict_by_copies? {0:.., 1:.., 2:..}}",
-    "updated": "2026-10-23",
+    "updated": "2026-11-13",
     "source_tier": "primary_literature",
     "reviewed_positions_228": [
       "rs429358",
@@ -21,7 +21,21 @@
       "rs12206094": "Previous PMID29255262 describes SELENBP1 and is not FOXO3 evidence; replaced by29234056.",
       "rs4946935": "The direct functional study is29234056; gene-level aging evidence is not substituted for this variant.",
       "rs2075650": "Previous Alzheimer GWAS19734902 does not establish an independent longevity effect; conditional longevity source21418511 used."
-    }
+    },
+    "source_review_positions": [
+      "rs1501299",
+      "rs1050450",
+      "rs3781907",
+      "rs1776180",
+      "rs107251",
+      "rs1805086",
+      "rs1800795",
+      "rs2111699",
+      "rs275653",
+      "rs422858",
+      "rs5882",
+      "rs1800797"
+    ]
   },
   "directions": {
     "rs429358": {
@@ -637,48 +651,96 @@
     },
     "rs1501299": {
       "gene": "ADIPOQ",
-      "favorable": "T",
+      "favorable": null,
       "label": {
-        "en": "+276 G>T: T = higher adiponectin / insulin sensitivity",
-        "ru": "+276 G>T: T = выше адипонектин / чувствительность к инсулину"
+        "en": "In a Japanese high-BMI subgroup, adiponectin differed between GG, GT and TT. This metabolic association does not establish a favourable longevity allele or predict an individual measurement.",
+        "ru": "В японской подгруппе с повышенным ИМТ адипонектин различался между GG, GT и TT. Эта метаболическая ассоциация не устанавливает благоприятный аллель долголетия и не предсказывает личный анализ."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "pmids": [
-        "12429876"
+        "11812766"
       ],
       "action": {
-        "en": "a bridge to the metabolic axis: monitoring of HOMA-IR (and adiponectin if desired)",
-        "ru": "мостик к метаболической оси: контроль HOMA-IR (при желании — адипонектин)"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "level": "D",
+      "personal_effect_permitted": false,
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/11812766/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "endpoint_supported_draft",
+        "rejected_pmid": "12429876",
+        "rejected_article_title": "Binge-eating disorder in Brazilian women on a weight-loss program.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/11812766/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
       }
     },
     "rs5882": {
       "gene": "CETP",
-      "favorable": "G",
+      "favorable": null,
       "label": {
-        "en": "Val405Ile: G=Val = low CETP activity, large HDL particles, longevity (Barzilai)",
-        "ru": "Val405Ile: G=Val = низкая активность CETP, крупные ЛПВП, долголетие (Barzilai)"
+        "en": "CETP I405V Val/Val was associated with larger lipoprotein particles in a family longevity sample. The abstract does not establish a half-dose effect for heterozygotes or a universal ancestry-specific longevity benefit.",
+        "ru": "CETP I405V Val/Val был связан с более крупными частицами липопротеинов в семейной выборке долгожителей. Абстракт не устанавливает половинный эффект у гетерозигот или универсальную пользу для долголетия в зависимости от происхождения."
       },
-      "confidence": "high",
+      "confidence": "low",
       "zygosity_note": {
-        "en": "the protection is concentrated in VV homozygotes; a single copy is half the dose",
-        "ru": "защита сконцентрирована у гомозигот VV; одна копия — половинная доза"
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
       },
       "population_caveat": {
-        "en": "the direction is valid for Europeans (in East Asians it is the opposite)",
-        "ru": "направление валидно для европейцев (у восточноазиатов обратное)"
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
       },
       "pmids": [
-        "14559957",
-        "20139178"
+        "14559957"
       ],
       "action": {
-        "en": "a mild plus does not cancel the phenotype: run the lipid line by ApoB",
-        "ru": "мягкий плюс не отменяет фенотип: липидную линию вести по ApoB"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
       },
-      "verdict_by_copies": {
-        "0": "neutral",
-        "1": "lean_plus",
-        "2": "plus"
+      "verdict_by_copies": {},
+      "level": "D",
+      "personal_effect_permitted": false,
+      "source": "https://pubmed.ncbi.nlm.nih.gov/14559957/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "source_conflict_partial_correction",
+        "rejected_pmid": "20139178",
+        "rejected_article_title": "Upregulation of Oct-4 isoforms in pulmonary artery smooth muscle cells from patients with pulmonary arterial hypertension.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/14559957/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
       }
     },
     "rs2542052": {
@@ -703,132 +765,382 @@
     },
     "rs2111699": {
       "gene": "GSTZ1",
-      "favorable": "G",
+      "favorable": null,
       "label": {
-        "en": "carriage of G is associated with survival into deep old age (a detoxification enzyme)",
-        "ru": "G-носительство ассоциировано с дожитием до глубокой старости (детокс-фермент)"
+        "en": "The primary GSTZ1 study reports an association with longevity. The reviewed abstract does not establish a favourable G or separate genotype effects; an association index alone cannot supply their direction.",
+        "ru": "Первичная работа о GSTZ1 сообщает об ассоциации с долголетием. Проверенный абстракт не устанавливает благоприятный G или отдельные эффекты генотипов; указатель ассоциаций не задаёт их направление."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "population_caveat": {
-        "en": "a single cohort",
-        "ru": "одна когорта"
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
       },
       "pmids": [
-        "20563878"
-      ]
+        "22576335"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22576335/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "bibliographic_correction_insufficient_genotype_evidence",
+        "rejected_pmid": "20563878",
+        "rejected_article_title": "The agmatine-degrading enzyme agmatinase: a key to agmatine signaling in rat and human brain?",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/22576335/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs1776180": {
       "gene": "EXO1",
-      "favorable": "C",
+      "favorable": null,
       "label": {
-        "en": "C = higher expression of EXO1; an association with centenarians",
-        "ru": "C = выше экспрессия EXO1; ассоциация с центенариями"
+        "en": "The EXO1 study reports a sex-specific association and promoter-function evidence. The available abstract does not establish a separate effect for one and two copies or a personal lifespan prediction.",
+        "ru": "Работа об EXO1 описывает зависимую от пола ассоциацию и данные о функции промотора. Доступный абстракт не устанавливает отдельные эффекты одной и двух копий или личный прогноз жизни."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "population_caveat": {
-        "en": "the effect was shown in women",
-        "ru": "эффект показан у женщин"
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
       },
       "pmids": [
-        "19269274"
-      ]
+        "19698732"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19698732/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "bibliographic_correction_partial_effect",
+        "rejected_pmid": "19269274",
+        "rejected_article_title": "State-dependent pattern of Fos protein expression in regionally-specific sites within the preoptic area of the cat.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/19698732/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs1050450": {
       "gene": "GPX1",
-      "favorable": "G",
+      "favorable": null,
       "label": {
-        "en": "Pro198Leu: Pro(G) = full activity of glutathione peroxidase; Leu(A) — reduced",
-        "ru": "Pro198Leu: Pro(G) = полная активность глутатионпероксидазы; Leu(A) — сниженная"
+        "en": "GPX1 Pro198Leu has outcome-dependent evidence: T carriers (study notation, not a verified genomic allele mapping) were associated with lower mortality in one cohort, while another study concerned selenium-response interactions. A universal full-versus-reduced activity or longevity ranking is not established.",
+        "ru": "Данные по GPX1 Pro198Leu зависят от исхода: носительство T (нотация статьи, без подтверждённого перевода в геномные аллели) было связано с меньшей смертностью в одной когорте, а другая работа изучала взаимодействие с обеспеченностью селеном. Универсальная шкала активности или долголетия не установлена."
       },
-      "confidence": "high",
+      "confidence": "low",
       "pmids": [
-        "18448905"
+        "19428448",
+        "19415410"
       ],
       "action": {
-        "en": "with a Leu copy the activity depends in part on selenium status (selenium is in the regimen)",
-        "ru": "при Leu-копии активность частично зависит от статуса селена (селен в схеме есть)"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "level": "D",
+      "personal_effect_permitted": false,
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/19428448/; https://pubmed.ncbi.nlm.nih.gov/19415410/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "source_direction_conflict_corrected_draft",
+        "rejected_pmid": "18448905",
+        "rejected_article_title": "Medicine and the arts. Visitation by John Stone. Commentary.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/19428448/",
+          "https://pubmed.ncbi.nlm.nih.gov/19415410/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
       }
     },
     "rs3781907": {
       "gene": "UCP3",
-      "favorable": "A",
+      "favorable": null,
       "label": {
-        "en": "A is associated with longevity; G — with lower survival",
-        "ru": "A ассоциирован с долголетием; G — с меньшей выживаемостью"
+        "en": "The corrected UCP3 publication names a mortality association for rs11235972 in its abstract. It does not establish a favourable allele or a genotype gradient for rs3781907.",
+        "ru": "Исправленная публикация об UCP3 в абстракте связывает смертность с rs11235972. Она не устанавливает благоприятный аллель или генотипную шкалу для rs3781907."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "pmids": [
-        "19086053"
-      ]
+        "22743239"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22743239/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "bibliographic_correction_insufficient_genotype_evidence",
+        "rejected_pmid": "19086053",
+        "rejected_article_title": "Identification of new putative susceptibility genes for several psychiatric disorders by association analysis of regulatory and non-synonymous SNPs of 306 genes involved in neurotransmission and neurodevelopment.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/22743239/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs107251": {
       "gene": "SIRT6",
-      "favorable": "T",
+      "favorable": null,
       "label": {
-        "en": "the major T is favourable; a minor copy — intermediate",
-        "ru": "мажорный T благоприятен; минорная копия — промежуточно"
+        "en": "In one cohort aged 65 and over, CC and CT had a higher modelled mean age at death than TT. The earlier favourable-T claim is withdrawn. This observational comparison does not establish a dose gradient or added years for a person.",
+        "ru": "В одной когорте людей 65+ модельный средний возраст смерти был выше при CC и CT, чем при TT. Прежнее утверждение о благоприятном T отозвано. Это наблюдательное сравнение не задаёт дозовую шкалу или прибавку лет человеку."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "pmids": [
-        "28640802"
-      ]
+        "25541994"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/25541994/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "source_direction_conflict_corrected_draft",
+        "rejected_pmid": "28640802",
+        "rejected_article_title": "Peroxisomal biogenesis is genetically and biochemically linked to carbohydrate metabolism in Drosophila and mouse.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/25541994/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs1805086": {
       "gene": "MSTN",
       "favorable": null,
       "label": {
-        "en": "K153R (myostatin): the direction is disputed in the literature — in some places a decrease in strength, in others an association with centenarians, the large studies on strength — null",
-        "ru": "K153R (миостатин): направление в литературе спорно — где-то снижение силы, где-то ассоциация с центенариями, крупные работы по силе — null"
+        "en": "MSTN K153R carrier associations with centenarian status in Spanish and Italian samples were not replicated in Japan. These data do not establish a favourable genotype, muscle outcome or genotype-based treatment.",
+        "ru": "Ассоциации носительства MSTN K153R со статусом долгожителя в испанской и итальянской выборках не воспроизвелись в Японии. Эти данные не устанавливают благоприятный генотип, мышечный исход или лечение по генотипу."
       },
       "confidence": "low",
       "pmids": [
-        "21617243"
+        "23354683",
+        "27861536"
       ],
       "action": {
-        "en": "carriage of Arg153 is not a verdict but a reason to protect the muscles actively: strength training + protein ~1.6 g/kg + monitoring of body composition (relevant on tirzepatide)",
-        "ru": "носительство Arg153 — не приговор, а повод активно защищать мышцы: силовые + белок ~1,6 г/кг + контроль состава тела (актуально на тирзепатиде)"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
       },
-      "verdict_by_copies": {
-        "0": "neutral",
-        "1": "flag",
-        "2": "flag"
+      "verdict_by_copies": {},
+      "level": "D",
+      "personal_effect_permitted": false,
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/23354683/; https://pubmed.ncbi.nlm.nih.gov/27861536/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "source_conflict_corrected_with_negative_replication",
+        "rejected_pmid": "21617243",
+        "rejected_article_title": "Assessment of general anxiety in patients with breast disease and breast cancer using the Spielberger STAI self evaluation test: a prospective case-control study in Finland.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/23354683/",
+          "https://pubmed.ncbi.nlm.nih.gov/27861536/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
       }
     },
     "rs1800795": {
       "gene": "IL6",
-      "favorable": "C",
+      "favorable": null,
       "label": {
-        "en": "the promoter −174 G>C: C = lower IL-6 production (anti-inflammatory); G = higher",
-        "ru": "−174 G>C промотора: C = ниже продукция ИЛ-6 (антивоспалительный); G = выше"
+        "en": "IL6 promoter-reporter activity, plasma IL-6 and longevity are different outcomes. In an Italian cohort CC was less frequent among men aged 85 and over. Neither a universal favourable C nor an intermediate-producer heterozygote is established.",
+        "ru": "Активность репортера промотора IL6, плазменный IL-6 и долголетие — разные исходы. В итальянской когорте CC реже встречался у мужчин 85+. Универсальный благоприятный C и промежуточный уровень у гетерозиготы не установлены."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "population_caveat": {
-        "en": "the direction depends on the population",
-        "ru": "направление зависит от популяции"
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
       },
       "pmids": [
-        "9466968",
+        "9769329",
         "19377912"
       ],
       "action": {
-        "en": "the heterozygote = an «intermediate producer»: the genetics are NOT pro-inflammatory — look for chronic inflammation in the metabolic picture, not in the genes",
-        "ru": "гетерозигота = «промежуточный продуцент»: генетика НЕ провоспалительная — хроническое воспаление искать в метаболике, не в генах"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "level": "D",
+      "personal_effect_permitted": false,
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/9769329/; https://pubmed.ncbi.nlm.nih.gov/19377912/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "source_direction_conflict_corrected_draft",
+        "rejected_pmid": "9466968",
+        "rejected_article_title": "The chemokine receptors CXCR3 and CCR5 mark subsets of T cells associated with certain inflammatory reactions.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/9769329/",
+          "https://pubmed.ncbi.nlm.nih.gov/19377912/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
       }
     },
     "rs1800797": {
       "gene": "IL6",
-      "favorable": "A",
+      "favorable": null,
       "label": {
-        "en": "−597 G>A: linked to −174, read them together",
-        "ru": "−597 G>A: сцеплен с −174, читать вместе"
+        "en": "The previously cited IL6 study concerns rs1800795, not a genotype effect for rs1800797. No variant-specific primary source supporting the former favourable-A claim was established in this review.",
+        "ru": "Ранее процитированная работа об IL6 изучает rs1800795 и не устанавливает генотипный эффект rs1800797. При проверке не установлен первичный источник для прежнего утверждения о благоприятном A."
       },
-      "confidence": "medium",
-      "pmids": [
-        "19377912"
-      ],
+      "confidence": "low",
+      "pmids": [],
       "action": {
-        "en": "duplicates rs1800795",
-        "ru": "дублирует rs1800795"
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "level": "E",
+      "personal_effect_permitted": false,
+      "zygosity_note": {
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://www.ncbi.nlm.nih.gov/snp/rs1800797",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "wrong_variant_source",
+        "rejected_pmid": "19377912",
+        "rejected_article_title": "Interleukin-6 plasma level increases with age in an Italian elderly population (\"The Treviso Longeva\"-Trelong-study) with a sex-specific contribution of rs1800795 polymorphism.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://www.ncbi.nlm.nih.gov/snp/rs1800797"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Identity only; no variant-effect source established."
       }
     },
     "rs4646": {
@@ -854,35 +1166,97 @@
     },
     "rs275653": {
       "gene": "AGTR1",
-      "favorable": "minor",
+      "favorable": null,
       "label": {
-        "en": "longevity has been shown in homozygotes for the minor allele; the effect is recessive",
-        "ru": "долголетие показано у гомозигот по минорному аллелю; эффект рецессивный"
+        "en": "The AGTR1 study reports fewer AT1R-positive cells in rare-allele homozygotes and linkage with rs422858. The reviewed abstract does not resolve literal allele orientation or establish a neutral heterozygote.",
+        "ru": "Работа об AGTR1 описывает меньше AT1R-положительных клеток у гомозигот по редкому аллелю и сцепление с rs422858. Проверенный абстракт не разрешает буквенную ориентацию аллеля и не устанавливает нейтральность гетерозиготы."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "zygosity_note": {
-        "en": "the effect is recessive: the heterozygote is neutral",
-        "ru": "эффект рецессивный: гетерозигота нейтральна"
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
       },
       "pmids": [
-        "19941348"
-      ]
+        "22569962"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22569962/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "bibliographic_correction_partial_effect",
+        "rejected_pmid": "19941348",
+        "rejected_article_title": "Short-term training adaptations in maximal motor unit firing rates and afterhyperpolarization duration.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/22569962/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs422858": {
       "gene": "AGTR1",
-      "favorable": "minor",
+      "favorable": null,
       "label": {
-        "en": "the same as rs275653 (a recessive effect)",
-        "ru": "то же, что rs275653 (рецессивный эффект)"
+        "en": "The AGTR1 association is linked to rs275653. Its promoter-function result cannot be assigned independently to rs422858, and the reviewed abstract does not establish literal genotype effects.",
+        "ru": "Ассоциация AGTR1 сцеплена с rs275653. Результат функционального теста его промотора нельзя независимо приписывать rs422858; проверенный абстракт не устанавливает эффекты буквенных генотипов."
       },
-      "confidence": "medium",
+      "confidence": "low",
       "zygosity_note": {
-        "en": "the effect is recessive: the heterozygote is neutral",
-        "ru": "эффект рецессивный: гетерозигота нейтральна"
+        "en": "No validated copy-count benefit ranking is supplied.",
+        "ru": "Проверенная шкала пользы по числу копий не задана."
       },
       "pmids": [
-        "19941348"
-      ]
+        "22569962"
+      ],
+      "level": "D",
+      "personal_effect_permitted": false,
+      "action": {
+        "en": "Reference evidence only; no personal longevity, dose or treatment inference.",
+        "ru": "Только справочные данные; без личного вывода о долголетии, дозе или лечении."
+      },
+      "population_caveat": {
+        "en": "Study-specific outcomes and populations; no calibrated individual longevity estimate.",
+        "ru": "Исходы и популяции конкретных работ; без калиброванной личной оценки долголетия."
+      },
+      "source": "https://pubmed.ncbi.nlm.nih.gov/22569962/",
+      "curated_on": "2026-11-13",
+      "text": {},
+      "verdict_by_copies": {},
+      "source_review": {
+        "checked_on": "2026-11-13",
+        "status": "bibliographic_correction_partial_effect",
+        "rejected_pmid": "19941348",
+        "rejected_article_title": "Short-term training adaptations in maximal motor unit firing rates and afterhyperpolarization duration.",
+        "scope": "Primary bibliography and the explicitly described study outcome; no universal favourable allele."
+      },
+      "source_passport": {
+        "version": "source-correction-2026-11-13",
+        "accessed": "2026-11-13",
+        "sources": [
+          "https://pubmed.ncbi.nlm.nih.gov/22569962/"
+        ],
+        "content": "Original Scholion paraphrases of the reviewed source scope. Earlier unsupported allele rankings and advice are withdrawn.",
+        "license": "CC BY 4.0 for original Scholion descriptions; articles retain their own rights.",
+        "scope": "Study-specific reference context, not a personal longevity direction."
+      }
     },
     "rs11591147": {
       "gene": "PCSK9",

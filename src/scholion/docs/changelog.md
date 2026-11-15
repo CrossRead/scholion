@@ -40,6 +40,41 @@ lab values, no dates of anyone's tests. This journal records what changed in the
 
 <!-- NEW ENTRIES GO HERE -->
 
+## v0.7.9 — 15.11.2026
+
+Longevity references correct unrelated or wrong-variant citations for twelve positions. Study-specific metabolic, molecular and survival findings replace unsupported favourable-allele rankings, copy-count benefits and genotype-based advice.
+
+Gene cards distinguish sourced gene-function descriptions from registered gene–variant effect links. Each counted effect link names a variant, outcome, direction, study scope and current source witnesses. Missing registry links do not imply that no published effects exist. The same coverage is retained in text and assistant responses.
+
+Catalogued SNP cards show the reference homozygote, heterozygotes and alternative homozygotes as explicit allele pairs. Sequence examples retain their genome assembly and available source verification date. Multiallelic positions include pairs of different alternatives. Source-bound research genotype descriptions remain conditional reference information with their evidence level and limitations.
+
+Gene cards now include retained genotype meanings, comparison groups, effect directions and complete source descriptions for catalogued variants. Original reviewed UniProt annotations are searchable and paged, with experimental substitutions separated from natural variants. `gene-knowledge` exposes the same information in the CLI and assistant tools. A source annotation and a fully supported genotype interpretation remain distinct.
+
+Gene information now includes complete reviewed function descriptions, tissue and pathway context, and gene–disease submissions with their inheritance and validity. Original source qualifications and negative evidence remain visible. These gene-level descriptions do not classify an individual variant or establish a healthy genotype. The same content is retained by reference refreshes.
+
+Reference checks can be started from Genome → Sources or `sources`. Downloads prepare a reviewable comparison; explicit acceptance installs an atomic snapshot and retains the previous version. Opt-in periodic checks run while the local app is open. Exact linked database records and publication correction metadata are checked in their supported scopes; unavailable or unsupported records remain visible. A changed source flags dependent interpretations for review without changing the saved genotype. A fresh download does not renew scientific review dates.
+
+Palindromic PGS variants no longer obtain a verified score from matching letters alone. Ambiguous homozygous A/T and C/G contributions require a source-reviewed orientation tied to the exact model file and genome build; heterozygous dosage remains unambiguous. Unresolved contributions are reported and cannot establish a verified percentile. A saved reference calibration whose audit established only matching allele labels cannot supply the missing strand evidence.
+
+### What this changes in the conclusions
+
+A reference allele is not labelled a healthy norm, and two alternative copies are not ranked as a maximum effect. Reference examples do not supply a missing personal genotype or change clinical eligibility. The same reference information is available in text reports and assistant results.
+
+### What is retracted
+
+Earlier longevity benefit rankings and advice for ADIPOQ rs1501299, GPX1 rs1050450, UCP3 rs3781907, EXO1 rs1776180, SIRT6 rs107251, MSTN rs1805086, IL6 rs1800795 and rs1800797, GSTZ1 rs2111699, AGTR1 rs275653 and rs422858, and CETP rs5882 are withdrawn. Correcting a citation does not by itself validate the old effect. These positions retain scoped reference context without a personal longevity verdict.
+
+### What needs recomputing
+
+**Run `scholion prs --recalculate` — if saved PGS results use the previous scoring validation.**
+PGS reports carrying the previous scoring witness retain their saved values as diagnostic results and require a scoring recheck before percentiles are reused. Existing scoring-site calls can be reused; this update does not start BAM analysis.
+
+**By hand — after installing the corrected reference descriptions.**
+The reference-description changes do not require re-genotyping. Restart the local application or assistant to load the corrected references. `scholion longevity` reinterprets existing reports when read; stale favourable-copy counts, verdicts and advice for the affected positions are not reused. Previously exported documents remain historical and need regeneration to reflect these retractions.
+
+Series break: the affected longevity interpretations change on unchanged genetic input. Earlier benefit labels must not be compared as current results.
+
+
 ## v0.7.8 — 11.11.2026
 
 Concurrent imports preserve independent profile changes and completed-file checkpoints. A write whose profile lock is unavailable is refused instead of proceeding without protection. Importing studies preserves other studies added while source documents are being read.

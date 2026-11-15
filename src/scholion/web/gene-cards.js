@@ -188,9 +188,60 @@
       confidence, review:text(p.review_confidence || p.review), reviewCode:text(p.review),
       coordinate:chrom && pos ? [text(assembly), text(chrom) + ':' + text(pos)].filter(Boolean).join(' ') : '',
       protein:text(p.protein || p.star), readingMessage:text(p.reading_label),
+      genotypeReference:isVariant && !compound ? object(reference.genotype_reference) : {},
+      variantKnowledge:object(reference.variant_knowledge),
       inheritance:object(context.inheritance), context, reference, annotation:object(reference.catalogue_annotation),
       levelShort:p.level_short, stars:p.stars, snapshot:p.clinvar_version || p.snapshot,
       calledDiplotype:!!p.diplotype};
+  }
+
+  function renderKnowledge(value, options) {
+    const data=object(value), e=options.escape, t=options.t;
+    if(!data.gene_id&&!list(data.models).length&&!list(data.records).length)return '';
+    const p=(v,cls='')=>v?`<p${cls?` class="${cls}"`:''}>${e(v)}</p>`:'';
+    const field=(key,v)=>v?`<p><b>${e(t('variant_knowledge.'+key))}:</b> ${e(v)}</p>`:'';
+    const level=m=>Array.isArray(m.level)?m.level.join(' / '):text(m.level);
+    const link=url=>/^https:\/\/[^\s]+$/.test(url||'')?`<a class="cr-source" href="${e(url)}" target="_blank" rel="noopener noreferrer">${e(url)}</a>`:'';
+    const sourceLinks=sources=>list(sources).map(s=>{
+      const label=typeof s==='string'?s:s.title||s.url||s.source||s.pmid||'';
+      const url=typeof s==='string'?s:s.url||'';
+      return p(label)+link(url);
+    }).join('');
+    const info=object(data.gene_information), identity=object(info.identity), observations=list(info.observations);
+    const sourceObservation=f=>`<div data-gene-observation="${e(f.kind)}"><p lang="en">${e(f.text)}</p>${f.shared_protein?p(t('variant_knowledge.shared_protein'),'gene-knowledge-review'):''}${p([f.provider,f.record,f.release,f.compared_on].filter(Boolean).join(' · '),'cr-caption')}${f.freshness==='due'||f.freshness==='date_unknown'?p(t('variant_knowledge.refresh_'+f.freshness),'cr-caption'):''}${link(f.url)} ${list(f.publications).map(link).join(' · ')}</div>`;
+    const firstFunction=observations.find(f=>f.kind==='FUNCTION');
+    const geneInfo=info.gene_id?`<section class="gene-information" data-gene-information><h4>${e(t('gene_information.title'))}</h4>${p([identity.name,identity.locus_type,identity.location].filter(Boolean).join(' · '),'cr-caption')}${firstFunction?sourceObservation(firstFunction):p(t('gene_information.missing_function'),'gene-knowledge-review')}
+      <details><summary>${e(t('gene_information.more'))}</summary>${p(t('gene_information.original'),'cr-caption')}${observations.filter(f=>f!==firstFunction).map(f=>`<h5>${e(t('gene_information.kind.'+f.kind))}</h5>${sourceObservation(f)}`).join('')}</details>
+      <details><summary>${e(t('gene_information.clinical'))} · ${list(info.clinical_assertions).length}</summary>${p(t('gene_information.clinical_scope'),'cr-caption')}${list(info.clinical_assertions).length?`<div class="gene-knowledge-table" tabindex="0"><table class="cr-table cr-table--compact"><thead><tr><th>${e(t('gene_information.disease'))}</th><th>${e(t('gene_information.inheritance'))}</th><th>${e(t('gene_information.validity'))}</th></tr></thead><tbody>${info.clinical_assertions.map(r=>`<tr><td>${e(r.disease)}${p(r.disease_id,'cr-caption')}</td><td>${e(r.inheritance||'—')}</td><td>${e(r.validity||'—')}${p([r.submitter,r.submission,r.submitted_on].filter(Boolean).join(' · '),'cr-caption')}${r.pmids?p('PMID: '+r.pmids,'cr-caption'):''}${link(r.url)}</td></tr>`).join('')}</tbody></table></div>`:p(t('gene_information.no_clinical'))}${p([info.clinical_source?.provider,info.clinical_source?.compared_on].filter(Boolean).join(' · '),'cr-caption')}${link(info.clinical_source?.url)}</details></section>`:'';
+    const functions=geneInfo||list(data.functions).map(f=>`<details><summary>${e(t('reference_updates.function'))} · ${e(f.provider)}</summary>${p(f.text)}${p(f.compared_on,'cr-caption')}${link(f.url)}</details>`).join('');
+    const checks=list(data.source_checks).map(c=>`<p class="cr-caption">${e([c.provider,c.scope_label||c.scope,c.status_label||c.status,c.compared_on||'—'].join(' · '))} ${link(c.url)}${c.error?' · '+e(c.error):''}</p>`).join('');
+    const models=list(data.models).map((m,i)=>`<details class="gene-knowledge-model" data-knowledge-model="${e(m.id)}"${data.variant&&i===0?' open':''}>
+      <summary>${e(list(m.variant_ids).join(' · '))} · ${e(m.effect||t('variant_knowledge.recorded_context'))}</summary>
+      ${m.gene_assignment_unresolved?p(t('variant_knowledge.unresolved_gene_assignment'),'gene-knowledge-review'):''}
+      ${m.related_locus?p(t('variant_knowledge.related_locus',{gene:m.gene||'—',target:m.studied_target_gene||data.gene}),'cr-caption'):''}
+      ${p(m.gene_mapping_note,'cr-caption')}${p(t('variant_knowledge.model_scope'),'cr-caption')}${field('effect',m.effect)}${field('direction',m.direction)}
+      ${field('comparator',m.comparator)}${field('normality',t('variant_knowledge.normality.'+(m.normality_basis||'not_established')))}
+      ${field('allele_frame',m.allele_frame_label||m.allele_frame)}${field('applicability',m.applicability)}${p(m.comparison_design)}
+      ${list(m.knowledge_gaps).map(g=>p(g,'gene-knowledge-review')).join('')}
+      ${m.review_required?p(t(m.review_reason==='source_missing'?'variant_knowledge.review_source_missing':'variant_knowledge.review_required'),'gene-knowledge-review'):''}
+      ${list(m.genotypes).length?`<div class="gene-knowledge-table" tabindex="0"><table class="cr-table cr-table--compact"><thead><tr><th>${e(t('variant_knowledge.genotype'))}</th><th>${e(t('variant_knowledge.meaning'))}</th><th>${e(t('variant_knowledge.direction'))}</th></tr></thead><tbody>${m.genotypes.map(g=>`<tr><th scope="row">${e(g.genotype)}</th><td>${e(g.meaning)}${p(g.normality_note,'cr-caption')}</td><td>${e(g.direction)}</td></tr>`).join('')}</tbody></table></div>`:p(t('variant_knowledge.no_genotype_model'),'cr-caption')}
+      ${p(m.limitations,'cr-caption')}${field('checked',m.checked_on)}${m.freshness==='due'||m.freshness==='date_unknown'?p(t('variant_knowledge.refresh_'+m.freshness),'cr-caption'):''}
+      ${level(m)?p(t('variant_knowledge.level',{level:level(m)}),'cr-caption'):p(t('variant_knowledge.level_unassigned'),'cr-caption')}
+      <details><summary>${e(t('variant_knowledge.sources'))}</summary>${sourceLinks(m.sources)}</details></details>`).join('');
+    const records=list(data.records).map(r=>`<details class="gene-knowledge-source" data-source-feature="${e(r.id)}"><summary>${e(list(r.protein_changes).join(' / ')||r.feature_id||r.id)}${list(r.rsids).length?' · '+e(r.rsids.join(' / ')):''} · ${e(t('variant_knowledge.type.'+(r.type==='Mutagenesis'?'experimental':'natural')))}</summary>
+      ${p(t('variant_knowledge.source_scope'),'cr-caption')}<p lang="en" data-source-description>${e(r.description||t('variant_knowledge.description_unavailable'))}</p>
+      ${r.gene_mapping==='shared_protein'?p(t('variant_knowledge.shared_protein'),'gene-knowledge-review'):''}
+      ${p(t('variant_knowledge.protein_not_genotype'),'cr-caption')}${field('normality',t('variant_knowledge.normality.not_established'))}
+      ${field('reference',r.protein+' · '+(r.feature_id||r.id))}${field('version',t('variant_knowledge.version_value',{release:r.source_release||'—',entry:r.source?.entry_version||'—',sequence:r.source?.sequence_version||'—'}))}
+      ${field('retrieved',r.source_compared_on)}${field('primary_checked',r.primary_study_checked_on||t('variant_knowledge.not_checked'))}
+      ${r.freshness==='due'||r.freshness==='date_unknown'?p(t('variant_knowledge.refresh_'+r.freshness),'cr-caption'):''}
+      <details><summary>${e(t('variant_knowledge.sources'))}</summary>${link(r.source?.url)} ${list(r.source?.publications).map(link).join(' · ')}</details></details>`).join('');
+    return `<section class="gene-card-knowledge" data-gene-knowledge data-gene="${e(data.gene)}" data-variant="${e(data.variant||'')}" data-offset="${e(data.offset||0)}">
+      <h4>${e(t('variant_knowledge.title'))}</h4>${functions}${models}
+      ${p(t('variant_knowledge.page',{shown:list(data.records).length,total:data.total||0,offset:list(data.records).length?(data.offset||0)+1:0}),'cr-caption')}
+      <div class="gene-knowledge-controls"><label><span class="cr-caption">${e(t('variant_knowledge.search'))}</span><input class="cr-input" type="search" data-knowledge-query value="${e(data.query||'')}"></label><select class="cr-input" data-knowledge-kind aria-label="${e(t('variant_knowledge.kind'))}">${['natural','experimental','all'].map(k=>`<option value="${k}"${data.kind===k?' selected':''}>${e(t('variant_knowledge.type.'+k))}</option>`).join('')}</select><button class="cr-btn cr-btn--ghost" type="button" data-knowledge-action="search">${e(t('variant_knowledge.find'))}</button>${data.variant?`<button class="cr-btn cr-btn--ghost" type="button" data-knowledge-action="gene">${e(t('variant_knowledge.whole_gene'))}</button>`:''}</div>
+      ${records||(!models?p(t('variant_knowledge.no_matching_knowledge')):'')}${checks?`<details><summary>${e(t('variant_knowledge.checks'))}</summary>${checks}</details>`:''}
+      <div class="gene-knowledge-controls">${data.offset?`<button class="cr-btn cr-btn--ghost" type="button" data-knowledge-action="previous" data-next="${Math.max(0,data.offset-data.limit)}">${e(t('variant_knowledge.previous'))}</button>`:''}${data.next_offset!=null?`<button class="cr-btn cr-btn--ghost" type="button" data-knowledge-action="next" data-next="${e(data.next_offset)}">${e(t('variant_knowledge.next'))}</button>`:''}</div><p class="cr-caption" data-knowledge-status role="status"></p></section>`;
   }
 
   function renderCard(input, options) {
@@ -213,6 +264,12 @@
     const para = (value, cls = '') => value ? `<p${cls ? ` class="${cls}"` : ''}>${e(value)}</p>` : '';
     const link = value => /^https?:\/\/[^\s;]+$/i.test(value || '')
       ? `<a class="cr-source" href="${e(value)}" target="_blank" rel="noopener noreferrer">${e(value)}</a>` : e(value || '');
+    const guide = object(model.genotypeReference);
+    const guideHtml = list(guide.frames).length ? `<div class="gene-card-genotypes" data-genotype-reference>
+      <div class="gene-card-label">${e(guide.title)} · ${e(guide.rsid)}</div>
+      ${list(guide.frames).map(frame=>`<div><b>${e(frame.assembly)}</b><dl>${list(frame.rows).map(row=>`<div><dt>${e(row.genotype)}</dt><dd>${e(row.label)}</dd></div>`).join('')}</dl>${para(frame.source_label,'cr-caption')}${para(frame.verification,'cr-caption')}${frame.source ? link(frame.source) : ''}</div>`).join('')}
+      ${para(guide.notice,'cr-caption')}${para(guide.ploidy_notice,'cr-caption')}
+      ${list(guide.study_examples).length ? `<details><summary>${e(t('genotype_reference.studies'))}</summary>${para(guide.study_notice)}${para(guide.study_level ? 'Scholion '+guide.study_level : '')}${list(guide.study_examples).map(row=>`<div><b>${e(t('genotype_reference.scenario',{genotype:row.genotype}))}</b>${para(row.summary)}</div>`).join('')}${guide.study_limitations_scope === 'genome' ? '' : para(guide.study_limitations)}${list(guide.study_sources).map(link).join(' · ')}</details>` : ''}</div>` : '';
     const region = model.geneRegion;
     const location = object(region?.location);
     const interval = location.chrom && location.start && location.end
@@ -327,8 +384,9 @@
       + (status ? `<div class="gene-card-tags"><span class="cr-badge cr-badge--plain" data-personal-status="${e(model.status || 'unread')}">${e(status)}</span></div>` : '')
       + `<div class="gene-card-grid"><div class="gene-card-confidence"><div class="gene-card-label">${label('confidence')}</div>${level}${model.level ? `<div class="cr-caption">${label('variant_scope')}</div>` : ''}</div>`
       + `<div class="gene-card-identity"><div class="gene-card-label">${identityLabel}</div>${attribution}${para(interval, 'cr-caption')}${annotation.title ? para(`GRCh38 · ${annotation.chrom}:${annotation.pos} ${annotation.ref}>${annotation.alt}`,'cr-caption') : ''}${/^rs\d+$/.test(model.position) ? `<p class="cr-caption"><a href="#variant/${e(model.position)}" data-rs-open="${e(model.position)}">${e(model.position)}</a></p>` : para(model.position, 'cr-caption')}${para(model.protein, 'cr-caption')}</div>`
-      + `<div class="gene-card-reading"><div class="gene-card-label">${label('reading')}</div><span class="${model.genotype && !screen ? 'gene-card-genotype' : 'gene-card-no-reading'}">${e(genotype)}</span>${zygosity ? `<div class="gene-card-zygosity">${e(zygosity)}</div>` : ''}${compoundReadings}${options.readingHtml || ''}${screen ? para(screenReason,'cr-caption') + (screen.scanStatus==='ok' && Number.isInteger(screen.findings) ? para(t('screen.gene_findings',{n:screen.findings}),'cr-caption') : '') : ''}${region?.status==='ok' ? para(regionSummary.coverage_message || t('thematic.region_scope'),'cr-caption') : ''}${para(copies, 'cr-caption')}${para(confidenceText, 'cr-caption')}${warning}${para(depthLine,'cr-caption')}${visibleQuality.filter(q=>q!==model.readingFailure).map(q=>para(q,'cr-caption')).join('')}${repeat}${readingDetails}</div>`
+      + `<div class="gene-card-reading"><div class="gene-card-label">${label('reading')}</div><span class="${model.genotype && !screen ? 'gene-card-genotype' : 'gene-card-no-reading'}">${e(genotype)}</span>${zygosity ? `<div class="gene-card-zygosity">${e(zygosity)}</div>` : ''}${compoundReadings}${options.readingHtml || ''}${screen ? para(screenReason,'cr-caption') + (screen.scanStatus==='ok' && Number.isInteger(screen.findings) ? para(t('screen.gene_findings',{n:screen.findings}),'cr-caption') : '') : ''}${region?.status==='ok' ? para(regionSummary.coverage_message || t('thematic.region_scope'),'cr-caption') : ''}${para(copies, 'cr-caption')}${para(confidenceText, 'cr-caption')}${warning}${para(depthLine,'cr-caption')}${visibleQuality.filter(q=>q!==model.readingFailure).map(q=>para(q,'cr-caption')).join('')}${repeat}${readingDetails}${guideHtml}</div>`
       + '</div>'
+      + renderKnowledge(model.variantKnowledge, options)
       + (annotations ? `<details class="gene-card-fold" data-gene-annotations><summary>${label('annotations')}</summary><div class="gene-card-fold-body">${annotations}</div></details>` : '')
       + `<details class="gene-card-fold" data-gene-inheritance><summary>${label('details')}</summary><div class="gene-card-fold-body">${details}</div></details>`
       + renderRegionDetails(options) + '</article>';
@@ -350,6 +408,7 @@ function referenceContextHtml(p,cardDetails=false){
   if(!c) return '';
   const caveat=value=>cardDetails?ScholionGeneCards.cardCaveat(value,t):value;
   return `<div class="why" data-reference-context>${cardDetails||c.function_status==='not_curated'?'':`<div><strong>${esc(c.gene_function)}</strong></div>`}`
+    +`${c.curation_coverage?`<p class="cr-caption" data-curation-coverage>${esc(c.curation_coverage.summary)}<br>${esc(c.curation_coverage.notice)}</p>`:''}`
     +`${cardDetails?'':`<div>${esc(t('reference.variant',{text:c.variant_context}))}</div>`}`
     +`${c.canonical_symbol&&p.gene&&c.canonical_symbol.toUpperCase()!==p.gene.toUpperCase()?`<p class="cr-caption">${esc(t('reference.resolved_gene',{gene:c.canonical_symbol}))}</p>`:''}`
     +`${c.gene_source&&!(cardDetails&&c.scientific_review?.length)?`<div class="why muted">${esc(t(c.gene_source_scope==='genomic_annotation'?'reference.region_source':'reference.gene_source',{source:c.gene_source}))}</div>`:''}`
@@ -471,10 +530,11 @@ function geneReferenceExtras(p){
 }
     return Object.freeze({render:geneDisplayCard, positions:genePositionCards, regionRows:geneRegionRows, findings:geneFindingCards,
       referenceExtras:geneReferenceExtras, reference:referenceContextHtml,
-      mechanism:mechanismHtml, preview:geneticPreviewHtml, brief:geneticBriefHtml});
+      mechanism:mechanismHtml, preview:geneticPreviewHtml, brief:geneticBriefHtml,
+      knowledge:value=>renderKnowledge(value,{t,escape:esc,register:getRegister()})});
   }
 
-  const api = {project, render:renderCard, renderModel, groupAssertions, cardCaveat, create};
+  const api = {project, render:renderCard, renderModel, renderKnowledge, groupAssertions, cardCaveat, create};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.ScholionGeneCards = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this));

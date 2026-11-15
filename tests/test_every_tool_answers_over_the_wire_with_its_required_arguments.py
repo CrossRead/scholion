@@ -24,7 +24,7 @@ import support
 from scholion import mcp_server, ouroboros_tools
 
 #: A minimal valid argument for every required parameter the schemas declare.
-ARG = {"drug": "clopidogrel", "folder": "", "day": "2026-01-01",
+ARG = {"gene": "COMT", "drug": "clopidogrel", "folder": "", "day": "2026-01-01",
        "key": "audit_key", "names": "audit name", "date": "2026-01-02"}
 
 

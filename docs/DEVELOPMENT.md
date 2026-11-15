@@ -506,6 +506,11 @@ list, with case normalisation and a single-sample input requirement. Missing,
 partial, conflicting and unresolved calls are excluded; an absent scoring
 position is never imputed from a variant-only VCF. Strand reversal requires a
 known, non-palindromic SNP pair. Indels use exact allele representations.
+Palindromic homozygous contributions need a reviewed forward-orientation witness
+bound to the exact scoring-file digest and coordinate build. Without it the
+contribution is unresolved and the score cannot establish a verified percentile.
+Heterozygous dosage is identical on either strand. Older scoring witnesses
+require rechecking; saved values remain available as diagnostic history.
 A private temporary disk index is shared across a report and then removed.
 Position coverage, absolute weight coverage, exclusion counts, algorithm identity
 and hashes of the model and input accompany the sum. Reference calibration is

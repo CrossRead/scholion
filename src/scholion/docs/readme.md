@@ -11,7 +11,7 @@ Use the local web application, the command line, or an assistant connected throu
 MCP, a skill or an Ouroboros plugin. They share the same analysis core and selected
 profile. English and Russian interfaces are included.
 
-**Current source version: 0.7.8.** See [published releases](https://github.com/CrossRead/scholion/releases)
+**Current source version: 0.7.9.** See [published releases](https://github.com/CrossRead/scholion/releases)
 and [PyPI](https://pypi.org/project/scholion/) for the version available to install.
 Scholion is not a medical device, does not diagnose and does not change treatment.
 
@@ -348,7 +348,7 @@ selected profile. The host's own model setup is separate from the local engine.
 See [the connection guide](https://github.com/CrossRead/scholion/blob/main/docs/CONNECTING-AN-AGENT.md#the-embedded-ouroboros-interface)
 and the [plugin setup guide](https://github.com/CrossRead/scholion/blob/main/ouroboros_plugin/README.md).
 
-For a classic checkout, `scholion/ouroboros_tools.py` registers 41 `sch_*` tools. Install
+For a classic checkout, `scholion/ouroboros_tools.py` registers 42 `sch_*` tools. Install
 the engine in the interpreter used by Ouroboros, then place this import shim in
 its tools package, replacing `<ouroboros>` with the checkout path:
 
@@ -466,6 +466,11 @@ Reference lookups and downloads have narrower, explicit network behaviour:
   `grch37.rest.ensembl.org`. PGS discovery uses `www.pgscatalog.org`; consented
   downloads of pinned public weights use `ftp.ebi.ac.uk`. These requests do not
   send a person's genotype or computed score.
+- Human-started or opt-in periodic reference checks use `rest.uniprot.org`,
+  `api.ncbi.nlm.nih.gov`, `eutils.ncbi.nlm.nih.gov`, `storage.googleapis.com`
+  (the fixed HGNC snapshot), `thegencc.org` and `www.ebi.ac.uk`. Requests contain
+  public catalogue identifiers, never personal genotypes or medical observations.
+  Downloads are staged; accepting reference changes is a separate human action.
 - The version check can contact `pypi.org` with the package name, at most once a
   day unless explicitly requested again. Installing an update requires permission.
 - Explicit method links include `doi.org` and `www8.garmin.com`.

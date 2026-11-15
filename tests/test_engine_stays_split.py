@@ -284,7 +284,9 @@ LINE_BUDGETS = {
     # 11.10.2026: verified APOE diplotype context and all four PCSK9 readings
     # preserve phase uncertainty and uncurated direction (1248 lines).
     # Study gene-set labels and distinct symbols are counted separately.
-    "genomics": 1300,  # Source-bound nine-position longevity references remain visible without a saved report.
+    # Source-bound nine-position longevity references remain visible without a saved report.
+    # 15.11.2026: a PGS orientation failure must not be described as a calibration-only issue.
+    "genomics": 1305,
     # 180 → 200 on 12.09.2026: the build's age says WHY it is unknown — no
     # journal, a heading that drifted, or a read that raised — instead of
     # one word for all three.

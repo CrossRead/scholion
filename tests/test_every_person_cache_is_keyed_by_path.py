@@ -24,6 +24,7 @@ PKG = support.SRC / "scholion"
 #: module.name → what the key is. «path» entries hold a person's data and key
 #: it by the file it came from; «program» entries hold nothing about a person.
 KEYED = {
+    "reference_updates._ACTIVE": ("path", "resolved per-container reference update directory; guarded by its lock"),
     "knowledge_provenance._RAW_CACHE": ("path", "resolved knowledge file path; mtime, size and reader identity checked before reuse"),
     "core._JSON_CACHE": ("path", "the file's path and its modification time"),
     "core._STAMP_CACHE": ("path", "the file's path and its modification time"),
@@ -48,6 +49,10 @@ KEYED = {
 #: lru_cache functions → the parameter that names the file, or «package» for a
 #: function of no arguments that reads only the catalogue every container shares.
 LRU = {
+    "variant_annotations._load": "path",
+    "variant_annotations._metadata": "path",
+    "variant_annotations._file_hash": "path",
+    "variant_annotations._indices": "path",
     "genome.catalogue_assembly": "package",
     "genome._header": "vcf",
     "genome.samples_of": "vcf",

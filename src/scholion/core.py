@@ -861,6 +861,7 @@ LOCALIZABLE_FIELDS = {
     "interpretation", "patient_summary", "recommendation", "evidence_note", "validity_note",
     "limitations", "evidence_reason", "allele_note",
     "comparator", "study_scope", "study_summary",
+    "comparison_design", "gene_mapping_note", "normality_note", "direction_text", "genotype_label", "outcome_label", "applicability_note",
     "meaning", "effect", "mechanism", "manage", "claim", "effect_size", "context",
     "low_dose_note", "pharmacologic_dose", "verdict_rule", "population_caveat",
     "not_a_cpic_drug_pair", "guidance_gap_reason", "report_rule_note", "units_note",
@@ -1020,6 +1021,22 @@ def knowledge_dir_local() -> Path:
 _STAMP_CACHE: Dict[Tuple[str, int], Optional[str]] = {}
 
 
+def knowledge_metadata(path: Path) -> Dict[str, Any]:
+    """Read a leading metadata object without decoding a large reference body."""
+    with path.open(encoding="utf-8") as stream:
+        prefix = stream.read(65536)
+    match = re.match(r'^\s*\{\s*"_meta"\s*:\s*', prefix)
+    if match:
+        try:
+            metadata, _ = json.JSONDecoder().raw_decode(prefix, match.end())
+            if isinstance(metadata, dict):
+                return metadata
+        except ValueError:
+            pass
+    value = json.loads(path.read_text(encoding="utf-8"))
+    return (value.get("_meta") or {}) if isinstance(value, dict) else {}
+
+
 def _knowledge_stamp(path: Path) -> Optional[str]:
     """The date a reference file says it was made — its import date or its curation date.
 
@@ -1034,8 +1051,9 @@ def _knowledge_stamp(path: Path) -> Optional[str]:
         return _STAMP_CACHE[key]
     stamp = None
     try:
-        meta = (json.loads(path.read_text(encoding="utf-8")) or {}).get("_meta") or {}
-        imported = meta.get("imported") if isinstance(meta.get("imported"), dict) else {}
+        meta = knowledge_metadata(path)
+        imported_value = meta.get("imported")
+        imported: Dict[str, Any] = imported_value if isinstance(imported_value, dict) else {}
         for c in (imported.get("fetched"), meta.get("fetched"), meta.get("updated"),
                   meta.get("catalog_updated")):
             if isinstance(c, str) and len(c) >= 10 and c[4] == "-" and c[7] == "-":
@@ -1114,6 +1132,18 @@ def _read_knowledge(name: str) -> Dict[str, Any]:
     from .i18n import lang as _lang
     path = knowledge_path(name)
     code = _lang()
+    if name in ("cpic_drug_gene.json", "cpic_pairs.json"):
+        from . import variant_annotations
+        overlay = variant_annotations.cpic_override(name)
+        if overlay is not None:
+            token = variant_annotations.catalogue_metadata().get("accepted_preview")
+            cache_key = f"{path}|{code}|reference-overlay"
+            hit = _KB_CACHE.get(cache_key)
+            if hit is not None and hit[0] == token:
+                return hit[1]
+            localized = _localize_tree(overlay, code)
+            _KB_CACHE[cache_key] = (token, localized)
+            return localized
     try:
         mt = path.stat().st_mtime
     except (FileNotFoundError, NotADirectoryError):

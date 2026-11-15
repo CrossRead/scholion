@@ -330,3 +330,26 @@ for(const [lang,{roles,examples}] of Object.entries(cases)){
             'cases': cases, 'messages': {k: i18n.CATALOGUES[k] for k in ('en', 'ru')},
         }), capture_output=True, text=True, timeout=60)
         self.assertEqual(0, result.returncode, result.stderr[-4000:])
+
+
+class ReferenceBibliography(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('node'), 'requires the shipped browser component')
+    def test_plain_citation_and_missing_comparison_are_visible_and_escaped(self):
+        script = "const cards=require(" + json.dumps(str(WEB / 'gene-cards.js')) + ");\n"
+        script += r"""
+const assert=require('node:assert/strict');
+const esc=x=>String(x??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const component=cards.create({t:k=>k,escape:esc,grade:esc,formatDate:esc,register:()=>'clinician'});
+const html=component.knowledge({gene_id:'HGNC:1',gene:'SYNTH',models:[{id:'test',variant_ids:['rs1'],sources:[{url:'PMID:123 <script>'}],knowledge_gaps:['Comparison not recorded'],genotypes:[]}]});
+assert.ok(html.includes('PMID:123 &lt;script&gt;'));
+assert.ok(html.includes('Comparison not recorded'));
+assert.ok(!html.includes('<script>'));
+const shared=component.knowledge({gene_id:'HGNC:1',gene:'SYNTH',gene_information:{gene_id:'HGNC:1',observations:[{kind:'FUNCTION',text:'Shared source function <script>',shared_protein:true,url:'https://www.uniprot.org/uniprotkb/P00001/entry'}],clinical_assertions:[{disease:'Synthetic condition',validity:'Refuted',inheritance:'Autosomal recessive'}]}});
+assert.ok(shared.includes('variant_knowledge.shared_protein'));
+assert.ok(shared.includes('Shared source function &lt;script&gt;'));
+assert.ok(shared.includes('Refuted'));
+assert.ok(shared.includes('Autosomal recessive'));
+assert.ok(!shared.includes('<script>'));
+"""
+        result = gene_card_support.run(script, capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stderr)

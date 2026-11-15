@@ -35,6 +35,8 @@ class Scenario:
 
 
 READS = (
+    Scenario('gene-knowledge', ('gene-knowledge', 'COMT', '--variant', 'rs4680'), 'GET /api/gene-knowledge', {'gene': 'COMT', 'variant': 'rs4680'}, 'gene=COMT&variant=rs4680'),
+    Scenario('gene-knowledge-gap', ('gene-knowledge', 'UNKNOWN'), 'GET /api/gene-knowledge', {'gene': 'UNKNOWN'}, 'gene=UNKNOWN'),
     Scenario('metrics', ('metrics',), 'GET /api/metrics', {}),
     Scenario('lifestyle', ('lifestyle',), 'GET /api/lifestyle', {}),
     Scenario('overview', ('overview',), 'GET /api/overview', {}),

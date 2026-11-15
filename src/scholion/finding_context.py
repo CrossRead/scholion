@@ -147,6 +147,10 @@ def attach(rows: list[dict[str, Any]], catalogue: dict[str, Any] | None = None) 
                 state = 'inheritance_review'
         if row.get('reportable') in ('needs_phase', 'needs_variant_class'):
             state = 'phase_unresolved' if row['reportable'] == 'needs_phase' else 'variant_class_review'
+        from .variant_annotations import needs_source_review
+        if any(needs_source_review(gene, str(row.get('rsid') or ''))
+               for gene in str(row.get('gene') or '').split('|') if gene):
+            state = 'reference_review'
         labels = []
         for mode in modes:
             key = 'finding.mode.' + mode if mode in ('AR', 'AD', 'SD', 'XL', 'XLR', 'XLD') else 'gencc.moi.' + mode

@@ -29,6 +29,9 @@ def calibration_for(row: dict, population: str) -> dict | None:
     witness = row["scoring_validation"]
     if witness.get("genome_build") != build:
         return None
+    from .pgs_scoring import _forward_model_verified
+    if not _forward_model_verified(witness.get("model_sha256") or "", build):
+        return None
     for ref in _read_knowledge("prs_references.json").get("references", []):
         if ref.get("pgs_id") != row.get("pgs_id") or ref.get("population") != population:
             continue

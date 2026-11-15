@@ -174,7 +174,8 @@ def describe(row: dict) -> dict:
         localized['genotypes'] = {key: core._localized(value, lang())
                                   for key, value in (spec.get('genotypes') or {}).items()}
         witnesses = spec.get('source_records') or []
-        current = bool(witnesses) and all(record(w['file'], *w['selector']).get('record_digest') == w['digest']
+        from .variant_annotations import needs_source_review
+        current = not needs_source_review(gene, rsid) and bool(witnesses) and all(record(w['file'], *w['selector']).get('record_digest') == w['digest']
                                          for w in witnesses)
         if current:
             out.update({k: localized.get(k) for k in ('mechanism', 'comparator', 'direction',

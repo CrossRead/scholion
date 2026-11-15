@@ -189,3 +189,61 @@ class TestQuotedProseIsRefreshed(unittest.TestCase):
         for g in warf["guidance"].values():
             if isinstance(g, dict):
                 self.assertIsNone(g.get("cpic"))
+
+
+class TestTheDefaultCpicFetcherRequiresTheWholeTable(unittest.TestCase):
+    def test_the_real_default_path_collects_server_capped_pages(self):
+        from unittest.mock import patch
+        from scholion import net
+        def response(url, request_headers):
+            offset = int(url.rsplit('offset=', 1)[1])
+            return {'data': [{'name': '*1' if offset == 0 else '*2'}],
+                    'headers': {'Content-Range': f'{offset}-{offset}/2'}}
+        with patch.object(net, 'offline', return_value=False), patch.object(net, 'get_json_response', side_effect=response) as fetch:
+            self.assertEqual(sources._fetch_json(sources.CPIC_API + '/allele?genesymbol=eq.SYNTH'),
+                             [{'name': '*1'}, {'name': '*2'}])
+            self.assertEqual(fetch.call_count, 2)
+
+    def test_an_unproven_table_does_not_replace_the_existing_knowledge(self):
+        from unittest.mock import patch
+        from scholion import net
+        with tempfile.TemporaryDirectory() as directory:
+            root = pathlib.Path(directory).resolve()
+            with patch.dict(os.environ, {'SCHOLION_REPO_DIR': str(root)}), patch.object(net, 'offline', return_value=False), patch.object(net, 'get_json_response', return_value={'data': [], 'headers': {}}):
+                core.reset_cache()
+                before = core.knowledge_path('cpic_drug_gene.json').read_bytes()
+                with self.assertRaises(sources.SourceUnavailable):
+                    sources.refresh('cpic')
+                self.assertFalse((root / 'knowledge/cpic_drug_gene.json').exists())
+                self.assertEqual(core.knowledge_path('cpic_drug_gene.json').read_bytes(), before)
+        core.reset_cache()
+
+
+class TestOneUnavailableSourceDoesNotPreventOthers(unittest.TestCase):
+    def test_refresh_all_preserves_an_unavailable_source_and_reports_the_next_result(self):
+        from unittest.mock import patch
+        registry = {'unavailable': {'auto': True}, 'available': {'auto': True}, 'manual': {'auto': False}}
+        def refresh(source_id, fetch):
+            if source_id == 'unavailable':
+                raise sources.SourceUnavailable('Synthetic provider unavailable; old snapshot retained')
+            return {'source': source_id, 'checked': 1, 'changes': []}
+        with patch.object(sources, 'SOURCES', registry), patch.object(sources, 'refresh', side_effect=refresh):
+            result = sources.refresh_all()
+        self.assertEqual([row['source'] for row in result], ['unavailable', 'available'])
+        self.assertTrue(result[0]['skipped'])
+        self.assertEqual(result[1]['checked'], 1)
+
+
+class TestActivityBandsDoNotBridgeAnotherPhenotype(unittest.TestCase):
+    def test_disjoint_and_unrecognised_scores_cannot_create_a_false_band(self):
+        rows = [
+            {'generesult': 'Normal Metabolizer', 'totalactivityscore': '2'},
+            {'generesult': 'Normal Metabolizer', 'totalactivityscore': '3'},
+            {'generesult': 'Intermediate Metabolizer', 'totalactivityscore': '1'},
+            {'generesult': 'Intermediate Metabolizer', 'totalactivityscore': '2.5'},
+            {'generesult': 'Poor Metabolizer', 'totalactivityscore': '0'},
+            {'generesult': 'Unknown', 'totalactivityscore': '100'},
+            {'generesult': 'Poor Metabolizer', 'totalactivityscore': None},
+        ]
+        self.assertEqual(sources._bands_from_diplotypes(rows),
+                         [{'min': 0.0, 'max': 0.0, 'phenotype': 'PM'}])

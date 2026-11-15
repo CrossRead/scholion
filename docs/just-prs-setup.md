@@ -27,7 +27,7 @@ Scholion reads GT by its FORMAT name, counts the actual alleles at multi-allelic
 sites and accepts lower-case reference bases. Partial calls, conflicting records,
 symbolic alleles and unresolved representations reduce coverage. Missing sites
 are never imputed as zero dose. Strand matching requires a resolved,
-non-palindromic SNP pair. Indels require an exact allele representation.
+non-palindromic SNP pair. A/T and C/G homozygous contributions require a reviewed forward-orientation witness tied to the exact model digest and coordinate build. Coordinate harmonisation alone is not that witness. Heterozygous dosage is invariant under either strand. Unresolved contributions are named and prevent a verified percentile; indels require an exact allele representation.
 
 ## Model and population selection
 

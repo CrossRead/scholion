@@ -39,6 +39,7 @@ PARITY: Dict[str, str] = {
     "GET /api/drug": "drug",
     "GET /api/suggest-tests": "suggest-tests",
     "GET /api/genome": "genome",
+    "GET /api/gene-knowledge": "gene-knowledge",
     "GET /api/genome-status": "genome-status",
     "GET /api/mitochondria": "mitochondria",
     "POST /api/mitochondria": "mitochondria",
@@ -76,6 +77,7 @@ PARITY: Dict[str, str] = {
     # command prints under `data_sources` (it was mapped to `provenance`,
     # a different function, until 12.09.2026).
     "GET /api/sources": "sources",
+    "GET /api/reference-updates": "sources",
     "GET /api/assistant": "assistant",
     # 0.6.0, task 192: which people this workstation holds, and whose data is read.
     "GET /api/patients": "patients",
@@ -86,6 +88,7 @@ PARITY: Dict[str, str] = {
     "POST /api/labs": "add-lab",
     "POST /api/targets": "target",
     "POST /api/version/seen": "version",
+    "POST /api/reference-updates": "sources",
     "POST /api/update": "update",
     "POST /api/recompute": "recompute",
     "POST /api/recompute/stop": "recompute",
@@ -164,10 +167,6 @@ CLI_ONLY: Dict[str, str] = {
                  "line; it also takes as long as one pass over two large files, which is not a "
                  "thing a button should start by accident. The web already shows the result — "
                  "and, when the table is absent, says which command produces it.",
-    "sources": "the register of external reference sources and the import that refreshes "
-               "them. A refresh reaches the network and rewrites reference data, so it stays "
-               "a typed command rather than a button a click can trigger by accident; the "
-               "Assistant tab already shows the outbound inventory a reader needs.",
     "capabilities": "the manifest of this build. In the web the tab bar IS the manifest — a "
                     "person sees what exists by looking at it — so a page listing commands "
                     "nobody types would answer a question the interface has already answered",
@@ -274,6 +273,7 @@ PLUGIN: Dict[str, str] = {
     "labs": "sch_analyze_labs",
     "suggest-tests": "sch_suggest_tests",
     "genome": "sch_genome_lookup",
+    "gene-knowledge": "sch_gene_knowledge",
     "prescription": "sch_check_prescription",
     "metrics": "sch_health_metrics",
     "lifestyle": "sch_lifestyle",

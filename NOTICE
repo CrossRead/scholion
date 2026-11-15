@@ -92,3 +92,12 @@ attributed to the UniProt Consortium (https://www.uniprot.org/), under CC BY 4.0
 adapted and translated. Each record links to its upstream accession. The
 annotation is at gene or protein level and supplies no individual clinical
 interpretation.
+
+Reviewed human natural-variant and experimental-mutagenesis annotations in
+variant_source_records.json are derived from UniProtKB/Swiss-Prot release
+2026_04, retrieved 14 November 2026, under CC BY 4.0. Attribution: the UniProt
+Consortium, https://www.uniprot.org/ and https://creativecommons.org/licenses/by/4.0/.
+The portable representation normalizes identifiers and groups repeated source
+metadata; original feature descriptions and evidence references are retained.
+Natural human variants and experimental replacements are labelled separately.
+These annotations do not establish a personal genotype's clinical effect.

@@ -75,6 +75,10 @@ def _function_fields(gene: str, rsid: str = "") -> Dict[str, Any]:
                      "retrieved": (locus.get("allele_identity") or {}).get("checked_on"),
                      "knowledge": record("loci.json", "loci", rsid)}
     symbol = entry.get("canonical_symbol") or canonical
+    from .variant_annotations import reference as variant_knowledge
+    from .curation_coverage import describe as curation_coverage
+    coverage = curation_coverage(str(symbol), bool(entry.get('description') and entry.get('source')
+                                and entry.get('function_status') not in ('identity_only', 'intergenic_region', 'not_curated')))
     repeat = (book.get("separate_repeats") or {}).get(symbol)
     role = (book.get("patient_gene_roles") or {}).get(symbol) or entry.get("patient_summary")
     if not role:
@@ -84,6 +88,8 @@ def _function_fields(gene: str, rsid: str = "") -> Dict[str, Any]:
     if detail.get("source") and detail["source"] not in additional_sources:
         additional_sources.append(detail["source"])
     return {"gene_function": entry.get("description") or t("reference.gene_unknown"),
+            "variant_knowledge": variant_knowledge(str(symbol), rsid, limit=5),
+            "curation_coverage": coverage,
             "gene_source": entry.get("source"),
             "gene_source_scope": "genomic_annotation" if entry.get("scope") == "genomic_annotation" else "gene_function",
             "gene_curation_status": entry.get("curation_status"),
@@ -189,7 +195,12 @@ def reference_lines(row: Dict[str, Any]) -> List[str]:
     description_key = "reference.region" if context.get("gene_source_scope") == "genomic_annotation" else "reference.gene"
     lines = [t(description_key, text=context.get("gene_function")),
              t("reference.variant", text=context.get("variant_context"))]
-    lines[1:1] = meaning_lines(row)
+    coverage = context.get('curation_coverage') or {}
+    lines.extend(value for value in (coverage.get('summary'), coverage.get('notice')) if value)
+    from .genotype_reference import lines as genotype_reference_lines
+    from .variant_annotations import lines as variant_knowledge_lines
+    lines[1:1] = meaning_lines(row) + genotype_reference_lines(context.get('genotype_reference') or {})
+    lines.extend(variant_knowledge_lines(context.get('variant_knowledge') or {}))
     disease = context.get("disease_context")
     if disease:
         lines.extend([disease["label"] + ": " + disease["name"],
@@ -424,7 +435,9 @@ def attach_finding_biology(rows: List[Dict[str, Any]], assembly: str | None = No
 
 def _scientific_context(gene: str, rsid: str, context: Dict[str, Any]) -> Dict[str, Any]:
     from .scientific_review import context_review
-    return {**context, 'scientific_review': context_review(gene, rsid, context)}
+    from .genotype_reference import describe as genotype_reference
+    return {**context, 'scientific_review': context_review(gene, rsid, context),
+            'genotype_reference': genotype_reference(rsid, gene)}
 
 
 def genome_context(gene: str, rsid: str = "") -> Dict[str, Any]:

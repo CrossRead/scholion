@@ -37,6 +37,11 @@ effect is established. A known gene function does not supply a missing allele
 mechanism, direction, personal risk or treatment rule. Retain the distinction between a catalogue interpretation and an eligible
 automatic clinical finding; do not supply missing facts or clinical support.
 
+Use `gene-knowledge` for the retained variant and genotype reference descriptions,
+comparison groups and source records. These are conditional reference meanings;
+opening the reference never supplies a missing personal reading. Changed source
+records require review before dependent personal interpretations are reused.
+
 **2b. A correction route is relayed only in the conditional, and only with what
 checks it.** When a system answers with `correction_routes`, every line of it
 answers a decision somebody has already made — never the question of whether to

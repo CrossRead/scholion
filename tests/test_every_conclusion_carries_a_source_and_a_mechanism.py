@@ -27,7 +27,7 @@ BASIS_FIELDS = {'conclusion_basis', 'subclaim_basis', 'clinical_basis', 'proposa
                 'selection_basis', 'timing_basis', 'priority_basis', 'specialist_basis',
                 'claim_basis', 'dose_basis', 'mechanism_basis', 'condition_basis', 'marker_basis', 'monitoring_basis', 'route_basis'}
 # These name exactly a different kind of datum, never a general "clinical" escape.
-NONCLINICAL_BASES = {'model_basis', 'display_basis', 'intervention_basis', 'basis'}
+NONCLINICAL_BASES = {"normality_basis",'model_basis', 'display_basis', 'intervention_basis', 'basis'}
 NONCLINICAL_KINDS = {'derived_measurement', 'display_reference_comparison', 'display_index',
                     'population_model_calculation', 'product_boundary'}
 

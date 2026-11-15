@@ -85,6 +85,12 @@ class TestHostList(unittest.TestCase):
     """
 
     EXPECTED = {
+        "api.ncbi.nlm.nih.gov",        # Exact public Gene and RefSNP records.
+        "eutils.ncbi.nlm.nih.gov",     # Exact public ClinVar and RefSeq records.
+        "rest.uniprot.org",           # Reviewed reference annotations, no patient input.
+        "storage.googleapis.com",     # Fixed complete HGNC public snapshot.
+        "thegencc.org",               # Public gene–disease assertions.
+        "www.ebi.ac.uk",              # Referenced publication and correction metadata.
         "doi.org",                     # supported estimate reference links; no profile requests
         "www8.garmin.com",             # explicit manufacturer reference link, no profile upload
         "api.cpicpgx.org",              # gene↔drug pairs from CPIC

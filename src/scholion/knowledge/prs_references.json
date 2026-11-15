@@ -2,7 +2,7 @@
   "_meta": {
     "purpose": "Independently checked aggregate reference statistics; no model weights or individual genomes.",
     "source_tier": "curated_reference",
-    "updated": "2026-10-11"
+    "updated": "2026-11-15"
   },
   "references": [
     {
@@ -25,8 +25,14 @@
       "model_publication": "PMID:32991828; DOI:10.1016/j.ajhg.2020.08.025",
       "reference_sample_list_sha256": "e9773545636380bb9962eeffab8dfbafd05e132a547a61dfde2b90a44a2e67d3",
       "reference_called_sites_sha256": "d2c84be9ba234bb2e946207d2fbdf1443bd5442185bffd9ef4a2db9533c70e36",
-      "validation": "All 32 scoring sites directly called in each of 503 EUR samples; exact forward alleles; no absent-site imputation. Original GRCh37 and harmonized GRCh38 files have identical original sites, alleles and weights.",
-      "updated": "2026-10-11"
+      "validation": "All 32 scoring sites directly called in each of 503 EUR samples; no absent-site imputation. Original GRCh37 and harmonized GRCh38 files have identical original sites, alleles and weights. Allele labels matched the reference VCF; this does not independently establish palindromic strand orientation.",
+      "updated": "2026-10-11",
+      "allele_orientation": {
+        "status": "not_independently_verified",
+        "scope": "all_scoring_alleles",
+        "checked_on": "2026-11-15",
+        "source": "The reference calculation matched allele labels to the VCF; it did not independently resolve palindromic source orientation."
+      }
     }
   ]
 }

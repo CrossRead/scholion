@@ -146,6 +146,14 @@ def _add_answers_commands(sub, common) -> None:
     g = sub.add_parser("genome", parents=[common], help="look a locus up in the full VCF (rsID or --gene)")
     g.add_argument("rsid", nargs="?", help="rsID (e.g. rs4149056)")
     g.add_argument("--gene", help="look for all the loci of a gene")
+    knowledge = sub.add_parser("gene-knowledge", parents=[common],
+                               help="retained variant effects, genotype meanings and exact sources; no genome lookup")
+    knowledge.add_argument("gene", help="human gene symbol or HGNC identifier")
+    knowledge.add_argument("--variant", default="", help="rsID, protein change or exact source feature")
+    knowledge.add_argument("--query", default="", help="filter source descriptions and identifiers")
+    knowledge.add_argument("--kind", choices=["natural", "experimental", "all"], default="natural")
+    knowledge.add_argument("--offset", type=int, default=0)
+    knowledge.add_argument("--limit", type=int, default=20)
 
     rx = sub.add_parser("prescription", parents=[common],
                         help="a second opinion on a NEW prescription: PGx + interactions + monitoring")
@@ -358,6 +366,16 @@ def _add_maintenance_commands(sub, common) -> None:
     srcp.add_argument("--refresh", action="store_true",
                       help="import the sources that can be automated (reaches the network)")
     srcp.add_argument("--only", default="", help="refresh one source by id (e.g. cpic)")
+    srcp.add_argument("--accept", default="", metavar="TOKEN", help="accept a staged gene/variant source comparison")
+    srcp.add_argument("--diff", default="", metavar="TOKEN", help="read all changes through paged source comparisons")
+    srcp.add_argument("--offset", type=int, default=0)
+    srcp.add_argument("--limit", type=int, default=20)
+    srcp.add_argument("--status", action="store_true", help="show reference update progress and schedule")
+    srcp.add_argument("--stop", action="store_true", help="cancel the running reference check")
+    srcp.add_argument("--discard", action="store_true", help="discard a staged reference comparison")
+    srcp.add_argument("--schedule", choices=["off", "1", "2", "3", "6", "12"],
+                      help="opt in to calendar-month checks while the app is open, or turn them off")
+    srcp.add_argument("--check-due", action="store_true", help="run an opted-in reference check if due")
     asi = sub.add_parser("assistant", parents=[common],
                          help="what the application does by itself, what the assistant adds and how to connect it")
     asi.add_argument("--context", action="store_true",
@@ -1292,6 +1310,13 @@ def _cmd_genome(args) -> Any:
     return res, render
 
 
+def _cmd_gene_knowledge(args) -> Any:
+    from . import variant_annotations
+    return (variant_annotations.reference(args.gene, args.variant, offset=args.offset,
+                                         limit=args.limit, kind=args.kind, query=args.query),
+            variant_annotations.report)
+
+
 def _cmd_prescription(args) -> Any:
     res, render = engine.check_new_prescription(args.name), fmt.prescription_check
     return res, render
@@ -1504,17 +1529,28 @@ def _cmd_genotype_sites(args) -> Any:
 
 def _cmd_sources(args) -> Any:
     from . import sources as _src
+    from . import reference_updates as _ref
     results = []
-    if getattr(args, "refresh", False):
+    if args.accept:
+        results = [_ref.accept(args.accept)]
+    elif args.diff:
+        results = [_ref.diff(args.diff, args.offset, args.limit)]
+    elif args.stop or args.discard:
+        results = [_ref.cancel(discard=args.discard)]
+    elif args.schedule is not None:
+        results = [_ref.configure(args.schedule != "off", 3 if args.schedule == "off" else int(args.schedule))]
+    elif args.check_due:
+        results = [_ref.check_due()]
+    elif getattr(args, "refresh", False):
         try:
-            ids = [args.only] if getattr(args, "only", "") else list(_src.SOURCES)
-            results = [_src.refresh(i) for i in ids]
+            results = [_src.refresh(args.only)] if args.only else _src.refresh_all()
         except _src.SourceUnavailable as e:
             results = [{"source": args.only or "all", "skipped": True, "reason": str(e)}]
         except KeyError:
             results = [{"source": args.only, "skipped": True,
                         "reason": f"no such source: {args.only}"}]
     res = {"sources": _src.state(), "results": results,
+           "reference_updates": _ref.status(),
            # Where each domain of the profile comes from — the block the
            # web's source badges read from `/api/sources` (parity, 12.09.2026).
            "data_sources": engine.provenance()}
@@ -1697,6 +1733,7 @@ _QUERIES = [
     (_is("labs"), _cmd_labs),
     (_is("suggest-tests"), _cmd_suggest_tests),
     (_is("genome"), _cmd_genome),
+    (_is("gene-knowledge"), _cmd_gene_knowledge),
     (_is("prescription"), _cmd_prescription),
     (_is("metrics"), _cmd_metrics),
     (_is("focus"), _cmd_focus),

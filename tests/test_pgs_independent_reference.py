@@ -21,6 +21,8 @@ class IndependentReference(unittest.TestCase):
                     "minimum_called_positions": 32, "reference_coordinate_build": "GRCh37",
                     "estimation": "normal_mean_sd", "source": "https://example.org/reference",
                     "validation": "All synthetic positions checked",
+                    "allele_orientation": {"status": "verified_forward", "scope": "all_scoring_alleles",
+                                           "checked_on": "2026-11-15", "source": "Synthetic independent orientation review"},
                     "reference_sample_list_sha256": "2" * 64,
                     "reference_called_sites_sha256": "3" * 64,
                     "model_sha256_by_build": {"GRCh37": "1" * 64, "GRCh38": "1" * 64}}
@@ -40,6 +42,11 @@ class IndependentReference(unittest.TestCase):
             self.assertAlmostEqual(97.724986805, got["percentile"], places=8)
             self.assertEqual(2.0, got["z_score"])
             self.assertEqual(503, got["validation"]["samples"])
+
+    def test_reference_letter_matching_alone_cannot_resolve_palindromic_orientation(self):
+        self.row['scoring_validation'].update(genome_build='GRCh38')
+        self.ref.pop('allele_orientation')
+        self.assertIsNone(calibration_for(self.row,'EUR'))
 
     def test_unknown_changed_or_wrong_population_models_are_not_promoted(self):
         for key, value in (("pgs_id", "PGS888888"), ("score", float("nan")),

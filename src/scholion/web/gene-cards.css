@@ -56,3 +56,22 @@
 @media print{.gene-card-fold>summary{color:var(--ink)}.gene-card-fold-body{display:block!important}.gene-card{--gene-card-label:9pt;--gene-card-emphasis:10pt;break-inside:auto;font-size:10pt;line-height:1.35}.gene-card-context{break-inside:avoid}}
 
 @media print{.gene-region-table{max-height:none;overflow:visible}}
+
+.gene-card-genotypes{margin-top:12px;border-top:1px solid var(--grid);padding-top:10px;overflow-wrap:anywhere}
+.gene-card-genotypes dl{margin:6px 0}.gene-card-genotypes dl>div{display:flex;gap:12px;margin:4px 0}.gene-card-genotypes dt{font-weight:600;min-width:3.5em}.gene-card-genotypes dd{margin:0}
+/* Source knowledge is composed by the shared card, never by a page adapter. */
+.gene-card-knowledge { min-width:0; overflow-wrap:anywhere; padding:var(--cr-space-4, 1rem); border-top:1px solid var(--grid); }
+.gene-card-knowledge h4 { margin:0 0 .75rem; }
+.gene-knowledge-model,.gene-knowledge-source { padding:.75rem 0; border-bottom:1px solid var(--grid); overflow-wrap:anywhere; }
+.gene-knowledge-model p,.gene-knowledge-source p { white-space:pre-line; }
+.gene-knowledge-table { overflow-x:auto; margin:.75rem 0; }
+.gene-knowledge-table table { min-width:32rem; }
+.gene-knowledge-table th,.gene-knowledge-table td { vertical-align:top; white-space:pre-line; }
+.gene-knowledge-controls { display:flex; gap:.5rem; flex-wrap:wrap; align-items:end; margin:.75rem 0; }
+.gene-knowledge-controls label { flex:1 1 15rem; }
+.gene-knowledge-controls label span { display:block; }
+.gene-knowledge-controls input { width:100%; }
+.gene-knowledge-review { color:var(--ink); font-weight:600; }
+@media print { .gene-knowledge-controls { display:none; } .gene-knowledge-model,.gene-knowledge-source { break-inside:avoid; } }
+
+.gene-knowledge-controls>* { min-width:0; max-width:100%; }

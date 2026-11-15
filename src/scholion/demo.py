@@ -310,7 +310,8 @@ def build_prs() -> dict:
                    reference_panel_ancestry="EUR", genome_build="GRCh38",
                    detected_genome_build="GRCh38", model_original_build="GRCh38",
                    model_harmonized_build="GRCh38", build_mismatch=False)
-        rec["scoring_validation"] = {"checked": True, "algorithm": "scholion-called-alleles-v1",
+        rec["scoring_validation"] = {"checked": True, "algorithm": "scholion-called-alleles-v2",
+                                     "allele_orientation": {"model_forward_verified": False, "unresolved_rows": 0},
                                      "input_sha256": "0" * 64, "model_sha256": "1" * 64,
                                      "synthetic": True,
                                      "source": "Synthetic demo, not a genome calculation"}

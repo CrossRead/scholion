@@ -164,6 +164,11 @@ def known_block():
             continue
         entry["genotype"] = g["gt"]
         entry["dp"] = g["dp"]
+        if d.get("personal_effect_permitted") is False:
+            entry.update(verdict="see_apoe" if rs in ("rs429358", "rs7412") else "reference_only",
+                         status="Reference context only; no individual longevity verdict")
+            out.append(entry)
+            continue
         if rs in ("rs429358", "rs7412"):
             entry.update(verdict="see_apoe", status=VERDICT_LABEL["see_apoe"])
             out.append(entry)

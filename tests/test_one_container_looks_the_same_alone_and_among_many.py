@@ -27,6 +27,7 @@ from scholion import cli, contract, core, demo
 #: Read commands with the arguments they are called with. Every read command of
 #: the parser is here unless it is in SKIP; a new one fails the coverage check.
 CALLS = [
+    ["gene-knowledge", "COMT", "--variant", "rs4680"],
     ["overview"], ["second-opinion"], ["radar"], ["medications"], ["labs"], ["metrics"],
     ["limits"], ["evidence-levels"], ["markers"], ["suggest-tests"], ["genome-status"],
     ["genome-updates"], ["genome", "rs4149056"], ["drug", "omeprazole"],

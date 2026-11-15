@@ -19,6 +19,7 @@ from scholion import mcp_server, ouroboros_tools
 
 #: 39 tools, frozen at 0.5.11 (27.09.2026).
 FROZEN = frozenset({
+    "sch_gene_knowledge",  # Added in 0.7.9; source-bound variant reference meanings.
     "sch_insight_snapshot",  # Added in 0.7.0; confirmed local review history.
     "sch_mitochondria",  # Added in 0.7.7; local mitochondrial BAM analysis.
     "sch_acmg", "sch_analyze_labs", "sch_array", "sch_brief", "sch_capabilities",

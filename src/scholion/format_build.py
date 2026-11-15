@@ -4,6 +4,8 @@ Split out of `format.py`; every face still calls these names through `format`,
 which re-exports them."""
 from __future__ import annotations
 
+import json
+
 from typing import Any, Dict, List, Optional  # noqa: F401
 
 from .i18n import plural as _plural, t as _t  # noqa: F401
@@ -138,6 +140,12 @@ def sources_report(r: Dict[str, Any]) -> str:
         if res.get("skipped"):
             L.append(f"ℹ️ {res['source']}: {res.get('reason','')}")
             continue
+        if res.get("token") or "schedule" in res or res.get("status") or res.get("error"):
+            L.append(_t("reference_updates.state") + ": " + str(res.get("status") or res.get("error") or "—"))
+            if res.get("token"):
+                L.append(_t("reference_updates.preview") + ": " + res["token"])
+            L.append(json.dumps(res, ensure_ascii=False, indent=2))
+            continue
         n_changed = len(res.get("changes") or [])
         L.append("✓ " + (_t("sources.refreshed", source=res["source"],
                             n=res.get("checked", 0), changed=n_changed)
@@ -149,6 +157,9 @@ def sources_report(r: Dict[str, Any]) -> str:
                          f"{c.get('was')} → {c.get('now')} ({c.get('upstream')})")
             else:
                 L.append(f"  - {c['gene']}: {c.get('field')} {c.get('was')} → {c.get('now')}")
+    if r.get("reference_updates"):
+        L += ["", _t("reference_updates.title"),
+              json.dumps(r["reference_updates"], ensure_ascii=False, indent=2)]
     # Where each domain of the profile comes from — the block the web's source
     # badges read from `/api/sources` (parity, 12.09.2026): a person reading
     # the markdown sees what the page shows.

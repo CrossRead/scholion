@@ -74,7 +74,7 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def _diag_opener(ctx: Optional[ssl.SSLContext]) -> "urllib.request.OpenerDirector":
-    """An opener for `diagnose()` alone: never redirects, optionally unverified."""
+    """A bounded-source/diagnostic opener: never redirects, optionally unverified."""
     handlers = [_NoRedirect()]
     if ctx is not None:
         handlers.append(urllib.request.HTTPSHandler(context=ctx))
@@ -213,6 +213,36 @@ def get_text(url: str, timeout: int = 15, headers: Optional[Dict[str, str]] = No
         return None
 
 
+def get_json_response(url: str, timeout: int = 30, max_bytes: int = 64 * 1024 * 1024,
+                      request_headers: Optional[Dict[str, str]] = None) -> Optional[Dict[str, Any]]:
+    """Public reference JSON plus release/pagination headers, without redirects.
+
+    A successful body without its source version is insufficient for a versioned
+    reference refresh. The same offline and explicit TLS policy applies here.
+    """
+    if offline():
+        return None
+    request = urllib.request.Request(url, headers={**_UA, **(request_headers or {})})
+    context = None
+    for attempt in range(2):
+        try:
+            with _diag_opener(context).open(request, timeout=timeout) as response:
+                body = response.read(max_bytes + 1)
+                if len(body) > max_bytes:
+                    return None
+                return {"data": json.loads(body.decode("utf-8")),
+                        "headers": {key.lower(): value for key, value in response.headers.items()},
+                        "status": getattr(response, "status", 200)}
+        except Exception as exc:
+            if attempt:
+                return None
+            try:
+                context = certificate_fallback(exc)
+            except Exception:
+                return None  # quiet: the bounded fetch reports unavailable, without an insecure fallback.
+    return None
+
+
 def diagnose(target: str = "default") -> Dict[str, Any]:
     """Check internet access from this Python. Returns the mode (verified/unverified) and the error.
 
@@ -254,3 +284,12 @@ def diagnose(target: str = "default") -> Dict[str, Any]:
     if "CERTIFICATE" in last.upper() or "SSL" in last.upper():
         hint = _t("net.certificates_hint")
     return {"ok": False, "error": last, "hint": hint, "url": url}
+
+
+def reference_error(exc: BaseException) -> str:
+    """A public job status never carries a local filename from an I/O failure."""
+    if isinstance(exc, OSError):
+        return "Reference I/O failed; the previous active knowledge was preserved."
+    if isinstance(exc, (ValueError, RuntimeError)):
+        return str(exc)[:500]
+    return "Reference check failed (" + type(exc).__name__ + "); the previous active knowledge was preserved."

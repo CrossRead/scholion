@@ -77,6 +77,12 @@ def _fetch_json(url: str) -> Any:
     from . import net
     if net.offline():
         raise SourceUnavailable(_t("sources.offline"))
+    if url.startswith((CPIC_API + "/allele?", CPIC_API + "/diplotype?")):
+        from .reference_checks import cpic_table
+        try:
+            return cpic_table(url)
+        except (ValueError, RuntimeError) as exc:
+            raise SourceUnavailable(_t("sources.fetch_failed", url=url)) from exc
     data = net.get_json(url)
     if data is None:
         raise SourceUnavailable(_t("sources.fetch_failed", url=url))
@@ -88,7 +94,7 @@ class SourceUnavailable(RuntimeError):
 
 
 # ---------------------------------------------------------------- importers
-def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
+def _prepare_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
     """Refresh the CPIC-derived parts of cpic_drug_gene.json, and report drift.
 
     What is imported is what CPIC publishes as data: the functional status of
@@ -99,7 +105,9 @@ def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
     is verbatim.
     """
     name = "cpic_drug_gene.json"
-    data = json.loads(core.knowledge_path(name).read_text(encoding="utf-8"))
+    from .variant_annotations import cpic_override
+    accepted = cpic_override(name)
+    data = json.loads(json.dumps(accepted)) if accepted is not None else json.loads(core.knowledge_path(name).read_text(encoding="utf-8"))
     genes = data.get("genes", {})
     changes: List[Dict[str, Any]] = []
     checked = 0
@@ -109,7 +117,7 @@ def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
         if not markers:
             continue
         alleles = fetch(f"{CPIC_API}/allele?genesymbol=eq.{gene}"
-                        f"&select=name,activityvalue,clinicalfunctionalstatus")
+                        f"&select=id,version,name,activityvalue,clinicalfunctionalstatus")
         by_star: Dict[str, Dict[str, Any]] = {}
         for a in alleles or []:
             tok = _star_token(a.get("name"))
@@ -128,6 +136,11 @@ def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
                                 "field": "function", "was": m.get("function"), "now": want,
                                 "upstream": up.get("clinicalfunctionalstatus")})
                 m["function"] = want
+            if want:
+                m["source_record"] = {"source": "CPIC allele table", "record_id": up.get("id"),
+                                      "record_version": up.get("version"), "checked_on": _today(),
+                                      "url": f"{CPIC_API}/allele?genesymbol=eq.{gene}",
+                                      "scope": "Named allele function, not an independently resolved diplotype"}
 
         if gdef.get("model") == "activity_score":
             rows = fetch(f"{CPIC_API}/diplotype?genesymbol=eq.{gene}"
@@ -154,7 +167,7 @@ def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
                 gdef["activity_bands"] = bands
 
     _import_cpic_recommendations(fetch, data, changes)
-    _import_cpic_pairs(fetch, changes)
+    pairs = _import_cpic_pairs(fetch, changes, persist=False)
 
     data.setdefault("_meta", {})["imported"] = {
         "source": "cpic", "fetched": _today(), "endpoint": CPIC_API,
@@ -164,8 +177,16 @@ def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
                   "the patient-facing notes stay project-written",
         "alleles_checked": checked,
     }
-    core.write_knowledge_local(name, data)
-    return {"source": "cpic", "file": name, "checked": checked, "changes": changes}
+    return {"data": data, "pairs": pairs, "checked": checked, "changes": changes}
+
+
+def _import_cpic(fetch: Callable[[str], Any]) -> Dict[str, Any]:
+    prepared = _prepare_cpic(fetch)
+    if prepared["pairs"] is not None:
+        core.write_knowledge_local("cpic_pairs.json", prepared["pairs"])
+    core.write_knowledge_local("cpic_drug_gene.json", prepared["data"])
+    return {"source": "cpic", "file": "cpic_drug_gene.json", "checked": prepared["checked"],
+            "changes": prepared["changes"]}
 
 
 #: Our guidance keys are the engine's vocabulary; CPIC's are its phenotype
@@ -232,7 +253,7 @@ def _import_cpic_recommendations(fetch, data, changes):
                 cp["classification"] = cls
 
 
-def _import_cpic_pairs(fetch, changes):
+def _import_cpic_pairs(fetch, changes, *, persist=True):
     """Refresh the level-A pair list — the denominator coverage is measured against.
 
     This list is what makes «we carry 16 of 78» a fact instead of a feeling, and
@@ -259,7 +280,9 @@ def _import_cpic_pairs(fetch, changes):
     doc["pairs"] = [{"gene": g, "drug": d} for g, d in pairs]
     doc.setdefault("_meta", {})["count"] = len(pairs)
     doc["_meta"]["fetched"] = _today()
-    core.write_knowledge_local(name, doc)
+    if persist:
+        core.write_knowledge_local(name, doc)
+    return doc
 
 
 def _bands_from_diplotypes(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -291,6 +314,21 @@ def _bands_from_diplotypes(rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 
 # ----------------------------------------------------------------- registry
+def _import_gene_variant_knowledge(fetch):
+    from . import reference_updates
+    return reference_updates.preview(fetch)
+
+
+def _fetch_reference_response(url):
+    from . import net
+    if net.offline():
+        raise SourceUnavailable(_t("sources.offline"))
+    result = net.get_json_response(url)
+    if result is None:
+        raise SourceUnavailable(_t("sources.fetch_failed", url=url))
+    return result
+
+
 SOURCES: Dict[str, Dict[str, Any]] = {
     # ── mirrors: data this build CARRIES, and that changes upstream ──────────
     "cpic": {
@@ -303,6 +341,13 @@ SOURCES: Dict[str, Dict[str, Any]] = {
         "cadence": "guidelines are revised a few times a year",
         "auto": True,
         "importer": _import_cpic,
+    },
+    "gene_variant_knowledge": {
+        "kind": "mirror", "title": "Gene functions, variant effects and exact reference sources",
+        "license": "UniProt annotations: CC BY 4.0; project wording: CC BY 4.0",
+        "homepage": "https://www.uniprot.org/", "endpoint": "https://rest.uniprot.org/uniprotkb/search",
+        "feeds": ["variant_source_records.json"], "cadence": "opt-in calendar checks; staged changes require acceptance",
+        "auto": True, "importer": _import_gene_variant_knowledge, "fetcher": _fetch_reference_response,
     },
     "acmg_sf": {
         "kind": "mirror",
@@ -455,19 +500,31 @@ def state() -> List[Dict[str, Any]]:
                 continue
             meta = {}
             try:
-                meta = (json.loads(core.knowledge_path(f).read_text(encoding="utf-8"))
-                        .get("_meta") or {})
+                if f == "variant_source_records.json":
+                    from . import variant_annotations
+                    meta = variant_annotations.catalogue().get("_meta") or {}
+                else:
+                    meta = (json.loads(core.knowledge_path(f).read_text(encoding="utf-8"))
+                            .get("_meta") or {})
             except (OSError, ValueError):
                 pass
             imported = (meta.get("imported") or {}).get("fetched")
             prec = core.knowledge_precedence(f)
-            files.append({"file": f,
+            item = {"file": f,
                           "local": core.knowledge_is_local(f),
                           "imported": imported,
                           "bundled_stamp": prec["bundled_stamp"] or meta.get("updated") or meta.get("version"),
                           "local_stamp": prec["local_stamp"],
                           "answers": prec["answers"], "why_answers": prec["why"],
-                          "tier": meta.get("source_tier")})
+                          "tier": meta.get("source_tier")}
+            if sid == "cpic":
+                from . import variant_annotations
+                overlay = variant_annotations.cpic_override(f)
+                if overlay is not None:
+                    item["reference_snapshot"] = True
+                    item["imported"] = (overlay.get("_meta", {}).get("imported") or {}).get("fetched")
+                    item["answers"] = "accepted_reference_snapshot"
+            files.append(item)
         out.append({"id": sid, "kind": s.get("kind", "mirror"), "title": s["title"],
                     "license": s["license"], "homepage": s.get("homepage"),
                     "endpoint": s.get("endpoint"), "cadence": s.get("cadence"),
@@ -485,8 +542,16 @@ def refresh(source_id: str, fetch: Optional[Callable[[str], Any]] = None) -> Dic
         return {"source": source_id, "skipped": True,
                 "reason": _t(s.get("why_manual") or "sources.manual.generic"),
                 "command": s.get("command")}
-    return s["importer"](fetch or _fetch_json)
+    return s["importer"](fetch or s.get("fetcher") or _fetch_json)
 
 
 def refresh_all(fetch: Optional[Callable[[str], Any]] = None) -> List[Dict[str, Any]]:
-    return [refresh(sid, fetch) for sid in SOURCES if SOURCES[sid].get("auto")]
+    results = []
+    for sid in SOURCES:
+        if not SOURCES[sid].get("auto"):
+            continue
+        try:
+            results.append(refresh(sid, fetch))
+        except (SourceUnavailable, RuntimeError, ValueError) as exc:
+            results.append({"source": sid, "skipped": True, "reason": str(exc)})
+    return results

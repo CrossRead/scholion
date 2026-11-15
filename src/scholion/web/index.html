@@ -1003,7 +1003,7 @@ const _net={started:0,done:0};
 // describe a running job are never remembered. A reader gets a copy.
 const _apiCache=new Map();
 let _answerEpoch=0;
-const NO_CACHE=[/\/api\/update-status/,/\/api\/recompute(\/status)?(\?|$)/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/,/\/api\/mitochondria/];
+const NO_CACHE=[/\/api\/reference-updates/,/\/api\/update-status/,/\/api\/recompute(\/status)?(\?|$)/,/\/api\/version\/check/,/\/api\/diag/,/\/api\/ping/,/\/api\/mitochondria/];
 const viewLifecycle=ScholionViewLifecycle.create({
   context:()=>({profile:_profileIdentity,revision:_profileRevision,language:LANG,mode:DISPLAY_MODE,epoch:_answerEpoch}),
   dispose:()=>{destroyGoalCharts();if(_loaderTimer){clearInterval(_loaderTimer);_loaderTimer=null;}}
@@ -2558,6 +2558,29 @@ function geneFindingCards(...args){
 function geneReferenceExtras(...args){
   return geneCards.referenceExtras(...args);
 }
+
+// Fetching belongs to the application; the shared component only renders data.
+document.addEventListener('click',async event=>{
+  const button=event.target.closest('[data-knowledge-action]');
+  if(!button)return;
+  const section=button.closest('[data-gene-knowledge]');
+  if(!section)return;
+  const stamp=viewLifecycle.snapshot(),action=button.dataset.knowledgeAction;
+  const query=section.querySelector('[data-knowledge-query]')?.value||'';
+  const kind=section.querySelector('[data-knowledge-kind]')?.value||'natural';
+  const parameters=new URLSearchParams({gene:section.dataset.gene,kind,query,
+    variant:action==='gene'||query?'':section.dataset.variant||'',
+    offset:action==='next'||action==='previous'?button.dataset.next||'0':'0',limit:'5'});
+  button.disabled=true;
+  try{
+    const result=await api('/api/gene-knowledge?'+parameters);
+    if(!section.isConnected||!viewLifecycle.matches(stamp))return;
+    section.outerHTML=geneCards.knowledge(result);
+  }catch(error){
+    const status=section.querySelector('[data-knowledge-status]');
+    if(status)status.textContent=error.message||String(error);
+  }finally{if(button.isConnected)button.disabled=false;}
+});
 function geneticCatalogueFold(gen,card){
   const table=genTableHtml(gen,card,card.register);
   return table?`<details class="fold" data-genetic-catalogue><summary>${esc(t('web.system.genetics_detail'))}</summary>${table}</details>`:'';
@@ -4549,7 +4572,7 @@ async function viewGenome(root){
         ? `<div class="cr-card card muted" style="margin-bottom:8px">${esc(upd.refresh_refusal||'')}</div>`
         : `<div class="row" style="margin-bottom:8px"><button class="cr-btn act" id="upd-btn">${esc(t('web.updates.check_btn'))}</button>
         <span class="muted small">${esc(t('web.genome.updates_note'))}</span></div>`}
-      <div id="upd-box">${renderUpdates(upd)}</div>`],
+      <div id="upd-box">${renderUpdates(upd)}</div><section class="cr-card card" data-reference-updates></section>`],
   ];
   const bindScreen=()=>root.querySelectorAll('.sc-cls').forEach(b=>b.onclick=async()=>{
     const box=$('#sc-box',root); if(!box)return;
@@ -4577,6 +4600,67 @@ async function viewGenome(root){
     <div id="g-card"></div>
     ${panes.filter(([id])=>id!=='panels').map(paneHtml).join('')}
     ${sb}`;
+
+  const referenceBox=$('[data-reference-updates]',root);
+  let referenceTimer=null, referenceRevision=0, referenceRequestRevision=0;
+  viewLifecycle.own(root,()=>clearTimeout(referenceTimer));
+  const referenceRequest=async(action,extra={})=>{
+    const result=await post('/api/reference-updates',{action,...extra});
+    if(result.error)throw new Error(result.error);
+    await loadReferences();
+  };
+  const paintReferences=async(data)=>{
+    if(!viewLifecycle.current(root))return;
+    const job=data.job||{}, schedule=data.schedule||{};
+    const revision=++referenceRevision;
+    clearTimeout(referenceTimer);
+    referenceBox.innerHTML=`<h3 class="cr-h3">${esc(t('reference_updates.title'))}</h3>
+      <p class="cr-caption">${esc(t('reference_updates.note'))}</p>
+      <p role="status">${esc(t('reference_updates.state'))}: ${esc(job.status||'—')} · ${esc(data.source_release||'—')} · ${esc(data.source_compared_on||'—')}</p>
+      ${job.stage?`<p class="cr-caption">${esc(job.stage)} · ${esc(job.entries||0)} · ${esc(job.reference_done||0)}/${esc(job.reference_total||0)}</p>`:''}
+      ${job.error?errorHtml(job.error):''}
+      <div data-reference-diff></div>
+      ${data.history?.length?`<details><summary>${esc(t('reference_updates.history'))}</summary>${data.history.map(row=>`<p class="cr-caption">${esc(row.source_release||'—')} · ${esc(row.source_compared_on||'—')} · ${esc(row.token)}</p>`).join('')}</details>`:''}
+      <div class="row">${!['running','review_ready'].includes(job.status)?`<button class="cr-btn" data-ref-action="check">${esc(t('reference_updates.check'))}</button>`:''}
+      ${job.status==='running'?`<button class="cr-btn" data-ref-action="cancel">${esc(t('reference_updates.cancel'))}</button>`:''}
+      ${job.status==='review_ready'?`<button class="cr-btn" data-ref-action="discard">${esc(t('reference_updates.discard'))}</button>`:''}</div>
+      <form data-reference-schedule><p><label><input type="checkbox" name="enabled" ${schedule.enabled?'checked':''}> ${esc(t('reference_updates.enabled'))}</label></p>
+      <label>${esc(t('reference_updates.months'))} <select class="cr-input" name="months">${[1,2,3,6,12].map(n=>`<option value="${esc(n)}" ${n===schedule.interval_months?'selected':''}>${n}</option>`).join('')}</select></label>
+      <button class="cr-btn" type="submit">${esc(t('reference_updates.save'))}</button></form><p data-reference-error role="alert"></p>`;
+    const failure=error=>{if(viewLifecycle.current(root)&&revision===referenceRevision)$('[data-reference-error]',referenceBox).textContent=error.message;};
+    referenceBox.querySelectorAll('[data-ref-action]').forEach(button=>button.onclick=async()=>{
+      button.disabled=true;try{await referenceRequest(button.dataset.refAction);}catch(error){failure(error);button.disabled=false;}
+    });
+    $('[data-reference-schedule]',referenceBox).onsubmit=async event=>{
+      event.preventDefault();const form=event.currentTarget;
+      try{await referenceRequest('schedule',{enabled:form.elements.enabled.checked,interval_months:Number(form.elements.months.value)});}catch(error){failure(error);}
+    };
+    if(job.status==='review_ready'){
+      const showDiff=async(offset=0)=>{
+        const diff=await api('/api/reference-updates?token='+encodeURIComponent(job.token)+'&offset='+offset);
+        if(diff.error)throw new Error(diff.error);
+        if(!viewLifecycle.current(root)||revision!==referenceRevision)return;
+        const box=$('[data-reference-diff]',referenceBox);
+        box.innerHTML=`<p>${esc(diff.total)} · ${esc(t('reference_updates.preview'))}: ${esc(job.token)}</p>
+          <pre class="cr-caption" style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(JSON.stringify({changes:diff.changes,source_check_failures:diff.source_check_failures,models_requiring_review:diff.models_requiring_review},null,2))}</pre>
+          ${diff.next_offset!=null?`<button class="cr-btn" data-reference-more>${esc(t('reference_updates.more'))}</button>`:''}
+          <p><label><input type="checkbox" data-reference-consent> ${esc(t('reference_updates.consent'))}</label></p>
+          <button class="cr-btn" data-reference-accept disabled>${esc(t('reference_updates.accept'))}</button>`;
+        const accept=$('[data-reference-accept]',box);
+        $('[data-reference-consent]',box).onchange=event=>accept.disabled=!event.target.checked;
+        accept.onclick=async()=>{accept.disabled=true;try{await referenceRequest('accept',{token:job.token});forgetAnswers();_sources=null;}catch(error){failure(error);accept.disabled=false;}};
+        const more=$('[data-reference-more]',box);if(more)more.onclick=()=>showDiff(diff.next_offset).catch(failure);
+      };
+      await showDiff().catch(failure);
+    }
+    if(job.status==='running'||(schedule.enabled&&job.status!=='review_ready'))referenceTimer=setTimeout(()=>loadReferences(),job.status==='running'?1500:15000);
+  };
+  const loadReferences=async()=>{
+    const requestRevision=++referenceRequestRevision;
+    try{const data=await api('/api/reference-updates');if(data.error)throw new Error(data.error);if(requestRevision===referenceRequestRevision)await paintReferences(data);}
+    catch(error){if(viewLifecycle.current(root))referenceBox.innerHTML=errorHtml(error.message);}
+  };
+  loadReferences();
 
   $('#acmg-load',root).onclick=async()=>{
     const box=$('#acmg-result',root);showLoader(box);

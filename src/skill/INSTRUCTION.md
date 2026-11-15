@@ -52,6 +52,11 @@ effect is established. A known gene function does not supply a missing allele
 mechanism, direction, personal risk or treatment rule. Retain the distinction between a catalogue interpretation and an eligible
 automatic clinical finding; do not supply missing facts or clinical support.
 
+Use `gene-knowledge` for the retained variant and genotype reference descriptions,
+comparison groups and source records. These are conditional reference meanings;
+opening the reference never supplies a missing personal reading. Changed source
+records require review before dependent personal interpretations are reused.
+
 **2b. A correction route is relayed only in the conditional, and only with what
 checks it.** When a system answers with `correction_routes`, every line of it
 answers a decision somebody has already made — never the question of whether to
@@ -921,7 +926,7 @@ The journal is needed where two factors always coincide in time and passive data
 does not separate them.
 
 The Ouroboros tools and the MCP server are the same core through one registry —
-41 tools. One tool may answer for more than one command, the second behind a
+42 tools. One tool may answer for more than one command, the second behind a
 flag: `sch_selfcheck` with `full=true` is `reconcile`, `sch_genome_status` with
 `updates=true` is `genome-updates`, `sch_analyze_labs` with `catalogue=true` is
 `markers`, `sch_rules` with `levels=true` is `evidence-levels`, `sch_overview` with
@@ -936,7 +941,7 @@ sets a value; `sch_update` installs the program and `sch_recompute` rebuilds wha
 person's own files already hold, each only with `confirm=true` after the person's
 yes. `sch_insight_snapshot` saves a review only with its preview fingerprint in
 `confirm`; previewing does not write. `sch_mitochondria` runs the local BAM
-analysis and saves a derived report only with explicit confirmation. The complete list is: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_insight_snapshot`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_mitochondria`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
+analysis and saves a derived report only with explicit confirmation. The complete list is: `sch_acmg`, `sch_analyze_labs`, `sch_array`, `sch_brief`, `sch_capabilities`, `sch_check_drug_gene`, `sch_check_prescription`, `sch_clinvar_findings`, `sch_flag_rate`, `sch_focus`, `sch_focus_log`, `sch_gene_knowledge`, `sch_genome_lookup`, `sch_genome_status`, `sch_goal`, `sch_goal_suggest`, `sch_health_metrics`, `sch_ingest_labs`, `sch_insight_snapshot`, `sch_lab_draw`, `sch_lifestyle`, `sch_limits`, `sch_lipid_genetics`, `sch_longevity`, `sch_marker_propose`, `sch_medications`, `sch_mitochondria`, `sch_overview`, `sch_phenoage`, `sch_provenance`, `sch_prs`, `sch_radar`, `sch_recompute`, `sch_rules`, `sch_screen`, `sch_second_opinion`, `sch_selfcheck`, `sch_sources`, `sch_suggest_tests`, `sch_system`, `sch_update`, `sch_version`.
 `scholion capabilities --json` derives the list from the build, and is the one
 to trust when this paragraph and the build disagree.
 
@@ -1577,3 +1582,14 @@ returns a confirmation fingerprint. Only when the person asks to save this
 review, pass that fingerprint with `--confirm`. `sch_insight_snapshot` uses the
 same `confirm` parameter. Reading, previewing and comparing do not write the
 profile or recompute a genome. Missing or stale inputs do not mean resolution.
+
+
+### Variant reference meanings
+
+`python3 -m scholion gene-knowledge GENE --variant rsID` reads retained genotype
+comparisons, directions, limits and exact source annotations. `sch_gene_knowledge`
+provides the same reference to an agent. These are not newly measured personal
+effects. The shared card exposes every retained row through paging and search.
+Reference source checks are human-controlled in Genome → Sources or `sources`;
+opt-in periodic checks stage a comparison while the app is open. Acceptance is
+separate; downloading a record does not renew primary scientific review dates.

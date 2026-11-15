@@ -143,6 +143,29 @@ wheel serves both component assets.
 
 ## Gene curation and source review
 
+### Gene-function and variant-effect coverage
+
+Gene-function curation and variant-effect curation are separate claims. A gene
+may have a sourced function description without any registered effect variant.
+Calling it curated for variant effects requires at least one explicit
+gene–variant–effect–source link. A link identifies the exact variant (rsID, or an
+appropriate HGVS, repeat, structural or haplotype model), the measured outcome,
+direction or explicit uncertainty, comparator, applicable population or model,
+limitations and source review date. It never upgrades clinical eligibility.
+
+The current source-bound research registry supplies qualifying SNP links through
+the shared core. Stale source witnesses or unresolved allele models do not count.
+Other annotations remain available but do not silently become registered effects.
+The common card, CLI and agent responses retain both coverage scopes. A zero
+registered count describes the registry, not the absence of published evidence.
+
+Count genes with at least one qualifying link, links and unique variant IDs
+separately. Every gene counted as variant-effect curated must have a link, so
+link count is at least the number of covered genes. Unique rsID count need not
+exceed gene count: the relationship can be many-to-many, and not all variants
+use rsIDs. Proximity, LD, study membership, gene–disease validity and variant
+classification alone do not establish a variant effect or a genotype gradient.
+
 ### Supported reference sources
 
 The following sources are supported for the stated curation purposes. The
@@ -274,3 +297,104 @@ A missing studied allele does not imply protection or the reverse effect.
 Uncertain reading, identity conflict, an unstudied genotype or changed source
 identity keeps the study visible without applying its personal comparison.
 No hypothesis changes clinical findings, scores, prescriptions or eligibility.
+
+## Genotype reference key
+
+The shared core adds `reference_context.genotype_reference` for catalogued SNPs.
+It lists explicit reference-homozygous, heterozygous and alternative-homozygous
+examples in the retained forward genomic allele frame, with the assembly and
+source verification date. GRCh37 is used only with its own verified sequence
+passport; legacy coordinates alone do not supply its allele orientation.
+Multiallelic positions retain all supported pairs, including two different
+alternative alleles. Indels, repeats, compound haplotypes and unknown positions
+are not reduced to a three-genotype SNP model. These diploid examples never
+turn a one-copy reading into a homozygote.
+
+This is a sequence reference, not a normal range, effect ranking or personal
+reading. It cannot rescue an unread, conflicted or withheld genotype. The shared
+component shows the key beside the actual reading in both registers; CLI text
+and agent results retain the same core information. It performs no downloads.
+Existing source-bound research descriptions may be displayed as explicitly
+conditional genotype examples, with their evidence level, sources and limits,
+only while their source witnesses still match. No inverse effect, normality,
+maximal deviation or clinical eligibility is inferred from allele counts.
+
+
+### Portable variant knowledge and source refresh (0.7.9)
+
+The shared card exposes the retained genotype models and original reviewed
+UniProt Natural variant annotations, including exact protein changes and source
+publications. Experimental Mutagenesis has its own filter. A source description
+is not a verified human genotype dose model: REF is not a clinical norm and two
+copies do not imply maximal deviation. Missing source fields stay visible.
+The core reader `gene-knowledge GENE --variant rsID` provides the same content;
+paging, source-text search and whole-gene navigation preserve access to all rows.
+
+The existing `sources` registry includes `gene_variant_knowledge`:
+
+```
+scholion sources --refresh --only gene_variant_knowledge
+scholion sources --diff PREVIEW_TOKEN
+scholion sources --accept PREVIEW_TOKEN
+scholion sources --discard
+scholion sources --schedule 3
+scholion sources --check-due
+scholion sources --schedule off
+```
+
+The Genome → Sources screen exposes these human controls. The agent tool reads
+status only. Periodic checks are opt-in per container and run while the local
+application is open; the CLI `--check-due` supports an external scheduler. The
+calendar interval is configurable. Viewing a card never initiates a download.
+Only public reference identifiers are requested, never personal readings.
+
+A complete versioned UniProt download includes FUNCTION, Natural variant and
+Mutagenesis. Exact linked HGNC, NCBI Gene, RefSeq, RefSNP, ClinVar, GenCC and CPIC
+records and Europe PMC publication/correction metadata are compared in their own
+scopes. GenCC includes submitter assertions such as ClinGen where supplied; it
+is not a complete independent ClinGen importer. Unsupported complex ClinVar
+records, absent records and unavailable sources remain explicit failures with
+the previous witness retained. Publication metadata checks are not full-text
+scientific reviews. Download dates never renew primary claim review dates.
+
+A preview provides a paged diff and failed checks before acceptance. One atomic
+snapshot includes accepted source records, dependent review flags and prepared
+CPIC guidance; previous snapshots are retained locally. Changed supporting
+records require review before dependent personal interpretations can be reused.
+The saved reading is retained; no BAM analysis starts. Cancellation, incomplete
+pages, offline mode, stale previews and another container cannot partially
+replace the active base. New product-authored models remain visible after an
+upgrade even when a later local source snapshot exists.
+
+
+Retained models with unresolved gene identity remain accessible by their exact
+variant identifier, including `gene-knowledge UNASSIGNED --variant rsID`. Raw
+historical gene labels also retain their reference context. The card labels the
+unresolved assignment explicitly; a query gene never becomes an inferred study
+target. These rows do not increase confirmed HGNC gene-effect coverage.
+
+
+### Minimum physician information and refresh scope
+
+The reference knowledge object carries `gene_information` from the shared core.
+It contains exact identity, complete source function descriptions, pathway,
+tissue and cellular context, and gene–disease submissions with inheritance and
+validity. A first function description is visible without expanding source
+records; all additional source text and clinical submissions remain available
+in the shared card and text/agent responses. The source language is retained.
+A blank function is a content gap, not a completed informative card. Negative,
+limited and disputed disease evidence is kept and never counted as an
+established gene–disease relationship.
+
+Variant meaning is a separate requirement: exact variant/allele frame, studied
+endpoint, direction, comparator, applicability and source. Protein assays do
+not establish human genotype dosage, and a sequence reference is not a clinical
+norm. Catalogue review counts these dimensions separately, per HGNC identity;
+raw annotation counts do not establish clinician-reviewed completeness.
+
+The staged reference refresh requests the same UniProt context fields shown by
+the card. Its linked-source pass is enabled in the shipped catalogue and
+compares HGNC identity, NCBI function and GenCC submissions in addition to
+variant and publication witnesses. Removed as well as changed protein contexts
+appear in the comparison. Source dates and primary-study review dates remain
+separate; a current empty GenCC response supersedes earlier submissions.

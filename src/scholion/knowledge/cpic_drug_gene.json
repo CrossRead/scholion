@@ -362,10 +362,28 @@
           "rsid": "rs4149056",
           "star": "*5",
           "variant_allele": "C",
-          "function": "decreased"
+          "function": "none",
+          "source_record": {
+            "source": "CPIC allele table",
+            "url": "https://api.cpicpgx.org/v1/allele?genesymbol=eq.SLCO1B1&name=eq.*5",
+            "record_id": 779286,
+            "record_version": 393,
+            "checked_on": "2026-11-13",
+            "scope": "Named allele functional status; not an independently resolved diplotype"
+          }
         }
       ],
       "phenotype_rules": [
+        {
+          "when": {"none": ">=2"},
+          "phenotype": "low_function",
+          "label": {"en": "poor transporter function", "ru": "низкая функция транспортёра"}
+        },
+        {
+          "when": {"none": ">=1"},
+          "phenotype": "intermediate_function",
+          "label": {"en": "decreased transporter function", "ru": "сниженная функция транспортёра"}
+        },
         {
           "when": {
             "decreased": ">=2"

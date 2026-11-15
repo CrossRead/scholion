@@ -123,3 +123,27 @@ let current=4,mounted=null,_systems=null,_sources=null;const mount=i=>mounted=i,
 })().catch(e=>{console.error(e);process.exitCode=1;});
 """
         self.run_js(script)
+
+
+    def test_reference_job_status_advances_without_invalidating_reference_card_cache(self):
+        page = (support.SRC / 'scholion/web/index.html').read_text(encoding='utf-8')
+        no_cache = next(line for line in page.splitlines() if line.startswith('const NO_CACHE='))
+        start = page.index('async function api(')
+        api = page[start:page.index('\n}\n', start) + 2]
+        script = r"""
+const assert=require('node:assert/strict');
+let _answerEpoch=0,_profileIdentity=null,reads=0;
+const _apiCache=new Map(),_net={started:0,done:0},API='',withLang=x=>x,t=x=>x;
+const fetch=async()=>{const serial=++reads;return {ok:true,json:async()=>({serial,job:{status:serial===1?'running':'review_ready'}})};};
+"""+no_cache+'\n'+api+r"""
+(async()=>{
+ const running=await api('/api/reference-updates');
+ const ready=await api('/api/reference-updates');
+ assert.equal(running.job.status,'running');assert.equal(ready.job.status,'review_ready');
+ assert.equal(reads,2,'a background source job must be read from the server on every poll');
+ const first=await api('/api/gene-knowledge?gene=SYNTH');
+ const second=await api('/api/gene-knowledge?gene=SYNTH');
+ assert.equal(first.serial,second.serial);assert.equal(reads,3,'unchanged reference cards may still use their cache');
+})().catch(e=>{console.error(e);process.exitCode=1;});
+"""
+        self.run_js(script)

@@ -54,6 +54,7 @@ SWEEP_EXCEPTIONS = {"GET /api/diag", "POST /api/pick-folder"}
 
 #: Bodies for the POST routes. Every one writes into the temporary profile.
 POST_BODIES = {
+    "/api/reference-updates": {"action": "schedule", "enabled": False, "interval_months": 3},
     "/api/mitochondria": {},
     "/api/insight-snapshot": {},  # Preview is read-only; confirmation tested separately.
     # An empty path is the «clear the choice» call, and it is the only body that
@@ -158,6 +159,28 @@ class _Live(unittest.TestCase):
 
 
 class TestEveryRouteAnswers(_Live):
+
+    @classmethod
+    def setUpClass(cls):
+        cls._was_repo = os.environ.get("SCHOLION_REPO_DIR")
+        super().setUpClass()
+        os.environ["SCHOLION_REPO_DIR"] = str(Path(cls._tmp).resolve())
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            super().tearDownClass()
+        finally:
+            if cls._was_repo is None:
+                os.environ.pop("SCHOLION_REPO_DIR", None)
+            else:
+                os.environ["SCHOLION_REPO_DIR"] = cls._was_repo
+
+    def test_reference_schedule_stays_in_the_synthetic_container(self):
+        result = self.json_of('/api/reference-updates', data={"action": "schedule", "enabled": False, "interval_months": 3})
+        self.assertFalse(result['schedule']['enabled'])
+        self.assertTrue((Path(self._tmp) / 'knowledge/.reference-updates/schedule.json').is_file())
+
 
     def test_every_get_route_answers_json(self):
         """A panel of the page each. An empty answer is legitimate — the fixture

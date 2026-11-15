@@ -42,16 +42,34 @@ def percentile_label(value: Any) -> str:
 def scoring_verified(row: dict) -> bool:
     """Whether a stored score carries the corrected called-allele witness."""
     witness = row.get("scoring_validation")
+    orientation = witness.get("allele_orientation") if isinstance(witness, dict) else None
     return (isinstance(witness, dict) and witness.get("checked") is True
-            and witness.get("algorithm") == "scholion-called-alleles-v1"
+            and witness.get("algorithm") == "scholion-called-alleles-v2"
+            and isinstance(orientation, dict) and orientation.get("unresolved_rows") == 0
             and all(isinstance(witness.get(k), str) and len(witness[k]) == 64
                     for k in ("input_sha256", "model_sha256")))
 
 
+def orientation_unresolved(row: dict) -> bool:
+    """Current scoring found a source ambiguity; repeating genotyping cannot fix it."""
+    witness = row.get("scoring_validation") or {}
+    if not isinstance(witness, dict):
+        return False
+    orientation = witness.get("allele_orientation") or {}
+    if not isinstance(orientation, dict):
+        return False
+    return (witness.get("algorithm") == "scholion-called-alleles-v2"
+            and isinstance(orientation.get("unresolved_rows"), int)
+            and orientation["unresolved_rows"] > 0)
+
+
 def recalculation_status(rows: list) -> dict:
     """An update never supplies missing scoring evidence or starts a genome job."""
-    count = sum(1 for row in rows if row.get("pgs_id") and not scoring_verified(row))
-    return {"required": count > 0, "traits": count, "reason": "scoring_unverified" if count else None}
+    pending = sum(1 for row in rows if row.get("pgs_id") and orientation_unresolved(row))
+    count = sum(1 for row in rows if row.get("pgs_id") and not scoring_verified(row)
+                and not orientation_unresolved(row))
+    return {"required": count > 0, "traits": count, "reason": "scoring_unverified" if count else None,
+            "source_review_required": pending > 0, "source_review_traits": pending}
 
 
 def validate(row: dict, *, expected_build: str | None = None,
@@ -64,7 +82,9 @@ def validate(row: dict, *, expected_build: str | None = None,
     """
     out = dict(row)
     reasons = []
-    if not scoring_verified(row):
+    if orientation_unresolved(row):
+        reasons.append("allele_orientation_unresolved")
+    elif not scoring_verified(row):
         reasons.append("scoring_unverified")
     method = row.get("percentile_method")
     if method != "reference_panel":
@@ -147,8 +167,10 @@ def retain_saved_value(row: dict, *, stale: bool = False) -> None:
     if saved is None and not row.get("reliable"):
         saved = number(row.get("percentile"))
     if saved is not None and 0 <= saved <= 100 and not row.get("reliable"):
-        required = stale or not scoring_verified(row)
+        pending_orientation = orientation_unresolved(row)
+        required = stale or (not scoring_verified(row) and not pending_orientation)
         row["saved_result"] = {"value": saved, "status": "unverified",
                                "recalculation_required": required,
                                "label": _t("prs.saved.label", value=f"{saved:g}"),
-                               "note": _t("prs.saved.recalculate" if required else "prs.saved.unverified")}
+                               "note": _t("prs.validation.allele_orientation_unresolved" if pending_orientation else
+                                          "prs.saved.recalculate" if required else "prs.saved.unverified")}

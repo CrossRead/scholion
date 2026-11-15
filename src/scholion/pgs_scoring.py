@@ -16,7 +16,7 @@ import re
 import sqlite3
 import tempfile
 
-ALGORITHM = "scholion-called-alleles-v1"
+ALGORITHM = "scholion-called-alleles-v2"
 _BASES = set("ACGT")
 _COMPLEMENT = str.maketrans("ACGT", "TGCA")
 
@@ -33,6 +33,20 @@ def _sha(path):
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _forward_model_verified(model_hash: str, build: str) -> bool:
+    """An exact reviewed model can resolve palindromes; coordinates alone cannot."""
+    from . import core
+    for reference in core._read_knowledge("prs_references.json").get("references", []):
+        orientation = reference.get("allele_orientation") or {}
+        if ((reference.get("model_sha256_by_build") or {}).get(build) == model_hash
+                and orientation.get("status") == "verified_forward"
+                and orientation.get("scope") == "all_scoring_alleles"
+                and orientation.get("checked_on") and orientation.get("source")
+                and not reference.get("review_required")):
+            return True
+    return False
 
 
 def dosage(effect: str, other: str, records):
@@ -139,6 +153,8 @@ class ScoringVCF:
         """Return a score, both coverage measures and a reproducible input witness."""
         path = Path(model)
         model_stat = path.stat()
+        model_hash = _sha(path)
+        orientation_verified = _forward_model_verified(model_hash, build)
         variants = matched = 0
         parts, total_mass, matched_mass = [], 0.0, 0.0
         reasons = Counter()
@@ -186,6 +202,15 @@ class ScoringVCF:
                 if dose is None:
                     reasons[status] += 1
                     continue
+                pair = {row.get("effect_allele", "").upper(), other.upper()}
+                # Missing other_allele does not resolve an ambiguous VCF SNP.
+                observed_pairs = [{str(r[0]).upper(), *[str(a).upper() for a in r[1]]}
+                                  - {".", "<*>", "<NON_REF>"} for r in records]
+                palindromic = pair in ({"A", "T"}, {"C", "G"}) or any(
+                    observed in ({"A", "T"}, {"C", "G"}) for observed in observed_pairs)
+                if palindromic and dose != 1 and not orientation_verified:
+                    reasons["strand_ambiguous"] += 1
+                    continue
                 dominant = row.get("is_dominant", "False").lower() in ("true", "1")
                 recessive = row.get("is_recessive", "False").lower() in ("true", "1")
                 if dominant and recessive:
@@ -204,9 +229,11 @@ class ScoringVCF:
         after = self.path.stat()
         if self.stat != (after.st_size, after.st_mtime_ns):
             raise ValueError("VCF changed while scoring")
-        witness = {"checked": not reasons["unsupported_weight"], "algorithm": ALGORITHM,
+        witness = {"checked": not (reasons["unsupported_weight"] or reasons["strand_ambiguous"]), "algorithm": ALGORITHM,
                    "input_sha256": self.sha256, "input_vcf": str(self.path.resolve()),
-                   "model_sha256": _sha(path),
+                   "model_sha256": model_hash,
+                   "allele_orientation": {"model_forward_verified": orientation_verified,
+                                          "unresolved_rows": reasons["strand_ambiguous"]},
                    "sample": self.sample, "genome_build": build,
                    "input_stat": {"size": self.stat[0], "mtime_ns": self.stat[1]},
                    "model_stat": {"size": model_stat.st_size, "mtime_ns": model_stat.st_mtime_ns},

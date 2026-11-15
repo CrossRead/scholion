@@ -910,7 +910,8 @@ def prs_findings() -> Dict[str, Any]:
         reasons = tr["calibration"]["reasons"]
         if reasons:
             tr["calibration_note"] = _t("prs.validation.calibration_only" if tr["build_validation"]["valid"]
-                                        and "scoring_unverified" not in reasons else "prs.validation.withdrawn") + " " + " ".join(
+                                        and not {"scoring_unverified", "allele_orientation_unresolved"}.intersection(reasons)
+                                        else "prs.validation.withdrawn") + " " + " ".join(
                 _t("prs.validation." + reason) for reason in reasons)
         ref = tr.get("reference_validation") or {}
         if not reasons and ref.get("kind") == "independent_called_reference":
@@ -1021,7 +1022,11 @@ def longevity_findings() -> Dict[str, Any]:
     known = [dict(k) for k in data.get("known", []) or []]
     reference_book = core._read_knowledge("longevity_directions.json")
     existing = {row.get("rsid") for row in known}
-    for rsid in reference_book.get("_meta", {}).get("reviewed_positions_228") or []:
+    reviewed = list(dict.fromkeys([
+        *(reference_book.get("_meta", {}).get("reviewed_positions_228") or []),
+        *(reference_book.get("_meta", {}).get("source_review_positions") or []),
+    ]))
+    for rsid in reviewed:
         if rsid in existing:
             continue
         spec = reference_book["directions"][rsid]
@@ -1052,6 +1057,12 @@ def longevity_findings() -> Dict[str, Any]:
     _known_conf = {"high", "medium", "low", "curated"}
     for k in known:
         src = _dirs.get(k.get("rsid")) or {}
+        if src.get("source_review"):
+            # Corrected sources invalidate copied claims, never the reading.
+            k.update(favorable=src.get("favorable"), copies_favorable=None,
+                     copies_minor=None, verdict=None, status=None,
+                     pmids=src.get("pmids") or [], source=src.get("source"),
+                     note=src.get("label"), confidence=src.get("confidence"))
         by_copies = src.get("verdict_by_copies") or {}
         c = k.get("copies_favorable")
         tok = (by_copies.get(str(c)) if c is not None else None) or k.get("verdict")

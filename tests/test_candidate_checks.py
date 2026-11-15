@@ -103,7 +103,7 @@ class CandidateChecks(unittest.TestCase):
         self.assertIn('tests.test_variant_readings', plan['tests'])
         self.assertIn('tests.test_gene_card_component_boundary', plan['tests'])
         self.assertIn('tests.test_prescribing_claims_require_their_own_basis', plan['tests'])
-        self.assertEqual(['acmg', 'clinvar', 'drug', 'genome', 'system'], plan['interface_commands'])
+        self.assertEqual(['acmg', 'clinvar', 'drug', 'gene-knowledge', 'genome', 'sources', 'system'], plan['interface_commands'])
         unknown = test_plan.plan(support.ROOT, ['src/scholion/conclusion_basis.py'])
         self.assertEqual('full', unknown['mode'])
         self.assertEqual(['review-and-composition'], unknown['families'])

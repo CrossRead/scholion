@@ -17,7 +17,7 @@ import urllib.request
 
 from . import core, genome, population, prs, sites
 from .i18n import t as _t
-from .pgs_scoring import ScoringVCF, _open, dosage
+from .pgs_scoring import ScoringVCF, _forward_model_verified, _open, dosage
 
 
 class Stopped(Exception):
@@ -115,7 +115,7 @@ def preflight(only=None):
 
 def recalculation_status(data):
     """A changed input/population, not an application version, invalidates reuse."""
-    from .pgs_validation import recalculation_status as scoring_status
+    from .pgs_validation import orientation_unresolved, recalculation_status as scoring_status
     rows = data.get("traits", [])
     pins = prs._pinned_models()
     applicable = [row for row in rows if (pins.get(row.get("term")) or {}).get("pgs_id")]
@@ -141,6 +141,9 @@ def recalculation_status(data):
             return {"required": True, "traits": len(applicable), "reason": "model_changed"}
         witness = row.get("scoring_validation") or {}
         build = witness.get("genome_build")
+        if (orientation_unresolved(row) and build in ("GRCh37", "GRCh38")
+                and _forward_model_verified(witness.get("model_sha256") or "", build)):
+            return {"required": True, "traits": len(applicable), "reason": "allele_orientation_reviewed"}
         if build in ("GRCh37", "GRCh38"):
             model = prs._cache_root() / "scores" / f"{row['pgs_id']}_hmPOS_{build}.txt.gz"
             if witness.get("model_stat") and model.is_file() and _stamp(model) != witness["model_stat"]:

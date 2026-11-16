@@ -34,5 +34,16 @@ def run(script: str, *, input=None, stdin=subprocess.DEVNULL, **kwargs):
         path = Path(folder) / 'probe.cjs'
         path.write_text(script, encoding='utf-8')
         if input is not None:
-            return subprocess.run([shutil.which('node'), str(path)], input=input, **kwargs)
+            # A seekable descriptor avoids Node's native large-pipe read path.
+            # The renderer receives the identical bytes on fd 0; only transport
+            # changes, so the real catalogue assertions remain intact.
+            payload = Path(folder) / 'input.bin'
+            data = (input.encode(kwargs.get('encoding') or 'utf-8',
+                                 kwargs.get('errors') or 'strict')
+                    if isinstance(input, str) else input)
+            payload.write_bytes(data)
+            del data, input
+            with payload.open('rb') as stream:
+                return subprocess.run([shutil.which('node'), str(path)],
+                                      stdin=stream, **kwargs)
         return subprocess.run([shutil.which('node'), str(path)], stdin=stdin, **kwargs)
